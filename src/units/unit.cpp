@@ -64,6 +64,7 @@ inline unsigned char Unit::GetState() { return activateFlags; }
 #include "../ingame/control_panel.h"
 
 #include "../../interfaces/seams.h"
+#include "../game/targeting_events.h"
 
 // FUNCTION: 0x489800
 void Unit::ReleaseWeapons(unsigned char index)
@@ -77,13 +78,7 @@ void Unit::ReleaseWeapons(unsigned char index)
     if (((WeaponSlotFlagBits*)&e->flags)->bits.bit1 != 0 && ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 == 0) {
         ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 = 1;
         int i = index;
-        AimTargetPair* p = (AimTargetPair*)&weapons[i];
-        if (p->a != 0 || p->b != (short)0x8000) {
-            p->a = 0;
-            p->b = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)script.get(), "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)script.get(), "TargetCleared", 0, 0, 1, i, 0, 0, 0);
-        }
+        TargetingPublishClear(SCHED_WEAPONS, this, i);
     }
 }
 
@@ -99,13 +94,7 @@ void Unit::ClaimWeapons(unsigned char index)
     if (((WeaponSlotFlagBits*)&e->flags)->bits.bit1 != 0 && ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 != 0) {
         ((WeaponSlotFlagBits*)&e->flags)->bits.bit4 = 0;
         int i = index;
-        AimTargetPair* p = (AimTargetPair*)&weapons[i];
-        if (p->a != 0 || p->b != (short)0x8000) {
-            p->a = 0;
-            p->b = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)script.get(), "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)script.get(), "TargetCleared", 0, 0, 1, i, 0, 0, 0);
-        }
+        TargetingPublishClear(SCHED_WEAPONS, this, i);
     }
 }
 

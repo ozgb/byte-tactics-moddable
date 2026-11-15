@@ -28,6 +28,7 @@
 #include "path_results.h"
 #include "economy_results.h"
 #include "features_results.h"
+#include "targeting_results.h"
 #include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
@@ -3094,6 +3095,66 @@ static void VisitFeaturesResults()
     }
 }
 
+static TargetingResults s_targetingResults;
+static bool s_targetingResultsLost;
+
+void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!TargetingResultsAdd(&s_targetingResults, event, outcome))
+        s_targetingResultsLost = true;
+}
+
+static void DumpUnitName(unsigned tag, unsigned id)
+{
+    if (tag == 0)
+        fputs("null", s_dump);
+    else if (tag == TT_HEAP)
+        fputs("heap", s_dump);
+    else
+        fprintf(s_dump, "%s:%u", s_targetNames[tag], id);
+    fputc('\n', s_dump);
+}
+
+static void VisitTargetingResults()
+{
+    if (s_targetingResultsLost)
+        Fail("testmode: no memory for the targeting events\n");
+    for (unsigned k = 0; k < s_targetingResults.count; k++) {
+        TargetingResult* r = &s_targetingResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
+        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
+    }
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("targeting.count");
+    fprintf(s_dump, "0x%08x\n", s_targetingResults.count);
+    for (unsigned k = 0; k < s_targetingResults.count; k++) {
+        const TargetingResult* r = &s_targetingResults.items[k];
+        const TargetingEvent* e = &r->event;
+        sprintf(path, "targeting[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
+        sprintf(path, "targeting[%u].unit", k);
+        DumpPrefix(path);
+        DumpUnitName(r->unitTag, r->unitId);
+        sprintf(path, "targeting[%u].weapon", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->weapon);
+        sprintf(path, "targeting[%u].target", k);
+        DumpPrefix(path);
+        DumpUnitName(r->targetTag, r->targetId);
+        sprintf(path, "targeting[%u].pos", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->pos, sizeof e->pos);
+        sprintf(path, "targeting[%u].outcome", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    }
+}
+
 static WindMeteorsResults s_windMeteorsResults;
 static bool s_windMeteorsResultsLost;
 
@@ -4044,6 +4105,7 @@ static void VisitWorld()
     VisitEconomyResults();
     VisitWindMeteorsResults();
     VisitFeaturesResults();
+    VisitTargetingResults();
 }
 
 enum {
@@ -4733,6 +4795,7 @@ void HarnessPhase(int phase)
         PathResultsClear(&s_pathResults);
         EconomyResultsClear(&s_economyResults);
         FeaturesResultsClear(&s_featuresResults);
+        TargetingResultsClear(&s_targetingResults);
         WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)

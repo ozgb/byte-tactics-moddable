@@ -1515,16 +1515,6 @@ unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
     return unit->ChooseWeapon();
 }
 
-void __stdcall SetWeaponTargetUnitSlot(Unit* unit, Unit* target, int weapon)
-{
-    SetWeaponTargetUnit((char*)unit, (char*)target, weapon);
-}
-
-void __stdcall SetWeaponTargetPosSlot(Unit* unit, Vec3* pos, int weapon)
-{
-    SetWeaponTargetPos((char*)unit, &pos->x, weapon);
-}
-
 int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
 {
     if (first != nullptr)

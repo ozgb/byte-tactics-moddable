@@ -104,6 +104,7 @@ void FreeWeaponArray(void)
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
+#include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/services.h"
@@ -1539,7 +1540,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             continue;
         if (e->reloadTimer > 0)
             e->reloadTimer--;
-        if (!g_seams.targeting->GetWeaponTargetPos(unit, &pos, i)) {
+        if (!ScheduleTargetingTargetPos(unit, &pos, i)) {
             e->flags &= 0xfe;
             continue;
         }
@@ -1596,7 +1597,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             }
             if (can == 0)
                 continue;
-            Unit* fired = g_seams.targeting->GetWeaponTargetUnit(unit, i);
+            Unit* fired = ScheduleTargetingTargetUnit(unit, i);
             if (((WeaponFireFn)attached->fire)(unit, e, fired, &pos) == 0)
                 continue;
             if (attached->flags.b.stockpile) {

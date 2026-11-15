@@ -27,7 +27,7 @@
     "ref": 2,
     "services": 1,
     "state_writer": 1,
-    "targeting": 1,
+    "targeting": 2,
     "units": 1,
     "weapons": 1,
     "wind_meteors": 2
@@ -72,10 +72,7 @@
       "WindMeteorsEmit": [["linear"], "void"]
     },
     "targeting": {
-      "SetWeaponTargetUnit": [["block", "block", "int"], "void"],
-      "SetWeaponTargetPos": [["block", "linear", "int"], "void"],
-      "ClearWeaponTarget": [["block", "int"], "void"],
-      "ResetWeaponTarget": [["block", "int"], "void"],
+      "Apply": [["linear"], "int"],
       "GetWeaponTargetUnit": [["block", "int"], "block"],
       "GetWeaponTargetPos": [["block", "linear", "int"], "int"],
       "FindWeaponTarget": [["block", "int", "int"], "block"],

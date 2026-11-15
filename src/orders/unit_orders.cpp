@@ -115,6 +115,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
 #include "../graphics/particles.h"
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
+#include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
@@ -132,9 +133,9 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, int flags);
 int __stdcall StopOrder(Unit* unit, Order* order, int unused)
 {
     order->AnnounceStatusIfFlagged(SIM_SPEECH_KIND_TEXT);
-    g_seams.targeting->ClearWeaponTarget(unit, 0);
-    g_seams.targeting->ClearWeaponTarget(unit, 1);
-    g_seams.targeting->ClearWeaponTarget(unit, 2);
+    TargetingPublishClear(SCHED_ORDERS, unit, 0);
+    TargetingPublishClear(SCHED_ORDERS, unit, 1);
+    TargetingPublishClear(SCHED_ORDERS, unit, 2);
     if ((unit->flags & 3) == 2 && (unit->def->flags1 & 0x800)) {
         AppendOrder(unit, new (kSim) Order("VTOL_LANDIFCAN", 0, &unit->pos, 0, 0, 0));
     }
@@ -231,7 +232,7 @@ int __stdcall AttackNoMoveOrder(Unit* unit, Order* order, int flags)
         return 1;
     case 1:
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+        TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         order->flags = 0x11808;
         return 1;
     case 2:
@@ -255,12 +256,12 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         order->SetDeadlineTicks(0x1e);
         return 1;
     case 1: {
-        order->link.SetUnit(g_seams.targeting->GetWeaponTargetUnit(unit, 0));
+        order->link.SetUnit(ScheduleTargetingTargetUnit(unit, 0));
         Unit* t = order->target;
         if (t != 0 && (t->flags & 0x10000000)) {
             order->pos = t->pos;
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-            g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+            TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->wait = 0;
             order->waitLimit = RandomInt(3) + 3;
             return 1;
@@ -287,7 +288,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
         if (!units.empty()) {
             order->link.SetUnit(units[RandomInt(units.size())]);
-            g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+            TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->state = 1;
             return 2;
         }
@@ -505,7 +506,7 @@ int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
         order->ticks = 0x708;
     g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
     for (char i = 0; i < 3; i++)
-        g_seams.targeting->ClearWeaponTarget(unit, i);
+        TargetingPublishClear(SCHED_ORDERS, unit, i);
     order->SetAttachedFx(0);
     order->SetDeadlineTicks(order->ticks);
     order->ticks = 0;
@@ -642,7 +643,7 @@ int __stdcall StandingFireOrder(Unit* unit, Order* order, int unused)
     if (order->mode == 0 || order->mode == 1) {
         for (char i = 0; i < 3; i++) {
             if (unit->weapons[i].flags & 0x10) {
-                g_seams.targeting->ClearWeaponTarget(unit, i);
+                TargetingPublishClear(SCHED_ORDERS, unit, i);
             }
         }
     }
@@ -742,7 +743,7 @@ int __stdcall PatrolOrder(Unit* unit, Order* order, int flags)
     case 2:
         if(flags&0xe0) { order->state=1; return 6; }
         {
-            Order* next=(Order*)g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+            Order* next=(Order*)ScheduleTargetingFireAtWill(unit);
             if(next && IssueAttackOrder(unit,(Unit *)next,0)) { order->flags=0; order->state=1; return 3; }
         }
         order->SetDeadlineTicks(RandomInt(30)+30);
@@ -798,7 +799,7 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
         if (!g_seams.weapons->WeaponCanReachUnit(unit, order->target, weapon)) return 1;
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 2);
-        g_seams.targeting->SetWeaponTargetUnit(unit, order->target, weapon);
+        TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, weapon);
         order->flags = 0x13808;
         return 2;
     case 2:
@@ -844,7 +845,7 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
         if (g_seams.weapons->WeaponCanReachUnit(unit, order->target, weapon)) {
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 2);
-            g_seams.targeting->SetWeaponTargetUnit(unit, order->target, weapon);
+            TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, weapon);
             order->flags = 0x148e8;
             order->SetDeadlineTicks(30);
             return 2;
@@ -870,13 +871,13 @@ int __stdcall SuppressOrder(Unit* unit,Order* order,unsigned flags)
     case 1:
         if(order->weapon==2) {
             g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
-            g_seams.targeting->SetWeaponTargetPos(unit,&order->pos,2);
+            TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,2);
             order->flags=0x1c00; return 1;
         }
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 1);
-        g_seams.targeting->SetWeaponTargetPos(unit,&order->pos,0);
-        g_seams.targeting->SetWeaponTargetPos(unit,&order->pos,1);
+        TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,0);
+        TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,1);
         order->flags=0x1c00; return 1;
     case 2:
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
@@ -1234,7 +1235,7 @@ int __stdcall StandbyOrder(Unit* unit,Order* order,int flags)
         order->SetDeadlineTicks(1); return 1;
     case 1:
         {
-            Unit* next=g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+            Unit* next=ScheduleTargetingFireAtWill(unit);
             if(next && IssueAttackOrder(unit,(Unit *)(Order*)next,0)) return 5;
         }
         order->flags|=0x10000;
@@ -1255,7 +1256,7 @@ int __stdcall StandbyMineOrder(Unit* unit, Order* order, int unused)
         return 1;
     case 1:
         {
-            Unit* other = g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+            Unit* other = ScheduleTargetingFireAtWill(unit);
             if (other && other->mode == 1 && (unit->flags & 0x300000)) {
                 AppendOrder(unit, new (kSim) Order("SELFDESTRUCT", 0, 0, 1, 0, 0));
                 return 5;
@@ -1881,9 +1882,9 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
                 for (unsigned char i=0;i<3;++i) {
                     UnitWeaponSlot* weapon=&unit->weapons[i];
                     if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1)) {
-                        Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
+                        Unit* target=ScheduleTargetingTargetUnit(unit,i);
                         if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
-                            g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
+                            TargetingPublishSetUnit(SCHED_ORDERS, unit,attacker,i);
                     }
                 }
             }

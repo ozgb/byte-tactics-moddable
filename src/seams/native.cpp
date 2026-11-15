@@ -220,16 +220,6 @@ static int __fastcall GetGameTypeNative(Mission* self)
     return self->GetGameType();
 }
 
-static void __stdcall SetWeaponTargetUnitNative(Unit* unit, Unit* target, int weapon)
-{
-    SetWeaponTargetUnit((char*)unit, (char*)target, weapon);
-}
-
-static void __stdcall SetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
-{
-    SetWeaponTargetPos((char*)unit, &pos->x, weapon);
-}
-
 static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 {
     return GetWeaponTargetPos(unit, (Vec3*)pos, weapon);
@@ -708,10 +698,7 @@ void InstallNativeSeams()
     s_features.ScanFeatureCell = ScanFeatureCell;
     s_features.FirstFeatureSpot = FirstFeatureSpot;
     s_features.UpdateFeatureSpot = UpdateFeatureSpot;
-    s_targeting.SetWeaponTargetUnit = SetWeaponTargetUnitNative;
-    s_targeting.SetWeaponTargetPos = SetWeaponTargetPosNative;
-    s_targeting.ClearWeaponTarget = ClearWeaponTarget;
-    s_targeting.ResetWeaponTarget = ResetWeaponTarget;
+    s_targeting.Apply = ApplyTargetingEvent;
     s_targeting.GetWeaponTargetUnit = GetWeaponTargetUnit;
     s_targeting.GetWeaponTargetPos = GetWeaponTargetPosNative;
     s_targeting.FindWeaponTarget = FindWeaponTarget;

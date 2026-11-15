@@ -9,6 +9,9 @@
 #include "../units/features_effects.h"
 #include "../map/map_features_effects.h"
 #include "../weapons/features_effects.h"
+#include "../../interfaces/targeting.h"
+#include "../seams/targeting_world.h"
+#include "../units/targeting_effects.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -34,6 +37,15 @@ static const SchedRoute s_routes[] = {
     {SCHED_FEATURES, FEATURES_EFFECT_INIT_STATE, SCHED_UNITS, UnitsOnFeaturesInitState, 1},
     {SCHED_FEATURES, FEATURES_EFFECT_PASS_MAPS, SCHED_MAP, MapOnFeaturesPassMaps, 1},
     {SCHED_FEATURES, FEATURES_EFFECT_AREA_DAMAGE, SCHED_WEAPONS, WeaponsOnFeaturesAreaDamage, 1},
+    {SCHED_ORDERS, TARGETING_SET_UNIT, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_ORDERS, TARGETING_SET_POS, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_ORDERS, TARGETING_CLEAR, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_AI, TARGETING_SET_UNIT, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_AI, TARGETING_SET_POS, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_AI, TARGETING_CLEAR, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_UNITS, TARGETING_RESET, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_WEAPONS, TARGETING_CLEAR, SCHED_TARGETING, TargetingInbox, 0},
+    {SCHED_TARGETING, TARGETING_EFFECT_CLEARED, SCHED_UNITS, UnitsOnTargetingCleared, 0},
     {SCHED_ENGINE, WIND_METEORS_ENABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_DISABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_PARAMS, SCHED_WIND_METEORS, WindMeteorsInbox, 0},

@@ -117,7 +117,7 @@ writes outside the pair, and that decides each route:
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv`, regenerated on this change, has these rows of
 class `immediate` with targeting as writer or reader. The access log names the target pair of slot 0, 1 and 2 by the
-union members of `Unit` at its offset (`Unit::current`, `Unit::field_20`, `Unit::field_3c`), a slot's flags by
+union members of `Unit` at its offset (`Unit::current`, `Unit::field_20`, `Unit::weapon2Target`), a slot's flags by
 `Unit::f_1f`, `Unit::f_3b` and `Unit::f_57`, and its weapon by `Unit::weapon`, `Unit::f2c` and `Unit::f48`; the
 player's fields by the `Game` union aliases (`unknown_1b8e`, `pad_1df4`, `unknown_1cd9`). No row names the target
 pair: only targeting writes it, and only targeting reads it. Each row is served as follows:

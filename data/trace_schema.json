@@ -1215,7 +1215,7 @@
         {"name": "", "offset": 48, "size": 10, "kind": "bytes", "target": null},
         {"name": "b3a", "offset": 58, "size": 1, "kind": "scalar", "target": null},
         {"name": "f_3b", "offset": 59, "size": 1, "kind": "scalar", "target": null},
-        {"name": "field_3c", "offset": 60, "size": 4, "kind": "scalar", "target": null},
+        {"name": "weapon2Target", "offset": 60, "size": 4, "kind": "scalar", "target": null},
         {"name": "", "offset": 64, "size": 4, "kind": "pointer", "target": "heap"},
         {"name": "", "offset": 68, "size": 4, "kind": "bytes", "target": null},
         {"name": "f48", "offset": 72, "size": 4, "kind": "ref", "target": "heap"},

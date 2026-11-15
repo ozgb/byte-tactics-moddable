@@ -110,27 +110,27 @@ class FeaturesOwnerTest(unittest.TestCase):
 
 class TargetingOwnerTest(unittest.TestCase):
     def test_the_weapon_target_pairs_are_private_for_writes_only(self):
-        for item in ("Unit::current", "Unit::field_20", "Unit::unknown_3c"):
+        for item in ("Unit::current", "Unit::field_20", "Unit::field_3c"):
             self.assertEqual(ps.private_to(item), ("targeting", ("writer",)), item)
 
     def test_other_unit_members_are_not_private(self):
-        for item in ("Unit::netDirtyFlags", "Unit::field_8", "Unit::unknown_24", "Unit::pos", "Unit::current2", "Unit::unknown_3c2"):
+        for item in ("Unit::netDirtyFlags", "Unit::field_8", "Unit::unknown_24", "Unit::unknown_40", "Unit::pos", "Unit::current2", "Unit::field_3c2"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_targeting_write_passes(self):
-        rows = {"edges": [("targeting", "weapons", "Unit::current"), ("targeting", "-", "Unit::field_20"), ("-", "targeting", "Unit::unknown_3c")],
-                "cross": [("targeting", "units", "Unit::unknown_3c")]}
+        rows = {"edges": [("targeting", "weapons", "Unit::current"), ("targeting", "-", "Unit::field_20"), ("-", "targeting", "Unit::field_3c")],
+                "cross": [("targeting", "units", "Unit::field_3c")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_a_weapons_or_units_write_fails(self):
-        rows = {"edges": [("weapons", "targeting", "Unit::current"), ("units", "-", "Unit::unknown_3c"), ("weapons", "-", "Unit::field_20")]}
+        rows = {"edges": [("weapons", "targeting", "Unit::current"), ("units", "-", "Unit::field_3c"), ("weapons", "-", "Unit::field_20")]}
         self.assertEqual(ps.violations(rows),
-                         ["edges: writer units on Unit::unknown_3c, which is written only by targeting",
+                         ["edges: writer units on Unit::field_3c, which is written only by targeting",
                           "edges: writer weapons on Unit::current, which is written only by targeting",
                           "edges: writer weapons on Unit::field_20, which is written only by targeting"])
 
     def test_a_read_and_a_shared_flag_write_pass(self):
-        rows = {"edges": [("-", "weapons", "Unit::current"), ("targeting", "units", "Unit::unknown_3c"), ("weapons", "-", "Unit::netDirtyFlags")],
+        rows = {"edges": [("-", "weapons", "Unit::current"), ("targeting", "units", "Unit::field_3c"), ("weapons", "-", "Unit::netDirtyFlags")],
                 "reads": [("-", "ai", "Unit::field_20")]}
         self.assertEqual(ps.violations(rows), [])
 

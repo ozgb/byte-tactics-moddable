@@ -51,10 +51,10 @@ damage and reclaim reach them through the scheduler's events.
 
 Targeting's state stays in the Unit record, hashed and read by others, and is written by targeting alone: the weapon target pair of each of the three
 weapon slots of a unit (`UnitWeaponSlot::aimTargetXOrUnitId` and `aimTargetZOrUnitSentinel`), which the log names by the first member of the union of
-`Unit` that starts each slot's words: `Unit::current` (slot 0), `Unit::field_20` (slot 1) and `Unit::unknown_3c` (slot 2). The other members of a slot
-(`Unit::field_8`, `Unit::unknown_24`) are not the pair and are shared with the unit's own set-up, so they are not listed. `Unit::netDirtyFlags` is not
-listed either: targeting clears bits of it, but weapons and orders write it too. Any writer but targeting fails, which is what makes every aim, clear and
-reset of a weapon's target reach the pair through the scheduler's events.
+`Unit` that starts each slot's words: `Unit::current` (slot 0), `Unit::field_20` (slot 1) and `Unit::field_3c` (slot 2), each the pair's four bytes.
+The other members of a slot (`Unit::field_8`, `Unit::unknown_24`, `Unit::unknown_40`) are not the pair and are shared with the unit's own set-up and
+weapons, so they are not listed. `Unit::netDirtyFlags` is not listed either: targeting clears bits of it, but weapons and orders write it too. Any
+writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -91,7 +91,7 @@ REGION_FUNCTION = "LoadBattleAssets"
 
 FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offsetX", "Cell::offsetY", "FeatureAnimEntry::next", "FeatureAnimEntry::prev")
 
-TARGETING_WRITE_ITEMS = ("Unit::current", "Unit::field_20", "Unit::unknown_3c")
+TARGETING_WRITE_ITEMS = ("Unit::current", "Unit::field_20", "Unit::field_3c")
 
 
 @dataclass(frozen=True)

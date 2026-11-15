@@ -56,7 +56,7 @@ static const TraceField kUnitFields[] = {
     { "", 0x30, 10, TF_BYTES, TT_NONE, 0x0 },
     { "b3a", 0x3a, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "f_3b", 0x3b, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "", 0x3c, 4, TF_BYTES, TT_NONE, 0x0 },
+    { "field_3c", 0x3c, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "", 0x40, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "", 0x44, 4, TF_BYTES, TT_NONE, 0x0 },
     { "f48", 0x48, 4, TF_REF, TT_HEAP, 0x0 },

@@ -6,8 +6,8 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; economy's report (`economyState.*`), the path results (section 32) and the economy events
-(section 33) are dumped only, and skipped.
+shape but not hashed; economy's report (`economyState.*`), the path results (section 32), the economy events
+(section 33) and the share packets (section 35) are dumped only, and skipped.
 """
 
 import argparse
@@ -25,7 +25,7 @@ PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "w
 TIMER_CLASS = (0, 7, 2, 3, 6, 1, 2, 3, 4, 5)
 AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "vec_bd", "values", "locked")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
-DUMPED_ONLY = ("results.", "results[", "economy.", "economy[")
+DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "packets.", "packets[")
 
 
 class Error(Exception):

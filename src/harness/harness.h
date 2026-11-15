@@ -17,6 +17,8 @@ void __stdcall HarnessAfterStep();
 void __stdcall HarnessBeforeStep();
 void __stdcall HarnessPhase(int phase);
 void __stdcall HarnessRecordPhase(int phase);
+int __stdcall HarnessSharing();
+void __stdcall HarnessSharePacket(const void* packet, int size);
 bool HarnessEventLogOpen();
 void __stdcall HarnessSimEventSlot(unsigned slot);
 const char* HarnessSimEventPhase(unsigned slot);

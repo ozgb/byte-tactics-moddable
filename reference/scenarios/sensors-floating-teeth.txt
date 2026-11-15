@@ -1,4 +1,4 @@
-# Human Arm commander on Hundred Isles has dragon's teeth owned by the AI player in its camera view, so the feature draw takes the IsFootprintVisible path (IsExplored with line of sight on); 400 ticks.
+# Human Arm commander on Hundred Isles has dragon's teeth owned by the AI player in its camera view, so the feature draw tests the features' footprints for visibility (whether their cells are explored, with line of sight on); 400 ticks.
 game_seed 422
 crt_seed 1422
 view_seed 2422

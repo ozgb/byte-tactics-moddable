@@ -1608,5 +1608,15 @@
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ],
     "account": {"kind": 1, "size": 48}
+  },
+  "packets": {
+    "section": 35,
+    "fields": [
+      {"name": "type", "size": 4, "kind": "scalar", "target": null},
+      {"name": "subtype", "size": 4, "kind": "scalar", "target": null},
+      {"name": "from", "size": 4, "kind": "scalar", "target": null},
+      {"name": "to", "size": 4, "kind": "scalar", "target": null},
+      {"name": "amount", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

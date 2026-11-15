@@ -1,4 +1,4 @@
-# Arm transport ship loads and unloads the Arm commander on Hundred Isles (AttachUnit, DropUnit); 200 ticks.
+# Arm transport ship loads and unloads the Arm commander on Hundred Isles (the cargo is attached to the transport, then dropped); 200 ticks.
 game_seed 402
 crt_seed 1402
 view_seed 2402

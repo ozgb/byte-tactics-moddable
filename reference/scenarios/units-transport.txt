@@ -1,4 +1,4 @@
-# Core Crusade hover transport loads and unloads the Arm commander (AttachUnit, DropUnit); cargo is checked loaded, then on the ground.
+# Core Crusade hover transport loads and unloads the Arm commander (the cargo is attached to the transport, then dropped); cargo is checked loaded, then on the ground.
 game_seed 401
 crt_seed 1401
 view_seed 2401

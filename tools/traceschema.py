@@ -7,7 +7,8 @@ The JSON is the same tables as data, for a re-implementation that has no use for
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
 and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
 holds for each path event the host delivers (section 32), in dump order; its "economy" entry is the
-record for each economy event (section 33), with the account that only a LOAD adds. No row hashes either.
+record for each economy event (section 33), with the account that only a LOAD adds; its "packets" entry
+is the record for each resource share packet the step sends (section 35). No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -913,6 +914,14 @@ ECONOMY_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("value", 4, "scalar", None),
     ("outcome", 4, "scalar", None),
 ]
+PACKETS_SECTION = 35
+PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("type", 4, "scalar", None),
+    ("subtype", 4, "scalar", None),
+    ("from", 4, "scalar", None),
+    ("to", 4, "scalar", None),
+    ("amount", 4, "scalar", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1310,6 +1319,11 @@ def render_json(model):
     out.append('    "section": %d,' % economy["section"])
     out.append('    "fields": %s,' % many(economy["fields"], "    "))
     out.append('    "account": %s' % one(economy["account"]))
+    out.append("  },")
+    packets = model["packets"]
+    out.append('  "packets": {')
+    out.append('    "section": %d,' % packets["section"])
+    out.append('    "fields": %s' % many(packets["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1474,6 +1488,9 @@ def generate():
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in ECONOMY_FIELDS],
                         "account": {"kind": ECONOMY_LOAD_KIND, "size": 4 * ECONOMY_ACCOUNT_WORDS}}
+    model["packets"] = {"section": PACKETS_SECTION,
+                        "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                   for n, size, kind, target in PACKET_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

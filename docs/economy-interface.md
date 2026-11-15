@@ -83,20 +83,22 @@ a double holds every float sum exactly enough for the float rounding to agree.
 Under the default no event 3.1c makes is refused except a SPEND that 3.1c also refused, and a REQUEST of a stalled
 account, which 3.1c also charged without granting.
 
-Across the 85 reference scenarios, the scheduler records these events and effects:
+Across the 88 reference scenarios, the scheduler records these events and effects:
 
 | Kind | Outcome 1 | Outcome 0 |
 |---|---:|---:|
-| RESET | 3,642 | 0 |
+| RESET | 3,651 | 0 |
 | LOAD | 4 | 0 |
 | REQUEST | 1,731,216 | 1,072,998 |
-| SPEND | 6,212 | 0 |
-| INCOME | 1,788 | 0 |
-| CLOAK | 855,102 | 0 |
+| SPEND | 6,250 | 0 |
+| INCOME | 1,826 | 0 |
+| CLOAK | 855,157 | 0 |
 | EXTRACTOR | 640 | 0 |
-| SHARE | 0 | 0 |
+| SHARE | 38 | 0 |
 
-No scenario shares resources, so SHARE is not exercised.
+The three `share-` scenarios (#953) are the only ones that share: a human slot gives to an allied remote slot every
+60 ticks, and each SHARE is followed by its transfer's SPEND and INCOME. Sharing runs after a tick's last phase, so
+its records go with the next tick's, and the shares of a scenario's last tick are not counted.
 
 ## 3. Effects out of economy
 
@@ -107,7 +109,7 @@ No scenario shares resources, so SHARE is not exercised.
 | `TransferEnergy`/`TransferMetal` in `UpdateResourceSharing` | SHARE | `players.TransferEnergy` or `TransferMetal`, whose own SPEND and INCOME follow it |
 
 `los_radar.GetMapCell`, economy's one query of another subsystem, became the world view's `CellMetal`. The share of
-maps in `UpdateResourceSharing` (network play) stays as it is.
+maps in `UpdateResourceSharing` stays as it is: it is sent at once, not published (section 8 has the order this changes).
 
 ## 4. Views
 
@@ -206,15 +208,19 @@ commander stayed visible to player 1 for the rest of the tick. A synchronous rou
 
 **Queued, and equal:** RESET, LOAD, REQUEST, INCOME and EXTRACTOR, in every scenario in both modes.
 
-**SHARE is queued by the model's rule, untested.** No scenario shares resources (section 2), so the gate cannot judge
-it; this is the analysis instead. `UpdateResourceSharing` runs once a tick, for the local player, and the scheduler
-drains the inboxes right after it, before the tail sends its packets. Inside it, after the metal SHARE is published,
-the code reads only energy (the giver's store and threshold, the allies' stores and capacities), which the metal
-transfer does not change: it spends the giver's metal and adds income to the receiver's account. After the energy
-SHARE it reads no store. So the transfers, with their own SPEND and INCOME, change the same state in the same order and
-the same tick as in 3.1c. One order does change: on a tick that is a multiple of 900, the share-map packets
-(`SendShareMapInfo`) are now queued before the share's packet, where 3.1c queued them after it; they carry independent
-state, and network compatibility with 3.1c is not kept (#2).
+**SHARE is queued, and equal.** The three `share-` scenarios (#953) give metal, energy, and both with the share of
+maps on, to an allied remote slot every 60 ticks; `share-all` runs past tick 900, where a share and a share of maps fall
+on the same tick. All three are equal to the reference in both modes. `UpdateResourceSharing` runs once a tick, for
+the local player, and the scheduler drains the inboxes right after it, before the tail sends its packets. Inside it,
+after the metal SHARE is published, the code reads only energy (the giver's store and threshold, the allies' stores and
+capacities), which the metal transfer does not change; after the energy SHARE it reads no store. So the transfers, with
+their own SPEND and INCOME, change the same state in the same order and the same tick as in 3.1c.
+
+One order does change, and only in the packets: on a tick that is a multiple of 900 (every 15th share, every second
+share of maps), the share-map packet is now sent before the share's packets, where 3.1c sent it after them. The
+packets section of a dump (`docs/trace-format.md`, section 8.23) shows it in `share-all` at tick 900: the same three
+packets with the same amounts, in another order. The traces hash no packet, they carry independent state, and network
+compatibility with 3.1c is not kept (#2).
 
 **`RequestGranted` is synchronous by analysis, not by a divergence.** Its answer depends on the stall, which a RESET or
 LOAD in economy's inbox sets (section 4), and a unit created in a slot whose last account was stalled can ask in the

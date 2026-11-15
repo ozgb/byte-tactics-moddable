@@ -157,6 +157,16 @@ ECONOMY_EVENTS = [
 ]
 
 
+SHARE_PACKETS = [
+    ("packets.count", "0x00000001"),
+    ("packets[0].type", "0x00000016"),
+    ("packets[0].subtype", "0x00000002"),
+    ("packets[0].from", "0x00000000"),
+    ("packets[0].to", "0x00000001"),
+    ("packets[0].amount", "0x00000064"),
+]
+
+
 class DumpedOnlyTest(unittest.TestCase):
     def test_path_results_and_economy_events_are_skipped(self):
         w = tr.Walker(RESULTS, PATH_RESULTS + ECONOMY_EVENTS)
@@ -169,6 +179,18 @@ class DumpedOnlyTest(unittest.TestCase):
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, len(PATH_RESULTS))
+
+    def test_share_packets_after_the_economy_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_packet_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("packets.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
 
     def test_skipping_stops_at_a_hashed_line(self):
         w = tr.Walker(RESULTS, [("results.count", "0x00000000"), ("game.x", "0x01")])

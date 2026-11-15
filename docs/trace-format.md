@@ -285,8 +285,8 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
-section 8.21) and the economy events (section 33, section 8.22) are in a dump and in no row, as
-diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.21), the economy events (section 33, section 8.22) and the share packets (section 35,
+section 8.23) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1074,6 +1074,38 @@ for k in 0 .. n-1, in application order:
   still are. What economy's `WriteState` reports (its record, numbered 34) is dumped between sections 15 and
   18, with the prefix `economyState.`, and is not hash input.
 
+### 8.23 share packets (section 35, dumped only)
+
+The resource share packets the step sends to a remote slot (`player<N>.remote`, `docs/scenario-format.md`):
+the metal and energy an ally gives and the share map. No row hashes them (section 6): a dump holds
+their lines, after those of section 33, at the end of the `meteors` block only. A test-mode run has
+no network, so these packets are recorded instead of sent, in the order the step sends them, and the
+record is emptied after the step. A run with no remote slot sends none, and its dump has
+`packets.count 0x00000000`. The fields are `packets.fields` of the schema, in this order.
+
+```
+packets.count                                  # n
+for k in 0 .. n-1, in sending order:
+    packets[k].type
+    packets[k].subtype
+    packets[k].from
+    packets[k].to
+    packets[k].amount
+```
+
+`packets.count` and the numbers of a record are written as `0x` and 8 hex digits.
+
+- `type` is the packet type, 0x16 for every share packet.
+- `subtype` is 1 for an energy share, 2 for a metal share and 3 for the share map.
+- `from` and `to` are the network IDs of the giver and the receiver: the `id` field of each one's
+  player record (section 7.4), or 0xffffffff for a player of type 0.
+- `amount` is the amount given as IEEE 754 single bits (0 for the share map).
+- A step records at most 64 packets; a run that sends more fails.
+
+Which packets a step sends, and when, is behaviour of the build, not of the state: two builds whose
+rows match can send the same packets in a different order within a step (`docs/economy-interface.md`,
+section 8). The lines are a diagnostic of what the receiver would see.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1107,7 +1139,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32 and 33. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33 and 35. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1122,11 +1154,12 @@ dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller stat
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
 lines of section 28), then the lines of sections 32 and 33, which end the block and are not hash
-input (sections 8.21 and 8.22). The `pathfinder.*` lines of
+input (sections 8.21 and 8.22). The `meteors` block ends with the lines of section 35 after them
+(section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*` and `economy.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1166,7 +1199,7 @@ not print excluded fields.
 To recompute a hash from the dump:
 
 1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` lines that follow them (section 8.22)
-   and the `results.*` and `economy.*` lines that end the block (sections 8.21 and 8.22), and parse the
+   and the `results.*`, `economy.*` and `packets.*` lines that end the block (sections 8.21 to 8.23), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1223,7 +1256,10 @@ To recompute a hash from the dump:
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
-of the hash of the Unit table.
+of the hash of the Unit table. Section 35 (the share packets, section 8.23) was added in format 5,
+without a new number: it is only dumped, after every line a row hashes, and changes no row, no digest
+and no line syntax. A reader that rejects unknown lines at the end of a block must learn to skip
+`packets.*`, as it skips `results.*` and `economy.*`.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

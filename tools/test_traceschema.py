@@ -256,6 +256,14 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([f["name"] for f in economy["fields"]],
                          ["kind", "player", "unit", "resources", "energy", "metal", "value", "outcome"])
 
+    def test_packets_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
+        packets = self.model["packets"]
+        header = (ts.ROOT / "src/harness/share_packets.h").read_text()
+        constants = dict(re.findall(r"(SHARE_PACKET_\w+) = (\d+)", header))
+        self.assertEqual(packets["section"], int(constants["SHARE_PACKET_SECTION"]))
+        self.assertEqual([f["name"] for f in packets["fields"]], ["type", "subtype", "from", "to", "amount"])
+        self.assertEqual({(f["size"], f["kind"], f["target"]) for f in packets["fields"]}, {(4, "scalar", None)})
+
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
         self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])

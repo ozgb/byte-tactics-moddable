@@ -70,7 +70,7 @@ Gaps. No scenario of the test mode runs marker 0 of a tick, so the `net` phase h
 global rows of data/state_classes.csv have no symbol in the map and never appear as items, so a coupling edge on one
 of them is `unobserved` whatever the code does; about 2% of the accesses fall in `unresolved:image` or
 `unresolved:block` and are not edges. Only native modules are instrumented, one thread is recorded, and the CRT's
-string and sort functions are not seen (tools/accesslog.py lists the rest). An edge is classified from the 85
+string and sort functions are not seen (tools/accesslog.py lists the rest). An edge is classified from the 88
 scenarios and no more: `deferrable` and `unobserved` claim only that those runs did not show a read, and a scenario
 that reaches the code differently could. The replay corpus of #389 is not read: accesslog.py has no way to play a
 replay.

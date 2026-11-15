@@ -12,6 +12,7 @@
 #include "../../interfaces/services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../harness/harness.h"
 #include "../game/scheduler.h"
 #include "economy_world.h"
 
@@ -36,7 +37,7 @@ static int __stdcall WorldDifficulty()
 
 static int __stdcall WorldSharingEnabled()
 {
-    return (g_game->netGameFlags & 1) != 0;
+    return (g_game->netGameFlags & 1) != 0 || HarnessSharing();
 }
 
 static float __stdcall WorldWind()

@@ -1,0 +1,21 @@
+# Game type 3: the local Arm player shares metal above 100 with its remote ally (player1.remote), whose storage of 100 limits every share; 300 ticks.
+game_seed 953
+crt_seed 1953
+view_seed 2953
+game_type 3
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player0.team 0
+player0.share_metal 100
+player1.controller human
+player1.side Core
+player1.team 0
+player1.remote 1
+player1.metal_storage 100
+player1.energy_storage 100
+console 1 +now Film Chris Include Reload Assert
+console 2 +nometal 1 0
+console 2 +noenergy 1 0

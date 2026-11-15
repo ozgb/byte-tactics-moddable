@@ -1,0 +1,23 @@
+# Game type 3: the local Arm player shares metal, energy and its map with its remote ally (player1.remote), past tick 900, where all three fall on one tick; 960 ticks.
+game_seed 955
+crt_seed 1955
+view_seed 2955
+game_type 3
+map The Pass
+start_positions fixed
+ticks 960
+player0.controller human
+player0.side Arm
+player0.team 0
+player0.share_metal 100
+player0.share_energy 100
+player0.share_mapping 1
+player1.controller human
+player1.side Core
+player1.team 0
+player1.remote 1
+player1.metal_storage 100000
+player1.energy_storage 100000
+console 1 +now Film Chris Include Reload Assert
+console 2 +nometal 1 0
+console 2 +noenergy 1 0

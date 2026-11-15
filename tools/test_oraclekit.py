@@ -858,13 +858,14 @@ class LeakCheckTest(unittest.TestCase):
             self.assertEqual(oraclekit.leak_check(leak_files('It starts the script "RockUnit".\n'), Path(tmp)), [])
             self.assertEqual(len(oraclekit.leak_check(leak_files("It calls RockUnit.\n"), Path(tmp))), 2)
 
-    def test_the_files_under_reference_are_not_asked_about_functions(self):
+    def test_the_files_under_reference_are_asked_about_functions(self):
         files = {**leak_files("ok\n"), "reference/scenarios/s.txt": b"# takes the UpdateMeteorShower path\n"}
         with tempfile.TemporaryDirectory() as tmp:
             src = Path(tmp) / "src"
             src.mkdir()
             (src / "meteors.cpp").write_text(LEAK_SOURCE)
-            self.assertEqual(oraclekit.leak_check(files, Path(tmp)), [])
+            self.assertEqual(oraclekit.leak_check(files, Path(tmp)),
+                             ["reference/scenarios/s.txt:1: function 'UpdateMeteorShower' is declared by no interface header"])
 
     def test_constructors_are_not_functions(self):
         with tempfile.TemporaryDirectory() as tmp:

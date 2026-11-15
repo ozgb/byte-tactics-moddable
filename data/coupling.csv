@@ -147,6 +147,11 @@ economy,harness,shared_write,EconomyEvent::player,1
 economy,harness,shared_write,EconomyEvent::resources,1
 economy,harness,shared_write,EconomyEvent::unit,1
 economy,harness,shared_write,EconomyEvent::value,1
+economy,harness,shared_write,Player::energyCapacity,1
+economy,harness,shared_write,Player::metalCapacity,1
+economy,harness,shared_write,Player::shareEnergy,1
+economy,harness,shared_write,Player::shareMetal,1
+economy,harness,shared_write,PlayerInfo::shareMetal,1
 economy,los_radar,indirect,CmdShareMapping,1
 economy,los_radar,indirect,CmdShareRadar,1
 economy,network,indirect,BroadcastPlayerInfo,2
@@ -541,6 +546,7 @@ game,harness,call,HarnessLoadEnded,1
 game,harness,call,HarnessPathEvent,1
 game,harness,call,HarnessPhase,1
 game,harness,call,HarnessRecordPhase,1
+game,harness,call,HarnessSharing,1
 game,harness,call,HarnessSimEventSlot,1
 game,harness,call,HarnessStartSkirmish,1
 game,harness,call,HarnessStepsPerFrame,1
@@ -1288,6 +1294,9 @@ harness,ai,shared_write,MapSeam::CanPlaceUnitFootprint,1
 harness,ai,shared_write,OrdersSeam::DeleteOrders,1
 harness,ai,shared_write,OrdersSeam::GetOrderFlags,1
 harness,ai,shared_write,OrdersSeam::IssueAttackOrder,1
+harness,ai,shared_write,Player::energyCapacity,1
+harness,ai,shared_write,Player::metalCapacity,1
+harness,ai,shared_write,Player::type,6
 harness,ai,shared_write,Seams::economy,1
 harness,ai,shared_write,Seams::los_radar,2
 harness,ai,shared_write,Seams::map,6
@@ -1310,6 +1319,12 @@ harness,economy,indirect,EconomyWriteState,1
 harness,economy,shared_write,Game::localPlayer,6
 harness,economy,shared_write,NetworkSeam::BroadcastPlayerInfo,2
 harness,economy,shared_write,NetworkSeam::SendShareMapInfo,1
+harness,economy,shared_write,Player::energyCapacity,3
+harness,economy,shared_write,Player::metalCapacity,3
+harness,economy,shared_write,Player::shareEnergy,2
+harness,economy,shared_write,Player::shareMetal,2
+harness,economy,shared_write,Player::type,2
+harness,economy,shared_write,PlayerInfo::shareMetal,1
 harness,economy,shared_write,Seams::los_radar,1
 harness,economy,shared_write,Seams::network,3
 harness,features,shared_write,Game::playerIndex,1
@@ -1392,6 +1407,7 @@ harness,game,shared_write,NetworkSeam::SendUnitStates,1
 harness,game,shared_write,OrdersSeam::ApplyPathEvent,1
 harness,game,shared_write,PathfindingSeam::Poll,1
 harness,game,shared_write,PathfindingSeam::Step,1
+harness,game,shared_write,Player::type,11
 harness,game,shared_write,PlayerInfo::energy,2
 harness,game,shared_write,PlayerInfo::metal,2
 harness,game,shared_write,PlayersSeam::KillPlayerUnits,3
@@ -1433,6 +1449,7 @@ harness,los_radar,shared_write,LosRadarSeam::RecalculateLineOfSight,2
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
 harness,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
+harness,los_radar,shared_write,Player::type,2
 harness,los_radar,shared_write,Seams::ai,2
 harness,los_radar,shared_write,Seams::features,2
 harness,los_radar,shared_write,Seams::los_radar,3
@@ -1453,6 +1470,7 @@ harness,map,shared_write,LosRadarSeam::GetMapCell,1
 harness,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
 harness,map,shared_write,LosRadarSeam::UpdateCellHeightRange,2
 harness,map,shared_write,PathfindingSeam::CellsChanged,2
+harness,map,shared_write,Player::type,2
 harness,map,shared_write,Seams::features,1
 harness,map,shared_write,Seams::los_radar,4
 harness,map,shared_write,Seams::pathfinding,2
@@ -1466,6 +1484,7 @@ harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
+harness,network,shared_write,Player::type,69
 harness,orders,call,Add,125
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
@@ -1490,6 +1509,9 @@ harness,orders,shared_write,NetworkSeam::SendScriptCall,3
 harness,orders,shared_write,NetworkSeam::SendScriptCallByName,1
 harness,orders,shared_write,PathfindingSeam::Cancel,2
 harness,orders,shared_write,PathfindingSeam::Submit,1
+harness,orders,shared_write,Player::energyCapacity,2
+harness,orders,shared_write,Player::metalCapacity,2
+harness,orders,shared_write,Player::type,2
 harness,orders,shared_write,PlayersSeam::GiveUnitToPlayer,1
 harness,orders,shared_write,Seams::ai,9
 harness,orders,shared_write,Seams::features,3
@@ -1540,7 +1562,7 @@ harness,pathfinding,call,PathfindingHpaSeam,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,16
+harness,platform,call,HarnessTestMode,17
 harness,platform,call,IsMemSet,1
 harness,platform,call,ModulesCheckStatics,1
 harness,platform,call,ModulesHideSwitch,1
@@ -1565,6 +1587,7 @@ harness,platform,call,host_mutex_unlock,3
 harness,platform,call,host_thread_id,3
 harness,platform,call,host_time_counter,1
 harness,platform,call,operator new,3
+harness,platform,shared_write,Player::type,2
 harness,platform,shared_write,Seams::weapons,2
 harness,platform,shared_write,Seams::wind_meteors,2
 harness,platform,shared_write,WeaponsSeam::SpawnProjectile,1
@@ -1592,6 +1615,11 @@ harness,players,shared_write,NetworkSeam::SendOwnershipTransfer,1
 harness,players,shared_write,NetworkSeam::SendShareEnergy,1
 harness,players,shared_write,NetworkSeam::SendShareMetal,1
 harness,players,shared_write,Player::alliedBy,3
+harness,players,shared_write,Player::energyCapacity,1
+harness,players,shared_write,Player::metalCapacity,1
+harness,players,shared_write,Player::shareEnergy,1
+harness,players,shared_write,Player::shareMetal,1
+harness,players,shared_write,Player::type,14
 harness,players,shared_write,PlayerInfo::energy,2
 harness,players,shared_write,PlayerInfo::metal,2
 harness,players,shared_write,PlayersSeam::TransferEnergy,1
@@ -1621,6 +1649,11 @@ harness,presentation,shared_write,Game::numPlayers,4
 harness,presentation,shared_write,Game::playerIndex,23
 harness,presentation,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,presentation,shared_write,Player::alliedBy,4
+harness,presentation,shared_write,Player::energyCapacity,3
+harness,presentation,shared_write,Player::metalCapacity,3
+harness,presentation,shared_write,Player::shareEnergy,1
+harness,presentation,shared_write,Player::shareMetal,1
+harness,presentation,shared_write,Player::type,43
 harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
 harness,presentation,shared_write,Seams::ai,1
@@ -1738,6 +1771,10 @@ harness,seams,shared_write,PathfindingSeam::CellsChanged,1
 harness,seams,shared_write,PathfindingSeam::Poll,1
 harness,seams,shared_write,PathfindingSeam::Step,1
 harness,seams,shared_write,PathfindingSeam::Submit,1
+harness,seams,shared_write,Player::type,2
+harness,seams,shared_write,PlayerInfo::shareEnergy,1
+harness,seams,shared_write,PlayerInfo::shareMapping,1
+harness,seams,shared_write,PlayerInfo::shareMetal,1
 harness,seams,shared_write,PlayersSeam::GiveUnitToPlayer,1
 harness,seams,shared_write,PlayersSeam::KillPlayerUnits,1
 harness,seams,shared_write,PlayersSeam::NotifyUnitCreated,1
@@ -1824,6 +1861,7 @@ harness,seams,shared_write,WindMeteorsSeam::UpdateMeteors,1
 harness,seams,shared_write,WindMeteorsSeam::UpdateWind,1
 harness,seams,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 harness,targeting,shared_write,AiSeam::GetVisibleEnemiesInRadius,1
+harness,targeting,shared_write,Player::type,1
 harness,targeting,shared_write,Seams::ai,1
 harness,targeting,shared_write,Seams::units,2
 harness,targeting,shared_write,Seams::weapons,1
@@ -1868,6 +1906,7 @@ harness,units,shared_write,OrdersSeam::RunSecondaryOrders,1
 harness,units,shared_write,OrdersSeam::UnitMotionReadNetState,1
 harness,units,shared_write,OrdersSeam::UpdateMotion,2
 harness,units,shared_write,PathfindingSeam::CellsChanged,2
+harness,units,shared_write,Player::type,6
 harness,units,shared_write,PlayersSeam::KillPlayerUnits,1
 harness,units,shared_write,PlayersSeam::NotifyUnitCreated,2
 harness,units,shared_write,PlayersSeam::NotifyUnitDied,1
@@ -1908,6 +1947,7 @@ harness,weapons,shared_write,NetworkSeam::SendWeaponFireAt,2
 harness,weapons,shared_write,OrdersSeam::AppendOrder,2
 harness,weapons,shared_write,OrdersSeam::MissionTypeFromName,2
 harness,weapons,shared_write,OrdersSeam::NewOrder,2
+harness,weapons,shared_write,Player::type,4
 harness,weapons,shared_write,Seams::ai,4
 harness,weapons,shared_write,Seams::features,1
 harness,weapons,shared_write,Seams::los_radar,5
@@ -2373,14 +2413,16 @@ network,game,shared_write,PlayerInfo::flags_97,2
 network,game,shared_write,PlayerInfo::versionMajor,1
 network,game,shared_write,PlayerInfo::versionMinor,1
 network,game,shared_write,g_packetManager,4
+network,harness,call,HarnessSharePacket,3
 network,harness,call,HarnessViewRand,2
 network,harness,shared_write,Game::endGameFlags,2
 network,harness,shared_write,Game::endGameVictory,2
 network,harness,shared_write,Game::numPlayers,2
 network,harness,shared_write,Player::allied,1
 network,harness,shared_write,Player::alliedBy,1
-network,harness,shared_write,Player::info,1
+network,harness,shared_write,Player::info,2
 network,harness,shared_write,Player::progress,1
+network,harness,shared_write,Player::type,1
 network,los_radar,call,GetMapCell,1
 network,los_radar,shared_write,Game::netGameFlags,3
 network,los_radar,shared_write,Game::numPlayers,1
@@ -3465,7 +3507,12 @@ players,harness,shared_write,Game::localPlayer,3
 players,harness,shared_write,Game::playerIndex,1
 players,harness,shared_write,Player::allied,1
 players,harness,shared_write,Player::alliedBy,1
-players,harness,shared_write,Player::info,1
+players,harness,shared_write,Player::energyCapacity,1
+players,harness,shared_write,Player::info,2
+players,harness,shared_write,Player::metalCapacity,1
+players,harness,shared_write,Player::shareEnergy,1
+players,harness,shared_write,Player::shareMetal,1
+players,harness,shared_write,Player::type,1
 players,harness,shared_write,Player::unitsBegin,2
 players,harness,shared_write,Player::unitsEnd,2
 players,harness,shared_write,Point16::x,1
@@ -4618,6 +4665,7 @@ seams,game,shared_write,WindMeteorsSeam::UpdateMeteors,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWind,1
 seams,game,shared_write,WindMeteorsSeam::UpdateWindOnStream,1
 seams,harness,call,HarnessEconomyEvent,3
+seams,harness,call,HarnessSharing,1
 seams,harness,call,ReplayImport::Int,2
 seams,harness,call,ReplayImport::Ptr,1
 seams,harness,call,ReplayImport::Result,2

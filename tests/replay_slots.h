@@ -448,9 +448,9 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsi
 }
 
 WindMeteorsSeam g_native_wind_meteors = {
-    UpdateWindOnStream,
+    UpdateWindSlot,
     UpdateMeteors,
-    WindMeteorsApply,
+    ApplySlot,
     InitMeteors,
     EmptyShutdownPreCleanup,
     LoadMeteorDefaults,

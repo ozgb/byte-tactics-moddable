@@ -13,6 +13,7 @@
 #include "../interfaces/services.h"
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
+#include "../src/map/meteors.h"
 #include "../src/map/feature_spot.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
@@ -1576,6 +1577,16 @@ Projectile* __stdcall FindTargetableProjectileSlot(Unit* unit, unsigned int weap
 int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);
+}
+
+void __cdecl UpdateWindSlot(RandStream stream)
+{
+    UpdateWindOnStream(stream);
+}
+
+void __stdcall ApplySlot(const WindMeteorsEvent* event)
+{
+    WindMeteorsApply(event);
 }
 
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)

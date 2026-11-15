@@ -82,12 +82,12 @@ class ModelTest(unittest.TestCase):
         self.assertGreater(stats["flow_parsed"] / stats["placed"], 0.99)
 
     def test_calls_go_through_seams_to_the_implementation(self):
-        meteors = self.function("UpdateMeteors")
+        meteors = self.function("WeaponsOnMeteorSpawn")
         spawn = self.function("SpawnProjectile")
         edge = meteors.out[spawn.id]
         self.assertIn("seam", edge.kinds)
         self.assertEqual(edge.via, "WeaponsSeam::SpawnProjectile")
-        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["g_meteorWeapon", "&pos", "&vel", "1"])
+        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["weapon", "&pos", "&vel", "effect->announce"])
         self.assertEqual(edge.sites[0]["args"][0]["param"], "weapon")
 
     def test_forwarding_wrappers_are_drawn_through(self):
@@ -110,7 +110,7 @@ class ModelTest(unittest.TestCase):
 
     def test_tick_lists_the_phases_in_order(self):
         names = [p["name"] for p in self.model.tick_phases()["phases"]]
-        expected = ["UpdateAllUnits", "UpdateProjectiles", "UpdateExplosions", "UpdatePlayers", "UpdateFeatures", "UpdateWind", "UpdateMeteors"]
+        expected = ["UpdateAllUnits", "UpdateProjectiles", "UpdateExplosions", "UpdatePlayers", "UpdateFeatures", "UpdateWindOnStream", "UpdateMeteors"]
         self.assertEqual(names[: len(expected)], expected)
 
     def test_data_items_know_writers_and_declaration(self):

@@ -30,6 +30,7 @@
 #include "features_results.h"
 #include "targeting_results.h"
 #include "los_radar_results.h"
+#include "map_results.h"
 #include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
@@ -3219,6 +3220,63 @@ static void VisitLosRadarResults()
     }
 }
 
+static MapResults s_mapResults;
+static bool s_mapResultsLost;
+
+void __stdcall HarnessMapEvent(const MapEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!MapResultsAdd(&s_mapResults, event, outcome))
+        s_mapResultsLost = true;
+}
+
+static void VisitMapResults()
+{
+    if (s_mapResultsLost)
+        Fail("testmode: no memory for the map events\n");
+    for (unsigned k = 0; k < s_mapResults.count; k++) {
+        MapResult* r = &s_mapResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
+    }
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("map.count");
+    fprintf(s_dump, "0x%08x\n", s_mapResults.count);
+    for (unsigned k = 0; k < s_mapResults.count; k++) {
+        const MapResult* r = &s_mapResults.items[k];
+        const MapEvent* e = &r->event;
+        sprintf(path, "map[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
+        sprintf(path, "map[%u].unit", k);
+        DumpPrefix(path);
+        DumpUnitName(r->unitTag, r->unitId);
+        sprintf(path, "map[%u].value", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
+        sprintf(path, "map[%u].cell", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->cell, sizeof e->cell);
+        sprintf(path, "map[%u].size", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->size, sizeof e->size);
+        sprintf(path, "map[%u].rect", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->rect, sizeof e->rect);
+        sprintf(path, "map[%u].classes", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", e->classes);
+        sprintf(path, "map[%u].cause", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->cause);
+        sprintf(path, "map[%u].outcome", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    }
+}
+
 static WindMeteorsResults s_windMeteorsResults;
 static bool s_windMeteorsResultsLost;
 
@@ -4171,6 +4229,7 @@ static void VisitWorld()
     VisitFeaturesResults();
     VisitTargetingResults();
     VisitLosRadarResults();
+    VisitMapResults();
 }
 
 enum {
@@ -4862,6 +4921,7 @@ void HarnessPhase(int phase)
         FeaturesResultsClear(&s_featuresResults);
         TargetingResultsClear(&s_targetingResults);
         LosRadarResultsClear(&s_losRadarResults);
+        MapResultsClear(&s_mapResults);
         WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)

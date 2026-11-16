@@ -81,6 +81,7 @@ struct Point16FromShorts : Point16 {
 
 #include "../util/angles.h"
 #include "../../interfaces/seams.h"
+#include "../game/map_events.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
@@ -1515,7 +1516,7 @@ void UnitMotion::UpdatePosition(Unit* u)
 
     if (((PlayerTypeView*)u->player.get())->active != 0) {
         if (((PlayerTypeView*)u->player.get())->type == 1 || ((PlayerTypeView*)u->player.get())->type == 2)
-            flag = g_seams.map->CanPlaceUnitFootprint((UnitDef*)u->def, (unsigned short)u->id, *(Point16*)&cell, m) == 0;
+            flag = ScheduleMapCanPlaceUnitFootprint((UnitDef*)u->def, (unsigned short)u->id, *(Point16*)&cell, m) == 0;
     }
 
     if (flag) {
@@ -1537,11 +1538,11 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
     }
 
-    g_seams.map->RemoveUnitFromMap(u);
+    MapPublishUnit(SCHED_ORDERS, MAP_REMOVE_UNIT, u);
     u->pos = pos;
     *(Point16*)&u->cell = cell;
     u->mode = (short)m;
-    g_seams.map->AddUnitToMap(u);
+    MapPublishUnit(SCHED_ORDERS, MAP_ADD_UNIT, u);
     u->moved = 1;
     LosRadarPublishUpdateUnit(SCHED_ORDERS, u);
 }

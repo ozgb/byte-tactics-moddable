@@ -537,6 +537,38 @@ Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit)
     return o;
 }
 
+int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_MAP_CAN_BUILD_AT);
+    Space(t);
+    t.AddInt((int)type);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT);
+    Space(t);
+    t.AddInt((int)otherTypeId);
+    Space(t);
+    t.AddInt((int)flags);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_MAP_PICK_RECLAIMABLE);
+    Space(t);
+    t.AddInt((int)range);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
     ReplayText t;

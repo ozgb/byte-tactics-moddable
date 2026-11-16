@@ -1361,7 +1361,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, BlockVector<KeyedC
         int d = DistSq(cell, center);
         if (limit >= 0 && d > limit + 160)
             break;
-        if (g_seams.map->CanBuildAt(type, cell, 0, 0) && g_lastPlaceMetalSum > best) {
+        if (ScheduleMapCanBuildAt(type, cell, 0, 0) && g_lastPlaceMetalSum > best) {
             result = cell;
             best = g_lastPlaceMetalSum;
             if (limit == -1)
@@ -1393,7 +1393,7 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
         Point16 cell = WorldToCell(v, *(Point16*)&type->f14a);
         cell.x = cell.x / spacing.x * spacing.x + offset.x + RandomInt(spacing.x - margin - type->footprintx);
         cell.y = cell.y / spacing.y * spacing.y + offset.y + RandomInt(spacing.y - margin - type->footprintz);
-        if (g_seams.map->CanPlaceUnitFootprint(type, 0, cell, 1) && g_lastPlaceMetalSum <= threshold) {
+        if (ScheduleMapCanPlaceUnitFootprint(type, 0, cell, 1) && g_lastPlaceMetalSum <= threshold) {
             if (out)
                 *out = cell;
             return true;

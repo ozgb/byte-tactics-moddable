@@ -91,6 +91,7 @@ extern Game* g_game;
 
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "../../interfaces/seams.h"
+#include "../seams/map_world.h"
 
 static inline void AddCondition(Ref<MissionCondition>* list, int* count, MissionCondition* value)
 {
@@ -491,7 +492,7 @@ int VictoryMoveUnitToRadius::IsSatisfied()
     if (pos.y == 0x12345678) {
         g_seams.los_radar->ClampWorldPosToTerrain(pos.x, pos.z, &pos);
     }
-    g_seams.map->VisitObjectsInRange(&pos, radius, (UnitVisitor*)(RadiusUnitVisitor*)this);
+    VisitUnitsInRange(&pos, radius, (UnitVisitor*)(RadiusUnitVisitor*)this);
     return satisfied;
 }
 

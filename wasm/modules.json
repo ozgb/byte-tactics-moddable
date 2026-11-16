@@ -18,7 +18,7 @@
     "files": 2,
     "host": 2,
     "los_radar": 3,
-    "map": 3,
+    "map": 4,
     "network": 1,
     "orders": 3,
     "pathfinding": 3,

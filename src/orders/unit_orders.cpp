@@ -99,6 +99,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
+#include "../seams/map_world.h"
 #include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"
@@ -394,7 +395,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         order->pos = g_seams.units->GetPiecePosition(unit, piece);
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
-        if (!g_seams.map->CanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {
+        if (!ScheduleMapCanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {
             order->SetDeadlineTicks(15);
             order->flags |= 2;
             return 2;
@@ -1650,7 +1651,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
                 return 8;
             }
         }
-        if (!g_seams.map->CanPlaceUnitFootprint(def, 0, WorldToCell16(order->pos, *(Point16*)&Definitions()[order->type].footprintx), 1)) {
+        if (!ScheduleMapCanPlaceUnitFootprint(def, 0, WorldToCell16(order->pos, *(Point16*)&Definitions()[order->type].footprintx), 1)) {
             if (!order->retries)
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_WAITING_FOR_TARGET_AREA_TO_CLEAR);
             else if (order->retries > 10) {
@@ -1794,7 +1795,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 DamagedAllyCollector collector(unit->player, &units, unit);
-                g_seams.map->VisitObjectsInRange(&unit->pos, range, &collector);
+                VisitUnitsInRange(&unit->pos, range, &collector);
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {
@@ -1815,7 +1816,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 int range2 = unit->def->range << 16;
                 do {} while (0);
                 float energyAmount, metalAmount;
-                if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range2, &energy, &energyAmount, &metal, &metalAmount)) {
+                if (ScheduleMapPickReclaimable(&unit->pos, range2, &energy, &energyAmount, &metal, &metalAmount)) {
                     if (metal && unit->player->metal < unit->player->metalCapacity * 0.2) {
                         order->SetAttachedFx(0);
                         AppendOrder(unit, new (kSim) Order("RECLAIM", 0, metal, 0, 0, 0));

@@ -143,6 +143,7 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
 
 #include <iterator>
 #include "../../interfaces/seams.h"
+#include "../game/map_events.h"
 #include <xutility>
 
 #define _ALGORITHM_
@@ -513,7 +514,7 @@ found:
     InitSpawnedUnit(typeId, pos, param_5, unit);
     unit->mode = mode;
     UpdateUnitHeight(unit);
-    g_seams.map->AddUnitToMap(unit);
+    MapPublishUnit(SCHED_UNITS, MAP_ADD_UNIT, unit);
     g_seams.network->SendNewUnit(unit);
     if (param_5) {
         if (type->mobile == 0)
@@ -559,7 +560,7 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
     }
     InitSpawnedUnit(spawn->type, spawn->pos, 0, unit);
     UpdateUnitHeight(unit);
-    g_seams.map->AddUnitToMap(unit);
+    MapPublishUnit(SCHED_UNITS, MAP_ADD_UNIT, unit);
     LosRadarPublishRevealUnit(SCHED_UNITS, unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
@@ -716,7 +717,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         g_seams.weapons->DamageUnit(unit->attacker, unit->cargo, 30000, depth, 0);
         AttachUnitToPiece(unit->cargo, 0, -1, 1);
     }
-    g_seams.map->ClearFootprintAndUnlink(unit);
+    MapPublishUnit(SCHED_UNITS, MAP_CLEAR_UNIT, unit);
     if ((g_game->mapFlags & 2) == 2)
         LosRadarPublishRemoveUnit(SCHED_UNITS, unit);
     if (local == 0 && cmd->cobKilledSeverity > 0)

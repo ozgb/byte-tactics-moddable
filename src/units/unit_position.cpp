@@ -86,6 +86,7 @@ int __stdcall GetGroundHeight(Vec3* pos);
 #include "unit_targets.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/seams.h"
+#include "../game/map_events.h"
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
 #include "unit_position.h"
@@ -166,11 +167,11 @@ int __stdcall SetUnitPosition(Unit* unit, Vec3 pos, int param_5)
     if (cell.x == unit->cell.x && cell.y == unit->cell.y && param_5 == (unit->flags & 3)) {
         unit->pos = pos;
     } else {
-        g_seams.map->RemoveUnitFromMap(unit);
+        MapPublishUnit(SCHED_UNITS, MAP_REMOVE_UNIT, unit);
         unit->pos = pos;
         unit->cell = cell;
         unit->flags = (unit->flags & 0xfffffffc) | (short)(param_5 & 3);
-        g_seams.map->AddUnitToMap(unit);
+        MapPublishUnit(SCHED_UNITS, MAP_ADD_UNIT, unit);
         LosRadarPublishUpdateUnit(SCHED_UNITS, unit);
     }
     unit->flags |= 0x10000;
@@ -223,7 +224,7 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             }
                             *link = u->cargoNext;
                         } else {
-                            g_seams.map->SpatialBucketUnlinkUnit((SpatialBucket*)u->spatialBucket.get(), 0, u);
+                            MapPublishUnit(SCHED_UNITS, MAP_BUCKET_UNLINK, u);
                         }
                         u->transportPiece = order->param;
                         if (t) {
@@ -236,7 +237,7 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             u->cargoNext = 0;
                             u->carriedNoPiece = 0;
                             u->carrier = 0;
-                            g_seams.map->SpatialBucketPrependUnit((SpatialBucket*)u->spatialBucket.get(), 0, u);
+                            MapPublishUnit(SCHED_UNITS, MAP_BUCKET_PREPEND, u);
                         }
                         u->motion->mode = order->param2;
                         if (u->player->active) {
@@ -429,11 +430,11 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     if (np.x == u->cell.x && np.y == u->cell.y && colour == (u->flags & 3)) {
         u->pos = pos;
     } else {
-        g_seams.map->RemoveUnitFromMap(u);
+        MapPublishUnit(SCHED_UNITS, MAP_REMOVE_UNIT, u);
         u->pos = pos;
         u->cell = np;
         u->mode = (unsigned int)(unsigned short)colour;
-        g_seams.map->AddUnitToMap(u);
+        MapPublishUnit(SCHED_UNITS, MAP_ADD_UNIT, u);
         LosRadarPublishUpdateUnit(SCHED_UNITS, u);
     }
     u->moved = 1;

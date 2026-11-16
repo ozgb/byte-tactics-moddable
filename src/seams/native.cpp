@@ -275,26 +275,6 @@ static char* __stdcall GetNameSlotNative(Mission* mission, int index)
     return mission->GetNameSlot(index);
 }
 
-static void __stdcall VisitObjectsInRangeNative(Vec3* pos, int range, UnitVisitor* visitor)
-{
-    VisitObjectsInRange(pos, range, visitor);
-}
-
-static void __fastcall SpatialBucketPrependUnitNative(SpatialBucket* self, int unusedEdx, Unit* unit)
-{
-    self->PrependUnit(unit);
-}
-
-static void __fastcall SpatialBucketUnlinkUnitNative(SpatialBucket* self, int unusedEdx, Unit* unit)
-{
-    self->UnlinkUnit(unit);
-}
-
-static void __fastcall RefreshPassMapNative(MovementClass* self, int unusedEdx, Point16 a, Point16 b)
-{
-    self->RefreshPassMap(a, b);
-}
-
 static int __fastcall AdvanceMissionNative(Mission* self)
 {
     return self->AdvanceMission();
@@ -741,7 +721,6 @@ void InstallNativeSeams()
     s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
     s_ai.IsPointVisible = IsPointVisible;
     s_map.GetNameSlot = GetNameSlotNative;
-    s_map.VisitObjectsInRange = VisitObjectsInRangeNative;
     s_players.TransferMetal = TransferMetal;
     s_players.TransferEnergy = TransferEnergy;
     s_units.GetGroundHeight = GetGroundHeightNative;
@@ -750,7 +729,6 @@ void InstallNativeSeams()
     s_units.StartScriptWithArgs = StartScriptWithArgsNative;
     s_units.SetStateBits = SetStateBitsNative;
     s_map.GetCellMeanHeight = GetCellMeanHeightNative;
-    s_map.RefreshAllPassMaps = RefreshAllPassMaps;
     s_map.GetGameType = GetGameTypeNative;
     s_weapons.FindWeaponByName = FindWeaponByNameNative;
     s_weapons.ApplyAreaDamageAt = ApplyAreaDamageAtNative;
@@ -797,6 +775,8 @@ void InstallNativeSeams()
     s_ai.SquadManagerTickIfActive = SquadManagerTickIfActiveNative;
     s_ai.SquadManagerDeleteTimers = SquadManagerDeleteTimersNative;
     s_ai.CreateSquadManager = CreateSquadManagerNative;
+    s_map.Apply = ApplyMapEvent;
+    s_map.UnitsInRange = UnitsInRange;
     s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
     s_orders.AddOrder = AddOrder;
@@ -829,17 +809,9 @@ void InstallNativeSeams()
     s_map.SavePlayerFeaturesPlotmap = SavePlayerFeaturesPlotmap;
     s_map.SetMissionType = SetMissionType;
     s_map.SnapWorldPosToFootprint = SnapWorldPosToFootprint;
-    s_map.AddUnitToMap = AddUnitToMap;
-    s_map.RemoveUnitFromMap = RemoveUnitFromMap;
     s_map.CanPlaceFootprintAt = CanPlaceFootprintAt;
     s_map.IsPadSlotFree = IsPadSlotFree;
     s_map.PickRandomReclaimableResourcesInRadius = PickRandomReclaimableResourcesInRadius;
-    s_map.ClearFootprintAndUnlink = ClearFootprintAndUnlink;
-    s_map.ForceNeighborFootprintReclaim = ForceNeighborFootprintReclaim;
-    s_map.SetYardOpen = SetYardOpen;
-    s_map.SpatialBucketPrependUnit = SpatialBucketPrependUnitNative;
-    s_map.SpatialBucketUnlinkUnit = SpatialBucketUnlinkUnitNative;
-    s_map.RefreshPassMap = RefreshPassMapNative;
     s_map.AdvanceMission = AdvanceMissionNative;
     s_map.GetCampaignName = GetCampaignNameNative;
     s_map.GetMissionIndex = GetMissionIndexNative;

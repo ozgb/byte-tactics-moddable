@@ -69,6 +69,8 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/map.h"
+#include "spatial_bucket.h"
+#include "unit_visitor.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
@@ -667,16 +669,18 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
 
 
 // FUNCTION: 0x47dac0
-void __stdcall SetYardOpen(Unit* obj, int flag)
+int __stdcall SetYardOpen(Unit* obj, int flag)
 {
     if (g_quirks.skipEmptyYardmap && obj->def->yardmap == 0)
-        return;
+        return 0;
     if (IsFootprintClear(obj, flag)) {
         obj->bit2 = flag;
         obj->flags |= 0x8000000;
         ClaimFootprintCells(obj);
         RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
+        return 1;
     }
+    return 0;
 }
 
 
@@ -1122,8 +1126,10 @@ static inline int BucketDistSquared(Vec3* b, Vec3* a)
 }
 
 // FUNCTION: 0x47e890
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor)
+int __stdcall UnitsInRange(const Vec3* at, int range, int skip, unsigned short* ids, int capacity)
 {
+    Vec3* pos = (Vec3*)at;
+    int count = 0;
     int cx1 = ClampBucketMinX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
     int cy1 = ClampBucketMinZ(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
     int cx2 = ClampBucketMaxX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
@@ -1133,11 +1139,18 @@ void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor)
         for (int x = cx1; x <= cx2; x++) {
             for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
                 if (BucketDistSquared(pos, &o->pos) <= range2) {
-                    visitor->Visit(o);
+                    if (skip > 0) {
+                        skip--;
+                    } else {
+                        if (count == capacity)
+                            return count;
+                        ids[count++] = o->id;
+                    }
                 }
             }
         }
     }
+    return count;
 }
 
 #include "../../interfaces/seams.h"
@@ -1321,4 +1334,59 @@ void __stdcall GetCellPosition(int x, int y, Vec3* out)
         SetWholePart(&out->y, cell->height);
         SetWholePart(&out->z, y << 4);
     }
+}
+
+static Unit* MapUnitOfHandle(unsigned int handle)
+{
+    Ref<Unit> ref;
+    ref.offset = handle;
+    return ref.get();
+}
+
+static Point16 MapPoint(const int* xy)
+{
+    Point16 p;
+    p.x = (short)xy[0];
+    p.y = (short)xy[1];
+    return p;
+}
+
+int __stdcall ApplyMapEvent(const MapEvent* e)
+{
+    switch (e->kind) {
+    case MAP_REFRESH_PASS_MAP:
+        if (e->value < 0 || e->value > 31 || g_movementClasses.entries[e->value].name == nullptr)
+            return 0;
+        g_movementClasses.entries[e->value].RefreshPassMap(MapPoint(e->cell), MapPoint(e->size));
+        return 1;
+    case MAP_PASS_MAPS:
+        RefreshAllPassMaps(MapPoint(e->cell), MapPoint(e->size));
+        return 1;
+    }
+    Unit* unit = MapUnitOfHandle(e->unit);
+    if (!unit)
+        return 0;
+    switch (e->kind) {
+    case MAP_ADD_UNIT:
+        AddUnitToMap(unit);
+        return 1;
+    case MAP_REMOVE_UNIT:
+        RemoveUnitFromMap(unit);
+        return 1;
+    case MAP_CLEAR_UNIT:
+        ClearFootprintAndUnlink(unit);
+        return 1;
+    case MAP_RECLAIM_FOOTPRINT:
+        ForceNeighborFootprintReclaim(unit);
+        return 1;
+    case MAP_SET_YARD:
+        return SetYardOpen(unit, e->value);
+    case MAP_BUCKET_UNLINK:
+        ((SpatialBucket*)unit->spatialBucket.get())->UnlinkUnit(unit);
+        return 1;
+    case MAP_BUCKET_PREPEND:
+        ((SpatialBucket*)unit->spatialBucket.get())->PrependUnit(unit);
+        return 1;
+    }
+    return 0;
 }

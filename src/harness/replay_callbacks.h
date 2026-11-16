@@ -4,23 +4,8 @@
 
 #include "replay_objects.h"
 #include "replay_values.h"
-#include "../../interfaces/map.h"
 #include "../game/victory_conditions.h"
 #include "../units/cob_types.h"
-
-class ReplayThunkUnitVisitor : public UnitVisitor {
-public:
-    void Visit(Unit* a0) override;
-};
-
-inline void ReplayThunkUnitVisitor::Visit(Unit* a0)
-{
-    ReplayCallbackCall call(this, 0);
-    call.Space();
-    ReplayAddObjectName(call.Text(), call.Table(), ROK_UNIT, a0, true);
-    typedef void (__thiscall* Method)(void*, Unit*);
-    ((Method)call.Original(0))(this, a0);
-}
 
 class ReplayThunkUnitScanVisitor : public UnitScanVisitor {
 public:
@@ -56,10 +41,6 @@ inline void ReplayThunkCallback::Complete(int a0)
 inline const void* ReplayThunkVtable(unsigned callback)
 {
     switch (callback) {
-    case RCB_UNITVISITOR: {
-        ReplayThunkUnitVisitor probe;
-        return ReplayVptrOf(&probe);
-    }
     case RCB_UNITSCANVISITOR: {
         ReplayThunkUnitScanVisitor probe;
         return ReplayVptrOf(&probe);

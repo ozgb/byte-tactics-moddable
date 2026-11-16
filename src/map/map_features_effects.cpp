@@ -3,6 +3,8 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/features.h"
 #include "../util/vec3.h"
+#include "../game/map_events.h"
+#include "../seams/map_world.h"
 #include "map_features_effects.h"
 
 void MapOnFeaturesPassMaps(const void* event)
@@ -14,5 +16,6 @@ void MapOnFeaturesPassMaps(const void* event)
     Point16 footprint;
     footprint.x = (short)effect->width;
     footprint.y = (short)effect->height;
-    g_seams.map->RefreshAllPassMaps(at, footprint);
+    MapEvent passMaps = MapRectEventOf(MAP_PASS_MAPS, 0, at, footprint);
+    MapInbox(&passMaps);
 }

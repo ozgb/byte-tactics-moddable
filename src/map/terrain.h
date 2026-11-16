@@ -27,7 +27,7 @@ void __stdcall FUN_0047caf0(void);
 void __stdcall SetOwner(Unit* unit, UnitBucket* bucket);
 void __stdcall ClearFootprintAndUnlink(Unit* unit);
 int __stdcall IsFootprintClear(Unit* obj, int flag);
-void __stdcall SetYardOpen(Unit* obj, int flag);
+int __stdcall SetYardOpen(Unit* obj, int flag);
 void __stdcall ForceNeighborFootprintReclaim(Unit* obj);
 void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos);
 int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h);
@@ -35,7 +35,9 @@ unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj
 unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y);
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor);
+int __stdcall UnitsInRange(const Vec3* at, int range, int skip, unsigned short* ids, int capacity);
+struct MapEvent;
+int __stdcall ApplyMapEvent(const MapEvent* e);
 
 int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
 void __stdcall AddUnitToMap(Unit* obj);

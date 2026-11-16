@@ -69,7 +69,11 @@
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
-      "WindMeteorsEmit": [["linear"], "void"]
+      "WindMeteorsEmit": [["linear"], "void"],
+      "SchedPublish": [["int", "linear", "int"], "void"],
+      "HarnessEconomyEvent": [["linear", "int"], "void"],
+      "HarnessFeaturesEvent": [["linear", "int"], "void"],
+      "HarnessTargetingEvent": [["linear", "int"], "void"]
     },
     "targeting": {
       "Apply": [["linear"], "int"],

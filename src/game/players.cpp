@@ -12,6 +12,7 @@
 #include "economy_events.h"
 #include "los_radar_events.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/rand_stream.h"
 #include "../util/tdf.h"
 
 struct Player;

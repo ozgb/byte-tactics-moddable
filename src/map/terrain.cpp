@@ -69,6 +69,7 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/map.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
 // FUNCTION: 0x47c790

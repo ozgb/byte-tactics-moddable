@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/services.h"
 #include "../state/game_rand.h"
 #include "../state/sim_globals.h"
 #include "../util/tdf.h"

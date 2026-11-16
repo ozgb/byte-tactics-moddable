@@ -213,11 +213,10 @@ void SchedPlayersPhase(RandStream stream)
             continue;
         {
             Player* owner = &g_game->players[player];
-            Unit* u = owner->unitsBegin;
 #if BT_ACCESS_LOG
             AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
 #endif
-            while (u <= owner->unitsEnd) {
+            for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
 #if BT_ACCESS_LOG
                 AccessLogEntity();
 #endif
@@ -225,7 +224,6 @@ void SchedPlayersPhase(RandStream stream)
                     SchedDeliver(SCHED_LOS_RADAR);
                     g_seams.los_radar->UpdateUnitLineOfSight(u);
                 }
-                u = (Unit*)((char*)u + 0x118);
             }
         }
         if ((unsigned char)player == g_game->playerIndex) {

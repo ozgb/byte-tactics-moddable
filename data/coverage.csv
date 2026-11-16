@@ -282,7 +282,6 @@ map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Missi
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
-map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
 network,*,,297,53,5263,577,2564,106,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu

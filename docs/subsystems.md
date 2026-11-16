@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5547 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5546 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -29,7 +29,7 @@ The subsystems and the issue each maps to:
 | [orders](#orders) | 378 | #18 |
 | [units](#the-remaining-subsystems) | 223 | none yet |
 | [players](#the-remaining-subsystems) | 147 | none yet |
-| [map](#the-remaining-subsystems) | 114 | none yet |
+| [map](#the-remaining-subsystems) | 113 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
 | [game](#the-remaining-subsystems) | 308 | none yet |
 | [harness](#the-remaining-subsystems) | 855 | none yet |
@@ -567,7 +567,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (114 functions). No phase root. 44 functions are called from outside, by presentation (24), seams (21), game (10) and orders (3); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 57 functions: platform 27, files 11, los_radar 2, game 5, wind_meteors 1. It holds the terrain, the pass maps and footprints. Coverage: 81.0% of functions (81 of 100), 87.1% of lines, 77.3% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
+**map** (113 functions). No phase root. 44 functions are called from outside, by presentation (24), seams (21), game (10) and orders (3); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 57 functions: platform 27, files 11, los_radar 2, game 5, wind_meteors 1. It holds the terrain, the pass maps and footprints. Coverage: 81.0% of functions (81 of 100), 87.1% of lines, 77.3% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
 
 **map, functions no scenario enters** (19 of 100 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 81 are entered, 81.0%), by reason:
 

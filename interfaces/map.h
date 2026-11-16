@@ -14,7 +14,7 @@ class HapiBank;
 // Minor version of the map interface, changed when a slot is added.
 #define MAP_VERSION_MINOR 0
 
-// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a unit with a null unit, or a movement class that does not exist, changes nothing; outcome 0.
+// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a null unit, a movement class that does not exist, a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
 enum MapEventKind {
     // Puts unit on the cells its footprint covers at its cell and in the spatial grid bucket of its position, or in the bucket of units off the map; outcome 1.
     MAP_ADD_UNIT = 160,
@@ -26,13 +26,13 @@ enum MapEventKind {
     MAP_RECLAIM_FOOTPRINT = 163,
     // Opens (value 1) or closes (value 0) the yard of unit when its footprint is clear for that state, and claims its cells for the state; outcome 1 when it changed, 0 when the footprint was not clear.
     MAP_SET_YARD = 164,
-    // Takes unit out of the spatial grid bucket it is in, as it boards a carrier; outcome 1.
+    // Takes unit out of the spatial grid bucket it is in, as it boards a carrier; outcome 1, or 0 when unit has no bucket or is not in its bucket's chain.
     MAP_BUCKET_UNLINK = 165,
-    // Puts unit at the front of its spatial grid bucket, as it leaves a carrier; outcome 1.
+    // Puts unit at the front of its spatial grid bucket, as it leaves a carrier; outcome 1, or 0 when unit has no bucket or is already in its bucket's chain.
     MAP_BUCKET_PREPEND = 166,
     // Computes again the pass map of movement class value (its index, 0 to 31) over the rectangle of cell and size, in cells, grown by the class's footprint; outcome 1.
     MAP_REFRESH_PASS_MAP = 167,
-    // Computes again the pass maps of every movement class over the rectangle of cell and size, after the terrain or the features on it changed; outcome 1.
+    // Computes again the pass maps of every movement class over the rectangle of cell and size, after the terrain or the features on it changed; outcome 1, or 0 when either size is negative.
     MAP_PASS_MAPS = 168
 };
 

@@ -71,8 +71,10 @@ result was thrown away. So none of these is synchronous by its contract: every s
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 40) and returned to no
 one: 1 for every kind, except SET_YARD (0 when the footprint is not clear for the new state, or the unit has an empty
 yard map and is skipped). `Apply` first rejects an event naming no unit (every kind but REFRESH_PASS_MAP and
-PASS_MAPS), a movement class index outside 0 to 31 or naming no class (REFRESH_PASS_MAP), and an unknown kind, with
-outcome 0 and no change. 3.1c's callers could publish none of these, so no trace moves; a module publishing from WASM
+PASS_MAPS), a movement class index outside 0 to 31 or naming no class (REFRESH_PASS_MAP), a negative size
+(PASS_MAPS), a unit with no bucket or not in its bucket's chain (BUCKET_UNLINK), a unit with no bucket or already in
+its bucket's chain (BUCKET_PREPEND), and an unknown kind, with outcome 0 and no change. A PASS_MAPS of size 0 is
+applied: it still covers its cell grown by each class's footprint, as in 3.1c. 3.1c's callers could publish none of these, so no trace moves; a module publishing from WASM
 can.
 
 **The mixed slots.**
@@ -112,7 +114,10 @@ pathfinding's `Poll` fills a caller's buffer. The service `VisitUnitsInRange` (s
 through it, 256 ids at a time, and calls the visitor for each unit, so its callers (orders' patrol and repair
 orders, the victory condition `VictoryMoveUnitToRadius`, los_radar's `UpdateSensorRadarAndCloak`) keep their
 visitors. The order is 3.1c's because no visitor moves a unit or publishes to map: they count, collect or test the
-units they are given.
+units they are given. That is the service's contract: a visitor must not move a unit or change map's grid, since
+`VisitUnitsInRange` takes a page of ids before it calls the visitors, and a changed grid would page differently
+once more than 256 units are in range. `VisitObjectsInRect`, 3.1c's visitor over a rectangle, had no caller; it is
+removed, so map calls no visitor.
 
 **The mission, campaign and map-list slots stay.** They are not simulation: they read and write the `Mission` object
 and the map list, from the front end, the load of a match and the end of a game. Two of them, `GetGameType` and

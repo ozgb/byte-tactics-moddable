@@ -24799,20 +24799,6 @@ address,function,file,kind,target
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,function,
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,global_read,g_game
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,indirect_call,virtual ClaimFootprintVisitor::ClaimFootprint
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,ClampBucketCoord
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator Unit *
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator UnitBucket *
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,deref_read,*BucketGrid
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::cells
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::height
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::width
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Unit::cargoNext
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,UnitBucket::first
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::x
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::z
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,function,
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,global_read,g_game
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,indirect_call,virtual UnitVisitor::Visit
 0x47e890,UnitsInRange,src/map/terrain.cpp,call,BucketDistSquared
 0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMaxX
 0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMaxZ
@@ -43008,6 +42994,7 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::z
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,function,
 ,ApplyMapEvent,src/map/terrain.cpp,call,AddUnitToMap
+,ApplyMapEvent,src/map/terrain.cpp,call,BucketHolds
 ,ApplyMapEvent,src/map/terrain.cpp,call,ClearFootprintAndUnlink
 ,ApplyMapEvent,src/map/terrain.cpp,call,ForceNeighborFootprintReclaim
 ,ApplyMapEvent,src/map/terrain.cpp,call,MapPoint
@@ -43019,6 +43006,7 @@ address,function,file,kind,target
 ,ApplyMapEvent,src/map/terrain.cpp,call,SpatialBucket::PrependUnit
 ,ApplyMapEvent,src/map/terrain.cpp,call,SpatialBucket::UnlinkUnit
 ,ApplyMapEvent,src/map/terrain.cpp,call,get
+,ApplyMapEvent,src/map/terrain.cpp,call,operator bool
 ,ApplyMapEvent,src/map/terrain.cpp,field_maybe_written,MovementClassTable::entries
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::cell
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::kind
@@ -43496,6 +43484,10 @@ address,function,file,kind,target
 ,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::x
 ,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::z
 ,BucketDistSquared,src/map/terrain.cpp,function,
+,BucketHolds,src/map/terrain.cpp,call,get
+,BucketHolds,src/map/terrain.cpp,field_read,SpatialBucket::head
+,BucketHolds,src/map/terrain.cpp,field_read,Unit::cargoNext
+,BucketHolds,src/map/terrain.cpp,function,
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,call,BuildCompoundAddress
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::data
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::size
@@ -43963,7 +43955,6 @@ address,function,file,kind,target
 ,ChunkSizeFor,src/state/block.cpp,global_read,kMinChunk
 ,ClaimWeaponsNative,src/seams/native.cpp,call,Unit::ClaimWeapons
 ,ClaimWeaponsNative,src/seams/native.cpp,function,
-,ClampBucketCoord,src/map/terrain.cpp,function,
 ,ClampBucketMaxX,src/map/terrain.cpp,call,ClampBucketRangeCoord
 ,ClampBucketMaxX,src/map/terrain.cpp,field_read,Vec3::x
 ,ClampBucketMaxX,src/map/terrain.cpp,function,

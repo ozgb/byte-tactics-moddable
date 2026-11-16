@@ -1047,35 +1047,6 @@ void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisit
     }
 }
 
-static inline int ClampBucketCoord(int v, unsigned int size)
-{
-    if (v < size) {
-        return v;
-    }
-    if (v < 0) {
-        return 0;
-    }
-    return size - 1;
-}
-
-// FUNCTION: 0x47e750
-void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, UnitVisitor* visitor)
-{
-    int cx1 = ClampBucketCoord(x1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy1 = ClampBucketCoord(y1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    int cx2 = ClampBucketCoord(x2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy2 = ClampBucketCoord(y2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    for (int y = cy1; y <= cy2; y++) {
-        for (int x = cx1; x <= cx2; x++) {
-            for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
-                if (o->pos.x >= x1 && o->pos.x <= x2 && o->pos.z >= y1 && o->pos.z <= y2) {
-                    visitor->Visit(o);
-                }
-            }
-        }
-    }
-}
-
 static inline int ClampBucketRangeCoord(int v, unsigned int size)
 {
     if (v < size) {
@@ -1340,6 +1311,15 @@ static Point16 MapPoint(const int* xy)
     return p;
 }
 
+static bool BucketHolds(SpatialBucket* bucket, Unit* unit)
+{
+    for (Unit* o = bucket->head.get(); o != nullptr; o = o->cargoNext.get()) {
+        if (o == unit)
+            return true;
+    }
+    return false;
+}
+
 int __stdcall ApplyMapEvent(const MapEvent* e)
 {
     switch (e->kind) {
@@ -1349,6 +1329,8 @@ int __stdcall ApplyMapEvent(const MapEvent* e)
         g_movementClasses.entries[e->value].RefreshPassMap(MapPoint(e->cell), MapPoint(e->size));
         return 1;
     case MAP_PASS_MAPS:
+        if (e->size[0] < 0 || e->size[1] < 0)
+            return 0;
         RefreshAllPassMaps(MapPoint(e->cell), MapPoint(e->size));
         return 1;
     }
@@ -1371,9 +1353,13 @@ int __stdcall ApplyMapEvent(const MapEvent* e)
     case MAP_SET_YARD:
         return SetYardOpen(unit, e->value);
     case MAP_BUCKET_UNLINK:
+        if (!unit->spatialBucket || !BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
+            return 0;
         ((SpatialBucket*)unit->spatialBucket.get())->UnlinkUnit(unit);
         return 1;
     case MAP_BUCKET_PREPEND:
+        if (!unit->spatialBucket || BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
+            return 0;
         ((SpatialBucket*)unit->spatialBucket.get())->PrependUnit(unit);
         return 1;
     }

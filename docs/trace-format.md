@@ -1275,7 +1275,10 @@ The events and effects of map in this tick (`interfaces/map.h`). No row hashes t
 holds their lines, after those of section 39, as a diagnostic. The reference build does not record them, so
 its dumps have no `map.*` lines. An event is recorded when map consumes it from its inbox, right after
 `Apply` returns, with the outcome `Apply` gave; an effect is recorded when map publishes it, just before `SchedPublish`, with outcome 1.
-So the records are in the order map consumed and published them. The host empties the record after the world
+So the records are in the order map finished consuming and published them: an effect that `Apply` publishes
+(the CELLS_CHANGED of a building's ADD_UNIT, of a SET_YARD or of a PASS_MAPS) comes before the event that caused it,
+which is recorded only once `Apply` has returned its outcome. A reader at a divergence takes the event after a run of
+effects as their cause. The host empties the record after the world
 row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. The record has
 no fixed capacity, as a tick may hold an event for each unit that moved; a run that cannot hold it stops with
 an error. The fields are `map.fields` of the schema, in this order.

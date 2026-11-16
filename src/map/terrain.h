@@ -2,7 +2,6 @@
 #define TERRAIN_H
 #include <vector>
 #include "../util/vec3.h"
-class UnitVisitor;
 
 class MovementClass;
 struct Cell;
@@ -48,7 +47,5 @@ int __stdcall GetCellHeight(Point16* p);
 int __stdcall GetCellMeanHeight(Vec3* p);
 int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b);
 void __stdcall GetCellPosition(int x, int y, Vec3* out);
-
-void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, UnitVisitor* visitor);
 
 #endif

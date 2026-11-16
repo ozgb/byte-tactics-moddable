@@ -126,13 +126,8 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
 int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 // Calls map's synchronous PickRandomReclaimableResourcesInRadius slot after delivering map's pending inbox, and returns its answer.
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
-// Visits each unit VisitUnitsInRange finds. Implementations keep the vtable pointer first and this method in the first slot.
-class UnitVisitor {
-public:
-    // Called once for each unit within range. Hooks: none.
-    virtual void Visit(Unit* unit) = 0;
-};
-// Calls the visitor for each unit within range of the position, in map's spatial grid order, through map's UnitsInRange query.
+class UnitVisitor;
+// Calls the visitor for each unit within range of the position, in map's spatial grid order, through map's UnitsInRange query; a visitor must not move a unit or change map's grid.
 void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor);
 
 // Returns the heading of the horizontal vector from one position to another.

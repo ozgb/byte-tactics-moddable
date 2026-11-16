@@ -216,7 +216,8 @@ item is every field of every cell, so a row with it is any field. Each is served
 | Writer → reader | Items | Phase | How it is served |
 |---|---|---|---|
 | map → units, orders, ai, players, targeting, weapons, los_radar | `Unit::flags` | units | The claim bits, written inside map's synchronous events at the publisher's statement, as in 3.1c. The readers that read other bits of the word read them as before. |
-| map → units, orders | `Unit::spatialBucket`, `Unit::cargoNext` | units | Written by the synchronous ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT and the bucket events, at the publisher's statement. |
+| map → orders | `Unit::spatialBucket` | units | Written by the synchronous ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, at the publisher's statement. |
+| map → units | `Unit::cargoNext` | units | The bucket chain, written by the synchronous ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT and the bucket events, at the publisher's statement. |
 | map → units | `Unit::cobStateFlags` | units | `bit2`, written by the synchronous SET_YARD. |
 | map → orders | `Order::pos` | units | The caller's own position, written through the query `SnapWorldPosToFootprint` (section 3). |
 | map → units, features, los_radar, weapons | `PLOT MEMORY` | units | The footprint fields, written by the synchronous events; the readers read them, or their own fields of the same records. |

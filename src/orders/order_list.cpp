@@ -82,6 +82,7 @@ struct Point16FromShorts : Point16 {
 #include "../util/angles.h"
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"

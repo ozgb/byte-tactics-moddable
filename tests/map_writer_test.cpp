@@ -343,12 +343,12 @@ static void CheckRejected()
         noUnit[k] = MapEventOf(MAP_ADD_UNIT + k);
     MapEvent badClass = MapEventOf(MAP_REFRESH_PASS_MAP);
     badClass.value = 40;
-    MapEvent unknown = MapEventOf(127);
-    unknown.unit = Ref<Unit>(&s_units[kRunner]).offset;
+    MapEvent badKind = MapEventOf(127);
+    badKind.unit = Ref<Unit>(&s_units[kRunner]).offset;
     for (int k = 0; k < 7; k++)
         Check(g_seams.map->Apply(&noUnit[k]) == 0, "an event of a unit kind with a null unit has outcome 0");
     Check(g_seams.map->Apply(&badClass) == 0, "a pass map refresh of a class that does not exist has outcome 0");
-    Check(g_seams.map->Apply(&unknown) == 0, "an event of an unknown kind has outcome 0");
+    Check(g_seams.map->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
     Check(HashState() == before, "a rejected event changes no hashed state");
     Check(memcmp(&units[0], s_units, units.size()) == 0, "a rejected event changes no unit");
     Check(memcmp(&cells[0], g_game->cells.get(), cells.size()) == 0, "a rejected event changes no cell");

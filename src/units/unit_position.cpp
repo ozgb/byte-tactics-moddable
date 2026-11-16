@@ -87,6 +87,7 @@ int __stdcall GetGroundHeight(Vec3* pos);
 #include "../game/los_radar_events.h"
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../../interfaces/map.h"
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
 #include "unit_position.h"

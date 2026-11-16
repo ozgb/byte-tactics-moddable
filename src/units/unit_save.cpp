@@ -147,6 +147,7 @@ void __stdcall LoadUnits(HapiBank* file)
 
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
 #include "../game/economy_events.h"
 #include "../../interfaces/economy.h"

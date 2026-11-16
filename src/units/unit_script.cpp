@@ -37,6 +37,7 @@ int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../../interfaces/services.h"
 #include "../graphics/particles.h"
 #include "../util/math.h"
 #include "../weapons/explosions.h"

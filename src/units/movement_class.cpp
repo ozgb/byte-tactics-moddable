@@ -85,6 +85,7 @@ struct UnitPassMapStampView {
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
 #include "../game/map_events.h"
+#include "../../interfaces/services.h"
 
 #include "../map/mission.h"
 

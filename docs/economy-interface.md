@@ -227,6 +227,15 @@ which read the bit to decide what player 1's AI sees. Queued, the bit changed on
 commander stayed visible to player 1 for the rest of the tick. A synchronous route delivers units' inbox and calls
 `UnitsOnEconomyCloak` before `Emit` returns, at 3.1c's statement.
 
+**CLOAK queued again, with los_radar on the scheduler (#965): it still diverges.** Los_radar's passes now run from the
+scheduler (`docs/los-radar-interface.md`), and `UpdateSensorRadarAndCloak` delivers los_radar's inbox before it runs.
+With CLOAK queued the tier diverged at the same place: conditions-dark-side, tick 2460, phase world, field
+`players[1].ai.visible.size` (reference 0, queued 1). The pass reads the cloak bit (bit 4 of a unit's
+`activateFlags`), which is units' state, written by units' handler; a queued CLOAK waits in units' inbox, and no
+delivery of los_radar's own reaches it. Serving the read from los_radar would mean a copy of the bit in los_radar's
+state, kept by an effect from units in the same phase, which needs the same delivery before the pass, and adds a
+hashed field (a trace format change). The synchronous route is that delivery, so CLOAK stays synchronous.
+
 **Queued, and equal:** RESET, LOAD, REQUEST, INCOME and EXTRACTOR, in every scenario in both modes.
 
 **SHARE is queued, and equal.** The three `share-` scenarios (#953) give metal, energy, and both with the share of

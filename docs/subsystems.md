@@ -47,11 +47,11 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, `Apply` (the inbox of the meteor set-up and console events), the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWindOnStream` in `src/game/game_state.cpp`).
 
-Coverage: 5.9% of functions (1 of 17), 1.8% of lines, 0.0% of branches; 16 live function no scenario enters, and 0 more are dead (data/coverage.csv).
+Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live function no scenario enters, and 0 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (16 of 17 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 1 are entered, 5.9%), by reason:
+**Live functions no scenario enters** (15 of 15 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 0 are entered, 0.0%), by reason:
 
-- Native modules switch only (15): `AddPoints`, `CmdMeteor`, `DisableMeteors`, `EnableMeteors`, `InitMeteors`, `LoadMeteors`, `MakePoint`, `MeteorParams::LoadMeteorDefaults`, `SaveMeteors`, `SetMeteorParams`, `StartMeteorShower`, `StartShower`, `UpdateMeteors`, `UpdateWind`, `UpdateWindOnStream`. Wind and meteors run in `wind_meteors.wasm` by default (#564), so their native code runs only with `-modules=native` (`reference.py --check --native-modules`), which the coverage run does not pass. Every scenario enters the module's copies, and `console-features` (#445) enters `CmdMeteor` and `StartMeteorShower` there (`meteor` and `meteor 1`).
+- Native modules switch only (14): `AddPoints`, `DisableMeteors`, `EnableMeteors`, `InitMeteors`, `LoadMeteorDefaults`, `LoadMeteors`, `MakePoint`, `SaveMeteors`, `SetMeteorParams`, `StartMeteorShower`, `StartShower`, `UpdateMeteors`, `UpdateWindOnStream`, `WindMeteorsApply`. Wind and meteors run in `wind_meteors.wasm` by default (#564), so their native code runs only with `-modules=native` (`reference.py --check --native-modules`), which the coverage run does not pass. Every scenario enters the module's copies. The console's `meteor` commands are events since #970: `CmdMeteor` is game code that publishes them, and `console-features` (#445) enters it and, through the module's `Apply`, the module's `StartMeteorShower` (`meteor` and `meteor 1`).
 - Shutdown only (1): `EmptyShutdownPreCleanup`.
 
 **Entry points.** Phase roots: `UpdateWindOnStream` (the `UpdateWind` slot) and `UpdateMeteors`, both called through the scheduler (`SchedWindPhase`, `SchedMeteorsPhase`), which delivers the inbox through `Apply` first. `UpdateWindOnStream` is also called from `LoadBattleAssets` (game).
@@ -160,9 +160,9 @@ Coverage: 92.3% of functions (48 of 52), 89.6% of lines, 73.5% of branches; 4 li
 
 Issue #12. 58 functions. `UpdateFeatures` and feature loading, spreading, burning, reclaim and wreckage (`src/map/features*.cpp`).
 
-Coverage: 98.3% of functions (57 of 58), 86.6% of lines, 73.5% of branches; 1 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
+Coverage: 98.2% of functions (55 of 56), 86.4% of lines, 73.5% of branches; 1 live functions no scenario enters, and 4 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (1 of 58 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 57 are entered, 98.3%), by reason:
+**Live functions no scenario enters** (1 of 56 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 55 are entered, 98.2%), by reason:
 
 - Shutdown only (1): `FreeFeaturePool` (called from the line-of-sight teardown).
 - Entered by the console: `CmdBurnAll`, `CmdBurnOne`, `CmdFeature` and `RemoveAllFeatures`, by `console-features` (#445).
@@ -572,9 +572,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Shutdown only (1): `FreePlayers` (called from `ShutdownIngameSystems`, which no scenario runs).
 - Entered by the console: `TransferEnergy` and `TransferMetal` (console `Give`, `console-economy`) and `MissionConditions::Deactivate` (console `Kill`, `console-units`) (#445).
 
-**map** (112 functions). No phase root. 52 functions are called from outside, by presentation (24), seams (20), game (11) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 64 functions: platform 28, files 11, los_radar 6, game 4, wind_meteors 1. It holds the terrain, the pass maps and footprints. Coverage: 80.8% of functions (80 of 99), 87.1% of lines, 77.2% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
+**map** (112 functions). No phase root. 52 functions are called from outside, by presentation (24), seams (20), game (11) and orders (7); the busiest are `Mission::GetGameType` (21), `Mission::LoadMissionByName` (14), `SetMissionType` (12) and `Mission::GetMissionName` (10) (mission accessors). It imports 64 functions: platform 28, files 11, los_radar 6, game 4, wind_meteors 1. It holds the terrain, the pass maps and footprints. Coverage: 81.0% of functions (81 of 100), 87.1% of lines, 77.3% of branches; 19 live functions no scenario enters, and 13 more are dead (data/coverage.csv).
 
-**map, functions no scenario enters** (19 of 99 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 80 are entered, 80.8%), by reason:
+**map, functions no scenario enters** (19 of 100 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 81 are entered, 81.0%), by reason:
 
 - Load only (1): `ForceNeighborFootprintReclaim` (called from `LoadUnit`). `save-midgame` (#422) enters the save side, and `load-midgame` (#442) enters `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap` and `LoadMappingData` (the saved game files).
 - Shutdown only (1): `FreeOtaEnumCacheAndMission`. It is called at the end of `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick.
@@ -598,7 +598,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (297 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 169 functions are called from outside, by platform (77 distinct functions) and presentation (30); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 531 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 27.
 
-**game, functions no scenario enters** (77 of 268 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 191 are entered, 71.3%), by reason:
+**game, functions no scenario enters** (77 of 275 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 198 are entered, 72.0%), by reason:
 
 - Network only (3): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`. Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
@@ -635,7 +635,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (859 functions). The test harness of #3 (`src/harness`). No phase root. 38 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 78 functions (game 24, platform 28).
 
-**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 355 functions: platform 159, network 54, files 32, game 30, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` in `src/graphics/palette.cpp` waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 355 functions: platform 159, network 54, files 32, game 30, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
 **platform** (821 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (49); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 181 functions: game 77, presentation 46.
 
@@ -739,9 +739,9 @@ A live function that the suite cannot enter by design is counted apart, like a d
 
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
-| **wind_meteors** | 1 of 17 | 5.9% | 1.8% | 0.0% | 16 | 0 |
+| **wind_meteors** | 0 of 15 | 0.0% | 0.0% | 0.0% | 15 | 0 |
 | **economy** | 48 of 52 | 92.3% | 89.6% | 73.5% | 4 | 3 |
-| **features** | 57 of 58 | 98.3% | 86.6% | 73.5% | 1 | 4 |
+| **features** | 55 of 56 | 98.2% | 86.4% | 73.5% | 1 | 4 |
 | **ai** | 91 of 102 | 89.2% | 88.8% | 83.7% | 11 | 33 |
 | **pathfinding** | 67 of 76 | 88.2% | 82.1% | 69.5% | 9 | 10 |
 | **weapons** | 81 of 94 | 86.2% | 86.9% | 71.7% | 13 | 17 |
@@ -750,13 +750,13 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **orders** | 309 of 370 | 83.5% | 81.9% | 64.8% | 61 | 25 |
 | **units** | 160 of 194 | 82.5% | 86.5% | 74.4% | 34 | 32 |
 | **players** | 99 of 146 | 67.8% | 70.2% | 62.7% | 47 | 10 |
-| **map** | 80 of 99 | 80.8% | 87.1% | 77.2% | 19 | 13 |
+| **map** | 81 of 100 | 81.0% | 87.1% | 77.3% | 19 | 13 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 191 of 268 | 71.3% | 56.0% | 35.9% | 77 | 23 |
+| game | 198 of 275 | 72.0% | 56.3% | 36.1% | 77 | 23 |
 | network | 53 of 297 | 17.8% | 11.0% | 4.1% | 244 | 74 |
-| platform | 405 of 753 | 53.8% | 41.1% | 27.9% | 348 | 84 |
+| platform | 399 of 747 | 53.4% | 40.9% | 27.9% | 348 | 84 |
 | presentation | 565 of 1149 | 49.2% | 36.3% | 29.6% | 584 | 295 |
-| seams | 133 of 145 | 91.7% | 92.6% | 46.2% | 12 | 0 |
+| seams | 136 of 147 | 92.5% | 93.1% | 46.4% | 11 | 0 |
 | state | 486 of 557 | 87.3% | 70.1% | 49.3% | 71 | 58 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

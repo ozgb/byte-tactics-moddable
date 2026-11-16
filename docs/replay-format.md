@@ -335,7 +335,7 @@ The replayer allocates the whole array the first time a line names one of its el
 
 ### A table with a capacity
 
-A table whose live elements are the first `count` of room for more (`Game.eyes` has `count_14277` live of 20, and `AddEyeball` writes element `count`,
+A table whose live elements are the first `count` of room for more (`Game.eyes` has `count_14277` live of 20, and an ADD_EYEBALL event writes element `count`,
 past the live ones) has a `capacity` beside its `count`. `count` is a member that the recording holds like any block field (a `game_fields` or `sim_fields`
 entry), and the replayer never stores into it: `alloc` stores into the count member, which would overwrite the live count. Elements are named up to the
 capacity, so a pointer to element `count` is `Eye#2`, not `Eye#?`. The all-of walk and the other walks that follow a table go only as far as the live

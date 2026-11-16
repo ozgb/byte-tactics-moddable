@@ -695,7 +695,7 @@ Flags: none.
 
 Recorded by a console command run by the local player, only in a network game (the net game flag 1 set): the toggles of sharing metal, energy, mapping, line of sight and radar (texts 0 to 4), with the new state, and the commands that set the thresholds for sharing metal and energy (texts 5 and 6), with the first argument of the command as given. The command that toggles all sharing records four events: metal, energy, mapping and radar (not line of sight). The radar toggle's value is the player's share-radar flag bit (64), tested after the toggle.
 
-Phases: match load, outside the steps.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load, outside the steps.
 
 The presentation puts the line in the message log: the text with ON or OFF for a toggle, or with the number.
 
@@ -719,7 +719,7 @@ A projectile record is 12 bytes: x i32 (whole part), y i32 (whole z minus half t
 
 The units and projectiles shown depend on the viewed player, so they differ between machines.
 
-Phases: players (4), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation draws the radar picture from the snapshot.
 
@@ -737,7 +737,7 @@ Recorded only when the map-changed flag is set, which clears it. A snapshot is a
 
 The snapshot is 12 bytes: the width and the height of the full map and the cell count (u32 each; the cell count is half the width times half the height, each rounded down), then one byte for each of those cells in order: 0 (hidden) when the viewed player's bit in the cell's visibility mask is clear, otherwise 1 (explored) when the viewed player's explored entry for the cell is non-zero, otherwise 2 (in sight now). The viewed player differs between machines.
 
-Phases: players (4), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation marks the cells on the radar picture as explored or hidden.
 

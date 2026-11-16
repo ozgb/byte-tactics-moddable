@@ -1620,7 +1620,7 @@ GetCellMeanHeight,src/map/terrain.cpp,map,file:src/map/terrain,
 FindHighestPointOnLine,src/map/terrain.cpp,map,file:src/map/terrain,
 GetCellPosition,src/map/terrain.cpp,map,file:src/map/terrain,
 ClampPositionToMap,src/units/units.cpp,units,default:src/units/,
-ShareMapInfo,src/map/line_of_sight.cpp,los_radar,name:Share,los_radar
+ShareMapInfo,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,los_radar
 AllocateUnitMemory,src/units/units.cpp,units,default:src/units/,
 ComparePlayers,src/units/units.cpp,players,name:Player,
 FreeUnitMemory,src/units/units.cpp,units,default:src/units/,
@@ -3920,9 +3920,9 @@ Lookup,src/state/block.cpp,game,default,
 LosRadarEventOf,src/game/los_radar_events.h,game,phase:UpdatePlayers,game
 LosRadarInbox,src/seams/los_radar_world.cpp,seams,folder:src/seams/,
 LosRadarPublishRecalculate,src/game/los_radar_events.h,game,phase:UpdatePlayers,game
+LosRadarPublishShareMap,src/game/los_radar_events.h,game,name:Radar,game
 LosRadarPublishShareMapping,src/game/los_radar_events.h,game,name:Radar,game
 LosRadarPublishShareRadar,src/game/los_radar_events.h,game,name:Radar,game
-LosRadarPublishShareMap,src/game/los_radar_events.h,game,name:Share,game
 LosRadarResultsAdd,src/harness/los_radar_results.h,harness,folder:src/harness/,
 LosRadarResultsClear,src/harness/los_radar_results.h,harness,folder:src/harness/,
 LosTable::GetLine,src/map/los_lines.h,los_radar,file:src/map/los_lines,

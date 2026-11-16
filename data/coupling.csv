@@ -2031,7 +2031,6 @@ los_radar,ai,shared_write,Vec3::z,18
 los_radar,ai,shared_write,Vec3Words::xWhole,3
 los_radar,ai,shared_write,Vec3Words::yWhole,2
 los_radar,ai,shared_write,Vec3Words::zWhole,3
-los_radar,economy,shared_write,Game::visibilityMask,1
 los_radar,economy,shared_write,PlayerInfo::flags_97_wide,1
 los_radar,economy,shared_write,Ref<Unit>::offset,1
 los_radar,features,indirect,FreeFeaturePool,1
@@ -2431,7 +2430,6 @@ network,ai,shared_write,Player::exploredHeight,2
 network,ai,shared_write,Player::exploredWidth,2
 network,ai,shared_write,Player::index,6
 network,ai,shared_write,Player::type,6
-network,economy,call,ShareMapInfo,1
 network,economy,shared_write,Game::netGameFlags,5
 network,economy,shared_write,Player::active,2
 network,economy,shared_write,Player::energyWasted,1
@@ -2453,6 +2451,7 @@ network,files,call,LzssDisablePreset,2
 network,files,call,LzssEnablePreset,2
 network,files,call,LzssExpand,1
 network,game,call,GameRand,1
+network,game,call,LosRadarPublishShareMap,1
 network,game,call,SetCursorMode,1
 network,game,call,SetGameSpeed,1
 network,game,call,SimAllocTagged,1
@@ -3879,7 +3878,6 @@ presentation,ai,shared_write,Unit::pos,3
 presentation,ai,shared_write,Vec3::x,18
 presentation,ai,shared_write,Vec3::y,11
 presentation,ai,shared_write,Vec3::z,18
-presentation,economy,call,ShareMapInfo,1
 presentation,economy,indirect,EconomyUnitAccount,1
 presentation,economy,shared_write,Game::netGameFlags,5
 presentation,economy,shared_write,Player::active,2
@@ -3940,6 +3938,7 @@ presentation,game,call,GetPreferenceInt,1
 presentation,game,call,GetPreferredLanguage,2
 presentation,game,call,InstallOutOfMemoryHandler,1
 presentation,game,call,LoadSettings,2
+presentation,game,call,LosRadarPublishShareMap,1
 presentation,game,call,MatchSetupToInfo,1
 presentation,game,call,ReadGameRegistryValue,3
 presentation,game,call,SaveAllMissionsSetting,1

@@ -112,6 +112,10 @@ int __stdcall ScheduleEconomySpend(const EconomyEvent*)
 {
     return 0;
 }
+int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef*, unsigned short, Point16, int)
+{
+    return 0;
+}
 int __stdcall CmdShareMapping(int)
 {
     return 0;

@@ -572,14 +572,11 @@ no header declares it with the type its definition has.
 
 ## Callbacks
 
-Some imports call back into the recorded subsystem while they run: `map.VisitObjectsInRange` calls `visitor->Visit(unit)` for each
-unit it finds, and the scan visitors of the victory conditions return a result. Each call the import made on the object it was
+Some imports call back into the recorded subsystem while they run: the scan visitors of the victory conditions are called for
+each unit and return a result. Each call the import made on the object it was
 given is a `c` line right after the import's `i` line and before its `o` lines, indented as the `i` line plus two spaces, in call order:
 
 ```
-  i map.VisitObjectsInRange (100,200) 300 visitor#1
-    c visitor#1.Visit Unit#3
-    c visitor#1.Visit Unit#9
   i fixture.Scan scanner#1 = 0
     c scanner#1.visit Unit#3 = 1
     c scanner#1.visit Unit#9 = 0
@@ -592,9 +589,9 @@ outer call, as any write of the module does. The annotation names each interface
 interface:
 
 ```json
-"callbacks": {"UnitVisitor": {"header": "<the header of the class>", "handle": "visitor",
-              "methods": [{"name": "Visit", "ret": "void", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
-{"mode": "callback", "callback": "UnitVisitor"}
+"callbacks": {"UnitScanVisitor": {"header": "<the header of the class>", "handle": "scanner",
+              "methods": [{"name": "VisitUnit", "ret": "int", "args": [{"name": "unit", "type": "Unit*", "mode": "object", "kind": "Unit"}]}]}}
+{"mode": "callback", "callback": "UnitScanVisitor"}
 ```
 
 `methods` are the virtual methods of the class in the header, in declaration order (the tool checks the names against the header, and a
@@ -610,7 +607,7 @@ lines could not be in call order. A callback that frees its own object is put ba
 
 The replayer stub makes the recorded calls in order, on the object the module passed, with the recorded arguments, after it has
 matched the `i` line and before it applies the `o` lines. It compares each result with the recorded one and reports a difference at
-`<import>.c[<k>]` (`import 0 map.VisitObjectsInRange.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
+`<import>.c[<k>]` (`import 0 fixture.Scan.c[1]: recorded 0, replayed 1`), and a call recorded on another handle than the
 object's at the same place.
 
 ### A callback held in state
@@ -1216,10 +1213,10 @@ nothing is recorded of it.
 wine build/modern/replay_inject_test.exe --expect 7 result tests/replay/map/orders-air-repair.txt
 ```
 
-The recordings of map, which the modern build runs as native code in every mode (it has no WASM module yet): `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `CanBuildAt`, `SnapWorldPosToFootprint`, `RefreshPassMap`), `orders-air`, ticks 1020 to 1585 only
-(`SetYardOpen`, `SpatialBucketPrependUnit` and `SpatialBucketUnlinkUnit`, `CanPlaceFootprintAt`, `CanBuildAt`) and `orders-air-repair`, ticks 380 to 385 only (`ClearFootprintAndUnlink`, `IsPadSlotFree`, `GetCellMeanHeight`).
+The recordings of map 4.0, which the modern build runs as native code in every mode (it has no WASM module yet), where `Apply` is called with each event map is given: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `Apply` with PASS_MAPS, ADD_UNIT, REMOVE_UNIT and REFRESH_PASS_MAP, `CanBuildAt`, `CanPlaceUnitFootprint`, `SnapWorldPosToFootprint`), `orders-air`, ticks 1020 to 1585 only
+(`Apply` with ADD_UNIT, REMOVE_UNIT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND and REFRESH_PASS_MAP, `CanPlaceFootprintAt`, `CanBuildAt`, `CanPlaceUnitFootprint`) and `orders-air-repair`, ticks 380 to 385 only (`Apply` with ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, `IsPadSlotFree`, `CanPlaceUnitFootprint`, `GetCellMeanHeight`).
 A window cannot start at tick 0, so only a whole run holds the load-time `BuildAllPassMaps`. The first call that names a field of `Cell` writes it for every cell of the table (a map of 224 by 102 cells is about 23,000 lines a field),
-which is most of each file, and after that only the cells a call changed. `ForceNeighborFootprintReclaim` is in no scenario.
+which is most of each file, and after that only the cells a call changed. RECLAIM_FOOTPRINT is in no scenario.
 The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a3` times `height_142a7` buckets, included under `pack1:` because the game lays a bucket out in 10 bytes, and listed before `Cell` so that the units
 of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game.overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
 `occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.

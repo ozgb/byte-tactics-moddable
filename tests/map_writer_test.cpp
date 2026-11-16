@@ -79,6 +79,7 @@ int TdfRecord::GetFieldInt(const char*, int fallback)
 }
 void __stdcall SchedPublish(int, const void*, unsigned int) {}
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
+void __stdcall HarnessMapEvent(const MapEvent*, int) {}
 
 enum {
     kMapCells = 32,

@@ -209,8 +209,46 @@ TARGETING_EVENTS = [
     ("targeting[1].outcome", "0x00000001"),
 ]
 
+LOS_RADAR_EVENTS = [
+    ("los_radar.count", "0x00000002"),
+    ("los_radar[0].kind", "0x00000080"),
+    ("los_radar[0].unit", "unit:3"),
+    ("los_radar[0].player", "0x00000001"),
+    ("los_radar[0].value", "0x00000000"),
+    ("los_radar[0].pos", "hex:" + bytes(12).hex()),
+    ("los_radar[0].sightDistance", "0x00000000"),
+    ("los_radar[0].eyeHeight", "0x00000000"),
+    ("los_radar[0].lifetime", "0x00000000"),
+    ("los_radar[0].cell", "hex:" + bytes(8).hex()),
+    ("los_radar[0].size", "hex:" + bytes(8).hex()),
+    ("los_radar[0].outcome", "0x00000001"),
+    ("los_radar[1].kind", "0x00000083"),
+    ("los_radar[1].unit", "null"),
+    ("los_radar[1].player", "0x00000000"),
+    ("los_radar[1].value", "0x00000000"),
+    ("los_radar[1].pos", "hex:" + bytes(range(12)).hex()),
+    ("los_radar[1].sightDistance", "0x00000140"),
+    ("los_radar[1].eyeHeight", "0x00000010"),
+    ("los_radar[1].lifetime", "0x0000003c"),
+    ("los_radar[1].cell", "hex:" + bytes(8).hex()),
+    ("los_radar[1].size", "hex:" + bytes(8).hex()),
+    ("los_radar[1].outcome", "0x00000000"),
+]
+
 
 class DumpedOnlyTest(unittest.TestCase):
+    def test_los_radar_events_after_the_targeting_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_los_radar_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("los_radar.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
     def test_targeting_events_after_the_features_events_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + SHARE_PACKETS
         w = tr.Walker(RESULTS, lines)

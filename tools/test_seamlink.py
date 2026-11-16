@@ -682,8 +682,8 @@ FeHelp,src/map/features.cpp,features,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_economy_wind_meteors_features_and_targeting(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting"])
+    def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -808,8 +808,8 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_targeting_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "targeting")
+    def test_the_pilots_table_lists_targeting_before_los_radar(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -856,6 +856,129 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         header = TARGETING_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
         found = self.check([], header=header, fillers={k: v for k, v in TARGETING_FILLERS.items() if k != "ChooseWeapon"})
         self.assertEqual([(f[0], f[2]) for f in found], [("slot", "ChooseWeapon"), ("slot", "Debug")])
+
+
+LOS_RADAR_HEADER = """struct LosRadarSeam {
+    int (__stdcall* Apply)(const LosRadarEvent* event);
+    Cell* (__stdcall* GetMapCell)(int x, int y);
+    void (__stdcall* ClampWorldPosToTerrain)(int x, int y, Vec3* out);
+    int (__stdcall* IsUnitVisibleToPlayer)(Player* player, Unit* unit);
+    void (__stdcall* UpdateUnitLineOfSight)(Unit* unit);
+    void (__stdcall* RecordRadarUnits)(void);
+    void (__stdcall* LoadTntMap)(void);
+    void (__stdcall* FreeRadar)(void);
+};
+"""
+LOS_RADAR_FILLERS = {"Apply": "LrApply", "GetMapCell": "LrCell", "ClampWorldPosToTerrain": "LrClamp", "IsUnitVisibleToPlayer": "LrVisible",
+                     "UpdateUnitLineOfSight": "LrUpdate", "RecordRadarUnits": "LrRecord", "LoadTntMap": "LrLoad", "FreeRadar": "LrFree"}
+LOS_RADAR_PILOT = dataclasses.replace(
+    seamlink.LOS_RADAR, writing=("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits"),
+    query=("GetMapCell", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer"), setup=("LoadTntMap", "FreeRadar"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),))
+
+
+class LosRadarPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Move,src/units/unit_position.cpp,units,x,
+Head,src/game/players.cpp,players,x,
+LoadBattleAssets,src/game/game_state.cpp,game,x,
+Other,src/game/console_commands.cpp,game,x,
+LrApply,src/map/line_of_sight.cpp,los_radar,x,
+LrCell,src/map/line_of_sight.cpp,los_radar,x,
+LrClamp,src/map/line_of_sight.cpp,los_radar,x,
+LrVisible,src/game/players.cpp,los_radar,x,
+LrHelp,src/map/line_of_sight.cpp,los_radar,x,
+"""
+
+    def check(self, rows, header=LOS_RADAR_HEADER, fillers=None):
+        fillers = LOS_RADAR_FILLERS if fillers is None else fillers
+        rows = [(f, "src/map/line_of_sight.cpp", "function", "") for f in ("LrCell", "LrClamp", "LrVisible")] + list(rows)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(
+                "static LosRadarSeam s_los_radar;\n" + "".join(f"s_los_radar.{s} = {f};\n" for s, f in fillers.items()))
+            (root / "interfaces/los_radar.h").write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, LOS_RADAR_PILOT)
+
+    def slot(self, name, seam="LosRadarSeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_los_radar_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "los_radar")
+        self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
+                                                     "RecordRadarMapped", "ExpireEyeballs"))
+        self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"))
+        header = seamlink.ROOT / "interfaces/los_radar.h"
+        if header.exists():
+            pilot = seamlink.LOS_RADAR
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "LosRadarSeam")))
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("UpdateUnitLineOfSight")),
+                            ("Head", "src/game/players.cpp", "field_read", "LosRadarSeam::RecordRadarUnits"),
+                            ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("Apply"))])
+        self.assertEqual(sorted(f[1:] for f in found),
+                         [("game", "Other", "LosRadarSeam::Apply"), ("players", "Head", "LosRadarSeam::RecordRadarUnits"),
+                          ("units", "Move", "LosRadarSeam::UpdateUnitLineOfSight")])
+
+    def test_the_engine_and_los_radar_may_call_writing_slots(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateUnitLineOfSight")),
+                ("LosRadarInbox", "src/seams/los_radar_world.cpp", "indirect_call", self.slot("Apply")),
+                ("RecLosRadarApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("RecordRadarUnits")),
+                ("LrApply", "src/map/line_of_sight.cpp", "indirect_call", self.slot("RecordRadarUnits"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("LoadTntMap")),
+                ("RecLosRadarFreeRadar", "src/harness/replay_hooks.inc", "indirect_call", self.slot("FreeRadar")),
+                ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("FreeRadar")),
+                ("Move", "src/units/unit_position.cpp", "field_read", "LosRadarSeam::LoadTntMap")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other"), ("setup", "units", "Move")])
+
+    def test_a_query_slot_is_called_by_anyone(self):
+        self.assertEqual(self.check([("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("GetMapCell")),
+                                     ("Head", "src/game/players.cpp", "indirect_call", self.slot("IsUnitVisibleToPlayer"))]), [])
+
+    def test_the_filler_may_write_its_out_parameter_and_its_own_locals(self):
+        rows = [("LrClamp", "src/map/line_of_sight.cpp", "deref_write", "*Vec3"),
+                ("LrClamp", "src/map/line_of_sight.cpp", "indirect_call", self.slot("GetGroundHeight", "UnitsSeam")),
+                ("LrVisible", "src/game/players.cpp", "field_write", "Vec3::x"),
+                ("LrVisible", "src/game/players.cpp", "field_maybe_written", "<anon>::words"),
+                ("LrVisible", "src/game/players.cpp", "call", "get"),
+                ("LrVisible", "src/game/players.cpp", "call", "IsVisible"),
+                ("IsVisible", "src/game/players.cpp", "indirect_call", self.slot("IsPointVisible", "AiSeam"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_query_slot_that_writes_or_calls_a_slot_is_found(self):
+        found = self.check([("LrCell", "src/map/line_of_sight.cpp", "field_write", "Cell::feature"),
+                            ("LrCell", "src/map/line_of_sight.cpp", "call", "LrHelp"),
+                            ("LrHelp", "src/map/line_of_sight.cpp", "field_write", "Vec3::x"),
+                            ("LrClamp", "src/map/line_of_sight.cpp", "indirect_call", self.slot("UpdateUnitLineOfSight")),
+                            ("LrClamp", "src/map/line_of_sight.cpp", "field_write", "Unit::flags"),
+                            ("LrVisible", "src/game/players.cpp", "indirect_call", self.slot("FindWeaponTarget", "TargetingSeam")),
+                            ("LrVisible", "src/game/players.cpp", "global_write", "g_x")])
+        self.assertEqual(sorted(f[3] for f in found),
+                         ["LosRadarSeam::ClampWorldPosToTerrain calls indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]",
+                          "LosRadarSeam::ClampWorldPosToTerrain field write Unit::flags",
+                          "LosRadarSeam::GetMapCell field write Cell::feature",
+                          "LosRadarSeam::GetMapCell field write Vec3::x",
+                          "LosRadarSeam::IsUnitVisibleToPlayer calls indirect via void (*)(int) __attribute__((stdcall)) [TargetingSeam::FindWeaponTarget]",
+                          "LosRadarSeam::IsUnitVisibleToPlayer global write g_x"])
+
+    def test_a_slot_in_no_list_or_unfilled_is_found(self):
+        header = LOS_RADAR_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
+        found = self.check([], header=header, fillers={k: v for k, v in LOS_RADAR_FILLERS.items() if k != "GetMapCell"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "GetMapCell")])
 
 
 if __name__ == "__main__":

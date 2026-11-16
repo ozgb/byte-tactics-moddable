@@ -8,7 +8,7 @@
 // Minor version of the economy interface, changed when a slot is added.
 #define ECONOMY_VERSION_MINOR 0
 
-// A unit, as an opaque handle the world view gives (0 for none, which names a player's own account in an event).
+// A unit, as the block offset of its record (an offset from the block base) that the world view gives; 0 for none, which names a player's own account in an event.
 typedef unsigned int EconUnit;
 // A unit type, as its number in the match's table of unit types.
 typedef unsigned int EconType;

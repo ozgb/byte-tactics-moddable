@@ -21,15 +21,15 @@ enum FeaturesEventKind {
     FEATURES_REMOVE = 33,
     // Weapon (value, the number of its definition) hits the feature whose footprint starts at cell (x, z), which may kill it or set it alight; outcome 1 when the feature was killed.
     FEATURES_DAMAGE = 34,
-    // The unit (unit, a handle) reclaims the feature at pos; outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
+    // The unit (unit, its block offset) reclaims the feature at pos; outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
     FEATURES_RECLAIM = 35
 };
 
 // The kinds of effect features publishes to its outbox, for the modules that subscribe to them.
 enum FeaturesEffectKind {
-    // A model's piece state that a removed feature held, state (a state block handle), is no longer needed and is freed.
+    // A model's piece state that a removed feature held, state (its block offset), is no longer needed and is freed.
     FEATURES_EFFECT_FREE_STATE = 48,
-    // The piece state at state (a state block handle, allocated by features with the size ObjectStateSize gave) is built for the model of feature.
+    // The piece state at state (its block offset, allocated by features with the size ObjectStateSize gave) is built for the model of feature.
     FEATURES_EFFECT_INIT_STATE = 49,
     // The features on the cells of the footprint at (x, z), width by height cells, changed: the passability of those cells is computed again.
     FEATURES_EFFECT_PASS_MAPS = 50,
@@ -59,11 +59,11 @@ struct FeaturesEvent {
     int feature;
     // The player that owns a placed feature, 10 for none.
     int owner;
-    // The unit that reclaims, as the handle economy's events use.
+    // The unit that reclaims, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
     unsigned int unit;
     // The argument of the kind, as the kind says.
     int value;
-    // A model's piece state, as a state block handle.
+    // A model's piece state, as its block offset.
     unsigned int state;
     // The size of a footprint, in cells.
     int width, height;

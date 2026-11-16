@@ -1300,7 +1300,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33, 35, 36, 37, 38 and 39. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 36 to 39. The first line is `bt-dump 5`; every
 other line is
 
 ```

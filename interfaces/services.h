@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 14
+#define SERVICES_VERSION_MINOR 15
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -53,6 +53,9 @@ void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome);
 struct TargetingEvent;
 // In test mode, records a targeting event as targeting consumes it, or an effect as targeting publishes it, with its outcome, for the dump's targeting events.
 void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome);
+struct LosRadarEvent;
+// In test mode, records a los_radar event as los_radar consumes it, with its outcome, for the dump's los_radar events.
+void __stdcall HarnessLosRadarEvent(const LosRadarEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -77,8 +80,10 @@ enum SchedModule {
     SCHED_TARGETING = 9,
     // AI.
     SCHED_AI = 10,
+    // Line of sight and radar (interfaces/los_radar.h).
+    SCHED_LOS_RADAR = 11,
     // The number of modules.
-    SCHED_MODULE_COUNT = 11
+    SCHED_MODULE_COUNT = 12
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);

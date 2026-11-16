@@ -261,18 +261,18 @@ queued 1). `UpdateSensorRadarAndCloak` now delivers los_radar's inbox first, but
 state, and a queued CLOAK waits in units' inbox. `docs/economy-interface.md`, section 8, has the argument.
 
 **How often each route runs, and inbox depths.** A measuring build (not merged) counted every publish to los_radar
-with the final routes, over 87 of the 88 scenarios with native modules (load-midgame plays only after save-midgame,
+with the final routes, over 88 of the 89 scenarios with native modules (load-midgame plays only after save-midgame,
 and was left out):
 
 | Route | Inside the tick | Outside the tick (delivered at once) |
 |---|---|---|
-| orders UPDATE_UNIT | 349026, synchronous, in 75 scenarios | none |
+| orders UPDATE_UNIT | 349201, synchronous, in 76 scenarios | none |
 | units UPDATE_UNIT | 58, synchronous, in 5 | none |
-| units REVEAL_UNIT | 1981, synchronous, in 51 | 1416, in 87 (the units of the map's start) |
+| units REVEAL_UNIT | 1989, synchronous, in 52 | 1420, in 88 (the units of the map's start) |
 | units REMOVE_UNIT | 933, synchronous, in 34 | 4, in 1 |
 | units ADD_EYEBALL | 174, synchronous, in 25 | 2, in 1 |
-| map CELL_HEIGHTS | 1837, queued, in 56 | 333, in 25 |
-| engine RECALCULATE | none | 94, in 87 (the load of a match) |
+| map CELL_HEIGHTS | 1845, queued, in 57 | 335, in 26 |
+| engine RECALCULATE | none | 95, in 88 (the load of a match) |
 | players UPDATE_UNIT, players RECALCULATE, engine SHARE_MAP, SHARE_MAPPING, SHARE_RADAR, economy SHARE_MAPPING, SHARE_RADAR | none | none |
 
 Only CELL_HEIGHTS is ever pending in the tick. Los_radar's inbox held at most 4 events (sensors-floating-teeth-los-off,
@@ -283,4 +283,5 @@ No scenario reaches seven of the routes. Of them, players' UPDATE_UNIT, players'
 can be published inside the tick, and are synchronous for it; the other four are published only outside the tick.
 
 The final build passes the full suite in both modes (`reference.py --check --both-modes`, the gate when the trace
-schema changes): 176 of 176 runs equal, and every sound log, ui log, event digest, frame and save equal.
+schema changes): 178 of 178 runs (89 scenarios, each in WASM and with native modules) equal, and every sound log, ui
+log, event digest, frame and save equal.

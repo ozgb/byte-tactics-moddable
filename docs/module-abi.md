@@ -549,9 +549,10 @@ signatures are `signatures.services` of the manifest.
 | `HarnessEconomyEvent` | `[linear, int] -> void` | in test mode, records an `EconomyEvent` with its outcome (second argument) for the dump's economy events; outside test mode it does nothing |
 | `HarnessFeaturesEvent` | `[linear, int] -> void` | the same for a `FeaturesEvent` and the dump's features events |
 | `HarnessTargetingEvent` | `[linear, int] -> void` | the same for a `TargetingEvent` and the dump's targeting events |
+| `HarnessLosRadarEvent` | `[linear, int] -> void` | the same for a `LosRadarEvent` and the dump's los_radar events |
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
-(`docs/trace-format.md`, sections 8.22 and 8.24 to 8.26), and two parties record them. The engine records each event
+(`docs/trace-format.md`, sections 8.22 and 8.24 to 8.27), and two parties record them. The engine records each event
 it delivers to a module's inbox, with the outcome `Apply` returns, and each synchronous call into the module (economy's
 `Spend`, features' `Place`) with its answer. The module records each effect it publishes: it calls `Harness<X>Event`
 with the effect and outcome 1 just before `SchedPublish`. Economy's world view `Emit` and wind_meteors' `WindMeteorsEmit`
@@ -564,14 +565,14 @@ through what its subscribers do with it. The `services` list of a subsystem in t
 `imports.services` of its manifest entry: targeting's names only `RandomInt`, and its recordings still carry
 `SchedPublish` lines.
 
-The services interface is at major 1 and minor 14 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 1 and minor 15 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). `CommandArgs_Count` came with minor 8, the goal-area services (`PathGoalContains`,
 `PathGoalDistance`, `PathGoalCells`) with minor 9 and `HarnessPathEvent`, which the players phase calls for the trace's
 path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls for the trace's economy events, with minor 11,
 `WindMeteorsEmit`, the meteors' SPAWN effect, and `HarnessWindMeteorsEvent` with minor 12, `HarnessFeaturesEvent` and
 `ScheduleFeaturesPlace`, features' synchronous placement, with minor 13, and `HarnessTargetingEvent` and the calls into
 targeting (`ScheduleTargetingTargetUnit`, `ScheduleTargetingTargetPos`, `ScheduleTargetingFind`,
-`ScheduleTargetingFireAtWill`) with minor 14. Each is an addition: a module built without it needs nothing.
+`ScheduleTargetingFireAtWill`) with minor 14, and `HarnessLosRadarEvent` with minor 15. Each is an addition: a module built without it needs nothing.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter

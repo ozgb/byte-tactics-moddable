@@ -37,7 +37,7 @@ enum LosRadarEventKind {
 struct LosRadarEvent {
     // A LosRadarEventKind.
     int kind;
-    // The unit, as the handle economy's events use.
+    // The unit, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
     unsigned int unit;
     // The player, 0 to 9.
     int player;

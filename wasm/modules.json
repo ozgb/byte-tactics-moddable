@@ -74,7 +74,8 @@
       "SchedPublish": [["int", "linear", "int"], "void"],
       "HarnessEconomyEvent": [["linear", "int"], "void"],
       "HarnessFeaturesEvent": [["linear", "int"], "void"],
-      "HarnessTargetingEvent": [["linear", "int"], "void"]
+      "HarnessTargetingEvent": [["linear", "int"], "void"],
+      "HarnessLosRadarEvent": [["linear", "int"], "void"]
     },
     "targeting": {
       "Apply": [["linear"], "int"],

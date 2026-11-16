@@ -1,0 +1,23 @@
+# A computer player's anti-nuke silo on The Pass, with a stockpiled missile, intercepts a nuke a human silo launches into its coverage; 5960 ticks.
+game_seed 975
+crt_seed 1975
+view_seed 2975
+map The Pass
+start_positions fixed
+ticks 5960
+commander_death 0
+player0.controller human
+player0.side Arm
+player0.metal 30000
+player0.energy 200000
+player1.controller human
+player1.side Core
+player1.metal 30000
+player1.energy 60000
+console 1 +now Film Chris Include Reload Assert
+spawn 10 0 ARMSILO 640 260
+spawn 10 1 CORFMD 2880 1056
+order 20 0:ARMSILO:1 qbuild MAKENUKE 1
+order 20 1:CORFMD:1 qbuild MAKEANTI 1
+console 30 +ai 1
+order 5430 0:ARMSILO:1 attack 3000 1000

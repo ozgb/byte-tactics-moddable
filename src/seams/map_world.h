@@ -1,7 +1,7 @@
 #ifndef MAP_WORLD_H
 #define MAP_WORLD_H
 
-#include "../../interfaces/services.h"
+#include "../map/unit_visitor.h"
 
 struct Vec3;
 

@@ -1,7 +1,7 @@
 #ifndef DAMAGED_ALLY_COLLECTOR_H
 #define DAMAGED_ALLY_COLLECTOR_H
 #include <vector>
-#include "../../interfaces/services.h"
+#include "../map/unit_visitor.h"
 
 struct Player;
 struct Unit;

@@ -77,6 +77,10 @@ int HarnessTestMode()
     return 1;
 }
 
+void __stdcall HarnessTargetingEvent(const TargetingEvent*, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
@@ -775,8 +779,19 @@ void ParseStruct(const char* name, unsigned kind, void* object)
         char key[96];
         sprintf(key, "%s.%s", name, f.name);
         const char* value = ArgLine(key);
-        if (value != nullptr)
-            ReplayRestoreObjectField(f, object, value, g_objects, nullptr);
+        if (value == nullptr || !ReplayRestoreObjectField(f, object, value, g_objects, AllocObject))
+            continue;
+        void* target = nullptr;
+        if (f.kind == RK_REF) {
+            unsigned offset = *(unsigned*)((unsigned char*)object + f.offset);
+            target = offset == 0 ? nullptr : (char*)SimBlockBase() + offset;
+        }
+        else if (f.kind == RK_PTR)
+            target = *(void**)((unsigned char*)object + f.offset);
+        if (target != nullptr && g_rootCount < REPLAY_MAX_ROOTS) {
+            g_rootKinds[g_rootCount] = f.target;
+            g_rootObjects[g_rootCount++] = target;
+        }
     }
 }
 
@@ -1515,16 +1530,6 @@ unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
     return unit->ChooseWeapon();
 }
 
-void __stdcall SetWeaponTargetUnitSlot(Unit* unit, Unit* target, int weapon)
-{
-    SetWeaponTargetUnit((char*)unit, (char*)target, weapon);
-}
-
-void __stdcall SetWeaponTargetPosSlot(Unit* unit, Vec3* pos, int weapon)
-{
-    SetWeaponTargetPos((char*)unit, &pos->x, weapon);
-}
-
 int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
 {
     if (first != nullptr)
@@ -1587,6 +1592,11 @@ void __cdecl UpdateWindSlot(RandStream stream)
 void __stdcall ApplySlot(const WindMeteorsEvent* event)
 {
     WindMeteorsApply(event);
+}
+
+int __stdcall ApplyTargetingSlot(const TargetingEvent* event)
+{
+    return ApplyTargetingEvent(event);
 }
 
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)

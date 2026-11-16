@@ -26,19 +26,19 @@ struct MeteorShowerParams {
 
 // The kinds of event the engine publishes to wind_meteors' inbox; each is consumed by Apply in the order it was published, at once outside a tick.
 enum WindMeteorsEventKind {
-    // Queued: meteor showers fall from the next one due.
+    // Meteor showers fall from the next one due.
     WIND_METEORS_ENABLE = 64,
-    // Queued: a shower that falls due from now on drops no meteor, though its centre and the next one's time are still drawn and set; one already falling ends as planned.
+    // A shower that falls due from now on drops no meteor, though its centre and the next one's time are still drawn and set; one already falling ends as planned.
     WIND_METEORS_DISABLE = 65,
-    // Queued: sets the meteor weapon's name and the shower timing from params; InitMeteors looks the weapon up.
+    // Sets the meteor weapon's name and the shower timing from params; InitMeteors looks the weapon up.
     WIND_METEORS_PARAMS = 66,
-    // Queued: starts a shower now, centred on a random cell, whether showers are enabled or not.
+    // Starts a shower now, centred on a random cell, whether showers are enabled or not.
     WIND_METEORS_START = 67
 };
 
 // The kinds of effect wind_meteors publishes to its outbox, for the modules that subscribe to them.
 enum WindMeteorsEffectKind {
-    // A meteor falls: a projectile of the meteor weapon starts at the position with the velocity; delivered at the next phase boundary.
+    // A meteor falls: a projectile of the meteor weapon starts at the position with the velocity.
     WIND_METEORS_EFFECT_SPAWN = 80
 };
 

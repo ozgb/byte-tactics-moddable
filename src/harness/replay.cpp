@@ -226,6 +226,8 @@ public:
             role = 1;
             s_open = true;
             SlotEnter(slot, sub, roots);
+        } else if (sub != s_sub && s_rec[sub] != nullptr && recorded) {
+            ReplayFail("a call of a recorded subsystem made inside a call of another recorded subsystem is not recorded: record each in its own run");
         } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
             ReplayCalls() = 0;

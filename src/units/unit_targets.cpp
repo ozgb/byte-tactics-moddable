@@ -258,6 +258,7 @@ unsigned char Unit::ChooseWeapon()
 
 #include "../network/wire_packets.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/targeting.h"
 #include "unit_targets.h"
 #include "../network/net_game.h"
 
@@ -408,45 +409,92 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
     }
 }
 
-// FUNCTION: 0x48a060
-void __stdcall SetWeaponTargetUnit(char* param_1, char* param_2, int param_3)
+static void PublishCleared(Unit* unit, int weapon)
 {
-    char* elem = param_1 + param_3 * 0x1c;
-    *(unsigned short*)(elem + 4) = *(unsigned short*)(param_2 + 0xa8);
-    *(unsigned short*)(elem + 6) = 0x8000;
-    *(unsigned short*)(param_1 + 0xba) &= 0x83ff;
+    TargetingEvent effect;
+    memset(&effect, 0, sizeof(effect));
+    effect.kind = TARGETING_EFFECT_CLEARED;
+    effect.unit = Ref<Unit>(unit).offset;
+    effect.weapon = weapon;
+    HarnessTargetingEvent(&effect, 1);
+    SchedPublish(SCHED_TARGETING, &effect, sizeof(effect));
+}
+
+static Unit* UnitOfHandle(unsigned int handle)
+{
+    Ref<Unit> ref;
+    ref.offset = handle;
+    return ref.get();
+}
+
+// FUNCTION: 0x48a060
+static void SetWeaponTargetUnit(Unit* unit, Unit* target, int weapon)
+{
+    UnitWeaponSlot* elem = &unit->weapons[weapon];
+    elem->aimTargetXOrUnitId = target->id;
+    elem->aimTargetZOrUnitSentinel = (short)0x8000;
+    unit->netDirtyFlags &= 0x83ff;
 }
 
 // FUNCTION: 0x48a0a0
-void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3)
+static void SetWeaponTargetPos(Unit* unit, const int* pos, int weapon)
 {
-    short* elem = (short*)(param_1 + param_3 * 0x1c + 4);
-    elem[0] = (short)(param_2[0] >> 16);
-    elem[1] = (short)(param_2[2] >> 16);
-    if (elem[1] == (short)0x8000) {
-        elem[1] = (short)0x8001;
+    UnitWeaponSlot* elem = &unit->weapons[weapon];
+    elem->aimTargetXOrUnitId = (short)(pos[0] >> 16);
+    elem->aimTargetZOrUnitSentinel = (short)(pos[2] >> 16);
+    if (elem->aimTargetZOrUnitSentinel == (short)0x8000) {
+        elem->aimTargetZOrUnitSentinel = (short)0x8001;
     }
-    *(unsigned short*)(param_1 + 0xba) &= 0x83ff;
+    unit->netDirtyFlags &= 0x83ff;
 }
 
 // FUNCTION: 0x48a0f0
-void __stdcall ClearWeaponTarget(Unit* unit, int index)
+static int ClearWeaponTarget(Unit* unit, int index)
 {
     AimTargetPair* p = (AimTargetPair*)&unit->weapons[index];
     if (p->a != 0 || p->b != (short)0x8000) {
         p->a = 0;
         p->b = (short)0x8000;
-        g_seams.units->FindScript((CobScript*)unit->script.get(), "StartBuilding");
-        g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", 0, 0, 1, index, 0, 0, 0);
+        PublishCleared(unit, index);
+        return 1;
     }
+    return 0;
 }
 
 // FUNCTION: 0x48a160
-void __stdcall ResetWeaponTarget(Unit* obj, int index)
+static int ResetWeaponTarget(Unit* obj, int index)
 {
     AimTargetPair* p = (AimTargetPair*)&obj->weapons[index];
+    int had = p->a != 0 || p->b != (short)0x8000;
     p->a = 0;
     p->b = (short)0x8000;
+    return had;
+}
+
+int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
+{
+    Unit* unit = UnitOfHandle(e->unit);
+    if (!unit || e->weapon < 0 || e->weapon > 2) {
+        return 0;
+    }
+    switch (e->kind) {
+    case TARGETING_SET_UNIT: {
+        Unit* target = UnitOfHandle(e->target);
+        if (!target) {
+            return 0;
+        }
+        SetWeaponTargetUnit(unit, target, e->weapon);
+        return 1;
+    }
+    case TARGETING_SET_POS:
+        SetWeaponTargetPos(unit, e->pos, e->weapon);
+        return 1;
+    case TARGETING_CLEAR:
+        return ClearWeaponTarget(unit, e->weapon);
+    case TARGETING_RESET:
+        return ResetWeaponTarget(unit, e->weapon);
+    }
+    return 0;
 }
 
 // FUNCTION: 0x48a190
@@ -496,8 +544,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         if (f->aimTargetXOrUnitId != 0 || f->aimTargetZOrUnitSentinel != (short)0x8000) {
             e->aimTargetXOrUnitId = 0;
             e->aimTargetZOrUnitSentinel = (short)0x8000;
-            g_seams.units->FindScript((CobScript*)unit->script.get(), "StartBuilding");
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TargetCleared", 0, 0, 1, index, 0, 0, 0);
+            PublishCleared(unit, index);
         }
         return 0;
     }

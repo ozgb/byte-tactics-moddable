@@ -210,6 +210,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/services.h"
+#include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../units/squads.h"
 #include "../util/math.h"
@@ -376,9 +377,9 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
                 UnitWeaponSlot* weapon=&unit->weapons[i];
                 if ((weapon->flags&2) && (weapon->flags&0x10) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,i) &&
                     !((unsigned char)(weapon->weapon->flags.value>>26)&1)) {
-                    Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
+                    Unit* target=ScheduleTargetingTargetUnit(unit,i);
                     if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
-                        g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
+                        TargetingPublishSetUnit(SCHED_AI, unit,attacker,i);
                 }
             }
         }
@@ -917,15 +918,15 @@ void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon)
     if (unit->weapons[weapon].weapon->flags.b.interceptor) {
         Projectile* p = g_seams.weapons->FindTargetableProjectile(unit, weapon);
         if (p)
-            g_seams.targeting->SetWeaponTargetPos(unit, (Vec3*)((int*)p + 1), weapon);
+            TargetingPublishSetPos(SCHED_AI, unit, (Vec3*)((int*)p + 1), weapon);
         else
-            g_seams.targeting->ClearWeaponTarget(unit, weapon);
+            TargetingPublishClear(SCHED_AI, unit, weapon);
     } else if ((unit->flags & 0x300000) == 0x200000) {
-        Unit* r = g_seams.targeting->FindWeaponTarget(unit, weapon, 1);
+        Unit* r = ScheduleTargetingFind(unit, weapon, 1);
         if (r)
-            g_seams.targeting->SetWeaponTargetUnit(unit, r, weapon);
+            TargetingPublishSetUnit(SCHED_AI, unit, r, weapon);
         else
-            g_seams.targeting->ClearWeaponTarget(unit, weapon);
+            TargetingPublishClear(SCHED_AI, unit, weapon);
     }
 }
 
@@ -945,7 +946,7 @@ void SquadManager::RetargetWeapons(int force)
                 if ((cursor->weapons[w].flags & 2) && (cursor->weapons[w].flags & 0x10)
                     && !(unsigned char)cursor->weapons[w].weapon->flags.b.dropped
                     && (force || !cursor->weapons[w].weapon->flags.b.commandFire)) {
-                    Unit* target = g_seams.targeting->GetWeaponTargetUnit(cursor, w);
+                    Unit* target = ScheduleTargetingTargetUnit(cursor, w);
                     if (target && (player->allied[target->player->index]
                         || cursor->def->weaponCategories[w]->Contains(target->unitDefIndex)
                         || (cursor->weapons[w].weapon->flags.b.paralyzer && (target->activateFlags & 0x10))))

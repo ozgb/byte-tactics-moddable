@@ -682,8 +682,8 @@ FeHelp,src/map/features.cpp,features,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_economy_wind_meteors_and_features(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features"])
+    def test_the_pilots_table_lists_economy_wind_meteors_features_and_targeting(self):
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -760,6 +760,102 @@ FeHelp,src/map/features.cpp,features,x,
                           "FeaturesSeam::GetCellFeature has inline assembly",
                           "FeaturesSeam::GetFootprintCentre calls indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]",
                           "FeaturesSeam::GetFootprintCentre calls memset, which data/rwsets.csv has no rows for"])
+
+
+TARGETING_HEADER = """struct TargetingSeam {
+    int (__stdcall* Apply)(const TargetingEvent* event);
+    Unit* (__stdcall* GetWeaponTargetUnit)(Unit* unit, int weapon);
+    int (__stdcall* GetWeaponTargetPos)(Unit* unit, Vec3* pos, int weapon);
+    Unit* (__stdcall* FindWeaponTarget)(Unit* unit, unsigned char weapon, int useRange);
+    Unit* (__stdcall* FindBestTargetIfFireAtWill)(Unit* unit);
+    unsigned char (__fastcall* ChooseWeapon)(Unit* unit);
+};
+"""
+TARGETING_FILLERS = {"Apply": "TgApply", "GetWeaponTargetUnit": "TgUnit", "GetWeaponTargetPos": "TgPos", "FindWeaponTarget": "TgFind",
+                     "FindBestTargetIfFireAtWill": "TgWill", "ChooseWeapon": "TgChoose"}
+
+
+class TargetingPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
+Order,src/orders/unit_orders.cpp,orders,x,
+TgApply,src/units/unit_targets.cpp,targeting,x,
+TgUnit,src/units/unit_targets.cpp,targeting,x,
+TgChoose,src/units/unit_targets.cpp,targeting,x,
+TgHelp,src/units/unit_targets.cpp,targeting,x,
+"""
+
+    def check(self, rows, header=TARGETING_HEADER, fillers=None):
+        fillers = TARGETING_FILLERS if fillers is None else fillers
+        rows = [(f, "src/units/unit_targets.cpp", "function", "") for f in ("TgUnit", "TgChoose")] + list(rows)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(
+                "static TargetingSeam s_targeting;\n" + "".join(f"s_targeting.{s} = {f};\n" for s, f in fillers.items()))
+            (root / "interfaces/targeting.h").write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, seamlink.TARGETING)
+
+    def slot(self, name, seam="TargetingSeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_targeting_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "targeting")
+        self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
+        self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
+        self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
+        header = seamlink.ROOT / "interfaces/targeting.h"
+        if header.exists():
+            self.assertEqual(set(seamlink.TARGETING.writing + seamlink.TARGETING.query),
+                             set(seamlink.slot_parameters(header.read_text(), "TargetingSeam")))
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("GetWeaponTargetPos")),
+                            ("Order", "src/orders/unit_orders.cpp", "field_read", "TargetingSeam::FindWeaponTarget"),
+                            ("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("FindBestTargetIfFireAtWill")),
+                            ("Order", "src/orders/unit_orders.cpp", "indirect_call", self.slot("Apply"))])
+        self.assertEqual(sorted(f[1:] for f in found),
+                         [("orders", "Order", "TargetingSeam::Apply"), ("orders", "Order", "TargetingSeam::FindWeaponTarget"),
+                          ("weapons", "Fire", "TargetingSeam::FindBestTargetIfFireAtWill"), ("weapons", "Fire", "TargetingSeam::GetWeaponTargetPos")])
+
+    def test_the_engine_and_targeting_may_call_writing_slots(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply")),
+                ("TargetingInbox", "src/seams/targeting_world.cpp", "indirect_call", self.slot("FindWeaponTarget")),
+                ("RecTargetingApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("GetWeaponTargetPos")),
+                ("TgApply", "src/units/unit_targets.cpp", "indirect_call", self.slot("FindBestTargetIfFireAtWill"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_query_slot_is_called_by_anyone(self):
+        self.assertEqual(self.check([("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("GetWeaponTargetUnit")),
+                                     ("Order", "src/orders/unit_orders.cpp", "indirect_call", self.slot("ChooseWeapon"))]), [])
+
+    def test_a_query_slot_that_writes_or_calls_a_slot_is_found(self):
+        found = self.check([("TgUnit", "src/units/unit_targets.cpp", "field_write", "Unit::current"),
+                            ("TgUnit", "src/units/unit_targets.cpp", "call", "TgHelp"),
+                            ("TgHelp", "src/units/unit_targets.cpp", "global_write", "g_x"),
+                            ("TgChoose", "src/units/unit_targets.cpp", "indirect_call", self.slot("FindWeaponTarget")),
+                            ("TgChoose", "src/units/unit_targets.cpp", "indirect_call", self.slot("GetGroundHeight", "UnitsSeam")),
+                            ("TgChoose", "src/units/unit_targets.cpp", "asm", "inline")])
+        self.assertEqual(sorted(f[3] for f in found),
+                         ["TargetingSeam::ChooseWeapon calls indirect via void (*)(int) __attribute__((stdcall)) [TargetingSeam::FindWeaponTarget]",
+                          "TargetingSeam::ChooseWeapon calls indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::GetGroundHeight]",
+                          "TargetingSeam::ChooseWeapon has inline assembly",
+                          "TargetingSeam::GetWeaponTargetUnit field write Unit::current",
+                          "TargetingSeam::GetWeaponTargetUnit global write g_x"])
+
+    def test_a_slot_in_no_list_or_unfilled_is_found(self):
+        header = TARGETING_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
+        found = self.check([], header=header, fillers={k: v for k, v in TARGETING_FILLERS.items() if k != "ChooseWeapon"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "ChooseWeapon"), ("slot", "Debug")])
 
 
 if __name__ == "__main__":

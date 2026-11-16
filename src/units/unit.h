@@ -50,7 +50,8 @@ struct Unit {
             char unknown_30[10];
             unsigned char b3a;
             unsigned char f_3b;
-            char unknown_3c[12];
+            int weapon2Target;
+            char weapon2AimCob[8];
             Ref<WeaponDef> f48;
             char unknown_4c[10];
             unsigned char b56;

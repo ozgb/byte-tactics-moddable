@@ -10,7 +10,8 @@ holds for each path event the host delivers (section 32), in dump order; its "ec
 record for each economy event (section 33), with the account that only a LOAD adds; its "packets" entry
 is the record for each resource share packet the step sends (section 35); its "features" entry is the
 record for each features event (section 36); its "windMeteors" entry is the record for each wind_meteors
-event consumed or effect published (section 37), the kind and then the record's bytes after it. No row hashes any of them.
+event consumed or effect published (section 37), the kind and then the record's bytes after it; its "targeting" entry is the
+record for each targeting event or effect (section 38). No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -946,6 +947,15 @@ WIND_METEORS_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("data", 4, "bytes", None),
 ]
+TARGETING_SECTION = 38
+TARGETING_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("weapon", 4, "scalar", None),
+    ("target", 4, "ref", "unit"),
+    ("pos", 12, "bytes", None),
+    ("outcome", 4, "scalar", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1358,6 +1368,11 @@ def render_json(model):
     out.append('  "windMeteors": {')
     out.append('    "section": %d,' % wind_meteors["section"])
     out.append('    "fields": %s' % many(wind_meteors["fields"], "    "))
+    out.append("  },")
+    targeting = model["targeting"]
+    out.append('  "targeting": {')
+    out.append('    "section": %d,' % targeting["section"])
+    out.append('    "fields": %s' % many(targeting["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1531,6 +1546,9 @@ def generate():
     model["windMeteors"] = {"section": WIND_METEORS_SECTION,
                             "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                        for n, size, kind, target in WIND_METEORS_FIELDS]}
+    model["targeting"] = {"section": TARGETING_SECTION,
+                          "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                     for n, size, kind, target in TARGETING_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

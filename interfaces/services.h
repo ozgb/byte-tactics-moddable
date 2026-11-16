@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 13
+#define SERVICES_VERSION_MINOR 14
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -50,6 +50,9 @@ void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
 struct FeaturesEvent;
 // In test mode, records a features event as features consumes or answers it, or an effect as features publishes it, with its outcome, for the dump's features events.
 void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome);
+struct TargetingEvent;
+// In test mode, records a targeting event as targeting consumes it, or an effect as targeting publishes it, with its outcome, for the dump's targeting events.
+void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -70,8 +73,12 @@ enum SchedModule {
     SCHED_MAP = 7,
     // Wind and meteors (interfaces/wind_meteors.h).
     SCHED_WIND_METEORS = 8,
+    // Targeting (interfaces/targeting.h).
+    SCHED_TARGETING = 9,
+    // AI.
+    SCHED_AI = 10,
     // The number of modules.
-    SCHED_MODULE_COUNT = 9
+    SCHED_MODULE_COUNT = 11
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
@@ -89,6 +96,16 @@ void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
 
 // Calls features' synchronous Place slot for a placement (an event of kind FEATURES_PLACE) after delivering features' pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place);
+
+struct Unit;
+// Calls targeting's GetWeaponTargetUnit query after delivering targeting's pending inbox, and returns its answer.
+Unit* __stdcall ScheduleTargetingTargetUnit(Unit* unit, int weapon);
+// Calls targeting's synchronous GetWeaponTargetPos slot after delivering targeting's pending inbox, and returns its answer.
+int __stdcall ScheduleTargetingTargetPos(Unit* unit, Vec3* pos, int weapon);
+// Calls targeting's synchronous FindWeaponTarget slot after delivering targeting's pending inbox, and returns the unit it picked, or null.
+Unit* __stdcall ScheduleTargetingFind(Unit* unit, unsigned char weapon, int useRange);
+// Calls targeting's synchronous FindBestTargetIfFireAtWill slot after delivering targeting's pending inbox, and returns the unit it picked, or null.
+Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

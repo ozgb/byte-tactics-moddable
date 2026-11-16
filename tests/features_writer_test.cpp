@@ -32,9 +32,12 @@ int __stdcall HarnessTestMode()
     return 0;
 }
 
+static int g_failures;
+
 extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
 {
     printf("FAIL: host_fatal: %s: %s\n", title, text);
+    g_failures++;
 }
 
 struct ConstructedElement {
@@ -47,8 +50,6 @@ ConstructedElement::~ConstructedElement() {}
 
 Game* g_game;
 Seams g_seams;
-
-static int g_failures;
 
 static void Check(bool ok, const char* what)
 {
@@ -74,6 +75,7 @@ void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, u
 void __stdcall FatalError(char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
+    g_failures++;
 }
 int __cdecl GameRand(RandStream)
 {

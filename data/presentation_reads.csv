@@ -199,7 +199,7 @@ Unit::cargoSelectable,presentation,after-event,SIM_EVENT_FOCUS_COMMANDER,per-pla
 Unit::carrier,orders,unknown,,per-player-filter,3
 Unit::carrier,presentation,every-frame,,per-player-filter,87
 Unit::cloakOn,presentation,unknown,,per-player-filter,0
-Unit::current,weapons,unknown,,per-player-filter,2
+Unit::current,targeting,unknown,,per-player-filter,2
 Unit::def,los_radar,ui-action,,per-player-filter,12
 Unit::def,orders,unknown,,per-player-filter,7
 Unit::def,presentation,every-frame,SIM_EVENT_UNIT_SPEECH,per-player-filter,88
@@ -253,8 +253,7 @@ Unit::pos,presentation,every-frame,,per-player-filter,87
 Unit::postTransferHoldoff,orders,unknown,,per-player-filter,3
 Unit::postTransferHoldoff,presentation,ui-action,,per-player-filter,8
 Unit::script,presentation,every-frame,,per-player-filter,87
-Unit::script,units,unknown,,per-player-filter,1
-Unit::script,weapons,unknown,,per-player-filter,2
+Unit::script,units,unknown,,per-player-filter,3
 Unit::selectState,presentation,ui-action,,per-player-filter,0
 Unit::selectable,presentation,after-event,SIM_EVENT_FOCUS_COMMANDER,per-player-filter,0
 Unit::selected,presentation,after-event,SIM_EVENT_RADAR_UNITS,per-player-filter,0

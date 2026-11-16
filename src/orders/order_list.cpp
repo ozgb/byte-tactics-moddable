@@ -82,6 +82,8 @@ struct Point16FromShorts : Point16 {
 #include "../util/angles.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
+#include "../../interfaces/services.h"
+#include "../game/targeting_events.h"
 
 #include "../network/player.h"
 
@@ -896,7 +898,7 @@ static void DelayOrderWake(Order* node, int n)
 static void ClearAllWeaponTargets(Unit* unit)
 {
     for (char i = 0; i < 3; i++)
-        g_seams.targeting->ClearWeaponTarget(unit, i);
+        TargetingPublishClear(SCHED_ORDERS, unit, i);
 }
 
 // FUNCTION: 0x43b7c0

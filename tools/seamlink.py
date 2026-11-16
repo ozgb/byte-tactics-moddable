@@ -43,7 +43,7 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
 data/rwsets.csv and the owners of data/subsystems.csv.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
-features, interfaces/features.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
+features, interfaces/features.h; targeting, interfaces/targeting.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
 slots, engine and allowed indirect calls. It fails, for each pilot, on:
 
@@ -53,7 +53,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
-                src/seams/features_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
+                src/seams/features_world.cpp, src/seams/targeting_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
                 (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
@@ -64,8 +64,10 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                                 ShutdownIngameSystems (src/game/game_state.cpp) and LoadSavedGameState and SaveGameFile
                                 (src/game/settings_campaign.cpp)
                   features      RunGameSteps (src/ingame/game_dialogs.cpp)
+                  targeting     none
                 Features' writing slots are UpdateFeatures (the phase slot), Apply, Place, AnimateFeatureType,
-                ScanFeatureCell and UpdateFeatureSpot. A presentation or unowned function fails like any other.
+                ScanFeatureCell and UpdateFeatureSpot; targeting's are Apply, GetWeaponTargetPos, FindWeaponTarget and
+                FindBestTargetIfFireAtWill. A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -76,20 +78,21 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 LoadUnitFbi (src/units/unit_types.cpp).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
-                FirstFeatureSpot), the function that fills it and every function it calls by name (rwsets keys functions
+                FirstFeatureSpot; targeting: GetWeaponTargetUnit, ChooseWeapon), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
                   it holds (economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
                   MeteorShowerParams; features' queries take no out parameter), or of the struct a slot returns by value
-                  (features' GetFootprintCentre: Vec3), and except economy's world view info structs (EconUnitInfo,
+                  (features' GetFootprintCentre: Vec3; targeting's queries take pointers to units and write nothing), and except economy's world view info structs (EconUnitInfo,
                   EconTypeInfo, EconPlayerInfo), which no state holds;
                   makes an indirect call other than through a read-only slot of the pilot's world view (economy's
                   EconomyWorldView, all but Emit; wind_meteors has none), a read-only slot of another seam the pilot allows
-                  (features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell) or a slot of a struct that a
+                  (features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell; targeting has none) or a slot of a struct that a
                   parameter of the query slot points to (WriteState's StateWriter);
                   calls a function data/rwsets.csv has no rows for (memset, memcpy, a template), but for operator=, the
-                  assignment rwsets records as the write itself, and X87LeTest41, a template that compares two values;
+                  assignment rwsets records as the write itself, X87LeTest41, a template that compares two values, and
+                  operator Unit *, the conversion of a Ref to the pointer it holds;
                   or has inline assembly.
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
@@ -153,13 +156,14 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
                  "PathExtra", "Pathfinder")
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
-ROWLESS_CALLS = ("operator=", "X87LeTest41")
+ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"
 PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"),
                  (NATIVE_TABLE, "UpdateFeatures"))
 FEATURES_GLUE_FILE = "src/seams/features_world.cpp"
+TARGETING_GLUE_FILE = "src/seams/targeting_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -225,7 +229,13 @@ FEATURES = Pilot(
                    ("FreeMapResources", "src/map/line_of_sight.cpp"), ("LoadUnitFbi", "src/units/unit_types.cpp")),
     phase_slots=("UpdateFeatures",),
     by_params=False)
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES)
+TARGETING = Pilot(
+    owner="targeting", header="interfaces/targeting.h", seam="TargetingSeam",
+    writing=("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"),
+    query=("GetWeaponTargetUnit", "ChooseWeapon"),
+    engine_files=(SCHEDULER_FILE, TARGETING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
+    by_params=False)
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING)
 
 
 @dataclass

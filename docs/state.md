@@ -49,14 +49,14 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2431 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2434 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 4 | 28 | 535 | 0 | 10 | 577 |
+| static | 4 | 28 | 537 | 0 | 10 | 579 |
 | game-region | 119 | 490 | 129 | 44 | 0 | 782 |
-| heap | 196 | 45 | 83 | 0 | 0 | 324 |
+| heap | 196 | 45 | 84 | 0 | 0 | 325 |
 
 ## Mixed cases and how to split them
 

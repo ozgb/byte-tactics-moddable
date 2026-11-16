@@ -370,6 +370,48 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
+    case RI_SCHEDULE_TARGETING_TARGET_UNIT:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        ImportResultObject(t, ROK_UNIT, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_SCHEDULE_TARGETING_TARGET_POS:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        AddResult(t, c.result);
+        t.Add("\n  o x ");
+        t.AddInt(*(const int*)a[3].v.p);
+        t.Add("\n  o y ");
+        t.AddInt(*(const int*)a[4].v.p);
+        t.Add("\n  o z ");
+        t.AddInt(*(const int*)a[5].v.p);
+        break;
+    }
+    case RI_SCHEDULE_TARGETING_FIND:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        ImportResultObject(t, ROK_UNIT, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
+    case RI_SCHEDULE_TARGETING_FIRE_AT_WILL:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
+        ImportResultObject(t, ROK_UNIT, (c.result.kind == 1 ? c.result.v.p : nullptr));
+        break;
+    }
     case RI_SIM_CAPTURE_ALLOC:
     {
         AddSpace(t);

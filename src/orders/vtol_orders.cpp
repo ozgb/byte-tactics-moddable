@@ -88,6 +88,7 @@ struct Mover {
 
 #include "../game/game.h"
 #include "../game/features_events.h"
+#include "../game/targeting_events.h"
 
 #include "path_order_attach.h"
 
@@ -371,7 +372,7 @@ int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        Unit* other = g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+        Unit* other = ScheduleTargetingFireAtWill(unit);
         if (other && IssueAttackOrder(unit, other, 0)) {
             order->flags = 0;
             order->state = 0;
@@ -893,7 +894,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     }
     case 2: {
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+        TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         PathOrder* obj = new (kSim) PathOrder(order, order->target->pos);
         obj->SetApproachRadius(range);
         order->SetAttachedFx(obj);
@@ -1074,9 +1075,9 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                             do {
                                 if (!((weapon->flags&2) && weapon->flags&0x10 && ((unsigned char)(((WeaponDef*)weapon->weapon)->flags.value >> 26)&1) == 0)) {
                                 } else {
-                                    Unit* target=g_seams.targeting->GetWeaponTargetUnit(unit,i);
+                                    Unit* target=ScheduleTargetingTargetUnit(unit,i);
                                     if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
-                                        g_seams.targeting->SetWeaponTargetUnit(unit,attacker,i);
+                                        TargetingPublishSetUnit(SCHED_ORDERS, unit,attacker,i);
                                 }
                                 ++i;
                                 weapon++;
@@ -1204,7 +1205,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         Dummy();
         Dummy();
         Dummy();
-        Unit* next = g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+        Unit* next = ScheduleTargetingFireAtWill(unit);
         if (next && IssueAttackOrder(unit, next, 0)) {
             order->flags = 0;
             return 3;
@@ -1444,7 +1445,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
     }
     case 5: {
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.targeting->SetWeaponTargetPos(unit, &order->pos, 0);
+        TargetingPublishSetPos(SCHED_ORDERS, unit, &order->pos, 0);
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, (unit->def->attackrunlength + 0x3c0) << 16));
         AttachMove(order, dest, 0x3c0);
@@ -1452,7 +1453,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         return 1;
     }
     case 6: {
-        g_seams.targeting->ClearWeaponTarget(unit, 0);
+        TargetingPublishClear(SCHED_ORDERS, unit, 0);
         Vec3 dest = AddVec3(unit->pos, Offset(unit->heading, 0x5a00000));
         AttachMove(order, dest, 0x80);
         order->flags = 0xe2;
@@ -1550,9 +1551,9 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     case 2: {
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
         if (order->target)
-            g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+            TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         else
-            g_seams.targeting->SetWeaponTargetPos(unit, &order->pos, 0);
+            TargetingPublishSetPos(SCHED_ORDERS, unit, &order->pos, 0);
         PathOrder* obj = new (kSim) PathOrder(order, order->pos);
         obj->SetApproachRadius(speed);
         order->SetAttachedFx(obj);
@@ -1904,7 +1905,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 return 0;
             }
         }
-        Unit* target=g_seams.targeting->FindBestTargetIfFireAtWill(unit);
+        Unit* target=ScheduleTargetingFireAtWill(unit);
         if (target && IssueAttackOrder(unit,target,0)) return 5;
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
         Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
@@ -1992,7 +1993,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
     case 1:
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.targeting->SetWeaponTargetUnit(unit, order->target, 0);
+        TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         if (flags & 0xe0) {
             if (IsAhead(unit, order)) {
                 Vec3 from = AddVec3(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));

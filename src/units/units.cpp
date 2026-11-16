@@ -14,6 +14,7 @@ class UnitMotion;
 class UnitResources;
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
+#include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/services.h"
@@ -364,7 +365,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     unit->unknown_110_8 = 0;
 
     for (int i = 0; i < 3; i++) {
-        g_seams.targeting->ResetWeaponTarget((Unit*)unit, i);
+        TargetingPublishReset(SCHED_UNITS, (Unit*)unit, i);
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, i);
     }
 

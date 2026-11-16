@@ -474,6 +474,69 @@ int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place)
     return atoi(result);
 }
 
+Unit* __stdcall ScheduleTargetingTargetUnit(Unit* unit, int weapon)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_TARGETING_TARGET_UNIT);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, unit, false);
+    Space(t);
+    t.AddInt((int)weapon);
+    const char* result = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+int __stdcall ScheduleTargetingTargetPos(Unit* unit, Vec3* pos, int weapon)
+{
+    int* posX = pos == nullptr ? nullptr : &pos->x;
+    int* posY = pos == nullptr ? nullptr : &pos->y;
+    int* posZ = pos == nullptr ? nullptr : &pos->z;
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_TARGETING_TARGET_POS);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, unit, false);
+    Space(t);
+    t.AddInt((int)weapon);
+    const char* result = Enter(t);
+    const char* posXText = OutValue("x");
+    if (posXText != nullptr && posX != nullptr)
+        *posX = atoi(posXText);
+    const char* posYText = OutValue("y");
+    if (posYText != nullptr && posY != nullptr)
+        *posY = atoi(posYText);
+    const char* posZText = OutValue("z");
+    if (posZText != nullptr && posZ != nullptr)
+        *posZ = atoi(posZText);
+    return atoi(result);
+}
+
+Unit* __stdcall ScheduleTargetingFind(Unit* unit, unsigned char weapon, int useRange)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_TARGETING_FIND);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, unit, false);
+    Space(t);
+    t.AddInt((int)weapon);
+    Space(t);
+    t.AddInt((int)useRange);
+    const char* result = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_TARGETING_FIRE_AT_WILL);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, unit, false);
+    const char* result = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+    return o;
+}
+
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset)
 {
     ReplayText t;

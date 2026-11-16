@@ -3086,7 +3086,6 @@ CellFeatureBlocks,src/map/terrain.cpp,map,file:src/map/terrain,
 CellSink::Add,src/util/path_goal.cpp,platform,folder:src/util/,
 CellToWorld,src/ai/ai_player.cpp,ai,file:src/ai/,
 CellToWorld,src/ingame/control_panel.cpp,presentation,presentation,
-CellToWorld,src/map/terrain.cpp,map,file:src/map/terrain,
 CellToWorld,src/orders/unit_orders.cpp,orders,file:src/orders/,
 CellToWorld,src/orders/vtol_orders.cpp,orders,file:src/orders/,
 CellsSquared,src/util/path_goal.cpp,platform,folder:src/util/,
@@ -3957,7 +3956,7 @@ MapFind,src/harness/harness.cpp,harness,folder:src/harness/,
 MapInbox,src/seams/map_world.cpp,seams,folder:src/seams/,
 MapInsertResult::MapInsertResult,src/debug/debug_lib.cpp,platform,folder:src/debug/,
 MapInsertResult::MapInsertResult,src/debug/free_block_map.h,platform,folder:src/debug/,
-MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,map,file:src/map/map_,
+MapOnFeaturesPassMaps,src/seams/map_world.cpp,seams,folder:src/seams/,
 MapPoint,src/map/terrain.cpp,map,file:src/map/terrain,
 MapPublishCellsChanged,src/game/map_events.h,map,name:Cell,
 MapRange,src/ai/ai_player.cpp,ai,file:src/ai/,
@@ -5346,7 +5345,6 @@ WorldTide,src/seams/economy_world.cpp,seams,folder:src/seams/,
 WorldToCell,src/ai/ai_player.cpp,platform,file:src/ai/,platform
 WorldToCell,src/ai/player_ai.cpp,platform,file:src/ai/,platform
 WorldToCell,src/ingame/control_panel.cpp,platform,presentation,platform
-WorldToCell,src/map/terrain.cpp,platform,file:src/map/terrain,platform
 WorldToCell,src/orders/unit_orders.cpp,platform,file:src/orders/,platform
 WorldToCell,src/orders/vtol_orders.cpp,platform,file:src/orders/,platform
 WorldToCell,src/units/unit_position.cpp,platform,name:Cell,platform

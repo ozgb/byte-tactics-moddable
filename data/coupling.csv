@@ -29,8 +29,8 @@ ai,los_radar,shared_write,Unit::flags,6
 ai,los_radar,shared_write,Vec3::x,12
 ai,los_radar,shared_write,Vec3::y,12
 ai,los_radar,shared_write,Vec3::z,12
-ai,map,shared_write,Point16::x,16
-ai,map,shared_write,Point16::y,16
+ai,map,shared_write,Point16::x,15
+ai,map,shared_write,Point16::y,15
 ai,map,shared_write,Unit::flags,5
 ai,map,shared_write,Vec3::x,12
 ai,map,shared_write,Vec3::y,4
@@ -68,11 +68,11 @@ ai,platform,call,WorldToCell,2
 ai,platform,call,operator delete,2
 ai,platform,call,operator new,5
 ai,platform,call,operator-,2
-ai,platform,shared_write,Point16::x,8
-ai,platform,shared_write,Point16::y,8
-ai,platform,shared_write,Vec3::x,22
+ai,platform,shared_write,Point16::x,7
+ai,platform,shared_write,Point16::y,7
+ai,platform,shared_write,Vec3::x,21
 ai,platform,shared_write,Vec3::y,13
-ai,platform,shared_write,Vec3::z,22
+ai,platform,shared_write,Vec3::z,21
 ai,players,indirect,LoadDefaultAIScript,1
 ai,players,shared_write,Point16::x,3
 ai,players,shared_write,Point16::y,3
@@ -93,8 +93,8 @@ ai,seams,call,ScheduleTargetingFind,1
 ai,seams,call,ScheduleTargetingTargetUnit,2
 ai,seams,indirect,GetNameSlotNative,1
 ai,seams,indirect,UnitTypeSetAddTypeOrCategoryNative,2
-ai,seams,shared_write,Point16::x,2
-ai,seams,shared_write,Point16::y,2
+ai,seams,shared_write,Point16::x,3
+ai,seams,shared_write,Point16::y,3
 ai,seams,shared_write,Unit::flags,1
 ai,seams,shared_write,Vec3::x,2
 ai,seams,shared_write,Vec3::y,2
@@ -308,15 +308,11 @@ features,map,shared_write,Cell::offsetX,6
 features,map,shared_write,Cell::offsetY,6
 features,map,shared_write,Feature::energy,1
 features,map,shared_write,Feature::metal,1
-features,map,shared_write,FeaturesEvent::height,1
-features,map,shared_write,FeaturesEvent::width,1
-features,map,shared_write,FeaturesEvent::x,1
-features,map,shared_write,FeaturesEvent::z,1
 features,map,shared_write,Fixed::whole,5
 features,map,shared_write,Game::featureCount,6
 features,map,shared_write,Game::features,8
-features,map,shared_write,Point16::x,16
-features,map,shared_write,Point16::y,16
+features,map,shared_write,Point16::x,15
+features,map,shared_write,Point16::y,15
 features,map,shared_write,Ref<Unit>::offset,1
 features,map,shared_write,Vec3::x,12
 features,map,shared_write,Vec3::y,4
@@ -360,11 +356,11 @@ features,platform,call,TdfRecord::GetFieldString,4
 features,platform,call,operator delete,2
 features,platform,call,operator new,1
 features,platform,shared_write,Fixed::whole,1
-features,platform,shared_write,Point16::x,8
-features,platform,shared_write,Point16::y,8
-features,platform,shared_write,Vec3::x,22
+features,platform,shared_write,Point16::x,7
+features,platform,shared_write,Point16::y,7
+features,platform,shared_write,Vec3::x,21
 features,platform,shared_write,Vec3::y,13
-features,platform,shared_write,Vec3::z,22
+features,platform,shared_write,Vec3::z,21
 features,players,shared_write,Point16::x,3
 features,players,shared_write,Point16::y,3
 features,players,shared_write,Vec3::x,3
@@ -396,8 +392,12 @@ features,seams,indirect,GetCellMeanHeightNative,1
 features,seams,indirect,GetGameTypeNative,2
 features,seams,indirect,GetGroundHeightNative,2
 features,seams,shared_write,Cell::metal,1
-features,seams,shared_write,Point16::x,2
-features,seams,shared_write,Point16::y,2
+features,seams,shared_write,FeaturesEvent::height,1
+features,seams,shared_write,FeaturesEvent::width,1
+features,seams,shared_write,FeaturesEvent::x,1
+features,seams,shared_write,FeaturesEvent::z,1
+features,seams,shared_write,Point16::x,3
+features,seams,shared_write,Point16::y,3
 features,seams,shared_write,Ref<Unit>::offset,8
 features,seams,shared_write,Vec3::x,2
 features,seams,shared_write,Vec3::y,2
@@ -682,14 +682,11 @@ game,map,indirect,FreeOtaEnumCacheAndMission,1
 game,map,indirect,LoadMappingData,1
 game,map,indirect,LoadMetalPlotmap,1
 game,map,indirect,LoadPlayerFeaturesPlotmap,1
-game,map,indirect,MapOnFeaturesPassMaps,2
 game,map,indirect,SaveMappingData,1
 game,map,indirect,SaveMetalPlotmap,1
 game,map,indirect,SavePlayerFeaturesPlotmap,1
 game,map,indirect,SetMissionType,5
 game,map,indirect,SnapWorldPosToFootprint,2
-game,map,shared_write,FeaturesEvent::x,1
-game,map,shared_write,FeaturesEvent::z,1
 game,map,shared_write,Fixed::whole,5
 game,map,shared_write,Game::difficulty,1
 game,map,shared_write,Game::mapFlags,1
@@ -702,8 +699,8 @@ game,map,shared_write,Grid::cells,1
 game,map,shared_write,Grid::height,1
 game,map,shared_write,Grid::width,1
 game,map,shared_write,MapEvent::kind,1
-game,map,shared_write,Point16::x,16
-game,map,shared_write,Point16::y,16
+game,map,shared_write,Point16::x,15
+game,map,shared_write,Point16::y,15
 game,map,shared_write,Unit::flags,5
 game,map,shared_write,UnitDef::flags1,1
 game,map,shared_write,Vec3::x,12
@@ -909,11 +906,11 @@ game,platform,call,operator delete,6
 game,platform,call,operator new,5
 game,platform,shared_write,Fixed::whole,1
 game,platform,shared_write,Game::ticks,2
-game,platform,shared_write,Point16::x,8
-game,platform,shared_write,Point16::y,8
-game,platform,shared_write,Vec3::x,22
+game,platform,shared_write,Point16::x,7
+game,platform,shared_write,Point16::y,7
+game,platform,shared_write,Vec3::x,21
 game,platform,shared_write,Vec3::y,13
-game,platform,shared_write,Vec3::z,22
+game,platform,shared_write,Vec3::z,21
 game,players,indirect,FreePlayers,1
 game,players,indirect,InitPlayerResources,1
 game,players,indirect,InitPlayers,1
@@ -1260,6 +1257,7 @@ game,seams,indirect,LoadConditionsNative,1
 game,seams,indirect,LoadMissionByNameNative,4
 game,seams,indirect,LosRadarInbox,2
 game,seams,indirect,MapInbox,2
+game,seams,indirect,MapOnFeaturesPassMaps,2
 game,seams,indirect,MissionExistsNative,1
 game,seams,indirect,RefreshMapListNative,1
 game,seams,indirect,SaveConditionsNative,1
@@ -1267,13 +1265,15 @@ game,seams,indirect,SelectMissionNative,2
 game,seams,indirect,TargetingInbox,2
 game,seams,indirect,WeaponsOnMeteorSpawn,2
 game,seams,indirect,WindMeteorsInbox,2
+game,seams,shared_write,FeaturesEvent::x,1
+game,seams,shared_write,FeaturesEvent::z,1
 game,seams,shared_write,Game::difficulty,1
 game,seams,shared_write,Game::numPlayers,1
 game,seams,shared_write,Game::ticks,2
 game,seams,shared_write,Player::allied,1
 game,seams,shared_write,Player::unitsCreated,1
-game,seams,shared_write,Point16::x,2
-game,seams,shared_write,Point16::y,2
+game,seams,shared_write,Point16::x,3
+game,seams,shared_write,Point16::y,3
 game,seams,shared_write,Unit::flags,1
 game,seams,shared_write,Vec3::x,2
 game,seams,shared_write,Vec3::y,2
@@ -2062,8 +2062,8 @@ los_radar,map,shared_write,Cell::low,7
 los_radar,map,shared_write,Game::cells,15
 los_radar,map,shared_write,Game::overflowBucket,2
 los_radar,map,shared_write,Game::visibilityMask,5
-los_radar,map,shared_write,Point16::x,16
-los_radar,map,shared_write,Point16::y,16
+los_radar,map,shared_write,Point16::x,15
+los_radar,map,shared_write,Point16::y,15
 los_radar,map,shared_write,Ref<Unit>::offset,1
 los_radar,map,shared_write,Unit::flags,5
 los_radar,map,shared_write,Vec3::x,12
@@ -2108,11 +2108,11 @@ los_radar,platform,call,_Destroy,1
 los_radar,platform,call,operator delete,3
 los_radar,platform,call,operator new,2
 los_radar,platform,shared_write,Game::loadProgress,1
-los_radar,platform,shared_write,Point16::x,8
-los_radar,platform,shared_write,Point16::y,8
-los_radar,platform,shared_write,Vec3::x,22
+los_radar,platform,shared_write,Point16::x,7
+los_radar,platform,shared_write,Point16::y,7
+los_radar,platform,shared_write,Vec3::x,21
 los_radar,platform,shared_write,Vec3::y,13
-los_radar,platform,shared_write,Vec3::z,22
+los_radar,platform,shared_write,Vec3::z,21
 los_radar,players,shared_write,Point16::x,3
 los_radar,players,shared_write,Point16::y,3
 los_radar,players,shared_write,Unit::flags,5
@@ -2164,8 +2164,8 @@ los_radar,seams,call,VisitUnitsInRange,1
 los_radar,seams,indirect,GetGroundHeightNative,1
 los_radar,seams,indirect,GetNameSlotNative,1
 los_radar,seams,shared_write,Game::visibilityMask,1
-los_radar,seams,shared_write,Point16::x,2
-los_radar,seams,shared_write,Point16::y,2
+los_radar,seams,shared_write,Point16::x,3
+los_radar,seams,shared_write,Point16::y,3
 los_radar,seams,shared_write,Ref<Unit>::offset,8
 los_radar,seams,shared_write,Unit::flags,1
 los_radar,seams,shared_write,Vec3::x,2
@@ -2319,17 +2319,16 @@ map,platform,call,TdfRecord::GetFieldString,3
 map,platform,call,TdfRecord::GetSubRecord,2
 map,platform,call,TdfRecord::GetSubRecordCount,1
 map,platform,call,Translate,2
-map,platform,call,WorldToCell,1
 map,platform,call,host_message,2
 map,platform,call,operator delete,11
 map,platform,call,operator new,6
 map,platform,call,operator==,5
 map,platform,shared_write,Fixed::value,2
-map,platform,shared_write,Point16::x,8
-map,platform,shared_write,Point16::y,8
-map,platform,shared_write,Vec3::x,22
+map,platform,shared_write,Point16::x,7
+map,platform,shared_write,Point16::y,7
+map,platform,shared_write,Vec3::x,21
 map,platform,shared_write,Vec3::y,13
-map,platform,shared_write,Vec3::z,22
+map,platform,shared_write,Vec3::z,21
 map,players,shared_write,Game::list_391ed,2
 map,players,shared_write,Game::net,12
 map,players,shared_write,Mission::killMul,1
@@ -2357,14 +2356,13 @@ map,presentation,shared_write,Vec3::x,42
 map,presentation,shared_write,Vec3::y,43
 map,presentation,shared_write,Vec3::z,41
 map,presentation,shared_write,g_lastPlaceHeight,1
-map,seams,call,MapInbox,1
 map,seams,indirect,DeleteConditionsNative,1
 map,seams,indirect,FreeConditionsNative,1
 map,seams,indirect,NewConditionsNative,1
 map,seams,indirect,RegisterConditionsNative,1
 map,seams,shared_write,Cell::metal,1
-map,seams,shared_write,Point16::x,2
-map,seams,shared_write,Point16::y,2
+map,seams,shared_write,Point16::x,3
+map,seams,shared_write,Point16::y,3
 map,seams,shared_write,Ref<Unit>::offset,8
 map,seams,shared_write,Unit::flags,1
 map,seams,shared_write,Vec3::x,2
@@ -2839,8 +2837,8 @@ orders,map,indirect,CanPlaceFootprintAt,1
 orders,map,indirect,IsPadSlotFree,2
 orders,map,indirect,SnapWorldPosToFootprint,2
 orders,map,shared_write,Fixed::value,2
-orders,map,shared_write,Point16::x,16
-orders,map,shared_write,Point16::y,16
+orders,map,shared_write,Point16::x,15
+orders,map,shared_write,Point16::y,15
 orders,map,shared_write,Unit::flags,5
 orders,map,shared_write,Unit::pos,2
 orders,map,shared_write,Vec3::x,12
@@ -2901,11 +2899,11 @@ orders,platform,shared_write,PathGoalArea::right,3
 orders,platform,shared_write,PathGoalArea::top,3
 orders,platform,shared_write,PathPoint::x,4
 orders,platform,shared_write,PathPoint::y,4
-orders,platform,shared_write,Point16::x,8
-orders,platform,shared_write,Point16::y,8
-orders,platform,shared_write,Vec3::x,22
+orders,platform,shared_write,Point16::x,7
+orders,platform,shared_write,Point16::y,7
+orders,platform,shared_write,Vec3::x,21
 orders,platform,shared_write,Vec3::y,13
-orders,platform,shared_write,Vec3::z,22
+orders,platform,shared_write,Vec3::z,21
 orders,players,indirect,GiveUnitToPlayer,1
 orders,players,shared_write,Point16::x,3
 orders,players,shared_write,Point16::y,3
@@ -2973,8 +2971,8 @@ orders,seams,indirect,UnitRefUnlinkNative,4
 orders,seams,indirect,UpdateSfxOccupyNative,1
 orders,seams,shared_write,PathPoint::x,1
 orders,seams,shared_write,PathPoint::y,1
-orders,seams,shared_write,Point16::x,2
-orders,seams,shared_write,Point16::y,2
+orders,seams,shared_write,Point16::x,3
+orders,seams,shared_write,Point16::y,3
 orders,seams,shared_write,Unit::buildLeft,1
 orders,seams,shared_write,Unit::flags,1
 orders,seams,shared_write,Unit::workTime,1
@@ -3073,8 +3071,8 @@ pathfinding,harness,shared_write,Point16::x,1
 pathfinding,harness,shared_write,Point16::y,1
 pathfinding,los_radar,shared_write,Point16::x,5
 pathfinding,los_radar,shared_write,Point16::y,5
-pathfinding,map,shared_write,Point16::x,16
-pathfinding,map,shared_write,Point16::y,16
+pathfinding,map,shared_write,Point16::x,15
+pathfinding,map,shared_write,Point16::y,15
 pathfinding,orders,shared_write,PathEvent::count,1
 pathfinding,orders,shared_write,PathEvent::kind,1
 pathfinding,orders,shared_write,PathEvent::requester,1
@@ -3091,8 +3089,8 @@ pathfinding,platform,call,PathGoalDistance,5
 pathfinding,platform,call,operator new,1
 pathfinding,platform,shared_write,PathPoint::x,4
 pathfinding,platform,shared_write,PathPoint::y,4
-pathfinding,platform,shared_write,Point16::x,8
-pathfinding,platform,shared_write,Point16::y,8
+pathfinding,platform,shared_write,Point16::x,7
+pathfinding,platform,shared_write,Point16::y,7
 pathfinding,players,shared_write,Point16::x,3
 pathfinding,players,shared_write,Point16::y,3
 pathfinding,presentation,shared_write,Point16::x,5
@@ -3116,8 +3114,8 @@ pathfinding,seams,indirect,WorldUnitState,2
 pathfinding,seams,indirect,WorldUnitsPerPlayer,1
 pathfinding,seams,shared_write,PathPoint::x,1
 pathfinding,seams,shared_write,PathPoint::y,1
-pathfinding,seams,shared_write,Point16::x,2
-pathfinding,seams,shared_write,Point16::y,2
+pathfinding,seams,shared_write,Point16::x,3
+pathfinding,seams,shared_write,Point16::y,3
 pathfinding,units,shared_write,Point16::x,9
 pathfinding,units,shared_write,Point16::y,9
 pathfinding,weapons,shared_write,Point16::x,1
@@ -3296,8 +3294,8 @@ platform,los_radar,shared_write,Vec3::y,12
 platform,los_radar,shared_write,Vec3::z,12
 platform,map,shared_write,Fixed::value,2
 platform,map,shared_write,Fixed::whole,5
-platform,map,shared_write,Point16::x,16
-platform,map,shared_write,Point16::y,16
+platform,map,shared_write,Point16::x,15
+platform,map,shared_write,Point16::y,15
 platform,map,shared_write,Seams::wind_meteors,1
 platform,map,shared_write,StringRef::data,1
 platform,map,shared_write,Vec3::x,12
@@ -3389,8 +3387,8 @@ platform,presentation,shared_write,Vec3f::z,1
 platform,seams,call,WindMeteorsEmit,1
 platform,seams,shared_write,PathPoint::x,1
 platform,seams,shared_write,PathPoint::y,1
-platform,seams,shared_write,Point16::x,2
-platform,seams,shared_write,Point16::y,2
+platform,seams,shared_write,Point16::x,3
+platform,seams,shared_write,Point16::y,3
 platform,seams,shared_write,Seams::wind_meteors,2
 platform,seams,shared_write,Vec3::x,2
 platform,seams,shared_write,Vec3::y,2
@@ -3599,8 +3597,8 @@ players,map,shared_write,Player::explored,1
 players,map,shared_write,Player::exploredHeight,1
 players,map,shared_write,Player::exploredWidth,4
 players,map,shared_write,Player::type,2
-players,map,shared_write,Point16::x,16
-players,map,shared_write,Point16::y,16
+players,map,shared_write,Point16::x,15
+players,map,shared_write,Point16::y,15
 players,map,shared_write,Unit::flags,5
 players,map,shared_write,Vec3::x,12
 players,map,shared_write,Vec3::y,4
@@ -3698,11 +3696,11 @@ players,platform,call,operator==,3
 players,platform,shared_write,Player::id,1
 players,platform,shared_write,Player::info,1
 players,platform,shared_write,Player::type,2
-players,platform,shared_write,Point16::x,8
-players,platform,shared_write,Point16::y,8
-players,platform,shared_write,Vec3::x,22
+players,platform,shared_write,Point16::x,7
+players,platform,shared_write,Point16::y,7
+players,platform,shared_write,Vec3::x,21
 players,platform,shared_write,Vec3::y,13
-players,platform,shared_write,Vec3::z,22
+players,platform,shared_write,Vec3::z,21
 players,presentation,shared_write,Game::endGameFlags,2
 players,presentation,shared_write,Game::endGameVictory,5
 players,presentation,shared_write,Game::head,2
@@ -3780,8 +3778,8 @@ players,seams,shared_write,Player::type,2
 players,seams,shared_write,Player::unitCount,1
 players,seams,shared_write,Player::unitsCreated,1
 players,seams,shared_write,PlayerInfo::kind,1
-players,seams,shared_write,Point16::x,2
-players,seams,shared_write,Point16::y,2
+players,seams,shared_write,Point16::x,3
+players,seams,shared_write,Point16::y,3
 players,seams,shared_write,Unit::buildLeft,1
 players,seams,shared_write,Unit::flags,1
 players,seams,shared_write,Vec3::x,2
@@ -4085,8 +4083,8 @@ presentation,map,shared_write,Game::difficulty,1
 presentation,map,shared_write,Game::mapFlags,1
 presentation,map,shared_write,Game::numPlayers,1
 presentation,map,shared_write,Player::active,2
-presentation,map,shared_write,Point16::x,16
-presentation,map,shared_write,Point16::y,16
+presentation,map,shared_write,Point16::x,15
+presentation,map,shared_write,Point16::y,15
 presentation,map,shared_write,StringRef::data,1
 presentation,map,shared_write,Unit::flags,5
 presentation,map,shared_write,Unit::pos,2
@@ -4380,12 +4378,12 @@ presentation,platform,shared_write,Fixed::value,2
 presentation,platform,shared_write,Fixed::whole,1
 presentation,platform,shared_write,GafFrame::pixelsOrLayers,1
 presentation,platform,shared_write,Player::id,1
-presentation,platform,shared_write,Point16::x,8
-presentation,platform,shared_write,Point16::y,8
+presentation,platform,shared_write,Point16::x,7
+presentation,platform,shared_write,Point16::y,7
 presentation,platform,shared_write,StringRef::data,6
-presentation,platform,shared_write,Vec3::x,22
+presentation,platform,shared_write,Vec3::x,21
 presentation,platform,shared_write,Vec3::y,13
-presentation,platform,shared_write,Vec3::z,22
+presentation,platform,shared_write,Vec3::z,21
 presentation,platform,shared_write,Vec3f::x,4
 presentation,platform,shared_write,Vec3f::y,4
 presentation,platform,shared_write,Vec3f::z,4
@@ -4436,8 +4434,8 @@ presentation,seams,shared_write,Game::numPlayers,1
 presentation,seams,shared_write,Player::active,2
 presentation,seams,shared_write,Player::allied,1
 presentation,seams,shared_write,Player::index,2
-presentation,seams,shared_write,Point16::x,2
-presentation,seams,shared_write,Point16::y,2
+presentation,seams,shared_write,Point16::x,3
+presentation,seams,shared_write,Point16::y,3
 presentation,seams,shared_write,Unit::flags,1
 presentation,seams,shared_write,Vec3::x,2
 presentation,seams,shared_write,Vec3::y,2
@@ -4542,6 +4540,8 @@ seams,ai,shared_write,OrdersSeam::DeleteOrders,1
 seams,ai,shared_write,OrdersSeam::GetOrderFlags,1
 seams,ai,shared_write,OrdersSeam::IssueAttackOrder,1
 seams,ai,shared_write,Player::ai,2
+seams,ai,shared_write,Point16::x,7
+seams,ai,shared_write,Point16::y,7
 seams,ai,shared_write,Seams::economy,1
 seams,ai,shared_write,Seams::los_radar,2
 seams,ai,shared_write,Seams::map,4
@@ -4609,6 +4609,8 @@ seams,features,shared_write,NetworkSeam::SendFeatureBurning,1
 seams,features,shared_write,NetworkSeam::SendFeatureHit,1
 seams,features,shared_write,NetworkSeam::SendFeatureKilled,1
 seams,features,shared_write,NetworkSeam::SendFeatureReclaimed,1
+seams,features,shared_write,Point16::x,11
+seams,features,shared_write,Point16::y,11
 seams,features,shared_write,Ref<Unit>::offset,1
 seams,features,shared_write,Seams::los_radar,13
 seams,features,shared_write,Seams::map,3
@@ -4691,6 +4693,8 @@ seams,game,shared_write,PlayersSeam::UpdatePlayerHead,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerTail,1
 seams,game,shared_write,PlayersSeam::UpdatePlayers,1
 seams,game,shared_write,PlayersSeam::UpdatePlayersFinish,1
+seams,game,shared_write,Point16::x,1
+seams,game,shared_write,Point16::y,1
 seams,game,shared_write,Ref<Unit>::offset,1
 seams,game,shared_write,Seams::ai,5
 seams,game,shared_write,Seams::economy,4
@@ -4838,6 +4842,8 @@ seams,harness,shared_write,PlayersSeam::UpdatePlayerHead,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayerTail,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayers,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayersFinish,2
+seams,harness,shared_write,Point16::x,1
+seams,harness,shared_write,Point16::y,1
 seams,harness,shared_write,Seams::ai,2
 seams,harness,shared_write,Seams::economy,2
 seams,harness,shared_write,Seams::features,2
@@ -4917,6 +4923,8 @@ seams,los_radar,indirect,SonarJamVisitor::ApplySonarJamFlag,1
 seams,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 seams,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
 seams,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
+seams,los_radar,shared_write,Point16::x,5
+seams,los_radar,shared_write,Point16::y,5
 seams,los_radar,shared_write,Ref<Unit>::offset,1
 seams,los_radar,shared_write,Seams::ai,2
 seams,los_radar,shared_write,Seams::features,2
@@ -4952,6 +4960,8 @@ seams,map,indirect,UnitsInRange,1
 seams,map,shared_write,FeaturesSeam::GetCellFeature,1
 seams,map,shared_write,LosRadarSeam::GetMapCell,1
 seams,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
+seams,map,shared_write,Point16::x,15
+seams,map,shared_write,Point16::y,15
 seams,map,shared_write,Ref<Unit>::offset,1
 seams,map,shared_write,Seams::features,1
 seams,map,shared_write,Seams::los_radar,2
@@ -4993,6 +5003,8 @@ seams,orders,shared_write,PathPoint::y,4
 seams,orders,shared_write,PathfindingSeam::Cancel,2
 seams,orders,shared_write,PathfindingSeam::Submit,1
 seams,orders,shared_write,PlayersSeam::GiveUnitToPlayer,1
+seams,orders,shared_write,Point16::x,45
+seams,orders,shared_write,Point16::y,41
 seams,orders,shared_write,Ref<Unit>::offset,1
 seams,orders,shared_write,Seams::ai,9
 seams,orders,shared_write,Seams::features,1
@@ -5046,6 +5058,8 @@ seams,pathfinding,shared_write,PathUnitState::footprintY,2
 seams,pathfinding,shared_write,PathUnitState::heading,1
 seams,pathfinding,shared_write,PathUnitState::moveClass,2
 seams,pathfinding,shared_write,PathfindingSeam::CellsChanged,1
+seams,pathfinding,shared_write,Point16::x,9
+seams,pathfinding,shared_write,Point16::y,9
 seams,pathfinding,shared_write,Seams::pathfinding,1
 seams,pathfinding,shared_write,Seams::pathworld,8
 seams,platform,call,Result,3
@@ -5053,11 +5067,13 @@ seams,platform,call,operator delete,1
 seams,platform,call,operator new,5
 seams,platform,shared_write,PathPoint::x,4
 seams,platform,shared_write,PathPoint::y,4
+seams,platform,shared_write,Point16::x,7
+seams,platform,shared_write,Point16::y,7
 seams,platform,shared_write,Seams::weapons,1
 seams,platform,shared_write,Seams::wind_meteors,2
-seams,platform,shared_write,Vec3::x,22
+seams,platform,shared_write,Vec3::x,21
 seams,platform,shared_write,Vec3::y,13
-seams,platform,shared_write,Vec3::z,22
+seams,platform,shared_write,Vec3::z,21
 seams,platform,shared_write,WindMeteorsSeam::Apply,1
 seams,players,call,MissionConditions::Deactivate,1
 seams,players,call,MissionConditions::FreeConditions,1
@@ -5081,6 +5097,8 @@ seams,players,shared_write,NetworkSeam::SendShareMetal,1
 seams,players,shared_write,Player::ai,4
 seams,players,shared_write,PlayersSeam::TransferEnergy,1
 seams,players,shared_write,PlayersSeam::TransferMetal,1
+seams,players,shared_write,Point16::x,3
+seams,players,shared_write,Point16::y,3
 seams,players,shared_write,Seams::ai,5
 seams,players,shared_write,Seams::los_radar,1
 seams,players,shared_write,Seams::map,11
@@ -5100,6 +5118,8 @@ seams,players,shared_write,WeaponsSeam::DamageUnit,2
 seams,players,shared_write,WeaponsSeam::DetonateUnitWeapon,1
 seams,players,shared_write,WeaponsSeam::FindFeatureAtPos,1
 seams,presentation,shared_write,NetworkSeam::BroadcastPlayerInfo,1
+seams,presentation,shared_write,Point16::x,5
+seams,presentation,shared_write,Point16::y,5
 seams,presentation,shared_write,Ref<Unit>::offset,1
 seams,presentation,shared_write,Seams::ai,1
 seams,presentation,shared_write,Seams::economy,1
@@ -5171,6 +5191,8 @@ seams,units,shared_write,PathfindingSeam::CellsChanged,2
 seams,units,shared_write,PlayersSeam::KillPlayerUnits,1
 seams,units,shared_write,PlayersSeam::NotifyUnitCreated,2
 seams,units,shared_write,PlayersSeam::NotifyUnitDied,1
+seams,units,shared_write,Point16::x,9
+seams,units,shared_write,Point16::y,9
 seams,units,shared_write,Ref<Unit>::offset,2
 seams,units,shared_write,Seams::ai,3
 seams,units,shared_write,Seams::economy,2
@@ -5222,6 +5244,8 @@ seams,weapons,shared_write,OrdersSeam::AppendOrder,2
 seams,weapons,shared_write,OrdersSeam::MissionTypeFromName,2
 seams,weapons,shared_write,OrdersSeam::NewOrder,2
 seams,weapons,shared_write,Player::ai,3
+seams,weapons,shared_write,Point16::x,1
+seams,weapons,shared_write,Point16::y,1
 seams,weapons,shared_write,Seams::ai,4
 seams,weapons,shared_write,Seams::features,1
 seams,weapons,shared_write,Seams::los_radar,5
@@ -5245,6 +5269,8 @@ seams,weapons,shared_write,Vec3::y,28
 seams,weapons,shared_write,Vec3::z,29
 seams,weapons,shared_write,WeaponsSeam::ApplyAreaDamageAt,1
 seams,wind_meteors,indirect,WindMeteorsApply,1
+seams,wind_meteors,shared_write,Point16::x,5
+seams,wind_meteors,shared_write,Point16::y,5
 seams,wind_meteors,shared_write,Seams::weapons,1
 seams,wind_meteors,shared_write,Vec3::x,1
 seams,wind_meteors,shared_write,Vec3::y,1
@@ -5287,9 +5313,9 @@ targeting,orders,shared_write,Vec3::z,84
 targeting,platform,call,RandomInt,1
 targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,platform,call,UnitTypeSet::Contains,1
-targeting,platform,shared_write,Vec3::x,22
+targeting,platform,shared_write,Vec3::x,21
 targeting,platform,shared_write,Vec3::y,13
-targeting,platform,shared_write,Vec3::z,22
+targeting,platform,shared_write,Vec3::z,21
 targeting,players,shared_write,Vec3::x,3
 targeting,players,shared_write,Vec3::y,3
 targeting,players,shared_write,Vec3::z,3
@@ -5523,8 +5549,8 @@ units,map,shared_write,MovementClass::maxWaterSlope,2
 units,map,shared_write,MovementClass::minWaterDepth,2
 units,map,shared_write,MovementClass::name,2
 units,map,shared_write,MovementClass::width,5
-units,map,shared_write,Point16::x,16
-units,map,shared_write,Point16::y,16
+units,map,shared_write,Point16::x,15
+units,map,shared_write,Point16::y,15
 units,map,shared_write,Ref<Unit>::offset,1
 units,map,shared_write,Unit::bit2,3
 units,map,shared_write,Unit::cargo,2
@@ -5754,8 +5780,8 @@ units,platform,shared_write,BitReader::data,1
 units,platform,shared_write,BitReader::index,1
 units,platform,shared_write,Fixed::value,2
 units,platform,shared_write,Game::defs,1
-units,platform,shared_write,Point16::x,8
-units,platform,shared_write,Point16::y,8
+units,platform,shared_write,Point16::x,7
+units,platform,shared_write,Point16::y,7
 units,platform,shared_write,UnitDef::energyCost,1
 units,platform,shared_write,UnitDef::extractsMetal,1
 units,platform,shared_write,UnitDef::maxHealth,1
@@ -5764,9 +5790,9 @@ units,platform,shared_write,UnitDef::scriptChecksum,1
 units,platform,shared_write,UnitDef::unitname,1
 units,platform,shared_write,UnitDef::weaponHashXor,1
 units,platform,shared_write,UnitTypeSet::bits,1
-units,platform,shared_write,Vec3::x,22
+units,platform,shared_write,Vec3::x,21
 units,platform,shared_write,Vec3::y,13
-units,platform,shared_write,Vec3::z,22
+units,platform,shared_write,Vec3::z,21
 units,players,indirect,KillPlayerUnits,1
 units,players,shared_write,Game::defs,1
 units,players,shared_write,Player::commanderKills,2
@@ -5928,8 +5954,8 @@ units,seams,shared_write,MovementClass::name,1
 units,seams,shared_write,Player::flags,1
 units,seams,shared_write,Player::unitCount,1
 units,seams,shared_write,Player::unitsCreated,1
-units,seams,shared_write,Point16::x,2
-units,seams,shared_write,Point16::y,2
+units,seams,shared_write,Point16::x,3
+units,seams,shared_write,Point16::y,3
 units,seams,shared_write,Ref<Unit>::offset,8
 units,seams,shared_write,Unit::activateFlags,1
 units,seams,shared_write,Unit::buildLeft,1
@@ -6110,8 +6136,8 @@ weapons,los_radar,shared_write,Vec3::z,12
 weapons,los_radar,shared_write,Vec3Words::yWhole,4
 weapons,los_radar,shared_write,WeaponDef::coverage,1
 weapons,map,shared_write,Fixed::value,2
-weapons,map,shared_write,Point16::x,16
-weapons,map,shared_write,Point16::y,16
+weapons,map,shared_write,Point16::x,15
+weapons,map,shared_write,Point16::y,15
 weapons,map,shared_write,Unit::flags,5
 weapons,map,shared_write,Vec3::x,12
 weapons,map,shared_write,Vec3::y,4
@@ -6194,11 +6220,11 @@ weapons,platform,call,operator delete,1
 weapons,platform,call,operator new,1
 weapons,platform,call,operator-,3
 weapons,platform,shared_write,Fixed::value,2
-weapons,platform,shared_write,Point16::x,8
-weapons,platform,shared_write,Point16::y,8
-weapons,platform,shared_write,Vec3::x,22
+weapons,platform,shared_write,Point16::x,7
+weapons,platform,shared_write,Point16::y,7
+weapons,platform,shared_write,Vec3::x,21
 weapons,platform,shared_write,Vec3::y,13
-weapons,platform,shared_write,Vec3::z,22
+weapons,platform,shared_write,Vec3::z,21
 weapons,platform,shared_write,Vec3f::x,4
 weapons,platform,shared_write,Vec3f::y,4
 weapons,platform,shared_write,Vec3f::z,4
@@ -6289,8 +6315,8 @@ weapons,seams,indirect,NewOrderNative,2
 weapons,seams,indirect,QueryScriptNative,1
 weapons,seams,indirect,StartScriptNative,3
 weapons,seams,indirect,StartScriptWithArgsNative,5
-weapons,seams,shared_write,Point16::x,2
-weapons,seams,shared_write,Point16::y,2
+weapons,seams,shared_write,Point16::x,3
+weapons,seams,shared_write,Point16::y,3
 weapons,seams,shared_write,Unit::flags,1
 weapons,seams,shared_write,Unit::workTime,1
 weapons,seams,shared_write,Vec3::x,2
@@ -6370,8 +6396,8 @@ wind_meteors,map,shared_write,MeteorShowerParams::density,1
 wind_meteors,map,shared_write,MeteorShowerParams::duration,1
 wind_meteors,map,shared_write,MeteorShowerParams::interval,1
 wind_meteors,map,shared_write,MeteorShowerParams::radius,1
-wind_meteors,map,shared_write,Point16::x,16
-wind_meteors,map,shared_write,Point16::y,16
+wind_meteors,map,shared_write,Point16::x,15
+wind_meteors,map,shared_write,Point16::y,15
 wind_meteors,map,shared_write,Vec3::x,12
 wind_meteors,map,shared_write,Vec3::y,4
 wind_meteors,map,shared_write,Vec3::z,12
@@ -6392,11 +6418,11 @@ wind_meteors,platform,call,TdfRecord::GetFieldDouble,1
 wind_meteors,platform,call,TdfRecord::GetFieldInt,1
 wind_meteors,platform,call,TdfRecord::GetFieldString,1
 wind_meteors,platform,call,operator==,1
-wind_meteors,platform,shared_write,Point16::x,8
-wind_meteors,platform,shared_write,Point16::y,8
-wind_meteors,platform,shared_write,Vec3::x,22
+wind_meteors,platform,shared_write,Point16::x,7
+wind_meteors,platform,shared_write,Point16::y,7
+wind_meteors,platform,shared_write,Vec3::x,21
 wind_meteors,platform,shared_write,Vec3::y,13
-wind_meteors,platform,shared_write,Vec3::z,22
+wind_meteors,platform,shared_write,Vec3::z,21
 wind_meteors,platform,shared_write,WindMeteorsEffect::weapon,1
 wind_meteors,players,shared_write,Point16::x,3
 wind_meteors,players,shared_write,Point16::y,3
@@ -6413,8 +6439,8 @@ wind_meteors,presentation,shared_write,Vec3::z,41
 wind_meteors,seams,call,WindMeteorsEmit,1
 wind_meteors,seams,indirect,FindWeaponByNameNative,1
 wind_meteors,seams,shared_write,Game::windStrength,1
-wind_meteors,seams,shared_write,Point16::x,2
-wind_meteors,seams,shared_write,Point16::y,2
+wind_meteors,seams,shared_write,Point16::x,3
+wind_meteors,seams,shared_write,Point16::y,3
 wind_meteors,seams,shared_write,Vec3::x,2
 wind_meteors,seams,shared_write,Vec3::y,2
 wind_meteors,seams,shared_write,Vec3::z,2

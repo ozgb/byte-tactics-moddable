@@ -24692,14 +24692,19 @@ address,function,file,kind,target
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,field_read,UnitDef::mobile
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,function,
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,global_read,g_game
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,CellToWorld
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,GetFootprintHeight
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,WorldToCell
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,deref_read,*Point16
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,deref_read,*Vec3
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_escape,UnitDef::footprintx
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Point16::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Point16::y
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,UnitDef::mobile
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Vec3::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Vec3::z
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Point16::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Point16::y
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::x
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::y
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::z
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Feature *
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Unit *
@@ -24817,12 +24822,12 @@ address,function,file,kind,target
 0x47e890,UnitsInRange,src/map/terrain.cpp,call,operator UnitBucket *
 0x47e890,UnitsInRange,src/map/terrain.cpp,deref_read,*BucketGrid
 0x47e890,UnitsInRange,src/map/terrain.cpp,deref_write,*unsigned short
-0x47e890,UnitsInRange,src/map/terrain.cpp,field_maybe_written,Unit::pos
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::cells
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::height
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::width
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::cargoNext
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::id
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::pos
 0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,UnitBucket::first
 0x47e890,UnitsInRange,src/map/terrain.cpp,function,
 0x47e890,UnitsInRange,src/map/terrain.cpp,global_read,g_game
@@ -43778,11 +43783,6 @@ address,function,file,kind,target
 ,CellToWorld,src/ingame/control_panel.cpp,field_write,Vec3::x
 ,CellToWorld,src/ingame/control_panel.cpp,field_write,Vec3::z
 ,CellToWorld,src/ingame/control_panel.cpp,function,
-,CellToWorld,src/map/terrain.cpp,field_read,Point16::x
-,CellToWorld,src/map/terrain.cpp,field_read,Point16::y
-,CellToWorld,src/map/terrain.cpp,field_write,Vec3::x
-,CellToWorld,src/map/terrain.cpp,field_write,Vec3::z
-,CellToWorld,src/map/terrain.cpp,function,
 ,CellToWorld,src/orders/unit_orders.cpp,field_read,Point16::x
 ,CellToWorld,src/orders/unit_orders.cpp,field_read,Point16::y
 ,CellToWorld,src/orders/unit_orders.cpp,field_write,Vec3::x
@@ -50666,15 +50666,15 @@ address,function,file,kind,target
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,field_write,MapInsertResult::first
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,field_write,MapInsertResult::second
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,function,
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,call,MapInbox
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,call,MapRectEventOf
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::height
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::width
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::x
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::z
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_write,Point16::x
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_write,Point16::y
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,function,
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,call,MapInbox
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,call,MapRectEventOf
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::height
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::width
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::x
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::z
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_write,Point16::x
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_write,Point16::y
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,function,
 ,MapPoint,src/map/terrain.cpp,deref_read,*int
 ,MapPoint,src/map/terrain.cpp,field_write,Point16::x
 ,MapPoint,src/map/terrain.cpp,field_write,Point16::y
@@ -62001,13 +62001,6 @@ address,function,file,kind,target
 ,WorldToCell,src/ingame/control_panel.cpp,field_write,Point16::x
 ,WorldToCell,src/ingame/control_panel.cpp,field_write,Point16::y
 ,WorldToCell,src/ingame/control_panel.cpp,function,
-,WorldToCell,src/map/terrain.cpp,field_read,Point16::x
-,WorldToCell,src/map/terrain.cpp,field_read,Point16::y
-,WorldToCell,src/map/terrain.cpp,field_read,Vec3::x
-,WorldToCell,src/map/terrain.cpp,field_read,Vec3::z
-,WorldToCell,src/map/terrain.cpp,field_write,Point16::x
-,WorldToCell,src/map/terrain.cpp,field_write,Point16::y
-,WorldToCell,src/map/terrain.cpp,function,
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Point16::x
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Point16::y
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Vec3::x

@@ -99,7 +99,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
-#include "../seams/map_world.h"
+#include "../map/unit_visitor.h"
 #include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"

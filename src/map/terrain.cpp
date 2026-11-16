@@ -758,27 +758,17 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     return 1;
 }
 
-static inline Point16 WorldToCell(Vec3 v, Point16 origin)
-{
-    Point16 c;
-    c.x = (v.x - (origin.x << 19) + 0x80000) >> 20;
-    c.y = (v.z - (origin.y << 19) + 0x80000) >> 20;
-    return c;
-}
-
-static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
-{
-    v->x = (origin.x + c.x * 2) << 19;
-    v->z = (origin.y + c.y * 2) << 19;
-}
-
 // FUNCTION: 0x47ddc0
 void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
 {
     if (unit->mobile)
         return;
-    Point16 cell = WorldToCell(*pos, *(Point16*)&unit->footprintx);
-    CellToWorld(*(Point16*)&unit->footprintx, cell, pos);
+    Point16 origin = *(Point16*)&unit->footprintx;
+    Point16 cell;
+    cell.x = (pos->x - (origin.x << 19) + 0x80000) >> 20;
+    cell.y = (pos->z - (origin.y << 19) + 0x80000) >> 20;
+    pos->x = (origin.x + cell.x * 2) << 19;
+    pos->z = (origin.y + cell.y * 2) << 19;
     pos->y = GetFootprintHeight(unit, cell) << 16;
 }
 
@@ -1118,7 +1108,7 @@ static inline int ClampBucketMaxZ(Vec3* p, int range, unsigned int size)
     return ClampBucketRangeCoord((p->z + range) >> 23, size);
 }
 
-static inline int BucketDistSquared(Vec3* b, Vec3* a)
+static inline int BucketDistSquared(const Vec3* b, const Vec3* a)
 {
     int dz = a->z - b->z;
     int dx = a->x - b->x;

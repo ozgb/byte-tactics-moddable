@@ -6,6 +6,6 @@
 struct Vec3;
 
 void MapInbox(const void* event);
-void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor);
+void MapOnFeaturesPassMaps(const void* event);
 
 #endif

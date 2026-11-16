@@ -4,12 +4,14 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/map.h"
+#include "../../interfaces/features.h"
 #include "../../interfaces/services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"
 #include "../game/game.h"
 #include "../util/vec3.h"
+#include "../game/map_events.h"
 #include "../units/unit.h"
 #include "../../link/globals.h"
 #include "map_world.h"
@@ -18,6 +20,19 @@ void MapInbox(const void* event)
 {
     const MapEvent* e = static_cast<const MapEvent*>(event);
     HarnessMapEvent(e, g_seams.map->Apply(e));
+}
+
+void MapOnFeaturesPassMaps(const void* event)
+{
+    const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
+    Point16 at;
+    at.x = (short)effect->x;
+    at.y = (short)effect->z;
+    Point16 footprint;
+    footprint.x = (short)effect->width;
+    footprint.y = (short)effect->height;
+    MapEvent passMaps = MapRectEventOf(MAP_PASS_MAPS, 0, at, footprint);
+    MapInbox(&passMaps);
 }
 
 void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor)

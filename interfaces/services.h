@@ -126,6 +126,9 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
 int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
 // Calls map's synchronous PickRandomReclaimableResourcesInRadius slot after delivering map's pending inbox, and returns its answer.
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
+class UnitVisitor;
+// Calls the visitor for each unit within range of the position, in map's spatial grid order, through map's UnitsInRange query.
+void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

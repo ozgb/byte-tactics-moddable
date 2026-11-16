@@ -137,7 +137,7 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
-#include "../seams/map_world.h"
+#include "../map/unit_visitor.h"
 #include "../../interfaces/orders.h"
 #include "order_queue.h"
 #include "order_queue.h"

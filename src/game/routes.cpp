@@ -7,7 +7,6 @@
 #include "../../interfaces/features.h"
 #include "../seams/features_world.h"
 #include "../units/features_effects.h"
-#include "../map/map_features_effects.h"
 #include "../weapons/features_effects.h"
 #include "../../interfaces/targeting.h"
 #include "../seams/targeting_world.h"

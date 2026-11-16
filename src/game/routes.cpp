@@ -12,6 +12,8 @@
 #include "../../interfaces/targeting.h"
 #include "../seams/targeting_world.h"
 #include "../units/targeting_effects.h"
+#include "../../interfaces/los_radar.h"
+#include "../seams/los_radar_world.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -46,6 +48,19 @@ static const SchedRoute s_routes[] = {
     {SCHED_UNITS, TARGETING_RESET, SCHED_TARGETING, TargetingInbox, 0},
     {SCHED_WEAPONS, TARGETING_CLEAR, SCHED_TARGETING, TargetingInbox, 1},
     {SCHED_TARGETING, TARGETING_EFFECT_CLEARED, SCHED_UNITS, UnitsOnTargetingCleared, 1},
+    {SCHED_UNITS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ORDERS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_PLAYERS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_UNITS, LOS_RADAR_REMOVE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_UNITS, LOS_RADAR_REVEAL_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_UNITS, LOS_RADAR_ADD_EYEBALL, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_MAP, LOS_RADAR_CELL_HEIGHTS, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_PLAYERS, LOS_RADAR_RECALCULATE, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ENGINE, LOS_RADAR_RECALCULATE, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ENGINE, LOS_RADAR_SHARE_MAPPING, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ENGINE, LOS_RADAR_SHARE_RADAR, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ECONOMY, LOS_RADAR_SHARE_MAPPING, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ECONOMY, LOS_RADAR_SHARE_RADAR, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_ENABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_DISABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_PARAMS, SCHED_WIND_METEORS, WindMeteorsInbox, 0},

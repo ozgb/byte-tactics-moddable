@@ -81,6 +81,10 @@ void __stdcall HarnessTargetingEvent(const TargetingEvent*, int)
 {
 }
 
+void __stdcall HarnessLosRadarEvent(const LosRadarEvent*, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];

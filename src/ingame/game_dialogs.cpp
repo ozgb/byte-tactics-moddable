@@ -1104,7 +1104,7 @@ void __stdcall RunGameSteps(int showStats)
         Player* shown = &g_game->players[g_game->playerIndex];
         if (shown->displayTimer < g_game->ticks)
             shown->displayTimer += 0x1e;
-        g_seams.los_radar->ExpireEyeballs();
+        SchedExpireEyeballs();
 
         if ((showStats && g_usePacketManager != 0) || HarnessSharing()) {
 #if BT_ACCESS_LOG

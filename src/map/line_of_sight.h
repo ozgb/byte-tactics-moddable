@@ -4,6 +4,7 @@ struct Cell;
 
 struct Cell;
 struct Eye;
+struct LosRadarEvent;
 struct Point16;
 struct SightQuery;
 struct Unit;
@@ -23,6 +24,7 @@ void __stdcall FreeLosTables();
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
 unsigned int __stdcall SoundHeardMask(const Vec3* at);
 Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
+int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e);
 void __stdcall RemoveUnitLineOfSight(Unit* unit);
 int __stdcall IsEyeballExpired(Eye* obj);
 void __stdcall ExpireEyeballs();
@@ -38,7 +40,7 @@ void __stdcall FreeMapResources();
 void __stdcall ClampWorldPosToTerrain(int x, int y, Vec3* out);
 void __stdcall RecalculateLineOfSight(int arg);
 void __stdcall RevealAroundUnit(SightQuery* params);
-void __stdcall AddEyeball(Vec3* src, int a, int b, int c);
+int __stdcall AddEyeball(Vec3* src, int sightDistance, int eyeHeight, int lifetime);
 void __stdcall RevealNewUnit(Unit* unit);
 
 Cell* __stdcall GetMapCell(int x, int y);

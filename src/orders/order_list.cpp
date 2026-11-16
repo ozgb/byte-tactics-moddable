@@ -84,6 +84,7 @@ struct Point16FromShorts : Point16 {
 #include "../../interfaces/orders.h"
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
+#include "../game/los_radar_events.h"
 
 #include "../network/player.h"
 
@@ -1542,7 +1543,7 @@ void UnitMotion::UpdatePosition(Unit* u)
     u->mode = (short)m;
     g_seams.map->AddUnitToMap(u);
     u->moved = 1;
-    g_seams.los_radar->UpdateUnitLineOfSight(u);
+    LosRadarPublishUpdateUnit(SCHED_ORDERS, u);
 }
 
 // FUNCTION: 0x43da70

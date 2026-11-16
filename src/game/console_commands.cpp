@@ -227,6 +227,7 @@ void __stdcall CmdBurnAll(int arg1)
 }
 
 #include "../../interfaces/seams.h"
+#include "los_radar_events.h"
 
 // FUNCTION: 0x4163a0
 void __stdcall CmdBurnOne(void* args)
@@ -327,11 +328,21 @@ void __stdcall CmdFShadow(int unused)
     g_game->visualBits.featureShadows = !g_game->visualBits.featureShadows;
 }
 
+void __stdcall ConsoleShareMapping(int unused)
+{
+    LosRadarPublishShareMapping(SCHED_ENGINE, g_game->localPlayer);
+}
+
+void __stdcall ConsoleShareRadar(int unused)
+{
+    LosRadarPublishShareRadar(SCHED_ENGINE, g_game->localPlayer);
+}
+
 // FUNCTION: 0x416690
 void __stdcall CmdLOSType(int unused)
 {
     g_game->bits_14281.bit2_14281 = !g_game->bits_14281.bit2_14281;
-    g_seams.los_radar->RecalculateLineOfSight(0);
+    LosRadarPublishRecalculate(SCHED_ENGINE, 0);
 }
 
 // FUNCTION: 0x4166c0
@@ -521,7 +532,7 @@ void __stdcall CmdLOS(int unused)
 {
     g_game->bits_14281.bit1_14281 = !g_game->bits_14281.bit1_14281;
     SaveSettings();
-    g_seams.los_radar->RecalculateLineOfSight(0);
+    LosRadarPublishRecalculate(SCHED_ENGINE, 0);
 }
 
 // FUNCTION: 0x416d80
@@ -529,7 +540,7 @@ void __stdcall CmdMapping(int unused)
 {
     g_game->bits_14281.bit0_14281 = !g_game->bits_14281.bit0_14281;
     SaveSettings();
-    g_seams.los_radar->RecalculateLineOfSight(1);
+    LosRadarPublishRecalculate(SCHED_ENGINE, 1);
 }
 
 // FUNCTION: 0x416db0
@@ -744,7 +755,7 @@ void __stdcall CmdNowISee(void*)
     p = (unsigned short*)((char*)p_game + 0x14281);
     *p = *p & 0xfffd;
 
-    g_seams.los_radar->RecalculateLineOfSight(1);
+    LosRadarPublishRecalculate(SCHED_ENGINE, 1);
 }
 
 // FUNCTION: 0x417570
@@ -1283,8 +1294,8 @@ ConsoleCommand g_consoleCommands[44] = {
     {"ShootAll", (void (__stdcall *)(CommandArgs *))CmdShootAll, 1},
     {"ShareMetal", (void (__stdcall *)(CommandArgs *))CmdShareMetal, 1},
     {"ShareEnergy", (void (__stdcall *)(CommandArgs *))CmdShareEnergy, 1},
-    {"ShareMapping", (void (__stdcall *)(CommandArgs *))CmdShareMapping, 1},
-    {"ShareRadar", (void (__stdcall *)(CommandArgs *))CmdShareRadar, 1},
+    {"ShareMapping", (void (__stdcall *)(CommandArgs *))ConsoleShareMapping, 1},
+    {"ShareRadar", (void (__stdcall *)(CommandArgs *))ConsoleShareRadar, 1},
     {"ShareAll", (void (__stdcall *)(CommandArgs *))CmdShareAll, 1},
     {"ShowRanges", (void (__stdcall *)(CommandArgs *))CmdShowRanges, 1},
     {"SetShareMetal", CmdSetShareMetal, 1},

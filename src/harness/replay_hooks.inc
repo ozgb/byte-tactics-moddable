@@ -1297,6 +1297,22 @@ unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
     return result;
 }
 
+int __stdcall RecLosRadarApply(const LosRadarEvent* a0)
+{
+    ReplayRoots roots;
+    if (a0 != nullptr && a0->unit != 0)
+        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
+    SlotScope scope(RSL_LOS_RADAR_APPLY, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgStruct(s_call, "a", "event", ROK_LOSRADAREVENT, a0);
+    }
+    int result = s_inner_los_radar->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 Cell* __stdcall RecLosRadarGetMapCell(int a0, int a1)
 {
     ReplayRoots roots;
@@ -1318,144 +1334,6 @@ Cell* __stdcall RecLosRadarGetMapCell(int a0, int a1)
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_CELL, result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecLosRadarCmdShareMapping(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_CMDSHAREMAPPING, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "unused", a0);
-    }
-    ReplayText line;
-    if (scope.Nested()) {
-        line.Add("\n    c los_radar.CmdShareMapping");
-        ImportValue(line, a0);
-    }
-    s_inner_los_radar->CmdShareMapping(a0);
-    if (scope.Nested()) {
-        FinishNested(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarCmdShareRadar(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_CMDSHARERADAR, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "unused", a0);
-    }
-    ReplayText line;
-    if (scope.Nested()) {
-        line.Add("\n    c los_radar.CmdShareRadar");
-        ImportValue(line, a0);
-    }
-    s_inner_los_radar->CmdShareRadar(a0);
-    if (scope.Nested()) {
-        FinishNested(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_CLAMPWORLDPOSTOTERRAIN, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "x", a0);
-        ArgValue(s_call, "y", a1);
-        ArgPending(s_call, "out");
-    }
-    s_inner_los_radar->ClampWorldPosToTerrain(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarExpireEyeballs()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_EXPIREEYEBALLS, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->ExpireEyeballs();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarFreeMapResources()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_FREEMAPRESOURCES, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->FreeMapResources();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarFreeRadar()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_FREERADAR, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->FreeRadar();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarInitRadar()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_INITRADAR, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->InitRadar();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarLoadTntMap()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_LOADTNTMAP, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->LoadTntMap();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarRecalculateLineOfSight(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_RECALCULATELINEOFSIGHT, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "flag", a0);
-    }
-    s_inner_los_radar->RecalculateLineOfSight(a0);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecLosRadarIsUnitVisibleToPlayer(Player* a0, Unit* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_LOS_RADAR_ISUNITVISIBLETOPLAYER, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-    }
-    int result = s_inner_los_radar->IsUnitVisibleToPlayer(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
@@ -1488,113 +1366,35 @@ Cell* __stdcall RecLosRadarGetOriginCellAtPosition(Vec3* a0)
     return result;
 }
 
-void __stdcall RecLosRadarUpdateCellHeightRange(Point16 a0, Point16 a1)
+void __stdcall RecLosRadarClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE, SUB_LOS_RADAR, roots);
+    SlotScope scope(RSL_LOS_RADAR_CLAMPWORLDPOSTOTERRAIN, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgValue(s_call, "pos", a0);
-        ArgValue(s_call, "size", a1);
+        ArgValue(s_call, "x", a0);
+        ArgValue(s_call, "y", a1);
+        ArgPending(s_call, "out");
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i los_radar.UpdateCellHeightRange");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-    }
-    s_inner_los_radar->UpdateCellHeightRange(a0, a1);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
+    s_inner_los_radar->ClampWorldPosToTerrain(a0, a1, a2);
     if (scope.Open()) {
     }
 }
 
-void __stdcall RecLosRadarUpdateUnitLineOfSight(Unit* a0)
+int __stdcall RecLosRadarIsUnitVisibleToPlayer(Player* a0, Unit* a1)
 {
     ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_LOS_RADAR_UPDATEUNITLINEOFSIGHT, SUB_LOS_RADAR, roots);
+    roots.Add(ROK_PLAYER, a0);
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_LOS_RADAR_ISUNITVISIBLETOPLAYER, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgObject(s_call, "player", ROK_PLAYER, a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
     }
-    s_inner_los_radar->UpdateUnitLineOfSight(a0);
+    int result = s_inner_los_radar->IsUnitVisibleToPlayer(a0, a1);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
-}
-
-void __stdcall RecLosRadarRemoveUnitLineOfSight(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_LOS_RADAR_REMOVEUNITLINEOFSIGHT, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_los_radar->RemoveUnitLineOfSight(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarRevealNewUnit(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_LOS_RADAR_REVEALNEWUNIT, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_los_radar->RevealNewUnit(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarAddEyeball(Vec3* a0, int a1, int a2, int a3)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_ADDEYEBALL, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "src");
-        ArgValue(s_call, "a", a1);
-        ArgValue(s_call, "b", a2);
-        ArgValue(s_call, "c", a3);
-    }
-    s_inner_los_radar->AddEyeball(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarRecordRadarUnits()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_RECORDRADARUNITS, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->RecordRadarUnits();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarRecordRadarMapped()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_RECORDRADARMAPPED, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->RecordRadarMapped();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecLosRadarUpdateSensorRadarAndCloak()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_UPDATESENSORRADARANDCLOAK, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-    }
-    s_inner_los_radar->UpdateSensorRadarAndCloak();
-    if (scope.Open()) {
-    }
+    return result;
 }
 
 unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
@@ -1618,6 +1418,107 @@ unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+void __stdcall RecLosRadarUpdateUnitLineOfSight(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_LOS_RADAR_UPDATEUNITLINEOFSIGHT, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_los_radar->UpdateUnitLineOfSight(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarRecordRadarUnits()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_RECORDRADARUNITS, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->RecordRadarUnits();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarUpdateSensorRadarAndCloak()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_UPDATESENSORRADARANDCLOAK, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->UpdateSensorRadarAndCloak();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarRecordRadarMapped()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_RECORDRADARMAPPED, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->RecordRadarMapped();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarExpireEyeballs()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_EXPIREEYEBALLS, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->ExpireEyeballs();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarLoadTntMap()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_LOADTNTMAP, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->LoadTntMap();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarInitRadar()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_INITRADAR, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->InitRadar();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarFreeRadar()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_FREERADAR, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->FreeRadar();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarFreeMapResources()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_FREEMAPRESOURCES, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    s_inner_los_radar->FreeMapResources();
+    if (scope.Open()) {
+    }
 }
 
 void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
@@ -3378,15 +3279,29 @@ MissionConditions* __stdcall RecPlayersNewConditions()
     return result;
 }
 
-int __stdcall RecPlayersUpdatePlayerHead(int a0, RandStream a1)
+int __stdcall RecPlayersUpdatePlayerHead(int a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_UPDATEPLAYERHEAD, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
+    }
+    int result = s_inner_players->UpdatePlayerHead(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPlayersUpdatePlayerBody(int a0, RandStream a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERBODY, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
         ArgValue(s_call, "stream", a1);
     }
-    int result = s_inner_players->UpdatePlayerHead(a0, a1);
+    int result = s_inner_players->UpdatePlayerBody(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4968,8 +4883,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         return false;
     case SUB_MAP:
-        if (slot == RSL_LOS_RADAR_UPDATECELLHEIGHTRANGE)
-            return true;
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
             return true;
         if (slot == RSL_PATHFINDING_CELLSCHANGED)
@@ -4983,8 +4896,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
 bool IsNestedSlot(unsigned slot)
 {
     switch (slot) {
-    case RSL_LOS_RADAR_CMDSHAREMAPPING:
-    case RSL_LOS_RADAR_CMDSHARERADAR:
         return true;
     default:
         return false;
@@ -5204,50 +5115,38 @@ void HookSeams(const bool* on)
         s_rec_targeting.FindBestTargetIfFireAtWill = RecTargetingFindBestTargetIfFireAtWill;
     if (on[SUB_TARGETING])
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.Apply = RecLosRadarApply;
     if (on[SUB_LOS_RADAR] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
-    if (on[SUB_LOS_RADAR] || any)
-        s_rec_los_radar.CmdShareMapping = RecLosRadarCmdShareMapping;
-    if (on[SUB_LOS_RADAR] || any)
-        s_rec_los_radar.CmdShareRadar = RecLosRadarCmdShareRadar;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.ExpireEyeballs = RecLosRadarExpireEyeballs;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.FreeRadar = RecLosRadarFreeRadar;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.InitRadar = RecLosRadarInitRadar;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.LoadTntMap = RecLosRadarLoadTntMap;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RecalculateLineOfSight = RecLosRadarRecalculateLineOfSight;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.IsUnitVisibleToPlayer = RecLosRadarIsUnitVisibleToPlayer;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;
-    if (on[SUB_LOS_RADAR] || on[SUB_MAP])
-        s_rec_los_radar.UpdateCellHeightRange = RecLosRadarUpdateCellHeightRange;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.IsUnitVisibleToPlayer = RecLosRadarIsUnitVisibleToPlayer;
+    if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS])
+        s_rec_los_radar.SoundHeardMask = RecLosRadarSoundHeardMask;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.UpdateUnitLineOfSight = RecLosRadarUpdateUnitLineOfSight;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RemoveUnitLineOfSight = RecLosRadarRemoveUnitLineOfSight;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.RevealNewUnit = RecLosRadarRevealNewUnit;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.AddEyeball = RecLosRadarAddEyeball;
-    if (on[SUB_LOS_RADAR])
         s_rec_los_radar.RecordRadarUnits = RecLosRadarRecordRadarUnits;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.RecordRadarMapped = RecLosRadarRecordRadarMapped;
     if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.UpdateSensorRadarAndCloak = RecLosRadarUpdateSensorRadarAndCloak;
-    if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS])
-        s_rec_los_radar.SoundHeardMask = RecLosRadarSoundHeardMask;
+        s_rec_los_radar.ExpireEyeballs = RecLosRadarExpireEyeballs;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.LoadTntMap = RecLosRadarLoadTntMap;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.InitRadar = RecLosRadarInitRadar;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.FreeRadar = RecLosRadarFreeRadar;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
     if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
@@ -5478,6 +5377,8 @@ void HookSeams(const bool* on)
         s_rec_players.NewConditions = RecPlayersNewConditions;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayerHead = RecPlayersUpdatePlayerHead;
+    if (on[SUB_PLAYERS])
+        s_rec_players.UpdatePlayerBody = RecPlayersUpdatePlayerBody;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayerTail = RecPlayersUpdatePlayerTail;
     if (on[SUB_PLAYERS])

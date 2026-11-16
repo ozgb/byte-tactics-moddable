@@ -11,6 +11,7 @@
 
 #include "../../link/globals.h"
 #include "share_commands.h"
+#include "los_radar_events.h"
 #include "../util/commands.h"
 #include "../state/sim_effects.h"
 #include "../../interfaces/services.h"
@@ -41,14 +42,16 @@ void __stdcall CmdShareEnergy(int unused)
 }
 
 // FUNCTION: 0x418e50
-void __stdcall CmdShareMapping(int unused)
+int __stdcall CmdShareMapping(int player)
 {
     if (g_game->netGameFlags & 1) {
-        PlayerInfo* data = g_game->players[g_game->localPlayer].info;
+        PlayerInfo* data = g_game->players[player].info;
         data->flags_97_wide = (data->flags_97_wide & ~0x20) | (~data->flags_97_wide & 0x20);
-        RecordMessage(SIM_MESSAGE_SHARE_MAPPING_TOGGLED, (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x20));
+        RecordMessage(SIM_MESSAGE_SHARE_MAPPING_TOGGLED, (g_game->players[player].info->flags_97_wide & 0x20));
         g_seams.network->BroadcastPlayerInfo();
+        return 1;
     }
+    return 0;
 }
 
 // FUNCTION: 0x418f10
@@ -63,14 +66,16 @@ void __stdcall ToggleShareLos(int unused)
 }
 
 // FUNCTION: 0x418fd0
-void __stdcall CmdShareRadar(int unused)
+int __stdcall CmdShareRadar(int player)
 {
     if (g_game->netGameFlags & 1) {
-        g_game->players[g_game->localPlayer].info->shareRadar =
-            !g_game->players[g_game->localPlayer].info->shareRadar;
-        RecordMessage(SIM_MESSAGE_SHARE_RADAR_TOGGLED, (g_game->players[g_game->localPlayer].info->flags_97_wide & 0x40));
+        g_game->players[player].info->shareRadar =
+            !g_game->players[player].info->shareRadar;
+        RecordMessage(SIM_MESSAGE_SHARE_RADAR_TOGGLED, (g_game->players[player].info->flags_97_wide & 0x40));
         g_seams.network->BroadcastPlayerInfo();
+        return 1;
     }
+    return 0;
 }
 
 // FUNCTION: 0x419090
@@ -79,8 +84,8 @@ void __stdcall CmdShareAll(int unused)
     if (g_game->netGameFlags & 1) {
         CmdShareMetal(unused);
         CmdShareEnergy(unused);
-        g_seams.los_radar->CmdShareMapping(unused);
-        g_seams.los_radar->CmdShareRadar(unused);
+        LosRadarPublishShareMapping(SCHED_ECONOMY, g_game->localPlayer);
+        LosRadarPublishShareRadar(SCHED_ECONOMY, g_game->localPlayer);
     }
 }
 

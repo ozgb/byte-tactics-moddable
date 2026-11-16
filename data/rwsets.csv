@@ -4609,14 +4609,11 @@ address,function,file,kind,target
 0x416660,CmdFShadow,src/game/console_commands.cpp,field_write,<anon>::featureShadows
 0x416660,CmdFShadow,src/game/console_commands.cpp,function,
 0x416660,CmdFShadow,src/game/console_commands.cpp,global_read,g_game
+0x416690,CmdLOSType,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
 0x416690,CmdLOSType,src/game/console_commands.cpp,field_read,<anon>::bit2_14281
-0x416690,CmdLOSType,src/game/console_commands.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x416690,CmdLOSType,src/game/console_commands.cpp,field_read,Seams::los_radar
 0x416690,CmdLOSType,src/game/console_commands.cpp,field_write,<anon>::bit2_14281
 0x416690,CmdLOSType,src/game/console_commands.cpp,function,
 0x416690,CmdLOSType,src/game/console_commands.cpp,global_read,g_game
-0x416690,CmdLOSType,src/game/console_commands.cpp,global_read,g_seams
-0x416690,CmdLOSType,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x4166c0,CmdLight,src/game/console_commands.cpp,call,CMemoryCache::FlushCache
 0x4166c0,CmdLight,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4166c0,CmdLight,src/game/console_commands.cpp,call,SetLightVector
@@ -4760,24 +4757,18 @@ address,function,file,kind,target
 0x416d20,CmdIFace,src/game/console_commands.cpp,field_write,Game::interfaceType
 0x416d20,CmdIFace,src/game/console_commands.cpp,function,
 0x416d20,CmdIFace,src/game/console_commands.cpp,global_read,g_game
+0x416d50,CmdLOS,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
 0x416d50,CmdLOS,src/game/console_commands.cpp,call,SaveSettings
 0x416d50,CmdLOS,src/game/console_commands.cpp,field_read,<anon>::bit1_14281
-0x416d50,CmdLOS,src/game/console_commands.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x416d50,CmdLOS,src/game/console_commands.cpp,field_read,Seams::los_radar
 0x416d50,CmdLOS,src/game/console_commands.cpp,field_write,<anon>::bit1_14281
 0x416d50,CmdLOS,src/game/console_commands.cpp,function,
 0x416d50,CmdLOS,src/game/console_commands.cpp,global_read,g_game
-0x416d50,CmdLOS,src/game/console_commands.cpp,global_read,g_seams
-0x416d50,CmdLOS,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
+0x416d80,CmdMapping,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
 0x416d80,CmdMapping,src/game/console_commands.cpp,call,SaveSettings
 0x416d80,CmdMapping,src/game/console_commands.cpp,field_read,<anon>::bit0_14281
-0x416d80,CmdMapping,src/game/console_commands.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x416d80,CmdMapping,src/game/console_commands.cpp,field_read,Seams::los_radar
 0x416d80,CmdMapping,src/game/console_commands.cpp,field_write,<anon>::bit0_14281
 0x416d80,CmdMapping,src/game/console_commands.cpp,function,
 0x416d80,CmdMapping,src/game/console_commands.cpp,global_read,g_game
-0x416d80,CmdMapping,src/game/console_commands.cpp,global_read,g_seams
-0x416d80,CmdMapping,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x416db0,CmdContour,src/game/console_commands.cpp,call,CommandArgs::GetFloatArg
 0x416db0,CmdContour,src/game/console_commands.cpp,function,
 0x416db0,CmdContour,src/game/console_commands.cpp,global_write,g_contourOffset
@@ -4915,14 +4906,11 @@ address,function,file,kind,target
 0x417520,CmdProfile,src/game/console_commands.cpp,field_write,Game::profileBarsEnabled
 0x417520,CmdProfile,src/game/console_commands.cpp,function,
 0x417520,CmdProfile,src/game/console_commands.cpp,global_read,g_game
+0x417540,CmdNowISee,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
 0x417540,CmdNowISee,src/game/console_commands.cpp,deref_read,*unsigned short
 0x417540,CmdNowISee,src/game/console_commands.cpp,deref_write,*unsigned short
-0x417540,CmdNowISee,src/game/console_commands.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x417540,CmdNowISee,src/game/console_commands.cpp,field_read,Seams::los_radar
 0x417540,CmdNowISee,src/game/console_commands.cpp,function,
 0x417540,CmdNowISee,src/game/console_commands.cpp,global_read,g_game
-0x417540,CmdNowISee,src/game/console_commands.cpp,global_read,g_seams
-0x417540,CmdNowISee,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x417570,CmdNetStats,src/game/console_commands.cpp,call,SumMessageStats
 0x417570,CmdNetStats,src/game/console_commands.cpp,field_read,Game::ticks
 0x417570,CmdNetStats,src/game/console_commands.cpp,field_write,MessageByteCounter::b
@@ -5230,7 +5218,6 @@ address,function,file,kind,target
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,RecordMessage
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,operator PlayerInfo *
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,call,operator->
-0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 0x418e50,CmdShareMapping,src/game/share_commands.cpp,field_read,Player::info
@@ -5256,7 +5243,6 @@ address,function,file,kind,target
 0x418f10,ToggleShareLos,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,RecordMessage
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,call,operator->
-0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Game::netGameFlags
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,field_read,Player::info
@@ -5270,15 +5256,12 @@ address,function,file,kind,target
 0x418fd0,CmdShareRadar,src/game/share_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 0x419090,CmdShareAll,src/game/share_commands.cpp,call,CmdShareEnergy
 0x419090,CmdShareAll,src/game/share_commands.cpp,call,CmdShareMetal
+0x419090,CmdShareAll,src/game/share_commands.cpp,call,LosRadarPublishShareMapping
+0x419090,CmdShareAll,src/game/share_commands.cpp,call,LosRadarPublishShareRadar
+0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,Game::localPlayer
 0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,Game::netGameFlags
-0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,LosRadarSeam::CmdShareMapping
-0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,LosRadarSeam::CmdShareRadar
-0x419090,CmdShareAll,src/game/share_commands.cpp,field_read,Seams::los_radar
 0x419090,CmdShareAll,src/game/share_commands.cpp,function,
 0x419090,CmdShareAll,src/game/share_commands.cpp,global_read,g_game
-0x419090,CmdShareAll,src/game/share_commands.cpp,global_read,g_seams
-0x419090,CmdShareAll,src/game/share_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareMapping]
-0x419090,CmdShareAll,src/game/share_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareRadar]
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,CommandArgs::GetIntArg
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,call,RecordMessage
 0x419340,CmdSetShareMetal,src/game/share_commands.cpp,field_escape,Game::players
@@ -12235,6 +12218,7 @@ address,function,file,kind,target
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,global_read,g_game
 0x43d290,UnitMotion::SteerAircraft,src/orders/order_list.cpp,indirect_call,virtual PathGoalVtableView::v4
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,ClampToCell
+0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,LosRadarPublishUpdateUnit
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,MakeFixed
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,OrderVec3
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,PosPlus
@@ -12256,7 +12240,6 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Fixed::value
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Game::seaLevel
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Game::ticks
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::AddUnitToMap
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::RemoveUnitFromMap
@@ -12266,7 +12249,6 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,PlayerTypeView::type
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Point16::x
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Point16::y
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Seams::los_radar
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Seams::map
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Seams::units
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Unit::carrier
@@ -12309,7 +12291,6 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via Vec3 (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::GetPiecePosition]"
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3, int) __attribute__((stdcall)) [UnitsSeam::SetUnitPosition]"
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp,call,get
@@ -20613,15 +20594,12 @@ address,function,file,kind,target
 0x464c60,TransferEnergy,src/game/players.cpp,global_read,g_game
 0x464c60,TransferEnergy,src/game/players.cpp,global_read,g_seams
 0x464c60,TransferEnergy,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareEnergy]"
+0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,call,LosRadarPublishUpdateUnit
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,call,operator Unit *
-0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,Player::unitsBegin
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,Player::unitsEnd
-0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,Seams::los_radar
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,Unit::flags
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,function,
-0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,global_read,g_seams
-0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,ClearSelectedGadget
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,IsGadgetNamed
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,PlaySoundByName
@@ -20637,110 +20615,22 @@ address,function,file,kind,target
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,global_read,g_game
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,global_read,g_seams
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,CountActiveAIPlayers
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,CountCombatPlayers
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,EconHandleOf
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,EconPublish
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,FindHostSlot
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,IsPlayerSlotInRange
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,MissionConditions::CheckDefeat
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,MissionConditions::CheckVictory
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,RandomInt
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,RecordFocusCommander
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,RecordWatchModeNotice
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,RecordWatchPrompt
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,SetStartingStorageBonus
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,get
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator Mission *
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator PlayerInfo *
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator SquadManager *
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator Unit *
 0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator!=
-0x464f80,UpdatePlayerHead,src/game/players.cpp,call,operator->
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_escape,Game::players
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,AiSeam::SquadManagerTickIfActive
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,AiSeam::UpdatePlayerAI
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::baseX
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::baseY
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::commanderDeath
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::defs
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::endGameCountdown
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::endGameFlags
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::height
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::list_391ed
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::localPlayer
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::mapFlags
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::net
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::playerIndex
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::seaLevel
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::startPos
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::ticks
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Game::width
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,LosRadarSeam::RecordRadarUnits
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,MapSeam::CanPlaceUnitFootprint
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,MapSeam::GetCellMeanHeight
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,MapSeam::GetGameType
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Mission::lavaWorld
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::active
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::ai
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::index
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::info
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::rejectReason
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::type
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::unitCount
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::unitsBegin
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::unitsCreated
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::unitsEnd
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Player::updateTime
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,PlayerInfo::energy
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,PlayerInfo::flags_9b
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,PlayerInfo::metal
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,PlayerInfo::side
 0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::ai
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::los_radar
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::map
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::network
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::units
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Seams::weapons
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Unit::flags
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Unit::playerIndex
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,UnitsSeam::CreateUnit
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,UnitsSeam::FindUnitTypeId
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Vec3::x
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,Vec3::z
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_read,WeaponsSeam::FindFeatureAtPos
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,<anon>::flag5
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,<anon>::flag6
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Game::endGameCountdown
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Game::endGameFlags
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Game::endGameVictory
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Game::mapFlags
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Player::updateTime
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,PlayerInfo::bit6
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Point16::x
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Point16::y
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Vec3::x
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Vec3::y
-0x464f80,UpdatePlayerHead,src/game/players.cpp,field_write,Vec3::z
 0x464f80,UpdatePlayerHead,src/game/players.cpp,function,
 0x464f80,UpdatePlayerHead,src/game/players.cpp,global_read,g_game
 0x464f80,UpdatePlayerHead,src/game/players.cpp,global_read,g_seams
-0x464f80,UpdatePlayerHead,src/game/players.cpp,global_read,kHundred@src/game/players.cpp
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,"indirect via void (*)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerTickIfActive]"
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::UpdatePlayerAI]
-0x464f80,UpdatePlayerHead,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x4658e0,IsFootprintVisible,src/game/players.cpp,call,IsExplored
 0x4658e0,IsFootprintVisible,src/game/players.cpp,call,IsSeen
 0x4658e0,IsFootprintVisible,src/game/players.cpp,call,memset
@@ -24637,6 +24527,7 @@ address,function,file,kind,target
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,field_write,Unit::cargoNext
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,field_write,Unit::spatialBucket
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,function,
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,LosRadarPublishCellHeights
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,RefreshAllPassMapsForUnits
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,SetOwner
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,get
@@ -24659,12 +24550,10 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::units
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width_142a3
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,LosRadarSeam::UpdateCellHeightRange
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Player::active
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Player::type
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Point16::x
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Point16::y
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Seams::los_radar
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::bit2
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::cell
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::def
@@ -24685,8 +24574,7 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Unit::flags
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,function,
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_game
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,global_read,g_seams
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
+0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,LosRadarPublishCellHeights
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,RefreshPassMapsForUnit
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,VisitObjectsInArea
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,call,get
@@ -24700,10 +24588,8 @@ address,function,file,kind,target
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Game::cells
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Game::overflowBucket
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Game::width
-0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,LosRadarSeam::UpdateCellHeightRange
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Point16::x
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Point16::y
-0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Seams::los_radar
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Unit::cell
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Unit::def
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_read,Unit::flags
@@ -24719,8 +24605,6 @@ address,function,file,kind,target
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,field_write,Unit::flags
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,function,
 0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,global_read,g_game
-0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,global_read,g_seams
-0x47d0e0,RemoveUnitFromMap,src/map/terrain.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,CellFeatureBlocks
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,GetCellFeatureDef
 0x47d2e0,CanBuildAt,src/map/terrain.cpp,call,GetCellHeight
@@ -26745,6 +26629,7 @@ address,function,file,kind,target
 0x485e90,InitUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::NewUnitMotion]
 0x485e90,InitUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::InitUnitWeaponSlots]
 0x485f50,CreateUnit,src/units/units.cpp,call,InitSpawnedUnit
+0x485f50,CreateUnit,src/units/units.cpp,call,LosRadarPublishRevealUnit
 0x485f50,CreateUnit,src/units/units.cpp,call,Unit::SetStateBits
 0x485f50,CreateUnit,src/units/units.cpp,call,UpdateUnitHeight
 0x485f50,CreateUnit,src/units/units.cpp,call,get
@@ -26757,7 +26642,6 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::defs
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::list_391ed
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::units
-0x485f50,CreateUnit,src/units/units.cpp,field_read,LosRadarSeam::RevealNewUnit
 0x485f50,CreateUnit,src/units/units.cpp,field_read,MapSeam::AddUnitToMap
 0x485f50,CreateUnit,src/units/units.cpp,field_read,NetworkSeam::SendBuilderLink
 0x485f50,CreateUnit,src/units/units.cpp,field_read,NetworkSeam::SendNewUnit
@@ -26766,7 +26650,6 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Player::unitsCreated
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Player::unitsEnd
 0x485f50,CreateUnit,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitCreated
-0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::los_radar
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::map
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::network
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::players
@@ -26786,12 +26669,12 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,global_read,g_game
 0x485f50,CreateUnit,src/units/units.cpp,global_read,g_seams
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
-0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendNewUnit]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *) __attribute__((stdcall)) [NetworkSeam::SendBuilderLink]"
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,InitSpawnedUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,KillUnit
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,LosRadarPublishRevealUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,UpdateUnitHeight
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator MissionConditions *
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator Unit *
@@ -26800,13 +26683,11 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_escape,Game::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::list_391ed
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::units
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,LosRadarSeam::RevealNewUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,MapSeam::AddUnitToMap
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitCount
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsBegin
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsCreated
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitCreated
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::los_radar
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::map
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Unit::unitDefIndex
@@ -26819,7 +26700,6 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_game
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_seams
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,CorpseEvent
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
@@ -26910,6 +26790,8 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,EconPublish
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FindSlotByDpid
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FreeObjectState
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,LosRadarPublishAddEyeball
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,LosRadarPublishRemoveUnit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordCdActivity
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordForcesDestroyed
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordPlayerLeft
@@ -26930,7 +26812,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Game::players
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,SideDef::commander
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::attacker
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::pos
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitDef::unitname
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,AiSeam::SetUnitSquad
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::commanderDeath
@@ -26941,8 +26822,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::net
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::playerIndex
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::units
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,LosRadarSeam::AddEyeball
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,LosRadarSeam::RemoveUnitLineOfSight
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,MapSeam::ClearFootprintAndUnlink
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,MapSeam::GetGameType
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,OrdersSeam::DeleteOrders
@@ -26964,7 +26843,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitDied
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Quirks::ignoreNullDeathRecord
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::ai
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::los_radar
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::map
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::orders
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::players
@@ -26980,6 +26858,7 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::motion
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::player
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::playerIndex
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::pos
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::script
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Unit::state
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,UnitDef::metalCost
@@ -27016,7 +26895,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_read,g_seams
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitDied]"
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RemoveUnitLineOfSight]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::ClearFootprintAndUnlink]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::RemoveUnitProjectiles]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
@@ -27024,7 +26902,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [OrdersSeam::DeleteOrders]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [WeaponsSeam::DetonateUnitWeapon]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(UnitMotion *) __attribute__((fastcall)) [OrdersSeam::DestroyMotionObject]
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, int, int) __attribute__((stdcall)) [LosRadarSeam::AddEyeball]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,virtual CobScript::~CobScript
 0x486e80,KillUnitsOfType,src/units/units.cpp,call,KillUnit
 0x486e80,KillUnitsOfType,src/units/units.cpp,call,operator Unit *
@@ -28020,14 +27897,13 @@ address,function,file,kind,target
 0x48a9b0,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,field_read,Vec3::x
 0x48a9b0,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,field_read,Vec3::z
 0x48a9b0,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,function,
+0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,LosRadarPublishUpdateUnit
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,WorldToCell
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,operator=
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,MapSeam::AddUnitToMap
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,MapSeam::RemoveUnitFromMap
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Point16::x
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Point16::y
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Seams::los_radar
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Seams::map
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Unit::flags
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Unit::footprint
@@ -28036,7 +27912,6 @@ address,function,file,kind,target
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_write,Unit::pos
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,function,
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,global_read,g_seams
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,call,ApplyAttachUnit
@@ -28220,6 +28095,7 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,BitReader::ReadBits
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,BitReader::ReadSignedBits
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,CreateUnitFromPacket
+0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,LosRadarPublishUpdateUnit
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,Unit::SetStateBits
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,get
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,operator bool
@@ -28227,12 +28103,10 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,operator=
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Angles16::bank
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Game::unitDefCountBits
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,MapSeam::AddUnitToMap
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,MapSeam::RemoveUnitFromMap
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Point16::x
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Point16::y
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Seams::los_radar
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Seams::map
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Unit::angles
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Unit::buildLeft
@@ -28278,7 +28152,6 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,function,
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,global_read,g_buildPercentScale
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,global_read,g_seams
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBit
@@ -30929,6 +30802,7 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedBeginTick
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedDeliver
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedEndTick
+0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedExpireEyeballs
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedMeteorsPhase
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedPhaseBoundary
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,call,SchedWindPhase
@@ -30944,13 +30818,11 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Game::localPlayer
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Game::playerIndex
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Game::ticks
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,LosRadarSeam::ExpireEyeballs
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Player::displayTimer
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,PlayersSeam::UpdateBlink
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,PlayersSeam::UpdatePlayers
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::economy
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::features
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::los_radar
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::players
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::units
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,field_read,Seams::weapons
@@ -30965,7 +30837,6 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,global_read,g_seams
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,global_read,g_usePacketManager
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::UpdateFeatures]
-0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::ExpireEyeballs]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdateBlink]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdatePlayers]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
@@ -31414,6 +31285,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadGuiLayer
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadPictureCached
 0x497180,LoadMatch,src/game/game_load.cpp,call,LoadSavedGameState
+0x497180,LoadMatch,src/game/game_load.cpp,call,LosRadarPublishRecalculate
 0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupBegin
 0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupBlockBytesKey
 0x497180,LoadMatch,src/game/game_load.cpp,call,MatchSetupOfInfo
@@ -31471,7 +31343,6 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,LoadingPlayerRecord::kind
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,LoadingPlayerRecord::startPos
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,LoadingPlayerRecord::team
-0x497180,LoadMatch,src/game/game_load.cpp,field_read,LosRadarSeam::RecalculateLineOfSight
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,MapSeam::GetGameType
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,MapSeam::GetStartPosition
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,MapSeam::LoadMissionByName
@@ -31492,7 +31363,6 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::LoadPlayerControllers
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::RebuildAIFeatureCells
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,PlayersSeam::UpdatePlayersOnStream
-0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::los_radar
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::map
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::players
 0x497180,LoadMatch,src/game/game_load.cpp,field_read,Seams::units
@@ -31536,7 +31406,6 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::RebuildAIFeatureCells]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayerControllers]
 0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayersOnStream]
-0x497180,LoadMatch,src/game/game_load.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,HarnessLoadEnded
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,LoadMatch
 0x497c70,LoadThreadMain,src/game/game_load.cpp,call,_exception_info
@@ -43169,6 +43038,31 @@ address,function,file,kind,target
 ,ApplyEvent,src/map/features.cpp,field_write,Ref<Unit>::offset
 ,ApplyEvent,src/map/features.cpp,function,
 ,ApplyEvent,src/map/features.cpp,global_read,g_game
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,AddEyeball
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,CmdShareMapping
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,CmdShareRadar
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,LosUnitOfHandle
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RecalculateLineOfSight
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RemoveUnitLineOfSight
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RevealNewUnit
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,UpdateCellHeightRange
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,UpdateUnitLineOfSight
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::cell
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::eyeHeight
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::kind
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::lifetime
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::player
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::pos
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::sightDistance
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::size
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::unit
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::value
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Point16::x
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Point16::y
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::x
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::y
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::z
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,function,
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_4
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_8
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_c
@@ -44345,6 +44239,14 @@ address,function,file,kind,target
 ,ConfigureListBoxFontHeight,src/gui/gui.cpp,field_read,Gui::language
 ,ConfigureListBoxFontHeight,src/gui/gui.cpp,function,
 ,ConfigureListBoxFontHeight,src/gui/gui.cpp,global_read,g_guiContext
+,ConsoleShareMapping,src/game/console_commands.cpp,call,LosRadarPublishShareMapping
+,ConsoleShareMapping,src/game/console_commands.cpp,field_read,Game::localPlayer
+,ConsoleShareMapping,src/game/console_commands.cpp,function,
+,ConsoleShareMapping,src/game/console_commands.cpp,global_read,g_game
+,ConsoleShareRadar,src/game/console_commands.cpp,call,LosRadarPublishShareRadar
+,ConsoleShareRadar,src/game/console_commands.cpp,field_read,Game::localPlayer
+,ConsoleShareRadar,src/game/console_commands.cpp,function,
+,ConsoleShareRadar,src/game/console_commands.cpp,global_read,g_game
 ,ConsoleWordAllowed,src/harness/harness.cpp,call,_stricmp
 ,ConsoleWordAllowed,src/harness/harness.cpp,function,
 ,ConsoleWordAllowed,src/harness/harness.cpp,global_read,s_consoleAllowed@src/harness/harness.cpp
@@ -47344,6 +47246,12 @@ address,function,file,kind,target
 ,HarnessLoadEnded,src/harness/harness.cpp,call,host_event_set
 ,HarnessLoadEnded,src/harness/harness.cpp,function,
 ,HarnessLoadEnded,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
+,HarnessLosRadarEvent,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessLosRadarEvent,src/harness/harness.cpp,call,LosRadarResultsAdd
+,HarnessLosRadarEvent,src/harness/harness.cpp,function,
+,HarnessLosRadarEvent,src/harness/harness.cpp,global_maybe_written,s_losRadarResults@src/harness/harness.cpp
+,HarnessLosRadarEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessLosRadarEvent,src/harness/harness.cpp,global_write,s_losRadarResultsLost@src/harness/harness.cpp
 ,HarnessPathEvent,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessPathEvent,src/harness/harness.cpp,call,PathResultsAdd
 ,HarnessPathEvent,src/harness/harness.cpp,function,
@@ -47355,6 +47263,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,GameHoldrand
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessPhase,src/harness/harness.cpp,call,LosRadarResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,PathResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,TargetingResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,VisitExplosions
@@ -47372,6 +47281,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,function,
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_economyResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_featuresResults@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_losRadarResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_targetingResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_windMeteorsResults@src/harness/harness.cpp
@@ -48007,10 +47917,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::Tell
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::Write
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::WriteBuffer
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::AddEyeball
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ClampWorldPosToTerrain
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareMapping
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CmdShareRadar
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeRadar
@@ -48020,13 +47928,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::InitRadar
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::IsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::LoadTntMap
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecalculateLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarUnits
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RemoveUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::SoundHeardMask
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateCellHeightRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AddUnitToMap
@@ -48128,6 +48032,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::TransferEnergy
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::TransferMetal
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdateBlink
+,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdatePlayerBody
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdatePlayerHead
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdatePlayerTail
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdatePlayers
@@ -48347,10 +48252,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesTell
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesWrite
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesWriteBuffer
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarAddEyeball
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarClampWorldPosToTerrain
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareMapping
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCmdShareRadar
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarExpireEyeballs
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeMapResources
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeRadar
@@ -48360,13 +48263,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarInitRadar
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarIsUnitVisibleToPlayer
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarLoadTntMap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecalculateLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarUnits
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRemoveUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRevealNewUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarSoundHeardMask
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateCellHeightRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAddUnitToMap
@@ -48468,6 +48367,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersTransferEnergy
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersTransferMetal
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdateBlink
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayerBody
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayerHead
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayerTail
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayers
@@ -49231,10 +49131,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,FilesSeam::Tell
 ,InstallNativeSeams,src/seams/native.cpp,field_write,FilesSeam::Write
 ,InstallNativeSeams,src/seams/native.cpp,field_write,FilesSeam::WriteBuffer
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::AddEyeball
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::ClampWorldPosToTerrain
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::CmdShareMapping
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::CmdShareRadar
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::ExpireEyeballs
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::FreeMapResources
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::FreeRadar
@@ -49244,13 +49142,9 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::InitRadar
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::IsUnitVisibleToPlayer
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::LoadTntMap
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecalculateLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarUnits
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RemoveUnitLineOfSight
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RevealNewUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SoundHeardMask
-,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateCellHeightRange
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::AddUnitToMap
@@ -49378,6 +49272,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::TransferEnergy
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::TransferMetal
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::UpdateBlink
+,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::UpdatePlayerBody
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::UpdatePlayerHead
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::UpdatePlayerTail
 ,InstallNativeSeams,src/seams/native.cpp,field_write,PlayersSeam::UpdatePlayers
@@ -49499,7 +49394,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WindMeteorsSeam::UpdateWind
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddBeCarriedOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddBuildProgress
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddEyeball
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddRepairProgress
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddUnitToMap
@@ -49510,6 +49404,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AppendOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyAreaDamageAtNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyEvent
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyLosRadarEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyPathEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyTargetingEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyUnfinishedBuildDecay
@@ -49551,8 +49446,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareMapping
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdShareRadar
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdWeight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CobScriptExplodePieceNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
@@ -49772,7 +49665,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReattachFxToUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildAIFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildFeatureCells
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecalculateLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshAllPassMaps
@@ -49787,13 +49679,11 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReloadUnitType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveFile
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveUnitFromMap
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveUnitProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RenameFile
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReparseAiWeightScriptsIfLimitNotSticky
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ResetAIPlayers
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ResolveFeatureLinks
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RevealNewUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RunOrders
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RunSecondaryOrders
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SaveConditionsNative
@@ -49837,7 +49727,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateBlink
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateCellHeightRange
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateExplosions
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateFeatureSpot
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateFeatures
@@ -49845,6 +49734,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateMotionNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateObjectState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerAI
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerBody
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerHead
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayerTail
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdatePlayers
@@ -50679,12 +50569,52 @@ address,function,file,kind,target
 ,Lookup,src/state/block.cpp,global_read,kChunkHeader
 ,Lookup,src/state/block.cpp,global_read,kFirstChunk
 ,Lookup,src/state/block.cpp,global_read,kFreeBit
+,LosRadarEventOf,src/game/los_radar_events.h,call,memset
+,LosRadarEventOf,src/game/los_radar_events.h,field_write,LosRadarEvent::kind
+,LosRadarEventOf,src/game/los_radar_events.h,function,
+,LosRadarInbox,src/seams/los_radar_world.cpp,call,HarnessLosRadarEvent
+,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,LosRadarSeam::Apply
+,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,Seams::los_radar
+,LosRadarInbox,src/seams/los_radar_world.cpp,function,
+,LosRadarInbox,src/seams/los_radar_world.cpp,global_read,g_seams
+,LosRadarInbox,src/seams/los_radar_world.cpp,indirect_call,indirect via int (*)(const LosRadarEvent *) __attribute__((stdcall)) [LosRadarSeam::Apply]
+,LosRadarPublishRecalculate,src/game/los_radar_events.h,call,LosRadarEventOf
+,LosRadarPublishRecalculate,src/game/los_radar_events.h,call,SchedPublish
+,LosRadarPublishRecalculate,src/game/los_radar_events.h,field_write,LosRadarEvent::value
+,LosRadarPublishRecalculate,src/game/los_radar_events.h,function,
+,LosRadarPublishShareMapping,src/game/los_radar_events.h,call,LosRadarEventOf
+,LosRadarPublishShareMapping,src/game/los_radar_events.h,call,SchedPublish
+,LosRadarPublishShareMapping,src/game/los_radar_events.h,field_write,LosRadarEvent::player
+,LosRadarPublishShareMapping,src/game/los_radar_events.h,function,
+,LosRadarPublishShareRadar,src/game/los_radar_events.h,call,LosRadarEventOf
+,LosRadarPublishShareRadar,src/game/los_radar_events.h,call,SchedPublish
+,LosRadarPublishShareRadar,src/game/los_radar_events.h,field_write,LosRadarEvent::player
+,LosRadarPublishShareRadar,src/game/los_radar_events.h,function,
+,LosRadarResultsAdd,src/harness/los_radar_results.h,call,memset
+,LosRadarResultsAdd,src/harness/los_radar_results.h,call,operator=
+,LosRadarResultsAdd,src/harness/los_radar_results.h,call,realloc
+,LosRadarResultsAdd,src/harness/los_radar_results.h,deref_escape,*LosRadarResult
+,LosRadarResultsAdd,src/harness/los_radar_results.h,deref_read,*LosRadarEvent
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_read,LosRadarResults::capacity
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_read,LosRadarResults::count
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_read,LosRadarResults::items
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_write,LosRadarResult::event
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_write,LosRadarResult::outcome
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_write,LosRadarResults::capacity
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_write,LosRadarResults::count
+,LosRadarResultsAdd,src/harness/los_radar_results.h,field_write,LosRadarResults::items
+,LosRadarResultsAdd,src/harness/los_radar_results.h,function,
+,LosRadarResultsClear,src/harness/los_radar_results.h,field_write,LosRadarResults::count
+,LosRadarResultsClear,src/harness/los_radar_results.h,function,
 ,LosTable::GetLine,src/map/los_lines.h,call,operator[]
 ,LosTable::GetLine,src/map/los_lines.h,deref_read,*LosTable
 ,LosTable::GetLine,src/map/los_lines.h,function,
 ,LosTable::SetNumLines,src/map/los_lines.h,call,BlockVector::Resize
 ,LosTable::SetNumLines,src/map/los_lines.h,call,LosLine::~LosLine
 ,LosTable::SetNumLines,src/map/los_lines.h,function,
+,LosUnitOfHandle,src/map/line_of_sight.cpp,call,get
+,LosUnitOfHandle,src/map/line_of_sight.cpp,field_write,Ref<Unit>::offset
+,LosUnitOfHandle,src/map/line_of_sight.cpp,function,
 ,LostBits,src/units/unit.cpp,function,
 ,LowerBound,src/util/tdf.cpp,call,operator()
 ,LowerBound,src/util/tdf.cpp,field_read,StringRef::ptr
@@ -54288,15 +54218,19 @@ address,function,file,kind,target
 ,RecFilesWriteBuffer,src/harness/replay_hooks.inc,global_read,s_inner_files
 ,RecFilesWriteBuffer,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecFilesWriteBuffer,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(char *, void *, int) __attribute__((stdcall)) [FilesSeam::WriteBuffer]"
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,call,ArgPending
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,field_read,LosRadarSeam::AddEyeball
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,function,
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarAddEyeball,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Vec3 *, int, int, int) __attribute__((stdcall)) [LosRadarSeam::AddEyeball]"
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,Add
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,ArgStruct
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,SimBlockBase
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarApply,src/harness/replay_hooks.inc,field_read,LosRadarEvent::unit
+,RecLosRadarApply,src/harness/replay_hooks.inc,field_read,LosRadarSeam::Apply
+,RecLosRadarApply,src/harness/replay_hooks.inc,function,
+,RecLosRadarApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecLosRadarApply,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecLosRadarApply,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const LosRadarEvent *) __attribute__((stdcall)) [LosRadarSeam::Apply]
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgPending
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54306,30 +54240,6 @@ address,function,file,kind,target
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int, Vec3 *) __attribute__((stdcall)) [LosRadarSeam::ClampWorldPosToTerrain]"
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,FinishNested
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,ImportValue
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,SlotScope::Nested
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,field_read,LosRadarSeam::CmdShareMapping
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,function,
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarCmdShareMapping,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareMapping]
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,FinishNested
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,ImportValue
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,SlotScope::Nested
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,field_read,LosRadarSeam::CmdShareRadar
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,function,
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarCmdShareRadar,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::CmdShareRadar]
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,field_read,LosRadarSeam::ExpireEyeballs
@@ -54406,14 +54316,6 @@ address,function,file,kind,target
 ,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,function,
 ,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::LoadTntMap]
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecalculateLineOfSight
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,function,
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarRecalculateLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [LosRadarSeam::RecalculateLineOfSight]
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarMapped
@@ -54426,24 +54328,6 @@ address,function,file,kind,target
 ,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,function,
 ,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRecordRadarUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,Add
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RemoveUnitLineOfSight
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,function,
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarRemoveUnitLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RemoveUnitLineOfSight]
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,call,Add
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RevealNewUnit
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,function,
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarRevealNewUnit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::RevealNewUnit]
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,FinishImport
@@ -54459,18 +54343,6 @@ address,function,file,kind,target
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask]
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,FinishImport
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ImportValue
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::Import
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateCellHeightRange
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,function,
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarUpdateCellHeightRange,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Point16, Point16) __attribute__((stdcall)) [LosRadarSeam::UpdateCellHeightRange]"
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarUpdateSensorRadarAndCloak,src/harness/replay_hooks.inc,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
@@ -55425,6 +55297,15 @@ address,function,file,kind,target
 ,RecPlayersUpdateBlink,src/harness/replay_hooks.inc,function,
 ,RecPlayersUpdateBlink,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersUpdateBlink,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [PlayersSeam::UpdateBlink]
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,call,ArgValue
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,field_read,PlayersSeam::UpdatePlayerBody
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,function,
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,global_read,s_call
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,global_read,s_inner_players
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPlayersUpdatePlayerBody,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerBody]"
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55433,7 +55314,7 @@ address,function,file,kind,target
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,global_read,s_tail
-,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerHead]"
+,RecPlayersUpdatePlayerHead,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(int) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerHead]
 ,RecPlayersUpdatePlayerTail,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPlayersUpdatePlayerTail,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPlayersUpdatePlayerTail,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -58387,6 +58268,12 @@ address,function,file,kind,target
 ,SchedEndTick,src/game/scheduler.cpp,call,SchedPhaseBoundary
 ,SchedEndTick,src/game/scheduler.cpp,function,
 ,SchedEndTick,src/game/scheduler.cpp,global_write,s_inTick
+,SchedExpireEyeballs,src/game/scheduler.cpp,call,SchedDeliver
+,SchedExpireEyeballs,src/game/scheduler.cpp,field_read,LosRadarSeam::ExpireEyeballs
+,SchedExpireEyeballs,src/game/scheduler.cpp,field_read,Seams::los_radar
+,SchedExpireEyeballs,src/game/scheduler.cpp,function,
+,SchedExpireEyeballs,src/game/scheduler.cpp,global_read,g_seams
+,SchedExpireEyeballs,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::ExpireEyeballs]
 ,SchedFeaturesPhase,src/game/scheduler.cpp,call,SchedDeliver
 ,SchedFeaturesPhase,src/game/scheduler.cpp,field_read,FeaturesSeam::AnimateFeatureType
 ,SchedFeaturesPhase,src/game/scheduler.cpp,field_read,FeaturesSeam::FeatureTypeCount
@@ -58416,23 +58303,41 @@ address,function,file,kind,target
 ,SchedPhaseBoundary,src/game/scheduler.cpp,function,
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,HarnessPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,SchedDeliver
+,SchedPlayersPhase,src/game/scheduler.cpp,call,operator Unit *
+,SchedPlayersPhase,src/game/scheduler.cpp,field_escape,Game::players
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,EconomySeam::UpdatePlayerEconomy
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Game::playerIndex
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,LosRadarSeam::RecordRadarMapped
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,LosRadarSeam::RecordRadarUnits
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,LosRadarSeam::UpdateUnitLineOfSight
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,OrdersSeam::ApplyPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PathfindingSeam::Poll
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PathfindingSeam::Step
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Player::unitsBegin
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Player::unitsEnd
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PlayersSeam::UpdatePlayerBody
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PlayersSeam::UpdatePlayerHead
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PlayersSeam::UpdatePlayerTail
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PlayersSeam::UpdatePlayersFinish
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Seams::economy
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Seams::los_radar
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Seams::orders
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Seams::pathfinding
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Seams::players
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Unit::flags
 ,SchedPlayersPhase,src/game/scheduler.cpp,function,
+,SchedPlayersPhase,src/game/scheduler.cpp,global_read,g_game
 ,SchedPlayersPhase,src/game/scheduler.cpp,global_read,g_seams
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via int (*)(PathEvent *, PathPoint *, int) __attribute__((stdcall)) [PathfindingSeam::Poll]"
-,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via int (*)(int, RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerHead]"
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via int (*)(int) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerHead]
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via int (*)(int, RandStream) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerBody]"
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarUnits]
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PathfindingSeam::Step]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdatePlayersFinish]
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(const PathEvent *, const PathPoint *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]"
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::UpdatePlayerEconomy]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerTail]
@@ -60468,15 +60373,96 @@ address,function,file,kind,target
 ,UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,UpdateMotionNative,src/seams/native.cpp,call,UnitMotion::UpdateMotion
 ,UpdateMotionNative,src/seams/native.cpp,function,
+,UpdatePlayerBody,src/game/players.cpp,call,CountActiveAIPlayers
+,UpdatePlayerBody,src/game/players.cpp,call,CountCombatPlayers
+,UpdatePlayerBody,src/game/players.cpp,call,EconHandleOf
+,UpdatePlayerBody,src/game/players.cpp,call,EconPublish
+,UpdatePlayerBody,src/game/players.cpp,call,FindHostSlot
+,UpdatePlayerBody,src/game/players.cpp,call,LosRadarPublishRecalculate
+,UpdatePlayerBody,src/game/players.cpp,call,MissionConditions::CheckDefeat
+,UpdatePlayerBody,src/game/players.cpp,call,MissionConditions::CheckVictory
+,UpdatePlayerBody,src/game/players.cpp,call,RandomInt
+,UpdatePlayerBody,src/game/players.cpp,call,RecordFocusCommander
+,UpdatePlayerBody,src/game/players.cpp,call,RecordWatchModeNotice
+,UpdatePlayerBody,src/game/players.cpp,call,RecordWatchPrompt
+,UpdatePlayerBody,src/game/players.cpp,call,SetStartingStorageBonus
+,UpdatePlayerBody,src/game/players.cpp,call,get
+,UpdatePlayerBody,src/game/players.cpp,call,operator Mission *
+,UpdatePlayerBody,src/game/players.cpp,call,operator PlayerInfo *
+,UpdatePlayerBody,src/game/players.cpp,call,operator->
+,UpdatePlayerBody,src/game/players.cpp,field_escape,Game::players
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::baseX
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::baseY
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::commanderDeath
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::defs
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::endGameCountdown
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::endGameFlags
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::height
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::list_391ed
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::localPlayer
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::mapFlags
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::net
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::seaLevel
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::startPos
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::ticks
+,UpdatePlayerBody,src/game/players.cpp,field_read,Game::width
+,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::CanPlaceUnitFootprint
+,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::GetCellMeanHeight
+,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::GetGameType
+,UpdatePlayerBody,src/game/players.cpp,field_read,Mission::lavaWorld
+,UpdatePlayerBody,src/game/players.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::active
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::index
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::info
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::rejectReason
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::type
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::unitCount
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::unitsCreated
+,UpdatePlayerBody,src/game/players.cpp,field_read,Player::updateTime
+,UpdatePlayerBody,src/game/players.cpp,field_read,PlayerInfo::energy
+,UpdatePlayerBody,src/game/players.cpp,field_read,PlayerInfo::flags_9b
+,UpdatePlayerBody,src/game/players.cpp,field_read,PlayerInfo::metal
+,UpdatePlayerBody,src/game/players.cpp,field_read,PlayerInfo::side
+,UpdatePlayerBody,src/game/players.cpp,field_read,Seams::map
+,UpdatePlayerBody,src/game/players.cpp,field_read,Seams::network
+,UpdatePlayerBody,src/game/players.cpp,field_read,Seams::units
+,UpdatePlayerBody,src/game/players.cpp,field_read,Seams::weapons
+,UpdatePlayerBody,src/game/players.cpp,field_read,Unit::playerIndex
+,UpdatePlayerBody,src/game/players.cpp,field_read,UnitsSeam::CreateUnit
+,UpdatePlayerBody,src/game/players.cpp,field_read,UnitsSeam::FindUnitTypeId
+,UpdatePlayerBody,src/game/players.cpp,field_read,Vec3::x
+,UpdatePlayerBody,src/game/players.cpp,field_read,Vec3::z
+,UpdatePlayerBody,src/game/players.cpp,field_read,WeaponsSeam::FindFeatureAtPos
+,UpdatePlayerBody,src/game/players.cpp,field_write,<anon>::flag5
+,UpdatePlayerBody,src/game/players.cpp,field_write,<anon>::flag6
+,UpdatePlayerBody,src/game/players.cpp,field_write,Game::endGameCountdown
+,UpdatePlayerBody,src/game/players.cpp,field_write,Game::endGameFlags
+,UpdatePlayerBody,src/game/players.cpp,field_write,Game::endGameVictory
+,UpdatePlayerBody,src/game/players.cpp,field_write,Game::mapFlags
+,UpdatePlayerBody,src/game/players.cpp,field_write,Player::updateTime
+,UpdatePlayerBody,src/game/players.cpp,field_write,PlayerInfo::bit6
+,UpdatePlayerBody,src/game/players.cpp,field_write,Point16::x
+,UpdatePlayerBody,src/game/players.cpp,field_write,Point16::y
+,UpdatePlayerBody,src/game/players.cpp,field_write,Vec3::x
+,UpdatePlayerBody,src/game/players.cpp,field_write,Vec3::y
+,UpdatePlayerBody,src/game/players.cpp,field_write,Vec3::z
+,UpdatePlayerBody,src/game/players.cpp,function,
+,UpdatePlayerBody,src/game/players.cpp,global_read,g_game
+,UpdatePlayerBody,src/game/players.cpp,global_read,g_seams
+,UpdatePlayerBody,src/game/players.cpp,global_read,kHundred@src/game/players.cpp
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
 ,UpdatePlayerTail,src/game/players.cpp,call,operator Mission *
 ,UpdatePlayerTail,src/game/players.cpp,field_escape,Game::players
 ,UpdatePlayerTail,src/game/players.cpp,field_read,Game::net
 ,UpdatePlayerTail,src/game/players.cpp,field_read,Game::playerIndex
-,UpdatePlayerTail,src/game/players.cpp,field_read,LosRadarSeam::RecordRadarMapped
-,UpdatePlayerTail,src/game/players.cpp,field_read,LosRadarSeam::UpdateSensorRadarAndCloak
 ,UpdatePlayerTail,src/game/players.cpp,field_read,MapSeam::GetGameType
 ,UpdatePlayerTail,src/game/players.cpp,field_read,NetworkSeam::BroadcastPlayerEconomy
-,UpdatePlayerTail,src/game/players.cpp,field_read,Seams::los_radar
 ,UpdatePlayerTail,src/game/players.cpp,field_read,Seams::map
 ,UpdatePlayerTail,src/game/players.cpp,field_read,Seams::network
 ,UpdatePlayerTail,src/game/players.cpp,function,
@@ -60485,8 +60471,6 @@ address,function,file,kind,target
 ,UpdatePlayerTail,src/game/players.cpp,global_read,g_seams
 ,UpdatePlayerTail,src/game/players.cpp,global_write,g_economyPacketTick
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::RecordRadarMapped]
-,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerEconomy]
 ,UpdatePlayers,src/seams/native.cpp,call,SchedPlayersPhase
 ,UpdatePlayers,src/seams/native.cpp,function,
@@ -61090,6 +61074,38 @@ address,function,file,kind,target
 ,VisitGoal,src/harness/harness.cpp,global_read,kPackedGoalTable@src/harness/trace_schema.h
 ,VisitGoal,src/harness/harness.cpp,global_read,kPatrolGoalTable@src/harness/trace_schema.h
 ,VisitGoal,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitLosRadarResults,src/harness/harness.cpp,call,DumpHexBytes
+,VisitLosRadarResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitLosRadarResults,src/harness/harness.cpp,call,DumpUnitName
+,VisitLosRadarResults,src/harness/harness.cpp,call,Fail
+,VisitLosRadarResults,src/harness/harness.cpp,call,Resolve
+,VisitLosRadarResults,src/harness/harness.cpp,call,SimBlockBase
+,VisitLosRadarResults,src/harness/harness.cpp,call,fprintf
+,VisitLosRadarResults,src/harness/harness.cpp,call,sprintf
+,VisitLosRadarResults,src/harness/harness.cpp,deref_escape,*LosRadarResult
+,VisitLosRadarResults,src/harness/harness.cpp,field_escape,LosRadarEvent::cell
+,VisitLosRadarResults,src/harness/harness.cpp,field_escape,LosRadarEvent::pos
+,VisitLosRadarResults,src/harness/harness.cpp,field_escape,LosRadarEvent::size
+,VisitLosRadarResults,src/harness/harness.cpp,field_escape,LosRadarResult::event
+,VisitLosRadarResults,src/harness/harness.cpp,field_maybe_written,LosRadarResult::unitId
+,VisitLosRadarResults,src/harness/harness.cpp,field_maybe_written,LosRadarResult::unitTag
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::eyeHeight
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::kind
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::lifetime
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::player
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::sightDistance
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::unit
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarEvent::value
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarResult::outcome
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarResult::unitId
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarResult::unitTag
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarResults::count
+,VisitLosRadarResults,src/harness/harness.cpp,field_read,LosRadarResults::items
+,VisitLosRadarResults,src/harness/harness.cpp,function,
+,VisitLosRadarResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,VisitLosRadarResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitLosRadarResults,src/harness/harness.cpp,global_read,s_losRadarResults@src/harness/harness.cpp
+,VisitLosRadarResults,src/harness/harness.cpp,global_read,s_losRadarResultsLost@src/harness/harness.cpp
 ,VisitMapCells,src/harness/harness.cpp,call,EndSection
 ,VisitMapCells,src/harness/harness.cpp,call,Fail
 ,VisitMapCells,src/harness/harness.cpp,call,GameRef
@@ -61530,6 +61546,7 @@ address,function,file,kind,target
 ,VisitWorld,src/harness/harness.cpp,call,VisitEyes
 ,VisitWorld,src/harness/harness.cpp,call,VisitFeaturesResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitGameScalars
+,VisitWorld,src/harness/harness.cpp,call,VisitLosRadarResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitMapCells
 ,VisitWorld,src/harness/harness.cpp,call,VisitModuleState
 ,VisitWorld,src/harness/harness.cpp,call,VisitMoveClasses

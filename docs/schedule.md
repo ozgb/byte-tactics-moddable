@@ -1671,6 +1671,7 @@ the split lies in.
 | economy | targeting | units, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 9) |  | by subsystem | 3 | 3 |
 | economy | units | units, each entity | apply before continuing | `economy.Apply` (step 1) | the caller |  | by subsystem | 3 | 3 |
 | economy | weapons | units, each entity | split | `economy.Apply` (step 1) | `weapons.CobScriptExplodePiece` (step 6) |  | by subsystem | 3 | 3 |
+| features | los_radar | units, each entity | split | `features.Apply` (step 9) | `targeting.Apply` (step 12) | `features.Apply` | by subsystem | 1 | 0 |
 | features | map | units, each entity | split | `features.Apply` (step 9) | `weapons.UpdateUnitWeapons` (step 16) |  | by subsystem | 1 | 1 |
 | features | units | units, each entity | apply before continuing | `features.Apply` (step 9) | the caller | `features.Apply` | by subsystem | 1 | 1 |
 | features | weapons | units, each entity | split | `features.Apply` (step 9) | `targeting.Apply` (step 12) | `features.Apply` | by subsystem | 3 | 3 |
@@ -1789,7 +1790,6 @@ the split lies in.
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
 | ai | los_radar | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `ai.UpdatePlayerAI` (step 2) | `ai.SquadManagerTickIfActive` | by item | 1 | 1 |
-| ai | players | players, each entity | apply before continuing | `ai.SquadManagerTickIfActive` (step 1) | the caller |  | by subsystem | 1 | 1 |
 | ai | targeting | players, each entity, in `ai.SquadManagerTickIfActive` | write before calling | the caller, before the first step | `targeting.FindWeaponTarget` (step 17) |  | by item | 1 | 1 |
 | economy | ai | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 5) |  | by subsystem | 3 | 3 |
 | economy | los_radar | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 5) |  | by subsystem | 3 | 2 |
@@ -1799,7 +1799,6 @@ the split lies in.
 | economy | units | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 5) |  | by subsystem | 2 | 2 |
 | los_radar | ai | players, each entity, in `los_radar.UpdateSensorRadarAndCloak` | write before calling | the caller, before the first step | `ai.HasReadyUnitInRange` (step 2) |  | by item | 1 | 1 |
 | los_radar | orders | players, each entity | split | `ai.SquadManagerTickIfActive` (step 1) | `units.CreateUnit` (step 24) |  | by subsystem | 1 | 1 |
-| los_radar | players | players.los, each entity | apply before continuing | `features.Apply` (step 5) | the caller |  | by subsystem | 1 | 1 |
 | los_radar | targeting | players.los, each entity | split | `features.Apply` (step 5) | `targeting.Apply` (step 10) | `features.Apply` | by subsystem | 1 | 1 |
 | los_radar | units | players.los, each entity | split | `features.Apply` (step 5) | `targeting.Apply` (step 10) | `features.Apply` | by subsystem | 1 | 1 |
 | map | ai | players, each entity | split | `map.CanPlaceUnitFootprint` (step 21) | `units.CreateUnit` (step 24) |  | by subsystem | 1 | 0 |
@@ -1840,15 +1839,15 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 |---|---|---|---|---|---|---|---|
 | wind_meteors | 0 / 0 | 0 / 0 | 1 / 8 | 4 / 0 | 0 | 0 | 0 |
 | economy | 0 / 0 | 1 / 1 | 2 / 2 | 3 / 11 | 36 | 3 | 38 |
-| features | 1 / 0 | 5 / 3 | 2 / 0 | 3 / 9 | 14 | 2 | 16 |
-| ai | 0 / 0 | 5 / 5 | 4 / 5 | 7 / 0 | 4 | 43 | 47 |
+| features | 1 / 0 | 5 / 3 | 2 / 0 | 3 / 9 | 15 | 2 | 17 |
+| ai | 0 / 0 | 5 / 5 | 4 / 5 | 7 / 0 | 3 | 43 | 46 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 5 | 0 / 1 | 0 | 0 | 0 |
 | weapons | 0 / 2 | 10 / 6 | 8 / 21 | 10 / 0 | 44 | 61 | 105 |
 | targeting | 1 / 0 | 3 / 4 | 2 / 0 | 4 / 11 | 4 | 33 | 37 |
-| los_radar | 0 / 0 | 3 / 13 | 0 / 4 | 0 / 9 | 12 | 30 | 41 |
+| los_radar | 0 / 0 | 3 / 13 | 0 / 4 | 0 / 9 | 11 | 31 | 41 |
 | orders | 2 / 0 | 22 / 2 | 21 / 13 | 13 / 3 | 60 | 52 | 112 |
 | units | 1 / 1 | 3 / 17 | 33 / 20 | 6 / 11 | 133 | 59 | 192 |
-| players | 1 / 0 | 3 / 0 | 15 / 4 | 8 / 0 | 14 | 23 | 35 |
+| players | 1 / 0 | 3 / 0 | 15 / 4 | 8 / 0 | 14 | 21 | 33 |
 | map | 0 / 4 | 3 / 8 | 1 / 9 | 0 / 3 | 17 | 32 | 49 |
 
 ## Limits

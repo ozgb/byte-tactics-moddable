@@ -1171,6 +1171,7 @@ SILENT_INTENTS = {
                                 "nothing.",
     "orders.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
     "players.NotifyUnitCreated": "it writes through a virtual call whose targets are not resolved.",
+    "units.RefreshUnitIfStale": "it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself.",
     "players.NotifyUnitDied": "it writes through a virtual call whose targets are not resolved.",
     "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }

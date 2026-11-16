@@ -3043,6 +3043,26 @@
     "note": "the movement class table"
    },
    {
+    "kind": "field_maybe_written",
+    "target": "MovementClassTable::entries",
+    "rule": "all-of",
+    "object": "MovementClass",
+    "functions": [
+     "ApplyMapEvent"
+    ],
+    "note": "the movement class table: REFRESH_PASS_MAP refreshes the pass map of the class its value names"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "MapPoint"
+    ],
+    "reads": [],
+    "note": "the cell and size of the event, recorded as its cellX, cellY, sizeX and sizeY"
+   },
+   {
     "kind": "global_escape",
     "target": "g_movementClasses",
     "rule": "all-of",

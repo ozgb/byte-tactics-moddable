@@ -38,8 +38,8 @@ text file: one that names a source file (SOURCE_FILE: a path under a source dire
 file other than an interface header of the kit and a `<system.h>` include; in a Python file only the directories and `.cpp`,
 `.hpp` and `.inc`) is a hit, and so is one that names a function the source defines and no interface header, `layout.json`,
 the module manifest or a recording declares (`source_functions`). Quoted text that is a string of the source is data, not a
-name. The interface headers are not asked about functions, and the files under reference/ are not either, since they change
-only with a new traces tag. The identifiers a file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
+name. The interface headers are not asked about functions; every other text file is, the files under reference/ included
+(FROZEN_DIRS is empty). The identifiers a file may use are those the kit's structured data defines (`allowed_identifiers`: the json, the interface headers and
 everything under reference/ and tests/replay/), never the checked text itself. The interface headers declare the names
 and are the source's own declarations, so only the address rule applies to them, and the export strips their
 address-marker lines (`// FUNCTION: 0x...`, `// GLOBAL: 0x...`) before the check and the manifest digests.

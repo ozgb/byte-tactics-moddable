@@ -84,9 +84,9 @@ enum SchedModule {
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
 // Calls economy's synchronous Spend slot for a spend (an event of kind ECONOMY_SPEND) after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
-// Calls economy's RequestGranted query for a unit (an economy unit handle) and the resources it asks for, as of economy's last run: economy's pending inbox is not delivered first.
+// Calls economy's RequestGranted query for a unit (an EconUnit, its block offset) and the resources it asks for, as of economy's last run: economy's pending inbox is not delivered first.
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
-// Runs economy's UpdateMetalExtraction for a unit (an economy unit handle) after delivering economy's pending inbox; its effects are published to economy's outbox.
+// Runs economy's UpdateMetalExtraction for a unit (an EconUnit, its block offset) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
 struct WindMeteorsEffect;
 // Publishes an effect of wind_meteors (interfaces/wind_meteors.h) to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.

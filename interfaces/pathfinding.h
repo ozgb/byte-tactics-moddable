@@ -8,9 +8,9 @@
 // Minor version of the pathfinding interface, changed when a slot is added.
 #define PATHFINDING_VERSION_MINOR 0
 
-// A unit, as an opaque handle the world view gives (0 for none).
+// A unit, as the block offset of its record (an offset from the block base) that the world view gives; 0 for none.
 typedef unsigned int PathUnit;
-// A movement class, as an opaque handle the world view gives (0 for none).
+// A movement class, as the block offset of its record that the world view gives; 0 for none.
 typedef unsigned int PathClass;
 // An object of the requester's that pathfinding stores and hands back in events, and never reads.
 typedef unsigned int PathHandle;

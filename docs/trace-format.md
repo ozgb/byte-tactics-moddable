@@ -1182,7 +1182,7 @@ for k in 0 .. n-1, in application order:
 - `unit` is the unit that reclaims, a pointer ID with target `unit` (section 5), null for the kinds that
   name none. `value` is the argument of the kind (REMOVE: 1 to remove even a feature that refuses
   removal; DAMAGE and AREA_DAMAGE: the number of the weapon's definition).
-- `state` is a state block handle: `null` for 0, `heap` for any other value, because a handle's number
+- `state` is the block offset of a piece state: `null` for 0, `heap` for any other value, because the offset
   depends on the allocator and is not behaviour.
 - `pos` is a position in world coordinates with 16 fractional bits and `rot` a rotation in 16-bit angles,
   x, y and z. Fields a kind does not use are 0.

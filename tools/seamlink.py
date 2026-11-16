@@ -43,7 +43,7 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
 data/rwsets.csv and the owners of data/subsystems.csv.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
-features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
+features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
 slots, engine and allowed indirect calls. It fails, for each pilot, on:
 
@@ -53,7 +53,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
-                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
+                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
                 (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
@@ -66,10 +66,13 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   features      RunGameSteps (src/ingame/game_dialogs.cpp)
                   targeting     none
                   los_radar     none
+                  map           none
                 Features' writing slots are UpdateFeatures (the phase slot), Apply, Place, AnimateFeatureType,
                 ScanFeatureCell and UpdateFeatureSpot; targeting's are Apply, GetWeaponTargetPos, FindWeaponTarget and
                 FindBestTargetIfFireAtWill; los_radar's are Apply and the passes the scheduler runs, UpdateUnitLineOfSight, RecordRadarUnits,
-                UpdateSensorRadarAndCloak, RecordRadarMapped and ExpireEyeballs. A presentation or unowned function fails like any other.
+                UpdateSensorRadarAndCloak, RecordRadarMapped and ExpireEyeballs; map's are Apply and the synchronous CanBuildAt, CanPlaceUnitFootprint and
+                PickRandomReclaimableResourcesInRadius, which the services ScheduleMapCanBuildAt, ScheduleMapCanPlaceUnitFootprint and ScheduleMapPickReclaimable
+                (src/seams/map_world.cpp) reach for the other subsystems. A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -80,26 +83,36 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 LoadUnitFbi (src/units/unit_types.cpp).
                 Los_radar's set-up slots, LoadTntMap, InitRadar, FreeRadar and FreeMapResources, run outside the tick too; their callers are
                 LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp).
+                Map's set-up slots, BuildAllPassMaps, FreeOtaEnumCacheAndMission, LoadMappingData, LoadMetalPlotmap, LoadPlayerFeaturesPlotmap, SaveMappingData,
+                SaveMetalPlotmap, SavePlayerFeaturesPlotmap, SetMissionType and the mission, campaign and map-list slots (AdvanceMission, GetCampaignName,
+                GetMissionIndex, GetMissionName, GetStartPosition, LoadCampaign, LoadMissionByName, MissionExists, RefreshMapList, SelectMission,
+                ComputeMapChecksum, GetTerrainLength), run outside the tick, from the frames of the menus, the loader and the end of a game; their callers are
+                BattleFrame (src/ingame/build_placement.cpp), InitFrame, ReturnToMainMenuFrame and SpawnCommanderAtStartPos (src/game/main_loop.cpp), InitGame,
+                LoadBattleAssets and ShutdownGame (src/game/game_state.cpp), LoadGameScreenHandler (src/game/savegame.cpp), LoadMatch and LoadingScreenFrame
+                (src/game/game_load.cpp), LoadSavedGameState and SaveGameFile (src/game/settings_campaign.cpp), LoadSettings (src/game/settings.cpp),
+                RunEndGameState (src/frontend/endgame.cpp) and UpdateBattleRoom (src/frontend/multi.cpp).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
                 FirstFeatureSpot; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
-                GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask), the function that fills it and every function it calls by name (rwsets keys functions
+                GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask; map: UnitsInRange, GetCellMeanHeight,
+                SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGameType, GetNameSlot), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
                   it holds (economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
                   MeteorShowerParams; features' queries take no out parameter), or of the struct a slot returns by value
-                  (features' GetFootprintCentre: Vec3; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
+                  (features' GetFootprintCentre: Vec3; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
                   its IsUnitVisibleToPlayer the Vec3 and word view that it builds in its own frame, the pilot's filler_locals), and except economy's world view info structs (EconUnitInfo,
                   EconTypeInfo, EconPlayerInfo), which no state holds;
                   makes an indirect call other than through a read-only slot of the pilot's world view (economy's
                   EconomyWorldView, all but Emit; wind_meteors has none), a read-only slot of another seam the pilot allows
-                  (features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell; targeting has none; los_radar's: UnitsSeam::GetGroundHeight and AiSeam::IsPointVisible) or a slot of a struct that a
+                  (features': UnitsSeam::GetGroundHeight and LosRadarSeam::GetMapCell; targeting has none; los_radar's: UnitsSeam::GetGroundHeight and AiSeam::IsPointVisible; map's: LosRadarSeam::GetMapCell and FeaturesSeam::GetCellFeature) or a slot of a struct that a
                   parameter of the query slot points to (WriteState's StateWriter);
                   calls a function data/rwsets.csv has no rows for (memset, memcpy, a template), but for operator=, the
                   assignment rwsets records as the write itself, X87LeTest41, a template that compares two values, and
-                  operator Unit *, operator Cell *, operator unsigned char * and operator unsigned short *, the conversions of a Ref
-                  to the pointer it holds, and get and operator->, which read it;
+                  operator Unit *, operator Cell *, operator Feature *, operator UnitBucket *, operator UnitDef *, operator unsigned char * and
+                  operator unsigned short *, the conversions of a Ref to the pointer it holds, and get and operator->, which read it, operator!=
+                  (which compares two Refs) and strlen;
                   or has inline assembly.
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
@@ -164,7 +177,7 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
 ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *", "operator Cell *", "operator unsigned char *", "operator unsigned short *",
-                 "operator->", "get")
+                 "operator Feature *", "operator UnitBucket *", "operator UnitDef *", "operator!=", "strlen", "operator->", "get")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"
@@ -173,6 +186,7 @@ PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers
 FEATURES_GLUE_FILE = "src/seams/features_world.cpp"
 TARGETING_GLUE_FILE = "src/seams/targeting_world.cpp"
 LOS_RADAR_GLUE_FILE = "src/seams/los_radar_world.cpp"
+MAP_GLUE_FILE = "src/seams/map_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -255,7 +269,25 @@ LOS_RADAR = Pilot(
     filler_locals=(("IsUnitVisibleToPlayer", "Vec3"), ("IsUnitVisibleToPlayer", "<anon>")),
     setup=("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")))
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR)
+MAP = Pilot(
+    owner="map", header="interfaces/map.h", seam="MapSeam",
+    writing=("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"),
+    query=("UnitsInRange", "GetCellMeanHeight", "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "GetGameType", "GetNameSlot"),
+    engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
+    setup=("BuildAllPassMaps", "FreeOtaEnumCacheAndMission", "LoadMappingData", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap", "SaveMappingData",
+           "SaveMetalPlotmap", "SavePlayerFeaturesPlotmap", "SetMissionType", "AdvanceMission", "GetCampaignName", "GetMissionIndex", "GetMissionName",
+           "GetStartPosition", "LoadCampaign", "LoadMissionByName", "MissionExists", "RefreshMapList", "SelectMission", "ComputeMapChecksum",
+           "GetTerrainLength"),
+    allowed_indirect=("LosRadarSeam::GetMapCell", "FeaturesSeam::GetCellFeature"),
+    filler_locals=(("SnapWorldPosToFootprint", "Point16"),),
+    setup_callers=(("BattleFrame", "src/ingame/build_placement.cpp"), ("InitFrame", "src/game/main_loop.cpp"), ("InitGame", "src/game/game_state.cpp"),
+                   ("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadGameScreenHandler", "src/game/savegame.cpp"),
+                   ("LoadMatch", "src/game/game_load.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
+                   ("LoadSettings", "src/game/settings.cpp"), ("LoadingScreenFrame", "src/game/game_load.cpp"),
+                   ("ReturnToMainMenuFrame", "src/game/main_loop.cpp"), ("RunEndGameState", "src/frontend/endgame.cpp"),
+                   ("SaveGameFile", "src/game/settings_campaign.cpp"), ("ShutdownGame", "src/game/game_state.cpp"),
+                   ("SpawnCommanderAtStartPos", "src/game/main_loop.cpp"), ("UpdateBattleRoom", "src/frontend/multi.cpp")))
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP)
 
 
 @dataclass
@@ -713,8 +745,9 @@ def pointee(parameter: str):
     if "*" not in parameter:
         return None
     words = re.findall(r"\w+", parameter.split("*")[0])
-    names = [w for w in words if w not in ("const", "struct", "unsigned", "signed", "volatile")]
-    return (names[-1] if names else "void", "const" not in words)
+    names = [w for w in words if w not in ("const", "struct", "volatile")]
+    name = " ".join(names[-2:]) if len(names) > 1 and names[-2] in ("unsigned", "signed") else (names[-1] if names else "void")
+    return (name, "const" not in words)
 
 
 def held_types(header: str, struct: str) -> set:

@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_and_map(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map"])
 
 
 class TargetingOwnerTest(unittest.TestCase):
@@ -164,6 +164,38 @@ class LosRadarOwnerTest(unittest.TestCase):
     def test_a_read_by_anyone_passes(self):
         rows = {"edges": [("-", "sound", self.EXPLORED), ("los_radar", "ai", self.MAPPED)], "reads": [("-", "weapons", "Eye::pos")],
                 "presentation": [("-", "presentation", self.MAPPED)]}
+        self.assertEqual(ps.violations(rows), [])
+
+
+class MapOwnerTest(unittest.TestCase):
+    PASS_MAPS = "BuildAllPassMaps: operator new unsigned int"
+
+    def test_the_buckets_the_pass_maps_and_the_placement_results_are_private_for_writes_only(self):
+        for item in ("Unit::spatialBucket", "UnitBucket::first", "SpatialBucket::head", self.PASS_MAPS, "g_lastPlaceHeight", "g_lastPlaceMetalSum"):
+            self.assertEqual(ps.private_to(item), ("map", ("writer",)), item)
+
+    def test_the_cells_and_the_shared_unit_state_are_not_private(self):
+        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::unit", "Cell::flags", "Unit::cargoNext", "Unit::flags", "Unit::bit2",
+                     "Unit::cobStateFlags", "cells_1429f", "overflowBucket", "BuildAllPassMaps: operator new unsigned short"):
+            self.assertFalse(ps.is_private(item), item)
+
+    def test_a_map_write_passes(self):
+        rows = {"edges": [("map", "units", "Unit::spatialBucket"), ("map", "-", self.PASS_MAPS), ("-", "map", "g_lastPlaceMetalSum")],
+                "cross": [("map", "ai", "g_lastPlaceHeight")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("units", "map", "Unit::spatialBucket"), ("ai", "-", "g_lastPlaceMetalSum"), ("pathfinding", "-", self.PASS_MAPS),
+                          ("orders", "-", "UnitBucket::first")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer ai on g_lastPlaceMetalSum, which is written only by map",
+                          "edges: writer orders on UnitBucket::first, which is written only by map",
+                          "edges: writer pathfinding on %s, which is written only by map" % self.PASS_MAPS,
+                          "edges: writer units on Unit::spatialBucket, which is written only by map"])
+
+    def test_a_read_by_anyone_passes(self):
+        rows = {"edges": [("-", "orders", "Unit::spatialBucket"), ("map", "ai", "g_lastPlaceMetalSum")], "reads": [("-", "units", self.PASS_MAPS)],
+                "presentation": [("-", "presentation", "g_lastPlaceHeight")]}
         self.assertEqual(ps.violations(rows), [])
 
 

@@ -1740,6 +1740,19 @@ void BuildFogTiles(void)
     }
 }
 
+// FUNCTION: 0x485420
+void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
+{
+    unsigned short fromBit = 1 << from;
+    unsigned short toBit = 1 << to;
+    int n = g_game->width * g_game->height / 4;
+    for (int i = 0; i < n; i++) {
+        unsigned short* p = &g_game->visibilityMask[i];
+        if (*p & fromBit)
+            *p |= toBit;
+    }
+}
+
 static Unit* LosUnitOfHandle(unsigned int handle)
 {
     Ref<Unit> ref;
@@ -1799,6 +1812,11 @@ int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e)
         if (e->player < 0 || e->player > 9)
             return 0;
         return CmdShareRadar(e->player);
+    case LOS_RADAR_SHARE_MAP:
+        if (e->player < 0 || e->player > 9 || e->value < 0 || e->value > 9)
+            return 0;
+        ShareMapInfo((unsigned char)e->player, (unsigned char)e->value);
+        return 1;
     }
     return 0;
 }

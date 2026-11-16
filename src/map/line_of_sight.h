@@ -42,6 +42,7 @@ void __stdcall RecalculateLineOfSight(int arg);
 void __stdcall RevealAroundUnit(SightQuery* params);
 int __stdcall AddEyeball(Vec3* src, int sightDistance, int eyeHeight, int lifetime);
 void __stdcall RevealNewUnit(Unit* unit);
+void __stdcall ShareMapInfo(unsigned char from, unsigned char to);
 
 Cell* __stdcall GetMapCell(int x, int y);
 void __stdcall AddLineOfSight(SightQuery* params);

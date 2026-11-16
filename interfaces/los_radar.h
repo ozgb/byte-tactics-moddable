@@ -28,7 +28,9 @@ enum LosRadarEventKind {
     // Toggles whether player shares its map with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
     LOS_RADAR_SHARE_MAPPING = 134,
     // Toggles whether player shares its radar with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
-    LOS_RADAR_SHARE_RADAR = 135
+    LOS_RADAR_SHARE_RADAR = 135,
+    // Shows player value every cell that player sees now; outcome 1.
+    LOS_RADAR_SHARE_MAP = 136
 };
 
 // An event (LosRadarEventKind), as plain data with no pointers; fields a kind does not use are 0.

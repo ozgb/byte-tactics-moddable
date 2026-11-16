@@ -90,4 +90,12 @@ inline void LosRadarPublishShareRadar(int outbox, int player)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void LosRadarPublishShareMap(int outbox, int from, int to)
+{
+    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SHARE_MAP);
+    event.player = from;
+    event.value = to;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 #endif

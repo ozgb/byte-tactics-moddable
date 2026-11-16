@@ -141,19 +141,6 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
         p->z = MakeFixed(g_game->baseY - 1);
 }
 
-// FUNCTION: 0x485420
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
-{
-    unsigned short fromBit = 1 << from;
-    unsigned short toBit = 1 << to;
-    int n = g_game->width * g_game->height / 4;
-    for (int i = 0; i < n; i++) {
-        unsigned short* p = &g_game->visibilityMask[i];
-        if (*p & fromBit)
-            *p |= toBit;
-    }
-}
-
 #include <iterator>
 #include "../../interfaces/seams.h"
 #include <xutility>

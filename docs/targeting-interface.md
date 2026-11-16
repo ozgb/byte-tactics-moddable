@@ -22,10 +22,10 @@ kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 3
 Targeting's place in it:
 - **Events into targeting:** SET_UNIT, SET_POS, CLEAR and RESET, published by orders, ai, weapons and units.
   Targeting's handler (`TargetingInbox`, `src/seams/targeting_world.cpp`) passes each to `Apply`.
-- **Routes:** Of the nine routes, the eight into targeting and the effect CLEARED out of it, one is queued: units'
-  RESET. The other eight are synchronous: three because the gate diverged with them queued (orders' SET_UNIT,
-  weapons' CLEAR and CLEARED), four by #952's rule (orders' SET_POS and CLEAR, ai's SET_UNIT and CLEAR), and ai's
-  SET_POS because no scenario reaches it, so nothing has tested it queued (sections 4 and 8).
+- **Routes:** Of the nine routes, the eight into targeting and the effect CLEARED out of it, two are queued: units'
+  RESET and ai's SET_POS (#975, judged by `ai-antinuke-intercept`). The other seven are synchronous: three because
+  the gate diverged with them queued (orders' SET_UNIT, weapons' CLEAR and CLEARED) and four by #952's rule (orders'
+  SET_POS and CLEAR, ai's SET_UNIT and CLEAR) (sections 4 and 8).
 - **Synchronous slots:** `GetWeaponTargetPos`, `FindWeaponTarget` and `FindBestTargetIfFireAtWill`, called through
   the services `ScheduleTargetingTargetPos`, `ScheduleTargetingFind` and `ScheduleTargetingFireAtWill`, which
   deliver targeting's inbox first (section 2).
@@ -113,7 +113,7 @@ writes outside the pair, and that decides each route:
 | orders CLEAR | synchronous | #952's rule. A CLEAR of a weapon with a target publishes CLEARED, which starts the unit's TargetCleared thread. Pending, it would start after the other threads started on the unit later in its update, in another of the eight channels, and after a death later in the phase has freed the unit's script (a build with it queued crashed so, in `FindScript`). |
 | ai SET_UNIT | synchronous | #952's rule. `ReactToAttack` runs where a hit is applied, in the projectiles phase among others, and ai reads the `netDirtyFlags` bits the event clears later in the same phase (the row targeting → ai on `Unit::netDirtyFlags`, projectiles, below). |
 | ai CLEAR | synchronous | #952's rule. The squad manager's `RetargetWeapon` runs in the players phase before the player's economy, which publishes the extractors' SetSpeed scripts to units' inbox. The phase boundary delivers units before targeting, so a pending CLEAR's TargetCleared thread on an armed extractor would start after SetSpeed instead of before it. |
-| ai SET_POS | synchronous | Untested, not divergent. Only `RetargetWeapon` publishes it, for an interceptor aimed at a projectile, in the players phase, and no scenario does (section 8), so no trace has judged it queued. It takes 3.1c's order until a scenario that reaches it shows that queueing it is equal. The argument for queueing it stands untested: it writes the pair and the `netDirtyFlags` weapon notices; the pair is read only through targeting's slots, which deliver first, and nothing in the players phase reads or writes those notices (`RunOrders` runs only in the units phase, and victory reads bit 0, which the event keeps). |
+| ai SET_POS | queued | Only `RetargetWeapon` publishes it, for an interceptor aimed at a projectile, in the players phase. It writes the pair and the `netDirtyFlags` weapon notices; the pair is read only through targeting's slots, which deliver first, and nothing in the players phase reads or writes those notices (`RunOrders` runs only in the units phase, and victory reads bit 0, which the event keeps). `ai-antinuke-intercept` reaches it, and its trace is equal with the route queued (section 8). |
 | units RESET | queued | `InitUnitFromType` publishes it for each slot of a unit it sets up. It writes only the pair, read only through targeting's slots, and publishes no effect. The `ReleaseWeapons` that follows it may publish a synchronous CLEAR of the same slot, which delivers the RESET first; the unit's `netDirtyFlags` is set to 0 after both. |
 | weapons CLEAR | synchronous | The gate (section 8). Its CLEARED starts the TargetCleared thread, whose channel among the unit's script threads is hashed. |
 | CLEARED, targeting to units | synchronous | The gate (section 8), for the same channel order. |
@@ -130,7 +130,7 @@ pair: only targeting writes it, and only targeting reads it. Each row is served 
 | weapons → targeting | a slot's flags (`Unit::f_1f`, `f_3b`, `f_57`) and weapon (`Unit::weapon`, `f2c`, `f48`) | units | Targeting reads them only in its synchronous slots and synchronous events, at the caller's statement, so it sees weapons' write as 3.1c did. |
 | units, orders, map, ai, los_radar → targeting | `Unit::flags`, `def`, `unitDefIndex`, `killCount`, `pos`, `yFraction`, `zFraction`, `motion`, `UnitMotion::velocity` | units, players | The same: `FindWeaponTarget`, `FindBestTargetIfFireAtWill` and `GetWeaponTargetPos` read them at the caller's statement. The queued RESET reads none of them. |
 | economy, players, units → targeting | the player's fields (`pad_1df4`, `unknown_1b8e`, `unknown_1cd9`) | units, players | The same, through `FindWeaponTarget`'s choice among enemies. |
-| ai → targeting | `Unit::netDirtyFlags` | projectiles | SET_UNIT and SET_POS clear bits of it as a read-modify-write. Every SET_UNIT and SET_POS is synchronous, so the write lands on ai's bits as in 3.1c. |
+| ai → targeting | `Unit::netDirtyFlags` | projectiles | SET_UNIT and SET_POS clear bits of it as a read-modify-write. Ai publishes only SET_UNIT in the projectiles phase (`ReactToAttack`), and it is synchronous, so the write lands on ai's bits as in 3.1c. Its queued SET_POS is published only in the players phase. |
 | targeting → orders, units, weapons | `Unit::netDirtyFlags` | units | The bits SET_UNIT and SET_POS clear. Every route that publishes them in the units phase is synchronous. |
 | targeting → ai | `Unit::netDirtyFlags` | projectiles | The same, for ai's SET_UNIT from `ReactToAttack`. |
 
@@ -195,14 +195,16 @@ unit in the phase.
 SET_POS and CLEAR and ai's SET_UNIT and CLEAR synchronous (section 4). That build passed the tier (38 scenarios equal)
 and the full suite in both modes, with ai's SET_POS and units' RESET queued.
 
-**Ai's SET_POS is synchronous, untested.** No scenario aims an interceptor at a projectile, so the route was queued
-zero times in the suite, and its queued status rested only on the argument in section 4, which no trace tested. A
-route nothing exercises takes 3.1c's order until a scenario shows that queueing it is equal. One queued route is
-left: units' RESET, which the scenarios queue 5943 times.
+**Ai's SET_POS is queued (#975).** #955 left it synchronous because no scenario aimed an interceptor at a
+projectile, so no trace had judged it queued. `ai-antinuke-intercept` does: the computer player's anti-nuke silo
+(unit 252), holding one stockpiled missile, finds the human player's nuke in flight at tick 5694, and ai publishes a
+SET_POS of its weapon 0 at the nuke's position in the players phase (outcome 1, section 38 of the dump). Queued, the
+event waits in targeting's inbox until the players phase's boundary, alone; the silo fires at tick 5696 and its
+missile meets the nuke at tick 5926. The scenario's trace is equal to the reference's with the route queued, in both
+modes, and so is the full suite. Two queued routes are left: units' RESET and ai's SET_POS.
 
-**Inbox depths.** With the final routes, over 87 of the 88 scenarios (load-midgame plays only after save-midgame, and
+**Inbox depths.** With the final routes, over 88 of the 89 scenarios (load-midgame plays only after save-midgame, and
 was left out), targeting's inbox held at most 9 events (long-greenhaven-8p, tick 52464), all of them units' RESETs
-of units set up in one update; the capacity is 1024. RESET was queued in 51 scenarios, 5943 times. Ai's SET_POS was
-published in none: no scenario has an interceptor aimed at a projectile. Making it synchronous changes none of these
-counts. Of the deliveries of a non-empty inbox, 1711
-came from a synchronous publish or slot that delivered first and 248 at a phase boundary (at most 6 events, long-great-divide-2p, tick 34050).
+of units set up in one update; the capacity is 1024. RESET was queued in 52 scenarios, 5967 times. Ai's SET_POS was
+queued in one, once (`ai-antinuke-intercept`, tick 5694). Of the deliveries of a non-empty inbox, 1719
+came from a synchronous publish or slot that delivered first and 249 at a phase boundary (at most 6 events, long-great-divide-2p, tick 34050).

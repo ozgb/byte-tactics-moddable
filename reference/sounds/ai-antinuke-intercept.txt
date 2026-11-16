@@ -1,0 +1,6 @@
+bt-sound 1
+0 stop_all - - - - -
+20 play ADDBUILD -585 - - -
+20 play ADDBUILD -585 - - -
+5430 play_file servroc1.WAV -585 - - -
+5670 play misicbm1 -585 - - -

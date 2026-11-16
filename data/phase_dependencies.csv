@@ -58,12 +58,12 @@ economy,los_radar,unknown_1cd9,units,features,immediate,2,long-greenhaven-8p@219
 economy,los_radar,unknown_1cd9,units,players,immediate,9,orders-air-repair@41,
 economy,los_radar,unknown_1cd9,units,projectiles,immediate,10,mission-build-unit@66,
 economy,los_radar,unknown_1cd9,units,units,carried,10,mission-build-unit@45,
-economy,map,pad_1df4,players,units,carried,4,edges-targeting-lead@1231,dynamic-only
-economy,map,pad_1df4,units,units,carried,2,long-greenhaven-8p@22518,dynamic-only
-economy,map,unknown_1b8e,players,presentation,immediate,1,ui-build-place@60,dynamic-only
-economy,map,unknown_1b8e,players,units,carried,5,orders-air-fights@121,dynamic-only
-economy,map,unknown_1b8e,units,units,carried,3,console-units@148,dynamic-only
-economy,map,unknown_1cd9,players,units,carried,1,long-great-divide-2p@49081,dynamic-only
+economy,map,pad_1df4,players,units,carried,4,edges-targeting-lead@1231,
+economy,map,pad_1df4,units,units,carried,2,long-greenhaven-8p@22518,
+economy,map,unknown_1b8e,players,presentation,immediate,1,ui-build-place@60,
+economy,map,unknown_1b8e,players,units,carried,5,orders-air-fights@121,
+economy,map,unknown_1b8e,units,units,carried,3,console-units@148,
+economy,map,unknown_1cd9,players,units,carried,1,long-great-divide-2p@49081,
 economy,orders,pad_1df4,players,projectiles,carried,2,skirmish4-long@25711,
 economy,orders,pad_1df4,players,units,carried,20,edges-economy-targeting@31,
 economy,orders,pad_1df4,units,players,immediate,1,long-greenhaven-8p@22200,
@@ -182,7 +182,6 @@ map,units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,tail,immediate,4,miss
 map,units,Unit::cargoNext,units,units,carried,4,eight-pincushion-teams@8981,
 map,units,Unit::flags,units,players,immediate,1,long-great-divide-2p@34049,
 map,units,Unit::flags,units,units,carried,17,ui-build-menu@87,
-map,units,Unit::spatialBucket,units,units,carried,4,eight-pincushion-teams@8981,
 map,units,UnitMotion::pathLockStamp,units,players,immediate,39,mission-build-unit@60,
 map,weapons,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,features,immediate,2,long-greenhaven-8p@22684,
 map,weapons,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,projectiles,immediate,21,edges-economy-targeting@37,

@@ -1274,8 +1274,8 @@ for k in 0 .. n-1, in application order:
 The events and effects of map in this tick (`interfaces/map.h`). No row hashes them (section 6): a dump
 holds their lines, after those of section 39, as a diagnostic. The reference build does not record them, so
 its dumps have no `map.*` lines. An event is recorded when map consumes it from its inbox, right after
-`Apply` returns, with the outcome `Apply` gave; an effect is recorded when the scheduler delivers it to its subscriber, with outcome 1.
-So the records are in the order map consumed and the scheduler delivered them. The host empties the record after the world
+`Apply` returns, with the outcome `Apply` gave; an effect is recorded when map publishes it, just before `SchedPublish`, with outcome 1.
+So the records are in the order map consumed and published them. The host empties the record after the world
 row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. The record has
 no fixed capacity, as a tick may hold an event for each unit that moved; a run that cannot hold it stops with
 an error. The fields are `map.fields` of the schema, in this order.

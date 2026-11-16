@@ -74,6 +74,7 @@ inline void MapPublishCellsChanged(int left, int top, int right, int bottom, uns
     event.rect[3] = bottom;
     event.classes = classes;
     event.cause = cause;
+    HarnessMapEvent(&event, 1);
     SchedPublish(SCHED_MAP, &event, sizeof(event));
 }
 

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <time.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/services.h"
 #include "../state/game_rand.h"
 #include "../files/files_api.h"
 
@@ -175,6 +176,7 @@ unsigned int __cdecl GetTicks();
 #include "main.h"
 
 #include "../../interfaces/seams.h"
+#include "los_radar_events.h"
 #include "../state/sim_globals.h"
 int __stdcall PointInRect(Rect* r, int x, int y);
 
@@ -396,7 +398,7 @@ void __cdecl LoadMatch(void*)
         }
     }
 
-    g_seams.los_radar->RecalculateLineOfSight(1);
+    LosRadarPublishRecalculate(SCHED_ENGINE, 1);
 
     if (((HapiBank*)g_game->pendingSaveStore) != 0) {
         ((HapiBank*)g_game->pendingSaveStore)->OpenAccount("summary");

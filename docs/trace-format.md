@@ -133,6 +133,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 | `windMeteors` | The wind_meteors events section (section 8.24), which is dumped and not hashed: its `section` number and the `fields` of a record in dump order. |
 | `features` | The features events section (section 8.25), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
 | `targeting` | The targeting events section (section 8.26), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
+| `los_radar` | The los_radar events section (section 8.27), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -290,7 +291,7 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23), wind_meteors' events (section 37, section 8.24) the features events (section 36, section 8.25) and targeting's events (section 38, section 8.26) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) and los_radar's events (section 39, section 8.27) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1222,6 +1223,51 @@ for k in 0 .. n-1, in application order:
 - `outcome` is the result of `Apply` (1 for SET_UNIT and SET_POS; for CLEAR and RESET 1 when the weapon had a
   target and 0 when not), or 1 for an effect.
 
+### 8.27 los_radar events (section 39, dumped only)
+
+The events of los_radar in this tick (`interfaces/los_radar.h`). No row hashes them (section 6): a dump
+holds their lines, after those of section 38, as a diagnostic. The reference build does not record them, so
+its dumps have no `los_radar.*` lines. An event is recorded when los_radar consumes it from its inbox, right
+after `Apply` returns, with the outcome `Apply` gave; los_radar publishes no effects. So the records are in
+los_radar's order of consumption. The host empties the record after the world row of the tick, so the lines
+a dump writes after an earlier phase hold the records made so far. The record has no fixed capacity, as a tick
+may hold an event for each unit that moved; a run that cannot hold it stops with an error. The fields are
+`los_radar.fields` of the schema, in this order.
+
+```
+los_radar.count                                # n
+for k in 0 .. n-1, in application order:
+    los_radar[k].kind
+    los_radar[k].unit                          # a pointer ID with target unit (is_ref=true)
+    los_radar[k].player
+    los_radar[k].value
+    los_radar[k].pos                           # hex: the 12 bytes, three little-endian i32
+    los_radar[k].sightDistance
+    los_radar[k].eyeHeight
+    los_radar[k].lifetime
+    los_radar[k].cell                          # hex: the 8 bytes, two little-endian i32
+    los_radar[k].size                          # hex: the 8 bytes, two little-endian i32
+    los_radar[k].outcome
+```
+
+`los_radar.count` and the numbers of a record are written as `0x` and 8 hex digits.
+
+- `kind` is an event: 128 UPDATE_UNIT, 129 REMOVE_UNIT, 130 REVEAL_UNIT, 131 ADD_EYEBALL, 132 CELL_HEIGHTS,
+  133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR, 136 SHARE_MAP.
+- `unit` is the unit whose line of sight changes, a pointer ID with target `unit` (section 5): `units:N`,
+  `null`, or `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
+- `player` is the player of SHARE_MAPPING and SHARE_RADAR and the player whose map SHARE_MAP shares, 0 to 9;
+  `value` is the argument of RECALCULATE, 1 when each cell is first reset to show nothing to every player, and
+  for SHARE_MAP the player it shows the map to, 0 to 9. Fields a kind does not use are 0.
+- `pos`, `sightDistance`, `eyeHeight` and `lifetime` are those of an ADD_EYEBALL: the position in world
+  coordinates with 16 fractional bits, x, y and z, the sight distance and the height of the eye above the
+  position, in world units, and the lifetime in ticks.
+- `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a
+  CELL_HEIGHTS.
+- `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
+  null; for ADD_EYEBALL 0 when line of sight is off or no eyeball is free; for SHARE_MAPPING and
+  SHARE_RADAR 0 outside a network game.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1255,7 +1301,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33, 35, 36, 37 and 38. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 36 to 39. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1269,8 +1315,8 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of sections 32, 33, 37, 36 and 38, in that order, which end the block and are
-not hash input (sections 8.21, 8.22, 8.24, 8.25 and 8.26). The `meteors` block ends with the lines of section 35 after them
+lines of section 28), then the lines of sections 32, 33, 37, 36, 38 and 39, in that order, which end the block and are
+not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26 and 8.27). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
@@ -1315,7 +1361,7 @@ not print excluded fields.
 To recompute a hash from the dump:
 
 1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` lines that follow them (section 8.22)
-   and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*` and `packets.*` lines that end the block (sections 8.21 to 8.26), and parse the
+   and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*` and `packets.*` lines that end the block (sections 8.21 to 8.27), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1379,7 +1425,8 @@ and no line syntax. A reader that rejects unknown lines at the end of a block mu
 added the same way, after section 33's lines: a reader must also skip `windMeteors.*`.
 Section 36 (the features events, section 8.25) was added in format 5 in the same way, after section 37's lines,
 and a reader must skip `features.*` too. Section 38 (targeting's events, section 8.26) was added the
-same way, after section 36's lines: a reader must also skip `targeting.*`.
+same way, after section 36's lines: a reader must also skip `targeting.*`. Section 39 (los_radar's events, section 8.27) was added
+the same way, after section 38's lines: a reader must also skip `los_radar.*`.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

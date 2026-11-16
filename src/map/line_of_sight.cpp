@@ -699,6 +699,8 @@ struct MapSettings {
 };
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/los_radar.h"
+#include "../game/share_commands.h"
 
 // FUNCTION: 0x483610
 void LoadTntMap()
@@ -1359,21 +1361,21 @@ void __stdcall RevealAroundUnit(SightQuery* params)
 }
 
 // FUNCTION: 0x482910
-void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
+int __stdcall AddEyeball(Vec3* src, int sightDistance, int eyeHeight, int lifetime)
 {
     if ((g_game->mapFlags_14281.raw & 2) == 2 && g_game->count_14277 < 0x14) {
         Eye* e = &g_game->eyes[g_game->count_14277];
         e->player = (char*)&g_game->players[g_game->playerIndex];
         e->screen = &e->screenPos;
-        e->x = a;
+        e->x = sightDistance;
         e->flagPtr = &e->flagB;
         e->pos = *src;
-        e->flagA = b;
+        e->flagA = eyeHeight;
         int minY = (g_game->seaLevel + 1) << 16;
         if (e->pos.y < minY) {
             e->pos.y = minY;
         }
-        e->expires = (unsigned int)g_game->ticks + c;
+        e->expires = (unsigned int)g_game->ticks + lifetime;
         if ((g_game->mapFlags_14281.raw & 2) == 2) {
             *e->flagPtr = 0;
             if ((g_game->mapFlags_14281.raw & 4) == 4) {
@@ -1398,7 +1400,9 @@ void __stdcall AddEyeball(Vec3* src, int a, int b, int c)
             }
         }
         g_game->count_14277++;
+        return 1;
     }
+    return 0;
 }
 
 // FUNCTION: 0x482ac0
@@ -1734,4 +1738,85 @@ void BuildFogTiles(void)
             } while (i - 1 < grid->height);
         }
     }
+}
+
+// FUNCTION: 0x485420
+void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
+{
+    unsigned short fromBit = 1 << from;
+    unsigned short toBit = 1 << to;
+    int n = g_game->width * g_game->height / 4;
+    for (int i = 0; i < n; i++) {
+        unsigned short* p = &g_game->visibilityMask[i];
+        if (*p & fromBit)
+            *p |= toBit;
+    }
+}
+
+static Unit* LosUnitOfHandle(unsigned int handle)
+{
+    Ref<Unit> ref;
+    ref.offset = handle;
+    return ref.get();
+}
+
+int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e)
+{
+    switch (e->kind) {
+    case LOS_RADAR_UPDATE_UNIT: {
+        Unit* unit = LosUnitOfHandle(e->unit);
+        if (!unit)
+            return 0;
+        UpdateUnitLineOfSight(unit);
+        return 1;
+    }
+    case LOS_RADAR_REMOVE_UNIT: {
+        Unit* unit = LosUnitOfHandle(e->unit);
+        if (!unit)
+            return 0;
+        RemoveUnitLineOfSight(unit);
+        return 1;
+    }
+    case LOS_RADAR_REVEAL_UNIT: {
+        Unit* unit = LosUnitOfHandle(e->unit);
+        if (!unit)
+            return 0;
+        RevealNewUnit(unit);
+        return 1;
+    }
+    case LOS_RADAR_ADD_EYEBALL: {
+        Vec3 pos;
+        pos.x = e->pos[0];
+        pos.y = e->pos[1];
+        pos.z = e->pos[2];
+        return AddEyeball(&pos, e->sightDistance, e->eyeHeight, e->lifetime);
+    }
+    case LOS_RADAR_CELL_HEIGHTS: {
+        Point16 cell;
+        cell.x = (short)e->cell[0];
+        cell.y = (short)e->cell[1];
+        Point16 size;
+        size.x = (short)e->size[0];
+        size.y = (short)e->size[1];
+        UpdateCellHeightRange(cell, size);
+        return 1;
+    }
+    case LOS_RADAR_RECALCULATE:
+        RecalculateLineOfSight(e->value);
+        return 1;
+    case LOS_RADAR_SHARE_MAPPING:
+        if (e->player < 0 || e->player > 9)
+            return 0;
+        return CmdShareMapping(e->player);
+    case LOS_RADAR_SHARE_RADAR:
+        if (e->player < 0 || e->player > 9)
+            return 0;
+        return CmdShareRadar(e->player);
+    case LOS_RADAR_SHARE_MAP:
+        if (e->player < 0 || e->player > 9 || e->value < 0 || e->value > 9)
+            return 0;
+        ShareMapInfo((unsigned char)e->player, (unsigned char)e->value);
+        return 1;
+    }
+    return 0;
 }

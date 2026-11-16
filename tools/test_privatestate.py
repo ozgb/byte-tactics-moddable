@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_and_targeting(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_and_los_radar(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar"])
 
 
 class TargetingOwnerTest(unittest.TestCase):
@@ -132,6 +132,38 @@ class TargetingOwnerTest(unittest.TestCase):
     def test_a_read_and_a_shared_flag_write_pass(self):
         rows = {"edges": [("-", "weapons", "Unit::current"), ("targeting", "units", "Unit::weapon2Target"), ("weapons", "-", "Unit::netDirtyFlags")],
                 "reads": [("-", "ai", "Unit::field_20")]}
+        self.assertEqual(ps.violations(rows), [])
+
+
+class LosRadarOwnerTest(unittest.TestCase):
+    MAPPED = "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY"
+    EXPLORED = "InitPlayerSlot: operator new unsigned char"
+
+    def test_the_visibility_layer_the_explored_maps_and_the_eyeballs_are_private_for_writes_only(self):
+        for item in (self.MAPPED, self.EXPLORED, "count_14277", "eyes", "Eye::pos", "Eye::expires", "Eye::screenPos"):
+            self.assertEqual(ps.private_to(item), ("los_radar", ("writer",)), item)
+
+    def test_the_cells_and_the_shared_state_are_not_private(self):
+        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::height", "Unit::losCacheCellX", "Unit::losSightFrameIdx", "Unit::flags",
+                     "Game::mapFlags_14281", "InitPlayerSlot: operator new Group", "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY 2"):
+            self.assertFalse(ps.is_private(item), item)
+
+    def test_a_los_radar_write_passes(self):
+        rows = {"edges": [("los_radar", "units", self.MAPPED), ("los_radar", "-", self.EXPLORED), ("-", "los_radar", "count_14277")],
+                "cross": [("los_radar", "players", "Eye::pos")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("players", "los_radar", self.EXPLORED), ("units", "-", "Eye::x"), ("map", "-", self.MAPPED), ("game", "-", "eyes")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer game on eyes, which is written only by los_radar",
+                          "edges: writer map on %s, which is written only by los_radar" % self.MAPPED,
+                          "edges: writer players on %s, which is written only by los_radar" % self.EXPLORED,
+                          "edges: writer units on Eye::x, which is written only by los_radar"])
+
+    def test_a_read_by_anyone_passes(self):
+        rows = {"edges": [("-", "sound", self.EXPLORED), ("los_radar", "ai", self.MAPPED)], "reads": [("-", "weapons", "Eye::pos")],
+                "presentation": [("-", "presentation", self.MAPPED)]}
         self.assertEqual(ps.violations(rows), [])
 
 

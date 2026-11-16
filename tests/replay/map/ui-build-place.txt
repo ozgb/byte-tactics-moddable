@@ -317256,7 +317256,7 @@ call 138 AddUnitToMap
   r Unit#1.posX 39767292
   r Unit#1.posZ 21615654
   a unit Unit#2
-  i los_radar.UpdateCellHeightRange (37,21) (6,6)
+  i services.SchedPublish 7 56
   i pathfinding.CellsChanged 36 20 42 26 1 2
   i pathfinding.CellsChanged 36 20 42 26 2 2
   i pathfinding.CellsChanged 36 20 42 26 4 2

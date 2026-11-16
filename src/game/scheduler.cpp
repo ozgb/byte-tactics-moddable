@@ -209,18 +209,55 @@ void SchedPlayersPhase(RandStream stream)
     }
     for (int player = 0; player < 10; player++) {
         SchedDeliver(SCHED_PLAYERS);
-        int step = g_seams.players->UpdatePlayerHead(player, stream);
+        if (g_seams.players->UpdatePlayerHead(player) == 0)
+            continue;
+        {
+            Player* owner = &g_game->players[player];
+#if BT_ACCESS_LOG
+            AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
+#endif
+            Unit* first = owner->unitsBegin;
+            if (first != nullptr) {
+                for (Unit* u = first; u <= owner->unitsEnd; u++) {
+#if BT_ACCESS_LOG
+                    AccessLogEntity();
+#endif
+                    if (u->flags & 0x10000000) {
+                        SchedDeliver(SCHED_LOS_RADAR);
+                        g_seams.los_radar->UpdateUnitLineOfSight(u);
+                    }
+                }
+            }
+        }
+        if ((unsigned char)player == g_game->playerIndex) {
+            SchedDeliver(SCHED_LOS_RADAR);
+            g_seams.los_radar->RecordRadarUnits();
+        }
+        SchedDeliver(SCHED_PLAYERS);
+        int step = g_seams.players->UpdatePlayerBody(player, stream);
         if (step == 0)
             continue;
         if (step == 2) {
             SchedDeliver(SCHED_ECONOMY);
             g_seams.economy->UpdatePlayerEconomy(player);
         }
+        if ((unsigned char)player == g_game->playerIndex) {
+            SchedDeliver(SCHED_LOS_RADAR);
+            g_seams.los_radar->UpdateSensorRadarAndCloak();
+            SchedDeliver(SCHED_LOS_RADAR);
+            g_seams.los_radar->RecordRadarMapped();
+        }
         SchedDeliver(SCHED_PLAYERS);
         g_seams.players->UpdatePlayerTail(player);
     }
     SchedDeliver(SCHED_PLAYERS);
     g_seams.players->UpdatePlayersFinish();
+}
+
+void SchedExpireEyeballs()
+{
+    SchedDeliver(SCHED_LOS_RADAR);
+    g_seams.los_radar->ExpireEyeballs();
 }
 
 void SchedWindPhase(RandStream stream)

@@ -10,7 +10,9 @@
 #include "../files/files_api.h"
 #include "players.h"
 #include "economy_events.h"
+#include "los_radar_events.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/rand_stream.h"
 #include "../util/tdf.h"
 
 struct Player;
@@ -401,7 +403,7 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 {
     for (Unit* u = range->unitsBegin; u <= range->unitsEnd; u++) {
         if (u->flags & 0x10000000) {
-            g_seams.los_radar->UpdateUnitLineOfSight(u);
+            LosRadarPublishUpdateUnit(SCHED_PLAYERS, u);
         }
     }
 }
@@ -468,7 +470,7 @@ static const float kHundred = 100.0f;
 #endif
 
 // FUNCTION: 0x464f80
-int __stdcall UpdatePlayerHead(int player, RandStream stream)
+int __stdcall UpdatePlayerHead(int player)
 {
     unsigned char bl = (unsigned char)player;
     if (!IsPlayerSlotInRange(bl))
@@ -504,23 +506,13 @@ int __stdcall UpdatePlayerHead(int player, RandStream stream)
 
     g_seams.ai->UpdatePlayerAI(bl);
 
-    {
-        Unit* u = pi->unitsBegin;
-#if BT_ACCESS_LOG
-        AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
-#endif
-        while (u <= pi->unitsEnd) {
-#if BT_ACCESS_LOG
-            AccessLogEntity();
-#endif
-            if (u->flags & 0x10000000)
-                g_seams.los_radar->UpdateUnitLineOfSight(u);
-            u = (Unit*)((char*)u + 0x118);
-        }
-    }
+    return 1;
+}
 
-    if (bl == g_game->playerIndex)
-        g_seams.los_radar->RecordRadarUnits();
+int __stdcall UpdatePlayerBody(int player, RandStream stream)
+{
+    unsigned char bl = (unsigned char)player;
+    Player* pi = &g_game->players[bl];
 
     if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
         return 0;
@@ -623,7 +615,7 @@ int __stdcall UpdatePlayerHead(int player, RandStream stream)
                                 float f = (float)self->metal * kHundred;
                                 EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f);
                             }
-                            g_seams.los_radar->RecalculateLineOfSight(1);
+                            LosRadarPublishRecalculate(SCHED_PLAYERS, 1);
                             RecordFocusCommander(1);
                         }
                     } else {
@@ -661,7 +653,7 @@ watch_check:
             if (bl == g_game->localPlayer) {
                 g_game->mapFlags &= 0xfffe;
                 g_game->mapFlags &= 0xfffd;
-                g_seams.los_radar->RecalculateLineOfSight(1);
+                LosRadarPublishRecalculate(SCHED_PLAYERS, 1);
                 g_seams.network->BroadcastPlayerInfo();
                 if (CountActiveAIPlayers() == 0) {
                     RecordWatchPrompt(bl);
@@ -708,8 +700,6 @@ void __stdcall UpdatePlayerTail(int player)
     unsigned char bl = (unsigned char)player;
     Player* pi = &g_game->players[bl];
     if (bl == g_game->playerIndex) {
-        g_seams.los_radar->UpdateSensorRadarAndCloak();
-        g_seams.los_radar->RecordRadarMapped();
         if (g_seams.map->GetGameType(g_game->net) == 3) {
             g_economyPacketTick++;
             if ((g_economyPacketTick & 3) == 0)

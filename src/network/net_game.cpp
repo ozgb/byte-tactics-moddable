@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/services.h"
 #include "../state/game_rand.h"
 #include "../state/sim_globals.h"
 #include "../util/tdf.h"
@@ -96,6 +97,7 @@ int GetTicks();
 #include "play_sound_packet.h"
 #include "../units/unit_commands.h"
 #include "../units/units.h"
+#include "../game/los_radar_events.h"
 #include "../game/game_state.h"
 void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
 void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
@@ -2636,7 +2638,7 @@ int HandleNetPackets()
                 TransferEnergy(a, b, share->amount, 0);
                 break;
             case 3:
-                ShareMapInfo(a, b);
+                LosRadarPublishShareMap(SCHED_ENGINE, a, b);
                 break;
             }
             break;

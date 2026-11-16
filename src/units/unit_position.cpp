@@ -84,6 +84,7 @@ struct Block {
 
 int __stdcall GetGroundHeight(Vec3* pos);
 #include "unit_targets.h"
+#include "../game/los_radar_events.h"
 #include "../../interfaces/seams.h"
 int __cdecl AngleOfVector(int x, int z);
 #include "../network/net_game.h"
@@ -170,7 +171,7 @@ int __stdcall SetUnitPosition(Unit* unit, Vec3 pos, int param_5)
         unit->cell = cell;
         unit->flags = (unit->flags & 0xfffffffc) | (short)(param_5 & 3);
         g_seams.map->AddUnitToMap(unit);
-        g_seams.los_radar->UpdateUnitLineOfSight(unit);
+        LosRadarPublishUpdateUnit(SCHED_UNITS, unit);
     }
     unit->flags |= 0x10000;
     return unit->flags;
@@ -433,7 +434,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         u->cell = np;
         u->mode = (unsigned int)(unsigned short)colour;
         g_seams.map->AddUnitToMap(u);
-        g_seams.los_radar->UpdateUnitLineOfSight(u);
+        LosRadarPublishUpdateUnit(SCHED_UNITS, u);
     }
     u->moved = 1;
     u->angles = tail;

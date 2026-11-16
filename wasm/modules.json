@@ -17,12 +17,12 @@
     "features": 3,
     "files": 2,
     "host": 2,
-    "los_radar": 2,
+    "los_radar": 3,
     "map": 3,
     "network": 1,
     "orders": 3,
     "pathfinding": 3,
-    "players": 1,
+    "players": 2,
     "rand_stream": 1,
     "ref": 2,
     "services": 1,
@@ -43,6 +43,7 @@
       "BankWriteBox": [["handle", "linear", "int"], "int"]
     },
     "los_radar": {
+      "Apply": [["linear"], "int"],
       "GetMapCell": [["int", "int"], "block"]
     },
     "network": {
@@ -73,7 +74,8 @@
       "SchedPublish": [["int", "linear", "int"], "void"],
       "HarnessEconomyEvent": [["linear", "int"], "void"],
       "HarnessFeaturesEvent": [["linear", "int"], "void"],
-      "HarnessTargetingEvent": [["linear", "int"], "void"]
+      "HarnessTargetingEvent": [["linear", "int"], "void"],
+      "HarnessLosRadarEvent": [["linear", "int"], "void"]
     },
     "targeting": {
       "Apply": [["linear"], "int"],

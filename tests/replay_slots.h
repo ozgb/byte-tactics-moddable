@@ -91,18 +91,6 @@ unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
     return ParseResult<unsigned int>(r);
 }
 
-void __stdcall Imp_los_radar_UpdateCellHeightRange(Point16 a0, Point16 a1)
-{
-    ReplayText t;
-    StartImport(t, "los_radar.UpdateCellHeightRange");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    ReplayValue(t, a1);
-    const char* r = Enter(t);
-    (void)r;
-}
-
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
 {
     ReplayText t;
@@ -1198,7 +1186,6 @@ void BindSeams()
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
-    g_import_los_radar.UpdateCellHeightRange = Imp_los_radar_UpdateCellHeightRange;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
     g_seams.units = &g_import_units;
     g_import_units.StartScript = Imp_units_StartScript;

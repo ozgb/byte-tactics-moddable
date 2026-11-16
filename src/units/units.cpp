@@ -15,6 +15,7 @@ class UnitResources;
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
 #include "../game/targeting_events.h"
+#include "../game/los_radar_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/services.h"
@@ -138,19 +139,6 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
         p->z.value = 0;
     else if (p->z.value >= MakeFixed(g_game->baseY).value)
         p->z = MakeFixed(g_game->baseY - 1);
-}
-
-// FUNCTION: 0x485420
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to)
-{
-    unsigned short fromBit = 1 << from;
-    unsigned short toBit = 1 << to;
-    int n = g_game->width * g_game->height / 4;
-    for (int i = 0; i < n; i++) {
-        unsigned short* p = &g_game->visibilityMask[i];
-        if (*p & fromBit)
-            *p |= toBit;
-    }
 }
 
 #include <iterator>
@@ -537,7 +525,7 @@ found:
             unit->killPending = 1;
         }
     }
-    g_seams.los_radar->RevealNewUnit(unit);
+    LosRadarPublishRevealUnit(SCHED_UNITS, unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
     g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
@@ -572,7 +560,7 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
     InitSpawnedUnit(spawn->type, spawn->pos, 0, unit);
     UpdateUnitHeight(unit);
     g_seams.map->AddUnitToMap(unit);
-    g_seams.los_radar->RevealNewUnit(unit);
+    LosRadarPublishRevealUnit(SCHED_UNITS, unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
     g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
@@ -708,7 +696,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         return;
 
     if (unit->player->index == g_game->playerIndex)
-        g_seams.los_radar->AddEyeball((Vec3*)&unit->pos, unit->def->range, unit->def->modelMaxYHigh, 60);
+        LosRadarPublishAddEyeball(SCHED_UNITS, &unit->pos, unit->def->range, unit->def->modelMaxYHigh, 60);
     Unit* parent;
     if (cmd->attackerUnitId == 0)
         parent = 0;
@@ -730,7 +718,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     }
     g_seams.map->ClearFootprintAndUnlink(unit);
     if ((g_game->mapFlags & 2) == 2)
-        g_seams.los_radar->RemoveUnitLineOfSight(unit);
+        LosRadarPublishRemoveUnit(SCHED_UNITS, unit);
     if (local == 0 && cmd->cobKilledSeverity > 0)
         ((CobScript*)unit->script.get())->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
 

@@ -110,6 +110,7 @@ void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount
 void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 #include "../network/net_game.h"
 #include "../units/units.h"
+#include "../game/los_radar_events.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "../units/unit_commands.h"
 #include "game_dialogs.h"
@@ -241,7 +242,7 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
             if (GetButtonStageByName(obj, "SHARUNIT"))
                 GiveSelectedUnitsToPlayer(pi);
             if (GetButtonStageByName(obj, "MAPINFO")) {
-                ShareMapInfo(g_game->localPlayer, pi);
+                LosRadarPublishShareMap(SCHED_ENGINE, g_game->localPlayer, pi);
                 SendShareMapInfo(g_game->localPlayer, pi);
             }
         }
@@ -1104,7 +1105,7 @@ void __stdcall RunGameSteps(int showStats)
         Player* shown = &g_game->players[g_game->playerIndex];
         if (shown->displayTimer < g_game->ticks)
             shown->displayTimer += 0x1e;
-        g_seams.los_radar->ExpireEyeballs();
+        SchedExpireEyeballs();
 
         if ((showStats && g_usePacketManager != 0) || HarnessSharing()) {
 #if BT_ACCESS_LOG

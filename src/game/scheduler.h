@@ -22,6 +22,7 @@ void SchedEndTick();
 void SchedUnitsPhase();
 void SchedFeaturesPhase();
 void SchedPlayersPhase(RandStream stream);
+void SchedExpireEyeballs();
 void SchedWindPhase(RandStream stream);
 void SchedMeteorsPhase();
 

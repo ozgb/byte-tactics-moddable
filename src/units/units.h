@@ -8,7 +8,6 @@ struct Player;
 struct Unit;
 struct Vec3;
 
-void __stdcall ShareMapInfo(unsigned char from, unsigned char to);
 void __stdcall AllocateUnitMemory(void);
 int __stdcall ComparePlayers(Player* a, Player* b);
 void __stdcall FreeUnitMemory(void);

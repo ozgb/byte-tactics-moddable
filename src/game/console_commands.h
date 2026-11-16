@@ -62,6 +62,8 @@ void __stdcall CmdShadow(int unused);
 void __stdcall CmdDither(int unused);
 void __stdcall CmdTShadow(int unused);
 void __stdcall CmdFShadow(int unused);
+void __stdcall ConsoleShareMapping(int unused);
+void __stdcall ConsoleShareRadar(int unused);
 void __stdcall CmdLOSType(int unused);
 void __stdcall CmdRCache(int unused);
 void __stdcall CmdCDStop(int unused);

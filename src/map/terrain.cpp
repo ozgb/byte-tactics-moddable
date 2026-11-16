@@ -67,7 +67,9 @@ public:
 #include "../../link/globals.h"
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
+#include "../game/los_radar_events.h"
 #include "../../interfaces/map.h"
+#include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
 // FUNCTION: 0x47c790
@@ -307,7 +309,7 @@ void __stdcall AddUnitToMap(Unit* obj)
             Point16 pad;
             pad.x = obj->cell.x - 1;
             pad.y = obj->cell.y - 1;
-            g_seams.los_radar->UpdateCellHeightRange(pad, grown);
+            LosRadarPublishCellHeights(SCHED_MAP, pad, grown);
             RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
             return;
         }
@@ -399,7 +401,7 @@ void __stdcall RemoveUnitFromMap(Unit* obj)
             Point16 pad;
             pad.x = obj->cell.x - 1;
             pad.y = obj->cell.y - 1;
-            g_seams.los_radar->UpdateCellHeightRange(pad, grown);
+            LosRadarPublishCellHeights(SCHED_MAP, pad, grown);
         } else if ((obj->flags & 3) == 1) {
             for (int j = size.y; j > 0; j--) {
                 for (int i = size.x; i > 0; i--) {

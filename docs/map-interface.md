@@ -25,8 +25,8 @@ Map's place in it:
 - **Events into map:** ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT, RECLAIM_FOOTPRINT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND,
   REFRESH_PASS_MAP and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name.
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
-  `MapOnFeaturesPassMaps` (`src/map/map_features_effects.cpp`), the route #971 added, which now builds a PASS_MAPS
-  event and hands it to the same handler.
+  `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
+  it moved from map's files into the same glue, as it is the engine's adapter.
 - **Routes:** all eleven routes into map are synchronous: seven because the gate diverged with them queued, units'
   ADD_UNIT and BUCKET_PREPEND by #952's rule, features' PASS_MAPS as #971 left it, and RECLAIM_FOOTPRINT because no
   scenario reaches it (sections 4 and 8). Of map's two effects, CELLS_CHANGED is synchronous by #952's rule and
@@ -108,7 +108,7 @@ can.
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
 inside map's. Map 4.0's `UnitsInRange` writes the ids of the units in range to a buffer the caller gives, in the
 same order, skipping the first `skip` of them, and returns how many it wrote, at most the buffer's capacity, as
-pathfinding's `Poll` fills a caller's buffer. The engine's `VisitUnitsInRange` (`src/seams/map_world.cpp`) pages
+pathfinding's `Poll` fills a caller's buffer. The service `VisitUnitsInRange` (services 1.16, `src/seams/map_world.cpp`) pages
 through it, 256 ids at a time, and calls the visitor for each unit, so its callers (orders' patrol and repair
 orders, the victory condition `VictoryMoveUnitToRadius`, los_radar's `UpdateSensorRadarAndCloak`) keep their
 visitors. The order is 3.1c's because no visitor moves a unit or publishes to map: they count, collect or test the
@@ -180,7 +180,7 @@ Map's CELL_HEIGHTS to los_radar, published by ADD_UNIT and REMOVE_UNIT for a bui
 phase can see a difference while it is pending (`docs/los-radar-interface.md`, section 4).
 
 **What others read of map:**
-- **Queries:** `UnitsInRange` (through the engine's `VisitUnitsInRange`), `GetCellMeanHeight` (features, players,
+- **Queries:** `UnitsInRange` (through the service `VisitUnitsInRange`), `GetCellMeanHeight` (features, players,
   weapons),
   `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` (orders), `GetGameType`, `GetNameSlot`.
 - **Views:** the footprint fields of the cells; `Unit::spatialBucket` and `overflowBucket` (orders, units); the claim
@@ -245,11 +245,13 @@ what only its owner reads, for los_radar, players, ai and map in one format bump
 | The placement record: `g_lastPlaceMetalSum` | sim globals, hashed | map, ai | no |
 | The placement record: `g_lastPlaceHeight` | sim globals, hashed | map (the sim); presentation's `movies.cpp` | yes, in the simulation |
 
-`privatestate.py --check` fails when another subsystem writes any of the items map alone writes: the spatial grid,
-`Unit::spatialBucket`, the bucket heads (`UnitBucket::first`, `SpatialBucket::head`), `overflowBucket` and the
-placement record. The cells are not listed (presentation, features and los_radar write other fields of the same
-records, and the access log names them as one item), nor are `Unit::cargoNext` and `Unit::flags`, which units writes
-too.
+`privatestate.py --check` fails when another subsystem writes any of the items map alone writes: `Unit::spatialBucket`,
+the bucket heads (`UnitBucket::first`, `SpatialBucket::head`), the pass maps and the placement record
+(`g_lastPlaceHeight`, `g_lastPlaceMetalSum`). The bucket array (`cells_1429f`) and `overflowBucket` are not listed:
+los_radar allocates and frees them with the map's other layers, outside the tick (`BuildDerivedLayers`,
+`FreeMapResources`). The cells are not listed (presentation, features and los_radar write other fields of the same
+records, and the access log names them as one item), nor are `Unit::cargoNext`, `Unit::flags`, `Unit::bit2` and
+`Unit::cobStateFlags`, which units writes too.
 
 **The trace dumps map's events** in section 40 (`docs/trace-format.md`, section 8.28), after los_radar's section 39,
 and hashes none of them. Each record is an event with the outcome `Apply` gave, or a CELLS_CHANGED map published, in
@@ -295,8 +297,8 @@ tick, phase and field.
 | units REFRESH_PASS_MAP | diverged | mission-radius, tick 60, world phase: `pathfinder.used` (reference 0x1f1, queued 0x1d9), then unit 1's path (`units[1].motion.goal`). |
 | map CELLS_CHANGED | equal | none (synchronous by #952's rule, section 4) |
 
-With every route as above, the tier was equal (38 of 38 scenarios), and the full suite in both modes is the gate of
-this change (the pull request says its result).
+With every route as above, the tier was equal (38 of 38 scenarios), and so was the full suite in both modes (178 of
+178 games), the gate of this change.
 
 **How often each route is taken.** A build that counts every publish into and out of map, over the 89 scenarios with
 native modules: the events published inside the tick and outside it (when a game is set up or loaded), and in how
@@ -304,18 +306,18 @@ many scenarios each was published at all.
 
 | Route | Inside the tick | Scenarios | Outside the tick | Scenarios |
 |---|---|---|---|---|
-| units ADD_UNIT | 1,980 | 55 | 1,424 | 89 |
-| orders ADD_UNIT | 287,978 | 77 | 0 | 0 |
+| units ADD_UNIT | 2,050 | 55 | 1,424 | 89 |
+| orders ADD_UNIT | 349,229 | 77 | 0 | 0 |
 | units REMOVE_UNIT | 58 | 5 | 0 | 0 |
-| orders REMOVE_UNIT | 287,978 | 77 | 0 | 0 |
-| units CLEAR_UNIT | 881 | 35 | 4 | 1 |
+| orders REMOVE_UNIT | 349,229 | 77 | 0 | 0 |
+| units CLEAR_UNIT | 937 | 35 | 4 | 1 |
 | units RECLAIM_FOOTPRINT | 0 | 0 | 0 | 0 |
-| units SET_YARD | 1,547 | 23 | 0 | 0 |
-| units BUCKET_UNLINK | 449 | 25 | 23 | 2 |
-| units BUCKET_PREPEND | 372 | 18 | 0 | 0 |
-| units REFRESH_PASS_MAP | 36,203 | 75 | 0 | 0 |
-| map CELLS_CHANGED | 105,044 | 80 | 21,557 | 29 |
-| map CELL_HEIGHTS | 1,790 | 58 | 337 | 27 |
+| units SET_YARD | 1,775 | 23 | 0 | 0 |
+| units BUCKET_UNLINK | 488 | 25 | 23 | 2 |
+| units BUCKET_PREPEND | 414 | 18 | 0 | 0 |
+| units REFRESH_PASS_MAP | 44,107 | 75 | 0 | 0 |
+| map CELLS_CHANGED | 116,056 | 80 | 21,557 | 29 |
+| map CELL_HEIGHTS | 1,848 | 58 | 337 | 27 |
 
 Features' PASS_MAPS is not counted here: it reaches map through features' effect (`docs/features-interface.md`).
 

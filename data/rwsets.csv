@@ -16941,6 +16941,7 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,IsConnected
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,KillFeature
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,LocalPlayer
+0x453d40,HandleNetPackets,src/network/net_game.cpp,call,LosRadarPublishShareMap
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,PacketManager::HandleIntegrityNop
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,PacketManager::SendAllQueued
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,PlaySoundAt
@@ -16957,7 +16958,6 @@ address,function,file,kind,target
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,SendPacketToPlayer
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,SetAlliance
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,SetGameSpeed
-0x453d40,HandleNetPackets,src/network/net_game.cpp,call,ShareMapInfo
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,StartFeatureBurning
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,TransferEnergy
 0x453d40,HandleNetPackets,src/network/net_game.cpp,call,TransferMetal
@@ -26412,15 +26412,15 @@ address,function,file,kind,target
 0x4853b0,ClampPositionToMap,src/units/units.cpp,field_write,Fixed::value
 0x4853b0,ClampPositionToMap,src/units/units.cpp,function,
 0x4853b0,ClampPositionToMap,src/units/units.cpp,global_read,g_game
-0x485420,ShareMapInfo,src/units/units.cpp,call,operator unsigned short *
-0x485420,ShareMapInfo,src/units/units.cpp,deref_escape,*unsigned short
-0x485420,ShareMapInfo,src/units/units.cpp,deref_read,*unsigned short
-0x485420,ShareMapInfo,src/units/units.cpp,deref_write,*unsigned short
-0x485420,ShareMapInfo,src/units/units.cpp,field_read,Game::height
-0x485420,ShareMapInfo,src/units/units.cpp,field_read,Game::visibilityMask
-0x485420,ShareMapInfo,src/units/units.cpp,field_read,Game::width
-0x485420,ShareMapInfo,src/units/units.cpp,function,
-0x485420,ShareMapInfo,src/units/units.cpp,global_read,g_game
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,call,operator unsigned short *
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,deref_escape,*unsigned short
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,deref_read,*unsigned short
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,deref_write,*unsigned short
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,field_read,Game::height
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,field_read,Game::visibilityMask
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,field_read,Game::width
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,function,
+0x485420,ShareMapInfo,src/map/line_of_sight.cpp,global_read,g_game
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,SimAllocTagged
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,get
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,memset
@@ -30353,11 +30353,11 @@ address,function,file,kind,target
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,IsCurrentGadgetNamed
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,IsPlayerAlive
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,IsPlayerInGame
+0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,LosRadarPublishShareMap
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,MarkChanged
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,PlaySoundByName
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,ReadSliderValue
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,SendShareMapInfo
-0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,ShareMapInfo
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,TransferEnergy
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,TransferMetal
 0x4934b0,HandleShareDialogEvent,src/ingame/game_dialogs.cpp,call,operator->
@@ -43045,6 +43045,7 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RecalculateLineOfSight
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RemoveUnitLineOfSight
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,RevealNewUnit
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,ShareMapInfo
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,UpdateCellHeightRange
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,UpdateUnitLineOfSight
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEvent::cell
@@ -50582,6 +50583,11 @@ address,function,file,kind,target
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,call,SchedPublish
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,field_write,LosRadarEvent::value
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,function,
+,LosRadarPublishShareMap,src/game/los_radar_events.h,call,LosRadarEventOf
+,LosRadarPublishShareMap,src/game/los_radar_events.h,call,SchedPublish
+,LosRadarPublishShareMap,src/game/los_radar_events.h,field_write,LosRadarEvent::player
+,LosRadarPublishShareMap,src/game/los_radar_events.h,field_write,LosRadarEvent::value
+,LosRadarPublishShareMap,src/game/los_radar_events.h,function,
 ,LosRadarPublishShareMapping,src/game/los_radar_events.h,call,LosRadarEventOf
 ,LosRadarPublishShareMapping,src/game/los_radar_events.h,call,SchedPublish
 ,LosRadarPublishShareMapping,src/game/los_radar_events.h,field_write,LosRadarEvent::player

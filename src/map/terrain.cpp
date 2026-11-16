@@ -70,7 +70,6 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../game/los_radar_events.h"
 #include "../../interfaces/map.h"
 #include "spatial_bucket.h"
-#include "unit_visitor.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 

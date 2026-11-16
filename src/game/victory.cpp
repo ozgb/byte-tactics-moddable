@@ -91,7 +91,6 @@ extern Game* g_game;
 
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
 
 static inline void AddCondition(Ref<MissionCondition>* list, int* count, MissionCondition* value)
 {

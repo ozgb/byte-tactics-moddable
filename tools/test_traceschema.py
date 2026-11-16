@@ -304,6 +304,17 @@ class SchemaJsonTest(unittest.TestCase):
         for f in los_radar["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
+    def test_map_section_names_its_fields_in_dump_order(self):
+        map_ = self.model["map"]
+        self.assertEqual(map_["section"], 40)
+        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in map_["fields"]],
+                         [("kind", 4, "scalar", None), ("unit", 4, "ref", "unit"), ("value", 4, "scalar", None),
+                          ("cell", 8, "bytes", None), ("size", 8, "bytes", None), ("rect", 16, "bytes", None),
+                          ("classes", 4, "scalar", None), ("cause", 4, "scalar", None), ("outcome", 4, "scalar", None)])
+        targets = {t["name"] for t in self.model["targets"]}
+        for f in map_["fields"]:
+            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
         self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])

@@ -1671,5 +1671,19 @@
       {"name": "size", "size": 8, "kind": "bytes", "target": null},
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ]
+  },
+  "map": {
+    "section": 40,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "value", "size": 4, "kind": "scalar", "target": null},
+      {"name": "cell", "size": 8, "kind": "bytes", "target": null},
+      {"name": "size", "size": 8, "kind": "bytes", "target": null},
+      {"name": "rect", "size": 16, "kind": "bytes", "target": null},
+      {"name": "classes", "size": 4, "kind": "scalar", "target": null},
+      {"name": "cause", "size": 4, "kind": "scalar", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

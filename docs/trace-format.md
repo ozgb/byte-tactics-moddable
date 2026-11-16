@@ -1253,11 +1253,12 @@ for k in 0 .. n-1, in application order:
 `los_radar.count` and the numbers of a record are written as `0x` and 8 hex digits.
 
 - `kind` is an event: 128 UPDATE_UNIT, 129 REMOVE_UNIT, 130 REVEAL_UNIT, 131 ADD_EYEBALL, 132 CELL_HEIGHTS,
-  133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR.
+  133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR, 136 SHARE_MAP.
 - `unit` is the unit whose line of sight changes, a pointer ID with target `unit` (section 5): `units:N`,
   `null`, or `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
-- `player` is the player of SHARE_MAPPING and SHARE_RADAR, 0 to 9; `value` is the argument of RECALCULATE, 1
-  when each cell is first reset to show nothing to every player. Fields a kind does not use are 0.
+- `player` is the player of SHARE_MAPPING and SHARE_RADAR and the player whose map SHARE_MAP shares, 0 to 9;
+  `value` is the argument of RECALCULATE, 1 when each cell is first reset to show nothing to every player, and
+  for SHARE_MAP the player it shows the map to, 0 to 9. Fields a kind does not use are 0.
 - `pos`, `sightDistance`, `eyeHeight` and `lifetime` are those of an ADD_EYEBALL: the position in world
   coordinates with 16 fractional bits, x, y and z, the sight distance and the height of the eye above the
   position, in world units, and the lifetime in ticks.

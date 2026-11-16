@@ -500,7 +500,7 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 ```
 
 `--tier` is the same `--check` restricted to the 38 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 37,450 ticks of the 367,240 that the suite's 88 scenarios play (10.2%), none longer than 9000.
+`tools/reference.py`, 37,450 ticks of the 373,200 that the suite's 89 scenarios play (10.0%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how

@@ -1607,6 +1607,11 @@ int __stdcall ApplyTargetingSlot(const TargetingEvent* event)
     return ApplyTargetingEvent(event);
 }
 
+int __stdcall ApplyMapEventSlot(const MapEvent* event)
+{
+    return ApplyMapEvent(event);
+}
+
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);

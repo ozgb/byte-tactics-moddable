@@ -458,7 +458,7 @@ TargetingSeam g_native_targeting = {
 };
 
 MapSeam g_native_map = {
-    ApplyMapEvent,
+    ApplyMapEventSlot,
     UnitsInRange,
     GetCellMeanHeight,
     GetGameTypeSlot,

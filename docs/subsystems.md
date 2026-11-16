@@ -102,11 +102,10 @@ Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live 
 
 Issue #11. 49 functions. Economy is on interface 4.0 behind the scheduler (#937): the per-unit resource accounts are private to the module, in a region the engine allocates at the size `RegionSize` asks for and hands to `Init`, and every write another subsystem makes to economy's state is an `EconomyEvent` that the scheduler (`src/game/scheduler.cpp`) applies through `Apply`. Economy reaches the rest of the game through a world view (`src/seams/economy_world.cpp`) and hands its effects (cloak, extractor speed, sharing) back through `Emit`. The module holds the income step `EconomyUpdatePlayer`, metal extraction, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`).
 
-Coverage: 92.3% of functions (48 of 52), 89.6% of lines, 73.5% of branches; 4 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
+Coverage: 92.3% of functions (48 of 52), 89.6% of lines, 73.5% of branches; 3 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (4 of 52 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445), and `share-metal`, `share-energy` and `share-all` (#953); 48 are entered, 92.3%), by reason:
+**Live functions no scenario enters** (3 of 52 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445), and `share-metal`, `share-energy` and `share-all` (#953); 48 are entered, 92.3%), by reason:
 
-- Share dialog or network only (1): `ShareMapInfo` (the map-share button of the ally share dialog, or a share packet).
 - Shutdown only (1): `EconomyShutdown` (the seam's `Shutdown`, called from `ShutdownIngameSystems`). Test mode ends with `host_exit(0)` right after the last tick, so no scenario runs the shutdown.
 - Test only (1): `EconomyWriteState`. The seam's `WriteState` writes economy's report (record 34, `economyState`), which the harness dumps but does not hash, and only at the tick `-testdump` names; the coverage run does not pass it.
 - No caller in the game (1): `RequestMetalOn`. `Apply` grants a REQUEST for metal alone through it, but the game requests only energy, or energy and metal together.
@@ -152,7 +151,7 @@ Coverage: 92.3% of functions (48 of 52), 89.6% of lines, 73.5% of branches; 4 li
 **Open questions.**
 
 - Which subsystem owns the per-player account fields? A state-block struct for the accounts that economy writes and players and network only read would match the data better than the `Player` struct.
-- `GetMapCell`, `ShareMapping` and `ShareRadar` are imports from los_radar: resource sharing also shares vision. Does that sharing belong to los_radar's interface or to economy's?
+- Resolved by #965: the sharing of vision is los_radar's. `ShareAll` publishes SHARE_MAPPING and SHARE_RADAR to los_radar's inbox, and economy imports nothing from los_radar (`docs/los-radar-interface.md`).
 
 ## features
 
@@ -431,10 +430,11 @@ Coverage: 100.0% of functions (10 of 10), 96.2% of lines, 82.9% of branches; 0 l
 
 Issue #17. 89 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 95.5% of functions (63 of 66), 89.8% of lines, 77.6% of branches; 3 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
+Coverage: 95.5% of functions (63 of 66), 89.8% of lines, 77.6% of branches; 4 live functions no scenario enters, and 21 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (3 of 66 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 63 are entered, 95.5%), by reason:
+**Live functions no scenario enters** (4 of 66 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 63 are entered, 95.5%), by reason:
 
+- Share dialog or network only (1): `ShareMapInfo` (the map-share button of the ally share dialog, or a share packet).
 - Shutdown only (1): `FreeMapResources`. It is called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick.
 - Network only (2): `CmdShareMapping` and `CmdShareRadar` (the share commands, which all check `netGameFlags & 1`, a network game). Test mode runs a skirmish.
 - Entered by the console: `CmdLOS`, `CmdLOSType` and `CmdRadar`, by `console-sight` (#445).
@@ -736,13 +736,13 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 0 of 15 | 0.0% | 0.0% | 0.0% | 15 | 0 |
-| **economy** | 48 of 52 | 92.3% | 89.6% | 73.5% | 4 | 3 |
+| **economy** | 48 of 52 | 92.3% | 89.6% | 73.5% | 3 | 3 |
 | **features** | 55 of 56 | 98.2% | 86.4% | 73.5% | 1 | 4 |
 | **ai** | 91 of 102 | 89.2% | 88.8% | 83.7% | 11 | 33 |
 | **pathfinding** | 67 of 76 | 88.2% | 82.1% | 69.5% | 9 | 10 |
 | **weapons** | 81 of 94 | 86.2% | 86.9% | 71.7% | 13 | 17 |
 | **targeting** | 10 of 10 | 100.0% | 96.2% | 82.9% | 0 | 1 |
-| **los_radar** | 63 of 66 | 95.5% | 89.8% | 77.6% | 3 | 21 |
+| **los_radar** | 63 of 66 | 95.5% | 89.8% | 77.6% | 4 | 21 |
 | **orders** | 309 of 370 | 83.5% | 81.9% | 64.8% | 61 | 25 |
 | **units** | 160 of 194 | 82.5% | 86.5% | 74.4% | 34 | 32 |
 | **players** | 99 of 146 | 67.8% | 70.2% | 62.7% | 47 | 10 |

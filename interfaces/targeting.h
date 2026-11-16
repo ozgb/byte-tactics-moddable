@@ -31,11 +31,11 @@ enum TargetingEffectKind {
 struct TargetingEvent {
     // A TargetingEventKind or a TargetingEffectKind.
     int kind;
-    // The unit whose weapon aims, as the handle economy's events use.
+    // The unit whose weapon aims, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
     unsigned int unit;
     // The weapon of the unit, 0 to 2.
     int weapon;
-    // The unit aimed at, as the same handle.
+    // The unit aimed at, as its block offset.
     unsigned int target;
     // The position aimed at, in world coordinates with 16 fractional bits.
     int pos[3];

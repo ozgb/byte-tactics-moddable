@@ -498,8 +498,10 @@ it compares the runs that differed.
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--tier` is the same `--check` restricted to the 32 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 34,630 ticks of the suite's 364,120 (9.5%), none longer than 9000. It is the
+`--tier` is the same `--check` restricted to the 38 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 37,450 ticks of the 367,240 that the suite's 88 scenarios play (10.2%), none longer than 9000.
+A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
+victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
 many scenarios were equal and at which commit; a failure prints the same `tools/tracediff.py` report
 as the full run. `--tier` goes with `--check` and `--exe`, and `--traces` rejects it. It checks the
@@ -517,9 +519,9 @@ added or removed and when the tier changes.
 
 With the ten `mission-` scenarios of #764 in the suite, the rule takes `mission-build-unit`, `mission-capture`,
 `mission-defeat-passes-x`, `mission-kill-mobile`, `mission-kill-of-type`, `mission-passes-x` and `mission-passes-z`, and no longer needs
-`conditions-dark-side`, `mission-victory` and `orders-guard-attacked`, which stay in the tier. Only `mission-kill-mobile` and
-`mission-kill-of-type` are in it: the other five draw extra numbers from the view random stream before tick 1, so their UI logs
-sometimes differ under load, and they wait for #829.
+`conditions-dark-side`, `mission-victory` and `orders-guard-attacked`, which stay in the tier. All seven are in it:
+the five that draw extra numbers from the view random stream before tick 1 joined `mission-kill-mobile` and
+`mission-kill-of-type` once #829 made their UI logs stable under load.
 
 `share-all` (#953) is in the tier by hand: it is the only scenario of the tier that shares resources with an ally, so
 without it the tier would never enter the resource sharing of a network game.
@@ -547,8 +549,13 @@ upper bound. Replay parts pick their recordings from it.
 | eight-full-moon | 8 | 9000 |
 | hailstorm-los-off | 2 | 150 |
 | load-midgame | 0 | 900 |
+| mission-build-unit | 0 | 180 |
+| mission-capture | 0 | 660 |
+| mission-defeat-passes-x | 0 | 270 |
 | mission-kill-mobile | 0 | 360 |
 | mission-kill-of-type | 0 | 360 |
+| mission-passes-x | 0 | 510 |
+| mission-passes-z | 0 | 240 |
 | mission-radius | 0 | 2700 |
 | mission-victory | 0 | 360 |
 | orders-air | 2 | 4600 |

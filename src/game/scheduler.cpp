@@ -216,13 +216,16 @@ void SchedPlayersPhase(RandStream stream)
 #if BT_ACCESS_LOG
             AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
 #endif
-            for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
+            Unit* first = owner->unitsBegin;
+            if (first != nullptr) {
+                for (Unit* u = first; u <= owner->unitsEnd; u++) {
 #if BT_ACCESS_LOG
-                AccessLogEntity();
+                    AccessLogEntity();
 #endif
-                if (u->flags & 0x10000000) {
-                    SchedDeliver(SCHED_LOS_RADAR);
-                    g_seams.los_radar->UpdateUnitLineOfSight(u);
+                    if (u->flags & 0x10000000) {
+                        SchedDeliver(SCHED_LOS_RADAR);
+                        g_seams.los_radar->UpdateUnitLineOfSight(u);
+                    }
                 }
             }
         }

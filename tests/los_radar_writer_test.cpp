@@ -521,8 +521,8 @@ static void CheckRejected()
     LosRadarEvent noUnit = LosRadarEventOf(LOS_RADAR_UPDATE_UNIT);
     LosRadarEvent badPlayer = LosRadarEventOf(LOS_RADAR_SHARE_MAP);
     badPlayer.player = 10;
-    LosRadarEvent unknownKind = LosRadarEventOf(127);
-    const LosRadarEvent* rejected[] = { &noUnit, &badPlayer, &unknownKind };
+    LosRadarEvent badKind = LosRadarEventOf(127);
+    const LosRadarEvent* rejected[] = { &noUnit, &badPlayer, &badKind };
     for (const LosRadarEvent* e : rejected)
         Check(g_seams.los_radar->Apply(e) == 0, "an event with a null unit, a player outside 0 to 9 or an unknown kind has outcome 0");
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");

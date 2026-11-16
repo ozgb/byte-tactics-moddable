@@ -182,6 +182,7 @@ seeds) and runs deterministically: two runs give identical traces.
 
 | Name | Map | Players | Ticks | Covers |
 | --- | --- | ---: | ---: | --- |
+| ai-antinuke-intercept | The Pass | 2 | 5960 | A computer player's anti-nuke silo with a stockpiled missile intercepts a nuke a human silo launches into its coverage (`ai 1` hands slot 1 to the computer after its `qbuild MAKEANTI`), so the squad manager's retargeting of an interceptor finds a projectile and aims at it |
 | allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
 | commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
 | console-economy | The Pass | 2 | 200 | Console: resources (`atm`, `nometal`, `noenergy`, `give`), the share commands, the AI toggle (`ai`) and the player switches (`control`, `view`) |

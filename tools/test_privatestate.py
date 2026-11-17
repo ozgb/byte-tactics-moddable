@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_and_players(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_players_and_ai(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai"])
 
 
 class TargetingOwnerTest(unittest.TestCase):
@@ -223,6 +223,31 @@ class PlayersOwnerTest(unittest.TestCase):
     def test_a_read_by_anyone_passes(self):
         rows = {"edges": [("-", "orders", "Player::winLoseTime"), ("players", "ai", "MissionConditions::active")],
                 "presentation": [("-", "presentation", "Player::updateTime")]}
+        self.assertEqual(ps.violations(rows), [])
+
+
+class AiOwnerTest(unittest.TestCase):
+    def test_the_records_the_squads_and_the_three_items_are_private_for_writes_only(self):
+        for item in ("PlayerAI::lastTick", "KeyedCell::key", "SquadManager::nextAction", "SquadTimer::next", "AssaultTimer::attacking", "SpatialTimer::best",
+                     "Group::units", "Player::groups", "g_aiCommandsEnabled", "g_playerAI"):
+            self.assertEqual(ps.private_to(item), ("ai", ("writer",)), item)
+
+    def test_the_group_of_a_unit_and_the_ai_of_a_player_are_not_private(self):
+        for item in ("Unit::group", "Player::ai", "Player::econ"):
+            self.assertFalse(ps.is_private(item), item)
+
+    def test_an_ai_write_passes(self):
+        rows = {"edges": [("ai", "units", "Player::groups"), ("ai", "-", "g_aiCommandsEnabled")], "cross": [("ai", "orders", "SquadManager::countdown")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("units", "ai", "Player::groups"), ("players", "-", "g_playerAI")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer players on g_playerAI, which is written only by ai",
+                          "edges: writer units on Player::groups, which is written only by ai"])
+
+    def test_a_read_by_anyone_passes(self):
+        rows = {"edges": [("-", "orders", "g_aiCommandsEnabled"), ("-", "ai", "Group::units")]}
         self.assertEqual(ps.violations(rows), [])
 
 

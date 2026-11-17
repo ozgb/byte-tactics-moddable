@@ -43,7 +43,7 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
 data/rwsets.csv and the owners of data/subsystems.csv.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
-features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
+features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
 slots, engine and allowed indirect calls. It fails, for each pilot, on:
 
@@ -53,7 +53,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
-                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
+                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp, src/seams/players_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
                 (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
@@ -67,12 +67,15 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   targeting     none
                   los_radar     none
                   map           none
+                  players       RunGameSteps (src/ingame/game_dialogs.cpp), which runs UpdateBlink, and LoadMatch (src/game/game_load.cpp), which runs
+                                UpdatePlayersOnStream on the load stream
                 Features' writing slots are UpdateFeatures (the phase slot), Apply, Place, AnimateFeatureType,
                 ScanFeatureCell and UpdateFeatureSpot; targeting's are Apply, GetWeaponTargetPos, FindWeaponTarget and
                 FindBestTargetIfFireAtWill; los_radar's are Apply and the passes the scheduler runs, UpdateUnitLineOfSight, RecordRadarUnits,
                 UpdateSensorRadarAndCloak, RecordRadarMapped and ExpireEyeballs; map's are Apply and the synchronous CanBuildAt, CanPlaceUnitFootprint and
                 PickRandomReclaimableResourcesInRadius, which the services ScheduleMapCanBuildAt, ScheduleMapCanPlaceUnitFootprint and ScheduleMapPickReclaimable
-                (src/seams/map_world.cpp) reach for the other subsystems. A presentation or unowned function fails like any other.
+                (src/seams/map_world.cpp) reach for the other subsystems; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
+                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -91,6 +94,12 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 LoadBattleAssets and ShutdownGame (src/game/game_state.cpp), LoadGameScreenHandler (src/game/savegame.cpp), LoadMatch and LoadingScreenFrame
                 (src/game/game_load.cpp), LoadSavedGameState and SaveGameFile (src/game/settings_campaign.cpp), LoadSettings (src/game/settings.cpp),
                 RunEndGameState (src/frontend/endgame.cpp) and UpdateBattleRoom (src/frontend/multi.cpp).
+                Players' set-up slots, LoadDefaultAIScript, InitPlayers, FreePlayers, InitPlayerResources, LoadPlayerControllers, LoadPlayers, SavePlayers, RebuildAIFeatureCells,
+                SetupPlayerSlot and the conditions slots (DeactivateConditions, LoadConditions, SaveConditions, RegisterConditions, FreeConditions, DeleteConditions,
+                NewConditions), run outside the tick, from the loader, the menus, the saved game and the console; their callers are ApplySlotsToGamePlayers
+                (src/frontend/skirmish_menu.cpp), CampaignSetupFrame (src/game/main_loop.cpp), CmdKill (src/game/console_commands.cpp), CreateMissionUnits
+                (src/units/unit_commands.cpp), LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp), LoadMatch (src/game/game_load.cpp), LoadSavedGameState and
+                SaveGameFile (src/game/settings_campaign.cpp), Mission::LoadMission and Mission::~Mission (src/map/map_list.cpp) and ResetAIPlayers (src/ai/ai_player.cpp, which the console runs).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
                 FirstFeatureSpot; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
@@ -187,6 +196,7 @@ FEATURES_GLUE_FILE = "src/seams/features_world.cpp"
 TARGETING_GLUE_FILE = "src/seams/targeting_world.cpp"
 LOS_RADAR_GLUE_FILE = "src/seams/los_radar_world.cpp"
 MAP_GLUE_FILE = "src/seams/map_world.cpp"
+PLAYERS_GLUE_FILE = "src/seams/players_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -287,7 +297,23 @@ MAP = Pilot(
                    ("ReturnToMainMenuFrame", "src/game/main_loop.cpp"), ("RunEndGameState", "src/frontend/endgame.cpp"),
                    ("SaveGameFile", "src/game/settings_campaign.cpp"), ("ShutdownGame", "src/game/game_state.cpp"),
                    ("SpawnCommanderAtStartPos", "src/game/main_loop.cpp"), ("UpdateBattleRoom", "src/frontend/multi.cpp")))
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP)
+PLAYERS = Pilot(
+    owner="players", header="interfaces/players.h", seam="PlayersSeam",
+    writing=("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody", "UpdatePlayerTail", "UpdatePlayersFinish",
+             "UpdateBlink"),
+    query=(),
+    engine_files=(SCHEDULER_FILE, PLAYERS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"), ("LoadMatch", "src/game/game_load.cpp")),
+    setup=("LoadDefaultAIScript", "InitPlayers", "FreePlayers", "InitPlayerResources", "LoadPlayerControllers", "LoadPlayers", "SavePlayers",
+           "RebuildAIFeatureCells", "SetupPlayerSlot", "DeactivateConditions", "LoadConditions", "SaveConditions", "RegisterConditions",
+           "FreeConditions", "DeleteConditions", "NewConditions"),
+    setup_callers=(("ApplySlotsToGamePlayers", "src/frontend/skirmish_menu.cpp"), ("CampaignSetupFrame", "src/game/main_loop.cpp"),
+                   ("CmdKill", "src/game/console_commands.cpp"), ("CreateMissionUnits", "src/units/unit_commands.cpp"),
+                   ("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadMatch", "src/game/game_load.cpp"),
+                   ("LoadSavedGameState", "src/game/settings_campaign.cpp"), ("Mission::LoadMission", "src/map/map_list.cpp"),
+                   ("Mission::~Mission", "src/map/map_list.cpp"), ("ResetAIPlayers", "src/ai/ai_player.cpp"),
+                   ("SaveGameFile", "src/game/settings_campaign.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")))
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS)
 
 
 @dataclass

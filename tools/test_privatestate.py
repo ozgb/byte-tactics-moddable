@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_and_map(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_and_players(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players"])
 
 
 class TargetingOwnerTest(unittest.TestCase):
@@ -196,6 +196,33 @@ class MapOwnerTest(unittest.TestCase):
     def test_a_read_by_anyone_passes(self):
         rows = {"edges": [("-", "orders", "Unit::spatialBucket"), ("map", "ai", "g_lastPlaceMetalSum")], "reads": [("-", "units", self.PASS_MAPS)],
                 "presentation": [("-", "presentation", "g_lastPlaceHeight")]}
+        self.assertEqual(ps.violations(rows), [])
+
+
+class PlayersOwnerTest(unittest.TestCase):
+    def test_the_conditions_and_the_two_clocks_are_private_for_writes_only(self):
+        for item in ("MissionConditions::active", "MissionCondition::met", "VictoryTimerRunsOut::deadline", "DefeatCommanderKilled::player",
+                     "Player::updateTime", "Player::winLoseTime"):
+            self.assertEqual(ps.private_to(item), ("players", ("writer",)), item)
+
+    def test_the_rest_of_a_player_is_not_private(self):
+        for item in ("Player::econ", "Player::units", "Player::controller"):
+            self.assertFalse(ps.is_private(item), item)
+
+    def test_a_players_write_passes(self):
+        rows = {"edges": [("players", "units", "Player::updateTime"), ("players", "-", "MissionConditions::active")],
+                "cross": [("players", "ai", "Player::winLoseTime")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("units", "players", "Player::updateTime"), ("ai", "-", "VictoryTimerRunsOut::deadline")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer ai on VictoryTimerRunsOut::deadline, which is written only by players",
+                          "edges: writer units on Player::updateTime, which is written only by players"])
+
+    def test_a_read_by_anyone_passes(self):
+        rows = {"edges": [("-", "orders", "Player::winLoseTime"), ("players", "ai", "MissionConditions::active")],
+                "presentation": [("-", "presentation", "Player::updateTime")]}
         self.assertEqual(ps.violations(rows), [])
 
 

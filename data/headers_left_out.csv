@@ -99,7 +99,6 @@ GameReallocTagged,mismatch,"definition type not nameable in a header, or no clea
 GetButtonStage,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetEnergyIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetFactoriesInRadius,skip,qualified name std::vector
 GetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetGafFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
@@ -109,7 +108,6 @@ GetGroundHeight,mismatch,"definition type not nameable in a header, or no clean 
 GetHeadingBetween,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetHostDpid,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-GetMetalIncome,mismatch,pointer/int cast: definition's type is likely wrong
 GetObjectBounds,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetObjectHeight,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetOrderCursor,ambiguous,several definitions share the name
@@ -206,8 +204,6 @@ SortUnitTypes,mismatch,"static risk rule: a convention, parameter count, or non-
 StepGafSequence,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 SubtractVec3,mismatch,fixing it changes the generated code of a caller
 TintFrameBelow,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-TransferEnergy,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
-TransferMetal,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 TruncateTextWithEllipsis,mismatch,pointer/int cast: definition's type is likely wrong
 TryGetDesiredHeading,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 UnlockScreen,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

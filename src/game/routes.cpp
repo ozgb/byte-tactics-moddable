@@ -17,6 +17,9 @@
 #include "../seams/map_world.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../../interfaces/players.h"
+#include "../seams/players_world.h"
+#include "../units/players_effects.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -39,6 +42,16 @@ static const SchedRoute s_routes[] = {
     {SCHED_ECONOMY, ECONOMY_EFFECT_CLOAK, SCHED_UNITS, UnitsOnEconomyCloak, 1},
     {SCHED_ECONOMY, ECONOMY_EFFECT_EXTRACTOR, SCHED_UNITS, UnitsOnEconomyExtractor, 0},
     {SCHED_ECONOMY, ECONOMY_EFFECT_SHARE, SCHED_PLAYERS, PlayersOnEconomyShare, 0},
+    {SCHED_UNITS, PLAYERS_KILL_UNITS, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ENGINE, PLAYERS_KILL_UNITS, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_UNITS, PLAYERS_UNIT_CREATED, SCHED_PLAYERS, PlayersInbox, 0},
+    {SCHED_UNITS, PLAYERS_UNIT_DIED, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ORDERS, PLAYERS_GIVE_UNIT, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ENGINE, PLAYERS_GIVE_UNIT, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ENGINE, PLAYERS_TRANSFER, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_PLAYERS, PLAYERS_EFFECT_KILL_UNIT, SCHED_UNITS, UnitsOnPlayersKillUnit, 1},
+    {SCHED_PLAYERS, PLAYERS_EFFECT_SEND_UNIT, SCHED_UNITS, UnitsOnPlayersSendUnit, 1},
+    {SCHED_PLAYERS, PLAYERS_EFFECT_CAPTURE_UNIT, SCHED_UNITS, UnitsOnPlayersCaptureUnit, 1},
     {SCHED_UNITS, FEATURES_PLACE, SCHED_FEATURES, FeaturesInbox, 1},
     {SCHED_ORDERS, FEATURES_RECLAIM, SCHED_FEATURES, FeaturesInbox, 1},
     {SCHED_ORDERS, FEATURES_REMOVE, SCHED_FEATURES, FeaturesInbox, 1},

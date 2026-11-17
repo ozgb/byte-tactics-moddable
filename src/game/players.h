@@ -8,8 +8,7 @@ struct Player;
 struct Unit;
 
 struct Gui;
-
-struct NetMetalSource;
+struct PlayersEvent;
 
 class HapiBank;
 struct Gadget;
@@ -29,7 +28,7 @@ void __stdcall UpdatePlayersFinish();
 void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
-void PlayersOnEconomyShare(const void* event);
+int __stdcall PlayersApply(const PlayersEvent* event);
 
 int CountActiveAIPlayers();
 int CountCombatPlayers();
@@ -37,13 +36,7 @@ int CountCombatPlayers();
 void __stdcall LoadPlayers(HapiBank* file);
 void __stdcall SavePlayers(HapiBank* file);
 
-float __stdcall GetNetEnergy(void*);
-float __stdcall GetNetMetal(NetMetalSource*);
-
 int __stdcall IsFootprintVisible(Player* player, int x, int y, int dx, int dy, short size);
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u);
-
-float __stdcall GetEnergyUsage(Player*);
-float __stdcall GetMetalUsage(void*);
 
 #endif

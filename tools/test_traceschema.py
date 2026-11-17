@@ -315,6 +315,20 @@ class SchemaJsonTest(unittest.TestCase):
         for f in map_["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
+    def test_players_events_section_names_its_fields_in_dump_order(self):
+        events = self.model["playersEvents"]
+        self.assertEqual(events["section"], 41)
+        s = "scalar"
+        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in events["fields"]],
+                         [("kind", 4, s, None), ("unit", 4, "ref", "unit"), ("player", 4, s, None),
+                          ("from", 4, s, None), ("value", 4, s, None), ("amount", 4, s, None),
+                          ("announce", 4, s, None), ("record", 4, s, None), ("hitPoints", 4, s, None),
+                          ("buildPercent", 4, s, None), ("angles", 6, "bytes", None),
+                          ("stockpiles", 3, "bytes", None), ("outcome", 4, s, None)])
+        targets = {t["name"] for t in self.model["targets"]}
+        for f in events["fields"]:
+            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
         self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])

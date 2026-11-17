@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar and map.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar, map and players.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -69,6 +69,9 @@ the last placement test, `g_lastPlaceHeight` and `g_lastPlaceMetalSum`. The buck
 BuildDerivedLayers and FreeMapResources (src/map/line_of_sight.cpp) allocate and free them outside the tick. The cells of the map (the allocation "PLOT MEMORY", which
 presentation, features and los_radar write too) are not listed either, nor are `Unit::cargoNext` (units write it), `Unit::flags`, `Unit::bit2` and `Unit::cobStateFlags`. Any writer but
 map fails, which is what makes every placement, move and removal reach these items through the scheduler's events.
+
+Players' state is written by players alone and read by others: the mission conditions (the members of `MissionConditions`, `MissionCondition` and of each victory and defeat condition type, such as `VictoryTimerRunsOut` and `DefeatCommanderKilled`) and the two clocks of a player, `Player::updateTime` and `Player::winLoseTime`.
+The rest of a player's fields (units, the economy's accounts, the controller and the slot's set-up) are not listed: others write them. Any writer but players fails, which is what makes every capture, kill, transfer and creation or death of a unit reach the conditions through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -115,6 +118,13 @@ MAP_WRITE_ITEMS = ("Unit::spatialBucket", "BuildAllPassMaps: operator new unsign
 
 MAP_WRITE_TYPES = ("UnitBucket", "SpatialBucket")
 
+PLAYERS_WRITE_ITEMS = ("Player::updateTime", "Player::winLoseTime")
+
+PLAYERS_WRITE_TYPES = ("MissionConditions", "MissionCondition", "VictoryKillEnemyCommander", "VictoryDestroyAllUnits", "VictoryKillAllMobileUnits",
+                       "VictoryBuildUnitType", "VictoryCaptureUnitType", "VictoryKillAllOfType", "VictoryKillUnitType", "VictoryMoveUnitToRadius",
+                       "VictoryUnitTypePassesX", "VictoryUnitTypePassesZ", "VictoryTimerRunsOut", "DefeatCommanderKilled", "DefeatAllUnitsKilled",
+                       "DefeatAllUnitsKilledOfType", "DefeatUnitTypeKilled", "DefeatDeathTimerRunsOut", "DefeatAnyUnitPassesX", "DefeatAnyUnitPassesZ")
+
 
 @dataclass(frozen=True)
 class Owner:
@@ -140,7 +150,8 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("features", "", (), NO_ALLOCATION, write_items=FEATURES_WRITE_ITEMS),
           Owner("targeting", "", (), NO_ALLOCATION, write_items=TARGETING_WRITE_ITEMS),
           Owner("los_radar", "", (), NO_ALLOCATION, write_types=LOS_RADAR_WRITE_TYPES, write_items=LOS_RADAR_WRITE_ITEMS),
-          Owner("map", "", (), NO_ALLOCATION, write_types=MAP_WRITE_TYPES, write_items=MAP_WRITE_ITEMS))
+          Owner("map", "", (), NO_ALLOCATION, write_types=MAP_WRITE_TYPES, write_items=MAP_WRITE_ITEMS),
+          Owner("players", "", (), NO_ALLOCATION, write_types=PLAYERS_WRITE_TYPES, write_items=PLAYERS_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

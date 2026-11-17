@@ -1685,5 +1685,23 @@
       {"name": "cause", "size": 4, "kind": "scalar", "target": null},
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ]
+  },
+  "playersEvents": {
+    "section": 41,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "player", "size": 4, "kind": "scalar", "target": null},
+      {"name": "from", "size": 4, "kind": "scalar", "target": null},
+      {"name": "value", "size": 4, "kind": "scalar", "target": null},
+      {"name": "amount", "size": 4, "kind": "scalar", "target": null},
+      {"name": "announce", "size": 4, "kind": "scalar", "target": null},
+      {"name": "record", "size": 4, "kind": "scalar", "target": null},
+      {"name": "hitPoints", "size": 4, "kind": "scalar", "target": null},
+      {"name": "buildPercent", "size": 4, "kind": "scalar", "target": null},
+      {"name": "angles", "size": 6, "kind": "bytes", "target": null},
+      {"name": "stockpiles", "size": 3, "kind": "bytes", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

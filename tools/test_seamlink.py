@@ -683,7 +683,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map"])
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -809,7 +809,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
-        self.assertEqual(seamlink.PILOTS[-3].owner, "targeting")
+        self.assertEqual(seamlink.PILOTS[-4].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -914,7 +914,7 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_los_radar_before_map(self):
-        self.assertEqual(seamlink.PILOTS[-2].owner, "los_radar")
+        self.assertEqual(seamlink.PILOTS[-3].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"))
@@ -1032,8 +1032,8 @@ MpHelp,src/map/terrain.cpp,map,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_map_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "map")
+    def test_the_pilots_table_lists_map_before_players(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "map")
         self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"))
         header = seamlink.ROOT / "interfaces/map.h"
         if header.exists():
@@ -1086,6 +1086,91 @@ MpHelp,src/map/terrain.cpp,map,x,
         header = MAP_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
         found = self.check([], header=header, fillers={k: v for k, v in MAP_FILLERS.items() if k != "UnitsInRange"})
         self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "UnitsInRange")])
+
+
+PLAYERS_HEADER = """struct PlayersSeam {
+    int (__stdcall* Apply)(const PlayersEvent* event);
+    void (__stdcall* UpdatePlayers)(void);
+    void (__stdcall* UpdateBlink)(void);
+    void (__stdcall* InitPlayers)(void);
+    void (__stdcall* SetupPlayerSlot)(int player, char type);
+};
+"""
+PLAYERS_FILLERS = {"Apply": "PlApply", "UpdatePlayers": "PlUpdate", "UpdateBlink": "PlBlink", "InitPlayers": "PlInit",
+                   "SetupPlayerSlot": "PlSetup"}
+PLAYERS_PILOT = dataclasses.replace(
+    seamlink.PLAYERS, writing=("Apply", "UpdatePlayers", "UpdateBlink"), setup=("InitPlayers", "SetupPlayerSlot"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),),
+    engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),))
+
+
+class PlayersPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+RunGameSteps,src/ingame/game_dialogs.cpp,game,x,
+Move,src/units/unit_position.cpp,units,x,
+Head,src/ai/ai_player.cpp,ai,x,
+LoadBattleAssets,src/game/game_state.cpp,game,x,
+Other,src/game/console_commands.cpp,game,x,
+PlApply,src/game/players.cpp,players,x,
+PlBlink,src/game/players.cpp,players,x,
+"""
+
+    def check(self, rows, header=PLAYERS_HEADER, fillers=None):
+        fillers = PLAYERS_FILLERS if fillers is None else fillers
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(
+                "static PlayersSeam s_players;\n" + "".join(f"s_players.{s} = {f};\n" for s, f in fillers.items()))
+            (root / "interfaces/players.h").write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, PLAYERS_PILOT)
+
+    def slot(self, name, seam="PlayersSeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_players_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "players")
+        self.assertEqual(seamlink.PLAYERS.writing, ("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
+                                                    "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink"))
+        self.assertEqual(seamlink.PLAYERS.query, ())
+        header = seamlink.ROOT / "interfaces/players.h"
+        if header.exists():
+            pilot = seamlink.PLAYERS
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "PlayersSeam")))
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("UpdateBlink")),
+                            ("Head", "src/ai/ai_player.cpp", "field_read", "PlayersSeam::Apply")])
+        self.assertEqual(sorted(f[1:] for f in found), [("ai", "Head", "PlayersSeam::Apply"), ("units", "Move", "PlayersSeam::UpdateBlink")])
+
+    def test_the_engine_and_players_may_call_writing_slots(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdatePlayers")),
+                ("RunGameSteps", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateBlink")),
+                ("PlInbox", "src/seams/players_world.cpp", "indirect_call", self.slot("Apply")),
+                ("RecPlApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("PlApply", "src/game/players.cpp", "indirect_call", self.slot("UpdateBlink"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("InitPlayers")),
+                ("RecPlSetup", "src/harness/replay_hooks.inc", "indirect_call", self.slot("SetupPlayerSlot")),
+                ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("SetupPlayerSlot")),
+                ("Move", "src/units/unit_position.cpp", "field_read", "PlayersSeam::InitPlayers")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other"), ("setup", "units", "Move")])
+
+    def test_a_slot_in_no_list_or_unfilled_is_found(self):
+        header = PLAYERS_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
+        found = self.check([], header=header, fillers={k: v for k, v in PLAYERS_FILLERS.items() if k != "InitPlayers"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "InitPlayers")])
 
 
 if __name__ == "__main__":

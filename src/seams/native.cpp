@@ -70,8 +70,6 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
 #include "../orders/order_targets.h"
-float __stdcall GetEnergyIncome(Player* player);
-float __stdcall GetMetalIncome(Player* player);
 #include "../game/players.h"
 #include "../units/unit_targets.h"
 
@@ -89,8 +87,6 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 
 #include "../map/line_of_sight.h"
 #include "../game/share_commands.h"
-void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
-void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
 int __stdcall GetGroundHeight(GroundHeightPos* p);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
@@ -368,16 +364,6 @@ static void __stdcall DeleteConditionsNative(MissionConditions* self)
 static MissionConditions* __stdcall NewConditionsNative(void)
 {
     return new (kSim) MissionConditions;
-}
-
-static void __fastcall NotifyUnitCreatedNative(MissionConditions* self, int unusedEdx, Unit* unit)
-{
-    self->NotifyUnitCreated(unit);
-}
-
-static void __fastcall NotifyUnitDiedNative(MissionConditions* self, int unusedEdx, Unit* unit)
-{
-    self->NotifyUnitDied(unit);
 }
 
 static int __fastcall CanLoadNative(Unit* self, int unusedEdx, Unit* target)
@@ -721,8 +707,6 @@ void InstallNativeSeams()
     s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
     s_ai.IsPointVisible = IsPointVisible;
     s_map.GetNameSlot = GetNameSlotNative;
-    s_players.TransferMetal = TransferMetal;
-    s_players.TransferEnergy = TransferEnergy;
     s_units.GetGroundHeight = GetGroundHeightNative;
     s_units.GetSweetSpot = GetSweetSpotNative;
     s_units.FindScript = FindScriptNative;
@@ -786,10 +770,7 @@ void InstallNativeSeams()
     s_orders.IssueAttackOrder = IssueAttackOrder;
     s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
     s_orders.ClearOrderTypeTable = ClearOrderTypeTable;
-    s_players.GetEnergyIncome = GetEnergyIncome;
-    s_players.GetMetalIncome = GetMetalIncome;
-    s_players.GetNetEnergy = (float (__stdcall *)(Player *))GetNetEnergy;
-    s_players.GetNetMetal = (float (__stdcall *)(Player *))GetNetMetal;
+    s_players.Apply = PlayersApply;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
@@ -833,8 +814,6 @@ void InstallNativeSeams()
     s_players.RebuildAIFeatureCells = RebuildAIFeatureCells;
     s_players.SetupPlayerSlot = SetupPlayerSlot;
     s_players.UpdateBlink = UpdateBlink;
-    s_players.KillPlayerUnits = KillPlayerUnits;
-    s_players.GiveUnitToPlayer = GiveUnitToPlayer;
     s_players.DeactivateConditions = DeactivateConditionsNative;
     s_players.LoadConditions = LoadConditionsNative;
     s_players.SaveConditions = SaveConditionsNative;
@@ -842,8 +821,6 @@ void InstallNativeSeams()
     s_players.FreeConditions = FreeConditionsNative;
     s_players.DeleteConditions = DeleteConditionsNative;
     s_players.NewConditions = NewConditionsNative;
-    s_players.NotifyUnitCreated = NotifyUnitCreatedNative;
-    s_players.NotifyUnitDied = NotifyUnitDiedNative;
     s_players.UpdatePlayersOnStream = UpdatePlayersOnStream;
     s_players.UpdatePlayerHead = UpdatePlayerHead;
     s_players.UpdatePlayerBody = UpdatePlayerBody;

@@ -213,6 +213,12 @@ void SchedPlayersPhase(RandStream stream)
             continue;
         {
             Player* owner = &g_game->players[player];
+            if (owner->ai != nullptr)
+                g_seams.ai->SquadManagerTickIfActive(owner->ai, 0);
+            g_seams.ai->UpdatePlayerAI((unsigned char)player);
+        }
+        {
+            Player* owner = &g_game->players[player];
 #if BT_ACCESS_LOG
             AccessLogPassScope losPass(ACCESS_PASS_PLAYERS_LOS);
 #endif

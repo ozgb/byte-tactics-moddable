@@ -233,10 +233,6 @@ units,presentation,CollectVisibleUnitIds,units,1,
 units,presentation,DrawBattleFrame,units,1,
 unitsEnd,presentation,CollectVisibleUnitIds,unitsEnd,1,
 unknown_1b8e,los_radar,BuildFogTiles,unknown_1b8e,0,-
-unknown_1b8e,players,GetEnergyIncome,unknown_1b8e,0,
-unknown_1b8e,players,GetEnergyUsage,unknown_1b8e,0,
-unknown_1b8e,players,GetMetalIncome,unknown_1b8e,0,
-unknown_1b8e,players,GetMetalUsage,unknown_1b8e,0,
 unknown_1b8e,presentation,DrawBattleFrame,unknown_1b8e,1,
 unknown_1b8e,presentation,NanoParticle::DrawParticle,unknown_1b8e,0,
 width,los_radar,BuildFogTiles,width,0,-

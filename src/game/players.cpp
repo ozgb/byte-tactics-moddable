@@ -301,102 +301,11 @@ void FreePlayers()
     }
 }
 
-// FUNCTION: 0x464ab0
-float __stdcall GetEnergyIncome(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x90);
-}
-
 void RegisterUnitOrders(void);
-
-// FUNCTION: 0x464ac0
-float __stdcall GetEnergyUsage(Player* param_1)
-{
-    return param_1->energyUsage;
-}
-
-// FUNCTION: 0x464ad0
-float __stdcall GetNetEnergy(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x90) - *(float*)((char*)param_1 + 0x94);
-}
-
-// FUNCTION: 0x464af0
-float __stdcall GetMetalIncome(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x9c);
-}
-
-// FUNCTION: 0x464b00
-float __stdcall GetMetalUsage(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0xa0);
-}
-
-struct NetMetalSource {
-    char unknown_0[0x9c];
-    float metalIncome;
-    float metalUsage;
-};
-
-// FUNCTION: 0x464b10
-float __stdcall GetNetMetal(NetMetalSource* param_1)
-{
-    return param_1->metalIncome - param_1->metalUsage;
-}
 
 #include "../network/net_game.h"
 
-// FUNCTION: 0x464b30
-void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
-{
-    if (from == 10)
-        return;
-    if (to == 10)
-        return;
-    if (flag) {
-        float cap = g_game->players[from].energy;
-        if (amount > cap)
-            amount = cap;
-    }
-    if (amount == 0.0f)
-        return;
-    if (flag)
-        EconSpend(from, 0, ECON_ENERGY, amount, 0);
-    EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_ENERGY, amount, 0);
-    if (flag)
-        g_seams.network->SendShareMetal(from, to, amount);
-}
 
-// FUNCTION: 0x464c60
-void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag)
-{
-    if (from == 10)
-        return;
-    if (to == 10)
-        return;
-    if (flag) {
-        float cap = g_game->players[from].metal;
-        if (amount > cap)
-            amount = cap;
-    }
-    if (amount == 0.0f)
-        return;
-    if (flag)
-        EconSpend(from, 0, ECON_METAL, 0, amount);
-    EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_METAL, 0, amount);
-    if (flag)
-        g_seams.network->SendShareEnergy(from, to, amount);
-}
-
-void PlayersOnEconomyShare(const void* event)
-{
-    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
-    if (effect->resources & ECON_METAL)
-        g_seams.players->TransferEnergy((unsigned char)effect->player, (unsigned char)effect->value, effect->metal, 1);
-    else
-        g_seams.players->TransferMetal((unsigned char)effect->player, (unsigned char)effect->value, effect->energy, 1);
-}
 
 // FUNCTION: 0x464da0
 void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
@@ -501,11 +410,6 @@ int __stdcall UpdatePlayerHead(int player)
 #if BT_ACCESS_LOG
     AccessLogEntity();
 #endif
-    if (pi->ai != 0)
-        g_seams.ai->SquadManagerTickIfActive(pi->ai, 0);
-
-    g_seams.ai->UpdatePlayerAI(bl);
-
     return 1;
 }
 

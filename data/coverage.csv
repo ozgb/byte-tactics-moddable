@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,290,208,5132,2911,1956,712,,23,
+game,*,,294,212,5161,2940,1958,714,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -286,7 +286,7 @@ map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Missi
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
-network,*,,297,54,5263,584,2564,106,,74,
+network,*,,297,54,5269,584,2564,106,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
 network,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PBIPAI@std@@YGPAIPBI0PAI@Z,1,
@@ -1204,8 +1204,9 @@ platform,host_window_place,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_pla
 platform,host_window_post,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_post,0,
 platform,host_window_raise,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_raise,0,
 platform,host_window_set_topmost,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_set_topmost,0,
-players,*,,147,100,1671,1171,718,448,,10,
+players,*,,147,99,1697,1195,734,463,,10,
 players,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,src/units/units.cpp,0,0,0,0,0,0,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,1,
+players,??$PlayersPublishSendUnit@UUnit@@@@YGXPAUUnit@@H@Z,src/game/players_events.h,1,0,0,0,0,0,??$PlayersPublishSendUnit@UUnit@@@@YGXPAUUnit@@H@Z,0,network-game
 players,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,src/units/units.cpp,0,0,0,0,0,0,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,1,
 players,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,src/units/units.cpp,0,0,0,0,0,0,??$_Iter_swap@PAPAUPlayer@@PAPAU1@PAU1@@std@@YGXPAPAUPlayer@@00@Z,1,
 players,??$_Median@PAUPlayer@@P6GHPAU1@0@Z@std@@YGPAUPlayer@@PAU1@00P6GH00@Z@Z,src/units/units.cpp,0,0,0,0,0,0,??$_Median@PAUPlayer@@P6GHPAU1@0@Z@std@@YGPAUPlayer@@PAU1@00P6GH00@Z@Z,1,
@@ -2148,7 +2149,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,153,142,1035,967,90,44,,0,
+seams,*,,153,142,1039,971,92,46,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,GetMissionIndexNative,src/seams/native.cpp,1,0,0,0,0,0,?GetMissionIndexNative@@YIHPAVMission@@@Z,0,
@@ -2161,7 +2162,7 @@ seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadMana
 seams,UnitMotionReadNetStateNative,src/seams/native.cpp,1,0,0,0,0,0,?UnitMotionReadNetStateNative@@YGXPAVUnitMotion@@PAVBitReader@@@Z,0,
 seams,WorldLineOfSight,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldLineOfSight@@YGHIHHHH@Z,0,
 seams,WorldTerrainPass,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldTerrainPass@@YGHIHH@Z,0,
-state,*,,556,486,1712,1201,1170,577,,58,
+state,*,,557,487,1713,1202,1170,577,,58,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2292,7 +2293,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,19,19,205,196,98,80,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,195,161,4194,3628,1726,1284,,32,
+units,*,,198,163,4253,3661,1744,1290,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2357,6 +2358,7 @@ units,UnitScript::ExplodeLegacy,src/units/unit_script.cpp,1,0,0,0,0,0,?ExplodeLe
 units,UnitScript::GetTransporterId,src/units/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0,unused-opcode
 units,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0,unused-opcode
 units,UnitScript::PlaySoundNoop,src/units/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
+units,UnitsOnPlayersSendUnit,src/units/players_effects.cpp,1,0,0,0,0,0,?UnitsOnPlayersSendUnit@@YGXPBX@Z,0,network-game
 units,WriteUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,0,network
 units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0,unit-info
 weapons,*,,94,82,2326,2080,1012,754,,17,

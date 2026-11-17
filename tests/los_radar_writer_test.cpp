@@ -134,6 +134,13 @@ int __stdcall ExecuteCommandText(char*, int, CommandArgs*, int)
 {
     return 0;
 }
+void MissionConditions::NotifyUnitCreated(Unit*) {}
+void MissionConditions::NotifyUnitDied(Unit*) {}
+int __stdcall GiveUnitToPlayer(Unit*, Player*, const PlayersEvent*)
+{
+    return 0;
+}
+void __stdcall KillPlayerUnits(unsigned char) {}
 int MissionConditions::CheckVictory()
 {
     return 0;

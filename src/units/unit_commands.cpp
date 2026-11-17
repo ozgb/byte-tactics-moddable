@@ -32,6 +32,7 @@ struct UnitPtrVectorView {
 #include "../orders/mission_type.h"
 
 #include "unit_commands.h"
+#include "../game/players_events.h"
 
 union MissionSlot {
     MissionType type;
@@ -319,61 +320,32 @@ void __cdecl CreateMissionUnits()
 #include "../network/net_game.h"
 
 // FUNCTION: 0x488570
-void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPacket* p)
+int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event)
 {
     if (unit->player == other)
-        return;
+        return 0;
     if (!(unit->flags & 0x10000000))
-        return;
+        return 0;
     if (unit->flags & 0x4000)
-        return;
+        return 0;
     g_game->list_391ed->NotifyUnitCaptured(unit);
 
     Player* cur = unit->player;
     if (cur->active != 0 && (cur->type == 1 || cur->type == 2)) {
         if (other->active == 0)
-            return;
+            return 0;
         if (other->type == 3) {
-            unit->flags &= ~0x10;
-            unit->postTransferHoldoff = 0x96;
-            g_seams.network->SendOwnershipTransfer(unit, other);
-            g_seams.weapons->DamageUnit(0, unit, 30000, 4, 0);
-            return;
+            PlayersPublishSendUnit(unit, (int)(other - g_game->players));
+            return 1;
         }
     }
     if (other->active == 0)
-        return;
+        return 0;
     if (other->type != 1 && other->type != 2)
-        return;
+        return 0;
 
-    Unit* n = g_seams.units->CreateUnit(other->index, unit->unitDefIndex, *(Vec3*)&unit->pos, 1, unit->flags & 3, 0);
-    if (!n)
-        return;
-    n->flags &= 0xffc3ffff;
-    if (p) {
-        n->health = (short)p->hitPoints;
-        n->buildLeft = (float)p->buildPercent;
-        n->angles = p->angles;
-        if (n->weapons[0].flags & 2)
-            n->weapons[0].stockpile = p->stockpile0;
-        if (n->weapons[1].flags & 2)
-            n->weapons[1].stockpile = p->stockpile1;
-        if (n->weapons[2].flags & 2)
-            n->weapons[2].stockpile = p->stockpile2;
-    } else {
-        n->health = unit->health;
-        n->speed_bits = unit->speed_bits;
-        n->angles = unit->angles;
-        if (n->weapons[0].flags & 2)
-            n->weapons[0].stockpile = unit->weapons[0].stockpile;
-        if (n->weapons[1].flags & 2)
-            n->weapons[1].stockpile = unit->weapons[1].stockpile;
-        if (n->weapons[2].flags & 2)
-            n->weapons[2].stockpile = unit->weapons[2].stockpile;
-        g_seams.weapons->DamageUnit(0, unit, 30000, 4, 0);
-    }
-    g_seams.units->SetStateBits(n, unit->activateFlags, 1);
-    g_seams.units->SetStateBits(n, ~unit->activateFlags, 0);
+    PlayersPublishCaptureUnit(unit, (int)(other - g_game->players), event);
+    return 1;
 }
 
 typedef int (__stdcall* QuickSortPred)(Player*, Player*);

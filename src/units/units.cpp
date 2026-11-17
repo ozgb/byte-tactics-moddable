@@ -144,6 +144,7 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
 #include <iterator>
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../game/players_events.h"
 #include "../../interfaces/map.h"
 #include <xutility>
 
@@ -530,7 +531,7 @@ found:
     LosRadarPublishRevealUnit(SCHED_UNITS, unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
-    g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
+    PlayersPublishUnit(SCHED_UNITS, PLAYERS_UNIT_CREATED, unit);
     return unit;
 }
 
@@ -565,7 +566,7 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
     LosRadarPublishRevealUnit(SCHED_UNITS, unit);
     g_game->players[player].unitCount++;
     g_game->players[player].unitsCreated++;
-    g_seams.players->NotifyUnitCreated(g_game->list_391ed, 0, unit);
+    PlayersPublishUnit(SCHED_UNITS, PLAYERS_UNIT_CREATED, unit);
     return unit;
 }
 
@@ -672,7 +673,7 @@ void __stdcall KillUnit(Unit* unit, int killType)
         if (same && g_game->commanderDeath != 0 && unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
             RecordPopToGameLayout(1);
-            g_seams.players->KillPlayerUnits(unit->playerIndex);
+            PlayersPublishKillUnits(SCHED_UNITS, unit->playerIndex);
         }
     }
 }
@@ -706,7 +707,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         parent = &g_game->units[cmd->attackerUnitId];
     unit->attacker = parent;
     unit->lastAttackerSlot = FindSlotByDpid(cmd->attackerPlayerNetId);
-    g_seams.players->NotifyUnitDied(g_game->list_391ed, 0, unit);
+    PlayersPublishUnit(SCHED_UNITS, PLAYERS_UNIT_DIED, unit);
     g_seams.orders->DeleteOrders(unit, 1);
     RecordRemoveUnitSpeech(unit);
     g_seams.ai->SetUnitSquad(unit, -1);
@@ -896,11 +897,9 @@ void __stdcall KillPlayerUnits(unsigned char player)
                             Player* d = u->player;
                             if (d->active != 0 &&
                                 (d->type == 1 || d->type == 2)) {
-                                g_seams.weapons->DamageUnit(u, u, 0x7530, 3, 0);
+                                PlayersPublishKillUnit(u, 0);
                             } else {
-                                g_seams.weapons->DetonateUnitWeapon(u, 1);
-                                u->flags |= 0x4000;
-                                g_seams.units->KillUnit(u, 3);
+                                PlayersPublishKillUnit(u, 1);
                             }
                         }
                     }

@@ -851,7 +851,7 @@ void __stdcall UpdateConverter(Unit* unit)
 {
     Economy* economy = (Economy*)unit->player.get();
     if (economy->cost + economy->cost < economy->energy) {
-        if (g_seams.players->GetNetEnergy((Player*)economy) > kZeroFloatAi && RandomInt(5) != 0) {
+        if ((((Player*)economy)->energyIncome - ((Player*)economy)->energyUsage) > kZeroFloatAi && RandomInt(5) != 0) {
             g_seams.units->SetStateBits(unit, 1, 1);
         }
     } else {
@@ -868,7 +868,7 @@ void BuildTimer::OnTimer()
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
             if (u->def->makesMetal) {
                 if (((Economy*)u->player.get())->cost + ((Economy*)u->player.get())->cost < ((Economy*)u->player.get())->energy) {
-                    if (g_seams.players->GetNetEnergy(u->player) > kZeroFloatAi && RandomInt(5))
+                    if ((u->player->energyIncome - u->player->energyUsage) > kZeroFloatAi && RandomInt(5))
                         g_seams.units->SetStateBits(u, 1, 1);
                 } else
                     g_seams.units->SetStateBits(u, 1, 0);
@@ -1583,12 +1583,12 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     int metalCap=min(500,(int)p->metalCapacity);
     int energy=(int)Max(0.0f,(energyCap-p->energy)*0.125f);
     int metal=(int)Max(0.0f,(metalCap-p->metal)*0.25f);
-    if(g_seams.players->GetNetEnergy(p)<1.0f) energy+=20;
-    if(g_seams.players->GetNetMetal(p)<1.0f) metal+=20;
-    if(g_seams.players->GetEnergyIncome(p)<50.0f) energy+=100;
-    else if(g_seams.players->GetEnergyIncome(p)<200.0f) energy+=10;
-    if(g_seams.players->GetMetalIncome(p)<3.0f) metal+=100;
-    else if(g_seams.players->GetMetalIncome(p)<5.0f) metal+=20;
+    if((p->energyIncome - p->energyUsage)<1.0f) energy+=20;
+    if((p->metalIncome - p->metalUsage)<1.0f) metal+=20;
+    if(p->energyIncome<50.0f) energy+=100;
+    else if(p->energyIncome<200.0f) energy+=10;
+    if(p->metalIncome<3.0f) metal+=100;
+    else if(p->metalIncome<5.0f) metal+=20;
     int metal2=min(max(metal,0),100);
     int energy2=min(max(energy-metal2,0),100);
     int normal=max(100-metal2-energy2,0);

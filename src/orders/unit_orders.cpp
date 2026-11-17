@@ -775,6 +775,7 @@ static const float kZeroFloatOrders = 0.0f;
 
 
 #include "../util/math.h"
+#include "../game/players_events.h"
 
 // FUNCTION: 0x4034a0
 int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
@@ -996,7 +997,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         return 2;
     }
     case 5:
-        g_seams.players->GiveUnitToPlayer(target, unit->player, 0);
+        PlayersPublishGiveUnit(SCHED_ORDERS, target, (int)(unit->player.get() - g_game->players), nullptr);
         RecordUnitSpeech(unit, 16, SIM_SPEECH_KIND_TEXT);
         return 5;
     }

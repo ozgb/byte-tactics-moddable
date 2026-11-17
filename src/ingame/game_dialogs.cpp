@@ -106,8 +106,7 @@ void __stdcall PlaySoundByName(char* name, int flag);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "../graphics/object_pool.h"
 #include "../gui/dialogs.h"
-void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
-void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
+#include "../game/players_events.h"
 #include "../network/net_game.h"
 #include "../units/units.h"
 #include "../game/los_radar_events.h"
@@ -185,7 +184,7 @@ void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
         Unit* unit = *it;
         if ((unit->flags & 3) != 2 && unit->cargo == 0 && unit->carrier == 0
             && !TestBit(set, unit->unitDefIndex)) {
-            GiveUnitToPlayer(unit, p, 0);
+            PlayersPublishGiveUnit(SCHED_ENGINE, unit, (int)(p - g_game->players), nullptr);
         }
     }
 }
@@ -235,9 +234,9 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         int pi = FindSlotByDpid(g_shareDialogPlayerNetIds[idx]);
         Player* p = &g_game->players[pi];
         if (IsPlayerInGame(p) && !(p->info->flags_9b & 0x40) && IsPlayerAlive(p)) {
-            TransferEnergy(g_game->localPlayer, pi,
+            PlayersPublishTransfer(SCHED_ENGINE, g_game->localPlayer, pi, 1,
                          (float)ReadSliderValue(FindGadgetChecked_D(data, "METAL")), 1);
-            TransferMetal(g_game->localPlayer, pi,
+            PlayersPublishTransfer(SCHED_ENGINE, g_game->localPlayer, pi, 0,
                          (float)ReadSliderValue(FindGadgetChecked_D(data, "ENERGY")), 1);
             if (GetButtonStageByName(obj, "SHARUNIT"))
                 GiveSelectedUnitsToPlayer(pi);

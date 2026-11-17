@@ -22,7 +22,7 @@
     "network": 1,
     "orders": 3,
     "pathfinding": 3,
-    "players": 2,
+    "players": 3,
     "rand_stream": 1,
     "ref": 2,
     "services": 1,
@@ -50,8 +50,7 @@
       "SendShareMapInfo": [["int", "int"], "void"]
     },
     "players": {
-      "TransferMetal": [["int", "int", "f32", "int"], "void"],
-      "TransferEnergy": [["int", "int", "f32", "int"], "void"]
+      "Apply": [["linear"], "int"]
     },
     "services": {
       "GameRand": [["int"], "int"],

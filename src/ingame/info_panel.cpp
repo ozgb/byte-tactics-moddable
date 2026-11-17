@@ -240,9 +240,7 @@ void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, c
 void __stdcall DrawUnit(void* context, UnitDrawView* unit);
 #include "../frontend/options.h"
 #include "../network/net_chat.h"
-float __stdcall GetEnergyIncome(void* param_1);
 #include "../game/players.h"
-float __stdcall GetMetalIncome(void* param_1);
 #include "../game/players.h"
 #include "../ingame/radar.h"
 #include "../map/line_of_sight.h"
@@ -1017,10 +1015,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         static unsigned int s_incomesShownAt = ~0u;
         if (pl->displayTimer != s_incomesShownAt) {
             s_incomesShownAt = pl->displayTimer;
-            res.metalIncome = GetEnergyIncome((void*)pl);
-            res.metalUse = GetEnergyUsage((Player*)pl);
-            res.energyIncome = GetMetalIncome((void*)pl);
-            res.energyUse = GetMetalUsage((void*)pl);
+            res.metalIncome = pl->energyIncome;
+            res.metalUse = pl->energyUsage;
+            res.energyIncome = pl->metalIncome;
+            res.energyUse = pl->metalUsage;
         }
         if (memcmp((char*)&(*(Resources*)&g_game->a), &res, sizeof(res)) != 0) {
             (*(Resources*)&g_game->a) = res;

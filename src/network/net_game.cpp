@@ -99,8 +99,7 @@ int GetTicks();
 #include "../units/units.h"
 #include "../game/los_radar_events.h"
 #include "../game/game_state.h"
-void __stdcall TransferMetal(unsigned char, unsigned char, int, int);
-void __stdcall TransferEnergy(unsigned char, unsigned char, int, int);
+#include "../game/players_events.h"
 
 // FUNCTION: 0x44fd40
 int __stdcall DefaultPacketHandler(int arg1)
@@ -1765,7 +1764,7 @@ void __stdcall RemovePlayer(int id)
         }
     }
 
-    KillPlayerUnits(FindSlotByDpid(id));
+    PlayersPublishKillUnits(SCHED_ENGINE, (unsigned char)(FindSlotByDpid(id)));
 
     if (g_game->bits_2a44.bit2) {
         if (!IsConnected(p))
@@ -2617,7 +2616,7 @@ int HandleNetPackets()
             else
                 p = &g_game->players[FindSlotByDpid(id)];
             if (IsConnected(p))
-                GiveUnitToPlayer(unit, p, (OwnershipTransferPacket *)packet);
+                PlayersPublishGiveUnit(SCHED_ENGINE, unit, (int)(p - g_game->players), (OwnershipTransferPacket *)packet);
             break;
         }
         case 21:
@@ -2631,12 +2630,18 @@ int HandleNetPackets()
             if (a == 10 || b == 10)
                 break;
             switch (share->subtype) {
-            case 1:
-                TransferMetal(a, b, share->amount, 0);
+            case 1: {
+                float amount;
+                memcpy(&amount, &share->amount, sizeof(amount));
+                PlayersPublishTransfer(SCHED_ENGINE, a, b, 0, amount, 0);
                 break;
-            case 2:
-                TransferEnergy(a, b, share->amount, 0);
+            }
+            case 2: {
+                float amount;
+                memcpy(&amount, &share->amount, sizeof(amount));
+                PlayersPublishTransfer(SCHED_ENGINE, a, b, 1, amount, 0);
                 break;
+            }
             case 3:
                 LosRadarPublishShareMap(SCHED_ENGINE, a, b);
                 break;

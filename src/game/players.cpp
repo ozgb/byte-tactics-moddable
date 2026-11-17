@@ -9,6 +9,9 @@
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
 #include "players.h"
+#include "../../interfaces/players.h"
+#include "../units/unit_commands.h"
+#include "../units/units.h"
 #include "economy_events.h"
 #include "los_radar_events.h"
 #include "../../interfaces/economy.h"
@@ -301,101 +304,89 @@ void FreePlayers()
     }
 }
 
-// FUNCTION: 0x464ab0
-float __stdcall GetEnergyIncome(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x90);
-}
-
 void RegisterUnitOrders(void);
-
-// FUNCTION: 0x464ac0
-float __stdcall GetEnergyUsage(Player* param_1)
-{
-    return param_1->energyUsage;
-}
-
-// FUNCTION: 0x464ad0
-float __stdcall GetNetEnergy(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x90) - *(float*)((char*)param_1 + 0x94);
-}
-
-// FUNCTION: 0x464af0
-float __stdcall GetMetalIncome(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0x9c);
-}
-
-// FUNCTION: 0x464b00
-float __stdcall GetMetalUsage(void* param_1)
-{
-    return *(float*)((char*)param_1 + 0xa0);
-}
-
-struct NetMetalSource {
-    char unknown_0[0x9c];
-    float metalIncome;
-    float metalUsage;
-};
-
-// FUNCTION: 0x464b10
-float __stdcall GetNetMetal(NetMetalSource* param_1)
-{
-    return param_1->metalIncome - param_1->metalUsage;
-}
 
 #include "../network/net_game.h"
 
 // FUNCTION: 0x464b30
-void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
+int __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
 {
     if (from == 10)
-        return;
+        return 0;
     if (to == 10)
-        return;
+        return 0;
     if (flag) {
         float cap = g_game->players[from].energy;
         if (amount > cap)
             amount = cap;
     }
     if (amount == 0.0f)
-        return;
+        return 0;
     if (flag)
         EconSpend(from, 0, ECON_ENERGY, amount, 0);
     EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_ENERGY, amount, 0);
     if (flag)
         g_seams.network->SendShareMetal(from, to, amount);
+    return 1;
 }
 
 // FUNCTION: 0x464c60
-void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag)
+int __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag)
 {
     if (from == 10)
-        return;
+        return 0;
     if (to == 10)
-        return;
+        return 0;
     if (flag) {
         float cap = g_game->players[from].metal;
         if (amount > cap)
             amount = cap;
     }
     if (amount == 0.0f)
-        return;
+        return 0;
     if (flag)
         EconSpend(from, 0, ECON_METAL, 0, amount);
     EconPublish(SCHED_PLAYERS, ECONOMY_INCOME, to, 0, ECON_METAL, 0, amount);
     if (flag)
         g_seams.network->SendShareEnergy(from, to, amount);
+    return 1;
 }
 
-void PlayersOnEconomyShare(const void* event)
+int __stdcall PlayersApply(const PlayersEvent* e)
 {
-    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
-    if (effect->resources & ECON_METAL)
-        g_seams.players->TransferEnergy((unsigned char)effect->player, (unsigned char)effect->value, effect->metal, 1);
-    else
-        g_seams.players->TransferMetal((unsigned char)effect->player, (unsigned char)effect->value, effect->energy, 1);
+    Ref<Unit> ref;
+    ref.offset = e->unit;
+    Unit* unit = ref.get();
+    switch (e->kind) {
+    case PLAYERS_GIVE_UNIT:
+        if (unit == nullptr || (unsigned)e->player > 9)
+            return 0;
+        return GiveUnitToPlayer(unit, &g_game->players[e->player], e);
+    case PLAYERS_KILL_UNITS:
+        if ((unsigned)e->player > 10)
+            return 0;
+        KillPlayerUnits((unsigned char)e->player);
+        return 1;
+    case PLAYERS_UNIT_CREATED:
+        if (unit == nullptr || g_game->list_391ed == nullptr)
+            return 0;
+        g_game->list_391ed->NotifyUnitCreated(unit);
+        return 1;
+    case PLAYERS_UNIT_DIED:
+        if (unit == nullptr || g_game->list_391ed == nullptr)
+            return 0;
+        g_game->list_391ed->NotifyUnitDied(unit);
+        return 1;
+    case PLAYERS_TRANSFER:
+        if ((unsigned)e->from > 10 || (unsigned)e->player > 10)
+            return 0;
+        if (e->value == 0)
+            return TransferMetal((unsigned char)e->from, (unsigned char)e->player, e->amount, e->announce);
+        if (e->value == 1)
+            return TransferEnergy((unsigned char)e->from, (unsigned char)e->player, e->amount, e->announce);
+        return 0;
+    }
+    return 0;
 }
 
 // FUNCTION: 0x464da0
@@ -501,11 +492,6 @@ int __stdcall UpdatePlayerHead(int player)
 #if BT_ACCESS_LOG
     AccessLogEntity();
 #endif
-    if (pi->ai != 0)
-        g_seams.ai->SquadManagerTickIfActive(pi->ai, 0);
-
-    g_seams.ai->UpdatePlayerAI(bl);
-
     return 1;
 }
 

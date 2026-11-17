@@ -1468,44 +1468,32 @@ address,function,file,kind,target
 0x406c70,CopyDwordIfNonNull,src/orders/unit_orders.cpp,deref_read,*int
 0x406c70,CopyDwordIfNonNull,src/orders/unit_orders.cpp,deref_write,*int
 0x406c70,CopyDwordIfNonNull,src/orders/unit_orders.cpp,function,
-0x406c90,CmdPlan,src/ai/ai_player.cpp,call,CommandArgs::GetArg
-0x406c90,CmdPlan,src/ai/ai_player.cpp,call,_strcmpi
-0x406c90,CmdPlan,src/ai/ai_player.cpp,field_read,CommandArgs::count
-0x406c90,CmdPlan,src/ai/ai_player.cpp,field_read,Game::difficulty
-0x406c90,CmdPlan,src/ai/ai_player.cpp,function,
-0x406c90,CmdPlan,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
-0x406c90,CmdPlan,src/ai/ai_player.cpp,global_read,g_game
-0x406c90,CmdPlan,src/ai/ai_player.cpp,global_write,g_aiCommandsEnabled
+0x406c90,SetAiCommandsEnabled,src/ai/ai_player.cpp,field_read,Game::difficulty
+0x406c90,SetAiCommandsEnabled,src/ai/ai_player.cpp,function,
+0x406c90,SetAiCommandsEnabled,src/ai/ai_player.cpp,global_read,g_game
+0x406c90,SetAiCommandsEnabled,src/ai/ai_player.cpp,global_write,g_aiCommandsEnabled
 0x406da0,EnableAICommands,src/ai/ai_player.cpp,function,
 0x406da0,EnableAICommands,src/ai/ai_player.cpp,global_write,g_aiCommandsEnabled
-0x406db0,CmdWeight,src/ai/ai_player.cpp,call,CommandArgs::GetArg
-0x406db0,CmdWeight,src/ai/ai_player.cpp,call,CommandArgs::GetFloatArg
-0x406db0,CmdWeight,src/ai/ai_player.cpp,call,ScaleUnitWeights
-0x406db0,CmdWeight,src/ai/ai_player.cpp,call,memset
-0x406db0,CmdWeight,src/ai/ai_player.cpp,call,operator!=
-0x406db0,CmdWeight,src/ai/ai_player.cpp,field_read,Player::ai
-0x406db0,CmdWeight,src/ai/ai_player.cpp,field_read,Seams::units
-0x406db0,CmdWeight,src/ai/ai_player.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
-0x406db0,CmdWeight,src/ai/ai_player.cpp,function,
-0x406db0,CmdWeight,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
-0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
-0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_game
-0x406db0,CmdWeight,src/ai/ai_player.cpp,global_read,g_seams
-0x406db0,CmdWeight,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
-0x406e40,CmdLimit,src/ai/ai_player.cpp,call,CommandArgs::GetArg
-0x406e40,CmdLimit,src/ai/ai_player.cpp,call,CommandArgs::GetIntArg
-0x406e40,CmdLimit,src/ai/ai_player.cpp,call,SetUnitLimits
-0x406e40,CmdLimit,src/ai/ai_player.cpp,call,memset
-0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,Player::active
-0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,Player::type
-0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,Seams::units
-0x406e40,CmdLimit,src/ai/ai_player.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
-0x406e40,CmdLimit,src/ai/ai_player.cpp,function,
-0x406e40,CmdLimit,src/ai/ai_player.cpp,global_maybe_written,g_emptyText
-0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
-0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_game
-0x406e40,CmdLimit,src/ai/ai_player.cpp,global_read,g_seams
-0x406e40,CmdLimit,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,call,ScaleUnitWeights
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,call,memcpy
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,call,operator!=
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,field_escape,AiEvent::types
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,field_read,AiEvent::extra
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,field_read,AiEvent::scale
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,field_read,Player::ai
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,function,
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
+0x406db0,ScaleWeights,src/ai/ai_player.cpp,global_read,g_game
+0x406e40,SetLimits,src/ai/ai_player.cpp,call,SetUnitLimits
+0x406e40,SetLimits,src/ai/ai_player.cpp,call,memcpy
+0x406e40,SetLimits,src/ai/ai_player.cpp,field_escape,AiEvent::types
+0x406e40,SetLimits,src/ai/ai_player.cpp,field_read,AiEvent::extra
+0x406e40,SetLimits,src/ai/ai_player.cpp,field_read,AiEvent::value
+0x406e40,SetLimits,src/ai/ai_player.cpp,field_read,Player::active
+0x406e40,SetLimits,src/ai/ai_player.cpp,field_read,Player::type
+0x406e40,SetLimits,src/ai/ai_player.cpp,function,
+0x406e40,SetLimits,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
+0x406e40,SetLimits,src/ai/ai_player.cpp,global_read,g_game
 0x406ee0,IsCountBelowAiLimit,src/ai/ai_player.cpp,call,IsUnderLimit
 0x406ee0,IsCountBelowAiLimit,src/ai/ai_player.cpp,function,
 0x406f00,RegisterAICommands,src/game/console_commands.cpp,call,RegisterCommands
@@ -1514,11 +1502,11 @@ address,function,file,kind,target
 0x406f00,RegisterAICommands,src/game/console_commands.cpp,fn_ref,CmdWeightSlot
 0x406f00,RegisterAICommands,src/game/console_commands.cpp,function,
 0x406f40,FUN_00406f40,src/ai/ai_player.cpp,function,
-0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,call,get
-0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_read,Projectile::attacker
-0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_write,UnitNetDirtyFlagsView::flag5
-0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,field_write,UnitNetDirtyFlagsView::flag6
-0x406f50,SquadManager::MarkOwnerNetDirtyFromDamageSplit,src/ai/ai_player.cpp,function,
+0x406f50,MarkOwnerNetDirty,src/ai/ai_player.cpp,call,AiPublishHit
+0x406f50,MarkOwnerNetDirty,src/ai/ai_player.cpp,function,
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,AiPublishNotifyRefs
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,AiPublishStop
+0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,AttackOrdered
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RandomInt
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,RecordUnitSpeech
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,call,ScheduleTargetingTargetUnit
@@ -1530,16 +1518,13 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,<anon>::value
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Game::ticks
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Order::flags_42
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,OrdersSeam::DeleteOrders
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,OrdersSeam::GetOrderFlags
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,OrdersSeam::IssueAttackOrder
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::active
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::ai
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::allied
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::index
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Player::type
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::orders
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::units
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Seams::weapons
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Unit::buildLeft
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,Unit::def
@@ -1556,7 +1541,6 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,UnitDef::weaponCategories
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,UnitWeaponSlot::flags
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,UnitWeaponSlot::weapon
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,UnitsSeam::NotifyUnitRefs
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_read,WeaponsSeam::WeaponCanReachUnit
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,field_write,SquadManager::nextAction
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,function,
@@ -1564,10 +1548,7 @@ address,function,file,kind,target
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,global_read,g_seams
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,global_read,kZeroFloatAi@src/ai/ai_player.cpp
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,indirect via int (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::GetOrderFlags]
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::IssueAttackOrder]"
 0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [OrdersSeam::DeleteOrders]"
-0x406f80,ReactToAttack,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::NotifyUnitRefs]"
 0x4071f0,SquadManager::FindNearestEnemyUnit,src/ai/ai_player.cpp,call,operator Unit *
 0x4071f0,SquadManager::FindNearestEnemyUnit,src/ai/ai_player.cpp,call,operator->
 0x4071f0,SquadManager::FindNearestEnemyUnit,src/ai/ai_player.cpp,deref_read,*unsigned short
@@ -1730,6 +1711,7 @@ address,function,file,kind,target
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,field_write,SpatialTimer::step
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,function,
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,global_read,g_game
+0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,AiPublishAddOrder
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::Begin
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::Empty
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::End
@@ -1753,7 +1735,6 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Group::player
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Group::units
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,MissionType::index
-0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::AddOrder
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::GetOrderType
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::orders
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::weapons
@@ -1777,7 +1758,6 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_seams
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachPos]"
-0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(MissionType, int, Unit *, Unit *, Vec3 *, int, int) __attribute__((stdcall)) [OrdersSeam::AddOrder]"
 0x408090,IsPointVisible,src/ai/ai_player.cpp,call,operator unsigned short *
 0x408090,IsPointVisible,src/ai/ai_player.cpp,deref_read,*unsigned short
 0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Game::playerIndex
@@ -1789,6 +1769,7 @@ address,function,file,kind,target
 0x408090,IsPointVisible,src/ai/ai_player.cpp,field_read,Vec3Words::zWhole
 0x408090,IsPointVisible,src/ai/ai_player.cpp,function,
 0x408090,IsPointVisible,src/ai/ai_player.cpp,global_read,g_game
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,AiPublishAddOrder
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::Begin
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::End
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,call,ChooseBuildOption
@@ -1815,8 +1796,8 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_maybe_written,Group::units
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::defs
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::ticks
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,MissionType::index
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Order::flags_42
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::AddOrder
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::GetOrderType
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::orders
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadManager::nextAction
@@ -1838,36 +1819,27 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_seams
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(MissionType, int, Unit *, Unit *, Vec3 *, int, int) __attribute__((stdcall)) [OrdersSeam::AddOrder]"
 0x408600,ScoutTimer::ScoutTimer,src/ai/ai_player.cpp,function,
+0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,AiPublishQueueBuild
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,ChooseBuildOption
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,RecordBuildQueueSound
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,operator UnitDef *
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,operator!=
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_escape,UnitDef::unitname
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Game::defs
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,OrdersSeam::QueueBuildOrder
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Seams::orders
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,SquadTimer::player
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Unit::list
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,field_read,Unit::playerIndex
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,function,
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,global_read,g_game
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,global_read,g_seams
-0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(char *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::QueueBuildOrder]"
+0x408670,UpdateConverter,src/ai/ai_player.cpp,call,AiPublishActivate
 0x408670,UpdateConverter,src/ai/ai_player.cpp,call,RandomInt
 0x408670,UpdateConverter,src/ai/ai_player.cpp,call,get
 0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Economy::cost
 0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Economy::energy
 0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Player::energyIncome
 0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Player::energyUsage
-0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Seams::units
 0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,Unit::player
-0x408670,UpdateConverter,src/ai/ai_player.cpp,field_read,UnitsSeam::SetStateBits
 0x408670,UpdateConverter,src/ai/ai_player.cpp,function,
-0x408670,UpdateConverter,src/ai/ai_player.cpp,global_read,g_seams
 0x408670,UpdateConverter,src/ai/ai_player.cpp,global_read,kZeroFloatAi@src/ai/ai_player.cpp
-0x408670,UpdateConverter,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,AiPublishActivate
+0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,AiPublishQueueBuild
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::Begin
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,BlockVector::End
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,ChooseBuildOption
@@ -1875,21 +1847,15 @@ address,function,file,kind,target
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,RecordBuildQueueSound
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,get
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,operator Unit *
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,operator UnitDef *
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,operator bool
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,call,operator->
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,deref_read,*Ref<Unit>
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_escape,UnitDef::unitname
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_maybe_written,Group::units
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Economy::cost
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Economy::energy
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::defs
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Game::ticks
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,OrdersSeam::QueueBuildOrder
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Player::energyIncome
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Player::energyUsage
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::orders
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Seams::units
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::group
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,SquadTimer::player
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::def
@@ -1899,15 +1865,12 @@ address,function,file,kind,target
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,Unit::playerIndex
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::count
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitDef::makesMetal
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_read,UnitsSeam::SetStateBits
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,field_write,SquadTimer::next
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,function,
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_seams
 0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,global_read,kZeroFloatAi@src/ai/ai_player.cpp
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
-0x4086d0,BuildTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(char *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::QueueBuildOrder]"
 0x408810,BuildTimer::BuildTimer,src/ai/ai_player.cpp,function,
+0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,call,AiPublishSetStates
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,call,SetUnitSquad
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,call,operator Unit *
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,call,operator->
@@ -1923,7 +1886,6 @@ address,function,file,kind,target
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_read,Unit::flags
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_read,Unit::group
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_read,UnitDef::minwaterdepth
-0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,field_write,Unit::flags
 0x408830,SquadManager::AssignSquads,src/ai/ai_player.cpp,function,
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,ScheduleTargetingFind
 0x408920,RetargetWeapon,src/ai/ai_player.cpp,call,TargetingPublishClear
@@ -20495,20 +20457,19 @@ address,function,file,kind,target
 0x464a00,FreePlayers,src/game/players.cpp,deref_read,*Ref<UnitResources>
 0x464a00,FreePlayers,src/game/players.cpp,deref_read,*Ref<unsigned char>
 0x464a00,FreePlayers,src/game/players.cpp,deref_read,*unsigned char
-0x464a00,FreePlayers,src/game/players.cpp,deref_write,*Ref<SquadManager>
 0x464a00,FreePlayers,src/game/players.cpp,deref_write,*Ref<UnitResources>
 0x464a00,FreePlayers,src/game/players.cpp,deref_write,*Ref<unsigned char>
 0x464a00,FreePlayers,src/game/players.cpp,deref_write,*int
 0x464a00,FreePlayers,src/game/players.cpp,field_escape,Game::players
 0x464a00,FreePlayers,src/game/players.cpp,field_read,AiSeam::DestroyPlayerAI
+0x464a00,FreePlayers,src/game/players.cpp,field_read,AiSeam::FreeSquadManager
 0x464a00,FreePlayers,src/game/players.cpp,field_read,AiSeam::FreeSquads
-0x464a00,FreePlayers,src/game/players.cpp,field_read,AiSeam::SquadManagerDeleteTimers
 0x464a00,FreePlayers,src/game/players.cpp,field_read,Seams::ai
 0x464a00,FreePlayers,src/game/players.cpp,function,
 0x464a00,FreePlayers,src/game/players.cpp,global_read,g_game
 0x464a00,FreePlayers,src/game/players.cpp,global_read,g_seams
+0x464a00,FreePlayers,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [AiSeam::FreeSquadManager]
 0x464a00,FreePlayers,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [AiSeam::FreeSquads]
-0x464a00,FreePlayers,src/game/players.cpp,indirect_call,"indirect via void (*)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerDeleteTimers]"
 0x464a00,FreePlayers,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::DestroyPlayerAI]
 0x464b30,TransferMetal,src/game/players_events.cpp,call,EconPublish
 0x464b30,TransferMetal,src/game/players_events.cpp,call,EconSpend
@@ -25173,8 +25134,9 @@ address,function,file,kind,target
 0x480250,SetUnitSquad,src/units/squads.cpp,field_read,Unit::player
 0x480250,SetUnitSquad,src/units/squads.cpp,field_write,Unit::group
 0x480250,SetUnitSquad,src/units/squads.cpp,function,
+0x480460,OrderSquad,src/units/squads.cpp,call,AiPublishAddOrder
 0x480460,OrderSquad,src/units/squads.cpp,call,operator Unit *
-0x480460,OrderSquad,src/units/squads.cpp,field_read,OrdersSeam::AddOrder
+0x480460,OrderSquad,src/units/squads.cpp,field_read,MissionType::index
 0x480460,OrderSquad,src/units/squads.cpp,field_read,OrdersSeam::GetOrderType
 0x480460,OrderSquad,src/units/squads.cpp,field_read,Player::unitsBegin
 0x480460,OrderSquad,src/units/squads.cpp,field_read,Player::unitsEnd
@@ -25184,7 +25146,6 @@ address,function,file,kind,target
 0x480460,OrderSquad,src/units/squads.cpp,function,
 0x480460,OrderSquad,src/units/squads.cpp,global_read,g_seams
 0x480460,OrderSquad,src/units/squads.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
-0x480460,OrderSquad,src/units/squads.cpp,indirect_call,"indirect via void (*)(MissionType, int, Unit *, Unit *, Vec3 *, int, int) __attribute__((stdcall)) [OrdersSeam::AddOrder]"
 0x4804e0,StepTowards,src/units/unit_script_calls.cpp,function,
 0x480510,StepPointTowards,src/units/unit_script_calls.cpp,field_read,Point16::x
 0x480510,StepPointTowards,src/units/unit_script_calls.cpp,field_read,Point16::y
@@ -26385,6 +26346,7 @@ address,function,file,kind,target
 0x485980,FreeUnitMemory,src/units/units.cpp,field_write,Game::units
 0x485980,FreeUnitMemory,src/units/units.cpp,function,
 0x485980,FreeUnitMemory,src/units/units.cpp,global_read,g_game
+0x485a40,InitUnitFromType,src/units/units.cpp,call,AiPublishSetSquad
 0x485a40,InitUnitFromType,src/units/units.cpp,call,EconHandleOf
 0x485a40,InitUnitFromType,src/units/units.cpp,call,EconPublish
 0x485a40,InitUnitFromType,src/units/units.cpp,call,RandomInt
@@ -26401,13 +26363,11 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,<anon>::hi
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,<anon>::initCloaked
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,<anon>::movOrder
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,AiSeam::SetUnitSquad
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Game::defs
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Game::playerIndex
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Player::index
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Point16::x
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Point16::y
-0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Seams::ai
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Seams::weapons
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::def
 0x485a40,InitUnitFromType,src/units/units.cpp,field_read,Unit::footprint
@@ -26478,7 +26438,6 @@ address,function,file,kind,target
 0x485a40,InitUnitFromType,src/units/units.cpp,function,
 0x485a40,InitUnitFromType,src/units/units.cpp,global_read,g_game
 0x485a40,InitUnitFromType,src/units/units.cpp,global_read,g_seams
-0x485a40,InitUnitFromType,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 0x485a40,InitUnitFromType,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
 0x485d40,InitUnitScript,src/units/units.cpp,call,CobScript::SetCob
 0x485d40,InitUnitScript,src/units/units.cpp,call,CobScript::StartScript
@@ -26675,6 +26634,7 @@ address,function,file,kind,target
 0x4864b0,KillUnit,src/units/units.cpp,global_read,g_game
 0x4864b0,KillUnit,src/units/units.cpp,global_read,g_seams
 0x4864b0,KillUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int, int, int) __attribute__((stdcall)) [NetworkSeam::SendUnitKilled]"
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AiPublishSetSquad
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,AttachUnitToPiece
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,ClearUnitRefs
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,CobScript::StartScriptWithArgs
@@ -26708,7 +26668,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,SideDef::commander
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,Unit::attacker
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_escape,UnitDef::unitname
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,AiSeam::SetUnitSquad
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::commanderDeath
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::defs
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::localPlayer
@@ -26734,7 +26693,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,PlayerInfo::bit6
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,PlayerInfo::side
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Quirks::ignoreNullDeathRecord
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::ai
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::map
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::orders
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Seams::weapons
@@ -26787,7 +26745,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::RemoveUnitProjectiles]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [OrdersSeam::DeleteOrders]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [WeaponsSeam::DetonateUnitWeapon]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(UnitMotion *) __attribute__((fastcall)) [OrdersSeam::DestroyMotionObject]
@@ -26828,6 +26785,7 @@ address,function,file,kind,target
 0x486fd0,LoadUnits,src/units/unit_save.cpp,field_read,SaveRec::id
 0x486fd0,LoadUnits,src/units/unit_save.cpp,field_write,SaveRec::id
 0x486fd0,LoadUnits,src/units/unit_save.cpp,function,
+0x487080,LoadUnit,src/units/unit_save.cpp,call,AiPublishSetSquad
 0x487080,LoadUnit,src/units/unit_save.cpp,call,AttachUnitToPiece
 0x487080,LoadUnit,src/units/unit_save.cpp,call,CobScript::LoadScriptState
 0x487080,LoadUnit,src/units/unit_save.cpp,call,CreateUnit
@@ -26857,7 +26815,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::list2
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::weapons
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,UnitWeaponSlot::flags
-0x487080,LoadUnit,src/units/unit_save.cpp,field_read,AiSeam::SetUnitSquad
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a0
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a1
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a2
@@ -26900,7 +26857,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SaveRec::id
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SaveRec::player
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SaveRec::pos
-0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Seams::ai
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Seams::orders
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SrcPiece::f0
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SrcPiece::f10
@@ -26957,7 +26913,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,global_read,g_seams
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via Order *(*)(Unit *, HapiBank *, char *) __attribute__((stdcall)) [OrdersSeam::LoadOrder]"
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,indirect via void (*)(Order *) __attribute__((fastcall)) [OrdersSeam::ReattachFxToUnit]
-0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *, HapiBank *) __attribute__((fastcall)) [OrdersSeam::LoadMotion]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,CobScript::SaveScriptState
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,HapiBank::OpenAccount
@@ -27501,6 +27456,7 @@ address,function,file,kind,target
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,function,
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,global_read,g_seams
 0x489bb0,DamageUnit,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [NetworkSeam::SendUnitDamage]"
+0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,AiPublishReactToAttack
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,RecordCdActivity
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,ScaledCos
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,ScaledSin
@@ -27512,7 +27468,6 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator=
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,call,operator==
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,deref_escape,*Unit
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,AiSeam::ReactToAttack
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Game::localPlayer
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Game::units
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Order::kind
@@ -27522,7 +27477,6 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,OrdersSeam::NewOrder
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Player::active
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Player::type
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Seams::ai
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Seams::orders
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Seams::units
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,field_read,Unit::def
@@ -27558,7 +27512,6 @@ address,function,file,kind,target
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::MarkRecentlyDamaged]
 0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Order *) __attribute__((stdcall)) [OrdersSeam::AppendOrder]"
-0x489ce0,ApplyUnitDamage,src/units/unit_targets.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int) __attribute__((stdcall)) [AiSeam::ReactToAttack]"
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Order *
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator Player *
 0x489fa0,ParalyzeUnit,src/units/unit_targets.cpp,call,operator->
@@ -28511,8 +28464,8 @@ address,function,file,kind,target
 0x48d790,CycleSelection,src/ingame/selection.cpp,field_write,Unit::flags
 0x48d790,CycleSelection,src/ingame/selection.cpp,function,
 0x48d790,CycleSelection,src/ingame/selection.cpp,global_read,g_game
+0x48d920,CreateSquad,src/ingame/selection.cpp,call,AiPublishSetSquad
 0x48d920,CreateSquad,src/ingame/selection.cpp,call,HarnessUiGroup
-0x48d920,CreateSquad,src/ingame/selection.cpp,call,SetUnitSquad
 0x48d920,CreateSquad,src/ingame/selection.cpp,call,operator Unit *
 0x48d920,CreateSquad,src/ingame/selection.cpp,field_escape,Game::players
 0x48d920,CreateSquad,src/ingame/selection.cpp,field_read,Game::localPlayer
@@ -31718,20 +31671,13 @@ address,function,file,kind,target
 0x499c10,RockUnit,src/weapons/weapons.cpp,function,
 0x499c10,RockUnit,src/weapons/weapons.cpp,global_read,g_seams
 0x499c10,RockUnit,src/weapons/weapons.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [UnitsSeam::StartScriptWithArgs]"
+0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,call,AiPublishDamageSplit
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,call,ApplyWeaponDamage
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,call,operator SquadManager *
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,call,operator Unit *
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,call,operator->
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,AiSeam::MarkOwnerNetDirtyFromDamageSplit
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Player::ai
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Projectile::owner
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Seams::ai
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Unit::player
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,field_read,Unit::playerIndex
 0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,function,
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,global_read,g_seams
-0x499c70,ApplyWeaponHit,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,AngleOfVector
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,DamageUnit
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,FindDamageValue
@@ -31770,12 +31716,12 @@ address,function,file,kind,target
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,function,
 0x499e50,UntrackProjectile,src/weapons/weapons.cpp,global_read,g_game
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AddExplosionEffect
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AiPublishDamageSplit
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyWeaponDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordScreenShake
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordSoundAt
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordWhiteSmoke
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator SquadManager *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator Unit *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,operator->
@@ -31787,23 +31733,19 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Projectile::position
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::endSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::noExplode
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,AiSeam::MarkOwnerNetDirtyFromDamageSplit
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::net
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::active
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::ai
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::type
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::owner
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::position
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::type
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Seams::ai
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Seams::los_radar
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Unit::player
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Unit::playerIndex
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::areaOfEffect
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,WeaponDef::explosionSeq
@@ -31821,7 +31763,6 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,global_read,g_game
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,global_read,g_seams
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,memset
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,call,operator=
@@ -31831,6 +31772,7 @@ address,function,file,kind,target
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::ownerUnit
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,field_write,AreaDamageProjectileView::pos
 0x49a0c0,ApplyAreaDamageAt,src/weapons/weapons.cpp,function,
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,AiPublishDamageSplit
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,ApplyWeaponDamage
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,AreaDamageHits::AddFeature
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,AreaDamageHits::AddUnit
@@ -31848,7 +31790,6 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Feature *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator FeatureSpot *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Projectile *
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator SquadManager *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator Unit *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator UnitDef *
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,operator bool
@@ -31861,7 +31802,6 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_escape,Projectile::position
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,<anon>::interceptor
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,<anon>::value
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,AiSeam::MarkOwnerNetDirtyFromDamageSplit
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Cell::feature
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Cell::flags
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Cell::offsetX
@@ -31881,17 +31821,14 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Game::width
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCell
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,NetworkSeam::SendProjectileDetonated
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Player::ai
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Projectile::flags
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Projectile::owner
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Projectile::type
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Seams::ai
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Seams::features
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Seams::los_radar
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Seams::network
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Unit::def
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Unit::player
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,Unit::playerIndex
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,UnitDef::modelMaxX
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,field_read,UnitDef::modelMaxY
@@ -31916,7 +31853,6 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,global_read,g_seams
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via Vec3 (*)(Point16 *, Feature *) __attribute__((stdcall)) [FeaturesSeam::GetFootprintCentre]"
-0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Projectile *) __attribute__((stdcall)) [NetworkSeam::SendProjectileDetonated]"
 0x49a850,VectorLength,src/weapons/weapons.cpp,call,bx_sqrt
 0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3::x
@@ -42737,12 +42673,105 @@ address,function,file,kind,target
 ,AddVec3,src/harness/replay.cpp,function,
 ,AdvanceMissionNative,src/seams/native.cpp,call,Mission::AdvanceMission
 ,AdvanceMissionNative,src/seams/native.cpp,function,
+,AiApply,src/ai/ai_player.cpp,call,AiUnitOf
+,AiApply,src/ai/ai_player.cpp,call,MarkOwnerNetDirty
+,AiApply,src/ai/ai_player.cpp,call,ReactToAttack
+,AiApply,src/ai/ai_player.cpp,call,ScaleWeights
+,AiApply,src/ai/ai_player.cpp,call,SetAiCommandsEnabled
+,AiApply,src/ai/ai_player.cpp,call,SetLimits
+,AiApply,src/ai/ai_player.cpp,call,SetUnitSquad
+,AiApply,src/ai/ai_player.cpp,call,operator bool
+,AiApply,src/ai/ai_player.cpp,call,operator->
+,AiApply,src/ai/ai_player.cpp,field_read,AiEvent::extra
+,AiApply,src/ai/ai_player.cpp,field_read,AiEvent::kind
+,AiApply,src/ai/ai_player.cpp,field_read,AiEvent::target
+,AiApply,src/ai/ai_player.cpp,field_read,AiEvent::unit
+,AiApply,src/ai/ai_player.cpp,field_read,AiEvent::value
+,AiApply,src/ai/ai_player.cpp,field_read,Player::groups
+,AiApply,src/ai/ai_player.cpp,field_read,Unit::player
+,AiApply,src/ai/ai_player.cpp,function,
+,AiApply,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
+,AiEventOf,src/game/ai_events.h,call,memset
+,AiEventOf,src/game/ai_events.h,field_write,AiEvent::kind
+,AiEventOf,src/game/ai_events.h,function,
+,AiIdleSeam,src/ai/ai_idle.cpp,call,operator=
+,AiIdleSeam,src/ai/ai_idle.cpp,deref_read,*AiSeam
+,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::Apply
+,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::UpdatePlayerAI
+,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::UpdateSquads
+,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,ApplyIdle
+,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,UpdatePlayerAIIdle
+,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,UpdateSquadsIdle
+,AiIdleSeam,src/ai/ai_idle.cpp,function,
+,AiIdleSeam,src/ai/ai_idle.cpp,global_escape,s_idle
+,AiIdleSeam,src/ai/ai_idle.cpp,global_write,s_idle
+,AiIdleSeam,src/ai/ai_idle.cpp,global_write,s_standard
+,AiInbox,src/seams/ai_world.cpp,call,HarnessAiEvent
+,AiInbox,src/seams/ai_world.cpp,field_read,AiSeam::Apply
+,AiInbox,src/seams/ai_world.cpp,field_read,Seams::ai
+,AiInbox,src/seams/ai_world.cpp,function,
+,AiInbox,src/seams/ai_world.cpp,global_read,g_seams
+,AiInbox,src/seams/ai_world.cpp,indirect_call,indirect via int (*)(const AiEvent *) __attribute__((stdcall)) [AiSeam::Apply]
+,AiPublishLimit,src/game/ai_events.h,call,AiEventOf
+,AiPublishLimit,src/game/ai_events.h,call,SchedPublish
+,AiPublishLimit,src/game/ai_events.h,call,memcpy
+,AiPublishLimit,src/game/ai_events.h,field_escape,AiEvent::types
+,AiPublishLimit,src/game/ai_events.h,field_write,AiEvent::extra
+,AiPublishLimit,src/game/ai_events.h,field_write,AiEvent::value
+,AiPublishLimit,src/game/ai_events.h,function,
+,AiPublishPlan,src/game/ai_events.h,call,AiEventOf
+,AiPublishPlan,src/game/ai_events.h,call,SchedPublish
+,AiPublishPlan,src/game/ai_events.h,field_write,AiEvent::value
+,AiPublishPlan,src/game/ai_events.h,function,
+,AiPublishWeight,src/game/ai_events.h,call,AiEventOf
+,AiPublishWeight,src/game/ai_events.h,call,SchedPublish
+,AiPublishWeight,src/game/ai_events.h,call,memcpy
+,AiPublishWeight,src/game/ai_events.h,field_escape,AiEvent::types
+,AiPublishWeight,src/game/ai_events.h,field_write,AiEvent::extra
+,AiPublishWeight,src/game/ai_events.h,field_write,AiEvent::scale
+,AiPublishWeight,src/game/ai_events.h,function,
+,AiResultsAdd,src/harness/ai_results.h,call,memset
+,AiResultsAdd,src/harness/ai_results.h,call,operator=
+,AiResultsAdd,src/harness/ai_results.h,call,realloc
+,AiResultsAdd,src/harness/ai_results.h,deref_escape,*AiResult
+,AiResultsAdd,src/harness/ai_results.h,deref_read,*AiEvent
+,AiResultsAdd,src/harness/ai_results.h,field_read,AiResults::capacity
+,AiResultsAdd,src/harness/ai_results.h,field_read,AiResults::count
+,AiResultsAdd,src/harness/ai_results.h,field_read,AiResults::items
+,AiResultsAdd,src/harness/ai_results.h,field_write,AiResult::event
+,AiResultsAdd,src/harness/ai_results.h,field_write,AiResult::outcome
+,AiResultsAdd,src/harness/ai_results.h,field_write,AiResults::capacity
+,AiResultsAdd,src/harness/ai_results.h,field_write,AiResults::count
+,AiResultsAdd,src/harness/ai_results.h,field_write,AiResults::items
+,AiResultsAdd,src/harness/ai_results.h,function,
+,AiResultsClear,src/harness/ai_results.h,field_write,AiResults::count
+,AiResultsClear,src/harness/ai_results.h,function,
 ,AiUnitList::Clear,src/ai/player_ai.h,call,BlockVector::Clear
 ,AiUnitList::Clear,src/ai/player_ai.h,field_maybe_written,AiUnitList::units
 ,AiUnitList::Clear,src/ai/player_ai.h,function,
+,AiUnitOf,src/ai/ai_player.cpp,call,get
+,AiUnitOf,src/ai/ai_player.cpp,field_write,Ref<Unit>::offset
+,AiUnitOf,src/ai/ai_player.cpp,function,
 ,AiVec3::AiVec3,src/ai/player_ai.h,call,operator=
 ,AiVec3::AiVec3,src/ai/player_ai.h,deref_write,*AiVec3
 ,AiVec3::AiVec3,src/ai/player_ai.h,function,
+,AiWriteState,src/ai/ai_player.cpp,call,get
+,AiWriteState,src/ai/ai_player.cpp,call,operator!=
+,AiWriteState,src/ai/ai_player.cpp,call,operator->
+,AiWriteState,src/ai/ai_player.cpp,field_read,Player::ai
+,AiWriteState,src/ai/ai_player.cpp,field_read,SquadManager::countdown
+,AiWriteState,src/ai/ai_player.cpp,field_read,SquadManager::nextAction
+,AiWriteState,src/ai/ai_player.cpp,field_read,SquadManager::timers
+,AiWriteState,src/ai/ai_player.cpp,field_read,SquadTimer::next
+,AiWriteState,src/ai/ai_player.cpp,field_read,StateWriter::Begin
+,AiWriteState,src/ai/ai_player.cpp,field_read,StateWriter::Bytes
+,AiWriteState,src/ai/ai_player.cpp,field_read,StateWriter::Int
+,AiWriteState,src/ai/ai_player.cpp,function,
+,AiWriteState,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
+,AiWriteState,src/ai/ai_player.cpp,global_read,g_game
+,AiWriteState,src/ai/ai_player.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,AiWriteState,src/ai/ai_player.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,AiWriteState,src/ai/ai_player.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
 ,Align8,src/ai/pathfind_hpa.cpp,function,
 ,AllocDepthFrame,src/graphics/gaf.cpp,call,GameAllocIgnoreTag
 ,AllocDepthFrame,src/graphics/gaf.cpp,field_write,GafFrame::blend
@@ -42865,6 +42894,11 @@ address,function,file,kind,target
 ,ApplyEvent,src/map/features.cpp,field_write,Ref<Unit>::offset
 ,ApplyEvent,src/map/features.cpp,function,
 ,ApplyEvent,src/map/features.cpp,global_read,g_game
+,ApplyIdle,src/ai/ai_idle.cpp,field_read,AiEvent::kind
+,ApplyIdle,src/ai/ai_idle.cpp,field_read,AiSeam::Apply
+,ApplyIdle,src/ai/ai_idle.cpp,function,
+,ApplyIdle,src/ai/ai_idle.cpp,global_read,s_standard
+,ApplyIdle,src/ai/ai_idle.cpp,indirect_call,indirect via int (*const)(const AiEvent *) __attribute__((stdcall)) [AiSeam::Apply]
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,AddEyeball
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,CmdShareMapping
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,CmdShareRadar
@@ -43093,6 +43127,14 @@ address,function,file,kind,target
 ,AttachMove,src/orders/vtol_orders.cpp,call,operator new
 ,AttachMove,src/orders/vtol_orders.cpp,function,
 ,AttachMove,src/orders/vtol_orders.cpp,global_read,kSim
+,AttackOrdered,src/ai/ai_player.cpp,call,AiPublishAttack
+,AttackOrdered,src/ai/ai_player.cpp,field_read,MissionType::index
+,AttackOrdered,src/ai/ai_player.cpp,field_read,OrdersSeam::GetOrderType
+,AttackOrdered,src/ai/ai_player.cpp,field_read,Seams::orders
+,AttackOrdered,src/ai/ai_player.cpp,field_read,Unit::flags
+,AttackOrdered,src/ai/ai_player.cpp,function,
+,AttackOrdered,src/ai/ai_player.cpp,global_read,g_seams
+,AttackOrdered,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 ,BankCloseNative,src/seams/native.cpp,call,AccountBank::CloseBank
 ,BankCloseNative,src/seams/native.cpp,function,
 ,BankGetBoxSizeNative,src/seams/native.cpp,call,AccountBank::GetBoxSize
@@ -43950,21 +43992,29 @@ address,function,file,kind,target
 ,ClusterOf,src/ai/pathfind_hpa.cpp,field_read,Hdr::CW
 ,ClusterOf,src/ai/pathfind_hpa.cpp,field_read,Hdr::shift
 ,ClusterOf,src/ai/pathfind_hpa.cpp,function,
-,CmdLimitSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdLimit
-,CmdLimitSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdLimitSlot,src/game/console_commands.cpp,call,AiPublishLimit
+,CmdLimitSlot,src/game/console_commands.cpp,call,CommandArgs::GetArg
+,CmdLimitSlot,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
+,CmdLimitSlot,src/game/console_commands.cpp,field_escape,UnitTypeSet::bits
+,CmdLimitSlot,src/game/console_commands.cpp,field_read,Seams::units
+,CmdLimitSlot,src/game/console_commands.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
 ,CmdLimitSlot,src/game/console_commands.cpp,function,
 ,CmdLimitSlot,src/game/console_commands.cpp,global_read,g_seams
-,CmdLimitSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdLimit]
-,CmdPlanSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdPlan
-,CmdPlanSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdLimitSlot,src/game/console_commands.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
+,CmdPlanSlot,src/game/console_commands.cpp,call,AiPublishPlan
+,CmdPlanSlot,src/game/console_commands.cpp,call,CommandArgs::GetArg
+,CmdPlanSlot,src/game/console_commands.cpp,call,_strcmpi
+,CmdPlanSlot,src/game/console_commands.cpp,field_read,CommandArgs::count
 ,CmdPlanSlot,src/game/console_commands.cpp,function,
-,CmdPlanSlot,src/game/console_commands.cpp,global_read,g_seams
-,CmdPlanSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdPlan]
-,CmdWeightSlot,src/game/console_commands.cpp,field_read,AiSeam::CmdWeight
-,CmdWeightSlot,src/game/console_commands.cpp,field_read,Seams::ai
+,CmdWeightSlot,src/game/console_commands.cpp,call,AiPublishWeight
+,CmdWeightSlot,src/game/console_commands.cpp,call,CommandArgs::GetArg
+,CmdWeightSlot,src/game/console_commands.cpp,call,CommandArgs::GetFloatArg
+,CmdWeightSlot,src/game/console_commands.cpp,field_escape,UnitTypeSet::bits
+,CmdWeightSlot,src/game/console_commands.cpp,field_read,Seams::units
+,CmdWeightSlot,src/game/console_commands.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
 ,CmdWeightSlot,src/game/console_commands.cpp,function,
 ,CmdWeightSlot,src/game/console_commands.cpp,global_read,g_seams
-,CmdWeightSlot,src/game/console_commands.cpp,indirect_call,indirect via void (*)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdWeight]
+,CmdWeightSlot,src/game/console_commands.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
 ,CobScript::Wake,src/units/cob_script.h,field_read,Channel::state
 ,CobScript::Wake,src/units/cob_script.h,field_read,Channel::waiting
 ,CobScript::Wake,src/units/cob_script.h,field_write,Channel::state
@@ -46144,6 +46194,13 @@ address,function,file,kind,target
 ,FreePresented,src/host/win32/headless.cpp,global_write,g_presented
 ,FreePresented,src/host/win32/headless.cpp,global_write,g_presentedHeight
 ,FreePresented,src/host/win32/headless.cpp,global_write,g_presentedWidth
+,FreeSquadManagerNative,src/seams/native.cpp,call,SquadManager::DeleteTimers
+,FreeSquadManagerNative,src/seams/native.cpp,call,get
+,FreeSquadManagerNative,src/seams/native.cpp,call,operator delete
+,FreeSquadManagerNative,src/seams/native.cpp,call,operator=
+,FreeSquadManagerNative,src/seams/native.cpp,field_read,Player::ai
+,FreeSquadManagerNative,src/seams/native.cpp,field_write,Player::ai
+,FreeSquadManagerNative,src/seams/native.cpp,function,
 ,FreeState,src/map/features.cpp,call,EffectOf
 ,FreeState,src/map/features.cpp,call,PublishEffect
 ,FreeState,src/map/features.cpp,field_write,FeaturesEvent::state
@@ -46964,6 +47021,12 @@ address,function,file,kind,target
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_sound@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_trace@src/harness/harness.cpp
 ,HarnessAfterStep,src/harness/harness.cpp,global_write,s_ui@src/harness/harness.cpp
+,HarnessAiEvent,src/harness/harness.cpp,call,AiResultsAdd
+,HarnessAiEvent,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessAiEvent,src/harness/harness.cpp,function,
+,HarnessAiEvent,src/harness/harness.cpp,global_maybe_written,s_aiResults@src/harness/harness.cpp
+,HarnessAiEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessAiEvent,src/harness/harness.cpp,global_write,s_aiResultsLost@src/harness/harness.cpp
 ,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,call,host_event_wait
 ,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,function,
 ,HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,global_read,s_loadEnded@src/harness/harness.cpp
@@ -47052,6 +47115,7 @@ address,function,file,kind,target
 ,HarnessGameSeed,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessGameSeed,src/harness/harness.cpp,function,
 ,HarnessGameSeed,src/harness/harness.cpp,global_read,s_gameSeed@src/harness/harness.cpp
+,HarnessInit,src/harness/harness.cpp,call,AiIdleSeam
 ,HarnessInit,src/harness/harness.cpp,call,BlockScanEnable
 ,HarnessInit,src/harness/harness.cpp,call,EnterHarnessTestMode
 ,HarnessInit,src/harness/harness.cpp,call,Fail
@@ -47080,9 +47144,13 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,call,strcpy
 ,HarnessInit,src/harness/harness.cpp,call,time
 ,HarnessInit,src/harness/harness.cpp,deref_read,*char
+,HarnessInit,src/harness/harness.cpp,field_read,Seams::ai
+,HarnessInit,src/harness/harness.cpp,field_write,Seams::ai
 ,HarnessInit,src/harness/harness.cpp,field_write,Seams::pathfinding
 ,HarnessInit,src/harness/harness.cpp,function,
 ,HarnessInit,src/harness/harness.cpp,global_maybe_written,s_scenarioPath@src/harness/harness.cpp
+,HarnessInit,src/harness/harness.cpp,global_read,g_seams
+,HarnessInit,src/harness/harness.cpp,global_read,s_aiIdle@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_fpuControlWord@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,global_read,s_matchSetup@src/harness/harness.cpp
@@ -47115,6 +47183,7 @@ address,function,file,kind,target
 ,HarnessPathEvent,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
 ,HarnessPathEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessPathEvent,src/harness/harness.cpp,global_write,s_pathResultsLost@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,call,AiResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,EconomyResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,FeaturesResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,GameHoldrand
@@ -47138,6 +47207,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,fflush
 ,HarnessPhase,src/harness/harness.cpp,call,fprintf
 ,HarnessPhase,src/harness/harness.cpp,function,
+,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_aiResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_economyResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_featuresResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_losRadarResults@src/harness/harness.cpp
@@ -47669,30 +47739,26 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::units
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::weapons
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::wind_meteors
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CmdLimit
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CmdPlan
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CmdWeight
+,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CreatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CreateSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::CreateSquads
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::DestroyPlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::DumpPlayerAI
+,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::FreeSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::FreeSquads
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::GetFactoriesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::GetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::GetVisibleEnemiesInRadiusList
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::HasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::IsPointVisible
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::MarkOwnerNetDirtyFromDamageSplit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ParseDownloadableAiWeightScripts
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ReactToAttack
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::RebuildFeatureCells
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ResetAIPlayers
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::SetUnitSquad
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::SquadManagerDeleteTimers
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::SquadManagerTickIfActive
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdatePlayerAI
+,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdateSquads
+,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::GetEnergyUse
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Init
@@ -47987,30 +48053,26 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::SaveMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::UpdateMeteors
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WindMeteorsSeam::UpdateWind
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdLimit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdPlan
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCmdWeight
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCreatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCreateSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiCreateSquads
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiDestroyPlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiDumpPlayerAI
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiFreeSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiFreeSquads
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiGetFactoriesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiGetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiGetVisibleEnemiesInRadiusList
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiHasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiIsPointVisible
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiMarkOwnerNetDirtyFromDamageSplit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiParseDownloadableAiWeightScripts
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiReactToAttack
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiRebuildFeatureCells
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiReparseAiWeightScriptsIfLimitNotSticky
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiResetAIPlayers
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiSetUnitSquad
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiSquadManagerDeleteTimers
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiSquadManagerTickIfActive
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdatePlayerAI
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdateSquads
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyGetEnergyUse
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyInit
@@ -48849,30 +48911,26 @@ address,function,file,kind,target
 ,Install,src/units/unit_motion.cpp,function,
 ,Install,src/units/unit_motion.cpp,indirect_call,indirect via <overloaded function type>
 ,InstallNativeSeams,src/seams/native.cpp,call,NativePathWorld
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdLimit
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdPlan
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CmdWeight
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreatePlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquadManager
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::CreateSquads
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::DestroyPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::DumpPlayerAI
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::FreeSquadManager
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::FreeSquads
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::GetFactoriesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::GetVisibleEnemiesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::GetVisibleEnemiesInRadiusList
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::HasReadyUnitInRange
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::IsPointVisible
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::MarkOwnerNetDirtyFromDamageSplit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ParseDownloadableAiWeightScripts
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ReactToAttack
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::RebuildFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ResetAIPlayers
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::SetUnitSquad
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::SquadManagerDeleteTimers
-,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::SquadManagerTickIfActive
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::UpdatePlayerAI
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::UpdateSquads
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::WriteState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::GetEnergyUse
 ,InstallNativeSeams,src/seams/native.cpp,field_write,EconomySeam::Init
@@ -49213,6 +49271,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddRepairProgress
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AdvanceMissionNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,AiApply
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,AiWriteState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AllocWeaponArray
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AllocateUnitMemory
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AnimateFeatureType
@@ -49259,9 +49319,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClaimWeaponsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClampWorldPosToTerrain
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdWeight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CobScriptExplodePieceNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountDirectoryEntries
@@ -49317,6 +49374,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeOtaEnumCacheAndMission
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreePlayers
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeRadar
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeSquadManagerNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeSquads
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeUnitCategories
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeUnitInfo
@@ -49419,7 +49477,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LzssEnablePreset
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LzssExpand
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MakeDirectoryPath
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,MarkOwnerNetDirtyFromDamageSplitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MarkRecentlyDamaged
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MatchWildcard
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MissionExistsNative
@@ -49468,7 +49525,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PoseUnitModel
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,QueryScriptNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,QueueBuildOrder
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReactToAttack
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReattachFxToUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildAIFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildFeatureCells
@@ -49510,13 +49566,10 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetMissionType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetStateBitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitPosition
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitSquad
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetupPlayerSlot
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SnapWorldPosToFootprint
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SoundHeardMask
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpawnProjectile
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SquadManagerDeleteTimersNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SquadManagerTickIfActiveNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,StampFeatureMetal
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,StartScriptNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,StartScriptWithArgsByIndexNative
@@ -49543,6 +49596,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSfxOccupyNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateSquadsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitWeapons
@@ -50572,8 +50626,6 @@ address,function,file,kind,target
 ,MapUnitOfHandle,src/map/terrain.cpp,call,get
 ,MapUnitOfHandle,src/map/terrain.cpp,field_write,Ref<Unit>::offset
 ,MapUnitOfHandle,src/map/terrain.cpp,function,
-,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,call,SquadManager::MarkOwnerNetDirtyFromDamageSplit
-,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,function,
 ,Marked,src/orders/order_dispatch.cpp,field_read,FeatureMarkView::ffe
 ,Marked,src/orders/order_dispatch.cpp,function,
 ,MatchSetupBegin,src/game/match_setup.cpp,call,Fatal
@@ -51423,6 +51475,7 @@ address,function,file,kind,target
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_soundBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_maybe_written,s_uiBuffer@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,g_quirks
+,OpenTrace,src/harness/harness.cpp,global_read,s_aiIdle@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_crtSeed@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,OpenTrace,src/harness/harness.cpp,global_read,s_dumpEnabled@src/harness/harness.cpp
@@ -51493,6 +51546,57 @@ address,function,file,kind,target
 ,OrderVec3,src/orders/order_list.cpp,field_write,Vec3::y
 ,OrderVec3,src/orders/order_list.cpp,field_write,Vec3::z
 ,OrderVec3,src/orders/order_list.cpp,function,
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,call,UnitOfOffset
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::extra
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::hasPos
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::params
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::pos
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::target
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::unit
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,AiEvent::value
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,OrdersSeam::AddOrder
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_read,Seams::orders
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_write,Vec3::x
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_write,Vec3::y
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,field_write,Vec3::z
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,function,
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,global_read,g_seams
+,OrdersOnAiAddOrder,src/orders/ai_effects.cpp,indirect_call,"indirect via void (*)(MissionType, int, Unit *, Unit *, Vec3 *, int, int) __attribute__((stdcall)) [OrdersSeam::AddOrder]"
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,call,UnitOfOffset
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,field_read,AiEvent::target
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,field_read,AiEvent::unit
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,field_read,OrdersSeam::IssueAttackOrder
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,field_read,Seams::orders
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,function,
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,global_read,g_seams
+,OrdersOnAiAttack,src/orders/ai_effects.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::IssueAttackOrder]"
+,OrdersOnAiHit,src/orders/ai_effects.cpp,call,UnitOfOffset
+,OrdersOnAiHit,src/orders/ai_effects.cpp,field_read,AiEvent::unit
+,OrdersOnAiHit,src/orders/ai_effects.cpp,field_read,AiEvent::value
+,OrdersOnAiHit,src/orders/ai_effects.cpp,field_read,Unit::netDirtyFlags
+,OrdersOnAiHit,src/orders/ai_effects.cpp,field_write,Unit::netDirtyFlags
+,OrdersOnAiHit,src/orders/ai_effects.cpp,function,
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,call,UnitOfOffset
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,call,operator UnitDef *
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_escape,UnitDef::unitname
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,AiEvent::extra
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,AiEvent::unit
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,AiEvent::value
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,Game::defs
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,OrdersSeam::QueueBuildOrder
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,field_read,Seams::orders
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,function,
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,global_read,g_game
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,global_read,g_seams
+,OrdersOnAiQueueBuild,src/orders/ai_effects.cpp,indirect_call,"indirect via void (*)(char *, Unit *, int) __attribute__((stdcall)) [OrdersSeam::QueueBuildOrder]"
+,OrdersOnAiStop,src/orders/ai_effects.cpp,call,UnitOfOffset
+,OrdersOnAiStop,src/orders/ai_effects.cpp,field_read,AiEvent::unit
+,OrdersOnAiStop,src/orders/ai_effects.cpp,field_read,AiEvent::value
+,OrdersOnAiStop,src/orders/ai_effects.cpp,field_read,OrdersSeam::DeleteOrders
+,OrdersOnAiStop,src/orders/ai_effects.cpp,field_read,Seams::orders
+,OrdersOnAiStop,src/orders/ai_effects.cpp,function,
+,OrdersOnAiStop,src/orders/ai_effects.cpp,global_read,g_seams
+,OrdersOnAiStop,src/orders/ai_effects.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [OrdersSeam::DeleteOrders]"
 ,OutOfBlock,src/state/block.cpp,call,Fatal
 ,OutOfBlock,src/state/block.cpp,function,
 ,OvrFile::OvrFile,src/units/unit_types.cpp,call,HapiBank::InitBank
@@ -52694,6 +52798,7 @@ address,function,file,kind,target
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,ReachPosVec3::x
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,field_read,ReachPosVec3::z
 ,ReachPosLineOfFire,src/weapons/weapons.cpp,function,
+,ReachQuirkGuard,src/harness/harness.cpp,call,AiPublishSetSquad
 ,ReachQuirkGuard,src/harness/harness.cpp,call,ApplyUnitDeath
 ,ReachQuirkGuard,src/harness/harness.cpp,call,Fail
 ,ReachQuirkGuard,src/harness/harness.cpp,call,GameAt
@@ -52706,16 +52811,12 @@ address,function,file,kind,target
 ,ReachQuirkGuard,src/harness/harness.cpp,call,operator unsigned char *
 ,ReachQuirkGuard,src/harness/harness.cpp,deref_read,*unsigned short
 ,ReachQuirkGuard,src/harness/harness.cpp,deref_read,*void
-,ReachQuirkGuard,src/harness/harness.cpp,field_read,AiSeam::SetUnitSquad
 ,ReachQuirkGuard,src/harness/harness.cpp,field_read,PlayerSpec::human
 ,ReachQuirkGuard,src/harness/harness.cpp,field_read,PlayerSpec::named
-,ReachQuirkGuard,src/harness/harness.cpp,field_read,Seams::ai
 ,ReachQuirkGuard,src/harness/harness.cpp,function,
 ,ReachQuirkGuard,src/harness/harness.cpp,global_read,g_playerAI
-,ReachQuirkGuard,src/harness/harness.cpp,global_read,g_seams
 ,ReachQuirkGuard,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,ReachQuirkGuard,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
-,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,indirect via void (*)(void *) __attribute__((thiscall)) [onTimer]
 ,ReachQuirkGuard,src/harness/harness.cpp,indirect_call,"indirect via void (*)(void *, int, int) __attribute__((thiscall)) [setUnitValue]"
 ,ReachUnitDistSquared,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
@@ -52838,6 +52939,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_scenarioQuirkSet@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_maybe_written,s_scenarioQuirks@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,reachFlags@ReadKey
+,ReadKey,src/harness/harness.cpp,global_read,s_aiLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_decidedLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameTypeLine@src/harness/harness.cpp
@@ -52851,6 +52953,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_aiIdle@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_aiLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_campaignLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_commanderDeath@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_commanderDeathLine@src/harness/harness.cpp
@@ -53080,30 +53184,16 @@ address,function,file,kind,target
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::field_6
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::flags
 ,Rec::Rec,src/map/line_of_sight.h,function,
-,RecAiCmdLimit,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiCmdLimit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiCmdLimit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiCmdLimit,src/harness/replay_hooks.inc,field_read,AiSeam::CmdLimit
-,RecAiCmdLimit,src/harness/replay_hooks.inc,function,
-,RecAiCmdLimit,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiCmdLimit,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiCmdLimit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdLimit]
-,RecAiCmdPlan,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiCmdPlan,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiCmdPlan,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiCmdPlan,src/harness/replay_hooks.inc,field_read,AiSeam::CmdPlan
-,RecAiCmdPlan,src/harness/replay_hooks.inc,function,
-,RecAiCmdPlan,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiCmdPlan,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiCmdPlan,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdPlan]
-,RecAiCmdWeight,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiCmdWeight,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiCmdWeight,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiCmdWeight,src/harness/replay_hooks.inc,field_read,AiSeam::CmdWeight
-,RecAiCmdWeight,src/harness/replay_hooks.inc,function,
-,RecAiCmdWeight,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiCmdWeight,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiCmdWeight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(CommandArgs *) __attribute__((stdcall)) [AiSeam::CmdWeight]
+,RecAiApply,src/harness/replay_hooks.inc,call,ArgPending
+,RecAiApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecAiApply,src/harness/replay_hooks.inc,field_read,AiSeam::Apply
+,RecAiApply,src/harness/replay_hooks.inc,function,
+,RecAiApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecAiApply,src/harness/replay_hooks.inc,global_read,s_inner_ai
+,RecAiApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecAiApply,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const AiEvent *) __attribute__((stdcall)) [AiSeam::Apply]
 ,RecAiCreatePlayerAI,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiCreatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiCreatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53147,6 +53237,15 @@ address,function,file,kind,target
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, void *) __attribute__((stdcall)) [AiSeam::DumpPlayerAI]"
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,call,Add
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,call,ArgObject
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,field_read,AiSeam::FreeSquadManager
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,function,
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,global_read,s_call
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,global_read,s_inner_ai
+,RecAiFreeSquadManager,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Player *) __attribute__((stdcall)) [AiSeam::FreeSquadManager]
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,call,Add
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,call,ArgObject
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -53213,17 +53312,6 @@ address,function,file,kind,target
 ,RecAiIsPointVisible,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiIsPointVisible,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecAiIsPointVisible,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Player *, Vec3 *) __attribute__((stdcall)) [AiSeam::IsPointVisible]"
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,Add
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,ArgObject
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,field_read,AiSeam::MarkOwnerNetDirtyFromDamageSplit
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,function,
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiMarkOwnerNetDirtyFromDamageSplit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SquadManager *, int, Projectile *, int, int) __attribute__((fastcall)) [AiSeam::MarkOwnerNetDirtyFromDamageSplit]"
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53232,21 +53320,6 @@ address,function,file,kind,target
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::ParseDownloadableAiWeightScripts]
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,Add
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ArgObject
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,FinishImport
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ImportObject
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ImportValue
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::Import
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiReactToAttack,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiReactToAttack,src/harness/replay_hooks.inc,field_read,AiSeam::ReactToAttack
-,RecAiReactToAttack,src/harness/replay_hooks.inc,function,
-,RecAiReactToAttack,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiReactToAttack,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiReactToAttack,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, Unit *, int) __attribute__((stdcall)) [AiSeam::ReactToAttack]"
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53269,34 +53342,6 @@ address,function,file,kind,target
 ,RecAiResetAIPlayers,src/harness/replay_hooks.inc,function,
 ,RecAiResetAIPlayers,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiResetAIPlayers,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [AiSeam::ResetAIPlayers]
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,call,Add
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,call,ArgObject
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,field_read,AiSeam::SetUnitSquad
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,function,
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiSetUnitSquad,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,field_read,AiSeam::SquadManagerDeleteTimers
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,function,
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiSquadManagerDeleteTimers,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerDeleteTimers]"
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,field_read,AiSeam::SquadManagerTickIfActive
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,function,
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiSquadManagerTickIfActive,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerTickIfActive]"
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -53305,6 +53350,22 @@ address,function,file,kind,target
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::UpdatePlayerAI]
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,call,ArgValue
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,field_read,AiSeam::UpdateSquads
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,function,
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,global_read,s_call
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,global_read,s_inner_ai
+,RecAiUpdateSquads,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::UpdateSquads]
+,RecAiWriteState,src/harness/replay_hooks.inc,call,ArgPending
+,RecAiWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecAiWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecAiWriteState,src/harness/replay_hooks.inc,field_read,AiSeam::WriteState
+,RecAiWriteState,src/harness/replay_hooks.inc,function,
+,RecAiWriteState,src/harness/replay_hooks.inc,global_read,s_call
+,RecAiWriteState,src/harness/replay_hooks.inc,global_read,s_inner_ai
+,RecAiWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [AiSeam::WriteState]
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,ArgPending
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -58030,12 +58091,10 @@ address,function,file,kind,target
 ,SchedPhaseBoundary,src/game/scheduler.cpp,function,
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,HarnessPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,SchedDeliver
-,SchedPlayersPhase,src/game/scheduler.cpp,call,operator SquadManager *
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,operator Unit *
-,SchedPlayersPhase,src/game/scheduler.cpp,call,operator!=
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_escape,Game::players
-,SchedPlayersPhase,src/game/scheduler.cpp,field_read,AiSeam::SquadManagerTickIfActive
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,AiSeam::UpdatePlayerAI
+,SchedPlayersPhase,src/game/scheduler.cpp,field_read,AiSeam::UpdateSquads
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,EconomySeam::UpdatePlayerEconomy
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Game::playerIndex
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,LosRadarSeam::RecordRadarMapped
@@ -58045,7 +58104,6 @@ address,function,file,kind,target
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,OrdersSeam::ApplyPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PathfindingSeam::Poll
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PathfindingSeam::Step
-,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Player::ai
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Player::unitsBegin
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,Player::unitsEnd
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_read,PlayersSeam::UpdatePlayerBody
@@ -58070,10 +58128,10 @@ address,function,file,kind,target
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::UpdateSensorRadarAndCloak]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PathfindingSeam::Step]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdatePlayersFinish]
-,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerTickIfActive]"
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(const PathEvent *, const PathPoint *) __attribute__((stdcall)) [OrdersSeam::ApplyPathEvent]"
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::UpdatePlayerAI]
+,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::UpdateSquads]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::UpdatePlayerEconomy]
 ,SchedPlayersPhase,src/game/scheduler.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PlayersSeam::UpdatePlayerTail]
 ,SchedPublish,src/game/scheduler.cpp,call,FatalError
@@ -59066,10 +59124,6 @@ address,function,file,kind,target
 ,SpendOn,src/game/economy.cpp,call,SpendEnergyOn
 ,SpendOn,src/game/economy.cpp,call,SpendMetalOn
 ,SpendOn,src/game/economy.cpp,function,
-,SquadManagerDeleteTimersNative,src/seams/native.cpp,call,SquadManager::DeleteTimers
-,SquadManagerDeleteTimersNative,src/seams/native.cpp,function,
-,SquadManagerTickIfActiveNative,src/seams/native.cpp,call,SquadManager::TickIfActive
-,SquadManagerTickIfActiveNative,src/seams/native.cpp,function,
 ,SquadTimer::~SquadTimer,src/ai/squad_timer.h,function,
 ,Square,src/orders/vtol_orders.cpp,field_read,Vec3::x
 ,Square,src/orders/vtol_orders.cpp,field_read,Vec3::z
@@ -59923,6 +59977,12 @@ address,function,file,kind,target
 ,UnitOfHandle,src/units/unit_targets.cpp,call,get
 ,UnitOfHandle,src/units/unit_targets.cpp,field_write,Ref<Unit>::offset
 ,UnitOfHandle,src/units/unit_targets.cpp,function,
+,UnitOfOffset,src/orders/ai_effects.cpp,call,get
+,UnitOfOffset,src/orders/ai_effects.cpp,field_write,Ref<Unit>::offset
+,UnitOfOffset,src/orders/ai_effects.cpp,function,
+,UnitOfOffset,src/units/ai_effects.cpp,call,get
+,UnitOfOffset,src/units/ai_effects.cpp,field_write,Ref<Unit>::offset
+,UnitOfOffset,src/units/ai_effects.cpp,function,
 ,UnitRef::Get,src/units/unit_ref.h,call,operator Unit *
 ,UnitRef::Get,src/units/unit_ref.h,field_read,UnitRef::owner
 ,UnitRef::Get,src/units/unit_ref.h,function,
@@ -59996,6 +60056,30 @@ address,function,file,kind,target
 ,UnitTypeSet::UnitTypeSet,src/units/unit_type_set.h,function,
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,call,UnitTypeSet::AddTypeOrCategory
 ,UnitTypeSetAddTypeOrCategoryNative,src/seams/native.cpp,function,
+,UnitsOnAiActivate,src/units/ai_effects.cpp,call,UnitOfOffset
+,UnitsOnAiActivate,src/units/ai_effects.cpp,field_read,AiEvent::extra
+,UnitsOnAiActivate,src/units/ai_effects.cpp,field_read,AiEvent::unit
+,UnitsOnAiActivate,src/units/ai_effects.cpp,field_read,AiEvent::value
+,UnitsOnAiActivate,src/units/ai_effects.cpp,field_read,Seams::units
+,UnitsOnAiActivate,src/units/ai_effects.cpp,field_read,UnitsSeam::SetStateBits
+,UnitsOnAiActivate,src/units/ai_effects.cpp,function,
+,UnitsOnAiActivate,src/units/ai_effects.cpp,global_read,g_seams
+,UnitsOnAiActivate,src/units/ai_effects.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,call,UnitOfOffset
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,field_read,AiEvent::unit
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,field_read,AiEvent::value
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,field_read,Seams::units
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,field_read,UnitsSeam::NotifyUnitRefs
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,function,
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,global_read,g_seams
+,UnitsOnAiNotifyRefs,src/units/ai_effects.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::NotifyUnitRefs]"
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,call,UnitOfOffset
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,field_read,AiEvent::extra
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,field_read,AiEvent::unit
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,field_read,AiEvent::value
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,field_read,Unit::flags
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,field_write,Unit::flags
+,UnitsOnAiSetStates,src/units/ai_effects.cpp,function,
 ,UnitsOnEconomyCloak,src/units/economy_effects.cpp,call,UnitOfHandle
 ,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,EconomyEvent::unit
 ,UnitsOnEconomyCloak,src/units/economy_effects.cpp,field_read,EconomyEvent::value
@@ -60207,6 +60291,7 @@ address,function,file,kind,target
 ,UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,UpdateMotionNative,src/seams/native.cpp,call,UnitMotion::UpdateMotion
 ,UpdateMotionNative,src/seams/native.cpp,function,
+,UpdatePlayerAIIdle,src/ai/ai_idle.cpp,function,
 ,UpdatePlayerBody,src/game/players.cpp,call,CountActiveAIPlayers
 ,UpdatePlayerBody,src/game/players.cpp,call,CountCombatPlayers
 ,UpdatePlayerBody,src/game/players.cpp,call,EconHandleOf
@@ -60327,6 +60412,12 @@ address,function,file,kind,target
 ,UpdatePlayersOnStream,src/seams/native.cpp,function,
 ,UpdateSfxOccupyNative,src/seams/native.cpp,call,SfxOccupyTracker::UpdateSfxOccupy
 ,UpdateSfxOccupyNative,src/seams/native.cpp,function,
+,UpdateSquadsIdle,src/ai/ai_idle.cpp,function,
+,UpdateSquadsNative,src/seams/native.cpp,call,SquadManager::TickIfActive
+,UpdateSquadsNative,src/seams/native.cpp,call,get
+,UpdateSquadsNative,src/seams/native.cpp,field_read,Player::ai
+,UpdateSquadsNative,src/seams/native.cpp,function,
+,UpdateSquadsNative,src/seams/native.cpp,global_read,g_game
 ,UpdateSubState,src/frontend/frontend.cpp,call,SetSubState
 ,UpdateSubState,src/frontend/frontend.cpp,field_read,Game::frontendNextSubState
 ,UpdateSubState,src/frontend/frontend.cpp,field_read,Game::frontendSubState
@@ -60473,7 +60564,7 @@ address,function,file,kind,target
 ,Vec3Sum::operator+,src/orders/unit_orders.cpp,field_write,Vec3::y
 ,Vec3Sum::operator+,src/orders/unit_orders.cpp,field_write,Vec3::z
 ,Vec3Sum::operator+,src/orders/unit_orders.cpp,function,
-,Vec::Vec,src/ai/vec.h,function,
+,Vec::Vec,src/util/vec.h,function,
 ,VectorCount,src/harness/harness.cpp,call,ReadRefAt
 ,VectorCount,src/harness/harness.cpp,deref_write,*unsigned char
 ,VectorCount,src/harness/harness.cpp,function,
@@ -60630,6 +60721,43 @@ address,function,file,kind,target
 ,Visit,src/harness/replay_objects.cpp,function,
 ,Visit,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,Visit,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,VisitAiResults,src/harness/harness.cpp,call,DumpHexBytes
+,VisitAiResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitAiResults,src/harness/harness.cpp,call,DumpUnitName
+,VisitAiResults,src/harness/harness.cpp,call,Fail
+,VisitAiResults,src/harness/harness.cpp,call,Resolve
+,VisitAiResults,src/harness/harness.cpp,call,SimBlockBase
+,VisitAiResults,src/harness/harness.cpp,call,fprintf
+,VisitAiResults,src/harness/harness.cpp,call,memcpy
+,VisitAiResults,src/harness/harness.cpp,call,sprintf
+,VisitAiResults,src/harness/harness.cpp,deref_escape,*AiResult
+,VisitAiResults,src/harness/harness.cpp,field_escape,AiEvent::params
+,VisitAiResults,src/harness/harness.cpp,field_escape,AiEvent::pos
+,VisitAiResults,src/harness/harness.cpp,field_escape,AiEvent::types
+,VisitAiResults,src/harness/harness.cpp,field_escape,AiResult::event
+,VisitAiResults,src/harness/harness.cpp,field_maybe_written,AiResult::targetId
+,VisitAiResults,src/harness/harness.cpp,field_maybe_written,AiResult::targetTag
+,VisitAiResults,src/harness/harness.cpp,field_maybe_written,AiResult::unitId
+,VisitAiResults,src/harness/harness.cpp,field_maybe_written,AiResult::unitTag
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::extra
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::hasPos
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::kind
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::scale
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::target
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::unit
+,VisitAiResults,src/harness/harness.cpp,field_read,AiEvent::value
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResult::outcome
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResult::targetId
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResult::targetTag
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResult::unitId
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResult::unitTag
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResults::count
+,VisitAiResults,src/harness/harness.cpp,field_read,AiResults::items
+,VisitAiResults,src/harness/harness.cpp,function,
+,VisitAiResults,src/harness/harness.cpp,global_read,s_aiResults@src/harness/harness.cpp
+,VisitAiResults,src/harness/harness.cpp,global_read,s_aiResultsLost@src/harness/harness.cpp
+,VisitAiResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,VisitAiResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitBlob,src/harness/harness.cpp,call,DumpPrefix
 ,VisitBlob,src/harness/harness.cpp,call,HashBuf
 ,VisitBlob,src/harness/harness.cpp,call,fputs
@@ -61017,8 +61145,10 @@ address,function,file,kind,target
 ,VisitMissionConditions,src/harness/harness.cpp,function,
 ,VisitMissionConditions,src/harness/harness.cpp,global_read,kMissionConditionsTable@src/harness/trace_schema.h
 ,VisitModuleState,src/harness/harness.cpp,call,WriterEndRecord
+,VisitModuleState,src/harness/harness.cpp,field_read,AiSeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,field_read,EconomySeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,field_read,PathfindingSeam::WriteState
+,VisitModuleState,src/harness/harness.cpp,field_read,Seams::ai
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::economy
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::pathfinding
 ,VisitModuleState,src/harness/harness.cpp,function,
@@ -61028,6 +61158,7 @@ address,function,file,kind,target
 ,VisitModuleState,src/harness/harness.cpp,global_read,s_stateWriter@src/harness/harness.cpp
 ,VisitModuleState,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
 ,VisitModuleState,src/harness/harness.cpp,global_write,s_writerOpen@src/harness/harness.cpp
+,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [AiSeam::WriteState]
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [EconomySeam::WriteState]
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [PathfindingSeam::WriteState]
 ,VisitMotions,src/harness/harness.cpp,call,EndSection
@@ -61446,6 +61577,7 @@ address,function,file,kind,target
 ,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_windMeteorsResults@src/harness/harness.cpp
 ,VisitWindMeteorsResults,src/harness/harness.cpp,global_read,s_windMeteorsResultsLost@src/harness/harness.cpp
+,VisitWorld,src/harness/harness.cpp,call,VisitAiResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitConstants
 ,VisitWorld,src/harness/harness.cpp,call,VisitEconomyResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitExplored

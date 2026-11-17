@@ -9,6 +9,12 @@
 #include "../../interfaces/services.h"
 #include "../units/unit_commands.h"
 
+struct Player;
+struct Unit;
+
+void __stdcall KillPlayerUnits(unsigned char player);
+int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event);
+
 inline PlayersEvent PlayersEventOf(int kind)
 {
     PlayersEvent event;

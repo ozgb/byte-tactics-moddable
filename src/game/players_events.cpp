@@ -32,8 +32,6 @@ struct UnitDef;
 #include "../../link/globals.h"
 #include "players_events.h"
 #include "../network/net_game.h"
-#include "economy_events.h"
-#include "../units/units.h"
 
 // FUNCTION: 0x464b30
 int __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
@@ -86,7 +84,7 @@ int __stdcall PlayersApply(const PlayersEvent* e)
     Unit* unit = ref.get();
     switch (e->kind) {
     case PLAYERS_GIVE_UNIT:
-        if (unit == nullptr || (unsigned)e->player > 9)
+        if (unit == nullptr || (unsigned)e->player > 9 || g_game->list_391ed == nullptr)
             return 0;
         return GiveUnitToPlayer(unit, &g_game->players[e->player], e);
     case PLAYERS_KILL_UNITS:

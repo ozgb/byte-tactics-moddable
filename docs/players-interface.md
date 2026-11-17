@@ -95,11 +95,15 @@ transfers returned nothing in 3.1c, so none of them is synchronous by its contra
 route's (section 4).
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 41) and returned to no
-one: 1 for UNIT_CREATED, UNIT_DIED and KILL_UNITS; for GIVE_UNIT, 1 when the unit changed hands and 0 when it was
-already the receiver's, dead, dying, or the receiver could not take it; for TRANSFER, 1, or 0 when either player is
+one: 1 for UNIT_CREATED, UNIT_DIED and KILL_UNITS; for GIVE_UNIT, 1 when players published the hand-over (SEND_UNIT or
+CAPTURE_UNIT) and 0 when the unit was already the receiver's, dead, dying, or the receiver could not take it (the
+outcome is players' decision: units can still refuse a local copy at its unit limit, and the unit then stays with its
+old owner); for TRANSFER, 1, or 0 when either player is
 slot 10 or the amount is 0. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
-player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a UNIT_CREATED or
-UNIT_DIED with no conditions, and an unknown kind, with outcome 0 and no change. KILL_UNITS takes slot 10, the
+player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a GIVE_UNIT, UNIT_CREATED or
+UNIT_DIED with no conditions (3.1c's GIVE_UNIT had no such check and crashed there, so no
+trace depends on it), and an
+unknown kind, with outcome 0 and no change. KILL_UNITS takes slot 10, the
 `Player` record past the ten players (`pad_2851`), because 3.1c's `KillPlayerUnits` is reachable with it from the
 network (`RemovePlayer` of an unknown id); a module publishing from WASM can reach the others.
 

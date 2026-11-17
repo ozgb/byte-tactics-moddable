@@ -23,13 +23,11 @@ struct OwnershipTransferPacket {
 #pragma pack(pop)
 
 class UnitDef;
-struct PlayersEvent;
 
 void __stdcall InitUnitCategories();
 void __stdcall FreeUnitCategories();
 
 void __cdecl CreateMissionUnits();
-int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
 UnitTypeSet* __stdcall GetLoadCategoryMask(char* name);

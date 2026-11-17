@@ -20,7 +20,6 @@ int __stdcall IsUnitCommander(Unit* unit);
 void __stdcall KillUnit(Unit* unit, int);
 void __stdcall KillUnitsOfType(short id);
 void __stdcall KillAllUnits(void);
-void __stdcall KillPlayerUnits(unsigned char player);
 
 void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local);
 

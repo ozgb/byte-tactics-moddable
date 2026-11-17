@@ -12,9 +12,9 @@ class TdfFile;
 // Minor version of the players interface, changed when a slot is added.
 #define PLAYERS_VERSION_MINOR 0
 
-// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a null unit, or a player above 10, changes nothing; outcome 0.
+// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
 enum PlayersEventKind {
-    // Hands unit to player: the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of an ownership record when record is 1); outcome 1 when it changed hands, 0 when the unit was already the player's, dead, dying or the player could not take it.
+    // Hands unit to player: the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of an ownership record when record is 1); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it.
     PLAYERS_GIVE_UNIT = 192,
     // Kills every unit of player that is alive and not dying, one by one in the order of the player's units: by its own damage when its owner plays, else by self-destruct; outcome 1.
     PLAYERS_KILL_UNITS = 193,

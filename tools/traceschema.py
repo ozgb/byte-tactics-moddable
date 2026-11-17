@@ -11,7 +11,7 @@ record for each economy event (section 33), with the account that only a LOAD ad
 is the record for each resource share packet the step sends (section 35); its "features" entry is the
 record for each features event (section 36); its "windMeteors" entry is the record for each wind_meteors
 event consumed or effect published (section 37), the kind and then the record's bytes after it; its "targeting" entry is the
-record for each targeting event or effect (section 38); its "los_radar" entry is the record for each los_radar event (section 39); its "map" entry is the record for each map event or effect (section 40). No row hashes any of them.
+record for each targeting event or effect (section 38); its "los_radar" entry is the record for each los_radar event (section 39); its "map" entry is the record for each map event or effect (section 40); its "playersEvents" entry is the record for each players event or effect (section 41). No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -982,6 +982,22 @@ MAP_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("cause", 4, "scalar", None),
     ("outcome", 4, "scalar", None),
 ]
+PLAYERS_EVENTS_SECTION = 41
+PLAYERS_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("player", 4, "scalar", None),
+    ("from", 4, "scalar", None),
+    ("value", 4, "scalar", None),
+    ("amount", 4, "scalar", None),
+    ("announce", 4, "scalar", None),
+    ("record", 4, "scalar", None),
+    ("hitPoints", 4, "scalar", None),
+    ("buildPercent", 4, "scalar", None),
+    ("angles", 6, "bytes", None),
+    ("stockpiles", 3, "bytes", None),
+    ("outcome", 4, "scalar", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1409,6 +1425,11 @@ def render_json(model):
     out.append('  "map": {')
     out.append('    "section": %d,' % map_["section"])
     out.append('    "fields": %s' % many(map_["fields"], "    "))
+    out.append("  },")
+    players_events = model["playersEvents"]
+    out.append('  "playersEvents": {')
+    out.append('    "section": %d,' % players_events["section"])
+    out.append('    "fields": %s' % many(players_events["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1591,6 +1612,9 @@ def generate():
     model["map"] = {"section": MAP_SECTION,
                     "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                for n, size, kind, target in MAP_FIELDS]}
+    model["playersEvents"] = {"section": PLAYERS_EVENTS_SECTION,
+                              "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                         for n, size, kind, target in PLAYERS_EVENTS_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

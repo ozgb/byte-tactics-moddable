@@ -258,6 +258,19 @@ MAP_EVENTS = [
 ]
 
 
+def players_event(k, kind, unit, outcome):
+    names = ["player", "from", "value", "amount", "announce", "record", "hitPoints", "buildPercent"]
+    rows = [("playersEvents[%d].kind" % k, "0x%08x" % kind), ("playersEvents[%d].unit" % k, unit)]
+    rows += [("playersEvents[%d].%s" % (k, n), "0x%08x" % i) for i, n in enumerate(names)]
+    rows += [("playersEvents[%d].angles" % k, "hex:" + bytes(range(6)).hex()),
+             ("playersEvents[%d].stockpiles" % k, "hex:" + bytes(3).hex()),
+             ("playersEvents[%d].outcome" % k, "0x%08x" % outcome)]
+    return rows
+
+
+PLAYERS_EVENTS = [("playersEvents.count", "0x00000002")] + players_event(0, 0xc0, "unit:3", 1) + players_event(1, 0xd1, "null", 1)
+
+
 class DumpedOnlyTest(unittest.TestCase):
     def test_map_events_after_the_los_radar_events_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + SHARE_PACKETS
@@ -265,6 +278,18 @@ class DumpedOnlyTest(unittest.TestCase):
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, len(lines))
+
+    def test_players_events_after_the_map_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + PLAYERS_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_players_events_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("playersEvents.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
 
     def test_an_empty_map_record_is_skipped(self):
         w = tr.Walker(RESULTS, [("map.count", "0x00000000")])

@@ -146,6 +146,8 @@ void __stdcall LoadUnits(HapiBank* file)
 }
 
 #include "../../interfaces/seams.h"
+#include "../game/map_events.h"
+#include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
 #include "../game/economy_events.h"
 #include "../../interfaces/economy.h"
@@ -307,7 +309,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     }
 
     if (unit->cobStateFlags & 4)
-        g_seams.map->ForceNeighborFootprintReclaim(unit);
+        MapPublishUnit(SCHED_UNITS, MAP_RECLAIM_FOOTPRINT, unit);
     return unit;
     }
     return 0;

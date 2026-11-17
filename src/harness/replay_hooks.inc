@@ -3331,6 +3331,22 @@ void __stdcall RecPlayersUpdatePlayersFinish()
     }
 }
 
+int __stdcall RecMapApply(const MapEvent* a0)
+{
+    ReplayRoots roots;
+    if (a0 != nullptr && a0->unit != 0)
+        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
+    SlotScope scope(RSL_MAP_APPLY, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgStruct(s_call, "a", "event", ROK_MAPEVENT, a0);
+    }
+    int result = s_inner_map->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
 {
     ReplayRoots roots;
@@ -3343,19 +3359,6 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecMapRefreshAllPassMaps(Point16 a0, Point16 a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MAP_REFRESHALLPASSMAPS, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "a", a0);
-        ArgValue(s_call, "b", a1);
-    }
-    s_inner_map->RefreshAllPassMaps(a0, a1);
-    if (scope.Open()) {
-    }
 }
 
 int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
@@ -3421,32 +3424,6 @@ void __stdcall RecMapSnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
     }
 }
 
-void __stdcall RecMapAddUnitToMap(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_MAP_ADDUNITTOMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_map->AddUnitToMap(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapRemoveUnitFromMap(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_MAP_REMOVEUNITFROMMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_map->RemoveUnitFromMap(a0);
-    if (scope.Open()) {
-    }
-}
-
 int __stdcall RecMapCanPlaceFootprintAt(Unit* a0, Vec3* a1)
 {
     ReplayRoots roots;
@@ -3477,94 +3454,6 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecMapClearFootprintAndUnlink(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_MAP_CLEARFOOTPRINTANDUNLINK, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_map->ClearFootprintAndUnlink(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapForceNeighborFootprintReclaim(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_MAP_FORCENEIGHBORFOOTPRINTRECLAIM, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_map->ForceNeighborFootprintReclaim(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecMapSetYardOpen(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_MAP_SETYARDOPEN, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "open", a1);
-    }
-    s_inner_map->SetYardOpen(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecMapSpatialBucketPrependUnit(SpatialBucket* a0, int a1, Unit* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_SPATIALBUCKET, a0);
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_MAP_SPATIALBUCKETPREPENDUNIT, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "bucket", ROK_SPATIALBUCKET, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-    }
-    s_inner_map->SpatialBucketPrependUnit(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecMapSpatialBucketUnlinkUnit(SpatialBucket* a0, int a1, Unit* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_SPATIALBUCKET, a0);
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_MAP_SPATIALBUCKETUNLINKUNIT, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "bucket", ROK_SPATIALBUCKET, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-    }
-    s_inner_map->SpatialBucketUnlinkUnit(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecMapRefreshPassMap(MovementClass* a0, int a1, Point16 a2, Point16 a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    SlotScope scope(RSL_MAP_REFRESHPASSMAP, SUB_MAP, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "movementClass", ROK_MOVEMENTCLASS, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "a", a2);
-        ArgValue(s_call, "b", a3);
-    }
-    s_inner_map->RefreshPassMap(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
 }
 
 FileHandle* __stdcall RecFilesOpenRead(char* a0)
@@ -5384,9 +5273,9 @@ void HookSeams(const bool* on)
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayersFinish = RecPlayersUpdatePlayersFinish;
     if (on[SUB_MAP])
-        s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
+        s_rec_map.Apply = RecMapApply;
     if (on[SUB_MAP])
-        s_rec_map.RefreshAllPassMaps = RecMapRefreshAllPassMaps;
+        s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
         s_rec_map.CanBuildAt = RecMapCanBuildAt;
     if (on[SUB_MAP])
@@ -5396,25 +5285,9 @@ void HookSeams(const bool* on)
     if (on[SUB_MAP])
         s_rec_map.SnapWorldPosToFootprint = RecMapSnapWorldPosToFootprint;
     if (on[SUB_MAP])
-        s_rec_map.AddUnitToMap = RecMapAddUnitToMap;
-    if (on[SUB_MAP])
-        s_rec_map.RemoveUnitFromMap = RecMapRemoveUnitFromMap;
-    if (on[SUB_MAP])
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
-    if (on[SUB_MAP])
-        s_rec_map.ClearFootprintAndUnlink = RecMapClearFootprintAndUnlink;
-    if (on[SUB_MAP])
-        s_rec_map.ForceNeighborFootprintReclaim = RecMapForceNeighborFootprintReclaim;
-    if (on[SUB_MAP])
-        s_rec_map.SetYardOpen = RecMapSetYardOpen;
-    if (on[SUB_MAP])
-        s_rec_map.SpatialBucketPrependUnit = RecMapSpatialBucketPrependUnit;
-    if (on[SUB_MAP])
-        s_rec_map.SpatialBucketUnlinkUnit = RecMapSpatialBucketUnlinkUnit;
-    if (on[SUB_MAP])
-        s_rec_map.RefreshPassMap = RecMapRefreshPassMap;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])

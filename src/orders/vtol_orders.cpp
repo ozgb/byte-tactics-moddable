@@ -137,6 +137,7 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
+#include "../map/unit_visitor.h"
 #include "../../interfaces/orders.h"
 #include "order_queue.h"
 #include "order_queue.h"
@@ -487,7 +488,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     UnitList units;
     int range=SearchRange(unit);
     GroundAllyVisitor visitor((Player*)unit->player,&units,unit);
-    g_seams.map->VisitObjectsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
+    VisitUnitsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
     if (!units.empty()) {
         order->SetAttachedFx(0);
         MissionType kind=GetOrderType(7, unit, units[0], nullptr);
@@ -533,7 +534,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         Unit* cargo = order->target;
-        if (g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
+        if (ScheduleMapCanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
             PathOrder* obj = new (kSim) PathOrder(order, order->pos);
             int h = unit->cargo->def->modelMaxYHigh;
             obj->SetAltitude(h);
@@ -548,7 +549,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         if (flags & 0x40)
             return 9;
         Unit* cargo = order->target;
-        if (!g_seams.map->CanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
+        if (!ScheduleMapCanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_UNLOAD_UNIT);
             return 9;
         }
@@ -634,7 +635,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
     case 2: {
         if (flags&0x40) return 8;
         UnitDef* def=&g_game->defs[order->type];
-        if (!g_seams.map->CanPlaceUnitFootprint(def,0,WorldToCell16(order->pos,*(Point16*)&g_game->defs[order->type].footprintx),1)) {
+        if (!ScheduleMapCanPlaceUnitFootprint(def,0,WorldToCell16(order->pos,*(Point16*)&g_game->defs[order->type].footprintx),1)) {
             if (!order->retries) RecordUnitSpeech(unit,7,SIM_SPEECH_WAITING_FOR_TARGET_AREA_TO_CLEAR);
             else if (order->retries>10) { RecordUnitSpeech(unit,7,SIM_SPEECH_TARGET_AREA_WAS_BLOCKED); return 8; }
             ++order->retries;
@@ -2066,7 +2067,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 RepairableUnitVisitor collector((Player*)unit->player, &units, unit);
-                g_seams.map->VisitObjectsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                VisitUnitsInRange(&unit->pos, range, (UnitVisitor*)&collector);
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft == 0.0f) {
@@ -2088,7 +2089,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
             float energyAmount, metalAmount;
             Fixed range;
             range.value = 0xf00000;
-            if (g_seams.map->PickRandomReclaimableResourcesInRadius(&unit->pos, range.value, &energy, &energyAmount, &metal, &metalAmount)) {
+            if (ScheduleMapPickReclaimable(&unit->pos, range.value, &energy, &energyAmount, &metal, &metalAmount)) {
                 if (((Player*)unit->player)->GetMetal() < ((Player*)unit->player)->metalCapacity * 0.2 && metal) {
                     order->SetAttachedFx(0);
                     AppendOrder(unit, new (kSim) Order("VTOL_RECLAIM", 0, metal, 0, 0, 0));

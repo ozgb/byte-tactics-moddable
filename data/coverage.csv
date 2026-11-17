@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,285,203,5103,2882,1956,712,,23,
+game,*,,290,208,5132,2911,1956,712,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -255,9 +255,8 @@ los_radar,SightTilesRaw,src/map/line_of_sight.cpp,0,0,0,0,0,0,?SightTilesRaw@@YG
 los_radar,StoreDwordIfDst,src/map/los_tables.cpp,0,0,0,0,0,0,?StoreDwordIfDst@@YGXPAH0@Z,1,
 los_radar,ToggleShareLos,src/game/share_commands.cpp,0,0,0,0,0,0,?ToggleShareLos@@YGXH@Z,1,
 los_radar,UpdateAllCellHeightRanges,src/map/line_of_sight.cpp,0,0,0,0,0,0,?UpdateAllCellHeightRanges@@YGXXZ,1,
-map,*,,100,81,2085,1817,1016,785,,13,
+map,*,,104,85,2165,1894,1066,821,,11,
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1,
-map,ClampBucketCoord,src/map/terrain.cpp,0,0,0,0,0,0,?ClampBucketCoord@@YGHHI@Z,1,
 map,FUN_0047caf0,src/map/terrain.cpp,0,0,0,0,0,0,?FUN_0047caf0@@YGXXZ,1,
 map,FindHighestPointOnLine,src/map/terrain.cpp,0,0,0,0,0,0,?FindHighestPointOnLine@@YGHUVec3@@0@Z,1,
 map,ForceNeighborFootprintReclaim,src/map/terrain.cpp,1,0,0,0,0,0,?ForceNeighborFootprintReclaim@@YGXPAUUnit@@@Z,0,load-only
@@ -287,7 +286,6 @@ map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Missi
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
-map,VisitObjectsInRect,src/map/terrain.cpp,0,0,0,0,0,0,?VisitObjectsInRect@@YGXHHHHPAVUnitVisitor@@@Z,1,
 network,*,,297,54,5263,584,2564,106,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
@@ -693,7 +691,7 @@ orders,Visible,src/orders/order_dispatch.cpp,0,0,0,0,0,0,?Visible@@YGHPAUUnitCur
 orders,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolGetRepairedOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0,no-caller
 orders,Whole,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Whole@@YGFABH@Z,1,
 orders,WriteUnitTypeNameKey,src/orders/order_list.cpp,0,0,0,0,0,0,?WriteUnitTypeNameKey@@YGXPAVHapiBank@@G@Z,1,
-pathfinding,*,,76,67,1110,911,420,292,,10,
+pathfinding,*,,77,68,1114,915,420,292,,10,
 pathfinding,Align8,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?Align8@?A0x@@YGHH@Z,0,demo: hpa
 pathfinding,AppendLocalPath,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?AppendLocalPath@?A0x@@YGXPAUHpaView@?A0x@@PAULocal@?A0x@@@Z,0,demo: hpa
 pathfinding,BuildCluster,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?BuildCluster@?A0x@@YGXPAUHpaView@?A0x@@HH@Z,0,demo: hpa
@@ -773,7 +771,7 @@ pathfinding,WriteCells,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteCells@?A0x@@YGXPBUS
 pathfinding,WriteNodes,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteNodes@?A0x@@YGXPBUStateWriter@@PAVPathfinder@@@Z,0,test-only
 pathfinding,WriteRequest,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteRequest@?A0x@@YGXPBUStateWriter@@HHPBUPathRequest@@I@Z,0,demo: hpa
 pathfinding,WriteSearch,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteSearch@?A0x@@YGXPBUStateWriter@@PAUHpaView@?A0x@@@Z,0,demo: hpa
-platform,*,,747,399,8390,3430,3460,966,,84,
+platform,*,,746,398,8384,3424,3460,966,,84,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -2150,7 +2148,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-seams,*,,151,140,999,932,86,41,,0,
+seams,*,,153,142,1035,967,90,44,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,GetMissionIndexNative,src/seams/native.cpp,1,0,0,0,0,0,?GetMissionIndexNative@@YIHPAVMission@@@Z,0,
@@ -2163,7 +2161,7 @@ seams,SquadManagerDeleteTimersNative,src/seams/native.cpp,1,0,0,0,0,0,?SquadMana
 seams,UnitMotionReadNetStateNative,src/seams/native.cpp,1,0,0,0,0,0,?UnitMotionReadNetStateNative@@YGXPAVUnitMotion@@PAVBitReader@@@Z,0,
 seams,WorldLineOfSight,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldLineOfSight@@YGHIHHHH@Z,0,
 seams,WorldTerrainPass,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldTerrainPass@@YGHIHH@Z,0,
-state,*,,557,487,1713,1202,1172,578,,58,
+state,*,,556,486,1712,1201,1170,577,,58,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2294,7 +2292,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,19,19,205,196,98,80,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,195,161,4192,3626,1726,1284,,32,
+units,*,,195,161,4194,3628,1726,1284,,32,
 units,AimCobStub,src/units/unit_script_calls.cpp,1,0,0,0,0,0,?AimCobStub@@YGHHHHH@Z,0,unused-slot
 units,Channel::XorOp,src/units/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,

@@ -85,6 +85,10 @@ void __stdcall HarnessLosRadarEvent(const LosRadarEvent*, int)
 {
 }
 
+void __stdcall HarnessMapEvent(const MapEvent*, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
@@ -1601,6 +1605,11 @@ void __stdcall ApplySlot(const WindMeteorsEvent* event)
 int __stdcall ApplyTargetingSlot(const TargetingEvent* event)
 {
     return ApplyTargetingEvent(event);
+}
+
+int __stdcall ApplyMapEventSlot(const MapEvent* event)
+{
+    return ApplyMapEvent(event);
 }
 
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)

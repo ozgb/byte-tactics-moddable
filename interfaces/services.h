@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 15
+#define SERVICES_VERSION_MINOR 16
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -56,6 +56,9 @@ void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome);
 struct LosRadarEvent;
 // In test mode, records a los_radar event as los_radar consumes it, with its outcome, for the dump's los_radar events.
 void __stdcall HarnessLosRadarEvent(const LosRadarEvent* event, int outcome);
+struct MapEvent;
+// In test mode, records a map event as map consumes it, or an effect as map publishes it, with its outcome, for the dump's map events.
+void __stdcall HarnessMapEvent(const MapEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -82,8 +85,10 @@ enum SchedModule {
     SCHED_AI = 10,
     // Line of sight and radar (interfaces/los_radar.h).
     SCHED_LOS_RADAR = 11,
+    // Pathfinding (interfaces/pathfinding.h).
+    SCHED_PATHFINDING = 12,
     // The number of modules.
-    SCHED_MODULE_COUNT = 12
+    SCHED_MODULE_COUNT = 13
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
@@ -111,6 +116,19 @@ int __stdcall ScheduleTargetingTargetPos(Unit* unit, Vec3* pos, int weapon);
 Unit* __stdcall ScheduleTargetingFind(Unit* unit, unsigned char weapon, int useRange);
 // Calls targeting's synchronous FindBestTargetIfFireAtWill slot after delivering targeting's pending inbox, and returns the unit it picked, or null.
 Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit);
+
+class UnitDef;
+struct Player;
+struct Point16;
+// Calls map's synchronous CanBuildAt slot after delivering map's pending inbox, and returns its answer; the placement record it fills is visible at once.
+int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);
+// Calls map's synchronous CanPlaceUnitFootprint slot after delivering map's pending inbox, and returns its answer; the placement record it fills is visible at once.
+int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
+// Calls map's synchronous PickRandomReclaimableResourcesInRadius slot after delivering map's pending inbox, and returns its answer.
+int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
+class UnitVisitor;
+// Calls the visitor for each unit within range of the position, in map's spatial grid order, through map's UnitsInRange query; a visitor must not move a unit or change map's grid.
+void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor);
 
 // Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);

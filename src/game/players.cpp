@@ -584,7 +584,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
                                 cell.y = zacc >> 20;
                                 do {
                                     cell.x = xacc >> 20;
-                                    if (g_seams.map->CanPlaceUnitFootprint(
+                                    if (ScheduleMapCanPlaceUnitFootprint(
                                             (UnitDef*)((char*)g_game->defs.get() + typeOff),
                                             0, cell, 1) != 0)
                                         hits++;

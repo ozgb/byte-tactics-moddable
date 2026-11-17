@@ -683,7 +683,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar"])
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -809,7 +809,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
-        self.assertEqual(seamlink.PILOTS[-2].owner, "targeting")
+        self.assertEqual(seamlink.PILOTS[-3].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -913,8 +913,8 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_los_radar_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "los_radar")
+    def test_the_pilots_table_lists_los_radar_before_map(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"))
@@ -979,6 +979,113 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
         header = LOS_RADAR_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
         found = self.check([], header=header, fillers={k: v for k, v in LOS_RADAR_FILLERS.items() if k != "GetMapCell"})
         self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "GetMapCell")])
+
+
+MAP_HEADER = """struct MapSeam {
+    int (__stdcall* Apply)(const MapEvent* event);
+    int (__stdcall* UnitsInRange)(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity);
+    void (__stdcall* SnapWorldPosToFootprint)(UnitDef* unit, Vec3* pos);
+    int (__stdcall* CanBuildAt)(UnitDef* unit, Point16 cell, short type, Player* player);
+    void (__stdcall* BuildAllPassMaps)(void);
+    void (__stdcall* SetMissionType)(int type);
+};
+"""
+MAP_FILLERS = {"Apply": "MpApply", "UnitsInRange": "MpUnits", "SnapWorldPosToFootprint": "MpSnap", "CanBuildAt": "MpCanBuild",
+               "BuildAllPassMaps": "MpPass", "SetMissionType": "MpType"}
+MAP_PILOT = dataclasses.replace(
+    seamlink.MAP, writing=("Apply", "CanBuildAt"), query=("UnitsInRange", "SnapWorldPosToFootprint"), setup=("BuildAllPassMaps", "SetMissionType"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),))
+
+
+class MapPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Move,src/units/unit_position.cpp,units,x,
+Head,src/ai/ai_player.cpp,ai,x,
+LoadBattleAssets,src/game/game_state.cpp,game,x,
+Other,src/game/console_commands.cpp,game,x,
+MpApply,src/map/terrain.cpp,map,x,
+MpUnits,src/map/terrain.cpp,map,x,
+MpSnap,src/map/terrain.cpp,map,x,
+MpHelp,src/map/terrain.cpp,map,x,
+"""
+
+    def check(self, rows, header=MAP_HEADER, fillers=None):
+        fillers = MAP_FILLERS if fillers is None else fillers
+        rows = [(f, "src/map/terrain.cpp", "function", "") for f in ("MpUnits", "MpSnap")] + list(rows)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(
+                "static MapSeam s_map;\n" + "".join(f"s_map.{s} = {f};\n" for s, f in fillers.items()))
+            (root / "interfaces/map.h").write_text(header)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, MAP_PILOT)
+
+    def slot(self, name, seam="MapSeam"):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [{seam}::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_map_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "map")
+        self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"))
+        header = seamlink.ROOT / "interfaces/map.h"
+        if header.exists():
+            pilot = seamlink.MAP
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "MapSeam")))
+
+    def test_another_subsystem_calling_a_writing_slot_is_found(self):
+        found = self.check([("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("CanBuildAt")),
+                            ("Head", "src/ai/ai_player.cpp", "field_read", "MapSeam::Apply")])
+        self.assertEqual(sorted(f[1:] for f in found), [("ai", "Head", "MapSeam::Apply"), ("units", "Move", "MapSeam::CanBuildAt")])
+
+    def test_the_engine_and_map_may_call_writing_slots(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply")),
+                ("MapInbox", "src/seams/map_world.cpp", "indirect_call", self.slot("CanBuildAt")),
+                ("RecMapApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
+                ("MpApply", "src/map/terrain.cpp", "indirect_call", self.slot("CanBuildAt"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("BuildAllPassMaps")),
+                ("RecMapSetMissionType", "src/harness/replay_hooks.inc", "indirect_call", self.slot("SetMissionType")),
+                ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("SetMissionType")),
+                ("Move", "src/units/unit_position.cpp", "field_read", "MapSeam::BuildAllPassMaps")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other"), ("setup", "units", "Move")])
+
+    def test_a_query_slot_is_called_by_anyone(self):
+        self.assertEqual(self.check([("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("UnitsInRange")),
+                                     ("Head", "src/ai/ai_player.cpp", "indirect_call", self.slot("SnapWorldPosToFootprint"))]), [])
+
+    def test_the_filler_may_write_its_out_parameter_and_read_through_another_seam(self):
+        rows = [("MpUnits", "src/map/terrain.cpp", "deref_write", "*unsigned short"),
+                ("MpSnap", "src/map/terrain.cpp", "field_write", "Vec3::y"),
+                ("MpSnap", "src/map/terrain.cpp", "indirect_call", self.slot("GetMapCell", "LosRadarSeam")),
+                ("MpSnap", "src/map/terrain.cpp", "indirect_call", self.slot("GetCellFeature", "FeaturesSeam"))]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_query_slot_that_writes_or_calls_a_writing_slot_is_found(self):
+        found = self.check([("MpUnits", "src/map/terrain.cpp", "field_write", "Unit::pos"),
+                            ("MpUnits", "src/map/terrain.cpp", "call", "MpHelp"),
+                            ("MpHelp", "src/map/terrain.cpp", "field_write", "Cell::unit"),
+                            ("MpSnap", "src/map/terrain.cpp", "indirect_call", self.slot("CanBuildAt")),
+                            ("MpSnap", "src/map/terrain.cpp", "global_write", "g_lastPlaceHeight")])
+        self.assertEqual(sorted(f[3] for f in found),
+                         ["MapSeam::SnapWorldPosToFootprint calls indirect via void (*)(int) __attribute__((stdcall)) [MapSeam::CanBuildAt]",
+                          "MapSeam::SnapWorldPosToFootprint global write g_lastPlaceHeight",
+                          "MapSeam::UnitsInRange field write Cell::unit",
+                          "MapSeam::UnitsInRange field write Unit::pos"])
+
+    def test_a_slot_in_no_list_or_unfilled_is_found(self):
+        header = MAP_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
+        found = self.check([], header=header, fillers={k: v for k, v in MAP_FILLERS.items() if k != "UnitsInRange"})
+        self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "UnitsInRange")])
 
 
 if __name__ == "__main__":

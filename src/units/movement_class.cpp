@@ -84,6 +84,8 @@ struct UnitPassMapStampView {
 #include "../network/player.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../game/map_events.h"
+#include "../../interfaces/services.h"
 
 #include "../map/mission.h"
 
@@ -377,12 +379,18 @@ void FreeMovementClasses(void)
     } while (p < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
 }
 
+#define PASS_MAP_CHANGE_ARGS(moveClass, a, b) \
+    (a).x - (moveClass)->footprintX < 0 ? 0 : (a).x - (moveClass)->footprintX, \
+    (a).y - (moveClass)->footprintZ < 0 ? 0 : (a).y - (moveClass)->footprintZ, \
+    (a).x + (b).x >= (int)(moveClass)->width ? (int)(moveClass)->width - 1 : (a).x + (b).x, \
+    (a).y + (b).y >= (int)(moveClass)->height ? (int)(moveClass)->height - 1 : (a).y + (b).y, \
+    1u << (int)((moveClass) - g_movementClasses.entries)
+
 #define REPORT_PASS_MAP_CHANGE(moveClass, a, b, cause) \
-    g_seams.pathfinding->CellsChanged((a).x - (moveClass)->footprintX < 0 ? 0 : (a).x - (moveClass)->footprintX, \
-                                      (a).y - (moveClass)->footprintZ < 0 ? 0 : (a).y - (moveClass)->footprintZ, \
-                                      (a).x + (b).x >= (int)(moveClass)->width ? (int)(moveClass)->width - 1 : (a).x + (b).x, \
-                                      (a).y + (b).y >= (int)(moveClass)->height ? (int)(moveClass)->height - 1 : (a).y + (b).y, \
-                                      1u << (int)((moveClass) - g_movementClasses.entries), cause)
+    g_seams.pathfinding->CellsChanged(PASS_MAP_CHANGE_ARGS(moveClass, a, b), cause)
+
+#define PUBLISH_PASS_MAP_CHANGE(moveClass, a, b, cause) \
+    MapPublishCellsChanged(PASS_MAP_CHANGE_ARGS(moveClass, a, b), cause)
 
 static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
 {
@@ -393,7 +401,7 @@ static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
     }
     for (int i = 0; i < 32; i++) {
         if (g_movementClasses.entries[i].name != nullptr) {
-            REPORT_PASS_MAP_CHANGE(&g_movementClasses.entries[i], a, b, cause);
+            PUBLISH_PASS_MAP_CHANGE(&g_movementClasses.entries[i], a, b, cause);
         }
     }
 }
@@ -418,7 +426,7 @@ void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
         for (int i = 0; i < 32; i++) {
             if (last < g_movementClasses.entries[i].lastTick) {
                 ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
-                REPORT_PASS_MAP_CHANGE(&g_movementClasses.entries[i], p->a, p->b, PATH_CHANGE_UNITS);
+                PUBLISH_PASS_MAP_CHANGE(&g_movementClasses.entries[i], p->a, p->b, PATH_CHANGE_UNITS);
             }
         }
         return;
@@ -439,7 +447,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
     unsigned int prev = p->unit->lastTick;
     p->unit->lastTick = (unsigned int)g_game->ticks;
     if (prev < old) {
-        g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), p->a, p->b);
         REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
     if (start != old) {
@@ -447,7 +455,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
             if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {
-                    g_seams.map->RefreshPassMap(this, 0, r->a, r->b);
+                    MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), r->a, r->b);
                     REPORT_PASS_MAP_CHANGE(this, r->a, r->b, PATH_CHANGE_UNITS);
                 }
             }
@@ -460,7 +468,7 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
 void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
 {
     if (p->unit->lastTick < lastTick) {
-        g_seams.map->RefreshPassMap(this, 0, p->a, p->b);
+        MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), p->a, p->b);
         REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
 }

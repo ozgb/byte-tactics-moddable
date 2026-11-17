@@ -36,6 +36,8 @@ struct ExplodedPieceInit {
 int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
+#include "../game/map_events.h"
+#include "../../interfaces/services.h"
 #include "../graphics/particles.h"
 #include "../util/math.h"
 #include "../weapons/explosions.h"
@@ -155,7 +157,7 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->bit1 = value;
         break;
     case 18:
-        g_seams.map->SetYardOpen(unit, value);
+        MapPublishSetYard(SCHED_UNITS, unit, value);
         break;
     case 19:
         unit->bit3 = value;
@@ -389,7 +391,7 @@ void UnitScript::DropUnit(unsigned short id)
 {
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000) && u->carrier == state->unit) {
-        if (g_seams.map->CanPlaceUnitFootprint(u->def, (unsigned short)u->id, *(Point16*)&u->cell, 1)) {
+        if (ScheduleMapCanPlaceUnitFootprint(u->def, (unsigned short)u->id, *(Point16*)&u->cell, 1)) {
             AttachUnitToPiece(u, 0, -1, 1);
         }
     }

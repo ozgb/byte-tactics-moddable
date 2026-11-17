@@ -1026,8 +1026,8 @@ class Callbacks(unittest.TestCase):
 
     def with_import(self, mutate=None):
         ann = annotations()
-        ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"] = {"pos": {"mode": "struct", "kind": "Vec3", "dir": "in"}, "visitor": {"mode": "callback", "callback": "UnitVisitor"}}
-        ann["subsystems"]["wind_meteors"]["imports"].append("map.VisitObjectsInRange")
+        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"] = {"callback": {"mode": "callback", "callback": "Callback", "line": "callback"}}
+        ann["subsystems"]["wind_meteors"]["imports"].append("weapons.WeaponAimCobComplete")
         if mutate:
             mutate(ann)
         return ann
@@ -1039,7 +1039,7 @@ class Callbacks(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn("RCB_UNITVISITOR,", text)
+        self.assertIn("RCB_UNITSCANVISITOR,", text)
         self.assertIn('static const char* const kReplayUnitScanVisitorMethods[] = { "VisitUnit" };', text)
         self.assertIn('{ "UnitScanVisitor", "scanner", 1, kReplayUnitScanVisitorMethods },', text)
 
@@ -1067,36 +1067,34 @@ class Callbacks(unittest.TestCase):
         files, errors, _ = self.generated(self.with_import())
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecMapVisitObjectsInRange("):]
+        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ReplayCallbackScope cb2;", body)
-        self.assertIn("ImportCallback(line, cb2, RCB_UNITVISITOR, a2);", body)
-        self.assertLess(body.index("s_inner_map->VisitObjectsInRange"), body.index("cb2.Stop();"))
-        self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
-        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
+        self.assertIn("ReplayCallbackScope cb0;", body)
+        self.assertIn("ImportCallback(line, cb0, RCB_CALLBACK, a0);", body)
+        self.assertLess(body.index("s_inner_weapons->WeaponAimCobComplete"), body.index("cb0.Stop();"))
+        self.assertLess(body.index("cb0.Stop();"), body.index("line.AddText(cb0.Lines());"))
+        self.assertLess(body.index("line.AddText(cb0.Lines());"), body.index("FinishImport(line);"))
 
     def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
         files, _, _ = self.generated(self.with_import())
         slots = files[rs.SLOTS_H]
-        body = slots[slots.index("Imp_map_VisitObjectsInRange("):]
+        body = slots[slots.index("Imp_weapons_WeaponAimCobComplete("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_UNITVISITOR, a2);", body)
-        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_UnitVisitor(a2, OBJ_CALLBACK + RCB_UNITVISITOR, "map.VisitObjectsInRange");'))
+        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a0);", body)
+        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_Callback(a0, OBJ_CALLBACK + RCB_CALLBACK, "weapons.WeaponAimCobComplete");'))
 
     def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_recorded_as_an_a_line(self):
         def only_note(ann):
-            ann["subsystems"]["wind_meteors"]["imports"].remove("map.VisitObjectsInRange")
-            del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["record"]
-            del ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["reason"]
+            ann["subsystems"]["wind_meteors"]["imports"].remove("weapons.WeaponAimCobComplete")
         files, errors, _ = self.generated(self.with_import(only_note))
         self.assertFalse([e for e in errors if "callback argument" in e])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecMapVisitObjectsInRange("):]
+        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ReplayCallbackScope held2;", body)
-        self.assertIn('ArgCallback(s_call, "visitor", held2, RCB_UNITVISITOR, a2);', body)
-        self.assertLess(body.index("s_inner_map->VisitObjectsInRange"), body.index("held2.Stop();"))
-        self.assertLess(body.index("held2.Stop();"), body.index("ArgCallbackExit(s_tail, held2);"))
+        self.assertIn("ReplayCallbackScope held0;", body)
+        self.assertIn('ArgCallback(s_call, "callback", held0, RCB_CALLBACK, a0);', body)
+        self.assertLess(body.index("s_inner_weapons->WeaponAimCobComplete"), body.index("held0.Stop();"))
+        self.assertLess(body.index("held0.Stop();"), body.index("ArgCallbackExit(s_tail, held0);"))
         self.assertNotIn("ImportCallback", body)
 
     def test_the_runner_of_a_slot_binds_its_callback_argument_by_the_line(self):
@@ -1179,24 +1177,24 @@ class Callbacks(unittest.TestCase):
 
     def test_the_callback_names_an_entry_and_its_type(self):
         def unknown(ann):
-            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Nowhere"
+            ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"]["callback"]["callback"] = "Nowhere"
         self.assertTrue(any("needs a `callback` that is an entry of `callbacks`" in e for e in self.errors(self.with_import(unknown))))
 
         def wrong(ann):
-            ann["subsystems"]["map"]["slots"]["VisitObjectsInRange"]["args"]["visitor"]["callback"] = "Callback"
-        self.assertTrue(any("the callback Callback is Callback*" in e for e in self.errors(self.with_import(wrong))))
+            ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"]["callback"]["callback"] = "UnitScanVisitor"
+        self.assertTrue(any("the callback UnitScanVisitor is UnitScanVisitor*" in e for e in self.errors(self.with_import(wrong))))
 
     def test_the_methods_are_the_virtuals_of_the_class_in_order(self):
         ann = annotations()
-        ann["callbacks"]["UnitVisitor"]["methods"][0]["name"] = "VisitAll"
-        self.assertTrue(any("callback UnitVisitor: the methods are ['VisitAll'], and the class declares the virtuals ['Visit']" in e for e in self.errors(ann)))
+        ann["callbacks"]["UnitScanVisitor"]["methods"][0]["name"] = "VisitAll"
+        self.assertTrue(any("callback UnitScanVisitor: the methods are ['VisitAll'], and the class declares the virtuals ['VisitUnit']" in e for e in self.errors(ann)))
         ann = annotations()
-        ann["callbacks"]["UnitVisitor"]["header"] = "interfaces/units.h"
+        ann["callbacks"]["UnitScanVisitor"]["header"] = "interfaces/units.h"
         self.assertTrue(any("units.h declares no such class" in e for e in self.errors(ann)))
 
     def test_a_handle_is_a_name_no_other_handle_has(self):
         ann = annotations()
-        ann["callbacks"]["Callback"]["handle"] = "visitor"
+        ann["callbacks"]["Callback"]["handle"] = "scanner"
         self.assertTrue(any("callback Callback: the handle is a name that no other handle has" in e for e in self.errors(ann)))
         ann = annotations()
         ann["callbacks"]["Callback"]["handle"] = "bank"
@@ -1204,10 +1202,10 @@ class Callbacks(unittest.TestCase):
 
     def test_an_argument_has_a_mode_a_type_and_a_kind_that_fit(self):
         ann = annotations()
-        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["mode"] = "bytes-in"
+        ann["callbacks"]["UnitScanVisitor"]["methods"][0]["args"][0]["mode"] = "bytes-in"
         self.assertTrue(any("the argument unit has the mode bytes-in" in e for e in self.errors(ann)))
         ann = annotations()
-        ann["callbacks"]["UnitVisitor"]["methods"][0]["args"][0]["type"] = "Player*"
+        ann["callbacks"]["UnitScanVisitor"]["methods"][0]["args"][0]["type"] = "Player*"
         self.assertTrue(any("the argument unit is a pointer to a state kind of the schema" in e for e in self.errors(ann)))
         ann = annotations()
         ann["callbacks"]["Callback"]["methods"][0]["args"][0]["type"] = "Widget"

@@ -235,8 +235,42 @@ LOS_RADAR_EVENTS = [
     ("los_radar[1].outcome", "0x00000000"),
 ]
 
+MAP_EVENTS = [
+    ("map.count", "0x00000002"),
+    ("map[0].kind", "0x000000a0"),
+    ("map[0].unit", "unit:3"),
+    ("map[0].value", "0x00000000"),
+    ("map[0].cell", "hex:" + bytes(8).hex()),
+    ("map[0].size", "hex:" + bytes(8).hex()),
+    ("map[0].rect", "hex:" + bytes(16).hex()),
+    ("map[0].classes", "0x00000000"),
+    ("map[0].cause", "0x00000000"),
+    ("map[0].outcome", "0x00000001"),
+    ("map[1].kind", "0x000000b0"),
+    ("map[1].unit", "null"),
+    ("map[1].value", "0x00000000"),
+    ("map[1].cell", "hex:" + bytes(8).hex()),
+    ("map[1].size", "hex:" + bytes(8).hex()),
+    ("map[1].rect", "hex:" + bytes(range(16)).hex()),
+    ("map[1].classes", "0x00000005"),
+    ("map[1].cause", "0x00000001"),
+    ("map[1].outcome", "0x00000001"),
+]
+
 
 class DumpedOnlyTest(unittest.TestCase):
+    def test_map_events_after_the_los_radar_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_map_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("map.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
     def test_los_radar_events_after_the_targeting_events_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + SHARE_PACKETS
         w = tr.Walker(RESULTS, lines)

@@ -350,6 +350,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,get
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
@@ -363,14 +364,12 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::footprintx
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::link
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Game::defs
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::pos
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::state
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::unitType
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Seams::map
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Seams::units
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Seams::weapons
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Unit::buildLeft
@@ -417,7 +416,6 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via Vec3 (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::GetPiecePosition]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, int *, int *, int *, int *) __attribute__((stdcall)) [UnitsSeam::QueryScript]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddBuildProgress]"
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *) __attribute__((stdcall)) [UnitsSeam::FinishConstruction]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
@@ -691,6 +689,7 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordNanoParticles
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordSelectionOrdersDirty
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell
@@ -710,7 +709,6 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,Fixed::whole
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,Game::ticks
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,MapSeam::SnapWorldPosToFootprint
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,Order::pos
@@ -747,7 +745,6 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddBuildProgress]"
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
@@ -1216,6 +1213,8 @@ address,function,file,kind,target
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,Order::SetAttachedFx
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,RandomInt
+0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,ScheduleMapPickReclaimable
+0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,VisitUnitsInRange
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,empty
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,operator Player *
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,operator bool
@@ -1226,8 +1225,6 @@ address,function,file,kind,target
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,call,size
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,MapSeam::VisitObjectsInRange
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,MissionType::index
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Order::state
@@ -1238,7 +1235,6 @@ address,function,file,kind,target
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Player::index
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Player::metal
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Player::metalCapacity
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Seams::map
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Unit::def
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Unit::player
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_read,Unit::pos
@@ -1246,10 +1242,7 @@ address,function,file,kind,target
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_write,Order::flags
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,field_write,Order::pos
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,function,
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,global_read,kSim
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
-0x405980,RepairPatrolOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,call,operator->
 0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,call,push_back
 0x405d90,DamagedAllyCollector::Visit,src/orders/unit_orders.cpp,field_read,DamagedAllyCollector::owner
@@ -2231,6 +2224,7 @@ address,function,file,kind,target
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,DistSq
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,MakeHeap
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,PopHeap
+0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,ScheduleMapCanBuildAt
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,WorldToCell
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,back
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,call,begin
@@ -2247,10 +2241,8 @@ address,function,file,kind,target
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,deref_write,*Point16
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_escape,UnitDef::f14a
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,KeyedCell::pos
-0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,MapSeam::CanBuildAt
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,Point16::x
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,Point16::y
-0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,Seams::map
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,UnitDef::footprintx
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_read,UnitDef::footprintz
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_write,KeyedCell::key
@@ -2258,14 +2250,13 @@ address,function,file,kind,target
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,field_write,Point16::y
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,function,
 0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,global_read,g_lastPlaceMetalSum
-0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,global_read,g_seams
-0x40a260,PlayerAI::FindCellNearFeatures,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, Point16, short, Player *) __attribute__((stdcall)) [MapSeam::CanBuildAt]"
 0x40a5b0,KeyedCell::KeyedCell,src/ai/player_ai.h,field_read,KeyedCell::key
 0x40a5b0,KeyedCell::KeyedCell,src/ai/player_ai.h,field_read,KeyedCell::pos
 0x40a5b0,KeyedCell::KeyedCell,src/ai/player_ai.h,function,
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,Direction
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,PosPlus
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,RandomInt
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,WorldToCell
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,operator->
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,operator=
@@ -2274,7 +2265,6 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,deref_write,*Point16
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_escape,UnitDef::f14a
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Game::net
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Mission::surfaceMetal
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::margin0
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::margin1
@@ -2284,7 +2274,6 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::spacing1
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Point16::x
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Point16::y
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Seams::map
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::footprintx
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::footprintz
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::minwaterdepth
@@ -2293,8 +2282,6 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,function,
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_game
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_lastPlaceMetalSum
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_seams
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::Clear
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::PushBack
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,operator Feature *
@@ -3541,6 +3528,7 @@ address,function,file,kind,target
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrder::SetApproachRadius
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,PathOrderAttach::SetUnit
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
+0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,WorldToCell16
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,get
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3551,11 +3539,9 @@ address,function,file,kind,target
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,deref_read,*Point16
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_escape,Unit::footprint
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_maybe_written,Order::link
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Order::state
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Order::target
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Seams::map
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Unit::cargo
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
@@ -3572,7 +3558,6 @@ address,function,file,kind,target
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [UnitsSeam::StartScript]"
-0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x411560,VtolUnloadOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
 0x411840,FindLandingPad,src/orders/vtol_orders.cpp,call,get
 0x411840,FindLandingPad,src/orders/vtol_orders.cpp,field_read,MapSeam::IsPadSlotFree
@@ -3967,6 +3952,7 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordSelectionOrdersDirty
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,StartBuildingScript
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,UnitMotion::SetFlightMode
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,call,WaitIfNotInBuildStance
@@ -3989,7 +3975,6 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Game::defs
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Game::ticks
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::SnapWorldPosToFootprint
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
@@ -4028,7 +4013,6 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddBuildProgress]"
-0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [UnitsSeam::AttachUnitToPiece]"
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, Vec3 *) __attribute__((stdcall)) [UnitsSeam::GetNanoPiecePosition]"
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, int) __attribute__((stdcall)) [UnitsSeam::SetStateBits]"
@@ -4291,7 +4275,9 @@ address,function,file,kind,target
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Player::GetMetal
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,RandomInt
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,ScheduleMapPickReclaimable
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,Total
+0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,VisitUnitsInRange
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,empty
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator Player *
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -4303,8 +4289,6 @@ address,function,file,kind,target
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,call,size
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Fixed::value
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,MapSeam::VisitObjectsInRange
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::flags
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::pos
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Order::state
@@ -4312,7 +4296,6 @@ address,function,file,kind,target
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::energy
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::energyCapacity
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Player::metalCapacity
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::map
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::buildLeft
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
@@ -4331,8 +4314,6 @@ address,function,file,kind,target
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
-0x4152f0,VtolRepairPatrolOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,operator Player *
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,operator->
 0x4158d0,RepairableUnitVisitor::CollectRepairableUnit,src/orders/vtol_orders.cpp,call,push_back
@@ -12220,10 +12201,12 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,ClampToCell
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,LosRadarPublishUpdateUnit
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,MakeFixed
+0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,MapPublishUnit
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,OrderVec3
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,PosPlus
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,ScaledCos
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,ScaledSin
+0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,get
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,operator Unit *
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,call,operator UnitDef *
@@ -12240,16 +12223,12 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Fixed::value
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Game::seaLevel
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Game::ticks
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::AddUnitToMap
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::CanPlaceUnitFootprint
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MapSeam::RemoveUnitFromMap
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MotionVelocityView::speed
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,MotionVelocityView::velocity
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,PlayerTypeView::active
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,PlayerTypeView::type
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Point16::x
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Point16::y
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Seams::map
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Seams::units
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Unit::carrier
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,field_read,Unit::def
@@ -12290,9 +12269,6 @@ address,function,file,kind,target
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via Angles16 (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::GetPieceAngles]"
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via Vec3 (*)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::GetPiecePosition]"
 0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3, int) __attribute__((stdcall)) [UnitsSeam::SetUnitPosition]"
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
-0x43d6d0,UnitMotion::UpdatePosition,src/orders/order_list.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp,call,get
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp,call,operator==
 0x43da70,UnitMotion::UpdateMoveRate,src/orders/order_list.cpp,field_read,Seams::units
@@ -12737,6 +12713,7 @@ address,function,file,kind,target
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_escape,g_movementClassEntries
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
 0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,function,
+0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,MapPublishCellsChanged
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,RefreshAllPassMapsForUnits
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,operator!=
@@ -12749,10 +12726,8 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::height
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::lastTick
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::width
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::x
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::y
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::a
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::b
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::unit
@@ -12761,8 +12736,7 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_game
 0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_movementClasses
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_seams
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,MapPublishRefreshPassMap
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,get
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator!=
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator->
@@ -12771,7 +12745,6 @@ address,function,file,kind,target
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::ticks
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::units
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::unitsEnd
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MapSeam::RefreshPassMap
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintX
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
@@ -12781,7 +12754,6 @@ address,function,file,kind,target
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::x
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::y
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Seams::map
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::a
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::b
@@ -12796,11 +12768,10 @@ address,function,file,kind,target
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_read,g_game
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_read,g_seams
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
 0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,MapPublishRefreshPassMap
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,operator->
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MapSeam::RefreshPassMap
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintX
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
@@ -12810,7 +12781,6 @@ address,function,file,kind,target
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::x
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::y
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Seams::map
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Seams::pathfinding
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::a
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::b
@@ -12818,7 +12788,6 @@ address,function,file,kind,target
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,function,
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_read,g_seams
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
 0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,call,operator=
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_read,PathLockSrcView::rect
@@ -20933,6 +20902,7 @@ address,function,file,kind,target
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,Game::Current
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,IsExplored
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,IsSeen
+0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,VisitUnitsInRange
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,operator Unit *
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,operator->
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,call,operator=
@@ -20945,7 +20915,6 @@ address,function,file,kind,target
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Game::ticks
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Game::units
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Game::unitsEnd
-0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,MapSeam::VisitObjectsInRange
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Player::active
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Player::allied
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Player::index
@@ -20956,7 +20925,6 @@ address,function,file,kind,target
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,PlayerInfo::flags_97
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,PlayerInfo::flags_9b
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Seams::ai
-0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Seams::map
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Unit::activateFlags
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Unit::def
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,field_read,Unit::flags
@@ -20979,7 +20947,6 @@ address,function,file,kind,target
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,global_read,g_game
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,global_read,g_seams
 0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,indirect_call,"indirect via bool (*)(int, Vec3 *, int) __attribute__((stdcall)) [AiSeam::HasReadyUnitInRange]"
-0x467440,UpdateSensorRadarAndCloak,src/ingame/info_panel.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x467840,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,src/ingame/info_panel.cpp,call,operator UnitDef *
 0x467840,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,src/ingame/info_panel.cpp,field_read,DetectionVisitor::radarRangeSq
 0x467840,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,src/ingame/info_panel.cpp,field_read,DetectionVisitor::sonarRangeSq
@@ -24725,14 +24692,19 @@ address,function,file,kind,target
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,field_read,UnitDef::mobile
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,function,
 0x47db70,CanPlaceUnitFootprint,src/map/terrain.cpp,global_read,g_game
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,CellToWorld
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,GetFootprintHeight
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,call,WorldToCell
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,deref_read,*Point16
-0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,deref_read,*Vec3
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_escape,UnitDef::footprintx
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Point16::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Point16::y
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,UnitDef::mobile
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Vec3::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_read,Vec3::z
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Point16::x
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Point16::y
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::x
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::y
+0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,field_write,Vec3::z
 0x47ddc0,SnapWorldPosToFootprint,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Feature *
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Unit *
@@ -24827,37 +24799,24 @@ address,function,file,kind,target
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,function,
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,global_read,g_game
 0x47e5c0,VisitObjectsInArea,src/map/terrain.cpp,indirect_call,virtual ClaimFootprintVisitor::ClaimFootprint
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,ClampBucketCoord
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator Unit *
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,call,operator UnitBucket *
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,deref_read,*BucketGrid
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::cells
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::height
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,BucketGrid::width
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Unit::cargoNext
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,UnitBucket::first
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::x
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,field_read,Vec3::z
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,function,
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,global_read,g_game
-0x47e750,VisitObjectsInRect,src/map/terrain.cpp,indirect_call,virtual UnitVisitor::Visit
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,BucketDistSquared
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxX
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMaxZ
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMinX
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,ClampBucketMinZ
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,operator Unit *
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,call,operator UnitBucket *
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,deref_read,*BucketGrid
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_maybe_written,Unit::pos
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,BucketGrid::cells
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,BucketGrid::height
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,BucketGrid::width
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,Unit::cargoNext
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,field_read,UnitBucket::first
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,function,
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,global_read,g_game
-0x47e890,VisitObjectsInRange,src/map/terrain.cpp,indirect_call,virtual UnitVisitor::Visit
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,BucketDistSquared
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMaxX
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMaxZ
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMinX
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,ClampBucketMinZ
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,operator Unit *
+0x47e890,UnitsInRange,src/map/terrain.cpp,call,operator UnitBucket *
+0x47e890,UnitsInRange,src/map/terrain.cpp,deref_read,*BucketGrid
+0x47e890,UnitsInRange,src/map/terrain.cpp,deref_write,*unsigned short
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::cells
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::height
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,BucketGrid::width
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::cargoNext
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::id
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,Unit::pos
+0x47e890,UnitsInRange,src/map/terrain.cpp,field_read,UnitBucket::first
+0x47e890,UnitsInRange,src/map/terrain.cpp,function,
+0x47e890,UnitsInRange,src/map/terrain.cpp,global_read,g_game
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,RandomInt
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,SimAlloc
 0x47ea40,PickRandomReclaimableResourcesInRadius,src/map/terrain.cpp,call,operator Feature *
@@ -25319,20 +25278,17 @@ address,function,file,kind,target
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,field_write,Vec3::x
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,field_write,Vec3::z
 0x480770,UnitScript::GetUnitValue,src/units/unit_script.cpp,function,
+0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,MapPublishSetYard
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,Unit::SetStateBits
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,operator Unit *
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,call,operator->
-0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,MapSeam::SetYardOpen
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,ObjectState::unit
-0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,Seams::map
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_read,UnitScript::state
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_write,Unit::bit0
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_write,Unit::bit1
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_write,Unit::bit3
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,field_write,Unit::dirty
 0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,function,
-0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,global_read,g_seams
-0x480b20,UnitScript::SetUnitValue,src/units/unit_script.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [MapSeam::SetYardOpen]"
 0x480c30,UnitScript::GetPieceTranslation,src/units/unit_script.cpp,call,operator->
 0x480c30,UnitScript::GetPieceTranslation,src/units/unit_script.cpp,field_read,PieceState::translation
 0x480c30,UnitScript::GetPieceTranslation,src/units/unit_script.cpp,field_read,UnitScript::state
@@ -25464,22 +25420,19 @@ address,function,file,kind,target
 0x481340,UnitScript::AttachUnit,src/units/unit_script.cpp,function,
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,AttachUnitToPiece
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,GetUnit
+0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,operator UnitDef *
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,operator->
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,call,operator==
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,deref_read,*Point16
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_escape,Unit::cell
-0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,ObjectState::unit
-0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,Seams::map
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,Unit::carrier
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,Unit::def
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,Unit::flags
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,Unit::id
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,field_read,UnitScript::state
 0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,function,
-0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,global_read,g_seams
-0x4813b0,UnitScript::DropUnit,src/units/unit_script.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 0x481430,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,call,operator Unit *
 0x481430,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,call,operator->
 0x481430,UnitScript::IsCarryingUnit,src/units/unit_script.cpp,field_read,ObjectState::unit
@@ -26630,6 +26583,7 @@ address,function,file,kind,target
 0x485e90,InitUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::InitUnitWeaponSlots]
 0x485f50,CreateUnit,src/units/units.cpp,call,InitSpawnedUnit
 0x485f50,CreateUnit,src/units/units.cpp,call,LosRadarPublishRevealUnit
+0x485f50,CreateUnit,src/units/units.cpp,call,MapPublishUnit
 0x485f50,CreateUnit,src/units/units.cpp,call,Unit::SetStateBits
 0x485f50,CreateUnit,src/units/units.cpp,call,UpdateUnitHeight
 0x485f50,CreateUnit,src/units/units.cpp,call,get
@@ -26642,7 +26596,6 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::defs
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::list_391ed
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Game::units
-0x485f50,CreateUnit,src/units/units.cpp,field_read,MapSeam::AddUnitToMap
 0x485f50,CreateUnit,src/units/units.cpp,field_read,NetworkSeam::SendBuilderLink
 0x485f50,CreateUnit,src/units/units.cpp,field_read,NetworkSeam::SendNewUnit
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Player::unitCount
@@ -26650,7 +26603,6 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Player::unitsCreated
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Player::unitsEnd
 0x485f50,CreateUnit,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitCreated
-0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::map
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::network
 0x485f50,CreateUnit,src/units/units.cpp,field_read,Seams::players
 0x485f50,CreateUnit,src/units/units.cpp,field_read,TypeFlags::bit18
@@ -26669,12 +26621,12 @@ address,function,file,kind,target
 0x485f50,CreateUnit,src/units/units.cpp,global_read,g_game
 0x485f50,CreateUnit,src/units/units.cpp,global_read,g_seams
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
-0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendNewUnit]
 0x485f50,CreateUnit,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *) __attribute__((stdcall)) [NetworkSeam::SendBuilderLink]"
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,InitSpawnedUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,KillUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,LosRadarPublishRevealUnit
+0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,MapPublishUnit
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,UpdateUnitHeight
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator MissionConditions *
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,call,operator Unit *
@@ -26683,12 +26635,10 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_escape,Game::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::list_391ed
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Game::units
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,MapSeam::AddUnitToMap
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitCount
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsBegin
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Player::unitsCreated
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,PlayersSeam::NotifyUnitCreated
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::map
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Seams::players
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,Unit::unitDefIndex
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,field_read,UnitSpawnPacket::id
@@ -26700,7 +26650,6 @@ address,function,file,kind,target
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_game
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,global_read,g_seams
 0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitCreated]"
-0x4861d0,CreateUnitFromPacket,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,CorpseEvent
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,GetGroundHeight
 0x486360,CreateUnitCorpse,src/units/units.cpp,call,RecordSmoke
@@ -26792,6 +26741,7 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,FreeObjectState
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,LosRadarPublishAddEyeball
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,LosRadarPublishRemoveUnit
+0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,MapPublishUnit
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordCdActivity
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordForcesDestroyed
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,call,RecordPlayerLeft
@@ -26822,7 +26772,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::net
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::playerIndex
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,Game::units
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,MapSeam::ClearFootprintAndUnlink
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,MapSeam::GetGameType
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,OrdersSeam::DeleteOrders
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,field_read,OrdersSeam::DestroyMotionObject
@@ -26895,7 +26844,6 @@ address,function,file,kind,target
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,global_read,g_seams
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(MissionConditions *, int, Unit *) __attribute__((fastcall)) [PlayersSeam::NotifyUnitDied]"
-0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::ClearFootprintAndUnlink]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::RemoveUnitProjectiles]
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, int, int, unsigned short) __attribute__((stdcall)) [WeaponsSeam::DamageUnit]"
 0x4866d0,ApplyUnitDeath,src/units/units.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
@@ -26959,6 +26907,7 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,call,HapiBank::SeekBox
 0x487080,LoadUnit,src/units/unit_save.cpp,call,LoadUnit
 0x487080,LoadUnit,src/units/unit_save.cpp,call,LoadUnitAccounts
+0x487080,LoadUnit,src/units/unit_save.cpp,call,MapPublishUnit
 0x487080,LoadUnit,src/units/unit_save.cpp,call,get
 0x487080,LoadUnit,src/units/unit_save.cpp,call,operator Order *
 0x487080,LoadUnit,src/units/unit_save.cpp,call,operator UnitMotion *
@@ -26985,7 +26934,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::c
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::e
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Game::units
-0x487080,LoadUnit,src/units/unit_save.cpp,field_read,MapSeam::ForceNeighborFootprintReclaim
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Order::flags_42
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,OrdersSeam::LoadMotion
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,OrdersSeam::LoadOrder
@@ -27021,7 +26969,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SaveRec::player
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SaveRec::pos
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Seams::ai
-0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Seams::map
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,Seams::orders
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SrcPiece::f0
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,SrcPiece::f10
@@ -27078,7 +27025,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,global_read,g_seams
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via Order *(*)(Unit *, HapiBank *, char *) __attribute__((stdcall)) [OrdersSeam::LoadOrder]"
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,indirect via void (*)(Order *) __attribute__((fastcall)) [OrdersSeam::ReattachFxToUnit]
-0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::ForceNeighborFootprintReclaim]
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, int) __attribute__((stdcall)) [AiSeam::SetUnitSquad]"
 0x487080,LoadUnit,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *, HapiBank *) __attribute__((fastcall)) [OrdersSeam::LoadMotion]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,call,CobScript::SaveScriptState
@@ -27898,22 +27844,17 @@ address,function,file,kind,target
 0x48a9b0,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,field_read,Vec3::z
 0x48a9b0,GetHeadingBetweenOrDefault,src/units/unit_position.cpp,function,
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,LosRadarPublishUpdateUnit
+0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,MapPublishUnit
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,WorldToCell
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,call,operator=
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,MapSeam::AddUnitToMap
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,MapSeam::RemoveUnitFromMap
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Point16::x
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Point16::y
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Seams::map
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Unit::flags
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_read,Unit::footprint
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_write,Unit::cell
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_write,Unit::flags
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,field_write,Unit::pos
 0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,function,
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,global_read,g_seams
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
-0x48a9f0,SetUnitPosition,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,call,ApplyAttachUnit
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,call,operator==
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,field_read,NetworkSeam::SendAttach
@@ -27930,8 +27871,8 @@ address,function,file,kind,target
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,function,
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,global_read,g_seams
 0x48aac0,AttachUnitToPiece,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(Unit *, Unit *, char, char) __attribute__((stdcall)) [NetworkSeam::SendAttach]"
+0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,MapPublishUnit
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,RecordDeselectIfIneligible
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,get
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,operator Unit *
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,operator!=
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,call,operator->
@@ -27944,8 +27885,6 @@ address,function,file,kind,target
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,<anon>::low
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Game::units
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,MapSeam::SpatialBucketPrependUnit
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,MapSeam::SpatialBucketUnlinkUnit
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,OrderView::id1
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,OrderView::id2
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,OrderView::param
@@ -27953,7 +27892,6 @@ address,function,file,kind,target
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,OrdersSeam::AddBeCarriedOrder
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Player::active
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Player::type
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Seams::map
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Seams::orders
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::cargo
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::cargoNext
@@ -27962,7 +27900,6 @@ address,function,file,kind,target
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::flags
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::motion
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::player
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_read,Unit::spatialBucket
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_write,Unit::cargo
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_write,Unit::cargoNext
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_write,Unit::carriedNoPiece
@@ -27971,8 +27908,6 @@ address,function,file,kind,target
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,field_write,UnitMotion::mode
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,function,
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,global_read,g_seams
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketPrependUnit]"
-0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketUnlinkUnit]"
 0x48ab70,ApplyAttachUnit,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::AddBeCarriedOrder]
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,call,AddRepairProgress
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,call,CobScript::RunScripts
@@ -28096,6 +28031,7 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,BitReader::ReadSignedBits
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,CreateUnitFromPacket
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,LosRadarPublishUpdateUnit
+0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,MapPublishUnit
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,Unit::SetStateBits
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,get
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,operator bool
@@ -28103,11 +28039,8 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,call,operator=
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Angles16::bank
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Game::unitDefCountBits
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,MapSeam::AddUnitToMap
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,MapSeam::RemoveUnitFromMap
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Point16::x
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Point16::y
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Seams::map
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Unit::angles
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Unit::buildLeft
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_read,Unit::carrier
@@ -28151,9 +28084,6 @@ address,function,file,kind,target
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,field_write,Vec3::z
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,function,
 0x48b3f0,ReadUnitState,src/units/unit_position.cpp,global_read,g_buildPercentScale
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,global_read,g_seams
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
-0x48b3f0,ReadUnitState,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBit
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBits
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,CreateUnitFromPacket
@@ -28994,19 +28924,18 @@ address,function,file,kind,target
 0x48f1b0,VictoryKillUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_killUnitTypeKey
 0x48f1b0,VictoryKillUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_numLeftToKillKey
 0x48f1b0,VictoryKillUnitType::LoadState,src/game/victory.cpp,global_maybe_written,g_satisfiedKey
+0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,call,VisitUnitsInRange
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_maybe_written,VictoryMoveUnitToRadius::pos
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,LosRadarSeam::ClampWorldPosToTerrain
-0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,MapSeam::VisitObjectsInRange
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,MissionCondition::satisfied
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Seams::los_radar
-0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Seams::map
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Vec3::x
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Vec3::y
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,Vec3::z
+0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,VictoryMoveUnitToRadius::pos
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,field_read,VictoryMoveUnitToRadius::radius
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,function,
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,global_read,g_seams
-0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 0x48f200,VictoryMoveUnitToRadius::IsSatisfied,src/game/victory.cpp,indirect_call,"indirect via void (*)(int, int, Vec3 *) __attribute__((stdcall)) [LosRadarSeam::ClampWorldPosToTerrain]"
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,RecordSound
 0x48f250,VictoryMoveUnitToRadius::VisitUnit,src/game/victory.cpp,call,_strcmpi
@@ -43064,6 +42993,31 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::y
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::z
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,function,
+,ApplyMapEvent,src/map/terrain.cpp,call,AddUnitToMap
+,ApplyMapEvent,src/map/terrain.cpp,call,BucketHolds
+,ApplyMapEvent,src/map/terrain.cpp,call,ClearFootprintAndUnlink
+,ApplyMapEvent,src/map/terrain.cpp,call,ForceNeighborFootprintReclaim
+,ApplyMapEvent,src/map/terrain.cpp,call,MapPoint
+,ApplyMapEvent,src/map/terrain.cpp,call,MapUnitOfHandle
+,ApplyMapEvent,src/map/terrain.cpp,call,MovementClass::RefreshPassMap
+,ApplyMapEvent,src/map/terrain.cpp,call,RefreshAllPassMaps
+,ApplyMapEvent,src/map/terrain.cpp,call,RemoveUnitFromMap
+,ApplyMapEvent,src/map/terrain.cpp,call,SetYardOpen
+,ApplyMapEvent,src/map/terrain.cpp,call,SpatialBucket::PrependUnit
+,ApplyMapEvent,src/map/terrain.cpp,call,SpatialBucket::UnlinkUnit
+,ApplyMapEvent,src/map/terrain.cpp,call,get
+,ApplyMapEvent,src/map/terrain.cpp,call,operator bool
+,ApplyMapEvent,src/map/terrain.cpp,field_maybe_written,MovementClassTable::entries
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::cell
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::kind
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::size
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::unit
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEvent::value
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MovementClass::name
+,ApplyMapEvent,src/map/terrain.cpp,field_read,Unit::spatialBucket
+,ApplyMapEvent,src/map/terrain.cpp,function,
+,ApplyMapEvent,src/map/terrain.cpp,global_maybe_written,MovementClassTable::g_movementClasses
+,ApplyMapEvent,src/map/terrain.cpp,global_read,MovementClassTable::g_movementClasses
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_4
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_8
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_c
@@ -43530,6 +43484,10 @@ address,function,file,kind,target
 ,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::x
 ,BucketDistSquared,src/map/terrain.cpp,field_read,Vec3::z
 ,BucketDistSquared,src/map/terrain.cpp,function,
+,BucketHolds,src/map/terrain.cpp,call,get
+,BucketHolds,src/map/terrain.cpp,field_read,SpatialBucket::head
+,BucketHolds,src/map/terrain.cpp,field_read,Unit::cargoNext
+,BucketHolds,src/map/terrain.cpp,function,
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,call,BuildCompoundAddress
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::data
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::size
@@ -43817,11 +43775,6 @@ address,function,file,kind,target
 ,CellToWorld,src/ingame/control_panel.cpp,field_write,Vec3::x
 ,CellToWorld,src/ingame/control_panel.cpp,field_write,Vec3::z
 ,CellToWorld,src/ingame/control_panel.cpp,function,
-,CellToWorld,src/map/terrain.cpp,field_read,Point16::x
-,CellToWorld,src/map/terrain.cpp,field_read,Point16::y
-,CellToWorld,src/map/terrain.cpp,field_write,Vec3::x
-,CellToWorld,src/map/terrain.cpp,field_write,Vec3::z
-,CellToWorld,src/map/terrain.cpp,function,
 ,CellToWorld,src/orders/unit_orders.cpp,field_read,Point16::x
 ,CellToWorld,src/orders/unit_orders.cpp,field_read,Point16::y
 ,CellToWorld,src/orders/unit_orders.cpp,field_write,Vec3::x
@@ -44002,7 +43955,6 @@ address,function,file,kind,target
 ,ChunkSizeFor,src/state/block.cpp,global_read,kMinChunk
 ,ClaimWeaponsNative,src/seams/native.cpp,call,Unit::ClaimWeapons
 ,ClaimWeaponsNative,src/seams/native.cpp,function,
-,ClampBucketCoord,src/map/terrain.cpp,function,
 ,ClampBucketMaxX,src/map/terrain.cpp,call,ClampBucketRangeCoord
 ,ClampBucketMaxX,src/map/terrain.cpp,field_read,Vec3::x
 ,ClampBucketMaxX,src/map/terrain.cpp,function,
@@ -47253,6 +47205,12 @@ address,function,file,kind,target
 ,HarnessLosRadarEvent,src/harness/harness.cpp,global_maybe_written,s_losRadarResults@src/harness/harness.cpp
 ,HarnessLosRadarEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
 ,HarnessLosRadarEvent,src/harness/harness.cpp,global_write,s_losRadarResultsLost@src/harness/harness.cpp
+,HarnessMapEvent,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessMapEvent,src/harness/harness.cpp,call,MapResultsAdd
+,HarnessMapEvent,src/harness/harness.cpp,function,
+,HarnessMapEvent,src/harness/harness.cpp,global_maybe_written,s_mapResults@src/harness/harness.cpp
+,HarnessMapEvent,src/harness/harness.cpp,global_read,s_trace@src/harness/harness.cpp
+,HarnessMapEvent,src/harness/harness.cpp,global_write,s_mapResultsLost@src/harness/harness.cpp
 ,HarnessPathEvent,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessPathEvent,src/harness/harness.cpp,call,PathResultsAdd
 ,HarnessPathEvent,src/harness/harness.cpp,function,
@@ -47265,6 +47223,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,call,GameU32
 ,HarnessPhase,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessPhase,src/harness/harness.cpp,call,LosRadarResultsClear
+,HarnessPhase,src/harness/harness.cpp,call,MapResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,PathResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,TargetingResultsClear
 ,HarnessPhase,src/harness/harness.cpp,call,VisitExplosions
@@ -47283,6 +47242,7 @@ address,function,file,kind,target
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_economyResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_featuresResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_losRadarResults@src/harness/harness.cpp
+,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_mapResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_pathResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_targetingResults@src/harness/harness.cpp
 ,HarnessPhase,src/harness/harness.cpp,global_maybe_written,s_windMeteorsResults@src/harness/harness.cpp
@@ -47934,22 +47894,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::SoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::AddUnitToMap
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::BuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanBuildAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanPlaceFootprintAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanPlaceUnitFootprint
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::ClearFootprintAndUnlink
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::ForceNeighborFootprintReclaim
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetCellMeanHeight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::IsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshAllPassMaps
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshPassMap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RemoveUnitFromMap
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SetYardOpen
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SpatialBucketPrependUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SpatialBucketUnlinkUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::BroadcastPlayerEconomy
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::BroadcastPlayerInfo
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::SendActivateFlags
@@ -48269,22 +48221,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarSoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapAddUnitToMap
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapBuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanBuildAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanPlaceFootprintAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanPlaceUnitFootprint
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapClearFootprintAndUnlink
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapForceNeighborFootprintReclaim
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetCellMeanHeight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapIsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshAllPassMaps
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshPassMap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRemoveUnitFromMap
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSetYardOpen
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSpatialBucketPrependUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSpatialBucketUnlinkUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkBroadcastPlayerEconomy
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkBroadcastPlayerInfo
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkSendActivateFlags
@@ -49148,15 +49092,13 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SoundHeardMask
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::UpdateUnitLineOfSight
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::AddUnitToMap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::AdvanceMission
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::Apply
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::BuildAllPassMaps
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::CanBuildAt
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::CanPlaceFootprintAt
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::CanPlaceUnitFootprint
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::ClearFootprintAndUnlink
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::ComputeMapChecksum
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::ForceNeighborFootprintReclaim
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::FreeOtaEnumCacheAndMission
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetCampaignName
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetCellMeanHeight
@@ -49174,20 +49116,14 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadPlayerFeaturesPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::MissionExists
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PickRandomReclaimableResourcesInRadius
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshAllPassMaps
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshMapList
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshPassMap
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RemoveUnitFromMap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SaveMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SaveMetalPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SavePlayerFeaturesPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SelectMission
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SetMissionType
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SetYardOpen
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SnapWorldPosToFootprint
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SpatialBucketPrependUnit
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SpatialBucketUnlinkUnit
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::VisitObjectsInRange
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::UnitsInRange
 ,InstallNativeSeams,src/seams/native.cpp,field_write,NetworkSeam::BroadcastPlayerEconomy
 ,InstallNativeSeams,src/seams/native.cpp,field_write,NetworkSeam::BroadcastPlayerInfo
 ,InstallNativeSeams,src/seams/native.cpp,field_write,NetworkSeam::SendActivateFlags
@@ -49397,7 +49333,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddBuildProgress
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddOrder
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddRepairProgress
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,AddUnitToMap
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AdvanceMissionNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AllocWeaponArray
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,AllocateUnitMemory
@@ -49406,6 +49341,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyAreaDamageAtNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyLosRadarEvent
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyMapEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyPathEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyTargetingEvent
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ApplyUnfinishedBuildDecay
@@ -49443,7 +49379,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ChooseWeaponNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClaimWeaponsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClampWorldPosToTerrain
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearFootprintAndUnlink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ClearOrderTypeTable
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdLimit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CmdPlan
@@ -49492,7 +49427,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FindWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FinishConstruction
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FirstFeatureSpot
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,ForceNeighborFootprintReclaim
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeConditionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeDownloadMenus
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeExplosions
@@ -49668,10 +49602,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RebuildFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RecordRadarUnits
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshAllPassMaps
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshMapListNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshMovedUnitsNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshPassMapNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshUnitIfStaleNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RefreshUnitInfo
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RegisterAllOrderTypes
@@ -49679,7 +49611,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReleaseWeaponsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReloadUnitType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveFile
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveUnitFromMap
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RemoveUnitProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,RenameFile
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ReparseAiWeightScriptsIfLimitNotSticky
@@ -49708,12 +49639,9 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetStateBitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitPosition
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitSquad
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetYardOpen
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetupPlayerSlot
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SnapWorldPosToFootprint
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SoundHeardMask
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpatialBucketPrependUnitNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpatialBucketUnlinkUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SpawnProjectile
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SquadManagerDeleteTimersNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SquadManagerTickIfActiveNative
@@ -49726,6 +49654,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitMotionReadNetStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitRefUnlinkNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitTypeSetAddTypeOrCategoryNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,UnitsInRange
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateAllUnits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateBlink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateExplosions
@@ -49748,7 +49677,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitLineOfSight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateUnitWeapons
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,UpdateWindOnStream
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,VisitObjectsInRangeNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponAimCobCompleteNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachPos
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachUnit
@@ -50708,10 +50636,19 @@ address,function,file,kind,target
 ,MapCellCount,src/harness/harness.cpp,call,GameU32
 ,MapCellCount,src/harness/harness.cpp,function,
 ,MapContains,src/sound/sound.cpp,function,
+,MapEventOf,src/game/map_events.h,call,memset
+,MapEventOf,src/game/map_events.h,field_write,MapEvent::kind
+,MapEventOf,src/game/map_events.h,function,
 ,MapFind,src/harness/harness.cpp,call,MapSlot
 ,MapFind,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapFind,src/harness/harness.cpp,deref_write,*unsigned int
 ,MapFind,src/harness/harness.cpp,function,
+,MapInbox,src/seams/map_world.cpp,call,HarnessMapEvent
+,MapInbox,src/seams/map_world.cpp,field_read,MapSeam::Apply
+,MapInbox,src/seams/map_world.cpp,field_read,Seams::map
+,MapInbox,src/seams/map_world.cpp,function,
+,MapInbox,src/seams/map_world.cpp,global_read,g_seams
+,MapInbox,src/seams/map_world.cpp,indirect_call,indirect via int (*)(const MapEvent *) __attribute__((stdcall)) [MapSeam::Apply]
 ,MapInsertResult::MapInsertResult,src/debug/debug_lib.cpp,field_read,BlockMapIter::ptr
 ,MapInsertResult::MapInsertResult,src/debug/debug_lib.cpp,function,
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,call,operator=
@@ -50720,23 +50657,51 @@ address,function,file,kind,target
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,field_write,MapInsertResult::first
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,field_write,MapInsertResult::second
 ,MapInsertResult::MapInsertResult,src/debug/free_block_map.h,function,
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::height
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::width
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::x
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,FeaturesEvent::z
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,MapSeam::RefreshAllPassMaps
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_read,Seams::map
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_write,Point16::x
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,field_write,Point16::y
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,function,
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,global_read,g_seams
-,MapOnFeaturesPassMaps,src/map/map_features_effects.cpp,indirect_call,"indirect via void (*)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,call,MapInbox
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,call,MapRectEventOf
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::height
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::width
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::x
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_read,FeaturesEvent::z
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_write,Point16::x
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,field_write,Point16::y
+,MapOnFeaturesPassMaps,src/seams/map_world.cpp,function,
+,MapPoint,src/map/terrain.cpp,deref_read,*int
+,MapPoint,src/map/terrain.cpp,field_write,Point16::x
+,MapPoint,src/map/terrain.cpp,field_write,Point16::y
+,MapPoint,src/map/terrain.cpp,function,
+,MapPublishCellsChanged,src/game/map_events.h,call,HarnessMapEvent
+,MapPublishCellsChanged,src/game/map_events.h,call,MapEventOf
+,MapPublishCellsChanged,src/game/map_events.h,call,SchedPublish
+,MapPublishCellsChanged,src/game/map_events.h,field_write,MapEvent::cause
+,MapPublishCellsChanged,src/game/map_events.h,field_write,MapEvent::classes
+,MapPublishCellsChanged,src/game/map_events.h,field_write,MapEvent::rect
+,MapPublishCellsChanged,src/game/map_events.h,function,
 ,MapRange,src/ai/ai_player.cpp,field_read,Game::mapHeight
 ,MapRange,src/ai/ai_player.cpp,field_read,Game::mapWidth
 ,MapRange,src/ai/ai_player.cpp,function,
 ,MapRange,src/ai/ai_player.cpp,global_read,g_game
+,MapResultsAdd,src/harness/map_results.h,call,memset
+,MapResultsAdd,src/harness/map_results.h,call,operator=
+,MapResultsAdd,src/harness/map_results.h,call,realloc
+,MapResultsAdd,src/harness/map_results.h,deref_escape,*MapResult
+,MapResultsAdd,src/harness/map_results.h,deref_read,*MapEvent
+,MapResultsAdd,src/harness/map_results.h,field_read,MapResults::capacity
+,MapResultsAdd,src/harness/map_results.h,field_read,MapResults::count
+,MapResultsAdd,src/harness/map_results.h,field_read,MapResults::items
+,MapResultsAdd,src/harness/map_results.h,field_write,MapResult::event
+,MapResultsAdd,src/harness/map_results.h,field_write,MapResult::outcome
+,MapResultsAdd,src/harness/map_results.h,field_write,MapResults::capacity
+,MapResultsAdd,src/harness/map_results.h,field_write,MapResults::count
+,MapResultsAdd,src/harness/map_results.h,field_write,MapResults::items
+,MapResultsAdd,src/harness/map_results.h,function,
+,MapResultsClear,src/harness/map_results.h,field_write,MapResults::count
+,MapResultsClear,src/harness/map_results.h,function,
 ,MapSlot,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapSlot,src/harness/harness.cpp,function,
+,MapUnitOfHandle,src/map/terrain.cpp,call,get
+,MapUnitOfHandle,src/map/terrain.cpp,field_write,Ref<Unit>::offset
+,MapUnitOfHandle,src/map/terrain.cpp,function,
 ,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,call,SquadManager::MarkOwnerNetDirtyFromDamageSplit
 ,MarkOwnerNetDirtyFromDamageSplitNative,src/seams/native.cpp,function,
 ,Marked,src/orders/order_dispatch.cpp,field_read,FeatureMarkView::ffe
@@ -52170,6 +52135,14 @@ address,function,file,kind,target
 ,PathfindingInit,src/ai/pathfind.cpp,field_write,PathPending::nextRequester
 ,PathfindingInit,src/ai/pathfind.cpp,function,
 ,PathfindingInit,src/ai/pathfind.cpp,global_read,g_game
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,field_read,MapEvent::cause
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,field_read,MapEvent::classes
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,field_read,MapEvent::rect
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,field_read,PathfindingSeam::CellsChanged
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,field_read,Seams::pathfinding
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,function,
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,global_read,g_seams
+,PathfindingOnMapCellsChanged,src/game/routes.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 ,PathfindingPoll,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingPoll,src/ai/pathfind.cpp,call,Pathfinder::Poll
 ,PathfindingPoll,src/ai/pathfind.cpp,function,
@@ -52252,27 +52225,24 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,call,RandomInt
 ,Patrol,src/orders/vtol_orders.cpp,call,SearchRange
 ,Patrol,src/orders/vtol_orders.cpp,call,UnitList::~UnitList
+,Patrol,src/orders/vtol_orders.cpp,call,VisitUnitsInRange
 ,Patrol,src/orders/vtol_orders.cpp,call,empty
 ,Patrol,src/orders/vtol_orders.cpp,call,operator Player *
 ,Patrol,src/orders/vtol_orders.cpp,call,operator WeaponDef *
 ,Patrol,src/orders/vtol_orders.cpp,call,operator new
 ,Patrol,src/orders/vtol_orders.cpp,call,operator[]
 ,Patrol,src/orders/vtol_orders.cpp,call,size
-,Patrol,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
-,Patrol,src/orders/vtol_orders.cpp,field_read,MapSeam::VisitObjectsInRange
 ,Patrol,src/orders/vtol_orders.cpp,field_read,Order::angle
 ,Patrol,src/orders/vtol_orders.cpp,field_read,Order::flags
 ,Patrol,src/orders/vtol_orders.cpp,field_read,Order::pos
-,Patrol,src/orders/vtol_orders.cpp,field_read,Seams::map
 ,Patrol,src/orders/vtol_orders.cpp,field_read,Unit::player
+,Patrol,src/orders/vtol_orders.cpp,field_read,Unit::pos
 ,Patrol,src/orders/vtol_orders.cpp,field_read,UnitWeaponSlot::weapon
 ,Patrol,src/orders/vtol_orders.cpp,field_read,WeaponDef::range
 ,Patrol,src/orders/vtol_orders.cpp,field_write,Order::angle
 ,Patrol,src/orders/vtol_orders.cpp,field_write,Order::flags
 ,Patrol,src/orders/vtol_orders.cpp,function,
-,Patrol,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Patrol,src/orders/vtol_orders.cpp,global_read,kSim
-,Patrol,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Vec3 *, int, UnitVisitor *) __attribute__((stdcall)) [MapSeam::VisitObjectsInRange]"
 ,PeekFrame,src/network/packets.cpp,call,operator->
 ,PeekFrame,src/network/packets.cpp,call,operator==
 ,PeekFrame,src/network/packets.cpp,field_escape,FrameRing::frames
@@ -54364,15 +54334,19 @@ address,function,file,kind,target
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,call,Add
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,field_read,MapSeam::AddUnitToMap
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,function,
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapAddUnitToMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::AddUnitToMap]
+,RecMapApply,src/harness/replay_hooks.inc,call,Add
+,RecMapApply,src/harness/replay_hooks.inc,call,ArgStruct
+,RecMapApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapApply,src/harness/replay_hooks.inc,call,SimBlockBase
+,RecMapApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapApply,src/harness/replay_hooks.inc,field_read,MapEvent::unit
+,RecMapApply,src/harness/replay_hooks.inc,field_read,MapSeam::Apply
+,RecMapApply,src/harness/replay_hooks.inc,function,
+,RecMapApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapApply,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMapApply,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const MapEvent *) __attribute__((stdcall)) [MapSeam::Apply]
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,field_read,MapSeam::BuildAllPassMaps
@@ -54413,24 +54387,6 @@ address,function,file,kind,target
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,call,Add
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,field_read,MapSeam::ClearFootprintAndUnlink
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,function,
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapClearFootprintAndUnlink,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::ClearFootprintAndUnlink]
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,Add
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,field_read,MapSeam::ForceNeighborFootprintReclaim
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,function,
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapForceNeighborFootprintReclaim,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::ForceNeighborFootprintReclaim]
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54452,43 +54408,6 @@ address,function,file,kind,target
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::IsPadSlotFree]"
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,field_read,MapSeam::RefreshAllPassMaps
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,function,
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapRefreshAllPassMaps,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Point16, Point16) __attribute__((stdcall)) [MapSeam::RefreshAllPassMaps]"
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,Add
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,field_read,MapSeam::RefreshPassMap
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,function,
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapRefreshPassMap,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(MovementClass *, int, Point16, Point16) __attribute__((fastcall)) [MapSeam::RefreshPassMap]"
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,call,Add
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,field_read,MapSeam::RemoveUnitFromMap
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,function,
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapRemoveUnitFromMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [MapSeam::RemoveUnitFromMap]
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,Add
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,field_read,MapSeam::SetYardOpen
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,function,
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSetYardOpen,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::SetYardOpen]"
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,Add
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
@@ -54501,26 +54420,6 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,Add
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,field_read,MapSeam::SpatialBucketPrependUnit
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,function,
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSpatialBucketPrependUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketPrependUnit]"
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,Add
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,field_read,MapSeam::SpatialBucketUnlinkUnit
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,function,
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapSpatialBucketUnlinkUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(SpatialBucket *, int, Unit *) __attribute__((fastcall)) [MapSeam::SpatialBucketUnlinkUnit]"
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkBroadcastPlayerEconomy,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -56390,6 +56289,7 @@ address,function,file,kind,target
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
 ,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,function,
+,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,call,MapPublishCellsChanged
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::footprintX
@@ -56397,21 +56297,15 @@ address,function,file,kind,target
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::height
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::name
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::width
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,PathfindingSeam::CellsChanged
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::x
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::y
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Seams::pathfinding
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,function,
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
 ,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_read,g_movementClasses
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_read,g_seams
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
 ,RefreshMapListNative,src/seams/native.cpp,function,
 ,RefreshMovedUnitsNative,src/seams/native.cpp,call,MovementClass::RefreshMovedUnits
 ,RefreshMovedUnitsNative,src/seams/native.cpp,function,
-,RefreshPassMapNative,src/seams/native.cpp,call,MovementClass::RefreshPassMap
-,RefreshPassMapNative,src/seams/native.cpp,function,
 ,RefreshPassMaps,src/map/features.cpp,call,EffectOf
 ,RefreshPassMaps,src/map/features.cpp,call,PublishEffect
 ,RefreshPassMaps,src/map/features.cpp,field_read,Point16::x
@@ -57616,14 +57510,6 @@ address,function,file,kind,target
 ,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,call,ReplayValue
 ,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,function,
 ,ReplayThunkUnitScanVisitor::VisitUnit,src/harness/replay_callbacks.h,indirect_call,"indirect via int (*)(void *, Unit *) __attribute__((thiscall))"
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayAddObjectName
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Original
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Space
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Table
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::Text
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,call,ReplayCallbackCall::~ReplayCallbackCall
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,function,
-,ReplayThunkUnitVisitor::Visit,src/harness/replay_callbacks.h,indirect_call,"indirect via void (*)(void *, Unit *) __attribute__((thiscall))"
 ,ReplayThunkVtable,src/harness/replay_callbacks.h,call,ReplayVptrOf
 ,ReplayThunkVtable,src/harness/replay_callbacks.h,function,
 ,ReplayValue,src/harness/replay_values.h,call,ReplayText::Add
@@ -58432,6 +58318,36 @@ address,function,file,kind,target
 ,ScheduleFeaturesPlace,src/seams/features_world.cpp,function,
 ,ScheduleFeaturesPlace,src/seams/features_world.cpp,global_read,g_seams
 ,ScheduleFeaturesPlace,src/seams/features_world.cpp,indirect_call,indirect via int (*)(const FeaturesEvent *) __attribute__((stdcall)) [FeaturesSeam::Place]
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,call,ReplayImport::Int
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,call,ReplayImport::Ptr
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,call,ReplayImport::Result
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,call,SchedDeliver
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,field_read,MapSeam::CanBuildAt
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,field_read,Seams::map
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,function,
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,global_read,g_seams
+,ScheduleMapCanBuildAt,src/seams/map_world.cpp,indirect_call,"indirect via int (*)(UnitDef *, Point16, short, Player *) __attribute__((stdcall)) [MapSeam::CanBuildAt]"
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,call,ReplayImport::Int
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,call,ReplayImport::Ptr
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,call,ReplayImport::Result
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,call,SchedDeliver
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,field_read,MapSeam::CanPlaceUnitFootprint
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,field_read,Seams::map
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,function,
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,global_read,g_seams
+,ScheduleMapCanPlaceUnitFootprint,src/seams/map_world.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,call,ReplayImport::Int
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,call,ReplayImport::Ptr
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,call,ReplayImport::Result
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,call,ReplayImport::~ReplayImport
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,call,SchedDeliver
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,field_read,MapSeam::PickRandomReclaimableResourcesInRadius
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,field_read,Seams::map
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,function,
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,global_read,g_seams
+,ScheduleMapPickReclaimable,src/seams/map_world.cpp,indirect_call,"indirect via int (*)(Vec3 *, int, Vec3 **, float *, Vec3 **, float *) __attribute__((stdcall)) [MapSeam::PickRandomReclaimableResourcesInRadius]"
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,ReplayImport::Int
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
 ,ScheduleMetalExtraction,src/seams/economy_world.cpp,call,SchedDeliver
@@ -59294,10 +59210,6 @@ address,function,file,kind,target
 ,SpanMoved,src/harness/block_scan.cpp,function,
 ,SpanMoved,src/harness/block_scan.cpp,global_read,g_spanCount
 ,SpanMoved,src/harness/block_scan.cpp,global_read,g_spans
-,SpatialBucketPrependUnitNative,src/seams/native.cpp,call,SpatialBucket::PrependUnit
-,SpatialBucketPrependUnitNative,src/seams/native.cpp,function,
-,SpatialBucketUnlinkUnitNative,src/seams/native.cpp,call,SpatialBucket::UnlinkUnit
-,SpatialBucketUnlinkUnitNative,src/seams/native.cpp,function,
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,GameFreeThunk
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,operator=
 ,SpeechQueue::Remove,src/sound/sound.cpp,field_read,SpeechEntry::data
@@ -60391,6 +60303,7 @@ address,function,file,kind,target
 ,UpdatePlayerBody,src/game/players.cpp,call,RecordFocusCommander
 ,UpdatePlayerBody,src/game/players.cpp,call,RecordWatchModeNotice
 ,UpdatePlayerBody,src/game/players.cpp,call,RecordWatchPrompt
+,UpdatePlayerBody,src/game/players.cpp,call,ScheduleMapCanPlaceUnitFootprint
 ,UpdatePlayerBody,src/game/players.cpp,call,SetStartingStorageBonus
 ,UpdatePlayerBody,src/game/players.cpp,call,get
 ,UpdatePlayerBody,src/game/players.cpp,call,operator Mission *
@@ -60412,7 +60325,6 @@ address,function,file,kind,target
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::startPos
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::ticks
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::width
-,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::CanPlaceUnitFootprint
 ,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::GetCellMeanHeight
 ,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::GetGameType
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Mission::lavaWorld
@@ -60458,7 +60370,6 @@ address,function,file,kind,target
 ,UpdatePlayerBody,src/game/players.cpp,global_read,kHundred@src/game/players.cpp
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via int (*)(Mission *) __attribute__((fastcall)) [MapSeam::GetGameType]
-,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via int (*)(UnitDef *, unsigned short, Point16, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
@@ -61129,6 +61040,36 @@ address,function,file,kind,target
 ,VisitMapCells,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,VisitMapCells,src/harness/harness.cpp,global_read,s_hash@src/harness/harness.cpp
 ,VisitMapCells,src/harness/harness.cpp,global_write,s_hash@src/harness/harness.cpp
+,VisitMapResults,src/harness/harness.cpp,call,DumpHexBytes
+,VisitMapResults,src/harness/harness.cpp,call,DumpPrefix
+,VisitMapResults,src/harness/harness.cpp,call,DumpUnitName
+,VisitMapResults,src/harness/harness.cpp,call,Fail
+,VisitMapResults,src/harness/harness.cpp,call,Resolve
+,VisitMapResults,src/harness/harness.cpp,call,SimBlockBase
+,VisitMapResults,src/harness/harness.cpp,call,fprintf
+,VisitMapResults,src/harness/harness.cpp,call,sprintf
+,VisitMapResults,src/harness/harness.cpp,deref_escape,*MapResult
+,VisitMapResults,src/harness/harness.cpp,field_escape,MapEvent::cell
+,VisitMapResults,src/harness/harness.cpp,field_escape,MapEvent::rect
+,VisitMapResults,src/harness/harness.cpp,field_escape,MapEvent::size
+,VisitMapResults,src/harness/harness.cpp,field_escape,MapResult::event
+,VisitMapResults,src/harness/harness.cpp,field_maybe_written,MapResult::unitId
+,VisitMapResults,src/harness/harness.cpp,field_maybe_written,MapResult::unitTag
+,VisitMapResults,src/harness/harness.cpp,field_read,MapEvent::cause
+,VisitMapResults,src/harness/harness.cpp,field_read,MapEvent::classes
+,VisitMapResults,src/harness/harness.cpp,field_read,MapEvent::kind
+,VisitMapResults,src/harness/harness.cpp,field_read,MapEvent::unit
+,VisitMapResults,src/harness/harness.cpp,field_read,MapEvent::value
+,VisitMapResults,src/harness/harness.cpp,field_read,MapResult::outcome
+,VisitMapResults,src/harness/harness.cpp,field_read,MapResult::unitId
+,VisitMapResults,src/harness/harness.cpp,field_read,MapResult::unitTag
+,VisitMapResults,src/harness/harness.cpp,field_read,MapResults::count
+,VisitMapResults,src/harness/harness.cpp,field_read,MapResults::items
+,VisitMapResults,src/harness/harness.cpp,function,
+,VisitMapResults,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
+,VisitMapResults,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,VisitMapResults,src/harness/harness.cpp,global_read,s_mapResults@src/harness/harness.cpp
+,VisitMapResults,src/harness/harness.cpp,global_read,s_mapResultsLost@src/harness/harness.cpp
 ,VisitMeteors,src/harness/harness.cpp,call,EndSection
 ,VisitMeteors,src/harness/harness.cpp,call,HashByte
 ,VisitMeteors,src/harness/harness.cpp,call,VisitGlobalList
@@ -61192,8 +61133,6 @@ address,function,file,kind,target
 ,VisitMoveClasses,src/harness/harness.cpp,call,VisitElement
 ,VisitMoveClasses,src/harness/harness.cpp,function,
 ,VisitMoveClasses,src/harness/harness.cpp,global_read,kMoveClassTable@src/harness/trace_schema.h
-,VisitObjectsInRangeNative,src/seams/native.cpp,call,VisitObjectsInRange
-,VisitObjectsInRangeNative,src/seams/native.cpp,function,
 ,VisitOrders,src/harness/harness.cpp,call,EndSection
 ,VisitOrders,src/harness/harness.cpp,call,HashByte
 ,VisitOrders,src/harness/harness.cpp,call,HashU32
@@ -61490,6 +61429,16 @@ address,function,file,kind,target
 ,VisitUnits,src/harness/harness.cpp,deref_read,*unsigned short
 ,VisitUnits,src/harness/harness.cpp,function,
 ,VisitUnits,src/harness/harness.cpp,global_read,kUnitTable@src/harness/trace_schema.h
+,VisitUnitsInRange,src/seams/map_world.cpp,call,operator Unit *
+,VisitUnitsInRange,src/seams/map_world.cpp,deref_maybe_written,*Unit
+,VisitUnitsInRange,src/seams/map_world.cpp,field_read,Game::units
+,VisitUnitsInRange,src/seams/map_world.cpp,field_read,MapSeam::UnitsInRange
+,VisitUnitsInRange,src/seams/map_world.cpp,field_read,Seams::map
+,VisitUnitsInRange,src/seams/map_world.cpp,function,
+,VisitUnitsInRange,src/seams/map_world.cpp,global_read,g_game
+,VisitUnitsInRange,src/seams/map_world.cpp,global_read,g_seams
+,VisitUnitsInRange,src/seams/map_world.cpp,indirect_call,"indirect via int (*)(const Vec3 *, int, int, unsigned short *, int) __attribute__((stdcall)) [MapSeam::UnitsInRange]"
+,VisitUnitsInRange,src/seams/map_world.cpp,indirect_call,virtual UnitVisitor::Visit
 ,VisitValue,src/harness/harness.cpp,call,DumpPrefix
 ,VisitValue,src/harness/harness.cpp,call,HashBuf
 ,VisitValue,src/harness/harness.cpp,call,fprintf
@@ -61554,6 +61503,7 @@ address,function,file,kind,target
 ,VisitWorld,src/harness/harness.cpp,call,VisitGameScalars
 ,VisitWorld,src/harness/harness.cpp,call,VisitLosRadarResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitMapCells
+,VisitWorld,src/harness/harness.cpp,call,VisitMapResults
 ,VisitWorld,src/harness/harness.cpp,call,VisitModuleState
 ,VisitWorld,src/harness/harness.cpp,call,VisitMoveClasses
 ,VisitWorld,src/harness/harness.cpp,call,VisitPassMaps
@@ -62042,13 +61992,6 @@ address,function,file,kind,target
 ,WorldToCell,src/ingame/control_panel.cpp,field_write,Point16::x
 ,WorldToCell,src/ingame/control_panel.cpp,field_write,Point16::y
 ,WorldToCell,src/ingame/control_panel.cpp,function,
-,WorldToCell,src/map/terrain.cpp,field_read,Point16::x
-,WorldToCell,src/map/terrain.cpp,field_read,Point16::y
-,WorldToCell,src/map/terrain.cpp,field_read,Vec3::x
-,WorldToCell,src/map/terrain.cpp,field_read,Vec3::z
-,WorldToCell,src/map/terrain.cpp,field_write,Point16::x
-,WorldToCell,src/map/terrain.cpp,field_write,Point16::y
-,WorldToCell,src/map/terrain.cpp,function,
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Point16::x
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Point16::y
 ,WorldToCell,src/orders/unit_orders.cpp,field_read,Vec3::x

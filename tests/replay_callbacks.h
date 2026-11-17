@@ -2,23 +2,6 @@
 
 // included by replay_native_test.cpp after its helpers
 
-void PlayCallbacks_UnitVisitor(void* object, unsigned handle, const char* import)
-{
-    for (int k = 0; k < g_cbCount; k++) {
-        const char* args = nullptr;
-        const char* method = CallbackMethod(k, handle, object, "visitor", import, &args);
-        if (method == nullptr)
-            continue;
-        if (CallbackIs(method, "Visit")) {
-            Unit* a0 = (Unit*)CallbackObject(&args, ROK_UNIT);
-            ((UnitVisitor*)object)->Visit(a0);
-            CallbackDone(import, k, args, nullptr);
-            continue;
-        }
-        CallbackUnknown(import, k, method);
-    }
-}
-
 void PlayCallbacks_UnitScanVisitor(void* object, unsigned handle, const char* import)
 {
     for (int k = 0; k < g_cbCount; k++) {
@@ -56,19 +39,6 @@ void PlayCallbacks_Callback(void* object, unsigned handle, const char* import)
     }
 }
 
-class ReplayHeldUnitVisitor : public UnitVisitor {
-public:
-    void Visit(Unit* a0) override;
-};
-
-inline void ReplayHeldUnitVisitor::Visit(Unit* a0)
-{
-    HeldCall call(RCB_UNITVISITOR, (const UnitVisitor*)this, "Visit");
-    call.Space();
-    ReplayAddObjectName(call.Text(), g_objects, ROK_UNIT, a0, false);
-    call.Finish();
-}
-
 class ReplayHeldUnitScanVisitor : public UnitScanVisitor {
 public:
     int VisitUnit(Unit* a0) override;
@@ -98,8 +68,6 @@ inline void ReplayHeldCallback::Complete(int a0)
 inline void* NewHeldCallback(unsigned callback, void* memory)
 {
     switch (callback) {
-    case RCB_UNITVISITOR:
-        return (UnitVisitor*)new (memory) ReplayHeldUnitVisitor;
     case RCB_UNITSCANVISITOR:
         return (UnitScanVisitor*)new (memory) ReplayHeldUnitScanVisitor;
     case RCB_CALLBACK:
@@ -111,8 +79,6 @@ inline void* NewHeldCallback(unsigned callback, void* memory)
 inline unsigned HeldCallbackSize(unsigned callback)
 {
     switch (callback) {
-    case RCB_UNITVISITOR:
-        return sizeof(ReplayHeldUnitVisitor);
     case RCB_UNITSCANVISITOR:
         return sizeof(ReplayHeldUnitScanVisitor);
     case RCB_CALLBACK:

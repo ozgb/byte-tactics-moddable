@@ -2608,6 +2608,73 @@
       "table": "weaponFire"
      }
     ]
+   },
+   "MapEvent": {
+    "type": "MapEvent",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "kind",
+      "kind": "i32"
+     },
+     {
+      "name": "unit",
+      "kind": "ref",
+      "target": "Unit"
+     },
+     {
+      "name": "value",
+      "kind": "i32"
+     },
+     {
+      "name": "cellX",
+      "kind": "i32",
+      "member": "cell[0]"
+     },
+     {
+      "name": "cellY",
+      "kind": "i32",
+      "member": "cell[1]"
+     },
+     {
+      "name": "sizeX",
+      "kind": "i32",
+      "member": "size[0]"
+     },
+     {
+      "name": "sizeY",
+      "kind": "i32",
+      "member": "size[1]"
+     },
+     {
+      "name": "left",
+      "kind": "i32",
+      "member": "rect[0]"
+     },
+     {
+      "name": "top",
+      "kind": "i32",
+      "member": "rect[1]"
+     },
+     {
+      "name": "right",
+      "kind": "i32",
+      "member": "rect[2]"
+     },
+     {
+      "name": "bottom",
+      "kind": "i32",
+      "member": "rect[3]"
+     },
+     {
+      "name": "classes",
+      "kind": "i32"
+     },
+     {
+      "name": "cause",
+      "kind": "i32"
+     }
+    ]
    }
   },
   "rules": [
@@ -2974,6 +3041,26 @@
      "RefreshPassMapsForUnit"
     ],
     "note": "the movement class table"
+   },
+   {
+    "kind": "field_maybe_written",
+    "target": "MovementClassTable::entries",
+    "rule": "all-of",
+    "object": "MovementClass",
+    "functions": [
+     "ApplyMapEvent"
+    ],
+    "note": "the movement class table: REFRESH_PASS_MAP refreshes the pass map of the class its value names"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "MapPoint"
+    ],
+    "reads": [],
+    "note": "the cell and size of the event, recorded as its cellX, cellY, sizeX and sizeY"
    },
    {
     "kind": "global_escape",
@@ -4478,7 +4565,54 @@
     "status": "complete",
     "issue": 693,
     "slots": {
-     "VisitObjectsInRange": {
+     "Apply": {
+      "native": "ApplyMapEventSlot",
+      "functions": [
+       "ApplyMapEvent",
+       "MapUnitOfHandle",
+       "MapPoint",
+       "AddUnitToMap",
+       "RefreshAllPassMapsForUnits",
+       "RefreshAndReportAllPassMaps",
+       "MovementClass::RefreshPassMap",
+       "GetPassMapFootprintValueWithEdgeStrips",
+       "GetPassMapFootprintValue",
+       "FootprintValueWithEdgeStrips",
+       "FootprintValue",
+       "SetOwner",
+       "UnlinkBucketUnit",
+       "RemoveUnitFromMap",
+       "RefreshPassMapsForUnit",
+       "VisitObjectsInArea",
+       "ClearFootprintAndUnlink",
+       "ForceNeighborFootprintReclaim",
+       "SetYardOpen",
+       "ClaimFootprintCells",
+       "IsFootprintClear",
+       "RefreshAllPassMaps",
+       "SpatialBucket::PrependUnit",
+       "SpatialBucket::UnlinkUnit"
+      ],
+      "reads": [
+       "Game.width_142a3",
+       "Game.height_142a7",
+       "Game.poolCount"
+      ],
+      "through": {
+       "virtual ClaimFootprintVisitor::ClaimFootprint": [
+        "ClaimFootprintVisitor::ClaimFootprint",
+        "ClaimFootprintCells"
+       ]
+      },
+      "args": {
+       "event": {
+        "mode": "struct",
+        "kind": "MapEvent",
+        "dir": "in"
+       }
+      }
+     },
+     "UnitsInRange": {
       "record": false,
       "reason": "#660 part 3"
      },
@@ -4643,50 +4777,6 @@
        }
       }
      },
-     "AddUnitToMap": {
-      "functions": [
-       "AddUnitToMap",
-       "RefreshAllPassMapsForUnits",
-       "RefreshAndReportAllPassMaps",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue",
-       "SetOwner",
-       "UnlinkBucketUnit"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ]
-     },
-     "RemoveUnitFromMap": {
-      "functions": [
-       "RemoveUnitFromMap",
-       "RefreshPassMapsForUnit",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue",
-       "RefreshAllPassMapsForUnits",
-       "RefreshAndReportAllPassMaps",
-       "VisitObjectsInArea"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ],
-      "through": {
-       "virtual ClaimFootprintVisitor::ClaimFootprint": [
-        "ClaimFootprintVisitor::ClaimFootprint",
-        "ClaimFootprintCells"
-       ]
-      }
-     },
      "CanPlaceFootprintAt": {
       "functions": [
        "CanPlaceFootprintAt"
@@ -4707,88 +4797,6 @@
        "IsPadSlotFree"
       ]
      },
-     "ClearFootprintAndUnlink": {
-      "functions": [
-       "ClearFootprintAndUnlink",
-       "RemoveUnitFromMap",
-       "RefreshPassMapsForUnit",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue",
-       "RefreshAllPassMapsForUnits",
-       "RefreshAndReportAllPassMaps",
-       "VisitObjectsInArea",
-       "UnlinkBucketUnit"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ],
-      "through": {
-       "virtual ClaimFootprintVisitor::ClaimFootprint": [
-        "ClaimFootprintVisitor::ClaimFootprint",
-        "ClaimFootprintCells"
-       ]
-      }
-     },
-     "ForceNeighborFootprintReclaim": {
-      "functions": [
-       "ForceNeighborFootprintReclaim",
-       "RefreshAllPassMapsForUnits",
-       "RefreshAndReportAllPassMaps",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue",
-       "VisitObjectsInArea"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ],
-      "through": {
-       "virtual ClaimFootprintVisitor::ClaimFootprint": [
-        "ClaimFootprintVisitor::ClaimFootprint",
-        "ClaimFootprintCells"
-       ]
-      }
-     },
-     "SetYardOpen": {
-      "functions": [
-       "SetYardOpen",
-       "ClaimFootprintCells",
-       "IsFootprintClear",
-       "RefreshAllPassMapsForUnits",
-       "RefreshAndReportAllPassMaps",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue"
-      ],
-      "reads": [
-       "Game.poolCount"
-      ]
-     },
-     "RefreshAllPassMaps": {
-      "functions": [
-       "RefreshAllPassMaps",
-       "RefreshAndReportAllPassMaps",
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue"
-      ],
-      "reads": [
-       "Game.poolCount"
-      ]
-     },
      "BuildAllPassMaps": {
       "functions": [
        "BuildAllPassMaps",
@@ -4799,53 +4807,6 @@
       "reads": [
        "Game.poolCount"
       ]
-     },
-     "RefreshPassMap": {
-      "functions": [
-       "MovementClass::RefreshPassMap",
-       "GetPassMapFootprintValueWithEdgeStrips",
-       "GetPassMapFootprintValue",
-       "FootprintValueWithEdgeStrips",
-       "FootprintValue"
-      ],
-      "native": "RefreshPassMapSlot",
-      "reads": [
-       "Game.poolCount"
-      ]
-     },
-     "SpatialBucketPrependUnit": {
-      "functions": [
-       "SpatialBucket::PrependUnit"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ],
-      "args": {
-       "bucket": {
-        "mode": "object",
-        "kind": "SpatialBucket"
-       }
-      },
-      "native": "SpatialBucketPrependUnitSlot"
-     },
-     "SpatialBucketUnlinkUnit": {
-      "functions": [
-       "SpatialBucket::UnlinkUnit"
-      ],
-      "reads": [
-       "Game.width_142a3",
-       "Game.height_142a7",
-       "Game.poolCount"
-      ],
-      "args": {
-       "bucket": {
-        "mode": "object",
-        "kind": "SpatialBucket"
-       }
-      },
-      "native": "SpatialBucketUnlinkUnitSlot"
      },
      "GetCellMeanHeight": {
       "functions": [
@@ -5745,6 +5706,86 @@
     "ctype": "Unit*"
    },
    {
+    "name": "ScheduleMapCanBuildAt",
+    "id": "RI_SCHEDULE_MAP_CAN_BUILD_AT",
+    "declaration": "int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "unit"
+     },
+     {
+      "mode": "skip",
+      "param": "cell"
+     },
+     {
+      "mode": "int",
+      "param": "type"
+     },
+     {
+      "mode": "skip",
+      "param": "player"
+     }
+    ],
+    "result": "int"
+   },
+   {
+    "name": "ScheduleMapCanPlaceUnitFootprint",
+    "id": "RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT",
+    "declaration": "int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "unit"
+     },
+     {
+      "mode": "int",
+      "param": "otherTypeId"
+     },
+     {
+      "mode": "skip",
+      "param": "cell"
+     },
+     {
+      "mode": "int",
+      "param": "flags"
+     }
+    ],
+    "result": "int"
+   },
+   {
+    "name": "ScheduleMapPickReclaimable",
+    "id": "RI_SCHEDULE_MAP_PICK_RECLAIMABLE",
+    "declaration": "int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);",
+    "args": [
+     {
+      "mode": "skip",
+      "param": "pos"
+     },
+     {
+      "mode": "int",
+      "param": "range"
+     },
+     {
+      "mode": "skip",
+      "param": "energy"
+     },
+     {
+      "mode": "skip",
+      "param": "energyAmount"
+     },
+     {
+      "mode": "skip",
+      "param": "metal"
+     },
+     {
+      "mode": "skip",
+      "param": "metalAmount"
+     }
+    ],
+    "result": "int"
+   },
+   {
     "name": "SimCaptureAlloc",
     "id": "RI_SIM_CAPTURE_ALLOC",
     "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
@@ -6102,24 +6143,6 @@
    }
   },
   "callbacks": {
-   "UnitVisitor": {
-    "header": "interfaces/map.h",
-    "handle": "visitor",
-    "methods": [
-     {
-      "name": "Visit",
-      "ret": "void",
-      "args": [
-       {
-        "name": "unit",
-        "type": "Unit*",
-        "mode": "object",
-        "kind": "Unit"
-       }
-      ]
-     }
-    ]
-   },
    "UnitScanVisitor": {
     "header": "src/game/victory_conditions.h",
     "handle": "scanner",
@@ -6257,7 +6280,8 @@
   {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "Mission", "type": "Mission", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "WeaponAimCobCb", "type": "WeaponAimCobCb", "scope": "state", "table": null, "inside": [{"kind": "Unit", "member": "weapons[].aimCob"}], "vptr": "g_weaponAimCobVtable", "fields": [{"name": "nAimCobDone", "kind": "i32"}]},
-  {"name": "WeaponFire", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "fire", "kind": "code", "table": "weaponFire", "codeTable": 1}]}
+  {"name": "WeaponFire", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "fire", "kind": "code", "table": "weaponFire", "codeTable": 1}]},
+  {"name": "MapEvent", "type": "MapEvent", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}, {"name": "value", "kind": "i32"}, {"name": "cellX", "kind": "i32", "member": "cell[0]"}, {"name": "cellY", "kind": "i32", "member": "cell[1]"}, {"name": "sizeX", "kind": "i32", "member": "size[0]"}, {"name": "sizeY", "kind": "i32", "member": "size[1]"}, {"name": "left", "kind": "i32", "member": "rect[0]"}, {"name": "top", "kind": "i32", "member": "rect[1]"}, {"name": "right", "kind": "i32", "member": "rect[2]"}, {"name": "bottom", "kind": "i32", "member": "rect[3]"}, {"name": "classes", "kind": "i32"}, {"name": "cause", "kind": "i32"}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -6540,24 +6564,16 @@
    }
   },
   "map": {
-   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [3, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "VisitObjectsInRange": {"reason": "#660 part 3", "native": "VisitObjectsInRange"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}}},
+   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [4, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}}},
    "slots": {
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cobStateFlags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "event", "type": "MapEvent*", "line": "event", "mode": "struct", "kind": "MapEvent", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
-    "RefreshAllPassMaps": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshAllPassMaps", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Unit.motion", "Cell.unit", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["MovementClass.cells"], "allOf": ["Unit", "Cell", "MovementClass", "Feature"], "args": [{"name": "a", "type": "Point16", "line": "a", "mode": "scalar"}, {"name": "b", "type": "Point16", "line": "b", "mode": "scalar"}], "result": null, "native": "RefreshAllPassMaps"},
     "CanBuildAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanBuildAt", "CellFeatureBlocks", "GetCellFeatureDef", "GetCellHeight", "CellAt", "InsideExplored", "IsExploredAtHeight", "IsSeenAtHeight", "VisibilityWord"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "writes": ["SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.cell", "Unit.footprint", "UnitDef.footprintx", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.maxslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "Cell.metal", "Cell.unit", "Cell.height", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Cell", "Feature"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "cell", "type": "Point16", "line": "cell", "mode": "scalar"}, {"name": "type", "type": "short", "line": "type", "mode": "scalar"}, {"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanBuildAt"},
     "CanPlaceUnitFootprint": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceUnitFootprint", "CanBuildAt", "CellFeatureBlocks", "GetCellFeatureDef", "GetCellHeight", "CellAt", "InsideExplored", "IsExploredAtHeight", "IsSeenAtHeight", "VisibilityWord", "SteepCell"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "writes": ["SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.cell", "Unit.footprint", "UnitDef.footprintx", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.maxslope", "UnitDef.maxwaterslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "UnitDef.mobile", "Cell.metal", "Cell.unit", "Cell.height", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Cell", "Feature"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "otherTypeId", "type": "unsigned short", "line": "otherTypeId", "mode": "scalar"}, {"name": "cell", "type": "Point16", "line": "cell", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceUnitFootprint"},
     "BuildAllPassMaps": {"conv": "__stdcall", "ret": "void", "functions": ["BuildAllPassMaps", "MovementClassBuildView::BuildPassMap", "GetPassMapCellValue", "setcell"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": ["Game.progress_38d73"], "objectReads": ["Unit.motion", "Cell.unit", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["MovementClass.width", "MovementClass.height", "MovementClass.cells"], "allOf": ["Unit", "Cell", "MovementClass", "Feature"], "args": [], "result": null, "native": "BuildAllPassMaps"},
     "SnapWorldPosToFootprint": {"conv": "__stdcall", "ret": "void", "functions": ["SnapWorldPosToFootprint", "CellToWorld", "GetFootprintHeight", "WorldToCell"], "reads": ["Game.width", "Game.height", "Game.seaLevel"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "UnitDef.footprintx", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.mobile", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "inout"}], "result": null, "native": "SnapWorldPosToFootprint"},
-    "AddUnitToMap": {"conv": "__stdcall", "ret": "void", "functions": ["AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.cobStateFlags", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "AddUnitToMap"},
-    "RemoveUnitFromMap": {"conv": "__stdcall", "ret": "void", "functions": ["RemoveUnitFromMap", "RefreshPassMapsForUnit", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "VisitObjectsInArea"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RemoveUnitFromMap"},
     "CanPlaceFootprintAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceFootprintAt"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.poolCount"], "writes": [], "objectReads": ["Unit.def", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.playerIndex", "UnitDef.flags1", "UnitDef.maxslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Unit", "Cell", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceFootprintAt"},
-    "IsPadSlotFree": {"conv": "__stdcall", "ret": "int", "functions": ["IsPadSlotFree"], "reads": [], "writes": [], "objectReads": ["Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.transportPiece"], "objectWrites": [], "allOf": [], "args": [{"name": "pad", "type": "Unit*", "line": "pad", "mode": "object", "kind": "Unit"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPadSlotFree"},
-    "ClearFootprintAndUnlink": {"conv": "__stdcall", "ret": "void", "functions": ["ClearFootprintAndUnlink", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "VisitObjectsInArea", "UnlinkBucketUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "ClearFootprintAndUnlink"},
-    "ForceNeighborFootprintReclaim": {"conv": "__stdcall", "ret": "void", "functions": ["ForceNeighborFootprintReclaim", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "VisitObjectsInArea"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Cell.unit", "Cell.unit2", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "ForceNeighborFootprintReclaim"},
-    "SetYardOpen": {"conv": "__stdcall", "ret": "void", "functions": ["SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.cobStateFlags", "UnitDef.yardmap", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cobStateFlags", "Cell.unit", "Cell.unit2", "MovementClass.cells"], "allOf": ["Unit", "Cell", "MovementClass", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "open", "type": "int", "line": "open", "mode": "scalar"}], "result": null, "native": "SetYardOpen"},
-    "SpatialBucketPrependUnit": {"conv": "__fastcall", "ret": "void", "functions": ["SpatialBucket::PrependUnit"], "reads": ["Game.width_142a3", "Game.height_142a7", "Game.poolCount"], "writes": [], "objectReads": ["SpatialBucket.head", "OverflowBucket.head"], "objectWrites": ["Unit.cargoNext", "SpatialBucket.head", "OverflowBucket.head"], "allOf": ["Unit"], "args": [{"name": "bucket", "type": "SpatialBucket*", "line": "bucket", "mode": "object", "kind": "SpatialBucket"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "SpatialBucketPrependUnitSlot"},
-    "SpatialBucketUnlinkUnit": {"conv": "__fastcall", "ret": "void", "functions": ["SpatialBucket::UnlinkUnit"], "reads": ["Game.width_142a3", "Game.height_142a7", "Game.poolCount"], "writes": [], "objectReads": ["Unit.cargoNext", "SpatialBucket.head", "OverflowBucket.head"], "objectWrites": ["Unit.cargoNext", "SpatialBucket.head", "OverflowBucket.head"], "allOf": ["Unit"], "args": [{"name": "bucket", "type": "SpatialBucket*", "line": "bucket", "mode": "object", "kind": "SpatialBucket"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "SpatialBucketUnlinkUnitSlot"},
-    "RefreshPassMap": {"conv": "__fastcall", "ret": "void", "functions": ["MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Unit.motion", "Cell.unit", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["MovementClass.cells"], "allOf": ["Unit", "Cell", "Feature"], "args": [{"name": "movementClass", "type": "MovementClass*", "line": "movementClass", "mode": "object", "kind": "MovementClass"}, {"name": "unusedEdx", "type": "int", "line": "unusedEdx", "mode": "scalar"}, {"name": "a", "type": "Point16", "line": "a", "mode": "scalar"}, {"name": "b", "type": "Point16", "line": "b", "mode": "scalar"}], "result": null, "native": "RefreshPassMapSlot"}
+    "IsPadSlotFree": {"conv": "__stdcall", "ret": "int", "functions": ["IsPadSlotFree"], "reads": [], "writes": [], "objectReads": ["Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.transportPiece"], "objectWrites": [], "allOf": [], "args": [{"name": "pad", "type": "Unit*", "line": "pad", "mode": "object", "kind": "Unit"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPadSlotFree"}
    }
   },
   "files": {

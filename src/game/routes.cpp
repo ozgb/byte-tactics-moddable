@@ -7,15 +7,24 @@
 #include "../../interfaces/features.h"
 #include "../seams/features_world.h"
 #include "../units/features_effects.h"
-#include "../map/map_features_effects.h"
 #include "../weapons/features_effects.h"
 #include "../../interfaces/targeting.h"
 #include "../seams/targeting_world.h"
 #include "../units/targeting_effects.h"
 #include "../../interfaces/los_radar.h"
 #include "../seams/los_radar_world.h"
+#include "../../interfaces/map.h"
+#include "../seams/map_world.h"
+#include "../../interfaces/seams.h"
+#include "../../interfaces/pathfinding.h"
 #include "players.h"
 #include "scheduler.h"
+
+static void PathfindingOnMapCellsChanged(const void* event)
+{
+    const MapEvent* e = static_cast<const MapEvent*>(event);
+    g_seams.pathfinding->CellsChanged(e->rect[0], e->rect[1], e->rect[2], e->rect[3], e->classes, e->cause);
+}
 
 static const SchedRoute s_routes[] = {
     {SCHED_UNITS, ECONOMY_RESET, SCHED_ECONOMY, EconomyInbox, 0},
@@ -62,6 +71,17 @@ static const SchedRoute s_routes[] = {
     {SCHED_ECONOMY, LOS_RADAR_SHARE_MAPPING, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ECONOMY, LOS_RADAR_SHARE_RADAR, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ENGINE, LOS_RADAR_SHARE_MAP, SCHED_LOS_RADAR, LosRadarInbox, 1},
+    {SCHED_UNITS, MAP_ADD_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_ORDERS, MAP_ADD_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_REMOVE_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_ORDERS, MAP_REMOVE_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_CLEAR_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_RECLAIM_FOOTPRINT, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_SET_YARD, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_BUCKET_UNLINK, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_BUCKET_PREPEND, SCHED_MAP, MapInbox, 1},
+    {SCHED_UNITS, MAP_REFRESH_PASS_MAP, SCHED_MAP, MapInbox, 1},
+    {SCHED_MAP, MAP_EFFECT_CELLS_CHANGED, SCHED_PATHFINDING, PathfindingOnMapCellsChanged, 1},
     {SCHED_ENGINE, WIND_METEORS_ENABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_DISABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_PARAMS, SCHED_WIND_METEORS, WindMeteorsInbox, 0},

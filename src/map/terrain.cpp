@@ -69,6 +69,7 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/map.h"
+#include "spatial_bucket.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
 
@@ -667,16 +668,18 @@ int __stdcall IsFootprintClear(Unit* obj, int flag)
 
 
 // FUNCTION: 0x47dac0
-void __stdcall SetYardOpen(Unit* obj, int flag)
+int __stdcall SetYardOpen(Unit* obj, int flag)
 {
     if (g_quirks.skipEmptyYardmap && obj->def->yardmap == 0)
-        return;
+        return 0;
     if (IsFootprintClear(obj, flag)) {
         obj->bit2 = flag;
         obj->flags |= 0x8000000;
         ClaimFootprintCells(obj);
         RefreshAllPassMapsForUnits(obj->cell, obj->footprint);
+        return 1;
     }
+    return 0;
 }
 
 
@@ -754,27 +757,17 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
     return 1;
 }
 
-static inline Point16 WorldToCell(Vec3 v, Point16 origin)
-{
-    Point16 c;
-    c.x = (v.x - (origin.x << 19) + 0x80000) >> 20;
-    c.y = (v.z - (origin.y << 19) + 0x80000) >> 20;
-    return c;
-}
-
-static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
-{
-    v->x = (origin.x + c.x * 2) << 19;
-    v->z = (origin.y + c.y * 2) << 19;
-}
-
 // FUNCTION: 0x47ddc0
 void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
 {
     if (unit->mobile)
         return;
-    Point16 cell = WorldToCell(*pos, *(Point16*)&unit->footprintx);
-    CellToWorld(*(Point16*)&unit->footprintx, cell, pos);
+    Point16 origin = *(Point16*)&unit->footprintx;
+    Point16 cell;
+    cell.x = (pos->x - (origin.x << 19) + 0x80000) >> 20;
+    cell.y = (pos->z - (origin.y << 19) + 0x80000) >> 20;
+    pos->x = (origin.x + cell.x * 2) << 19;
+    pos->z = (origin.y + cell.y * 2) << 19;
     pos->y = GetFootprintHeight(unit, cell) << 16;
 }
 
@@ -1054,35 +1047,6 @@ void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisit
     }
 }
 
-static inline int ClampBucketCoord(int v, unsigned int size)
-{
-    if (v < size) {
-        return v;
-    }
-    if (v < 0) {
-        return 0;
-    }
-    return size - 1;
-}
-
-// FUNCTION: 0x47e750
-void __stdcall VisitObjectsInRect(int x1, int y1, int x2, int y2, UnitVisitor* visitor)
-{
-    int cx1 = ClampBucketCoord(x1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy1 = ClampBucketCoord(y1 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    int cx2 = ClampBucketCoord(x2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
-    int cy2 = ClampBucketCoord(y2 >> 23, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
-    for (int y = cy1; y <= cy2; y++) {
-        for (int x = cx1; x <= cx2; x++) {
-            for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
-                if (o->pos.x >= x1 && o->pos.x <= x2 && o->pos.z >= y1 && o->pos.z <= y2) {
-                    visitor->Visit(o);
-                }
-            }
-        }
-    }
-}
-
 static inline int ClampBucketRangeCoord(int v, unsigned int size)
 {
     if (v < size) {
@@ -1114,7 +1078,7 @@ static inline int ClampBucketMaxZ(Vec3* p, int range, unsigned int size)
     return ClampBucketRangeCoord((p->z + range) >> 23, size);
 }
 
-static inline int BucketDistSquared(Vec3* b, Vec3* a)
+static inline int BucketDistSquared(const Vec3* b, const Vec3* a)
 {
     int dz = a->z - b->z;
     int dx = a->x - b->x;
@@ -1122,8 +1086,10 @@ static inline int BucketDistSquared(Vec3* b, Vec3* a)
 }
 
 // FUNCTION: 0x47e890
-void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor)
+int __stdcall UnitsInRange(const Vec3* at, int range, int skip, unsigned short* ids, int capacity)
 {
+    Vec3* pos = (Vec3*)at;
+    int count = 0;
     int cx1 = ClampBucketMinX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
     int cy1 = ClampBucketMinZ(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).height);
     int cx2 = ClampBucketMaxX(pos, range, (*(BucketGrid*)((char*)g_game + 0x1429f)).width);
@@ -1133,11 +1099,18 @@ void __stdcall VisitObjectsInRange(Vec3* pos, int range, UnitVisitor* visitor)
         for (int x = cx1; x <= cx2; x++) {
             for (Unit* o = (*(BucketGrid*)((char*)g_game + 0x1429f)).cells[(*(BucketGrid*)((char*)g_game + 0x1429f)).width * y + x].first; o != 0; o = o->cargoNext) {
                 if (BucketDistSquared(pos, &o->pos) <= range2) {
-                    visitor->Visit(o);
+                    if (skip > 0) {
+                        skip--;
+                    } else {
+                        if (count == capacity)
+                            return count;
+                        ids[count++] = o->id;
+                    }
                 }
             }
         }
     }
+    return count;
 }
 
 #include "../../interfaces/seams.h"
@@ -1321,4 +1294,74 @@ void __stdcall GetCellPosition(int x, int y, Vec3* out)
         SetWholePart(&out->y, cell->height);
         SetWholePart(&out->z, y << 4);
     }
+}
+
+static Unit* MapUnitOfHandle(unsigned int handle)
+{
+    Ref<Unit> ref;
+    ref.offset = handle;
+    return ref.get();
+}
+
+static Point16 MapPoint(const int* xy)
+{
+    Point16 p;
+    p.x = (short)xy[0];
+    p.y = (short)xy[1];
+    return p;
+}
+
+static bool BucketHolds(SpatialBucket* bucket, Unit* unit)
+{
+    for (Unit* o = bucket->head.get(); o != nullptr; o = o->cargoNext.get()) {
+        if (o == unit)
+            return true;
+    }
+    return false;
+}
+
+int __stdcall ApplyMapEvent(const MapEvent* e)
+{
+    switch (e->kind) {
+    case MAP_REFRESH_PASS_MAP:
+        if (e->value < 0 || e->value > 31 || g_movementClasses.entries[e->value].name == nullptr)
+            return 0;
+        g_movementClasses.entries[e->value].RefreshPassMap(MapPoint(e->cell), MapPoint(e->size));
+        return 1;
+    case MAP_PASS_MAPS:
+        if (e->size[0] < 0 || e->size[1] < 0)
+            return 0;
+        RefreshAllPassMaps(MapPoint(e->cell), MapPoint(e->size));
+        return 1;
+    }
+    Unit* unit = MapUnitOfHandle(e->unit);
+    if (!unit)
+        return 0;
+    switch (e->kind) {
+    case MAP_ADD_UNIT:
+        AddUnitToMap(unit);
+        return 1;
+    case MAP_REMOVE_UNIT:
+        RemoveUnitFromMap(unit);
+        return 1;
+    case MAP_CLEAR_UNIT:
+        ClearFootprintAndUnlink(unit);
+        return 1;
+    case MAP_RECLAIM_FOOTPRINT:
+        ForceNeighborFootprintReclaim(unit);
+        return 1;
+    case MAP_SET_YARD:
+        return SetYardOpen(unit, e->value);
+    case MAP_BUCKET_UNLINK:
+        if (!unit->spatialBucket || !BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
+            return 0;
+        ((SpatialBucket*)unit->spatialBucket.get())->UnlinkUnit(unit);
+        return 1;
+    case MAP_BUCKET_PREPEND:
+        if (!unit->spatialBucket || BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
+            return 0;
+        ((SpatialBucket*)unit->spatialBucket.get())->PrependUnit(unit);
+        return 1;
+    }
+    return 0;
 }

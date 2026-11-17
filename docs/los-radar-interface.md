@@ -120,7 +120,8 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
 distances, jamming, cloak), player and the sight cache (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`);
 the players' alliances, sharing flags and the fields of the game record behind `pad_1df4`, `unknown_1b8e` and
 `unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); ai's
-`HasReadyUnitInRange` and `IsPointVisible`, and map's `VisitObjectsInRange`. All as of each module's last run.
+`HasReadyUnitInRange` and `IsPointVisible`, and map's `UnitsInRange` (through the engine's `VisitUnitsInRange`). All as
+of each module's last run.
 
 **The cell view.** `GetMapCell`, `GetMapCellAtPosition` and `GetOriginCellAtPosition` return a pointer into the cell
 records that `LoadTntMap` allocates (the plot memory), and their callers (economy, features, map, units, weapons)

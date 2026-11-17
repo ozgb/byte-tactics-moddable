@@ -42,9 +42,7 @@ ai,map,shared_write,Ref<Unit>::offset,1
 ai,map,shared_write,Vec3::x,11
 ai,map,shared_write,Vec3::y,4
 ai,map,shared_write,Vec3::z,11
-ai,orders,indirect,DeleteOrders,1
 ai,orders,indirect,GetOrderFlags,1
-ai,orders,indirect,IssueAttackOrder,1
 ai,orders,shared_write,Point16::x,45
 ai,orders,shared_write,Point16::y,41
 ai,orders,shared_write,Ref<Unit>::offset,2
@@ -108,7 +106,6 @@ ai,targeting,shared_write,Ref<Unit>::offset,2
 ai,targeting,shared_write,Vec3::x,3
 ai,targeting,shared_write,Vec3::y,2
 ai,targeting,shared_write,Vec3::z,3
-ai,units,indirect,NotifyUnitRefs,1
 ai,units,shared_write,Point16::x,9
 ai,units,shared_write,Point16::y,9
 ai,units,shared_write,Ref<Unit>::offset,4

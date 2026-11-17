@@ -319,34 +319,6 @@ void __cdecl CreateMissionUnits()
 
 #include "../network/net_game.h"
 
-// FUNCTION: 0x488570
-int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event)
-{
-    if (unit->player == other)
-        return 0;
-    if (!(unit->flags & 0x10000000))
-        return 0;
-    if (unit->flags & 0x4000)
-        return 0;
-    g_game->list_391ed->NotifyUnitCaptured(unit);
-
-    Player* cur = unit->player;
-    if (cur->active != 0 && (cur->type == 1 || cur->type == 2)) {
-        if (other->active == 0)
-            return 0;
-        if (other->type == 3) {
-            PlayersPublishSendUnit(unit, (int)(other - g_game->players));
-            return 1;
-        }
-    }
-    if (other->active == 0)
-        return 0;
-    if (other->type != 1 && other->type != 2)
-        return 0;
-
-    PlayersPublishCaptureUnit(unit, (int)(other - g_game->players), event);
-    return 1;
-}
 
 typedef int (__stdcall* QuickSortPred)(Player*, Player*);
 

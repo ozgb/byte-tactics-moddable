@@ -20510,24 +20510,24 @@ address,function,file,kind,target
 0x464a00,FreePlayers,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [AiSeam::FreeSquads]
 0x464a00,FreePlayers,src/game/players.cpp,indirect_call,"indirect via void (*)(SquadManager *, int) __attribute__((fastcall)) [AiSeam::SquadManagerDeleteTimers]"
 0x464a00,FreePlayers,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::DestroyPlayerAI]
-0x464b30,TransferMetal,src/game/players.cpp,call,EconPublish
-0x464b30,TransferMetal,src/game/players.cpp,call,EconSpend
-0x464b30,TransferMetal,src/game/players.cpp,field_read,NetworkSeam::SendShareMetal
-0x464b30,TransferMetal,src/game/players.cpp,field_read,Player::energy
-0x464b30,TransferMetal,src/game/players.cpp,field_read,Seams::network
-0x464b30,TransferMetal,src/game/players.cpp,function,
-0x464b30,TransferMetal,src/game/players.cpp,global_read,g_game
-0x464b30,TransferMetal,src/game/players.cpp,global_read,g_seams
-0x464b30,TransferMetal,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareMetal]"
-0x464c60,TransferEnergy,src/game/players.cpp,call,EconPublish
-0x464c60,TransferEnergy,src/game/players.cpp,call,EconSpend
-0x464c60,TransferEnergy,src/game/players.cpp,field_read,NetworkSeam::SendShareEnergy
-0x464c60,TransferEnergy,src/game/players.cpp,field_read,Player::metal
-0x464c60,TransferEnergy,src/game/players.cpp,field_read,Seams::network
-0x464c60,TransferEnergy,src/game/players.cpp,function,
-0x464c60,TransferEnergy,src/game/players.cpp,global_read,g_game
-0x464c60,TransferEnergy,src/game/players.cpp,global_read,g_seams
-0x464c60,TransferEnergy,src/game/players.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareEnergy]"
+0x464b30,TransferMetal,src/game/players_events.cpp,call,EconPublish
+0x464b30,TransferMetal,src/game/players_events.cpp,call,EconSpend
+0x464b30,TransferMetal,src/game/players_events.cpp,field_read,NetworkSeam::SendShareMetal
+0x464b30,TransferMetal,src/game/players_events.cpp,field_read,Player::energy
+0x464b30,TransferMetal,src/game/players_events.cpp,field_read,Seams::network
+0x464b30,TransferMetal,src/game/players_events.cpp,function,
+0x464b30,TransferMetal,src/game/players_events.cpp,global_read,g_game
+0x464b30,TransferMetal,src/game/players_events.cpp,global_read,g_seams
+0x464b30,TransferMetal,src/game/players_events.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareMetal]"
+0x464c60,TransferEnergy,src/game/players_events.cpp,call,EconPublish
+0x464c60,TransferEnergy,src/game/players_events.cpp,call,EconSpend
+0x464c60,TransferEnergy,src/game/players_events.cpp,field_read,NetworkSeam::SendShareEnergy
+0x464c60,TransferEnergy,src/game/players_events.cpp,field_read,Player::metal
+0x464c60,TransferEnergy,src/game/players_events.cpp,field_read,Seams::network
+0x464c60,TransferEnergy,src/game/players_events.cpp,function,
+0x464c60,TransferEnergy,src/game/players_events.cpp,global_read,g_game
+0x464c60,TransferEnergy,src/game/players_events.cpp,global_read,g_seams
+0x464c60,TransferEnergy,src/game/players_events.cpp,indirect_call,"indirect via void (*)(unsigned char, unsigned char, float) __attribute__((stdcall)) [NetworkSeam::SendShareEnergy]"
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,call,LosRadarPublishUpdateUnit
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,call,operator Unit *
 0x464da0,RefreshOwnedUnitsLineOfSight,src/game/players.cpp,field_read,Player::unitsBegin
@@ -26806,19 +26806,19 @@ address,function,file,kind,target
 0x486ed0,KillAllUnits,src/units/units.cpp,field_read,Unit::unitDefIndex
 0x486ed0,KillAllUnits,src/units/units.cpp,function,
 0x486ed0,KillAllUnits,src/units/units.cpp,global_read,g_game
-0x486f10,KillPlayerUnits,src/units/units.cpp,call,PlayersPublishKillUnit
-0x486f10,KillPlayerUnits,src/units/units.cpp,call,operator Player *
-0x486f10,KillPlayerUnits,src/units/units.cpp,call,operator Unit *
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_escape,Game::players
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Player::active
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Player::type
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Player::unitCount
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Player::unitsBegin
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Player::unitsEnd
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Unit::flags
-0x486f10,KillPlayerUnits,src/units/units.cpp,field_read,Unit::player
-0x486f10,KillPlayerUnits,src/units/units.cpp,function,
-0x486f10,KillPlayerUnits,src/units/units.cpp,global_read,g_game
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,call,PlayersPublishKillUnit
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,call,operator Player *
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,call,operator Unit *
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_escape,Game::players
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Player::active
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Player::type
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Player::unitCount
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Player::unitsBegin
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Player::unitsEnd
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Unit::flags
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,field_read,Unit::player
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,function,
+0x486f10,KillPlayerUnits,src/game/players_events.cpp,global_read,g_game
 0x486fd0,LoadUnits,src/units/unit_save.cpp,call,HapiBank::GetIntegerItem
 0x486fd0,LoadUnits,src/units/unit_save.cpp,call,HapiBank::OpenAccount
 0x486fd0,LoadUnits,src/units/unit_save.cpp,call,HapiBank::OpenNumberedBox
@@ -27196,20 +27196,20 @@ address,function,file,kind,target
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,indirect via UnitDef *(*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitType]
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,indirect via void (*)(MissionConditions *) __attribute__((fastcall)) [PlayersSeam::DeactivateConditions]
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,"indirect via void (*)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,MissionConditions::NotifyUnitCaptured
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,PlayersPublishCaptureUnit
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,PlayersPublishSendUnit
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,operator Player *
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,operator->
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,call,operator==
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_escape,Game::players
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_read,Game::list_391ed
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_read,Player::active
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_read,Player::type
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_read,Unit::flags
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,field_read,Unit::player
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,function,
-0x488570,GiveUnitToPlayer,src/units/unit_commands.cpp,global_read,g_game
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,MissionConditions::NotifyUnitCaptured
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,PlayersPublishCaptureUnit
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,PlayersPublishSendUnit
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,operator Player *
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,operator->
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,operator==
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_escape,Game::players
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_read,Game::list_391ed
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_read,Player::active
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_read,Player::type
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_read,Unit::flags
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,field_read,Unit::player
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,function,
+0x488570,GiveUnitToPlayer,src/game/players_events.cpp,global_read,g_game
 0x488810,QuickSort,src/units/unit_commands.cpp,call,PointerSpanBytes
 0x488810,QuickSort,src/units/unit_commands.cpp,call,QuickSort
 0x488810,QuickSort,src/units/unit_commands.cpp,deref_read,*Player
@@ -52217,27 +52217,27 @@ address,function,file,kind,target
 ,Player_Get,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
 ,Player_Get,src/map/radar_capture.cpp,function,
 ,Player_Get,src/map/radar_capture.cpp,global_read,g_game
-,PlayersApply,src/game/players.cpp,call,GiveUnitToPlayer
-,PlayersApply,src/game/players.cpp,call,KillPlayerUnits
-,PlayersApply,src/game/players.cpp,call,MissionConditions::NotifyUnitCreated
-,PlayersApply,src/game/players.cpp,call,MissionConditions::NotifyUnitDied
-,PlayersApply,src/game/players.cpp,call,TransferEnergy
-,PlayersApply,src/game/players.cpp,call,TransferMetal
-,PlayersApply,src/game/players.cpp,call,get
-,PlayersApply,src/game/players.cpp,call,operator->
-,PlayersApply,src/game/players.cpp,call,operator==
-,PlayersApply,src/game/players.cpp,field_maybe_written,Game::players
-,PlayersApply,src/game/players.cpp,field_read,Game::list_391ed
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::amount
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::announce
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::from
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::kind
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::player
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::unit
-,PlayersApply,src/game/players.cpp,field_read,PlayersEvent::value
-,PlayersApply,src/game/players.cpp,field_write,Ref<Unit>::offset
-,PlayersApply,src/game/players.cpp,function,
-,PlayersApply,src/game/players.cpp,global_read,g_game
+,PlayersApply,src/game/players_events.cpp,call,GiveUnitToPlayer
+,PlayersApply,src/game/players_events.cpp,call,KillPlayerUnits
+,PlayersApply,src/game/players_events.cpp,call,MissionConditions::NotifyUnitCreated
+,PlayersApply,src/game/players_events.cpp,call,MissionConditions::NotifyUnitDied
+,PlayersApply,src/game/players_events.cpp,call,TransferEnergy
+,PlayersApply,src/game/players_events.cpp,call,TransferMetal
+,PlayersApply,src/game/players_events.cpp,call,get
+,PlayersApply,src/game/players_events.cpp,call,operator->
+,PlayersApply,src/game/players_events.cpp,call,operator==
+,PlayersApply,src/game/players_events.cpp,field_maybe_written,Game::players
+,PlayersApply,src/game/players_events.cpp,field_read,Game::list_391ed
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::amount
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::announce
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::from
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::kind
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::player
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::unit
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersEvent::value
+,PlayersApply,src/game/players_events.cpp,field_write,Ref<Unit>::offset
+,PlayersApply,src/game/players_events.cpp,function,
+,PlayersApply,src/game/players_events.cpp,global_read,g_game
 ,PlayersEventOf,src/game/players_events.h,call,memset
 ,PlayersEventOf,src/game/players_events.h,field_write,PlayersEvent::kind
 ,PlayersEventOf,src/game/players_events.h,function,

@@ -881,30 +881,3 @@ void KillAllUnits(void)
     }
 }
 
-// FUNCTION: 0x486f10
-void __stdcall KillPlayerUnits(unsigned char player)
-{
-    Player* p = &g_game->players[player];
-    if (p != 0) {
-        if (p->unitCount != 0) {
-            Unit* u = g_game->players[player].unitsBegin;
-            Unit* last = g_game->players[player].unitsEnd;
-            if (u != 0) {
-                for (; u <= last; u++) {
-                    unsigned int flags = u->flags;
-                    if (flags & 0x10000000) {
-                        if (!(flags & 0x4000)) {
-                            Player* d = u->player;
-                            if (d->active != 0 &&
-                                (d->type == 1 || d->type == 2)) {
-                                PlayersPublishKillUnit(u, 0);
-                            } else {
-                                PlayersPublishKillUnit(u, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

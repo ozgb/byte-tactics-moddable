@@ -146,6 +146,7 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
 #include "../game/map_events.h"
 #include "../game/players_events.h"
 #include "../../interfaces/map.h"
+#include "../../interfaces/players.h"
 #include <xutility>
 
 #define _ALGORITHM_

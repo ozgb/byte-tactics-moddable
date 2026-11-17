@@ -1,22 +1,13 @@
-#include <stdio.h>
-#include "../state/sim_effects.h"
-#include "../state/block.h"
 #include "../../interfaces/ref.h"
-#include <string.h>
 
-#include "../map/mission.h"
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
-#include "../files/files_api.h"
 #include "players.h"
 #include "../../interfaces/players.h"
 #include "../units/unit_commands.h"
 #include "../units/units.h"
 #include "economy_events.h"
-#include "los_radar_events.h"
 #include "../../interfaces/economy.h"
-#include "../../interfaces/rand_stream.h"
-#include "../util/tdf.h"
 
 struct Player;
 struct Unit;
@@ -26,25 +17,16 @@ class Pathfinder;
 
 #include "../ai/squad_manager.h"
 
-#include "../util/vec3.h"
-
 struct UnitDef;
-#include "../units/unit_def.h"
 
 #include "../units/unit.h"
 
-#include "../network/player_info.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/pathfinding.h"
 
 #include "../network/player.h"
 
-#include "settings.h"
-
 #include "game.h"
-#include "../graphics/display.h"
 #include "los_helpers.h"
-#include "../state/sim_globals.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -96,7 +78,6 @@ int __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount,
         g_seams.network->SendShareEnergy(from, to, amount);
     return 1;
 }
-
 
 int __stdcall PlayersApply(const PlayersEvent* e)
 {

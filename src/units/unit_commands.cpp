@@ -32,7 +32,6 @@ struct UnitPtrVectorView {
 #include "../orders/mission_type.h"
 
 #include "unit_commands.h"
-#include "../game/players_events.h"
 
 union MissionSlot {
     MissionType type;

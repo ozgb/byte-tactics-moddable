@@ -7,8 +7,6 @@
 #include "../game/players_events.h"
 #include "players_world.h"
 
-#include "../../link/globals.h"
-
 void PlayersInbox(const void* event)
 {
     const PlayersEvent* e = static_cast<const PlayersEvent*>(event);

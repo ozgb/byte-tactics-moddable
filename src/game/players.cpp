@@ -288,11 +288,7 @@ void FreePlayers()
         g_seams.ai->FreeSquads(p);
         if (((Ref<SquadManager>*)q)[-4]) {
             g_seams.ai->DestroyPlayerAI(((unsigned char*)q)[0xc2]);
-            if (SquadManager* u = ((Ref<SquadManager>*)q)[-4].get()) {
-                g_seams.ai->SquadManagerDeleteTimers(u, 0);
-                delete u;
-            }
-            ((Ref<SquadManager>*)q)[-4] = (SquadManager*)0;
+            g_seams.ai->FreeSquadManager(p);
         }
         if (((Ref<UnitResources>*)q)[0x1a]) {
             delete[] ((Ref<UnitResources>*)q)[0x1a].get();

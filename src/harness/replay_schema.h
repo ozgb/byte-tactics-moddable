@@ -1284,11 +1284,10 @@ enum ReplaySlotId {
     RSL_FEATURES_SCANFEATURECELL,
     RSL_FEATURES_FIRSTFEATURESPOT,
     RSL_FEATURES_UPDATEFEATURESPOT,
+    RSL_AI_APPLY,
     RSL_AI_GETVISIBLEENEMIESINRADIUS,
     RSL_AI_HASREADYUNITINRANGE,
     RSL_AI_ISPOINTVISIBLE,
-    RSL_AI_REACTTOATTACK,
-    RSL_AI_MARKOWNERNETDIRTYFROMDAMAGESPLIT,
     RSL_AI_DUMPPLAYERAI,
     RSL_AI_RESETAIPLAYERS,
     RSL_AI_GETFACTORIESINRADIUS,
@@ -1300,14 +1299,11 @@ enum ReplaySlotId {
     RSL_AI_REPARSEAIWEIGHTSCRIPTSIFLIMITNOTSTICKY,
     RSL_AI_CREATESQUADS,
     RSL_AI_FREESQUADS,
-    RSL_AI_SETUNITSQUAD,
-    RSL_AI_SQUADMANAGERTICKIFACTIVE,
-    RSL_AI_SQUADMANAGERDELETETIMERS,
+    RSL_AI_UPDATESQUADS,
     RSL_AI_CREATESQUADMANAGER,
-    RSL_AI_CMDPLAN,
-    RSL_AI_CMDWEIGHT,
-    RSL_AI_CMDLIMIT,
+    RSL_AI_FREESQUADMANAGER,
     RSL_AI_GETVISIBLEENEMIESINRADIUSLIST,
+    RSL_AI_WRITESTATE,
     RSL_PATHFINDING_REGIONSIZE,
     RSL_PATHFINDING_INIT,
     RSL_PATHFINDING_SHUTDOWN,
@@ -1595,11 +1591,6 @@ static const unsigned short kReplayFeaturesUpdateFeatureSpotObjWrites[] = { 330,
 static const unsigned short kReplayAiHasReadyUnitInRangeObjReads[] = { 37 };
 static const unsigned char kReplayAiIsPointVisibleReads[] = { 20, 22 };
 static const unsigned short kReplayAiIsPointVisibleObjReads[] = { 31, 32 };
-static const unsigned char kReplayAiReactToAttackReads[] = { 0, 46, 47, 48 };
-static const unsigned char kReplayAiReactToAttackWrites[] = { 46, 47, 48 };
-static const unsigned short kReplayAiReactToAttackObjReads[] = { 0, 24, 25, 28, 34, 35, 36, 37, 45, 47, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 78, 79, 80, 108, 110, 111, 112, 113 };
-static const unsigned short kReplayAiReactToAttackObjWrites[] = { 54, 55, 59, 60, 64, 65 };
-static const unsigned short kReplayAiMarkOwnerNetDirtyFromDamageSplitObjReads[] = { 214 };
 static const unsigned char kReplayAiDumpPlayerAIAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiDumpPlayerAIReads[] = { 0, 15 };
 static const unsigned short kReplayAiDumpPlayerAIObjReads[] = { 24 };
@@ -1609,9 +1600,6 @@ static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 46, 47, 48 };
 static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 46, 47, 48 };
 static const unsigned char kReplayAiParseDownloadableAiWeightScriptsAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf[] = { ROK_UNITDEF };
-static const unsigned short kReplayAiSetUnitSquadObjReads[] = { 36 };
-static const unsigned char kReplayAiCmdPlanReads[] = { 15 };
-static const unsigned short kReplayAiCmdLimitObjReads[] = { 0, 24 };
 static const unsigned short kReplayWeaponsGetWeaponRangeObjReads[] = { 56, 61, 66, 141 };
 static const unsigned char kReplayWeaponsWeaponCanReachUnitReads[] = { 17, 28 };
 static const unsigned short kReplayWeaponsWeaponCanReachUnitObjReads[] = { 35, 37, 51, 52, 53, 56, 61, 66, 108, 125, 129, 130, 137, 141 };
@@ -1866,11 +1854,10 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "ScanFeatureCell", SUB_FEATURES, kReplayFeaturesScanFeatureCellReads, 5, kReplayFeaturesScanFeatureCellWrites, 3, kReplayFeaturesScanFeatureCellObjReads, 5, nullptr, 0, nullptr, 0 },
     { "FirstFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesFirstFeatureSpotObjReads, 1, nullptr, 0, nullptr, 0 },
     { "UpdateFeatureSpot", SUB_FEATURES, kReplayFeaturesUpdateFeatureSpotReads, 3, nullptr, 0, kReplayFeaturesUpdateFeatureSpotObjReads, 19, kReplayFeaturesUpdateFeatureSpotObjWrites, 11, nullptr, 0 },
+    { "Apply", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetVisibleEnemiesInRadius", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "HasReadyUnitInRange", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiHasReadyUnitInRangeObjReads, 1, nullptr, 0, nullptr, 0 },
     { "IsPointVisible", SUB_AI, kReplayAiIsPointVisibleReads, 2, nullptr, 0, kReplayAiIsPointVisibleObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "ReactToAttack", SUB_AI, kReplayAiReactToAttackReads, 4, kReplayAiReactToAttackWrites, 3, kReplayAiReactToAttackObjReads, 30, kReplayAiReactToAttackObjWrites, 6, nullptr, 0 },
-    { "MarkOwnerNetDirtyFromDamageSplit", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiMarkOwnerNetDirtyFromDamageSplitObjReads, 1, nullptr, 0, nullptr, 0 },
     { "DumpPlayerAI", SUB_AI, kReplayAiDumpPlayerAIReads, 2, nullptr, 0, kReplayAiDumpPlayerAIObjReads, 1, nullptr, 0, kReplayAiDumpPlayerAIAllOf, 1 },
     { "ResetAIPlayers", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiResetAIPlayersObjReads, 2, nullptr, 0, nullptr, 0 },
     { "GetFactoriesInRadius", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiGetFactoriesInRadiusObjReads, 3, nullptr, 0, nullptr, 0 },
@@ -1882,14 +1869,11 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "ReparseAiWeightScriptsIfLimitNotSticky", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf, 1 },
     { "CreateSquads", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeSquads", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "SetUnitSquad", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiSetUnitSquadObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "SquadManagerTickIfActive", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "SquadManagerDeleteTimers", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UpdateSquads", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "CreateSquadManager", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CmdPlan", SUB_AI, kReplayAiCmdPlanReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CmdWeight", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CmdLimit", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiCmdLimitObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "FreeSquadManager", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetVisibleEnemiesInRadiusList", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteState", SUB_AI, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RegionSize", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Init", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2136,17 +2120,17 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 2, 0, 1, 0, 8 },
     { "economy", 4, 0, 0, 8, 12 },
     { "features", 3, 0, 0, 20, 21 },
-    { "ai", 3, 1, 0, 41, 24 },
-    { "pathfinding", 3, 0, 0, 65, 9 },
-    { "weapons", 1, 5, 1, 74, 10 },
-    { "targeting", 2, 0, 1, 84, 6 },
-    { "los_radar", 3, 0, 0, 90, 16 },
-    { "orders", 3, 0, 0, 106, 25 },
-    { "units", 1, 9, 0, 131, 60 },
-    { "players", 3, 0, 0, 191, 24 },
-    { "map", 4, 0, 1, 215, 8 },
-    { "files", 2, 0, 0, 223, 58 },
-    { "network", 1, 0, 0, 281, 22 },
+    { "ai", 4, 0, 0, 41, 20 },
+    { "pathfinding", 3, 0, 0, 61, 9 },
+    { "weapons", 1, 5, 1, 70, 10 },
+    { "targeting", 2, 0, 1, 80, 6 },
+    { "los_radar", 3, 0, 0, 86, 16 },
+    { "orders", 3, 0, 0, 102, 25 },
+    { "units", 1, 9, 0, 127, 60 },
+    { "players", 3, 0, 0, 187, 24 },
+    { "map", 4, 0, 1, 211, 8 },
+    { "files", 2, 0, 0, 219, 58 },
+    { "network", 1, 0, 0, 277, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

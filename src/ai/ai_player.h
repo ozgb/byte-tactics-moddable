@@ -12,16 +12,15 @@ class UnitDef;
 struct Unit;
 struct Vec3;
 
-class CommandArgs;
+struct AiEvent;
+struct StateWriter;
 class UnitDef;
 struct Unit;
 
-void __stdcall CmdPlan(CommandArgs* args);
 void __stdcall EnableAICommands();
-void __stdcall CmdWeight(CommandArgs* args);
-void __stdcall CmdLimit(CommandArgs* args);
 void __stdcall FUN_00406f40(void);
-void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused);
+int __stdcall AiApply(const AiEvent* event);
+void __stdcall AiWriteState(const StateWriter* writer);
 void __stdcall UpdateConverter(Unit* unit);
 void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon);
 int __stdcall RateWeapons(UnitDef* p);

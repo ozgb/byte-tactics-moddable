@@ -298,54 +298,6 @@ void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2
     (void)r;
 }
 
-void __stdcall Imp_ai_ReactToAttack(Unit* a0, Unit* a1, int a2)
-{
-    ReplayText t;
-    StartImport(t, "ai.ReactToAttack");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
-    Space(t);
-    ReplayValue(t, a2);
-    const char* r = Enter(t);
-    (void)r;
-}
-
-void __stdcall Imp_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
-{
-    ReplayText t;
-    StartImport(t, "ai.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    ApplyUnits(a4, "out");
-    (void)r;
-}
-
-int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayText t;
-    StartImport(t, "ai.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    return EnterList(t, a4, a5);
-}
-
 MissionType __stdcall Imp_orders_MissionTypeFromName(const char* a0)
 {
     ReplayText t;
@@ -387,6 +339,40 @@ Order* __stdcall Imp_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3,
     const char* r = Enter(t);
     Order* o = (Order*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
     return o;
+}
+
+void __stdcall Imp_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+{
+    ReplayText t;
+    StartImport(t, "ai.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    ApplyUnits(a4, "out");
+    (void)r;
+}
+
+int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "ai.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    return EnterList(t, a4, a5);
 }
 
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
@@ -1076,8 +1062,8 @@ FilesSeam g_import_files;
 LosRadarSeam g_import_los_radar;
 UnitsSeam g_import_units;
 NetworkSeam g_import_network;
-AiSeam g_import_ai;
 OrdersSeam g_import_orders;
+AiSeam g_import_ai;
 PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
@@ -1107,14 +1093,13 @@ void BindSeams()
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
     g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
-    g_seams.ai = &g_import_ai;
-    g_import_ai.ReactToAttack = Imp_ai_ReactToAttack;
-    g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
-    g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
     g_seams.orders = &g_import_orders;
     g_import_orders.MissionTypeFromName = Imp_orders_MissionTypeFromName;
     g_import_orders.AppendOrder = Imp_orders_AppendOrder;
     g_import_orders.NewOrder = Imp_orders_NewOrder;
+    g_seams.ai = &g_import_ai;
+    g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
+    g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {

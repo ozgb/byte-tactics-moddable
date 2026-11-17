@@ -21,7 +21,7 @@
 
 namespace {
 
-const unsigned int kEventWords = 20;
+const unsigned int kEventWords = 32;
 const unsigned int kInboxCapacity = 1024;
 
 struct InboxEntry {
@@ -211,12 +211,10 @@ void SchedPlayersPhase(RandStream stream)
         SchedDeliver(SCHED_PLAYERS);
         if (g_seams.players->UpdatePlayerHead(player) == 0)
             continue;
-        {
-            Player* owner = &g_game->players[player];
-            if (owner->ai != nullptr)
-                g_seams.ai->SquadManagerTickIfActive(owner->ai, 0);
-            g_seams.ai->UpdatePlayerAI((unsigned char)player);
-        }
+        SchedDeliver(SCHED_AI);
+        g_seams.ai->UpdateSquads(player);
+        SchedDeliver(SCHED_AI);
+        g_seams.ai->UpdatePlayerAI((unsigned char)player);
         {
             Player* owner = &g_game->players[player];
 #if BT_ACCESS_LOG

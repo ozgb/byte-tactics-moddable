@@ -543,6 +543,20 @@ int __stdcall RecFeaturesUpdateFeatureSpot(int a0)
     return result;
 }
 
+int __stdcall RecAiApply(const AiEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_AI_APPLY, SUB_AI, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+    }
+    int result = s_inner_ai->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
 {
     ReplayRoots roots;
@@ -600,49 +614,6 @@ int __stdcall RecAiIsPointVisible(Player* a0, Vec3* a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecAiReactToAttack(Unit* a0, Unit* a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_AI_REACTTOATTACK, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "attacker", ROK_UNIT, a0);
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-        ArgValue(s_call, "amount", a2);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i ai.ReactToAttack");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportObject(line, ROK_UNIT, a1);
-        ImportValue(line, a2);
-    }
-    s_inner_ai->ReactToAttack(a0, a1, a2);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecAiMarkOwnerNetDirtyFromDamageSplit(SquadManager* a0, int a1, Projectile* a2, int a3, int a4)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PROJECTILE, a2);
-    SlotScope scope(RSL_AI_MARKOWNERNETDIRTYFROMDAMAGESPLIT, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "projectile", ROK_PROJECTILE, a2);
-        ArgValue(s_call, "enemyDamage", a3);
-        ArgValue(s_call, "friendlyDamage", a4);
-    }
-    s_inner_ai->MarkOwnerNetDirtyFromDamageSplit(a0, a1, a2, a3, a4);
-    if (scope.Open()) {
-    }
 }
 
 void __stdcall RecAiDumpPlayerAI(int a0, void* a1)
@@ -782,42 +753,14 @@ void __stdcall RecAiFreeSquads(Player* a0)
     }
 }
 
-void __stdcall RecAiSetUnitSquad(Unit* a0, int a1)
+void __stdcall RecAiUpdateSquads(int a0)
 {
     ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_AI_SETUNITSQUAD, SUB_AI, roots);
+    SlotScope scope(RSL_AI_UPDATESQUADS, SUB_AI, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "index", a1);
+        ArgValue(s_call, "player", a0);
     }
-    s_inner_ai->SetUnitSquad(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecAiSquadManagerTickIfActive(SquadManager* a0, int a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_SQUADMANAGERTICKIFACTIVE, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgValue(s_call, "unusedEdx", a1);
-    }
-    s_inner_ai->SquadManagerTickIfActive(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecAiSquadManagerDeleteTimers(SquadManager* a0, int a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_SQUADMANAGERDELETETIMERS, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgValue(s_call, "unusedEdx", a1);
-    }
-    s_inner_ai->SquadManagerDeleteTimers(a0, a1);
+    s_inner_ai->UpdateSquads(a0);
     if (scope.Open()) {
     }
 }
@@ -835,38 +778,15 @@ void __stdcall RecAiCreateSquadManager(Player* a0)
     }
 }
 
-void __stdcall RecAiCmdPlan(CommandArgs* a0)
+void __stdcall RecAiFreeSquadManager(Player* a0)
 {
     ReplayRoots roots;
-    SlotScope scope(RSL_AI_CMDPLAN, SUB_AI, roots);
+    roots.Add(ROK_PLAYER, a0);
+    SlotScope scope(RSL_AI_FREESQUADMANAGER, SUB_AI, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "args");
+        ArgObject(s_call, "player", ROK_PLAYER, a0);
     }
-    s_inner_ai->CmdPlan(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiCmdWeight(CommandArgs* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_CMDWEIGHT, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "args");
-    }
-    s_inner_ai->CmdWeight(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiCmdLimit(CommandArgs* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_CMDLIMIT, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "args");
-    }
-    s_inner_ai->CmdLimit(a0);
+    s_inner_ai->FreeSquadManager(a0);
     if (scope.Open()) {
     }
 }
@@ -887,6 +807,18 @@ int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2,
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+void __stdcall RecAiWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_AI_WRITESTATE, SUB_AI, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_ai->WriteState(a0);
+    if (scope.Open()) {
+    }
 }
 
 unsigned int __stdcall RecPathfindingRegionSize(const PathMapInfo* a0)
@@ -4616,8 +4548,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDWEAPONFIRE)
             return true;
-        if (slot == RSL_AI_REACTTOATTACK)
-            return true;
         if (slot == RSL_ORDERS_MISSIONTYPEFROMNAME)
             return true;
         if (slot == RSL_ORDERS_APPENDORDER)
@@ -4772,16 +4702,14 @@ void HookSeams(const bool* on)
         s_rec_features.FirstFeatureSpot = RecFeaturesFirstFeatureSpot;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatureSpot = RecFeaturesUpdateFeatureSpot;
+    if (on[SUB_AI])
+        s_rec_ai.Apply = RecAiApply;
     if (on[SUB_AI] || on[SUB_TARGETING])
         s_rec_ai.GetVisibleEnemiesInRadius = RecAiGetVisibleEnemiesInRadius;
     if (on[SUB_AI])
         s_rec_ai.HasReadyUnitInRange = RecAiHasReadyUnitInRange;
     if (on[SUB_AI])
         s_rec_ai.IsPointVisible = RecAiIsPointVisible;
-    if (on[SUB_AI] || on[SUB_WEAPONS])
-        s_rec_ai.ReactToAttack = RecAiReactToAttack;
-    if (on[SUB_AI])
-        s_rec_ai.MarkOwnerNetDirtyFromDamageSplit = RecAiMarkOwnerNetDirtyFromDamageSplit;
     if (on[SUB_AI])
         s_rec_ai.DumpPlayerAI = RecAiDumpPlayerAI;
     if (on[SUB_AI])
@@ -4805,21 +4733,15 @@ void HookSeams(const bool* on)
     if (on[SUB_AI])
         s_rec_ai.FreeSquads = RecAiFreeSquads;
     if (on[SUB_AI])
-        s_rec_ai.SetUnitSquad = RecAiSetUnitSquad;
-    if (on[SUB_AI])
-        s_rec_ai.SquadManagerTickIfActive = RecAiSquadManagerTickIfActive;
-    if (on[SUB_AI])
-        s_rec_ai.SquadManagerDeleteTimers = RecAiSquadManagerDeleteTimers;
+        s_rec_ai.UpdateSquads = RecAiUpdateSquads;
     if (on[SUB_AI])
         s_rec_ai.CreateSquadManager = RecAiCreateSquadManager;
     if (on[SUB_AI])
-        s_rec_ai.CmdPlan = RecAiCmdPlan;
-    if (on[SUB_AI])
-        s_rec_ai.CmdWeight = RecAiCmdWeight;
-    if (on[SUB_AI])
-        s_rec_ai.CmdLimit = RecAiCmdLimit;
+        s_rec_ai.FreeSquadManager = RecAiFreeSquadManager;
     if (on[SUB_AI])
         s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
+    if (on[SUB_AI])
+        s_rec_ai.WriteState = RecAiWriteState;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.RegionSize = RecPathfindingRegionSize;
     if (on[SUB_PATHFINDING])

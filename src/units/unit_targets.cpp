@@ -305,6 +305,7 @@ struct UnitDamagePacket {
 
 
 #include "../../interfaces/seams.h"
+#include "../game/ai_events.h"
 #include "../state/sim_globals.h"
 #include "../ingame/game_dialogs.h"
 #include "../util/math.h"
@@ -332,7 +333,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
     g_seams.units->MarkRecentlyDamaged(unit);
 
     if (ev->damageKind != 11)
-        g_seams.ai->ReactToAttack(target, unit, ev->amount);
+        AiPublishReactToAttack(SCHED_WEAPONS, unit, target, ev->amount);
 
     unit->lastDamageType = ev->damageKind;
 

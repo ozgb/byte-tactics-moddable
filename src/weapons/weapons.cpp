@@ -104,6 +104,7 @@ void FreeWeaponArray(void)
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
+#include "../game/ai_events.h"
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
@@ -149,7 +150,6 @@ void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src)
     g_seams.units->StartScriptWithArgs(obj->anims, "RockUnit", 0, 0, 2, b, a, 0, 0);
 }
 
-#include "../ai/squad_manager.h"
 
 #include "damage_table.h"
 #include "../map/los_tables.h"
@@ -169,7 +169,7 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
             a = damage;
         else
             b = damage;
-        g_seams.ai->MarkOwnerNetDirtyFromDamageSplit(attacker->player->ai, 0, weapon, a, b);
+        AiPublishDamageSplit(SCHED_WEAPONS, attacker, a, b);
     }
 }
 
@@ -310,7 +310,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
                     a = damage;
                 else
                     b = damage;
-                g_seams.ai->MarkOwnerNetDirtyFromDamageSplit(source->player->ai, 0, projectile, a & 0xffff, b & 0xffff);
+                AiPublishDamageSplit(SCHED_WEAPONS, source, a & 0xffff, b & 0xffff);
                 return;
             }
         } else {
@@ -2150,7 +2150,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
     }
 
     if (weapon->attacker)
-        g_seams.ai->MarkOwnerNetDirtyFromDamageSplit(weapon->attacker->player->ai, 0, weapon, enemyDamage, friendlyDamage);
+        AiPublishDamageSplit(SCHED_WEAPONS, weapon->attacker.get(), enemyDamage, friendlyDamage);
 }
 
 static inline void Fall(Vec3* v)

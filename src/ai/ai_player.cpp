@@ -125,14 +125,6 @@ void __stdcall OrderSquad(Player*, int, unsigned char, int, Unit*, Vec3*, int, i
 
 #include "squad_manager.h"
 
-struct UnitNetDirtyFlagsView {
-    char unknown_0[0xbb];
-    unsigned short bit0_4 : 5;
-    unsigned short flag5 : 1;
-    unsigned short flag6 : 1;
-    unsigned short bit7_15 : 9;
-};
-
 #include "../weapons/projectile.h"
 
 #include "squad_timer.h"
@@ -213,6 +205,8 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../units/squads.h"
+#include "../../interfaces/ai.h"
+#include "../game/ai_events.h"
 #include "../util/math.h"
 #include "pathfind.h"
 
@@ -278,16 +272,20 @@ void Group::Send(unsigned char mode, int remove, Unit* target, Vec3* pos, int fl
     OrderSquad(player, id, mode, remove, target, pos, flags, extra);
 }
 
+static Unit* AiUnitOf(unsigned int offset)
+{
+    Ref<Unit> ref;
+    ref.offset = offset;
+    return ref.get();
+}
+
 // FUNCTION: 0x406c90
-void __stdcall CmdPlan(CommandArgs* args)
+static void SetAiCommandsEnabled(int bits)
 {
     g_aiCommandsEnabled = 0;
-    for (int i = 1; i < args->count; ++i) {
-        if (!_strcmpi(args->GetArg(1, g_emptyText), "any")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 0 && !_strcmpi(args->GetArg(i, g_emptyText), "easy")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 1 && !_strcmpi(args->GetArg(i, g_emptyText), "medium")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 2 && !_strcmpi(args->GetArg(i, g_emptyText), "hard")) g_aiCommandsEnabled = 1;
-    }
+    if ((bits & 8) || (g_game->difficulty == 0 && (bits & 1)) || (g_game->difficulty == 1 && (bits & 2))
+        || (g_game->difficulty == 2 && (bits & 4)))
+        g_aiCommandsEnabled = 1;
 }
 
 #pragma auto_inline(off)
@@ -299,34 +297,28 @@ void EnableAICommands()
 #pragma auto_inline(on)
 
 // FUNCTION: 0x406db0
-void __stdcall CmdWeight(CommandArgs* args)
+static void ScaleWeights(const AiEvent* e)
 {
     if (g_aiCommandsEnabled != 0) {
-        int count;
         UnitTypeSet set;
-        memset(&set, 0, sizeof(set));
-        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, g_emptyText), &count);
-        float value = args->GetFloatArg(2, 0);
+        memcpy(&set, e->types, sizeof(set));
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].ai != 0) {
-                ScaleUnitWeights(i, &set, value, count);
+                ScaleUnitWeights(i, &set, e->scale, e->extra);
             }
         }
     }
 }
 
 // FUNCTION: 0x406e40
-void __stdcall CmdLimit(CommandArgs* args)
+static void SetLimits(const AiEvent* e)
 {
     if (g_aiCommandsEnabled != 0) {
-        int count;
         UnitTypeSet set;
-        memset(&set, 0, sizeof(set));
-        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, g_emptyText), &count);
-        int value = args->GetIntArg(2, 0);
+        memcpy(&set, e->types, sizeof(set));
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].active != 0 && g_game->players[i].type == 2) {
-                SetUnitLimits(i, &set, value, count);
+                SetUnitLimits(i, &set, e->value, e->extra);
             }
         }
     }
@@ -344,26 +336,33 @@ void FUN_00406f40(void)
 }
 
 // FUNCTION: 0x406f50
-void SquadManager::MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b)
+static void MarkOwnerNetDirty(Unit* attacker, int enemyDamage, int friendlyDamage)
 {
-    UnitNetDirtyFlagsView* t = (UnitNetDirtyFlagsView*)projectile->attacker.get();
-    if (t) {
-        if (a > b * 2) {
-            t->flag6 = 1;
-            return;
-        }
-        t->flag5 = 1;
-    }
+    AiPublishHit(attacker, enemyDamage > friendlyDamage * 2 ? 1 : 0);
+}
+
+static int AttackOrdered(Unit* unit, Unit* target)
+{
+    if (unit == target)
+        return 0;
+    if (!(unit->flags & 0xc0000))
+        return 0;
+    if (!(unit->flags & 0x300000))
+        return 0;
+    if (g_seams.orders->GetOrderType(3, unit, target, 0).index == 0)
+        return 0;
+    AiPublishAttack(unit, target);
+    return 1;
 }
 
 // FUNCTION: 0x406f80
-void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
+static void ReactToAttack(Unit* attacker, Unit* unit)
 {
-    g_seams.units->NotifyUnitRefs(unit,16);
+    AiPublishNotifyRefs(unit, 16);
     if (attacker && !attacker->unitDefIndex) attacker=0;
     if ((unit->def->flags2&0x1000) && unit->player->active && unit->player->type==2) {
         unit->player->ai->nextAction=RandomInt(300)+(unsigned int)g_game->ticks+30;
-        g_seams.orders->DeleteOrders(unit,0);
+        AiPublishStop(unit, 0);
     }
     if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
         (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloatAi && !unit->player->allied[attacker->player->index]) {
@@ -371,7 +370,7 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
         if ((!unit->list || (unit->list->flags_42&ORDER_FLAG_IDLE)) &&
             !unit->def->categories->Contains(attacker->unitDefIndex) &&
             !unit->def->weaponCategories[0]->Contains(attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
-            ordered=g_seams.orders->IssueAttackOrder(unit,attacker,0);
+            ordered=AttackOrdered(unit,attacker);
         if (!ordered && (unit->flags&0x300000)) {
             for (unsigned char i=0;i<3;++i) {
                 UnitWeaponSlot* weapon=&unit->weapons[i];
@@ -386,6 +385,69 @@ void __stdcall ReactToAttack(Unit* attacker, Unit* unit, int unused)
     }
     if (!(g_seams.orders->GetOrderFlags(unit)&ORDER_FLAG_NO_UNDERATTACK_LINE) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
         RecordUnitSpeech(unit,2,SIM_SPEECH_KIND_TEXT,SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
+}
+
+int __stdcall AiApply(const AiEvent* e)
+{
+    Unit* unit = AiUnitOf(e->unit);
+    switch (e->kind) {
+    case AI_REACT_TO_ATTACK:
+        if (unit == nullptr)
+            return 0;
+        ReactToAttack(AiUnitOf(e->target), unit);
+        return 1;
+    case AI_DAMAGE_SPLIT:
+        if (unit == nullptr)
+            return 0;
+        MarkOwnerNetDirty(unit, e->value, e->extra);
+        return 1;
+    case AI_SET_SQUAD:
+        if (unit == nullptr || e->value < -1 || e->value > 9 || !unit->player || !unit->player->groups)
+            return 0;
+        SetUnitSquad(unit, e->value);
+        return 1;
+    case AI_PLAN:
+        if ((unsigned int)e->value > 15)
+            return 0;
+        SetAiCommandsEnabled(e->value);
+        return 1;
+    case AI_WEIGHT:
+        if (g_aiCommandsEnabled == 0)
+            return 0;
+        ScaleWeights(e);
+        return 1;
+    case AI_LIMIT:
+        if (g_aiCommandsEnabled == 0)
+            return 0;
+        SetLimits(e);
+        return 1;
+    }
+    return 0;
+}
+
+void __stdcall AiWriteState(const StateWriter* w)
+{
+    unsigned int count = 0;
+    for (int i = 0; i <= 10; i++)
+        if (g_game->players[i].ai != 0)
+            count++;
+    w->Begin(43, "aiState");
+    w->Int("commandsEnabled", 0, 4, g_aiCommandsEnabled);
+    w->Int("count", 0, 4, count);
+    unsigned int k = 0;
+    for (int i = 0; i <= 10; i++) {
+        SquadManager* manager = g_game->players[i].ai.get();
+        if (manager == nullptr)
+            continue;
+        unsigned int next[10];
+        for (int j = 0; j < 10; j++)
+            next[j] = manager->timers[j] != 0 ? (unsigned int)manager->timers[j]->next : 0;
+        w->Int("manager[%u].player", k, 4, i);
+        w->Int("manager[%u].countdown", k, 4, manager->countdown);
+        w->Int("manager[%u].nextAction", k, 4, manager->nextAction);
+        w->Bytes("manager[%u].timers", k, next, sizeof(next));
+        k++;
+    }
 }
 
 // FUNCTION: 0x4071f0
@@ -714,7 +776,7 @@ void SpatialTimer::OnTimer()
             if (u->motion || g_seams.weapons->WeaponCanReachPos(u, (Vec3*)&u->pos, (Vec3*)&best, 0)) {
                 MissionType kind = g_seams.orders->GetOrderType(3, u, nullptr, (Vec3*)&best);
                 if (kind.index)
-                    g_seams.orders->AddOrder(kind, 0, u, nullptr, (Vec3*)&best, 0, 0);
+                    AiPublishAddOrder(u, kind.index, 0, nullptr, &best, 0, 0);
             }
         }
     }
@@ -782,7 +844,7 @@ void ScoutTimer::OnTimer()
                 }
                 if (ok) {
                     MissionType kind = g_seams.orders->GetOrderType(0xe, u, nullptr, &pos);
-                    g_seams.orders->AddOrder(kind, 0, u, nullptr, &pos, idx, 1);
+                    AiPublishAddOrder(u, kind.index, 0, nullptr, &pos, idx, 1);
                 }
             }
         }
@@ -801,9 +863,9 @@ void ScoutTimer::OnTimer()
                 target = origin + d;
                 MissionType kind;
                 kind = g_seams.orders->GetOrderType(2, u, nullptr, &target);
-                g_seams.orders->AddOrder(kind, 0, u, nullptr, &target, 0, 0);
+                AiPublishAddOrder(u, kind.index, 0, nullptr, &target, 0, 0);
                 kind = g_seams.orders->GetOrderType(9, u, nullptr, &origin);
-                g_seams.orders->AddOrder(kind, 1, u, nullptr, &origin, 0, 0);
+                AiPublishAddOrder(u, kind.index, 1, nullptr, &origin, 0, 0);
             } else {
                 Vec3 d = origin - u->pos;
                 int len = Vec3Length(&d);
@@ -819,7 +881,7 @@ void ScoutTimer::OnTimer()
                     target = u->pos + d;
                 }
                 MissionType kind = g_seams.orders->GetOrderType(9, u, nullptr, &target);
-                g_seams.orders->AddOrder(kind, 0, u, nullptr, &target, 0, 0);
+                AiPublishAddOrder(u, kind.index, 0, nullptr, &target, 0, 0);
             }
         }
     }
@@ -841,7 +903,7 @@ void BuildTimer::TryIssueIdleFactoryBuildOrder(Unit* unit)
     unsigned short idx = ChooseBuildOption(player, unit);
     if (idx != 0)
         {
-            g_seams.orders->QueueBuildOrder((char*)&g_game->defs[idx].unitname[0], unit, 1);
+            AiPublishQueueBuild(unit, idx, 1);
             RecordBuildQueueSound(unit->playerIndex, 1);
         }
 }
@@ -852,10 +914,10 @@ void __stdcall UpdateConverter(Unit* unit)
     Economy* economy = (Economy*)unit->player.get();
     if (economy->cost + economy->cost < economy->energy) {
         if ((((Player*)economy)->energyIncome - ((Player*)economy)->energyUsage) > kZeroFloatAi && RandomInt(5) != 0) {
-            g_seams.units->SetStateBits(unit, 1, 1);
+            AiPublishActivate(unit, 1, 1);
         }
     } else {
-        g_seams.units->SetStateBits(unit, 1, 0);
+        AiPublishActivate(unit, 1, 0);
     }
 }
 
@@ -869,14 +931,14 @@ void BuildTimer::OnTimer()
             if (u->def->makesMetal) {
                 if (((Economy*)u->player.get())->cost + ((Economy*)u->player.get())->cost < ((Economy*)u->player.get())->energy) {
                     if ((u->player->energyIncome - u->player->energyUsage) > kZeroFloatAi && RandomInt(5))
-                        g_seams.units->SetStateBits(u, 1, 1);
+                        AiPublishActivate(u, 1, 1);
                 } else
-                    g_seams.units->SetStateBits(u, 1, 0);
+                    AiPublishActivate(u, 1, 0);
             } else if (u->def->count && !u->list) {
                 unsigned short id = ChooseBuildOption(player, u);
                 if (id)
                 {
-                    g_seams.orders->QueueBuildOrder((char*)&g_game->defs[id].unitname[0], u, 1);
+                    AiPublishQueueBuild(u, id, 1);
                     RecordBuildQueueSound(u->playerIndex, 1);
                 }
             }
@@ -896,9 +958,7 @@ void SquadManager::AssignSquads()
 {
     for (Unit* u = player->unitsBegin; u <= player->unitsEnd; ++u) {
         if(u->flags&0x20) {
-            if(((Flags245*)&u->def->flags2)->special) u->flags=(u->flags&~0x80000)|0x40000;
-            else u->flags=(u->flags&~0x40000)|0x80000;
-            u->flags=(u->flags&~0x100000)|0x200000;
+            AiPublishSetStates(u, ((Flags245*)&u->def->flags2)->special ? 1 : 2, 2);
             if(!u->group) {
                 if(u->flags&0x20000000) {
                     if(u->flags&0x80000000) SetUnitSquad(u,5);

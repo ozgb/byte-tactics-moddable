@@ -19,6 +19,7 @@ struct Unit;
 
 #include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
+#include "../game/ai_events.h"
 
 // FUNCTION: 0x480190
 void __stdcall CreateSquads(Player* owner)
@@ -73,7 +74,7 @@ void __stdcall OrderSquad(Player* owner, int key, unsigned char mode, int remove
     for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
         if (((short)u->unitDefIndex) != 0 && u->group == key) {
             MissionType kind = g_seams.orders->GetOrderType(mode, u, target, (Vec3*)flags);
-            g_seams.orders->AddOrder(kind, remove, u, target, (Vec3*)flags, param_7, param_8);
+            AiPublishAddOrder(u, kind.index, remove, target, (Vec3*)flags, param_7, param_8);
         }
     }
 }

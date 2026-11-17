@@ -32,6 +32,8 @@
 #include "los_radar_results.h"
 #include "map_results.h"
 #include "players_results.h"
+#include "ai_results.h"
+#include "../game/ai_events.h"
 #include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
@@ -2899,6 +2901,7 @@ static void VisitModuleState()
     s_writerOpen = 0;
     g_seams.pathfinding->WriteState(&s_stateWriter);
     g_seams.economy->WriteState(&s_stateWriter);
+    g_seams.ai->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -3344,6 +3347,72 @@ static void VisitPlayersResults()
         DumpPrefix(path);
         DumpHexBytes(e->stockpiles, sizeof e->stockpiles);
         sprintf(path, "playersEvents[%u].outcome", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    }
+}
+
+static AiResults s_aiResults;
+static bool s_aiResultsLost;
+
+void __stdcall HarnessAiEvent(const AiEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!AiResultsAdd(&s_aiResults, event, outcome))
+        s_aiResultsLost = true;
+}
+
+static void VisitAiResults()
+{
+    if (s_aiResultsLost)
+        Fail("testmode: no memory for the ai events\n");
+    for (unsigned k = 0; k < s_aiResults.count; k++) {
+        AiResult* r = &s_aiResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
+        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
+    }
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("aiEvents.count");
+    fprintf(s_dump, "0x%08x\n", s_aiResults.count);
+    for (unsigned k = 0; k < s_aiResults.count; k++) {
+        const AiResult* r = &s_aiResults.items[k];
+        const AiEvent* e = &r->event;
+        sprintf(path, "aiEvents[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
+        sprintf(path, "aiEvents[%u].unit", k);
+        DumpPrefix(path);
+        DumpUnitName(r->unitTag, r->unitId);
+        sprintf(path, "aiEvents[%u].target", k);
+        DumpPrefix(path);
+        DumpUnitName(r->targetTag, r->targetId);
+        sprintf(path, "aiEvents[%u].value", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
+        sprintf(path, "aiEvents[%u].extra", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->extra);
+        sprintf(path, "aiEvents[%u].params", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->params, sizeof e->params);
+        sprintf(path, "aiEvents[%u].hasPos", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->hasPos);
+        sprintf(path, "aiEvents[%u].pos", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->pos, sizeof e->pos);
+        sprintf(path, "aiEvents[%u].scale", k);
+        DumpPrefix(path);
+        unsigned scaleBits;
+        memcpy(&scaleBits, &e->scale, sizeof scaleBits);
+        fprintf(s_dump, "0x%08x\n", scaleBits);
+        sprintf(path, "aiEvents[%u].types", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->types, sizeof e->types);
+        sprintf(path, "aiEvents[%u].outcome", k);
         DumpPrefix(path);
         fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
     }
@@ -4303,6 +4372,7 @@ static void VisitWorld()
     VisitLosRadarResults();
     VisitMapResults();
     VisitPlayersResults();
+    VisitAiResults();
 }
 
 enum {
@@ -4583,7 +4653,7 @@ static void ReachQuirkGuard()
                 unsigned char* u = PoolUnit(i);
                 if (*(unsigned short*)(u + UNIT_TYPE) == 0 || !UnitIsSlot(u, slot))
                     continue;
-                g_seams.ai->SetUnitSquad((Unit*)u, SQUAD_SCOUT);
+                AiPublishSetSquad(SCHED_ENGINE, (Unit*)u, SQUAD_SCOUT);
                 memset(ai + AI_CENTRE, 0, AI_CENTRE_SIZE);
                 void* timer = (void*)ReadRefAt(manager, MANAGER_TIMERS + MANAGER_SCOUT_TIMER * 4);
                 void (__thiscall* onTimer)(void*) = (void (__thiscall*)(void*))(*(void***)timer)[0];
@@ -4996,6 +5066,7 @@ void HarnessPhase(int phase)
         LosRadarResultsClear(&s_losRadarResults);
         MapResultsClear(&s_mapResults);
         PlayersResultsClear(&s_playersResults);
+        AiResultsClear(&s_aiResults);
         WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)

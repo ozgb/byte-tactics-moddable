@@ -229,6 +229,8 @@ void __stdcall CmdBurnAll(int arg1)
 #include "../../interfaces/seams.h"
 #include "los_radar_events.h"
 #include "players_events.h"
+#include "ai_events.h"
+#include "../units/unit_type_set.h"
 
 // FUNCTION: 0x4163a0
 void __stdcall CmdBurnOne(void* args)
@@ -1309,17 +1311,35 @@ ConsoleCommand g_consoleCommands[44] = {
 
 static void __stdcall CmdPlanSlot(CommandArgs* args)
 {
-    g_seams.ai->CmdPlan(args);
+    char empty[1] = {0};
+    int bits = 0;
+    for (int i = 1; i < args->count; ++i) {
+        if (!_strcmpi(args->GetArg(1, empty), "any")) bits |= 8;
+        if (!_strcmpi(args->GetArg(i, empty), "easy")) bits |= 1;
+        if (!_strcmpi(args->GetArg(i, empty), "medium")) bits |= 2;
+        if (!_strcmpi(args->GetArg(i, empty), "hard")) bits |= 4;
+    }
+    AiPublishPlan(SCHED_ENGINE, bits);
 }
 
 static void __stdcall CmdWeightSlot(CommandArgs* args)
 {
-    g_seams.ai->CmdWeight(args);
+    char empty[1] = {0};
+    int count;
+    UnitTypeSet set;
+    g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, empty), &count);
+    float scale = args->GetFloatArg(2, 0);
+    AiPublishWeight(SCHED_ENGINE, (const unsigned int*)set.bits, scale, count);
 }
 
 static void __stdcall CmdLimitSlot(CommandArgs* args)
 {
-    g_seams.ai->CmdLimit(args);
+    char empty[1] = {0};
+    int count;
+    UnitTypeSet set;
+    g_seams.units->UnitTypeSetAddTypeOrCategory(&set, args->GetArg(1, empty), &count);
+    int value = args->GetIntArg(2, 0);
+    AiPublishLimit(SCHED_ENGINE, (const unsigned int*)set.bits, value, count);
 }
 
 // FUNCTION: 0x406f00

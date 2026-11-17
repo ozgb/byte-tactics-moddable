@@ -12,7 +12,7 @@
   "window": 65536,
   "table_slots": 32,
   "majors": {
-    "ai": 3,
+    "ai": 4,
     "economy": 4,
     "features": 3,
     "files": 2,
@@ -34,6 +34,7 @@
   },
   "signatures": {
     "ai": {
+      "Apply": [["linear"], "int"],
       "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"]
     },
     "files": {

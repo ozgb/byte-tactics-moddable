@@ -171,19 +171,22 @@ static void __fastcall ReleaseWeaponsNative(Unit* self, int unusedEdx, unsigned 
     self->ReleaseWeapons(index);
 }
 
-static void __fastcall MarkOwnerNetDirtyFromDamageSplitNative(SquadManager* self, int unusedEdx, Projectile* projectile, int enemyDamage, int friendlyDamage)
+static void __stdcall UpdateSquadsNative(int player)
 {
-    self->MarkOwnerNetDirtyFromDamageSplit(projectile, enemyDamage, friendlyDamage);
+    SquadManager* manager = g_game->players[player].ai.get();
+    if (manager == nullptr)
+        return;
+    manager->TickIfActive();
 }
 
-static void __fastcall SquadManagerTickIfActiveNative(SquadManager* self, int unusedEdx)
+static void __stdcall FreeSquadManagerNative(Player* player)
 {
-    self->TickIfActive();
-}
-
-static void __fastcall SquadManagerDeleteTimersNative(SquadManager* self, int unusedEdx)
-{
-    self->DeleteTimers();
+    SquadManager* manager = player->ai.get();
+    if (manager == nullptr)
+        return;
+    manager->DeleteTimers();
+    delete manager;
+    player->ai = (SquadManager*)0;
 }
 
 static void __stdcall CreateSquadManagerNative(Player* player)
@@ -738,15 +741,12 @@ void InstallNativeSeams()
     s_weapons.UpdateUnitWeapons = UpdateUnitWeapons;
     s_weapons.WeaponAimCobComplete = WeaponAimCobCompleteNative;
     s_weapons.CobScriptExplodePiece = CobScriptExplodePieceNative;
-    s_ai.ReactToAttack = ReactToAttack;
-    s_ai.MarkOwnerNetDirtyFromDamageSplit = MarkOwnerNetDirtyFromDamageSplitNative;
+    s_ai.Apply = AiApply;
+    s_ai.WriteState = AiWriteState;
     s_orders.AppendOrder = AppendOrder;
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
     s_ai.GetFactoriesInRadius = GetFactoriesInRadiusNative;
-    s_ai.CmdPlan = CmdPlan;
-    s_ai.CmdWeight = CmdWeight;
-    s_ai.CmdLimit = CmdLimit;
     s_ai.CreatePlayerAI = CreatePlayerAI;
     s_ai.DestroyPlayerAI = DestroyPlayerAI;
     s_ai.UpdatePlayerAI = UpdatePlayerAI;
@@ -755,9 +755,8 @@ void InstallNativeSeams()
     s_ai.ReparseAiWeightScriptsIfLimitNotSticky = ReparseAiWeightScriptsIfLimitNotSticky;
     s_ai.CreateSquads = CreateSquads;
     s_ai.FreeSquads = FreeSquads;
-    s_ai.SetUnitSquad = SetUnitSquad;
-    s_ai.SquadManagerTickIfActive = SquadManagerTickIfActiveNative;
-    s_ai.SquadManagerDeleteTimers = SquadManagerDeleteTimersNative;
+    s_ai.UpdateSquads = UpdateSquadsNative;
+    s_ai.FreeSquadManager = FreeSquadManagerNative;
     s_ai.CreateSquadManager = CreateSquadManagerNative;
     s_map.Apply = ApplyMapEvent;
     s_map.UnitsInRange = UnitsInRange;

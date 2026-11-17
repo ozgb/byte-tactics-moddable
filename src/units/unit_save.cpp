@@ -152,6 +152,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../game/economy_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/services.h"
+#include "../game/ai_events.h"
 
 // FUNCTION: 0x4010b0
 static void SaveUnitAccounts(Unit* info, HapiBank* file)
@@ -233,7 +234,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->losCacheCell = rec.f97;
     *(int*)&unit->footprint = rec.f9b;
     unit->group = rec.f9f;
-    g_seams.ai->SetUnitSquad(unit, rec.f9f);
+    AiPublishSetSquad(SCHED_UNITS, unit, rec.f9f);
     unit->speed_bits = rec.fa7;
     unit->lastDamageType = rec.bab;
     unit->healthPercent = rec.bac;

@@ -88,9 +88,9 @@ Functions counted apart. A never-entered row with `dead` 0 and a reason starting
 that the suite cannot enter by design. It is left out of its subsystem's sums as a dead function is, and printed in its own
 list. `kit:` marks a function that no 3.1c code calls, such as the native of a seam slot added for the oracle kit: only a row
 of the `seams` subsystem whose function is the native (`<Slot>Native`) of a slot that `--slots all` lists may carry it.
-`demo:` marks a function of the HPA* pathfinder demo (#930), an alternative to 3.1c's pathfinder that a scenario selects
-only by changing its traces, so that pathfinding's totals measure the default pathfinder alone: only a row of a function
-defined in src/ai/pathfind_hpa.cpp may carry it. `--write` and `--check` fail on a row that breaks its prefix's rule.
+`demo:` marks a function of the HPA* pathfinder demo (#930) or of the idle ai demo (#968), alternatives that a scenario
+selects only by changing its traces, so that the totals measure the default modules alone: only a row of a function
+defined in src/ai/pathfind_hpa.cpp or src/ai/ai_idle.cpp may carry it. `--write` and `--check` fail on a row that breaks its prefix's rule.
 `--write` carries the reason over, and `--check` fails when such a row's function is entered, since its reason is then
 wrong and the function counts again.
 
@@ -152,7 +152,7 @@ UNSTABLE = "unstable:"
 KIT = "kit:"
 KIT_SUBSYSTEM = "seams"
 DEMO = "demo:"
-DEMO_FILE = "src/ai/pathfind_hpa.cpp"
+DEMO_FILES = ("src/ai/pathfind_hpa.cpp", "src/ai/ai_idle.cpp")
 APART = (KIT, DEMO)
 SATURATED = 1 << 62
 TIER_LINE_FLOOR = 96
@@ -480,14 +480,14 @@ def slot_natives() -> set[str]:
 
 
 def misplaced_apart(old: dict[str, Totals], natives: set[str]) -> str:
-    """The failure text listing the `kit:` rows outside the seams subsystem or on a function that is no slot's native, and the `demo:` rows of a function outside DEMO_FILE, or an empty string."""
+    """The failure text listing the `kit:` rows outside the seams subsystem or on a function that is no slot's native, and the `demo:` rows of a function outside DEMO_FILES, or an empty string."""
     kit, demo = [], []
     for subsystem, t in old.items():
         for name, file, decorated in t.apart:
             reason = t.reasons.get((name, file, decorated), "")
             if reason.startswith(KIT) and (subsystem != KIT_SUBSYSTEM or name not in natives):
                 kit.append(f"{subsystem} {name} ({file})")
-            elif reason.startswith(DEMO) and file != DEMO_FILE:
+            elif reason.startswith(DEMO) and file not in DEMO_FILES:
                 demo.append(f"{subsystem} {name} ({file})")
     parts = []
     if kit:
@@ -495,7 +495,7 @@ def misplaced_apart(old: dict[str, Totals], natives: set[str]) -> str:
                      f"the {KIT_SUBSYSTEM} subsystem:\n" + "\n".join(sorted(kit)))
     if demo:
         parts.append(f"coverage: {len(demo)} rows of data/coverage.csv have a `{DEMO}` reason but are not defined in "
-                     f"{DEMO_FILE}:\n" + "\n".join(sorted(demo)))
+                     f"{' or '.join(DEMO_FILES)}:\n" + "\n".join(sorted(demo)))
     return "\n".join(parts)
 
 
@@ -511,7 +511,7 @@ def entered_apart(got: dict[str, Totals]) -> str:
 def apart_list(totals: dict[str, Totals]) -> str:
     """The `kit:` functions and the `demo:` functions of every subsystem, one per line under a heading each, or an empty string."""
     heads = ((KIT, "kit functions (no 3.1c code calls them, left out of the sums):"),
-             (DEMO, "demo functions (the HPA* demo, which no gate scenario selects, left out of the sums):"))
+             (DEMO, "demo functions (the HPA* and idle ai demos, which no gate scenario selects, left out of the sums):"))
     parts = []
     for prefix, head in heads:
         rows = [f"{subsystem} {name} ({file})" for subsystem in sorted(totals) for name, file, decorated in totals[subsystem].apart

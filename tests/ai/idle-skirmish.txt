@@ -1,0 +1,26 @@
+# A human Arm army faces a computer Core player that gives no orders, on The Pass; plays to tick 3000. Select the demo with the ai key.
+game_seed 968
+crt_seed 1968
+view_seed 2968
+ai idle
+map The Pass
+start_positions fixed
+ticks 3000
+player0.controller human
+player0.side Arm
+player0.metal 5000
+player0.energy 5000
+player1.controller ai
+player1.side Core
+player1.metal 5000
+player1.energy 5000
+
+spawn 10 0 ARMPW 700 300
+spawn 10 0 ARMPW 760 300
+spawn 10 0 ARMSAM 700 360
+spawn 10 1 CORAK 900 340
+spawn 10 1 CORAK 960 340
+spawn 10 1 CORSTORM 900 400
+
+order 20 0:ARMPW:1 attack 1:CORAK:1
+order 20 0:ARMPW:2 attack 1:CORAK:2

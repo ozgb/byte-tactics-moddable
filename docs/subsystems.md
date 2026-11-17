@@ -273,7 +273,7 @@ Issue #14. 146 functions. The search in `src/ai/pathfind*.cpp`: per-player cost 
 
 Coverage: 88.3% of functions (68 of 77), 82.1% of lines, 69.5% of branches; 9 live functions no scenario enters, and 10 more are dead (data/coverage.csv).
 
-The HPA* demo of `src/ai/pathfind_hpa.cpp` (#930) is counted apart, with the reason `demo: hpa` in `data/coverage.csv` (see Coverage): its 60 live functions are in none of these counts.
+The HPA* demo of `src/ai/pathfind_hpa.cpp` (#930) is counted apart, with the reason `demo: hpa` in `data/coverage.csv` (see Coverage): its 60 live functions are in none of these counts. The idle ai demo of `src/ai/ai_idle.cpp` (#968) is counted apart in the same way, with the reason `demo: idle ai`.
 
 **Live functions no scenario enters** (9 of 77 after #421; 68 are entered, 88.3%), by reason:
 
@@ -734,7 +734,7 @@ A dead function is one that 3.1c's code cannot reach: the modern link drops it, 
 
 A live function whose lines or branches follow timing (a wall-clock sampler, a wait on a lock another thread holds) is marked by hand with a row of `functions` 0, `dead` 0 and a reason starting `unstable:`. The function stays in the function counts, and its lines and branches are left out of the totals and the covered counts of its subsystem. `--write` keeps the row, and `--check` and `--write` fail on a row that matches no live function. A branch side whose count is 2^62 or more (an underflowed counter, from an update lost between threads) is not covered.
 
-A live function that the suite cannot enter by design is counted apart, like a dead one: its row has `functions` 1, `dead` 0 and a reason starting `kit:` or `demo:`, and it is left out of every count of its subsystem, the never-entered column included. `kit:` marks the native of a seam slot that the oracle kit added and no 3.1c code calls (only in `seams`). `demo:` marks a function of the HPA* pathfinder demo (`src/ai/pathfind_hpa.cpp`, #930): an alternative to 3.1c's pathfinder that a scenario can select only by changing its traces, so the pathfinding row measures the default pathfinder alone. `--check` fails when such a function is entered, and `tools/coverage.py` prints both lists after its table.
+A live function that the suite cannot enter by design is counted apart, like a dead one: its row has `functions` 1, `dead` 0 and a reason starting `kit:` or `demo:`, and it is left out of every count of its subsystem, the never-entered column included. `kit:` marks the native of a seam slot that the oracle kit added and no 3.1c code calls (only in `seams`). `demo:` marks a function of the HPA* pathfinder demo (`src/ai/pathfind_hpa.cpp`, #930) or of the idle ai demo (`src/ai/ai_idle.cpp`, #968): alternatives to 3.1c's pathfinder and ai that a scenario can select only by changing its traces, so the pathfinding and ai rows measure the default modules alone. `--check` fails when such a function is entered, and `tools/coverage.py` prints both lists after its table.
 
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|

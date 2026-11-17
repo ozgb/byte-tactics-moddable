@@ -53,6 +53,7 @@
 #include "harness.h"
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
+#include "../ai/ai_idle.h"
 #include "../game/match_setup.h"
 #include "share_packets.h"
 
@@ -144,6 +145,8 @@ static char s_switchQuirks[512];
 static char s_quirkSpec[512] = "3.1c";
 static unsigned s_quirkHash = 0;
 static int s_pathfinderHpa = 0;
+static int s_aiIdle = 0;
+static int s_aiLine = 0;
 static MatchSetup s_matchSetup;
 static int s_pathfinderLine = 0;
 static unsigned s_quirkTamperTick = 0;
@@ -933,6 +936,14 @@ static void ReadKey(int lineNo, const char* key, char* value)
         else if (strcmp(value, "default") != 0)
             FailLine(lineNo, "must be default or hpa", key, "");
         s_pathfinderLine = lineNo;
+    } else if (strcmp(key, "ai") == 0) {
+        if (s_aiLine != 0)
+            FailLine(lineNo, "is a second ai line", key, "");
+        if (strcmp(value, "idle") == 0)
+            s_aiIdle = 1;
+        else if (strcmp(value, "default") != 0)
+            FailLine(lineNo, "must be default or idle", key, "");
+        s_aiLine = lineNo;
     } else if (strcmp(key, "quirks_tamper") == 0) {
         s_quirkTamperTick = ParseNumber(lineNo, key, value);
         s_quirkTamper = 1;
@@ -1661,6 +1672,8 @@ void HarnessInit(char* cmdLine)
     ResolveQuirks();
     if (s_pathfinderHpa)
         g_seams.pathfinding = PathfindingHpaSeam();
+    if (s_aiIdle)
+        g_seams.ai = AiIdleSeam(g_seams.ai);
     ReplayInstall();
     s_viewState = s_viewSeed;
 
@@ -5132,6 +5145,8 @@ static void OpenTrace(unsigned controlWord)
         fprintf(s_trace, "quirks %08x %s\n", s_quirkHash, s_quirkSpec);
     if (s_pathfinderHpa)
         fprintf(s_trace, "pathfinder hpa\n");
+    if (s_aiIdle)
+        fprintf(s_trace, "ai idle\n");
     if (s_matchSetup.blockBytes != 0)
         fprintf(s_trace, "block_bytes %u\n", s_matchSetup.blockBytes);
     if (s_matchSetup.searchSteps != 0)

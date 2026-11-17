@@ -90,7 +90,7 @@ inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 #include "vtol_orders.h"
 #include "../ingame/markers.h"
 #include "win_types.h"
-#include "../ai/vec.h"
+#include "../util/vec.h"
 
 inline int Order::Advance(int distance) {
     ((Order*)this)->AttachApproachRadiusGoal(&target->pos, distance);

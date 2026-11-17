@@ -156,7 +156,7 @@ void RegisterUnitOrders(void);
 
 #include "player_ai.h"
 
-#include "vec.h"
+#include "../util/vec.h"
 
 struct MirroredBasePos {
     int a, b, c;

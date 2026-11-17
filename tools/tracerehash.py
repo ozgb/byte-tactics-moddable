@@ -6,8 +6,8 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; economy's report (`economyState.*`), the path results (section 32), the economy events
-(section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40) and players' events (section 41) are dumped only, and skipped.
+shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), the path results (section 32), the economy events
+(section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40), players' events (section 41) and ai's events (section 42) are dumped only, and skipped.
 """
 
 import argparse
@@ -27,7 +27,7 @@ AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "v
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
 DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[",
                "windMeteors.", "windMeteors[", "targeting.", "targeting[", "los_radar.", "los_radar[", "map.", "map[",
-               "playersEvents.", "playersEvents[")
+               "playersEvents.", "playersEvents[", "aiEvents.", "aiEvents[")
 
 
 class Error(Exception):
@@ -425,7 +425,7 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
-        self.skip_dumped(("economyState.",))
+        self.skip_dumped(("economyState.", "aiState."))
 
     def pathfinder_report(self) -> None:
         h = self.hash

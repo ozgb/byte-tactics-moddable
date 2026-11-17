@@ -136,6 +136,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 | `los_radar` | The los_radar events section (section 8.27), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
 | `map` | The map events section (section 8.28), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
 | `playersEvents` | The players events section (section 8.29), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
+| `aiEvents` | The ai events section (section 8.30), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -293,7 +294,7 @@ out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tic
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) and players' events (section 41, section 8.29) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) and ai's events (section 42, section 8.30) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1079,7 +1080,7 @@ for k in 0 .. n-1, in application order:
 - The resource accounts of units are private to economy and are not hashed (the Unit table leaves out
   bytes 0xbc to 0xeb, section 4); the player accounts of section 27 and the players' resource fields
   still are. What economy's `WriteState` reports (its record, numbered 34) is dumped between sections 15 and
-  18, with the prefix `economyState.`, and is not hash input.
+  18, with the prefix `economyState.`, and is not hash input. ai's report (record 43, section 8.30) follows it.
 
 ### 8.23 share packets (section 35, dumped only)
 
@@ -1364,6 +1365,60 @@ for k in 0 .. n-1, in order:
   the amount is 0; 0 for any event that names a null unit or a player above 10; 1 for the other kinds. It is 1
   for an effect.
 
+### 8.30 ai events (section 42, dumped only) and ai's report (record 43)
+
+The events and effects of ai in this tick (`interfaces/ai.h`). No row hashes them (section 6): a dump holds
+their lines, after those of section 41, as a diagnostic. The reference build does not record them, so its
+dumps have no `aiEvents.*` lines. An event is recorded when ai consumes it from its inbox, right after `Apply`
+returns, with the outcome `Apply` gave; an effect is recorded when ai publishes it, with outcome 1. So the
+records are in the order ai consumed and published them. The host empties the record after the world row of
+the tick, so the lines a dump writes after an earlier phase hold the records made so far. The fields are
+`aiEvents.fields` of the schema, in this order. The section is dumped, never hashed.
+
+```
+aiEvents.count                                 # n
+for k in 0 .. n-1, in order:
+    aiEvents[k].kind
+    aiEvents[k].unit                           # a pointer ID with target unit (is_ref=true)
+    aiEvents[k].target                         # a pointer ID with target unit (is_ref=true)
+    aiEvents[k].value
+    aiEvents[k].extra
+    aiEvents[k].params                         # hex: the 8 bytes, two little-endian i32
+    aiEvents[k].hasPos
+    aiEvents[k].pos                            # hex: the 12 bytes, three little-endian i32
+    aiEvents[k].scale                          # the bits of a float
+    aiEvents[k].types                          # hex: the 64 bytes, a set of bits
+    aiEvents[k].outcome
+```
+
+`aiEvents.count` and the numbers of a record are written as `0x` and 8 hex digits.
+
+- `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 225 DAMAGE_SPLIT, 226 SET_SQUAD, 227 PLAN,
+  228 WEIGHT, 229 LIMIT; or an effect ai publishes: 240 ADD_ORDER, 241 QUEUE_BUILD, 242 ATTACK, 243 STOP,
+  244 NOTIFY_REFS, 245 ACTIVATE, 246 SET_STATES, 247 HIT.
+- `unit` is the unit the kind is about and `target` the other unit (the attacker of REACT_TO_ATTACK, the target
+  of an order), each a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer
+  that is not in the unit table. Each is null for a kind that names no such unit.
+- `value` and `extra` are the arguments of the kind, `params` the two arguments of an order, `hasPos` is 1 when
+  `pos` holds a position (x, y and z with 16 fractional bits), `scale` is the factor of WEIGHT (the bits of a
+  float) and `types` the unit types of WEIGHT and LIMIT as a set of bits: type n is bit n % 32 of word n / 32.
+  Fields a kind does not use are 0.
+- `outcome` is the result of `Apply` for an event: 1, or 0 for a WEIGHT or LIMIT while the AI commands are off.
+  It is 1 for an effect.
+
+ai's own report (record 43, written through the `StateWriter` of the seam's `WriteState`) is dumped and never
+hashed, after the `economyState.*` lines that follow the pathfinder's, with the prefix `aiState.`:
+
+```
+aiState.commandsEnabled                        # 1 when the AI commands are on
+aiState.count                                  # n, the players that have a squad manager
+for k in 0 .. n-1, in player order:
+    aiState.manager[k].player
+    aiState.manager[k].countdown
+    aiState.manager[k].nextAction
+    aiState.manager[k].timers                  # hex: the 40 bytes, the tick each of the 10 squad timers runs next, 0 for none
+```
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1397,7 +1452,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's report, and of sections 32, 33, 35 and 36 to 41. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35 and 36 to 42. The first line is `bt-dump 5`; every
 other line is
 
 ```
@@ -1411,13 +1466,13 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of sections 32, 33, 37, 36, 38, 39, 40 and 41, in that order, which end the block and are
-not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28 and 8.29). The `meteors` block ends with the lines of section 35 after them
+lines of section 28), then the lines of sections 32, 33, 37, 36, 38, 39, 40, 41 and 42, in that order, which end the block and are
+not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29 and 8.30). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
-sections 16 and 17, and the `economyState.*` lines of economy's own report that follow them, sit between those of
+sections 16 and 17, and the `economyState.*` and `aiState.*` lines of economy's and ai's own reports that follow them, sit between those of
 sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1456,8 +1511,8 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` lines that follow them (section 8.22)
-   and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*`, `map.*`, `playersEvents.*` and `packets.*` lines that end the block (sections 8.21 to 8.29), and parse the
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*` and `aiState.*` lines that follow them (sections 8.22 and 8.30)
+   and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*`, `map.*`, `playersEvents.*`, `aiEvents.*` and `packets.*` lines that end the block (sections 8.21 to 8.30), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
@@ -1523,7 +1578,7 @@ Section 36 (the features events, section 8.25) was added in format 5 in the same
 and a reader must skip `features.*` too. Section 38 (targeting's events, section 8.26) was added the
 same way, after section 36's lines: a reader must also skip `targeting.*`. Section 39 (los_radar's events, section 8.27) was added
 the same way, after section 38's lines: a reader must also skip `los_radar.*`. Section 40 (map's events, section 8.28) was added the same way, after
-section 39's lines: a reader must also skip `map.*`. Section 41 (players' events, section 8.29) was added the same way, after section 40's lines: a reader must also skip `playersEvents.*`. Section 41 is new in the trace format.
+section 39's lines: a reader must also skip `map.*`. Section 41 (players' events, section 8.29) was added the same way, after section 40's lines: a reader must also skip `playersEvents.*`. Section 42 (ai's events, section 8.30) and record 43 (ai's report, `aiState.*`) were added the same way: a reader must also skip `aiEvents.*` and `aiState.*`. Section 42 is new in the trace format.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

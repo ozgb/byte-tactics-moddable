@@ -271,6 +271,19 @@ def players_event(k, kind, unit, outcome):
 PLAYERS_EVENTS = [("playersEvents.count", "0x00000002")] + players_event(0, 0xc0, "unit:3", 1) + players_event(1, 0xd1, "null", 1)
 
 
+def ai_event(k, kind, unit, target, outcome):
+    names = ["value", "extra"]
+    rows = [("aiEvents[%d].kind" % k, "0x%08x" % kind), ("aiEvents[%d].unit" % k, unit), ("aiEvents[%d].target" % k, target)]
+    rows += [("aiEvents[%d].%s" % (k, n), "0x%08x" % i) for i, n in enumerate(names)]
+    rows += [("aiEvents[%d].params" % k, "hex:" + bytes(8).hex()), ("aiEvents[%d].hasPos" % k, "0x00000001"),
+             ("aiEvents[%d].pos" % k, "hex:" + bytes(range(12)).hex()), ("aiEvents[%d].scale" % k, "0x3f800000"),
+             ("aiEvents[%d].types" % k, "hex:" + bytes(64).hex()), ("aiEvents[%d].outcome" % k, "0x%08x" % outcome)]
+    return rows
+
+
+AI_EVENTS = [("aiEvents.count", "0x00000002")] + ai_event(0, 0xe0, "unit:3", "unit:4", 1) + ai_event(1, 0xf0, "unit:3", "null", 1)
+
+
 class DumpedOnlyTest(unittest.TestCase):
     def test_map_events_after_the_los_radar_events_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + SHARE_PACKETS
@@ -288,6 +301,18 @@ class DumpedOnlyTest(unittest.TestCase):
 
     def test_an_empty_players_events_record_is_skipped(self):
         w = tr.Walker(RESULTS, [("playersEvents.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
+    def test_ai_events_after_the_players_events_are_skipped(self):
+        lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + PLAYERS_EVENTS + AI_EVENTS + SHARE_PACKETS
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_ai_events_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("aiEvents.count", "0x00000000")])
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.pos, 1)
 
@@ -379,6 +404,17 @@ class DumpedOnlyTest(unittest.TestCase):
         w.pathfinder()
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, 2)
+
+    def test_ai_report_after_the_economy_report_is_skipped(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("economyState.count", "0x00000001"),
+                                ("aiState.commandsEnabled", "0x00000001"), ("aiState.count", "0x00000001"),
+                                ("aiState.manager[0].player", "0x00000002"), ("aiState.manager[0].countdown", "0x00000003"),
+                                ("aiState.manager[0].nextAction", "0x00000004"),
+                                ("aiState.manager[0].timers", "hex:" + bytes(40).hex()),
+                                ("moveClasses[0].x", "0x00000001")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 8)
 
     def test_pathfinder_report_is_read_but_not_hashed(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])

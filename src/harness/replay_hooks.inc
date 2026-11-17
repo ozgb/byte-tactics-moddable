@@ -2903,6 +2903,20 @@ unsigned int __stdcall RecUnitsObjectStateSize(Object3do* a0)
     return result;
 }
 
+int __stdcall RecPlayersApply(const PlayersEvent* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+    }
+    int result = s_inner_players->Apply(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecPlayersUpdatePlayers()
 {
     ReplayRoots roots;
@@ -2912,96 +2926,6 @@ void __stdcall RecPlayersUpdatePlayers()
     s_inner_players->UpdatePlayers();
     if (scope.Open()) {
     }
-}
-
-void __stdcall RecPlayersTransferMetal(unsigned char a0, unsigned char a1, float a2, int a3)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_TRANSFERMETAL, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "from", a0);
-        ArgValue(s_call, "to", a1);
-        ArgValue(s_call, "amount", a2);
-        ArgValue(s_call, "flag", a3);
-    }
-    s_inner_players->TransferMetal(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersTransferEnergy(unsigned char a0, unsigned char a1, float a2, int a3)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_TRANSFERENERGY, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "from", a0);
-        ArgValue(s_call, "to", a1);
-        ArgValue(s_call, "amount", a2);
-        ArgValue(s_call, "flag", a3);
-    }
-    s_inner_players->TransferEnergy(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
-}
-
-float __stdcall RecPlayersGetEnergyIncome(Player* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_PLAYERS_GETENERGYINCOME, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-    }
-    float result = s_inner_players->GetEnergyIncome(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-float __stdcall RecPlayersGetMetalIncome(Player* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_PLAYERS_GETMETALINCOME, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-    }
-    float result = s_inner_players->GetMetalIncome(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-float __stdcall RecPlayersGetNetEnergy(Player* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_PLAYERS_GETNETENERGY, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-    }
-    float result = s_inner_players->GetNetEnergy(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-float __stdcall RecPlayersGetNetMetal(Player* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_PLAYERS_GETNETMETAL, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-    }
-    float result = s_inner_players->GetNetMetal(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecPlayersLoadDefaultAIScript()
@@ -3119,34 +3043,6 @@ void __stdcall RecPlayersUpdateBlink()
     }
 }
 
-void __stdcall RecPlayersKillPlayerUnits(unsigned char a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_KILLPLAYERUNITS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_players->KillPlayerUnits(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersGiveUnitToPlayer(Unit* a0, Player* a1, OwnershipTransferPacket* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_PLAYER, a1);
-    SlotScope scope(RSL_PLAYERS_GIVEUNITTOPLAYER, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgObject(s_call, "other", ROK_PLAYER, a1);
-        ArgPending(s_call, "packet");
-    }
-    s_inner_players->GiveUnitToPlayer(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
 void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
@@ -3221,36 +3117,6 @@ void __stdcall RecPlayersDeleteConditions(MissionConditions* a0)
         ArgPending(s_call, "conditions");
     }
     s_inner_players->DeleteConditions(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecPlayersNotifyUnitCreated(MissionConditions* a0, int a1, Unit* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_PLAYERS_NOTIFYUNITCREATED, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-    }
-    s_inner_players->NotifyUnitCreated(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecPlayersNotifyUnitDied(MissionConditions* a0, int a1, Unit* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_PLAYERS_NOTIFYUNITDIED, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-    }
-    s_inner_players->NotifyUnitDied(a0, a1, a2);
     if (scope.Open()) {
     }
 }
@@ -5207,19 +5073,9 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.ObjectStateSize = RecUnitsObjectStateSize;
     if (on[SUB_PLAYERS])
+        s_rec_players.Apply = RecPlayersApply;
+    if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.TransferMetal = RecPlayersTransferMetal;
-    if (on[SUB_PLAYERS])
-        s_rec_players.TransferEnergy = RecPlayersTransferEnergy;
-    if (on[SUB_PLAYERS])
-        s_rec_players.GetEnergyIncome = RecPlayersGetEnergyIncome;
-    if (on[SUB_PLAYERS])
-        s_rec_players.GetMetalIncome = RecPlayersGetMetalIncome;
-    if (on[SUB_PLAYERS])
-        s_rec_players.GetNetEnergy = RecPlayersGetNetEnergy;
-    if (on[SUB_PLAYERS])
-        s_rec_players.GetNetMetal = RecPlayersGetNetMetal;
     if (on[SUB_PLAYERS])
         s_rec_players.LoadDefaultAIScript = RecPlayersLoadDefaultAIScript;
     if (on[SUB_PLAYERS])
@@ -5241,10 +5097,6 @@ void HookSeams(const bool* on)
     if (on[SUB_PLAYERS])
         s_rec_players.UpdateBlink = RecPlayersUpdateBlink;
     if (on[SUB_PLAYERS])
-        s_rec_players.KillPlayerUnits = RecPlayersKillPlayerUnits;
-    if (on[SUB_PLAYERS])
-        s_rec_players.GiveUnitToPlayer = RecPlayersGiveUnitToPlayer;
-    if (on[SUB_PLAYERS])
         s_rec_players.DeactivateConditions = RecPlayersDeactivateConditions;
     if (on[SUB_PLAYERS])
         s_rec_players.LoadConditions = RecPlayersLoadConditions;
@@ -5256,10 +5108,6 @@ void HookSeams(const bool* on)
         s_rec_players.FreeConditions = RecPlayersFreeConditions;
     if (on[SUB_PLAYERS])
         s_rec_players.DeleteConditions = RecPlayersDeleteConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.NotifyUnitCreated = RecPlayersNotifyUnitCreated;
-    if (on[SUB_PLAYERS])
-        s_rec_players.NotifyUnitDied = RecPlayersNotifyUnitDied;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayersOnStream = RecPlayersUpdatePlayersOnStream;
     if (on[SUB_PLAYERS])

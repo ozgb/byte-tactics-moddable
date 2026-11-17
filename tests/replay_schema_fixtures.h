@@ -1800,13 +1800,8 @@ enum ReplaySlotId {
     RSL_UNITS_UPDATEOBJECTSTATE,
     RSL_UNITS_UPDATEUNIT,
     RSL_UNITS_OBJECTSTATESIZE,
+    RSL_PLAYERS_APPLY,
     RSL_PLAYERS_UPDATEPLAYERS,
-    RSL_PLAYERS_TRANSFERMETAL,
-    RSL_PLAYERS_TRANSFERENERGY,
-    RSL_PLAYERS_GETENERGYINCOME,
-    RSL_PLAYERS_GETMETALINCOME,
-    RSL_PLAYERS_GETNETENERGY,
-    RSL_PLAYERS_GETNETMETAL,
     RSL_PLAYERS_LOADDEFAULTAISCRIPT,
     RSL_PLAYERS_INITPLAYERS,
     RSL_PLAYERS_FREEPLAYERS,
@@ -1817,16 +1812,12 @@ enum ReplaySlotId {
     RSL_PLAYERS_REBUILDAIFEATURECELLS,
     RSL_PLAYERS_SETUPPLAYERSLOT,
     RSL_PLAYERS_UPDATEBLINK,
-    RSL_PLAYERS_KILLPLAYERUNITS,
-    RSL_PLAYERS_GIVEUNITTOPLAYER,
     RSL_PLAYERS_DEACTIVATECONDITIONS,
     RSL_PLAYERS_LOADCONDITIONS,
     RSL_PLAYERS_SAVECONDITIONS,
     RSL_PLAYERS_REGISTERCONDITIONS,
     RSL_PLAYERS_FREECONDITIONS,
     RSL_PLAYERS_DELETECONDITIONS,
-    RSL_PLAYERS_NOTIFYUNITCREATED,
-    RSL_PLAYERS_NOTIFYUNITDIED,
     RSL_PLAYERS_UPDATEPLAYERSONSTREAM,
     RSL_PLAYERS_NEWCONDITIONS,
     RSL_PLAYERS_UPDATEPLAYERHEAD,
@@ -2131,8 +2122,6 @@ static const unsigned char kReplayUnitsUpdateSfxOccupyReads[] = { 17 };
 static const unsigned short kReplayUnitsUpdateSfxOccupyObjReads[] = { 35, 37, 43, 52, 117, 125 };
 static const unsigned char kReplayUnitsUpdateUnitReads[] = { 0, 17 };
 static const unsigned short kReplayUnitsUpdateUnitObjReads[] = { 0, 24, 33, 34, 35, 36, 43, 50, 52, 72, 79, 124 };
-static const unsigned short kReplayPlayersTransferMetalObjReads[] = { 2 };
-static const unsigned short kReplayPlayersTransferEnergyObjReads[] = { 3 };
 static const unsigned char kReplayPlayersLoadDefaultAIScriptAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayPlayersLoadDefaultAIScriptObjReads[] = { 0, 24 };
 static const unsigned char kReplayPlayersInitPlayersAllOf[] = { ROK_PLAYER };
@@ -2154,11 +2143,6 @@ static const unsigned short kReplayPlayersSavePlayersObjReads[] = { 2, 3, 12, 13
 static const unsigned char kReplayPlayersSetupPlayerSlotAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayPlayersSetupPlayerSlotObjReads[] = { 0, 22, 24 };
 static const unsigned short kReplayPlayersSetupPlayerSlotObjWrites[] = { 0, 1, 24, 25, 28, 166 };
-static const unsigned char kReplayPlayersKillPlayerUnitsAllOf[] = { ROK_PLAYER };
-static const unsigned short kReplayPlayersKillPlayerUnitsObjReads[] = { 0, 4, 5, 24, 26, 36, 37 };
-static const unsigned short kReplayPlayersKillPlayerUnitsObjWrites[] = { 37 };
-static const unsigned short kReplayPlayersGiveUnitToPlayerObjReads[] = { 0, 24, 25, 33, 36, 37, 38, 45, 51, 52, 53, 57, 62, 67, 84, 89, 94 };
-static const unsigned short kReplayPlayersGiveUnitToPlayerObjWrites[] = { 33, 34, 37, 84, 89, 94 };
 static const unsigned char kReplayPlayersUpdatePlayerHeadAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayPlayersUpdatePlayerHeadObjReads[] = { 0, 24, 25 };
 static const unsigned char kReplayPlayersUpdatePlayerBodyAllOf[] = { ROK_PLAYER };
@@ -2398,13 +2382,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdateObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnit", SUB_UNITS, kReplayUnitsUpdateUnitReads, 2, nullptr, 0, kReplayUnitsUpdateUnitObjReads, 12, nullptr, 0, nullptr, 0 },
     { "ObjectStateSize", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayers", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "TransferMetal", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersTransferMetalObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "TransferEnergy", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersTransferEnergyObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "GetEnergyIncome", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetMetalIncome", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetNetEnergy", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetNetMetal", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadDefaultAIScript", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersLoadDefaultAIScriptObjReads, 2, nullptr, 0, kReplayPlayersLoadDefaultAIScriptAllOf, 1 },
     { "InitPlayers", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersInitPlayersObjReads, 1, nullptr, 0, kReplayPlayersInitPlayersAllOf, 1 },
     { "FreePlayers", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayPlayersFreePlayersAllOf, 1 },
@@ -2415,16 +2394,12 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RebuildAIFeatureCells", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SetupPlayerSlot", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersSetupPlayerSlotObjReads, 3, kReplayPlayersSetupPlayerSlotObjWrites, 6, kReplayPlayersSetupPlayerSlotAllOf, 1 },
     { "UpdateBlink", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "KillPlayerUnits", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersKillPlayerUnitsObjReads, 7, kReplayPlayersKillPlayerUnitsObjWrites, 1, kReplayPlayersKillPlayerUnitsAllOf, 1 },
-    { "GiveUnitToPlayer", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersGiveUnitToPlayerObjReads, 17, kReplayPlayersGiveUnitToPlayerObjWrites, 6, nullptr, 0 },
     { "DeactivateConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SaveConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RegisterConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "DeleteConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "NotifyUnitCreated", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "NotifyUnitDied", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayersOnStream", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewConditions", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayerHead", SUB_PLAYERS, nullptr, 0, nullptr, 0, kReplayPlayersUpdatePlayerHeadObjReads, 3, nullptr, 0, kReplayPlayersUpdatePlayerHeadAllOf, 1 },
@@ -2534,10 +2509,10 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "los_radar", 3, 0, 0, 90, 16 },
     { "orders", 3, 0, 0, 106, 25 },
     { "units", 1, 9, 0, 131, 60 },
-    { "players", 2, 0, 0, 191, 33 },
-    { "map", 4, 0, 1, 224, 8 },
-    { "files", 2, 0, 0, 232, 58 },
-    { "network", 1, 0, 0, 290, 22 },
+    { "players", 3, 0, 0, 191, 24 },
+    { "map", 4, 0, 1, 215, 8 },
+    { "files", 2, 0, 0, 223, 58 },
+    { "network", 1, 0, 0, 281, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

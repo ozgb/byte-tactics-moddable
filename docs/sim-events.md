@@ -339,7 +339,7 @@ Flags: none.
 
 Recorded when a unit dies and it was the last unit of its player, in a skirmish (game type 2).
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation prints the message that the side's forces are destroyed, in the side's name, with one of three texts chosen from the view random stream.
 
@@ -363,7 +363,7 @@ Recorded when a unit's death is credited and its last attacker slot is not 10. A
 
 Arguments are then the last attacker slot and the unit's player.
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation flashes the kill and the loss on the score panel, when the player's options show the score panel.
 
@@ -476,7 +476,7 @@ Flags: none.
 
 Recorded when the commander of a human or computer-controlled player is killed in a match whose commander-death setting is "Game Ends" or "Deathmatch" (not 0), just before all that player's units are killed.
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation closes the screens above the game screen, unless a dialog is open and the flag is 0.
 
@@ -493,7 +493,7 @@ Flags: none.
 
 Recorded when a credited death (as for `SIM_EVENT_SCORE_FLASH`, with the last attacker slot not 10) moves the attacker to rank 0 on the score list. The attacker's player must be active, of type 1, 2 or 3, with index not 10 and rank above 0 before the move; the game type must be 2 or 3; and the attacker's count (the commander kills in Deathmatch, else the kills) must exceed the count of a player of type other than 0 whose watch flag is clear and whose rank is 0. The kills in the argument are counted after the kill that was just credited (kill types 1, 5 and 6 add one; kill type 3 adds none).
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation prints the message that the player has taken the lead, in the player's name and with the kills.
 
@@ -509,7 +509,7 @@ Flags: none.
 
 Recorded when a unit dies and it was the last unit of its player, in a multiplayer game (game type 3).
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation prints that the player left the game, in the player's name, with one of eight texts chosen from the view random stream, unless the local player was rejected or no slot has the id.
 
@@ -678,7 +678,7 @@ Flags: none.
 
 Recorded when a death is applied to a unit that exists, after the dead unit's orders are deleted.
 
-Phases: net (0), units (1), match load.
+Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
 The presentation drops the unit's pending lines from the speech queue.
 

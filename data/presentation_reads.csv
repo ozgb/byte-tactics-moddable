@@ -142,6 +142,8 @@ Player::commanderLosses,presentation,ui-action,,own,0
 Player::displayTimer,presentation,ui-action,,own,0
 Player::energy,presentation,ui-action,,own,0
 Player::energyCapacity,presentation,ui-action,,own,0
+Player::energyIncome,presentation,ui-action,,own,0
+Player::energyUsage,presentation,ui-action,,own,0
 Player::energyWasted,presentation,unknown,,own,0
 Player::explored,presentation,ui-action,,own,0
 Player::exploredHeight,presentation,ui-action,,own,0
@@ -157,6 +159,8 @@ Player::losses,presentation,ui-action,,own,0
 Player::messages,presentation,ui-action,,own,0
 Player::metal,presentation,ui-action,,own,0
 Player::metalCapacity,presentation,ui-action,,own,0
+Player::metalIncome,presentation,ui-action,,own,0
+Player::metalUsage,presentation,ui-action,,own,0
 Player::metalWasted,presentation,unknown,,own,0
 Player::ping,presentation,unknown,,own,0
 Player::rank,presentation,ui-action,,own,0
@@ -460,12 +464,10 @@ unknown_1b8e,map,unknown,,own,1
 unknown_1b8e,network,ui-action,,own,1
 unknown_1b8e,orders,ui-action,,own,6
 unknown_1b8e,platform,ui-action,,own,1
-unknown_1b8e,players,ui-action,,own,85
 unknown_1b8e,presentation,every-frame,,own,85
 unknown_1b8e,units,unknown,,own,1
 unknown_1cd9,ai,ui-action,,own,1
 unknown_1cd9,los_radar,ui-action,,own,5
-unknown_1cd9,players,ui-action,,own,6
 unknown_1cd9,presentation,every-frame,,own,6
 vertices,platform,ui-action,,per-player-filter,8
 visibilityMask,presentation,ui-action,,own,0

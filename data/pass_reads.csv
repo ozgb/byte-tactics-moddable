@@ -214,12 +214,7 @@ players,pad_1df4,network,BroadcastPacket,same-record,2,ten-ring-atoll@6540
 players,pad_1df4,network,NetSendActivateFlags,same-record,2,ten-ring-atoll@6540
 players,pad_1df4,orders,GetFeature,same-record,1,long-greenhaven-8p@20100
 players,pad_1df4,platform,GetSlotDpid,same-record,2,ten-ring-atoll@6540
-players,pad_1df4,players,GetEnergyIncome,same-record,15,eight-full-moon@90
-players,pad_1df4,players,GetMetalIncome,same-record,15,eight-full-moon@90
-players,pad_1df4,players,GetNetEnergy,same-record,15,eight-full-moon@90
-players,pad_1df4,players,GetNetMetal,same-record,15,eight-full-moon@90
 players,pad_1df4,players,UpdatePlayerBody,same-record,16,allied-victory@30
-players,pad_1df4,players,UpdatePlayerHead,same-record,16,allied-victory@30
 players,pad_1df4,targeting,FindWeaponTarget,same-record,15,eight-full-moon@750
 players,pad_1df4,units,Unit::SetStateBits,same-record,2,ten-ring-atoll@6540
 players,unknown_1b8e,ai,PlayerAI::RefreshUnitLists,same-record,85,ai-antinuke-intercept@30
@@ -920,6 +915,7 @@ units,Projectile::active,weapons,RemoveUnitProjectiles,same-record,3,mission-bui
 units,Projectile::flags,weapons,ComputeProjectileTime,other-record,9,edges-economy-targeting@36
 units,Projectile::flags,weapons,FireBallisticProjectile,other-record,4,mission-radius@1301
 units,Rec::field_6,map,ApplyMapEvent,other-record,7,mission-kill-of-type@182
+units,Rec::field_6,map,BucketHolds,other-record,7,mission-kill-of-type@182
 units,Rec::field_6,map,ClaimFootprintsInArea,other-record,9,console-units@150
 units,Rec::field_6,map,ClaimFootprintsInArea,same-record,7,orders-air-fights@150
 units,Rec::field_6,map,ClearFootprintAndUnlink,other-record,16,mission-build-unit@1
@@ -1076,7 +1072,7 @@ units,Unit::def,units,AlignUnitToGround,other-record,13,mission-build-unit@1
 units,Unit::def,units,AlignUnitToGround,same-record,4,units-transport@2115
 units,Unit::def,units,ApplyUnfinishedBuildDecay,other-record,1,long-greenhaven-8p@44232
 units,Unit::def,units,ApplyUnitDeath,other-record,13,mission-build-unit@1
-units,Unit::def,units,CreateUnitCorpse,other-record,15,mission-build-unit@1
+units,Unit::def,units,CreateUnitCorpse,other-record,14,mission-build-unit@1
 units,Unit::def,units,FinishConstruction,other-record,4,mission-kill-of-type@182
 units,Unit::def,units,KillUnit,other-record,15,mission-build-unit@1
 units,Unit::def,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,11,mission-timer@51
@@ -2047,6 +2043,7 @@ units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,AlignUnitToGround
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,46,conditions-dark-side@17
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,FindFeatureAtPos,same-record,4,eight-pincushion-teams@11753
 units.players,MissionConditions::RegisterConditions: new DefeatUnitTypeKilled,players,MissionConditions::NotifyUnitDied,same-record,1,mission-radius@2523
+units.players,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitCreated,same-record,1,mission-capture@499
 units.players,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-capture@499
 units.players,ModelState::animDirty,units,GetPieceOffset,other-record,40,mission-passes-z@99
 units.players,ModelState::animDirty,units,UnitScript::GetPieceRotation,other-record,23,mission-defeat-all-units@30
@@ -2400,6 +2397,7 @@ units.players,Projectile::flags,weapons,FireBallisticProjectile,other-record,3,s
 units.players,Projectile::flags,weapons,FireDroppedWeapon,other-record,1,long-greenhaven-8p@37152
 units.players,Projectile::flags,weapons,FireVLaunchProjectile,other-record,1,mission-radius@1671
 units.players,Rec::field_6,map,ApplyMapEvent,other-record,4,ten-ring-atoll@6196
+units.players,Rec::field_6,map,BucketHolds,other-record,4,ten-ring-atoll@6196
 units.players,Rec::field_6,map,ClaimFootprintsInArea,other-record,5,mission-capture@499
 units.players,Rec::field_6,map,ClaimFootprintsInArea,same-record,3,conditions-dark-side@2674
 units.players,Rec::field_6,map,ClearFootprintAndUnlink,other-record,9,mission-build-unit@1
@@ -2525,7 +2523,7 @@ units.players,Unit::def,units,AddRepairProgress,other-record,3,skirmish4-long@24
 units.players,Unit::def,units,AlignUnitToGround,other-record,12,mission-build-unit@1
 units.players,Unit::def,units,ApplyUnfinishedBuildDecay,other-record,1,long-greenhaven-8p@40206
 units.players,Unit::def,units,ApplyUnitDeath,other-record,6,edges-economy-targeting@245
-units.players,Unit::def,units,CreateUnitCorpse,other-record,9,mission-build-unit@1
+units.players,Unit::def,units,CreateUnitCorpse,other-record,8,mission-build-unit@1
 units.players,Unit::def,units,FinishConstruction,other-record,2,eight-greenhaven@4808
 units.players,Unit::def,units,KillUnit,other-record,11,mission-build-unit@1
 units.players,Unit::def,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,10,mission-defeat@181

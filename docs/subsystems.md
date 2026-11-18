@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5564 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5563 functions of `data/rwsets.csv` are in 19 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -21,7 +21,7 @@ The subsystems and the issue each maps to:
 | [wind_meteors](#wind_meteors) | 15 | #9 |
 | [economy](#economy) | 49 | #11 |
 | [features](#features) | 58 | #12 |
-| [ai](#ai) | 137 | #13 |
+| [ai](#ai) | 136 | #13 |
 | [pathfinding](#pathfinding) | 146 | #14 |
 | [weapons](#weapons) | 107 | #15 |
 | [targeting](#targeting) | 14 | #16 |
@@ -211,7 +211,7 @@ Coverage: 98.2% of functions (55 of 56), 86.4% of lines, 73.5% of branches; 1 li
 
 ## ai
 
-Issue #13. 137 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
+Issue #13. 136 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
 Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 live functions no scenario enters, and 32 more are dead (data/coverage.csv).
 
@@ -225,7 +225,7 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 
 **Entry points.** Phase roots: none. `UpdatePlayerAI` and `UpdateSquads` (3.1c's `SquadManager::TickIfActive`) are run by the scheduler's players phase (`SchedPlayersPhase`), in each player's turn, after ai's inbox is delivered (#968, `docs/ai-interface.md`).
 
-27 functions are called from other subsystems. The most called, with their callers:
+26 functions are called from other subsystems. The most called, with their callers:
 
 - `IsPointVisible` (2 from presentation, 1 from los_radar)
 - `GetVisibleEnemiesInRadius` (2 from seams)
@@ -234,7 +234,7 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 - `CopyOneByte` (1 from platform)
 - `GetFactoriesInRadius` (1 from seams)
 - `UpdatePlayerAI` (1 from game)
-- By calling subsystem (functions called): players 7, seams 6, game 5, presentation 3, los_radar 2, network 2, platform 2, harness 1
+- By calling subsystem (functions called): players 7, seams 6, game 4, presentation 3, los_radar 2, network 2, platform 2, harness 1
 
 **Imports.** 31 functions of 8 subsystems, by target, each with the number of functions it calls there:
 
@@ -246,7 +246,7 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 - orders (1): `GetOrderFlags`
 - 2 smaller targets: players (1), weapons (1)
 
-**Sim writes.** 32 items in all, 27 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 31 items in all, 26 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `PlayerAI::hasSpecial` (sim); `Squad::field_8` (sim); `Squad::field_c` (sim)
 
@@ -256,10 +256,10 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 
 **Draft interface.**
 
-- Exports: 27 functions (`UpdatePlayerAI`, `SquadManager::TickIfActive`, the create, reset and destroy calls from game, `Apply` for the events of weapons, units and the engine (`docs/ai-interface.md`) and helpers other subsystems borrow: `GetFactoriesInRadius` (orders), `GetVisibleEnemiesInRadius` (orders, targeting), `IsPointVisible` (los_radar)).
+- Exports: 26 functions (`UpdatePlayerAI`, `SquadManager::TickIfActive`, the create, reset and destroy calls from game, `Apply` for the events of weapons, units and the engine (`docs/ai-interface.md`) and helpers other subsystems borrow: `GetFactoriesInRadius` (orders), `GetVisibleEnemiesInRadius` (orders, targeting), `IsPointVisible` (los_radar)).
 - Needs from seams: 31 functions in platform, seams, game, los_radar, economy, orders, players, weapons.
 - Owns: 22 named sim items that only this subsystem writes, for example `g_playerAI`, `SquadManager::timers`, `SquadTimer::next`, `SquadManager::player`, `g_aiCommandsEnabled`.
-- Shares: 5 named sim items that other subsystems also write, for example `Unit::group`.
+- Shares: 4 named sim items that other subsystems also write, for example `Unit::group`.
 - It acts through other modules: effects to orders (ADD_ORDER, QUEUE_BUILD, ATTACK, STOP, HIT) and units (NOTIFY_REFS, ACTIVATE, SET_STATES), and intents to targeting. Its own sim writes are few.
 - Its read set is wide (items of `Unit`, `UnitDef`, `Player` and `Game`). A read-only view of the state block fits it better than a getter per field.
 
@@ -594,7 +594,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (316 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 184 functions are called from outside, by platform (84 distinct functions) and presentation (32); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 556 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 34.
+**game** (316 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 184 functions are called from outside, by platform (84 distinct functions) and presentation (32); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 555 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 34.
 
 **game, functions no scenario enters** (82 of 307 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 225 are entered, 73.3%), by reason:
 

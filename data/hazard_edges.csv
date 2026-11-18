@@ -1579,7 +1579,6 @@ UnitsOnAiNotifyRefs,NotifyUnitRefs,"seam slot filled by InstallNativeSeams, Unit
 UnitsOnAiActivate,SetStateBitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::SetStateBits, UnitsOnAiActivate (src/units/ai_effects.cpp), src/seams/native.cpp"
 AiInbox,ApplyIdle,"seam slot filled by AiIdleSeam, AiSeam::Apply, AiInbox (src/seams/ai_world.cpp), src/ai/ai_idle.cpp"
 SchedPlayersPhase,UpdateSquadsIdle,"seam slot filled by AiIdleSeam, AiSeam::UpdateSquads, SchedPlayersPhase (src/game/scheduler.cpp), src/ai/ai_idle.cpp"
-SchedPlayersPhase,UpdatePlayerAIIdle,"seam slot filled by AiIdleSeam, AiSeam::UpdatePlayerAI, SchedPlayersPhase (src/game/scheduler.cpp), src/ai/ai_idle.cpp"
 ApplyIdle,AiApply,"standard table passed to AiIdleSeam by HarnessInit (src/harness/harness.cpp), AiSeam::Apply, ApplyIdle (src/ai/ai_idle.cpp), src/seams/native.cpp"
 SchedPublish,AiInbox,"route table entry, s_routes (src/game/routes.cpp) read through SchedRoutes, SchedRoute::handler called by SchedPublish (src/game/scheduler.cpp)"
 SchedDeliver,AiInbox,"route table entry, s_routes (src/game/routes.cpp) read through SchedRoutes, SchedRoute::handler called by SchedDeliver (src/game/scheduler.cpp)"

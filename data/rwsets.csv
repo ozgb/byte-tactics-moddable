@@ -42697,10 +42697,8 @@ address,function,file,kind,target
 ,AiIdleSeam,src/ai/ai_idle.cpp,call,operator=
 ,AiIdleSeam,src/ai/ai_idle.cpp,deref_read,*AiSeam
 ,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::Apply
-,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::UpdatePlayerAI
 ,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::UpdateSquads
 ,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,ApplyIdle
-,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,UpdatePlayerAIIdle
 ,AiIdleSeam,src/ai/ai_idle.cpp,fn_ref,UpdateSquadsIdle
 ,AiIdleSeam,src/ai/ai_idle.cpp,function,
 ,AiIdleSeam,src/ai/ai_idle.cpp,global_escape,s_idle
@@ -60298,7 +60296,6 @@ address,function,file,kind,target
 ,UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,UpdateMotionNative,src/seams/native.cpp,call,UnitMotion::UpdateMotion
 ,UpdateMotionNative,src/seams/native.cpp,function,
-,UpdatePlayerAIIdle,src/ai/ai_idle.cpp,function,
 ,UpdatePlayerBody,src/game/players.cpp,call,CountActiveAIPlayers
 ,UpdatePlayerBody,src/game/players.cpp,call,CountCombatPlayers
 ,UpdatePlayerBody,src/game/players.cpp,call,EconHandleOf

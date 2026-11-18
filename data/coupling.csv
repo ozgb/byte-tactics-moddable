@@ -10,7 +10,6 @@ ai,features,shared_write,Vec3::z,8
 ai,game,call,RecordBuildQueueSound,2
 ai,game,call,RecordUnitSpeech,1
 ai,game,call,SimAllocTagged,1
-ai,game,shared_write,AiSeam::UpdatePlayerAI,1
 ai,game,shared_write,AiSeam::UpdateSquads,1
 ai,game,shared_write,Point16::x,1
 ai,game,shared_write,Point16::y,1
@@ -19,7 +18,6 @@ ai,game,shared_write,Vec3::x,4
 ai,game,shared_write,Vec3::y,2
 ai,game,shared_write,Vec3::z,4
 ai,harness,shared_write,AiSeam::Apply,2
-ai,harness,shared_write,AiSeam::UpdatePlayerAI,2
 ai,harness,shared_write,AiSeam::UpdateSquads,2
 ai,harness,shared_write,Point16::x,1
 ai,harness,shared_write,Point16::y,1
@@ -94,7 +92,6 @@ ai,seams,call,ScheduleTargetingFind,1
 ai,seams,call,ScheduleTargetingTargetUnit,2
 ai,seams,indirect,GetNameSlotNative,1
 ai,seams,shared_write,AiSeam::Apply,2
-ai,seams,shared_write,AiSeam::UpdatePlayerAI,1
 ai,seams,shared_write,AiSeam::UpdateSquads,1
 ai,seams,shared_write,Point16::x,3
 ai,seams,shared_write,Point16::y,3
@@ -516,7 +513,6 @@ files,seams,indirect,BankWriteBoxNative,1
 game,ai,indirect,DumpPlayerAI,1
 game,ai,indirect,ResetAIPlayers,1
 game,ai,indirect,UpdatePlayerAI,1
-game,ai,indirect,UpdatePlayerAIIdle,1
 game,ai,indirect,UpdateSquadsIdle,1
 game,ai,shared_write,AiEvent::extra,3
 game,ai,shared_write,AiEvent::kind,2
@@ -1438,7 +1434,6 @@ game,wind_meteors,shared_write,Vec3::y,1
 game,wind_meteors,shared_write,Vec3::z,1
 harness,ai,call,AiIdleSeam,1
 harness,ai,shared_write,AiSeam::Apply,2
-harness,ai,shared_write,AiSeam::UpdatePlayerAI,1
 harness,ai,shared_write,AiSeam::UpdateSquads,1
 harness,ai,shared_write,EconomySeam::GetEnergyUse,1
 harness,ai,shared_write,Game::difficulty,2
@@ -4546,7 +4541,6 @@ seams,ai,call,SquadManager::TickIfActive,1
 seams,ai,indirect,AiApply,1
 seams,ai,indirect,ApplyIdle,1
 seams,ai,shared_write,AiSeam::Apply,2
-seams,ai,shared_write,AiSeam::UpdatePlayerAI,1
 seams,ai,shared_write,AiSeam::UpdateSquads,1
 seams,ai,shared_write,EconomySeam::GetEnergyUse,1
 seams,ai,shared_write,LosRadarSeam::GetMapCell,1

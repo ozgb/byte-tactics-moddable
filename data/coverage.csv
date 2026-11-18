@@ -45,7 +45,6 @@ ai,SquadTimer::TryGetBaseBuildOrScoutCentroid,src/ai/ai_player.cpp,0,0,0,0,0,0,?
 ai,SquadTimer::~SquadTimer,src/ai/squad_timer.h,1,0,0,0,0,0,??1SquadTimer@@UAE@XZ,0,shutdown
 ai,SumUnitRatingsInRange,src/ai/ai_player.cpp,1,0,0,0,0,0,?SumUnitRatingsInRange@@YGHHPAUVec3@@H@Z,0,unset-case
 ai,UpdateConverter,src/ai/ai_player.cpp,0,0,0,0,0,0,?UpdateConverter@@YGXPAUUnit@@@Z,1,
-ai,UpdatePlayerAIIdle,src/ai/ai_idle.cpp,1,0,0,0,0,0,?UpdatePlayerAIIdle@?A0x@@YGXH@Z,0,demo: idle ai
 ai,UpdateSquadsIdle,src/ai/ai_idle.cpp,1,0,0,0,0,0,?UpdateSquadsIdle@?A0x@@YGXH@Z,0,demo: idle ai
 ai,std::_Construct,src/ai/ai_player.cpp,0,0,0,0,0,0,?_Construct@std@@YGXPAUPercentByte@@ABU2@@Z,1,
 economy,*,,51,48,654,595,298,222,,3,

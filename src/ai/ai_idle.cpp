@@ -1,4 +1,7 @@
 #include "../../interfaces/ai.h"
+#include "../../interfaces/ref.h"
+#include "../units/unit.h"
+#include "../network/player.h"
 
 #include "ai_idle.h"
 
@@ -9,8 +12,13 @@ const AiSeam* s_standard = nullptr;
 
 int __stdcall ApplyIdle(const AiEvent* event)
 {
-    if (event->kind == AI_REACT_TO_ATTACK || event->kind == AI_DAMAGE_SPLIT)
-        return 0;
+    if (event->kind == AI_REACT_TO_ATTACK || event->kind == AI_DAMAGE_SPLIT) {
+        Ref<Unit> ref;
+        ref.offset = event->unit;
+        Unit* unit = ref.get();
+        if (unit != nullptr && unit->player != nullptr && unit->player->type == 2)
+            return 0;
+    }
     return s_standard->Apply(event);
 }
 

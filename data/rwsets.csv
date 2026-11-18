@@ -42894,8 +42894,15 @@ address,function,file,kind,target
 ,ApplyEvent,src/map/features.cpp,field_write,Ref<Unit>::offset
 ,ApplyEvent,src/map/features.cpp,function,
 ,ApplyEvent,src/map/features.cpp,global_read,g_game
+,ApplyIdle,src/ai/ai_idle.cpp,call,get
+,ApplyIdle,src/ai/ai_idle.cpp,call,operator!=
+,ApplyIdle,src/ai/ai_idle.cpp,call,operator->
 ,ApplyIdle,src/ai/ai_idle.cpp,field_read,AiEvent::kind
+,ApplyIdle,src/ai/ai_idle.cpp,field_read,AiEvent::unit
 ,ApplyIdle,src/ai/ai_idle.cpp,field_read,AiSeam::Apply
+,ApplyIdle,src/ai/ai_idle.cpp,field_read,Player::type
+,ApplyIdle,src/ai/ai_idle.cpp,field_read,Unit::player
+,ApplyIdle,src/ai/ai_idle.cpp,field_write,Ref<Unit>::offset
 ,ApplyIdle,src/ai/ai_idle.cpp,function,
 ,ApplyIdle,src/ai/ai_idle.cpp,global_read,s_standard
 ,ApplyIdle,src/ai/ai_idle.cpp,indirect_call,indirect via int (*const)(const AiEvent *) __attribute__((stdcall)) [AiSeam::Apply]

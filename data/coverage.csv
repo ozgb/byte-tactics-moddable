@@ -123,7 +123,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,294,212,5161,2940,1958,714,,23,
+game,*,,294,212,5161,2943,1958,715,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -1204,7 +1204,7 @@ platform,host_window_place,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_pla
 platform,host_window_post,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_post,0,
 platform,host_window_raise,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_raise,0,
 platform,host_window_set_topmost,src/host/win32/window.cpp,1,0,0,0,0,0,host_window_set_topmost,0,
-players,*,,147,99,1697,1195,734,463,,10,
+players,*,,147,99,1697,1195,736,464,,10,
 players,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,src/units/units.cpp,0,0,0,0,0,0,??$Partition@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGPAPAUPlayer@@PAPAU0@0PAU0@P6GH11@Z@Z,1,
 players,??$PlayersPublishSendUnit@UUnit@@@@YGXPAUUnit@@H@Z,src/game/players_events.h,1,0,0,0,0,0,??$PlayersPublishSendUnit@UUnit@@@@YGXPAUUnit@@H@Z,0,network-game
 players,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,src/units/units.cpp,0,0,0,0,0,0,??$QuickSort@PAPAUPlayer@@PAU1@P6GHPAU1@0@Z@@YGXPAPAUPlayer@@0P6GHPAU0@1@Z0@Z,1,
@@ -1263,7 +1263,7 @@ players,VictoryUnitTypePassesX::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?Load
 players,VictoryUnitTypePassesX::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesX@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
-presentation,*,,1149,565,31604,11460,12036,3561,,295,
+presentation,*,,1149,565,31604,11465,12036,3564,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,

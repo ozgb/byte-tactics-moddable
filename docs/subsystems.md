@@ -557,7 +557,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 - Slot no code calls (1): `AimCobStub` (slot 1 of `g_weaponAimCobVtable`). It returns 0; not explained further.
 
-**players** (141 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 31 functions are called from outside, mostly by game (15) and presentation (3); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 56 functions: platform 13, network 5, seams 7, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.3% of functions (99 of 147), 70.4% of lines, 63.1% of branches; 48 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 48 follows this paragraph.
+**players** (141 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 31 functions are called from outside, mostly by game (15) and presentation (3); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 56 functions: platform 13, network 5, seams 7, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 67.3% of functions (99 of 147), 70.4% of lines, 63.0% of branches; 48 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 48 follows this paragraph.
 
 **players, functions no scenario enters** (48 of 147 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 99 are entered, 67.3%), by reason:
 
@@ -748,7 +748,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **los_radar** | 69 of 73 | 94.5% | 89.2% | 76.4% | 4 | 21 |
 | **orders** | 309 of 370 | 83.5% | 81.9% | 64.8% | 61 | 25 |
 | **units** | 163 of 198 | 82.3% | 86.1% | 74.0% | 35 | 32 |
-| **players** | 99 of 147 | 67.3% | 70.4% | 63.1% | 48 | 10 |
+| **players** | 99 of 147 | 67.3% | 70.4% | 63.0% | 48 | 10 |
 | **map** | 85 of 104 | 81.7% | 87.5% | 77.0% | 19 | 11 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 212 of 294 | 72.1% | 57.0% | 36.5% | 82 | 23 |

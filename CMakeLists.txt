@@ -485,7 +485,7 @@ add_custom_command(
   DEPENDS players_writer_test_objects $<TARGET_OBJECTS:players_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(players_writer_test DEPENDS "${CMAKE_BINARY_DIR}/players_writer_test.exe")
-add_library(ai_writer_test_objects OBJECT src/ai/ai_player.cpp src/orders/ai_effects.cpp src/units/ai_effects.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ai_writer_test.cpp)
+add_library(ai_writer_test_objects OBJECT src/ai/ai_player.cpp src/ai/ai_idle.cpp src/orders/ai_effects.cpp src/units/ai_effects.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ai_writer_test.cpp)
 target_include_directories(ai_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(ai_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(ai_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

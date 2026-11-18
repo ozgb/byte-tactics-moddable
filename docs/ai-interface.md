@@ -281,9 +281,12 @@ squads), the build weights' scale and the sticky flags, the plan's difficulties 
 its block offset and a player as its index. The interface names no 3.1c plan, weight or squad type: a replacement AI
 needs only the views, the queries and the events, as the demo shows.
 
-**The demo module.** `AiIdleSeam` (`src/ai/ai_idle.cpp`) is an AI that gives no orders at all: its runs do nothing,
-and its `Apply` rejects REACT_TO_ATTACK for a unit of a computer player and DAMAGE_SPLIT for a shooter of a computer
-player (outcome 0), and passes the rest to the default, so the squads and the AI commands stay consistent for the trace.
+**The demo module.** `AiIdleSeam` (`src/ai/ai_idle.cpp`) is an AI that gives no orders at all. Its `UpdateSquads`
+does nothing. It keeps the default `UpdatePlayerAI`, because that run refreshes every player's visible-enemy and
+factory lists every 30 ticks, and the queries of section 4 answer from them for every player's guard, wait, weapon
+search and pad search: an index, not a decision (the refresh's base-weight draw stays in the stream too).
+`ai_writer_test` checks that the demo runs it for every player. Its `Apply` rejects REACT_TO_ATTACK for a unit of a
+computer player and DAMAGE_SPLIT for a shooter of a computer player (outcome 0), and passes the rest to the default, so the squads and the AI commands stay consistent for the trace.
 A human player's units still return fire and their shooters still get HIT's wake bits: only the computer player is
 idle. The scenario key `ai idle` installs it
 (`docs/scenario-format.md`), and `tests/ai/idle-skirmish.txt` plays it to its end: a human Arm army against a

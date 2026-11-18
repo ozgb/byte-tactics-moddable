@@ -25,6 +25,7 @@
 #include "../src/ai/ai_player.h"
 #include "../src/orders/ai_effects.h"
 #include "../src/units/ai_effects.h"
+#include "../src/ai/ai_idle.h"
 
 Game* g_game;
 Seams g_seams;
@@ -436,6 +437,34 @@ static void CheckAttackGates()
     Check(AttacksAfterReaction(kEnemy0, ready, 0) == 0, "a unit with no order type for the attack gives no attack order");
 }
 
+static int s_listRefreshes[kPlayers];
+static int s_squadRuns;
+
+static void __stdcall CountListRefresh(int player)
+{
+    s_listRefreshes[player]++;
+}
+
+static void __stdcall CountSquadRun(int)
+{
+    s_squadRuns++;
+}
+
+static void CheckIdleKeepsListRefresh()
+{
+    AiSeam standard;
+    memset(&standard, 0, sizeof standard);
+    standard.UpdatePlayerAI = CountListRefresh;
+    standard.UpdateSquads = CountSquadRun;
+    AiSeam* idle = AiIdleSeam(&standard);
+    for (int p = 0; p < kPlayers; p++) {
+        idle->UpdatePlayerAI(p);
+        idle->UpdateSquads(p);
+    }
+    Check(s_listRefreshes[0] == 1 && s_listRefreshes[1] == 1, "the idle module runs the default UpdatePlayerAI for every player, so the visible and factory lists stay current");
+    Check(s_squadRuns == 0, "the idle module runs no squads");
+}
+
 int main()
 {
     Setup();
@@ -480,6 +509,7 @@ int main()
     s_dropKind = 0;
     s_redirectTick = -1;
     CheckAttackGates();
+    CheckIdleKeepsListRefresh();
 
     printf(g_failures ? "FAILED\n" : "ai_writer_test: all passed\n");
     return g_failures != 0;

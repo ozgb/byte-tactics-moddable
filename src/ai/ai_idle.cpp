@@ -26,10 +26,6 @@ void __stdcall UpdateSquadsIdle(int)
 {
 }
 
-void __stdcall UpdatePlayerAIIdle(int)
-{
-}
-
 }
 
 AiSeam* AiIdleSeam(const AiSeam* standard)
@@ -38,6 +34,5 @@ AiSeam* AiIdleSeam(const AiSeam* standard)
     s_idle = *standard;
     s_idle.Apply = ApplyIdle;
     s_idle.UpdateSquads = UpdateSquadsIdle;
-    s_idle.UpdatePlayerAI = UpdatePlayerAIIdle;
     return &s_idle;
 }

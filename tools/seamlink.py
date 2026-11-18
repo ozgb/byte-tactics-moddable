@@ -126,8 +126,9 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   calls a function data/rwsets.csv has no rows for (memset, memcpy, a template), but for operator=, the
                   assignment rwsets records as the write itself, X87LeTest41, a template that compares two values, and
                   operator Unit *, operator Cell *, operator Feature *, operator UnitBucket *, operator UnitDef *, operator unsigned char * and
-                  operator unsigned short *, operator PlayerAI * and operator[], the conversions of a Ref to the pointer it holds, and get and operator->, which read it, operator!=
-                  (which compares two Refs) strlen, BlockVector::Begin, BlockVector::End, empty, size and push_back (the vectors the ai queries read and fill);
+                  operator unsigned short *, the conversions of a Ref to the pointer it holds, and get and operator->, which read it, operator!=
+                  (which compares two Refs) and strlen, and for the pilot's own rowless_calls (ai's: operator PlayerAI *, operator[],
+                  BlockVector::Begin, BlockVector::End, empty, size and push_back, the vectors its queries read and fill; no other pilot has any);
                   or has inline assembly.
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
@@ -192,8 +193,7 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
 ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *", "operator Cell *", "operator unsigned char *", "operator unsigned short *",
-                 "operator Feature *", "operator UnitBucket *", "operator UnitDef *", "operator!=", "strlen", "operator->", "get",
-                 "BlockVector::Begin", "BlockVector::End", "empty", "operator PlayerAI *", "operator[]", "push_back", "size")
+                 "operator Feature *", "operator UnitBucket *", "operator UnitDef *", "operator!=", "strlen", "operator->", "get")
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"
@@ -233,6 +233,7 @@ class Pilot:
     setup_callers: tuple = ()
     phase_slots: tuple = ()
     filler_locals: tuple = ()
+    rowless_calls: tuple = ()
     by_params: bool = True
 
 
@@ -331,6 +332,7 @@ AI = Pilot(
            "ReparseAiWeightScriptsIfLimitNotSticky", "CreateSquads", "FreeSquads", "CreateSquadManager", "FreeSquadManager"),
     info_types=("AiUnitList",),
     filler_locals=(("GetVisibleEnemiesInRadiusList", "Ref<Unit>"),),
+    rowless_calls=("BlockVector::Begin", "BlockVector::End", "empty", "operator PlayerAI *", "operator[]", "push_back", "size"),
     setup_callers=(("CmdPrintWeights", "src/game/console_commands.cpp"), ("CmdReloadAIProfiles", "src/game/console_commands.cpp"),
                    ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),
                    ("LoadDefaultAIScript", "src/game/players.cpp"), ("RebuildAIFeatureCells", "src/game/players.cpp")))
@@ -851,7 +853,7 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
             if kind == "call":
                 if target in pilot.services:
                     continue
-                if target not in ROWLESS_CALLS or target in functions:
+                if (target not in ROWLESS_CALLS and target not in pilot.rowless_calls) or target in functions:
                     todo.append(target)
             elif kind == "indirect_call":
                 via = re.findall(r"\[(\w+)::(\w+)\]", target)

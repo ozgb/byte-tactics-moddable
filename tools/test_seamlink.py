@@ -517,6 +517,10 @@ Help,src/game/economy.cpp,economy,x,
 
     def test_a_call_without_rows_behind_a_query_is_found(self):
         self.assertEqual(self.check([("Account", "src/game/economy.cpp", "call", "operator=")]), [])
+        found = self.check([("Gate", "src/game/economy.cpp", "call", "push_back"), ("Account", "src/game/economy.cpp", "call", "operator[]")])
+        self.assertEqual([(f[2], f[3]) for f in found],
+                         [("operator[]", "EconomySeam::UnitAccount calls operator[], which data/rwsets.csv has no rows for"),
+                          ("push_back", "EconomySeam::RequestGranted calls push_back, which data/rwsets.csv has no rows for")])
         found = self.check([("Gate", "src/game/economy.cpp", "call", "memset"), ("Use", "src/game/economy.cpp", "asm", "inline")])
         self.assertEqual([(f[2], f[3]) for f in found],
                          [("Use", "EconomySeam::GetEnergyUse has inline assembly"),

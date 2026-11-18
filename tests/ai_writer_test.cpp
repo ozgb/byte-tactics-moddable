@@ -184,9 +184,11 @@ static int __stdcall FakeGetOrderFlags(Unit*)
     return 0;
 }
 
+static int s_orderType = 1;
+
 static MissionType __stdcall FakeGetOrderType(unsigned char, Unit*, Unit*, Vec3*)
 {
-    return MissionType((unsigned char)1);
+    return MissionType((unsigned char)s_orderType);
 }
 
 static void __stdcall FakeNotifyUnitRefs(Unit* unit, int event)
@@ -397,13 +399,41 @@ static void CheckRejected()
     AiEvent badPlan = Event(AI_PLAN, kAi0);
     badPlan.value = 16;
     AiEvent badKind = Event(255, kAi0);
+    AiEvent squadBelow = Event(AI_SET_SQUAD, kAi0);
+    squadBelow.value = -2;
+    AiEvent noSquads = Event(AI_SET_SQUAD, kAi0);
+    noSquads.value = 0;
     Check(g_seams.ai->Apply(&noUnit) == 0, "a reaction with a null unit has outcome 0");
     Check(g_seams.ai->Apply(&splitNoUnit) == 0, "a damage split with a null unit has outcome 0");
     Check(g_seams.ai->Apply(&badSquad) == 0, "a squad above 9 has outcome 0");
     Check(g_seams.ai->Apply(&badPlan) == 0, "a plan with a bit above 3 has outcome 0");
     Check(g_seams.ai->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
+    Check(g_seams.ai->Apply(&squadBelow) == 0, "a squad below -1 has outcome 0");
+    Check(g_seams.ai->Apply(&noSquads) == 0, "a squad for a unit whose player has no squads has outcome 0");
     Check(HashState() == before, "a rejected event changes no hashed state");
     Check(s_effectCount == effects, "a rejected event publishes no effect");
+}
+
+static int AttacksAfterReaction(int attacker, unsigned int flags, int orderType)
+{
+    Restart();
+    s_units[kAi1].flags = flags;
+    s_orderType = orderType;
+    int attacks = s_records[kAi1].attacks;
+    AiEvent event = Attacked(kAi1, attacker);
+    Check(g_seams.ai->Apply(&event) == 1, "a reaction to an attack has outcome 1");
+    s_orderType = 1;
+    return s_records[kAi1].attacks - attacks;
+}
+
+static void CheckAttackGates()
+{
+    const unsigned int ready = 0x10000000 | 0x40000 | 0x100000;
+    Check(AttacksAfterReaction(kEnemy0, ready, 1) == 1, "an idle unit that may move and fire attacks its attacker");
+    Check(AttacksAfterReaction(kAi1, ready, 1) == 0, "a unit attacked by itself gives no attack order");
+    Check(AttacksAfterReaction(kEnemy0, 0x10000000 | 0x100000, 1) == 0, "a unit holding its position gives no attack order");
+    Check(AttacksAfterReaction(kEnemy0, 0x10000000 | 0x40000, 1) == 0, "a unit holding its fire gives no attack order");
+    Check(AttacksAfterReaction(kEnemy0, ready, 0) == 0, "a unit with no order type for the attack gives no attack order");
 }
 
 int main()
@@ -426,8 +456,8 @@ int main()
     Check(plain.records[kAi0].stops > 0 && plain.records[kAi1].stops == 0, "only the unit that flags the stop is stopped");
     Check(plain.nextAction[0] != 0, "a reaction sets the next action of the player's AI");
     Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same hashes at every tick");
-    Check(memcmp(plain.state, direct.state, sizeof plain.state) == 0, "the default module matches a direct call of the 3.1c code path at every tick");
-    Check(memcmp(plain.records, direct.records, sizeof plain.records) == 0, "the default module leaves the records a direct call leaves");
+    Check(memcmp(plain.state, direct.state, sizeof plain.state) == 0, "a call through the seam hashes as a direct call of AiApply at every tick");
+    Check(memcmp(plain.records, direct.records, sizeof plain.records) == 0, "a call through the seam leaves the records a direct call of AiApply leaves");
     Check(noReact.dropped == kDropTick, "the tampered module drops the reaction at the tampered tick");
     Check(redirected.redirected == kRedirectTick, "the tampered module redirects the attack at the tampered tick");
     Check(noReact.applied == plain.applied && redirected.applied == plain.applied, "the tampered modules are offered the same events as the default");
@@ -447,6 +477,9 @@ int main()
         noReact.dropped, redirected.redirected, firstDrop, firstRedirect, dropDiffering, redirectDiffering, redirectEffects);
 
     CheckRejected();
+    s_dropKind = 0;
+    s_redirectTick = -1;
+    CheckAttackGates();
 
     printf(g_failures ? "FAILED\n" : "ai_writer_test: all passed\n");
     return g_failures != 0;

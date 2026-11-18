@@ -22,7 +22,7 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
 static FactoryIndex* s_index;
 
-static FactoryIndex* EnsureIndex()
+static FactoryIndex* EnsureFactoryIndex()
 {
     if (s_index == nullptr) {
         s_index = new (kSim) FactoryIndex;
@@ -40,7 +40,7 @@ const BlockVector<Ref<Unit> >* FactoryIndexOf(int player)
 
 void __stdcall CreateFactoryIndex(int player)
 {
-    FactoryIndexEntry& entry = EnsureIndex()->players[player];
+    FactoryIndexEntry& entry = EnsureFactoryIndex()->players[player];
     entry.factories.Clear();
     entry.lastTick = 0;
     entry.live = 1;

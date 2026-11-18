@@ -23,7 +23,7 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
 static LosUnitIndex* s_index;
 
-static LosUnitIndex* EnsureIndex()
+static LosUnitIndex* EnsureUnitIndex()
 {
     if (s_index == nullptr) {
         s_index = new (kSim) LosUnitIndex;
@@ -52,7 +52,7 @@ static void ReleaseUnits(BlockVector<Ref<Unit> >& list)
 
 void __stdcall CreateUnitIndex(int player)
 {
-    LosUnitIndexEntry& entry = EnsureIndex()->players[player];
+    LosUnitIndexEntry& entry = EnsureUnitIndex()->players[player];
     entry.visible.Clear();
     entry.known.Clear();
     entry.hasSpecial = 0;

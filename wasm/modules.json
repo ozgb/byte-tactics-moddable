@@ -12,7 +12,7 @@
   "window": 65536,
   "table_slots": 32,
   "majors": {
-    "ai": 4,
+    "ai": 5,
     "economy": 4,
     "features": 3,
     "files": 2,
@@ -34,8 +34,7 @@
   },
   "signatures": {
     "ai": {
-      "Apply": [["linear"], "int"],
-      "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"]
+      "Apply": [["linear"], "int"]
     },
     "files": {
       "BankOpenNamedBox": [["handle", "linear"], "int"],
@@ -45,7 +44,9 @@
     },
     "los_radar": {
       "Apply": [["linear"], "int"],
-      "GetMapCell": [["int", "int"], "block"]
+      "GetMapCell": [["int", "int"], "block"],
+      "GetVisibleEnemiesInRadiusList": [["int", "linear", "int", "int", "linear", "int"], "int"],
+      "GetSeenUnitsInRadius": [["int", "linear", "int", "linear", "int"], "int"]
     },
     "network": {
       "SendShareMapInfo": [["int", "int"], "void"]

@@ -349,7 +349,7 @@ static int AttackOrdered(Unit* unit, Unit* target)
         return 0;
     if (!(unit->flags & 0x300000))
         return 0;
-    if (g_seams.orders->GetOrderType(3, unit, target, 0).index == 0)
+    if (g_seams.orders->GetOrderType(3, unit, target, nullptr).index == 0)
         return 0;
     AiPublishAttack(unit, target);
     return 1;
@@ -429,7 +429,7 @@ void __stdcall AiWriteState(const StateWriter* w)
 {
     unsigned int count = 0;
     for (int i = 0; i <= 10; i++)
-        if (g_game->players[i].ai != 0)
+        if (g_game->players[i].ai != nullptr)
             count++;
     w->Begin(43, "aiState");
     w->Int("commandsEnabled", 0, 4, g_aiCommandsEnabled);
@@ -441,7 +441,7 @@ void __stdcall AiWriteState(const StateWriter* w)
             continue;
         unsigned int next[10];
         for (int j = 0; j < 10; j++)
-            next[j] = manager->timers[j] != 0 ? (unsigned int)manager->timers[j]->next : 0;
+            next[j] = manager->timers[j] != nullptr ? (unsigned int)manager->timers[j]->next : 0;
         w->Int("manager[%u].player", k, 4, i);
         w->Int("manager[%u].countdown", k, 4, manager->countdown);
         w->Int("manager[%u].nextAction", k, 4, manager->nextAction);

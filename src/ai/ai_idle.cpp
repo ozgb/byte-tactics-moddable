@@ -5,7 +5,7 @@
 namespace {
 
 AiSeam s_idle;
-const AiSeam* s_standard = 0;
+const AiSeam* s_standard = nullptr;
 
 int __stdcall ApplyIdle(const AiEvent* event)
 {

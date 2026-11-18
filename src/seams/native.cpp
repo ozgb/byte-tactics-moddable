@@ -186,7 +186,7 @@ static void __stdcall FreeSquadManagerNative(Player* player)
         return;
     manager->DeleteTimers();
     delete manager;
-    player->ai = (SquadManager*)0;
+    player->ai = nullptr;
 }
 
 static void __stdcall CreateSquadManagerNative(Player* player)

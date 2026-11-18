@@ -5,8 +5,6 @@
 #include "../../interfaces/services.h"
 #include "ai_world.h"
 
-#include "../../link/globals.h"
-
 void AiInbox(const void* event)
 {
     const AiEvent* e = static_cast<const AiEvent*>(event);

@@ -28,7 +28,7 @@ void OrdersOnAiAddOrder(const void* event)
     pos.y = e->pos[1];
     pos.z = e->pos[2];
     g_seams.orders->AddOrder(MissionType((unsigned char)e->value), e->extra, UnitOfOffset(e->unit), UnitOfOffset(e->target),
-                             e->hasPos ? &pos : 0, e->params[0], e->params[1]);
+                             e->hasPos ? &pos : nullptr, e->params[0], e->params[1]);
 }
 
 void OrdersOnAiQueueBuild(const void* event)

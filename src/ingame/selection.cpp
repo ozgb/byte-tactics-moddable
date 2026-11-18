@@ -824,6 +824,7 @@ done:
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).flags |= flag;
 }
 
+#include "../../interfaces/services.h"
 #include "../game/ai_events.h"
 
 // FUNCTION: 0x48d920

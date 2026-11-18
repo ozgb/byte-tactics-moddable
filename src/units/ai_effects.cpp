@@ -7,8 +7,6 @@
 #include "unit.h"
 #include "ai_effects.h"
 
-#include "../../link/globals.h"
-
 static Unit* UnitOfOffset(unsigned int offset)
 {
     Ref<Unit> ref;

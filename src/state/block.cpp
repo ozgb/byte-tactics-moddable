@@ -45,7 +45,7 @@ char* g_base;
 bool g_growable;
 unsigned int g_insideThread;
 void* g_lock = host_mutex_create();
-void** g_tracked[8];
+void** g_tracked[16];
 unsigned int g_trackedCount;
 
 void Fatal(const char* what)

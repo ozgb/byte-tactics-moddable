@@ -67,13 +67,17 @@ Ai's place in it:
 | the AI scripts and the console: `plan`, `weight`, `limit` (`CmdPlan`, `CmdWeight`, `CmdLimit`) | the slots `CmdPlan`, `CmdWeight`, `CmdLimit` | PLAN, WEIGHT, LIMIT from the engine, outside the tick |
 
 **What each event writes.**
-- **REACT_TO_ATTACK** tells the attacked unit's references of the attack (NOTIFY_REFS 16), and for a unit of a
-  computer player that can react: draws the squad manager's next action (`RandomInt(300)`, section 6) and stops the
-  unit (STOP), orders an attack on the attacker when the unit is idle and its weapon reaches (ATTACK), else retargets
-  its weapons (targeting's SET_UNIT), and records the unit's "under attack" speech (a sim event) unless its order
-  says not to. It writes the squad manager's `nextAction`; the rest are effects.
-- **DAMAGE_SPLIT** publishes HIT: whether the shot hit mostly units of other players (more than twice the damage
-  dealt to its own player's). It writes nothing of ai's.
+- **REACT_TO_ATTACK** serves the units of every player, human players' included, not only the computer players'.
+  For any attacked unit it tells the unit's references of the attack (NOTIFY_REFS 16) and records the unit's "under
+  attack" speech (a sim event) unless its order says not to. For a unit of a human or a computer player (player
+  type 1 or 2) that can fight back and is not allied to the attacker, it orders an attack on the attacker when the unit is idle
+  and its weapon reaches (ATTACK), else retargets its weapons (targeting's SET_UNIT): this is how a human player's
+  idle units return fire. Only for a unit of a computer player with the reacting flag does it draw the squad manager's
+  next action (`RandomInt(300)`, section 6) and stop the unit (STOP). It writes the squad manager's `nextAction`; the
+  rest are effects. A replacement AI that drops this event takes return fire and the reference notices away from
+  human players too.
+- **DAMAGE_SPLIT** publishes HIT, for a shooter of any player: whether the shot hit mostly units of other players
+  (more than twice the damage dealt to its own player's), the wake bits its orders read. It writes nothing of ai's.
 - **SET_SQUAD** moves the unit from its squad's list to the new squad's (`Player::groups`) and sets `Unit::group`.
 - **PLAN** switches the AI commands on or off (`g_aiCommandsEnabled`) from the match's difficulty.
 - **WEIGHT** and **LIMIT** write the build weights and limits of the computer players' AI (`PlayerAI`).
@@ -173,8 +177,8 @@ too (3.1c's direct write, kept).
 | `HasReadyUnitInRange` | ai's private state: the visible list, then the units' flags | the info panel (`UpdateSensorRadarAndCloak`), presentation only |
 | `IsPointVisible` | only los_radar's views: the player's explored size and the line of sight mask (`Game::visibilityMask`); nothing of ai | weapons' drawing (`DrawProjectiles`) and players' `IsVisible` |
 
-`IsPointVisible` reads no ai state, and none of its callers is ai: it belongs with los_radar's queries. Moving it is a
-change of two interfaces and is left to los_radar's next major (left out, section 7). The four others read the visible
+`IsPointVisible` reads no ai state, and none of its callers is ai: it belongs with los_radar's queries. #979 moves it,
+in the same bump of los_radar and ai. The four others read the visible
 and factory lists, which only ai writes (`UpdatePlayerAI`), so they are ai's queries, answered as of ai's last run.
 
 **The routes.** Every route, with its reason:
@@ -278,14 +282,16 @@ its block offset and a player as its index. The interface names no 3.1c plan, we
 needs only the views, the queries and the events, as the demo shows.
 
 **The demo module.** `AiIdleSeam` (`src/ai/ai_idle.cpp`) is an AI that gives no orders at all: its runs do nothing,
-and its `Apply` rejects REACT_TO_ATTACK and DAMAGE_SPLIT (outcome 0) and passes the rest to the default, so the squads
-and the AI commands stay consistent for the trace. The scenario key `ai idle` installs it
+and its `Apply` rejects REACT_TO_ATTACK for a unit of a computer player and DAMAGE_SPLIT for a shooter of a computer
+player (outcome 0), and passes the rest to the default, so the squads and the AI commands stay consistent for the trace.
+A human player's units still return fire and their shooters still get HIT's wake bits: only the computer player is
+idle. The scenario key `ai idle` installs it
 (`docs/scenario-format.md`), and `tests/ai/idle-skirmish.txt` plays it to its end: a human Arm army against a
 computer Core player that never moves, 3000 ticks. It is counted apart in coverage (`demo:` rows of
 `data/coverage.csv`), like the HPA* pathfinder.
 
-**Left for later.** `IsPointVisible` moves to los_radar with its next major (section 4). Ai's private region and its
-leaving the hash are #979's.
+**Left for later.** `IsPointVisible`'s move to los_radar (section 4), ai's private region and its leaving the hash are
+#979's.
 
 ## 8. What the gate decided
 

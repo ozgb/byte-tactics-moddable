@@ -545,6 +545,7 @@ CobScript::SetCob #2,0x6 0xa,AllocFrame: TED GENERATED PIC,1,270,0xb280,not-a-po
 CobScript::SetCob #2,0x2 0x5 0x6,CMemoryCache::InitCache: CMemoryCache CCH,4,1230,0xffe0-0x23005c,not-a-pointer,"COB static variables: script integers, no pointers"
 CobScript::SetCob #2,0x2+0x4*k 0x16,HAPI_LoadFile,5,4016,0xa80-0xcfd8,not-a-pointer,"COB static variables: script integers, no pointers"
 CobScript::SetCob #2,0x5,LoadTntMap: TILE SET #3,1,270,0x73009c,not-a-pointer,"COB static variables: script integers, no pointers"
+CreateFactoryIndex,*,*,0,0,-,not-a-pointer,"Factory index entries (0x18 bytes): the live flag and refresh tick words that only look like addresses; the factory list is a block vector of Refs"
 CreateGameObject,*,*,0,0,-,not-a-pointer,words of CreateGameObject that only look like addresses
 CreateGameObject,*,*,0,0,-,outside,"the 38 outside pair rows of CreateGameObject, which follow"
 CreateGameObject,0x166c3,??0TdfRecord@@QAE@PAD0PAPAD0@Z #2,1,1,0x26,not-a-pointer,words of CreateGameObject that only look like addresses
@@ -741,6 +742,7 @@ CreateSquads: SQUADS,0x15 0x19 0x35 0x95 0x99,CMemoryCache::InitCache: CMemoryCa
 CreateSquads: SQUADS,0x32+0x4*k 0x35 0x75 0x92+0x4*k 0x95 0x99,HAPI_LoadFile,4,10952,0x3ae-0x403ae,not-a-pointer,"Squad (stride 0x20): every offset is 2 mod 4, a misaligned word across two in-block items pointers"
 CreateSquads: SQUADS,0x96,LoadTntMap: TILE MAP #1,1,980,0x5876,not-a-pointer,words of ??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS that only look like addresses
 CreateSquads: SQUADS,0x15+0x20*k 0x19 0x32+0x4*k 0x39,LoadTntMap: TILE SET #3,5,31377,0x139bc-0x22007d,not-a-pointer,words of ??0Squad@@QAE@PAUPlayer@@H@Z: SQUADS that only look like addresses
+CreateUnitIndex,*,*,0,0,-,not-a-pointer,"Unit index entries (0x2c bytes): the live flag and refresh tick words that only look like addresses; the visible and known lists are block vectors of Refs"
 DebrisCache::InitSimCache: CMemoryCache CCH,*,*,0,0,-,not-a-pointer,words of DebrisCache::InitSimCache: CMemoryCache CCH that only look like addresses
 DebrisCache::InitSimCache: CMemoryCache CCH,*,*,0,0,-,outside,"the 1 outside pair rows of DebrisCache::InitSimCache: CMemoryCache CCH, which follow"
 DebrisCache::InitSimCache: CMemoryCache CCH,0x1633 0x198d,??0TdfRecord@@QAE@PAD0PAPAD0@Z #2,1,1,0x10,not-a-pointer,words of DebrisCache::InitSimCache: CMemoryCache CCH that only look like addresses

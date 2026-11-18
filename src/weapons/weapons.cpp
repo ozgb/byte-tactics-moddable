@@ -104,7 +104,7 @@ void FreeWeaponArray(void)
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
-#include "../game/ai_events.h"
+#include "../game/weapons_events.h"
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
@@ -169,7 +169,7 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
             a = damage;
         else
             b = damage;
-        AiPublishDamageSplit(SCHED_WEAPONS, attacker, a, b);
+        WeaponsPublishHit(attacker, a, b);
     }
 }
 
@@ -310,7 +310,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
                     a = damage;
                 else
                     b = damage;
-                AiPublishDamageSplit(SCHED_WEAPONS, source, a & 0xffff, b & 0xffff);
+                WeaponsPublishHit(source, a & 0xffff, b & 0xffff);
                 return;
             }
         } else {
@@ -1806,7 +1806,7 @@ void __stdcall DrawProjectiles(void* surface)
                 else
                     visible = 0;
             } else {
-                visible = g_seams.ai->IsPointVisible(pb, pos);
+                visible = g_seams.los_radar->IsPointVisible(pb, pos);
             }
             if (visible) {
                 type = p->type;
@@ -2150,7 +2150,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
     }
 
     if (weapon->attacker)
-        AiPublishDamageSplit(SCHED_WEAPONS, weapon->attacker.get(), enemyDamage, friendlyDamage);
+        WeaponsPublishHit(weapon->attacker.get(), enemyDamage, friendlyDamage);
 }
 
 static inline void Fall(Vec3* v)

@@ -45,30 +45,18 @@ struct AiVec3 {
     AiVec3() { *this = AiVec3(0, 0, 0); }
 };
 
-struct AiUnitList {
-    BlockVector<Ref<Unit> > units;
-    void Clear() { units.Clear(); }
-};
-
-struct FactoryUnitGroup {
-    AiUnitList list;
-    void Clear() { list.Clear(); }
-};
-
 class PlayerAI {
 public:
     Ref<Player> owner;
     unsigned char index;
-    AiUnitList visible;
-    AiUnitList known;
-    FactoryUnitGroup factories;
+    unsigned char unused_05[0x30];
     AiVec3 centre;
     AiVec3 pos_41;
     BlockVector<KeyedCell> cells;
     CenterPos center;
     BlockVector<BuildRatingWeights> vec_65;
     int builders;
-    int hasSpecial;
+    int unused_79;
     BlockVector<short> counts;
     BlockVector<unsigned char> vec_8d;
     BlockVector<unsigned char> weights;
@@ -98,10 +86,10 @@ public:
 
 #define PLAYER_AI_OFFSET(field, off) \
     static_assert(__builtin_offsetof(PlayerAI, field) == off, "PlayerAI::" #field)
-PLAYER_AI_OFFSET(visible, 0x05);
-PLAYER_AI_OFFSET(known, 0x15);
-PLAYER_AI_OFFSET(factories, 0x25);
+PLAYER_AI_OFFSET(unused_05, 0x05);
+PLAYER_AI_OFFSET(centre, 0x35);
 PLAYER_AI_OFFSET(cells, 0x4d);
+PLAYER_AI_OFFSET(unused_79, 0x79);
 PLAYER_AI_OFFSET(vec_65, 0x65);
 PLAYER_AI_OFFSET(counts, 0x7d);
 PLAYER_AI_OFFSET(vec_8d, 0x8d);

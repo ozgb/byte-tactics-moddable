@@ -12,7 +12,29 @@ class CobScript;
 // Major version of the weapons interface, changed when a slot is removed or its signature changes.
 #define WEAPONS_VERSION_MAJOR 1
 // Minor version of the weapons interface, changed when a slot is added.
-#define WEAPONS_VERSION_MINOR 5
+#define WEAPONS_VERSION_MINOR 6
+
+// The kinds of effect weapons publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
+enum WeaponsEffectKind {
+    // unit was damaged by target (0 when no unit attacked it) for value points, by damage of any kind but repair (10) and 11.
+    WEAPONS_EFFECT_ATTACKED = 272,
+    // A shot of unit hit, dealing value damage to units of other players and extra damage to units of unit's own player.
+    WEAPONS_EFFECT_HIT = 273
+};
+
+// An effect (WeaponsEffectKind), as plain data with no pointers; fields a kind does not use are 0.
+struct WeaponsEffect {
+    // A WeaponsEffectKind.
+    int kind;
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none).
+    unsigned int unit;
+    // The other unit, as its block offset: the attacker of ATTACKED.
+    unsigned int target;
+    // The argument of the kind, as the kind says.
+    int value;
+    // The second argument of the kind, as the kind says.
+    int extra;
+};
 
 // Projectiles and explosions.
 struct WeaponsSeam {

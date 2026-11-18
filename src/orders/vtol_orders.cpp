@@ -464,7 +464,7 @@ class UnitList : public std::vector<Unit*> {};
 
 static inline void FindPads(Unit* u, std::vector<Unit*>* pads)
 {
-    g_seams.ai->GetFactoriesInRadius(((Player*)u->player)->index,&u->pos,0xf00,pads);
+    g_seams.units->GetFactoriesInRadius(((Player*)u->player)->index,&u->pos,0xf00,pads);
 }
 
 static inline int SearchRange(Unit* u)
@@ -791,7 +791,7 @@ static inline int Land(Unit* unit, Order* order)
 {
     if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
         std::vector<Unit*> pads;
-        g_seams.ai->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &pads);
+        g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &pads);
         if (!pads.empty()) {
             order->SetAttachedFx(0);
             Unit* pad = pads[RandomInt(pads.size())];
@@ -934,7 +934,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
             std::vector<Unit*> v;
-            g_seams.ai->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &v);
+            g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &v);
             if (!v.empty()) {
                 order->SetAttachedFx(0);
                 Unit* target = v[RandomInt(v.size())];
@@ -1181,7 +1181,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
             std::vector<Unit*> v;
-            g_seams.ai->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
+            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
             if (!v.empty()) {
                 order->SetAttachedFx(0);
                 Unit* target = v[RandomInt(v.size())];
@@ -1460,7 +1460,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
             std::vector<Unit*> pads;
-            g_seams.ai->GetFactoriesInRadius(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, 0xf00, &pads);
+            g_seams.units->GetFactoriesInRadius(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, 0xf00, &pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad = pads[RandomInt(pads.size())];
@@ -1574,7 +1574,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     case 4: {
         if (IsDamaged(unit)) {
             LandingPadList v;
-            g_seams.ai->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
+            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
             if (!v.empty()) {
                 order->SetAttachedFx(0);
                 Unit* target = v[RandomInt(v.size())];
@@ -1897,7 +1897,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
             LandingPadList pads;
-            g_seams.ai->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
+            g_seams.units->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
             if (!pads.empty()) {
                 order->SetAttachedFx(0);
                 Unit* pad=pads[RandomInt(pads.size())];

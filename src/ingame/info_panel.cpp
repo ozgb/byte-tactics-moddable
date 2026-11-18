@@ -329,7 +329,7 @@ void UpdateSensorRadarAndCloak(void)
             char c = (char)u->player->type;
             if (c == 1 || c == 2) {
                 if (u->def->flags2 & 0x2000) {
-                    if (g_seams.ai->HasReadyUnitInRange(u->playerIndex, (Vec3*)&u->pos, u->def->mincloakdistance)) {
+                    if (g_seams.los_radar->HasReadyUnitInRange(u->playerIndex, (Vec3*)&u->pos, u->def->mincloakdistance)) {
                         int& b0 = u->workTime;
                         b0 = g_game->ticks + 0x5a;
                         u->flags |= 0x1000;

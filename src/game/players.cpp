@@ -9,6 +9,7 @@
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
 #include "players.h"
+#include "../map/line_of_sight_index.h"
 #include "economy_events.h"
 #include "los_radar_events.h"
 #include "../../interfaces/economy.h"
@@ -223,6 +224,8 @@ guard:
     if (!p->active || p->type != 3) {
         g_seams.ai->CreateSquadManager(p);
         g_seams.ai->CreatePlayerAI(p->index);
+        g_seams.los_radar->CreateUnitIndex(p->index);
+        g_seams.units->CreateFactoryIndex(p->index);
     }
 }
 
@@ -287,6 +290,8 @@ void FreePlayers()
         ((Ref<unsigned char>*)q)[-2] = (unsigned char*)0;
         g_seams.ai->FreeSquads(p);
         if (((Ref<SquadManager>*)q)[-4]) {
+            g_seams.los_radar->FreeUnitIndex(((unsigned char*)q)[0xc2]);
+            g_seams.units->FreeFactoryIndex(((unsigned char*)q)[0xc2]);
             g_seams.ai->DestroyPlayerAI(((unsigned char*)q)[0xc2]);
             g_seams.ai->FreeSquadManager(p);
         }
@@ -629,7 +634,7 @@ void __stdcall UpdatePlayersFinish()
 
 static inline int IsVisible(Player* player, Vec3Words* pos)
 {
-    return (g_game->mapFlags & 2) == 2 ? IsExplored(player, pos) : g_seams.ai->IsPointVisible(player, (Vec3*)pos);
+    return (g_game->mapFlags & 2) == 2 ? IsExplored(player, pos) : IsPointVisible(player, (Vec3*)pos);
 }
 
 static inline int IsVisibleByMask(Player* player, Vec3Words* pos)

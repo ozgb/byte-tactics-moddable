@@ -26,24 +26,6 @@ inline AiEvent AiEventOf(int kind, U* unit)
 }
 
 template <class U>
-inline void AiPublishReactToAttack(int outbox, U* unit, Unit* attacker, int amount)
-{
-    AiEvent event = AiEventOf(AI_REACT_TO_ATTACK, unit);
-    event.target = Ref<Unit>(attacker).offset;
-    event.value = amount;
-    SchedPublish(outbox, &event, sizeof(event));
-}
-
-template <class U>
-inline void AiPublishDamageSplit(int outbox, U* unit, int enemyDamage, int friendlyDamage)
-{
-    AiEvent event = AiEventOf(AI_DAMAGE_SPLIT, unit);
-    event.value = enemyDamage;
-    event.extra = friendlyDamage;
-    SchedPublish(outbox, &event, sizeof(event));
-}
-
-template <class U>
 inline void AiPublishSetSquad(int outbox, U* unit, int squad)
 {
     AiEvent event = AiEventOf(AI_SET_SQUAD, unit);
@@ -104,28 +86,10 @@ inline void AiPublishQueueBuild(U* unit, int type, int count)
 }
 
 template <class U>
-inline void AiPublishAttack(U* unit, Unit* target)
-{
-    AiEvent event = AiEventOf(AI_EFFECT_ATTACK, unit);
-    event.target = Ref<Unit>(target).offset;
-    HarnessAiEvent(&event, 1);
-    SchedPublish(SCHED_AI, &event, sizeof(event));
-}
-
-template <class U>
 inline void AiPublishStop(U* unit, int all)
 {
     AiEvent event = AiEventOf(AI_EFFECT_STOP, unit);
     event.value = all;
-    HarnessAiEvent(&event, 1);
-    SchedPublish(SCHED_AI, &event, sizeof(event));
-}
-
-template <class U>
-inline void AiPublishNotifyRefs(U* unit, int what)
-{
-    AiEvent event = AiEventOf(AI_EFFECT_NOTIFY_REFS, unit);
-    event.value = what;
     HarnessAiEvent(&event, 1);
     SchedPublish(SCHED_AI, &event, sizeof(event));
 }
@@ -146,15 +110,6 @@ inline void AiPublishSetStates(U* unit, int movement, int firing)
     AiEvent event = AiEventOf(AI_EFFECT_SET_STATES, unit);
     event.value = movement;
     event.extra = firing;
-    HarnessAiEvent(&event, 1);
-    SchedPublish(SCHED_AI, &event, sizeof(event));
-}
-
-template <class U>
-inline void AiPublishHit(U* unit, int mostlyEnemies)
-{
-    AiEvent event = AiEventOf(AI_EFFECT_HIT, unit);
-    event.value = mostlyEnemies;
     HarnessAiEvent(&event, 1);
     SchedPublish(SCHED_AI, &event, sizeof(event));
 }

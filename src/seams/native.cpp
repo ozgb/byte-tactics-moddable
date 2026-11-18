@@ -59,7 +59,10 @@ struct Order;
 class MissionType;
 
 #include "../ai/ai_player.h"
-void __stdcall GetFactoriesInRadius(int player, const Vec* pos, int radius, std::vector<Unit*>* out);
+void __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, std::vector<Unit*>* out);
+void __stdcall CreateFactoryIndex(int player);
+void __stdcall FreeFactoryIndex(int player);
+void __stdcall RefreshFactoryIndex(int player);
 #include "../units/squads.h"
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
@@ -89,7 +92,14 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 #include "../game/share_commands.h"
 int __stdcall GetGroundHeight(GroundHeightPos* p);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
-void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
+void __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*>* out);
+int __stdcall GetVisibleEnemiesInRadiusList(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
+bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
+int __stdcall IsPointVisible(Player* player, Vec3* point);
+int __stdcall GetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
+void __stdcall CreateUnitIndex(int player);
+void __stdcall FreeUnitIndex(int player);
+void __stdcall RefreshUnitIndex(int player);
 
 #include "../map/line_of_sight.h"
 #include "../ingame/radar.h"
@@ -199,11 +209,6 @@ static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char
     self->AddTypeOrCategory(text, out);
 }
 
-static void __stdcall GetFactoriesInRadiusNative(int player, const Vec3* pos, int radius, std::vector<Unit*>* out)
-{
-    GetFactoriesInRadius(player, (const Vec*)pos, radius, out);
-}
-
 static void __stdcall SetStateBitsNative(Unit* unit, int mask, int set)
 {
     unit->SetStateBits(mask, set);
@@ -252,21 +257,6 @@ static WeaponDef* __stdcall FindWeaponByNameNative(char* name)
 static int __stdcall GetWeaponRangeNative(Unit* unit, unsigned int weapon)
 {
     return GetWeaponRange((int)unit, weapon);
-}
-
-static void __stdcall GetVisibleEnemiesInRadiusNative(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*>* out)
-{
-    GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, out);
-}
-
-static int __stdcall GetVisibleEnemiesInRadiusListNative(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
-{
-    std::vector<Unit*> found;
-    GetVisibleEnemiesInRadius(player, (const Vec*)pos, radius, flags, &found);
-    int count = (int)found.size();
-    for (int i = 0; i < count && i < capacity; i++)
-        out[i] = found[i];
-    return count;
 }
 
 static char* __stdcall GetNameSlotNative(Mission* mission, int index)
@@ -707,8 +697,18 @@ void InstallNativeSeams()
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;
     s_units.RefreshUnitIfStale = RefreshUnitIfStaleNative;
-    s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
-    s_ai.IsPointVisible = IsPointVisible;
+    s_los_radar.HasReadyUnitInRange = HasReadyUnitInRange;
+    s_los_radar.IsPointVisible = IsPointVisible;
+    s_los_radar.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
+    s_los_radar.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
+    s_los_radar.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
+    s_los_radar.CreateUnitIndex = CreateUnitIndex;
+    s_los_radar.FreeUnitIndex = FreeUnitIndex;
+    s_los_radar.RefreshUnitIndex = RefreshUnitIndex;
+    s_units.GetFactoriesInRadius = GetFactoriesInRadius;
+    s_units.CreateFactoryIndex = CreateFactoryIndex;
+    s_units.FreeFactoryIndex = FreeFactoryIndex;
+    s_units.RefreshFactoryIndex = RefreshFactoryIndex;
     s_map.GetNameSlot = GetNameSlotNative;
     s_units.GetGroundHeight = GetGroundHeightNative;
     s_units.GetSweetSpot = GetSweetSpotNative;
@@ -721,8 +721,6 @@ void InstallNativeSeams()
     s_weapons.ApplyAreaDamageAt = ApplyAreaDamageAtNative;
     s_weapons.GetWeaponRange = GetWeaponRangeNative;
     s_weapons.WeaponCanReachUnit = WeaponCanReachUnit;
-    s_ai.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadiusNative;
-    s_ai.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusListNative;
     s_weapons.FindTargetableProjectile = FindTargetableProjectile;
     s_weapons.WeaponCanReachPos = WeaponCanReachPos;
     s_weapons.AllocWeaponArray = AllocWeaponArray;
@@ -746,7 +744,6 @@ void InstallNativeSeams()
     s_orders.AppendOrder = AppendOrder;
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
-    s_ai.GetFactoriesInRadius = GetFactoriesInRadiusNative;
     s_ai.CreatePlayerAI = CreatePlayerAI;
     s_ai.DestroyPlayerAI = DestroyPlayerAI;
     s_ai.UpdatePlayerAI = UpdatePlayerAI;

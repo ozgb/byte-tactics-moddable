@@ -155,7 +155,7 @@ int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
 {
     if(order->radius) {
         std::vector<Unit*> units;
-        g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units);
+        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units);
         if(!units.empty()) return 5;
         if(order->wait<=0) return 5;
         int delay=RandomInt(30)+150;
@@ -286,7 +286,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         break;
     case 3: {
         std::vector<Unit*> units;
-        g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
+        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
         if (!units.empty()) {
             order->link.SetUnit(units[RandomInt(units.size())]);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);

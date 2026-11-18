@@ -212,7 +212,6 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 
 #include "../util/commands.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
-void __stdcall GetVisibleEnemiesInRadius(int player, const Vec* pos, int radius, int flags, std::vector<Unit*>* out);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
 
 static const float kZeroFloatAi = 0.0f;
@@ -335,56 +334,13 @@ void FUN_00406f40(void)
 {
 }
 
-// FUNCTION: 0x406f50
-static void MarkOwnerNetDirty(Unit* attacker, int enemyDamage, int friendlyDamage)
-{
-    AiPublishHit(attacker, enemyDamage > friendlyDamage * 2 ? 1 : 0);
-}
-
-static int AttackOrdered(Unit* unit, Unit* target)
-{
-    if (unit == target)
-        return 0;
-    if (!(unit->flags & 0xc0000))
-        return 0;
-    if (!(unit->flags & 0x300000))
-        return 0;
-    if (g_seams.orders->GetOrderType(3, unit, target, nullptr).index == 0)
-        return 0;
-    AiPublishAttack(unit, target);
-    return 1;
-}
-
 // FUNCTION: 0x406f80
-static void ReactToAttack(Unit* attacker, Unit* unit)
+static void ReactToAttack(Unit* unit)
 {
-    AiPublishNotifyRefs(unit, 16);
-    if (attacker && !attacker->unitDefIndex) attacker=0;
     if ((unit->def->flags2&0x1000) && unit->player->active && unit->player->type==2) {
         unit->player->ai->nextAction=RandomInt(300)+(unsigned int)g_game->ticks+30;
         AiPublishStop(unit, 0);
     }
-    if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
-        (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloatAi && !unit->player->allied[attacker->player->index]) {
-        int ordered=0;
-        if ((!unit->list || (unit->list->flags_42&ORDER_FLAG_IDLE)) &&
-            !unit->def->categories->Contains(attacker->unitDefIndex) &&
-            !unit->def->weaponCategories[0]->Contains(attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
-            ordered=AttackOrdered(unit,attacker);
-        if (!ordered && (unit->flags&0x300000)) {
-            for (unsigned char i=0;i<3;++i) {
-                UnitWeaponSlot* weapon=&unit->weapons[i];
-                if ((weapon->flags&2) && (weapon->flags&0x10) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,i) &&
-                    !((unsigned char)(weapon->weapon->flags.value>>26)&1)) {
-                    Unit* target=ScheduleTargetingTargetUnit(unit,i);
-                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
-                        TargetingPublishSetUnit(SCHED_AI, unit,attacker,i);
-                }
-            }
-        }
-    }
-    if (!(g_seams.orders->GetOrderFlags(unit)&ORDER_FLAG_NO_UNDERATTACK_LINE) && (unit->lastAttackerSlot!=unit->playerIndex || unit->lastDamageType==1))
-        RecordUnitSpeech(unit,2,SIM_SPEECH_KIND_TEXT,SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
 }
 
 int __stdcall AiApply(const AiEvent* e)
@@ -394,12 +350,7 @@ int __stdcall AiApply(const AiEvent* e)
     case AI_REACT_TO_ATTACK:
         if (unit == nullptr)
             return 0;
-        ReactToAttack(AiUnitOf(e->target), unit);
-        return 1;
-    case AI_DAMAGE_SPLIT:
-        if (unit == nullptr)
-            return 0;
-        MarkOwnerNetDirty(unit, e->value, e->extra);
+        ReactToAttack(unit);
         return 1;
     case AI_SET_SQUAD:
         if (unit == nullptr || e->value < -1 || e->value > 9 || !unit->player || !unit->player->groups)
@@ -736,7 +687,7 @@ static inline int IsVisible(Player* player, Vec3Words* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(player, pos);
-    return IsPointVisible(player, (Vec3*)pos);
+    return g_seams.los_radar->IsPointVisible(player, (Vec3*)pos);
 }
 
 static inline Vec3 Offset(int angle, int distance)
@@ -780,18 +731,6 @@ void SpatialTimer::OnTimer()
             }
         }
     }
-}
-
-// FUNCTION: 0x408090
-int __stdcall IsPointVisible(Player* player, Vec3* point)
-{
-    Vec3Words* pos = (Vec3Words*)point;
-    int tx = pos->xWhole >> 5;
-    int ty = (pos->zWhole - (pos->yWhole >> 1)) >> 5;
-    if (!((unsigned int)tx < (unsigned int)player->exploredWidth && (unsigned int)ty < (unsigned int)player->exploredHeight)) {
-        return 0;
-    }
-    return (g_game->visibilityMask[(unsigned int)player->exploredWidth * ty + tx] & (1 << g_game->playerIndex)) != 0;
 }
 
 static inline int FixMul(int a, int b)
@@ -1496,66 +1435,23 @@ void __stdcall ProbeUnitDefEnergyRate(int unused1, int unused2, int param_3)
     EnergyUseOf((UnitDef*)param_3);
 }
 
-// FUNCTION: 0x40ad80
-void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,int flags,std::vector<Unit*>* out)
-{
-    int radius2=radius*radius;
-    BlockVector<Ref<Unit> >& visible=g_playerAI[player]->visible.units;
-    BlockVector<Ref<Unit> >::iterator it;
-    for(it=visible.Begin();it!=visible.End();++it) {
-        Unit* unit=*it;
-        int dz=pos->z-unit->pos.z;
-        int dx=pos->x-unit->pos.x;
-        int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
-        if(d<=radius2 && unit->Ready()) out->push_back(unit);
-    }
-    PlayerAI* owner=g_playerAI[player];
-    if(owner->hasSpecial && out->empty()) {
-        for(it=owner->known.units.Begin();it!=owner->known.units.End();++it) {
-            Unit* unit=*it;
-            int dz=pos->z-unit->pos.z;
-        int dx=pos->x-unit->pos.x;
-        int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
-        if(d<=radius2 && unit->Ready()) out->push_back(unit);
-        }
-    }
-}
-
-// FUNCTION: 0x40b0d0
-bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range)
-{
-    int r2 = range * range;
-    PlayerAI* t = g_playerAI[player];
-    BlockVector<Ref<Unit> >& units = t->visible.units;
-    BlockVector<Ref<Unit> >::iterator it = units.Begin();
-    if (it != units.End()) {
-        do {
-            Unit* u = *it;
-            int dz = p->z - u->pos.z;
-            int dx = p->x - u->pos.x;
-            if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32) <= r2
-                && (u->flags & 0x10000000)
-                && !(u->flags & 0x4000))
-                return true;
-        } while (++it != units.End());
-    }
-    return false;
-}
-
 // FUNCTION: 0x40b1c0
 int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range)
 {
     int total = 0;
     PlayerAI* p = g_playerAI[player];
-    int r2 = range * range;
-    BlockVector<Ref<Unit> >& units = p->visible.units;
-    for (BlockVector<Ref<Unit> >::iterator it = units.Begin(); it != units.End(); it++) {
-        Unit* u = *it;
-        int dz = pos->z - u->pos.z;
-        int dx = pos->x - u->pos.x;
-        int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
-        if (d <= r2)
-            total += (signed char)p->vec_8d[u->unitDefIndex];
+    Ref<Unit> seen[64];
+    int count = g_seams.los_radar->GetSeenUnitsInRadius(player, pos, range, seen, 64);
+    Ref<Unit>* units = seen;
+    std::vector<Ref<Unit> > more;
+    if (count > 64) {
+        more.resize(count);
+        g_seams.los_radar->GetSeenUnitsInRadius(player, pos, range, &more[0], count);
+        units = &more[0];
+    }
+    for (int i = 0; i < count; i++) {
+        Unit* u = units[i];
+        total += (signed char)p->vec_8d[u->unitDefIndex];
     }
     return total;
 }
@@ -1592,26 +1488,6 @@ void __stdcall DestroyPlayerAI(int player)
 {
     delete g_playerAI[player].get();
     g_playerAI[player]=0;
-}
-
-namespace std {
-inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int *)dest, (int *)&src); }
-}
-
-// FUNCTION: 0x40b530
-void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::vector<Unit*>* out)
-{
-    BlockVector<Ref<Unit> >& list=g_playerAI[player]->factories.list.units;
-    radius*=radius;
-    for(BlockVector<Ref<Unit> >::iterator it=list.Begin();it!=list.End();++it) {
-        Unit* unit=*it;
-        if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->activateFlags&1)) {
-            int dz=pos->z-unit->pos.z;
-            int dx=pos->x-unit->pos.x;
-            int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
-            if(d<=radius) out->push_back(*it);
-        }
-    }
 }
 
 // FUNCTION: 0x40ba80
@@ -1759,12 +1635,6 @@ void __stdcall DumpPlayerAI(int player, void* file)
         sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->vec_65[i].a,ai->vec_65[i].b,ai->vec_65[i].c,ai->vec_ad[i].value,type->unitname,type->name);
         FilePrintf(file,buffer);
     }
-}
-
-// FUNCTION: 0x40c4f0
-int __stdcall HasSpecialUnit(int param_1)
-{
-    return *(int*)((char*)g_playerAI[param_1].get() + 0x79);
 }
 
 template class BlockVector<Ref<Unit> >;

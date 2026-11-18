@@ -246,7 +246,7 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 - orders (1): `GetOrderFlags`
 - 2 smaller targets: players (1), weapons (1)
 
-**Sim writes.** 33 items in all, 28 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
+**Sim writes.** 32 items in all, 27 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
 `SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `PlayerAI::hasSpecial` (sim); `Squad::field_8` (sim); `Squad::field_c` (sim)
 
@@ -258,7 +258,7 @@ Coverage: 88.7% of functions (94 of 106), 87.5% of lines, 81.7% of branches; 12 
 
 - Exports: 27 functions (`UpdatePlayerAI`, `SquadManager::TickIfActive`, the create, reset and destroy calls from game, `Apply` for the events of weapons, units and the engine (`docs/ai-interface.md`) and helpers other subsystems borrow: `GetFactoriesInRadius` (orders), `GetVisibleEnemiesInRadius` (orders, targeting), `IsPointVisible` (los_radar)).
 - Needs from seams: 31 functions in platform, seams, game, los_radar, economy, orders, players, weapons.
-- Owns: 23 named sim items that only this subsystem writes, for example `g_playerAI`, `SquadManager::timers`, `SquadTimer::next`, `SquadManager::player`, `g_aiCommandsEnabled`.
+- Owns: 22 named sim items that only this subsystem writes, for example `g_playerAI`, `SquadManager::timers`, `SquadTimer::next`, `SquadManager::player`, `g_aiCommandsEnabled`.
 - Shares: 5 named sim items that other subsystems also write, for example `Unit::group`.
 - It acts through other modules: effects to orders (ADD_ORDER, QUEUE_BUILD, ATTACK, STOP, HIT) and units (NOTIFY_REFS, ACTIVATE, SET_STATES), and intents to targeting. Its own sim writes are few.
 - Its read set is wide (items of `Unit`, `UnitDef`, `Player` and `Game`). A read-only view of the state block fits it better than a getter per field.

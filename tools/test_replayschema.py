@@ -1450,13 +1450,23 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn("const char* result = EnterNested(t);", answers)
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
-    def nested_annotations(self):
+    def nested_generated(self):
+        """The generator's output with a command slot CmdPlan added to ai's seam, as the Cmd slots were before #964 took them out of the interfaces."""
         ann = annotations()
         ann["subsystems"]["ai"]["slots"]["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
-        return ann
+        with tempfile.TemporaryDirectory() as d:
+            for h in rs.INTERFACES.glob("*.h"):
+                (Path(d) / h.name).write_text(h.read_text())
+            ai = Path(d) / "ai.h"
+            text = ai.read_text()
+            start = text.index("struct AiSeam {")
+            end = text.index("\n};", start)
+            ai.write_text(text[:end] + "\n    void (__stdcall* CmdPlan)(CommandArgs* args);" + text[end:])
+            with mock.patch.object(rs, "INTERFACES", Path(d)):
+                return self.generated(ann)
 
     def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
-        files, errors, model = self.generated(self.nested_annotations())
+        files, errors, model = self.nested_generated()
         self.assertEqual(errors, [])
         slots = model["subsystems"]["ai"]["slots"]
         self.assertTrue(rs.nestable("CmdPlan", slots["CmdPlan"]))
@@ -1471,7 +1481,7 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn("if (on[SUB_AI] || any)\n        s_rec_ai.CmdPlan = RecAiCmdPlan;", hooks)
 
     def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
-        _, _, model = self.generated(self.nested_annotations())
+        _, _, model = self.nested_generated()
         player = "\n".join(rs.nested_player({"ai": {"slots": {"CmdPlan": model["subsystems"]["ai"]["slots"]["CmdPlan"]}}}))
         self.assertIn("void PlayNestedCalls(const char* import)", player)
         self.assertIn('if (CallbackIs(name, "ai.CmdPlan")) {', player)

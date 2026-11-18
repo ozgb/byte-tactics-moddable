@@ -177,7 +177,7 @@ too (3.1c's direct write, kept).
 | `HasReadyUnitInRange` | ai's private state: the visible list, then the units' flags | the info panel (`UpdateSensorRadarAndCloak`), presentation only |
 | `IsPointVisible` | only los_radar's views: the player's explored size and the line of sight mask (`Game::visibilityMask`); nothing of ai | weapons' drawing (`DrawProjectiles`) and players' `IsVisible` |
 
-`IsPointVisible` reads no ai state, and none of its callers is ai: it belongs with los_radar's queries. #979 moves it,
+`IsPointVisible` reads no ai state, and none of its callers is ai: it belongs with los_radar's queries. #991 moves it,
 in the same bump of los_radar and ai. The four others read the visible
 and factory lists, which only ai writes (`UpdatePlayerAI`), so they are ai's queries, answered as of ai's last run.
 
@@ -293,8 +293,8 @@ idle. The scenario key `ai idle` installs it
 computer Core player that never moves, 3000 ticks. It is counted apart in coverage (`demo:` rows of
 `data/coverage.csv`), like the HPA* pathfinder.
 
-**Left for later.** `IsPointVisible`'s move to los_radar (section 4), ai's private region and its leaving the hash are
-#979's.
+**Left for later.** `IsPointVisible`'s move to los_radar (section 4) is #991's, with the visible and factory lists,
+their queries and REACT_TO_ATTACK's every-player part. Ai's private region and its leaving the hash are #979's.
 
 ## 8. What the gate decided
 

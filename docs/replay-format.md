@@ -84,7 +84,7 @@ never end its lines early, and a slot with no closing name has no closing `o` li
 import's `o` lines can be followed at once by closing ones:
 
 ```
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 ```
@@ -1136,7 +1136,7 @@ targeting:
 - `FindBestTargetIfFireAtWill` with a fire order of 3: `Unit.fireOrder` takes its value from `standingfireorder` of the unit's FBI at creation (the shipped units have 0, 2 or none, which is 2), from the `STANDING_FIREORDER` order (the order type `Standing_FireOrder`, whose mode the order panel gives as 0, 1 or 2 and the scenario `firestate` line limits to 0, 1 and 2), or by copy from the builder or factory (`getbuilt`). A 3 is only what the order panel shows when the selected units have different fire orders ("mixed"), and is never an order's mode. Fire order 1 is recorded: `orders-immediate`, ticks 740 to 770 only, holds the call at tick 752 (the `firestate 1` of tick 750, before `firestate 2` at 755 and `firestate 0` at 760), which returns null without an import.
 - A negative `UnitDef.range`: the unit type loader stores the key `sightdistance` in it as a signed 16-bit number and nothing writes it again, so only a value below 0 or above 32767 gives one, and the `SightDistance` of the 821 shipped `units/*.fbi` lies between 55 and 490. `FindWeaponTarget` with `useRange` 0 and `FindBestTargetIfFireAtWill` pass it to `GetVisibleEnemiesInRadius` as the radius.
 - `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
-- `ai.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `ai.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
+- `los_radar.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `los_radar.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
 
 weapons:
@@ -1191,7 +1191,7 @@ wine build/modern/replay_inject_test.exe --expect 356 pos.x tests/replay/targeti
 ```
 
 The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every
-slot, and `Apply` of every kind but SET_POS: SET_UNIT 315 times, CLEAR 1014 times, RESET 18 times; candidates from `ai.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
+slot, and `Apply` of every kind but SET_POS: SET_UNIT 315 times, CLEAR 1014 times, RESET 18 times; candidates from `los_radar.GetVisibleEnemiesInRadius`, `ChooseWeapon`),
 `orders-tier2-spider` (`Apply` of a SET_POS 8 times, and the ground positions of `GetWeaponTargetPos`), `orders-immediate`, ticks 740 to 770 only (a unit with fire order 1, 2 and 0 in turn, which searches only with 2), `edges-targeting-lead` (the whole run, 1300 ticks, listed below) and `skirmish4-long`, ticks
 25750 to 25770 only, where a unit with more than five kills fires at a moving unit (the scale of `GetWeaponTargetPos`). `console-units` (the whole run) holds a
 unit target whose `unitDefIndex` is 0, so `GetWeaponTargetPos` returns 0 and the target is cleared. `edges-economy-targeting` (the whole run, 260 ticks) holds
@@ -1232,7 +1232,7 @@ The recordings of weapons, which the modern build runs as native code in every m
 - `orders-guard-attacked`, ticks 1 to 250: two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (`units.StartScriptWithArgs` `AimPrimary`, `WeaponAimCobComplete` 39 times, `network.SendScriptCallByName`), fires (`economy.SpendEnergyAndMetal`, `services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit`, `GetWeaponRange`, `ClaimWeapons` and `ReleaseWeapons` (index 3 too) and `DamageUnit` (the repair of a unit, kind 10) are called.
 - `orders-air-fights`, ticks 100 to 260: fighters shoot at each other (the line-of-sight handler, `WeaponAimCobComplete` 22 times, `WeaponCanReachUnit`).
 - `orders-weapon-build`, ticks 700 to 780: an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
-- `combat-deaths`, ticks 850 to 1000: a solar plant and a laser tower self-destruct, `DamageUnit` with 30000 damage (`units.MarkRecentlyDamaged`, and `services.SchedPublish` of ai's `AI_REACT_TO_ATTACK` event).
+- `combat-deaths`, ticks 850 to 1000: a solar plant and a laser tower self-destruct, `DamageUnit` with 30000 damage (`units.MarkRecentlyDamaged`, and `services.SchedPublish` of weapons' `WEAPONS_EFFECT_ATTACKED` effect).
 - `mission-radius`, ticks 1640 to 1650: a missile ship fires its vertical-launch weapon at tick 1644 (`Unit#269`, `weapondef#130`, whose `WeaponFire#130.fire` is `weaponFire[1]`). The shot reads its target (`targeting.GetWeaponTargetPos`, `targeting.GetWeaponTargetUnit`), queries and starts the fire script (`units.QueryScript` `QueryPrimary`, `units.GetPieceOffset`, `units.StartScript` `FirePrimary`, `units.StartScriptWithArgs` `RockUnit`), records the sound and smoke events, pays (`economy.SpendEnergyAndMetal`) and writes the new `Projectile#4`. The window also holds a turret shot and a line-of-sight shot.
 - `long-greenhaven-8p`, tick 30518 only: a bomber drops a bomb (`Unit#1783`, `weapondef#5`, whose `WeaponFire#5.fire` is `weaponFire[3]`), the first dropped shot of the suite: it reads its target and the weapon piece, records the sound event, pays and writes `Projectile#2` with the bomber's heading. One tick of the eight-player match is 287 calls.
 

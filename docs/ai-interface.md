@@ -341,7 +341,7 @@ in both modes).
 **#991 replaced five of these routes.** #991 moved REACT_TO_ATTACK's every-player part, DAMAGE_SPLIT and the effects ATTACK,
 NOTIFY_REFS and HIT out of ai (sections 2 and 3). The routes the table names for them are now weapons' routes: the
 effect ATTACKED to units' notice, the engine's adapter of ai's REACT_TO_ATTACK, orders' return fire and units' speech, and the effect HIT to
-orders, all synchronous, as the ai routes were. GATE-RESULT-TODO
+orders, all synchronous, as the ai routes were. The tier gate with both module modes plays them equal: `76 of 76 scenarios equal`, sound, UI, event, frame and save logs equal in each mode.
 
 **How often each route is taken.** A build that counts every publish into and out of ai, over the 89 scenarios with
 native modules (all 89 equal to the reference): the events published inside the tick and outside it (when a game is

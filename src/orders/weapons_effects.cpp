@@ -1,10 +1,6 @@
 #include <stddef.h>
-#include "win_types.h"
-#include "../state/block.h"
-#include "../state/block_vector.h"
 
 #pragma pack(push, 1)
-#include "../util/vec3.h"
 #include "../units/unit_type_set.h"
 #include "../weapons/weapon_def.h"
 #include "../weapons/unit_weapon_slot.h"

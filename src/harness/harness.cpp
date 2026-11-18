@@ -54,6 +54,7 @@
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
 #include "../ai/ai_idle.h"
+#include "../state/block_vector.h"
 #include "../map/line_of_sight_index.h"
 #include "../units/factory_index.h"
 #include "../game/match_setup.h"
@@ -4078,16 +4079,16 @@ static void VisitPlayerAI()
         const BlockVector<Ref<Unit> >* factoryList = FactoryIndexOf((int)i);
         unsigned char view[0x10d];
         memcpy(view, (const unsigned char*)ai, sizeof view);
-        int hasSpecial = los != NULL ? los->hasSpecial : 0;
+        int hasSpecial = los != nullptr ? los->hasSpecial : 0;
         memcpy(view + 0x79, &hasSpecial, sizeof hasSpecial);
         FormatPath(path, "players[%u].ai", i);
         VisitElement(path, view, &kPlayerAITable);
         FormatPath(path, "players[%u].ai.visible", i);
-        VisitUnitVector(path, los != NULL ? (unsigned)&los->visible : (unsigned)emptyVector);
+        VisitUnitVector(path, los != nullptr ? (unsigned)&los->visible : (unsigned)emptyVector);
         FormatPath(path, "players[%u].ai.known", i);
-        VisitUnitVector(path, los != NULL ? (unsigned)&los->known : (unsigned)emptyVector);
+        VisitUnitVector(path, los != nullptr ? (unsigned)&los->known : (unsigned)emptyVector);
         FormatPath(path, "players[%u].ai.factories", i);
-        VisitUnitVector(path, factoryList != NULL ? (unsigned)factoryList : (unsigned)emptyVector);
+        VisitUnitVector(path, factoryList != nullptr ? (unsigned)factoryList : (unsigned)emptyVector);
         for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
             FormatPath(path, "players[%u].ai.%s", i, vectors[v].name);
             VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);

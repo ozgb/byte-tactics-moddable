@@ -1,8 +1,8 @@
-#include "win_types.h"
 #include <vector>
 #include <new>
 #include "../state/block.h"
 #include "../state/block_vector.h"
+#include "../../interfaces/ref.h"
 
 #include "../util/vec3.h"
 
@@ -65,7 +65,7 @@ void __stdcall RefreshFactoryIndex(int player)
         return;
     entry.factories.Clear();
     Player* owner = &g_game->players[player];
-    for (Unit* u = g_game->units + 1; u <= g_game->unitsEnd; ++u) {
+    for (Unit* u = g_game->units + 1; u != nullptr && u <= g_game->unitsEnd; ++u) {
         if (u->Ready()) {
             if (!owner->allied[u->PlayerIndex()]) {
             } else if (u->PlayerIndex() == owner->index && u->buildLeft == 0.0) {

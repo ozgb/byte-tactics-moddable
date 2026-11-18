@@ -867,6 +867,8 @@ LOS_RADAR_HEADER = """struct LosRadarSeam {
     Cell* (__stdcall* GetMapCell)(int x, int y);
     void (__stdcall* ClampWorldPosToTerrain)(int x, int y, Vec3* out);
     int (__stdcall* IsUnitVisibleToPlayer)(Player* player, Unit* unit);
+    bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
+    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
     void (__stdcall* UpdateUnitLineOfSight)(Unit* unit);
     void (__stdcall* RecordRadarUnits)(void);
     void (__stdcall* LoadTntMap)(void);
@@ -874,10 +876,12 @@ LOS_RADAR_HEADER = """struct LosRadarSeam {
 };
 """
 LOS_RADAR_FILLERS = {"Apply": "LrApply", "GetMapCell": "LrCell", "ClampWorldPosToTerrain": "LrClamp", "IsUnitVisibleToPlayer": "LrVisible",
+                     "HasReadyUnitInRange": "(bool (__stdcall *)(int, Vec3 *, int))LrReady", "GetVisibleEnemiesInRadiusList": "LrList",
                      "UpdateUnitLineOfSight": "LrUpdate", "RecordRadarUnits": "LrRecord", "LoadTntMap": "LrLoad", "FreeRadar": "LrFree"}
 LOS_RADAR_PILOT = dataclasses.replace(
     seamlink.LOS_RADAR, writing=("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits"),
-    query=("GetMapCell", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer"), setup=("LoadTntMap", "FreeRadar"),
+    query=("GetMapCell", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer", "HasReadyUnitInRange", "GetVisibleEnemiesInRadiusList"),
+    setup=("LoadTntMap", "FreeRadar"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),))
 
 
@@ -893,11 +897,14 @@ LrCell,src/map/line_of_sight.cpp,los_radar,x,
 LrClamp,src/map/line_of_sight.cpp,los_radar,x,
 LrVisible,src/game/players.cpp,los_radar,x,
 LrHelp,src/map/line_of_sight.cpp,los_radar,x,
+LrReady,src/map/line_of_sight_index.cpp,los_radar,x,
+LrList,src/map/line_of_sight_index.cpp,los_radar,x,
 """
 
     def check(self, rows, header=LOS_RADAR_HEADER, fillers=None):
         fillers = LOS_RADAR_FILLERS if fillers is None else fillers
-        rows = [(f, "src/map/line_of_sight.cpp", "function", "") for f in ("LrCell", "LrClamp", "LrVisible")] + list(rows)
+        rows = [(f, "src/map/line_of_sight.cpp", "function", "") for f in ("LrCell", "LrClamp", "LrVisible")] + \
+               [(f, "src/map/line_of_sight_index.cpp", "function", "") for f in ("LrReady", "LrList")] + list(rows)
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             (root / "data").mkdir()
@@ -920,8 +927,8 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
     def test_the_pilots_table_lists_los_radar_before_map(self):
         self.assertEqual(seamlink.PILOTS[-4].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
-                                                     "RecordRadarMapped", "ExpireEyeballs"))
-        self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"))
+                                                     "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex"))
+        self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"))
         header = seamlink.ROOT / "interfaces/los_radar.h"
         if header.exists():
             pilot = seamlink.LOS_RADAR
@@ -960,8 +967,16 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
                 ("LrVisible", "src/game/players.cpp", "field_maybe_written", "<anon>::words"),
                 ("LrVisible", "src/game/players.cpp", "call", "get"),
                 ("LrVisible", "src/game/players.cpp", "call", "IsVisible"),
-                ("IsVisible", "src/game/players.cpp", "indirect_call", self.slot("IsPointVisible", "AiSeam"))]
+                ("IsVisible", "src/game/players.cpp", "indirect_call", self.slot("IsPointVisible"))]
         self.assertEqual(self.check(rows), [])
+
+    def test_a_query_may_fill_its_out_list_but_write_nothing_else(self):
+        rows = [("LrList", "src/map/line_of_sight_index.cpp", "deref_write", "*Ref<Unit>"),
+                ("LrReady", "src/map/line_of_sight_index.cpp", "call", "empty"),
+                ("LrReady", "src/map/line_of_sight_index.cpp", "call", "BlockVector::Begin")]
+        self.assertEqual(self.check(rows), [])
+        found = self.check(rows + [("LrReady", "src/map/line_of_sight_index.cpp", "global_write", "s_index")])
+        self.assertEqual([f[:3] for f in found], [("query", "los_radar", "LrReady")])
 
     def test_a_query_slot_that_writes_or_calls_a_slot_is_found(self):
         found = self.check([("LrCell", "src/map/line_of_sight.cpp", "field_write", "Cell::feature"),
@@ -1180,20 +1195,16 @@ PlBlink,src/game/players.cpp,players,x,
 AI_HEADER = """struct AiSeam {
     int (__stdcall* Apply)(const AiEvent* event);
     void (__stdcall* UpdateSquads)(int player);
-    bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
-    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
     void (__stdcall* CreateSquads)(Player* player);
 };
 """
 AI_NATIVE = """static AiSeam s_ai;
 s_ai.Apply = AiApply;
-s_ai.UpdateSquads = UpdateSquadsNative;
-s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
-s_ai.GetVisibleEnemiesInRadiusList = ListNative;
+s_ai.UpdateSquads = (void (__stdcall *)(int))UpdateSquadsNative;
 s_ai.CreateSquads = CreateSquads;
 """
 AI_PILOT = dataclasses.replace(
-    seamlink.AI, writing=("Apply", "UpdateSquads"), query=("HasReadyUnitInRange", "GetVisibleEnemiesInRadiusList"), setup=("CreateSquads",),
+    seamlink.AI, writing=("Apply", "UpdateSquads"), query=(), setup=("CreateSquads",),
     setup_callers=(("InitPlayerSlot", "src/game/players.cpp"),))
 
 
@@ -1204,12 +1215,11 @@ Move,src/units/unit_position.cpp,units,x,
 InitPlayerSlot,src/game/players.cpp,players,x,
 Other,src/game/console_commands.cpp,game,x,
 AiApply,src/ai/ai_player.cpp,ai,x,
-HasReadyUnitInRange,src/ai/ai_player.cpp,ai,x,
-ListNative,src/seams/native.cpp,seams,x,
+UpdateSquadsNative,src/seams/native.cpp,seams,x,
 """
 
     def check(self, rows, native=AI_NATIVE):
-        rows = [("HasReadyUnitInRange", "src/ai/ai_player.cpp", "function", ""), ("ListNative", "src/seams/native.cpp", "function", "")] + rows
+        rows = [("UpdateSquadsNative", "src/seams/native.cpp", "function", "")] + rows
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             (root / "data").mkdir()
@@ -1249,14 +1259,6 @@ ListNative,src/seams/native.cpp,seams,x,
                 ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("CreateSquads"))]
         self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other")])
 
-    def test_a_query_may_fill_its_out_list_and_its_cache_but_write_nothing_else(self):
-        rows = [("ListNative", "src/seams/native.cpp", "deref_write", "*Ref<Unit>"),
-                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "field_maybe_written", "AiUnitList::units"),
-                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "call", "empty"),
-                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "call", "BlockVector::Begin")]
-        self.assertEqual(self.check(rows), [])
-        found = self.check(rows + [("HasReadyUnitInRange", "src/ai/ai_player.cpp", "global_write", "g_playerAI")])
-        self.assertEqual([f[:3] for f in found], [("query", "ai", "HasReadyUnitInRange")])
 
 
 if __name__ == "__main__":

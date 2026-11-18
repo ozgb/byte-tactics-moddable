@@ -32,6 +32,8 @@
 #include "los_radar_results.h"
 #include "map_results.h"
 #include "players_results.h"
+#include "ai_results.h"
+#include "../game/ai_events.h"
 #include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
@@ -51,6 +53,7 @@
 #include "harness.h"
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
+#include "../ai/ai_idle.h"
 #include "../game/match_setup.h"
 #include "share_packets.h"
 
@@ -142,6 +145,8 @@ static char s_switchQuirks[512];
 static char s_quirkSpec[512] = "3.1c";
 static unsigned s_quirkHash = 0;
 static int s_pathfinderHpa = 0;
+static int s_aiIdle = 0;
+static int s_aiLine = 0;
 static MatchSetup s_matchSetup;
 static int s_pathfinderLine = 0;
 static unsigned s_quirkTamperTick = 0;
@@ -931,6 +936,14 @@ static void ReadKey(int lineNo, const char* key, char* value)
         else if (strcmp(value, "default") != 0)
             FailLine(lineNo, "must be default or hpa", key, "");
         s_pathfinderLine = lineNo;
+    } else if (strcmp(key, "ai") == 0) {
+        if (s_aiLine != 0)
+            FailLine(lineNo, "is a second ai line", key, "");
+        if (strcmp(value, "idle") == 0)
+            s_aiIdle = 1;
+        else if (strcmp(value, "default") != 0)
+            FailLine(lineNo, "must be default or idle", key, "");
+        s_aiLine = lineNo;
     } else if (strcmp(key, "quirks_tamper") == 0) {
         s_quirkTamperTick = ParseNumber(lineNo, key, value);
         s_quirkTamper = 1;
@@ -1659,6 +1672,8 @@ void HarnessInit(char* cmdLine)
     ResolveQuirks();
     if (s_pathfinderHpa)
         g_seams.pathfinding = PathfindingHpaSeam();
+    if (s_aiIdle)
+        g_seams.ai = AiIdleSeam(g_seams.ai);
     ReplayInstall();
     s_viewState = s_viewSeed;
 
@@ -2899,6 +2914,7 @@ static void VisitModuleState()
     s_writerOpen = 0;
     g_seams.pathfinding->WriteState(&s_stateWriter);
     g_seams.economy->WriteState(&s_stateWriter);
+    g_seams.ai->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -3344,6 +3360,72 @@ static void VisitPlayersResults()
         DumpPrefix(path);
         DumpHexBytes(e->stockpiles, sizeof e->stockpiles);
         sprintf(path, "playersEvents[%u].outcome", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    }
+}
+
+static AiResults s_aiResults;
+static bool s_aiResultsLost;
+
+void __stdcall HarnessAiEvent(const AiEvent* event, int outcome)
+{
+    if (!HarnessTestMode() || s_trace == nullptr)
+        return;
+    if (!AiResultsAdd(&s_aiResults, event, outcome))
+        s_aiResultsLost = true;
+}
+
+static void VisitAiResults()
+{
+    if (s_aiResultsLost)
+        Fail("testmode: no memory for the ai events\n");
+    for (unsigned k = 0; k < s_aiResults.count; k++) {
+        AiResult* r = &s_aiResults.items[k];
+        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
+        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
+    }
+    if (!s_dumpNow)
+        return;
+    char path[64];
+    DumpPrefix("aiEvents.count");
+    fprintf(s_dump, "0x%08x\n", s_aiResults.count);
+    for (unsigned k = 0; k < s_aiResults.count; k++) {
+        const AiResult* r = &s_aiResults.items[k];
+        const AiEvent* e = &r->event;
+        sprintf(path, "aiEvents[%u].kind", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
+        sprintf(path, "aiEvents[%u].unit", k);
+        DumpPrefix(path);
+        DumpUnitName(r->unitTag, r->unitId);
+        sprintf(path, "aiEvents[%u].target", k);
+        DumpPrefix(path);
+        DumpUnitName(r->targetTag, r->targetId);
+        sprintf(path, "aiEvents[%u].value", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
+        sprintf(path, "aiEvents[%u].extra", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->extra);
+        sprintf(path, "aiEvents[%u].params", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->params, sizeof e->params);
+        sprintf(path, "aiEvents[%u].hasPos", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->hasPos);
+        sprintf(path, "aiEvents[%u].pos", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->pos, sizeof e->pos);
+        sprintf(path, "aiEvents[%u].scale", k);
+        DumpPrefix(path);
+        unsigned scaleBits;
+        memcpy(&scaleBits, &e->scale, sizeof scaleBits);
+        fprintf(s_dump, "0x%08x\n", scaleBits);
+        sprintf(path, "aiEvents[%u].types", k);
+        DumpPrefix(path);
+        DumpHexBytes(e->types, sizeof e->types);
+        sprintf(path, "aiEvents[%u].outcome", k);
         DumpPrefix(path);
         fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
     }
@@ -4303,6 +4385,7 @@ static void VisitWorld()
     VisitLosRadarResults();
     VisitMapResults();
     VisitPlayersResults();
+    VisitAiResults();
 }
 
 enum {
@@ -4583,7 +4666,7 @@ static void ReachQuirkGuard()
                 unsigned char* u = PoolUnit(i);
                 if (*(unsigned short*)(u + UNIT_TYPE) == 0 || !UnitIsSlot(u, slot))
                     continue;
-                g_seams.ai->SetUnitSquad((Unit*)u, SQUAD_SCOUT);
+                AiPublishSetSquad(SCHED_ENGINE, (Unit*)u, SQUAD_SCOUT);
                 memset(ai + AI_CENTRE, 0, AI_CENTRE_SIZE);
                 void* timer = (void*)ReadRefAt(manager, MANAGER_TIMERS + MANAGER_SCOUT_TIMER * 4);
                 void (__thiscall* onTimer)(void*) = (void (__thiscall*)(void*))(*(void***)timer)[0];
@@ -4996,6 +5079,7 @@ void HarnessPhase(int phase)
         LosRadarResultsClear(&s_losRadarResults);
         MapResultsClear(&s_mapResults);
         PlayersResultsClear(&s_playersResults);
+        AiResultsClear(&s_aiResults);
         WindMeteorsResultsClear(&s_windMeteorsResults);
         fflush(s_trace);
         if (s_sound != nullptr)
@@ -5061,6 +5145,8 @@ static void OpenTrace(unsigned controlWord)
         fprintf(s_trace, "quirks %08x %s\n", s_quirkHash, s_quirkSpec);
     if (s_pathfinderHpa)
         fprintf(s_trace, "pathfinder hpa\n");
+    if (s_aiIdle)
+        fprintf(s_trace, "ai idle\n");
     if (s_matchSetup.blockBytes != 0)
         fprintf(s_trace, "block_bytes %u\n", s_matchSetup.blockBytes);
     if (s_matchSetup.searchSteps != 0)

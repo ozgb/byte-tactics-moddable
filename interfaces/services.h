@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 17
+#define SERVICES_VERSION_MINOR 18
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -62,6 +62,9 @@ void __stdcall HarnessMapEvent(const MapEvent* event, int outcome);
 struct PlayersEvent;
 // In test mode, records a players event as players consumes it, or an effect as players publishes it, with its outcome, for the dump's players events.
 void __stdcall HarnessPlayersEvent(const PlayersEvent* event, int outcome);
+struct AiEvent;
+// In test mode, records an ai event as ai consumes it, or an effect as ai publishes it, with its outcome, for the dump's ai events.
+void __stdcall HarnessAiEvent(const AiEvent* event, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.

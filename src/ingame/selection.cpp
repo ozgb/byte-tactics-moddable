@@ -824,7 +824,8 @@ done:
     (*(Orders_37ebe*)&g_game->ordersPanelFlags_37ebe).flags |= flag;
 }
 
-#include "../units/squads.h"
+#include "../../interfaces/services.h"
+#include "../game/ai_events.h"
 
 // FUNCTION: 0x48d920
 void __stdcall CreateSquad(int group)
@@ -833,9 +834,9 @@ void __stdcall CreateSquad(int group)
     for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
         if (u->unitDefIndex != 0) {
             if (u->selected) {
-                SetUnitSquad(u, group);
+                AiPublishSetSquad(SCHED_ENGINE, u, group);
             } else if (u->group == group) {
-                SetUnitSquad(u, 0);
+                AiPublishSetSquad(SCHED_ENGINE, u, 0);
             }
         }
     }

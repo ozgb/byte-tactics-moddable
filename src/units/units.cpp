@@ -145,6 +145,7 @@ void __stdcall ClampPositionToMap(ClampedPos* p)
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
 #include "../game/players_events.h"
+#include "../game/ai_events.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/players.h"
 #include <xutility>
@@ -382,7 +383,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     EconPublish(SCHED_UNITS, ECONOMY_RESET, unit->playerIndex, EconHandleOf(unit), 0, 0, 0);
     unit->transportPiece = 0xff;
     unit->hoverBobPhase = (short)RandomInt(0x10000);
-    g_seams.ai->SetUnitSquad(unit, 0);
+    AiPublishSetSquad(SCHED_UNITS, unit, 0);
 }
 
 struct SpotStateUnitView {
@@ -711,7 +712,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     PlayersPublishUnit(SCHED_UNITS, PLAYERS_UNIT_DIED, unit);
     g_seams.orders->DeleteOrders(unit, 1);
     RecordRemoveUnitSpeech(unit);
-    g_seams.ai->SetUnitSquad(unit, -1);
+    AiPublishSetSquad(SCHED_UNITS, unit, -1);
     g_seams.weapons->RemoveUnitProjectiles(unit);
     if (unit->carrier != 0)
         AttachUnitToPiece(unit, 0, -1, 1);

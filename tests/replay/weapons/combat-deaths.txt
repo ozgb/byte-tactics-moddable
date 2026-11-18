@@ -8962,7 +8962,7 @@ call 857 DamageUnit
   a type 3
   a extra 0
   i units.MarkRecentlyDamaged Unit#2
-  i ai.ReactToAttack Unit#2 Unit#2 30000
+  i services.SchedPublish 6 112
   i services.RecordSimEvent 12 0 [1,0,0] 3
   w Unit#2.health -29930
   w Unit#2.flags 0x30286321
@@ -12419,7 +12419,7 @@ call 964 DamageUnit
   a type 3
   a extra 0
   i units.MarkRecentlyDamaged Unit#3
-  i ai.ReactToAttack Unit#3 Unit#3 30000
+  i services.SchedPublish 6 112
   i services.RecordSimEvent 12 0 [1,0,0] 3
   w Unit#3.health -29250
   w Unit#3.flags 0xb0286321

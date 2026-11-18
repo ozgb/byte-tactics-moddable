@@ -20,6 +20,10 @@
 #include "../../interfaces/players.h"
 #include "../seams/players_world.h"
 #include "../units/players_effects.h"
+#include "../../interfaces/ai.h"
+#include "../seams/ai_world.h"
+#include "../orders/ai_effects.h"
+#include "../units/ai_effects.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -52,6 +56,21 @@ static const SchedRoute s_routes[] = {
     {SCHED_PLAYERS, PLAYERS_EFFECT_KILL_UNIT, SCHED_UNITS, UnitsOnPlayersKillUnit, 1},
     {SCHED_PLAYERS, PLAYERS_EFFECT_SEND_UNIT, SCHED_UNITS, UnitsOnPlayersSendUnit, 1},
     {SCHED_PLAYERS, PLAYERS_EFFECT_CAPTURE_UNIT, SCHED_UNITS, UnitsOnPlayersCaptureUnit, 1},
+    {SCHED_WEAPONS, AI_REACT_TO_ATTACK, SCHED_AI, AiInbox, 1},
+    {SCHED_WEAPONS, AI_DAMAGE_SPLIT, SCHED_AI, AiInbox, 1},
+    {SCHED_UNITS, AI_SET_SQUAD, SCHED_AI, AiInbox, 1},
+    {SCHED_ENGINE, AI_SET_SQUAD, SCHED_AI, AiInbox, 0},
+    {SCHED_ENGINE, AI_PLAN, SCHED_AI, AiInbox, 0},
+    {SCHED_ENGINE, AI_WEIGHT, SCHED_AI, AiInbox, 0},
+    {SCHED_ENGINE, AI_LIMIT, SCHED_AI, AiInbox, 0},
+    {SCHED_AI, AI_EFFECT_ADD_ORDER, SCHED_ORDERS, OrdersOnAiAddOrder, 1},
+    {SCHED_AI, AI_EFFECT_QUEUE_BUILD, SCHED_ORDERS, OrdersOnAiQueueBuild, 1},
+    {SCHED_AI, AI_EFFECT_ATTACK, SCHED_ORDERS, OrdersOnAiAttack, 1},
+    {SCHED_AI, AI_EFFECT_STOP, SCHED_ORDERS, OrdersOnAiStop, 1},
+    {SCHED_AI, AI_EFFECT_HIT, SCHED_ORDERS, OrdersOnAiHit, 1},
+    {SCHED_AI, AI_EFFECT_NOTIFY_REFS, SCHED_UNITS, UnitsOnAiNotifyRefs, 1},
+    {SCHED_AI, AI_EFFECT_ACTIVATE, SCHED_UNITS, UnitsOnAiActivate, 1},
+    {SCHED_AI, AI_EFFECT_SET_STATES, SCHED_UNITS, UnitsOnAiSetStates, 1},
     {SCHED_UNITS, FEATURES_PLACE, SCHED_FEATURES, FeaturesInbox, 1},
     {SCHED_ORDERS, FEATURES_RECLAIM, SCHED_FEATURES, FeaturesInbox, 1},
     {SCHED_ORDERS, FEATURES_REMOVE, SCHED_FEATURES, FeaturesInbox, 1},

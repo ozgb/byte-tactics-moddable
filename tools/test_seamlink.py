@@ -517,6 +517,10 @@ Help,src/game/economy.cpp,economy,x,
 
     def test_a_call_without_rows_behind_a_query_is_found(self):
         self.assertEqual(self.check([("Account", "src/game/economy.cpp", "call", "operator=")]), [])
+        found = self.check([("Gate", "src/game/economy.cpp", "call", "push_back"), ("Account", "src/game/economy.cpp", "call", "operator[]")])
+        self.assertEqual([(f[2], f[3]) for f in found],
+                         [("operator[]", "EconomySeam::UnitAccount calls operator[], which data/rwsets.csv has no rows for"),
+                          ("push_back", "EconomySeam::RequestGranted calls push_back, which data/rwsets.csv has no rows for")])
         found = self.check([("Gate", "src/game/economy.cpp", "call", "memset"), ("Use", "src/game/economy.cpp", "asm", "inline")])
         self.assertEqual([(f[2], f[3]) for f in found],
                          [("Use", "EconomySeam::GetEnergyUse has inline assembly"),
@@ -683,7 +687,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players"])
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -809,7 +813,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
-        self.assertEqual(seamlink.PILOTS[-4].owner, "targeting")
+        self.assertEqual(seamlink.PILOTS[-5].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -914,7 +918,7 @@ LrHelp,src/map/line_of_sight.cpp,los_radar,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_los_radar_before_map(self):
-        self.assertEqual(seamlink.PILOTS[-3].owner, "los_radar")
+        self.assertEqual(seamlink.PILOTS[-4].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources"))
@@ -1033,7 +1037,7 @@ MpHelp,src/map/terrain.cpp,map,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_map_before_players(self):
-        self.assertEqual(seamlink.PILOTS[-2].owner, "map")
+        self.assertEqual(seamlink.PILOTS[-3].owner, "map")
         self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"))
         header = seamlink.ROOT / "interfaces/map.h"
         if header.exists():
@@ -1137,8 +1141,8 @@ PlBlink,src/game/players.cpp,players,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_players_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "players")
+    def test_the_pilots_table_lists_players_before_ai(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "players")
         self.assertEqual(seamlink.PLAYERS.writing, ("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
                                                     "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink"))
         self.assertEqual(seamlink.PLAYERS.query, ())
@@ -1171,6 +1175,88 @@ PlBlink,src/game/players.cpp,players,x,
         header = PLAYERS_HEADER.replace("    int (__stdcall* Apply)", "    void (__stdcall* Debug)(int x);\n    int (__stdcall* Apply)")
         found = self.check([], header=header, fillers={k: v for k, v in PLAYERS_FILLERS.items() if k != "InitPlayers"})
         self.assertEqual([(f[0], f[2]) for f in found], [("slot", "Debug"), ("slot", "InitPlayers")])
+
+
+AI_HEADER = """struct AiSeam {
+    int (__stdcall* Apply)(const AiEvent* event);
+    void (__stdcall* UpdateSquads)(int player);
+    bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
+    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
+    void (__stdcall* CreateSquads)(Player* player);
+};
+"""
+AI_NATIVE = """static AiSeam s_ai;
+s_ai.Apply = AiApply;
+s_ai.UpdateSquads = UpdateSquadsNative;
+s_ai.HasReadyUnitInRange = (bool (__stdcall *)(int, Vec3 *, int))HasReadyUnitInRange;
+s_ai.GetVisibleEnemiesInRadiusList = ListNative;
+s_ai.CreateSquads = CreateSquads;
+"""
+AI_PILOT = dataclasses.replace(
+    seamlink.AI, writing=("Apply", "UpdateSquads"), query=("HasReadyUnitInRange", "GetVisibleEnemiesInRadiusList"), setup=("CreateSquads",),
+    setup_callers=(("InitPlayerSlot", "src/game/players.cpp"),))
+
+
+class AiPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Move,src/units/unit_position.cpp,units,x,
+InitPlayerSlot,src/game/players.cpp,players,x,
+Other,src/game/console_commands.cpp,game,x,
+AiApply,src/ai/ai_player.cpp,ai,x,
+HasReadyUnitInRange,src/ai/ai_player.cpp,ai,x,
+ListNative,src/seams/native.cpp,seams,x,
+"""
+
+    def check(self, rows, native=AI_NATIVE):
+        rows = [("HasReadyUnitInRange", "src/ai/ai_player.cpp", "function", ""), ("ListNative", "src/seams/native.cpp", "function", "")] + rows
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(native)
+            (root / "interfaces/ai.h").write_text(AI_HEADER)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, AI_PILOT)
+
+    def slot(self, name):
+        return f"indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::{name}]"
+
+    def test_the_tree_as_given_passes_with_a_cast_on_a_filler(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_ai_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "ai")
+        self.assertEqual(seamlink.AI.writing, ("Apply", "UpdateSquads", "UpdatePlayerAI"))
+        self.assertEqual(seamlink.AI.engine_functions, ())
+        header = seamlink.ROOT / "interfaces/ai.h"
+        if header.exists():
+            pilot = seamlink.AI
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "AiSeam")))
+
+    def test_only_the_engine_and_ai_call_a_writing_slot(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateSquads")),
+                ("AiInbox", "src/seams/ai_world.cpp", "indirect_call", self.slot("Apply")),
+                ("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("UpdateSquads")),
+                ("Other", "src/game/console_commands.cpp", "field_read", "AiSeam::Apply")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("call", "game", "Other"), ("call", "units", "Move")])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("InitPlayerSlot", "src/game/players.cpp", "indirect_call", self.slot("CreateSquads")),
+                ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("CreateSquads"))]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other")])
+
+    def test_a_query_may_fill_its_out_list_and_its_cache_but_write_nothing_else(self):
+        rows = [("ListNative", "src/seams/native.cpp", "deref_write", "*Ref<Unit>"),
+                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "field_maybe_written", "AiUnitList::units"),
+                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "call", "empty"),
+                ("HasReadyUnitInRange", "src/ai/ai_player.cpp", "call", "BlockVector::Begin")]
+        self.assertEqual(self.check(rows), [])
+        found = self.check(rows + [("HasReadyUnitInRange", "src/ai/ai_player.cpp", "global_write", "g_playerAI")])
+        self.assertEqual([f[:3] for f in found], [("query", "ai", "HasReadyUnitInRange")])
 
 
 if __name__ == "__main__":

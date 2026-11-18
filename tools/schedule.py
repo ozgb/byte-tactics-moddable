@@ -876,27 +876,38 @@ class Effects:
     def __init__(self, program: Program):
         self.program = program
         self.memo: dict[str, tuple[bool, set]] = {}
+        self.local: dict[str, tuple[bool, list]] = {}
 
-    def reach(self, slot: str, stack: tuple = ()) -> tuple[bool, set]:
+    def own(self, slot: str) -> tuple[bool, list]:
+        """(effects, slots): whether the entry point itself writes state, draws or emits; and the entry points it calls."""
+        if slot not in self.local:
+            steps, own = self.program.entry(slot)
+            writes = any(state_write(i) for i in self.program.items_of(own))
+            called = []
+            for n in steps:
+                if n.kind == "effect":
+                    writes = True
+                elif n.kind == "direct":
+                    writes = writes or any(state_write(i) for f in self.program.lookup(n.label) if f.sub == n.sub
+                                           for i in f.items)
+                elif n.kind == "entry":
+                    called.append(n.slot)
+            self.local[slot] = (writes, called)
+        return self.local[slot]
+
+    def reach(self, slot: str) -> tuple[bool, set]:
         """(effects, slots): whether the entry point, or one it calls, writes state, draws or emits; and the slots it reaches."""
-        if slot in self.memo:
-            return self.memo[slot]
-        steps, own = self.program.entry(slot)
-        writes = any(state_write(i) for i in self.program.items_of(own))
-        slots = {slot}
-        for n in steps:
-            if n.kind == "effect":
-                writes = True
-            elif n.kind == "direct":
-                writes = writes or any(state_write(i) for f in self.program.lookup(n.label) if f.sub == n.sub
-                                       for i in f.items)
-            elif n.kind == "entry" and n.slot not in stack and n.slot != slot:
-                w, s = self.reach(n.slot, stack + (slot,))
+        if slot not in self.memo:
+            writes, slots, todo = False, {slot}, [slot]
+            while todo:
+                w, called = self.own(todo.pop())
                 writes = writes or w
-                slots |= s
-        if not stack:
+                for s in called:
+                    if s not in slots:
+                        slots.add(s)
+                        todo.append(s)
             self.memo[slot] = (writes, slots)
-        return writes, slots
+        return self.memo[slot]
 
     def view(self, slot: str) -> bool:
         """An entry point that only reads data: one function besides the seam wrapper, without branches or calls out."""

@@ -11,7 +11,7 @@ record for each economy event (section 33), with the account that only a LOAD ad
 is the record for each resource share packet the step sends (section 35); its "features" entry is the
 record for each features event (section 36); its "windMeteors" entry is the record for each wind_meteors
 event consumed or effect published (section 37), the kind and then the record's bytes after it; its "targeting" entry is the
-record for each targeting event or effect (section 38); its "los_radar" entry is the record for each los_radar event (section 39); its "map" entry is the record for each map event or effect (section 40); its "playersEvents" entry is the record for each players event or effect (section 41). No row hashes any of them.
+record for each targeting event or effect (section 38); its "los_radar" entry is the record for each los_radar event (section 39); its "map" entry is the record for each map event or effect (section 40); its "playersEvents" entry is the record for each players event or effect (section 41); its "aiEvents" entry is the record for each ai event consumed or effect published (section 42). No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -998,6 +998,20 @@ PLAYERS_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("stockpiles", 3, "bytes", None),
     ("outcome", 4, "scalar", None),
 ]
+AI_EVENTS_SECTION = 42
+AI_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
+    ("kind", 4, "scalar", None),
+    ("unit", 4, "ref", "unit"),
+    ("target", 4, "ref", "unit"),
+    ("value", 4, "scalar", None),
+    ("extra", 4, "scalar", None),
+    ("params", 8, "bytes", None),
+    ("hasPos", 4, "scalar", None),
+    ("pos", 12, "bytes", None),
+    ("scale", 4, "scalar", None),
+    ("types", 64, "bytes", None),
+    ("outcome", 4, "scalar", None),
+]
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1430,6 +1444,11 @@ def render_json(model):
     out.append('  "playersEvents": {')
     out.append('    "section": %d,' % players_events["section"])
     out.append('    "fields": %s' % many(players_events["fields"], "    "))
+    out.append("  },")
+    ai_events = model["aiEvents"]
+    out.append('  "aiEvents": {')
+    out.append('    "section": %d,' % ai_events["section"])
+    out.append('    "fields": %s' % many(ai_events["fields"], "    "))
     out.append("  }")
     out.append("}")
     return "\n".join(out) + "\n"
@@ -1615,6 +1634,9 @@ def generate():
     model["playersEvents"] = {"section": PLAYERS_EVENTS_SECTION,
                               "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                          for n, size, kind, target in PLAYERS_EVENTS_FIELDS]}
+    model["aiEvents"] = {"section": AI_EVENTS_SECTION,
+                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
+                                    for n, size, kind, target in AI_EVENTS_FIELDS]}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

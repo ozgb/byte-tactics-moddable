@@ -1703,5 +1703,21 @@
       {"name": "stockpiles", "size": 3, "kind": "bytes", "target": null},
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ]
+  },
+  "aiEvents": {
+    "section": 42,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "value", "size": 4, "kind": "scalar", "target": null},
+      {"name": "extra", "size": 4, "kind": "scalar", "target": null},
+      {"name": "params", "size": 8, "kind": "bytes", "target": null},
+      {"name": "hasPos", "size": 4, "kind": "scalar", "target": null},
+      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
+      {"name": "scale", "size": 4, "kind": "scalar", "target": null},
+      {"name": "types", "size": 64, "kind": "bytes", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

@@ -1,6 +1,6 @@
 pass,stream,subsystem,function,entities,draws_min,draws_max,ticks,start_state,evidence,example
 features,rng.crtHoldrand,features,UpdateFeatureSpot,56,2,2,6574,fixed,,ui-keys@99
-features,rng.parkMiller,ai,ReactToAttack,1,1,1,1,fixed,,orders-guard-attacked@270
+features,rng.parkMiller,ai,AiApply,1,1,1,1,fixed,,orders-guard-attacked@270
 features,rng.parkMiller,features,SpreadFire,2,1,8,157,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:image;SimEventsCreate: GameAllocIgnoreTag SimEventQueue,edges-targeting-lead@261
 features,rng.parkMiller,features,StartFeatureBurning,2,1,5,118,depends-on-earlier,FeatureAnimEntry::bytes_10;FeatureAnimEntry::state;unresolved:image;SimEventsCreate: GameAllocIgnoreTag SimEventQueue,edges-targeting-lead@261
 features.anim,rng.parkMiller,features,ScanFeatureCell,1,1,1,5864,fixed,,duel-great-divide@4
@@ -14,10 +14,10 @@ players,rng.parkMiller,ai,PlayerAI::FindRandomPlacementCell,5,3,938,1737,depends
 players,rng.parkMiller,ai,ScoutTimer::OnTimer,1,1,1,19,fixed,,long-greenhaven-8p@12420
 players,rng.parkMiller,ai,UpdatePlayerAI,10,1,1,12428,fixed,,ai-antinuke-intercept@30
 players,rng.parkMiller,targeting,FindWeaponTarget,3,1,250,1735,depends-on-earlier,unresolved:image;SquadManager::cursor;SquadManager::countdown;g_allocSerial,edges-economy-targeting@31
-projectiles,rng.parkMiller,ai,ReactToAttack,5,1,1,820,fixed,,edges-economy-targeting@36
+projectiles,rng.parkMiller,ai,AiApply,5,1,1,820,fixed,,edges-economy-targeting@36
 projectiles,rng.parkMiller,features,StartFeatureBurning,1,1,3,124,depends-on-earlier,Projectile::angles;Projectile::position;Projectile::speed;unresolved:image,ui-keys@99
 projectiles,rng.parkMiller,weapons,UpdateProjectiles,3,1,1,3040,fixed,,orders-guard-attacked@53
-units,rng.parkMiller,ai,ReactToAttack,1,1,2,4,depends-on-earlier,Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript,edges-economy-targeting@244
+units,rng.parkMiller,ai,AiApply,1,1,2,4,depends-on-earlier,Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript,edges-economy-targeting@244
 units,rng.parkMiller,features,StartFeatureBurning,1,4,51,2,depends-on-earlier,Unit::def;f14353;unknown_1cd9;unresolved:image,mission-kill-of-type@185
 units,rng.parkMiller,map,PickRandomReclaimableResourcesInRadius,2,3,6,1216,depends-on-earlier,Unit::f_1f;f14353;unresolved:image;Unit::f_57,mission-kill-of-type@128
 units,rng.parkMiller,orders,AirStrikeOrder,1,1,1,29,fixed,,orders-air-fights@1000

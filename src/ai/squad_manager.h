@@ -5,7 +5,6 @@
 struct Player;
 struct Unit;
 struct Vec3;
-struct Projectile;
 class SquadTimer;
 
 class SquadManager {
@@ -19,7 +18,6 @@ public:
     Ref<Unit> cursor;
 
     SquadManager(Player* p);
-    void MarkOwnerNetDirtyFromDamageSplit(Projectile* projectile, int a, int b);
     void AssignSquads();
     void RetargetWeapons(int force);
     void TickIfActive();

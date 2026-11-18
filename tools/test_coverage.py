@@ -555,17 +555,17 @@ class KitTest(unittest.TestCase):
 
 DEMO_EXPORT = {"data": [{"functions": [
     entry("?Search@@YAXXZ", "src/ai/pathfind.cpp", 5, [region(1, 1, 4, 2, 5)], [[2, 5, 2, 9, 5, 0, 0, 0, 4]]),
-    entry("?RunBuild@?A0x1234abcd@@YAXXZ", cov.DEMO_FILE, 0, [region(10, 1, 19, 2, 0)], [[12, 5, 12, 9, 0, 0, 0, 0, 4]]),
-    entry("?Touch@?A0x1234abcd@@YAXXZ", cov.DEMO_FILE, 3, [region(30, 1, 32, 2, 3)]),
+    entry("?RunBuild@?A0x1234abcd@@YAXXZ", cov.DEMO_FILES[0], 0, [region(10, 1, 19, 2, 0)], [[12, 5, 12, 9, 0, 0, 0, 0, 4]]),
+    entry("?Touch@?A0x1234abcd@@YAXXZ", cov.DEMO_FILES[0], 3, [region(30, 1, 32, 2, 3)]),
 ]}]}
-DEMO_KEY = {("src/ai/pathfind.cpp", "Search"): "pathfinding", (cov.DEMO_FILE, "RunBuild"): "pathfinding",
-            (cov.DEMO_FILE, "Touch"): "pathfinding"}
+DEMO_KEY = {("src/ai/pathfind.cpp", "Search"): "pathfinding", (cov.DEMO_FILES[0], "RunBuild"): "pathfinding",
+            (cov.DEMO_FILES[0], "Touch"): "pathfinding"}
 DEMO_NAME = {"Search": {"pathfinding"}, "RunBuild": {"pathfinding"}, "Touch": {"pathfinding"}}
 
 
 class DemoTest(unittest.TestCase):
-    BUILD = ("RunBuild", cov.DEMO_FILE, "?RunBuild@?A0x@@YAXXZ")
-    TOUCH = ("Touch", cov.DEMO_FILE, "?Touch@?A0x@@YAXXZ")
+    BUILD = ("RunBuild", cov.DEMO_FILES[0], "?RunBuild@?A0x@@YAXXZ")
+    TOUCH = ("Touch", cov.DEMO_FILES[0], "?Touch@?A0x@@YAXXZ")
     REASON = "demo: hpa"
 
     def totals(self, *keys):
@@ -602,8 +602,13 @@ class DemoTest(unittest.TestCase):
     def test_a_demo_row_outside_the_demo_file_is_rejected(self):
         key = ("Search", "src/ai/pathfind.cpp", "?Search@@YAXXZ")
         rows = {"pathfinding": cov.Totals(apart=[key], reasons={key: self.REASON})}
-        self.assertIn("have a `demo:` reason but are not defined in src/ai/pathfind_hpa.cpp:\npathfinding Search",
+        self.assertIn("have a `demo:` reason but are not defined in src/ai/pathfind_hpa.cpp or src/ai/ai_idle.cpp:\npathfinding Search",
                       cov.misplaced_apart(rows, set()))
+
+    def test_a_demo_row_in_the_idle_ai_file_is_accepted(self):
+        key = ("UpdateSquadsIdle", "src/ai/ai_idle.cpp", "?UpdateSquadsIdle@?A0x@@YAXH@Z")
+        rows = {"ai": cov.Totals(apart=[key], reasons={key: "demo: idle ai"})}
+        self.assertEqual(cov.misplaced_apart(rows, set()), "")
 
     def test_a_demo_row_does_not_pass_as_a_kit_row(self):
         key = ("GetNative", "src/seams/native.cpp", "?GetNative@@YAXXZ")
@@ -612,7 +617,7 @@ class DemoTest(unittest.TestCase):
 
     def test_an_entered_demo_row_fails_the_check(self):
         entered = self.totals(self.BUILD, self.TOUCH)
-        self.assertEqual(entered.apart_entered, [("Touch", cov.DEMO_FILE, "?Touch@?A0x@@YAXXZ")])
+        self.assertEqual(entered.apart_entered, [("Touch", cov.DEMO_FILES[0], "?Touch@?A0x@@YAXXZ")])
         self.assertEqual(entered.functions, 2)
         self.assertIn("pathfinding Touch (src/ai/pathfind_hpa.cpp)", cov.entered_apart({"pathfinding": entered}))
 

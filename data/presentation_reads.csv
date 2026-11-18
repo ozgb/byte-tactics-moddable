@@ -48,7 +48,7 @@ FeaturePseudoUnit::unknown_96,units,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_a8,presentation,every-frame,,per-player-filter,7
 FogCell::level0,presentation,ui-action,,own,0
 FogCell::level1,presentation,ui-action,,own,0
-Group::units,ai,ui-action,,all-players,1
+Group::units,ai,unknown,,all-players,1
 InfoModeFlags::b0,presentation,ui-action,,all-players,0
 InfoModeFlags::b1,presentation,ui-action,,all-players,0
 InfoModeFlags::raw,presentation,ui-action,,all-players,0
@@ -221,7 +221,7 @@ Unit::flags,los_radar,ui-action,,per-player-filter,12
 Unit::flags,orders,unknown,,per-player-filter,7
 Unit::flags,presentation,every-frame,SIM_EVENT_UNIT_SPEECH,per-player-filter,89
 Unit::flags,units,unknown,,per-player-filter,1
-Unit::group,ai,ui-action,,per-player-filter,1
+Unit::group,ai,unknown,,per-player-filter,1
 Unit::group,harness,ui-action,,per-player-filter,1
 Unit::group,presentation,every-frame,,per-player-filter,88
 Unit::head,orders,unknown,,per-player-filter,1
@@ -244,7 +244,7 @@ Unit::moveOrder,presentation,unknown,,per-player-filter,0
 Unit::owner,orders,unknown,,per-player-filter,1
 Unit::pitch,platform,ui-action,,per-player-filter,8
 Unit::pitch,units,every-frame,,per-player-filter,88
-Unit::player,ai,ui-action,,per-player-filter,1
+Unit::player,ai,unknown,,per-player-filter,1
 Unit::player,los_radar,ui-action,,per-player-filter,19
 Unit::player,network,unknown,,per-player-filter,1
 Unit::player,orders,ui-action,,per-player-filter,5

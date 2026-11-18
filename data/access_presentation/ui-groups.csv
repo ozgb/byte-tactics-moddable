@@ -157,6 +157,7 @@ Unit::motion,orders,GetFeature,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMOR
 Unit::motion,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::pitch,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::pitch,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::player,ai,AiApply,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::player,ai,SetUnitSquad,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::player,los_radar,IsUnitVisibleToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::player,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -331,6 +332,7 @@ unitsEnd,presentation,ClearSelection,unitsEnd,0,-
 unitsEnd,presentation,ClickSelectHoverUnit,unitsEnd,0,-
 unitsEnd,presentation,CollectVisibleUnitIds,unitsEnd,1,
 unitsEnd,presentation,MarkLocalVisibleUnits,unitsEnd,0,-
+unknown_1b8e,ai,AiApply,unknown_1b8e,0,-
 unknown_1b8e,ai,SetUnitSquad,unknown_1b8e,0,-
 unknown_1b8e,harness,HarnessUiGroup,unknown_1b8e,0,
 unknown_1b8e,los_radar,BuildFogTiles,unknown_1b8e,0,

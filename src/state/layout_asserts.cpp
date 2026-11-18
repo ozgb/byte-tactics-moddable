@@ -83,6 +83,7 @@
 #include "../map/grid.h"
 #include "../map/grid2.h"
 #include "../map/line_of_sight.h"
+#include "../map/line_of_sight_index.h"
 #include "../map/los_lines.h"
 #include "../map/los_tables.h"
 #include "../map/map_info.h"
@@ -121,6 +122,7 @@
 #include "../units/cob_script.h"
 #include "../units/cob_types.h"
 #include "../units/f14373.h"
+#include "../units/factory_index.h"
 #include "../units/movement_class.h"
 #include "../units/unit.h"
 #include "../units/unit_def.h"
@@ -360,6 +362,12 @@ static_assert(offsetof(Face, flags) == 28, "");
 static_assert(sizeof(FaceFlags) == 4, "");
 static_assert(offsetof(FaceFlags, raw) == 0, "");
 static_assert(offsetof(FaceFlags, bits) == 0, "");
+static_assert(sizeof(FactoryIndex) == 240, "");
+static_assert(offsetof(FactoryIndex, players) == 0, "");
+static_assert(sizeof(FactoryIndexEntry) == 24, "");
+static_assert(offsetof(FactoryIndexEntry, live) == 0, "");
+static_assert(offsetof(FactoryIndexEntry, lastTick) == 4, "");
+static_assert(offsetof(FactoryIndexEntry, factories) == 8, "");
 static_assert(sizeof(Feature) == 256, "");
 static_assert(offsetof(Feature, name) == 0, "");
 static_assert(offsetof(Feature, description) == 128, "");
@@ -1461,6 +1469,14 @@ static_assert(offsetof(LosStep, a) == 0, "");
 static_assert(offsetof(LosStep, b) == 2, "");
 static_assert(sizeof(LosTable) == 16, "");
 static_assert(sizeof(LosTables) == 16, "");
+static_assert(sizeof(LosUnitIndex) == 440, "");
+static_assert(offsetof(LosUnitIndex, players) == 0, "");
+static_assert(sizeof(LosUnitIndexEntry) == 44, "");
+static_assert(offsetof(LosUnitIndexEntry, live) == 0, "");
+static_assert(offsetof(LosUnitIndexEntry, lastTick) == 4, "");
+static_assert(offsetof(LosUnitIndexEntry, hasSpecial) == 8, "");
+static_assert(offsetof(LosUnitIndexEntry, visible) == 12, "");
+static_assert(offsetof(LosUnitIndexEntry, known) == 28, "");
 static_assert(sizeof(Main2Menu) == 24, "");
 static_assert(offsetof(Main2Menu, field_51d) == 0, "");
 static_assert(offsetof(Main2Menu, unknown_8) == 4, "");

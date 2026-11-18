@@ -59,10 +59,7 @@ struct Order;
 class MissionType;
 
 #include "../ai/ai_player.h"
-void __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, std::vector<Unit*>* out);
-void __stdcall CreateFactoryIndex(int player);
-void __stdcall FreeFactoryIndex(int player);
-void __stdcall RefreshFactoryIndex(int player);
+#include "../units/factory_index.h"
 #include "../units/squads.h"
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
@@ -92,14 +89,7 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 #include "../game/share_commands.h"
 int __stdcall GetGroundHeight(GroundHeightPos* p);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
-void __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*>* out);
-int __stdcall GetVisibleEnemiesInRadiusList(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
-bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
-int __stdcall IsPointVisible(Player* player, Vec3* point);
-int __stdcall GetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
-void __stdcall CreateUnitIndex(int player);
-void __stdcall FreeUnitIndex(int player);
-void __stdcall RefreshUnitIndex(int player);
+#include "../map/line_of_sight_index.h"
 
 #include "../map/line_of_sight.h"
 #include "../ingame/radar.h"

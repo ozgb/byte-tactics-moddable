@@ -99,7 +99,6 @@ GameReallocTagged,mismatch,"definition type not nameable in a header, or no clea
 GetButtonStage,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetCobChecksum,mismatch,pointer/int cast: definition's type is likely wrong
 GetDisplayModes,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetFactoriesInRadius,skip,qualified name std::vector
 GetGadgetActiveByName,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetGafFrame,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetGafFrameCount,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
@@ -117,7 +116,6 @@ GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no
 GetTextPixelWidth,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetTextWidth,mismatch,pointer/int cast: definition's type is likely wrong
 GetTicks,mismatch,fixing it changes the generated code of a caller
-GetVisibleEnemiesInRadius,skip,qualified name std::vector
 GetWeaponPiecePosition,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetWeaponRange,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GroundPickupOrder,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"

@@ -132,7 +132,7 @@ economy,ai,shared_write,Player::metal,1
 economy,ai,shared_write,Player::metalCapacity,1
 economy,ai,shared_write,Player::metalIncome,1
 economy,ai,shared_write,Player::metalUsage,1
-economy,ai,shared_write,Ref<Unit>::offset,1
+economy,ai,shared_write,Ref<Unit>::offset,2
 economy,features,shared_write,Ref<Unit>::offset,1
 economy,game,call,IsPlaying,1
 economy,game,call,LosRadarPublishShareMapping,1
@@ -250,7 +250,7 @@ features,ai,shared_write,Feature::metal,1
 features,ai,shared_write,Game::features,1
 features,ai,shared_write,Point16::x,7
 features,ai,shared_write,Point16::y,7
-features,ai,shared_write,Ref<Unit>::offset,1
+features,ai,shared_write,Ref<Unit>::offset,2
 features,ai,shared_write,Vec3::x,18
 features,ai,shared_write,Vec3::y,11
 features,ai,shared_write,Vec3::z,18
@@ -1449,7 +1449,7 @@ harness,ai,shared_write,OrdersSeam::GetOrderFlags,1
 harness,ai,shared_write,OrdersSeam::GetOrderType,4
 harness,ai,shared_write,Player::energyCapacity,1
 harness,ai,shared_write,Player::metalCapacity,1
-harness,ai,shared_write,Player::type,6
+harness,ai,shared_write,Player::type,7
 harness,ai,shared_write,Seams::economy,1
 harness,ai,shared_write,Seams::los_radar,2
 harness,ai,shared_write,Seams::map,4
@@ -2057,7 +2057,7 @@ los_radar,ai,shared_write,Game::mapWidth,1
 los_radar,ai,shared_write,Game::visibilityMask,1
 los_radar,ai,shared_write,Point16::x,7
 los_radar,ai,shared_write,Point16::y,7
-los_radar,ai,shared_write,Ref<Unit>::offset,1
+los_radar,ai,shared_write,Ref<Unit>::offset,2
 los_radar,ai,shared_write,Unit::flags,11
 los_radar,ai,shared_write,Vec3::x,18
 los_radar,ai,shared_write,Vec3::y,11
@@ -2254,7 +2254,7 @@ map,ai,shared_write,Fixed::value,1
 map,ai,shared_write,Game::net,6
 map,ai,shared_write,Point16::x,7
 map,ai,shared_write,Point16::y,7
-map,ai,shared_write,Ref<Unit>::offset,1
+map,ai,shared_write,Ref<Unit>::offset,2
 map,ai,shared_write,Unit::flags,11
 map,ai,shared_write,Vec3::x,18
 map,ai,shared_write,Vec3::y,11
@@ -2474,7 +2474,7 @@ network,ai,shared_write,Player::explored,1
 network,ai,shared_write,Player::exploredHeight,2
 network,ai,shared_write,Player::exploredWidth,2
 network,ai,shared_write,Player::index,6
-network,ai,shared_write,Player::type,6
+network,ai,shared_write,Player::type,7
 network,economy,shared_write,Game::netGameFlags,5
 network,economy,shared_write,Player::active,2
 network,economy,shared_write,Player::energyWasted,1
@@ -2811,7 +2811,7 @@ orders,ai,shared_write,MissionType::index,4
 orders,ai,shared_write,Order::flags_42,2
 orders,ai,shared_write,Point16::x,7
 orders,ai,shared_write,Point16::y,7
-orders,ai,shared_write,Ref<Unit>::offset,1
+orders,ai,shared_write,Ref<Unit>::offset,2
 orders,ai,shared_write,Unit::buildLeft,3
 orders,ai,shared_write,Unit::flags,11
 orders,ai,shared_write,Unit::group,4
@@ -3503,13 +3503,13 @@ players,ai,shared_write,Player::metal,1
 players,ai,shared_write,Player::metalCapacity,1
 players,ai,shared_write,Player::metalIncome,1
 players,ai,shared_write,Player::metalUsage,1
-players,ai,shared_write,Player::type,6
+players,ai,shared_write,Player::type,7
 players,ai,shared_write,Player::unitCount,1
 players,ai,shared_write,Player::unitsBegin,5
 players,ai,shared_write,Player::unitsEnd,5
 players,ai,shared_write,Point16::x,7
 players,ai,shared_write,Point16::y,7
-players,ai,shared_write,Ref<Unit>::offset,1
+players,ai,shared_write,Ref<Unit>::offset,2
 players,ai,shared_write,Vec3::x,18
 players,ai,shared_write,Vec3::y,11
 players,ai,shared_write,Vec3::z,18
@@ -4557,7 +4557,7 @@ seams,ai,shared_write,OrdersSeam::GetOrderType,4
 seams,ai,shared_write,Player::ai,3
 seams,ai,shared_write,Point16::x,7
 seams,ai,shared_write,Point16::y,7
-seams,ai,shared_write,Ref<Unit>::offset,1
+seams,ai,shared_write,Ref<Unit>::offset,2
 seams,ai,shared_write,Seams::economy,1
 seams,ai,shared_write,Seams::los_radar,2
 seams,ai,shared_write,Seams::map,4
@@ -5295,7 +5295,7 @@ seams,wind_meteors,shared_write,Vec3::y,1
 seams,wind_meteors,shared_write,Vec3::z,1
 seams,wind_meteors,shared_write,WindMeteorsEvent::kind,1
 seams,wind_meteors,shared_write,WindMeteorsEvent::params,1
-targeting,ai,shared_write,Ref<Unit>::offset,1
+targeting,ai,shared_write,Ref<Unit>::offset,2
 targeting,ai,shared_write,Vec3::x,18
 targeting,ai,shared_write,Vec3::y,11
 targeting,ai,shared_write,Vec3::z,18
@@ -5377,7 +5377,7 @@ units,ai,shared_write,Player::unitsBegin,5
 units,ai,shared_write,Player::unitsEnd,5
 units,ai,shared_write,Point16::x,7
 units,ai,shared_write,Point16::y,7
-units,ai,shared_write,Ref<Unit>::offset,1
+units,ai,shared_write,Ref<Unit>::offset,2
 units,ai,shared_write,Unit::activateFlags,4
 units,ai,shared_write,Unit::buildLeft,3
 units,ai,shared_write,Unit::def,9
@@ -5387,7 +5387,7 @@ units,ai,shared_write,Unit::lastAttackerSlot,1
 units,ai,shared_write,Unit::lastDamageType,1
 units,ai,shared_write,Unit::mode,1
 units,ai,shared_write,Unit::motion,1
-units,ai,shared_write,Unit::player,7
+units,ai,shared_write,Unit::player,8
 units,ai,shared_write,Unit::pos,3
 units,ai,shared_write,Unit::unitDefIndex,5
 units,ai,shared_write,Unit::yWhole,1

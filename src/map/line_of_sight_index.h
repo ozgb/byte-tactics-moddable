@@ -1,6 +1,7 @@
 #ifndef LINE_OF_SIGHT_INDEX_H
 #define LINE_OF_SIGHT_INDEX_H
 
+#include <vector>
 #include "../state/block_vector.h"
 #include "../../interfaces/ref.h"
 

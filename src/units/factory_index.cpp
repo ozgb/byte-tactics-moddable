@@ -66,13 +66,9 @@ void __stdcall RefreshFactoryIndex(int player)
     entry.factories.Clear();
     Player* owner = &g_game->players[player];
     for (Unit* u = g_game->units + 1; u != nullptr && u <= g_game->unitsEnd; ++u) {
-        if (u->Ready()) {
-            if (!owner->allied[u->PlayerIndex()]) {
-            } else if (u->PlayerIndex() == owner->index && u->buildLeft == 0.0) {
-                if ((u->def.get()->flags1 & 0x40) && (u->def.get()->flags1 & 0x200) && (u->activateFlags & 1))
-                    entry.factories.PushBack(u);
-            }
-        }
+        if (u->Ready() && owner->allied[u->PlayerIndex()] && u->PlayerIndex() == owner->index && u->buildLeft == 0.0 &&
+            (u->def.get()->flags1 & 0x40) && (u->def.get()->flags1 & 0x200) && (u->activateFlags & 1))
+            entry.factories.PushBack(u);
     }
     entry.lastTick = (unsigned int)g_game->ticks;
 }

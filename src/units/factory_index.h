@@ -1,6 +1,7 @@
 #ifndef UNITS_FACTORY_INDEX_H
 #define UNITS_FACTORY_INDEX_H
 
+#include <vector>
 #include "../state/block_vector.h"
 #include "../../interfaces/ref.h"
 

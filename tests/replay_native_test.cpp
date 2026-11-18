@@ -3051,7 +3051,7 @@ void BeginImport()
 void EnemyListSelfTest()
 {
     printf("a unit list answered from the recorded vector form\n");
-    const char* call = "  i ai.GetVisibleEnemiesInRadius 1 pos=(100,0,200) 300 0\n  o out [Unit#3,Unit#9,Unit#5]\n";
+    const char* call = "  i los_radar.GetVisibleEnemiesInRadius 1 pos=(100,0,200) 300 0\n  o out [Unit#3,Unit#9,Unit#5]\n";
     Vec3 pos;
     pos.x = 100;
     pos.y = 0;
@@ -3078,7 +3078,7 @@ void EnemyListSelfTest()
     Check(wide[0].get() == narrow[0].get() && wide[1].get() == narrow[1].get() && wide[2].get() != nullptr && wide[3].get() == nullptr, "with the same units in the same order");
     again = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
     printf("a third call: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
 
     ResetBlock();
     LoadCall(call);
@@ -3086,7 +3086,7 @@ void EnemyListSelfTest()
     Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
     Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 301, 0, wide, 5);
     printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
 }
 
 void ShapeSelfTest()

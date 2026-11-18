@@ -129,7 +129,7 @@ call 0 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 0 Apply
@@ -176,7 +176,7 @@ call 0 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out []
   o result null
 call 0 Apply
@@ -197,7 +197,7 @@ call 0 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out []
   o result null
 call 0 Apply
@@ -270,7 +270,7 @@ call 3 FindBestTargetIfFireAtWill
   r rng.seed 0x0f1b9b53
   r Unit#1.flags 0x90e00321
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 3 GetWeaponTargetPos
@@ -284,7 +284,7 @@ call 3 GetWeaponTargetPos
 call 3 FindBestTargetIfFireAtWill
   r rng.seed 0x5d726de4
   a unit Unit#251
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
   o out []
   o result null
 call 4 GetWeaponTargetPos
@@ -723,7 +723,7 @@ call 12 FindBestTargetIfFireAtWill
   r UnitDef#95.weaponCategories1 UnitTypeSet#2
   r UnitDef#95.weaponCategories2 UnitTypeSet#2
   a unit Unit#2
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212336640,65536,87162880) 280 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212336640,65536,87162880) 280 0
   o out []
   o result null
 call 12 GetWeaponTargetPos
@@ -738,7 +738,7 @@ call 12 FindBestTargetIfFireAtWill
   r Unit#3.activateFlags 0
   r Unit#3.playerIndex 0
   a unit Unit#3
-  i ai.GetVisibleEnemiesInRadius 0 pos=(204472320,65536,81920000) 280 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(204472320,65536,81920000) 280 0
   o out []
   o result null
 call 12 GetWeaponTargetPos
@@ -753,7 +753,7 @@ call 12 FindBestTargetIfFireAtWill
   r Unit#4.activateFlags 0
   r Unit#4.playerIndex 0
   a unit Unit#4
-  i ai.GetVisibleEnemiesInRadius 0 pos=(201850880,65536,81920000) 280 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(201850880,65536,81920000) 280 0
   o out []
   o result null
 call 12 GetWeaponTargetPos
@@ -775,7 +775,7 @@ call 12 FindBestTargetIfFireAtWill
   r UnitDef#51.weaponCategories2 UnitTypeSet#2
   r UnitTypeSet#3.bits x:f6ff5fdbbffff77fdfffffd7fff2fff7fff7efeffdf77fff3fffffffff5ffdffef3f7e0000000000000000000000000000000000000000000000000000000000
   a unit Unit#5
-  i ai.GetVisibleEnemiesInRadius 0 pos=(196608000,65536,85196800) 350 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(196608000,65536,85196800) 350 0
   o out []
   o result null
 call 12 GetWeaponTargetPos
@@ -1396,7 +1396,7 @@ call 27 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 27 Apply
@@ -1417,7 +1417,7 @@ call 27 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out []
   o result null
 call 27 Apply
@@ -1438,7 +1438,7 @@ call 27 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out []
   o result null
 call 27 Apply
@@ -1511,7 +1511,7 @@ call 28 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#3 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(204564864,65536,81765199) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(204564864,65536,81765199) 180 0
   o out []
   o result null
 call 28 Apply
@@ -1535,7 +1535,7 @@ call 28 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(201888401,65536,81830095) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(201888401,65536,81830095) 180 0
   o out []
   o result null
 call 28 Apply
@@ -1946,7 +1946,7 @@ call 37 GetWeaponTargetPos
 call 37 FindBestTargetIfFireAtWill
   r rng.seed 0x47c8d65f
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 37 GetWeaponTargetPos
@@ -2822,7 +2822,7 @@ call 55 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 55 Apply
@@ -2846,7 +2846,7 @@ call 55 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#3 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(207155009,65536,82490905) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(207155009,65536,82490905) 180 0
   o out []
   o result null
 call 55 Apply
@@ -2870,7 +2870,7 @@ call 55 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(204489334,65536,81679340) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(204489334,65536,81679340) 180 0
   o out []
   o result null
 call 55 Apply
@@ -2892,7 +2892,7 @@ call 55 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2]
   o Unit#2.flags 0x90240321
   i services.RandomInt 1 = 0
@@ -2920,7 +2920,7 @@ call 55 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2]
   i services.RandomInt 1 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -3314,7 +3314,7 @@ call 61 GetWeaponTargetUnit
 call 61 FindBestTargetIfFireAtWill
   r rng.seed 0x3fdbddad
   a unit Unit#251
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 290 0
   o out [Unit#2,Unit#3]
   o Unit#3.posX 207813197
   o Unit#3.posZ 82749486
@@ -4764,7 +4764,7 @@ call 83 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 83 Apply
@@ -4787,7 +4787,7 @@ call 83 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#3 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(210405976,65536,82816063) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(210405976,65536,82816063) 180 0
   o out []
   o result null
 call 83 Apply
@@ -4810,7 +4810,7 @@ call 83 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(207791814,65536,81731572) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(207791814,65536,81731572) 180 0
   o out []
   o result null
 call 83 Apply
@@ -5028,7 +5028,7 @@ call 87 GetWeaponTargetPos
 call 87 FindBestTargetIfFireAtWill
   r rng.seed 0x31c04bbd
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 87 GetWeaponTargetPos
@@ -6628,7 +6628,7 @@ call 111 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 111 Apply
@@ -6651,7 +6651,7 @@ call 111 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#3 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212913294,65536,83908247) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212913294,65536,83908247) 180 0
   o out []
   o result null
 call 111 Apply
@@ -6674,7 +6674,7 @@ call 111 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(211053670,65536,81978968) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(211053670,65536,81978968) 180 0
   o out []
   o result null
 call 111 Apply
@@ -8609,7 +8609,7 @@ call 138 GetWeaponTargetPos
 call 138 FindBestTargetIfFireAtWill
   r rng.seed 0x14bfede7
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 138 GetWeaponTargetPos
@@ -8709,7 +8709,7 @@ call 138 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 138 Apply
@@ -8730,7 +8730,7 @@ call 138 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   o Unit#3.flags 0x90240321
   o Unit#4.flags 0x90240321
@@ -8765,7 +8765,7 @@ call 138 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -8907,7 +8907,7 @@ call 139 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
   o out []
   o result null
 call 139 Apply
@@ -11040,7 +11040,7 @@ call 166 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 166 Apply
@@ -11061,7 +11061,7 @@ call 166 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4,Unit#5]
   o Unit#5.flags 0x9024032a
   o Unit#5.activateFlags 1
@@ -11100,7 +11100,7 @@ call 166 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4,Unit#5]
   i services.RandomInt 4 = 3
   i weapons.WeaponCanReachUnit Unit#251 Unit#5 2 = 1
@@ -11260,7 +11260,7 @@ call 167 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
   o out []
   o result null
 call 167 Apply
@@ -13284,7 +13284,7 @@ call 193 FindBestTargetIfFireAtWill
   r rng.main 0x103d23b0
   r rng.seed 0x627b768e
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 193 GetWeaponTargetPos
@@ -13462,7 +13462,7 @@ call 194 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 194 Apply
@@ -13483,7 +13483,7 @@ call 194 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212336639,65536,83361791) 180 0
   o out []
   o result null
 call 194 Apply
@@ -15777,7 +15777,7 @@ call 222 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 222 Apply
@@ -15801,7 +15801,7 @@ call 222 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(212011267,65536,83967099) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(212011267,65536,83967099) 180 0
   o out []
   o result null
 call 222 Apply
@@ -17093,7 +17093,7 @@ call 238 FindBestTargetIfFireAtWill
   r rng.main 0x4e304d26
   r rng.seed 0x24f53d68
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 238 GetWeaponTargetPos
@@ -18221,7 +18221,7 @@ call 250 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 250 Apply
@@ -18244,7 +18244,7 @@ call 250 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(209327284,65536,85647645) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(209327284,65536,85647645) 180 0
   o out []
   o result null
 call 250 Apply
@@ -20508,7 +20508,7 @@ call 277 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 277 Apply
@@ -20529,7 +20529,7 @@ call 277 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   o Unit#4.posX 209656071
   o Unit#4.posZ 88807386
@@ -20563,7 +20563,7 @@ call 277 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 2
   i weapons.WeaponCanReachUnit Unit#251 Unit#4 2 = 1
@@ -20706,7 +20706,7 @@ call 278 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#4 0 = 180
-  i ai.GetVisibleEnemiesInRadius 0 pos=(209677656,65536,88923363) 180 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(209677656,65536,88923363) 180 0
   o out []
   o result null
 call 278 Apply
@@ -22274,7 +22274,7 @@ call 296 FindBestTargetIfFireAtWill
   r rng.main 0xcbd391b4
   r rng.seed 0x5c8fee3e
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 296 GetWeaponTargetPos
@@ -23159,7 +23159,7 @@ call 305 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 305 Apply
@@ -23180,7 +23180,7 @@ call 305 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   o Unit#4.flags 0x90240321
   i services.RandomInt 3 = 2
@@ -23213,7 +23213,7 @@ call 305 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -25729,7 +25729,7 @@ call 333 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 333 Apply
@@ -25750,7 +25750,7 @@ call 333 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 1
   i weapons.WeaponCanReachUnit Unit#251 Unit#3 0 = 1
@@ -25782,7 +25782,7 @@ call 333 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -26832,7 +26832,7 @@ call 345 FindBestTargetIfFireAtWill
   r rng.main 0xdb4e1cd4
   r rng.seed 0x7bc9fc93
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 345 GetWeaponTargetPos
@@ -28429,7 +28429,7 @@ call 361 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 361 Apply
@@ -28450,7 +28450,7 @@ call 361 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 1
   i weapons.WeaponCanReachUnit Unit#251 Unit#3 0 = 1
@@ -28482,7 +28482,7 @@ call 361 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -30009,7 +30009,7 @@ call 378 GetWeaponTargetPos
 call 378 FindBestTargetIfFireAtWill
   r rng.seed 0x577f3eee
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 378 GetWeaponTargetPos
@@ -30996,7 +30996,7 @@ call 388 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 388 Apply
@@ -31017,7 +31017,7 @@ call 388 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 1
   i weapons.WeaponCanReachUnit Unit#251 Unit#3 0 = 1
@@ -31049,7 +31049,7 @@ call 388 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 1
   i weapons.WeaponCanReachUnit Unit#251 Unit#3 2 = 1
@@ -33735,7 +33735,7 @@ call 416 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 416 Apply
@@ -34047,7 +34047,7 @@ call 420 GetWeaponTargetPos
 call 420 FindBestTargetIfFireAtWill
   r rng.seed 0x1aea6374
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 420 GetWeaponTargetPos
@@ -36346,7 +36346,7 @@ call 444 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 444 Apply
@@ -36367,7 +36367,7 @@ call 444 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 1
   i weapons.WeaponCanReachUnit Unit#251 Unit#3 0 = 1
@@ -36399,7 +36399,7 @@ call 444 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -39010,7 +39010,7 @@ call 472 GetWeaponTargetPos
 call 472 FindBestTargetIfFireAtWill
   r rng.seed 0x393cc411
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 472 GetWeaponTargetPos
@@ -39109,7 +39109,7 @@ call 472 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 472 Apply
@@ -41761,7 +41761,7 @@ call 500 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 500 Apply
@@ -41782,7 +41782,7 @@ call 500 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#251 0 = 200
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 200 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 0 = 1
@@ -41814,7 +41814,7 @@ call 500 FindWeaponTarget
   a weapon 2
   a useRange 1
   i weapons.GetWeaponRange Unit#251 2 = 240
-  i ai.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
+  i los_radar.GetVisibleEnemiesInRadius 1 pos=(221249536,65536,92274688) 240 0
   o out [Unit#2,Unit#3,Unit#4]
   i services.RandomInt 3 = 0
   i weapons.WeaponCanReachUnit Unit#251 Unit#2 2 = 1
@@ -41982,7 +41982,7 @@ call 502 GetWeaponTargetPos
 call 502 FindBestTargetIfFireAtWill
   r rng.seed 0x6865a9cf
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 502 GetWeaponTargetPos
@@ -44362,7 +44362,7 @@ call 527 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 527 Apply
@@ -45504,7 +45504,7 @@ call 540 GetWeaponTargetPos
 call 540 FindBestTargetIfFireAtWill
   r rng.seed 0x58de21e4
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 540 GetWeaponTargetPos
@@ -47117,7 +47117,7 @@ call 555 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 555 Apply
@@ -48967,7 +48967,7 @@ call 576 FindBestTargetIfFireAtWill
   r rng.main 0x15647f3b
   r rng.seed 0x3fd68954
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 290 0
   o out []
   o result null
 call 576 GetWeaponTargetPos
@@ -49736,7 +49736,7 @@ call 583 FindWeaponTarget
   a weapon 0
   a useRange 1
   i weapons.GetWeaponRange Unit#1 0 = 200
-  i ai.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(36700160,65536,15728640) 200 0
   o out []
   o result null
 call 583 Apply

@@ -142,7 +142,7 @@ call 742 FindBestTargetIfFireAtWill
   r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
   r UnitTypeSet#2.bits x:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
   o out []
   o result null
 call 742 GetWeaponTargetPos
@@ -249,7 +249,7 @@ call 747 FindBestTargetIfFireAtWill
   r rng.seed 0x11dc4dd9
   r Unit#1.flags 0x90e00321
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
   o out []
   o result null
 call 747 GetWeaponTargetPos
@@ -490,7 +490,7 @@ call 757 FindBestTargetIfFireAtWill
   r rng.seed 0x2192a07e
   r Unit#1.flags 0x90e00321
   a unit Unit#1
-  i ai.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
+  i los_radar.GetVisibleEnemiesInRadius 0 pos=(43650856,65536,22023259) 290 0
   o out []
   o result null
 call 757 GetWeaponTargetPos

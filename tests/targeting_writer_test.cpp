@@ -6,7 +6,7 @@
 #include "../interfaces/seams.h"
 #include "../interfaces/services.h"
 #include "../interfaces/targeting.h"
-#include "../interfaces/ai.h"
+#include "../interfaces/los_radar.h"
 #include "../interfaces/units.h"
 #include "../interfaces/weapons.h"
 #include "../src/state/sim_globals.h"
@@ -303,10 +303,10 @@ int main()
     seam.GetWeaponTargetPos = GetWeaponTargetPos;
     seam.FindWeaponTarget = TamperedFindWeaponTarget;
     g_seams.targeting = &seam;
-    static AiSeam ai;
-    memset(&ai, 0, sizeof ai);
-    ai.GetVisibleEnemiesInRadius = GetVisibleEnemies;
-    g_seams.ai = &ai;
+    static LosRadarSeam losRadar;
+    memset(&losRadar, 0, sizeof losRadar);
+    losRadar.GetVisibleEnemiesInRadius = GetVisibleEnemies;
+    g_seams.los_radar = &losRadar;
     static UnitsSeam units;
     memset(&units, 0, sizeof units);
     units.GetSweetSpot = GetSweetSpot;

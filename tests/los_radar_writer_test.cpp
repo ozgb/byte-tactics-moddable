@@ -23,6 +23,7 @@
 #pragma pack(pop)
 #include "../src/game/los_radar_events.h"
 #include "../src/map/line_of_sight.h"
+#include "../src/map/line_of_sight_index.h"
 #include "../src/game/players.h"
 
 struct Surface;
@@ -539,6 +540,179 @@ static void CheckRejected()
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
 }
 
+static int ListCount(int player, int cell, int z, int radius, std::vector<Unit*>* out)
+{
+    Vec3 at;
+    at.x = WorldOfLosCell(cell);
+    at.y = 0;
+    at.z = WorldOfLosCell(z);
+    out->clear();
+    g_seams.los_radar->GetVisibleEnemiesInRadius(player, &at, radius, 0, out);
+    return (int)out->size();
+}
+
+static void PlaceAt(int unit, int cellX, int cellZ)
+{
+    s_units[unit].pos.x = WorldOfLosCell(cellX);
+    s_units[unit].pos.y = 0;
+    s_units[unit].pos.z = WorldOfLosCell(cellZ);
+}
+
+static void Explore(int player, int cellX, int cellZ)
+{
+    s_players[player].explored[kLos * cellZ + cellX] = 1;
+}
+
+static int VisibleCount(int player)
+{
+    const LosUnitIndexEntry* entry = LosUnitIndexOf(player);
+    return (int)(entry->visible.End() - entry->visible.Begin());
+}
+
+static int KnownCount(int player)
+{
+    const LosUnitIndexEntry* entry = LosUnitIndexOf(player);
+    return (int)(entry->known.End() - entry->known.Begin());
+}
+
+static void CheckUnitIndex()
+{
+    const LosRadarSeam& seam = *g_seams.los_radar;
+    Restart();
+    UnitDef* specialDef = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    memset((void*)specialDef, 0, sizeof(UnitDef));
+    specialDef->flags1 = 0x400;
+    UnitDef* plainDef = s_units[kScout].def.get();
+    for (int p = 0; p < kPlayers; p++)
+        s_players[p].allied[p] = 1;
+    for (int i = 1; i < kUnits; i++) {
+        s_units[i].flags = 0x10000000;
+        s_units[i].activateFlags = 0;
+        s_units[i].buildLeft = 0;
+    }
+    PlaceAt(kScout, 6, 6);
+    PlaceAt(kRover, 7, 7);
+    PlaceAt(kBase, 8, 8);
+    PlaceAt(kPeakEnemy, 1, 1);
+    PlaceAt(kPatroller, 12, 4);
+    PlaceAt(kWatched, 12, 5);
+    Explore(0, 1, 1);
+    Explore(0, 12, 4);
+    Explore(1, 6, 6);
+    s_units[kPatroller].flags |= 0x8000 | 0x100;
+    s_units[kWatched].flags |= 0x100;
+    s_units[kBase].def = specialDef;
+    s_units[kBase].buildLeft = 1.0f;
+    s_units[kBase].activateFlags = 1;
+
+    g_game->ticks = 0;
+    seam.CreateUnitIndex(0);
+    seam.CreateUnitIndex(1);
+    Check(LosUnitIndexOf(0)->live == 1 && VisibleCount(0) == 0 && KnownCount(0) == 0, "CreateUnitIndex makes an empty live index");
+    seam.RefreshUnitIndex(0);
+    Check(VisibleCount(0) == 0, "an index made at tick 0 is not refreshed before tick 30");
+    g_game->ticks = 29;
+    seam.RefreshUnitIndex(0);
+    Check(VisibleCount(0) == 0, "an index is not refreshed at tick 29");
+    g_game->ticks = 30;
+    seam.RefreshUnitIndex(0);
+    Check(VisibleCount(0) == 1 && *LosUnitIndexOf(0)->visible.Begin() == &s_units[kPeakEnemy],
+          "the visible list holds the enemy units the player sees, not the ones with flag 0x8000");
+    Check(KnownCount(0) == 2, "the known list holds the enemy units with flag 0x100");
+    Check(LosUnitIndexOf(0)->hasSpecial == 0, "an unfinished unit of a type with flag 0x400 does not set hasSpecial");
+    Check(LosUnitIndexOf(0)->lastTick == 30, "a refresh stores its tick");
+
+    s_units[kBase].buildLeft = 0;
+    g_game->ticks = 59;
+    seam.RefreshUnitIndex(0);
+    Check(LosUnitIndexOf(0)->hasSpecial == 0, "an index is not refreshed at tick 59");
+    g_game->ticks = 60;
+    seam.RefreshUnitIndex(0);
+    Check(LosUnitIndexOf(0)->hasSpecial == 1, "an own finished unit of a type with flag 0x400 that is switched on sets hasSpecial");
+    s_units[kBase].activateFlags = 0;
+    g_game->ticks = 90;
+    seam.RefreshUnitIndex(0);
+    Check(LosUnitIndexOf(0)->hasSpecial == 0, "a unit of a type with flag 0x400 that is switched off does not set hasSpecial");
+    s_units[kBase].activateFlags = 1;
+    s_units[kBase].def = plainDef;
+    s_units[kPeakEnemy].def = specialDef;
+    g_game->ticks = 120;
+    seam.RefreshUnitIndex(0);
+    Check(LosUnitIndexOf(0)->hasSpecial == 0, "an enemy unit of a type with flag 0x400 does not set hasSpecial");
+    s_units[kPeakEnemy].def = plainDef;
+    Check(VisibleCount(1) == 0, "the second player's index is independent and was not refreshed");
+    seam.RefreshUnitIndex(1);
+    Check(VisibleCount(1) == 1 && *LosUnitIndexOf(1)->visible.Begin() == &s_units[kScout], "the second player sees only its own enemy");
+
+    std::vector<Unit*> found;
+    Check(ListCount(0, 1, 1, 40, &found) == 1 && found[0] == &s_units[kPeakEnemy], "GetVisibleEnemiesInRadius appends the visible enemy in range");
+    Check(ListCount(0, 6, 6, 40, &found) == 0, "GetVisibleEnemiesInRadius appends nothing out of range");
+    Check(ListCount(0, 12, 4, 40, &found) == 0, "without hasSpecial the known units are not a fallback");
+    s_units[kPeakEnemy].flags |= 0x4000;
+    Check(ListCount(0, 1, 1, 40, &found) == 0, "a dying unit is not appended");
+    s_units[kPeakEnemy].flags &= ~0x4000u;
+
+    s_units[kBase].def = specialDef;
+    g_game->ticks = 150;
+    seam.RefreshUnitIndex(0);
+    Check(LosUnitIndexOf(0)->hasSpecial == 1, "hasSpecial is set again");
+    Check(ListCount(0, 12, 4, 40, &found) == 2 && found[0] == &s_units[kPatroller] && found[1] == &s_units[kWatched],
+          "with hasSpecial and nothing visible in range the known units in range are appended");
+    Check(ListCount(0, 12, 4, 100, &found) == 2, "with hasSpecial the known fallback ignores the flag 0x8000 of the visible list");
+    Check(ListCount(0, 1, 1, 500, &found) == 1, "with a visible unit in range the known units are not appended");
+    Check(ListCount(0, 12, 5, 10, &found) == 1 && found[0] == &s_units[kWatched], "the fallback respects the radius");
+
+    Ref<Unit> refs[2];
+    refs[0] = (Unit*)0;
+    refs[1] = (Unit*)0;
+    Vec3 at;
+    at.x = WorldOfLosCell(12);
+    at.y = 0;
+    at.z = WorldOfLosCell(4);
+    int count = seam.GetVisibleEnemiesInRadiusList(0, &at, 40, 0, refs, 1);
+    Check(count == 2 && refs[0] == &s_units[kPatroller] && refs[1] == 0, "the list form counts all and writes only the capacity");
+    count = seam.GetVisibleEnemiesInRadiusList(0, &at, 40, 0, refs, 2);
+    Check(count == 2 && refs[1] == &s_units[kWatched], "the list form writes every unit within the capacity");
+
+    at.x = WorldOfLosCell(1);
+    at.z = WorldOfLosCell(1);
+    Check(seam.HasReadyUnitInRange(0, &at, 40), "HasReadyUnitInRange sees a ready visible enemy in range");
+    s_units[kPeakEnemy].flags |= 0x4000;
+    Check(!seam.HasReadyUnitInRange(0, &at, 40), "HasReadyUnitInRange ignores a dying unit");
+    refs[0] = 0;
+    Check(seam.GetSeenUnitsInRadius(0, &at, 40, refs, 1) == 1 && refs[0] == &s_units[kPeakEnemy], "GetSeenUnitsInRadius counts a dying visible unit");
+    s_units[kPeakEnemy].flags &= ~0x4000u;
+    Check(seam.GetSeenUnitsInRadius(0, &at, 40, refs, 0) == 1, "GetSeenUnitsInRadius counts past its capacity");
+    at.x = WorldOfLosCell(12);
+    at.z = WorldOfLosCell(4);
+    Check(!seam.HasReadyUnitInRange(0, &at, 40), "HasReadyUnitInRange ignores units that are not in the visible list");
+    Check(seam.GetSeenUnitsInRadius(0, &at, 40, refs, 2) == 0, "GetSeenUnitsInRadius ignores units that are not in the visible list");
+
+    unsigned short* mask = g_game->visibilityMask.get();
+    mask[kLos * 2 + 2] = 1;
+    mask[kLos * 2 + 3] = 2;
+    Vec3 point;
+    point.x = WorldOfLosCell(2);
+    point.y = 0;
+    point.z = WorldOfLosCell(2);
+    Check(seam.IsPointVisible(&s_players[0], &point) == 1, "IsPointVisible is 1 for a cell the viewing player sees");
+    point.x = WorldOfLosCell(3);
+    Check(seam.IsPointVisible(&s_players[0], &point) == 0, "IsPointVisible is 0 for a cell only another player sees");
+    point.x = WorldOfLosCell(kLos);
+    Check(seam.IsPointVisible(&s_players[0], &point) == 0, "IsPointVisible is 0 outside the player's grid");
+
+    seam.FreeUnitIndex(0);
+    Check(LosUnitIndexOf(0)->live == 0 && VisibleCount(0) == 0 && KnownCount(0) == 0, "FreeUnitIndex empties the index and makes it not live");
+    g_game->ticks = 300;
+    seam.RefreshUnitIndex(0);
+    Check(VisibleCount(0) == 0, "a freed index is not refreshed");
+    seam.CreateUnitIndex(0);
+    Check(LosUnitIndexOf(0)->live == 1 && LosUnitIndexOf(0)->hasSpecial == 0, "CreateUnitIndex after FreeUnitIndex makes a fresh index");
+    seam.FreeUnitIndex(0);
+    seam.FreeUnitIndex(1);
+    s_units[kBase].def = s_units[kRover].def;
+}
+
 int main()
 {
     Setup();
@@ -548,6 +722,14 @@ int main()
     seam.UpdateUnitLineOfSight = TamperedUpdateUnitLineOfSight;
     seam.ExpireEyeballs = ExpireEyeballs;
     seam.IsUnitVisibleToPlayer = IsUnitVisibleToPlayer;
+    seam.CreateUnitIndex = CreateUnitIndex;
+    seam.FreeUnitIndex = FreeUnitIndex;
+    seam.RefreshUnitIndex = RefreshUnitIndex;
+    seam.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
+    seam.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
+    seam.HasReadyUnitInRange = HasReadyUnitInRange;
+    seam.IsPointVisible = IsPointVisible;
+    seam.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
     g_seams.los_radar = &seam;
 
     static Run plain, again, tampered;
@@ -593,6 +775,7 @@ int main()
     printf("tampered tick %d, first differing tick %d, %d differing ticks\n", tampered.tampered, firstState, stateDiffering);
 
     CheckRejected();
+    CheckUnitIndex();
 
     printf(g_failures ? "FAILED\n" : "los_radar_writer_test: all passed\n");
     return g_failures != 0;

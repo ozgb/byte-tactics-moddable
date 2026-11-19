@@ -927,7 +927,7 @@ LrList,src/map/line_of_sight_index.cpp,los_radar,x,
     def test_the_pilots_table_lists_los_radar_before_map(self):
         self.assertEqual(seamlink.PILOTS[-4].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
-                                                     "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex"))
+                                                     "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex", "Init", "Shutdown"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"))
         header = seamlink.ROOT / "interfaces/los_radar.h"
         if header.exists():
@@ -1118,7 +1118,7 @@ PLAYERS_HEADER = """struct PlayersSeam {
 PLAYERS_FILLERS = {"Apply": "PlApply", "UpdatePlayers": "PlUpdate", "UpdateBlink": "PlBlink", "InitPlayers": "PlInit",
                    "SetupPlayerSlot": "PlSetup"}
 PLAYERS_PILOT = dataclasses.replace(
-    seamlink.PLAYERS, writing=("Apply", "UpdatePlayers", "UpdateBlink"), setup=("InitPlayers", "SetupPlayerSlot"),
+    seamlink.PLAYERS, writing=("Apply", "UpdatePlayers", "UpdateBlink"), query=(), setup=("InitPlayers", "SetupPlayerSlot"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),))
 
@@ -1159,8 +1159,8 @@ PlBlink,src/game/players.cpp,players,x,
     def test_the_pilots_table_lists_players_before_ai(self):
         self.assertEqual(seamlink.PILOTS[-2].owner, "players")
         self.assertEqual(seamlink.PLAYERS.writing, ("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
-                                                    "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink"))
-        self.assertEqual(seamlink.PLAYERS.query, ())
+                                                    "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink", "Init", "Shutdown"))
+        self.assertEqual(seamlink.PLAYERS.query, ("RegionSize", "WriteState"))
         header = seamlink.ROOT / "interfaces/players.h"
         if header.exists():
             pilot = seamlink.PLAYERS

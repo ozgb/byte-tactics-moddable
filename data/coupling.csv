@@ -39,7 +39,7 @@ ai,los_radar,shared_write,Vec3::y,13
 ai,los_radar,shared_write,Vec3::z,16
 ai,map,shared_write,Point16::x,15
 ai,map,shared_write,Point16::y,15
-ai,map,shared_write,Ref<Unit>::offset,1
+ai,map,shared_write,Ref<Unit>::offset,2
 ai,map,shared_write,Vec3::x,11
 ai,map,shared_write,Vec3::y,4
 ai,map,shared_write,Vec3::z,11
@@ -165,7 +165,7 @@ economy,harness,shared_write,Player::shareMetal,1
 economy,harness,shared_write,PlayerInfo::shareMetal,1
 economy,los_radar,shared_write,PlayerInfo::flags_97_wide,2
 economy,los_radar,shared_write,Ref<Unit>::offset,2
-economy,map,shared_write,Ref<Unit>::offset,1
+economy,map,shared_write,Ref<Unit>::offset,2
 economy,network,indirect,BroadcastPlayerInfo,2
 economy,network,indirect,SendShareMapInfo,1
 economy,network,shared_write,Player::energy,1
@@ -326,7 +326,7 @@ features,map,shared_write,Game::featureCount,6
 features,map,shared_write,Game::features,8
 features,map,shared_write,Point16::x,15
 features,map,shared_write,Point16::y,15
-features,map,shared_write,Ref<Unit>::offset,1
+features,map,shared_write,Ref<Unit>::offset,2
 features,map,shared_write,Vec3::x,11
 features,map,shared_write,Vec3::y,4
 features,map,shared_write,Vec3::z,11
@@ -676,6 +676,9 @@ game,los_radar,indirect,ExpireEyeballs,1
 game,los_radar,indirect,FreeMapResources,1
 game,los_radar,indirect,GetMapCellAtPosition,1
 game,los_radar,indirect,LoadTntMap,1
+game,los_radar,indirect,LosRadarInit,1
+game,los_radar,indirect,LosRadarRegionSize,1
+game,los_radar,indirect,LosRadarShutdown,1
 game,los_radar,indirect,RecordRadarMapped,1
 game,los_radar,indirect,RecordRadarUnits,1
 game,los_radar,indirect,RefreshUnitIndex,1
@@ -956,6 +959,9 @@ game,players,indirect,InitPlayerResources,1
 game,players,indirect,InitPlayers,1
 game,players,indirect,LoadPlayerControllers,1
 game,players,indirect,LoadPlayers,1
+game,players,indirect,PlayersInit,1
+game,players,indirect,PlayersRegionSize,1
+game,players,indirect,PlayersShutdown,1
 game,players,indirect,RebuildAIFeatureCells,1
 game,players,indirect,SavePlayers,1
 game,players,indirect,SetupPlayerSlot,2
@@ -1632,7 +1638,7 @@ harness,network,shared_write,LoadingFlags::value,1
 harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
 harness,network,shared_write,Player::type,69
-harness,orders,call,Add,101
+harness,orders,call,Add,102
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,FeaturesSeam::GetCellFeature,1
@@ -2105,6 +2111,8 @@ los_radar,harness,shared_write,Point16::y,1
 los_radar,harness,shared_write,Vec3::x,2
 los_radar,harness,shared_write,Vec3::y,1
 los_radar,harness,shared_write,Vec3::z,2
+los_radar,map,indirect,MapAllocateBuckets,1
+los_radar,map,indirect,MapFreeBuckets,1
 los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
@@ -2112,7 +2120,8 @@ los_radar,map,shared_write,Game::cells,16
 los_radar,map,shared_write,Game::visibilityMask,5
 los_radar,map,shared_write,Point16::x,15
 los_radar,map,shared_write,Point16::y,15
-los_radar,map,shared_write,Ref<Unit>::offset,1
+los_radar,map,shared_write,Rec::flags,2
+los_radar,map,shared_write,Ref<Unit>::offset,2
 los_radar,map,shared_write,Unit::flags,5
 los_radar,map,shared_write,Vec3::x,11
 los_radar,map,shared_write,Vec3::y,4
@@ -2320,6 +2329,7 @@ map,los_radar,shared_write,Grid::width,3
 map,los_radar,shared_write,Mission::lavaWorld,1
 map,los_radar,shared_write,Point16::x,5
 map,los_radar,shared_write,Point16::y,5
+map,los_radar,shared_write,Rec::flags,1
 map,los_radar,shared_write,Ref<Unit>::offset,2
 map,los_radar,shared_write,Unit::flags,9
 map,los_radar,shared_write,Vec3::x,16
@@ -2887,7 +2897,7 @@ orders,map,indirect,SnapWorldPosToFootprint,2
 orders,map,shared_write,Fixed::value,2
 orders,map,shared_write,Point16::x,15
 orders,map,shared_write,Point16::y,15
-orders,map,shared_write,Ref<Unit>::offset,1
+orders,map,shared_write,Ref<Unit>::offset,2
 orders,map,shared_write,Unit::flags,5
 orders,map,shared_write,Unit::pos,2
 orders,map,shared_write,Vec3::x,11
@@ -3650,7 +3660,7 @@ players,map,shared_write,Player::exploredWidth,4
 players,map,shared_write,Player::type,2
 players,map,shared_write,Point16::x,15
 players,map,shared_write,Point16::y,15
-players,map,shared_write,Ref<Unit>::offset,1
+players,map,shared_write,Ref<Unit>::offset,2
 players,map,shared_write,Vec3::x,11
 players,map,shared_write,Vec3::y,4
 players,map,shared_write,Vec3::z,11
@@ -4995,7 +5005,7 @@ seams,map,shared_write,LosRadarSeam::GetMapCell,1
 seams,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
 seams,map,shared_write,Point16::x,15
 seams,map,shared_write,Point16::y,15
-seams,map,shared_write,Ref<Unit>::offset,1
+seams,map,shared_write,Ref<Unit>::offset,2
 seams,map,shared_write,Seams::features,1
 seams,map,shared_write,Seams::los_radar,2
 seams,map,shared_write,Seams::players,2
@@ -5336,7 +5346,7 @@ targeting,los_radar,shared_write,Ref<Unit>::offset,2
 targeting,los_radar,shared_write,Vec3::x,16
 targeting,los_radar,shared_write,Vec3::y,13
 targeting,los_radar,shared_write,Vec3::z,16
-targeting,map,shared_write,Ref<Unit>::offset,1
+targeting,map,shared_write,Ref<Unit>::offset,2
 targeting,map,shared_write,Vec3::x,11
 targeting,map,shared_write,Vec3::y,4
 targeting,map,shared_write,Vec3::z,11
@@ -5538,6 +5548,7 @@ units,harness,shared_write,Vec3::y,1
 units,harness,shared_write,Vec3::z,2
 units,los_radar,indirect,GetMapCell,1
 units,los_radar,indirect,IsUnitVisibleToPlayer,1
+units,los_radar,indirect,LosRadarSightCache,1
 units,los_radar,shared_write,Game::poolCount,1
 units,los_radar,shared_write,Game::units,6
 units,los_radar,shared_write,Game::unitsEnd,4
@@ -5587,7 +5598,7 @@ units,map,shared_write,MovementClass::name,2
 units,map,shared_write,MovementClass::width,5
 units,map,shared_write,Point16::x,15
 units,map,shared_write,Point16::y,15
-units,map,shared_write,Ref<Unit>::offset,1
+units,map,shared_write,Ref<Unit>::offset,2
 units,map,shared_write,Unit::bit2,3
 units,map,shared_write,Unit::cargo,2
 units,map,shared_write,Unit::cargoNext,9

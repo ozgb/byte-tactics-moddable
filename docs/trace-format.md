@@ -814,10 +814,10 @@ through the `StateWriter` of its `WriteState`, dumped and never hashed, with the
 `mapState.*`:
 
 ```
-playersState.endGameCountdown                  # 2 bytes (game+0x39239, set by the engine at set-up, unused)
+playersState.<end-game countdown>              # 2 bytes (game+0x39239, set by the engine at set-up, unused); the leaf is the countdown's name in the game record
 for i in 0 .. 9:
-    playersState.players[i].updateTime         # 4 bytes (Player's unused words)
-    playersState.players[i].winLoseTime        # 4 bytes
+    playersState.players[i].<update time>      # 4 bytes (Player's unused words); the leaf is the update clock's name in the player record
+    playersState.players[i].<win/lose time>    # 4 bytes; the leaf is the win/lose clock's name in the player record
 playersState.conditions.present                # 1 when the list ref at game+0x391ed is not null
 if present:
     playersState.conditions.victoryCount       # the u32 at 0x40 of the list
@@ -1231,13 +1231,15 @@ for k in 0 .. n-1, in application order:
     los_radar[k].lifetime
     los_radar[k].cell                          # hex: the 8 bytes, two little-endian i32
     los_radar[k].size                          # hex: the 8 bytes, two little-endian i32
+    los_radar[k].sightCell
+    los_radar[k].sightFrameIdx
     los_radar[k].outcome
 ```
 
 `los_radar.count` and the numbers of a record are written as `0x` and 8 hex digits.
 
 - `kind` is an event: 128 UPDATE_UNIT, 129 REMOVE_UNIT, 130 REVEAL_UNIT, 131 ADD_EYEBALL, 132 CELL_HEIGHTS,
-  133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR, 136 SHARE_MAP.
+  133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR, 136 SHARE_MAP, 137 SIGHT_RESET, 138 SIGHT_LOAD.
 - `unit` is the unit whose line of sight changes, a pointer ID with target `unit` (section 5): `units:N`,
   `null`, or `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
 - `player` is the player of SHARE_MAPPING and SHARE_RADAR and the player whose map SHARE_MAP shares, 0 to 9;
@@ -1249,6 +1251,9 @@ for k in 0 .. n-1, in application order:
   position, in world units, and the lifetime in ticks.
 - `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a
   CELL_HEIGHTS.
+- `sightCell` and `sightFrameIdx` are the sight cache a SIGHT_LOAD sets for the unit: the cell of the last sight
+  circle (x in the low 16 bits, z in the high 16) and the table frame index. They are 0 for every other kind,
+  SIGHT_RESET included.
 - `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
   null; for ADD_EYEBALL 0 when line of sight is off or no eyeball is free; for SHARE_MAPPING and
   SHARE_RADAR 0 outside a network game.
@@ -1597,7 +1602,7 @@ Format 6 took the state that only its owner reads out of the hash (#979). Sectio
 left the world row, and section 25 (the squad managers) and section 24 (the player AI) were replaced by the records that units and los_radar write
 (sections 8.13 and 8.14: the factory index, the unit index and `hasSpecial`, in the new `Begin(24 or 25)` records of the `StateWriter`); the table Rec
 hashes `b` only; the sight cache of a unit (`Unit::unusedLosCache`, `unusedLosSightFrame`), the clocks of a player (`Player::unusedUpdateTime`,
-`unusedWinLoseTime`) and the end-game countdown (game scalar `endGameCountdown`) left the tables. What left is dumped, never hashed, in the
+`unusedWinLoseTime`) and the end-game countdown (a game scalar) left the tables. What left is dumped, never hashed, in the
 records 43 (ai, extended), 44 (los_radar), 45 (map) and 46 (players), with the prefixes `aiState.`, `losRadarState.`, `mapState.` and `playersState.`. A reader of
 format 5 must read the new world row; a reader of the dump must skip the four prefixes. The digests of the stored scenarios change, and so does the tag.
 

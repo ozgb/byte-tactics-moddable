@@ -328,13 +328,13 @@ void __stdcall MapWriteState(const StateWriter* w)
     for (unsigned int r = 0; r < count; r++) {
         w->Int("spatial[%u].a", r, 1, recs[r].a);
         w->Int("spatial[%u].flags", r, 4, (unsigned int)recs[r].flags);
-        w->Handle("spatial[%u].first", r, STATE_HANDLE_UNIT, (unsigned int)recs[r].field_6);
+        w->Handle("spatial[%u].first", r, STATE_HANDLE_UNIT, ((UnitBucket*)&recs[r])->first.offset);
     }
     w->Int("overflow.present", 0, 1, overflow != nullptr);
     if (overflow != nullptr) {
         w->Int("overflow.a", 0, 1, overflow->a);
         w->Int("overflow.flags", 0, 4, (unsigned int)overflow->flags);
-        w->Handle("overflow.first", 0, STATE_HANDLE_UNIT, (unsigned int)overflow->field_6);
+        w->Handle("overflow.first", 0, STATE_HANDLE_UNIT, ((UnitBucket*)overflow)->first.offset);
     }
 }
 

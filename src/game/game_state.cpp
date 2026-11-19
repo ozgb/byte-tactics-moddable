@@ -10,6 +10,8 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/los_radar.h"
+#include "../../interfaces/players.h"
 #include "../seams/economy_world.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"

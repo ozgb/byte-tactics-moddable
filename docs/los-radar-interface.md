@@ -23,7 +23,7 @@ to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 138 (effects would ta
 Los_radar's place in it:
 - **Events into los_radar:** UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT, ADD_EYEBALL, CELL_HEIGHTS, RECALCULATE,
   SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players, economy and the engine; and,
-  since 3.2, SIGHT_RESET and SIGHT_LOAD, which units applies through `Apply` as it sets a unit up and loads a saved game.
+  since 3.2, SIGHT_RESET and SIGHT_LOAD, which units publishes (`LosRadarPublishSightReset`, `LosRadarPublishSightLoad`) as it sets a unit up and loads a saved game.
   Los_radar's handler (`LosRadarInbox`, `src/seams/los_radar_world.cpp`) passes each to `Apply`.
 - **Routes:** of the fourteen routes, every one that can be published inside the tick is synchronous except map's
   CELL_HEIGHTS: three because the gate diverged with them queued, two by #952's rule, and three because no scenario
@@ -248,8 +248,8 @@ written in one call, record 44 first.
   Only `UpdateUnitLineOfSight`, `RemoveUnitLineOfSight`, `RevealNewUnit` and `RecalculateLineOfSight` read or write it.
   The 12 bytes of the unit record stay, unused (`Unit::unusedLosCache` at 0x7a and `unusedLosSightFrame` at 0xf8), so
   no other offset moves, as economy's 48. Units' set-up applies SIGHT_RESET (the cache back to zero, as it zeroed the
-  bytes), the saved game reads it through `SightCache` and the load applies SIGHT_LOAD. Both events are applied through
-  `Apply` at the statement that wrote the bytes in 3.1c, not queued. It is dumped in record 44, as `sight[s].cell` and
+  bytes), the saved game reads it through `SightCache` and the load applies SIGHT_LOAD. Both events are published
+  through synchronous routes (`src/game/routes.cpp`), so `Apply` runs at the statement that wrote the bytes in 3.1c, not queued. It is dumped in record 44, as `sight[s].cell` and
   `sight[s].frameIdx` for each unit slot s, and is not hashed. **A wrong cache still diverges in hashed state.** The
   two divergences that showed the cache in #978 differ in what they reach. Conditions-dark-side's fault (tick 1243)
   never reaches the view state: the mask and the explored grids stay equal, so a wrong cache there is seen only
@@ -262,7 +262,7 @@ written in one call, record 44 first.
   (`docs/map-interface.md`, section 5).
 - **The trace dumps los_radar's events** in section 39 (`docs/trace-format.md`, section 8.27), after targeting's
   section 38, and hashes none of them. Each record is an event with the outcome `Apply` gave, in los_radar's order.
-  SIGHT_RESET and SIGHT_LOAD are applied directly by units and are not in section 39.
+  SIGHT_RESET and SIGHT_LOAD are in section 39 like the other events, with the fields `sightCell` and `sightFrameIdx`.
 
 ## 6. Random draws and sim events
 

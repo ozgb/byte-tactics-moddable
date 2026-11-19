@@ -194,6 +194,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "ai_player.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
+#include "../../interfaces/state_writer.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../state/sim_effects.h"
@@ -409,7 +410,7 @@ static void AiWritePlayerAI(const StateWriter* w, const PlayerAI* ai)
     w->Int("ai.pos_41.z", 0, 4, (unsigned int)ai->pos_41.z);
     w->Int("ai.center.x", 0, 2, (unsigned short)ai->center.x);
     w->Int("ai.center.y", 0, 2, (unsigned short)ai->center.y);
-    w->Int("ai.centerPad", 0, 4, (unsigned int)ai->center.unknown_4);
+    w->Int("ai.centerPad", 0, 4, ((const unsigned int*)&ai->center)[1]);
     w->Int("ai.builders", 0, 4, (unsigned int)ai->builders);
     w->Int("ai.lastTick", 0, 4, ai->lastTick);
     w->Int("ai.spacing0.x", 0, 2, (unsigned short)ai->spacing0.x);
@@ -505,8 +506,8 @@ static void WriteAiRecords(const StateWriter* w)
             w->Begin(43, name);
             w->Int("owner", 0, 1, AiPlayerSlotOf(squad->owner));
             w->Int("index", 0, 4, (unsigned int)squad->index);
-            w->Int("field_8", 0, 4, (unsigned int)squad->field_8);
-            w->Int("field_c", 0, 4, (unsigned int)squad->field_c);
+            w->Int("word8", 0, 4, ((const unsigned int*)squad)[2]);
+            w->Int("wordC", 0, 4, ((const unsigned int*)squad)[3]);
             unsigned int n = squad->items.Size();
             w->Int("items.size", 0, 4, n);
             for (unsigned int k = 0; k < n; k++)

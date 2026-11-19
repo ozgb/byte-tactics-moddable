@@ -151,6 +151,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../../interfaces/orders.h"
 #include "../game/economy_events.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/los_radar.h"
 #include "../../interfaces/services.h"
 #include "../game/ai_events.h"
 #include "../game/los_radar_events.h"

@@ -238,7 +238,7 @@ Coverage: 79.4% of functions (85 of 107), 75.2% of lines, 73.0% of branches; 22 
 - platform (17): `RandomInt`, `operator new`, `CommandArgs::InitArgs`, `ExecuteCommandText`, and 13 more
 - seams (5): `ScheduleTargetingTargetUnit`, `ScheduleTargetingFind`, `GetNameSlotNative`, `ScheduleMapCanBuildAt`, `ScheduleMapCanPlaceUnitFootprint`
 - los_radar (4): `GetMapCell`, `GetSeenUnitsInRadius`, `IsPointVisible`, `IsUnitVisibleToPlayer`
-- game (3): `RecordBuildQueueSound`, `SimAllocTagged`
+- game (3): `Game::SlotOf`, `RecordBuildQueueSound`, `SimAllocTagged`
 - economy (1): `GetEnergyUse`
 - orders (1): `GetOrderFlags`
 - 2 smaller targets: players (1), weapons (1)
@@ -454,7 +454,7 @@ Coverage: 90.7% of functions (88 of 97), 87.7% of lines, 74.5% of branches; 9 li
 **Imports.** 38 functions of 7 subsystems, by target, each with the number of functions it calls there:
 
 - platform (16): `GameFreeThunk`, `StringRef::Assign`, `operator delete`, `GameAllocIgnoreTag`, and 12 more
-- game (9): `FeaturesPublishPlace`, `Game::Current`, `RecordMessage`, `RecordSimEvent`, `SimAlloc`, `SimAllocTagged`, `SimBlockTrack`, `SimCaptureAlloc`
+- game (9): `FeaturesPublishPlace`, `Game::Current`, `Game::SlotOf`, `RecordMessage`, `RecordSimEvent`, `SimAlloc`, `SimAllocTagged`, `SimBlockTrack`, `SimCaptureAlloc`
 - features (4): `FreeFeaturePool`, `InitFeatureAnimPool`, `PlaceFeature`, `PlaceMissionFeatures`, and 0 more
 - presentation (3): `BuildTedRadarFrame`, `GetGafFrame`, `StringRef::ReleaseRef`
 - seams (3): `GetGroundHeightNative`, `GetNameSlotNative`, `VisitUnitsInRange`
@@ -465,7 +465,7 @@ Coverage: 90.7% of functions (88 of 97), 87.7% of lines, 74.5% of branches; 9 li
 
 `Game::count_14277` (mixed); `SightQuery::cacheCell` (mixed); `SightQuery::eyeHeight` (mixed); `SightQuery::frameIdx` (mixed); `SightQuery::player` (mixed); `SightQuery::pos` (mixed); `SightQuery::sightDistance` (mixed); `Unit::flags` (mixed); `Eye::expires` (mixed); `Eye::flagA` (mixed); `Eye::flagPtr` (mixed); `Eye::player` (mixed)
 
-**Sim reads.** 125 items only read, 125 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 124 items only read, 124 named. The most used (`g_game`, the root pointer, left out):
 
 `Game::width` (sim); `Game::height` (sim); `Game::playerIndex` (mixed); `Game::seaLevel` (mixed); `Game::losTable` (sim); `Player::exploredWidth` (sim); `Unit::def` (mixed); `Player::explored` (sim); `FrameTable::count` (sim); `Unit::player` (sim); `Game::grid1` (sim)
 

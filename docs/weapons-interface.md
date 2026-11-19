@@ -21,7 +21,7 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 168 and 176, players 192 to 196 and 208 to
+to 67 and 80, targeting 96 to 100 and 112, los_radar 128 to 136, map 160 to 168 and 176, players 192 to 196 and 208 to
 210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246, weapons 256 to 269 and 272 to 281 (its range is 256 to 287).
 
 The human ruled on 2026-11-17 that **weapons owns the damage rules and units owns the record**: weapons computes the
@@ -88,7 +88,7 @@ another machine already computed and announced, and skips the armour and the net
 | units: a unit is built or created from a packet (`units.cpp`) | `InitUnitWeaponSlots` | INIT_SLOTS from units |
 | units: a unit dies (`ApplyUnitDeath`) | `RemoveUnitProjectiles` | REMOVE_PROJECTILES from units |
 | units: a unit captured by another player (`UnitsOnPlayersCaptureUnit`) | the stockpiles copied into the new unit's slots | SET_STOCKPILES from units |
-| units: a saved game loads (`unit_save.cpp`) | the slot's fields restored | LOAD_SLOT from units, outside the tick |
+| units: a saved game loads (`unit_save.cpp`) | the slot's fields restored, but its target pair | LOAD_SLOT from units, outside the tick; the target pair is targeting's, restored by targeting's LOAD (`docs/targeting-interface.md`, section 2) |
 | orders: a stockpile weapon's build order finishes a round (`BuildWeaponOrder`, `unit_orders.cpp`) | the slot's `stockpile` raised by one | ADD_STOCKPILE from orders, `value` the weapon (0 to 2) |
 | scripts: an aim thread ends, or the aim script is missing (`cob.cpp`) | `WeaponAimCobComplete` | AIM_DONE from scripts |
 | scripts: the explode opcode (`script_explode.cpp`) | `CobScriptExplodePiece` | EXPLODE_PIECE from scripts |
@@ -157,7 +157,8 @@ the rules, units owns the record.
 
 | Field of `Unit` | Whose | Written how |
 |---|---|---|
-| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`): `aimTargetXOrUnitId`, `aimTargetZOrUnitSentinel`, `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, LOAD_SLOT, ADD_STOCKPILE, AIM_DONE) and runs (`UpdateUnitWeapons`). The aim target fields are also written by targeting (`SetWeaponTargetUnit`, `SetWeaponTargetPos`, `GetWeaponTargetPos`, `src/units/unit_targets.cpp`) |
+| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`) but the target pair: `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, LOAD_SLOT, ADD_STOCKPILE, AIM_DONE) and runs (`UpdateUnitWeapons`) |
+| the target pair of each slot, `aimTargetXOrUnitId` and `aimTargetZOrUnitSentinel`, the slot's first four bytes | targeting's (`docs/targeting-interface.md`, section 5) | by targeting's events (SET_UNIT, SET_POS, CLEAR, RESET, LOAD) and its slot `GetWeaponTargetPos`; a saved game's pair by LOAD, which units publishes as the save loads |
 | `health`, `flags` (0x4000 dying), `attacker`, `lastAttackerSlot`, `lastDamageType` | units' record | by the effects HEALTH and DAMAGE_RECORD, units' handlers; `health` has other writers (self-repair, build progress, orders) |
 | `recentlyDamagedTimer` | units' record | by MARK_DAMAGED |
 | `workTime` | units' record | by BUSY (orders write it too) |

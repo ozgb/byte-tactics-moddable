@@ -61,4 +61,13 @@ inline void TargetingPublishReset(int outbox, U* unit, int weapon)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+template <class U>
+inline void TargetingPublishLoad(int outbox, U* unit, int weapon, short first, short second)
+{
+    TargetingEvent event = TargetingEventOf(TARGETING_LOAD, unit, weapon);
+    event.pos[0] = first;
+    event.pos[2] = second;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 #endif

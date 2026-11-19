@@ -1,9 +1,9 @@
 # The targeting interface
 
-Targeting sits behind `interfaces/targeting.h` (version 2.0), the third module on the scheduler after economy
-(`docs/economy-interface.md`) and features (`docs/features-interface.md`), and the first whose state stays in the
-`Unit` record (#955). 3.1c's targeting code is its default implementation. This page is the inventory the interface
-was cut from:
+Targeting sits behind `interfaces/targeting.h` (version 2.1, which adds LOAD), the third module on the scheduler
+after economy (`docs/economy-interface.md`) and features (`docs/features-interface.md`), and the first whose state
+stays in the `Unit` record (#955). 3.1c's targeting code is its default implementation. This page is the inventory
+the interface was cut from:
 - what other subsystems did to targeting's state in 3.1c, and what each became;
 - what targeting did to others, and what each became;
 - what targeting reads, and what others read of it;
@@ -17,15 +17,15 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, targeting 96 to
-99 and 112.
+100 and 112.
 
 Targeting's place in it:
-- **Events into targeting:** SET_UNIT, SET_POS, CLEAR and RESET, published by orders, ai, weapons and units.
+- **Events into targeting:** SET_UNIT, SET_POS, CLEAR, RESET and LOAD, published by orders, ai, weapons and units.
   Targeting's handler (`TargetingInbox`, `src/seams/targeting_world.cpp`) passes each to `Apply`.
-- **Routes:** Of the nine routes, the eight into targeting and the effect CLEARED out of it, two are queued: units'
-  RESET and ai's SET_POS (#975, judged by `ai-antinuke-intercept`). The other seven are synchronous: three because
-  the gate diverged with them queued (orders' SET_UNIT, weapons' CLEAR and CLEARED) and four by #952's rule (orders'
-  SET_POS and CLEAR, ai's SET_UNIT and CLEAR) (sections 4 and 8).
+- **Routes:** Of the ten routes, the nine into targeting and the effect CLEARED out of it, three are queued: units'
+  RESET and LOAD and ai's SET_POS (#975, judged by `ai-antinuke-intercept`). The other seven are synchronous:
+  three because the gate diverged with them queued (orders' SET_UNIT, weapons' CLEAR and CLEARED) and four by #952's
+  rule (orders' SET_POS and CLEAR, ai's SET_UNIT and CLEAR) (sections 4 and 8).
 - **Synchronous slots:** `GetWeaponTargetPos`, `FindWeaponTarget` and `FindBestTargetIfFireAtWill`, called through
   the services `ScheduleTargetingTargetPos`, `ScheduleTargetingFind` and `ScheduleTargetingFireAtWill`, which
   deliver targeting's inbox first (section 2).
@@ -49,6 +49,7 @@ Targeting's place in it:
 | ai: the squad manager's retargeting (`RetargetWeapon`) | `SetWeaponTargetPos` (an interceptor at a projectile), `SetWeaponTargetUnit`, `ClearWeaponTarget` | SET_POS, SET_UNIT, CLEAR from ai |
 | weapons: a weapon claimed or released (`Unit::ClaimWeapons`, `Unit::ReleaseWeapons`) | the code of `ClearWeaponTarget`, inline | CLEAR from weapons |
 | units: a unit set up (`InitUnitFromType`) | `ResetWeaponTarget` | RESET from units |
+| units: a saved game loads (`LoadUnit`, `unit_save.cpp`) | the pair's four bytes written from the save | LOAD from units, outside the tick (2.1, #1010) |
 
 **Weapons' inline clear.** `Unit::ClaimWeapons` and `Unit::ReleaseWeapons` (weapons' code) held a copy of
 `ClearWeaponTarget`: they wrote the target pair and ran the unit's TargetCleared script themselves. They now publish
@@ -115,6 +116,7 @@ writes outside the pair, and that decides each route:
 | ai CLEAR | synchronous | #952's rule. The squad manager's `RetargetWeapon` runs in the players phase before the player's economy, which publishes the extractors' SetSpeed scripts to units' inbox. The phase boundary delivers units before targeting, so a pending CLEAR's TargetCleared thread on an armed extractor would start after SetSpeed instead of before it. |
 | ai SET_POS | queued | Only `RetargetWeapon` publishes it, for an interceptor aimed at a projectile, in the players phase. It writes the pair and the `netDirtyFlags` weapon notices; the pair is read only through targeting's slots, which deliver first, and nothing in the players phase reads or writes those notices (`RunOrders` runs only in the units phase, and victory reads bit 0, which the event keeps). `ai-antinuke-intercept` reaches it, and its trace is equal with the route queued (section 8). |
 | units RESET | queued | `InitUnitFromType` publishes it for each slot of a unit it sets up. It writes only the pair, read only through targeting's slots, and publishes no effect. The `ReleaseWeapons` that follows it may publish a synchronous CLEAR of the same slot, which delivers the RESET first; the unit's `netDirtyFlags` is set to 0 after both. |
+| units LOAD | queued | `LoadUnit` publishes it for each slot of a unit a saved game loads, outside the tick, where #970's rule delivers it at once. It writes only the pair and publishes no effect. |
 | weapons CLEAR | synchronous | The gate (section 8). Its CLEARED starts the TargetCleared thread, whose channel among the unit's script threads is hashed. |
 | CLEARED, targeting to units | synchronous | The gate (section 8), for the same channel order. |
 
@@ -140,7 +142,10 @@ Targeting keeps no private region, and so it has no `WriteState` report: its sta
 
 - **The target pair** of each of a unit's three weapon slots (a target unit's number with the mark 0x8000, or a
   ground point's x and z in whole units, or none) stays in the `Unit` record and in the hash (section 1 of the trace, `units[i]`).
-  It is targeting's alone to write: `privatestate.py --check` fails when another subsystem writes it. Moving it to a
+  It is targeting's alone to write: `privatestate.py --check` fails when another subsystem writes it inside the
+  tick. A saved game loads outside the tick, where the access log records nothing, so the check cannot see the
+  load: until #1010 units' `LoadUnit` wrote the pair itself and the check passed. LOAD holds the load to the same
+  rule. Moving it to a
   private region would be a trace format bump with a reference half (#946's path) for no gain in what a
   re-implementation must match: every reader already reaches it through targeting's slots, and the hash is what shows
   a wrong target at the tick it is chosen (the negative test, `tests/targeting_writer_test.cpp`).
@@ -153,8 +158,8 @@ Targeting keeps no private region, and so it has no `WriteState` report: its sta
 
 Targeting draws from one stream (`data/draws.csv`): `rng.parkMiller`, in `FindWeaponTarget`, to pick among the
 enemies in reach, in the units phase (through `FindBestTargetIfFireAtWill`, from orders) and the players phase
-(through `FindWeaponTarget`, from ai's retargeting). No event draws: SET_UNIT, SET_POS, CLEAR and RESET write the pair
-and nothing else of the streams. CLEARED starts a script thread, which draws only when it runs, in units' run.
+(through `FindWeaponTarget`, from ai's retargeting). No event draws: SET_UNIT, SET_POS, CLEAR, RESET and LOAD write
+the pair and nothing else of the streams. CLEARED starts a script thread, which draws only when it runs, in units' run.
 
 The class `ordered` of `data/dependencies.csv` names each pair of subsystems whose draws interleave in one phase. Each
 pair with targeting is kept in 3.1c's order as follows:

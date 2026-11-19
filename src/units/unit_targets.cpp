@@ -353,6 +353,12 @@ int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
         return ClearWeaponTarget(unit, e->weapon);
     case TARGETING_RESET:
         return ResetWeaponTarget(unit, e->weapon);
+    case TARGETING_LOAD: {
+        UnitWeaponSlot* elem = &unit->weapons[e->weapon];
+        elem->aimTargetXOrUnitId = (short)e->pos[0];
+        elem->aimTargetZOrUnitSentinel = (short)e->pos[2];
+        return 1;
+    }
     }
     return 0;
 }

@@ -249,6 +249,23 @@ int __stdcall BuildCampaignNameList(char** out, int side)
     return found;
 }
 
+int __stdcall BuildMissionNameList(char** out)
+{
+    char name[256];
+    int n = g_seams.mission->CountMissions();
+    if (n != 0) {
+        char* p = (char*)GameAllocIgnoreTag("MissionList", n << 8);
+        *out = p;
+        *p = 0;
+        for (int i = 0; i < n; i++) {
+            if (g_seams.mission->GetCampaignMissionName(i, name, sizeof(name)) == 0)
+                return 0;
+            strcpy(SkipTextLines(*out, i), name);
+        }
+    }
+    return n;
+}
+
 // FUNCTION: 0x476c70
 void StartBriefingNarration()
 {
@@ -661,7 +678,7 @@ void __stdcall FillMissionList(Gui* menu, int unused)
     Gadget* layout =
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
     g_seams.mission->LoadCampaign(SkipTextLines(layout->u.list.lines, layout->u.list.selected));
-    int count = g_seams.mission->BuildMissionList(&g_missionNameList);
+    int count = BuildMissionNameList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
@@ -694,7 +711,7 @@ static inline void FillMissionListInline(Gui* menu, Gadget* unused)
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
     g_seams.mission->LoadCampaign(
         SkipTextLines(layout->u.list.lines, layout->u.list.selected));
-    int count = g_seams.mission->BuildMissionList(&g_missionNameList);
+    int count = BuildMissionNameList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
@@ -937,7 +954,7 @@ void __stdcall OpenNewGameMenu(int param_1)
                                              "Campaign");
             char* text = SkipTextLines(m->u.list.lines, m->u.list.selected);
             g_seams.mission->LoadCampaign(text);
-            int mc = g_seams.mission->BuildMissionList(
+            int mc = BuildMissionNameList(
                 &g_missionNameList);
             ConfigureListBoxByName(menu, "Missions", g_missionNameList, mc, 0);
             int mi = FindGadgetIndex(mlayer->entries, "Missions", 2);

@@ -6517,6 +6517,7 @@ address,function,file,kind,target
 0x41f040,ShouldShowNextMission,src/frontend/endgame.cpp,indirect_call,indirect via int (*)(int) __attribute__((stdcall)) [MissionSeam::MissionExists]
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,ApplyDifficultyButtons
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,BlankScreen
+0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,BuildMissionNameList
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,BuildScrollItems1
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,ConfigureListBoxByName
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,call,DrawFrame
@@ -6555,7 +6556,6 @@ address,function,file,kind,target
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,Game::won
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,Layer::entries
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,Layer::surface
-0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,MissionSeam::BuildMissionList
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,MissionSeam::SelectMission
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,Player::active
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,field_read,Player::info
@@ -6569,7 +6569,6 @@ address,function,file,kind,target
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,function,
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,global_read,g_game
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,global_read,g_seams
-0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,indirect_call,indirect via int (*)(char **) __attribute__((stdcall)) [MissionSeam::BuildMissionList]
 0x41f0a0,OpenEndMissionScreen,src/frontend/endgame.cpp,indirect_call,indirect via int (*)(int) __attribute__((stdcall)) [MissionSeam::SelectMission]
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,call,FindGadgetIndex
 0x41f400,EnableEndMissionButtons,src/frontend/endgame.cpp,call,HasNextMission
@@ -10559,18 +10558,12 @@ address,function,file,kind,target
 0x4356f0,Mission::CountMissions,src/mission/map_list.cpp,field_maybe_written,Mission::list
 0x4356f0,Mission::CountMissions,src/mission/map_list.cpp,function,
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,GameAllocIgnoreTag
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,GetLocalizedString
+0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,Mission::CountMissions
+0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,Mission::GetCampaignMissionName
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,SkipTextLines
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,TdfFile::ResetCurrentRecord
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,TdfFile::SelectRecord
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,sprintf
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,strcpy
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,call,strlen
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,deref_read,*char
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,deref_write,*char
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,field_escape,Mission::campaign
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,field_maybe_written,Mission::list
-0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,field_read,Mission::campaign
 0x435760,Mission::BuildMissionList,src/mission/map_list.cpp,function,
 0x4358f0,Mission::GetTerrainLength,src/mission/map_list.cpp,field_read,Mission::exists
 0x4358f0,Mission::GetTerrainLength,src/mission/map_list.cpp,function,
@@ -23645,6 +23638,7 @@ address,function,file,kind,target
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,global_read,g_campaignNameList
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,global_read,g_game
 0x477940,FillCampaignList,src/frontend/campaign_menu.cpp,global_write,g_campaignNameList
+0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,BuildMissionNameList
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,ConfigureListBoxByName
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,FindGadgetChecked
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,call,FindGadgetIndex
@@ -23657,7 +23651,6 @@ address,function,file,kind,target
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,<anon>::selected
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Layer::entries
-0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,MissionSeam::BuildMissionList
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,MissionSeam::LoadCampaign
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,field_read,Seams::mission
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,function,
@@ -23666,7 +23659,6 @@ address,function,file,kind,target
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,global_read,g_missionNameList
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,global_read,g_seams
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,global_write,g_missionNameList
-0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,indirect_call,indirect via int (*)(char **) __attribute__((stdcall)) [MissionSeam::BuildMissionList]
 0x4779e0,FillMissionList,src/frontend/campaign_menu.cpp,indirect_call,indirect via void (*)(char *) __attribute__((stdcall)) [MissionSeam::LoadCampaign]
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,call,ClearSelectedGadget
 0x477ab0,HandleNewGameClick,src/frontend/campaign_menu.cpp,call,FillCampaignListInline
@@ -23717,6 +23709,7 @@ address,function,file,kind,target
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,BlankScreen
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,BuildCampaignNameList
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,BuildDataPath
+0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,BuildMissionNameList
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,ConfigureListBoxByName
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,CountDirectoryEntries
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,call,FindGadgetChecked
@@ -23751,7 +23744,6 @@ address,function,file,kind,target
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,Game::localPlayer
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,Layer::entries
-0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,MissionSeam::BuildMissionList
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,MissionSeam::LoadCampaign
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,PlayerInfo::side
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,field_read,PlayerInfoEntry::info
@@ -23777,7 +23769,6 @@ address,function,file,kind,target
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,global_write,g_campaignNameList
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,global_write,g_campaignSimplifiedLayout
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,global_write,g_missionNameList
-0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,indirect_call,indirect via int (*)(char **) __attribute__((stdcall)) [MissionSeam::BuildMissionList]
 0x478240,OpenNewGameMenu,src/frontend/campaign_menu.cpp,indirect_call,indirect via void (*)(char *) __attribute__((stdcall)) [MissionSeam::LoadCampaign]
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,DrawBlinkWords
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,DrawFrame
@@ -43778,9 +43769,18 @@ address,function,file,kind,target
 ,BuildDataPathImport,src/wasm/wind_meteors_glue.cpp,call,Linear
 ,BuildDataPathImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,BuildDataPathImport,src/wasm/wind_meteors_glue.cpp,function,
-,BuildMissionListNative,src/seams/native.cpp,call,Mission::BuildMissionList
-,BuildMissionListNative,src/seams/native.cpp,call,TheMission
-,BuildMissionListNative,src/seams/native.cpp,function,
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,call,GameAllocIgnoreTag
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,call,SkipTextLines
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,call,strcpy
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,deref_read,*char
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,deref_write,*char
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,field_read,MissionSeam::CountMissions
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,field_read,MissionSeam::GetCampaignMissionName
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,field_read,Seams::mission
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,function,
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,global_read,g_seams
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissions]
+,BuildMissionNameList,src/frontend/campaign_menu.cpp,indirect_call,"indirect via int (*)(int, char *, int) __attribute__((stdcall)) [MissionSeam::GetCampaignMissionName]"
 ,BuildRoute,src/ai/pathfind_hpa.cpp,deref_read,*int
 ,BuildRoute,src/ai/pathfind_hpa.cpp,deref_write,*int
 ,BuildRoute,src/ai/pathfind_hpa.cpp,field_read,Hdr::NN
@@ -44559,6 +44559,9 @@ address,function,file,kind,target
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayer::controller
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,function,
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,global_read,g_game
+,CountMissionsNative,src/seams/native.cpp,call,Mission::CountMissions
+,CountMissionsNative,src/seams/native.cpp,call,TheMission
+,CountMissionsNative,src/seams/native.cpp,function,
 ,CountStartPositionsNative,src/seams/native.cpp,call,Mission::CountStartPositions
 ,CountStartPositionsNative,src/seams/native.cpp,call,TheMission
 ,CountStartPositionsNative,src/seams/native.cpp,function,
@@ -45772,6 +45775,7 @@ address,function,file,kind,target
 ,FillFormat,src/host/win32/sound.cpp,field_write,WAVEFORMATEX::wBitsPerSample
 ,FillFormat,src/host/win32/sound.cpp,field_write,WAVEFORMATEX::wFormatTag
 ,FillFormat,src/host/win32/sound.cpp,function,
+,FillMissionListInline,src/frontend/campaign_menu.cpp,call,BuildMissionNameList
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,ConfigureListBoxByName
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,FindGadgetChecked
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,call,FindGadgetIndex
@@ -45784,7 +45788,6 @@ address,function,file,kind,target
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,<anon>::selected
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Layer::entries
-,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,MissionSeam::BuildMissionList
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,MissionSeam::LoadCampaign
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,field_read,Seams::mission
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,function,
@@ -45793,7 +45796,6 @@ address,function,file,kind,target
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,global_read,g_missionNameList
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,global_read,g_seams
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,global_write,g_missionNameList
-,FillMissionListInline,src/frontend/campaign_menu.cpp,indirect_call,indirect via int (*)(char **) __attribute__((stdcall)) [MissionSeam::BuildMissionList]
 ,FillMissionListInline,src/frontend/campaign_menu.cpp,indirect_call,indirect via void (*)(char *) __attribute__((stdcall)) [MissionSeam::LoadCampaign]
 ,Find,src/harness/block_scan.cpp,call,Slot
 ,Find,src/harness/block_scan.cpp,deref_escape,*Entry
@@ -46710,6 +46712,9 @@ address,function,file,kind,target
 ,GetBriefingNative,src/seams/native.cpp,call,Mission::GetBriefing
 ,GetBriefingNative,src/seams/native.cpp,call,TheMission
 ,GetBriefingNative,src/seams/native.cpp,function,
+,GetCampaignMissionNameNative,src/seams/native.cpp,call,Mission::GetCampaignMissionName
+,GetCampaignMissionNameNative,src/seams/native.cpp,call,TheMission
+,GetCampaignMissionNameNative,src/seams/native.cpp,function,
 ,GetCampaignNameNative,src/seams/native.cpp,call,Mission::GetCampaignName
 ,GetCampaignNameNative,src/seams/native.cpp,call,TheMission
 ,GetCampaignNameNative,src/seams/native.cpp,function,
@@ -49538,11 +49543,12 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::UnitsInRange
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::WriteState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::AdvanceMission
-,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::BuildMissionList
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::ComputeMapChecksum
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountMissions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountStartPositions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::FreeOtaEnumCacheAndMission
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetBriefing
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetCampaignMissionName
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetCampaignName
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetDescription
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetGameType
@@ -49844,7 +49850,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,BroadcastBuilderLink
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,BroadcastPlayerInfo
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,BuildAllPassMaps
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,BuildMissionListNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CanBuildAt
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CanLoadNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CanPlaceFootprintAt
@@ -49860,6 +49865,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CobScriptExplodePieceNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountDirectoryEntries
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountMissionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountStartPositionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CreateFactoryIndex
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CreateObjectState
@@ -49929,6 +49935,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeWeaponTypes
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetAimFromPosition
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetBriefingNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetCampaignMissionNameNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetCampaignNameNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetCellFeature
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetCellMeanHeightNative
@@ -51484,6 +51491,16 @@ address,function,file,kind,target
 ,Min,src/debug/debug_lib.cpp,function,
 ,Min,src/debug/debug_lib.cpp,global_read,DAT_00528a54
 ,MinOf,src/util/path_goal.cpp,function,
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,GetLocalizedString
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,TdfFile::ResetCurrentRecord
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,TdfFile::SelectRecord
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,sprintf
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,strlen
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,strncpy
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,deref_write,*char
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,field_escape,Mission::campaign
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,field_maybe_written,Mission::list
+,Mission::GetCampaignMissionName,src/mission/map_list.cpp,function,
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,field_write,MissionCondition::celebrated
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,field_write,MissionCondition::satisfied
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,function,

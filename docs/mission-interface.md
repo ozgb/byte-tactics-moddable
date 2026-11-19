@@ -28,7 +28,7 @@ The mission draws no random number (no row of `data/draws.csv`) and records no s
 
 ## 2. The slots
 
-Twenty-five slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`, section 2); the last nine are calls
+Twenty-six slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`, section 2); the last ten are for calls
 3.1c's callers made straight into the mission's methods, which had no seam. The callers are counted by subsystem
 (`data/rwsets.csv`, the reads of each slot, and `data/subsystems.csv`).
 
@@ -50,7 +50,8 @@ Twenty-five slots. The first sixteen were map's (map 4.1, `docs/map-interface.md
 | `SelectMission` | `Mission::SelectMission` | 7: game, presentation | no |
 | `ComputeMapChecksum` | `Mission::ComputeMapChecksum` | 3: presentation (the lobby's map check) | no |
 | `GetTerrainLength` | `Mission::GetTerrainLength` | 1: presentation (the lobby's map check) | no |
-| `BuildMissionList` | `Mission::BuildMissionList` | 4: presentation (the campaign menus) | no |
+| `CountMissions` | `Mission::CountMissions` | 1: presentation (`BuildMissionNameList`) | no |
+| `GetCampaignMissionName` | the loop of `Mission::BuildMissionList` | 1: presentation (`BuildMissionNameList`) | no |
 | `CountStartPositions` | `Mission::CountStartPositions` | 2: presentation, harness | no |
 | `GetBriefing` | `Mission::GetBriefing` | 1: presentation | no |
 | `GetDescription` | `Mission::GetDescription` | 1: presentation | no |
@@ -70,7 +71,7 @@ other caller.
 
 ## 3. What moved
 
-- **The slots:** the sixteen of map 4.1 left `MapSeam` (map 5.0); the nine others are new. `g_seams.mission` is the
+- **The slots:** the sixteen of map 4.1 left `MapSeam` (map 5.0); the ten others are new. `g_seams.mission` is the
   table (`interfaces/seams.h`), filled by `InstallNativeSeams` (`src/seams/native.cpp`) with fillers that call 3.1c's
   methods on the one mission.
 - **The callers:** every call of a mission method outside `src/mission/` goes through the seam. The mission's fields
@@ -90,6 +91,26 @@ decision was needed: a name is a `char*` into the mission's record, a start posi
 map's parsed file of `SelectSchema` 3.1c's `TdfFile*`, and the game type an `int` (0 none, 1 campaign, 2 skirmish, 3
 multiplayer). Every slot is `__stdcall`.
 
+No slot passes ownership of memory across the seam (the ruling on #983's pull request). A mission module has its own
+allocator, so memory it allocates can't be freed by its caller, and the reverse. 3.1c's `BuildMissionList` gave its
+caller a list of the campaign's mission names to free. In its place:
+- `CountMissions` returns how many missions the campaign has.
+- `GetCampaignMissionName` writes the localised name of one mission to a buffer the caller owns.
+- The front end builds the list its menus show in its own memory (`BuildMissionNameList`,
+  `src/frontend/campaign_menu.cpp`). It is used by the campaign menus (`FillMissionList`, `FillMissionListInline`,
+  `OpenNewGameMenu`) and the end screen (`OpenEndMissionScreen`).
+- The front end makes the same allocation as before, and the mission selects the same records in the same order.
+  `LoadMissionByName` still builds and frees its own list inside the mission.
+
+The other slots were checked against the same rule:
+- Every `char*` a slot returns points into the record the mission keeps.
+- `GetStartPosition` writes to a `Vec3` the caller owns, and `SelectSchema` borrows the caller's parsed file and frees
+  nothing.
+- The slots that load or replace the mission (`SetMissionType`, `LoadCampaign`, `LoadMissionByName`, `SelectMission`,
+  `AdvanceMission`, `RefreshMapList`) allocate and free only the mission's own memory.
+- So do map 5.0's new slots (`GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds`, `RefreshMovedUnits`,
+  `RefreshUnitIfStale`).
+
 ## 5. State and the trace
 
 The mission's record (`Game::net`, `0xec4` bytes) is allocated by `SetMissionType` outside the tick and freed by
@@ -107,17 +128,18 @@ What the simulation still reads of the record directly, as views of a record not
 - ai: the surface metal.
 
 Each is read as of the last load, so no order of 3.1c's changes. Turning them into slots or into copies taken at the
-load is left for a later issue (section 7).
+load is #1003 (section 7).
 
 ## 6. Replays
 
-The mission subsystem is `pending` in `data/replay_schema.json`: its 25 slots are annotated `record: false`, with the
+The mission subsystem is `pending` in `data/replay_schema.json`: its 26 slots are annotated `record: false`, with the
 reason `#660 part 3`, and nothing records or replays them yet. The recordings of the other subsystems are unchanged
 by it: their imports of the mission (`GetGameType`, `GetNameSlot`) are not recorded either, as in map 4.1.
 
 ## 7. What is left
 
 - **The views of section 5.** A re-implementation of the mission must keep the record's layout today, since the
-  simulation reads its fields directly. A later issue can make them queries or copies taken at the load.
+  simulation reads its fields directly. #1003 makes them queries or copies taken at the load, with the front end's
+  direct reads of the record (`campaign_menu.cpp`, `map_enum.cpp`).
 - **A WASM module.** The mission has no module yet; the modern build runs the default as native code in every mode.
 - **Replays** of the mission's slots (section 6).

@@ -4859,10 +4859,15 @@
       "reason": "#660 part 3",
       "native": "GetTerrainLengthSlot"
      },
-     "BuildMissionList": {
+     "CountMissions": {
       "record": false,
       "reason": "#660 part 3",
-      "native": "BuildMissionListSlot"
+      "native": "CountMissionsSlot"
+     },
+     "GetCampaignMissionName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetCampaignMissionNameSlot"
      },
      "CountStartPositions": {
       "record": false,
@@ -6703,7 +6708,7 @@
    }
   },
   "mission": {
-   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [1, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "BuildMissionList": {"reason": "#660 part 3", "native": "BuildMissionListSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
+   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [1, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
    "slots": {
 
    }

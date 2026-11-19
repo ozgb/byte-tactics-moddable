@@ -618,7 +618,7 @@ void __stdcall OpenEndMissionScreen()
     }
     next = HasNextMission();
     if (next) {
-        int count = g_seams.mission->BuildMissionList((char**)&data->items);
+        int count = BuildMissionNameList((char**)&data->items);
         data->items = BuildScrollItems1((char*)data->items, g_game->campaignMissionStatus, count);
         int i;
         for (i = 0; i < 0x19; i++) {

@@ -43,8 +43,10 @@ struct MissionSeam {
     int (__stdcall* ComputeMapChecksum)(void);
     // Returns the size of the terrain file, or 0 when the mission has none. Hooks: none.
     int (__stdcall* GetTerrainLength)(void);
-    // Writes to out a list the caller frees of the names of the campaign's missions, one after another, and returns how many there are. Hooks: none.
-    int (__stdcall* BuildMissionList)(char** out);
+    // Returns how many missions the campaign has, or 0 when the mission has no campaign. Hooks: none.
+    int (__stdcall* CountMissions)(void);
+    // Writes the name of the campaign's mission of that index, in the player's language, to a buffer of size bytes the caller owns, and returns 0 when the campaign has no such mission. Hooks: none.
+    int (__stdcall* GetCampaignMissionName)(int index, char* out, int size);
     // Returns how many start positions the mission has. Hooks: none.
     int (__stdcall* CountStartPositions)(void);
     // Returns the text of the mission's briefing, or 0 when it has none. Hooks: none.

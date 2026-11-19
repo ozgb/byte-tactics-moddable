@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5691 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5694 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -30,15 +30,15 @@ The subsystems and the issue each maps to:
 | [units](#the-remaining-subsystems) | 153 | none yet |
 | [players](#the-remaining-subsystems) | 147 | none yet |
 | [map](#the-remaining-subsystems) | 81 | none yet |
-| [mission](#the-remaining-subsystems) | 40 | none yet |
+| [mission](#the-remaining-subsystems) | 41 | none yet |
 | [scripts](#the-remaining-subsystems) | 82 | none yet |
 | [movement](#the-remaining-subsystems) | 144 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
 | [game](#the-remaining-subsystems) | 317 | none yet |
 | [harness](#the-remaining-subsystems) | 889 | none yet |
-| [presentation](#the-remaining-subsystems) | 1429 | none yet |
+| [presentation](#the-remaining-subsystems) | 1430 | none yet |
 | [platform](#the-remaining-subsystems) | 822 | none yet |
-| [seams](#the-remaining-subsystems) | 200 | none yet |
+| [seams](#the-remaining-subsystems) | 201 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The eleven subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -573,7 +573,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **map** (81 functions). No phase root. 26 functions are called from outside, by seams (11), game (9), orders (4), presentation (4) and los_radar (3); the busiest are `GetGroundHeight` (22), `SnapWorldPosToFootprint` (4), `IsPadSlotFree` (2) and `CanBuildAt` (2). It imports 16 functions: files 5, platform 4, game 3, los_radar 2, features 1, harness 1. It holds the terrain and the ground height, the pass maps and when they are current, and the footprints (`docs/map-interface.md`). Coverage: 94.5% of functions (69 of 73), 93.8% of lines, 82.7% of branches; 4 live functions no scenario enters, and 9 more are dead (data/coverage.csv).
 
-**mission** (40 functions). No phase root. The mission, the campaign and the list of maps (`src/mission`, `interfaces/mission.h`, #983). 25 functions are called from outside, by seams (23), game (2), harness (1), network (1) and presentation (1); the busiest are `SetMissionType` (12) and the 24 other slots' functions, each through its filler. It imports 42 functions: platform 25, files 6, seams 4, game 3, presentation 3, wind_meteors 1. Its calls into players (the conditions of a mission) and wind_meteors (`LoadMeteorDefaults`) go through their seams. The inventory is `docs/mission-interface.md`. Coverage: 55.3% of functions (21 of 38), 73.9% of lines, 63.4% of branches; 17 live functions no scenario enters, and 2 more are dead (data/coverage.csv). The list of those 17 is under **mission, functions no scenario enters** below.
+**mission** (41 functions). No phase root. The mission, the campaign and the list of maps (`src/mission`, `interfaces/mission.h`, #983). 26 functions are called from outside, by seams (24), game (2), harness (1), network (1) and presentation (1); the busiest are `SetMissionType` (12) and the 25 other slots' functions, each through its filler. It imports 42 functions: platform 25, files 6, seams 4, game 3, presentation 3, wind_meteors 1. Its calls into players (the conditions of a mission) and wind_meteors (`LoadMeteorDefaults`) go through their seams. The inventory is `docs/mission-interface.md`. Coverage: 55.3% of functions (21 of 38), 73.9% of lines, 63.4% of branches; 17 live functions no scenario enters, and 2 more are dead (data/coverage.csv). The list of those 17 is under **mission, functions no scenario enters** below.
 
 **map, functions no scenario enters** (4 of 73 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 69 are entered, 94.5%), by reason:
 
@@ -660,11 +660,11 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **harness** (889 functions). The test harness of #3 (`src/harness`). No phase root. 43 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 78 functions (game 24, platform 28).
 
-**presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 348 functions: platform 159, network 54, files 32, game 32, map 4. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1430 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 349 functions: platform 159, network 54, files 32, game 32, map 4. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
-**platform** (822 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 181 functions: game 84, presentation 46.
+**platform** (822 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (82), then `Translate` (77) and `GameAllocIgnoreTag` (77). It imports 181 functions: game 84, presentation 46.
 
-**seams** (200 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 145 functions are called from outside. It imports 153 functions.
+**seams** (201 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 146 functions are called from outside. It imports 154 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 

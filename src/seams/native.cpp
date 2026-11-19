@@ -320,9 +320,14 @@ static int __stdcall GetTerrainLengthNative()
     return TheMission()->GetTerrainLength();
 }
 
-static int __stdcall BuildMissionListNative(char** out)
+static int __stdcall CountMissionsNative()
 {
-    return TheMission()->BuildMissionList(out);
+    return TheMission()->CountMissions();
+}
+
+static int __stdcall GetCampaignMissionNameNative(int index, char* out, int size)
+{
+    return TheMission()->GetCampaignMissionName(index, out, size);
 }
 
 static int __stdcall CountStartPositionsNative()
@@ -1027,7 +1032,8 @@ void InstallNativeSeams()
     s_mission.SelectMission = SelectMissionNative;
     s_mission.ComputeMapChecksum = ComputeMapChecksumNative;
     s_mission.GetTerrainLength = GetTerrainLengthNative;
-    s_mission.BuildMissionList = BuildMissionListNative;
+    s_mission.CountMissions = CountMissionsNative;
+    s_mission.GetCampaignMissionName = GetCampaignMissionNameNative;
     s_mission.CountStartPositions = CountStartPositionsNative;
     s_mission.GetBriefing = GetBriefingNative;
     s_mission.GetDescription = GetDescriptionNative;

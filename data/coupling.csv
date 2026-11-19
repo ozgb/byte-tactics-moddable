@@ -1871,7 +1871,7 @@ harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
 harness,presentation,shared_write,Seams::economy,1
 harness,presentation,shared_write,Seams::los_radar,1
-harness,presentation,shared_write,Seams::mission,47
+harness,presentation,shared_write,Seams::mission,48
 harness,presentation,shared_write,Seams::network,1
 harness,presentation,shared_write,Seams::orders,1
 harness,presentation,shared_write,Seams::pathfinding,1
@@ -4674,7 +4674,7 @@ presentation,platform,call,FatalError,15
 presentation,platform,call,FilePrintf,1
 presentation,platform,call,FindHostSlot,7
 presentation,platform,call,FindSlotByDpid,1
-presentation,platform,call,GameAllocIgnoreTag,52
+presentation,platform,call,GameAllocIgnoreTag,53
 presentation,platform,call,GameAllocShared,1
 presentation,platform,call,GameFreeThunk,84
 presentation,platform,call,GameReallocIgnoreTag,1
@@ -4701,7 +4701,7 @@ presentation,platform,call,RotateByAngles,3
 presentation,platform,call,SetDefaultCommandHandler,1
 presentation,platform,call,SetMediaNotifyCallback,1
 presentation,platform,call,SetOutOfMemoryHandler,1
-presentation,platform,call,SkipTextLines,27
+presentation,platform,call,SkipTextLines,28
 presentation,platform,call,StringRef::GetUnique,2
 presentation,platform,call,StringRef::~StringRef,1
 presentation,platform,call,TdfFile::GetCurrentRecord,1
@@ -4884,10 +4884,11 @@ presentation,scripts,shared_write,Unit::state,1
 presentation,scripts,shared_write,Vec3::x,7
 presentation,scripts,shared_write,Vec3::y,7
 presentation,scripts,shared_write,Vec3::z,7
-presentation,seams,indirect,BuildMissionListNative,4
 presentation,seams,indirect,ComputeMapChecksumNative,3
+presentation,seams,indirect,CountMissionsNative,1
 presentation,seams,indirect,CountStartPositionsNative,1
 presentation,seams,indirect,GetBriefingNative,1
+presentation,seams,indirect,GetCampaignMissionNameNative,1
 presentation,seams,indirect,GetDescriptionNative,1
 presentation,seams,indirect,GetGameTypeNative,16
 presentation,seams,indirect,GetMissionIndexNative,1
@@ -5577,10 +5578,11 @@ seams,map,shared_write,Vec3::x,11
 seams,map,shared_write,Vec3::y,3
 seams,map,shared_write,Vec3::z,11
 seams,mission,call,Mission::AdvanceMission,1
-seams,mission,call,Mission::BuildMissionList,1
 seams,mission,call,Mission::ComputeMapChecksum,1
+seams,mission,call,Mission::CountMissions,1
 seams,mission,call,Mission::CountStartPositions,1
 seams,mission,call,Mission::GetBriefing,1
+seams,mission,call,Mission::GetCampaignMissionName,1
 seams,mission,call,Mission::GetCampaignName,1
 seams,mission,call,Mission::GetDescription,1
 seams,mission,call,Mission::GetGameType,1
@@ -5813,7 +5815,7 @@ seams,presentation,shared_write,Point16::y,5
 seams,presentation,shared_write,Ref<Unit>::offset,1
 seams,presentation,shared_write,Seams::economy,1
 seams,presentation,shared_write,Seams::los_radar,1
-seams,presentation,shared_write,Seams::mission,47
+seams,presentation,shared_write,Seams::mission,48
 seams,presentation,shared_write,Seams::network,1
 seams,presentation,shared_write,Seams::orders,1
 seams,presentation,shared_write,Seams::pathfinding,1

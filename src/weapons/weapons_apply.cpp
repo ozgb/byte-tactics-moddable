@@ -35,7 +35,7 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 static int KnownKind(int kind)
 {
-    return kind == WEAPONS_DAMAGE || kind == WEAPONS_REMOTE_DAMAGE || (kind >= WEAPONS_DETONATE && kind <= WEAPONS_LOAD_SLOT);
+    return kind == WEAPONS_DAMAGE || kind == WEAPONS_REMOTE_DAMAGE || (kind >= WEAPONS_DETONATE && kind <= WEAPONS_ADD_STOCKPILE);
 }
 
 static int Valid(const WeaponsEvent* e, Unit* unit)

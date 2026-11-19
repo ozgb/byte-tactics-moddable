@@ -1468,7 +1468,7 @@ for k in 0 .. n-1, in order:
 
 - `kind` is a damage event into weapons' inbox: 256 DAMAGE, 257 REMOTE_DAMAGE; another event: 258 DETONATE,
   259 RELEASE, 260 CLAIM, 261 INIT_SLOTS, 262 REMOVE_PROJECTILES, 263 AIM_DONE, 264 EXPLODE_PIECE,
-  265 AREA_DAMAGE, 266 SPAWN, 267 SET_STOCKPILES, 268 LOAD_SLOT; a damage effect weapons publishes: 272 ATTACKED,
+  265 AREA_DAMAGE, 266 SPAWN, 267 SET_STOCKPILES, 268 LOAD_SLOT, 269 ADD_STOCKPILE; a damage effect weapons publishes: 272 ATTACKED,
   274 MARK_DAMAGED, 275 DAMAGE_RECORD, 276 HEALTH, 277 PARALYZE; or another effect: 273 HIT, 278 START_SCRIPT,
   279 DETACH_PIECE, 280 NOTICE, 281 BUSY.
 - `unit` is the unit the kind is about and `target` the other unit (the source of DAMAGE, the attacker of

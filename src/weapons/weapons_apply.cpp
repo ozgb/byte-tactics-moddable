@@ -24,6 +24,7 @@
 #include "weapons.h"
 
 #include "../../link/globals.h"
+#include "weapons_apply.h"
 
 extern void* g_weaponAimCobVtable[];
 

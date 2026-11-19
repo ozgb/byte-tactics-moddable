@@ -207,7 +207,7 @@ static void Play(Run* run, bool tamper)
         WeaponsEvent e = WeaponsEventOf(WEAPONS_DAMAGE, &s_units[kVictim]);
         e.value = Amount(t);
         e.extra = 0;
-        SchedPublish(SCHED_ENGINE, &e, sizeof e);
+        SchedPublish(SCHED_UNITS, &e, sizeof e);
         run->health[t] = s_units[kVictim].health;
         run->dying[t] = (s_units[kVictim].flags & 0x4000) != 0;
     }

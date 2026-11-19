@@ -61,7 +61,7 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
     
     if (param_2 == 0) {
         s.bFlag = 1;
-        if (g_game->net->type != 3)
+        if (g_seams.mission->GetGameType() != 3)
             s.bFlag = 0;
     } else {
         s.bFlag = 0;

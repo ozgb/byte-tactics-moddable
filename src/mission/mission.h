@@ -11,6 +11,9 @@ struct MissionRule {
     short z;
 };
 struct Vec3;
+struct MissionParams;
+struct MissionUnitInfo;
+struct MissionFeatureInfo;
 
 struct MissionUnit {
     Ref<char> name;
@@ -115,6 +118,14 @@ public:
     int CountStartPositions();
     int GetStartPosition(Vec3* out, int id);
     int ComputeMapChecksum();
+    void GetParams(MissionParams* out);
+    int CountUnits();
+    int GetUnit(int index, MissionUnitInfo* out);
+    void SetUnitPosition(int index, Vec3* pos);
+    int CountFeatures();
+    int GetFeature(int index, MissionFeatureInfo* out);
+    char* GetMemory();
+    char* GetNumPlayers();
 };
 
 #endif

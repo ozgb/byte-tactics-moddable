@@ -1561,9 +1561,9 @@ void ShowSelectedMapInfo()
     }
 
     sprintf(buffer, "%s  %s: %s",
-            (char*)g_game->net.get() + 0xdc4,
+            g_seams.mission->GetMemory(),
             Translate("Players"),
-            (char*)g_game->net.get() + 0xe44);
+            g_seams.mission->GetNumPlayers());
     SetTranslatedTextByName(&g_game->gui, "SIZE", (char*)buffer, 0);
 
     Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");

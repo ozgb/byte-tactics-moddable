@@ -1521,7 +1521,9 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
 {
     int areaY = type->footprintz;
     int areaX = type->footprintx;
-    int threshold = g_game->net->surfaceMetal * areaY * areaX * 2;
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    int threshold = mission.surfaceMetal * areaY * areaX * 2;
     Point16 spacing = type->minwaterdepth < 0 ? spacing0 : spacing1;
     Point16 offset = type->minwaterdepth < 0 ? offset0 : offset1;
     int margin = type->minwaterdepth < 0 ? margin0 : margin1;
@@ -1719,7 +1721,9 @@ int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec
     Vec3 pos=MoveTowards(from,(const Vec3*)&ai->centre,ai->searchRadius<<16);
     Point16 cell;
     int result;
-    if (type->extractsMetal!=0.0f && g_game->net->surfaceMetal<RandomInt(255))
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    if (type->extractsMetal!=0.0f && mission.surfaceMetal<RandomInt(255))
         result=ai->FindCellNearFeatures(type,&pos,&ai->cells,ai->searchRadius*4,&cell);
     else result=ai->FindRandomPlacementCell(type,&pos,ai->searchRadius,&cell);
     if (result) {

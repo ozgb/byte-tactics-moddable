@@ -260,6 +260,13 @@ void __stdcall UntrackProjectile(Projectile* projectile)
 
 #include "../ingame/control_panel.h"
 void __stdcall AddExplosionEffect(Vec3* position, void* value, int a, int b);
+static int NoSeaLevelTrigger()
+{
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    return mission.noSeaLevelTrigger;
+}
+
 // FUNCTION: 0x499eb0
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
 {
@@ -277,7 +284,7 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
         }
         projectile->flags = projectile->flags | 2;
     }
-    if (g_game->net->noSeaLevelTrigger && hostile && !unit) {
+    if (NoSeaLevelTrigger() && hostile && !unit) {
         if (projectile == g_game->tracked) {
             g_game->trackedPos = g_game->tracked->position;
             g_game->value_1434b = projectile->type->holdTime;
@@ -1746,7 +1753,7 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj)
         return;
     } else if (proj->positionWords.yWhole >= g_game->seaLevel) {
         return;
-    } else if (g_game->net->noSeaLevelTrigger) {
+    } else if (NoSeaLevelTrigger()) {
         return;
     }
     DetonateProjectile(proj, 0);
@@ -2324,7 +2331,7 @@ void UpdateProjectiles()
             }
             if (oldY > g_game->seaLevel && p->positionWords.yWhole <= g_game->seaLevel) {
                 Cell* cell = g_seams.los_radar->GetMapCellAtPosition((Vec3*)&p->position);
-                if (cell && cell->high < g_game->seaLevel && g_game->net->noSeaLevelTrigger == 0)
+                if (cell && cell->high < g_game->seaLevel && NoSeaLevelTrigger() == 0)
                     AddExplosionEffect(&p->position, type->splash, 0, 1);
             }
         }

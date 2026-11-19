@@ -71,11 +71,6 @@ MapViewFlags::bit0,presentation,ui-action,,all-players,0
 MapViewFlags::bit1,presentation,ui-action,,all-players,0
 MapViewFlags::bit2,presentation,ui-action,,all-players,0
 MapViewFlags::raw,presentation,ui-action,,all-players,0
-Mission::gravity,presentation,unknown,,all-players,0
-Mission::killMul,presentation,unknown,,all-players,0
-Mission::maxWindSpeed,presentation,unknown,,all-players,0
-Mission::minWindSpeed,presentation,unknown,,all-players,0
-Mission::timeMul,presentation,unknown,,all-players,0
 Mission::type,map,every-frame,,all-players,89
 ModelState::animDirty,platform,every-frame,,per-player-filter,85
 ModelState::animDirty,scripts,every-frame,,per-player-filter,88

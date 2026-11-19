@@ -604,6 +604,7 @@ jobs:
           uv run tools/test_seamlink.py
           uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
           uv run tools/seamlink.py --private-state
+          uv run tools/seamlink.py --mission-record
           uv run tools/seamlink.py --pilot-seams
 
       - name: Check the state writer of pathfinding is pure, stateless and free of scenario logic

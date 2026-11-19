@@ -411,7 +411,8 @@ class AdapterManifestTests(unittest.TestCase):
         self.assertEqual(found["services"]["Rand"], [["int", "int"], "int"])
 
     def test_the_headers_declare_their_slots_and_not_removed_ones(self):
-        self.assertTrue(wm.header_declares("units", "GetGroundHeight"))
+        self.assertTrue(wm.header_declares("map", "GetGroundHeight"))
+        self.assertFalse(wm.header_declares("units", "GetGroundHeight"))
         self.assertFalse(wm.header_declares("units", "GetSweetSpot"))
         self.assertFalse(wm.header_declares("nosuchinterface", "Apply"))
         self.assertTrue(wm.header_declares("services", "HapiBank_OpenAccount"))

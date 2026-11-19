@@ -29,10 +29,10 @@ FeaturePseudoUnit::unitDefIndex,presentation,CMemoryCache::DrawObjectPicture,Ini
 FeaturePseudoUnit::unknown_0,presentation,CMemoryCache::DrawObjectPicture,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_0,presentation,CMemoryCache::MergeIntoComposite,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_0,presentation,DrawUnit,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
+FeaturePseudoUnit::unknown_0,scripts,UpdateObjectState,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_0,units,GetGroundHeight,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
-FeaturePseudoUnit::unknown_0,units,UpdateObjectState,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_96,presentation,DrawUnit,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
-FeaturePseudoUnit::unknown_96,units,UpdateObjectState,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
+FeaturePseudoUnit::unknown_96,scripts,UpdateObjectState,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_a8,presentation,CMemoryCache::DrawObjectPicture,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_a8,presentation,CMemoryCache::DrawObjectState,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
 FeaturePseudoUnit::unknown_a8,presentation,CMemoryCache::ShadeByIntensity,InitFeatureAnimPool: GameAllocIgnoreTag FeaturePseudoUnit,1,
@@ -45,33 +45,33 @@ LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMa
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
-ModelState::animDirty,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::animDirty,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::animDirty,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::animDirty,units,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::animDirty,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::animDirty,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::animDirty,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::animDirty,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::AddModelBounds,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::AllocTwoPlaneBitmap,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
-ModelState::bitmap,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,unknown,CacheCore::AllocHandle,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::cacheDrawCount,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::cacheDrawCount,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::cacheDrawCount,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::cacheDrawCount,presentation,UnitTable::DrawLitPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::cacheDrawCount,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::cacheDrawCount,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::cacheDrawCount,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
-ModelState::cacheDrawCount,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::cacheDrawCount,units,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
+ModelState::cacheDrawCount,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
+ModelState::cacheDrawCount,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::count,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::count,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::count,presentation,UnitTable::DrawLitPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::count,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::count,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::count,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::count,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::owner,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::owner,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::owner,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
@@ -79,29 +79,29 @@ ModelState::owner,presentation,CMemoryCache::ShadeByIntensity,CreatePlayerObject
 ModelState::owner,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::owner,presentation,UnitTable::DrawLitPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::owner,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::owner,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::owner,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::owner,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::pieces,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::pieces,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::pieces,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::pieces,presentation,UnitTable::DrawLitPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::pieces,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pieces,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pieces,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pieces,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::pos,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pos,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pos,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::pos,units,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::root,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::root,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
-ModelState::root,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::root,units,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
+ModelState::root,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::shadow,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::shadow,units,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
-ModelState::shadow,units,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
-ModelState::shadow,units,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::shadow,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::shadow,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
+ModelState::shadow,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 Pool::entries,presentation,BlitFeatureGaf,pool,1,
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -114,7 +114,7 @@ Unit::def,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnore
 Unit::def,presentation,SpeechQueue::PlaySpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,1
 Unit::def,presentation,UnitTable::DrawLitPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::field_64,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::field_64,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -125,11 +125,11 @@ Unit::flags,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameA
 Unit::flags,presentation,UnitTable::DrawLitPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::group,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::heading,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::heading,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::id,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::id,presentation,SpeechQueue::PlaySpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,1
 Unit::motion,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::pitch,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pitch,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::playerIndex,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::playerIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::playerIndex,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
@@ -141,7 +141,7 @@ Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: Game
 Unit::speed,presentation,UnitTable::DrawLitPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::state,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::state,units,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::state,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::unitDefIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::xWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,

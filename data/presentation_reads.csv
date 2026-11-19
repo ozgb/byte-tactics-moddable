@@ -42,9 +42,10 @@ FeaturePseudoUnit::flags_110,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::flags_114,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unitDefIndex,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_0,presentation,every-frame,,per-player-filter,7
+FeaturePseudoUnit::unknown_0,scripts,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_0,units,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_96,presentation,every-frame,,per-player-filter,7
-FeaturePseudoUnit::unknown_96,units,every-frame,,per-player-filter,7
+FeaturePseudoUnit::unknown_96,scripts,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_a8,presentation,every-frame,,per-player-filter,7
 FogCell::level0,presentation,ui-action,,own,0
 FogCell::level1,presentation,ui-action,,own,0
@@ -56,14 +57,13 @@ InitPlayerSlot: operator new unsigned char,los_radar,ui-action,,own,89
 InitPlayerSlot: operator new unsigned char,map,unknown,,own,1
 InitPlayerSlot: operator new unsigned char,presentation,every-frame,,own,69
 LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,unknown,,all-players,8
-LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,ai,every-frame,,all-players,3
-LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,ui-action,,all-players,89
+LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,every-frame,,all-players,89
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,unknown,,all-players,1
-LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,ui-action,,all-players,1
+LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,ui-action,,all-players,4
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,presentation,unknown,,all-players,5
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,every-frame,,all-players,89
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,unknown,,all-players,1
-LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,ui-action,,all-players,1
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,ui-action,,all-players,4
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,every-frame,,all-players,89
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,every-frame,,all-players,89
 LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD,map,unknown,,all-players,1
@@ -78,36 +78,38 @@ Mission::minWindSpeed,presentation,unknown,,all-players,0
 Mission::timeMul,presentation,unknown,,all-players,0
 Mission::type,map,every-frame,,all-players,89
 ModelState::animDirty,platform,every-frame,,per-player-filter,85
-ModelState::animDirty,units,every-frame,,per-player-filter,88
+ModelState::animDirty,scripts,every-frame,,per-player-filter,88
 ModelState::bitmap,platform,every-frame,,per-player-filter,85
 ModelState::bitmap,presentation,every-frame,,per-player-filter,88
-ModelState::bitmap,units,every-frame,,per-player-filter,88
+ModelState::bitmap,scripts,every-frame,,per-player-filter,88
 ModelState::bitmap,unknown,unknown,,per-player-filter,88
 ModelState::cacheDrawCount,platform,ui-action,,per-player-filter,84
 ModelState::cacheDrawCount,presentation,every-frame,,per-player-filter,88
-ModelState::cacheDrawCount,units,every-frame,,per-player-filter,88
+ModelState::cacheDrawCount,scripts,every-frame,,per-player-filter,88
 ModelState::count,platform,ui-action,,per-player-filter,84
 ModelState::count,presentation,every-frame,,per-player-filter,88
-ModelState::count,units,every-frame,,per-player-filter,88
+ModelState::count,scripts,every-frame,,per-player-filter,88
 ModelState::owner,platform,every-frame,,per-player-filter,85
 ModelState::owner,presentation,every-frame,,per-player-filter,88
-ModelState::owner,units,every-frame,,per-player-filter,88
+ModelState::owner,scripts,every-frame,,per-player-filter,88
 ModelState::pieces,platform,every-frame,,per-player-filter,88
 ModelState::pieces,presentation,every-frame,,per-player-filter,88
-ModelState::pieces,units,every-frame,,per-player-filter,88
+ModelState::pieces,scripts,every-frame,,per-player-filter,88
 ModelState::pos,platform,every-frame,,per-player-filter,88
 ModelState::pos,presentation,every-frame,,per-player-filter,85
-ModelState::pos,units,every-frame,,per-player-filter,88
+ModelState::pos,scripts,every-frame,,per-player-filter,88
 ModelState::root,platform,every-frame,,per-player-filter,88
 ModelState::root,presentation,every-frame,,per-player-filter,84
-ModelState::root,units,every-frame,,per-player-filter,88
+ModelState::root,scripts,every-frame,,per-player-filter,88
 ModelState::shadow,platform,every-frame,,per-player-filter,88
 ModelState::shadow,presentation,every-frame,,per-player-filter,63
-ModelState::shadow,units,every-frame,,per-player-filter,88
+ModelState::shadow,scripts,every-frame,,per-player-filter,88
 ModelState::shadow,unknown,unknown,,per-player-filter,48
-NewUnitScript: new UnitScript,units,unknown,,all-players,3
-Order::AttachApproachRadiusGoal: new ApproachRadius,orders,ui-action,,per-player-filter,3
-Order::AttachBuildFootprintMarker: new PointMarker,orders,ui-action,,per-player-filter,1
+NewApproachRadiusNative: new ApproachRadius,movement,unknown,,all-players,3
+NewApproachRadiusNative: new ApproachRadius,seams,unknown,,all-players,3
+NewPointMarkerNative: new PointMarker,movement,unknown,,all-players,1
+NewPointMarkerNative: new PointMarker,seams,unknown,,all-players,1
+NewUnitScript: new UnitScript,scripts,unknown,,all-players,3
 Order::attached,orders,ui-action,,per-player-filter,4
 Order::created,presentation,ui-action,,per-player-filter,2
 Order::flags,orders,ui-action,,per-player-filter,5
@@ -119,10 +121,10 @@ Order::next,presentation,ui-action,,per-player-filter,3
 Order::pos,orders,ui-action,,per-player-filter,1
 Order::pos,presentation,ui-action,,per-player-filter,2
 Order::radius,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,2
-Order::subFlags,orders,unknown,,per-player-filter,4
-Order::target,orders,ui-action,,per-player-filter,6
+Order::subFlags,movement,unknown,,per-player-filter,4
+Order::target,orders,ui-action,,per-player-filter,3
 Order::target,presentation,ui-action,,per-player-filter,2
-Order::target,units,unknown,,per-player-filter,5
+Order::target,units,unknown,,per-player-filter,6
 Order::type,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,2
 Order::type,presentation,ui-action,,per-player-filter,1
 Order::unit,orders,ui-action,,per-player-filter,5
@@ -180,7 +182,7 @@ Projectile::active,presentation,every-frame,,per-player-filter,30
 Projectile::angles,platform,after-event,SIM_EVENT_NANO_PARTICLES,per-player-filter,1
 Projectile::angles,presentation,ui-action,,per-player-filter,12
 Projectile::groundHeightAvg,presentation,ui-action,,per-player-filter,0
-Projectile::position,ai,every-frame,,per-player-filter,2
+Projectile::position,los_radar,every-frame,,per-player-filter,2
 Projectile::position,presentation,every-frame,,per-player-filter,30
 Projectile::propellerSpin,presentation,ui-action,,per-player-filter,1
 Projectile::radius,presentation,ui-action,,per-player-filter,17
@@ -205,7 +207,7 @@ Unit::carrier,presentation,every-frame,,per-player-filter,88
 Unit::cloakOn,presentation,unknown,,per-player-filter,0
 Unit::current,targeting,unknown,,per-player-filter,2
 Unit::def,los_radar,ui-action,,per-player-filter,12
-Unit::def,orders,unknown,,per-player-filter,7
+Unit::def,orders,ui-action,,per-player-filter,7
 Unit::def,presentation,every-frame,SIM_EVENT_UNIT_SPEECH,per-player-filter,89
 Unit::f2c,presentation,ui-action,,per-player-filter,8
 Unit::f48,orders,unknown,,per-player-filter,1
@@ -215,18 +217,18 @@ Unit::f_3b,weapons,unknown,,per-player-filter,6
 Unit::f_57,presentation,ui-action,,per-player-filter,5
 Unit::f_57,weapons,unknown,,per-player-filter,6
 Unit::field_64,platform,ui-action,,per-player-filter,8
-Unit::field_64,units,every-frame,,per-player-filter,88
+Unit::field_64,scripts,every-frame,,per-player-filter,88
 Unit::fireOrder,presentation,unknown,,per-player-filter,0
 Unit::flags,los_radar,ui-action,,per-player-filter,12
-Unit::flags,orders,unknown,,per-player-filter,7
+Unit::flags,orders,ui-action,,per-player-filter,7
 Unit::flags,presentation,every-frame,SIM_EVENT_UNIT_SPEECH,per-player-filter,89
 Unit::flags,units,unknown,,per-player-filter,1
 Unit::group,ai,unknown,,per-player-filter,1
 Unit::group,harness,ui-action,,per-player-filter,1
 Unit::group,presentation,every-frame,,per-player-filter,88
-Unit::head,orders,unknown,,per-player-filter,1
+Unit::head,units,unknown,,per-player-filter,1
 Unit::heading,platform,ui-action,,per-player-filter,8
-Unit::heading,units,every-frame,,per-player-filter,88
+Unit::heading,scripts,every-frame,,per-player-filter,88
 Unit::health,presentation,ui-action,,per-player-filter,8
 Unit::id,network,unknown,,per-player-filter,1
 Unit::id,orders,unknown,,per-player-filter,2
@@ -243,11 +245,11 @@ Unit::motion,presentation,every-frame,,per-player-filter,87
 Unit::moveOrder,presentation,unknown,,per-player-filter,0
 Unit::owner,orders,unknown,,per-player-filter,1
 Unit::pitch,platform,ui-action,,per-player-filter,8
-Unit::pitch,units,every-frame,,per-player-filter,88
+Unit::pitch,scripts,every-frame,,per-player-filter,88
 Unit::player,ai,unknown,,per-player-filter,1
 Unit::player,los_radar,ui-action,,per-player-filter,19
 Unit::player,network,unknown,,per-player-filter,1
-Unit::player,orders,ui-action,,per-player-filter,5
+Unit::player,orders,ui-action,,per-player-filter,7
 Unit::player,presentation,ui-action,,per-player-filter,12
 Unit::player,units,unknown,,per-player-filter,1
 Unit::playerIndex,orders,unknown,,per-player-filter,5
@@ -264,19 +266,19 @@ Unit::selected,presentation,after-event,SIM_EVENT_RADAR_UNITS,per-player-filter,
 Unit::speed,orders,unknown,,per-player-filter,4
 Unit::speed,presentation,every-frame,,per-player-filter,88
 Unit::state,presentation,every-frame,,per-player-filter,88
-Unit::state,units,every-frame,,per-player-filter,88
+Unit::state,scripts,every-frame,,per-player-filter,88
 Unit::unitDefIndex,game,unknown,,per-player-filter,7
 Unit::unitDefIndex,harness,ui-action,,per-player-filter,1
-Unit::unitDefIndex,orders,unknown,,per-player-filter,1
 Unit::unitDefIndex,presentation,every-frame,,per-player-filter,89
+Unit::unitDefIndex,units,unknown,,per-player-filter,1
 Unit::unknown_4c,presentation,ui-action,,per-player-filter,5
-Unit::weapon,orders,unknown,,per-player-filter,3
+Unit::weapon,orders,ui-action,,per-player-filter,3
 Unit::weapon,presentation,ui-action,,per-player-filter,8
 Unit::xWhole,presentation,every-frame,,per-player-filter,89
 Unit::xWhole,units,every-frame,,per-player-filter,88
 Unit::yFraction,los_radar,ui-action,,per-player-filter,12
 Unit::yFraction,presentation,every-frame,,per-player-filter,88
-Unit::yWhole,orders,unknown,,per-player-filter,1
+Unit::yWhole,orders,ui-action,,per-player-filter,1
 Unit::yWhole,presentation,every-frame,,per-player-filter,89
 Unit::zBufferFlag,presentation,every-frame,,per-player-filter,88
 Unit::zFraction,los_radar,every-frame,,per-player-filter,26
@@ -293,9 +295,9 @@ UnitDef::f14a,map,unknown,,all-players,1
 UnitDef::f14a,presentation,ui-action,,all-players,1
 UnitDef::f14e,map,unknown,,all-players,1
 UnitDef::fbiChecksum,presentation,unknown,,all-players,0
-UnitDef::flags1,orders,unknown,,all-players,4
+UnitDef::flags1,orders,ui-action,,all-players,4
 UnitDef::flags1,presentation,every-frame,,all-players,88
-UnitDef::flags2,orders,unknown,,all-players,7
+UnitDef::flags2,orders,ui-action,,all-players,7
 UnitDef::flags2,presentation,ui-action,,all-players,8
 UnitDef::flags2Byte,presentation,ui-action,,all-players,0
 UnitDef::flying,presentation,ui-action,,all-players,0
@@ -315,7 +317,7 @@ UnitDef::minwaterdepth,map,unknown,,all-players,1
 UnitDef::mobile,presentation,ui-action,,all-players,2
 UnitDef::modelMaxX,presentation,every-frame,,all-players,89
 UnitDef::modelMaxY,los_radar,ui-action,,all-players,12
-UnitDef::modelMaxYHigh,orders,unknown,,all-players,1
+UnitDef::modelMaxYHigh,orders,ui-action,,all-players,1
 UnitDef::modelMaxYHigh,presentation,every-frame,,all-players,89
 UnitDef::modelMaxZ,presentation,every-frame,,all-players,89
 UnitDef::modelMinX,los_radar,ui-action,,all-players,12
@@ -341,7 +343,9 @@ UnitDef::sonardistance,presentation,ui-action,,all-players,0
 UnitDef::sonardistancejam,presentation,ui-action,,all-players,0
 UnitDef::soundcategory,presentation,ui-action,SIM_EVENT_UNIT_SPEECH,all-players,66
 UnitDef::weapons,orders,unknown,,all-players,2
+UnitMotion::UnitMotion: new PackedPosGoal,movement,unknown,,per-player-filter,4
 UnitMotion::UnitMotion: new PackedPosGoal,orders,ui-action,,per-player-filter,5
+UnitMotion::UnitMotion: new PackedPosGoal,seams,unknown,,per-player-filter,4
 UnitMotion::obj,orders,ui-action,,per-player-filter,5
 UnitMotion::speed,presentation,every-frame,,per-player-filter,87
 UnitTypeSet::bits,presentation,ui-action,,all-players,1
@@ -350,7 +354,7 @@ WeaponDef::colour,presentation,ui-action,,all-players,18
 WeaponDef::colour2,presentation,ui-action,,all-players,18
 WeaponDef::coverage,presentation,ui-action,,all-players,0
 WeaponDef::energyPerShot,orders,unknown,,all-players,1
-WeaponDef::flags,orders,unknown,,all-players,3
+WeaponDef::flags,orders,ui-action,,all-players,3
 WeaponDef::flags,presentation,ui-action,,all-players,9
 WeaponDef::lifetime,presentation,ui-action,,all-players,0
 WeaponDef::metalPerShot,orders,unknown,,all-players,1
@@ -417,32 +421,31 @@ numPlayers,presentation,ui-action,,own,0
 otherFlags,presentation,ui-action,,all-players,0
 p1b8a,presentation,every-frame,,own,85
 p1cd5,presentation,every-frame,,own,14
-pad_14273,ai,every-frame,,all-players,3
-pad_14273,los_radar,ui-action,,all-players,89
+pad_14273,los_radar,every-frame,,all-players,89
 pad_14273,map,unknown,,all-players,1
-pad_14273,orders,ui-action,,all-players,1
+pad_14273,orders,ui-action,,all-players,4
 pad_14273,presentation,unknown,,all-players,5
-pad_1df4,orders,unknown,,own,1
+pad_1df4,orders,ui-action,,own,1
 pad_1df4,presentation,every-frame,,own,13
 pad_3816f,presentation,every-frame,,all-players,11
 pathfinder,pathfinding,unknown,,all-players,4
 pauseFlags,presentation,ui-action,,all-players,0
-playerIndex,ai,every-frame,,own,3
-playerIndex,los_radar,ui-action,,own,89
+playerIndex,los_radar,every-frame,,own,89
 playerIndex,map,unknown,,own,1
-playerIndex,orders,ui-action,,own,1
+playerIndex,orders,ui-action,,own,4
 playerIndex,presentation,every-frame,,own,89
 projectileCount,presentation,every-frame,,per-player-filter,89
 projectiles,presentation,every-frame,,per-player-filter,30
 seaLevel,los_radar,every-frame,,all-players,89
 seaLevel,map,unknown,,all-players,1
-seaLevel,orders,unknown,,all-players,1
+seaLevel,orders,ui-action,,all-players,1
 seaLevel,presentation,every-frame,,all-players,88
 sides,presentation,ui-action,,all-players,0
 spots,presentation,ui-action,,all-players,0
 startPos,presentation,every-frame,,all-players,80
 ticks,game,every-frame,,all-players,89
 ticks,harness,ui-action,,all-players,66
+ticks,movement,unknown,,all-players,4
 ticks,network,ui-action,,all-players,23
 ticks,orders,unknown,,all-players,6
 ticks,presentation,every-frame,SIM_EVENT_UNIT_SPEECH,all-players,89
@@ -457,17 +460,16 @@ units,harness,ui-action,,per-player-filter,6
 units,presentation,every-frame,,per-player-filter,89
 units,seams,unknown,,per-player-filter,8
 unitsEnd,presentation,every-frame,,per-player-filter,89
-unknown_1b8e,ai,every-frame,,own,3
+unknown_1b8e,ai,unknown,,own,1
 unknown_1b8e,harness,ui-action,,own,1
-unknown_1b8e,los_radar,ui-action,,own,85
+unknown_1b8e,los_radar,every-frame,,own,85
 unknown_1b8e,map,unknown,,own,1
 unknown_1b8e,network,ui-action,,own,1
-unknown_1b8e,orders,ui-action,,own,6
+unknown_1b8e,orders,ui-action,,own,7
 unknown_1b8e,platform,ui-action,,own,1
 unknown_1b8e,presentation,every-frame,,own,85
 unknown_1b8e,units,unknown,,own,1
-unknown_1cd9,ai,ui-action,,own,1
-unknown_1cd9,los_radar,ui-action,,own,5
+unknown_1cd9,los_radar,ui-action,,own,6
 unknown_1cd9,presentation,every-frame,,own,6
 vertices,platform,ui-action,,per-player-filter,8
 visibilityMask,presentation,ui-action,,own,0

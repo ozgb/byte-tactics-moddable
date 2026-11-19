@@ -1,13 +1,8 @@
-#include "win_types.h"
 #include "../../interfaces/ref.h"
-#include <string.h>
 
-#include "../util/vec3.h"
-#include "../util/angles.h"
 
 #include "../scripts/cob_script.h"
 
-#include "../map/mission.h"
 
 struct UnitCursorView;
 struct FeatureCursorView;
@@ -47,7 +42,7 @@ void SfxOccupyTracker::UpdateSfxOccupy(Unit* unit)
         newState = 0;
     }
     if (*(int*)unit->unknown_10a != newState) {
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "setSFXoccupy", nullptr, 1, 1, newState, 0, 0, 0);
         *(int*)unit->unknown_10a = newState;
     }
 }

@@ -2,6 +2,8 @@
 #include <vector>
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/scripts.h"
+#include "../../interfaces/movement.h"
 #include "../../interfaces/network.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"

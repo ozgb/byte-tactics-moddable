@@ -1,18 +1,12 @@
-#include "win_types.h"
-#include "../../interfaces/ref.h"
-#include <string.h>
 
 #include "../util/vec3.h"
-#include "../util/angles.h"
 
-#include "../scripts/cob_script.h"
 
 #include "../map/mission.h"
 
 struct UnitCursorView;
 struct FeatureCursorView;
 
-#include "../units/unit_def.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -22,7 +16,6 @@ struct FeatureCursorView;
 #include "../scripts/object_view.h"
 #include "../units/unit.h"
 
-#include "../../link/globals.h"
 
 #include "../../interfaces/seams.h"
 #include "weapon_pieces.h"
@@ -32,7 +25,7 @@ int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
 {
     char* names[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
     int piece = 0;
-    g_seams.scripts->QueryScript(obj->script, names[weapon], &piece, 0, 0, 0);
+    g_seams.scripts->QueryScript(obj->script, names[weapon], &piece, nullptr, nullptr, nullptr);
     return piece;
 }
 

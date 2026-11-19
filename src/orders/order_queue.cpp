@@ -1,5 +1,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
+#include "../movement/ai_search_goal.h"
+#include "../movement/air_maneuver_order.h"
 #include "../units/unit_def.h"
 #include "../../interfaces/ref.h"
 #include <stdio.h>
@@ -48,7 +50,6 @@ struct OrderSaveRecord {
 #include "../units/unit_ref.h"
 
 #include "../util/vec3.h"
-#include "../movement/air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
 class OrderFxSlot {
@@ -435,7 +436,7 @@ static unsigned char OrderKindFromSavedIndex(unsigned char want)
 Order::Order(Unit* punit, HapiBank* file, char* name)
     : link()
 {
-    g_seams.units->UnitRefInit(&link, 0, 0);
+    g_seams.units->UnitRefInit(&link, nullptr, nullptr);
     link.SetValue(this);
     g_seams.units->UnitRefSetUnit(&link, 0);
     next = 0;

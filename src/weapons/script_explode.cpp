@@ -1,8 +1,5 @@
-#include "win_types.h"
-#include <string.h>
 
 #include "../util/vec3.h"
-#include "../units/unit_def.h"
 
 #pragma pack(push, 1)
 #include "../units/unit.h"
@@ -10,7 +7,6 @@
 #include "../network/player.h"
 
 #include "../game/game.h"
-#include "../state/sim_effects.h"
 
 struct ExplodedPieceInit {
     Ref<Unit> obj;

@@ -3,10 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <memory.h>
-#include <vector>
-#include <algorithm>
-#include <iterator>
 
 #include "../state/block.h"
 #include "../util/vec3.h"
@@ -108,9 +104,7 @@ struct Unit;
 
 #include "../orders/order.h"
 
-#include "../weapons/weapon_def.h"
 
-#include "../weapons/unit_weapon_slot.h"
 
 #include "../game/game.h"
 
@@ -123,7 +117,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 #include "../state/sim_globals.h"
 
 
-#include "../network/net_stats.h"
 #include "order_goals.h"
 #include "ai_search_goal.h"
 #include "unit_motion.h"
@@ -149,7 +142,6 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
 void RegisterUnitOrders();
-extern int DAT_0051234c;
 
 
 #pragma pack(push, 1)
@@ -573,19 +565,19 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     if (rate == (int)((unit->flags >> 2) & 3))
         return;
     if (rate == 0) {
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StopMoving", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StopMoving", nullptr, 1);
     } else if ((unit->flags & 0xc) == 0) {
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StartMoving", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StartMoving", nullptr, 1);
     }
     switch (rate) {
     case 1:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate1", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate1", nullptr, 1);
         break;
     case 2:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate2", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate2", nullptr, 1);
         break;
     case 3:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate3", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate3", nullptr, 1);
         break;
     }
     unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);

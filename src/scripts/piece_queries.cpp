@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include "../../interfaces/ref.h"
 #include <string.h>
 
@@ -12,7 +11,6 @@
 struct UnitCursorView;
 struct FeatureCursorView;
 
-#include "../units/unit_def.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -22,7 +20,6 @@ struct FeatureCursorView;
 #include "object_view.h"
 #include "../units/unit.h"
 
-#include "../../link/globals.h"
 
 #include "piece_queries.h"
 

@@ -1,10 +1,7 @@
-#include <string.h>
 #include <math.h>
-#include "win_types.h"
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
 #include "../util/vec3.h"
-#include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
 
 struct Unit;

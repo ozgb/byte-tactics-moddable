@@ -31,9 +31,9 @@ need a scheduler:
 - **Versions.** Movement 1.0 (33 slots), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
   state slots left for scripts, #993; it gained `UnitRefInit` and `UnitRefSetUnit`, section 3).
 - **What it calls out.** Movement calls other subsystems only through their seams: pathfinding (`Submit`, `Cancel`),
-  scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`GetGroundHeight`, `SetStateBits`,
+  scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`SetStateBits`,
   `SetUnitPosition`, `UpdateSfxOccupy`, `UnitRefSetUnit`, `UnitRefUnlink`, `LoadUnit`) and map
-  (`ScheduleMapCanPlaceUnitFootprint`). Its three publishes of other modules' events are section 6.
+  (`GetGroundHeight`, units' until map 5.0, and `ScheduleMapCanPlaceUnitFootprint`). Its three publishes of other modules' events are section 6.
 - **Who takes it on.** Orders (#985) puts movement on the scheduler with itself, as both run in the units phase;
   scripts go with units (#986); weapons (#984) addresses scripts' slots. None of the three changes what this page lists.
 

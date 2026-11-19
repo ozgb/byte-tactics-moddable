@@ -1,11 +1,13 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 4.1), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 5.0), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
-unit stands on each cell (the footprints), the spatial grid of units (the buckets), the pass map of each movement
-class, the placement tests, and the mission and campaign data. 3.1c's code is its default implementation. This page is
-the inventory the interface was cut from:
+unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
+map of each movement class and when it is current, and the placement tests. 3.1c's code is its default
+implementation. Map 5.0 (#983) gave the mission and campaign data their own interface (`docs/mission-interface.md`)
+and took the pass maps over from units end to end, their reads and their lazy refresh, by the human's ruling of
+2026-11-18 on #986. This page is the inventory the interface was cut from:
 - what other subsystems did to map's state in 3.1c, and what each became;
 - what map did to others, and what each became;
 - what map reads, and what others read of it;
@@ -19,15 +21,16 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 168 and 176.
+to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 166, 168 and 176 (167 was
+REFRESH_PASS_MAP, which map 5.0 removed).
 
 Map's place in it:
-- **Events into map:** ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT, RECLAIM_FOOTPRINT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND,
-  REFRESH_PASS_MAP and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name.
+- **Events into map:** ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT, RECLAIM_FOOTPRINT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND
+  and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name.
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
   `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
   it moved from map's files into the same glue, as it is the engine's adapter.
-- **Routes:** all eleven routes into map are synchronous: seven because the gate diverged with them queued, units'
+- **Routes:** all ten routes into map are synchronous: six because the gate diverged with them queued, units'
   ADD_UNIT and BUCKET_PREPEND by #952's rule, features' PASS_MAPS as #971 left it, and RECLAIM_FOOTPRINT because no
   scenario reaches it (sections 4 and 8). Of map's two effects, CELLS_CHANGED is synchronous by #952's rule and
   CELL_HEIGHTS stays queued.
@@ -36,12 +39,16 @@ Map's place in it:
 - **Synchronous slots:** `CanBuildAt`, `CanPlaceUnitFootprint` and `PickRandomReclaimableResourcesInRadius`, called
   through the services `ScheduleMapCanBuildAt`, `ScheduleMapCanPlaceUnitFootprint` and `ScheduleMapPickReclaimable`
   (services 1.16), which deliver map's inbox first. Each caller needs the answer in the same statement (section 2).
+  `RefreshMovedUnits` and `RefreshUnitIfStale` (5.0), the lazy refresh of the pass maps, are called by pathfinding's
+  world view at the start and end of a search (`WorldBeginSearch`, `WorldEndSearch`, `src/seams/pathfinding_world.cpp`),
+  which deliver map's inbox first too.
 - **Queries:** `UnitsInRange`, `GetCellMeanHeight`, `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`,
-  `IsPadSlotFree`, and the mission's `GetGameType` and `GetNameSlot`, called directly, as of map's last apply.
+  `IsPadSlotFree`, and since 5.0 `GetGroundHeight`, `MovementClassGet` and `MovementClassInBounds`, called directly, as
+  of map's last apply.
 - **Views:** the footprint fields of the cell records, through los_radar's cell view (section 4); a unit's bucket
   (`Unit::spatialBucket`) and the bucket of units off the map (`Game::overflowBucket`); the pass maps; the placement
   record (`g_lastPlaceMetalSum`, `g_lastPlaceHeight`).
-- **Effects out of map:** CELLS_CHANGED, to pathfinding, when a pass map changed; pathfinding is not on the model
+- **Effects out of map:** CELLS_CHANGED, to pathfinding, when a pass map changed, the refreshes of 5.0 included; pathfinding is not on the model
   yet, so its handler is an adapter onto its seam slot `CellsChanged` (`PathfindingOnMapCellsChanged`,
   `src/game/routes.cpp`). The writes map makes into units' records stay view state that map writes in its own events
   (section 3).
@@ -61,7 +68,7 @@ Map's place in it:
 | units: a unit's script sets YARD_OPEN (`UnitScript::SetUnitValue`) | `SetYardOpen` | SET_YARD from units |
 | units: a unit boards a carrier (`ApplyAttachUnit`) | `SpatialBucketUnlinkUnit` | BUCKET_UNLINK from units |
 | units: a unit leaves a carrier (`ApplyAttachUnit`) | `SpatialBucketPrependUnit` | BUCKET_PREPEND from units |
-| units: a stale pass map under a unit, found by pathfinding's world view (`MovementClass::RefreshMovedUnits`, `RefreshUnitIfStale`) | `RefreshPassMap` | REFRESH_PASS_MAP from units |
+| a stale pass map under a unit, found by pathfinding's world view (`MovementClass::RefreshMovedUnits`, `RefreshUnitIfStale`) | `RefreshPassMap` | map's own work since 5.0: the synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` (REFRESH_PASS_MAP from units in 4.x) |
 | features: the PASS_MAPS effect (a feature placed or removed) | `RefreshAllPassMaps` | PASS_MAPS, through `MapOnFeaturesPassMaps` |
 
 **Answers.** No caller used a value: 3.1c's `AddUnitToMap`, `RemoveUnitFromMap`, `ClearFootprintAndUnlink`,
@@ -70,8 +77,7 @@ result was thrown away. So none of these is synchronous by its contract: every s
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 40) and returned to no
 one: 1 for every kind, except SET_YARD (0 when the footprint is not clear for the new state, or the unit has an empty
-yard map and is skipped). `Apply` first rejects an event naming no unit (every kind but REFRESH_PASS_MAP and
-PASS_MAPS), a movement class index outside 0 to 31 or naming no class (REFRESH_PASS_MAP), a negative size
+yard map and is skipped). `Apply` first rejects an event naming no unit (every kind but PASS_MAPS), a negative size
 (PASS_MAPS), a unit with no bucket or not in its bucket's chain (BUCKET_UNLINK), a unit with no bucket or already in
 its bucket's chain (BUCKET_PREPEND), and an unknown kind, with outcome 0 and no change. A PASS_MAPS of size 0 is
 applied: it still covers its cell grown by each class's footprint, as in 3.1c. 3.1c's callers could publish none of these, so no trace moves; a module publishing from WASM
@@ -106,6 +112,16 @@ can.
 | `BuildAllPassMaps`, `FreeOtaEnumCacheAndMission`, `SetMissionType`, `LoadMappingData`, `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap`, `SaveMappingData`, `SaveMetalPlotmap`, `SavePlayerFeaturesPlotmap` | set-up, save and load slots, outside the tick |
 | `AdvanceMission`, `GetCampaignName`, `GetMissionIndex`, `GetMissionName`, `GetStartPosition`, `LoadCampaign`, `LoadMissionByName`, `MissionExists`, `RefreshMapList`, `SelectMission`, `ComputeMapChecksum`, `GetTerrainLength` | the mission, campaign and map-list slots, outside the tick |
 
+**Every slot of 4.1.** What map 5.0 changed:
+
+| 4.1 | 5.0 |
+|---|---|
+| `GetGameType`, `GetNameSlot`, `SetMissionType`, `FreeOtaEnumCacheAndMission`, `AdvanceMission`, `GetCampaignName`, `GetMissionIndex`, `GetMissionName`, `GetStartPosition`, `LoadCampaign`, `LoadMissionByName`, `MissionExists`, `RefreshMapList`, `SelectMission`, `ComputeMapChecksum`, `GetTerrainLength` | the mission interface 1.0, without the `Mission*` argument (`docs/mission-interface.md`) |
+| the event REFRESH_PASS_MAP | the synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale`, moved from units 2.0 (units 3.0 no longer has them) |
+| units' `MovementClassGet` and `MovementClassInBounds` | queries of map |
+| units' `GetGroundHeight` | a query of map: it interpolates the heights of the cells, terrain map alone keeps |
+| every other slot | unchanged |
+
 **`VisitObjectsInRange` became a query.** 3.1c's took a `UnitVisitor` and called its `Visit` for each unit within
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
 inside map's. Map 4.0's `UnitsInRange` writes the ids of the units in range to a buffer the caller gives, in the
@@ -119,12 +135,23 @@ units they are given. That is the service's contract: a visitor must not move a 
 once more than 256 units are in range. `VisitObjectsInRect`, 3.1c's visitor over a rectangle, had no caller; it is
 removed, so map calls no visitor.
 
-**The mission, campaign and map-list slots stay.** They are not simulation: they read and write the `Mission` object
-and the map list, from the front end, the load of a match and the end of a game. Two of them, `GetGameType` and
-`GetNameSlot`, are read inside the tick (the game type by units, orders, players, ai, features and the victory
-conditions; a player's name slot by players and ai) and are queries of a record nothing in the tick writes. Moving the
-rest out of map would make a new interface or move them into the engine; that is a decision #2 does not make, so
-they stay in `MapSeam`, and section 7 lists them with the default's set-up.
+**The mission, campaign and map-list slots left map in 5.0.** They are not simulation: they read and write the
+`Mission` object and the map list, from the front end, the load of a match and the end of a game, and two of them,
+`GetGameType` and `GetNameSlot`, are queries read inside the tick. By the human's ruling of 2026-11-17 on #980 they
+are the mission interface's (`interfaces/mission.h`, `docs/mission-interface.md`), a module that can be replaced like
+any other.
+
+**The pass maps are map's end to end since 5.0.** In 4.x map wrote the pass maps under its events, while units
+answered the reads (`MovementClassGet`, `MovementClassInBounds`) and ran the lazy refresh around a search
+(`RefreshMovedUnits`, `RefreshUnitIfStale`), which published REFRESH_PASS_MAP back to map and reported to
+pathfinding itself. By the human's ruling of 2026-11-18 on #986 the four are map's slots: the reads are queries, the
+refresh is map's own synchronous work, and the event is gone. The refresh writes the class's window of stale stamps
+(`MovementClass::lastTick`) and a unit's stamp (`UnitMotion::pathLockStamp`), both map's bookkeeping of when a pass
+map is current, and reports each rewrite through CELLS_CHANGED (section 3). The movement class definition stays in
+units: the classes read from `MOVEINFO.TDF` (`ReadMoveInfo`, the `MovementClass` constructor and destructor,
+`FindMovementClass`, `FreeMovementClasses`, `CopyPathLockFields`) are units' functions in
+`src/units/movement_class.cpp`, and the pass-map functions of that file are map's (the `name:PassMap` rule and the
+overrides of `data/subsystems.csv`).
 
 ## 3. Effects out of map
 
@@ -133,9 +160,10 @@ movement classes changed and why (a `PathChange`), as 3.1c called `CellsChanged`
 movement class it computed again: under PASS_MAPS (the terrain changed), under ADD_UNIT of a building, SET_YARD and
 RECLAIM_FOOTPRINT (all classes over the footprint), and under REMOVE_UNIT (`RefreshPassMapsForUnit`: the classes whose
 pass map changed since the unit was last stamped). It records each in the trace's dump just before `SchedPublish`, as `docs/module-abi.md`, 9.3,
-asks of a module's effects. The adapter calls pathfinding's `CellsChanged` with the effect's fields. Units' own reports
-of the pass maps they refresh (`MovementClass::RefreshMovedUnits`, `RefreshUnitIfStale`) stay units' calls to
-pathfinding's seam: they are not map's.
+asks of a module's effects. The adapter calls pathfinding's `CellsChanged` with the effect's fields. Since 5.0 the
+refreshes around a search (`RefreshMovedUnits`, `RefreshUnitIfStale`) publish it as well, one for each pass map they
+compute again, with cause `PATH_CHANGE_UNITS`; in 4.x they were units' direct calls of pathfinding's seam. The route is
+synchronous, so pathfinding hears each at the statement that rewrote the pass map, in 3.1c's order.
 
 **Writes into units' records.** The issue counted writes into `Unit` and `Order` fields. Each stays view state that
 map alone writes, inside its own events, at the publisher's statement, as los_radar's sensor bits did
@@ -153,8 +181,9 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
   every reader of any bit.
 - **`Unit::bit2`:** the yard state that SET_YARD writes, which the yard map's test reads back (`ClaimFootprintCells`,
   `AddUnitToMap`). The access log names it as `Unit::cobStateFlags`, the union over it.
-- **`UnitMotion::pathLockStamp`:** ADD_UNIT stamps a mobile unit's motion with the tick it was placed; units' pass map
-  refreshes compare it with the movement class's tick.
+- **`UnitMotion::pathLockStamp`:** ADD_UNIT stamps a mobile unit's motion with the tick it was placed; map's pass map
+  refreshes (`RefreshPassMapsForUnit` under REMOVE_UNIT, and the slots `RefreshMovedUnits` and `RefreshUnitIfStale`)
+  compare it with the movement class's tick and stamp it again.
 - **`Order::pos`:** written by `SnapWorldPosToFootprint`, a query that writes only the position it is given; the
   caller passes its order's position. It is the caller's own write through a query, not map's.
 
@@ -168,7 +197,8 @@ water limits, `mobile`), motion and carrier chain (`carrier`, `cargo`, `cargoNex
 and the cell records, section below), the feature on a cell (`features.GetCellFeature`) and a feature's flags, metal
 and energy; what the viewing player sees (`IsUnitVisibleToPlayer`, `los_radar.IsPointVisible` for `CanBuildAt`'s
 visibility check); the players' alliance words (`pad_1df4`, `unknown_1b8e`, `unknown_1cd9`); the movement classes
-(`g_movementClassEntries`). All as of each module's last run, read inside map's events, synchronous slots and
+(`g_movementClassEntries`: their sizes, footprints and limits, which units reads from `MOVEINFO.TDF` at load). All as
+of each module's last run, read inside map's events, synchronous slots and
 queries, at the caller's statement.
 
 **The cell view.** Map writes three fields of each cell record of the cell view (`docs/los-radar-interface.md`,
@@ -179,7 +209,8 @@ section 4), all through its events:
   of the building's yard map is set. The owner and spot bits are features' (#954) and the rest are set at load.
 
 The pass maps are not cell fields: they are the movement classes' allocations (`BuildAllPassMaps`), which map's
-PASS_MAPS and REFRESH_PASS_MAP write and pathfinding reads through its world view (`WorldPass`, in the players phase).
+PASS_MAPS and the refresh slots write and pathfinding reads through map's queries `MovementClassGet` and
+`MovementClassInBounds`, called by its world view (`WorldPass`, `WorldInBounds`, in the players phase).
 Map's CELL_HEIGHTS to los_radar, published by ADD_UNIT and REMOVE_UNIT for a building's footprint, stays queued, as
 #965 left it: it rewrites `high` and `low` from the cells' `height`, which nothing writes in the tick, so no read in the
 phase can see a difference while it is pending (`docs/los-radar-interface.md`, section 4).
@@ -187,7 +218,9 @@ phase can see a difference while it is pending (`docs/los-radar-interface.md`, s
 **What others read of map:**
 - **Queries:** `UnitsInRange` (through the service `VisitUnitsInRange`), `GetCellMeanHeight` (features, players,
   weapons),
-  `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` (orders), `GetGameType`, `GetNameSlot`.
+  `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` (orders), `GetGroundHeight` (features, los_radar,
+  movement, orders, scripts, targeting, units, weapons and the minimap's cursor), `MovementClassGet` and `MovementClassInBounds`
+  (pathfinding's world view).
 - **Views:** the footprint fields of the cells; `Unit::spatialBucket` and `overflowBucket` (orders, units); the claim
   bits of `Unit::flags`; the pass maps (pathfinding); `g_lastPlaceMetalSum` (ai, right after a synchronous call).
 
@@ -208,10 +241,10 @@ one only when an event that can be pending writes what it reads. No route into m
 | units SET_YARD | synchronous | The gate (section 8). |
 | units BUCKET_UNLINK | synchronous | The gate (section 8). |
 | units BUCKET_PREPEND | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit that leaves a carrier in the units phase is missing from its bucket until the phase boundary, and orders' patrol and repair orders and the victory conditions walk the buckets (`UnitsInRange`) later in the same phase. BUCKET_UNLINK, its pair, diverged queued (section 8). |
-| units REFRESH_PASS_MAP | synchronous | The gate (section 8). |
+| units REFRESH_PASS_MAP | removed in 5.0 | Map's own synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` instead, called at the search's statement after map's inbox is delivered (section 8). Queued in 4.0, the event diverged. |
 | units RECLAIM_FOOTPRINT | synchronous | No scenario reaches it (section 8): `LoadUnit` publishes it only for a saved unit whose yard is open, and the one saved game of the suite has none. It is published only as a saved game is read, outside the tick, where #970's rule delivers it at once anyway, so the policy changes no order. |
 | features PASS_MAPS | synchronous | #971 made it synchronous by #952's rule (`docs/features-interface.md`, section 4); unchanged. |
-| map CELLS_CHANGED, to pathfinding | synchronous | #952's rule. Queued it stayed equal on the tier, which says little: the default pathfinding marks the stale clusters of its hierarchy from it, and the scenarios' paths came out the same. It can be pending while a later read in the same phase needs it: a path submitted later in the units phase (orders' `Submit`) reads the stale marks, and units' own `CellsChanged` reports, direct calls into pathfinding, interleave with map's in that phase; queued, map's would land after all of units', in another order than 3.1c's. |
+| map CELLS_CHANGED, to pathfinding | synchronous | #952's rule. Queued it stayed equal on the tier, which says little: the default pathfinding marks the stale clusters of its hierarchy from it, and the scenarios' paths came out the same. It can be pending while a later read in the same phase needs it: a path submitted later in the units phase (orders' `Submit`) reads the stale marks, and in 4.x units' own `CellsChanged` reports, direct calls into pathfinding, interleaved with map's in that phase (queued, map's would land after all of units', in another order than 3.1c's). Since 5.0 those reports are map's CELLS_CHANGED too, so the route carries them all at their statements. |
 | map CELL_HEIGHTS, to los_radar | queued | Unchanged from #965 (above). |
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv`, regenerated on this change, has these rows of
@@ -229,7 +262,7 @@ item is every field of every cell, so a row with it is any field. Each is served
 | map → ai | `g_lastPlaceMetalSum` | players | Written by the synchronous `CanBuildAt` and `CanPlaceUnitFootprint`, read by the same caller right after. |
 | units, orders, weapons → map | `Unit::cell`, `pos`, `zFraction`, `flags`, `footprint`, `def`, `motion`, `carrier`, `cargo`, `cargoNext`, `cobStateFlags` | units | Map reads them inside its synchronous events and slots, at the publisher's statement: REMOVE_UNIT before the publisher writes the new cell, ADD_UNIT after it, as 3.1c's calls did. |
 | orders → map | `Order::pos` | units | Read by the synchronous `CanPlaceUnitFootprint` and the queries at the caller's statement. |
-| units → map | `UnitMotion::pathLockStamp`, `g_movementClassEntries` | players | Read by the synchronous REFRESH_PASS_MAP, which units publishes from pathfinding's world view in the players phase, at its statement. |
+| units → map | `UnitMotion::pathLockStamp`, `g_movementClassEntries` | players | In 4.x read by the synchronous REFRESH_PASS_MAP, which units published from pathfinding's world view in the players phase. Since 5.0 the refresh that writes them is map's synchronous `RefreshMovedUnits` and `RefreshUnitIfStale`, run at the search's statement, so the writer is map itself; the row names units until `data/dependencies.csv` is next regenerated from access logs. |
 | economy, units → map | `pad_1df4`, `unknown_1b8e`, `unknown_1cd9` | units | The players' alliance words, read by `CanBuildAt` and the claim at the caller's statement. |
 | features, los_radar → map | `PLOT MEMORY`, `MAPPED MEMORY`, `FeatureAnimEntry::bytes_8`, `bytes_10` | units, features, projectiles | Features' and los_radar's fields of the cells and the spots, written by their own synchronous routes and runs; map reads them in its synchronous events and slots, after those writes, as in 3.1c. |
 | weapons → map | `Debris::pos` | explosions | Read by `GetCellMeanHeight`, a query, at the caller's statement. |
@@ -271,6 +304,8 @@ records, and the access log names them as one item), nor are `Unit::cargoNext`, 
 **The trace dumps map's events** in section 40 (`docs/trace-format.md`, section 8.28), after los_radar's section 39,
 and hashes none of them. Each record is an event with the outcome `Apply` gave, or a CELLS_CHANGED map published, in
 map's order. The section is new, so the trace format's schema changes and the gate of this change is the full suite.
+Since 5.0 the dump has no REFRESH_PASS_MAP records and a CELLS_CHANGED for each pass map the refreshes around a
+search compute again; nothing hashed changes, so the gate of 5.0 is the tier.
 
 ## 6. Random draws and sim events
 
@@ -290,8 +325,12 @@ Map records no sim event.
 3.1c's types and limits are the default's, not the interface's: the cell record's layout, the bucket grid (a bucket
 per 8 by 8 cells, 10 bytes each), the overflow bucket, the yard map's encoding, the pass map words and their edge
 strips, the 32 movement classes, the placement record, and the scratch lists of `PickRandomReclaimableResourcesInRadius`.
-An event carries a unit as its block offset, a movement class as its index, and a rectangle in cells. The mission,
-campaign and map-list slots, and the set-up, save and load slots, stay in `MapSeam` as 3.1c's code (section 2).
+An event carries a unit as its block offset, a movement class as its index, and a rectangle in cells. The set-up,
+save and load slots stay in `MapSeam` as 3.1c's code. The movement class slots (`MovementClassGet`,
+`MovementClassInBounds`, `RefreshMovedUnits`, `RefreshUnitIfStale`) take the class as 3.1c's `MovementClass*`, and the
+refreshes a `Unit*`, of which they read the motion's stamp, its cell and footprint: 3.1c's types where the change
+needed no new decision. The window of 30 ticks and the stamps are the default's. The movement class definition, which
+`MOVEINFO.TDF` gives, is units' (section 2); the mission, campaign and map-list slots are the mission interface's.
 
 ## 8. What the gate decided
 
@@ -339,3 +378,8 @@ Features' PASS_MAPS is not counted here: it reaches map through features' effect
 **Inbox depths.** Map's inbox was never deeper than 0 at a phase boundary in any scenario: every route into map that
 is taken inside the tick is synchronous, so nothing waits in it. The most map events published inside one unit's
 update (`UpdateUnit`) was 4, in mission-timer at tick 186 (unit 361).
+
+**Map 5.0 (#983).** The pass maps moved with the refresh as map's own work, the first of #986's two choices, and the
+tier was equal (38 of 38 scenarios); the fallback (only the two reads move, the refresh stays a synchronous slot of
+units) was not needed. The CELLS_CHANGED effects of the refreshes reach pathfinding through the synchronous route at
+the statements units' direct calls stood at, so no draw or write moved.

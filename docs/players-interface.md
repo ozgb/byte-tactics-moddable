@@ -43,7 +43,7 @@ Players' place in it:
 - **Synchronous calls out:** the commander's respawn calls units' `CreateUnit` and reads the new unit in the same
   statement (section 3). The placement test of the respawn is map's synchronous `CanPlaceUnitFootprint`, through
   `ScheduleMapCanPlaceUnitFootprint` (services 1.16).
-- **Queries:** map's `GetCellMeanHeight`, `GetGameType` and `GetNameSlot`, units' `FindUnitTypeId`, weapons'
+- **Queries:** map's `GetCellMeanHeight`, the mission's `GetGameType` and `GetNameSlot` (map's until map 5.0), units' `FindUnitTypeId`, weapons'
   `FindFeatureAtPos`, los_radar's `ClampWorldPosToTerrain` and the service `VisitUnitsInRange`, all as of the owner's
   last apply.
 - **Views:** the `Player` records (`Game::players`), which players, economy, units and the network write

@@ -1197,24 +1197,24 @@ slot, and `Apply` of every kind but SET_POS: SET_UNIT 315 times, CLEAR 1014 time
 unit target whose `unitDefIndex` is 0, so `GetWeaponTargetPos` returns 0 and the target is cleared. `edges-economy-targeting` (the whole run, 260 ticks) holds
 a search with more than 50 candidates, candidates at the same spot (`services.RandomInt` of 0), a unit with fire order 0, a kamikaze unit
 among the candidates, a paralyzer weapon against a paralyzed target, a veteran commander (more than five kills) aiming at a building,
-the D-gun (`Apply` of a SET_POS on weapon 2), and an aim at ground under the sea (`units.GetGroundHeight` returns 1). Each
+the D-gun (`Apply` of a SET_POS on weapon 2), and an aim at ground under the sea (`map.GetGroundHeight` returns 1). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
 
 `edges-targeting-lead` (the whole run) holds three outcomes the other recordings lack. All its lines are of `tests/replay/targeting/edges-targeting-lead.txt`:
 
-- Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `units.GetGroundHeight` returns 1: the call at tick 11, line 1332, where `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
+- Ground height equal to the sea level: `sealevel 1`, then the D-gun at the ground at (850, 300), where `map.GetGroundHeight` returns 1: the call at tick 11, line 1332, where `GetWeaponTargetPos` returns 1 with `o pos.y 65536` (16 calls, from tick 11).
 - Bit 10 (0x400) of `Game.uiOptionFlags` (`shootall`, tick 60) deciding a pick: the call at tick 83, line 4750, where `FindWeaponTarget` of the human commander `Unit#1` takes the enemy `CORSOLAR` (`Unit#502`, a def without `shootme`) as its only candidate and picks it.
 - The lead check of `GetWeaponTargetPos` at 4, 5, 6 and 7 kills, in `Unit#2` (an `ARMHLT`) aiming at `CORCK` constructors that patrol: with 4 kills the aim point is the sweet spot while the target moves (first at tick 766, line 35313), with 5 kills the same (tick 866, line 39500), and with 6 kills the target's velocity is added (`o out` differs from `o pos.x` and `o pos.z`): tick 1072, line 48086, with `UnitMotion#8` velocity read just before it. The first calls at each count are at ticks 724 (4 kills, line 33597), 864 (5, line 39429), 998 (6, line 45010), 1127 (7, line 50344) and 1233 (8, line 54800). In this list a line is the `scripts.GetSweetSpot` import of the call, a few lines below its `call` line. A target that moves at 6 kills is one call in the run (and 62 at 7), because the tower kills quickly.
 
-`replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 7 of `orders-air-repair` and at `result`:
+`replay_inject_test.exe` is also built with the mean-shift injection of 0 (the shift by one that halves the sum of the low and high corners of a cell in the cell mean height), and the divergence is reported at call 63 of `orders-air-repair` (its seventh `GetCellMeanHeight`; map 5.0's recording holds the `GetGroundHeight` calls too) and at `result`:
 
 ```sh
-wine build/modern/replay_inject_test.exe --expect 7 result tests/replay/map/orders-air-repair.txt
+wine build/modern/replay_inject_test.exe --expect 63 result tests/replay/map/orders-air-repair.txt
 ```
 
-The recordings of map 4.0, which the modern build runs as native code in every mode (it has no WASM module yet), where `Apply` is called with each event map is given: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `Apply` with PASS_MAPS, ADD_UNIT, REMOVE_UNIT and REFRESH_PASS_MAP, `CanBuildAt`, `CanPlaceUnitFootprint`, `SnapWorldPosToFootprint`), `orders-air`, ticks 1020 to 1585 only
-(`Apply` with ADD_UNIT, REMOVE_UNIT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND and REFRESH_PASS_MAP, `CanPlaceFootprintAt`, `CanBuildAt`, `CanPlaceUnitFootprint`) and `orders-air-repair`, ticks 380 to 385 only (`Apply` with ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, `IsPadSlotFree`, `CanPlaceUnitFootprint`, `GetCellMeanHeight`).
+The recordings of map 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), where `Apply` is called with each event map is given: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `Apply` with PASS_MAPS, ADD_UNIT and REMOVE_UNIT, `CanBuildAt`, `CanPlaceUnitFootprint`, `SnapWorldPosToFootprint`, `GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds`), `orders-air`, ticks 1020 to 1585 only
+(`Apply` with ADD_UNIT, REMOVE_UNIT, SET_YARD, BUCKET_UNLINK and BUCKET_PREPEND, `CanPlaceFootprintAt`, `CanBuildAt`, `CanPlaceUnitFootprint`, `GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds`) and `orders-air-repair`, ticks 380 to 385 only (`Apply` with ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, `IsPadSlotFree`, `CanPlaceUnitFootprint`, `GetCellMeanHeight`, `GetGroundHeight`). `RefreshMovedUnits` and `RefreshUnitIfStale`, map's pass-map refreshes since 5.0, are not recorded yet (`record: false`, #660 part 3): they write units' stamps and publish CELLS_CHANGED, which the recorder has no form for.
 A window cannot start at tick 0, so only a whole run holds the load-time `BuildAllPassMaps`. The first call that names a field of `Cell` writes it for every cell of the table (a map of 224 by 102 cells is about 23,000 lines a field),
 which is most of each file, and after that only the cells a call changed. RECLAIM_FOOTPRINT is in no scenario.
 The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a3` times `height_142a7` buckets, included under `pack1:` because the game lays a bucket out in 10 bytes, and listed before `Cell` so that the units

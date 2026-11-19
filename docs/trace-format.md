@@ -1289,18 +1289,19 @@ for k in 0 .. n-1, in order:
 `map.count` and the numbers of a record are written as `0x` and 8 hex digits.
 
 - `kind` is an event or an effect: 160 ADD_UNIT, 161 REMOVE_UNIT, 162 CLEAR_UNIT, 163 RECLAIM_FOOTPRINT,
-  164 SET_YARD, 165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 167 REFRESH_PASS_MAP, 168 PASS_MAPS, and the effect 176
-  CELLS_CHANGED.
+  164 SET_YARD, 165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 168 PASS_MAPS, and the effect 176 CELLS_CHANGED. 167 was
+  REFRESH_PASS_MAP, which map 5.0 (#983) removed: the refreshes of the pass maps around a search are map's own slots,
+  and each pass map they compute again is a CELLS_CHANGED record.
 - `unit` is the unit the event names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or
   `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
-- `value` is the argument of the kind: for SET_YARD 1 to open the yard and 0 to close it, and for
-  REFRESH_PASS_MAP the movement class index, 0 to 31. Fields a kind does not use are 0.
+- `value` is the argument of the kind: for SET_YARD 1 to open the yard and 0 to close it. Fields a kind does
+  not use are 0.
 - `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a
-  REFRESH_PASS_MAP or PASS_MAPS.
+  PASS_MAPS.
 - `rect` is the rectangle of a CELLS_CHANGED, left, top, right and bottom, in cells, `classes` the movement
   classes whose pass maps changed, a bit for each class index, and `cause` the reason for the change.
 - `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
-  null, or names a movement class that does not exist; for SET_YARD 0 when the footprint was not clear. It is
+  null; for SET_YARD 0 when the footprint was not clear. It is
   1 for an effect.
 
 Map's own report (record 45, written through the `StateWriter` of the seam's `WriteState`) is dumped and never hashed, with the

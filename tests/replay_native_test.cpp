@@ -1616,6 +1616,21 @@ int __stdcall ApplyMapEventSlot(const MapEvent* event)
     return ApplyMapEvent(event);
 }
 
+void __stdcall AllocateBucketsSlot()
+{
+    MapAllocateBuckets();
+}
+
+void __stdcall FreeBucketsSlot()
+{
+    MapFreeBuckets();
+}
+
+void __stdcall WriteStateSlot(const StateWriter* writer)
+{
+    MapWriteState(writer);
+}
+
 WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);

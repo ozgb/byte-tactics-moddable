@@ -36,8 +36,8 @@ Weapons' place in it:
   (section 5). Features' AREA_DAMAGE and wind_meteors' SPAWN reach it through `WeaponsOnFeaturesAreaDamage` and
   `WeaponsOnMeteorSpawn`, which build the event and hand it to the same handler; their routes in `src/game/routes.cpp`
   are as they were (AREA_DAMAGE synchronous, SPAWN queued).
-- **Routes:** of the fifteen routes into weapons, thirteen are synchronous (eight because the gate diverged with them
-  queued, and five by #952's rule). LOAD_SLOT and wind_meteors' SPAWN stay queued. Of weapons' effects, START_SCRIPT,
+- **Routes:** of the fifteen routes into weapons, thirteen are synchronous (seven because the gate diverged with them
+  queued, five by #952's rule, and features' AREA_DAMAGE as it was). LOAD_SLOT and wind_meteors' SPAWN stay queued. Of weapons' effects, START_SCRIPT,
   DETACH_PIECE and HEALTH are synchronous because the gate diverged with them queued, and MARK_DAMAGED,
   DAMAGE_RECORD, PARALYZE, NOTICE and BUSY by #952's rule; ATTACKED (four routes), HIT, DAMAGE to features and CLEAR to
   targeting are as they were (sections 4 and 8).
@@ -365,13 +365,57 @@ section 4).
 | weapons DAMAGE_RECORD | equal | none (synchronous by #952's rule, section 4) |
 | weapons HEALTH | diverged | mission-victory, tick 181, units phase: `rng.parkMiller` (reference 0x613fc705, queued 0x01f484b2). |
 | weapons PARALYZE | equal | none (synchronous by #952's rule, section 4) |
-| weapons START_SCRIPT | diverged | mission-radius, tick 1279, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): `units[3].script.changed` (reference 1, queued 0); the script thread started a tick late, and ai's fields differ first. |
+| weapons START_SCRIPT | diverged | mission-radius, tick 1279, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): `units[3].script.changed` (reference 1, queued 0); queued, the script started at the phase boundary instead of in the weapon's update, and ai's fields differ first. |
 | weapons DETACH_PIECE | diverged | conditions-dark-side, tick 452, units phase: `explodedPieces[0].rec.flags` (reference 0x0006, queued 0x0007). |
 | weapons NOTICE | equal | none (synchronous by #952's rule, section 4) |
 | weapons BUSY | equal | none (synchronous by #952's rule, section 4) |
 | weapons ATTACKED, HIT | unchanged | synchronous as #991 left them (`docs/ai-interface.md`, section 8) |
 | weapons DAMAGE to features, CLEAR to targeting | unchanged | synchronous as before (`docs/features-interface.md` and `docs/targeting-interface.md`, section 8) |
 
-**Inbox depths.** INBOX DEPTHS: to fill
+**Inbox depths.** Every route into weapons but two is synchronous, so its inbox holds an event only while wind_meteors'
+SPAWN waits for the phase boundary: it was never deeper than 1, in any scenario (the SPAWNs of meteors-hailstorm and
+hailstorm-los-off, 150 each, and of console-features and meteors-earthquake, each delivered before the next was
+published). LOAD_SLOT is published only while a save loads, outside the tick, and is delivered at once. The most
+events delivered to weapons inside one tick was 541, in edges-economy-targeting at tick 245. A synchronous delivery
+into weapons ran inside another one 7 times, all orders' RELEASE: a DAMAGE (or features' AREA_DAMAGE) publishes
+ATTACKED, ai's handler reacts to the attack with an order that releases the unit's weapons, and that RELEASE runs
+inside the outer `Apply`, where 3.1c called `ReleaseWeapons` from inside `ai.ReactToAttack`, inside `DamageUnit`.
 
-**How often each route is taken.** ROUTE COUNTS: to fill
+**How often each route is taken.** A build that counts every publish into and out of weapons, over the 89 scenarios
+with native modules (all 89 equal to the reference): the events published inside the tick and outside it (when a game
+is set up or loaded, and the console's commands), and in how many scenarios each was published at all. A route with
+several subscribers (ATTACKED to units has two) counts once per subscriber.
+
+| Route | Inside the tick | Scenarios | Outside the tick | Scenarios |
+|---|---|---|---|---|
+| orders DAMAGE | 392 | 22 | 0 | 0 |
+| orders RELEASE | 37461 | 89 | 149 | 36 |
+| orders CLAIM | 17934 | 67 | 0 | 0 |
+| units DAMAGE | 17778 | 17 | 4 | 3 |
+| units DETONATE | 784 | 30 | 0 | 0 |
+| units RELEASE | 5976 | 53 | 4272 | 89 |
+| units INIT_SLOTS | 1992 | 53 | 1424 | 89 |
+| units REMOVE_PROJECTILES | 937 | 35 | 4 | 1 |
+| units SET_STOCKPILES | 2 | 2 | 0 | 0 |
+| units LOAD_SLOT | 0 | 0 | 12 | 1 |
+| engine REMOTE_DAMAGE | 0 | 0 | 0 | 0 |
+| scripts AIM_DONE | 10122 | 27 | 0 | 0 |
+| scripts EXPLODE_PIECE | 6402 | 27 | 0 | 0 |
+| features AREA_DAMAGE | 271 | 7 | 0 | 0 |
+| wind_meteors SPAWN | 313 | 4 | 0 | 0 |
+| weapons ATTACKED, to units | 14710 | 37 | 8 | 3 |
+| weapons ATTACKED, to ai | 7355 | 37 | 4 | 3 |
+| weapons ATTACKED, to orders | 7355 | 37 | 4 | 3 |
+| weapons HIT, to orders | 8154 | 25 | 0 | 0 |
+| weapons MARK_DAMAGED, to units | 7355 | 37 | 4 | 3 |
+| weapons DAMAGE_RECORD, to units | 7355 | 37 | 4 | 3 |
+| weapons HEALTH, to units | 25058 | 36 | 4 | 3 |
+| weapons PARALYZE, to orders | 12 | 2 | 0 | 0 |
+| weapons START_SCRIPT, to scripts | 37956 | 71 | 1424 | 89 |
+| weapons DETACH_PIECE, to scripts | 3641 | 24 | 0 | 0 |
+| weapons NOTICE, to units | 147992 | 27 | 0 | 0 |
+| weapons BUSY, to units | 6211 | 26 | 0 | 0 |
+| weapons DAMAGE, to features | 1575 | 26 | 0 | 0 |
+| weapons CLEAR, to targeting | 15772 | 66 | 39 | 13 |
+
+No scenario plays a network game, so the engine's REMOTE_DAMAGE is never taken.

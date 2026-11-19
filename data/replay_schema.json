@@ -4908,6 +4908,46 @@
       "record": false,
       "reason": "#660 part 3",
       "native": "SelectSchemaSlot"
+     },
+     "GetMissionParams": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMissionParamsSlot"
+     },
+     "CountMissionUnits": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "CountMissionUnitsSlot"
+     },
+     "GetMissionUnit": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMissionUnitSlot"
+     },
+     "SetMissionUnitPosition": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "SetMissionUnitPositionSlot"
+     },
+     "CountMissionFeatures": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "CountMissionFeaturesSlot"
+     },
+     "GetMissionFeature": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMissionFeatureSlot"
+     },
+     "GetMemory": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMemorySlot"
+     },
+     "GetNumPlayers": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetNumPlayersSlot"
      }
     }
    },
@@ -6398,7 +6438,7 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [3, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 6, "ruleless": 0, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "GetFootprintCentre(cell)", "Apply(event)", "Place(place)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [3, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 1, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "GetFootprintCentre(cell)", "Apply(event)", "Place(place)"]}},
    "slots": {
     "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateFeatures"},
     "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadFeatureFileList"},
@@ -6484,7 +6524,7 @@
    }
   },
   "los_radar": {
-   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [3, 2], "status": "pending", "imports": [], "unrecorded": {"GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}}, "pending": {"untracked": 41, "ruleless": 22, "unresolvedSlots": ["InitRadar", "FreeRadar", "RegionSize", "Init", "Shutdown", "SightCache", "WriteState"], "unannotatedArgs": ["GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "ClampWorldPosToTerrain(out)", "HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "RegionSize(map)", "Init(map)", "Init(region)", "Shutdown result", "SightCache(out)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [3, 2], "status": "pending", "imports": [], "unrecorded": {"GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}}, "pending": {"untracked": 35, "ruleless": 22, "unresolvedSlots": ["InitRadar", "FreeRadar", "RegionSize", "Init", "Shutdown", "SightCache", "WriteState"], "unannotatedArgs": ["GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "ClampWorldPosToTerrain(out)", "HasReadyUnitInRange(pos)", "IsPointVisible(pos)", "RegionSize(map)", "Init(map)", "Init(region)", "Shutdown result", "SightCache(out)", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateUnitLineOfSight", "RemoveUnitLineOfSight", "RevealNewUnit", "AddEyeball", "UpdateCellHeightRange", "RecalculateLineOfSight", "CmdShareMapping", "CmdShareRadar"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.flags_2a44", "Game.seaLevel", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.exploredSize", "Player.explored", "Unit.def", "Unit.player", "Unit.cell", "Unit.footprint", "Unit.unitDefIndex", "UnitDef.range", "UnitDef.modelMaxYHigh", "PlayerInfo.flags_97_wide", "Cell.height", "FrameTable.count", "GafFrame.xOffset", "GafFrame.yOffset"], "objectWrites": ["PlayerInfo.flags_97_wide", "Cell.high", "Cell.low"], "allOf": ["Player"], "args": [{"name": "event", "type": "LosRadarEvent*", "line": "event", "mode": "struct", "kind": "LosRadarEvent", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "GetMapCell": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCell"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell", "reach": ["metal"]}, "native": "GetMapCell"},
@@ -6540,7 +6580,7 @@
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 64, "ruleless": 27, "unresolvedSlots": ["UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 59, "ruleless": 27, "unresolvedSlots": ["UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "WriteState(writer)"]}},
    "slots": {
     "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateAllUnits"},
     "SetStateBits": {"conv": "__stdcall", "ret": "void", "functions": ["Unit::SetStateBits"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.player", "Unit.script"], "objectWrites": ["Unit.activateFlags"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "mask", "type": "int", "line": "mask", "mode": "scalar"}, {"name": "set", "type": "int", "line": "set", "mode": "scalar"}], "result": null, "native": "SetStateBits"},
@@ -6591,7 +6631,7 @@
    }
   },
   "players": {
-   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [3, 1], "status": "pending", "imports": [], "pending": {"untracked": 36, "ruleless": 11, "unresolvedSlots": ["Apply", "DeactivateConditions", "DeleteConditions", "NewConditions", "RegionSize", "Init", "Shutdown", "WriteState"], "unannotatedArgs": ["Apply(event)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NewConditions result", "RegionSize(info)", "Init(info)", "Init(region)", "Shutdown result", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [3, 1], "status": "pending", "imports": [], "pending": {"untracked": 32, "ruleless": 11, "unresolvedSlots": ["Apply", "DeactivateConditions", "DeleteConditions", "NewConditions", "RegionSize", "Init", "Shutdown", "WriteState"], "unannotatedArgs": ["Apply(event)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NewConditions result", "RegionSize(info)", "Init(info)", "Init(region)", "Shutdown result", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "PlayersEvent*", "line": "event", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "UpdatePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayers"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdatePlayers"},
@@ -6708,7 +6748,7 @@
    }
   },
   "mission": {
-   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [1, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
+   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [1, 1], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}, "GetMissionParams": {"reason": "#660 part 3", "native": "GetMissionParamsSlot"}, "CountMissionUnits": {"reason": "#660 part 3", "native": "CountMissionUnitsSlot"}, "GetMissionUnit": {"reason": "#660 part 3", "native": "GetMissionUnitSlot"}, "SetMissionUnitPosition": {"reason": "#660 part 3", "native": "SetMissionUnitPositionSlot"}, "CountMissionFeatures": {"reason": "#660 part 3", "native": "CountMissionFeaturesSlot"}, "GetMissionFeature": {"reason": "#660 part 3", "native": "GetMissionFeatureSlot"}, "GetMemory": {"reason": "#660 part 3", "native": "GetMemorySlot"}, "GetNumPlayers": {"reason": "#660 part 3", "native": "GetNumPlayersSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
    "slots": {
 
    }

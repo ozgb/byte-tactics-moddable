@@ -2197,14 +2197,13 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,RandomInt
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,WorldToCell
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,operator->
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,call,operator=
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,deref_read,*Point16
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,deref_read,*Vec3
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,deref_write,*Point16
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_escape,UnitDef::f14a
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Game::net
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Mission::surfaceMetal
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,MissionParams::surfaceMetal
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,MissionSeam::GetMissionParams
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::margin0
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::margin1
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::offset0
@@ -2213,14 +2212,16 @@ address,function,file,kind,target
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,PlayerAI::spacing1
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Point16::x
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Point16::y
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,Seams::mission
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::footprintx
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::footprintz
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_read,UnitDef::minwaterdepth
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_write,Point16::x
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,field_write,Point16::y
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,function,
-0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_game
 0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_lastPlaceMetalSum
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,global_read,g_seams
+0x40a5d0,PlayerAI::FindRandomPlacementCell,src/ai/ai_player.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::Clear
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,BlockVector::PushBack
 0x40a7b0,PlayerAI::BuildFeatureCells,src/ai/ai_player.cpp,call,operator Feature *
@@ -2478,21 +2479,23 @@ address,function,file,kind,target
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,PlayerAI::FindRandomPlacementCell
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,RandomInt
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,operator PlayerAI *
-0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,call,operator->
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,deref_read,*Point16
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_escape,PlayerAI::centre
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_escape,UnitDef::f14a
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_maybe_written,PlayerAI::cells
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,Game::baseX
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,Game::baseY
-0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,Game::net
-0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,Mission::surfaceMetal
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,MissionParams::surfaceMetal
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,MissionSeam::GetMissionParams
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,PlayerAI::searchRadius
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,Seams::mission
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_read,UnitDef::extractsMetal
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,field_write,PlayerAI::searchRadius
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,function,
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,global_read,g_game
 0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,global_read,g_seams
+0x40bfe0,FindBuildPosition,src/ai/ai_player.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,call,operator[]
 0x40c200,GetUnitCount,src/ai/ai_player.cpp,field_read,PlayerAI::counts
@@ -3602,7 +3605,8 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_escape,Unit::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_maybe_written,Order::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_maybe_written,Unit::pos
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Game::net
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,MissionParams::gravity
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,MissionSeam::GetMissionParams
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,MovementSeam::NewPathOrderAt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,MovementSeam::NewPathOrderToUnit
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,MovementSeam::PathOrderSetApproachRadius
@@ -3615,10 +3619,10 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Order::target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Point16::x
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Point16::y
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::mission
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::movement
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::units
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Seams::weapons
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Struct_Game391e9::gravity
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Struct_Unit96::slotIndex
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Unit::def
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_read,Unit::flags
@@ -3643,11 +3647,11 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_write,Order::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_write,Order::state
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,function,
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,g_game
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,g_seams
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,global_read,kSim
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via PathOrder *(*)(Order *, Unit *) __attribute__((stdcall)) [MovementSeam::NewPathOrderToUnit]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via PathOrder *(*)(Order *, const Vec3 *) __attribute__((stdcall)) [MovementSeam::NewPathOrderAt]"
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(PathOrder *, short) __attribute__((stdcall)) [MovementSeam::PathOrderSetApproachRadius]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ClaimWeapons]"
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,indirect_call,"indirect via void (*)(Unit *, int, unsigned char) __attribute__((fastcall)) [WeaponsSeam::ReleaseWeapons]"
@@ -6114,27 +6118,24 @@ address,function,file,kind,target
 0x41d0f0,CenterCameraOnRadarClick,src/ingame/camera.cpp,global_read,g_game
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,call,ClampCameraPosition
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,call,SetPos
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,call,get
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,call,operator StartPositionEntry *
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::mapFlags
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::net
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::scrollX
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::scrollY
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::viewDirtyFlags_142f1
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::viewHeight
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Game::viewWidth
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionEntry::id
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionEntry::type
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionEntry::x
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionEntry::z
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionNetView::entries
-0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,StartPositionNetView::entry_count
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,MissionSeam::GetStartPosition
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Seams::mission
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Vec3::x
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_read,Vec3::z
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_write,Game::mapFlags
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_write,Game::viewDirtyFlags_142f1
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_write,Game::x2
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,field_write,Game::y2
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,function,
 0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,global_read,g_game
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,global_read,g_seams
+0x41d1f0,CenterCameraOnStartPosition,src/ingame/camera.cpp,indirect_call,"indirect via int (*)(Vec3 *, int) __attribute__((stdcall)) [MissionSeam::GetStartPosition]"
 0x41d2b0,ReadCameraPosition,src/ingame/camera.cpp,call,ClampCameraPosition
 0x41d2b0,ReadCameraPosition,src/ingame/camera.cpp,call,HapiBank::GetIntegerItem
 0x41d2b0,ReadCameraPosition,src/ingame/camera.cpp,call,HapiBank::OpenAccount
@@ -6253,7 +6254,6 @@ address,function,file,kind,target
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,indirect_call,indirect via char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 0x41da60,SetUpEndMissionScreen,src/frontend/endgame.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,call,memset
-0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,call,operator Mission *
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,call,operator->
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,call,strncpy
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_escape,Game::players
@@ -6276,13 +6276,13 @@ address,function,file,kind,target
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::max_2e
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::max_32
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::mission
-0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::net
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::ticks
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Game::won
-0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Mission::killMul
-0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Mission::timeMul
+0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,MissionParams::killMul
+0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,MissionParams::timeMul
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,MissionSeam::GetGameType
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,MissionSeam::GetMissionIndex
+0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,MissionSeam::GetMissionParams
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Player::active
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Player::energyWasted
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,field_read,Player::index
@@ -6319,6 +6319,7 @@ address,function,file,kind,target
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,global_read,g_seams
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetMissionIndex]
+0x41dc20,CollectEndGameStats,src/frontend/endgame.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x41dee0,StartScreenFade,src/frontend/endgame.cpp,call,GetTicks
 0x41dee0,StartScreenFade,src/frontend/endgame.cpp,field_write,Game::done
 0x41dee0,StartScreenFade,src/frontend/endgame.cpp,field_write,Game::nextTime
@@ -6884,7 +6885,6 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,AddExplosionEffect
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,StepGafSequence
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,UpdateExplodedPiece
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,get
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator!=
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator->
@@ -6909,15 +6909,16 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,DebrisView::pos
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,GafRef::src
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::gravity
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::net
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::seaLevel
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::src1
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::src2
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Game::src3
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,MapSeam::GetCellMeanHeight
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Mission::lavaWorld
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Mission::noSeaLevelTrigger
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,MissionParams::lavaWorld
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,MissionParams::noSeaLevelTrigger
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,MissionSeam::GetMissionParams
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Seams::map
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Seams::mission
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::x
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::y
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,field_read,Vec3::z
@@ -6936,6 +6937,7 @@ address,function,file,kind,target
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,global_read,g_seams
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,global_write,g_explodedPieces
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,call,operator==
 0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,function,
 0x421150,FindFreeExplodedPieceSlot,src/weapons/explosions.cpp,global_read,g_explodedPieces
@@ -7002,7 +7004,6 @@ address,function,file,kind,target
 0x4211d0,DrawExplodedPieceFaces,src/weapons/explosions.cpp,global_read,g_game
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,AddExplosionEffect
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,operator PieceRec *
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,call,operator->
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelX
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelY
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::angVelZ
@@ -7014,18 +7015,19 @@ address,function,file,kind,target
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::vel_y
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::vel_z
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::gravity
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::net
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::seaLevel
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::src1
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::src2
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Game::src3
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,MapSeam::GetCellMeanHeight
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Mission::lavaWorld
-0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Mission::noSeaLevelTrigger
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,MissionParams::lavaWorld
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,MissionParams::noSeaLevelTrigger
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,MissionSeam::GetMissionParams
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_10
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_12
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,PieceRec::angle_14
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Seams::map
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Seams::mission
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Vec3::x
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Vec3::y
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,field_read,Vec3::z
@@ -7043,6 +7045,7 @@ address,function,file,kind,target
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,global_read,g_game
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,global_read,g_seams
 0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
+0x4213b0,UpdateExplodedPiece,src/weapons/explosions.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,DrawExplodedPieceFaces
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,EmitJitteredThrustParticles
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,EmitWhiteSmoke
@@ -7438,27 +7441,26 @@ address,function,file,kind,target
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,LoadFeatureType
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,PlaceFeature
 0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator Feature *
-0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator MissionFeature *
-0x423160,PlaceMissionFeatures,src/map/features.cpp,call,operator->
 0x423160,PlaceMissionFeatures,src/map/features.cpp,deref_escape,*Feature
-0x423160,PlaceMissionFeatures,src/map/features.cpp,deref_escape,*MissionFeature
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_maybe_written,MissionFeature::name
+0x423160,PlaceMissionFeatures,src/map/features.cpp,deref_read,*char
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Feature::flags16
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Game::features
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Game::net
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,LosRadarSeam::GetMapCell
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Mission::featureCount
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Mission::features
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeature::name
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeature::x
-0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeature::y
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeatureInfo::name
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeatureInfo::x
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionFeatureInfo::y
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionSeam::CountMissionFeatures
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,MissionSeam::GetMissionFeature
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Point16::x
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Point16::y
 0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Seams::los_radar
+0x423160,PlaceMissionFeatures,src/map/features.cpp,field_read,Seams::mission
 0x423160,PlaceMissionFeatures,src/map/features.cpp,function,
 0x423160,PlaceMissionFeatures,src/map/features.cpp,global_read,g_game
 0x423160,PlaceMissionFeatures,src/map/features.cpp,global_read,g_seams
 0x423160,PlaceMissionFeatures,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
+0x423160,PlaceMissionFeatures,src/map/features.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissionFeatures]
+0x423160,PlaceMissionFeatures,src/map/features.cpp,indirect_call,"indirect via int (*)(int, MissionFeatureInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionFeature]"
 0x4232a0,AllocFeatureSpot,src/map/features.cpp,call,MoveFeatureSpot
 0x4232a0,AllocFeatureSpot,src/map/features.cpp,call,operator Spot *
 0x4232a0,AllocFeatureSpot,src/map/features.cpp,field_escape,Game::pool
@@ -9658,13 +9660,11 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetFieldString
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetRecordName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,_strcmpi
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,get
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator DamageTable *
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator bool
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator new
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator=
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,strcpy
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_read,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*int
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*unsigned char
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,DamageTableEntry::value
@@ -9675,7 +9675,9 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::modelName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_maybe_written,WeaponDef::name
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,DamageTableEntry::name
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Game::net
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,MissionParams::lavaWorld
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,MissionSeam::GetMissionParams
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,Seams::mission
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,StringRef::ptr
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,WeaponDef::index
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_read,WeaponDef::model
@@ -9753,7 +9755,9 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,function,
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_maybe_written,g_emptyText
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,g_game
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,g_seams
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,global_read,kSim
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,DamageTable::~DamageTable
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,GameFreeThunk
 0x42f3a0,FreeWeaponTypes,src/weapons/weapon_types.cpp,call,operator DamageTable *
@@ -10407,7 +10411,6 @@ address,function,file,kind,target
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,_strcmpi
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,_strlwr
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,memcpy
-0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,operator->
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,operator[]
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,size
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,call,strcpy
@@ -10419,8 +10422,7 @@ address,function,file,kind,target
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_maybe_written,A::lower
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_maybe_written,A::name
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_maybe_written,A::path
-0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,Game::net
-0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,Mission::type
+0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,MissionSeam::GetGameType
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,MissionSeam::SelectSchema
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,S::bFlag
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_read,S::count
@@ -10431,7 +10433,6 @@ address,function,file,kind,target
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_write,S::count
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,field_write,S::i
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,function,
-0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_read,g_game
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_read,g_otaEnumCacheComplete
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_read,g_otaEnumFileCount
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_read,g_otaEnumFileList
@@ -10441,6 +10442,7 @@ address,function,file,kind,target
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_write,g_otaEnumFileCount
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_write,g_otaEnumFileList
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,global_write,g_otaEnumFileListBytes
+0x434bf0,LoadMapList,src/frontend/map_enum.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 0x434bf0,LoadMapList,src/frontend/map_enum.cpp,indirect_call,"indirect via int (*)(int, TdfFile *, char *) __attribute__((stdcall)) [MissionSeam::SelectSchema]"
 0x434f70,Mission::Mission,src/mission/map_list.cpp,call,Mission::LoadCampaign
 0x434f70,Mission::Mission,src/mission/map_list.cpp,call,operator=
@@ -13598,17 +13600,17 @@ address,function,file,kind,target
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,ResizeRadarPicture
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,SetTranslatedTextByName
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,Translate
-0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,get
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,call,sprintf
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_maybe_written,Game::gui
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,<anon>::frame
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Gadget::height
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Gadget::width
-0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Game::net
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Gui::layer
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Layer::entries
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,MissionSeam::GetDescription
+0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,MissionSeam::GetMemory
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,MissionSeam::GetNameSlot
+0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,MissionSeam::GetNumPlayers
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,MissionSeam::GetTranslatedName
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_read,Seams::mission
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,field_write,<anon>::frame
@@ -13616,6 +13618,8 @@ address,function,file,kind,target
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,global_read,g_game
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,global_read,g_seams
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,indirect_call,indirect via char *(*)() __attribute__((stdcall)) [MissionSeam::GetDescription]
+0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,indirect_call,indirect via char *(*)() __attribute__((stdcall)) [MissionSeam::GetMemory]
+0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,indirect_call,indirect via char *(*)() __attribute__((stdcall)) [MissionSeam::GetNumPlayers]
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,indirect_call,indirect via char *(*)() __attribute__((stdcall)) [MissionSeam::GetTranslatedName]
 0x444a20,ShowSelectedMapInfo,src/frontend/multi.cpp,indirect_call,indirect via char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 0x444ba0,HandleViewMapClick,src/frontend/multi.cpp,call,ClearSelectedGadget
@@ -20739,12 +20743,12 @@ address,function,file,kind,target
 0x465e30,InitPlayerResources,src/game/players.cpp,call,SetStartingStorageBonus
 0x465e30,InitPlayerResources,src/game/players.cpp,call,operator->
 0x465e30,InitPlayerResources,src/game/players.cpp,field_escape,Game::players
-0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Game::net
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Game::options
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Game::pendingSaveStore
-0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Mission::startEnergy
-0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Mission::startMetal
+0x465e30,InitPlayerResources,src/game/players.cpp,field_read,MissionParams::startEnergy
+0x465e30,InitPlayerResources,src/game/players.cpp,field_read,MissionParams::startMetal
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,MissionSeam::GetGameType
+0x465e30,InitPlayerResources,src/game/players.cpp,field_read,MissionSeam::GetMissionParams
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Player::info
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,PlayerInfo::energy
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,PlayerInfo::metal
@@ -20757,6 +20761,7 @@ address,function,file,kind,target
 0x465e30,InitPlayerResources,src/game/players.cpp,global_read,g_game
 0x465e30,InitPlayerResources,src/game/players.cpp,global_read,g_seams
 0x465e30,InitPlayerResources,src/game/players.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
+0x465e30,InitPlayerResources,src/game/players.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x465fb0,LoadPlayerControllers,src/game/players.cpp,call,HapiBank::GetIntegerItem
 0x465fb0,LoadPlayerControllers,src/game/players.cpp,call,HapiBank::OpenAccount
 0x465fb0,LoadPlayerControllers,src/game/players.cpp,call,sprintf
@@ -21846,7 +21851,6 @@ address,function,file,kind,target
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,global_write,g_onlineReportScoreBoards
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,global_write,g_onlineReportScores
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,indirect_call,indirect via void (*)() __attribute__((cdecl)) [g_riTerminate]
-0x46c2a0,FillScoreTables,src/game/statistics.cpp,call,operator Mission *
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,call,operator->
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,deref_read,*OnlineReportPlayer
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,deref_read,*OnlineReportScore
@@ -21856,10 +21860,10 @@ address,function,file,kind,target
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_escape,Player::name
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::endGameVictory
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::localPlayer
-0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::net
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Game::ticks
-0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Mission::killMul
-0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Mission::timeMul
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,MissionParams::killMul
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,MissionParams::timeMul
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,MissionSeam::GetMissionParams
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,OnlineReportPlayer::allies
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,OnlineReportPlayer::flags
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,OnlineReportScoreBoard::scores
@@ -21882,6 +21886,7 @@ address,function,file,kind,target
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,PlayerInfo::flags_97
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,PlayerInfo::kind
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,PlayerInfo::side
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_read,Seams::mission
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_write,OnlineReportPlayer::flags
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_write,OnlineReportPlayer::id
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,field_write,OnlineReportPlayer::name
@@ -21896,7 +21901,9 @@ address,function,file,kind,target
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,global_read,g_onlineReportPlayers
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,global_read,g_onlineReportScoreBoards
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,global_read,g_scoreNames
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,global_read,g_seams
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,global_read,g_sideNames
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,call,FillScoreTables
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,call,GetCreatedLobbyInterface
 0x46c620,ReportGameEvent,src/network/unit_sync.cpp,call,GetSessionGuidInstance
@@ -23787,7 +23794,6 @@ address,function,file,kind,target
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,SetTextColors
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,Translate
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,operator PlayerInfo *
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,operator->
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,call,sprintf
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,deref_read,*unsigned short
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_maybe_written,Game::gui
@@ -23803,18 +23809,19 @@ address,function,file,kind,target
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,GafFrame::width
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Game::flag_37ef2
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Game::localPlayer
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Game::net
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Gui::colours
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Layer::entries
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Mission::gravity
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Mission::maxWindSpeed
-0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Mission::minWindSpeed
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,MissionParams::gravity
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,MissionParams::maxWindSpeed
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,MissionParams::minWindSpeed
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,MissionSeam::GetMissionParams
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,PlayerInfo::side
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,PlayerInfoEntry::info
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Rect::left
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Rect::right
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Rect::top
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_read,Seams::mission
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_write,<anon>::index
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_write,GafFrame::xOffset
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,field_write,GafFrame::yOffset
@@ -23829,10 +23836,12 @@ address,function,file,kind,target
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_read,g_briefingWindSpeed
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_read,g_briefingWindTickCountdown
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_read,g_game
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_read,g_seams
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_write,g_briefingPanoramaNextTick
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_write,g_briefingPanoramaScrollX
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_write,g_briefingWindSpeed
 0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,global_write,g_briefingWindTickCountdown
+0x478790,UpdateSolarSystem,src/frontend/campaign_menu.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,DrawFrame
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,FillRectangle
 0x478b40,UpdatePlanet,src/frontend/campaign_menu.cpp,call,GetButtonStageByName
@@ -23927,11 +23936,11 @@ address,function,file,kind,target
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Gadget::attribs
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Game::flag_37ef2
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Game::localPlayer
-0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Game::net
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Gui::layer
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Layer::entries
-0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Mission::maxWindSpeed
-0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,Mission::minWindSpeed
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,MissionParams::maxWindSpeed
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,MissionParams::minWindSpeed
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,MissionSeam::GetMissionParams
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,MissionSeam::GetPlanet
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,PlayerInfo::side
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,field_read,PlayerInfoEntry::info
@@ -23952,6 +23961,7 @@ address,function,file,kind,target
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,global_write,g_briefingWindSpeed
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,global_write,g_briefingWindTickCountdown
 0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,indirect_call,indirect via char *(*)() __attribute__((stdcall)) [MissionSeam::GetPlanet]
+0x478e80,OpenMissionBriefing,src/frontend/campaign_menu.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_escape,SkirmishOptionsTable::players
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_read,Game::options
 0x4794d0,CountComputerSlots,src/frontend/campaign_menu.cpp,field_read,Game::playerCount
@@ -26054,7 +26064,6 @@ address,function,file,kind,target
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,call,GetCellPixel
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,call,GetMapCell
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,call,operator Cell *
-0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,call,operator->
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Cell::height
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Cell::low
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::baseX
@@ -26062,14 +26071,17 @@ address,function,file,kind,target
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::cells
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::height
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::mapHeight
-0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::net
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::seaLevel
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Game::width
-0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Mission::lavaWorld
+0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,MissionParams::lavaWorld
+0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,MissionSeam::GetMissionParams
+0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_read,Seams::mission
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_write,Game::mapHeight
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,field_write,Game::mapWidth
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,function,
 0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,global_read,g_game
+0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,global_read,g_seams
+0x4833b0,ClearBorderFeatures,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,BuildDerivedLayers
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,BuildTedRadarFrame
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,ClearBorderFeatures
@@ -26087,7 +26099,6 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,operator Cell *
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,operator delete
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,operator new
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,operator->
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,operator=
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,sprintf
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_read,*int
@@ -26097,13 +26108,12 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned char
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned int
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,deref_write,*unsigned short
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,Mission::tidalStrength
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_escape,MissionParams::tidalStrength
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::InitFeatureAnimPool
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::PlaceMissionFeatures
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,FeaturesSeam::StampFeatureMetal
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::cells
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::height
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::net
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::pendingSaveStore
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::viewHeight
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Game::viewWidth
@@ -26119,11 +26129,12 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MapSettings::sortRowCount
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MapSettings::width
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MapViewFlags::raw
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Mission::gravity
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Mission::maxWindSpeed
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Mission::minWindSpeed
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Mission::surfaceMetal
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Mission::tidalStrength
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionParams::gravity
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionParams::maxWindSpeed
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionParams::minWindSpeed
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionParams::surfaceMetal
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionParams::tidalStrength
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionSeam::GetMissionParams
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,MissionSeam::GetNameSlot
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Seams::features
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_read,Seams::mission
@@ -26202,6 +26213,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::PlaceMissionFeatures]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::StampFeatureMetal]
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)(TntInfo *) __attribute__((stdcall)) [FeaturesSeam::InitFeatureAnimPool]
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,GameFreeThunk
 0x483dd0,FreeMapResources,src/map/line_of_sight.cpp,call,get
@@ -27258,20 +27270,17 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(UnitMotion *, int, Unit *, HapiBank *) __attribute__((fastcall)) [MovementSeam::SaveMotion]"
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,IdAt
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,_strcmpi
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,operator MissionUnit *
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,operator bool
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,operator char *
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,operator->
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,deref_escape,*MissionUnit
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,deref_read,*int
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Game::net
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Mission::unitCount
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Mission::units
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnit::ident
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnit::name
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionSeam::CountMissionUnits
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionSeam::GetMissionUnit
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnitIdTable::ids
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnitInfo::ident
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnitInfo::name
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Seams::mission
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,function,
-0x487af0,FindMissionUnit,src/units/unit_save.cpp,global_read,g_game
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,global_read,g_seams
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissionUnits]
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(int, MissionUnitInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionUnit]"
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,bx_sscanf
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,isspace
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,operator!=
@@ -27327,32 +27336,29 @@ address,function,file,kind,target
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,RunInitialMission
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,get
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator MissionConditions *
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator MissionUnit *
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator bool
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator char *
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator->
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,operator[]
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,sprintf
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,deref_escape,*MissionUnit
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,deref_read,*Vec3
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_escape,Game::players
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_escape,MissionUnit::x
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Game::list_391ed
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Game::net
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MapSeam::SnapWorldPosToFootprint
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Mission::unitCount
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Mission::units
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::angle
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::flags
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::health
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::initialMission
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::name
-0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnit::player
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionSeam::CountMissionUnits
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionSeam::GetMissionUnit
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionSeam::SetMissionUnitPosition
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::angle
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::flags
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::health
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::initialMission
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::name
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::player
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::x
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::y
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,MissionUnitInfo::z
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Player::active
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Player::index
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Player::type
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,PlayersSeam::DeactivateConditions
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Seams::map
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Seams::mission
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Seams::players
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Seams::units
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,field_read,Unit::def
@@ -27369,8 +27375,11 @@ address,function,file,kind,target
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,global_read,g_seams
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,"indirect via Unit *(*)(unsigned char, unsigned short, Vec3, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,indirect via UnitDef *(*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitType]
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissionUnits]
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(int, MissionUnitInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionUnit]"
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,indirect via void (*)(MissionConditions *) __attribute__((fastcall)) [PlayersSeam::DeactivateConditions]
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,"indirect via void (*)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
+0x488310,CreateMissionUnits,src/units/unit_commands.cpp,indirect_call,"indirect via void (*)(int, Vec3 *) __attribute__((stdcall)) [MissionSeam::SetMissionUnitPosition]"
 0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,MissionConditions::NotifyUnitCaptured
 0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,PlayersPublishCaptureUnit
 0x488570,GiveUnitToPlayer,src/game/players_events.cpp,call,PlayersPublishSendUnit
@@ -28011,17 +28020,18 @@ address,function,file,kind,target
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_escape,UnitDef::flags1
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,<anon>::floats
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Game::f14353
-0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Game::net
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Game::seaLevel
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Game::ticks
-0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Mission::waterDamage
-0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Mission::waterDoesDamage
+0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,MissionParams::waterDamage
+0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,MissionParams::waterDoesDamage
+0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,MissionSeam::GetMissionParams
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,MovementSeam::UpdateMotion
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,OrdersSeam::RunOrders
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,OrdersSeam::RunSecondaryOrders
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Player::active
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Player::type
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,ScriptsSeam::RunScripts
+0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Seams::mission
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Seams::movement
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Seams::orders
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,field_read,Seams::scripts
@@ -28056,6 +28066,7 @@ address,function,file,kind,target
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,global_read,g_game
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,global_read,g_seams
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,indirect_call,"indirect via void (*)(CobScript *, int) __attribute__((stdcall)) [ScriptsSeam::RunScripts]"
+0x48ad30,UpdateUnit,src/units/unit_position.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::RunOrders]
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [OrdersSeam::RunSecondaryOrders]
 0x48ad30,UpdateUnit,src/units/unit_position.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::UpdateUnitWeapons]
@@ -31952,6 +31963,7 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,AddExplosionEffect
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyAreaDamage
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,ApplyWeaponDamage
+0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,NoSeaLevelTrigger
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordScreenShake
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordSoundAt
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,call,RecordWhiteSmoke
@@ -31967,11 +31979,9 @@ address,function,file,kind,target
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_escape,Projectile::position
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::endSmoke
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,<anon>::noExplode
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::net
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Game::tracked
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::active
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Player::type
 0x499eb0,DetonateProjectile,src/weapons/weapons.cpp,field_read,Projectile::attacker
@@ -32190,6 +32200,7 @@ address,function,file,kind,target
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,field_write,Projectile::type
 0x49b000,DetonateUnitWeapon,src/weapons/weapons.cpp,function,
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,DetonateProjectile
+0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,NoSeaLevelTrigger
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator Feature *
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator Unit *
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,call,operator bool
@@ -32211,13 +32222,11 @@ address,function,file,kind,target
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Feature::height
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::featureCount
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::features
-0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::net
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::tracked
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::units
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Game::width
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::cellX
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::cellZ
 0x49b090,CheckProjectileCollision,src/weapons/weapons.cpp,field_read,Projectile::interceptedProjectile
@@ -32321,6 +32330,7 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,Fall
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,GetProjectileAimPoint
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
+0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,NoSeaLevelTrigger
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RandomInt
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RecordSoundAt
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,call,RecordWhiteSmoke
@@ -32368,13 +32378,11 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Angles16::pitch
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Cell::high
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::gravity
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::net
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::projectileCount
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::projectiles
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::seaLevel
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Game::ticks
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,LosRadarSeam::GetMapCellAtPosition
-0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Mission::noSeaLevelTrigger
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::active
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::attacker
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,field_read,Projectile::direction
@@ -44559,6 +44567,12 @@ address,function,file,kind,target
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,field_read,SkirmishPlayer::controller
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,function,
 ,CountHumanSlots,src/frontend/skirmish_menu.cpp,global_read,g_game
+,CountMissionFeaturesNative,src/seams/native.cpp,call,Mission::CountFeatures
+,CountMissionFeaturesNative,src/seams/native.cpp,call,TheMission
+,CountMissionFeaturesNative,src/seams/native.cpp,function,
+,CountMissionUnitsNative,src/seams/native.cpp,call,Mission::CountUnits
+,CountMissionUnitsNative,src/seams/native.cpp,call,TheMission
+,CountMissionUnitsNative,src/seams/native.cpp,function,
 ,CountMissionsNative,src/seams/native.cpp,call,Mission::CountMissions
 ,CountMissionsNative,src/seams/native.cpp,call,TheMission
 ,CountMissionsNative,src/seams/native.cpp,function,
@@ -46867,15 +46881,30 @@ address,function,file,kind,target
 ,GetLoadCategoryMask,src/units/unit_commands.cpp,field_read,UnitCategory::value
 ,GetLoadCategoryMask,src/units/unit_commands.cpp,function,
 ,GetLoadCategoryMask,src/units/unit_commands.cpp,global_maybe_written,s_unitCategories@src/units/unit_commands.cpp
+,GetMemoryNative,src/seams/native.cpp,call,Mission::GetMemory
+,GetMemoryNative,src/seams/native.cpp,call,TheMission
+,GetMemoryNative,src/seams/native.cpp,function,
+,GetMissionFeatureNative,src/seams/native.cpp,call,Mission::GetFeature
+,GetMissionFeatureNative,src/seams/native.cpp,call,TheMission
+,GetMissionFeatureNative,src/seams/native.cpp,function,
 ,GetMissionIndexNative,src/seams/native.cpp,call,Mission::GetMissionIndex
 ,GetMissionIndexNative,src/seams/native.cpp,call,TheMission
 ,GetMissionIndexNative,src/seams/native.cpp,function,
 ,GetMissionNameNative,src/seams/native.cpp,call,Mission::GetMissionName
 ,GetMissionNameNative,src/seams/native.cpp,call,TheMission
 ,GetMissionNameNative,src/seams/native.cpp,function,
+,GetMissionParamsNative,src/seams/native.cpp,call,Mission::GetParams
+,GetMissionParamsNative,src/seams/native.cpp,call,TheMission
+,GetMissionParamsNative,src/seams/native.cpp,function,
+,GetMissionUnitNative,src/seams/native.cpp,call,Mission::GetUnit
+,GetMissionUnitNative,src/seams/native.cpp,call,TheMission
+,GetMissionUnitNative,src/seams/native.cpp,function,
 ,GetNameSlotNative,src/seams/native.cpp,call,Mission::GetNameSlot
 ,GetNameSlotNative,src/seams/native.cpp,call,TheMission
 ,GetNameSlotNative,src/seams/native.cpp,function,
+,GetNumPlayersNative,src/seams/native.cpp,call,Mission::GetNumPlayers
+,GetNumPlayersNative,src/seams/native.cpp,call,TheMission
+,GetNumPlayersNative,src/seams/native.cpp,function,
 ,GetPathfinder,src/ai/pathfind.cpp,call,get
 ,GetPathfinder,src/ai/pathfind.cpp,field_read,Game::pathfinder
 ,GetPathfinder,src/ai/pathfind.cpp,function,
@@ -49544,6 +49573,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::WriteState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::AdvanceMission
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::ComputeMapChecksum
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountMissionFeatures
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountMissionUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountMissions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::CountStartPositions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::FreeOtaEnumCacheAndMission
@@ -49552,9 +49583,14 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetCampaignName
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetDescription
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetGameType
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMemory
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMissionFeature
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMissionIndex
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMissionName
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMissionParams
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetMissionUnit
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetNameSlot
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetNumPlayers
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetPlanet
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetStartPosition
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::GetTerrainLength
@@ -49568,6 +49604,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::SelectMission
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::SelectSchema
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::SetMissionType
+,InstallNativeSeams,src/seams/native.cpp,field_write,MissionSeam::SetMissionUnitPosition
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::AirManeuverOrderSetAltitude
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::ApplyPathEvent
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::DestroyMotionObject
@@ -49865,6 +49902,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CobScriptExplodePieceNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ComputeMapChecksumNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountDirectoryEntries
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountMissionFeaturesNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountMissionUnitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountMissionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CountStartPositionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,CreateFactoryIndex
@@ -49948,10 +49987,15 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetGroundHeight
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMapCell
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMapCellAtPosition
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMemoryNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionFeatureNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionIndexNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionNameNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionParamsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionUnitNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNameSlotNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNanoPiecePosition
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNumPlayersNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetOrderFlags
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetOrderType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetOriginCellAtPosition
@@ -50169,6 +50213,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetCobNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetFlightModeNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetMissionType
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetMissionUnitPositionNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetObjectStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetStateBitsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SetUnitPosition
@@ -51491,6 +51536,10 @@ address,function,file,kind,target
 ,Min,src/debug/debug_lib.cpp,function,
 ,Min,src/debug/debug_lib.cpp,global_read,DAT_00528a54
 ,MinOf,src/util/path_goal.cpp,function,
+,Mission::CountFeatures,src/mission/map_list.cpp,field_read,Mission::featureCount
+,Mission::CountFeatures,src/mission/map_list.cpp,function,
+,Mission::CountUnits,src/mission/map_list.cpp,field_read,Mission::unitCount
+,Mission::CountUnits,src/mission/map_list.cpp,function,
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,GetLocalizedString
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,TdfFile::ResetCurrentRecord
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,call,TdfFile::SelectRecord
@@ -51501,6 +51550,89 @@ address,function,file,kind,target
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,field_escape,Mission::campaign
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,field_maybe_written,Mission::list
 ,Mission::GetCampaignMissionName,src/mission/map_list.cpp,function,
+,Mission::GetFeature,src/mission/map_list.cpp,call,operator MissionFeature *
+,Mission::GetFeature,src/mission/map_list.cpp,deref_escape,*MissionFeature
+,Mission::GetFeature,src/mission/map_list.cpp,field_escape,MissionFeature::name
+,Mission::GetFeature,src/mission/map_list.cpp,field_read,Mission::featureCount
+,Mission::GetFeature,src/mission/map_list.cpp,field_read,Mission::features
+,Mission::GetFeature,src/mission/map_list.cpp,field_read,MissionFeature::x
+,Mission::GetFeature,src/mission/map_list.cpp,field_read,MissionFeature::y
+,Mission::GetFeature,src/mission/map_list.cpp,field_write,MissionFeatureInfo::name
+,Mission::GetFeature,src/mission/map_list.cpp,field_write,MissionFeatureInfo::x
+,Mission::GetFeature,src/mission/map_list.cpp,field_write,MissionFeatureInfo::y
+,Mission::GetFeature,src/mission/map_list.cpp,function,
+,Mission::GetMemory,src/mission/map_list.cpp,field_escape,Mission::memory
+,Mission::GetMemory,src/mission/map_list.cpp,function,
+,Mission::GetNumPlayers,src/mission/map_list.cpp,field_escape,Mission::numPlayers
+,Mission::GetNumPlayers,src/mission/map_list.cpp,function,
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::gravity
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::killMul
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::lavaWorld
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::maxWindSpeed
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::minWindSpeed
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::noSeaLevelTrigger
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::startEnergy
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::startMetal
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::surfaceMetal
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::tidalStrength
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::timeMul
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::waterDamage
+,Mission::GetParams,src/mission/map_list.cpp,field_read,Mission::waterDoesDamage
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::gravity
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::killMul
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::lavaWorld
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::maxWindSpeed
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::minWindSpeed
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::noSeaLevelTrigger
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::startEnergy
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::startMetal
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::surfaceMetal
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::tidalStrength
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::timeMul
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::waterDamage
+,Mission::GetParams,src/mission/map_list.cpp,field_write,MissionParams::waterDoesDamage
+,Mission::GetParams,src/mission/map_list.cpp,function,
+,Mission::GetUnit,src/mission/map_list.cpp,call,operator MissionUnit *
+,Mission::GetUnit,src/mission/map_list.cpp,call,operator char *
+,Mission::GetUnit,src/mission/map_list.cpp,deref_escape,*MissionUnit
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,Mission::unitCount
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,Mission::units
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::angle
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::buildPriority
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::creationCountdown
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::flags
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::health
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::ident
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::initialMission
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::name
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::player
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::x
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::y
+,Mission::GetUnit,src/mission/map_list.cpp,field_read,MissionUnit::z
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::angle
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::buildPriority
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::creationCountdown
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::flags
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::health
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::ident
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::initialMission
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::name
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::player
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::x
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::y
+,Mission::GetUnit,src/mission/map_list.cpp,field_write,MissionUnitInfo::z
+,Mission::GetUnit,src/mission/map_list.cpp,function,
+,Mission::SetUnitPosition,src/mission/map_list.cpp,call,operator MissionUnit *
+,Mission::SetUnitPosition,src/mission/map_list.cpp,deref_escape,*MissionUnit
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_read,Mission::unitCount
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_read,Mission::units
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_read,Vec3::x
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_read,Vec3::y
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_read,Vec3::z
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_write,MissionUnit::x
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_write,MissionUnit::y
+,Mission::SetUnitPosition,src/mission/map_list.cpp,field_write,MissionUnit::z
+,Mission::SetUnitPosition,src/mission/map_list.cpp,function,
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,field_write,MissionCondition::celebrated
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,field_write,MissionCondition::satisfied
 ,MissionCondition::MissionCondition,src/game/mission_conditions.h,function,
@@ -51959,6 +52091,12 @@ address,function,file,kind,target
 ,NextToken,src/quirks/quirks.cpp,deref_read,*char
 ,NextToken,src/quirks/quirks.cpp,deref_write,*char
 ,NextToken,src/quirks/quirks.cpp,function,
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,field_read,MissionParams::noSeaLevelTrigger
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,field_read,MissionSeam::GetMissionParams
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,field_read,Seams::mission
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,function,
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,global_read,g_seams
+,NoSeaLevelTrigger,src/weapons/weapons.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 ,NodeCell,src/ai/pathfind_hpa.cpp,deref_escape,*ClusterRec
 ,NodeCell,src/ai/pathfind_hpa.cpp,field_read,ClusterRec::cell
 ,NodeCell,src/ai/pathfind_hpa.cpp,field_read,Hdr::nClu
@@ -59909,6 +60047,9 @@ address,function,file,kind,target
 ,SetKey,src/host/win32/headless.cpp,global_read,g_keys
 ,SetKey,src/host/win32/headless.cpp,global_read,kKeyCount
 ,SetKey,src/host/win32/headless.cpp,global_write,g_keys
+,SetMissionUnitPositionNative,src/seams/native.cpp,call,Mission::SetUnitPosition
+,SetMissionUnitPositionNative,src/seams/native.cpp,call,TheMission
+,SetMissionUnitPositionNative,src/seams/native.cpp,function,
 ,SetObjectStateNative,src/seams/native.cpp,call,UnitScript::SetObjectState
 ,SetObjectStateNative,src/seams/native.cpp,function,
 ,SetPage,src/ingame/control_panel.cpp,call,get
@@ -61825,14 +61966,14 @@ address,function,file,kind,target
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::list_391ed
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::localPlayer
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::mapFlags
-,UpdatePlayerBody,src/game/players.cpp,field_read,Game::net
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::seaLevel
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::startPos
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::ticks
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Game::width
 ,UpdatePlayerBody,src/game/players.cpp,field_read,MapSeam::GetCellMeanHeight
-,UpdatePlayerBody,src/game/players.cpp,field_read,Mission::lavaWorld
+,UpdatePlayerBody,src/game/players.cpp,field_read,MissionParams::lavaWorld
 ,UpdatePlayerBody,src/game/players.cpp,field_read,MissionSeam::GetGameType
+,UpdatePlayerBody,src/game/players.cpp,field_read,MissionSeam::GetMissionParams
 ,UpdatePlayerBody,src/game/players.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Player::active
 ,UpdatePlayerBody,src/game/players.cpp,field_read,Player::index
@@ -61882,6 +62023,7 @@ address,function,file,kind,target
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,"indirect via unsigned short (*)(Vec3 *, Point16 *, Point16 *) __attribute__((stdcall)) [WeaponsSeam::FindFeatureAtPos]"
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
 ,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerInfo]
+,UpdatePlayerBody,src/game/players.cpp,indirect_call,indirect via void (*)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 ,UpdatePlayerTail,src/game/players.cpp,field_escape,Game::players
 ,UpdatePlayerTail,src/game/players.cpp,field_read,Game::playerIndex
 ,UpdatePlayerTail,src/game/players.cpp,field_read,MissionSeam::GetGameType

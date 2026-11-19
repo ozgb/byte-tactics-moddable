@@ -51,6 +51,7 @@ struct Unit;
 #include "../game/game.h"
 
 #include "../units/unit.h"
+#include "../units/unit_ref.h"
 
 static inline short PosXWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 2); }
 static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 0xa); }

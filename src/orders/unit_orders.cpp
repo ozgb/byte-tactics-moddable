@@ -50,6 +50,7 @@ class SquadScoutTimer;
 #include "mission_type.h"
 
 #include "../units/path_order_attach.h"
+#include "../units/unit_ref.h"
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"

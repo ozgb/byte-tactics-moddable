@@ -12,13 +12,14 @@
 #include "../files/files_bank.h"
 #include "../game/unit_resources.h"
 #include "../units/movement_class.h"
-#include "../units/cob_script.h"
-#include "../units/cob_types.h"
+#include "../scripts/cob_script.h"
+#include "../scripts/cob_types.h"
+#include "../scripts/unit_script.h"
 #include "../util/vec3.h"
 #include "../map/mission.h"
 #include "../map/spatial_bucket.h"
 #include "../game/mission_conditions.h"
-#include "../units/object_state.h"
+#include "../scripts/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
 #include "../ai/ai_search_goal.h"
@@ -78,8 +79,9 @@ int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
 #include "../weapons/weapon_types.h"
 #include "../weapons/explosions.h"
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
-#include "../units/unit_scripts.h"
+#include "../scripts/piece_queries.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
+struct ModelBuildList;
 #include "../ingame/info_panel.h"
 
 #include "../units/unit_commands.h"
@@ -112,7 +114,7 @@ int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char piece, char mode);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
-#include "../units/unit_scripts.h"
+#include "../scripts/piece_queries.h"
 #include "../units/unit_position.h"
 #include "../game/scheduler.h"
 #include "../../interfaces/rand_stream.h"
@@ -374,6 +376,51 @@ static int __stdcall StartScriptWithArgsByIndexNative(CobScript* script, int ind
     return script->StartScriptWithArgsByIndex(index, callback, update, count, a, b, c, d);
 }
 
+static void __stdcall NewUnitScriptNative(Unit* unit)
+{
+    NewUnitScript(unit);
+}
+
+static void __stdcall SetCobNative(CobScript* script, ScriptTable* data)
+{
+    script->SetCob(data);
+}
+
+static ModelState* __stdcall CreatePlayerObjectStateNative(Object3do* model, ScriptTable* data, Unit* owner)
+{
+    return CreatePlayerObjectState(model, (ModelBuildList*)data, owner);
+}
+
+static void __stdcall SetObjectStateNative(UnitScript* script, int state)
+{
+    script->SetObjectState(state);
+}
+
+static void __stdcall RunScriptsNative(CobScript* script, int elapsed)
+{
+    script->RunScripts(elapsed);
+}
+
+static void __stdcall SaveScriptStateNative(CobScript* script, HapiBank* file)
+{
+    script->SaveScriptState(file);
+}
+
+static int __stdcall LoadScriptStateNative(CobScript* script, HapiBank* file)
+{
+    return script->LoadScriptState(file);
+}
+
+static void __stdcall DeleteScriptNative(CobScript* script)
+{
+    delete script;
+}
+
+static void __stdcall InitObjectStateNative(ModelState* state, Object3do* model)
+{
+    InitObjectState(state, model);
+}
+
 static void __fastcall UpdateSfxOccupyNative(UnitMotion* self, int unusedEdx, Unit* unit)
 {
     ((SfxOccupyTracker*)self)->UpdateSfxOccupy(unit);
@@ -481,6 +528,7 @@ static TargetingSeam s_targeting;
 static LosRadarSeam s_los_radar;
 static OrdersSeam s_orders;
 static UnitsSeam s_units;
+static ScriptsSeam s_scripts;
 static PlayersSeam s_players;
 static MapSeam s_map;
 static FilesSeam s_files;
@@ -701,9 +749,9 @@ void InstallNativeSeams()
     s_units.RefreshFactoryIndex = RefreshFactoryIndex;
     s_map.GetNameSlot = GetNameSlotNative;
     s_units.GetGroundHeight = GetGroundHeightNative;
-    s_units.GetSweetSpot = GetSweetSpotNative;
-    s_units.FindScript = FindScriptNative;
-    s_units.StartScriptWithArgs = StartScriptWithArgsNative;
+    s_scripts.GetSweetSpot = GetSweetSpotNative;
+    s_scripts.FindScript = FindScriptNative;
+    s_scripts.StartScriptWithArgs = StartScriptWithArgsNative;
     s_units.SetStateBits = SetStateBitsNative;
     s_map.GetCellMeanHeight = GetCellMeanHeightNative;
     s_map.GetGameType = GetGameTypeNative;
@@ -760,11 +808,11 @@ void InstallNativeSeams()
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
-    s_units.StartScript = StartScriptNative;
-    s_units.QueryScript = QueryScriptNative;
-    s_units.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
-    s_units.GetPieceOffset = GetPieceOffset;
-    s_units.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_scripts.StartScript = StartScriptNative;
+    s_scripts.QueryScript = QueryScriptNative;
+    s_scripts.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
+    s_scripts.GetPieceOffset = GetPieceOffset;
+    s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
     s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
@@ -835,8 +883,8 @@ void InstallNativeSeams()
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_units.AttachUnitToPiece = AttachUnitToPiece;
-    s_units.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
-    s_units.GetPieceAngles = GetPieceAngles;
+    s_scripts.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
+    s_scripts.GetPieceAngles = GetPieceAngles;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;
     s_units.ApplyUnfinishedBuildDecay = ApplyUnfinishedBuildDecay;
@@ -846,14 +894,23 @@ void InstallNativeSeams()
     s_units.CanReclaim = CanReclaimNative;
     s_units.CanRepair = CanRepairNative;
     s_units.UnitRefUnlink = UnitRefUnlinkNative;
-    s_units.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
+    s_scripts.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
     s_units.UpdateSfxOccupy = UpdateSfxOccupyNative;
-    s_units.PoseUnitModel = PoseUnitModel;
-    s_units.CreateObjectState = CreateObjectState;
-    s_units.FreeObjectState = FreeObjectState;
-    s_units.UpdateObjectState = UpdateObjectState;
+    s_scripts.PoseUnitModel = PoseUnitModel;
+    s_scripts.CreateObjectState = CreateObjectState;
+    s_scripts.FreeObjectState = FreeObjectState;
+    s_scripts.UpdateObjectState = UpdateObjectState;
     s_units.UpdateUnit = UpdateUnit;
-    s_units.ObjectStateSize = ObjectStateSize;
+    s_scripts.ObjectStateSize = ObjectStateSize;
+    s_scripts.NewUnitScript = NewUnitScriptNative;
+    s_scripts.SetCob = SetCobNative;
+    s_scripts.CreatePlayerObjectState = CreatePlayerObjectStateNative;
+    s_scripts.SetObjectState = SetObjectStateNative;
+    s_scripts.RunScripts = RunScriptsNative;
+    s_scripts.SaveScriptState = SaveScriptStateNative;
+    s_scripts.LoadScriptState = LoadScriptStateNative;
+    s_scripts.DeleteScript = DeleteScriptNative;
+    s_scripts.InitObjectState = InitObjectStateNative;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;
@@ -965,6 +1022,7 @@ void InstallNativeSeams()
     g_seams.units = &s_units;
     g_seams.players = &s_players;
     g_seams.map = &s_map;
+    g_seams.scripts = &s_scripts;
     g_seams.files = &s_files;
     g_seams.network = &s_network;
     g_seams.pathworld = NativePathWorld();

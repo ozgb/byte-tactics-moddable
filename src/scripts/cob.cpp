@@ -889,11 +889,6 @@ void CobScript::EmitSfx(int, int)
 {
 }
 
-// FUNCTION: 0x4b1eb0
-void CobScript::ExplodePiece(int, unsigned int)
-{
-}
-
 // FUNCTION: 0x4b1ec0
 void CobScript::SaveScriptState(HapiBank* file)
 {

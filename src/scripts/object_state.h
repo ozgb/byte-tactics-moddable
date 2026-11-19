@@ -1,5 +1,9 @@
 #ifndef OBJECT_STATE_H
 #define OBJECT_STATE_H
+struct ModelBuildList;
+struct ModelState;
+struct Object3do;
+struct Unit;
 
 struct ModelState;
 struct ModelPiece;
@@ -19,5 +23,7 @@ unsigned int __stdcall ObjectStateSize(Object3do* obj);
 void __stdcall InitObjectState(ModelState* state, Object3do* obj);
 void __stdcall UpdateObjectState(UnitDrawView* unit);
 void __stdcall FreeObjectState(ModelState* state);
+
+ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, Unit* owner);
 
 #endif

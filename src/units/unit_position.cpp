@@ -71,7 +71,7 @@ struct Block {
     int field_10;
 };
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../sound/sound.h"
 #include "../util/tdf.h"
@@ -269,7 +269,7 @@ void __stdcall UpdateUnit(Unit* u)
         }
     }
     if (u->script != 0) {
-        ((CobScript*)u->script.get())->RunScripts(1);
+        g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
     }
     if (u->recentlyDamagedTimer != 0) {
         u->recentlyDamagedTimer--;

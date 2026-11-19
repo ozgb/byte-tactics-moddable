@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 1
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 18
+#define SERVICES_VERSION_MINOR 19
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -93,8 +93,12 @@ enum SchedModule {
     SCHED_LOS_RADAR = 11,
     // Pathfinding (interfaces/pathfinding.h).
     SCHED_PATHFINDING = 12,
+    // Scripts (interfaces/scripts.h).
+    SCHED_SCRIPTS = 13,
+    // Movement (interfaces/movement.h).
+    SCHED_MOVEMENT = 14,
     // The number of modules.
-    SCHED_MODULE_COUNT = 13
+    SCHED_MODULE_COUNT = 15
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);

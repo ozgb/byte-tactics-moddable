@@ -26,6 +26,8 @@ const PlayersSeam* s_inner_players;
 PlayersSeam s_rec_players;
 const MapSeam* s_inner_map;
 MapSeam s_rec_map;
+const ScriptsSeam* s_inner_scripts;
+ScriptsSeam s_rec_scripts;
 const FilesSeam* s_inner_files;
 FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
@@ -1916,94 +1918,6 @@ int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
     return result;
 }
 
-void __stdcall RecUnitsGetSweetSpot(Unit* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETSWEETSPOT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetSweetSpot");
-        ImportObject(line, ROK_UNIT, a0);
-    }
-    s_inner_units->GetSweetSpot(a0, a1);
-    if (scope.Import()) {
-        ImportOutVec3(line, "out", a1);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecUnitsFindScript(CobScript* a0, const char* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_FINDSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.FindScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-    }
-    int result = s_inner_units->FindScript(a0, a1);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsStartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-        ArgValue(s_call, "count", a4);
-        ArgValue(s_call, "a", a5);
-        ArgValue(s_call, "b", a6);
-        ArgValue(s_call, "c", a7);
-        ArgValue(s_call, "d", a8);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.StartScriptWithArgs");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportPending(line);
-        ImportValue(line, a3);
-        ImportValue(line, a4);
-        ImportValue(line, a5);
-        ImportValue(line, a6);
-        ImportValue(line, a7);
-        ImportValue(line, a8);
-    }
-    int result = s_inner_units->StartScriptWithArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
 {
     ReplayRoots roots;
@@ -2081,144 +1995,6 @@ void __stdcall RecUnitsRefreshUnitIfStale(MovementClass* a0, Unit* a1)
     s_inner_units->RefreshUnitIfStale(a0, a1);
     if (scope.Open()) {
     }
-}
-
-int __stdcall RecUnitsStartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.StartScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportPending(line);
-        ImportValue(line, a3);
-    }
-    int result = s_inner_units->StartScript(a0, a1, a2, a3);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_QUERYSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgInOutScalar(s_call, "p2", a2);
-        ArgInOutScalar(s_call, "p3", a3);
-        ArgInOutScalar(s_call, "p4", a4);
-        ArgInOutScalar(s_call, "p5", a5);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.QueryScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportInOutScalar(line, a2);
-        ImportInOutScalar(line, a3);
-        ImportInOutScalar(line, a4);
-        ImportInOutScalar(line, a5);
-    }
-    int result = s_inner_units->QueryScript(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        ImportOutInOutScalar(line, "p2", a2);
-        ImportOutInOutScalar(line, "p3", a3);
-        ImportOutInOutScalar(line, "p4", a4);
-        ImportOutInOutScalar(line, "p5", a5);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgInOutScalarExit(s_tail, "p2", a2);
-        ArgInOutScalarExit(s_tail, "p3", a3);
-        ArgInOutScalarExit(s_tail, "p4", a4);
-        ArgInOutScalarExit(s_tail, "p5", a5);
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETAIMFROMPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "weapon", a2);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetAimFromPosition");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a2);
-    }
-    s_inner_units->GetAimFromPosition(a0, a1, a2);
-    if (scope.Import()) {
-        ImportOutVec3(line, "out", a1);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-Vec3 __stdcall RecUnitsGetPieceOffset(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEOFFSET, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetPieceOffset");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a1);
-    }
-    Vec3 result = s_inner_units->GetPieceOffset(a0, a1);
-    if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
-    }
-    return result;
-}
-
-Vec3 __stdcall RecUnitsGetPiecePosition(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    Vec3 result = s_inner_units->GetPiecePosition(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecUnitsMarkRecentlyDamaged(Unit* a0)
@@ -2559,35 +2335,6 @@ void __stdcall RecUnitsAttachUnitToPiece(Unit* a0, Unit* a1, char a2, char a3)
     }
 }
 
-void __stdcall RecUnitsGetNanoPiecePosition(Unit* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETNANOPIECEPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "out");
-    }
-    s_inner_units->GetNanoPiecePosition(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-Angles16 __stdcall RecUnitsGetPieceAngles(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEANGLES, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    Angles16 result = s_inner_units->GetPieceAngles(a0, a1);
-    if (scope.Open()) {
-    }
-    return result;
-}
-
 int __stdcall RecUnitsAddBuildProgress(Unit* a0, Unit* a1, float a2)
 {
     ReplayRoots roots;
@@ -2736,29 +2483,6 @@ void __fastcall RecUnitsUnitRefUnlink(UnitRef* a0)
     }
 }
 
-int __stdcall RecUnitsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGSBYINDEX, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "index", a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-        ArgValue(s_call, "count", a4);
-        ArgValue(s_call, "a", a5);
-        ArgValue(s_call, "b", a6);
-        ArgValue(s_call, "c", a7);
-        ArgValue(s_call, "d", a8);
-    }
-    int result = s_inner_units->StartScriptWithArgsByIndex(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
@@ -2775,59 +2499,6 @@ void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall RecUnitsPoseUnitModel(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_POSEUNITMODEL, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_units->PoseUnitModel(a0);
-    if (scope.Open()) {
-    }
-}
-
-ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_OBJECT3DO, a0);
-    SlotScope scope(RSL_UNITS_CREATEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
-    }
-    ModelState* result = s_inner_units->CreateObjectState(a0);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsFreeObjectState(ModelState* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MODELSTATE, a0);
-    SlotScope scope(RSL_UNITS_FREEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
-    }
-    s_inner_units->FreeObjectState(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsUpdateObjectState(UnitDrawView* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UPDATEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "unit");
-    }
-    s_inner_units->UpdateObjectState(a0);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecUnitsUpdateUnit(Unit* a0)
 {
     ReplayRoots roots;
@@ -2839,21 +2510,6 @@ void __stdcall RecUnitsUpdateUnit(Unit* a0)
     s_inner_units->UpdateUnit(a0);
     if (scope.Open()) {
     }
-}
-
-unsigned int __stdcall RecUnitsObjectStateSize(Object3do* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_OBJECT3DO, a0);
-    SlotScope scope(RSL_UNITS_OBJECTSTATESIZE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
-    }
-    unsigned int result = s_inner_units->ObjectStateSize(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
@@ -3324,6 +2980,482 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+int __stdcall RecScriptsStartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.StartScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+    }
+    int result = s_inner_scripts->StartScript(a0, a1, a2, a3);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsStartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPTWITHARGS, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+        ArgValue(s_call, "count", a4);
+        ArgValue(s_call, "a", a5);
+        ArgValue(s_call, "b", a6);
+        ArgValue(s_call, "c", a7);
+        ArgValue(s_call, "d", a8);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.StartScriptWithArgs");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+        ImportValue(line, a6);
+        ImportValue(line, a7);
+        ImportValue(line, a8);
+    }
+    int result = s_inner_scripts->StartScriptWithArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPTWITHARGSBYINDEX, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "index", a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+        ArgValue(s_call, "count", a4);
+        ArgValue(s_call, "a", a5);
+        ArgValue(s_call, "b", a6);
+        ArgValue(s_call, "c", a7);
+        ArgValue(s_call, "d", a8);
+    }
+    int result = s_inner_scripts->StartScriptWithArgsByIndex(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_QUERYSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgInOutScalar(s_call, "p2", a2);
+        ArgInOutScalar(s_call, "p3", a3);
+        ArgInOutScalar(s_call, "p4", a4);
+        ArgInOutScalar(s_call, "p5", a5);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.QueryScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportInOutScalar(line, a2);
+        ImportInOutScalar(line, a3);
+        ImportInOutScalar(line, a4);
+        ImportInOutScalar(line, a5);
+    }
+    int result = s_inner_scripts->QueryScript(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ImportOutInOutScalar(line, "p2", a2);
+        ImportOutInOutScalar(line, "p3", a3);
+        ImportOutInOutScalar(line, "p4", a4);
+        ImportOutInOutScalar(line, "p5", a5);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgInOutScalarExit(s_tail, "p2", a2);
+        ArgInOutScalarExit(s_tail, "p3", a3);
+        ArgInOutScalarExit(s_tail, "p4", a4);
+        ArgInOutScalarExit(s_tail, "p5", a5);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_FINDSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.FindScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+    }
+    int result = s_inner_scripts->FindScript(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEOFFSET, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetPieceOffset");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
+    Vec3 result = s_inner_scripts->GetPieceOffset(a0, a1);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_VEC3, &result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+    }
+    return result;
+}
+
+Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEANGLES, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    Angles16 result = s_inner_scripts->GetPieceAngles(a0, a1);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+void __stdcall RecScriptsGetNanoPiecePosition(Unit* a0, Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETNANOPIECEPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgPending(s_call, "out");
+    }
+    s_inner_scripts->GetNanoPiecePosition(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETAIMFROMPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "weapon", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetAimFromPosition");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a2);
+    }
+    s_inner_scripts->GetAimFromPosition(a0, a1, a2);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsGetSweetSpot(Unit* a0, Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETSWEETSPOT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetSweetSpot");
+        ImportObject(line, ROK_UNIT, a0);
+    }
+    s_inner_scripts->GetSweetSpot(a0, a1);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsPoseUnitModel(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_POSEUNITMODEL, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_scripts->PoseUnitModel(a0);
+    if (scope.Open()) {
+    }
+}
+
+ModelState* __stdcall RecScriptsCreateObjectState(Object3do* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    SlotScope scope(RSL_SCRIPTS_CREATEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+    }
+    ModelState* result = s_inner_scripts->CreateObjectState(a0);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsFreeObjectState(ModelState* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a0);
+    SlotScope scope(RSL_SCRIPTS_FREEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
+    }
+    s_inner_scripts->FreeObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsUpdateObjectState(UnitDrawView* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_SCRIPTS_UPDATEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "unit");
+    }
+    s_inner_scripts->UpdateObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
+unsigned int __stdcall RecScriptsObjectStateSize(Object3do* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    SlotScope scope(RSL_SCRIPTS_OBJECTSTATESIZE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+    }
+    unsigned int result = s_inner_scripts->ObjectStateSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsNewUnitScript(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_NEWUNITSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_scripts->NewUnitScript(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsSetCob(CobScript* a0, ScriptTable* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_SETCOB, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgPending(s_call, "data");
+    }
+    s_inner_scripts->SetCob(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+ModelState* __stdcall RecScriptsCreatePlayerObjectState(Object3do* a0, ScriptTable* a1, Unit* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    roots.Add(ROK_UNIT, a2);
+    SlotScope scope(RSL_SCRIPTS_CREATEPLAYEROBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+        ArgPending(s_call, "data");
+        ArgObject(s_call, "owner", ROK_UNIT, a2);
+    }
+    ModelState* result = s_inner_scripts->CreatePlayerObjectState(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsSetObjectState(UnitScript* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_SCRIPTS_SETOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "script");
+        ArgValue(s_call, "state", a1);
+    }
+    s_inner_scripts->SetObjectState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsRunScripts(CobScript* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_RUNSCRIPTS, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "elapsed", a1);
+    }
+    s_inner_scripts->RunScripts(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsSaveScriptState(CobScript* a0, HapiBank* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_SAVESCRIPTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+    }
+    s_inner_scripts->SaveScriptState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecScriptsLoadScriptState(CobScript* a0, HapiBank* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_LOADSCRIPTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+    }
+    int result = s_inner_scripts->LoadScriptState(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsDeleteScript(CobScript* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_DELETESCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+    }
+    s_inner_scripts->DeleteScript(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsInitObjectState(ModelState* a0, Object3do* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a0);
+    roots.Add(ROK_OBJECT3DO, a1);
+    SlotScope scope(RSL_SCRIPTS_INITOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a1);
+    }
+    s_inner_scripts->InitObjectState(a0, a1);
+    if (scope.Open()) {
+    }
 }
 
 FileHandle* __stdcall RecFilesOpenRead(char* a0)
@@ -4600,17 +4732,17 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_WEAPONS:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
-        if (slot == RSL_UNITS_STARTSCRIPT)
+        if (slot == RSL_SCRIPTS_STARTSCRIPT)
             return true;
-        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
+        if (slot == RSL_SCRIPTS_STARTSCRIPTWITHARGS)
             return true;
-        if (slot == RSL_UNITS_FINDSCRIPT)
+        if (slot == RSL_SCRIPTS_FINDSCRIPT)
             return true;
-        if (slot == RSL_UNITS_GETAIMFROMPOSITION)
+        if (slot == RSL_SCRIPTS_GETAIMFROMPOSITION)
             return true;
-        if (slot == RSL_UNITS_GETPIECEOFFSET)
+        if (slot == RSL_SCRIPTS_GETPIECEOFFSET)
             return true;
-        if (slot == RSL_UNITS_QUERYSCRIPT)
+        if (slot == RSL_SCRIPTS_QUERYSCRIPT)
             return true;
         if (slot == RSL_UNITS_MARKRECENTLYDAMAGED)
             return true;
@@ -4636,7 +4768,7 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_UNITS_GETGROUNDHEIGHT)
             return true;
-        if (slot == RSL_UNITS_GETSWEETSPOT)
+        if (slot == RSL_SCRIPTS_GETSWEETSPOT)
             return true;
         return false;
     case SUB_MAP:
@@ -4688,6 +4820,8 @@ void HookSeams(const bool* on)
     s_rec_players = *s_inner_players;
     s_inner_map = g_seams.map;
     s_rec_map = *s_inner_map;
+    s_inner_scripts = g_seams.scripts;
+    s_rec_scripts = *s_inner_scripts;
     s_inner_files = g_seams.files;
     s_rec_files = *s_inner_files;
     s_inner_network = g_seams.network;
@@ -4954,12 +5088,6 @@ void HookSeams(const bool* on)
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
-    if (on[SUB_UNITS] || on[SUB_TARGETING])
-        s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
     if (on[SUB_UNITS])
@@ -4970,16 +5098,6 @@ void HookSeams(const bool* on)
         s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
     if (on[SUB_UNITS])
         s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.StartScript = RecUnitsStartScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.QueryScript = RecUnitsQueryScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.GetAimFromPosition = RecUnitsGetAimFromPosition;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.GetPieceOffset = RecUnitsGetPieceOffset;
-    if (on[SUB_UNITS])
-        s_rec_units.GetPiecePosition = RecUnitsGetPiecePosition;
     if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
@@ -5033,10 +5151,6 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.AttachUnitToPiece = RecUnitsAttachUnitToPiece;
     if (on[SUB_UNITS])
-        s_rec_units.GetNanoPiecePosition = RecUnitsGetNanoPiecePosition;
-    if (on[SUB_UNITS])
-        s_rec_units.GetPieceAngles = RecUnitsGetPieceAngles;
-    if (on[SUB_UNITS])
         s_rec_units.AddBuildProgress = RecUnitsAddBuildProgress;
     if (on[SUB_UNITS])
         s_rec_units.AddRepairProgress = RecUnitsAddRepairProgress;
@@ -5055,21 +5169,9 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.UnitRefUnlink = RecUnitsUnitRefUnlink;
     if (on[SUB_UNITS])
-        s_rec_units.StartScriptWithArgsByIndex = RecUnitsStartScriptWithArgsByIndex;
-    if (on[SUB_UNITS])
         s_rec_units.UpdateSfxOccupy = RecUnitsUpdateSfxOccupy;
     if (on[SUB_UNITS])
-        s_rec_units.PoseUnitModel = RecUnitsPoseUnitModel;
-    if (on[SUB_UNITS])
-        s_rec_units.CreateObjectState = RecUnitsCreateObjectState;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeObjectState = RecUnitsFreeObjectState;
-    if (on[SUB_UNITS])
-        s_rec_units.UpdateObjectState = RecUnitsUpdateObjectState;
-    if (on[SUB_UNITS])
         s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.ObjectStateSize = RecUnitsObjectStateSize;
     if (on[SUB_UNITS])
         s_rec_units.GetFactoriesInRadius = RecUnitsGetFactoriesInRadius;
     if (on[SUB_UNITS])
@@ -5142,6 +5244,56 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.StartScript = RecScriptsStartScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.StartScriptWithArgs = RecScriptsStartScriptWithArgs;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.StartScriptWithArgsByIndex = RecScriptsStartScriptWithArgsByIndex;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.QueryScript = RecScriptsQueryScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.FindScript = RecScriptsFindScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.GetPieceOffset = RecScriptsGetPieceOffset;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetPiecePosition = RecScriptsGetPiecePosition;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetPieceAngles = RecScriptsGetPieceAngles;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetNanoPiecePosition = RecScriptsGetNanoPiecePosition;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.GetAimFromPosition = RecScriptsGetAimFromPosition;
+    if (on[SUB_SCRIPTS] || on[SUB_TARGETING])
+        s_rec_scripts.GetSweetSpot = RecScriptsGetSweetSpot;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.PoseUnitModel = RecScriptsPoseUnitModel;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.CreateObjectState = RecScriptsCreateObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.FreeObjectState = RecScriptsFreeObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.UpdateObjectState = RecScriptsUpdateObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.ObjectStateSize = RecScriptsObjectStateSize;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.NewUnitScript = RecScriptsNewUnitScript;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SetCob = RecScriptsSetCob;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.CreatePlayerObjectState = RecScriptsCreatePlayerObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SetObjectState = RecScriptsSetObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.RunScripts = RecScriptsRunScripts;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SaveScriptState = RecScriptsSaveScriptState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.LoadScriptState = RecScriptsLoadScriptState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.DeleteScript = RecScriptsDeleteScript;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.InitObjectState = RecScriptsInitObjectState;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])
@@ -5316,6 +5468,7 @@ void HookSeams(const bool* on)
     g_seams.units = &s_rec_units;
     g_seams.players = &s_rec_players;
     g_seams.map = &s_rec_map;
+    g_seams.scripts = &s_rec_scripts;
     g_seams.files = &s_rec_files;
     g_seams.network = &s_rec_network;
 }

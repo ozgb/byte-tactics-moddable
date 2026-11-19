@@ -21,7 +21,7 @@
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
 #include "../src/game/unit_resources.h"
-#include "../src/units/cob_script.h"
+#include "../src/scripts/cob_script.h"
 #include "../src/map/cell.h"
 #include "../src/network/player_info.h"
 #include "../src/orders/unit_motion.h"
@@ -1607,6 +1607,7 @@ enum ReplaySubsystemId {
     SUB_UNITS,
     SUB_PLAYERS,
     SUB_MAP,
+    SUB_SCRIPTS,
     SUB_FILES,
     SUB_NETWORK,
     SUB_COUNT
@@ -1744,19 +1745,11 @@ enum ReplaySlotId {
     RSL_ORDERS_APPLYPATHEVENT,
     RSL_UNITS_UPDATEALLUNITS,
     RSL_UNITS_GETGROUNDHEIGHT,
-    RSL_UNITS_GETSWEETSPOT,
-    RSL_UNITS_FINDSCRIPT,
-    RSL_UNITS_STARTSCRIPTWITHARGS,
     RSL_UNITS_SETSTATEBITS,
     RSL_UNITS_MOVEMENTCLASSGET,
     RSL_UNITS_MOVEMENTCLASSINBOUNDS,
     RSL_UNITS_REFRESHMOVEDUNITS,
     RSL_UNITS_REFRESHUNITIFSTALE,
-    RSL_UNITS_STARTSCRIPT,
-    RSL_UNITS_QUERYSCRIPT,
-    RSL_UNITS_GETAIMFROMPOSITION,
-    RSL_UNITS_GETPIECEOFFSET,
-    RSL_UNITS_GETPIECEPOSITION,
     RSL_UNITS_MARKRECENTLYDAMAGED,
     RSL_UNITS_NOTIFYUNITREFS,
     RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY,
@@ -1783,8 +1776,6 @@ enum ReplaySlotId {
     RSL_UNITS_FINDUNITTYPEID,
     RSL_UNITS_FINDMISSIONUNIT,
     RSL_UNITS_ATTACHUNITTOPIECE,
-    RSL_UNITS_GETNANOPIECEPOSITION,
-    RSL_UNITS_GETPIECEANGLES,
     RSL_UNITS_ADDBUILDPROGRESS,
     RSL_UNITS_ADDREPAIRPROGRESS,
     RSL_UNITS_APPLYUNFINISHEDBUILDDECAY,
@@ -1794,14 +1785,8 @@ enum ReplaySlotId {
     RSL_UNITS_CANRECLAIM,
     RSL_UNITS_CANREPAIR,
     RSL_UNITS_UNITREFUNLINK,
-    RSL_UNITS_STARTSCRIPTWITHARGSBYINDEX,
     RSL_UNITS_UPDATESFXOCCUPY,
-    RSL_UNITS_POSEUNITMODEL,
-    RSL_UNITS_CREATEOBJECTSTATE,
-    RSL_UNITS_FREEOBJECTSTATE,
-    RSL_UNITS_UPDATEOBJECTSTATE,
     RSL_UNITS_UPDATEUNIT,
-    RSL_UNITS_OBJECTSTATESIZE,
     RSL_UNITS_GETFACTORIESINRADIUS,
     RSL_UNITS_CREATEFACTORYINDEX,
     RSL_UNITS_FREEFACTORYINDEX,
@@ -1838,6 +1823,31 @@ enum ReplaySlotId {
     RSL_MAP_SNAPWORLDPOSTOFOOTPRINT,
     RSL_MAP_CANPLACEFOOTPRINTAT,
     RSL_MAP_ISPADSLOTFREE,
+    RSL_SCRIPTS_STARTSCRIPT,
+    RSL_SCRIPTS_STARTSCRIPTWITHARGS,
+    RSL_SCRIPTS_STARTSCRIPTWITHARGSBYINDEX,
+    RSL_SCRIPTS_QUERYSCRIPT,
+    RSL_SCRIPTS_FINDSCRIPT,
+    RSL_SCRIPTS_GETPIECEOFFSET,
+    RSL_SCRIPTS_GETPIECEPOSITION,
+    RSL_SCRIPTS_GETPIECEANGLES,
+    RSL_SCRIPTS_GETNANOPIECEPOSITION,
+    RSL_SCRIPTS_GETAIMFROMPOSITION,
+    RSL_SCRIPTS_GETSWEETSPOT,
+    RSL_SCRIPTS_POSEUNITMODEL,
+    RSL_SCRIPTS_CREATEOBJECTSTATE,
+    RSL_SCRIPTS_FREEOBJECTSTATE,
+    RSL_SCRIPTS_UPDATEOBJECTSTATE,
+    RSL_SCRIPTS_OBJECTSTATESIZE,
+    RSL_SCRIPTS_NEWUNITSCRIPT,
+    RSL_SCRIPTS_SETCOB,
+    RSL_SCRIPTS_CREATEPLAYEROBJECTSTATE,
+    RSL_SCRIPTS_SETOBJECTSTATE,
+    RSL_SCRIPTS_RUNSCRIPTS,
+    RSL_SCRIPTS_SAVESCRIPTSTATE,
+    RSL_SCRIPTS_LOADSCRIPTSTATE,
+    RSL_SCRIPTS_DELETESCRIPT,
+    RSL_SCRIPTS_INITOBJECTSTATE,
     RSL_FILES_OPENREAD,
     RSL_FILES_OPENAPPEND,
     RSL_FILES_CREATE,
@@ -2076,7 +2086,6 @@ static const unsigned char kReplayUnitsRefreshMovedUnitsReads[] = { 0 };
 static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 41, 42, 185, 239, 241, 242, 244, 246 };
 static const unsigned short kReplayUnitsRefreshMovedUnitsObjWrites[] = { 185, 244 };
 static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 41, 42, 185, 239, 241, 242, 244, 246 };
-static const unsigned short kReplayUnitsGetPieceOffsetObjReads[] = { 230, 231 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayUnitsAllocateUnitMemoryReads[] = { 26 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryWrites[] = { 26 };
@@ -2103,8 +2112,6 @@ static const unsigned short kReplayUnitsCreateUnitObjWrites[] = { 26, 27, 79 };
 static const unsigned char kReplayUnitsFindUnitTypeAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayUnitsFindUnitTypeIdAllOf[] = { ROK_UNITDEF };
 static const unsigned short kReplayUnitsAttachUnitToPieceObjReads[] = { 37, 44, 70, 72 };
-static const unsigned short kReplayUnitsGetPieceAnglesObjReads[] = { 230, 231 };
-static const unsigned short kReplayUnitsGetPieceAnglesObjWrites[] = { 230, 231 };
 static const unsigned short kReplayUnitsAddBuildProgressObjReads[] = { 33, 34, 35, 37, 47, 124 };
 static const unsigned short kReplayUnitsAddBuildProgressObjWrites[] = { 33, 34, 37 };
 static const unsigned short kReplayUnitsAddRepairProgressObjReads[] = { 33, 35, 124 };
@@ -2182,6 +2189,10 @@ static const unsigned char kReplayMapCanPlaceFootprintAtAllOf[] = { ROK_UNIT, RO
 static const unsigned char kReplayMapCanPlaceFootprintAtReads[] = { 1, 2, 17, 19, 20, 26 };
 static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 35, 41, 42, 44, 47, 108, 118, 120, 121, 171, 172, 174, 175, 176, 177, 178, 179, 326 };
 static const unsigned short kReplayMapIsPadSlotFreeObjReads[] = { 70, 71, 72, 74 };
+static const unsigned short kReplayScriptsGetPieceOffsetObjReads[] = { 230, 231 };
+static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 230, 231 };
+static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 230, 231 };
+static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 43 };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoReads[] = { 16 };
 static const unsigned short kReplayNetworkBroadcastPlayerInfoObjReads[] = { 1, 22 };
@@ -2326,19 +2337,11 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "ApplyPathEvent", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateAllUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetGroundHeight", SUB_UNITS, kReplayUnitsGetGroundHeightReads, 2, nullptr, 0, kReplayUnitsGetGroundHeightObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "GetSweetSpot", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "FindScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "StartScriptWithArgs", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
     { "MovementClassGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "MovementClassInBounds", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 8, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
     { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 8, nullptr, 0, nullptr, 0 },
-    { "StartScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "QueryScript", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetAimFromPosition", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetPieceOffset", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsGetPieceOffsetObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "GetPiecePosition", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "MarkRecentlyDamaged", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NotifyUnitRefs", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitTypeSetAddTypeOrCategory", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2365,8 +2368,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FindUnitTypeId", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeIdAllOf, 1 },
     { "FindMissionUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AttachUnitToPiece", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAttachUnitToPieceObjReads, 4, nullptr, 0, nullptr, 0 },
-    { "GetNanoPiecePosition", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetPieceAngles", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsGetPieceAnglesObjReads, 2, kReplayUnitsGetPieceAnglesObjWrites, 2, nullptr, 0 },
     { "AddBuildProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddBuildProgressObjReads, 6, kReplayUnitsAddBuildProgressObjWrites, 3, nullptr, 0 },
     { "AddRepairProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddRepairProgressObjReads, 3, nullptr, 0, nullptr, 0 },
     { "ApplyUnfinishedBuildDecay", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsApplyUnfinishedBuildDecayObjReads, 1, nullptr, 0, nullptr, 0 },
@@ -2376,14 +2377,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CanReclaim", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCanReclaimObjReads, 1, nullptr, 0, nullptr, 0 },
     { "CanRepair", SUB_UNITS, kReplayUnitsCanRepairReads, 1, nullptr, 0, kReplayUnitsCanRepairObjReads, 8, nullptr, 0, nullptr, 0 },
     { "UnitRefUnlink", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "StartScriptWithArgsByIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateSfxOccupy", SUB_UNITS, kReplayUnitsUpdateSfxOccupyReads, 1, nullptr, 0, kReplayUnitsUpdateSfxOccupyObjReads, 6, nullptr, 0, nullptr, 0 },
-    { "PoseUnitModel", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CreateObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "FreeObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UpdateObjectState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnit", SUB_UNITS, kReplayUnitsUpdateUnitReads, 2, nullptr, 0, kReplayUnitsUpdateUnitObjReads, 12, nullptr, 0, nullptr, 0 },
-    { "ObjectStateSize", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetFactoriesInRadius", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsGetFactoriesInRadiusObjReads, 3, nullptr, 0, nullptr, 0 },
     { "CreateFactoryIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeFactoryIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2420,6 +2415,31 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SnapWorldPosToFootprint", SUB_MAP, kReplayMapSnapWorldPosToFootprintReads, 3, nullptr, 0, kReplayMapSnapWorldPosToFootprintObjReads, 9, nullptr, 0, kReplayMapSnapWorldPosToFootprintAllOf, 1 },
     { "CanPlaceFootprintAt", SUB_MAP, kReplayMapCanPlaceFootprintAtReads, 6, nullptr, 0, kReplayMapCanPlaceFootprintAtObjReads, 18, nullptr, 0, kReplayMapCanPlaceFootprintAtAllOf, 3 },
     { "IsPadSlotFree", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapIsPadSlotFreeObjReads, 4, nullptr, 0, nullptr, 0 },
+    { "StartScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "StartScriptWithArgs", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "StartScriptWithArgsByIndex", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "QueryScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "FindScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetPieceOffset", SUB_SCRIPTS, nullptr, 0, nullptr, 0, kReplayScriptsGetPieceOffsetObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "GetPiecePosition", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetPieceAngles", SUB_SCRIPTS, nullptr, 0, nullptr, 0, kReplayScriptsGetPieceAnglesObjReads, 2, kReplayScriptsGetPieceAnglesObjWrites, 2, nullptr, 0 },
+    { "GetNanoPiecePosition", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetAimFromPosition", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetSweetSpot", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "PoseUnitModel", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "CreateObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "FreeObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UpdateObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "ObjectStateSize", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "NewUnitScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, kReplayScriptsNewUnitScriptObjWrites, 1, nullptr, 0 },
+    { "SetCob", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "CreatePlayerObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SetObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "RunScripts", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SaveScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "LoadScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "InitObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OpenRead", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OpenAppend", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Create", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2514,11 +2534,12 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "targeting", 2, 0, 1, 75, 6 },
     { "los_radar", 3, 1, 0, 81, 23 },
     { "orders", 3, 0, 0, 104, 25 },
-    { "units", 1, 10, 0, 129, 64 },
-    { "players", 3, 0, 0, 193, 24 },
-    { "map", 4, 0, 1, 217, 8 },
-    { "files", 2, 0, 0, 225, 58 },
-    { "network", 1, 0, 0, 283, 22 },
+    { "units", 2, 0, 0, 129, 48 },
+    { "players", 3, 0, 0, 177, 24 },
+    { "map", 4, 0, 1, 201, 8 },
+    { "scripts", 1, 0, 0, 209, 25 },
+    { "files", 2, 0, 0, 234, 58 },
+    { "network", 1, 0, 0, 292, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

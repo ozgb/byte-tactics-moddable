@@ -895,7 +895,7 @@ int PathOrder::FillWorldPos(Vec3* out)
         if (ref.owner == 0 || (int)ref.owner->spatialBucket.get() == (int)g_game->overflowBucket.get())
             return 0;
         Vec3* p = &pos;
-        *p = g_seams.units->GetPiecePosition(ref.owner, piece);
+        *p = g_seams.scripts->GetPiecePosition(ref.owner, piece);
         if (flags & 2) {
             short angle = ref.owner->heading;
             if (flags & 0x40)

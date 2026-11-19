@@ -40,7 +40,7 @@ struct Pair16 { short lo, hi; };
 #include "box.h"
 
 #include "../state/block.h"
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../files/files_api.h"
 #include "../map/mission.h"
@@ -307,7 +307,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         if (g_seams.map->CanPlaceFootprintAt(unit, &unit->pos)) {
-            g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
+            g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
             PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
             int h = max(g_seams.units->GetGroundHeight(&unit->pos), g_game->seaLevel);
             obj->SetAltitude(h <= g_game->seaLevel ? g_seams.units->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
@@ -553,7 +553,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_UNLOAD_UNIT);
             return 9;
         }
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
         g_seams.units->AttachUnitToPiece(unit->cargo, 0, -1, 1);
         PathOrder* obj = new (kSim) PathOrder(order, unit->pos);
         obj->SetAltitude(unit->def->altitude);
@@ -579,7 +579,7 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     pads[1] = -1;
     pads[2] = -1;
     pads[3] = -1;
-    g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
+    g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
     for (int i = 0; i < 4; i++) {
         if (pads[i] != -1 && g_seams.map->IsPadSlotFree(unit, pads[i])) {
             return pads[i];
@@ -666,7 +666,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         int rate=0; rate=unit->def->buildRate;
         if (g_seams.units->AddBuildProgress(unit,order->target,(float)(rate/30))) {
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(unit,&start);
+            g_seams.scripts->GetNanoPiecePosition(unit,&start);
             Vec3 bounds[2];
             bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
             bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
@@ -744,7 +744,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         {
             g_seams.units->AddRepairProgress(unit, order->target, (float)(unit->def->buildRate / 30));
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(order->source, &nano);
+            g_seams.scripts->GetNanoPiecePosition(order->source, &nano);
             Box box;
             box.hi = order->target->pos;
             box.lo = order->target->pos;
@@ -983,14 +983,14 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         case 2:
             order->AnnounceStatusIfFlagged(SIM_SPEECH_PREPARING_FOR_TRANSPORT);
             order->piece = -1;
-            g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryTransport", &order->piece, 0, 0, 0);
+            g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryTransport", &order->piece, 0, 0, 0);
             order->flags = 0x100e8;
             return 1;
         case 3: {
             int height = target->def->modelMaxY;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
+            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             g_seams.network->SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
-            Vec3 offset = g_seams.units->GetPieceOffset(unit, order->piece);
+            Vec3 offset = g_seams.scripts->GetPieceOffset(unit, order->piece);
             PathOrder* obj = new (kSim) PathOrder(order, order->target, -1);
             obj->SetAltitude(-((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
@@ -999,7 +999,7 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
         }
         case 4: {
             if (flags & 0x42) {
-                g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
+                g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
                 return 8;
             }
             g_seams.units->AttachUnitToPiece(target, unit, order->piece, 0);
@@ -1312,7 +1312,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             obj->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else
             obj->SetAltitude(0);
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(0xf);
         order->state = 5;
@@ -1328,7 +1328,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             return 0;
         }
         if (unit->cargo) {
-            g_seams.units->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
+            g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
             g_seams.units->AttachUnitToPiece(unit->cargo, order->target, order->angle, 0);
             dropped = 1;
         } else {
@@ -1675,7 +1675,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         int ok=g_seams.units->AddBuildProgress(unit,order->target,(float)(rate/30));
         if (ok) {
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(unit,&start);
+            g_seams.scripts->GetNanoPiecePosition(unit,&start);
             Vec3 bounds[2];
             bounds[0]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMinX);
             bounds[1]=AddVec3(order->target->pos,*(Vec3*)&order->target->def->modelMaxX);
@@ -1746,7 +1746,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         unit->workTime = g_game->ticks + 300;
         if (order->time > 30) {
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(unit, &nano);
+            g_seams.scripts->GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;
@@ -1832,7 +1832,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
                 order->duration = 0;
             }
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(order->source, &start);
+            g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
             bounds[1] = order->target->pos;
             bounds[0] = order->target->pos;

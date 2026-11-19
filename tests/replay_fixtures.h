@@ -5,7 +5,7 @@
 #include "../src/graphics/handle.h"
 #include "../src/map/frame_table.h"
 #include "../src/state/block_vector.h"
-#include "../src/units/cob_types.h"
+#include "../src/scripts/cob_types.h"
 
 struct UnitDef;
 

@@ -30,7 +30,7 @@ public:
 
 #include "../network/packet_manager.h"
 
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../game/mission_conditions.h"
 
@@ -2578,7 +2578,7 @@ int HandleNetPackets()
             UnitScriptCallRecv* call = (UnitScriptCallRecv*)packet;
             Unit* unit = UnitAt(call->id);
             if (unit->flags & 0x10000000)
-                ((CobScript*)unit->script.get())->StartScriptWithArgsByIndex(call->index, 0, 0, call->argCount,
+                g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)unit->script.get(), call->index, 0, 0, call->argCount,
                                              call->arg0, call->arg1, call->arg2, call->arg3);
             break;
         }
@@ -2837,7 +2837,7 @@ void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
 {
     UnitScriptCallPacket packet;
-    int index = ((CobScript *)obj->script.get())->FindScript(name);
+    int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
@@ -2875,7 +2875,7 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
 {
     UnitScriptCallPacket packet;
-    short index = ((CobScript *)obj->script.get())->FindScript(name);
+    short index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }

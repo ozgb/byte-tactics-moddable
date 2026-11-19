@@ -32,7 +32,7 @@ static inline Vec3 Vec3Sub(const Vec3& a, const Vec3& b) {
 
 struct UnitDef;
 
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
@@ -324,7 +324,7 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
         unit->workTime = g_game->ticks + 0x96;
         if (g_seams.units->AddRepairProgress(order->target, unit, (float)(order->target->def->buildRate / 30))) {
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(order->target, &nano);
+            g_seams.scripts->GetNanoPiecePosition(order->target, &nano);
             Box box;
             box.hi = unit->pos;
             box.lo = unit->pos;
@@ -391,8 +391,8 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         return WaitIfNotInBuildStance(unit, order, 2);
     case 2: {
         int piece = -1;
-        g_seams.units->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
-        order->pos = g_seams.units->GetPiecePosition(unit, piece);
+        g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
+        order->pos = g_seams.scripts->GetPiecePosition(unit, piece);
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
         if (!ScheduleMapCanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {
@@ -420,7 +420,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         if (order->target != 0) {
             if (g_seams.units->AddBuildProgress(unit, order->target, (float)(unit->def->buildRate / 30))) {
                 Vec3 nano;
-                g_seams.units->GetNanoPiecePosition(unit, &nano);
+                g_seams.scripts->GetNanoPiecePosition(unit, &nano);
                 Box box;
                 box.hi = order->target->pos;
                 box.lo = order->target->pos;
@@ -981,7 +981,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         }
         if (order->elapsed >= order->duration) return 1;
         Vec3 start;
-        g_seams.units->GetNanoPiecePosition(order->source, &start);
+        g_seams.scripts->GetNanoPiecePosition(order->source, &start);
         Vec3 bounds[2];
         bounds[1] = order->link.Get()->pos;
         bounds[0] = order->link.Get()->pos;
@@ -1068,7 +1068,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
             }
             unit->workTime = g_game->ticks + 900;
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(order->source, &start);
+            g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
             bounds[1] = order->link.Get()->pos;
             bounds[0] = order->link.Get()->pos;
@@ -1142,7 +1142,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
         unit->workTime = g_game->ticks + 150;
         if (g_seams.units->AddRepairProgress(unit, order->target, (float)(unit->def->buildRate / 30))) {
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(order->source, &nano);
+            g_seams.scripts->GetNanoPiecePosition(order->source, &nano);
             Box box;
             box.hi = order->target->pos;
             box.lo = order->target->pos;
@@ -1189,7 +1189,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
         rate = unit->def->buildRate;
         if (g_seams.units->AddRepairProgress(unit, order->link.Get(), (float)(rate / 30))) {
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(order->source, &start);
+            g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
             bounds[1] = order->link.Get()->pos;
             bounds[0] = order->link.Get()->pos;
@@ -1322,7 +1322,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
         case 2:
             {
             int id = target->id;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportPickup", 0, 1, 1, id, 0, 0, 0);
+            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportPickup", 0, 1, 1, id, 0, 0, 0);
             RecordUnitSpeech(unit, 12, SIM_SPEECH_KIND_TEXT);
             ++order->attempts;
             order->SetDeadlineTicks(15); return 1;
@@ -1355,7 +1355,7 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         order->link.SetUnit(unit->cargo);
         if (!order->target) return 5;
         order->AnnounceStatusIfFlagged(SIM_SPEECH_UNLOADING);
-        g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportDrop",0,1,1,order->target->id,
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportDrop",0,1,1,order->target->id,
             (order->pos.x&0xffff0000)+(order->pos.z>>16),0,0);
         ++order->attempts;
         order->SetDeadlineTicks(15);
@@ -1480,7 +1480,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
         rate = unit->def->buildRate;
         if (g_seams.units->AddBuildProgress(unit, target, (float)(rate / 30))) {
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(unit, &start);
+            g_seams.scripts->GetNanoPiecePosition(unit, &start);
             Vec3 bounds[2];
             bounds[0] = (Vec3Sum&)order->target->pos + *(Vec3*)&order->target->def->modelMinX;
             bounds[1] = (Vec3Sum&)order->target->pos + *(Vec3*)&order->target->def->modelMaxX;
@@ -1685,7 +1685,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         rate = unit->def->buildRate;
         if (g_seams.units->AddBuildProgress(unit, order->target, (float)(rate / 30))) {
             Vec3 start;
-            g_seams.units->GetNanoPiecePosition(unit, &start);
+            g_seams.scripts->GetNanoPiecePosition(unit, &start);
             Vec3 bounds[2];
             bounds[0] = PosPlus(order->target->pos, *(Vec3*)&order->target->def->modelMinX);
             bounds[1] = PosPlus(order->target->pos, *(Vec3*)&order->target->def->modelMaxX);
@@ -1755,7 +1755,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
         unit->workTime = g_game->ticks + 300;
         if (order->time > 15) {
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(unit, &nano);
+            g_seams.scripts->GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;
@@ -2020,7 +2020,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     case 4:
         if (order->countdown--) {
             Vec3 nano;
-            g_seams.units->GetNanoPiecePosition(unit, &nano);
+            g_seams.scripts->GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;

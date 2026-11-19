@@ -1,5 +1,5 @@
 #include "../state/block.h"
-#include "unit.h"
+#include "../units/unit.h"
 #include "unit_script.h"
 
 void NewUnitScript(Unit* self)

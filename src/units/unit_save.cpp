@@ -102,7 +102,7 @@ struct MissionUnitIdTable {
 
 #include "../files/files_api.h"
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../orders/unit_motion.h"
 
@@ -292,7 +292,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         g_seams.orders->ReattachFxToUnit((Order*)unit->list);
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
-    ((CobScript*)unit->script.get())->LoadScriptState(file);
+    g_seams.scripts->LoadScriptState((CobScript*)unit->script.get(), file);
 
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
@@ -333,7 +333,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
-            ((CobScript*)unit->script.get())->SaveScriptState(file);
+            g_seams.scripts->SaveScriptState((CobScript*)unit->script.get(), file);
 
             int n = 0;
             Order* c = (Order*)unit->list;

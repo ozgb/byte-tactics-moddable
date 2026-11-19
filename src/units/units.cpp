@@ -40,7 +40,7 @@ struct Unit;
 #include "../network/player.h"
 
 
-#include "cob_types.h"
+#include "../scripts/cob_types.h"
 
 union TypeFlags {
     unsigned int all;
@@ -393,7 +393,7 @@ struct SpotStateUnitView {
     int drawFrame;
 };
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../sound/sound.h"
 struct BmpFileHeader;
@@ -401,25 +401,23 @@ struct BmpInfo;
 struct BmpInfoHeader;
 
 
-#include "unit_script.h"
+#include "../scripts/unit_script.h"
 
 void* __cdecl operator new(size_t size);
-SpotStateUnitView* __stdcall CreatePlayerObjectState(Object3do* obj, ScriptTable* data, Unit* owner);
-#include "object_state.h"
 
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Unit* self)
 {
     Object3do* obj = ((Object3do **)g_game->types.get())[self->unitDefIndex];
     if (self->def->data) {
-        NewUnitScript(self);
-        ((CobScript*)self->script.get())->SetCob((ScriptTable*)self->def->data);
-        self->state = (SpotState*)CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
-        ((UnitScript*)self->script.get())->SetObjectState((int)self->state.get());
-        ((CobScript*)self->script.get())->StartScript("Create", 0, 1);
+        g_seams.scripts->NewUnitScript(self);
+        g_seams.scripts->SetCob((CobScript*)self->script.get(), (ScriptTable*)self->def->data);
+        self->state = (SpotState*)g_seams.scripts->CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
+        g_seams.scripts->SetObjectState((UnitScript*)self->script.get(), (int)self->state.get());
+        g_seams.scripts->StartScript((CobScript*)self->script.get(), "Create", 0, 1);
     } else {
         self->script = 0;
-        self->state = (SpotState*)CreateObjectState(obj);
+        self->state = (SpotState*)g_seams.scripts->CreateObjectState(obj);
         ((SpotStateUnitView*)self->state.get())->unit = self;
     }
     ((SpotStateUnitView*)self->state.get())->drawFrame = 0;
@@ -651,7 +649,7 @@ void __stdcall KillUnit(Unit* unit, int killType)
                 amount = 1;
             if (amount > 100)
                 amount = 100;
-            ((CobScript*)unit->script.get())->QueryScript("Killed", &amount, &flag, 0, 0);
+            g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "Killed", &amount, &flag, 0, 0);
         }
         if (unit->buildLeft != 0.0f) {
             flag = 0;
@@ -725,7 +723,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     if ((g_game->mapFlags & 2) == 2)
         LosRadarPublishRemoveUnit(SCHED_UNITS, unit);
     if (local == 0 && cmd->cobKilledSeverity > 0)
-        ((CobScript*)unit->script.get())->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
 
     int credited = 0;
     switch (cmd->killType) {
@@ -829,11 +827,11 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
 
     ClearUnitRefs(unit);
     if (unit->script != 0) {
-        delete (CobScript*)unit->script.get();
+        g_seams.scripts->DeleteScript((CobScript*)unit->script.get());
         unit->script = 0;
     }
     if (unit->state != 0) {
-        FreeObjectState((ModelState*)unit->state.get());
+        g_seams.scripts->FreeObjectState((ModelState*)unit->state.get());
         unit->state = 0;
     }
     UnitMotion* head = unit->motion;

@@ -48,7 +48,7 @@ union Orders_37ebe {
 #include "control_panel.h"
 #include "../units/unit_commands.h"
 #include "../orders/mission_type.h"
-#include "../units/unit_scripts.h"
+#include "../orders/order_cursor.h"
 
 #include "../map/cell.h"
 

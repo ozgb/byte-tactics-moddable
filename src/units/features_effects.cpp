@@ -8,7 +8,6 @@
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
-#include "object_state.h"
 #include "features_effects.h"
 
 #include "../../link/globals.h"
@@ -23,11 +22,11 @@ static ModelState* StateOfHandle(unsigned int handle)
 void UnitsOnFeaturesFreeState(const void* event)
 {
     const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
-    g_seams.units->FreeObjectState(StateOfHandle(effect->state));
+    g_seams.scripts->FreeObjectState(StateOfHandle(effect->state));
 }
 
 void UnitsOnFeaturesInitState(const void* event)
 {
     const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
-    InitObjectState(StateOfHandle(effect->state), (Object3do*)g_game->features[effect->feature].object);
+    g_seams.scripts->InitObjectState(StateOfHandle(effect->state), (Object3do*)g_game->features[effect->feature].object);
 }

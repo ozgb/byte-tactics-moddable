@@ -8,7 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 #include "../util/angles.h"
 #include "../util/vec3.h"
 #include "../quirks/quirks.h"
@@ -376,13 +376,13 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         if (ev->damageKind == 1) {
             int a = ScaledCos((unsigned short)(ev->headingByte << 8), 400);
             int b = ScaledSin((short)(ev->headingByte << 8), 400);
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_hitByWeaponScriptName, 0, 0, 2, a, b, 0, 0);
+            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_hitByWeaponScriptName, 0, 0, 2, a, b, 0, 0);
             int pct = unit->health * 100 / unit->def->maxHealth;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
                 pct = 100;
-            g_seams.units->StartScriptWithArgs((CobScript*)unit->script.get(), g_takeDamageScriptName, 0, 0, 1, pct, 0, 0, 0);
+            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_takeDamageScriptName, 0, 0, 1, pct, 0, 0, 0);
         }
     }
 }
@@ -549,7 +549,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         }
         return 0;
     }
-    g_seams.units->GetSweetSpot(def, (Vec3*)pos);
+    g_seams.scripts->GetSweetSpot(def, (Vec3*)pos);
     if ((e->flags & 2) && !(((WeaponDefTargetView*)e->weapon.get())->field_111 & 0x2000000) && def->motion != 0
         && unit->killCount > 5 && ((WeaponDefTargetView*)e->weapon.get())->radius != 0) {
         Vec3 d;

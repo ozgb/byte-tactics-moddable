@@ -8,6 +8,7 @@
 #include "../interfaces/targeting.h"
 #include "../interfaces/los_radar.h"
 #include "../interfaces/units.h"
+#include "../interfaces/scripts.h"
 #include "../interfaces/weapons.h"
 #include "../src/state/sim_globals.h"
 #include "../src/units/unit_type_set.h"
@@ -309,9 +310,12 @@ int main()
     g_seams.los_radar = &losRadar;
     static UnitsSeam units;
     memset(&units, 0, sizeof units);
-    units.GetSweetSpot = GetSweetSpot;
     units.GetGroundHeight = GetGroundHeight;
     g_seams.units = &units;
+    static ScriptsSeam scripts;
+    memset(&scripts, 0, sizeof scripts);
+    scripts.GetSweetSpot = GetSweetSpot;
+    g_seams.scripts = &scripts;
 
     static Run plain, again, tampered;
     Play(&plain, false);

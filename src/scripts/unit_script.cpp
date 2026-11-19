@@ -4,36 +4,20 @@
 #include <string.h>
 
 #include "../util/vec3.h"
-#include "unit_def.h"
+#include "../units/unit_def.h"
 
 #pragma pack(push, 1)
-#include "unit.h"
+#include "../units/unit.h"
 
 #include "../network/player.h"
 
 #include "../game/game.h"
 #include "../state/sim_effects.h"
 
-struct ExplodedPieceInit {
-    Ref<Unit> obj;
-    int index;
-    int r1;
-    int r2;
-    int r3;
-    int x;
-    int y;
-    int z;
-    int f20;
-    int f24;
-    unsigned int bits;
-    Ref<char> rec;
-};
 #pragma pack(pop)
 
 #include "../../link/globals.h"
 
-#include "unit_scripts.h"
-int __stdcall GetGroundHeight(Vec3* pos);
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
@@ -42,7 +26,6 @@ int __cdecl AngleOfVector(int a, int b);
 #include "../util/math.h"
 #include "../weapons/explosions.h"
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
-void __stdcall AttachUnitToPiece(Unit* unit, Unit* transporter, int a, int b);
 
 static inline Unit* GetUnit(unsigned short id)
 {
@@ -52,6 +35,7 @@ static inline Unit* GetUnit(unsigned short id)
 }
 
 #include "unit_script.h"
+#include "piece_queries.h"
 
 // FUNCTION: 0x480770
 int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
@@ -122,7 +106,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         v.z = a << 16;
         if (v.z < 0)
             v.x += 0x10000;
-        return GetGroundHeight(&v) << 16;
+        return g_seams.units->GetGroundHeight(&v) << 16;
     }
     case 17: {
         int result;
@@ -148,7 +132,7 @@ void UnitScript::SetUnitValue(int which, int value)
     Unit* unit = state->unit;
     switch (which) {
     case 1:
-        unit->SetStateBits(1, value);
+        g_seams.units->SetStateBits(unit, 1, value);
         break;
     case 5:
         unit->bit0 = value;
@@ -163,7 +147,7 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->bit3 = value;
         break;
     case 20:
-        unit->SetStateBits(2, value);
+        g_seams.units->SetStateBits(unit, 2, value);
         break;
     }
     unit->dirty = true;
@@ -331,58 +315,13 @@ void UnitScript::EmitSfx(int a, int b)
     }
 }
 
-// FUNCTION: 0x481140
-void UnitScript::ExplodePiece(int a, unsigned int b)
-{
-    if (!(b & 0x20)) {
-        ExplodedPieceInit h;
-        h.obj = state->unit;
-        h.index = a;
-        h.r1 = RandomInt(3000);
-        h.r2 = RandomInt(3000);
-        h.r3 = RandomInt(3000);
-        h.x = (0x14 - RandomInt(0x28)) << 14;
-        h.y = RandomInt(10) << 16;
-        h.z = (0x14 - RandomInt(0x28)) << 14;
-        h.f20 = 900;
-        if (b & 1) {
-            h.bits = (h.bits & ~0x30) | ((b & 2) << 4);
-            h.f24 = 1;
-            h.bits |= 4;
-        } else {
-            h.f24 = 0;
-            h.bits = (h.bits & ~0x34) | ((b & 2) << 3);
-        }
-        h.bits = (h.bits & ~2) | ((b >> 2) & 2);
-        h.bits = (h.bits & ~1) | ((b >> 4) & 1);
-        h.bits = (h.bits & ~8) | ((b & 4) << 1);
-        StartExplodePiece((ExplodedPiece *)&h);
-    }
-    if (b & 0x3f00) {
-        Vec3 v;
-        v = g_seams.units->GetPiecePosition(state->unit, a);
-        if (b & 0x100)
-            AddExplosionEffect(&v, g_game->sources[0], 2, 0);
-        if (b & 0x200)
-            AddExplosionEffect(&v, g_game->sources[1], 2, 0);
-        if (b & 0x400)
-            AddExplosionEffect(&v, g_game->sources[2], 2, 0);
-        if (b & 0x800)
-            AddExplosionEffect(&v, g_game->sources[3], 2, 0);
-        if (b & 0x1000)
-            AddExplosionEffect(&v, g_game->sources[4], 2, 0);
-        if (b & 0x2000)
-            AddExplosionEffect(&v, g_game->sources[5], 2, 0);
-    }
-}
-
 // FUNCTION: 0x481340
 void UnitScript::AttachUnit(unsigned short id, int a, int b)
 {
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000)
         && (u->carrier == 0 || u->carrier == state->unit)) {
-        AttachUnitToPiece(u, state->unit, a, b);
+        g_seams.units->AttachUnitToPiece(u, state->unit, a, b);
     }
 }
 
@@ -392,7 +331,7 @@ void UnitScript::DropUnit(unsigned short id)
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000) && u->carrier == state->unit) {
         if (ScheduleMapCanPlaceUnitFootprint(u->def, (unsigned short)u->id, *(Point16*)&u->cell, 1)) {
-            AttachUnitToPiece(u, 0, -1, 1);
+            g_seams.units->AttachUnitToPiece(u, 0, -1, 1);
         }
     }
 }

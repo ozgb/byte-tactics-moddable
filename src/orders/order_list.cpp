@@ -150,7 +150,7 @@ struct UnitDefMoveView {
     char unknown_245[0x249 - 0x245];
 };
 
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 struct Unit;
 
@@ -1479,12 +1479,12 @@ void UnitMotion::UpdatePosition(Unit* u)
 {
     if (u->carrier != 0) {
         Vec3 v;
-        v = g_seams.units->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
+        v = g_seams.scripts->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
         if (((UnitDefMoveView*)u->def.get())->b19) {
             v.y = ORDER_MAX(v.y, MakeFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel).value);
         }
         g_seams.units->SetUnitPosition(u, v, mode);
-        Angles16 o = g_seams.units->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
+        Angles16 o = g_seams.scripts->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
         u->angles = o;
         if (((CarrierMotionView*)u->carrier.get())->motion != 0) {
             speed = ((CarrierMotionView*)u->carrier.get())->motion->speed;
@@ -1565,19 +1565,19 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     if (rate == (int)((unit->flags >> 2) & 3))
         return;
     if (rate == 0) {
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "StopMoving", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StopMoving", 0, 1);
     } else if ((unit->flags & 0xc) == 0) {
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "StartMoving", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StartMoving", 0, 1);
     }
     switch (rate) {
     case 1:
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate1", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate1", 0, 1);
         break;
     case 2:
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate2", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate2", 0, 1);
         break;
     case 3:
-        g_seams.units->StartScript((CobScript*)unit->script.get(), "MoveRate3", 0, 1);
+        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate3", 0, 1);
         break;
     }
     unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);

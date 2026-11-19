@@ -813,7 +813,7 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             spot->rot = *rot;
         else
             memset(&spot->rot, 0, sizeof(spot->rot));
-        unsigned int size = g_seams.units->ObjectStateSize((Object3do*)f->object);
+        unsigned int size = g_seams.scripts->ObjectStateSize((Object3do*)f->object);
         spot->state = (SpotState*)SimAllocTagged("Object State", size);
         FeaturesEvent init = EffectOf(FEATURES_EFFECT_INIT_STATE);
         init.state = spot->state.offset;

@@ -611,7 +611,7 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
 {
     Unit* obj = piece->unit;
     if (!g_quirks.renderPoseReads)
-        g_seams.units->PoseUnitModel(obj);
+        g_seams.scripts->PoseUnitModel(obj);
     PieceRec* rec = (PieceRec*)((char*)obj->state.get() + 0x22 + piece->index * 0x36);
     rec->flags &= 0xfffe;
     if (piece->b2) {

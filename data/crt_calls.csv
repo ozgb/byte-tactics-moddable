@@ -546,8 +546,8 @@ address,function,callee,kind,file,class,notes
 0x47f610,PlaySoundAtByName,_strcmpi,call,src/sound/sound.cpp,game,sites=1
 0x47fd70,SpeechQueue::PlaySpeech,_alldiv,call,src/sound/sound.cpp,game,sites=1
 0x47fd70,SpeechQueue::PlaySpeech,sprintf,call,src/sound/sound.cpp,game,sites=1
-0x480770,UnitScript::GetUnitValue,_ftol,call,src/units/unit_script.cpp,game,sites=2
-0x480770,UnitScript::GetUnitValue,_hypot,call,src/units/unit_script.cpp,game,sites=1
+0x480770,UnitScript::GetUnitValue,_ftol,call,src/scripts/unit_script.cpp,game,sites=2
+0x480770,UnitScript::GetUnitValue,_hypot,call,src/scripts/unit_script.cpp,game,sites=1
 0x4814c0,$E4,atexit,call,src/map/line_of_sight.cpp,presentation,sites=1
 0x483610,LoadTntMap,_ftol,call,src/map/line_of_sight.cpp,game,sites=2
 0x483610,LoadTntMap,sprintf,call,src/map/line_of_sight.cpp,game,sites=1
@@ -822,9 +822,9 @@ address,function,callee,kind,file,class,notes
 0x4af320,ScanDirectory,_itoa,call,src/gui/file_list.cpp,presentation,sites=1
 0x4af320,ScanDirectory,strncpy,call,src/gui/file_list.cpp,presentation,sites=1
 0x4afd80,AddBlinkWord,strncpy,call,src/gui/file_list.cpp,presentation,sites=1
-0x4b0610,CobScript::CobScript,_purecall,call,src/units/cob.cpp,game,sites=7; address taken
-0x4b06b0,??_GCobScript@@UAEPAXI@Z,_purecall,call,src/units/cob.cpp,game,sites=7; address taken
-0x4b06f0,CobScript::~CobScript,_purecall,call,src/units/cob.cpp,game,sites=7; address taken
+0x4b0610,CobScript::CobScript,_purecall,call,src/scripts/cob.cpp,game,sites=7; address taken
+0x4b06b0,??_GCobScript@@UAEPAXI@Z,_purecall,call,src/scripts/cob.cpp,game,sites=7; address taken
+0x4b06f0,CobScript::~CobScript,_purecall,call,src/scripts/cob.cpp,game,sites=7; address taken
 0x4b2290,$E6,atexit,call,src/util/int_map.cpp,presentation,sites=1
 0x4b2290,$E6,std::_Lockit::_Lockit,call,src/util/int_map.cpp,presentation,sites=1
 0x4b2290,$E6,std::_Lockit::~_Lockit,call,src/util/int_map.cpp,presentation,sites=1

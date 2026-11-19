@@ -43,7 +43,7 @@ struct OrderSaveRecord {
 #include "../files/files_api.h"
 
 #include "../state/block.h"
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../units/unit_ref.h"
 
@@ -123,8 +123,8 @@ void __stdcall AddBeCarriedOrder(Unit* p)
 // FUNCTION: 0x438590
 void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short param_3)
 {
-    int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StartBuilding");
-    g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 1, param_3, 0, 0, 0);
+    int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StartBuilding");
+    g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 1, param_3, 0, 0, 0);
     g_seams.network->SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
     target->flags_42 |= 0x400000;
 }
@@ -133,8 +133,8 @@ void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short para
 void __stdcall StopBuildingScript(Unit* obj, Order* target)
 {
     if (target->flags_42 & 0x400000) {
-        int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
-        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
+        int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StopBuilding");
+        g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
         g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         target->flags_42 &= ~0x400000;
     }
@@ -373,8 +373,8 @@ Order::~Order()
     }
     if (flags_42 & 0x400000) {
         Unit* obj = unit;
-        int index = g_seams.units->FindScript((CobScript*)obj->script.get(), "StopBuilding");
-        g_seams.units->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
+        int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StopBuilding");
+        g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
         g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         flags_42 &= ~0x400000;
     }

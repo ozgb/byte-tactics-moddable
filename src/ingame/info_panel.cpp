@@ -71,7 +71,7 @@ struct StatusPanelTeamTable {
 
 #include "../map/feature.h"
 
-#include "../units/unit_script.h"
+#include "../scripts/unit_script.h"
 
 struct LayerView {
     int unknown_0;

@@ -385,8 +385,44 @@ class AdapterManifestTests(unittest.TestCase):
                      imports={"weapons": {"Spawn": [["block", "int", "int"], "int"]}, "services": {"Rand": [["int"], "int"]}})
         game = dict(ADAPTED, modules=[entry])
         found = wm.current_signatures(game, [entry], ADAPTED["majors"])
-        self.assertEqual(found["weapons"], {"Spawn": [["block", "int", "int"], "int"]})
-        self.assertEqual(found["services"], {"Rand": [["int"], "int"], "Log": [["linear"], "void"]})
+        self.assertEqual(found, {"services": {"Rand": [["int"], "int"]}, "weapons": {"Spawn": [["block", "int", "int"], "int"]}})
+
+    def test_a_name_no_module_uses_is_dropped(self):
+        game = dict(ADAPTED, signatures=dict(SIGNATURES, units={"GetSweetSpot": [["block", "linear"], "void"]}))
+        found = wm.current_signatures(game, game["modules"], ADAPTED["majors"], lambda interface, name: True)
+        self.assertNotIn("units", found)
+        self.assertEqual(found, SIGNATURES)
+
+    def test_a_name_only_an_older_module_uses_keeps_the_old_entry(self):
+        found = wm.current_signatures(ADAPTED, ADAPTED["modules"], dict(ADAPTED["majors"], weapons=2), lambda interface, name: True)
+        self.assertEqual(found["weapons"], {"Spawn": [["block", "int"], "int"]})
+        self.assertEqual(found["services"], SIGNATURES["services"])
+
+    def test_a_name_an_older_module_uses_that_the_header_no_longer_has_fails(self):
+        majors = dict(ADAPTED["majors"], weapons=2)
+        with self.assertRaises(SystemExit) as e:
+            wm.current_signatures(ADAPTED, ADAPTED["modules"], majors, lambda interface, name: (interface, name) != ("weapons", "Spawn"))
+        self.assertIn("m: uses weapons.Spawn, which interfaces/weapons.h no longer declares", str(e.exception))
+
+    def test_a_current_module_keeps_a_name_the_header_check_would_refuse(self):
+        entry = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2})
+        older = dict(entry, name="n", majors={"wind_meteors": 1, "weapons": 1, "services": 1})
+        found = wm.current_signatures(ADAPTED, [entry, older], ADAPTED["majors"], lambda interface, name: False)
+        self.assertEqual(found["services"]["Rand"], [["int", "int"], "int"])
+
+    def test_the_headers_declare_their_slots_and_not_removed_ones(self):
+        self.assertTrue(wm.header_declares("units", "GetGroundHeight"))
+        self.assertFalse(wm.header_declares("units", "GetSweetSpot"))
+        self.assertFalse(wm.header_declares("nosuchinterface", "Apply"))
+        self.assertTrue(wm.header_declares("services", "HapiBank_OpenAccount"))
+
+    def test_every_committed_signature_is_used_by_a_module_and_declared(self):
+        game = wm.game_manifest()
+        used = {(interface, name) for entry in game["modules"] for interface in wm.module_interfaces(entry)
+                for name in wm.module_table(entry, interface)}
+        named = {(interface, name) for interface, names in game["signatures"].items() for name in names}
+        self.assertEqual(named, used)
+        self.assertEqual([item for item in sorted(named) if not wm.header_declares(*item)], [])
 
     def test_modules_that_disagree_on_a_current_signature_fail(self):
         first = dict(ADAPTED["modules"][0], majors={"wind_meteors": 1, "weapons": 1, "services": 2}, imports={"services": {"Rand": [["int"], "int"]}})

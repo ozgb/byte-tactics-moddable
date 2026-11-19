@@ -77,7 +77,7 @@ by its function is in the file given.
 | `SetCob` | gives a script its unit type's compiled data | units (`units.cpp`: `InitUnitScript`) | both | new: was `CobScript::SetCob` from `units.cpp` |
 | `CreatePlayerObjectState` | builds a scripted unit's piece state | units (`units.cpp`: `InitUnitScript`) | both | new: was a direct call of `CreatePlayerObjectState` from `units.cpp` |
 | `SetObjectState` | gives a unit script its piece state | units (`units.cpp`: `InitUnitScript`) | both | new: was `UnitScript::SetObjectState` from `units.cpp` |
-| `RunScripts` | runs a script's threads for the elapsed ticks | units (`unit_position.cpp`: `UpdateUnit`) | yes | new: was `CobScript::RunScripts` from `unit_position.cpp` |
+| `RunScripts` | runs a script's threads for the elapsed ticks | units (`unit_position.cpp`: `UpdateUnitBody`) | yes | new: was `CobScript::RunScripts` from `unit_position.cpp` |
 | `SaveScriptState` | writes a script's threads to a saved game | units (`unit_save.cpp`: `SaveUnits`) | no | new: was `CobScript::SaveScriptState` from `unit_save.cpp` |
 | `LoadScriptState` | reads a script's threads from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no | new: was `CobScript::LoadScriptState` from `unit_save.cpp` |
 | `DeleteScript` | destroys a unit script (the virtual deleting destructor) | units (`units.cpp`: `ApplyUnitDeath`) | yes | new: was a `delete` of the `CobScript` from `units.cpp` |
@@ -223,13 +223,13 @@ This issue leaves the following to the issues that put the module on the model, 
   mostly dropped, but not in `StartScript` of `InitUnitScript`'s "Create", nor in the `FindScript`/index pairs of
   `order_queue.cpp`, which use the index), `SetCob`, `SetObjectState`, `SaveScriptState` and `DeleteScript`. The
   queries (`QueryScript`, the piece getters, `ObjectStateSize`) and `FindScript` answer in the caller's statement.
-  Whether `RunScripts`, called from `UpdateUnit` for each unit in 3.1c's order, becomes a pass of scripts, and where
+  Whether `RunScripts`, called from `UpdateUnitBody` for each unit in 3.1c's order, becomes a pass of scripts, and where
   scripts' draws of `RandomInt` sit in it.
-- **#984 (weapons).** Weapons publishes its script starts (`StartScript`, `StartScriptWithArgs` with the fire, aim and
-  rock scripts) and calls `QueryScript` and `GetAimFromPosition`. Whether a weapon's aim callback
-  (`WeaponAimCobComplete`, called by the interpreter when an aim thread ends) stays a seam call from scripts to
-  weapons or becomes an event, and what a `Callback` that scripts holds in a channel means once weapons' state is
-  split. `CobScriptExplodePiece` and the two `ExplodePiece` methods that sit in `src/weapons/` go the same way.
+- **#984 (weapons), done (`docs/weapons-interface.md`).** Weapons publishes its script starts as the effect
+  START_SCRIPT and a piece's detaching as DETACH_PIECE, both to scripts; scripts publishes a weapon's aim callback
+  (`WeaponAimCobComplete`) as weapons' event AIM_DONE and the explode opcode (`CobScriptExplodePiece`) as
+  EXPLODE_PIECE. `QueryScript` and `GetAimFromPosition` stay synchronous slots of scripts (mixed: they run a unit's
+  script, and weapons uses the answer in the same statement), for #986.
 - **The format bump for weapons, orders and units.** Moving the state section 5 lists out of the hash, as #979 does
   for los_radar, players, ai and map.
 - **The piece queries stay scripts'.** They read the piece state, and their callers (weapons, orders, movement) reach

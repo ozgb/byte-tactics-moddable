@@ -1,6 +1,6 @@
 # The features interface
 
-Features sits behind `interfaces/features.h` (version 3.0), the second module on the scheduler after economy
+Features sits behind `interfaces/features.h` (version 3.1), the second module on the scheduler after economy
 (`docs/economy-interface.md`), and the first with random draws to keep in order (#954). 3.1c's feature code is its
 default implementation. This page is the inventory the interface was cut from:
 - what other subsystems did to features' state in 3.1c, and what each became;
@@ -109,7 +109,9 @@ level, and the weapon definitions it names, all as of each module's last run.
   a spot's position for an explosion's distance, orders a spot's rotation when it resurrects a wreck, and map, units,
   weapons and los_radar read the cells. They stay view state that features writes, as `Player`'s totals did for
   economy: the cells are map's allocation, and the feature fields of a cell are features'.
-- **Queries:** `GetCellFeature`, `GetFootprintCentre`, `FeatureTypeCount`, `FirstFeatureSpot`.
+- **Queries:** `GetCellFeature`, `GetFootprintCentre`, `FeatureTypeCount`, `FirstFeatureSpot` and `FindFeatureAtPos`
+  (weapons' slot until #984: it reads only features' and los_radar's cells, so it moved here in 3.1; orders and
+  players call it).
 
 **As of features' last run.** Every read above sees features' state as of its last run or its last synchronous
 apply. By #952's rule a query needs a delivery first only when an event that can be pending writes what it reads, and

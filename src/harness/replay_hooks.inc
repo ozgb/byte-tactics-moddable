@@ -422,22 +422,21 @@ Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
     roots.Add(ROK_FEATURE, a1);
     SlotScope scope(RSL_FEATURES_GETFOOTPRINTCENTRE, SUB_FEATURES, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "cell");
+        ArgStruct(s_call, "a", "cell", ROK_POINT16, a0);
         ArgObject(s_call, "def", ROK_FEATURE, a1);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i features.GetFootprintCentre");
-        ImportPending(line);
         ImportObject(line, ROK_FEATURE, a1);
     }
     Vec3 result = s_inner_features->GetFootprintCentre(a0, a1);
     if (scope.Import()) {
-        ImportResult(line, result);
+        ImportResultValue(line, ROK_VEC3, &result);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
     }
     return result;
 }
@@ -3185,11 +3184,11 @@ Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
     }
     Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
     if (scope.Import()) {
-        ImportResult(line, result);
+        ImportResultValue(line, ROK_VEC3, &result);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
     }
     return result;
 }

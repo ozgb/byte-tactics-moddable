@@ -89,7 +89,7 @@ Vec3 __stdcall Imp_features_GetFootprintCentre(Point16* a0, Feature* a1)
     Space(t);
     ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
     const char* r = Enter(t);
-    return ParseResult<Vec3>(r);
+    return ParseValueText<Vec3>(ROK_VEC3, r);
 }
 
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
@@ -344,7 +344,7 @@ Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseResult<Vec3>(r);
+    return ParseValueText<Vec3>(ROK_VEC3, r);
 }
 
 int __stdcall Imp_scripts_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)

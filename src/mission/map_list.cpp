@@ -328,7 +328,7 @@ int Mission::BuildMissionList(char** out)
 int Mission::GetCampaignMissionName(int index, char* out, int size)
 {
     char buf[128];
-    if (strlen(campaign) == 0)
+    if (size < 1 || strlen(campaign) == 0)
         return 0;
     sprintf(buf, "MISSION%d", index);
     list.ResetCurrentRecord();
@@ -981,6 +981,86 @@ int Mission::GetStartPosition(Vec3* out, int id)
         }
     }
     return 0;
+}
+
+void Mission::GetParams(MissionParams* out)
+{
+    out->surfaceMetal = surfaceMetal;
+    out->minWindSpeed = minWindSpeed;
+    out->maxWindSpeed = maxWindSpeed;
+    out->gravity = gravity;
+    out->tidalStrength = tidalStrength;
+    out->lavaWorld = lavaWorld;
+    out->noSeaLevelTrigger = noSeaLevelTrigger;
+    out->waterDoesDamage = waterDoesDamage;
+    out->waterDamage = waterDamage;
+    out->killMul = killMul;
+    out->timeMul = timeMul;
+    for (int i = 0; i < 10; i++) {
+        out->startMetal[i] = startMetal[i];
+        out->startEnergy[i] = startEnergy[i];
+    }
+}
+
+int Mission::CountUnits()
+{
+    return unitCount;
+}
+
+int Mission::GetUnit(int index, MissionUnitInfo* out)
+{
+    if (index < 0 || index >= unitCount)
+        return 0;
+    MissionUnit* u = &units[index];
+    out->name = u->name;
+    out->ident = u->ident;
+    out->initialMission = u->initialMission;
+    out->x = u->x;
+    out->y = u->y;
+    out->z = u->z;
+    out->angle = u->angle;
+    out->health = u->health;
+    out->creationCountdown = u->creationCountdown;
+    out->buildPriority = u->buildPriority;
+    out->player = u->player;
+    out->flags = u->flags;
+    return 1;
+}
+
+void Mission::SetUnitPosition(int index, Vec3* pos)
+{
+    if (index < 0 || index >= unitCount)
+        return;
+    MissionUnit* u = &units[index];
+    u->x = pos->x;
+    u->y = pos->y;
+    u->z = pos->z;
+}
+
+int Mission::CountFeatures()
+{
+    return featureCount;
+}
+
+int Mission::GetFeature(int index, MissionFeatureInfo* out)
+{
+    if (index < 0 || index >= featureCount)
+        return 0;
+    MissionFeature* f = &features[index];
+    out->name = f->name;
+    out->x = f->x;
+    out->y = f->y;
+    return 1;
+}
+
+char* Mission::GetMemory()
+{
+    return memory;
+}
+
+char* Mission::GetNumPlayers()
+{
+    return numPlayers;
 }
 
 // FUNCTION: 0x4373a0

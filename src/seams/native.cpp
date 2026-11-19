@@ -370,6 +370,46 @@ static int __stdcall SelectSchemaNative(int type, TdfFile* parser, char* schema)
     return TheMission()->SelectSchema(type, parser, schema);
 }
 
+static void __stdcall GetMissionParamsNative(MissionParams* out)
+{
+    TheMission()->GetParams(out);
+}
+
+static int __stdcall CountMissionUnitsNative()
+{
+    return TheMission()->CountUnits();
+}
+
+static int __stdcall GetMissionUnitNative(int index, MissionUnitInfo* out)
+{
+    return TheMission()->GetUnit(index, out);
+}
+
+static void __stdcall SetMissionUnitPositionNative(int index, Vec3* pos)
+{
+    TheMission()->SetUnitPosition(index, pos);
+}
+
+static int __stdcall CountMissionFeaturesNative()
+{
+    return TheMission()->CountFeatures();
+}
+
+static int __stdcall GetMissionFeatureNative(int index, MissionFeatureInfo* out)
+{
+    return TheMission()->GetFeature(index, out);
+}
+
+static char* __stdcall GetMemoryNative()
+{
+    return TheMission()->GetMemory();
+}
+
+static char* __stdcall GetNumPlayersNative()
+{
+    return TheMission()->GetNumPlayers();
+}
+
 static void __fastcall DeactivateConditionsNative(MissionConditions* self)
 {
     self->Deactivate();
@@ -1042,6 +1082,14 @@ void InstallNativeSeams()
     s_mission.GetTranslatedName = GetTranslatedNameNative;
     s_mission.HasMissionName = HasMissionNameNative;
     s_mission.SelectSchema = SelectSchemaNative;
+    s_mission.GetMissionParams = GetMissionParamsNative;
+    s_mission.CountMissionUnits = CountMissionUnitsNative;
+    s_mission.GetMissionUnit = GetMissionUnitNative;
+    s_mission.SetMissionUnitPosition = SetMissionUnitPositionNative;
+    s_mission.CountMissionFeatures = CountMissionFeaturesNative;
+    s_mission.GetMissionFeature = GetMissionFeatureNative;
+    s_mission.GetMemory = GetMemoryNative;
+    s_mission.GetNumPlayers = GetNumPlayersNative;
     s_map.Apply = ApplyMapEvent;
     s_map.AllocateBuckets = MapAllocateBuckets;
     s_map.FreeBuckets = MapFreeBuckets;

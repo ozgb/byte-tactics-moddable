@@ -281,10 +281,12 @@ void __cdecl CreateMissionUnits()
 {
     Player* p;
     char buf[100];
-    int n = g_game->net->unitCount;
+    int n = g_seams.mission->CountMissionUnits();
     std::vector<Unit*> units(n);
-    for (int i = 0; i < g_game->net->unitCount; i++) {
-        MissionUnit* e = &g_game->net->units[i];
+    for (int i = 0; i < n; i++) {
+        MissionUnitInfo info;
+        MissionUnitInfo* e = &info;
+        g_seams.mission->GetMissionUnit(i, e);
         UnitDefNameKeyView* item = (UnitDefNameKeyView*)g_seams.units->FindUnitType(e->name);
         if (item == 0) {
             units[i] = 0;
@@ -295,11 +297,13 @@ void __cdecl CreateMissionUnits()
             || (p = &g_game->players[pl], g_game->players[pl].active == 0)
             || (p->type != 1 && p->type != 2 && p->type != 3)
             || p->index == 10) {
-            sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name.get());
+            sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name);
             FatalError(buf);
         }
-        g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, (Vec3*)&e->x);
-        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, *(Vec3*)&e->x, 1, 1, 0);
+        Vec3 pos = {e->x, e->y, e->z};
+        g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, &pos);
+        g_seams.mission->SetMissionUnitPosition(i, &pos);
+        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, pos, 1, 1, 0);
         if (u) {
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
             u->health = (unsigned short)((unsigned)(((UnitDefMaxHealthView*)u->def.get())->f1fa * e->health) / 100);
@@ -307,12 +311,14 @@ void __cdecl CreateMissionUnits()
             units[i] = u;
         }
     }
-    for (int j = 0; j < g_game->net->unitCount; j++) {
-        MissionUnit* e = &g_game->net->units[j];
+    for (int j = 0; j < n; j++) {
+        MissionUnitInfo info;
+        MissionUnitInfo* e = &info;
+        g_seams.mission->GetMissionUnit(j, e);
         if (e->initialMission && units[j])
             RunInitialMission(units[j], e->initialMission, (UnitPtrVectorView*)&units);
     }
-    if (g_game->net->unitCount <= 0)
+    if (n <= 0)
         g_seams.players->DeactivateConditions(g_game->list_391ed);
 }
 

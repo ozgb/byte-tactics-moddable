@@ -59,6 +59,7 @@ void* __stdcall FindGafEntry(void* a, char* b);
 #include "../game/cd_check.h"
 extern void __cdecl operator delete(void*);
 #include "../graphics/object_pool.h"
+#include "../../interfaces/seams.h"
 
 // FUNCTION: 0x42e310
 void LoadWeaponTypes()
@@ -202,7 +203,9 @@ model_done:
         w->explosionSeq = r;
     }
     w->splash = 0;
-    if (*(int*)((char*)g_game->net.get() + 0xd44) != 0) {
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    if (mission.lavaWorld != 0) {
         if (parser->GetFieldString(gaf, "lavaexplosiongaf", 0x100, g_emptyText) != 0 &&
             parser->GetFieldString(model, "lavaexplosionart", 0x100, g_emptyText) != 0) {
             void* a = LoadAnimGaf(gaf);

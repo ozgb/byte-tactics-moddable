@@ -378,9 +378,10 @@ void UpdateExplosions()
                 }
             } else {
                 if (d->flag) {
-                    Mission* net = g_game->net.get();
-                    if (net->noSeaLevelTrigger == 0) {
-                        GafSequence* src = net->lavaWorld != 0 ? (GafSequence *)g_game->src2 : (GafSequence *)g_game->src1;
+                    MissionParams mission;
+                    g_seams.mission->GetMissionParams(&mission);
+                    if (mission.noSeaLevelTrigger == 0) {
+                        GafSequence* src = mission.lavaWorld != 0 ? (GafSequence *)g_game->src2 : (GafSequence *)g_game->src1;
                         AddExplosionEffect(&d->pos, src, -1, 1);
                     }
                 }
@@ -524,9 +525,11 @@ int __stdcall UpdateExplodedPiece(ExplodedPiece* obj)
 
     Vec3 pos;
     if (inner->pos.y <= (int)((unsigned)g_game->seaLevel << 16)) {
-        if (obj->b4 && g_game->net->noSeaLevelTrigger == 0) {
+        MissionParams mission;
+        g_seams.mission->GetMissionParams(&mission);
+        if (obj->b4 && mission.noSeaLevelTrigger == 0) {
             GafSequence* src;
-            if (g_game->net->lavaWorld != 0)
+            if (mission.lavaWorld != 0)
                 src = (GafSequence *)g_game->src2;
             else
                 src = (GafSequence *)g_game->src1;

@@ -980,8 +980,10 @@ void __stdcall OpenNewGameMenu(int param_1)
 // FUNCTION: 0x478790
 void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
 {
-    int windMin = g_game->net->minWindSpeed;
-    int windMax = g_game->net->maxWindSpeed;
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    int windMin = mission.minWindSpeed;
+    int windMax = mission.maxWindSpeed;
     void* surface = arg1->layer->entries->u.assets.surface;
 
     if (--g_briefingWindTickCountdown <= 0) {
@@ -1012,7 +1014,7 @@ void __stdcall UpdateSolarSystem(Gui* arg1, Gadget* arg2)
                  rect.right - rect.left - 0x50);
 
     sprintf(text, "%s : %.1f", Translate("Gravity"),
-            (double)g_game->net->gravity * 0.008928571428571428);
+            (double)mission.gravity * 0.008928571428571428);
     DrawString(surface, text, rect.left + 0x50, rect.top + 0x28,
                  rect.right - rect.left - 0x50);
 
@@ -1208,8 +1210,10 @@ void OpenMissionBriefing(void)
     SetGadgetActiveByName(&g_game->gui, "SOLARSYSTEM", 0);
     SetButtonStageByName(&g_game->gui, "SHUTUP", 1);
 
-    g_briefingWindSpeed = g_game->net->minWindSpeed +
-                   HarnessViewRand() % (g_game->net->maxWindSpeed - g_game->net->minWindSpeed + 1);
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    g_briefingWindSpeed = mission.minWindSpeed +
+                   HarnessViewRand() % (mission.maxWindSpeed - mission.minWindSpeed + 1);
     g_briefingWindTickCountdown = HarnessViewRand() % 64;
 
     name = g_seams.mission->GetPlanet();

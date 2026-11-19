@@ -495,8 +495,10 @@ void ResolveFeatureLinks()
 // FUNCTION: 0x423160
 void PlaceMissionFeatures(void)
 {
-    for (int i = 0; i < g_game->net->featureCount; i++) {
-        MissionFeature* p = &g_game->net->features[i];
+    for (int i = 0; i < g_seams.mission->CountMissionFeatures(); i++) {
+        MissionFeatureInfo info;
+        MissionFeatureInfo* p = &info;
+        g_seams.mission->GetMissionFeature(i, p);
         if (p->name[0] == 0)
             continue;
         unsigned short id = (unsigned short)FindFeatureType(p->name);

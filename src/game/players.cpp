@@ -582,7 +582,9 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
                                 zacc += hh;
                             } while (--outer != 0);
                             if (hits >= 9 && (short)g_seams.weapons->FindFeatureAtPos(&pos, 0, 0) == -1) {
-                                if (g_game->net->lavaWorld == 0)
+                                MissionParams mission;
+                                g_seams.mission->GetMissionParams(&mission);
+                                if (mission.lavaWorld == 0)
                                     break;
                                 if (g_seams.map->GetCellMeanHeight(&pos) >
                                     (int)g_game->seaLevel)
@@ -790,12 +792,15 @@ void InitPlayerResources()
         Player* player = &g_game->players[i];
         if (g_game->pendingSaveStore == 0) {
             switch (g_seams.mission->GetGameType()) {
-            case 1:
-                SetStartingStorageBonus(player, (int)g_game->net->startMetal[i],
-                             (int)g_game->net->startEnergy[i]);
-                player->energy = g_game->net->startEnergy[i];
-                player->metal = g_game->net->startMetal[i];
+            case 1: {
+                MissionParams mission;
+                g_seams.mission->GetMissionParams(&mission);
+                SetStartingStorageBonus(player, (int)mission.startMetal[i],
+                             (int)mission.startEnergy[i]);
+                player->energy = mission.startEnergy[i];
+                player->metal = mission.startMetal[i];
                 break;
+            }
             case 2:
                 player->energy = (float)g_game->options->players[i].energy;
                 player->metal = (float)g_game->options->players[i].metal;

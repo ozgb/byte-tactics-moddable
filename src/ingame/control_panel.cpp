@@ -1016,7 +1016,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         unit->buildLeft = next;
         unit->flags |= 0x2000;
         if (next >= 1.0f)
-            WeaponsPublishDamage(SCHED_ENGINE, unit, unit, 30000, 9, 0);
+            WeaponsPublishDamage(SCHED_UNITS, unit, unit, 30000, 9, 0);
     } else if (EconRequestEnergyAndMetal(SCHED_UNITS, builder, energyCharge, metalCharge)) {
         unit->health = min(hp + unit->health, ((UnitDef*)unit->def.get())->maxHealth);
         unit->buildLeft = next;
@@ -1056,7 +1056,7 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
     if (n2 >= 1)
         n2 = 1;
     if (EconRequestEnergy(SCHED_UNITS, builder, (float)n2)) {
-        WeaponsPublishDamage(SCHED_ENGINE, builder, unit, n1, 10, 0);
+        WeaponsPublishDamage(SCHED_UNITS, builder, unit, n1, 10, 0);
         result = 1;
     }
     return result;

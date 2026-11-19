@@ -25693,6 +25693,7 @@ address,function,file,kind,target
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_write,Vec3::y
 0x482910,AddEyeball,src/map/line_of_sight.cpp,function,
 0x482910,AddEyeball,src/map/line_of_sight.cpp,global_read,g_game
+0x482910,AddEyeball,src/map/line_of_sight.cpp,global_read,kEyeCapacity
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,GetGafFrame
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,RevealAroundUnit
@@ -25929,6 +25930,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,global_maybe_written,g_losTables
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,global_read,g_game
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,global_read,g_seams
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,global_read,kEyeCapacity
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,"indirect via char *(*)(Mission *, int) __attribute__((stdcall)) [MapSeam::GetNameSlot]"
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::PlaceMissionFeatures]
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::StampFeatureMetal]
@@ -42667,10 +42669,9 @@ address,function,file,kind,target
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,field_write,AiEvent::unit
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,field_write,AiEvent::value
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,function,
+,AiPlayerSlotOf,src/ai/ai_player.cpp,call,PlayerSlotChecked
 ,AiPlayerSlotOf,src/ai/ai_player.cpp,call,get
-,AiPlayerSlotOf,src/ai/ai_player.cpp,field_escape,Game::players
 ,AiPlayerSlotOf,src/ai/ai_player.cpp,function,
-,AiPlayerSlotOf,src/ai/ai_player.cpp,global_read,g_game
 ,AiPublishLimit,src/game/ai_events.h,call,AiEventOf
 ,AiPublishLimit,src/game/ai_events.h,call,SchedPublish
 ,AiPublishLimit,src/game/ai_events.h,call,memcpy
@@ -50614,11 +50615,11 @@ address,function,file,kind,target
 ,LosRadarSightCache,src/map/line_of_sight.cpp,deref_read,*LosSightCache
 ,LosRadarSightCache,src/map/line_of_sight.cpp,deref_write,*LosSightCache
 ,LosRadarSightCache,src/map/line_of_sight.cpp,function,
+,LosRadarWriteState,src/map/line_of_sight.cpp,call,PlayerSlotChecked
 ,LosRadarWriteState,src/map/line_of_sight.cpp,call,WriteLosUnitIndex
 ,LosRadarWriteState,src/map/line_of_sight.cpp,call,get
 ,LosRadarWriteState,src/map/line_of_sight.cpp,deref_read,*unsigned int
 ,LosRadarWriteState,src/map/line_of_sight.cpp,field_escape,Eye::screenPos
-,LosRadarWriteState,src/map/line_of_sight.cpp,field_escape,Game::players
 ,LosRadarWriteState,src/map/line_of_sight.cpp,field_read,Eye::expires
 ,LosRadarWriteState,src/map/line_of_sight.cpp,field_read,Eye::flagA
 ,LosRadarWriteState,src/map/line_of_sight.cpp,field_read,Eye::flagB
@@ -50636,6 +50637,7 @@ address,function,file,kind,target
 ,LosRadarWriteState,src/map/line_of_sight.cpp,field_read,Vec3::z
 ,LosRadarWriteState,src/map/line_of_sight.cpp,function,
 ,LosRadarWriteState,src/map/line_of_sight.cpp,global_read,g_game
+,LosRadarWriteState,src/map/line_of_sight.cpp,global_read,kEyeCapacity
 ,LosRadarWriteState,src/map/line_of_sight.cpp,global_read,s_sight@src/map/line_of_sight.cpp
 ,LosRadarWriteState,src/map/line_of_sight.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,LosRadarWriteState,src/map/line_of_sight.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
@@ -52588,6 +52590,9 @@ address,function,file,kind,target
 ,PlayerRecordAt,src/game/game_load.cpp,deref_escape,*LoadingPlayerRecord
 ,PlayerRecordAt,src/game/game_load.cpp,field_escape,Game::players
 ,PlayerRecordAt,src/game/game_load.cpp,function,
+,PlayerSlotChecked,src/game/game.h,field_escape,Game::players
+,PlayerSlotChecked,src/game/game.h,function,
+,PlayerSlotChecked,src/game/game.h,global_read,g_game
 ,PlayerSlotOf,src/game/players.cpp,field_escape,Game::players
 ,PlayerSlotOf,src/game/players.cpp,function,
 ,PlayerSlotOf,src/game/players.cpp,global_read,g_game
@@ -60265,8 +60270,6 @@ address,function,file,kind,target
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,global_write,s_slotCalls
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,global_write,s_slotTime
 ,TimedNativeUpdateWind,src/wasm/wind_meteors_glue.cpp,indirect_call,indirect via void (*const)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWind]
-,TimerClassOf,src/harness/harness.cpp,function,
-,TimerClassOf,src/harness/harness.cpp,global_read,classes@TimerClassOf
 ,TimingTick,src/wasm/modules.cpp,call,WindMeteorsTimeNative
 ,TimingTick,src/wasm/modules.cpp,call,WriteTiming
 ,TimingTick,src/wasm/modules.cpp,call,host_time_counter
@@ -62947,6 +62950,7 @@ address,function,file,kind,target
 ,WriterBegin,src/harness/harness.cpp,global_write,s_writerRecord@src/harness/harness.cpp
 ,WriterBegin,src/harness/harness.cpp,global_write,s_writerRunLeft@src/harness/harness.cpp
 ,WriterBegin,src/harness/harness.cpp,global_write,s_writerRunLength@src/harness/harness.cpp
+,WriterBegin,src/harness/harness.cpp,global_write,s_writerSection@src/harness/harness.cpp
 ,WriterBytes,src/harness/harness.cpp,call,DumpPrefix
 ,WriterBytes,src/harness/harness.cpp,call,WriterAdd
 ,WriterBytes,src/harness/harness.cpp,call,WriterPath
@@ -62957,6 +62961,7 @@ address,function,file,kind,target
 ,WriterBytes,src/harness/harness.cpp,function,
 ,WriterBytes,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,WriterBytes,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,WriterBytes,src/harness/harness.cpp,global_read,s_writerDumpOnly@src/harness/harness.cpp
 ,WriterEndRecord,src/harness/harness.cpp,call,EndSection
 ,WriterEndRecord,src/harness/harness.cpp,function,
 ,WriterEndRecord,src/harness/harness.cpp,global_read,s_writerDumpOnly@src/harness/harness.cpp
@@ -62978,12 +62983,18 @@ address,function,file,kind,target
 ,WriterHandle,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
 ,WriterHandle,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
 ,WriterInt,src/harness/harness.cpp,call,DumpPrefix
+,WriterInt,src/harness/harness.cpp,call,Fail
 ,WriterInt,src/harness/harness.cpp,call,WriterAdd
 ,WriterInt,src/harness/harness.cpp,call,WriterPath
 ,WriterInt,src/harness/harness.cpp,call,fprintf
+,WriterInt,src/harness/harness.cpp,call,sprintf
+,WriterInt,src/harness/harness.cpp,call,strcmp
 ,WriterInt,src/harness/harness.cpp,function,
+,WriterInt,src/harness/harness.cpp,global_maybe_written,s_writerRecord@src/harness/harness.cpp
 ,WriterInt,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,WriterInt,src/harness/harness.cpp,global_read,s_dumpNow@src/harness/harness.cpp
+,WriterInt,src/harness/harness.cpp,global_read,s_writerDumpOnly@src/harness/harness.cpp
+,WriterInt,src/harness/harness.cpp,global_read,s_writerSection@src/harness/harness.cpp
 ,WriterPath,src/harness/harness.cpp,call,sprintf
 ,WriterPath,src/harness/harness.cpp,function,
 ,WriterPath,src/harness/harness.cpp,global_maybe_written,s_writerRecord@src/harness/harness.cpp

@@ -73,6 +73,9 @@ TRANSPARENT = {None, "seams", "platform", "game"}
 OUTSIDE = "a call into %s outside its interface"
 DELIVERY = "the delivery of a queued effect to a handler of %s"
 ROUTE_REASON = "route table entry"
+ROUTE_ROW = re.compile(r"\{SCHED_(\w+), \w+, SCHED_(\w+), (\w+), ([01])\}")
+ROUTES = "src/game/routes.cpp"
+OUTBOX_ARG = re.compile(r"Publish\w*\(\s*SCHED_(\w+)")
 ENGINE = {"presentation", "harness", "network", "files"}
 
 
@@ -447,6 +450,27 @@ class Fn:
     forwards: list = field(default_factory=list)
 
 
+def outboxes(fns: dict, sources: dict[str, str]) -> dict[str, set]:
+    """The outboxes each subsystem publishes from besides its own: the SCHED_ constants its functions, and the shared
+    functions they call, pass to a publish."""
+    lines = {path: text.splitlines() for path, text in sources.items()}
+    named: dict[str, set] = {}
+    for name, found in fns.items():
+        for f in found:
+            body = "\n".join(lines.get(f.file, [])[f.start - 1:f.end])
+            named.setdefault(name, set()).update(m.lower() for m in OUTBOX_ARG.findall(body))
+    out: dict[str, set] = defaultdict(set)
+    for found in fns.values():
+        for f in found:
+            if f.sub not in SIMS:
+                continue
+            out[f.sub] |= named[f.name]
+            for _, kind, target, _ in f.calls:
+                if kind == "call" and any(g.sub in TRANSPARENT for g in fns.get(target, ())):
+                    out[f.sub] |= named[target]
+    return out
+
+
 class Program:
     """The functions, their subsystems, the seams and the marks: what the orders are walked over."""
 
@@ -471,6 +495,8 @@ class Program:
                 if impl in adapters:
                     self.methods.add("%s::%s" % (tables[table], slot))
         self.handlers = {r["target"] for r in edges if r["reason"].startswith(ROUTE_REASON)}
+        self.routes = [(p.lower(), s.lower(), h, sync == "1") for p, s, h, sync in ROUTE_ROW.findall(sources.get(ROUTES, ""))]
+        self.outboxes = outboxes(self.fns, sources)
         for r in edges:
             m = SLOT_REASON.match(r["reason"])
             if m:
@@ -657,6 +683,8 @@ class Program:
                                     self.hands_back(used, impls, slot in self.methods), fn.name, slot))
                 continue
             for name in names:
+                if not self.routes_to(sub, fn.name, name):
+                    continue
                 if name in self.phase_slot and fn.name not in self.slots[self.phase_slot[name]]:
                     slot = self.phase_slot[name]
                     callee = self.seam_owner[slot.split("::")[0]]
@@ -682,6 +710,17 @@ class Program:
         if own is not None:
             own |= mine
         return out, cut
+
+    def routes_to(self, sub: str, fn: str, handler: str) -> bool:
+        """Whether code of `sub` can run the route table handler from `fn`: SchedPublish runs the handlers of the
+        events the subsystem publishes, SchedDeliver those queued for the subscribers it publishes to."""
+        if sub not in SIMS or fn not in ("SchedPublish", "SchedDeliver") or handler not in self.handlers:
+            return True
+        mine = self.outboxes.get(sub, set()) | {sub}
+        if fn == "SchedPublish":
+            return any(p in mine and h == handler for p, _, h, _ in self.routes)
+        subscribers = {s for p, s, _, _ in self.routes if p in mine}
+        return any(s in subscribers and h == handler and not sync for _, s, h, sync in self.routes)
 
     def slot_label(self, slot: str) -> str:
         struct, name = slot.split("::")
@@ -1009,22 +1048,35 @@ class Splits:
         """Whether the entry point, or one it reaches, is the writer's write (or the reader's read) of the item."""
         key = (slot, who, item if match is not None else "", write)
         if key not in self.memo:
+            self.memo[key] = False
             found = False
             for s in self.closure(slot):
                 own_key = ("own", s, who, item if match is not None else "", write)
                 if own_key not in self.memo:
                     sub = self.program.seam_owner[s.split("::")[0]]
-                    self.memo[own_key] = self.hits(sub, self.program.entry(s)[1], who, match, write)
+                    self.memo[own_key] = self.hits(sub, self.program.entry(s)[1], who, match, write) or any(
+                        self.direct_hits(n, who, item, match, write) for n in self.deliveries(s))
                 if self.memo[own_key]:
                     found = True
                     break
             self.memo[key] = found
         return self.memo[key]
 
+    def deliveries(self, slot: str) -> list[Node]:
+        """The deliveries an entry point makes itself, once each."""
+        key = ("deliveries", slot)
+        if key not in self.lists:
+            found = {(n.label, n.sub): n for n in self.program.entry(slot)[0] if n.kind == "direct" and n.delivery}
+            self.lists[key] = list(found.values())
+        return self.lists[key]
+
     def locate(self, where: str, steps: list, sub: str, writer: str, reader: str, item: str,
-               stack: tuple = (), loose: bool = False, direct: bool = False) -> Placement | None:
+               stack: tuple = (), loose: bool = False, direct: bool = False, seen: set | None = None) -> Placement | None:
         """The first write of the writer, in these steps or nested in one of them, followed by a read of the reader;
-        with `direct`, the calls outside an interface count as steps too."""
+        with `direct`, the calls outside an interface count as steps too. `seen` holds the deliveries already searched
+        for this pair, so each handler is searched once."""
+        if seen is None:
+            seen = set()
         match = self.matcher(item, loose)
         loose = match is None
         writes = []
@@ -1069,16 +1121,17 @@ class Splits:
             if n.kind == "entry" and i in reads and n.slot not in stack:
                 inner, _ = self.program.entry(n.slot)
                 found = self.locate("%s, in %s" % (where, code(n.label)), inner, n.sub, writer, reader, item,
-                                    stack + (n.slot,), loose)
+                                    stack + (n.slot,), loose, direct, seen)
                 if found:
                     return found
         if direct:
             for i in writes:
                 n = steps[i]
-                key = ("delivery", n.label)
-                if n.kind == "direct" and n.delivery and i in reads and key not in stack:
+                key = (n.label, n.sub)
+                if n.kind == "direct" and n.delivery and i in reads and key not in seen:
+                    seen.add(key)
                     found = self.locate("%s, in %s" % (where, code(n.label)), self.delivery_steps(n), n.sub, writer,
-                                        reader, item, stack + (key,), loose, direct=True)
+                                        reader, item, stack, loose, direct=True, seen=seen)
                     if found:
                         return found
         return None
@@ -1314,11 +1367,15 @@ class Page:
         self.placed = [(d, self.place(d)) for d in self.deps]
 
     def walk_calls(self) -> None:
-        """Every cross-subsystem call a tick reaches, as (caller subsystem, entry point) with the classes of its sites."""
+        """Every cross-subsystem call a tick reaches, as (caller subsystem, entry point) with the classes of its sites;
+        the handlers that deliveries run make calls of their own subsystem."""
         seen: set = set()
 
         def walk(steps: list, caller: str) -> None:
             for n in steps:
+                if n.kind == "direct" and n.delivery and (n.label, n.sub) not in seen:
+                    seen.add((n.label, n.sub))
+                    walk(self.splits.delivery_steps(n), n.sub)
                 if n.kind != "entry":
                     continue
                 if caller != "game":

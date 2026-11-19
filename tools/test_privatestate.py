@@ -277,12 +277,12 @@ class AiOwnerTest(unittest.TestCase):
 class WeaponsOwnerTest(unittest.TestCase):
     def test_the_projectiles_the_debris_and_the_slots_are_private_for_writes_only(self):
         for item in ("Projectile::position", "projectileCount", "projectiles", "g_explodedPieces", "Debris::pos", "DebrisPiece::state",
-                     "Unit::weapon", "Unit::f_1f", "Unit::f2c", "Unit::f_3b", "Unit::f48", "Unit::f_57", "Unit::weapon2AimCob"):
+                     "Unit::weapon", "Unit::field_1e", "Unit::b3a", "Unit::b56", "Unit::f_1f", "Unit::f2c", "Unit::f_3b", "Unit::f48", "Unit::f_57", "Unit::weapon2AimCob"):
             self.assertEqual(ps.private_to(item), ("weapons", ("writer",)), item)
 
     def test_the_aim_pairs_stay_targetings_and_the_rest_is_not_private(self):
         self.assertEqual(ps.private_to("Unit::current")[0], "targeting")
-        for item in ("Unit::field_1e", "Unit::health", "Debris::ref1", "Debris::ref2", "WeaponDef::damage"):
+        for item in ("Unit::health", "Debris::ref1", "Debris::ref2", "WeaponDef::damage"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_weapons_write_passes_and_a_read_by_anyone_passes(self):

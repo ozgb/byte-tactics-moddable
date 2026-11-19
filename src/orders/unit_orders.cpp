@@ -257,7 +257,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         order->SetDeadlineTicks(0x1e);
         return 1;
     case 1: {
-        order->link.SetUnit(ScheduleTargetingTargetUnit(unit, 0));
+        g_seams.units->UnitRefSetUnit(&order->link, ScheduleTargetingTargetUnit(unit, 0));
         Unit* t = order->target;
         if (t != 0 && (t->flags & 0x10000000)) {
             order->pos = t->pos;
@@ -288,7 +288,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         std::vector<Unit*> units;
         g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
         if (!units.empty()) {
-            order->link.SetUnit(units[RandomInt(units.size())]);
+            g_seams.units->UnitRefSetUnit(&order->link, units[RandomInt(units.size())]);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->state = 1;
             return 2;
@@ -377,7 +377,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     }
     switch (order->state) {
     case 0:
-        order->link.SetUnit(0);
+        g_seams.units->UnitRefSetUnit(&order->link, 0);
         if (unit->flags & 0x20000000) {
             if (order->count <= 0) {
                 g_seams.units->SetStateBits(unit, 1, 0);
@@ -400,7 +400,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             order->flags |= 2;
             return 2;
         }
-        order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit(&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (order->target == 0) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);
@@ -443,7 +443,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         RecordUnitSpeech(unit, 8, SIM_SPEECH_KIND_TEXT);
         g_seams.units->SetStateBits(unit, 8, 0);
         g_seams.units->FinishConstruction(unit, order->target);
-        order->link.SetUnit(0);
+        g_seams.units->UnitRefSetUnit(&order->link, 0);
         order->count--;
         RecordBuildMenuUpdate(unit);
         return 0;
@@ -1352,7 +1352,7 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
     case 0:
         if (!unit->motion) break;
         if (!(unit->def->flags2&0x100)) break;
-        order->link.SetUnit(unit->cargo);
+        g_seams.units->UnitRefSetUnit(&order->link, unit->cargo);
         if (!order->target) return 5;
         order->AnnounceStatusIfFlagged(SIM_SPEECH_UNLOADING);
         g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportDrop",0,1,1,order->target->id,
@@ -1665,7 +1665,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         }
         g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
         g_seams.map->SnapWorldPosToFootprint(def, &order->pos);
-        ((PathOrderAttach*)((char*)order + 0x12))->SetUnit(
+        g_seams.units->UnitRefSetUnit((PathOrderAttach*)((char*)order + 0x12),
             g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
@@ -2036,7 +2036,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 5: {
-        order->link.SetUnit(g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit(&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);

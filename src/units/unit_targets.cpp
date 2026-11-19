@@ -164,18 +164,14 @@ PathOrderAttach::PathOrderAttach(Unit* o, OrderBase* v)
 // FUNCTION: 0x489650
 void UnitRef::Unlink()
 {
-    ((PathOrderAttach*)this)->PathOrderAttach::~PathOrderAttach();
-}
-
-inline PathOrderAttach::~PathOrderAttach()
-{
-    if (owner != 0) {
-        Ref<PathOrderAttach>* pp = &owner->head;
-        while (*pp != this)
+    PathOrderAttach* self = (PathOrderAttach*)this;
+    if (self->owner != 0) {
+        Ref<PathOrderAttach>* pp = &self->owner->head;
+        while (*pp != self)
             pp = &(*pp)->next;
-        *pp = next;
-        owner = 0;
-        next = 0;
+        *pp = self->next;
+        self->owner = 0;
+        self->next = 0;
     }
 }
 

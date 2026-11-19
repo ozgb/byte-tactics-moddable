@@ -318,9 +318,10 @@ static inline MissionType MissionTypeOf(unsigned char k)
 
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
-    : kind(MissionTypeOf(k)), link(o, 0), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
+    : kind(MissionTypeOf(k)), link(), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
       id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
 {
+    g_seams.units->UnitRefInit(&link, o, 0);
     link.SetValue(this);
     state = 0;
     flags = 0;
@@ -336,7 +337,7 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     if (p == 0)
         flags_42 &= ~ORDER_FLAG_POSITION;
     if (!(flags_42 & ORDER_FLAG_TARGET))
-        link.SetUnit(0);
+        g_seams.units->UnitRefSetUnit(&link, 0);
 }
 
 // FUNCTION: 0x43a1e0

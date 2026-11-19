@@ -428,7 +428,7 @@ void __stdcall InitUnitScript(Unit* self)
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)
 {
-    g_seams.orders->NewUnitMotion(unit);
+    g_seams.movement->NewUnitMotion(unit);
     unit->angles.heading = unit->def->buildangleUnsigned;
 }
 
@@ -448,7 +448,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     g_seams.weapons->InitUnitWeaponSlots(unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
-        g_seams.orders->NewUnitMotion(unit);
+        g_seams.movement->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }
@@ -474,7 +474,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
     g_seams.weapons->InitUnitWeaponSlots(unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
-        g_seams.orders->NewUnitMotion(unit);
+        g_seams.movement->NewUnitMotion(unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }
@@ -836,7 +836,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     }
     UnitMotion* head = unit->motion;
     if (head != 0) {
-        g_seams.orders->DestroyMotionObject(head);
+        g_seams.movement->DestroyMotionObject(head);
         operator delete(head);
         unit->motion = 0;
     }

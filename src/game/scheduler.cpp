@@ -205,7 +205,7 @@ void SchedPlayersPhase(RandStream stream)
     PathPoint waypoints[64];
     while (g_seams.pathfinding->Poll(&event, waypoints, 64)) {
         HarnessPathEvent(&event, waypoints, 64);
-        g_seams.orders->ApplyPathEvent(&event, waypoints);
+        g_seams.movement->ApplyPathEvent(&event, waypoints);
     }
     for (int player = 0; player < 10; player++) {
         SchedDeliver(SCHED_PLAYERS);

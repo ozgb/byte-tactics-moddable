@@ -545,12 +545,15 @@ void UnitMotion::UpdatePosition(Unit* u)
         return;
     }
 
+    // TODO(#985): publish from SCHED_MOVEMENT
     MapPublishUnit(SCHED_ORDERS, MAP_REMOVE_UNIT, u);
     u->pos = pos;
     *(Point16*)&u->cell = cell;
     u->mode = (short)m;
+    // TODO(#985): publish from SCHED_MOVEMENT
     MapPublishUnit(SCHED_ORDERS, MAP_ADD_UNIT, u);
     u->moved = 1;
+    // TODO(#985): publish from SCHED_MOVEMENT
     LosRadarPublishUpdateUnit(SCHED_ORDERS, u);
 }
 

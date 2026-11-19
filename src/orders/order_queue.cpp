@@ -239,13 +239,7 @@ void Order::ReattachFxToUnit()
     if (attached != 0) {
         void* p1 = unit->motion.get();
         void* p2 = ((UnitMotionSlotView*)p1)->slot.get();
-        void* p3 = *(void**)p2;
-        void* fn_ptr = *(void**)((char*)p3 + 4);
-#ifdef __clang__
-        ((void (__thiscall*)(void*, int))fn_ptr)(p2, (int)(OrderFx*)attached);
-#else
-        ((void (__stdcall*)(int))fn_ptr)((int)(OrderFx*)attached);
-#endif
+        g_seams.movement->GoalSetPathOrder((PathGoal*)p2, (OrderFx*)attached);
     }
 }
 
@@ -254,13 +248,13 @@ void Order::SetAttachedFx(OrderFx* obj)
 {
     if (((UnitMotionSlotView *)unit->motion.get())) {
         if (attached) {
-            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-            delete (OrderFx*)attached;
+            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
             attached = 0;
         }
         if (obj) {
             subFlags &= ~0x3e0;
-            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
+            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
             attached = obj;
         }
     }
@@ -270,23 +264,23 @@ void Order::SetAttachedFx(OrderFx* obj)
 void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
     if ((unit->def->flags1 & 0x800) == 0) {
-        ApproachRadius* obj = new (kSim) ApproachRadius(this, p->x, p->z, n);
+        ApproachRadius* obj = g_seams.movement->NewApproachRadius(this, p->x, p->z, n);
         if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
                 attached = obj;
             }
         }
     } else {
         if (((UnitMotionSlotView *)unit->motion.get()) && attached) {
-            ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-            delete (OrderFx*)attached;
+            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
             attached = 0;
         }
     }
@@ -296,24 +290,24 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        RingApproach* obj = new (kSim) RingApproach(this, pos->x, pos->z, radius1, radius2);
+        RingApproach* obj = g_seams.movement->NewRingApproach(this, pos->x, pos->z, radius1, radius2);
         if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
                 attached = obj;
             }
         }
     } else {
         if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
         }
@@ -324,24 +318,24 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        PointMarker* obj = new (kSim) PointMarker(this, cell, size);
+        PointMarker* obj = g_seams.movement->NewPointMarker(this, cell, size);
         if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(obj);
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
                 attached = obj;
             }
         }
     } else {
         if (((UnitMotionSlotView *)unit->motion.get())) {
             if (attached) {
-                ((UnitMotionSlotView *)unit->motion.get())->slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
         }
@@ -382,12 +376,12 @@ Order::~Order()
         OrderFxSlot* slot = ((UnitMotionSlotView *)unit->motion.get())->slot;
         if (slot->current.get() != 0 && slot->current.get() == attached.get()) {
             if (attached != 0) {
-                slot->Attach(0);
-                delete (OrderFx*)attached;
+                g_seams.movement->GoalSetPathOrder((PathGoal*)slot, 0);
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
         } else {
-            delete (OrderFx*)attached;
+            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
             attached = 0;
         }
     }
@@ -439,10 +433,11 @@ static unsigned char OrderKindFromSavedIndex(unsigned char want)
 
 // FUNCTION: 0x43a420
 Order::Order(Unit* punit, HapiBank* file, char* name)
-    : link(0, 0)
+    : link()
 {
+    g_seams.units->UnitRefInit(&link, 0, 0);
     link.SetValue(this);
-    link.SetUnit(0);
+    g_seams.units->UnitRefSetUnit(&link, 0);
     next = 0;
     attached = 0;
     created = (unsigned int)g_game->ticks;
@@ -480,7 +475,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
         return;
 
     unit = punit;
-    link.SetUnit(g_seams.units->LoadUnit(desc.ownerType, file));
+    g_seams.units->UnitRefSetUnit(&link, g_seams.units->LoadUnit(desc.ownerType, file));
 
     kind.index = desc.kind;
     state = desc.flag5;
@@ -505,19 +500,19 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     sprintf(buf3, "%s%s", name, "g");
     switch (desc.field_4) {
     case 2:
-        attached = new (kSim) PathOrder((int)this, file, buf3);
+        attached = g_seams.movement->LoadPathOrder(this, file, buf3);
         return;
     case 3:
-        attached = new (kSim) AirManeuverOrder((int)this, file, buf3);
+        attached = g_seams.movement->LoadAirManeuverOrder(this, file, buf3);
         return;
     case 4:
-        attached = new (kSim) ApproachRadius((int)this, file, buf3);
+        attached = g_seams.movement->LoadApproachRadius(this, file, buf3);
         return;
     case 5:
-        attached = new (kSim) RingApproach((int)this, file, buf3);
+        attached = g_seams.movement->LoadRingApproach(this, file, buf3);
         return;
     case 6:
-        attached = new (kSim) PointMarker((int)this, file, buf3);
+        attached = g_seams.movement->LoadPointMarker(this, file, buf3);
         return;
     case 0:
         attached = 0;
@@ -547,7 +542,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         desc.unitType = u->id;
     Unit* o = link.owner;
     desc.ownerType = (o != 0 && (link.owner->flags & 0x10000000) != 0 && link.owner != 0) ? o->id : 0;
-    desc.field_4 = attached ? ((OrderFx*)attached)->GetType() : 0;
+    desc.field_4 = attached ? g_seams.movement->OrderFxGetType((OrderFx*)attached) : 0;
     desc.kind = kind.index;
     desc.flag5 = state;
     desc.flags6 = flags;
@@ -582,7 +577,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     if (desc.field_4 != 0) {
         char buf3[0x20];
         sprintf(buf3, "%s%s", name, "g");
-        ((OrderFx*)attached)->SerializeToSave(this, file, buf3);
+        g_seams.movement->OrderFxSerializeToSave((OrderFx*)attached, this, file, buf3);
     }
     return 1;
 }

@@ -12,8 +12,9 @@ public:
     Ref<PathOrderAttach> next;
     Ref<OrderBase> value;
 
+    PathOrderAttach() {}
     PathOrderAttach(Unit* o, OrderBase* v);
-    virtual ~PathOrderAttach();
+    virtual ~PathOrderAttach() {}
     void SetUnit(Unit* o);
     void SetValue(OrderBase* v) { value = v; }
     Unit* Get() { return owner; }

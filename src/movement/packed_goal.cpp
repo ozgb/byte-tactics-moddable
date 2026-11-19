@@ -25,7 +25,7 @@ static inline Vec3 MakeVec3(int ax, int ay, int az)
 #include "../game/game.h"
 #pragma pack(pop)
 
-extern Game* g_game;
+#include "../../link/globals.h"
 
 
 #include "../units/unit_def.h"

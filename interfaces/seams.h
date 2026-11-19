@@ -14,6 +14,7 @@
 #include "players.h"
 #include "map.h"
 #include "scripts.h"
+#include "movement.h"
 #include "files.h"
 #include "network.h"
 
@@ -32,6 +33,7 @@ struct Seams {
     PlayersSeam* players;
     MapSeam* map;
     ScriptsSeam* scripts;
+    MovementSeam* movement;
     FilesSeam* files;
     NetworkSeam* network;
     PathWorldView* pathworld;

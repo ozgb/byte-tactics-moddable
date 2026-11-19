@@ -269,7 +269,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     LoadUnitAccounts(unit, file);
     if (rec.f27 != 0)
-        g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
+        g_seams.movement->LoadMotion(unit->motion, 0, unit, file);
 
     Ref<Order>* normal = &unit->list;
     Ref<Order>* special = &unit->list2;
@@ -352,7 +352,7 @@ void __stdcall SaveUnits(HapiBank* file)
             }
 
             if (unit->motion != 0)
-                g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
+                g_seams.movement->SaveMotion(unit->motion, 0, unit, file);
             SaveUnitAccounts(unit, file);
 
             strcpy(rec.name, ((char*)unit->def.get() + 0x20));

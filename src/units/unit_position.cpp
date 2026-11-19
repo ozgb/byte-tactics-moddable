@@ -312,7 +312,7 @@ void __stdcall UpdateUnit(Unit* u)
             g_seams.orders->RunOrders(u);
             g_seams.orders->RunSecondaryOrders(u);
             if (u->motion != 0) {
-                g_seams.orders->UpdateMotion(u->motion, 0, u);
+                g_seams.movement->UpdateMotion(u->motion, 0, u);
                 UpdateUnitHeight(u);
             }
         }
@@ -473,14 +473,14 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        g_seams.orders->UnitMotionReadNetState(unit->motion, &reader);
+        g_seams.movement->UnitMotionReadNetState(unit->motion, &reader);
         index = (short)reader.ReadBits(0x10);
     }
 
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            g_seams.orders->UpdateMotion(u->motion, 0, u);
+            g_seams.movement->UpdateMotion(u->motion, 0, u);
             UpdateUnitHeight(u);
         }
     }

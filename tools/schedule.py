@@ -1180,7 +1180,7 @@ LOOPS = {
 SILENT_INTENTS = {
     "pathfinding.CellsChanged": "a notification: what it does is left to the implementation, and the reference's does "
                                 "nothing.",
-    "orders.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
+    "movement.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
     "units.RefreshUnitIfStale": "it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself.",
     "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }

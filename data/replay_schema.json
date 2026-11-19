@@ -2948,6 +2948,15 @@
     "note": "*count reads Game.featureCount, a block field the slot's reads name"
    },
    {
+    "kind": "deref_read",
+    "target": "*char",
+    "rule": "fields",
+    "functions": [
+     "PlaceMissionFeatures"
+    ],
+    "note": "the first byte of a mission feature's name, which points into the mission's record"
+   },
+   {
     "kind": "field_escape",
     "target": "Spot::frame",
     "rule": "fields",
@@ -6438,7 +6447,7 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [3, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 1, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "GetFootprintCentre(cell)", "Apply(event)", "Place(place)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [3, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 0, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "GetFootprintCentre(cell)", "Apply(event)", "Place(place)"]}},
    "slots": {
     "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateFeatures"},
     "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadFeatureFileList"},

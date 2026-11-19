@@ -1,6 +1,6 @@
 # The mission interface
 
-The mission sits behind `interfaces/mission.h` (version 1.0, #983). It is the match's mission as the engine sees it:
+The mission sits behind `interfaces/mission.h` (version 1.1: 1.0 in #983, the slots of the record's fields in #1003). It is the match's mission as the engine sees it:
 the game type, the files of the match (the campaign, the terrain, the briefing), the campaign and its missions, the
 start positions and the list of maps. By the human's ruling of 2026-11-17 on #980 it is its own interface, a module
 that can be replaced like any other, rather than a part of map or of the engine. 3.1c's code is its default
@@ -14,11 +14,12 @@ implementation (`src/mission/`). This page is the inventory the interface was cu
 ## 1. The model
 
 The engine holds one mission, the record `Game::net` points to, and every slot works on it, so no slot takes the
-mission as an argument. A string a slot returns points into the mission's own record and stays valid until the mission
-loads another.
+mission as an argument. A string a slot returns, or writes into a struct the caller owns, points into the mission's own
+record and stays valid until the mission loads another. Nothing outside the mission reads the record: every caller goes
+through the slots (section 5), so a mission module with its own layout can serve them.
 
 The mission is not on the scheduler: it has no events, no inbox, no runs and no module id. Every slot is a direct call:
-- **Queries inside the tick:** `GetGameType` and `GetNameSlot`. They read a record nothing in the tick writes (the
+- **Queries inside the tick:** `GetGameType`, `GetNameSlot` and `GetMissionParams`. They read a record nothing in the tick writes (the
   mission is loaded before the match and replaced only from the menus), so a read as of the call is a read as of the
   last load, and no order can differ from 3.1c's.
 - **Everything else** runs outside the tick: from the front end's menus, the load of a match, the saved game and the
@@ -28,13 +29,14 @@ The mission draws no random number (no row of `data/draws.csv`) and records no s
 
 ## 2. The slots
 
-Twenty-six slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`, section 2); the last ten are for calls
-3.1c's callers made straight into the mission's methods, which had no seam. The callers are counted by subsystem
+Thirty-four slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`, section 2); the next ten are for calls
+3.1c's callers made straight into the mission's methods, which had no seam (mission 1.0); the last eight serve the fields
+of the record that 3.1c's callers read directly (mission 1.1, section 5). The callers are counted by subsystem
 (`data/rwsets.csv`, the reads of each slot, and `data/subsystems.csv`).
 
 | Slot | 3.1c | Callers | Inside the tick |
 |---|---|---|---|
-| `GetGameType` | `Mission::GetGameType` | 47: units (`ApplyUnitDeath`, `ComparePlayers`), orders (`ResurrectOrder`), features (`DamageFeature`, `ReclaimFeature`), players (the player updates, the slot set-up and the victory conditions), ai (`GetBuildRating`), network, game, presentation | yes: units, orders, features, players, ai, network |
+| `GetGameType` | `Mission::GetGameType` | 48: units (`ApplyUnitDeath`, `ComparePlayers`), orders (`ResurrectOrder`), features (`DamageFeature`, `ReclaimFeature`), players (the player updates, the slot set-up and the victory conditions), ai (`GetBuildRating`), network, game, presentation (`LoadMapList` among them) | yes: units, orders, features, players, ai, network |
 | `GetNameSlot` | `Mission::GetNameSlot` | 12: ai (`DumpPlayerAI`, the AI profile parser), players (`LoadDefaultAIScript`, `ApplyUseOnlyUnits`), los_radar (`LoadTntMap`), presentation | at an AI's load and the console's dump only |
 | `SetMissionType` | `SetMissionType` | 12: game, presentation, network (the lobby), harness | no |
 | `FreeOtaEnumCacheAndMission` | `FreeOtaEnumCacheAndMission` | 1: game (`ShutdownGame`) | no |
@@ -42,7 +44,7 @@ Twenty-six slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`
 | `GetCampaignName` | `Mission::GetCampaignName` | 3: game, harness | no |
 | `GetMissionIndex` | `Mission::GetMissionIndex` | 2: game, presentation | no |
 | `GetMissionName` | `Mission::GetMissionName` | 13: game, network, presentation | no |
-| `GetStartPosition` | `Mission::GetStartPosition` | 2: game (`LoadMatch`, `SpawnCommanderAtStartPos`) | no: the load |
+| `GetStartPosition` | `Mission::GetStartPosition` | 3: game (`LoadMatch`, `SpawnCommanderAtStartPos`), presentation (`CenterCameraOnStartPosition`) | no: the load and the camera |
 | `LoadCampaign` | `Mission::LoadCampaign` | 10: game, presentation, harness | no |
 | `LoadMissionByName` | `Mission::LoadMissionByName` | 17: game, presentation, harness | no |
 | `MissionExists` | `Mission::MissionExists` | 3: game, presentation | no |
@@ -60,6 +62,14 @@ Twenty-six slots. The first sixteen were map's (map 4.1, `docs/map-interface.md`
 | `GetTranslatedName` | `Mission::GetTranslatedName` | 2: presentation | no |
 | `HasMissionName` | `Mission::HasMissionName` | 4: presentation | no |
 | `SelectSchema` | `Mission::SelectSchema` | 1: presentation (`LoadMapList`) | no |
+| `GetMissionParams` | the record's scalars | 16: units (`UpdateUnit`), weapons (`NoSeaLevelTrigger`, `UpdateExplosions`, `UpdateExplodedPiece`, `LoadWeaponType`), orders (`AirStrikeOrder`), players (`UpdatePlayerBody`, `InitPlayerResources`, `FillScoreTables`), ai (`FindBuildPosition`, `FindRandomPlacementCell`), los_radar (`LoadTntMap`, `ClearBorderFeatures`), presentation | yes: units, weapons, orders, players, ai |
+| `CountMissionUnits` | `Mission::unitCount` | 2: game (`CreateMissionUnits`), units (`FindMissionUnit`) | no: the load |
+| `GetMissionUnit` | `Mission::units` | 2: game (`CreateMissionUnits`), units (`FindMissionUnit`) | no: the load |
+| `SetMissionUnitPosition` | the snap of `CreateMissionUnits`, in place | 1: game (`CreateMissionUnits`) | no: the load |
+| `CountMissionFeatures` | `Mission::featureCount` | 1: features (`PlaceMissionFeatures`) | no: the load |
+| `GetMissionFeature` | `Mission::features` | 1: features (`PlaceMissionFeatures`) | no: the load |
+| `GetMemory` | `Mission::memory` | 1: presentation (`ShowSelectedMapInfo`) | no |
+| `GetNumPlayers` | `Mission::numPlayers` | 1: presentation (`ShowSelectedMapInfo`) | no |
 
 "Inside the tick" is the simulation's own calls. `data/hazards.csv` also marks some calls of the menus and of
 `SaveGameFile` as reached from the tick, because the frame handlers that run them are reached from the main loop; they
@@ -74,8 +84,8 @@ other caller.
 - **The slots:** the sixteen of map 4.1 left `MapSeam` (map 5.0); the ten others are new. `g_seams.mission` is the
   table (`interfaces/seams.h`), filled by `InstallNativeSeams` (`src/seams/native.cpp`) with fillers that call 3.1c's
   methods on the one mission.
-- **The callers:** every call of a mission method outside `src/mission/` goes through the seam. The mission's fields
-  that the simulation reads directly (section 5) are views, not calls, and stay as they are.
+- **The callers:** every call of a mission method outside `src/mission/` goes through the seam, and since 1.1 so does
+  every read of the record's fields (section 5). `tools/seamlink.py --mission-record` fails on a new one.
 - **The files:** `src/map/map_list.cpp`, `map_list.h`, `map_load.cpp`, `map_cache_entry.h` and `mission.h` moved to
   `src/mission/`. `data/subsystems.csv` gives every function of the folder to the subsystem `mission` (the rule
   `file:src/mission/`), and `tools/coupling.py` counts it as a simulation subsystem.
@@ -110,6 +120,12 @@ The other slots were checked against the same rule:
   `AdvanceMission`, `RefreshMapList`) allocate and free only the mission's own memory.
 - So do map 5.0's new slots (`GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds`, `RefreshMovedUnits`,
   `RefreshUnitIfStale`).
+- The slots of 1.1 hand plain data. `GetMissionParams`, `GetMissionUnit` and `GetMissionFeature` write to a struct the
+  caller owns (`MissionParams`, `MissionUnitInfo`, `MissionFeatureInfo`); the names in the last two point into the
+  record, as the other strings do. The units and the features are a count and a query by index, not a pointer to the
+  mission's array. `SetMissionUnitPosition` copies a `Vec3` the caller owns into the mission's own record.
+- `GetCampaignMissionName` returns 0 for a `size` below 1 and writes nothing, since its fallback would write
+  `out[size - 1]` (the review of #983's pull request).
 
 ## 5. State and the trace
 
@@ -119,27 +135,52 @@ water damage, kill and time multipliers and the start positions; the names and t
 cache of map checksums (`s_mapCache`, `src/mission/map_list.cpp`) is platform state, as before. No trace field changed,
 so the gate of this change was the tier.
 
-What the simulation still reads of the record directly, as views of a record nothing in the tick writes:
-- features: the mission's features and their count, at the load of a match;
-- los_radar: the tidal strength, the surface metal, the wind's limits, `lavaWorld` and the gravity, at the load;
-- weapons: `noSeaLevelTrigger` and `lavaWorld`;
-- units: the mission's units and their count, `waterDamage` and `waterDoesDamage`;
-- players: the start metal and energy;
-- ai: the surface metal.
+No file outside `src/mission/` reads a field of the record (#1003). For each field 3.1c's callers read, the choice was a
+slot (a query, read when needed) or a copy into the reader's own state taken at the load. Every field is a slot:
 
-Each is read as of the last load, so no order of 3.1c's changes. Turning them into slots or into copies taken at the
-load is #1003 (section 7).
+| Reader | Fields | Slot |
+|---|---|---|
+| features (`PlaceMissionFeatures`) | `features`, `featureCount` | `CountMissionFeatures`, `GetMissionFeature` |
+| los_radar (`LoadTntMap`, `ClearBorderFeatures`) | `tidalStrength`, `surfaceMetal`, `minWindSpeed`, `maxWindSpeed`, `lavaWorld`, `gravity` | `GetMissionParams` |
+| weapons (`weapons.cpp`, `explosions.cpp`, `weapon_types.cpp`) | `noSeaLevelTrigger`, `lavaWorld` | `GetMissionParams` |
+| units (`UpdateUnit`, `FindMissionUnit`) | `waterDamage`, `waterDoesDamage`, `units`, `unitCount` | `GetMissionParams`, `CountMissionUnits`, `GetMissionUnit` |
+| game (`CreateMissionUnits`) | `units`, `unitCount` | `CountMissionUnits`, `GetMissionUnit`, `SetMissionUnitPosition` |
+| players (`InitPlayerResources`, `UpdatePlayerBody`, `FillScoreTables`) | `startMetal`, `startEnergy`, `lavaWorld`, `killMul`, `timeMul` | `GetMissionParams` |
+| ai (`FindBuildPosition`, `FindRandomPlacementCell`) | `surfaceMetal` | `GetMissionParams` |
+| orders (`AirStrikeOrder`) | `gravity` | `GetMissionParams` |
+| presentation (`campaign_menu.cpp`, `endgame.cpp`) | `minWindSpeed`, `maxWindSpeed`, `gravity`, `killMul`, `timeMul` | `GetMissionParams` |
+| presentation (`map_enum.cpp`) | `type` | `GetGameType` |
+| presentation (`multi.cpp`) | `memory`, `numPlayers` | `GetMemory`, `GetNumPlayers` |
+| presentation (`camera.cpp`) | the start positions (`rules`, `ruleCount`) | `GetStartPosition` |
+
+Why slots and no copies:
+- **The trace.** The trace hashes the record (the mission section of the constants, `docs/trace-format.md`), and none of
+  the readers' own state holds these fields. A copy taken at the load would add hashed state to a reader or leave it out
+  of the hash, and either changes the trace; a slot changes nothing that is hashed.
+- **The order.** Each slot is a query of a record nothing in the tick writes (section 1), so a read through the slot
+  is a read as of the last load, as 3.1c's direct read was.
+- **The shape.** The scalars are one plain struct, `MissionParams`, which the mission fills on each call. `type` is
+  not in it: `GetGameType` already serves it.
+
+`SetMissionUnitPosition` is the one write. 3.1c's `CreateMissionUnits` snaps each mission unit's position to its
+footprint (map's `SnapWorldPosToFootprint`) in the record itself, and the trace hashes the record's units. The load now
+snaps a copy and writes it back through the slot, so the record ends as 3.1c's did, and the unit is created at the
+same position.
+
+`tools/seamlink.py --mission-record` (CI, the seamlink step) fails on a field, deref or call row of `data/rwsets.csv`
+that reaches `Game::net` or a member of `Mission`, `MissionUnit`, `MissionFeature` or `MissionRule` from a function
+outside the subsystem mission, other than the mission's fillers in `src/seams/native.cpp`.
 
 ## 6. Replays
 
-The mission subsystem is `pending` in `data/replay_schema.json`: its 26 slots are annotated `record: false`, with the
+The mission subsystem is `pending` in `data/replay_schema.json`: its 34 slots are annotated `record: false`, with the
 reason `#660 part 3`, and nothing records or replays them yet. The recordings of the other subsystems are unchanged
 by it: their imports of the mission (`GetGameType`, `GetNameSlot`) are not recorded either, as in map 4.1.
 
 ## 7. What is left
 
-- **The views of section 5.** A re-implementation of the mission must keep the record's layout today, since the
-  simulation reads its fields directly. #1003 makes them queries or copies taken at the load, with the front end's
-  direct reads of the record (`campaign_menu.cpp`, `map_enum.cpp`).
+- **The trace of the record.** The harness hashes the record by 3.1c's layout (`VisitMission`,
+  `src/harness/harness.cpp`). Every caller of the engine is served through the seam, but a mission module with its own
+  layout would still need a way to hand the harness what it hashes, as the pilots' `WriteState` slots do.
 - **A WASM module.** The mission has no module yet; the modern build runs the default as native code in every mode.
 - **Replays** of the mission's slots (section 6).

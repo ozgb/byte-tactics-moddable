@@ -174,42 +174,87 @@ jobs:
       - name: Point apt at a reachable Ubuntu mirror
         if: steps.changed.outputs.run == 'true'
         run: &apt-mirror |
+          sudo tee /usr/local/bin/ci-apt-mirror > /dev/null <<'EOF'
+          #!/usr/bin/env bash
           list=/etc/apt/apt-mirrors.txt
+          saved=/etc/apt/apt-mirrors.ci
           if ! grep -rqs "mirror+file:$list" /etc/apt/sources.list /etc/apt/sources.list.d; then
             echo "apt reads no mirror list at $list; its sources stay as they are"
             exit 0
           fi
+          [ -f "$saved" ] || cp "$list" "$saved"
           suite="$(. /etc/os-release && echo "$VERSION_CODENAME")-security"
-          mirrors=$(cut -f1 "$list")
+          mirrors=$(cut -f1 "$saved")
           if [ "$(dpkg --print-architecture)" = amd64 ]; then
             mirrors="$mirrors http://archive.ubuntu.com/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ http://mirrors.mit.edu/ubuntu/"
+          fi
+          mirrors=$(echo "$mirrors" | tr ' ' '\n' | awk 'NF && !seen[$0]++')
+          if [ "${1:-}" = --next ]; then
+            current=$(head -n1 "$list" | cut -f1)
+            before=
+            after=
+            seen=
+            for mirror in $mirrors; do
+              if [ "$mirror" = "$current" ]; then
+                seen=1
+              elif [ -n "$seen" ]; then
+                after="$after $mirror"
+              else
+                before="$before $mirror"
+              fi
+            done
+            mirrors="$after $before"
           fi
           for mirror in $mirrors; do
             if curl -fsS -o /dev/null --connect-timeout 10 --max-time 60 "${mirror%/}/dists/$suite/InRelease"; then
               echo "apt mirror: $mirror"
-              echo "$mirror" | sudo tee "$list" > /dev/null
+              echo "$mirror" > "$list"
               exit 0
             fi
             echo "::warning::Ubuntu mirror $mirror is unreachable"
           done
-          echo "::warning::no Ubuntu mirror is reachable; $list stays as it was"
+          echo "::warning::no other Ubuntu mirror is reachable; $list stays as it was"
+          EOF
+          sudo chmod 755 /usr/local/bin/ci-apt-mirror
+          sudo ci-apt-mirror
 
       - name: Configure apt to keep and retry its downloads
         if: steps.changed.outputs.run == 'true'
-        run: |
+        run: &apt-config |
           mkdir -p "$HOME/apt-archives/partial"
           sudo tee /etc/apt/apt.conf.d/99ci > /dev/null <<EOF
           Dir::Cache::Archives "$HOME/apt-archives";
           APT::Keep-Downloaded-Packages "true";
-          Acquire::Retries "3";
+          Acquire::Retries "5";
           Acquire::http::Timeout "30";
           EOF
+          sudo tee /usr/local/bin/ci-apt-install > /dev/null <<'EOF'
+          #!/usr/bin/env bash
+          pauses=(30 90)
+          for try in 1 2 3; do
+            if apt-get install -y --no-install-recommends "$@"; then
+              exit 0
+            fi
+            if [ "$try" = 3 ]; then
+              echo "::error::apt-get install $* failed $try times"
+              exit 1
+            fi
+            pause=${pauses[try - 1]}
+            echo "::warning::apt-get install $* failed (try $try of 3); retrying in ${pause}s on the next reachable mirror"
+            sleep "$pause"
+            if command -v ci-apt-mirror > /dev/null; then
+              ci-apt-mirror --next
+            fi
+            apt-get update || echo "::warning::apt-get update failed; retrying with the package lists apt already has"
+          done
+          EOF
+          sudo chmod 755 /usr/local/bin/ci-apt-install
 
       - name: Install packages
         if: steps.changed.outputs.run == 'true'
         run: |
           sudo apt-get update || echo "::warning::apt-get update failed; installing from the package lists apt already has"
-          sudo apt-get install -y --no-install-recommends ninja-build cmake p7zip-full cabextract curl xz-utils
+          sudo ci-apt-install ninja-build cmake p7zip-full cabextract curl xz-utils
           sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -301,7 +346,7 @@ jobs:
       - name: Install the WASM toolchain
         if: steps.changed.outputs.run == 'true'
         run: |
-          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686 wabt
+          sudo ci-apt-install gcc-mingw-w64-i686 wabt
           sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           installed=
           for attempt in 1 2 3; do
@@ -341,7 +386,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update || echo "::warning::apt-get update failed; installing from the package lists apt already has"
-          sudo apt-get install -y --no-install-recommends wine wine32:i386
+          sudo ci-apt-install wine wine32:i386
           sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           tools/ci_replays.sh build/modern wine
 
@@ -419,20 +464,13 @@ jobs:
 
       - name: Configure apt to keep and retry its downloads
         if: steps.changed.outputs.run == 'true'
-        run: |
-          mkdir -p "$HOME/apt-archives/partial"
-          sudo tee /etc/apt/apt.conf.d/99ci > /dev/null <<EOF
-          Dir::Cache::Archives "$HOME/apt-archives";
-          APT::Keep-Downloaded-Packages "true";
-          Acquire::Retries "3";
-          Acquire::http::Timeout "30";
-          EOF
+        run: *apt-config
 
       - name: Install packages
         if: steps.changed.outputs.run == 'true'
         run: |
           sudo apt-get update || echo "::warning::apt-get update failed; installing from the package lists apt already has"
-          sudo apt-get install -y --no-install-recommends ninja-build cmake p7zip-full cabextract curl xz-utils
+          sudo ci-apt-install ninja-build cmake p7zip-full cabextract curl xz-utils
           sudo chown -R "$(id -u):$(id -g)" "$HOME/apt-archives"
           curl -LsSf "https://astral.sh/uv/$UV_VERSION/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -840,11 +878,15 @@ jobs:
         if: matrix.multilib
         run: *apt-mirror
 
+      - name: Configure apt to keep and retry its downloads
+        if: matrix.multilib
+        run: *apt-config
+
       - name: Install 32-bit support
         if: matrix.multilib
         run: |
           sudo apt-get update || echo "::warning::apt-get update failed; installing from the package lists apt already has"
-          sudo apt-get install -y --no-install-recommends gcc-multilib
+          sudo ci-apt-install gcc-multilib
 
       - name: Configure
         shell: bash

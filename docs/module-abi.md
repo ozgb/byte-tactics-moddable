@@ -524,7 +524,7 @@ signature. The game manifest's module imports `weapons.FindWeaponByName`. The ho
 The `services` group is the engine's plain functions and the member functions of its classes. A
 C++ member is imported as `<Class>_<Member>`, with `this` as the first argument, a `linear` address
 when the object lives in the module's memory and a `handle` when it is an engine object. Their
-signatures are `signatures.services` of the manifest.
+signatures are below; those the manifest's modules import are also `signatures.services` of the manifest.
 
 | Import | Signature (kinds) | Behaviour |
 | --- | --- | --- |
@@ -597,12 +597,15 @@ An interface has a major version that changes when a slot is removed or its sign
 ### 10.1 What the manifest records
 
 - `majors`: the current major of each interface and of each import group's interface, read from the
-  interface headers. The game manifest has, for example, `services` 1 and `wind_meteors` 1.
+  interface headers. The game manifest has, for example, `services` 1 and `wind_meteors` 2.
 - `modules[].interface`: the interface whose slots the module implements.
 - `modules[].majors`: for its own interface and for every import group, the major the module was
   built against.
 - `signatures`: for each interface, `{name: [[kinds], result]}`, the **current** signature of every
-  slot and import the manifest's modules use.
+  slot and import the manifest's modules use. A name no module of the manifest uses is dropped, even
+  one the interface still declares. A module built against the current major gives its name's
+  signature; a name only older modules use keeps its entry, and the build fails when the interface's
+  header no longer declares it (that module needs an adapter or a rebuild before the slot can go).
 - `adapters`: a list of `{"interface", "from_major", "name", "args", "result"}`.
 
 ### 10.2 What the loader does

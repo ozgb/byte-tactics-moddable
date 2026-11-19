@@ -7,14 +7,8 @@ template<class T, class A> class vector;
 }
 
 struct Unit;
-struct ModelState;
-struct Object3do;
-struct UnitDrawView;
 struct UnitDef;
 struct Vec3;
-struct Angles16;
-struct Callback;
-class CobScript;
 class HapiBank;
 class OrderBase;
 class PathOrderAttach;

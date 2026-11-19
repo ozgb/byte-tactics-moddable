@@ -529,7 +529,6 @@ typedef std::vector<OrderTableEntry> OrderTableEntryVector;
 typedef int(__stdcall* OrderTableEntryCompare)(const OrderTableEntry&, const OrderTableEntry&);
 
 
-#include "../units/sfx_occupy.h"
 
 #pragma pack(pop)
 

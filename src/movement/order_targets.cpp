@@ -814,9 +814,8 @@ PathOrder::PathOrder(Unit* owner_, BitReader* reader)
 PathOrder::PathOrder(Order* order, Unit* unit)
     : OrderFx(order), ref()
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit(&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
-    g_seams.units->UnitRefSetUnit(&ref, unit);
     approachRadius = 0;
     altitude = 0;
     this->unit = order->unit;
@@ -838,14 +837,13 @@ PathOrder::PathOrder(Order* order, Unit* unit)
 PathOrder::PathOrder(Order* source, Unit* unit, short value)
     : OrderFx(source), piece(value), ref()
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit(&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
     field_8 = 5;
     this->unit = source->unit;
     pos = this->unit->pos;
-    g_seams.units->UnitRefSetUnit(&ref, unit);
 }
 
 // FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
@@ -865,9 +863,8 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
 PathOrder::PathOrder(Order* source, Unit* unit, const Vec3& p)
     : OrderFx(source), ref()
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit(&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
-    g_seams.units->UnitRefSetUnit(&ref, unit);
     pos = p;
     approachRadius = 0;
     altitude = 0;

@@ -17,7 +17,6 @@ struct Tail32 {
 
 class CobScript;
 class UnitMotion;
-class MotionSerializer;
 class BitWriter;
 class BitReader;
 struct Block;

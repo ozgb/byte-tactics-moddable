@@ -35,8 +35,6 @@ struct UnitDefSeaFlags {
 };
 #pragma pack(pop)
 
-#include "../../interfaces/services.h"
-
 
 struct GoalOwnerUnit;
 

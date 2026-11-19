@@ -19,6 +19,7 @@ static ModelState* StateOfHandle(unsigned int handle)
     return ref.get();
 }
 
+// TODO(#986): route FREE_STATE and INIT_STATE to SCHED_SCRIPTS
 void UnitsOnFeaturesFreeState(const void* event)
 {
     const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);

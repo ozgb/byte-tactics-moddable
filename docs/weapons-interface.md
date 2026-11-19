@@ -200,7 +200,7 @@ delivers it.
 | orders DAMAGE | synchronous | The gate (section 8). |
 | orders RELEASE | synchronous | The gate (section 8). |
 | orders CLAIM | synchronous | The gate (section 8). |
-| orders ADD_STOCKPILE | synchronous | #952's rule. Queued it stayed equal on the tier, but it can be pending while a later read in the same phase needs the stockpile: a capture later in the units phase copies the unit's stockpiles into the new unit (players' CAPTURE_UNIT, units' handler publishes SET_STOCKPILES with them), and the network's unit state packet sends them. |
+| orders ADD_STOCKPILE | synchronous | #952's rule. Queued it stayed equal on the two scenarios with a stockpile weapon (the tier has none), but it can be pending while a later read in the same phase needs the stockpile: a capture later in the units phase copies the unit's stockpiles into the new unit (players' CAPTURE_UNIT, units' handler publishes SET_STOCKPILES with them), and the network's unit state packet sends them. |
 | units DAMAGE | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. The route also carries the build progress and repair damage of `AddBuildProgress` and `AddRepairProgress`, which units' functions publish on units' outbox. |
 | units DETONATE | synchronous | The gate (section 8). |
 | units RELEASE | synchronous | #952's rule. Queued it stayed equal on the tier, but `InitUnitFromType` releases each slot of a unit created in the units phase (a build), which is updated later in the same phase when its slot follows its builder's, and `UpdateUnitWeapons` reads the released slots. Queued, the release would also land after INIT_SLOTS (synchronous), reversing the two writes to the same slots. |
@@ -351,7 +351,7 @@ section 4).
 | orders DAMAGE | diverged | mission-victory, tick 181, units phase (`UpdateAllUnits`, 0x48ad30): `rng.parkMiller` (reference 0x613fc705, queued 0x01f484b2). |
 | orders RELEASE | diverged | orders-guard-attacked, tick 159, projectiles phase (`UpdateProjectiles`, 0x49b720): `units[251].+0xba` (reference 0x0000, queued 0x4000). |
 | orders CLAIM | diverged | mission-radius, tick 1325, units phase: `units[4].f_1f` (reference 0x03, queued 0x02). |
-| orders ADD_STOCKPILE | equal | none (synchronous by #952's rule, section 4; queued on its own at e6aae2352 with the event added, the tier was equal) |
+| orders ADD_STOCKPILE | equal | none (synchronous by #952's rule, section 4). The tier has no stockpile weapon, so it was queued on its own on ai-antinuke-intercept and orders-weapon-build, two scenarios that build stockpile rounds, and both were equal |
 | units DAMAGE | traces equal, events diverged | conditions-dark-side, tick 2674, units phase: the sim event digest, reference record `2674 units unit_speech 0x1 252 2 0` against `0x0 1 16 0`; also mission-capture, tick 499, units phase. |
 | units DETONATE | diverged | mission-victory, tick 188, units phase: `debris[45].obj` (reference piece 0, queued piece 1). |
 | units RELEASE | equal | none (synchronous by #952's rule, section 4) |

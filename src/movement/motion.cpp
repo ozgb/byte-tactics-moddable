@@ -138,7 +138,6 @@ void __stdcall DeleteOrder(Unit* owner, Order* node);
 extern int __cdecl _strcmpi(const char*, const char*);
 
 
-#include "../ingame/markers.h"
 void __stdcall DrawUnitRangeRings(void* a, void* b, Order* e, Vec3* p, int c);
 extern OrderTableEntry g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];

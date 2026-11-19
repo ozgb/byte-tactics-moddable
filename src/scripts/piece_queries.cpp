@@ -8,7 +8,6 @@
 #include "cob_script.h"
 
 #include "../map/mission.h"
-#include "../sound/sound.h"
 
 struct UnitCursorView;
 struct FeatureCursorView;

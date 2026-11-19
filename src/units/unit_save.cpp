@@ -104,7 +104,7 @@ struct MissionUnitIdTable {
 
 #include "../scripts/cob_script.h"
 
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #pragma pack(push, 1)
 #include "../orders/order.h"

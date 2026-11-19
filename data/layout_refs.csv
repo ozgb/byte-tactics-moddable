@@ -103,7 +103,7 @@ VictoryKillUnitType::SaveState,0x48f160,src/game/victory.cpp,end-of,g_satisfiedK
 VictoryKillUnitType::LoadState,0x48f1b0,src/game/victory.cpp,end-of,g_killUnitTypeKey,0,g_numLeftToKillKey,,none
 VictoryKillUnitType::LoadState,0x48f1b0,src/game/victory.cpp,end-of,g_satisfiedKey,0,g_celebratedKey,,none
 DefeatAllUnitsKilled::SaveState,0x48f840,src/game/victory.cpp,end-of,g_satisfiedKey,0,g_celebratedKey,,none
-LiteGoal::LiteGoal,0x4907e0,src/game/victory.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,none
+LiteGoal::LiteGoal,0x4907e0,src/movement/packed_goal.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,none
 ReopenCdAudio,0x490fe0,src/game/game_state.cpp,end-of,g_cachedCdTrackTypes,0,DAT_0051e848,,none
 ReopenCdAudio,0x490fe0,src/game/game_state.cpp,past-end,DAT_0051e848,136,DAT_0051e848,g_cdListsDiscEntries+0xa8,none
 ReopenCdAudio,0x490fe0,src/game/game_state.cpp,past-end,g_cdListsDiscEntries,2752,g_cdListsDiscEntries,g_savegameSideList+0x0,none

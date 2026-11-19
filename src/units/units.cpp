@@ -423,7 +423,7 @@ void __stdcall InitUnitScript(Unit* self)
     ((SpotStateUnitView*)self->state.get())->drawFrame = 0;
 }
 
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)

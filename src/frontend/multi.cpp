@@ -442,7 +442,7 @@ struct UnitRestrictRecord {
 
 #pragma pack(pop)
 
-#include "../orders/order_fx.h"
+#include "../movement/order_fx.h"
 
 #include "../network/packet_manager.h"
 #include "../state/sim_globals.h"

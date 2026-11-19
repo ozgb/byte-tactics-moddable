@@ -42,7 +42,7 @@ union TerrainFlags {
     unsigned int all;
 };
 
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #include "../map/spatial_bucket.h"
 

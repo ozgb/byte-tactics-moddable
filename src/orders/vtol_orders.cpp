@@ -61,7 +61,7 @@ class SpatialTimer;
 
 #include "mission_type.h"
 
-#include "unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #pragma pack(push, 1)
 #include "../weapons/weapon_def.h"
@@ -98,9 +98,9 @@ struct Mover {
 #include "../units/unit_ref.h"
 #pragma pack(pop)
 
-#include "path_order.h"
+#include "../movement/path_order.h"
 
-#include "air_maneuver_order.h"
+#include "../movement/air_maneuver_order.h"
 
 #include "../ingame/control_panel.h"
 

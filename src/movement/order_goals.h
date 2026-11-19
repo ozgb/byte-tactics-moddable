@@ -2,8 +2,8 @@
 #define ORDER_GOALS_H
 
 #include "order_target_types.h"
-#include "../game/packed_goal.h"
-#include "../ai/ai_search_goal.h"
+#include "packed_goal.h"
+#include "ai_search_goal.h"
 
 struct Unit;
 

@@ -1,7 +1,7 @@
 #ifndef GOAL_OWNER_H
 #define GOAL_OWNER_H
 
-#include "../orders/order_target_types.h"
+#include "order_target_types.h"
 #include "../../interfaces/ref.h"
 #include "../util/angles.h"
 #include "../util/vec3.h"

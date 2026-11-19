@@ -22,13 +22,13 @@
 #include "../scripts/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
-#include "../ai/ai_search_goal.h"
-#include "../orders/order_fx.h"
+#include "../movement/ai_search_goal.h"
+#include "../movement/order_fx.h"
 #include "../ai/squad_manager.h"
 #include "../units/unit_type_set.h"
 #include "../units/unit_ref.h"
 #include "../units/sfx_occupy.h"
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../util/angles.h"
@@ -70,7 +70,7 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
-#include "../orders/order_targets.h"
+#include "../movement/order_targets.h"
 #include "../game/players.h"
 #include "../units/unit_targets.h"
 

@@ -93,7 +93,7 @@ struct PathOrderRecord {
 #include "../../interfaces/seams.h"
 
 #pragma pack(push, 2)
-#include "order.h"
+#include "../orders/order.h"
 
 #pragma pack(pop)
 
@@ -134,9 +134,9 @@ struct PointVectorUfillAccess : UfillPointVector {
 
 #include "order_target_types.h"
 
-#include "../game/goal_owner.h"
+#include "goal_owner.h"
 
-#include "../ai/ai_search_goal.h"
+#include "ai_search_goal.h"
 #include "order_goals.h"
 
 #include "unit_motion.h"

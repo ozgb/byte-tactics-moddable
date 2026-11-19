@@ -2912,7 +2912,7 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
 #include "../weapons/unit_weapon_slot.h"
 #include "../weapons/projectile.h"
 #include "wire_packets.h"
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #pragma pack(push, 1)
 struct ActivateFlagsPacket {

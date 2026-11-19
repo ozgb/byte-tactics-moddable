@@ -48,7 +48,7 @@ struct OrderSaveRecord {
 #include "../units/unit_ref.h"
 
 #include "../util/vec3.h"
-#include "air_maneuver_order.h"
+#include "../movement/air_maneuver_order.h"
 #include "../state/sim_globals.h"
 
 class OrderFxSlot {
@@ -73,9 +73,9 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 #include "mission_type.h"
 
 #pragma pack(push, 1)
-#include "path_order.h"
+#include "../movement/path_order.h"
 
-#include "approach_areas.h"
+#include "../movement/approach_areas.h"
 
 #pragma pack(pop)
 

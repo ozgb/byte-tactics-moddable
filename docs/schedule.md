@@ -33,6 +33,9 @@ edit by hand.
 - **A call into a subsystem outside its interface:** a call into code another subsystem owns (a constructor or a
   helper of its records) that goes through no seam. It has no class; its writes count for the entry point that
   makes it.
+- **A delivery:** the call of a subscriber's handler for a queued effect, a function of the scheduler's route
+  table. The scheduler makes it, not the code that published the effect; it is listed once for each
+  subscribing subsystem, has no class, and its writes count for the entry point that publishes.
 
 ## The tick
 
@@ -40,15 +43,15 @@ Phase numbers are the trace's. A phase that calls a pass is described under Pass
 
 | phase | name | what runs, in order |
 |---|---|---|
-| 0 | net | the network packets received since the last tick are applied (network play only: a test-mode run does not run this phase); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 1 | units | `units.UpdateAllUnits` (the pass below); presentation: when auto-follow is on, the followed unit is cycled; `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 2 | projectiles | the sim-event queue is drained (`docs/sim-events.md`); `weapons.UpdateProjectiles` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 3 | explosions | the sim-event queue is drained (`docs/sim-events.md`); `weapons.UpdateExplosions` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 4 | players | the sim-event queue is drained (`docs/sim-events.md`); `players.UpdatePlayers` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 5 | features | the sim-event queue is drained (`docs/sim-events.md`); `features.UpdateFeatures` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
-| 6 | wind | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once); `wind_meteors.UpdateWind` (the pass below) |
-| 7 | meteors | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once); `wind_meteors.UpdateMeteors` (the pass below) |
-| after | tail | the sim-event queue is drained (`docs/sim-events.md`); presentation: the camera follows the followed unit; presentation: the particles advance; `players.UpdateBlink` (once); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `weapons.SpawnProjectile` (once); `los_radar.Apply` (once); `ai.Apply` (once); `los_radar.ExpireEyeballs` (once); `economy.UpdateResourceSharing` (once); the queued network packets are sent (network play only) |
+| 0 | net | the network packets received since the last tick are applied (network play only: a test-mode run does not run this phase); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
+| 1 | units | `units.UpdateAllUnits` (the pass below); presentation: when auto-follow is on, the followed unit is cycled; `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
+| 2 | projectiles | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once); `weapons.UpdateProjectiles` (the pass below) |
+| 3 | explosions | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once); `weapons.UpdateExplosions` (the pass below) |
+| 4 | players | the sim-event queue is drained (`docs/sim-events.md`); `players.UpdatePlayers` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
+| 5 | features | the sim-event queue is drained (`docs/sim-events.md`); `features.UpdateFeatures` (the pass below); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once) |
+| 6 | wind | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once); `wind_meteors.UpdateWind` (the pass below) |
+| 7 | meteors | the sim-event queue is drained (`docs/sim-events.md`); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once); `wind_meteors.UpdateMeteors` (the pass below) |
+| after | tail | the sim-event queue is drained (`docs/sim-events.md`); presentation: the camera follows the followed unit; presentation: the particles advance; `players.UpdateBlink` (once); `economy.Apply` (once); `players.Apply` (once); `features.Apply` (once); `map.Apply` (once); `weapons.Apply` (once); `targeting.Apply` (once); `wind_meteors.Apply` (once); `los_radar.Apply` (once); `ai.Apply` (once); `los_radar.ExpireEyeballs` (once); `economy.UpdateResourceSharing` (once); the queued network packets are sent (network play only) |
 
 ## Passes
 
@@ -90,37 +93,28 @@ Each entity:
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -152,40 +146,22 @@ Each entity:
 1. a draw from the Park-Miller generator (`rng`)
 1. `units.GetGroundHeight`: query
 1. `los_radar.GetMapCellAtPosition`: query
-1. `units.MarkRecentlyDamaged`: intent
-1. a call into orders outside its interface
-1. `orders.MissionTypeFromName`: query
-1. `orders.NewOrder`: mixed
-1. `orders.AppendOrder`: intent
-1. `scripts.StartScriptWithArgs`: intent
-1. `los_radar.GetMapCell`: query
-1. `features.GetFootprintCentre`: query
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
+1. `los_radar.GetMapCell`: query
+1. `features.GetFootprintCentre`: query
+1. `scripts.GetAimFromPosition`: mixed
+1. `scripts.GetPiecePosition`: query
 
 After the loop:
 
@@ -244,63 +220,33 @@ Before the loop:
 1. `pathfinding.Poll`: mixed
 1. `movement.ApplyPathEvent`: intent
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 
 Each entity:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 1. `ai.UpdateSquads`: intent
 1. `los_radar.RefreshUnitIndex`: intent
@@ -312,7 +258,7 @@ Each entity:
 1. `units.FindUnitTypeId`: query
 1. a draw from the Park-Miller generator (`rng`)
 1. `map.CanPlaceUnitFootprint`: mixed
-1. `weapons.FindFeatureAtPos`: query
+1. `features.FindFeatureAtPos`: query
 1. `map.GetCellMeanHeight`: query
 1. `units.CreateUnit`: mixed
 1. a sim event is recorded
@@ -323,32 +269,17 @@ Each entity:
 After the loop:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 1. `map.GetGameType`: view read
 
@@ -363,32 +294,17 @@ None.
 Each entity:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 1. `los_radar.UpdateUnitLineOfSight`: intent
 
@@ -407,32 +323,17 @@ Before the loop:
 Each entity:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -454,32 +355,17 @@ Nested in the pass `features`, where its lists name it. Loop 1 visits each featu
 Before the loops:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -499,32 +385,17 @@ None.
 Each entity of loop 2:
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -558,32 +429,17 @@ Each entity:
 
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### After the phases
 
@@ -591,33 +447,18 @@ The steps of the tick after its last phase:
 
 1. `players.UpdateBlink`: intent
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `los_radar.ExpireEyeballs`: intent
 1. `economy.UpdateResourceSharing`: intent
 
@@ -639,34 +480,19 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `ai.UpdateSquads`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. a draw from the Park-Miller generator (`rng`)
 1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `targeting.GetWeaponTargetUnit`: query
 1. `weapons.FindTargetableProjectile`: query
 1. `targeting.FindWeaponTarget`: mixed
@@ -674,123 +500,63 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `economy.UpdateMetalExtraction`
 
 1. `los_radar.GetMapCell`: query
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### `economy.UpdatePlayerEconomy`
 
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### `economy.UpdateResourceSharing`
 
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### `features.Apply`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -799,6 +565,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.SoundHeardMask`: query
 
+### `features.FindFeatureAtPos`
+
+1. `los_radar.GetMapCell`: query
+
 ### `features.GetFootprintCentre`
 
 1. `units.GetGroundHeight`: query
@@ -806,32 +576,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `features.Place`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -843,32 +598,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `features.UpdateFeatures`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `units.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -899,32 +639,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `map.Apply`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `los_radar.GetMapCell`: query
 
 ### `map.PickRandomReclaimableResourcesInRadius`
@@ -995,33 +720,18 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.SetUnitPosition`: intent
 1. `scripts.GetPieceAngles`: query
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `map.CanPlaceUnitFootprint`: mixed
 1. `scripts.StartScript`: intent
 1. `units.UpdateSfxOccupy`: intent
@@ -1039,18 +749,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.LoadPointMarker`: mixed
 
 ### `orders.LoadOrder`
-
-1. `units.UnitRefInit`: mixed
-1. `units.UnitRefSetUnit`: mixed
-1. `units.LoadUnit`: mixed
-1. `units.FindUnitTypeId`: query
-1. `movement.LoadPathOrder`: mixed
-1. `movement.LoadAirManeuverOrder`: mixed
-1. `movement.LoadApproachRadius`: mixed
-1. `movement.LoadRingApproach`: mixed
-1. `movement.LoadPointMarker`: mixed
-
-### `orders.NewOrder`
 
 1. `units.UnitRefInit`: mixed
 1. `units.UnitRefSetUnit`: mixed
@@ -1080,7 +778,23 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.LoadRingApproach`: mixed
 1. `movement.LoadPointMarker`: mixed
 1. a sim event is recorded
-1. `weapons.ClaimWeapons`: intent
+1. `economy.Apply`: mixed
+1. the delivery of a queued effect to a handler of units
+1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `map.Apply`: mixed
+1. `weapons.Apply`: mixed
+1. `targeting.Apply`: mixed
+1. `wind_meteors.Apply`: intent
+1. `los_radar.Apply`: mixed
+1. the delivery of a queued effect to a handler of pathfinding
+1. `ai.Apply`: mixed
+1. `weapons.WeaponCanReachUnit`: query
+1. `units.CanRepair`: query
+1. `los_radar.GetMapCellAtPosition`: query
+1. `units.CanLoad`: query
+1. `targeting.GetWeaponTargetUnit`: query
+1. the delivery of a queued effect to a handler of scripts
 1. `units.AttachUnitToPiece`: intent
 1. `movement.SetFlightMode`: intent
 1. `movement.NewPathOrderAt`: mixed
@@ -1088,48 +802,18 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.MotionGoal`: view read
 1. `movement.GoalSetPathOrder`: intent
 1. `movement.OrderFxDestroy`: intent
-1. `weapons.ReleaseWeapons`: intent
 1. `movement.PathOrderSetApproachRadius`: intent
 1. a draw from the Park-Miller generator (`rng`)
 1. `movement.NewPathOrderToUnit`: mixed
 1. `units.GetFactoriesInRadius`: query
 1. `movement.NewAirManeuverOrder`: mixed
 1. `movement.AirManeuverOrderSetAltitude`: intent
-1. `weapons.WeaponCanReachUnit`: query
 1. `movement.NewPathOrderToUnitAt`: mixed
 1. `targeting.ChooseWeapon`: query
 1. `weapons.GetWeaponRange`: view read
 1. `movement.NewApproachRadius`: mixed
 1. `movement.NewRingApproach`: mixed
-1. `units.CanRepair`: query
-1. `los_radar.GetMapCellAtPosition`: query
-1. `units.CanLoad`: query
-1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `players.Apply`: mixed
-1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `map.Apply`: mixed
-1. a call into weapons outside its interface
-1. `targeting.Apply`: mixed
-1. a call into units outside its interface
-1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
-1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `ai.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `targeting.GetWeaponTargetUnit`: query
-1. a call into units outside its interface
 1. `units.FinishConstruction`: intent
-1. `weapons.DamageUnit`: intent
 1. `scripts.QueryScript`: mixed
 1. `scripts.GetPiecePosition`: query
 1. `map.CanPlaceUnitFootprint`: mixed
@@ -1144,7 +828,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `los_radar.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed
-1. `weapons.FindFeatureAtPos`: query
+1. `features.FindFeatureAtPos`: query
 1. `units.GetGroundHeight`: query
 1. `units.CanReclaim`: query
 1. `map.UnitsInRange`: query
@@ -1174,7 +858,23 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.LoadRingApproach`: mixed
 1. `movement.LoadPointMarker`: mixed
 1. a sim event is recorded
-1. `weapons.ClaimWeapons`: intent
+1. `economy.Apply`: mixed
+1. the delivery of a queued effect to a handler of units
+1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `map.Apply`: mixed
+1. `weapons.Apply`: mixed
+1. `targeting.Apply`: mixed
+1. `wind_meteors.Apply`: intent
+1. `los_radar.Apply`: mixed
+1. the delivery of a queued effect to a handler of pathfinding
+1. `ai.Apply`: mixed
+1. `weapons.WeaponCanReachUnit`: query
+1. `units.CanRepair`: query
+1. `los_radar.GetMapCellAtPosition`: query
+1. `units.CanLoad`: query
+1. `targeting.GetWeaponTargetUnit`: query
+1. the delivery of a queued effect to a handler of scripts
 1. `units.AttachUnitToPiece`: intent
 1. `movement.SetFlightMode`: intent
 1. `movement.NewPathOrderAt`: mixed
@@ -1182,48 +882,18 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.MotionGoal`: view read
 1. `movement.GoalSetPathOrder`: intent
 1. `movement.OrderFxDestroy`: intent
-1. `weapons.ReleaseWeapons`: intent
 1. `movement.PathOrderSetApproachRadius`: intent
 1. a draw from the Park-Miller generator (`rng`)
 1. `movement.NewPathOrderToUnit`: mixed
 1. `units.GetFactoriesInRadius`: query
 1. `movement.NewAirManeuverOrder`: mixed
 1. `movement.AirManeuverOrderSetAltitude`: intent
-1. `weapons.WeaponCanReachUnit`: query
 1. `movement.NewPathOrderToUnitAt`: mixed
 1. `targeting.ChooseWeapon`: query
 1. `weapons.GetWeaponRange`: view read
 1. `movement.NewApproachRadius`: mixed
 1. `movement.NewRingApproach`: mixed
-1. `units.CanRepair`: query
-1. `los_radar.GetMapCellAtPosition`: query
-1. `units.CanLoad`: query
-1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `players.Apply`: mixed
-1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `map.Apply`: mixed
-1. a call into weapons outside its interface
-1. `targeting.Apply`: mixed
-1. a call into units outside its interface
-1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
-1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `ai.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. `targeting.GetWeaponTargetUnit`: query
-1. a call into units outside its interface
 1. `units.FinishConstruction`: intent
-1. `weapons.DamageUnit`: intent
 1. `scripts.QueryScript`: mixed
 1. `scripts.GetPiecePosition`: query
 1. `map.CanPlaceUnitFootprint`: mixed
@@ -1238,7 +908,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `los_radar.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed
-1. `weapons.FindFeatureAtPos`: query
+1. `features.FindFeatureAtPos`: query
 1. `units.GetGroundHeight`: query
 1. `units.CanReclaim`: query
 1. `map.UnitsInRange`: query
@@ -1265,32 +935,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `players.Apply`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 
 ### `players.UpdatePlayers`
@@ -1299,32 +954,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `pathfinding.Poll`: mixed
 1. `movement.ApplyPathEvent`: intent
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `economy.Spend`: mixed
 1. `ai.UpdateSquads`: intent
 1. `los_radar.RefreshUnitIndex`: intent
@@ -1336,7 +976,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.FindUnitTypeId`: query
 1. a draw from the Park-Miller generator (`rng`)
 1. `map.CanPlaceUnitFootprint`: mixed
-1. `weapons.FindFeatureAtPos`: query
+1. `features.FindFeatureAtPos`: query
 1. `map.GetCellMeanHeight`: query
 1. `units.CreateUnit`: mixed
 1. a sim event is recorded
@@ -1349,94 +989,63 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.GetNanoPiecePosition`
 
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.GetSweetSpot`
 
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.QueryScript`
 
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.RunScripts`
 
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.StartScript`
 
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.WeaponAimCobComplete`: intent
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.StartScriptWithArgs`
 
-1. `weapons.WeaponAimCobComplete`: intent
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `scripts.StartScriptWithArgsByIndex`
 
-1. `weapons.WeaponAimCobComplete`: intent
 1. `los_radar.IsUnitVisibleToPlayer`: query
 1. a sim event is recorded
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.CobScriptExplodePiece`: intent
 
 ### `targeting.Apply`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
-1. a call into units outside its interface
+1. `weapons.Apply`: mixed
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### `targeting.FindBestTargetIfFireAtWill`
 
@@ -1456,32 +1065,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `units.GetGroundHeight`: query
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
-1. a call into units outside its interface
+1. `weapons.Apply`: mixed
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 1. `scripts.GetSweetSpot`: mixed
 
 ### `units.AddBuildProgress`
@@ -1496,37 +1090,28 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -1534,7 +1119,42 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 ### `units.AddRepairProgress`
 
-1. `weapons.DamageUnit`: intent
+1. `economy.Apply`: mixed
+1. `scripts.StartScript`: intent
+1. a sim event is recorded
+1. `orders.OrderOrStatusFlags`: intent
+1. `scripts.StartScriptWithArgs`: intent
+1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `scripts.FreeObjectState`: intent
+1. `scripts.InitObjectState`: intent
+1. `map.Apply`: mixed
+1. `weapons.Apply`: mixed
+1. `targeting.Apply`: mixed
+1. `scripts.FindScript`: intent
+1. `wind_meteors.Apply`: intent
+1. `los_radar.Apply`: mixed
+1. the delivery of a queued effect to a handler of pathfinding
+1. a draw from the Park-Miller generator (`rng`)
+1. `scripts.NewUnitScript`: intent
+1. `scripts.SetCob`: intent
+1. `scripts.CreatePlayerObjectState`: mixed
+1. `scripts.SetObjectState`: intent
+1. `scripts.CreateObjectState`: mixed
+1. `economy.UpdateMetalExtraction`: intent
+1. `movement.NewUnitMotion`: intent
+1. `ai.Apply`: mixed
+1. the delivery of a queued effect to a handler of orders
+1. `orders.GetOrderFlags`: query
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. `features.Place`: mixed
+1. `scripts.DeleteScript`: intent
+1. `movement.DestroyMotionObject`: intent
 
 ### `units.ApplyUnfinishedBuildDecay`
 
@@ -1548,37 +1168,28 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -1592,7 +1203,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `units.CreateUnit`
 
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `economy.Apply`: mixed
 1. `scripts.StartScript`: intent
 1. a sim event is recorded
@@ -1603,35 +1213,27 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -1647,7 +1249,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `units.LoadUnit`
 
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `economy.Apply`: mixed
 1. `scripts.StartScript`: intent
 1. a sim event is recorded
@@ -1658,35 +1259,27 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -1723,37 +1316,28 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.FreeObjectState`: intent
 1. `scripts.InitObjectState`: intent
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
 1. `scripts.FindScript`: intent
 1. `wind_meteors.Apply`: intent
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. `weapons.DamageUnit`: intent
-1. `weapons.DetonateUnitWeapon`: intent
-1. `scripts.QueryScript`: mixed
-1. `orders.DeleteOrders`: intent
-1. `weapons.RemoveUnitProjectiles`: intent
-1. `orders.AddBeCarriedOrder`: intent
-1. `map.GetGameType`: view read
+1. the delivery of a queued effect to a handler of pathfinding
 1. a draw from the Park-Miller generator (`rng`)
-1. `weapons.ReleaseWeapons`: intent
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
-1. `weapons.InitUnitWeaponSlots`: intent
 1. `economy.UpdateMetalExtraction`: intent
 1. `movement.NewUnitMotion`: intent
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
 1. `orders.GetOrderFlags`: query
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of scripts
+1. `scripts.QueryScript`: mixed
+1. `orders.DeleteOrders`: intent
+1. `orders.AddBeCarriedOrder`: intent
+1. `map.GetGameType`: view read
 1. `los_radar.GetMapCell`: query
 1. `features.Place`: mixed
 1. `scripts.DeleteScript`: intent
@@ -1770,80 +1354,30 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `scripts.StartScriptWithArgs`: intent
 
-### `weapons.CobScriptExplodePiece`
+### `weapons.Apply`
 
-1. a draw from the Park-Miller generator (`rng`)
-1. `scripts.PoseUnitModel`: intent
-1. `scripts.GetPiecePosition`: query
-1. a sim event is recorded
-
-### `weapons.DamageUnit`
-
-1. `units.MarkRecentlyDamaged`: intent
-1. a sim event is recorded
-1. a call into orders outside its interface
-1. `orders.MissionTypeFromName`: query
-1. `orders.NewOrder`: mixed
-1. `orders.AppendOrder`: intent
-1. `scripts.StartScriptWithArgs`: intent
-
-### `weapons.DetonateUnitWeapon`
-
-1. `los_radar.GetMapCellAtPosition`: query
-1. a sim event is recorded
-1. `los_radar.SoundHeardMask`: query
-1. `units.MarkRecentlyDamaged`: intent
-1. a call into orders outside its interface
-1. `orders.MissionTypeFromName`: query
-1. `orders.NewOrder`: mixed
-1. `orders.AppendOrder`: intent
-1. `scripts.StartScriptWithArgs`: intent
-1. `los_radar.GetMapCell`: query
-1. `features.GetFootprintCentre`: query
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `scripts.QueryScript`: mixed
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-
-### `weapons.FindFeatureAtPos`
-
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
+1. a sim event is recorded
+1. `los_radar.GetMapCellAtPosition`: query
+1. `los_radar.SoundHeardMask`: query
 1. `los_radar.GetMapCell`: query
-
-### `weapons.InitUnitWeaponSlots`
-
+1. `features.GetFootprintCentre`: query
 1. `scripts.QueryScript`: mixed
 1. `scripts.GetPieceOffset`: query
 1. `scripts.GetAimFromPosition`: mixed
-1. `scripts.StartScriptWithArgs`: intent
-
-### `weapons.SpawnProjectile`
-
-1. `scripts.QueryScript`: mixed
-1. `los_radar.SoundHeardMask`: query
-1. a sim event is recorded
+1. a draw from the Park-Miller generator (`rng`)
+1. `scripts.GetPiecePosition`: query
 
 ### `weapons.UpdateExplosions`
 
@@ -1859,88 +1393,50 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. a draw from the Park-Miller generator (`rng`)
 1. `units.GetGroundHeight`: query
 1. `los_radar.GetMapCellAtPosition`: query
-1. `units.MarkRecentlyDamaged`: intent
-1. a call into orders outside its interface
-1. `orders.MissionTypeFromName`: query
-1. `orders.NewOrder`: mixed
-1. `orders.AppendOrder`: intent
-1. `scripts.StartScriptWithArgs`: intent
-1. `los_radar.GetMapCell`: query
-1. `features.GetFootprintCentre`: query
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
+1. `los_radar.GetMapCell`: query
+1. `features.GetFootprintCentre`: query
+1. `scripts.GetAimFromPosition`: mixed
+1. `scripts.GetPiecePosition`: query
 
 ### `weapons.UpdateUnitWeapons`
 
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. `los_radar.GetMapCell`: query
-1. `units.MarkRecentlyDamaged`: intent
-1. a sim event is recorded
-1. a call into orders outside its interface
-1. `orders.MissionTypeFromName`: query
-1. `orders.NewOrder`: mixed
-1. `orders.AppendOrder`: intent
-1. `scripts.StartScriptWithArgs`: intent, mixed
-1. `features.GetFootprintCentre`: query
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
 1. `wind_meteors.Apply`: intent
-1. `scripts.QueryScript`: mixed
-1. `los_radar.SoundHeardMask`: query
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
+1. a sim event is recorded
 1. `los_radar.GetMapCellAtPosition`: query
-1. `targeting.GetWeaponTargetPos`: mixed
+1. `los_radar.SoundHeardMask`: query
+1. `los_radar.GetMapCell`: query
+1. `features.GetFootprintCentre`: query
+1. `scripts.QueryScript`: mixed
+1. `scripts.GetPieceOffset`: query
 1. `scripts.GetAimFromPosition`: mixed
+1. a draw from the Park-Miller generator (`rng`)
+1. `scripts.GetPiecePosition`: query
+1. `targeting.GetWeaponTargetPos`: mixed
 1. `scripts.FindScript`: query
 1. `targeting.GetWeaponTargetUnit`: query
-1. `scripts.GetPieceOffset`: query
-1. `scripts.StartScript`: intent
-1. a draw from the Park-Miller generator (`rng`)
 1. `economy.Spend`: mixed
 
 ### `wind_meteors.Apply`
@@ -1951,32 +1447,17 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
 1. `economy.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of units
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
-1. a call into units outside its interface
-1. a call into units outside its interface
 1. `map.Apply`: mixed
-1. a call into weapons outside its interface
+1. `weapons.Apply`: mixed
 1. `targeting.Apply`: mixed
-1. a call into units outside its interface
-1. `weapons.SpawnProjectile`: intent
 1. `los_radar.Apply`: mixed
-1. a call into pathfinding outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
+1. the delivery of a queued effect to a handler of pathfinding
 1. `ai.Apply`: mixed
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
-1. a call into units outside its interface
-1. a call into orders outside its interface
+1. the delivery of a queued effect to a handler of orders
+1. the delivery of a queued effect to a handler of scripts
 
 ### `wind_meteors.UpdateWind`
 
@@ -1996,7 +1477,6 @@ Entry points called as intents in which nothing is seen to change (Limits), with
 | `pathfinding.CellsChanged` | a notification: what it does is left to the implementation, and the reference's does nothing. |
 | `scripts.FindScript` | a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and drops the index, as 3.1c does. |
 | `units.RefreshUnitIfStale` | it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself. |
-| `weapons.WeaponAimCobComplete` | it writes through a virtual call whose targets are not resolved. |
 
 ## Cross-subsystem calls
 
@@ -2015,8 +1495,8 @@ is not listed.
 | ai | `targeting.Apply` | mixed |
 | ai | `targeting.FindWeaponTarget` | mixed |
 | ai | `targeting.GetWeaponTargetUnit` | query |
+| ai | `weapons.Apply` | mixed |
 | ai | `weapons.FindTargetableProjectile` | query |
-| ai | `weapons.SpawnProjectile` | intent |
 | ai | `wind_meteors.Apply` | intent |
 | economy | `ai.Apply` | mixed |
 | economy | `features.Apply` | mixed |
@@ -2025,7 +1505,7 @@ is not listed.
 | economy | `map.Apply` | mixed |
 | economy | `players.Apply` | mixed |
 | economy | `targeting.Apply` | mixed |
-| economy | `weapons.SpawnProjectile` | intent |
+| economy | `weapons.Apply` | mixed |
 | economy | `wind_meteors.Apply` | intent |
 | features | `ai.Apply` | mixed |
 | features | `economy.Apply` | mixed |
@@ -2039,7 +1519,7 @@ is not listed.
 | features | `scripts.ObjectStateSize` | query |
 | features | `targeting.Apply` | mixed |
 | features | `units.GetGroundHeight` | query |
-| features | `weapons.SpawnProjectile` | intent |
+| features | `weapons.Apply` | mixed |
 | features | `wind_meteors.Apply` | intent |
 | los_radar | `map.UnitsInRange` | query |
 | map | `ai.Apply` | mixed |
@@ -2051,7 +1531,7 @@ is not listed.
 | map | `los_radar.GetMapCellAtPosition` | query |
 | map | `players.Apply` | mixed |
 | map | `targeting.Apply` | mixed |
-| map | `weapons.SpawnProjectile` | intent |
+| map | `weapons.Apply` | mixed |
 | map | `wind_meteors.Apply` | intent |
 | movement | `ai.Apply` | mixed |
 | movement | `economy.Apply` | mixed |
@@ -2072,11 +1552,12 @@ is not listed.
 | movement | `units.UnitRefSetUnit` | mixed |
 | movement | `units.UnitRefUnlink` | intent |
 | movement | `units.UpdateSfxOccupy` | intent |
-| movement | `weapons.SpawnProjectile` | intent |
+| movement | `weapons.Apply` | mixed |
 | movement | `wind_meteors.Apply` | intent |
 | orders | `ai.Apply` | mixed |
 | orders | `economy.Apply` | mixed |
 | orders | `features.Apply` | mixed |
+| orders | `features.FindFeatureAtPos` | query |
 | orders | `features.GetCellFeature` | query |
 | orders | `los_radar.Apply` | mixed |
 | orders | `los_radar.GetMapCellAtPosition` | query |
@@ -2141,12 +1622,8 @@ is not listed.
 | orders | `units.SetUnitPosition` | intent |
 | orders | `units.UnitRefInit` | mixed |
 | orders | `units.UnitRefSetUnit` | intent, mixed |
-| orders | `weapons.ClaimWeapons` | intent |
-| orders | `weapons.DamageUnit` | intent |
-| orders | `weapons.FindFeatureAtPos` | query |
+| orders | `weapons.Apply` | mixed |
 | orders | `weapons.GetWeaponRange` | view read |
-| orders | `weapons.ReleaseWeapons` | intent |
-| orders | `weapons.SpawnProjectile` | intent |
 | orders | `weapons.WeaponCanReachUnit` | query |
 | orders | `wind_meteors.Apply` | intent |
 | pathfinding | `units.MovementClassGet` | view read |
@@ -2160,6 +1637,7 @@ is not listed.
 | players | `economy.Spend` | mixed |
 | players | `economy.UpdatePlayerEconomy` | intent |
 | players | `features.Apply` | mixed |
+| players | `features.FindFeatureAtPos` | query |
 | players | `los_radar.Apply` | mixed |
 | players | `los_radar.RecordRadarMapped` | intent |
 | players | `los_radar.RecordRadarUnits` | intent |
@@ -2177,12 +1655,9 @@ is not listed.
 | players | `units.CreateUnit` | mixed |
 | players | `units.FindUnitTypeId` | query |
 | players | `units.RefreshFactoryIndex` | intent |
-| players | `weapons.FindFeatureAtPos` | query |
-| players | `weapons.SpawnProjectile` | intent |
+| players | `weapons.Apply` | mixed |
 | players | `wind_meteors.Apply` | intent |
 | scripts | `los_radar.IsUnitVisibleToPlayer` | query |
-| scripts | `weapons.CobScriptExplodePiece` | intent |
-| scripts | `weapons.WeaponAimCobComplete` | intent |
 | targeting | `ai.Apply` | mixed |
 | targeting | `economy.Apply` | mixed |
 | targeting | `features.Apply` | mixed |
@@ -2192,8 +1667,8 @@ is not listed.
 | targeting | `players.Apply` | mixed |
 | targeting | `scripts.GetSweetSpot` | mixed |
 | targeting | `units.GetGroundHeight` | query |
+| targeting | `weapons.Apply` | mixed |
 | targeting | `weapons.GetWeaponRange` | view read |
-| targeting | `weapons.SpawnProjectile` | intent |
 | targeting | `weapons.WeaponCanReachUnit` | query |
 | targeting | `wind_meteors.Apply` | intent |
 | units | `ai.Apply` | mixed |
@@ -2237,12 +1712,7 @@ is not listed.
 | units | `scripts.StartScript` | intent |
 | units | `scripts.StartScriptWithArgs` | intent |
 | units | `targeting.Apply` | mixed |
-| units | `weapons.DamageUnit` | intent |
-| units | `weapons.DetonateUnitWeapon` | intent |
-| units | `weapons.InitUnitWeaponSlots` | intent |
-| units | `weapons.ReleaseWeapons` | intent |
-| units | `weapons.RemoveUnitProjectiles` | intent |
-| units | `weapons.SpawnProjectile` | intent |
+| units | `weapons.Apply` | mixed |
 | units | `weapons.UpdateUnitWeapons` | intent |
 | units | `wind_meteors.Apply` | intent |
 | weapons | `ai.Apply` | mixed |
@@ -2256,23 +1726,16 @@ is not listed.
 | weapons | `los_radar.SoundHeardMask` | query |
 | weapons | `map.Apply` | mixed |
 | weapons | `map.GetCellMeanHeight` | query |
-| weapons | `orders.AppendOrder` | intent |
-| weapons | `orders.MissionTypeFromName` | query |
-| weapons | `orders.NewOrder` | mixed |
 | weapons | `players.Apply` | mixed |
 | weapons | `scripts.FindScript` | query |
 | weapons | `scripts.GetAimFromPosition` | mixed |
 | weapons | `scripts.GetPieceOffset` | query |
 | weapons | `scripts.GetPiecePosition` | query |
-| weapons | `scripts.PoseUnitModel` | intent |
 | weapons | `scripts.QueryScript` | mixed |
-| weapons | `scripts.StartScript` | intent |
-| weapons | `scripts.StartScriptWithArgs` | intent, mixed |
 | weapons | `targeting.Apply` | mixed |
 | weapons | `targeting.GetWeaponTargetPos` | mixed |
 | weapons | `targeting.GetWeaponTargetUnit` | query |
 | weapons | `units.GetGroundHeight` | query |
-| weapons | `units.MarkRecentlyDamaged` | intent |
 | weapons | `wind_meteors.Apply` | intent |
 | wind_meteors | `ai.Apply` | mixed |
 | wind_meteors | `economy.Apply` | mixed |
@@ -2281,7 +1744,7 @@ is not listed.
 | wind_meteors | `map.Apply` | mixed |
 | wind_meteors | `players.Apply` | mixed |
 | wind_meteors | `targeting.Apply` | mixed |
-| wind_meteors | `weapons.SpawnProjectile` | intent |
+| wind_meteors | `weapons.Apply` | mixed |
 
 ## Split points
 
@@ -2297,123 +1760,138 @@ the split lies in.
 | economy | ai | units, each entity | split | `economy.Apply` (step 1) | `players.Apply` (step 6) |  | by subsystem | 3 | 3 |
 | economy | los_radar | units, each entity | split | `economy.Apply` (step 1) | `scripts.StartScript` (step 2) |  | by subsystem | 3 | 3 |
 | economy | map | units, each entity | split | `economy.Apply` (step 1) | `players.Apply` (step 6) |  | by subsystem | 2 | 2 |
-| economy | movement | units, each entity | split | `economy.Apply` (step 1) | `weapons.DamageUnit` (step 18) |  | by subsystem | 3 | 3 |
+| economy | movement | units, each entity | split | `economy.Apply` (step 1) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 3 | 3 |
 | economy | orders | units, each entity | split | `economy.Apply` (step 1) | `orders.OrderOrStatusFlags` (step 4) |  | by subsystem | 3 | 3 |
 | economy | targeting | units, each entity | split | `economy.Apply` (step 1) | `players.Apply` (step 6) |  | by subsystem | 3 | 3 |
 | economy | units | units, each entity | apply before continuing | `economy.Apply` (step 1) | the caller |  | by subsystem | 3 | 3 |
-| economy | weapons | units, each entity | split | `economy.Apply` (step 1) | `scripts.StartScript` (step 2) |  | by subsystem | 3 | 3 |
+| economy | weapons | units, each entity | split | `economy.Apply` (step 1) | `players.Apply` (step 6) |  | by subsystem | 3 | 3 |
 | features | los_radar | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 0 |
 | features | map | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
 | features | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 1 | 1 |
 | features | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 3 | 3 |
 | los_radar | features | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
 | los_radar | map | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 2 | 2 |
-| los_radar | orders | units, each entity | split | `players.Apply` (step 6) | `weapons.DamageUnit` (step 18) |  | by subsystem | 1 | 0 |
+| los_radar | orders | units, each entity | split | `players.Apply` (step 6) | `orders.OrderOrStatusFlags` again, after step 6 |  | by subsystem | 1 | 0 |
 | los_radar | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 2 | 2 |
 | los_radar | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
 | map | features | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
 | map | los_radar | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by item | 1 | 1 |
 | map | los_radar | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 0 |
-| map | movement | units, each entity | split | `players.Apply` (step 6) | `movement.UpdateMotion` (step 50) |  | by item | 2 | 2 |
-| map | orders | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 48) |  | by item | 2 | 2 |
-| map | orders | units, each entity | split | `players.Apply` (step 6) | `weapons.DamageUnit` (step 18) |  | by subsystem | 1 | 1 |
+| map | movement | units, each entity | split | `players.Apply` (step 6) | `movement.UpdateMotion` (step 47) |  | by item | 2 | 2 |
+| map | orders | units, each entity | split | `players.Apply` (step 6) | `orders.OrderOrStatusFlags` again, after step 6 |  | by subsystem | 1 | 1 |
+| map | orders | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 45) |  | by item | 2 | 2 |
 | map | scripts | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
-| map | targeting | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
+| map | targeting | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
+| map | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller |  | by item | 2 | 2 |
 | map | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 1 | 1 |
-| map | units | units, each entity | split | `players.Apply` (step 6) | `weapons.DamageUnit` (step 18) |  | by item | 2 | 2 |
 | map | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by item | 1 | 1 |
 | map | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
-| movement | los_radar | units, each entity | split | `movement.UpdateMotion` (step 50) | `orders.AddBeCarriedOrder` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | los_radar | units, each entity | split | `movement.UpdateMotion` (step 50) | `scripts.QueryScript` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | los_radar | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 2 | 2 |
-| movement | map | units, each entity | split | `movement.UpdateMotion` (step 50) | `orders.AddBeCarriedOrder` again, after step 50 |  | by item | 1 | 1 |
-| movement | map | units, each entity | split | `movement.UpdateMotion` (step 50) | `orders.AddBeCarriedOrder` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | map | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 2 | 2 |
-| movement | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
-| movement | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 8 | 8 |
-| movement | scripts | units, each entity | split | `movement.UpdateMotion` (step 50) | `scripts.QueryScript` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | scripts | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 6 | 6 |
-| movement | targeting | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 4 | 4 |
-| movement | units | units, each entity | apply before continuing | `movement.UpdateMotion` (step 50) | the caller |  | by item | 1 | 1 |
-| movement | units | units, each entity | apply before continuing | `movement.UpdateMotion` (step 50) | the caller | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | units | units, each entity | apply before continuing | `weapons.DamageUnit` (step 18) | the caller | `weapons.DamageUnit` | by subsystem | 10 | 8 |
-| movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 50) | `orders.AddBeCarriedOrder` again, after step 50 |  | by item | 1 | 1 |
-| movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 50) | `scripts.QueryScript` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | weapons | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 6 | 5 |
+| movement | los_radar | units, each entity | split | `movement.NewUnitMotion` (step 24) | `scripts.StartScript` again, after step 24 |  | by subsystem | 2 | 2 |
+| movement | los_radar | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
+| movement | los_radar | units, each entity | split | `movement.UpdateMotion` (step 47) | `scripts.QueryScript` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
+| movement | map | units, each entity | split | `movement.NewUnitMotion` (step 24) | `weapons.Apply` again, after step 24 |  | by subsystem | 2 | 2 |
+| movement | map | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 |  | by item | 1 | 1 |
+| movement | map | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
+| movement | orders | units, each entity | split | `movement.NewUnitMotion` (step 24) | `orders.OrderOrStatusFlags` again, after step 24 |  | by subsystem | 8 | 8 |
+| movement | orders | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
+| movement | scripts | units, each entity | split | `movement.NewUnitMotion` (step 24) | `scripts.StartScript` again, after step 24 |  | by subsystem | 6 | 6 |
+| movement | scripts | units, each entity | split | `movement.UpdateMotion` (step 47) | `scripts.QueryScript` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
+| movement | targeting | units, each entity | split | `movement.NewUnitMotion` (step 24) | `weapons.Apply` again, after step 24 |  | by subsystem | 4 | 4 |
+| movement | units | units, each entity | apply before continuing | `movement.NewUnitMotion` (step 24) | the caller |  | by subsystem | 10 | 8 |
+| movement | units | units, each entity | apply before continuing | `movement.UpdateMotion` (step 47) | the caller |  | by item | 1 | 1 |
+| movement | units | units, each entity | apply before continuing | `movement.UpdateMotion` (step 47) | the caller | `movement.UpdateMotion` | by item | 1 | 1 |
+| movement | weapons | units, each entity | split | `movement.NewUnitMotion` (step 24) | `weapons.Apply` again, after step 24 |  | by subsystem | 6 | 5 |
+| movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 |  | by item | 1 | 1 |
+| movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
 | orders | map | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `players.Apply` (step 6) |  | by subsystem | 1 | 1 |
-| orders | movement | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `weapons.DamageUnit` (step 18) |  | by subsystem | 4 | 4 |
-| orders | movement | units, each entity | split | `orders.RunOrders` (step 48) | `movement.UpdateMotion` (step 50) |  | by item | 1 | 1 |
-| orders | movement | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 1 |
+| orders | movement | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `orders.AddBeCarriedOrder` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
+| orders | movement | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 4 | 4 |
+| orders | movement | units, each entity | split | `orders.RunOrders` (step 45) | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
 | orders | scripts | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `scripts.StartScriptWithArgs` (step 5) |  | by subsystem | 2 | 2 |
-| orders | targeting | units, each entity | split | `orders.RunOrders` (step 48) | `orders.RunSecondaryOrders` (step 49) | `orders.RunOrders` | by item | 1 | 0 |
+| orders | targeting | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 1 | 0 |
 | orders | units | units, each entity | apply before continuing | `orders.OrderOrStatusFlags` (step 4) | the caller |  | by subsystem | 1 | 1 |
-| orders | units | units, each entity | split | `orders.RunOrders` (step 48) | `orders.RunSecondaryOrders` (step 49) | `orders.RunOrders` | by item | 3 | 2 |
-| orders | weapons | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `scripts.StartScriptWithArgs` (step 5) |  | by subsystem | 2 | 2 |
-| orders | weapons | units, each entity | split | `orders.RunOrders` (step 48) | `orders.RunSecondaryOrders` (step 49) | `orders.RunOrders` | by item | 2 | 2 |
+| orders | units | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 3 | 2 |
+| orders | weapons | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `players.Apply` (step 6) |  | by subsystem | 2 | 2 |
+| orders | weapons | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 2 | 2 |
 | scripts | map | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 1 | 1 |
-| scripts | movement | units, each entity | split | `weapons.DamageUnit` (step 18) | `movement.UpdateMotion` (step 50) |  | by item | 1 | 1 |
+| scripts | movement | units, each entity | split | `scripts.NewUnitScript` (step 18) | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
+| scripts | orders | units, each entity | split | `scripts.NewUnitScript` (step 18) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
 | scripts | orders | units, each entity | split | `scripts.StartScript` (step 2) | `orders.OrderOrStatusFlags` (step 4) |  | by subsystem | 2 | 2 |
-| scripts | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
+| scripts | units | units, each entity | apply before continuing | `scripts.NewUnitScript` (step 18) | the caller |  | by item | 1 | 1 |
 | scripts | units | units, each entity | apply before continuing | `scripts.StartScript` (step 2) | the caller |  | by subsystem | 1 | 1 |
-| scripts | units | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 1 |
-| scripts | weapons | units, each entity | split | `scripts.StartScript` (step 2) | `scripts.StartScript` again, after step 2 | `scripts.StartScript` | by subsystem | 11 | 4 |
-| scripts | weapons | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 2 | 2 |
-| targeting | orders | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
+| scripts | weapons | units, each entity | split | `scripts.NewUnitScript` (step 18) | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| scripts | weapons | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 12 | 5 |
+| targeting | orders | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
 | targeting | scripts | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
-| targeting | weapons | units, each entity | split | `players.Apply` (step 6) | `weapons.UpdateUnitWeapons` (step 46) |  | by item | 1 | 1 |
+| targeting | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
+| units | ai | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
 | units | ai | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 3 | 3 |
-| units | ai | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 1 |
 | units | economy | units, each entity | write before calling | the caller, before the first step | `economy.Apply` (step 1) |  | by subsystem | 3 | 3 |
+| units | los_radar | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 1 | `scripts.StartScript` (step 2) |  | by item | 1 | 1 |
+| units | los_radar | units, each entity | write before calling | the caller, after step 16 | `scripts.StartScript` again, after the write |  | by item | 2 | 2 |
 | units | los_radar | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 8 | 8 |
-| units | los_radar | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 3 | 3 |
+| units | map | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 5 | 5 |
+| units | map | units, each entity | write before calling | the caller, after step 36 | `orders.AddBeCarriedOrder` (step 37) |  | by item | 3 | 3 |
 | units | map | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 5 | 5 |
-| units | map | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 9 | 9 |
-| units | movement | units, each entity | write before calling | the caller, before the first step | `weapons.DamageUnit` (step 18) |  | by subsystem | 10 | 10 |
-| units | movement | units, each entity | split | `weapons.DamageUnit` (step 18) | `movement.UpdateMotion` (step 50) |  | by item | 6 | 6 |
-| units | movement | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 3 | 3 |
+| units | map | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `players.Apply` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, after step 16 | `movement.NewUnitMotion` (step 24) |  | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, before the first step | `movement.NewUnitMotion` (step 24) |  | by subsystem | 10 | 10 |
+| units | movement | units, each entity | write before calling | the caller, after step 16 | `movement.UpdateMotion` (step 47) |  | by item | 2 | 2 |
+| units | movement | units, each entity | write before calling | the caller, after step 17 | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, after step 21 | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, after step 24 | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, after step 36 | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
+| units | movement | units, each entity | write before calling | the caller, after step 16 | `orders.AddBeCarriedOrder` (step 37) |  | by item | 2 | 2 |
+| units | orders | units, each entity | write before calling | the caller, after step 36 | `orders.AddBeCarriedOrder` (step 37) |  | by item | 1 | 1 |
 | units | orders | units, each entity | write before calling | the caller, before the first step | `orders.OrderOrStatusFlags` (step 4) |  | by subsystem | 11 | 11 |
-| units | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 12 | 12 |
-| units | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 2 | 2 |
+| units | orders | units, each entity | write before calling | the caller, after step 16 | `orders.RunOrders` (step 45) |  | by item | 7 | 7 |
+| units | orders | units, each entity | write before calling | the caller, after step 17 | `orders.RunOrders` (step 45) |  | by item | 3 | 3 |
+| units | orders | units, each entity | write before calling | the caller, after step 21 | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
+| units | orders | units, each entity | write before calling | the caller, after step 36 | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
+| units | orders | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `orders.AddBeCarriedOrder` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
+| units | players | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 0 |
 | units | players | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 7 | 5 |
-| units | players | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 0 |
+| units | scripts | units, each entity | write before calling | the caller, after step 16 | `scripts.StartScript` again, after the write |  | by item | 1 | 1 |
 | units | scripts | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 12 | 12 |
-| units | scripts | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 2 | 2 |
+| units | scripts | units, each entity | write before calling | the caller, after step 19 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | targeting | units, each entity | write before calling | the caller, after step 16 | `orders.RunOrders` (step 45) |  | by item | 3 | 3 |
 | units | targeting | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 5 | 5 |
-| units | targeting | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 3 | 3 |
-| units | targeting | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.UpdateUnitWeapons` (step 46) |  | by item | 3 | 3 |
-| units | weapons | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 7 | 7 |
-| units | weapons | units, each entity | write before calling | the caller, after step 1 | `weapons.DamageUnit` (step 18) |  | by item | 1 | 1 |
-| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
-| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 8 | 8 |
-| units | weapons | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.UpdateUnitWeapons` (step 46) |  | by item | 2 | 2 |
-| weapons | map | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 1 |
-| weapons | movement | units, each entity | split | `weapons.DamageUnit` (step 18) | `movement.UpdateMotion` (step 50) |  | by item | 1 | 1 |
-| weapons | orders | units, each entity | split | `scripts.StartScript` (step 2) | `orders.OrderOrStatusFlags` (step 4) |  | by subsystem | 5 | 5 |
-| weapons | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 2 | 2 |
-| weapons | players | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 0 |
-| weapons | scripts | units, each entity | split | `scripts.StartScript` (step 2) | `scripts.StartScript` again, after step 2 | `scripts.StartScript` | by subsystem | 8 | 8 |
-| weapons | targeting | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 6 | 6 |
-| weapons | units | units, each entity | apply before continuing | `scripts.StartScript` (step 2) | the caller |  | by subsystem | 3 | 0 |
-| weapons | units | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 5 | 5 |
+| units | targeting | units, each entity | write before calling | the caller, after step 16 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | targeting | units, each entity | write before calling | the caller, after step 17 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | targeting | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 4 | 4 |
+| units | weapons | units, each entity | write before calling | the caller, after step 17 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, after step 19 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, after step 24 | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, after step 1 | `players.Apply` (step 6) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 8 | 8 |
+| units | weapons | units, each entity | write before calling | the caller, after step 17 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | write before calling | the caller, after step 21 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
+| units | weapons | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `players.Apply` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
+| weapons | map | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
+| weapons | movement | units, each entity | split | `players.Apply` (step 6) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 1 | 1 |
+| weapons | orders | units, each entity | split | `players.Apply` (step 6) | `orders.OrderOrStatusFlags` again, after step 6 |  | by subsystem | 7 | 7 |
+| weapons | players | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 0 |
+| weapons | scripts | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 8 | 8 |
+| weapons | targeting | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 6 | 6 |
+| weapons | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 8 | 5 |
 
 ### Phase projectiles
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| features | map | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 0 |
-| features | units | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
-| features | weapons | projectiles, each entity | apply before continuing | `orders.NewOrder` (step 11) | the caller | `orders.NewOrder` | by subsystem | 2 | 2 |
-| orders | movement | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 0 |
-| orders | targeting | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
-| orders | units | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
-| orders | weapons | projectiles, each entity | apply before continuing | `orders.NewOrder` (step 11) | the caller | `orders.NewOrder` | by subsystem | 1 | 1 |
-| scripts | weapons | projectiles, each entity | apply before continuing | `scripts.QueryScript` (step 1) | the caller | `scripts.QueryScript` | by subsystem | 1 | 1 |
-| targeting | orders | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.AppendOrder` (step 12) | `orders.NewOrder` | by subsystem | 1 | 1 |
-| weapons | los_radar | projectiles, each entity | split | `scripts.QueryScript` (step 1) | `los_radar.SoundHeardMask` (step 3) |  | by subsystem | 1 | 1 |
-| weapons | orders | projectiles, each entity | split | `scripts.QueryScript` (step 1) | `orders.MissionTypeFromName` (step 10) |  | by subsystem | 3 | 3 |
-| weapons | units | projectiles, each entity | write before calling | the caller, after step 8 | `orders.NewOrder` (step 11) |  | by item | 2 | 2 |
-| weapons | units | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by item | 1 | 1 |
+| features | map | projectiles, each entity | split | `players.Apply` (step 11) | `features.Apply` (step 12) | `players.Apply` | by subsystem | 1 | 0 |
+| features | units | projectiles, each entity | split | `players.Apply` (step 11) | `features.Apply` (step 12) | `players.Apply` | by subsystem | 1 | 1 |
+| features | weapons | projectiles, each entity | apply before continuing | `players.Apply` (step 11) | the caller | `players.Apply` | by subsystem | 2 | 2 |
+| orders | targeting | projectiles, each entity | split | the delivery of a queued effect to a handler of orders (step 31) | `players.Apply` again, after step 31 |  | by item | 1 | 1 |
+| orders | units | projectiles, each entity | split | the delivery of a queued effect to a handler of orders (step 25) | the delivery of a queued effect to a handler of units (step 28) |  | by subsystem | 1 | 1 |
+| orders | weapons | projectiles, each entity | apply before continuing | the delivery of a queued effect to a handler of orders (step 25) | the caller |  | by subsystem | 1 | 1 |
+| scripts | weapons | projectiles, each entity | apply before continuing | `scripts.QueryScript` (step 1) | the caller |  | by subsystem | 1 | 1 |
+| targeting | orders | projectiles, each entity | split | `players.Apply` (step 11) | the delivery of a queued effect to a handler of orders (step 31) |  | by item | 1 | 1 |
+| weapons | los_radar | projectiles, each entity | write before calling | the caller, after step 2 | `los_radar.SoundHeardMask` (step 3) |  | by subsystem | 1 | 1 |
+| weapons | orders | projectiles, each entity | write before calling | the caller, after step 2 | the delivery of a queued effect to a handler of orders (step 25) |  | by subsystem | 3 | 3 |
+| weapons | units | projectiles, each entity | write before calling | the caller, after step 2 | `units.GetGroundHeight` (step 6) |  | by subsystem | 3 | 3 |
 
 ### Phase explosions
 
@@ -2427,26 +1905,26 @@ the split lies in.
 |---|---|---|---|---|---|---|---|---|---|
 | economy | ai | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 4) |  | by subsystem | 3 | 3 |
 | economy | los_radar | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 4) |  | by subsystem | 3 | 2 |
-| economy | orders | players, each entity | split | `economy.Apply` (step 1) | `units.CreateUnit` (step 40) |  | by subsystem | 2 | 2 |
+| economy | orders | players, each entity | split | `economy.Apply` (step 1) | `units.CreateUnit` (step 47) |  | by subsystem | 2 | 2 |
 | economy | players | players.los, each entity | apply before continuing | `economy.Apply` (step 1) | the caller |  | by subsystem | 3 | 3 |
 | economy | targeting | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
 | economy | units | players.los, each entity | split | `economy.Apply` (step 1) | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
 | los_radar | ai | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 1 |
-| los_radar | orders | players, each entity | split | `features.Apply` (step 4) | `units.CreateUnit` (step 40) |  | by subsystem | 1 | 1 |
+| los_radar | orders | players, each entity | split | `features.Apply` (step 4) | `units.CreateUnit` (step 47) |  | by subsystem | 1 | 1 |
 | los_radar | targeting | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 1 |
 | los_radar | units | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 1 |
 | map | ai | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 0 |
-| orders | ai | players, each entity | split | `units.CreateUnit` (step 40) | `features.Apply` again, after step 40 | `units.CreateUnit` | by subsystem | 2 | 2 |
-| orders | movement | players, each entity, in `units.CreateUnit` | split | `orders.OrderOrStatusFlags` (step 6) | `weapons.DamageUnit` (step 20) |  | by subsystem | 1 | 0 |
-| orders | units | players, each entity | split | `units.CreateUnit` (step 40) | `features.Apply` again, after step 40 | `units.CreateUnit` | by subsystem | 1 | 0 |
+| orders | ai | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by subsystem | 2 | 2 |
+| orders | movement | players, each entity, in `units.CreateUnit` | split | `orders.OrderOrStatusFlags` (step 5) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 1 | 0 |
+| orders | units | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by subsystem | 1 | 0 |
 | players | ai | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 3 | 3 |
 | players | los_radar | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
 | players | targeting | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
 | players | units | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
-| units | ai | players, each entity | split | `units.RefreshFactoryIndex` (step 31) | `features.Apply` again, after step 31 |  | by subsystem | 2 | 2 |
-| units | los_radar | players, each entity | split | `units.CreateUnit` (step 40) | `features.Apply` again, after step 40 | `units.CreateUnit` | by item | 2 | 2 |
-| units | map | players, each entity | split | `units.RefreshFactoryIndex` (step 31) | `features.Apply` again, after step 31 |  | by subsystem | 2 | 0 |
-| units | targeting | players, each entity | split | `units.RefreshFactoryIndex` (step 31) | `features.Apply` again, after step 31 |  | by subsystem | 1 | 1 |
+| units | ai | players, each entity | split | `units.RefreshFactoryIndex` (step 38) | `features.Apply` again, after step 38 |  | by subsystem | 2 | 2 |
+| units | los_radar | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by item | 2 | 2 |
+| units | map | players, each entity | split | `units.RefreshFactoryIndex` (step 38) | `features.Apply` again, after step 38 |  | by subsystem | 2 | 0 |
+| units | targeting | players, each entity | split | `units.RefreshFactoryIndex` (step 38) | `features.Apply` again, after step 38 |  | by subsystem | 1 | 1 |
 | weapons | ai | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 2 | 2 |
 
 ### Phase features
@@ -2472,20 +1950,20 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 
 | subsystem | view read | query | intent | mixed | edges written | edges read | inside an entity |
 |---|---|---|---|---|---|---|---|
-| wind_meteors | 0 / 0 | 0 / 0 | 1 / 10 | 7 / 0 | 0 | 0 | 0 |
-| economy | 0 / 0 | 1 / 1 | 2 / 2 | 6 / 13 | 39 | 3 | 41 |
-| features | 1 / 0 | 5 / 3 | 2 / 0 | 6 / 11 | 15 | 2 | 17 |
-| ai | 0 / 0 | 2 / 0 | 2 / 2 | 8 / 10 | 0 | 21 | 21 |
+| wind_meteors | 0 / 0 | 0 / 0 | 0 / 10 | 8 / 0 | 0 | 0 | 0 |
+| economy | 0 / 0 | 1 / 1 | 1 / 2 | 7 / 13 | 39 | 3 | 41 |
+| features | 1 / 0 | 5 / 5 | 1 / 0 | 7 / 11 | 15 | 2 | 17 |
+| ai | 0 / 0 | 2 / 0 | 1 / 2 | 9 / 10 | 0 | 21 | 21 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 2 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 11 / 5 | 6 / 21 | 13 / 0 | 42 | 59 | 101 |
-| targeting | 1 / 0 | 3 / 4 | 2 / 0 | 7 / 13 | 4 | 33 | 37 |
+| weapons | 0 / 2 | 10 / 3 | 1 / 1 | 11 / 10 | 42 | 59 | 101 |
+| targeting | 1 / 0 | 3 / 4 | 1 / 0 | 8 / 13 | 4 | 33 | 37 |
 | los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 11 | 11 | 31 | 41 |
-| orders | 3 / 0 | 21 / 2 | 22 / 7 | 31 / 2 | 26 | 59 | 85 |
-| units | 3 / 1 | 3 / 12 | 31 / 15 | 12 / 10 | 136 | 47 | 183 |
-| players | 1 / 0 | 3 / 0 | 13 / 0 | 10 / 10 | 10 | 13 | 21 |
-| map | 0 / 4 | 3 / 8 | 2 / 0 | 6 / 14 | 16 | 33 | 49 |
-| scripts | 0 / 0 | 1 / 9 | 2 / 18 | 0 / 9 | 21 | 33 | 54 |
-| movement | 0 / 3 | 3 / 0 | 7 / 12 | 11 / 13 | 48 | 34 | 82 |
+| orders | 3 / 0 | 21 / 1 | 18 / 6 | 32 / 1 | 25 | 59 | 84 |
+| units | 3 / 1 | 3 / 12 | 25 / 14 | 13 / 10 | 136 | 47 | 183 |
+| players | 1 / 0 | 3 / 0 | 12 / 0 | 11 / 10 | 10 | 13 | 21 |
+| map | 0 / 4 | 3 / 8 | 1 / 0 | 7 / 14 | 16 | 33 | 49 |
+| scripts | 0 / 0 | 1 / 9 | 0 / 15 | 0 / 8 | 21 | 33 | 54 |
+| movement | 0 / 3 | 3 / 0 | 6 / 12 | 12 / 13 | 48 | 33 | 81 |
 
 ## Limits
 

@@ -2365,8 +2365,8 @@ the split lies in.
 | units | ai | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 1 | 1 |
 | units | economy | units, each entity | write before calling | the caller, before the first step | `economy.Apply` (step 1) |  | by subsystem | 3 | 3 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 1 | `scripts.StartScript` (step 2) |  | by item | 1 | 1 |
-| units | los_radar | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 7 | 7 |
-| units | los_radar | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 4 | 4 |
+| units | los_radar | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 8 | 8 |
+| units | los_radar | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 3 | 3 |
 | units | map | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 5 | 5 |
 | units | map | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by item | 9 | 9 |
 | units | movement | units, each entity | write before calling | the caller, before the first step | `weapons.DamageUnit` (step 18) |  | by subsystem | 10 | 10 |

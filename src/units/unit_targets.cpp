@@ -143,7 +143,7 @@ void UnitRef::UnlinkFromUnit()
     }
 }
 
-#include "../orders/path_order_attach.h"
+#include "path_order_attach.h"
 
 // FUNCTION: 0x4895c0
 PathOrderAttach::PathOrderAttach(Unit* o, OrderBase* v)

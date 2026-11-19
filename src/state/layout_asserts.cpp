@@ -116,7 +116,6 @@
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../orders/order_type_entry.h"
-#include "../orders/path_order_attach.h"
 #include "../quirks/quirks.h"
 #include "../scripts/cob_script.h"
 #include "../scripts/cob_types.h"
@@ -125,6 +124,7 @@
 #include "../units/f14373.h"
 #include "../units/factory_index.h"
 #include "../units/movement_class.h"
+#include "../units/path_order_attach.h"
 #include "../units/unit.h"
 #include "../units/unit_def.h"
 #include "../units/unit_type_set.h"
@@ -1323,7 +1323,7 @@ static_assert(offsetof(Game, multiCommanderDeath) == 234025, "");
 static_assert(offsetof(Game, multiMapping) == 234029, "");
 static_assert(offsetof(Game, multiLineOfSight) == 234033, "");
 static_assert(offsetof(Game, multiLOSType) == 234037, "");
-static_assert(offsetof(Game, endGameCountdown) == 234041, "");
+static_assert(offsetof(Game, unusedEndGameCountdown) == 234041, "");
 static_assert(offsetof(Game, endGameFlags) == 234043, "");
 static_assert(offsetof(Game, flagsByte_3923b) == 234043, "");
 static_assert(offsetof(Game, endGameFlags_3923b) == 234043, "");
@@ -1959,8 +1959,8 @@ static_assert(offsetof(Player, metalStorageBonus) == 224, "");
 static_assert(offsetof(Player, shareMetal) == 228, "");
 static_assert(offsetof(Player, shareEnergy) == 232, "");
 static_assert(offsetof(Player, econ) == 236, "");
-static_assert(offsetof(Player, updateTime) == 240, "");
-static_assert(offsetof(Player, winLoseTime) == 244, "");
+static_assert(offsetof(Player, unusedUpdateTime) == 240, "");
+static_assert(offsetof(Player, unusedWinLoseTime) == 244, "");
 static_assert(offsetof(Player, displayTimer) == 248, "");
 static_assert(offsetof(Player, kills) == 252, "");
 static_assert(offsetof(Player, losses) == 254, "");
@@ -2347,9 +2347,7 @@ static_assert(offsetof(Unit, yWhole) == 112, "");
 static_assert(offsetof(Unit, zFraction) == 114, "");
 static_assert(offsetof(Unit, zWhole) == 116, "");
 static_assert(offsetof(Unit, cell) == 118, "");
-static_assert(offsetof(Unit, losCacheCell) == 122, "");
-static_assert(offsetof(Unit, losCacheCellX) == 122, "");
-static_assert(offsetof(Unit, losCacheCellZ) == 124, "");
+static_assert(offsetof(Unit, unusedLosCache) == 122, "");
 static_assert(offsetof(Unit, footprint) == 126, "");
 static_assert(offsetof(Unit, spatialBucket) == 130, "");
 static_assert(offsetof(Unit, carrier) == 134, "");
@@ -2375,7 +2373,7 @@ static_assert(offsetof(Unit, lastAttackerSlot) == 244, "");
 static_assert(offsetof(Unit, lastDamageType) == 245, "");
 static_assert(offsetof(Unit, healthPercent) == 246, "");
 static_assert(offsetof(Unit, prevHealthPercent) == 247, "");
-static_assert(offsetof(Unit, losSightFrameIdx) == 248, "");
+static_assert(offsetof(Unit, unusedLosSightFrame) == 248, "");
 static_assert(offsetof(Unit, transportPiece) == 249, "");
 static_assert(offsetof(Unit, recentlyDamagedTimer) == 250, "");
 static_assert(offsetof(Unit, postTransferHoldoff) == 251, "");

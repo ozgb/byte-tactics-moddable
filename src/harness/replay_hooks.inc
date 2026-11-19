@@ -1478,6 +1478,72 @@ void __stdcall RecLosRadarRefreshUnitIndex(int a0)
     }
 }
 
+unsigned int __stdcall RecLosRadarRegionSize(const LosRadarMapInfo* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_REGIONSIZE, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "map");
+    }
+    unsigned int result = s_inner_los_radar->RegionSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecLosRadarInit(const LosRadarMapInfo* a0, void* a1, unsigned int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_INIT, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "map");
+        ArgPending(s_call, "region");
+        ArgValue(s_call, "size", a2);
+    }
+    s_inner_los_radar->Init(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
+void* __stdcall RecLosRadarShutdown()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_SHUTDOWN, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+    }
+    void* result = s_inner_los_radar->Shutdown();
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+void __stdcall RecLosRadarSightCache(Unit* a0, LosSightCache* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_LOS_RADAR_SIGHTCACHE, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgPending(s_call, "out");
+    }
+    s_inner_los_radar->SightCache(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_WRITESTATE, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_los_radar->WriteState(a0);
+    if (scope.Open()) {
+    }
+}
+
 void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
 {
     ReplayRoots roots;
@@ -2462,7 +2528,7 @@ void __stdcall RecUnitsRefreshFactoryIndex(int a0)
     }
 }
 
-void __stdcall RecUnitsUnitRefInit(PathOrderAttach* a0, Unit* a1, OrderBase* a2)
+void __stdcall RecUnitsUnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -2477,7 +2543,7 @@ void __stdcall RecUnitsUnitRefInit(PathOrderAttach* a0, Unit* a1, OrderBase* a2)
     }
 }
 
-void __stdcall RecUnitsUnitRefSetUnit(PathOrderAttach* a0, Unit* a1)
+void __stdcall RecUnitsUnitRefSetUnit(UnitRef* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -2487,6 +2553,18 @@ void __stdcall RecUnitsUnitRefSetUnit(PathOrderAttach* a0, Unit* a1)
         ArgObject(s_call, "unit", ROK_UNIT, a1);
     }
     s_inner_units->UnitRefSetUnit(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_WRITESTATE, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_units->WriteState(a0);
     if (scope.Open()) {
     }
 }
@@ -2781,6 +2859,58 @@ void __stdcall RecPlayersUpdatePlayersFinish()
     if (scope.Open()) {
     }
     s_inner_players->UpdatePlayersFinish();
+    if (scope.Open()) {
+    }
+}
+
+unsigned int __stdcall RecPlayersRegionSize(const PlayersMapInfo* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_REGIONSIZE, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "info");
+    }
+    unsigned int result = s_inner_players->RegionSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPlayersInit(const PlayersMapInfo* a0, void* a1, unsigned int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_INIT, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "info");
+        ArgPending(s_call, "region");
+        ArgValue(s_call, "size", a2);
+    }
+    s_inner_players->Init(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
+void* __stdcall RecPlayersShutdown()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_SHUTDOWN, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+    }
+    void* result = s_inner_players->Shutdown();
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+void __stdcall RecPlayersWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PLAYERS_WRITESTATE, SUB_PLAYERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_players->WriteState(a0);
     if (scope.Open()) {
     }
 }
@@ -5475,6 +5605,16 @@ void HookSeams(const bool* on)
         s_rec_los_radar.FreeUnitIndex = RecLosRadarFreeUnitIndex;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.RefreshUnitIndex = RecLosRadarRefreshUnitIndex;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.RegionSize = RecLosRadarRegionSize;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.Init = RecLosRadarInit;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.Shutdown = RecLosRadarShutdown;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.SightCache = RecLosRadarSightCache;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.WriteState = RecLosRadarWriteState;
     if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
@@ -5611,6 +5751,8 @@ void HookSeams(const bool* on)
         s_rec_units.UnitRefInit = RecUnitsUnitRefInit;
     if (on[SUB_UNITS])
         s_rec_units.UnitRefSetUnit = RecUnitsUnitRefSetUnit;
+    if (on[SUB_UNITS])
+        s_rec_units.WriteState = RecUnitsWriteState;
     if (on[SUB_PLAYERS])
         s_rec_players.Apply = RecPlayersApply;
     if (on[SUB_PLAYERS])
@@ -5659,6 +5801,14 @@ void HookSeams(const bool* on)
         s_rec_players.UpdatePlayerTail = RecPlayersUpdatePlayerTail;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayersFinish = RecPlayersUpdatePlayersFinish;
+    if (on[SUB_PLAYERS])
+        s_rec_players.RegionSize = RecPlayersRegionSize;
+    if (on[SUB_PLAYERS])
+        s_rec_players.Init = RecPlayersInit;
+    if (on[SUB_PLAYERS])
+        s_rec_players.Shutdown = RecPlayersShutdown;
+    if (on[SUB_PLAYERS])
+        s_rec_players.WriteState = RecPlayersWriteState;
     if (on[SUB_MAP])
         s_rec_map.Apply = RecMapApply;
     if (on[SUB_MAP])

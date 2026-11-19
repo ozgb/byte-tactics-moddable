@@ -5,8 +5,8 @@
 Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
-sections 29 to 31 in the world row. The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), the path results (section 32), the economy events
+sections 29 to 31 in the world row. Sections 24 and 25 are the records los_radar and units write through the state writer (`losRadarIndex[i].*`, `unitsFactories[i].*`). The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
+shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results (section 32), the economy events
 (section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40), players' events (section 41) and ai's events (section 42) are dumped only, and skipped.
 """
 
@@ -22,8 +22,6 @@ PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1
 END = 0xFFFFFFFF
 PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors")
-TIMER_CLASS = (0, 7, 2, 3, 6, 1, 2, 3, 4, 5)
-AI_RAW_VECTORS = ("cells", "vec_65", "counts", "vec_8d", "weights", "vec_ad", "vec_bd", "values", "locked")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
 DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[",
                "windMeteors.", "windMeteors[", "targeting.", "targeting[", "los_radar.", "los_radar[", "map.", "map[",
@@ -346,18 +344,15 @@ class Walker:
         self.visibility()
         self.explored()
         self.spatial()
-        self.eyes()
         self.pathfinder()
         self.move_classes()
         self.orders()
         self.motions()
         self.order_effects()
         self.scripts()
-        self.player_ai()
-        self.squad_managers()
-        self.squads()
+        self.los_radar_index()
+        self.factory_index()
         self.unit_resources()
-        self.conditions()
         if tick == 1:
             self.unit_definitions()
             self.weapon_definitions()
@@ -409,15 +404,6 @@ class Walker:
             self.table("Rec", "spatial.overflow")
         h.end()
 
-    def eyes(self) -> None:
-        h = self.hash
-        h.h8(15)
-        h.h32(int(self.take("eyes.count"), 16))
-        first = re.escape(field_name(self.schema.fields("Eye")[0]))
-        while (e := self.next_index(rf"eyes\[(\d+)\]\.{first}")) is not None:
-            self.table("Eye", f"eyes[{e}]")
-        h.end()
-
     def pathfinder(self) -> None:
         hashed = self.hash
         self.hash = Hasher()
@@ -425,7 +411,7 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
-        self.skip_dumped(("economyState.", "aiState."))
+        self.skip_dumped(("economyState.", "aiState.", "mapState.", "playersState."))
 
     def pathfinder_report(self) -> None:
         h = self.hash
@@ -616,67 +602,26 @@ class Walker:
             self.hash.pointer(*self.pointer_id(self.take(f"{path}[{k}]")))
             k += 1
 
-    def raw_vector(self, path: str) -> None:
-        self.hash.h32(int(self.take(path), 16))
-        self.hash.run(self.hex_run(path))
-
-    def player_ai(self) -> None:
+    def los_radar_index(self) -> None:
         h = self.hash
-        h.h8(24)
-        for i in range(10):
-            prefix = f"players[{i}].ai"
-            h.h32(i)
-            present = self.present("PlayerAI", prefix)
-            h.h8(int(present))
-            if not present:
-                continue
-            self.table("PlayerAI", prefix)
-            for name in ("visible", "known", "factories"):
-                self.unit_vector(f"{prefix}.{name}")
-            for name in AI_RAW_VECTORS:
-                self.raw_vector(f"{prefix}.{name}")
-        h.end()
+        self.skip_dumped(("losRadarState.",))
+        while (i := self.next_index(r"losRadarIndex\[(\d+)\]\.player")) is not None:
+            prefix = f"losRadarIndex[{i}]"
+            h.h8(24)
+            h.h32(int(self.take(f"{prefix}.player"), 16))
+            h.h32(int(self.take(f"{prefix}.hasSpecial"), 16))
+            self.unit_vector(f"{prefix}.visible")
+            self.unit_vector(f"{prefix}.known")
+            h.end()
 
-    def squad_managers(self) -> None:
+    def factory_index(self) -> None:
         h = self.hash
-        h.h8(25)
-        for i in range(11):
-            prefix = f"players[{i}].squadManager"
-            h.h32(i)
-            present = self.present("SquadManager", prefix)
-            h.h8(int(present))
-            if not present:
-                continue
-            self.table("SquadManager", prefix)
-            for t in range(10):
-                timer = f"{prefix}.timers[{t}]"
-                h.h8(t)
-                has = self.peek() == f"{timer}.class"
-                h.h8(int(has))
-                if not has:
-                    continue
-                cls = int(self.take(f"{timer}.class"), 16)
-                if cls != TIMER_CLASS[t]:
-                    raise Error(f"{timer}: class {cls} is not the class of slot {t}")
-                h.h32(cls)
-                name = {2: "AssaultTimer", 3: "EscortTimer", 5: "SpatialTimer"}.get(cls, "SquadTimer")
-                self.table(name, timer)
-        h.end()
-
-    def squads(self) -> None:
-        h = self.hash
-        h.h8(26)
-        for i in range(11):
-            h.h32(i)
-            present = self.present("Squad", f"players[{i}].squads[0]")
-            h.h8(int(present))
-            if not present:
-                continue
-            for s in range(10):
-                prefix = f"players[{i}].squads[{s}]"
-                self.table("Squad", prefix)
-                self.unit_vector(f"{prefix}.items")
-        h.end()
+        while (i := self.next_index(r"unitsFactories\[(\d+)\]\.player")) is not None:
+            prefix = f"unitsFactories[{i}]"
+            h.h8(25)
+            h.h32(int(self.take(f"{prefix}.player"), 16))
+            self.unit_vector(f"{prefix}.factories")
+            h.end()
 
     def unit_resources(self) -> None:
         h = self.hash
@@ -688,34 +633,6 @@ class Walker:
             if present:
                 self.table("UnitResources", f"players[{i}].econ")
         h.end()
-
-    def conditions(self) -> None:
-        h = self.hash
-        h.h8(28)
-        present = self.present("MissionConditions", "conditions")
-        h.h8(int(present))
-        if present:
-            values = self.table("MissionConditions", "conditions")
-            for which, (list_name, count_offset) in enumerate((("victory", 0x40), ("defeat", 0x84))):
-                count = int(values[count_offset], 16)
-                if count > 16:
-                    count = 0
-                h.h8(which + 1)
-                for k in range(count):
-                    prefix = f"conditions.{list_name}[{k}]"
-                    has = self.peek() == f"{prefix}.class"
-                    h.h8(int(has))
-                    if not has:
-                        continue
-                    cls = int(self.take(f"{prefix}.class"), 16)
-                    h.h32(cls)
-                    self.table("MissionCondition", prefix)
-                    if cls == 16:
-                        self.table("ConditionNumUnits", prefix)
-                    elif cls in (12, 4):
-                        self.table("ConditionNumLeft", prefix)
-        h.end()
-
 
     def string(self, path: str) -> None:
         value = self.take(path)

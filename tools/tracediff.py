@@ -18,7 +18,7 @@ phase that differs, with its value in A and in B. Set WINEARCH=win64 for Wine.
         units[12].health: a=0x0064 b=0x0063
 
 The row `world` is the tables hashed once per tick (game scalars, map, line of sight, orders), after the last
-phase's row. The pathfinder's own report (`pathfinder.*`), economy's report (`economyState.*`), ai's report (`aiState.*`), the path results
+phase's row. The pathfinder's own report (`pathfinder.*`), economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results
 (`results[k].*`), the economy events (`economy[k].*`), the features events (`features[k].*`), the share packets
 (`packets[k].*`) wind_meteors' events (`windMeteors[k].*`), targeting's events (`targeting[k].*`) los_radar's events (`los_radar[k].*`) map's events (`map[k].*`) players' events (`playersEvents[k].*`) and ai's events (`aiEvents[k].*`) are dumped but not hashed: they show the modules' state
 and what they delivered at a divergence. A dump holds them after every phase
@@ -100,20 +100,20 @@ PATH_TABLES = [
     (r"debris\[\d+\]", ("Debris",)),
     (r"pieces\[\d+\]\.faces\[\d+\]", ("Face",)),
     (r"pieces\[\d+\]", ("Piece",)),
-    (r"players\[\d+\]\.ai", ("PlayerAI",)),
-    (r"players\[\d+\]\.squadManager\.timers\[\d+\]", TIMER_TABLES),
-    (r"players\[\d+\]\.squadManager", ("SquadManager",)),
-    (r"players\[\d+\]\.squads\[\d+\]", ("Squad",)),
+    (r"aiState\.players\[\d+\]\.ai", ("PlayerAI",)),
+    (r"aiState\.players\[\d+\]\.squadManager\.timers\[\d+\]", TIMER_TABLES),
+    (r"aiState\.players\[\d+\]\.squadManager", ("SquadManager",)),
+    (r"aiState\.players\[\d+\]\.squads\[\d+\]", ("Squad",)),
     (r"players\[\d+\]\.econ", ("UnitResources",)),
     (r"players\[\d+\]", ("Player",)),
     (r"features\[\d+\]", ("SpotObject", "SpotAnim")),
-    (r"spatial\[\d+\]|spatial\.overflow", ("Rec",)),
-    (r"eyes\[\d+\]", ("Eye",)),
+    (r"spatial\[\d+\]|spatial\.overflow|mapState\.spatial\[\d+\]|mapState\.overflow", ("Rec",)),
+    (r"losRadarState\.eyes\[\d+\]", ("Eye",)),
     (r"pathfinder\.pool\[\d+\]", ("Node",)),
     (r"pathfinder", ("Pathfinder", "PathfinderSearch")),
     (r"moveClasses\[\d+\]", ("MoveClass",)),
-    (r"conditions\.(?:victory|defeat)\[\d+\]", CONDITION_TABLES),
-    (r"conditions", ("MissionConditions",)),
+    (r"playersState\.conditions\.(?:victory|defeat)\[\d+\]", CONDITION_TABLES),
+    (r"playersState\.conditions", ("MissionConditions",)),
     (r"mission", ("MissionData", "MissionStartRest")),
     (r"weapons\[\d+\]", ("WeaponDefData",)),
     (r"defs\[\d+\]", ("UnitDefData",)),

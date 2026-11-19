@@ -664,14 +664,14 @@ static void __stdcall GoalSerializeNetUnitStateNative(PathGoal* goal, BitWriter*
     goal->SerializeNetUnitState(stream);
 }
 
-static void __stdcall UnitRefInitNative(PathOrderAttach* ref, Unit* unit, OrderBase* value)
+static void __stdcall UnitRefInitNative(UnitRef* ref, Unit* unit, OrderBase* value)
 {
-    ref->PathOrderAttach::PathOrderAttach(unit, value);
+    ((PathOrderAttach*)ref)->PathOrderAttach::PathOrderAttach(unit, value);
 }
 
-static void __stdcall UnitRefSetUnitNative(PathOrderAttach* ref, Unit* unit)
+static void __stdcall UnitRefSetUnitNative(UnitRef* ref, Unit* unit)
 {
-    ref->SetUnit(unit);
+    ((PathOrderAttach*)ref)->SetUnit(unit);
 }
 
 Seams g_seams;
@@ -701,6 +701,16 @@ const PathfindingSeam* DefaultPathfindingSeam()
 const EconomySeam* DefaultEconomySeam()
 {
     return &s_economy;
+}
+
+const PlayersSeam* DefaultPlayersSeam()
+{
+    return &s_players;
+}
+
+const LosRadarSeam* DefaultLosRadarSeam()
+{
+    return &s_los_radar;
 }
 
 static_assert(sizeof(HapiBank) == sizeof(AccountBank), "HapiBank and AccountBank must have the same size");
@@ -902,10 +912,16 @@ void InstallNativeSeams()
     s_los_radar.CreateUnitIndex = CreateUnitIndex;
     s_los_radar.FreeUnitIndex = FreeUnitIndex;
     s_los_radar.RefreshUnitIndex = RefreshUnitIndex;
+    s_los_radar.RegionSize = LosRadarRegionSize;
+    s_los_radar.Init = LosRadarInit;
+    s_los_radar.Shutdown = LosRadarShutdown;
+    s_los_radar.SightCache = LosRadarSightCache;
+    s_los_radar.WriteState = LosRadarWriteState;
     s_units.GetFactoriesInRadius = GetFactoriesInRadius;
     s_units.CreateFactoryIndex = CreateFactoryIndex;
     s_units.FreeFactoryIndex = FreeFactoryIndex;
     s_units.RefreshFactoryIndex = RefreshFactoryIndex;
+    s_units.WriteState = UnitsWriteState;
     s_map.GetNameSlot = GetNameSlotNative;
     s_units.GetGroundHeight = GetGroundHeightNative;
     s_scripts.GetSweetSpot = GetSweetSpotNative;
@@ -953,6 +969,9 @@ void InstallNativeSeams()
     s_ai.FreeSquadManager = FreeSquadManagerNative;
     s_ai.CreateSquadManager = CreateSquadManagerNative;
     s_map.Apply = ApplyMapEvent;
+    s_map.AllocateBuckets = MapAllocateBuckets;
+    s_map.FreeBuckets = MapFreeBuckets;
+    s_map.WriteState = MapWriteState;
     s_map.UnitsInRange = UnitsInRange;
     s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
@@ -998,6 +1017,10 @@ void InstallNativeSeams()
     s_map.SelectMission = SelectMissionNative;
     s_map.ComputeMapChecksum = ComputeMapChecksumNative;
     s_map.GetTerrainLength = GetTerrainLengthNative;
+    s_players.RegionSize = PlayersRegionSize;
+    s_players.Init = PlayersInit;
+    s_players.Shutdown = PlayersShutdown;
+    s_players.WriteState = PlayersWriteState;
     s_players.InitPlayers = InitPlayers;
     s_players.FreePlayers = FreePlayers;
     s_players.InitPlayerResources = InitPlayerResources;

@@ -591,7 +591,6 @@ void LoadingScreenFrame(void)
         g_game->frames_38a3b = 0;
         g_game->ticks = 0;
         g_game->streak = 0;
-        g_game->endGameCountdown = (short)0xffff;
         g_game->width_37e1f = g_game->width_37f1b;
         g_game->screenHeight = g_game->height_37f1f;
         g_game->viewCullMinX = 0x80;

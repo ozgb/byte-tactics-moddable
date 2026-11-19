@@ -1,14 +1,14 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v29` is the fixed target for anyone writing a new
+The git tag `reference-traces-v30` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v29`**.
+code as a base. This page names the current tag: **`reference-traces-v30`**.
 
 ## What the tag holds
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (compiled into the test-mode build).
-- The trace format: `bt-trace 5` (the digest files are `bt-digest 5`). The
+- The trace format: `bt-trace 6` (the digest files are `bt-digest 6`). The
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v29`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v29
+git checkout reference-traces-v30
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -131,7 +131,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v29
+git checkout reference-traces-v30
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -203,9 +203,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v30`
+the digests that should become a target gets a new tag (`reference-traces-v31`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v29`.
+`reference-traces-v30`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -333,12 +333,21 @@ and so on), and this page is updated to name it. The current tag is
   player's anti-nuke silo intercepts a nuke in flight, so the retargeting of an interceptor at a projectile is
   judged. The format stays `bt-trace 5`. The 88 earlier digests, event digests, sound logs, UI logs, frames and
   the save are those of v28.
+- `reference-traces-v30`: the same 89 scenarios as v29 in trace format `bt-trace 6` (#979). The rows
+  no longer hash state that only its owner reads: the sight cache of a unit (bytes 0x7a to 0x7d and
+  0xf8 of a `Unit`), the eyeballs (section 15), the buckets' `a`, `flags` and unit lists (section 14
+  keeps `b`, which orders reads), the players' update and win/lose clocks, the end-game countdown, the
+  mission conditions (section 28) and ai's own state (the PlayerAI fields, the squad managers and the
+  squads, sections 24 to 26). Sections 24 and 25 now hash the unit lists los_radar keeps and the
+  factory lists units keeps, as the modules write them through the state writer. What left the rows is
+  dumped as los_radar's, map's, players' and ai's records (44, 45, 46 and 43). Every digest changes; the
+  event digests, sound logs, UI logs and frames are those of v29, and the save decodes equal to v29's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

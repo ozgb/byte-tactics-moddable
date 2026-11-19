@@ -1,6 +1,8 @@
 #ifndef INTERFACES_LOS_RADAR_H
 #define INTERFACES_LOS_RADAR_H
 
+#include "state_writer.h"
+
 namespace std {
 template<class T> class allocator;
 template<class T, class A> class vector;
@@ -15,7 +17,7 @@ struct Vec3;
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
 #define LOS_RADAR_VERSION_MAJOR 3
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 1
+#define LOS_RADAR_VERSION_MINOR 2
 
 // The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a unit with a null unit changes nothing; outcome 0.
 enum LosRadarEventKind {
@@ -29,14 +31,32 @@ enum LosRadarEventKind {
     LOS_RADAR_ADD_EYEBALL = 131,
     // Recomputes the terrain height range of the cells in the rectangle of cell and size, in cells; outcome 1.
     LOS_RADAR_CELL_HEIGHTS = 132,
-    // Rebuilds the line of sight of every unit and the radar picture; value 1 first resets what each cell shows to every player; outcome 1.
+    // Rebuilds the line of sight of every unit and the radar picture; value 1 first resets what each cell shows: to nothing for every player when mapping is on, to everything when it is off; outcome 1.
     LOS_RADAR_RECALCULATE = 133,
     // Toggles whether player shares its map with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
     LOS_RADAR_SHARE_MAPPING = 134,
     // Toggles whether player shares its radar with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
     LOS_RADAR_SHARE_RADAR = 135,
     // Shows player value every cell that player sees now; outcome 1.
-    LOS_RADAR_SHARE_MAP = 136
+    LOS_RADAR_SHARE_MAP = 136,
+    // Sets the sight cache of unit back to what units' set-up wrote, no cell and no frame; outcome 1.
+    LOS_RADAR_SIGHT_RESET = 137,
+    // Sets the sight cache of unit to sight, read from a saved game; outcome 1.
+    LOS_RADAR_SIGHT_LOAD = 138
+};
+
+// What los_radar remembers of the line of sight it gave a unit, in the order a saved game stores it.
+struct LosSightCache {
+    // The cell the sight circle was last drawn at, the x of its top left in the low 16 bits and the z in the high 16 bits.
+    int cell;
+    // The frame of the sight circle table last drawn.
+    unsigned char frameIdx;
+};
+
+// The map a match starts on.
+struct LosRadarMapInfo {
+    // The number of unit slots.
+    int unitSlots;
 };
 
 // An event (LosRadarEventKind), as plain data with no pointers; fields a kind does not use are 0.
@@ -61,6 +81,8 @@ struct LosRadarEvent {
     int cell[2];
     // The width and height of the rectangle, in cells.
     int size[2];
+    // The cache a LOS_RADAR_SIGHT_LOAD sets; 0 for the other kinds.
+    LosSightCache sight;
 };
 
 // Line of sight and radar. The engine delivers los_radar's pending inbox, through Apply, before each pass below and at each phase boundary.
@@ -113,6 +135,16 @@ struct LosRadarSeam {
     void (__stdcall* FreeUnitIndex)(int player);
     // Every 30 ticks of a player that has an index, refills it from the ready units: the enemy units the player sees, the enemy units with flag 0x100, and whether it has a finished unit of a type with flag 0x400 switched on. Hooks: none.
     void (__stdcall* RefreshUnitIndex)(int player);
+    // The bytes of private state the implementation needs for a map; called before Init.
+    unsigned int (__stdcall* RegionSize)(const LosRadarMapInfo* map);
+    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before the first tick and before any event.
+    void (__stdcall* Init)(const LosRadarMapInfo* map, void* region, unsigned int size);
+    // Ends the match and returns the region, which the engine frees.
+    void* (__stdcall* Shutdown)(void);
+    // Fills the sight cache of a unit as it stands, for a saved game; a query. Hooks: none.
+    void (__stdcall* SightCache)(Unit* unit, LosSightCache* out);
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

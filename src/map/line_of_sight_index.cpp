@@ -20,6 +20,8 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 #include "../game/players.h"
 #include "../../link/globals.h"
 #include "line_of_sight_index.h"
+#include "../../interfaces/state_writer.h"
+#include <stdio.h>
 
 static LosUnitIndex* s_index;
 
@@ -37,6 +39,33 @@ const LosUnitIndexEntry* LosUnitIndexOf(int player)
     if (s_index == nullptr)
         return nullptr;
     return &s_index->players[player];
+}
+
+static void WriteUnits(const StateWriter* w, const char* sizeName, const char* itemName, BlockVector<Ref<Unit> >& list)
+{
+    unsigned int n = list.Size();
+    w->Int(sizeName, 0, 4, n);
+    unsigned int k = 0;
+    for (BlockVector<Ref<Unit> >::iterator it = list.Begin(); it != list.End(); ++it, ++k)
+        w->Handle(itemName, k, STATE_HANDLE_UNIT, (*it).offset);
+}
+
+void WriteLosUnitIndex(const StateWriter* w)
+{
+    if (s_index == nullptr)
+        return;
+    for (int i = 0; i < 10; i++) {
+        LosUnitIndexEntry& entry = s_index->players[i];
+        if (!entry.live)
+            continue;
+        char name[32];
+        sprintf(name, "losRadarIndex[%d]", i);
+        w->Begin(24, name);
+        w->Int("player", 0, 4, i);
+        w->Int("hasSpecial", 0, 4, entry.hasSpecial);
+        WriteUnits(w, "visible.size", "visible[%u]", entry.visible);
+        WriteUnits(w, "known.size", "known[%u]", entry.known);
+    }
 }
 
 static LosUnitIndexEntry* EntryOf(int player)

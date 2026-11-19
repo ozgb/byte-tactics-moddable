@@ -72,6 +72,9 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "spatial_bucket.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_globals.h"
+#include "grid2.h"
+#include "line_of_sight.h"
+#include "../../interfaces/state_writer.h"
 
 // FUNCTION: 0x47c790
 void __stdcall ClaimFootprintCells(Unit* obj)
@@ -216,6 +219,123 @@ static void UnlinkBucketUnit(UnitBucket* bucket, Unit* unit)
     while (*pp != unit)
         pp = &(*pp)->cargoNext;
     *pp = unit->cargoNext;
+}
+
+void __stdcall MapAllocateBuckets()
+{
+    Rec* rec = new (kSim) Rec;
+    g_game->overflowBucket = (SpatialBucket*)rec;
+    ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
+
+    Grid2* grid2 = &g_game->spatialGrid_1429f;
+    int b = g_game->baseY * 0x10000;
+    int a = g_game->baseX * 0x10000;
+    grid2->heightFixed = b;
+    grid2->widthFixed = a;
+    int w2;
+    int h2;
+    h2 = (b + 0x7fffff) >> 0x17;
+    w2 = (a + 0x7fffff) >> 0x17;
+    grid2->width = w2;
+    grid2->height = h2;
+    operator delete(grid2->cells);
+    int count2 = (h2 * w2 + 7) & 0xfffffff8;
+    grid2->count = count2;
+
+    grid2->cells = count2 != 0 ? (FogCell*)new (kSim) Rec[count2] : 0;
+    unsigned char* cells2 = (unsigned char*)grid2->cells.get();
+    unsigned char* cellp = (unsigned char*)g_game->cells.get();
+
+    for (unsigned int lb1 = 0; lb1 < (unsigned int)grid2->width; lb1++)
+        ((Rec*)grid2->cells.get())[lb1].flags |= 1;
+    for (unsigned int lb2 = 0; lb2 < (unsigned int)grid2->width; lb2++)
+        ((Rec*)grid2->cells.get())[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
+    for (unsigned int lb3 = 0; lb3 < (unsigned int)grid2->height; lb3++)
+        ((Rec*)grid2->cells.get())[lb3 * grid2->width].flags |= 4;
+    for (unsigned int i = 0; i < (unsigned int)grid2->height; i++) {
+        int* fp = &((Rec*)grid2->cells.get())[(i + 1) * grid2->width - 1].flags;
+        *fp = *fp | 8;
+    }
+
+    for (int d = 0; d < grid2->count; d++)
+        ((unsigned char*)grid2->cells.get())[d * 10] = g_game->seaLevel;
+
+    {
+        for (int y = 0; y < g_game->height; y++) {
+            unsigned char* recp = cells2;
+            for (int x = 0; x < g_game->width; x++, cellp += 0xd) {
+                if (cellp[5] > recp[0])
+                    recp[0] = cellp[5];
+                if ((x & 7) == 7)
+                    recp += 10;
+            }
+            if ((y & 7) == 7)
+                cells2 += grid2->width * 10;
+        }
+    }
+
+    for (unsigned int r = 0; r < (unsigned int)grid2->height; r++) {
+        unsigned char* p = (unsigned char*)grid2->cells.get() + r * grid2->width * 10;
+        unsigned char prev = 0;
+        for (unsigned int fr = 1; fr < (unsigned int)grid2->width; fr++, p += 10) {
+            unsigned char t = p[10];
+            unsigned char last = prev;
+            prev = p[0];
+            if (prev <= t)
+                prev = t;
+            p[1] = last > prev ? last : prev;
+        }
+        p[1] = prev;
+    }
+
+    for (unsigned int outer = 0; outer < (unsigned int)grid2->width; outer++) {
+        unsigned char* p = (unsigned char*)grid2->cells.get() + outer * 10;
+        unsigned char prev = 0;
+        for (unsigned int gc = 1; gc < (unsigned int)grid2->height; gc++, p += grid2->width * 10) {
+            unsigned char t = p[grid2->width * 10 + 1];
+            unsigned char last = prev;
+            prev = p[1];
+            if (prev <= t)
+                prev = t;
+            p[1] = last > prev ? last : prev;
+        }
+        p[1] = prev;
+    }
+}
+
+void __stdcall MapFreeBuckets()
+{
+    Grid2* g2 = &g_game->spatialGrid_1429f;
+    g2->width = 0;
+    g2->height = 0;
+    operator delete(g2->cells);
+    g2->count = 0;
+    g2->cells = 0;
+
+    operator delete(g_game->overflowBucket.get());
+    g_game->overflowBucket = 0;
+}
+
+void __stdcall MapWriteState(const StateWriter* w)
+{
+    Rec* recs = (Rec*)g_game->cells_1429f.get();
+    unsigned int count = g_game->spatialGrid_1429f.count;
+    Rec* overflow = (Rec*)g_game->overflowBucket.get();
+    if (recs == nullptr || count > (1u << 20))
+        count = 0;
+    w->Begin(45, "mapState");
+    w->Int("spatial.count", 0, 4, count);
+    for (unsigned int r = 0; r < count; r++) {
+        w->Int("spatial[%u].a", r, 1, recs[r].a);
+        w->Int("spatial[%u].flags", r, 4, (unsigned int)recs[r].flags);
+        w->Handle("spatial[%u].first", r, STATE_HANDLE_UNIT, ((UnitBucket*)&recs[r])->first.offset);
+    }
+    w->Int("overflow.present", 0, 1, overflow != nullptr);
+    if (overflow != nullptr) {
+        w->Int("overflow.a", 0, 1, overflow->a);
+        w->Int("overflow.flags", 0, 4, (unsigned int)overflow->flags);
+        w->Handle("overflow.first", 0, STATE_HANDLE_UNIT, ((UnitBucket*)overflow)->first.offset);
+    }
 }
 
 // FUNCTION: 0x47cb60

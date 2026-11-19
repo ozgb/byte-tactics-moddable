@@ -103,8 +103,8 @@ struct Player {
     float shareMetal;
     float shareEnergy;
     Ref<UnitResources> econ;
-    int updateTime;
-    int winLoseTime;
+    int unusedUpdateTime;
+    int unusedWinLoseTime;
     int displayTimer;
     short kills;
     short losses;

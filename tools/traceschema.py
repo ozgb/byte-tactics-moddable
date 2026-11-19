@@ -31,7 +31,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 5
+TRACE_FORMAT = 6
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",
@@ -107,6 +107,13 @@ POINTER_NAMES: dict[tuple[str, int], str] = {
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
     ("Unit", "+0xbc..+0xeb", "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"),
+    ("Unit", "unusedLosCache", "los_radar's sight cache, in its private region: reported by losRadarState"),
+    ("Unit", "unusedLosSightFrame", "los_radar's sight cache, in its private region: reported by losRadarState"),
+    ("Rec", "a", "read only by map: reported by mapState"),
+    ("Rec", "flags", "read only by map: reported by mapState"),
+    ("Rec", "first", "read only by map: reported by mapState"),
+    ("Player", "unusedUpdateTime", "players' private region: reported by playersState"),
+    ("Player", "unusedWinLoseTime", "players' private region: reported by playersState"),
     ("Eye", "screen", "points at the record's own screenPos"),
     ("Eye", "flagPtr", "points at the record's own flagB"),
     ("Node", "penalty", "NodeData(x, y, g, f, steps) leaves it unset for the start node; the visit hashes it when g is not 0"),
@@ -144,18 +151,18 @@ EXCLUSIONS: list[tuple[str, str, str]] = [
     ("PieceTransform", "sfxOffset", "points at constant model data"),
     ("PieceTransform", "value", "a cache cleared when the piece changes"),
     ("PieceTransform", "rest", "bytes 0x2a to 0x35, which nothing in the script or the sim writes"),
-    ("PlayerAI", "visible", "the visit hashes the size and the unit IDs it holds"),
-    ("PlayerAI", "known", "the visit hashes the size and the unit IDs it holds"),
-    ("PlayerAI", "factories", "the visit hashes the size and the unit IDs it holds"),
-    ("PlayerAI", "cells", "the visit hashes the size and the elements it holds, never the begin and end pointers"),
-    ("PlayerAI", "vec_65", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "counts", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "vec_8d", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "weights", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "vec_ad", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "vec_bd", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "values", "the visit hashes the size and the elements it holds"),
-    ("PlayerAI", "locked", "the visit hashes the size and the elements it holds"),
+    ("PlayerAI", "visible", "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"),
+    ("PlayerAI", "known", "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"),
+    ("PlayerAI", "factories", "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"),
+    ("PlayerAI", "cells", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed, never the begin and end pointers"),
+    ("PlayerAI", "vec_65", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "counts", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "vec_8d", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "weights", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "vec_ad", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "vec_bd", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "values", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
+    ("PlayerAI", "locked", "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"),
     ("SquadManager", "timers", "the visit hashes the class and the fields of each timer"),
     ("SquadTimer", "vptr", "the class is hashed as a tag"),
     ("SquadTimer", "manager", "points back at the SquadManager that owns the timer"),
@@ -887,7 +894,6 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameCountdown", 0x39239, 2, None, 0),
     ("endGameFlags", 0x3923B, 2, None, 0),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
@@ -968,6 +974,8 @@ LOS_RADAR_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("lifetime", 4, "scalar", None),
     ("cell", 8, "bytes", None),
     ("size", 8, "bytes", None),
+    ("sightCell", 4, "scalar", None),
+    ("sightFrameIdx", 4, "scalar", None),
     ("outcome", 4, "scalar", None),
 ]
 MAP_SECTION = 40

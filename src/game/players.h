@@ -9,6 +9,8 @@ struct Unit;
 
 struct Gui;
 struct PlayersEvent;
+struct PlayersMapInfo;
+struct StateWriter;
 
 class HapiBank;
 struct Gadget;
@@ -29,6 +31,10 @@ void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
 int __stdcall PlayersApply(const PlayersEvent* event);
+unsigned int __stdcall PlayersRegionSize(const PlayersMapInfo* info);
+void __stdcall PlayersInit(const PlayersMapInfo* info, void* region, unsigned int size);
+void* __stdcall PlayersShutdown();
+void __stdcall PlayersWriteState(const StateWriter* writer);
 
 int CountActiveAIPlayers();
 int CountCombatPlayers();

@@ -105,13 +105,13 @@ so no call moved in time: the cut changed how the call is made, not when.
 that movement reads, as a view.
 
 **What stayed, and why:**
-- **`PathOrderAttach`** (`src/orders/path_order_attach.h`; `PathOrderAttach::PathOrderAttach` and `SetUnit` in
+- **`PathOrderAttach`** (`src/units/path_order_attach.h`; `PathOrderAttach::PathOrderAttach` and `SetUnit` in
   `src/units/unit_targets.cpp`). #993 lists them as movement's. They stay units': `PathOrderAttach` is the unit
   reference (`UnitRef`) that orders (`Order::link`) and movement (`PathOrder::ref`) both embed, and its link and unlink
   are units' unit-list code (`Unit::head`, `UnitRef::Unlink`). Movement and orders reach it through units' new slots
-  `UnitRefInit` and `UnitRefSetUnit`, and through the existing `UnitRefUnlink` (units 2.0). Where the caller built the
+  `UnitRefInit` and `UnitRefSetUnit`, and through the existing `UnitRefUnlink` (units 2.0); all three take a `UnitRef*`. Where the caller built the
   reference in place (`link(o, 0)`), the constructor now runs empty and `UnitRefInit` fills it; its destructor body
-  moved into `UnitRef::Unlink`. The header stays in `src/orders/`, as a plain data class.
+  moved into `UnitRef::Unlink`. The header moved from `src/orders/` to `src/units/`.
 - **`MovementClass`** (`src/units/movement_class.cpp`): the pass map and the movement class table are units' and map's
   (`docs/map-interface.md`), not the motion's. `UnitMotion::movementClass` only points at one.
 - **Pathfinding.** `src/ai/pathfind*.cpp` stays pathfinding's. It reads a goal's areas through `PathGoalCells`,

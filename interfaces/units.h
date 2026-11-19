@@ -1,6 +1,8 @@
 #ifndef INTERFACES_UNITS_H
 #define INTERFACES_UNITS_H
 
+#include "state_writer.h"
+
 namespace std {
 template<class T> class allocator;
 template<class T, class A> class vector;
@@ -11,7 +13,6 @@ struct UnitDef;
 struct Vec3;
 class HapiBank;
 class OrderBase;
-class PathOrderAttach;
 class MovementClass;
 class UnitMotion;
 class UnitRef;
@@ -121,9 +122,11 @@ struct UnitsSeam {
     // Every 30 ticks of a player that has an index, refills it with the player's ready, finished units that have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
     void (__stdcall* RefreshFactoryIndex)(int player);
     // Builds the reference an order holds to a unit in memory the caller owns, links it to the unit when it has one and gives it the order that listens to the unit. Hooks: none.
-    void (__stdcall* UnitRefInit)(PathOrderAttach* ref, Unit* unit, OrderBase* value);
+    void (__stdcall* UnitRefInit)(UnitRef* ref, Unit* unit, OrderBase* value);
     // Points a reference at another unit, or at none, and links it into the list of that unit (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* UnitRefSetUnit)(PathOrderAttach* ref, Unit* unit);
+    void (__stdcall* UnitRefSetUnit)(UnitRef* ref, Unit* unit);
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

@@ -46,6 +46,90 @@ struct UnitDef;
 #pragma pack(pop)
 
 #include "../../link/globals.h"
+#include "../../interfaces/players.h"
+#include "../../interfaces/state_writer.h"
+#include "victory.h"
+#include "victory_conditions.h"
+#include "../harness/condition_class.h"
+
+struct PlayersRegion {
+    short endGameCountdown;
+    int updateTime[10];
+    int winLoseTime[10];
+};
+
+static PlayersRegion* s_region;
+
+static int PlayerSlotOf(const Player* p)
+{
+    return (int)(p - g_game->players);
+}
+
+unsigned int __stdcall PlayersRegionSize(const PlayersMapInfo*)
+{
+    return sizeof(PlayersRegion);
+}
+
+void __stdcall PlayersInit(const PlayersMapInfo*, void* region, unsigned int)
+{
+    s_region = static_cast<PlayersRegion*>(region);
+    SimBlockTrack(reinterpret_cast<void**>(&s_region));
+    s_region->endGameCountdown = (short)0xffff;
+}
+
+void* __stdcall PlayersShutdown()
+{
+    void* region = s_region;
+    s_region = nullptr;
+    return region;
+}
+
+static void WriteCondition(const StateWriter* w, const char* name, MissionCondition* c)
+{
+    int cls = HarnessConditionClass(c);
+    w->Begin(46, name);
+    w->Int("class", 0, 4, (unsigned int)cls);
+    w->Int("satisfied", 0, 4, (unsigned int)c->satisfied);
+    w->Int("celebrated", 0, 4, (unsigned int)c->celebrated);
+    if (cls == COND_VICTORY_KILL_MOBILE)
+        w->Int("numUnits", 0, 4, (unsigned int)static_cast<VictoryKillAllMobileUnits*>(c)->numUnits);
+    else if (cls == COND_VICTORY_KILL_TYPE)
+        w->Int("numLeftToKill", 0, 4, (unsigned int)static_cast<VictoryKillUnitType*>(c)->numLeftToKill);
+    else if (cls == COND_DEFEAT_TYPE_KILLED)
+        w->Int("numLeftToKill", 0, 4, (unsigned int)static_cast<DefeatUnitTypeKilled*>(c)->numLeftToKill);
+}
+
+void __stdcall PlayersWriteState(const StateWriter* w)
+{
+    if (s_region == nullptr)
+        return;
+    w->Begin(46, "playersState");
+    w->Int("endGameCountdown", 0, 2, (unsigned short)s_region->endGameCountdown);
+    for (int i = 0; i < 10; i++) {
+        w->Int("players[%u].updateTime", i, 4, (unsigned int)s_region->updateTime[i]);
+        w->Int("players[%u].winLoseTime", i, 4, (unsigned int)s_region->winLoseTime[i]);
+    }
+    MissionConditions* conditions = g_game->list_391ed;
+    w->Int("conditions.present", 0, 1, conditions != nullptr);
+    if (conditions == nullptr)
+        return;
+    w->Int("conditions.victoryCount", 0, 4, (unsigned int)conditions->victoryCount);
+    w->Int("conditions.defeatCount", 0, 4, (unsigned int)conditions->defeatCount);
+    w->Int("conditions.active", 0, 4, (unsigned int)conditions->active);
+    for (int list = 0; list < 2; list++) {
+        unsigned int count = (unsigned int)(list == 0 ? conditions->victoryCount : conditions->defeatCount);
+        if (count > sizeof(conditions->victory) / sizeof(conditions->victory[0]))
+            count = 0;
+        for (unsigned int k = 0; k < count; k++) {
+            MissionCondition* c = (list == 0 ? conditions->victory : conditions->defeat)[k].get();
+            if (c == nullptr)
+                continue;
+            char name[64];
+            sprintf(name, "playersState.conditions.%s[%u]", list == 0 ? "victory" : "defeat", k);
+            WriteCondition(w, name, c);
+        }
+    }
+}
 
 
 // FUNCTION: 0x464290
@@ -168,8 +252,8 @@ void __cdecl operator delete(void* p);
 // FUNCTION: 0x464700
 void __stdcall InitPlayerSlot(Player* p)
 {
-    p->updateTime = (unsigned int)g_game->ticks;
-    p->winLoseTime = (unsigned int)g_game->ticks;
+    s_region->updateTime[PlayerSlotOf(p)] = (int)g_game->ticks;
+    s_region->winLoseTime[PlayerSlotOf(p)] = (int)g_game->ticks;
     goto stamp;
 back:
     p->totalEnergyProducedLo = 0;
@@ -419,19 +503,19 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
     unsigned char bl = (unsigned char)player;
     Player* pi = &g_game->players[bl];
 
-    if ((unsigned int)pi->updateTime > (unsigned int)g_game->ticks)
+    if ((unsigned int)s_region->updateTime[bl] > (unsigned int)g_game->ticks)
         return 0;
-    pi->updateTime += 0x1e;
+    s_region->updateTime[bl] += 0x1e;
 
     if (bl == g_game->localPlayer) {
         if (g_seams.map->GetGameType(g_game->net) == 1) {
             if (g_game->list_391ed->CheckVictory() == 0) {
                 if (g_game->list_391ed->CheckDefeat(stream) != 0) {
-                    if (g_game->endGameCountdown < 0) {
-                        g_game->endGameCountdown = 4;
+                    if (s_region->endGameCountdown < 0) {
+                        s_region->endGameCountdown = 4;
                     } else {
-                        g_game->endGameCountdown--;
-                        if (g_game->endGameCountdown < 0) {
+                        s_region->endGameCountdown--;
+                        if (s_region->endGameCountdown < 0) {
                             g_game->endGameFlags |= 4;
                             g_game->endGameVictory = 0;
                             g_game->bits.flag6 = 1;
@@ -439,11 +523,11 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
                     }
                 }
             } else {
-                if (g_game->endGameCountdown < 0) {
-                    g_game->endGameCountdown = 4;
+                if (s_region->endGameCountdown < 0) {
+                    s_region->endGameCountdown = 4;
                 } else {
-                    g_game->endGameCountdown--;
-                    if (g_game->endGameCountdown < 0) {
+                    s_region->endGameCountdown--;
+                    if (s_region->endGameCountdown < 0) {
                         g_game->endGameFlags |= 4;
                         g_game->endGameVictory = 1;
                         g_game->bits.flag5 = 1;
@@ -454,11 +538,11 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
         } else if ((pi->active == 0 ||
                     (pi->info->flags_9b & 0x40) == 0) &&
                    g_game->list_391ed->CheckDefeat(stream) != 0) {
-            if (g_game->endGameCountdown < 0) {
-                g_game->endGameCountdown = 4;
+            if (s_region->endGameCountdown < 0) {
+                s_region->endGameCountdown = 4;
             } else {
-                g_game->endGameCountdown--;
-                if (g_game->endGameCountdown < 0) {
+                s_region->endGameCountdown--;
+                if (s_region->endGameCountdown < 0) {
                     if (g_game->commanderDeath == 2) {
                         PlayerInfo* self =
                             g_game->players[FindHostSlot()].info;
@@ -541,7 +625,7 @@ skip508:
             if ((pi->unitCount != 0 || pi->unitsCreated == 0) &&
                 (t == 1 || t == 2)) {
                 if ((g_game->endGameFlags & 4) == 0 &&
-                    g_game->endGameCountdown < 0) {
+                    s_region->endGameCountdown < 0) {
                     return 2;
                 }
             }
@@ -587,11 +671,11 @@ check230:
     goto skip508;
 
 countdown_extra:
-    if (g_game->endGameCountdown < 0) {
-        g_game->endGameCountdown = 4;
+    if (s_region->endGameCountdown < 0) {
+        s_region->endGameCountdown = 4;
     } else {
-        g_game->endGameCountdown--;
-        if (g_game->endGameCountdown < 0) {
+        s_region->endGameCountdown--;
+        if (s_region->endGameCountdown < 0) {
             g_game->endGameFlags |= 4;
             g_game->endGameVictory = 1;
             g_game->bits.flag5 = 1;
@@ -618,12 +702,12 @@ void __stdcall UpdatePlayersFinish()
     if (g_seams.map->GetGameType(g_game->net) == 3 &&
         g_game->commanderDeath != 2 &&
         CountCombatPlayers() == 0) {
-        if (g_game->endGameCountdown < 0) {
-            g_game->endGameCountdown = 4;
+        if (s_region->endGameCountdown < 0) {
+            s_region->endGameCountdown = 4;
             return;
         }
-        g_game->endGameCountdown--;
-        if (g_game->endGameCountdown < 0) {
+        s_region->endGameCountdown--;
+        if (s_region->endGameCountdown < 0) {
             g_game->endGameFlags |= 4;
             g_game->endGameVictory = 0;
             g_game->bits.flag6 = 1;
@@ -775,8 +859,8 @@ void __stdcall LoadPlayers(HapiBank* file)
             p->bits_149.storage = file->GetIntegerItem("AddPlayerStorage", 0);
             p->kills = file->GetIntegerItem("Kills", 0);
             p->losses = file->GetIntegerItem("Losses", 0);
-            p->updateTime = file->GetIntegerItem("UpdateTime", 0);
-            p->winLoseTime = file->GetIntegerItem("WinLoseTime", 0);
+            s_region->updateTime[i] = file->GetIntegerItem("UpdateTime", 0);
+            s_region->winLoseTime[i] = file->GetIntegerItem("WinLoseTime", 0);
             p->displayTimer = file->GetIntegerItem("DisplayTimer", 0);
             p->info->color = file->GetIntegerItem("Logo", 0);
             p->info->side = file->GetIntegerItem("Side", 0);
@@ -816,8 +900,8 @@ void __stdcall SavePlayers(HapiBank* file)
             file->SetIntegerItem("AddPlayerStorage", p->bits_149.storage);
             file->SetIntegerItem("Kills", p->kills);
             file->SetIntegerItem("Losses", p->losses);
-            file->SetIntegerItem("UpdateTime", p->updateTime);
-            file->SetIntegerItem("WinLoseTime", p->winLoseTime);
+            file->SetIntegerItem("UpdateTime", s_region->updateTime[i]);
+            file->SetIntegerItem("WinLoseTime", s_region->winLoseTime[i]);
             file->SetIntegerItem("DisplayTimer", p->displayTimer);
             file->SetIntegerItem("Controller", p->type);
             file->SetIntegerItem("Logo", p->info->color);

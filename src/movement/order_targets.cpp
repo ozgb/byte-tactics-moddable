@@ -714,15 +714,15 @@ void PathOrder::SerializeToBits(BitWriter* stream)
 PathOrder::PathOrder(int owner, HapiBank* file, char* name)
     : OrderFx((Order*)owner), ref()
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     PathOrderRecord rec;
-    g_seams.units->UnitRefInit((PathOrderAttach*)&rec.ref_vt, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&rec.ref_vt, nullptr, nullptr);
     file->OpenNamedBox(name);
     file->SeekBox(0);
     if (file->ReadBox(&rec, 0x36) == 0x36) {
         unit = g_seams.units->LoadUnit(rec.id1, file);
-        g_seams.units->UnitRefSetUnit(&ref, (Unit*)g_seams.units->LoadUnit(rec.id2, file));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&ref, (Unit*)g_seams.units->LoadUnit(rec.id2, file));
         field_8 = rec.f1;
         approachRadius = rec.f2;
         altitude = rec.f3;
@@ -756,7 +756,7 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
 {
     PathOrderRecord rec;
     PathOrderAttach* ref = (PathOrderAttach*)&rec.ref_vt;
-    g_seams.units->UnitRefInit(ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)ref, nullptr, nullptr);
     if (unit == 0)
         rec.id1 = 0;
     else
@@ -783,13 +783,13 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
 PathOrder::PathOrder(Unit* owner_, BitReader* reader)
     : OrderFx(nullptr), unit(owner_), ref()
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     flags = reader->ReadBits(8);
     if (flags & 1) {
         piece = reader->ReadBits(0x10);
         unsigned short index = reader->ReadBits(0x10);
-        g_seams.units->UnitRefSetUnit(&ref, index == 0 ? nullptr : (Unit*)&g_game->units[index]);
+        g_seams.units->UnitRefSetUnit((UnitRef*)&ref, index == 0 ? nullptr : (Unit*)&g_game->units[index]);
     }
     if (flags & 0x10)
         approachRadius = reader->ReadBits(0x10);
@@ -814,7 +814,7 @@ PathOrder::PathOrder(Unit* owner_, BitReader* reader)
 PathOrder::PathOrder(Order* order, Unit* unit)
     : OrderFx(order), ref()
 {
-    g_seams.units->UnitRefInit(&ref, unit, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
@@ -837,7 +837,7 @@ PathOrder::PathOrder(Order* order, Unit* unit)
 PathOrder::PathOrder(Order* source, Unit* unit, short value)
     : OrderFx(source), piece(value), ref()
 {
-    g_seams.units->UnitRefInit(&ref, unit, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
@@ -850,7 +850,7 @@ PathOrder::PathOrder(Order* source, Unit* unit, short value)
 PathOrder::PathOrder(Order* source, const Vec3& p)
     : OrderFx(source), ref(), pos(p)
 {
-    g_seams.units->UnitRefInit(&ref, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
@@ -863,7 +863,7 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
 PathOrder::PathOrder(Order* source, Unit* unit, const Vec3& p)
     : OrderFx(source), ref()
 {
-    g_seams.units->UnitRefInit(&ref, unit, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
     pos = p;
     approachRadius = 0;

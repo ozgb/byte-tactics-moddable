@@ -299,7 +299,8 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in los_radar["fields"]],
                          [("kind", 4, "scalar", None), ("unit", 4, "ref", "unit"), ("player", 4, "scalar", None), ("value", 4, "scalar", None),
                           ("pos", 12, "bytes", None), ("sightDistance", 4, "scalar", None), ("eyeHeight", 4, "scalar", None),
-                          ("lifetime", 4, "scalar", None), ("cell", 8, "bytes", None), ("size", 8, "bytes", None), ("outcome", 4, "scalar", None)])
+                          ("lifetime", 4, "scalar", None), ("cell", 8, "bytes", None), ("size", 8, "bytes", None), ("sightCell", 4, "scalar", None),
+                          ("sightFrameIdx", 4, "scalar", None), ("outcome", 4, "scalar", None)])
         targets = {t["name"] for t in self.model["targets"]}
         for f in los_radar["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
@@ -344,10 +345,32 @@ class SchemaJsonTest(unittest.TestCase):
 
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
-        self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb"])
+        self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb", "unusedLosCache", "unusedLosSightFrame"])
         for f in unit["fields"] + unit["plan"]:
             self.assertFalse(0xBC <= f["offset"] <= 0xEB, f)
         self.assertIn({"name": "", "offset": 0xA6, "size": 22, "kind": "bytes", "target": None}, unit["plan"])
+
+
+class OwnerOnlyStateTest(unittest.TestCase):
+    def setUp(self):
+        self.model = json.loads(ts.JSON_OUT.read_text())
+
+    def test_the_format_is_6(self):
+        self.assertEqual(ts.TRACE_FORMAT, 6)
+
+    def test_rec_hashes_only_b(self):
+        rec = self.model["tables"]["Rec"]
+        self.assertEqual([f["name"] for f in rec["fields"]], ["b"])
+        self.assertEqual([e["field"] for e in rec["excluded"]], ["a", "flags", "first"])
+
+    def test_the_clocks_of_a_player_are_not_hashed(self):
+        player = self.model["tables"]["Player"]
+        self.assertEqual([e["field"] for e in player["excluded"]], ["unusedUpdateTime", "unusedWinLoseTime"])
+        for f in player["fields"] + player["plan"]:
+            self.assertFalse(f["offset"] <= 0xF0 < f["offset"] + f["size"] and f["name"] != "", f)
+
+    def test_the_end_game_countdown_is_not_a_game_scalar(self):
+        self.assertNotIn("endGameCountdown", [g["name"] for g in self.model["game_scalars"]])
 
 
 class CheckTest(unittest.TestCase):

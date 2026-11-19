@@ -218,17 +218,30 @@ first ticks. Each row is served as follows:
 
 ## 5. State and the trace
 
-Ai's state stays where it is and stays hashed in this change (the human, 2026-11-16, on PR #978); #979 moves out of
-the hash what only its owner reads, for los_radar, players, ai and map in one format bump.
+Ai keeps no private region: its state stays in the state block, where it was, and since #979 it is no longer
+hashed. #979 moved out of the hash what only its owner reads, for los_radar, players, ai and map in one format bump.
 
-**What only ai reads, for #979.** Hashed state that no other subsystem reads inside the tick but through ai's queries:
+**What left the hash, for #979.** State that no other subsystem reads inside the tick but through ai's queries, now
+dumped as record 43 (`aiState`) and not hashed:
 
 | Ai's state | Where | Read by | Written by |
 |---|---|---|---|
-| The per-player AI (`PlayerAI`): its plans, build weights and limits, feature cells, base positions, unit counts and weighted centre | `g_playerAI`, hashed as `players[i].ai` (`VisitPlayerAI`) | ai | ai (players creates and frees it through ai's set-up slots) |
-| The squad managers (`SquadManager`) and their six timers | `Player::ai`, hashed as `players[i].squadManager` | ai | ai (players' set-up calls `CreateSquadManager` and `FreeSquadManager`) |
-| The squads (`Group`, with their unit lists) | `Player::groups`, hashed as `players[i].squads` | ai | ai |
-| `g_aiCommandsEnabled` | the state block, hashed | ai | ai |
+| The per-player AI (`PlayerAI`): its plans, build weights and limits, feature cells, base positions, unit counts and weighted centre | `g_playerAI`; record 43 `aiState.players[i]` | ai | ai (players creates and frees it through ai's set-up slots) |
+| The squad managers (`SquadManager`) and their ten timer slots | `Player::ai`; record 43 `aiState.players[i].squadManager` | ai | ai (players' set-up calls `CreateSquadManager` and `FreeSquadManager`) |
+| The squads (`Group`, with their unit lists) | `Player::groups`; record 43 `aiState.players[i].squads[s]` | ai | ai |
+
+**What stays hashed, and who reads it.** `Unit::group` stays in the unit record: orders writes it (`GetBuiltOrder`),
+units loads it, and ai reads it (`SetUnitSquad`). The `Player::ai` and `Player::groups` references stay in the
+`Player` record, read by players (set-up, teardown and the rebuild of the feature cells) and ai. `g_aiCommandsEnabled` is not hashed and never
+was: only `aiState.commandsEnabled` dumps it, so a wrong value shows in the dump and in the orders it leads to.
+
+**The record 43 report** (dumped, never hashed; `docs/trace-format.md`). Its first lines are the report the module
+wrote before #979 (`commandsEnabled`, `count`, and per squad manager its player, countdown, next action and the next
+firing tick of each timer). After them, per player with a `PlayerAI`, the `PlayerAI` fields (without `hasSpecial`,
+which is los_radar's) and its nine raw vectors as a size and the bytes of the elements; per player with a squad
+manager, the manager's fields and each of its timers with its class number and fields; per player with squads, each of
+the ten squads with its fields and its unit list. A replacement ai writes what it needs to be judged by, and the
+default's report is required equal to the reference's.
 
 **The unit index is not ai's any more.** The visible, known and factory lists left `PlayerAI` (#991). los_radar holds,
 per player, the visible enemy list (`visible`), the known list (`known`, enemy units with flag 0x100) and `hasSpecial`,
@@ -242,11 +255,9 @@ when queued (`docs/economy-interface.md`, section 8) is los_radar's list built f
 Ai keeps in `PlayerAI` the unit counts, `builders`, the weighted centre, its own `lastTick`, the `RandomInt(0x1e)` draw
 and `ComputeBaseWeights`, all of `UpdatePlayerAI`.
 
-**The trace is unchanged.** No field leaves or enters the hash: section 24 still hashes, per player with a `PlayerAI`,
-the same table (the harness writes los_radar's `hasSpecial` at offset 0x79 of the copy it hashes) and the same three
-unit vectors, now read from los_radar's and units' records, at the same place in the stream. `PlayerAI`'s bytes 0x05 to
-0x34 and 0x79 to 0x7c are unused in the moddable build. #979 owns moving these out of section 24 with the trace format
-bump.
+**The unit index is reported by its owners.** Section 24 and 25 of the trace hash the visible, known and factory lists
+and `hasSpecial` through los_radar's and units' `WriteState`, not through `PlayerAI` (#979). `PlayerAI`'s bytes 0x05 to
+0x34 and 0x79 to 0x7c are unused in the moddable build.
 `privatestate.py --check` fails when another subsystem writes any of the items ai alone writes: its types (`PlayerAI`,
 `SquadManager`, the squad timers, `Group` and the AI's helper types) and `Player::groups`, `g_aiCommandsEnabled` and
 `g_playerAI`. `Unit::group` is not listed: orders writes it (`GetBuiltOrder`) and units loads it. `Player::ai` is not
@@ -256,8 +267,7 @@ and the runs, and ai has no query.
 **The trace dumps ai's events** in section 42 (`docs/trace-format.md`, section 8.30), after players' section 41, and
 hashes none of them. Each record is an event with the outcome `Apply` gave, or an effect ai published (`outcome` 1, as
 it is recorded before the publish), in ai's order. Ai's `WriteState` report (record 43, `aiState`) is dumped and not
-hashed: whether the AI commands are on, and per squad manager its player, countdown, next action and the
-next firing tick of each timer. The section is new, so the trace format's schema changes and the gate of this change is
+hashed (see above). The section is new, so the trace format's schema changes and the gate of this change is
 the full suite.
 
 ## 6. Random draws and sim events

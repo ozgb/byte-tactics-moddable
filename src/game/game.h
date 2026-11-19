@@ -1241,7 +1241,7 @@ struct Game {
     int multiMapping;
     int multiLineOfSight;
     int multiLOSType;
-    short endGameCountdown;
+    short unusedEndGameCountdown;
     union {
         unsigned short endGameFlags;
         unsigned char flagsByte_3923b;
@@ -1281,6 +1281,7 @@ struct Game {
     Game(void);
     Player* Current(void);
     Player* Current2(void);
+    int SlotOf(const Player* p) const;
 };
 #pragma pack(pop)
 
@@ -1305,6 +1306,12 @@ inline Player* Game::Current2(void)
 {
     int i = playerIndex;
     return &players[i];
+}
+
+inline int Game::SlotOf(const Player* p) const
+{
+    int slot = (int)(p - players);
+    return slot >= 0 && slot < 10 ? slot : -1;
 }
 
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600

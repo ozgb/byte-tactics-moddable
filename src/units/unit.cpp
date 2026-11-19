@@ -55,7 +55,7 @@ struct CargoLinkView {
 
 #include "../orders/order_base.h"
 
-#include "../orders/path_order_attach.h"
+#include "path_order_attach.h"
 
 #include "unit.h"
 

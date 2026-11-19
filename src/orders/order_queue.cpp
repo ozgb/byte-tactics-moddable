@@ -57,7 +57,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 
 #include "../../link/globals.h"
 
-#include "path_order_attach.h"
+#include "../units/path_order_attach.h"
 
 #include "mission_type.h"
 
@@ -425,9 +425,9 @@ static unsigned char OrderKindFromSavedIndex(unsigned char want)
 Order::Order(Unit* punit, HapiBank* file, char* name)
     : link()
 {
-    g_seams.units->UnitRefInit(&link, nullptr, nullptr);
+    g_seams.units->UnitRefInit((UnitRef*)&link, nullptr, nullptr);
     link.SetValue(this);
-    g_seams.units->UnitRefSetUnit(&link, 0);
+    g_seams.units->UnitRefSetUnit((UnitRef*)&link, 0);
     next = 0;
     attached = 0;
     created = (unsigned int)g_game->ticks;
@@ -465,7 +465,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
         return;
 
     unit = punit;
-    g_seams.units->UnitRefSetUnit(&link, g_seams.units->LoadUnit(desc.ownerType, file));
+    g_seams.units->UnitRefSetUnit((UnitRef*)&link, g_seams.units->LoadUnit(desc.ownerType, file));
 
     kind.index = desc.kind;
     state = desc.flag5;

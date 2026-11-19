@@ -267,6 +267,21 @@ class Splits(unittest.TestCase):
             self.assertIn("| economy | orders | units, each entity | split | `economy.Spend` (step 1) | a call into orders "
                           "outside its interface (step 3) |", sc.render(p))
 
+    def test_a_route_handler_is_a_delivery_not_a_call_outside_an_interface(self):
+        fns = functions()
+        fns[1]["calls"][2] = [7, "call", "OnSpent", False]
+        fns.append(fn("OnSpent", "src/orders.cpp", 1, 4, items=[("field_read", "Player::energy")]))
+        subs = SUBSYSTEMS + [{"function": "OnSpent", "file": "src/orders.cpp", "subsystem": "orders"}]
+        route = [{"caller": "Publish", "target": "OnSpent", "reason": "route table entry, s_routes (src/game/routes.cpp)"}]
+        with fixed():
+            p = sc.Page(sc.Program(fns, subs, route, SEAMS, NATIVE, SOURCES), [dep("economy", "orders")], [])
+            (d, found), = p.placed
+            self.assertEqual((found.kind, found.first, found.second, found.first_at, found.second_at),
+                             ("split", "economy.Spend", "the delivery of a queued effect to orders' handler", 1, 3))
+            text = sc.render(p)
+            self.assertIn("1. the delivery of a queued effect to orders' handler", text)
+            self.assertNotIn("a call into orders outside its interface (step", text)
+
     def test_across_entities(self):
         p = page([dep("economy", "orders")], [{"pass": "units", "item": "Player::energy", "reader": "orders"}])
         (key, rows, across), = p.groups()["units"]

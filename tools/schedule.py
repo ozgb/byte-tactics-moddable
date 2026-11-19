@@ -71,6 +71,8 @@ NATIVE_SLOT = re.compile(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\(.*\))?\s*(\w+);", re.M)
 EFFECTS = {"RandomInt": "draw rng", "GameRand": "draw crt", "RecordSimEvent": "sim event"}
 TRANSPARENT = {None, "seams", "platform", "game"}
 OUTSIDE = "a call into %s outside its interface"
+DELIVERY = "the delivery of a queued effect to %s' handler"
+ROUTE_REASON = "route table entry"
 ENGINE = {"presentation", "harness", "network", "files"}
 
 
@@ -427,6 +429,7 @@ class Node:
     slot: str = ""
     own: set = field(default_factory=set)
     access: str = ""
+    delivery: bool = False
 
 
 @dataclass
@@ -467,6 +470,7 @@ class Program:
                 self.slots["%s::%s" % (tables[table], slot)].add(impl)
                 if impl in adapters:
                     self.methods.add("%s::%s" % (tables[table], slot))
+        self.handlers = {r["target"] for r in edges if r["reason"].startswith(ROUTE_REASON)}
         for r in edges:
             m = SLOT_REASON.match(r["reason"])
             if m:
@@ -667,7 +671,8 @@ class Program:
                     if g.sub in ENGINE:
                         out.append(Node("engine", g.name, g.sub, used is True, fn.name))
                     elif g.sub in SIMS and g.sub != sub:
-                        out.append(Node("direct", g.name, g.sub, self.hands_back(used, [g], False), fn.name))
+                        out.append(Node("direct", g.name, g.sub, self.hands_back(used, [g], False), fn.name,
+                                        delivery=name in self.handlers))
                     else:
                         inline(g)
         cut.discard(key)
@@ -1264,12 +1269,12 @@ def step_label(n: Node) -> str:
     if n.kind == "entry":
         return n.label
     if n.kind == "direct":
-        return OUTSIDE % n.sub
+        return (DELIVERY if n.delivery else OUTSIDE) % n.sub
     return ""
 
 
 def step_name(label: str) -> str:
-    return label if label.startswith(OUTSIDE.split("%")[0]) else code(label)
+    return label if label.startswith((OUTSIDE.split("%")[0], DELIVERY.split("%")[0])) else code(label)
 
 
 class Page:
@@ -1353,6 +1358,10 @@ class Page:
                                     "sim event": "a sim event is recorded"}[n.label])
             elif n.kind == "pass":
                 out.append("1. the pass %s (below)" % code(n.label))
+            elif n.delivery:
+                line = "1. " + DELIVERY % n.sub
+                if line not in out:
+                    out.append(line)
             else:
                 out.append("1. " + OUTSIDE % n.sub)
         return out
@@ -1491,6 +1500,9 @@ def render(page: Page) -> str:
         "- **A call into a subsystem outside its interface:** a call into code another subsystem owns (a constructor or a",
         "  helper of its records) that goes through no seam. It has no class; its writes count for the entry point that",
         "  makes it.",
+        "- **A delivery:** the call of a subscriber's handler for a queued effect, a function of the scheduler's route",
+        "  table. The scheduler makes it, not the code that published the effect; it is listed once for each",
+        "  subscribing subsystem, has no class, and its writes count for the entry point that publishes.",
         "",
         "## The tick",
         "",

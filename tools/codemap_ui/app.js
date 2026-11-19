@@ -5,6 +5,7 @@ const SUB_COLORS = {
   weapons: "#ef6f6c", players: "#f28cc0", features: "#9ccc65", wind_meteors: "#4dd0c3", orders: "#e3c35a",
   ai: "#d08bf0", pathfinding: "#64b5f6", targeting: "#ff8a65", los_radar: "#4fc3f7", economy: "#ffd54f",
   map: "#b09184", files: "#90a4ae", platform: "#78909c", seams: "#b0bec5",
+  scripts: "#ff7fa8", movement: "#a5d6a7",
 };
 const BANDS = ["Drivers", "Tick phases", "Called from the phases", "World and engine"];
 const QUIET_TARGETS = new Set(["platform", "files", "harness"]);

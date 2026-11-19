@@ -32,14 +32,14 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import astcache
+import coupling
 import rwsets
 from rwsets import ROOT
 
 DEFAULT_BUILD_DIR = ROOT / "build/rwsets"
 DATA = ROOT / "data"
 DOC = ROOT / "docs" / "schedule.md"
-SIMS = ["wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar", "orders", "units",
-        "players", "map"]
+SIMS = coupling.SIM_SUBSYSTEMS
 SPLICE_SCALE = 1000
 SPLICE_DEPTH = 3
 PHASES = ["net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail"]

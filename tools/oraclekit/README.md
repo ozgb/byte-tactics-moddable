@@ -100,7 +100,7 @@ The kit's copy of the page sets each long numbered list of its `Tables` section 
 
 `coupling/` holds what the reference's 83 scenarios showed of how the subsystems depend on each other's state. A
 subsystem is one of `wind_meteors`, `economy`, `features`, `ai`, `pathfinding`, `weapons`, `targeting`, `los_radar`,
-`orders`, `units`, `players` and `map`. An item is a field of a record of `layout.json` (`Type::field`), a random stream
+`orders`, `units`, `players`, `map`, `scripts` and `movement`. An item is a field of a record of `layout.json` (`Type::field`), a random stream
 (`rng.*`), `sound`, `ui`, or a region of the block that the layout leaves unnamed. A phase is a window of a tick:
 `net`, `players`, `units` and the others the trace format lists, `tail`, then `presentation`. An example is
 `scenario@tick`: a scenario of `reference/scenarios/` and the tick at which the row was first seen. The files are CSV

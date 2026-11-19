@@ -20,7 +20,7 @@ state, like the order of their draws. This tool reads only those files, data/cou
 below) and the names of reference/scenarios, never build/.
 
 Simulation subsystems are coupling.SIM_SUBSYSTEMS: wind_meteors, economy, features, ai, pathfinding, weapons,
-targeting, los_radar, orders, units, players, map. A row whose writer or reader is anything else (game, network,
+targeting, los_radar, orders, units, players, map, scripts, movement. A row whose writer or reader is anything else (game, network,
 harness, seams, files, platform, presentation, unknown, or `-` for no subsystem) is not an edge between two
 simulation subsystems, and neither is a row of one subsystem with itself or a row whose item is `unresolved:*`
 (the access fell in an image or block range no state row names). Those rows are dropped, except that a `-`

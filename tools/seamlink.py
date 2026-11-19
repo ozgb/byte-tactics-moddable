@@ -6,6 +6,7 @@
     uv run tools/seamlink.py --objects @build/modern/objects.rsp --check
     uv run tools/seamlink.py --private-state                                # pathfinding's region, from data/rwsets.csv
     uv run tools/seamlink.py --pilot-seams                                  # the pilots' seams, from data/rwsets.csv
+    uv run tools/seamlink.py --mission-record                               # the mission's record, from data/rwsets.csv
     uv run tools/test_seamlink.py                                           # tests, on hand-written units
 
 The build puts every function in its own COMDAT section, so the relocations of a
@@ -42,6 +43,11 @@ symbol starts with `virtual ` is a virtual call between subsystems, which
 --private-state fails when a function of any subsystem other than pathfinding reads, writes or lets escape
 Game::pathfinder or a member of a type of pathfinding's state region, from the field and deref rows of
 data/rwsets.csv and the owners of data/subsystems.csv.
+--mission-record fails when a function outside the mission reaches the mission's record (#1003): a field, deref or call row of
+data/rwsets.csv whose target is Game::net, or names one of the record's types (MISSION_TYPES: Mission, MissionUnit, MissionFeature,
+MissionRule), by a function that data/subsystems.csv does not give to the subsystem mission. The mission's fillers in
+src/seams/native.cpp (each `s_mission.<slot> = <function>;` of the table, and TheMission, which they share) are the default's own
+and may. Every other caller reads the mission through MissionSeam, so a mission module with its own layout can serve it.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
 features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h; ai, interfaces/ai.h; weapons, interfaces/weapons.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
@@ -192,6 +198,12 @@ PRIVATE_TYPES = ("NodeData", "Node", "PathCell", "PathGrid", "TurnCostTable", "T
                  "PathExtra", "Pathfinder")
 PRIVATE_KINDS = ("field_read", "field_write", "field_escape", "field_maybe_written", "deref_read", "deref_write",
                  "deref_escape", "deref_maybe_written")
+MISSION_OWNER = "mission"
+MISSION_ITEMS = ("Game::net",)
+MISSION_TYPES = ("Mission", "MissionUnit", "MissionFeature", "MissionRule")
+MISSION_KINDS = PRIVATE_KINDS + ("call",)
+MISSION_TABLE = "s_mission"
+MISSION_FILLER_HELPERS = ("TheMission",)
 ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *", "operator Cell *", "operator unsigned char *", "operator unsigned short *",
                  "operator Feature *", "operator UnitBucket *", "operator UnitDef *", "operator!=", "strlen", "operator->", "get")
 NATIVE_TABLE = "src/seams/native.cpp"
@@ -786,6 +798,38 @@ def private_state(root: Path) -> list:
     return sorted(found)
 
 
+def mission_fillers(root: Path) -> set:
+    """The functions of src/seams/native.cpp that fill the mission's table, and the helpers they share."""
+    path = root / NATIVE_TABLE
+    text = path.read_text(errors="replace") if path.exists() else ""
+    found = set(re.findall(r"\b%s\.\w+\s*=\s*(\w+)\s*;" % MISSION_TABLE, text))
+    return found | set(MISSION_FILLER_HELPERS)
+
+
+def mission_record(root: Path) -> list:
+    """(subsystem, function, kind, target) of every access to the mission's record outside the mission."""
+    owners = {}
+    with (root / SUBSYSTEMS).open(newline="") as f:
+        for r in csv.DictReader(f):
+            owners[(r["function"], r["file"])] = r["subsystem"]
+    fillers = mission_fillers(root)
+    types = set(MISSION_TYPES)
+    found = set()
+    with (root / RWSETS).open(newline="") as f:
+        for r in csv.DictReader(f):
+            if r["kind"] not in MISSION_KINDS:
+                continue
+            target = r["target"]
+            if target not in MISSION_ITEMS and not types & set(re.findall(r"\w+", target)):
+                continue
+            if r["file"] == NATIVE_TABLE and r["function"] in fillers:
+                continue
+            owner = owners.get((r["function"], r["file"]), "unowned")
+            if owner != MISSION_OWNER:
+                found.add((owner, r["function"], r["kind"], target))
+    return sorted(found)
+
+
 def struct_body(text: str, name: str) -> str:
     """The body of a struct the text defines, without comments, or an empty string."""
     text = clean(text)
@@ -961,6 +1005,8 @@ def main(argv=None) -> int:
     parser.add_argument("--objects", nargs="+", default=[], help="object files, or @file listing them")
     parser.add_argument("--private-state", action="store_true",
                         help=f"fail on an access to pathfinding's state region by another subsystem, from {RWSETS}")
+    parser.add_argument("--mission-record", action="store_true",
+                        help=f"fail on a read, write or call of the mission's record outside the mission, from {RWSETS}")
     parser.add_argument("--pilot-seams", action="store_true",
                         help=f"fail on a call into a pilot's writing or set-up slots by a function not allowed to, or a write behind its query slots, from {RWSETS}")
     parser.add_argument("--root", default=str(ROOT))
@@ -973,6 +1019,11 @@ def main(argv=None) -> int:
         bad = private_state(root)
         for owner, function, kind, target in bad:
             print(f"{owner} {function} {kind} {target}: pathfinding's region is private to {PRIVATE_OWNER}")
+        return 1 if bad else 0
+    if args.mission_record:
+        bad = mission_record(root)
+        for owner, function, kind, target in bad:
+            print(f"{owner} {function} {kind} {target}: the mission's record is reached only through MissionSeam")
         return 1 if bad else 0
     if args.pilot_seams:
         failed = False

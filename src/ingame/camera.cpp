@@ -2,20 +2,6 @@
 #include "../util/mouse_event.h"
 
 #pragma pack(push, 1)
-struct StartPositionEntry {
-    int type;
-    int id;
-    short x;
-    short z;
-};
-
-class StartPositionNetView {
-public:
-    char unknown_0[0xdb4];
-    Ref<StartPositionEntry> entries;
-    int entry_count;
-};
-
 #include "../game/game.h"
 #pragma pack(pop)
 
@@ -28,6 +14,7 @@ extern Game* g_game;
 
 
 #include "control_panel.h"
+#include "../../interfaces/seams.h"
 
 static inline void SetPos(int x, int y)
 {
@@ -56,19 +43,14 @@ void CenterCameraOnRadarClick()
 // FUNCTION: 0x41d1f0
 void CenterCameraOnStartPosition()
 {
-    int i = 0;
-    StartPositionEntry* e = ((StartPositionNetView *)g_game->net.get())->entries;
-    int count = ((StartPositionNetView *)g_game->net.get())->entry_count;
-    for (; i < count; i++, e++) {
-        if (e->type == 1 && e->id == 0) {
-            SetPos(e->x - g_game->viewWidth / 2, e->z - g_game->viewHeight / 2);
-            g_game->viewDirtyFlags_142f1 |= 2;
-            ClampCameraPosition();
-            g_game->x2 = g_game->scrollX;
-            g_game->y2 = g_game->scrollY;
-            g_game->mapFlags &= 0xfff7;
-            return;
-        }
+    Vec3 start;
+    if (g_seams.mission->GetStartPosition(&start, 0) != 0) {
+        SetPos((start.x >> 16) - g_game->viewWidth / 2, (start.z >> 16) - g_game->viewHeight / 2);
+        g_game->viewDirtyFlags_142f1 |= 2;
+        ClampCameraPosition();
+        g_game->x2 = g_game->scrollX;
+        g_game->y2 = g_game->scrollY;
+        g_game->mapFlags &= 0xfff7;
     }
 }
 

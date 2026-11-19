@@ -596,7 +596,9 @@ void ClearBorderFeatures()
         }
     }
 
-    if (g_game->net->lavaWorld != 0) {
+    MissionParams mission;
+    g_seams.mission->GetMissionParams(&mission);
+    if (mission.lavaWorld != 0) {
         Cell* c = g_game->cells;
         Cell* end = c + g_game->width * g_game->height;
         while (c < end) {
@@ -653,7 +655,9 @@ void LoadTntMap()
     Slot a;
     Slot b;
     int* tnt;
+    MissionParams mission;
 
+    g_seams.mission->GetMissionParams(&mission);
     tnt = (int*)g_seams.mission->GetNameSlot(1);
     tnt = (int *)LoadFileWithProgress((char *)tnt);
     info.version = *tnt;
@@ -700,25 +704,25 @@ void LoadTntMap()
         break;
     }
 
-    a.n = g_game->net->minWindSpeed;
+    a.n = mission.minWindSpeed;
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->windSpeedMin = a.n;
     else
         mapSettings->windSpeedMin = info.sea_a;
-    a.n = g_game->net->maxWindSpeed;
+    a.n = mission.maxWindSpeed;
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->windSpeedMax = a.n;
     else
         mapSettings->windSpeedMax = info.sea_b;
-    a.n = g_game->net->gravity;
+    a.n = mission.gravity;
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->rise = (int)((a.n * 65536.0) * 0.0011111111111111111);
     else if (info.sea_d != 0)
         mapSettings->rise = (int)((info.sea_d * 65536.0) * 0.0011111111111111111);
     else
         mapSettings->rise = 0x1fdb;
-    if (g_game->net->tidalStrength >= 0.0f)
-        mapSettings->tidal = *(int*)&g_game->net->tidalStrength;
+    if (mission.tidalStrength >= 0.0f)
+        mapSettings->tidal = *(int*)&mission.tidalStrength;
     else
         mapSettings->tidal = 0x3f000000;
     mapSettings->seaLevel = (unsigned char)info.flag;
@@ -739,7 +743,7 @@ void LoadTntMap()
     a.n = mapSettings->width * mapSettings->height;
     unsigned char* plot = (unsigned char*)SimAllocTagged("PLOT MEMORY", a.n * 0xd);
     mapSettings->cells = (Cell*)plot;
-    int fill = g_game->net->surfaceMetal;
+    int fill = mission.surfaceMetal;
     if (fill < 0 || info.version < 0x2000)
         fill = 0;
     for (int i = a.n; i > 0; i--) {

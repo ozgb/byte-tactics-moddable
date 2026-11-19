@@ -2597,7 +2597,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "map", 5, 0, 1, 198, 11 },
     { "scripts", 1, 0, 0, 209, 25 },
     { "movement", 1, 0, 0, 234, 33 },
-    { "mission", 1, 0, 0, 267, 0 },
+    { "mission", 1, 1, 0, 267, 0 },
     { "files", 2, 0, 0, 267, 58 },
     { "network", 1, 0, 0, 325, 22 },
 };

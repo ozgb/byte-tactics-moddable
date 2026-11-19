@@ -226,9 +226,10 @@ void CollectEndGameStats()
                 stats[i].metalProduced = (int)p->totalMetalProduced;
                 stats[i].energyWasted = (int)p->energyWasted;
                 stats[i].metalWasted = (int)p->metalWasted;
-                Mission* c = g_game->net;
-                int t = (int)((unsigned int)g_game->ticks / 60 * c->timeMul);
-                stats[i].score = t + (int)(stats[i].kills * c->killMul);
+                MissionParams mission;
+                g_seams.mission->GetMissionParams(&mission);
+                int t = (int)((unsigned int)g_game->ticks / 60 * mission.timeMul);
+                stats[i].score = t + (int)(stats[i].kills * mission.killMul);
                 if (stats[i].score < 0)
                     stats[i].score = 0;
                 if (stats[i].kills > g_game->maxKills)

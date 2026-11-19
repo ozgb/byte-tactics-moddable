@@ -294,11 +294,13 @@ void __stdcall UpdateUnitBody(Unit* u)
     if (pl->active != 0) {
         unsigned char k3 = pl->type;
         if (k3 == 1 || k3 == 2) {
-            if (g_game->net->waterDoesDamage != 0
-                && g_game->net->waterDamage != 0
+            MissionParams mission;
+            g_seams.mission->GetMissionParams(&mission);
+            if (mission.waterDoesDamage != 0
+                && mission.waterDamage != 0
                 && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
                 && !((TerrainFlags*)&u->def->flags1)->bits.floats) {
-                WeaponsPublishDamage(SCHED_UNITS, nullptr, u, g_game->net->waterDamage, 0xb, 0);
+                WeaponsPublishDamage(SCHED_UNITS, nullptr, u, mission.waterDamage, 0xb, 0);
             }
             if (u->def->healtimeUnsigned != 0 && u->health < u->def->maxHealth
                 && (g_game->ticks & 7) == 0) {

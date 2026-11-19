@@ -354,6 +354,75 @@ Move,src/units/units.cpp,units,x,
         self.assertEqual(found[0][0], "unowned")
 
 
+class MissionRecordTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Mission::GetGameType,src/mission/map_list.cpp,mission,x,
+SetMissionType,src/mission/map_list.cpp,mission,x,
+TheMission,src/seams/native.cpp,seams,x,
+GetGameTypeNative,src/seams/native.cpp,seams,x,
+OtherNative,src/seams/native.cpp,seams,x,
+UpdateUnit,src/units/unit_position.cpp,units,x,
+ShowMap,src/frontend/multi.cpp,presentation,x,
+"""
+    NATIVE = """static int __stdcall GetGameTypeNative()
+{
+    return TheMission()->GetGameType();
+}
+void InstallNativeSeams()
+{
+    s_mission.GetGameType = GetGameTypeNative;
+    s_map.Other = OtherNative;
+}
+"""
+
+    def check(self, rows):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src" / "seams").mkdir(parents=True)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.NATIVE_TABLE).write_text(self.NATIVE)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f"0x1,{f},{p},{k},{t}\n" for f, p, k, t in rows))
+            return seamlink.mission_record(root)
+
+    def test_the_mission_and_its_fillers_may_reach_the_record(self):
+        rows = [("SetMissionType", "src/mission/map_list.cpp", "field_write", "Game::net"),
+                ("Mission::GetGameType", "src/mission/map_list.cpp", "field_read", "Mission::type"),
+                ("TheMission", "src/seams/native.cpp", "field_read", "Game::net"),
+                ("GetGameTypeNative", "src/seams/native.cpp", "call", "Mission::GetGameType")]
+        self.assertEqual(self.check(rows), [])
+
+    def test_a_read_of_the_record_outside_the_mission_is_found(self):
+        found = self.check([("UpdateUnit", "src/units/unit_position.cpp", "field_read", "Game::net"),
+                            ("UpdateUnit", "src/units/unit_position.cpp", "field_read", "Mission::waterDamage")])
+        self.assertEqual(found, [("units", "UpdateUnit", "field_read", "Game::net"),
+                                 ("units", "UpdateUnit", "field_read", "Mission::waterDamage")])
+
+    def test_a_view_of_the_record_is_found_by_its_game_net_read(self):
+        found = self.check([("ShowMap", "src/frontend/multi.cpp", "field_read", "Game::net")])
+        self.assertEqual([f[0] for f in found], ["presentation"])
+
+    def test_the_record_types_and_method_calls_are_found(self):
+        rows = [("UpdateUnit", "src/units/unit_position.cpp", "field_read", "MissionUnit::name"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "deref_escape", "*MissionFeature"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "call", "operator MissionRule *"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "call", "Mission::GetGameType")]
+        self.assertEqual(len(self.check(rows)), 4)
+
+    def test_a_native_function_that_fills_another_table_is_found(self):
+        found = self.check([("OtherNative", "src/seams/native.cpp", "field_read", "Game::net")])
+        self.assertEqual([f[0] for f in found], ["seams"])
+
+    def test_the_slot_structs_and_similar_names_are_not_found(self):
+        rows = [("UpdateUnit", "src/units/unit_position.cpp", "field_read", "MissionParams::waterDamage"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "field_read", "MissionUnitInfo::name"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "field_read", "Game::netGameFlags"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "call", "MissionConditions::CheckVictory"),
+                ("UpdateUnit", "src/units/unit_position.cpp", "function", "Mission::type")]
+        self.assertEqual(self.check(rows), [])
+
+
 ECONOMY_HEADER = """#include "state_writer.h"
 // A ledger.
 struct EconLedger {

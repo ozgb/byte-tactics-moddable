@@ -443,17 +443,20 @@ static inline int* IdAt(int* arr, int i)
 int __stdcall FindMissionUnit(char* name, MissionUnitIdTable* param_2, int value)
 {
     int i = 0;
+    int count = g_seams.mission->CountMissionUnits();
 
     if (value) {
         while (*IdAt(param_2->ids, i++) != value) {
-            if (i >= g_game->net->unitCount)
+            if (i >= count)
                 return 0;
         }
     }
-    if (i >= g_game->net->unitCount)
+    if (i >= count)
         return 0;
-    for (; i < g_game->net->unitCount; i++) {
-        MissionUnit* e = &g_game->net->units[i];
+    for (; i < count; i++) {
+        MissionUnitInfo info;
+        MissionUnitInfo* e = &info;
+        g_seams.mission->GetMissionUnit(i, e);
         if (e->ident && _strcmpi(e->ident, name) == 0 && param_2->ids[i])
             return param_2->ids[i];
         if (e->name && _strcmpi(e->name, name) == 0 && param_2->ids[i])

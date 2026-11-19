@@ -38,7 +38,8 @@ extern RiReportGameChatFn g_riReportGameChat;
 #include "../ingame/info_panel.h"
 #include "../network/online_report.h"
 #include "../graphics/object_pool.h"
-#include "../mission/mission.h"
+#include "../../interfaces/seams.h"
+#include "../../interfaces/mission.h"
 #include "../network/player_info.h"
 #include "../data/exe_only.h"
 
@@ -79,9 +80,10 @@ int FillScoreTables()
             g_onlineReportPlayers[i]->numAllies = n;
             for (; n < 10; n++)
                 allies[n] = 0;
-            Mission* c = g_game->net;
-            int score = (int)((unsigned int)g_game->ticks / 60 * c->timeMul);
-            score += (int)(p->kills * c->killMul);
+            MissionParams mission;
+            g_seams.mission->GetMissionParams(&mission);
+            int score = (int)((unsigned int)g_game->ticks / 60 * mission.timeMul);
+            score += (int)(p->kills * mission.killMul);
             g_onlineReportScoreBoards[i]->score = score;
             g_onlineReportScoreBoards[i]->count = 9;
             OnlineReportScore* s;

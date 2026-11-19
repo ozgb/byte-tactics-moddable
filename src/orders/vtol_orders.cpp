@@ -1354,9 +1354,6 @@ struct Unit;
 struct Struct_Unit96 {
     char pad0[0x146]; unsigned char slotIndex;
 };
-struct Struct_Game391e9 {
-    char pad0[0xd3c]; int gravity;
-};
 #pragma pack(pop)
 
 
@@ -1427,7 +1424,9 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
             return 1;
         UnitDef* def = unit->def;
         int size = def->altitude;
-        int rate = ((Struct_Game391e9 *)g_game->net.get())->gravity;
+        MissionParams mission;
+        g_seams.mission->GetMissionParams(&mission);
+        int rate = mission.gravity;
         if (!rate)
             break;
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;

@@ -121,5 +121,3 @@ by it: their imports of the mission (`GetGameType`, `GetNameSlot`) are not recor
   simulation reads its fields directly. A later issue can make them queries or copies taken at the load.
 - **A WASM module.** The mission has no module yet; the modern build runs the default as native code in every mode.
 - **Replays** of the mission's slots (section 6).
-- **Coverage.** `data/coverage.csv` still counts the mission's functions under map until the next coverage run writes
-  it (`docs/subsystems.md`).

@@ -13,7 +13,7 @@ ai,harness,call,HarnessEventSpeech,1
 ai,harness,call,HarnessEventSuppress,1
 ai,harness,call,HarnessEventWords,2
 ai,harness,call,HarnessZeroVec3,1
-ai,harness,shared_write,g_playerAI,1
+ai,harness,shared_write,g_playerAI,3
 ai,los_radar,call,GetMapCell,1
 ai,los_radar,call,IsUnitVisibleToPlayer,1
 ai,los_radar,shared_write,Unit::flags,5

@@ -170,11 +170,11 @@ players,Unit::weapon2Target,targeting,GetWeaponTargetUnit,other-record,4,eight-f
 players,Unit::workTime,seams,WorldUnitInfo,other-record,3,edges-economy-targeting@60
 players,Unit::workTime,seams,WorldUnitInfo,same-record,3,edges-economy-targeting@60
 players,UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::SetPathOrder,other-record,5,eight-pincushion-teams@8100
-players,UnitMotion::UnitMotion: new PackedPosGoal,orders,??1Order@@QAE@XZ,other-record,8,long-great-divide-2p@7200
 players,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalSetPathOrderNative,other-record,5,eight-pincushion-teams@8100
+players,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,other-record,8,long-great-divide-2p@7200
 players,UnitMotion::UnitMotion: new PatrolGoal,movement,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@22950
-players,UnitMotion::UnitMotion: new PatrolGoal,orders,??1Order@@QAE@XZ,other-record,2,long-greenhaven-8p@14130
 players,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalSetPathOrderNative,other-record,1,long-greenhaven-8p@22950
+players,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalTargetNative,other-record,2,long-greenhaven-8p@14130
 players,UnitResources::energyMake,economy,EconomyUpdatePlayer,other-record,83,ai-antinuke-intercept@30
 players,UnitResources::energyStall,economy,EconomyUpdatePlayer,other-record,83,ai-antinuke-intercept@30
 players,UnitResources::energyUse,economy,EconomyUpdatePlayer,other-record,83,ai-antinuke-intercept@30
@@ -1556,12 +1556,11 @@ units,Unit::unitDefIndex,players,VictoryKillAllOfType::OnUnitDied,other-record,2
 units,Unit::unitDefIndex,players,VictoryKillAllOfType::OnUnitDied,same-record,2,mission-kill-of-type@182
 units,Unit::unitDefIndex,players,VictoryKillAllOfType::VisitUnit,other-record,2,mission-timer@180
 units,Unit::unitDefIndex,targeting,GetWeaponTargetPos,other-record,9,mission-build-unit@71
-units,Unit::unitDefIndex,units,??0PathOrderAttach@@QAE@PAUUnit@@PAVOrderBase@@@Z,other-record,3,mission-kill-of-type@186
+units,Unit::unitDefIndex,units,??0PathOrderAttach@@QAE@PAUUnit@@PAVOrderBase@@@Z,other-record,4,mission-kill-of-type@186
 units,Unit::unitDefIndex,units,AlignUnitToGround,other-record,13,mission-build-unit@1
 units,Unit::unitDefIndex,units,AlignUnitToGround,same-record,4,units-transport@2115
 units,Unit::unitDefIndex,units,CreateUnit,other-record,6,mission-kill-of-type@99
 units,Unit::unitDefIndex,units,CreateUnit,same-record,5,mission-kill-of-type@99
-units,Unit::unitDefIndex,units,PathOrderAttach::SetUnit,other-record,2,orders-air-repair@382
 units,Unit::unknown_10a,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,30,mission-build-unit@1
 units,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,1,skirmish4-long@24706
 units,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,10,edges-economy-targeting@36
@@ -1690,14 +1689,14 @@ units,UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::TickTowar
 units,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::DestroyObject,other-record,12,edges-economy-targeting@117
 units,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::SteerGroundUnit,other-record,38,mission-build-unit@1
 units,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::UpdateMotion,other-record,38,mission-build-unit@1
-units,UnitMotion::UnitMotion: new PackedPosGoal,orders,??1Order@@QAE@XZ,other-record,18,mission-build-unit@1
 units,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalSetPathOrderNative,other-record,21,mission-build-unit@1
+units,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,other-record,18,mission-build-unit@1
 units,UnitMotion::UnitMotion: new PatrolGoal,movement,LiteGoal::TickTowardGoal,other-record,16,mission-kill-of-type@1
 units,UnitMotion::UnitMotion: new PatrolGoal,movement,LiteGoal::TickTowardGoal,same-record,11,orders-air@1025
 units,UnitMotion::UnitMotion: new PatrolGoal,movement,PathGoal::SetPathOrder,other-record,9,mission-capture@1
 units,UnitMotion::UnitMotion: new PatrolGoal,movement,UnitMotion::UpdateMotion,other-record,16,mission-kill-of-type@1
-units,UnitMotion::UnitMotion: new PatrolGoal,orders,??1Order@@QAE@XZ,other-record,9,mission-capture@1
 units,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalSetPathOrderNative,other-record,9,mission-capture@1
+units,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalTargetNative,other-record,9,mission-capture@1
 units,UnitMotion::flags,movement,??0UnitMotion@@QAE@PAUUnit@@@Z,other-record,10,mission-kill-of-type@90
 units,UnitMotion::flags,movement,AiSearchGoal::TickTowardGoal,other-record,26,edges-targeting-lead@11
 units,UnitMotion::flags,movement,AiSearchGoal::TickTowardGoal,same-record,13,sensors-los-off@1369
@@ -1726,11 +1725,7 @@ units,UnitMotion::obj,movement,UnitMotion::SteerGroundUnit,other-record,13,missi
 units,UnitMotion::obj,movement,UnitMotion::SteerGroundUnit,same-record,20,ui-build-menu@87
 units,UnitMotion::obj,movement,UnitMotion::UpdateMotion,other-record,15,mission-timer@51
 units,UnitMotion::obj,movement,UnitMotion::UpdateMotion,same-record,22,mission-timer@51
-units,UnitMotion::obj,orders,??1Order@@QAE@XZ,other-record,2,mission-timer@186
-units,UnitMotion::obj,orders,Order::AttachApproachRadiusGoal,other-record,3,long-great-divide-2p@8251
-units,UnitMotion::obj,orders,Order::AttachBuildFootprintMarker,other-record,1,long-greenhaven-8p@24481
-units,UnitMotion::obj,orders,Order::AttachRingApproachGoal,other-record,1,skirmish4-long@18061
-units,UnitMotion::obj,orders,Order::SetAttachedFx,other-record,3,long-greenhaven-8p@12300
+units,UnitMotion::obj,seams,MotionGoalNative,other-record,4,mission-timer@186
 units,UnitMotion::p2,movement,UnitMotion::ApplyBankAndPitch,other-record,9,mission-capture@1
 units,UnitMotion::pathLockStamp,map,FootprintValue,other-record,10,mission-build-unit@1
 units,UnitMotion::pathLockStamp,map,FootprintValue,same-record,4,units-transport@2114
@@ -2960,13 +2955,13 @@ units.players,UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::T
 units.players,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::DestroyObject,other-record,5,edges-economy-targeting@114
 units.players,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::SteerGroundUnit,other-record,64,load-midgame@1
 units.players,UnitMotion::UnitMotion: new PackedPosGoal,movement,UnitMotion::UpdateMotion,other-record,64,load-midgame@1
-units.players,UnitMotion::UnitMotion: new PackedPosGoal,orders,??1Order@@QAE@XZ,other-record,18,edges-economy-targeting@72
 units.players,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalSetPathOrderNative,other-record,29,mission-build-unit@1
+units.players,UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,other-record,18,edges-economy-targeting@72
 units.players,UnitMotion::UnitMotion: new PatrolGoal,movement,LiteGoal::TickTowardGoal,other-record,6,mission-kill-of-type@1
 units.players,UnitMotion::UnitMotion: new PatrolGoal,movement,PathGoal::SetPathOrder,other-record,5,mission-kill-of-type@191
 units.players,UnitMotion::UnitMotion: new PatrolGoal,movement,UnitMotion::UpdateMotion,other-record,6,mission-kill-of-type@1
-units.players,UnitMotion::UnitMotion: new PatrolGoal,orders,??1Order@@QAE@XZ,other-record,5,mission-kill-of-type@191
 units.players,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalSetPathOrderNative,other-record,5,mission-kill-of-type@191
+units.players,UnitMotion::UnitMotion: new PatrolGoal,seams,GoalTargetNative,other-record,5,mission-kill-of-type@191
 units.players,UnitMotion::flags,movement,??0UnitMotion@@QAE@PAUUnit@@@Z,other-record,9,long-greenhaven-8p@5416
 units.players,UnitMotion::flags,movement,AiSearchGoal::TickTowardGoal,other-record,44,mission-capture@1
 units.players,UnitMotion::flags,movement,LiteGoal::TickTowardGoal,other-record,8,ten-ring-atoll@4127
@@ -2982,10 +2977,7 @@ units.players,UnitMotion::lastMoveTick,units,AlignUnitToGround,other-record,2,lo
 units.players,UnitMotion::obj,movement,UnitMotion::SteerAircraft,other-record,3,long-greenhaven-8p@10385
 units.players,UnitMotion::obj,movement,UnitMotion::SteerGroundUnit,other-record,19,ui-build-menu@87
 units.players,UnitMotion::obj,movement,UnitMotion::UpdateMotion,other-record,19,ui-build-menu@87
-units.players,UnitMotion::obj,orders,??1Order@@QAE@XZ,other-record,2,long-greenhaven-8p@14221
-units.players,UnitMotion::obj,orders,Order::AttachApproachRadiusGoal,other-record,3,long-greenhaven-8p@12301
-units.players,UnitMotion::obj,orders,Order::AttachBuildFootprintMarker,other-record,2,six-painted-desert@11971
-units.players,UnitMotion::obj,orders,Order::SetAttachedFx,other-record,2,long-greenhaven-8p@14666
+units.players,UnitMotion::obj,seams,MotionGoalNative,other-record,4,six-painted-desert@11971
 units.players,UnitMotion::p2,movement,UnitMotion::ApplyBankAndPitch,other-record,4,long-greenhaven-8p@10385
 units.players,UnitMotion::pathLockStamp,map,FootprintValue,other-record,18,mission-build-unit@71
 units.players,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,39,mission-capture@17

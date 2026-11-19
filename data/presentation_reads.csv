@@ -344,9 +344,8 @@ UnitDef::sonardistancejam,presentation,ui-action,,all-players,0
 UnitDef::soundcategory,presentation,ui-action,SIM_EVENT_UNIT_SPEECH,all-players,66
 UnitDef::weapons,orders,unknown,,all-players,2
 UnitMotion::UnitMotion: new PackedPosGoal,movement,unknown,,per-player-filter,4
-UnitMotion::UnitMotion: new PackedPosGoal,orders,ui-action,,per-player-filter,5
-UnitMotion::UnitMotion: new PackedPosGoal,seams,unknown,,per-player-filter,4
-UnitMotion::obj,orders,ui-action,,per-player-filter,5
+UnitMotion::UnitMotion: new PackedPosGoal,seams,unknown,,per-player-filter,5
+UnitMotion::obj,seams,unknown,,per-player-filter,5
 UnitMotion::speed,presentation,every-frame,,per-player-filter,87
 UnitTypeSet::bits,presentation,ui-action,,all-players,1
 WeaponDef::areaOfEffect,presentation,ui-action,,all-players,0

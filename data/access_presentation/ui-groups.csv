@@ -242,8 +242,8 @@ UnitDef::modelSizeX,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgno
 UnitDef::modelSizeY,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
-UnitMotion::UnitMotion: new PackedPosGoal,orders,??1Order@@QAE@XZ,UnitMotion::UnitMotion: new PackedPosGoal,0,-
-UnitMotion::obj,orders,??1Order@@QAE@XZ,NewUnitMotionNative: new UnitMotion,0,-
+UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,UnitMotion::UnitMotion: new PackedPosGoal,0,-
+UnitMotion::obj,seams,MotionGoalNative,NewUnitMotionNative: new UnitMotion,0,-
 UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
 UnitTypeSet::bits,presentation,SelectSquad,GetLoadCategoryMask: GameAllocIgnoreTag UnitTypeSet,0,-
 WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,

@@ -321,9 +321,9 @@ UnitDef::name,presentation,DrawString,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0
 UnitDef::name,presentation,GetTextWidth,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::SetPathOrder,UnitMotion::UnitMotion: new PackedPosGoal,0,-
-UnitMotion::UnitMotion: new PackedPosGoal,orders,??1Order@@QAE@XZ,UnitMotion::UnitMotion: new PackedPosGoal,0,-
 UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalSetPathOrderNative,UnitMotion::UnitMotion: new PackedPosGoal,0,-
-UnitMotion::obj,orders,??1Order@@QAE@XZ,NewUnitMotionNative: new UnitMotion,0,-
+UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,UnitMotion::UnitMotion: new PackedPosGoal,0,-
+UnitMotion::obj,seams,MotionGoalNative,NewUnitMotionNative: new UnitMotion,0,-
 UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
 WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,
 baseX,los_radar,ClampWorldPosToTerrain,baseX,1,

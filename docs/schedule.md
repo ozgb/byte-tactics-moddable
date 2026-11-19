@@ -1064,6 +1064,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 ### `orders.ReattachFxToUnit`
 
+1. `movement.MotionGoal`: view read
 1. `movement.GoalSetPathOrder`: intent
 
 ### `orders.RunOrders`
@@ -1084,6 +1085,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.SetFlightMode`: intent
 1. `movement.NewPathOrderAt`: mixed
 1. `movement.PathOrderSetAltitude`: intent
+1. `movement.MotionGoal`: view read
 1. `movement.GoalSetPathOrder`: intent
 1. `movement.OrderFxDestroy`: intent
 1. `weapons.ReleaseWeapons`: intent
@@ -1177,6 +1179,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.SetFlightMode`: intent
 1. `movement.NewPathOrderAt`: mixed
 1. `movement.PathOrderSetAltitude`: intent
+1. `movement.MotionGoal`: view read
 1. `movement.GoalSetPathOrder`: intent
 1. `movement.OrderFxDestroy`: intent
 1. `weapons.ReleaseWeapons`: intent
@@ -2094,6 +2097,7 @@ is not listed.
 | orders | `movement.LoadPathOrder` | mixed |
 | orders | `movement.LoadPointMarker` | mixed |
 | orders | `movement.LoadRingApproach` | mixed |
+| orders | `movement.MotionGoal` | view read |
 | orders | `movement.NewAirManeuverOrder` | mixed |
 | orders | `movement.NewApproachRadius` | mixed |
 | orders | `movement.NewPathOrderAt` | mixed |
@@ -2326,7 +2330,7 @@ the split lies in.
 | movement | map | units, each entity | split | `movement.UpdateMotion` (step 50) | `orders.AddBeCarriedOrder` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
 | movement | map | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 2 | 2 |
 | movement | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `orders.RunOrders` (step 48) |  | by item | 1 | 1 |
-| movement | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 11 | 11 |
+| movement | orders | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 8 | 8 |
 | movement | scripts | units, each entity | split | `movement.UpdateMotion` (step 50) | `scripts.QueryScript` again, after step 50 | `movement.UpdateMotion` | by item | 1 | 1 |
 | movement | scripts | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 6 | 6 |
 | movement | targeting | units, each entity | split | `weapons.DamageUnit` (step 18) | `weapons.DetonateUnitWeapon` (step 19) | `weapons.DamageUnit` | by subsystem | 4 | 4 |
@@ -2400,7 +2404,6 @@ the split lies in.
 | features | map | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 0 |
 | features | units | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
 | features | weapons | projectiles, each entity | apply before continuing | `orders.NewOrder` (step 11) | the caller | `orders.NewOrder` | by subsystem | 2 | 2 |
-| movement | orders | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.AppendOrder` (step 12) | `orders.NewOrder` | by subsystem | 1 | 0 |
 | orders | movement | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 0 |
 | orders | targeting | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
 | orders | units | projectiles, each entity | split | `orders.NewOrder` (step 11) | `orders.NewOrder` again, after step 11 | `orders.NewOrder` | by subsystem | 1 | 1 |
@@ -2433,7 +2436,6 @@ the split lies in.
 | los_radar | targeting | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 1 |
 | los_radar | units | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 1 |
 | map | ai | players.los, each entity | split | `features.Apply` (step 4) | `map.Apply` (step 7) | `features.Apply` | by subsystem | 1 | 0 |
-| movement | orders | players, each entity, in `units.CreateUnit` | split | `weapons.DamageUnit` (step 20) | `weapons.DetonateUnitWeapon` (step 21) | `weapons.DamageUnit` | by subsystem | 2 | 2 |
 | orders | ai | players, each entity | split | `units.CreateUnit` (step 40) | `features.Apply` again, after step 40 | `units.CreateUnit` | by subsystem | 2 | 2 |
 | orders | movement | players, each entity, in `units.CreateUnit` | split | `orders.OrderOrStatusFlags` (step 6) | `weapons.DamageUnit` (step 20) |  | by subsystem | 1 | 0 |
 | orders | units | players, each entity | split | `units.CreateUnit` (step 40) | `features.Apply` again, after step 40 | `units.CreateUnit` | by subsystem | 1 | 0 |
@@ -2478,12 +2480,12 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | weapons | 0 / 2 | 11 / 5 | 6 / 21 | 13 / 0 | 42 | 59 | 101 |
 | targeting | 1 / 0 | 3 / 4 | 2 / 0 | 7 / 13 | 4 | 33 | 37 |
 | los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 11 | 11 | 31 | 41 |
-| orders | 2 / 0 | 21 / 2 | 22 / 7 | 31 / 2 | 26 | 65 | 91 |
+| orders | 3 / 0 | 21 / 2 | 22 / 7 | 31 / 2 | 26 | 59 | 85 |
 | units | 3 / 1 | 3 / 12 | 31 / 15 | 12 / 10 | 136 | 47 | 183 |
 | players | 1 / 0 | 3 / 0 | 13 / 0 | 10 / 10 | 10 | 13 | 21 |
 | map | 0 / 4 | 3 / 8 | 2 / 0 | 6 / 14 | 16 | 33 | 49 |
 | scripts | 0 / 0 | 1 / 9 | 2 / 18 | 0 / 9 | 21 | 33 | 54 |
-| movement | 0 / 2 | 3 / 0 | 7 / 12 | 11 / 13 | 54 | 34 | 88 |
+| movement | 0 / 3 | 3 / 0 | 7 / 12 | 11 / 13 | 48 | 34 | 82 |
 
 ## Limits
 

@@ -125,6 +125,7 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int, const unsigned in
 }
 
 void __stdcall HarnessAiEvent(const AiEvent*, int) {}
+void __stdcall HarnessWeaponsEvent(const WeaponsEvent*, int) {}
 
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
@@ -618,7 +619,7 @@ static void CheckSplitAttack()
     s_units[kGuard].lastAttackerSlot = 1;
     s_units[kGuard].lastDamageType = 0;
 
-    WeaponsEffect none = WeaponsEffectOf(WEAPONS_EFFECT_ATTACKED);
+    WeaponsEvent none = WeaponsEventOf(WEAPONS_EFFECT_ATTACKED);
     s_log.clear();
     SchedPublish(SCHED_WEAPONS, &none, sizeof none);
     Check(s_log.empty(), "an attack with a null unit does nothing");
@@ -630,7 +631,7 @@ static void CheckSplitAttack()
     Check(s_units[kGuard].netDirtyFlags == 0x2000, "a hit with enemy damage of twice the friendly damage sets 0x2000");
     WeaponsPublishHit(&s_units[kGuard], 10, 4);
     Check(s_units[kGuard].netDirtyFlags == 0x6000, "the hit flags accumulate");
-    WeaponsEffect noShooter = WeaponsEffectOf(WEAPONS_EFFECT_HIT);
+    WeaponsEvent noShooter = WeaponsEventOf(WEAPONS_EFFECT_HIT);
     s_units[kGuard].netDirtyFlags = 0;
     SchedPublish(SCHED_WEAPONS, &noShooter, sizeof noShooter);
     Check(s_units[kGuard].netDirtyFlags == 0, "a hit with a null unit does nothing");
@@ -639,7 +640,7 @@ static void CheckSplitAttack()
 static int ReturnFire(int unit, int attacker)
 {
     s_log.clear();
-    WeaponsEffect e = WeaponsEffectOf(WEAPONS_EFFECT_ATTACKED);
+    WeaponsEvent e = WeaponsEventOf(WEAPONS_EFFECT_ATTACKED);
     e.unit = Ref<Unit>(&s_units[unit]).offset;
     e.target = attacker == 0 ? 0 : Ref<Unit>(&s_units[attacker]).offset;
     e.value = 10;

@@ -145,6 +145,29 @@ unsigned short __stdcall GetCellFeature(Cell* cell)
 #include "../game/economy_events.h"
 #include "../../interfaces/economy.h"
 
+// FUNCTION: 0x421da0
+unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
+{
+    Point16 c;
+    c.x = (short)(pos->x >> 20);
+    c.y = (short)(pos->z >> 20);
+    Cell* p = g_seams.los_radar->GetMapCell(c.x, c.y);
+    if (p == 0)
+        return 0xffff;
+    if (p->feature == 0xfffe) {
+        c.x -= p->offsetX;
+        c.y -= p->offsetY;
+        p = g_seams.los_radar->GetMapCell(c.x, c.y);
+    }
+    if (p->feature >= 0xfffb)
+        return 0xffff;
+    if (cell)
+        *cell = c;
+    if (size)
+        *size = g_game->features[p->feature].footprint;
+    return p->feature;
+}
+
 // FUNCTION: 0x421eb0
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
 {

@@ -45,7 +45,7 @@ Every slot has the harness replay hook as a caller of the inner seam in test mod
 
 | Slot | What it does | Callers | In the tick | Came from |
 |---|---|---|---|---|
-| `UpdateMotion` | Steers a unit, moves it and updates its move rate for one tick | units (`unit_position.cpp`: `UpdateUnit`, `ReceiveUnitStates`) | yes | `OrdersSeam::UpdateMotion` |
+| `UpdateMotion` | Steers a unit, moves it and updates its move rate for one tick | units (`unit_position.cpp`: `UpdateUnitBody`, `ReceiveUnitStates`) | yes | `OrdersSeam::UpdateMotion` |
 | `ApplyPathEvent` | Applies a path search event to its requester | game (`scheduler.cpp`: `SchedPlayersPhase`, for each event pathfinding polls) | yes | `OrdersSeam::ApplyPathEvent` |
 | `NewUnitMotion` | Allocates and builds a unit's motion | units (`units.cpp`: `CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`) | both: the creation code runs in the tick and outside it when a game is set up | `OrdersSeam::NewUnitMotion` |
 | `LoadMotion` | Reads a unit's motion from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no: load | `OrdersSeam::LoadMotion` |
@@ -197,7 +197,7 @@ parameter and an id (`MotionRangeView`, `DroppedMotionParamView`, `DroppedMotion
 
 This issue closes the cut and leaves these to #984, #985 and #986:
 - **#985 puts movement on the scheduler with orders.** It decides which slots become events, and whether movement has a
-  pass or runs as part of orders' unit update. `UpdateMotion` is called from units' `UpdateUnit` after `RunOrders` and
+  pass or runs as part of orders' unit update. `UpdateMotion` is called from units' `UpdateUnitBody` after `RunOrders` and
   `RunSecondaryOrders`, so the order of the two runs is the order the scheduler has to keep.
 - **The three publishes in `UnitMotion::UpdatePosition`** (`src/movement/motion.cpp`) carry `TODO(#985)` markers: map's
   `MAP_REMOVE_UNIT` and `MAP_ADD_UNIT` and los_radar's update of the unit, all published from `SCHED_ORDERS`. They move

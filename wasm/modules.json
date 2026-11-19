@@ -31,8 +31,8 @@
     "services": 1,
     "state_writer": 1,
     "targeting": 2,
-    "units": 3,
-    "weapons": 1,
+    "units": 4,
+    "weapons": 2,
     "wind_meteors": 2
   },
   "signatures": {
@@ -74,7 +74,7 @@
       "interface": "wind_meteors",
       "majors": {
         "wind_meteors": 2,
-        "weapons": 1,
+        "weapons": 2,
         "services": 1
       },
       "fuel_budget": 250,

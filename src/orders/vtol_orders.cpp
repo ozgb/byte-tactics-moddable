@@ -103,6 +103,7 @@ struct Mover {
 #include "../movement/air_maneuver_order.h"
 
 #include "../ingame/control_panel.h"
+#include "../game/weapons_events.h"
 
 class GroundAllyVisitor {
 public:
@@ -142,7 +143,6 @@ struct FixedPosView;
 #include "order_queue.h"
 #include "order_queue.h"
 #include "../graphics/particles.h"
-void __stdcall DamageUnit(Unit*, Unit*, int, int, int);
 void __stdcall DrawUnit(void*, Unit*);
 
 #include "vtol_orders.h"
@@ -259,7 +259,7 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
 // FUNCTION: 0x40f200
 void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
-    g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+    WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
     if (unit->carrier)
         g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
     g_seams.units->SetStateBits(unit, 1, 1);
@@ -364,7 +364,7 @@ int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
     switch (state) {
     case 0:
         if (unit->motion && (unit->def->flags1 & 0x800)) {
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             order->flags |= 0x10000;
             order->SetDeadlineTicks(1);
             order->x = order->source->xWhole;
@@ -423,7 +423,7 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
         break;
     case 1:
         order->AnnounceStatusIfFlagged(SIM_SPEECH_KIND_TEXT);
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         Snap(&order->pos, *(Point16*)&unit->footprint);
         order->SetAttachedFx(g_seams.movement->NewPathOrderAt(order, &order->pos));
         order->flags = 0xe0;
@@ -607,7 +607,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
     case 0:
         if (unit->motion && (unit->def->flags1&0x800)) {
             order->AnnounceStatusIfFlagged(SIM_SPEECH_BUILDING);
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
             g_seams.units->SetStateBits(unit, 1,1);
             if ((unit->motion->flags&3)==1) {
@@ -882,7 +882,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         int dist = (int)_hypot(order->target->pos.x - unit->pos.x, order->target->pos.z - unit->pos.z);
         int angle = GetHeadingBetween(&unit->pos, &order->target->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
@@ -894,7 +894,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 2: {
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->target->pos);
         g_seams.movement->PathOrderSetApproachRadius(obj, range);
@@ -1046,7 +1046,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
         case 0:
             if (unit->motion && (unit->def->flags1&0x800)) {
                 order->AnnounceStatusIfFlagged(SIM_SPEECH_GUARDING);
-                g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+                WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
@@ -1062,7 +1062,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             }
             return 7;
         case 1:
-            g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
             return 1;
         case 2: {
             Unit* attacker=order->target->attacker;
@@ -1222,7 +1222,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
             EnsurePatrolReturnOrder(unit, order);
             order->AnnounceStatusIfFlagged(SIM_SPEECH_PATROLLING);
             PrepVtolClimb(unit, order, 0);
-            g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
             return 1;
         }
         break;
@@ -1389,8 +1389,8 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         }
         break;
     case 1: {
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         Vec3* op;
         Vec3* up;
         op = &order->pos;
@@ -1444,7 +1444,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         return 2;
     }
     case 5: {
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         TargetingPublishSetPos(SCHED_ORDERS, unit, &order->pos, 0);
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, (unit->def->attackrunlength + 0x3c0) << 16));
@@ -1537,7 +1537,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
@@ -1549,7 +1549,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         return 1;
     }
     case 2: {
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         if (order->target)
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         else
@@ -1631,7 +1631,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             if (unit->def->flags1&0x800) {
                 if (!unit->def->ids) return 7;
                 order->AnnounceStatusIfFlagged(SIM_SPEECH_BUILDING);
-                g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+                WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
@@ -1709,7 +1709,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
 {
     Point16 cell;
     Point16 size;
-    unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
+    unsigned short index = g_seams.features->FindFeatureAtPos(&order->pos, &cell, &size);
     if (index == 0xffff) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
         return 8;
@@ -1827,7 +1827,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         int square = Square(delta);
         if (square <= range * range && g_seams.units->CanReclaim(unit, 0, order->target)) {
             if (order->duration >= 15) {
-                g_seams.weapons->DamageUnit(unit, order->target, order->elapsed, 5, 0);
+                WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, order->elapsed, 5, 0);
                 order->duration = 0;
             }
             Vec3 start;
@@ -1878,7 +1878,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 if (!order->pos.x && !order->pos.z && !order->pos.y) order->pos=unit->pos;
                 order->angle=RandomInt(0x10000);
                 order->parity=order->angle&1;
-                g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+                WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
                 if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
                 g_seams.units->SetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
@@ -1893,7 +1893,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
             LandingPadList pads;
             g_seams.units->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
@@ -1991,8 +1991,8 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1:
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         if (flags & 0xe0) {
             if (IsAhead(unit, order)) {

@@ -84,6 +84,7 @@ struct Block {
 #include "unit_targets.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/seams.h"
+#include "../game/weapons_events.h"
 #include "../game/map_events.h"
 #include "../../interfaces/map.h"
 int __cdecl AngleOfVector(int x, int z);
@@ -255,17 +256,14 @@ void __stdcall ApplyAttachUnit(OrderView* order)
 }
 
 // FUNCTION: 0x48ad30
-void __stdcall UpdateUnit(Unit* u)
+void __stdcall UpdateUnitHead(Unit* u)
 {
-    Player* p = u->player;
     g_game->f14353++;
     UpdateWindGenerator(u);
-    if (p->active != 0) {
-        unsigned char k2 = p->type;
-        if (k2 == 1 || k2 == 2) {
-            g_seams.weapons->UpdateUnitWeapons(u);
-        }
-    }
+}
+
+void __stdcall UpdateUnitBody(Unit* u)
+{
     if (u->script != 0) {
         g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
     }
@@ -302,7 +300,7 @@ void __stdcall UpdateUnit(Unit* u)
                 && mission.waterDamage != 0
                 && (unsigned int)g_game->ticks % 30 == 0 && u->yWhole <= g_game->seaLevel
                 && !((TerrainFlags*)&u->def->flags1)->bits.floats) {
-                g_seams.weapons->DamageUnit(0, u, mission.waterDamage, 0xb, 0);
+                WeaponsPublishDamage(SCHED_UNITS, nullptr, u, mission.waterDamage, 0xb, 0);
             }
             if (u->def->healtimeUnsigned != 0 && u->health < u->def->maxHealth
                 && (g_game->ticks & 7) == 0) {

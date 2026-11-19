@@ -24,7 +24,7 @@ void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRe
 int __stdcall UpdateExplodedPiece(ExplodedPiece* obj);
 int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj);
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param);
-unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
+void CountExplosionTables(unsigned int* explosions, unsigned int* debris, unsigned int* pieces);
 
 GafFrame* __stdcall BuildExplosionFrame(int size);
 void __stdcall StartExplodePiece(ExplodedPiece* piece);

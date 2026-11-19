@@ -49,7 +49,7 @@ MissionRule), by a function that data/subsystems.csv does not give to the subsys
 src/seams/native.cpp (each `s_mission.<slot> = <function>;` of the table, and TheMission, which they share) are the default's own
 and may. Every other caller reads the mission through MissionSeam, so a mission module with its own layout can serve it.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
-features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h; ai, interfaces/ai.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
+features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h; ai, interfaces/ai.h; weapons, interfaces/weapons.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
 slots, engine and allowed indirect calls. It fails, for each pilot, on:
 
@@ -59,7 +59,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
-                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp and for map src/seams/pathfinding_world.cpp, src/seams/players_world.cpp, src/seams/ai_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
+                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp and for map src/seams/pathfinding_world.cpp, src/seams/players_world.cpp, src/seams/ai_world.cpp, src/seams/weapons_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
                 (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
@@ -83,7 +83,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 PickRandomReclaimableResourcesInRadius, which the services ScheduleMapCanBuildAt, ScheduleMapCanPlaceUnitFootprint and ScheduleMapPickReclaimable
                 (src/seams/map_world.cpp) reach for the other subsystems, and RefreshMovedUnits and RefreshUnitIfStale, the lazy refresh of the pass maps that
                 pathfinding's world (src/seams/pathfinding_world.cpp) runs at the start and end of a search; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
-                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs. A presentation or unowned function fails like any other.
+                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -108,9 +108,11 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 ReparseAiWeightScriptsIfLimitNotSticky, CreateSquads, FreeSquads, CreateSquadManager and FreeSquadManager, run outside the tick, from the console and
                 players' set-up; their callers are CmdPrintWeights and CmdReloadAIProfiles (src/game/console_commands.cpp) and FreePlayers, InitPlayerSlot,
                 LoadDefaultAIScript and RebuildAIFeatureCells (src/game/players.cpp).
+                Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions and FreeExplosions, run outside the tick;
+                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
-                FirstFeatureSpot; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
+                FirstFeatureSpot, FindFeatureAtPos; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
                 GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
                 SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, MovementClassGet, MovementClassInBounds; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
@@ -216,6 +218,7 @@ MAP_GLUE_FILE = "src/seams/map_world.cpp"
 PATHFINDING_GLUE_FILE = "src/seams/pathfinding_world.cpp"
 PLAYERS_GLUE_FILE = "src/seams/players_world.cpp"
 AI_GLUE_FILE = "src/seams/ai_world.cpp"
+WEAPONS_GLUE_FILE = "src/seams/weapons_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -245,6 +248,7 @@ class Pilot:
     phase_slots: tuple = ()
     filler_locals: tuple = ()
     rowless_calls: tuple = ()
+    frame_writers: tuple = ()
     by_params: bool = True
 
 
@@ -272,10 +276,11 @@ WIND_METEORS = Pilot(
 FEATURES = Pilot(
     owner="features", header="interfaces/features.h", seam="FeaturesSeam",
     writing=("UpdateFeatures", "Apply", "Place", "AnimateFeatureType", "ScanFeatureCell", "UpdateFeatureSpot"),
-    query=("GetCellFeature", "GetFootprintCentre", "FeatureTypeCount", "FirstFeatureSpot"),
+    query=("GetCellFeature", "GetFootprintCentre", "FeatureTypeCount", "FirstFeatureSpot", "FindFeatureAtPos"),
     engine_files=(SCHEDULER_FILE, FEATURES_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::GetMapCell"),
+    filler_locals=(("FindFeatureAtPos", "Point16"),),
     setup=("LoadFeatureFileList", "FreeFeatureFileList", "NopAfterFeatureEnum", "ResolveFeatureLinks", "InitFeatureAnimPool",
            "FreeFeaturePool", "PlaceMissionFeatures", "StampFeatureMetal", "FindOrLoadFeatureType", "SaveFeatures", "LoadFeatures"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
@@ -348,7 +353,18 @@ AI = Pilot(
     setup_callers=(("CmdPrintWeights", "src/game/console_commands.cpp"), ("CmdReloadAIProfiles", "src/game/console_commands.cpp"),
                    ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),
                    ("LoadDefaultAIScript", "src/game/players.cpp"), ("RebuildAIFeatureCells", "src/game/players.cpp")))
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI)
+WEAPONS = Pilot(
+    owner="weapons", header="interfaces/weapons.h", seam="WeaponsSeam",
+    writing=("Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons"),
+    query=("FindWeaponByName", "GetWeaponRange", "WeaponCanReachUnit", "FindTargetableProjectile", "WeaponCanReachPos", "WriteState"),
+    engine_files=(SCHEDULER_FILE, WEAPONS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(),
+    info_types=("Fixed", "MovableVec3", "ReachPosVec3", "ReachUnitVec3", "WakeVector"),
+    rowless_calls=("_strcmpi", "strcmp", "operator Projectile *", "operator WeaponDef *", "operator bool", "bx_acos", "bx_hypot", "bx_sqrt"),
+    frame_writers=(("WriteState", "CountExplosionTables"),),
+    setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")))
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS)
 
 
 @dataclass
@@ -916,6 +932,8 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
                 if pilot.services and fn == filler and kind in OUT_SERVICE_KINDS and written in out_types:
                     continue
                 if kind == "global_maybe_written" and target in pilot.service_defaults:
+                    continue
+                if kind in OUT_KINDS and (slot, fn) in pilot.frame_writers:
                     continue
                 found.add(("query", owner, fn, f"{what} {kind.replace('_', ' ')} {target}"))
     return found

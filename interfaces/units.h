@@ -18,7 +18,7 @@ class UnitRef;
 class UnitTypeSet;
 
 // Major version of the units interface, changed when a slot is removed or its signature changes.
-#define UNITS_VERSION_MAJOR 3
+#define UNITS_VERSION_MAJOR 4
 // Minor version of the units interface, changed when a slot is added.
 #define UNITS_VERSION_MINOR 0
 
@@ -100,8 +100,10 @@ struct UnitsSeam {
     void (__fastcall* UnitRefUnlink)(UnitRef* ref);
     // Starts the script that tells a unit's script whether the unit is in the water, on the ground or in the air, when that changed (thiscall in 3.1c: this in ecx). Hooks: none.
     void (__fastcall* UpdateSfxOccupy)(UnitMotion* motion, int unusedEdx, Unit* unit);
-    // Advances one unit for one tick, as UpdateAllUnits does for each unit of each player. Hooks: none.
-    void (__stdcall* UpdateUnit)(Unit* unit);
+    // Starts one unit's update for one tick, before its weapons: the count of units updated and its wind generator; UpdateAllUnits calls it for each unit of each player. Hooks: none.
+    void (__stdcall* UpdateUnitHead)(Unit* unit);
+    // Finishes one unit's update for one tick, after its weapons: its scripts, timers, health percentage, water damage, self-repair, orders, motion and a pending death. Hooks: none.
+    void (__stdcall* UpdateUnitBody)(Unit* unit);
     // Appends to out the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
     void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
     // Creates the empty index of a player's factories, refreshed by the next RefreshFactoryIndex, outside the tick. Hooks: none.

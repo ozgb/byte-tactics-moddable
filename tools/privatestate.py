@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar, map, players and ai.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar, map, players, ai and weapons.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -74,6 +74,8 @@ Two items are read elsewhere, so private for writes only: `MissionConditions` (t
 
 Ai's state is written by ai alone: the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`) and the records a computer player's AI holds (`KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`) are private for reads and writes, and `aiState` reports them. `PlayerAI` itself is private for writes only: the log charges reads of its `vec_65` and `vec_8d` to no subsystem (`unknown`), and they are ai's own code (PlayerAI::ComputeBaseWeights). The pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI` are private for writes only too: others read the pointers of `g_playerAI` through the indexes of los_radar and units.
 `Unit::group` is not listed: orders' GetBuiltOrder gives a human player's built unit its factory's group, a UI group, and LoadUnit writes it. `Player::ai` is not listed either: players' slot set-up writes it. Any writer but ai fails, which is what makes every reaction, squad change and weight or limit command reach these items through the scheduler's events.
+
+Weapons' state is written by weapons alone and read by others: the projectile table and its count (`Game::projectiles`, `Game::projectileCount` and the members of `Projectile`, which ai and los_radar read), the explosions and debris (`Game::count_1491b`, the `debris` array, the members of `Explosion`, `ExplodedPiece` and `Debris` but `Debris::ref1` and `Debris::ref2`, which the GAF helpers of game and presentation write, `DebrisPiece::state` and `DebrisCache::cur`, `Debris::pos` is read by map) and the exploded pieces (`g_explodedPieces`), and the weapon slots of a unit (`Unit::weapons`, src/weapons/unit_weapon_slot.h), which the log names by the members of the union of `Unit` that starts each word of a slot: the cob callback, the weapon, the reload timer, the fire angles, the flags and the three pads of each slot. Not listed: the aim target pair of each slot (targeting's, above). The stockpile of each slot (`Unit::field_1e`, `Unit::b3a` and `Unit::b56`) is listed: orders' build order adds a round through ADD_STOCKPILE. Any writer but weapons fails, which is what makes every damage, claim, release, detonation, stockpile and aim reach these items through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -139,6 +141,15 @@ AI_TYPES = ("KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "Ce
                   "SquadManager", "SquadTimer", "AssaultTimer", "EscortTimer", "SquadScoutTimer", "ScoutTimer", "BuildTimer", "SpatialTimer", "Group")
 
 
+WEAPONS_WRITE_TYPES = ("Projectile", "Explosion", "ExplodedPiece")
+
+WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris", "g_explodedPieces", "DebrisPiece::state", "DebrisCache::cur",
+                       "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
+                       "Unit::field_8", "Unit::type", "Unit::weapon", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b",
+                       "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::unknown_24", "Unit::lastTick", "Unit::unknown_2a", "Unit::f2c", "Unit::unknown_30",
+                       "Unit::b3a", "Unit::f_3b", "Unit::weapon2AimCob", "Unit::f48", "Unit::unknown_4c", "Unit::b56", "Unit::f_57")
+
+
 @dataclass(frozen=True)
 class Owner:
     """A subsystem with private state: the items of its types, its region root and its allocation (an item named `<function>: <allocator> <tag>` of a region it allocates), the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
@@ -165,7 +176,8 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("los_radar", "", LOS_RADAR_TYPES, re.compile(r"LosRadar region"), LOS_RADAR_WRITE_TYPES, LOS_RADAR_ITEMS, LOS_RADAR_WRITE_ITEMS),
           Owner("map", "", MAP_TYPES, NO_ALLOCATION, write_items=MAP_WRITE_ITEMS),
           Owner("players", "", PLAYERS_TYPES, re.compile(r"Players region"), PLAYERS_WRITE_TYPES),
-          Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS))
+          Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS),
+          Owner("weapons", "", (), NO_ALLOCATION, WEAPONS_WRITE_TYPES, write_items=WEAPONS_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

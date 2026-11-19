@@ -7,7 +7,6 @@
 #include "../../interfaces/features.h"
 #include "../seams/features_world.h"
 #include "../units/features_effects.h"
-#include "../weapons/features_effects.h"
 #include "../../interfaces/targeting.h"
 #include "../seams/targeting_world.h"
 #include "../units/targeting_effects.h"
@@ -27,6 +26,8 @@
 #include "../../interfaces/weapons.h"
 #include "../orders/weapons_effects.h"
 #include "../units/weapons_effects.h"
+#include "../scripts/weapons_effects.h"
+#include "../seams/weapons_world.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -64,6 +65,28 @@ static const SchedRoute s_routes[] = {
     {SCHED_WEAPONS, WEAPONS_EFFECT_ATTACKED, SCHED_ORDERS, OrdersOnWeaponsAttacked, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_ATTACKED, SCHED_UNITS, UnitsOnWeaponsAttackedSpeech, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_HIT, SCHED_ORDERS, OrdersOnWeaponsHit, 1},
+    {SCHED_ORDERS, WEAPONS_DAMAGE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_ORDERS, WEAPONS_RELEASE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_ORDERS, WEAPONS_CLAIM, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_ORDERS, WEAPONS_ADD_STOCKPILE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_DAMAGE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_DETONATE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_RELEASE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_INIT_SLOTS, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_REMOVE_PROJECTILES, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_SET_STOCKPILES, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_UNITS, WEAPONS_LOAD_SLOT, SCHED_WEAPONS, WeaponsInbox, 0},
+    {SCHED_ENGINE, WEAPONS_REMOTE_DAMAGE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_SCRIPTS, WEAPONS_AIM_DONE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_SCRIPTS, WEAPONS_EXPLODE_PIECE, SCHED_WEAPONS, WeaponsInbox, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_MARK_DAMAGED, SCHED_UNITS, UnitsOnWeaponsMarkDamaged, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_DAMAGE_RECORD, SCHED_UNITS, UnitsOnWeaponsDamageRecord, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_HEALTH, SCHED_UNITS, UnitsOnWeaponsHealth, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_PARALYZE, SCHED_ORDERS, OrdersOnWeaponsParalyze, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_START_SCRIPT, SCHED_SCRIPTS, ScriptsOnWeaponsStartScript, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_DETACH_PIECE, SCHED_SCRIPTS, ScriptsOnWeaponsDetachPiece, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_NOTICE, SCHED_UNITS, UnitsOnWeaponsNotice, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_BUSY, SCHED_UNITS, UnitsOnWeaponsBusy, 1},
     {SCHED_UNITS, AI_SET_SQUAD, SCHED_AI, AiInbox, 1},
     {SCHED_ENGINE, AI_SET_SQUAD, SCHED_AI, AiInbox, 0},
     {SCHED_ENGINE, AI_PLAN, SCHED_AI, AiInbox, 0},

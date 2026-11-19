@@ -785,7 +785,7 @@ address,function,file
 0x480e90,UnitScript::ExplodeLegacy,src/scripts/unit_script.cpp
 0x480ea0,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp
 0x480eb0,UnitScript::EmitSfx,src/scripts/unit_script.cpp
-0x481140,UnitScript::ExplodePiece,src/weapons/script_explode.cpp
+0x481140,ExplodeUnitPiece,src/weapons/piece_explode.cpp
 0x481340,UnitScript::AttachUnit,src/scripts/unit_script.cpp
 0x4813b0,UnitScript::DropUnit,src/scripts/unit_script.cpp
 0x481430,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp
@@ -1154,7 +1154,7 @@ address,function,file
 0x4b1e80,CobScript::ExplodeLegacy,src/scripts/cob.cpp
 0x4b1e90,CobScript::PlaySoundNoop,src/scripts/cob.cpp
 0x4b1ea0,CobScript::EmitSfx,src/scripts/cob.cpp
-0x4b1eb0,CobScript::ExplodePiece,src/weapons/script_explode.cpp
+0x4b1eb0,CobScript::ExplodePiece,src/scripts/script_explode.cpp
 0x4b1ec0,CobScript::SaveScriptState,src/scripts/cob.cpp
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp
 0x4b2450,LoadCobScript,src/util/int_map.cpp

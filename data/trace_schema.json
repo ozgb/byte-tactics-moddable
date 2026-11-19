@@ -1719,5 +1719,21 @@
       {"name": "types", "size": 64, "kind": "bytes", "target": null},
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ]
+  },
+  "weaponsEvents": {
+    "section": 47,
+    "fields": [
+      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
+      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
+      {"name": "value", "size": 4, "kind": "scalar", "target": null},
+      {"name": "extra", "size": 4, "kind": "scalar", "target": null},
+      {"name": "callback", "size": 4, "kind": "scalar", "target": null},
+      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
+      {"name": "vel", "size": 12, "kind": "bytes", "target": null},
+      {"name": "args", "size": 32, "kind": "bytes", "target": null},
+      {"name": "name", "size": 32, "kind": "bytes", "target": null},
+      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
+    ]
   }
 }

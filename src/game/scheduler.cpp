@@ -140,7 +140,16 @@ void SchedUnitsPhase()
                         AccessLogEntity();
 #endif
                         SchedDeliver(SCHED_UNITS);
-                        g_seams.units->UpdateUnit(u);
+                        g_seams.units->UpdateUnitHead(u);
+                        if (u->player->active != 0) {
+                            unsigned char weaponsKind = u->player->type;
+                            if (weaponsKind == 1 || weaponsKind == 2) {
+                                SchedDeliver(SCHED_WEAPONS);
+                                g_seams.weapons->UpdateUnitWeapons(u);
+                            }
+                        }
+                        SchedDeliver(SCHED_UNITS);
+                        g_seams.units->UpdateUnitBody(u);
                     }
                     u = (Unit*)((char*)u + 0x118);
                 }
@@ -158,6 +167,18 @@ void SchedUnitsPhase()
             }
         }
     }
+}
+
+void SchedProjectilesPhase()
+{
+    SchedDeliver(SCHED_WEAPONS);
+    g_seams.weapons->UpdateProjectiles();
+}
+
+void SchedExplosionsPhase()
+{
+    SchedDeliver(SCHED_WEAPONS);
+    g_seams.weapons->UpdateExplosions();
 }
 
 void SchedFeaturesPhase()

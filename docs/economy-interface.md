@@ -202,7 +202,7 @@ see: inside `UnitAccount` itself, a write to the region looks like the write to 
 
 Every one of economy's writes and reads inside the tick falls inside one entity's update: a unit's in the units phase,
 or a player's in the players phase (`docs/schedule.md`). The scheduler holds those loops: the units phase delivers
-units' inbox and calls `units.UpdateUnit` for each unit, and the players phase delivers players' inbox and calls
+units' inbox and calls `units.UpdateUnitHead`, `weapons.UpdateUnitWeapons` and `units.UpdateUnitBody` for each unit (units 4.0 split `UpdateUnit` around the weapons, #984), and the players phase delivers players' inbox and calls
 `players.UpdatePlayerHead`, then (after delivering economy's inbox) `UpdatePlayerEconomy` when it is due, then
 `players.UpdatePlayerTail`, for each player. The requests, refunds, resets and income published inside a unit's or a
 player's update wait in economy's inbox until economy's next synchronous slot or run, or the phase boundary (a

@@ -5,6 +5,8 @@
 #include "cob_script.h"
 #include "cob_types.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
+#include "../game/weapons_events.h"
 
 struct QueryChannelView {
     char unknown_0[0x24];
@@ -196,7 +198,7 @@ int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int upd
     int i = StartThread(index);
     if (i < 0) {
         if (callback)
-            g_seams.weapons->WeaponAimCobComplete(callback, 0);
+            WeaponsPublishAimDone(SCHED_SCRIPTS, callback, 0);
         return 0;
     }
     Channel* ch = &channels[i];
@@ -709,7 +711,7 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
             }
             case 0x10065000: {
                 if (c->callback)
-                    g_seams.weapons->WeaponAimCobComplete(c->callback, c->Pop());
+                    WeaponsPublishAimDone(SCHED_SCRIPTS, c->callback.get(), c->Pop());
                 c->state = 0;
                 activeCount--;
                 Wake(channel);
@@ -747,7 +749,7 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
             }
             case 0x10071000: {
                 int a = c->Pop();
-                g_seams.weapons->CobScriptExplodePiece(this, table->code[c->pc + 1], a);
+                this->ExplodePiece(table->code[c->pc + 1], a);
                 c->pc += 2;
                 break;
             }

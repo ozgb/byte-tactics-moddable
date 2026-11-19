@@ -267,10 +267,65 @@ class Splits(unittest.TestCase):
             self.assertIn("| economy | orders | units, each entity | split | `economy.Spend` (step 1) | a call into orders "
                           "outside its interface (step 3) |", sc.render(p))
 
+    def test_a_route_handler_is_a_delivery_not_a_call_outside_an_interface(self):
+        fns = functions()
+        fns[1]["calls"][2] = [7, "call", "OnSpent", False]
+        fns.append(fn("OnSpent", "src/orders.cpp", 1, 4, items=[("field_read", "Player::energy")]))
+        subs = SUBSYSTEMS + [{"function": "OnSpent", "file": "src/orders.cpp", "subsystem": "orders"}]
+        route = [{"caller": "Publish", "target": "OnSpent", "reason": "route table entry, s_routes (src/game/routes.cpp)"}]
+        with fixed():
+            p = sc.Page(sc.Program(fns, subs, route, SEAMS, NATIVE, SOURCES), [dep("economy", "orders")], [])
+            (d, found), = p.placed
+            self.assertEqual((found.kind, found.first, found.second, found.first_at, found.second_at),
+                             ("split", "economy.Spend", "the delivery of a queued effect to a handler of orders", 1, 3))
+            text = sc.render(p)
+            self.assertIn("1. the delivery of a queued effect to a handler of orders", text)
+            self.assertNotIn("a call into orders outside its interface (step", text)
+
     def test_across_entities(self):
         p = page([dep("economy", "orders")], [{"pass": "units", "item": "Player::energy", "reader": "orders"}])
         (key, rows, across), = p.groups()["units"]
         self.assertEqual((rows, across), (1, 1))
+
+
+ROUTE_TABLE = """static const SchedRoute s_routes[] = {
+    {SCHED_UNITS, ORDERS_RUN, SCHED_ORDERS, OnUnits, 1},
+    {SCHED_ECONOMY, ORDERS_SPENT, SCHED_ORDERS, OnEconomy, 0},
+};
+"""
+
+
+def routed(deliver=False, units_source=None):
+    """UpdateAll publishes through the scheduler (or delivers its inboxes), whose route table holds a handler for
+    units' event and one for economy's."""
+    fns = functions()
+    fns[1]["calls"][2] = [7, "call", "SchedDeliver" if deliver else "SchedPublish", False]
+    fns += [fn("SchedPublish", "src/game/scheduler.cpp", 1, 3, [(2, "indirect_call", "route->handler", False)]),
+            fn("SchedDeliver", "src/game/scheduler.cpp", 5, 7, [(6, "indirect_call", "entry.handler", False)]),
+            fn("OnUnits", "src/orders.cpp", 1, 2, items=[("field_read", "Player::energy")]),
+            fn("OnEconomy", "src/orders.cpp", 3, 4, items=[("field_read", "Player::energy")])]
+    subs = SUBSYSTEMS + [{"function": f, "file": path, "subsystem": sub} for f, path, sub in (
+        ("SchedPublish", "src/game/scheduler.cpp", "game"), ("SchedDeliver", "src/game/scheduler.cpp", "game"),
+        ("OnUnits", "src/orders.cpp", "orders"), ("OnEconomy", "src/orders.cpp", "orders"))]
+    edges = [{"caller": caller, "target": h, "reason": "route table entry, s_routes (src/game/routes.cpp)"}
+             for caller in ("SchedPublish", "SchedDeliver") for h in ("OnUnits", "OnEconomy")]
+    sources = dict(SOURCES, **{sc.ROUTES: ROUTE_TABLE, "src/game/scheduler.cpp": "\n" * 7})
+    if units_source is not None:
+        sources["src/units.cpp"] = units_source
+    p = sc.Program(fns, subs, edges, SEAMS, NATIVE, sources)
+    return [n.label for n in p.expand(p.lookup("UpdateAll")[0], "units") if n.kind == "direct" and n.delivery]
+
+
+class Routes(unittest.TestCase):
+    def test_a_publish_runs_only_the_handlers_of_the_publishers_events(self):
+        self.assertEqual(routed(), ["OnUnits"])
+
+    def test_a_delivery_runs_the_queued_handlers_of_the_subscribers_published_to(self):
+        self.assertEqual(routed(deliver=True), ["OnEconomy"])
+
+    def test_an_outbox_passed_to_a_publish_is_published_from(self):
+        source = UNITS.replace("g_seams.orders->Run(u);", "EconomyPublishSpent(SCHED_ECONOMY, u);")
+        self.assertEqual(routed(units_source=source), ["OnUnits", "OnEconomy"])
 
 
 class Problems(unittest.TestCase):

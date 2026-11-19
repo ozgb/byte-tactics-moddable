@@ -102,6 +102,7 @@ struct ClampedPos {
 #include "../ingame/hot_radar_slot.h"
 #include "../state/sim_effects.h"
 #include "../quirks/quirks.h"
+#include "../game/weapons_events.h"
 #pragma pack(pop)
 
 // GLOBAL: 0x511de8
@@ -338,7 +339,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 
     for (int i = 0; i < 3; i++) {
         TargetingPublishReset(SCHED_UNITS, (Unit*)unit, i);
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, i);
+        WeaponsPublishRelease(SCHED_UNITS, (Unit*)unit, i);
     }
 
     unit->netDirtyFlags = 0;
@@ -410,20 +411,14 @@ void __stdcall CreateUnitMotion(Unit* unit)
     unit->angles.heading = unit->def->buildangleUnsigned;
 }
 
-extern void* g_weaponAimCobVtable[];
-
 // FUNCTION: 0x485e90
 void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
 {
     UnitDef* type = &g_game->defs.get()[(unsigned short)unitType];
-    if (unit) {
-        for (int i = 0; i < 3; i++)
-            unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
-    }
     unit->unitDefIndex = (short)unitType;
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
-    g_seams.weapons->InitUnitWeaponSlots(unit);
+    WeaponsPublishInitSlots(SCHED_UNITS, unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.movement->NewUnitMotion(unit);
@@ -442,14 +437,10 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
                                                int param_5, Unit* unit)
 {
     UnitDef* type = &g_game->defs.get()[unitType];
-    if (unit) {
-        for (int i = 0; i < 3; i++)
-            unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
-    }
     unit->unitDefIndex = unitType;
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
-    g_seams.weapons->InitUnitWeaponSlots(unit);
+    WeaponsPublishInitSlots(SCHED_UNITS, unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
         g_seams.movement->NewUnitMotion(unit);
@@ -689,12 +680,12 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     g_seams.orders->DeleteOrders(unit, 1);
     RecordRemoveUnitSpeech(unit);
     AiPublishSetSquad(SCHED_UNITS, unit, -1);
-    g_seams.weapons->RemoveUnitProjectiles(unit);
+    WeaponsPublishRemoveProjectiles(SCHED_UNITS, unit);
     if (unit->carrier != 0)
         AttachUnitToPiece(unit, 0, -1, 1);
     while (unit->cargo != 0) {
         unsigned char depth = cmd->killType != 3 ? 6 : 3;
-        g_seams.weapons->DamageUnit(unit->attacker, unit->cargo, 30000, depth, 0);
+        WeaponsPublishDamage(SCHED_UNITS, unit->attacker, unit->cargo, 30000, depth, 0);
         AttachUnitToPiece(unit->cargo, 0, -1, 1);
     }
     MapPublishUnit(SCHED_UNITS, MAP_CLEAR_UNIT, unit);
@@ -797,7 +788,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         EconPublish(SCHED_UNITS, ECONOMY_INCOME, attacker->playerIndex, EconHandleOf(attacker), ECON_METAL, 0, f);
     }
     if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
-        g_seams.weapons->DetonateUnitWeapon(unit, cmd->killType == 3);
+        WeaponsPublishDetonate(SCHED_UNITS, unit, cmd->killType == 3);
     if (cmd->wreckageLevel > 0) {
         int flag = cmd->killType != 7;
         CreateUnitCorpse(unit, cmd->wreckageLevel, flag);

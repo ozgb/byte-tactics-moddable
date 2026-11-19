@@ -11,7 +11,7 @@ class HapiBank;
 // Major version of the features interface, changed when a slot is removed or its signature changes.
 #define FEATURES_VERSION_MAJOR 3
 // Minor version of the features interface, changed when a slot is added.
-#define FEATURES_VERSION_MINOR 0
+#define FEATURES_VERSION_MINOR 1
 
 // The kinds of event other modules publish to features' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published, at once when its route is synchronous.
 enum FeaturesEventKind {
@@ -117,6 +117,8 @@ struct FeaturesSeam {
     int (__stdcall* FirstFeatureSpot)(void);
     // Advances one spot of the used list for one tick (a feature that falls, burns or dies) and returns the spot after it, read before the update, or -1. Hooks: none.
     int (__stdcall* UpdateFeatureSpot)(int spot);
+    // Returns the feature on the cell under a position (the cell that holds the feature when the position is on a part of a larger footprint), filling in that cell and the feature's footprint when they are not null, or 0xffff when there is none; a query, as of features' last run. Hooks: none.
+    unsigned short (__stdcall* FindFeatureAtPos)(Vec3* pos, Point16* cell, Point16* size);
 };
 
 #endif

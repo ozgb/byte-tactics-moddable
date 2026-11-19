@@ -284,6 +284,19 @@ def ai_event(k, kind, unit, target, outcome):
 AI_EVENTS = [("aiEvents.count", "0x00000002")] + ai_event(0, 0xe0, "unit:3", "unit:4", 1) + ai_event(1, 0xf0, "unit:3", "null", 1)
 
 
+def weapons_event(k, kind, unit, target, outcome):
+    p = "weaponsEvents[%d]." % k
+    rows = [(p + "kind", "0x%08x" % kind), (p + "unit", unit), (p + "target", target), (p + "value", "0x00000001"),
+            (p + "extra", "0x00000002"), (p + "callback", "0x00001234"), (p + "pos", "hex:" + bytes(range(12)).hex()),
+            (p + "vel", "hex:" + bytes(12).hex()), (p + "args", "hex:" + bytes(32).hex()),
+            (p + "name", "hex:" + bytes(32).hex()), (p + "outcome", "0x%08x" % outcome)]
+    return rows
+
+
+WEAPONS_EVENTS = ([("weaponsEvents.count", "0x00000002")] + weapons_event(0, 0x100, "unit:3", "unit:4", 1)
+                  + weapons_event(1, 0x110, "unit:3", "null", 1))
+
+
 class DumpedOnlyTest(unittest.TestCase):
     def test_map_events_after_the_los_radar_events_are_skipped(self):
         lines = PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS + SHARE_PACKETS
@@ -313,6 +326,19 @@ class DumpedOnlyTest(unittest.TestCase):
 
     def test_an_empty_ai_events_record_is_skipped(self):
         w = tr.Walker(RESULTS, [("aiEvents.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 1)
+
+    def test_weapons_events_after_the_ai_events_are_skipped(self):
+        lines = (PATH_RESULTS + ECONOMY_EVENTS + FEATURES_EVENTS + TARGETING_EVENTS + LOS_RADAR_EVENTS + MAP_EVENTS
+                 + PLAYERS_EVENTS + AI_EVENTS + WEAPONS_EVENTS + SHARE_PACKETS)
+        w = tr.Walker(RESULTS, lines)
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_empty_weapons_events_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("weaponsEvents.count", "0x00000000")])
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.pos, 1)
 
@@ -456,6 +482,15 @@ class DumpedOnlyTest(unittest.TestCase):
         w.factory_index()
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, 0)
+
+    def test_weapons_report_after_the_ai_report_is_skipped(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("aiState.commandsEnabled", "0x00000001"),
+                                ("weaponsState.projectiles", "0x00000003"), ("weaponsState.explosions", "0x00000000"),
+                                ("weaponsState.debris", "0x00000001"), ("weaponsState.pieces", "0x00000002"),
+                                ("moveClasses[0].x", "0x00000001")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 6)
 
     def test_pathfinder_report_is_read_but_not_hashed(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])

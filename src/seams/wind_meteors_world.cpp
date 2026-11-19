@@ -2,12 +2,15 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/weapons.h"
 #include "../../interfaces/wind_meteors.h"
 #include "../util/vec3.h"
 #include "../weapons/weapon_def.h"
 #include "../game/game.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../game/weapons_events.h"
+#include "weapons_world.h"
 #include "wind_meteors_world.h"
 
 #include "../../link/globals.h"
@@ -39,14 +42,14 @@ void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect)
 void WeaponsOnMeteorSpawn(const void* event)
 {
     const WindMeteorsEffect* effect = static_cast<const WindMeteorsEffect*>(event);
-    Vec3 pos;
-    pos.x = effect->x;
-    pos.y = effect->y;
-    pos.z = effect->z;
-    Vec3 vel;
-    vel.x = effect->vx;
-    vel.y = effect->vy;
-    vel.z = effect->vz;
-    WeaponDef* weapon = effect->weapon < 0 ? nullptr : &g_game->weapons[effect->weapon];
-    g_seams.weapons->SpawnProjectile(weapon, &pos, &vel, effect->announce);
+    WeaponsEvent e = WeaponsEventOf(WEAPONS_SPAWN);
+    e.value = effect->weapon;
+    e.pos[0] = effect->x;
+    e.pos[1] = effect->y;
+    e.pos[2] = effect->z;
+    e.vel[0] = effect->vx;
+    e.vel[1] = effect->vy;
+    e.vel[2] = effect->vz;
+    e.extra = effect->announce;
+    WeaponsInbox(&e);
 }

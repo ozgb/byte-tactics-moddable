@@ -154,6 +154,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../../interfaces/los_radar.h"
 #include "../../interfaces/services.h"
 #include "../game/ai_events.h"
+#include "../game/weapons_events.h"
 #include "../game/los_radar_events.h"
 
 // FUNCTION: 0x4010b0
@@ -297,17 +298,16 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
-        unit->weapons[j].aimCob.nAimCobDone = rec.pieces[j].f4;
-        ((unsigned char*)unit->weapons[j].weapon.get())[0x10a] = rec.pieces[j].f8b;
-        unit->weapons[j].muzzleAimFromDeltaZ = rec.pieces[j].fc;
-        unit->weapons[j].reloadTimer = rec.pieces[j].f10;
-        unit->weapons[j].fireHeading = rec.pieces[j].f12;
-        unit->weapons[j].firePitch = rec.pieces[j].f14;
-        unit->weapons[j].stockpile = rec.pieces[j].f16;
-        ((PieceBits*)&unit->weapons[j].flags)->b0 = rec.pieces[j].fl.b0;
-        ((PieceBits*)&unit->weapons[j].flags)->b1 = rec.pieces[j].fl.b1;
-        ((PieceBits*)&unit->weapons[j].flags)->b23 = rec.pieces[j].fl.b23;
-        ((PieceBits*)&unit->weapons[j].flags)->b4 = rec.pieces[j].fl.b4;
+        int args[8];
+        args[0] = rec.pieces[j].f4;
+        args[1] = rec.pieces[j].f8b;
+        args[2] = rec.pieces[j].fc;
+        args[3] = rec.pieces[j].f10;
+        args[4] = rec.pieces[j].f12;
+        args[5] = rec.pieces[j].f14;
+        args[6] = rec.pieces[j].f16;
+        args[7] = rec.pieces[j].fl.b0 | rec.pieces[j].fl.b1 << 1 | rec.pieces[j].fl.b23 << 2 | rec.pieces[j].fl.b4 << 4;
+        WeaponsPublishLoadSlot(SCHED_UNITS, unit, j, args);
     }
 
     if (unit->cobStateFlags & 4)

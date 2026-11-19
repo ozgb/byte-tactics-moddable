@@ -47,6 +47,7 @@ struct Player;
 #include "../map/meteors.h"
 #include "../game/console_commands.h"
 #include "../weapons/weapons.h"
+#include "../weapons/weapons_apply.h"
 #include "../network/net_game.h"
 #include "../map/features.h"
 
@@ -83,7 +84,6 @@ Projectile* __stdcall FindTargetableProjectile(Unit* unit, unsigned int weapon);
 int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
 #include "../weapons/weapon_types.h"
 #include "../weapons/explosions.h"
-void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
 #include "../scripts/piece_queries.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 struct ModelBuildList;
@@ -167,16 +167,6 @@ static int __stdcall QueryScriptNative(CobScript* script, char* name, int* p2, i
     return script->QueryScript(name, p2, p3, p4, p5);
 }
 
-static void __fastcall ClaimWeaponsNative(Unit* self, int unusedEdx, unsigned char index)
-{
-    self->ClaimWeapons(index);
-}
-
-static void __fastcall ReleaseWeaponsNative(Unit* self, int unusedEdx, unsigned char index)
-{
-    self->ReleaseWeapons(index);
-}
-
 static void __stdcall UpdateSquadsNative(int player)
 {
     SquadManager* manager = g_game->players[player].ai.get();
@@ -228,11 +218,6 @@ static void __stdcall GetSweetSpotNative(Unit* unit, Vec3* out)
 static int __stdcall GetCellMeanHeightNative(Vec3* pos)
 {
     return GetCellMeanHeight(pos);
-}
-
-static void __stdcall ApplyAreaDamageAtNative(WeaponDef* weapon, Vec3* pos)
-{
-    ApplyAreaDamageAt(weapon, (Vec3*)pos);
 }
 
 static WeaponDef* __stdcall FindWeaponByNameNative(char* name)
@@ -568,16 +553,6 @@ static void __stdcall RefreshUnitIfStaleNative(MovementClass* self, Unit* unit)
 static void __stdcall OrderOrStatusFlagsNative(OrderBase* order, unsigned int flags)
 {
     order->OrStatusFlags(flags);
-}
-
-static void __stdcall WeaponAimCobCompleteNative(Callback* callback, int result)
-{
-    callback->Complete(result);
-}
-
-static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, unsigned int flags)
-{
-    script->ExplodePiece(piece, flags);
 }
 
 static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
@@ -948,6 +923,7 @@ void InstallNativeSeams()
     s_features.SaveFeatures = SaveFeatures;
     s_features.LoadFeatures = LoadFeatures;
     s_features.Apply = ApplyEvent;
+    s_features.FindFeatureAtPos = FindFeatureAtPos;
     s_features.Place = PlaceEvent;
     s_features.FeatureTypeCount = FeatureTypeCount;
     s_features.AnimateFeatureType = AnimateFeatureType;
@@ -1019,7 +995,6 @@ void InstallNativeSeams()
     s_units.SetStateBits = SetStateBitsNative;
     s_map.GetCellMeanHeight = GetCellMeanHeightNative;
     s_weapons.FindWeaponByName = FindWeaponByNameNative;
-    s_weapons.ApplyAreaDamageAt = ApplyAreaDamageAtNative;
     s_weapons.GetWeaponRange = GetWeaponRangeNative;
     s_weapons.WeaponCanReachUnit = WeaponCanReachUnit;
     s_weapons.FindTargetableProjectile = FindTargetableProjectile;
@@ -1030,16 +1005,7 @@ void InstallNativeSeams()
     s_weapons.FreeWeaponTypes = FreeWeaponTypes;
     s_weapons.InitExplosions = InitExplosions;
     s_weapons.FreeExplosions = FreeExplosions;
-    s_weapons.DamageUnit = DamageUnit;
-    s_weapons.FindFeatureAtPos = FindFeatureAtPos;
-    s_weapons.ReleaseWeapons = ReleaseWeaponsNative;
-    s_weapons.ClaimWeapons = ClaimWeaponsNative;
-    s_weapons.DetonateUnitWeapon = DetonateUnitWeapon;
-    s_weapons.InitUnitWeaponSlots = InitUnitWeaponSlots;
-    s_weapons.RemoveUnitProjectiles = RemoveUnitProjectiles;
     s_weapons.UpdateUnitWeapons = UpdateUnitWeapons;
-    s_weapons.WeaponAimCobComplete = WeaponAimCobCompleteNative;
-    s_weapons.CobScriptExplodePiece = CobScriptExplodePieceNative;
     s_ai.Apply = AiApply;
     s_ai.WriteState = AiWriteState;
     s_orders.AppendOrder = AppendOrder;
@@ -1218,7 +1184,8 @@ void InstallNativeSeams()
     s_scripts.CreateObjectState = CreateObjectState;
     s_scripts.FreeObjectState = FreeObjectState;
     s_scripts.UpdateObjectState = UpdateObjectState;
-    s_units.UpdateUnit = UpdateUnit;
+    s_units.UpdateUnitHead = UpdateUnitHead;
+    s_units.UpdateUnitBody = UpdateUnitBody;
     s_scripts.ObjectStateSize = ObjectStateSize;
     s_scripts.NewUnitScript = NewUnitScriptNative;
     s_scripts.SetCob = SetCobNative;
@@ -1245,7 +1212,8 @@ void InstallNativeSeams()
     s_movement.UpdateMotion = UpdateMotionNative;
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
-    s_weapons.SpawnProjectile = SpawnProjectile;
+    s_weapons.Apply = WeaponsApply;
+    s_weapons.WriteState = WeaponsWriteState;
     s_units.UpdateAllUnits = UpdateAllUnits;
     s_players.UpdatePlayers = UpdatePlayers;
     s_files.OpenRead = HAPI_OpenFileRead;

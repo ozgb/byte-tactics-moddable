@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 1.6
+subsystem weapons 2.0
 call 850 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 0
@@ -11,12 +11,10 @@ call 850 UpdateUnitWeapons
   r Unit#1.health 3000
   r Unit#1.def UnitDef#34
   r Unit#1.flags 0x90e00321
-  r Unit#1.workTime 1149
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
   r Unit#1.playerIndex 0
-  r Unit#1.netDirtyFlags 0
   r Unit#1.owner Player#0
   r Unit#1.motion UnitMotion#1
   r Unit#1.posX 43650856
@@ -8476,12 +8474,10 @@ call 850 UpdateUnitWeapons
   r Unit#2.health 75
   r Unit#2.def UnitDef#112
   r Unit#2.flags 0x30282321
-  r Unit#2.workTime 0
   r Unit#2.script CobScript#2
   r Unit#2.id 2
   r Unit#2.killCount 0
   r Unit#2.playerIndex 0
-  r Unit#2.netDirtyFlags 0
   r Unit#2.owner Player#0
   r Unit#2.motion null
   r Unit#2.posX 42467328
@@ -8527,12 +8523,10 @@ call 850 UpdateUnitWeapons
   r Unit#3.health 618
   r Unit#3.def UnitDef#71
   r Unit#3.flags 0xb0282321
-  r Unit#3.workTime 0
   r Unit#3.script CobScript#3
   r Unit#3.id 3
   r Unit#3.killCount 0
   r Unit#3.playerIndex 0
-  r Unit#3.netDirtyFlags -32768
   r Unit#3.owner Player#0
   r Unit#3.motion null
   r Unit#3.posX 46137344
@@ -8597,12 +8591,10 @@ call 850 UpdateUnitWeapons
   r Unit#251.health 3000
   r Unit#251.def UnitDef#167
   r Unit#251.flags 0x90e40021
-  r Unit#251.workTime 981
   r Unit#251.script CobScript#4
   r Unit#251.id 251
   r Unit#251.killCount 0
   r Unit#251.playerIndex 1
-  r Unit#251.netDirtyFlags 4
   r Unit#251.owner Player#1
   r Unit#251.motion UnitMotion#2
   r Unit#251.posX 198625775
@@ -8690,12 +8682,10 @@ call 850 UpdateUnitWeapons
   r Unit#252.health 175
   r Unit#252.def UnitDef#208
   r Unit#252.flags 0x30282021
-  r Unit#252.workTime 0
   r Unit#252.script CobScript#5
   r Unit#252.id 252
   r Unit#252.killCount 0
   r Unit#252.playerIndex 1
-  r Unit#252.netDirtyFlags 0
   r Unit#252.owner Player#1
   r Unit#252.motion null
   r Unit#252.posX 195559424
@@ -8737,7 +8727,6 @@ call 850 UpdateUnitWeapons
   r Unit#252.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#252
 call 851 UpdateUnitWeapons
-  r Unit#1.workTime 1150
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8769,7 +8758,6 @@ call 851 UpdateUnitWeapons
 call 851 UpdateUnitWeapons
   a unit Unit#252
 call 852 UpdateUnitWeapons
-  r Unit#1.workTime 1151
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8801,7 +8789,6 @@ call 852 UpdateUnitWeapons
 call 852 UpdateUnitWeapons
   a unit Unit#252
 call 853 UpdateUnitWeapons
-  r Unit#1.workTime 1152
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8833,7 +8820,6 @@ call 853 UpdateUnitWeapons
 call 853 UpdateUnitWeapons
   a unit Unit#252
 call 854 UpdateUnitWeapons
-  r Unit#1.workTime 1153
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8865,7 +8851,6 @@ call 854 UpdateUnitWeapons
 call 854 UpdateUnitWeapons
   a unit Unit#252
 call 855 UpdateUnitWeapons
-  r Unit#1.workTime 1154
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8897,7 +8882,6 @@ call 855 UpdateUnitWeapons
 call 855 UpdateUnitWeapons
   a unit Unit#252
 call 856 UpdateUnitWeapons
-  r Unit#1.workTime 1155
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8929,7 +8913,6 @@ call 856 UpdateUnitWeapons
 call 856 UpdateUnitWeapons
   a unit Unit#252
 call 857 UpdateUnitWeapons
-  r Unit#1.workTime 1156
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8941,38 +8924,6 @@ call 857 UpdateUnitWeapons
   o z 0
 call 857 UpdateUnitWeapons
   a unit Unit#2
-call 857 DamageUnit
-  r Game.localPlayer 0
-  r Unit#2.health 70
-  r Unit#2.player Player#0
-  r Unit#2.activateFlags 0
-  r Unit#2.attacker null
-  r Unit#2.lastAttackerSlot 10
-  r Unit#2.lastDamageType 0
-  r Unit#2.list Order#1
-  r UnitDef#112.flags1 0x0084008a
-  r UnitDef#112.damagemodifier 21845
-  r Player#0.active 1
-  r Player#0.type 1
-  r Order#1.kind 19
-  r Order#1.ticks 0
-  a source Unit#2
-  a target Unit#2
-  a amount 30000
-  a type 3
-  a extra 0
-  i units.MarkRecentlyDamaged Unit#2
-  i services.SchedPublish 6 20
-  i services.RecordSimEvent 12 0 [1,0,0] 3
-  w Unit#2.health -29930
-  w Unit#2.flags 0x30286321
-  w Unit#2.attacker Unit#2
-  w Unit#2.lastAttackerSlot 0
-  w Unit#2.lastDamageType 3
-call 857 ReleaseWeapons
-  a unit Unit#2
-  a unusedEdx 0
-  a index 3
 call 857 UpdateUnitWeapons
   r rng.seed 0x39d15801
   r Unit#3.health 630
@@ -8994,7 +8945,6 @@ call 857 UpdateUnitWeapons
 call 857 UpdateUnitWeapons
   a unit Unit#252
 call 858 UpdateUnitWeapons
-  r Unit#1.workTime 1157
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9024,7 +8974,6 @@ call 858 UpdateUnitWeapons
 call 858 UpdateUnitWeapons
   a unit Unit#252
 call 859 UpdateUnitWeapons
-  r Unit#1.workTime 1158
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9054,7 +9003,6 @@ call 859 UpdateUnitWeapons
 call 859 UpdateUnitWeapons
   a unit Unit#252
 call 860 UpdateUnitWeapons
-  r Unit#1.workTime 1159
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9084,7 +9032,6 @@ call 860 UpdateUnitWeapons
 call 860 UpdateUnitWeapons
   a unit Unit#252
 call 861 UpdateUnitWeapons
-  r Unit#1.workTime 1160
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9122,7 +9069,6 @@ call 861 GetWeaponRange
   a weapon 2
   o result 240
 call 862 UpdateUnitWeapons
-  r Unit#1.workTime 1161
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9153,7 +9099,6 @@ call 862 UpdateUnitWeapons
   a unit Unit#252
 call 863 UpdateUnitWeapons
   r rng.seed 0x5ee8c74e
-  r Unit#1.workTime 1162
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9183,7 +9128,6 @@ call 863 UpdateUnitWeapons
 call 863 UpdateUnitWeapons
   a unit Unit#252
 call 864 UpdateUnitWeapons
-  r Unit#1.workTime 1163
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9213,7 +9157,6 @@ call 864 UpdateUnitWeapons
 call 864 UpdateUnitWeapons
   a unit Unit#252
 call 865 UpdateUnitWeapons
-  r Unit#1.workTime 1164
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9243,7 +9186,6 @@ call 865 UpdateUnitWeapons
 call 865 UpdateUnitWeapons
   a unit Unit#252
 call 866 UpdateUnitWeapons
-  r Unit#1.workTime 1165
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9273,7 +9215,6 @@ call 866 UpdateUnitWeapons
 call 866 UpdateUnitWeapons
   a unit Unit#252
 call 867 UpdateUnitWeapons
-  r Unit#1.workTime 1166
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9303,7 +9244,6 @@ call 867 UpdateUnitWeapons
 call 867 UpdateUnitWeapons
   a unit Unit#252
 call 868 UpdateUnitWeapons
-  r Unit#1.workTime 1167
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9333,7 +9273,6 @@ call 868 UpdateUnitWeapons
 call 868 UpdateUnitWeapons
   a unit Unit#252
 call 869 UpdateUnitWeapons
-  r Unit#1.workTime 1168
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9363,7 +9302,6 @@ call 869 UpdateUnitWeapons
 call 869 UpdateUnitWeapons
   a unit Unit#252
 call 870 UpdateUnitWeapons
-  r Unit#1.workTime 1169
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9394,7 +9332,6 @@ call 870 UpdateUnitWeapons
   a unit Unit#252
 call 871 UpdateUnitWeapons
   r rng.seed 0x1dfb3e39
-  r Unit#1.workTime 1170
   r Player#0.energy f32:0x452d0181
   r Player#0.metal f32:0x4594e762
   a unit Unit#1
@@ -9428,7 +9365,6 @@ call 871 UpdateUnitWeapons
 call 871 UpdateUnitWeapons
   a unit Unit#252
 call 872 UpdateUnitWeapons
-  r Unit#1.workTime 1171
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9458,7 +9394,6 @@ call 872 UpdateUnitWeapons
 call 872 UpdateUnitWeapons
   a unit Unit#252
 call 873 UpdateUnitWeapons
-  r Unit#1.workTime 1172
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9488,7 +9423,6 @@ call 873 UpdateUnitWeapons
 call 873 UpdateUnitWeapons
   a unit Unit#252
 call 874 UpdateUnitWeapons
-  r Unit#1.workTime 1173
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9518,7 +9452,6 @@ call 874 UpdateUnitWeapons
 call 874 UpdateUnitWeapons
   a unit Unit#252
 call 875 UpdateUnitWeapons
-  r Unit#1.workTime 1174
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9548,7 +9481,6 @@ call 875 UpdateUnitWeapons
 call 875 UpdateUnitWeapons
   a unit Unit#252
 call 876 UpdateUnitWeapons
-  r Unit#1.workTime 1175
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9578,7 +9510,6 @@ call 876 UpdateUnitWeapons
 call 876 UpdateUnitWeapons
   a unit Unit#252
 call 877 UpdateUnitWeapons
-  r Unit#1.workTime 1176
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9608,7 +9539,6 @@ call 877 UpdateUnitWeapons
 call 877 UpdateUnitWeapons
   a unit Unit#252
 call 878 UpdateUnitWeapons
-  r Unit#1.workTime 1177
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9638,7 +9568,6 @@ call 878 UpdateUnitWeapons
 call 878 UpdateUnitWeapons
   a unit Unit#252
 call 879 UpdateUnitWeapons
-  r Unit#1.workTime 1178
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9668,7 +9597,6 @@ call 879 UpdateUnitWeapons
 call 879 UpdateUnitWeapons
   a unit Unit#252
 call 880 UpdateUnitWeapons
-  r Unit#1.workTime 1179
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9698,7 +9626,6 @@ call 880 UpdateUnitWeapons
 call 880 UpdateUnitWeapons
   a unit Unit#252
 call 881 UpdateUnitWeapons
-  r Unit#1.workTime 1180
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9728,7 +9655,6 @@ call 881 UpdateUnitWeapons
 call 881 UpdateUnitWeapons
   a unit Unit#252
 call 882 UpdateUnitWeapons
-  r Unit#1.workTime 1181
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9758,7 +9684,6 @@ call 882 UpdateUnitWeapons
 call 882 UpdateUnitWeapons
   a unit Unit#252
 call 883 UpdateUnitWeapons
-  r Unit#1.workTime 1182
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9788,7 +9713,6 @@ call 883 UpdateUnitWeapons
 call 883 UpdateUnitWeapons
   a unit Unit#252
 call 884 UpdateUnitWeapons
-  r Unit#1.workTime 1183
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9818,7 +9742,6 @@ call 884 UpdateUnitWeapons
 call 884 UpdateUnitWeapons
   a unit Unit#252
 call 885 UpdateUnitWeapons
-  r Unit#1.workTime 1184
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9848,7 +9771,6 @@ call 885 UpdateUnitWeapons
 call 885 UpdateUnitWeapons
   a unit Unit#252
 call 886 UpdateUnitWeapons
-  r Unit#1.workTime 1185
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9878,7 +9800,6 @@ call 886 UpdateUnitWeapons
 call 886 UpdateUnitWeapons
   a unit Unit#252
 call 887 UpdateUnitWeapons
-  r Unit#1.workTime 1186
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9908,7 +9829,6 @@ call 887 UpdateUnitWeapons
 call 887 UpdateUnitWeapons
   a unit Unit#252
 call 888 UpdateUnitWeapons
-  r Unit#1.workTime 1187
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9946,7 +9866,6 @@ call 888 GetWeaponRange
   a weapon 2
   o result 240
 call 889 UpdateUnitWeapons
-  r Unit#1.workTime 1188
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -9976,7 +9895,6 @@ call 889 UpdateUnitWeapons
 call 889 UpdateUnitWeapons
   a unit Unit#252
 call 890 UpdateUnitWeapons
-  r Unit#1.workTime 1189
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10006,7 +9924,6 @@ call 890 UpdateUnitWeapons
 call 890 UpdateUnitWeapons
   a unit Unit#252
 call 891 UpdateUnitWeapons
-  r Unit#1.workTime 1190
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10036,7 +9953,6 @@ call 891 UpdateUnitWeapons
 call 891 UpdateUnitWeapons
   a unit Unit#252
 call 892 UpdateUnitWeapons
-  r Unit#1.workTime 1191
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10066,7 +9982,6 @@ call 892 UpdateUnitWeapons
 call 892 UpdateUnitWeapons
   a unit Unit#252
 call 893 UpdateUnitWeapons
-  r Unit#1.workTime 1192
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10096,7 +10011,6 @@ call 893 UpdateUnitWeapons
 call 893 UpdateUnitWeapons
   a unit Unit#252
 call 894 UpdateUnitWeapons
-  r Unit#1.workTime 1193
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10126,7 +10040,6 @@ call 894 UpdateUnitWeapons
 call 894 UpdateUnitWeapons
   a unit Unit#252
 call 895 UpdateUnitWeapons
-  r Unit#1.workTime 1194
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10156,7 +10069,6 @@ call 895 UpdateUnitWeapons
 call 895 UpdateUnitWeapons
   a unit Unit#252
 call 896 UpdateUnitWeapons
-  r Unit#1.workTime 1195
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10186,7 +10098,6 @@ call 896 UpdateUnitWeapons
 call 896 UpdateUnitWeapons
   a unit Unit#252
 call 897 UpdateUnitWeapons
-  r Unit#1.workTime 1196
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10216,7 +10127,6 @@ call 897 UpdateUnitWeapons
 call 897 UpdateUnitWeapons
   a unit Unit#252
 call 898 UpdateUnitWeapons
-  r Unit#1.workTime 1197
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10246,7 +10156,6 @@ call 898 UpdateUnitWeapons
 call 898 UpdateUnitWeapons
   a unit Unit#252
 call 899 UpdateUnitWeapons
-  r Unit#1.workTime 1198
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10276,7 +10185,6 @@ call 899 UpdateUnitWeapons
 call 899 UpdateUnitWeapons
   a unit Unit#252
 call 900 UpdateUnitWeapons
-  r Unit#1.workTime 1199
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10305,13 +10213,8 @@ call 900 UpdateUnitWeapons
   o z 0
 call 900 UpdateUnitWeapons
   a unit Unit#252
-call 900 ReleaseWeapons
-  a unit Unit#251
-  a unusedEdx 0
-  a index 3
 call 901 UpdateUnitWeapons
   r rng.seed 0x37063248
-  r Unit#1.workTime 1200
   r Player#0.energy f32:0x45245424
   r Player#0.metal f32:0x45946881
   a unit Unit#1
@@ -10345,7 +10248,6 @@ call 901 UpdateUnitWeapons
 call 901 UpdateUnitWeapons
   a unit Unit#252
 call 902 UpdateUnitWeapons
-  r Unit#1.workTime 1201
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10380,7 +10282,6 @@ call 902 UpdateUnitWeapons
 call 902 UpdateUnitWeapons
   a unit Unit#252
 call 903 UpdateUnitWeapons
-  r Unit#1.workTime 1202
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10414,7 +10315,6 @@ call 903 UpdateUnitWeapons
 call 903 UpdateUnitWeapons
   a unit Unit#252
 call 904 UpdateUnitWeapons
-  r Unit#1.workTime 1203
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10448,7 +10348,6 @@ call 904 UpdateUnitWeapons
 call 904 UpdateUnitWeapons
   a unit Unit#252
 call 905 UpdateUnitWeapons
-  r Unit#1.workTime 1204
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10482,7 +10381,6 @@ call 905 UpdateUnitWeapons
 call 905 UpdateUnitWeapons
   a unit Unit#252
 call 906 UpdateUnitWeapons
-  r Unit#1.workTime 1205
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10516,7 +10414,6 @@ call 906 UpdateUnitWeapons
 call 906 UpdateUnitWeapons
   a unit Unit#252
 call 907 UpdateUnitWeapons
-  r Unit#1.workTime 1206
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10550,7 +10447,6 @@ call 907 UpdateUnitWeapons
 call 907 UpdateUnitWeapons
   a unit Unit#252
 call 908 UpdateUnitWeapons
-  r Unit#1.workTime 1207
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10584,7 +10480,6 @@ call 908 UpdateUnitWeapons
 call 908 UpdateUnitWeapons
   a unit Unit#252
 call 909 UpdateUnitWeapons
-  r Unit#1.workTime 1208
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10617,7 +10512,6 @@ call 909 UpdateUnitWeapons
 call 909 UpdateUnitWeapons
   a unit Unit#252
 call 910 UpdateUnitWeapons
-  r Unit#1.workTime 1209
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10650,7 +10544,6 @@ call 910 UpdateUnitWeapons
 call 910 UpdateUnitWeapons
   a unit Unit#252
 call 911 UpdateUnitWeapons
-  r Unit#1.workTime 1210
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10683,7 +10576,6 @@ call 911 UpdateUnitWeapons
 call 911 UpdateUnitWeapons
   a unit Unit#252
 call 912 UpdateUnitWeapons
-  r Unit#1.workTime 1211
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10716,7 +10608,6 @@ call 912 UpdateUnitWeapons
 call 912 UpdateUnitWeapons
   a unit Unit#252
 call 913 UpdateUnitWeapons
-  r Unit#1.workTime 1212
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10749,7 +10640,6 @@ call 913 UpdateUnitWeapons
 call 913 UpdateUnitWeapons
   a unit Unit#252
 call 914 UpdateUnitWeapons
-  r Unit#1.workTime 1213
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10782,7 +10672,6 @@ call 914 UpdateUnitWeapons
 call 914 UpdateUnitWeapons
   a unit Unit#252
 call 915 UpdateUnitWeapons
-  r Unit#1.workTime 1214
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10815,7 +10704,6 @@ call 915 UpdateUnitWeapons
 call 915 UpdateUnitWeapons
   a unit Unit#252
 call 916 UpdateUnitWeapons
-  r Unit#1.workTime 1215
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10856,7 +10744,6 @@ call 916 GetWeaponRange
   a weapon 2
   o result 240
 call 917 UpdateUnitWeapons
-  r Unit#1.workTime 1216
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10889,7 +10776,6 @@ call 917 UpdateUnitWeapons
 call 917 UpdateUnitWeapons
   a unit Unit#252
 call 918 UpdateUnitWeapons
-  r Unit#1.workTime 1217
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10922,7 +10808,6 @@ call 918 UpdateUnitWeapons
 call 918 UpdateUnitWeapons
   a unit Unit#252
 call 919 UpdateUnitWeapons
-  r Unit#1.workTime 1218
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10955,7 +10840,6 @@ call 919 UpdateUnitWeapons
 call 919 UpdateUnitWeapons
   a unit Unit#252
 call 920 UpdateUnitWeapons
-  r Unit#1.workTime 1219
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10988,7 +10872,6 @@ call 920 UpdateUnitWeapons
 call 920 UpdateUnitWeapons
   a unit Unit#252
 call 921 UpdateUnitWeapons
-  r Unit#1.workTime 1220
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11021,7 +10904,6 @@ call 921 UpdateUnitWeapons
 call 921 UpdateUnitWeapons
   a unit Unit#252
 call 922 UpdateUnitWeapons
-  r Unit#1.workTime 1221
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11054,7 +10936,6 @@ call 922 UpdateUnitWeapons
 call 922 UpdateUnitWeapons
   a unit Unit#252
 call 923 UpdateUnitWeapons
-  r Unit#1.workTime 1222
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11087,7 +10968,6 @@ call 923 UpdateUnitWeapons
 call 923 UpdateUnitWeapons
   a unit Unit#252
 call 924 UpdateUnitWeapons
-  r Unit#1.workTime 1223
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11120,7 +11000,6 @@ call 924 UpdateUnitWeapons
 call 924 UpdateUnitWeapons
   a unit Unit#252
 call 925 UpdateUnitWeapons
-  r Unit#1.workTime 1224
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11153,7 +11032,6 @@ call 925 UpdateUnitWeapons
 call 925 UpdateUnitWeapons
   a unit Unit#252
 call 926 UpdateUnitWeapons
-  r Unit#1.workTime 1225
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11186,7 +11064,6 @@ call 926 UpdateUnitWeapons
 call 926 UpdateUnitWeapons
   a unit Unit#252
 call 927 UpdateUnitWeapons
-  r Unit#1.workTime 1226
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11219,7 +11096,6 @@ call 927 UpdateUnitWeapons
 call 927 UpdateUnitWeapons
   a unit Unit#252
 call 928 UpdateUnitWeapons
-  r Unit#1.workTime 1227
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11252,7 +11128,6 @@ call 928 UpdateUnitWeapons
 call 928 UpdateUnitWeapons
   a unit Unit#252
 call 929 UpdateUnitWeapons
-  r Unit#1.workTime 1228
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11285,7 +11160,6 @@ call 929 UpdateUnitWeapons
 call 929 UpdateUnitWeapons
   a unit Unit#252
 call 930 UpdateUnitWeapons
-  r Unit#1.workTime 1229
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11319,7 +11193,6 @@ call 930 UpdateUnitWeapons
   a unit Unit#252
 call 931 UpdateUnitWeapons
   r rng.seed 0x43a683c3
-  r Unit#1.workTime 1230
   r Player#0.energy f32:0x451ba6c6
   r Player#0.metal f32:0x4593e9a0
   a unit Unit#1
@@ -11356,7 +11229,6 @@ call 931 UpdateUnitWeapons
 call 931 UpdateUnitWeapons
   a unit Unit#252
 call 932 UpdateUnitWeapons
-  r Unit#1.workTime 1231
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11389,7 +11261,6 @@ call 932 UpdateUnitWeapons
 call 932 UpdateUnitWeapons
   a unit Unit#252
 call 933 UpdateUnitWeapons
-  r Unit#1.workTime 1232
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11399,26 +11270,12 @@ call 933 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 933 ReleaseWeapons
-  a unit Unit#1
-  a unusedEdx 0
-  a index 3
-  i services.SchedPublish 6 28
-  i services.SchedPublish 6 28
-  w Unit#1.weapon0Flags 18
-  w Unit#1.weapon2Flags 26
 call 933 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
-call 933 ReleaseWeapons
-  a unit Unit#3
-  a unusedEdx 0
-  a index 3
-  i services.SchedPublish 6 28
-  w Unit#3.weapon0Flags 18
 call 933 UpdateUnitWeapons
   r Unit#251.posX 199509163
   r Unit#251.posZ 84722156
@@ -11434,7 +11291,8 @@ call 933 UpdateUnitWeapons
 call 933 UpdateUnitWeapons
   a unit Unit#252
 call 934 UpdateUnitWeapons
-  r Unit#1.workTime 1233
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon2Flags 26
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11444,21 +11302,13 @@ call 934 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 934 ReleaseWeapons
-  a unit Unit#1
-  a unusedEdx 0
-  a index 3
 call 934 UpdateUnitWeapons
-  r Unit#3.netDirtyFlags 0
+  r Unit#3.weapon0Flags 18
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
-call 934 ReleaseWeapons
-  a unit Unit#3
-  a unusedEdx 0
-  a index 3
 call 934 UpdateUnitWeapons
   r Unit#251.posX 199558751
   r Unit#251.posZ 84672568
@@ -11474,7 +11324,6 @@ call 934 UpdateUnitWeapons
 call 934 UpdateUnitWeapons
   a unit Unit#252
 call 935 UpdateUnitWeapons
-  r Unit#1.netDirtyFlags 4
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -12402,34 +12251,6 @@ call 964 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 964 DamageUnit
-  r Unit#3.player Player#0
-  r Unit#3.activateFlags 0
-  r Unit#3.attacker null
-  r Unit#3.lastAttackerSlot 10
-  r Unit#3.lastDamageType 0
-  r Unit#3.list Order#2
-  r UnitDef#71.flags1 0x0081808a
-  r UnitDef#71.damagemodifier 65536
-  r Order#2.kind 22
-  r Order#2.ticks 0
-  a source Unit#3
-  a target Unit#3
-  a amount 30000
-  a type 3
-  a extra 0
-  i units.MarkRecentlyDamaged Unit#3
-  i services.SchedPublish 6 20
-  i services.RecordSimEvent 12 0 [1,0,0] 3
-  w Unit#3.health -29250
-  w Unit#3.flags 0xb0286321
-  w Unit#3.attacker Unit#3
-  w Unit#3.lastAttackerSlot 0
-  w Unit#3.lastDamageType 3
-call 964 ReleaseWeapons
-  a unit Unit#3
-  a unusedEdx 0
-  a index 3
 call 964 UpdateUnitWeapons
   r rng.seed 0x28887861
   r Unit#251.posX 201034668
@@ -12532,23 +12353,6 @@ call 968 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 968 DamageUnit
-  r Unit#1.player Player#0
-  r Unit#1.activateFlags 1
-  r Unit#1.attacker null
-  r Unit#1.lastAttackerSlot 10
-  r Unit#1.lastDamageType 1
-  r Unit#1.list Order#3
-  r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.damagemodifier 65536
-  r Order#3.kind 41
-  r Order#3.ticks 0
-  a source Unit#1
-  a target Unit#1
-  a amount 1
-  a type 10
-  a extra 0
-  w Unit#1.health 2029
 call 968 UpdateUnitWeapons
   r Unit#251.posX 201231169
   r Unit#251.posZ 82973398
@@ -12566,6 +12370,7 @@ call 968 UpdateUnitWeapons
   a unit Unit#252
 call 969 UpdateUnitWeapons
   r rng.seed 0x4a2a3330
+  r Unit#1.health 2029
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -12763,13 +12568,6 @@ call 976 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 976 DamageUnit
-  a source Unit#1
-  a target Unit#1
-  a amount 1
-  a type 10
-  a extra 0
-  w Unit#1.health 2030
 call 976 UpdateUnitWeapons
   r Unit#251.posX 201624171
   r Unit#251.posZ 82573100
@@ -12786,6 +12584,7 @@ call 976 UpdateUnitWeapons
 call 976 UpdateUnitWeapons
   a unit Unit#252
 call 977 UpdateUnitWeapons
+  r Unit#1.health 2030
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -12970,13 +12769,6 @@ call 984 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 984 DamageUnit
-  a source Unit#1
-  a target Unit#1
-  a amount 1
-  a type 10
-  a extra 0
-  w Unit#1.health 2031
 call 984 UpdateUnitWeapons
   r Unit#251.posX 202017173
   r Unit#251.posZ 82172802
@@ -12993,6 +12785,7 @@ call 984 UpdateUnitWeapons
 call 984 UpdateUnitWeapons
   a unit Unit#252
 call 985 UpdateUnitWeapons
+  r Unit#1.health 2031
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13184,13 +12977,6 @@ call 992 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 992 DamageUnit
-  a source Unit#1
-  a target Unit#1
-  a amount 1
-  a type 10
-  a extra 0
-  w Unit#1.health 2032
 call 992 UpdateUnitWeapons
   r Unit#251.posX 202410175
   r Unit#251.posZ 81772504
@@ -13207,6 +12993,7 @@ call 992 UpdateUnitWeapons
 call 992 UpdateUnitWeapons
   a unit Unit#252
 call 993 UpdateUnitWeapons
+  r Unit#1.health 2032
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13392,13 +13179,6 @@ call 1000 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 1000 DamageUnit
-  a source Unit#1
-  a target Unit#1
-  a amount 1
-  a type 10
-  a extra 0
-  w Unit#1.health 2033
 call 1000 UpdateUnitWeapons
   r Unit#251.posX 202803177
   r Unit#251.posZ 81372206

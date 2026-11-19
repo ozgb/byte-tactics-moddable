@@ -1045,12 +1045,12 @@ void __stdcall RunGameSteps(int showStats)
         HarnessPhase(1);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 1);
-        g_seams.weapons->UpdateProjectiles();
+        SchedProjectilesPhase();
         SchedPhaseBoundary();
         HarnessPhase(2);
         DrainSimEvents();
         AccumulateProfileTime(&g_game->timers, 7);
-        g_seams.weapons->UpdateExplosions();
+        SchedExplosionsPhase();
         SchedPhaseBoundary();
         HarnessPhase(3);
         DrainSimEvents();

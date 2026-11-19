@@ -82,13 +82,13 @@ class ModelTest(unittest.TestCase):
         self.assertGreater(stats["flow_parsed"] / stats["placed"], 0.99)
 
     def test_calls_go_through_seams_to_the_implementation(self):
-        meteors = self.function("WeaponsOnMeteorSpawn")
-        spawn = self.function("SpawnProjectile")
-        edge = meteors.out[spawn.id]
+        inbox = self.function("WeaponsInbox")
+        apply = self.function("WeaponsApply")
+        edge = inbox.out[apply.id]
         self.assertIn("seam", edge.kinds)
-        self.assertEqual(edge.via, "WeaponsSeam::SpawnProjectile")
-        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["weapon", "&pos", "&vel", "effect->announce"])
-        self.assertEqual(edge.sites[0]["args"][0]["param"], "weapon")
+        self.assertEqual(edge.via, "WeaponsSeam::Apply")
+        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["e"])
+        self.assertEqual(edge.sites[0]["args"][0]["param"], "event")
 
     def test_forwarding_wrappers_are_drawn_through(self):
         activate = self.function("ActivateOrder")

@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 1.6
+subsystem weapons 2.0
 call 1640 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 47
@@ -11,12 +11,10 @@ call 1640 UpdateUnitWeapons
   r Unit#1.health 3390
   r Unit#1.def UnitDef#20
   r Unit#1.flags 0x50240325
-  r Unit#1.workTime 0
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
   r Unit#1.playerIndex 0
-  r Unit#1.netDirtyFlags 0
   r Unit#1.owner Player#0
   r Unit#1.motion UnitMotion#1
   r Unit#1.posX 95600083
@@ -8434,12 +8432,10 @@ call 1640 UpdateUnitWeapons
   r Unit#4.health 3942
   r Unit#4.def UnitDef#25
   r Unit#4.flags 0x90240321
-  r Unit#4.workTime 2191
   r Unit#4.script CobScript#2
   r Unit#4.id 4
   r Unit#4.killCount 0
   r Unit#4.playerIndex 0
-  r Unit#4.netDirtyFlags 1024
   r Unit#4.owner Player#0
   r Unit#4.motion UnitMotion#2
   r Unit#4.posX 141557760
@@ -8493,12 +8489,10 @@ call 1640 UpdateUnitWeapons
   r Unit#275.health 242
   r Unit#275.def UnitDef#140
   r Unit#275.flags 0x90240305
-  r Unit#275.workTime 2210
   r Unit#275.script CobScript#3
   r Unit#275.id 275
   r Unit#275.killCount 0
   r Unit#275.playerIndex 1
-  r Unit#275.netDirtyFlags 0
   r Unit#275.owner Player#1
   r Unit#275.motion UnitMotion#3
   r Unit#275.posX 108181794
@@ -8536,12 +8530,10 @@ call 1640 UpdateUnitWeapons
   r Unit#5.health 2808
   r Unit#5.def UnitDef#67
   r Unit#5.flags 0x90240321
-  r Unit#5.workTime 2222
   r Unit#5.script CobScript#4
   r Unit#5.id 5
   r Unit#5.killCount 1
   r Unit#5.playerIndex 0
-  r Unit#5.netDirtyFlags 0
   r Unit#5.owner Player#0
   r Unit#5.motion UnitMotion#4
   r Unit#5.posX 117440512
@@ -8595,12 +8587,10 @@ call 1640 UpdateUnitWeapons
   r Unit#6.health 2806
   r Unit#6.def UnitDef#67
   r Unit#6.flags 0x90240321
-  r Unit#6.workTime 2235
   r Unit#6.script CobScript#5
   r Unit#6.id 6
   r Unit#6.killCount 0
   r Unit#6.playerIndex 0
-  r Unit#6.netDirtyFlags 0
   r Unit#6.owner Player#0
   r Unit#6.motion UnitMotion#5
   r Unit#6.posX 131060434
@@ -8638,12 +8628,10 @@ call 1640 UpdateUnitWeapons
   r Unit#14.health 560
   r Unit#14.def UnitDef#62
   r Unit#14.flags 0x90240321
-  r Unit#14.workTime 2226
   r Unit#14.script CobScript#6
   r Unit#14.id 14
   r Unit#14.killCount 0
   r Unit#14.playerIndex 0
-  r Unit#14.netDirtyFlags 17408
   r Unit#14.owner Player#0
   r Unit#14.motion UnitMotion#6
   r Unit#14.posX 113246208
@@ -8697,12 +8685,10 @@ call 1640 UpdateUnitWeapons
   r Unit#2.health 2870
   r Unit#2.def UnitDef#67
   r Unit#2.flags 0x90240321
-  r Unit#2.workTime 2115
   r Unit#2.script CobScript#7
   r Unit#2.id 2
   r Unit#2.killCount 1
   r Unit#2.playerIndex 0
-  r Unit#2.netDirtyFlags 9216
   r Unit#2.owner Player#0
   r Unit#2.motion UnitMotion#7
   r Unit#2.posX 136314880
@@ -8740,12 +8726,10 @@ call 1640 UpdateUnitWeapons
   r Unit#271.health -6
   r Unit#271.def UnitDef#0
   r Unit#271.flags 0x80244305
-  r Unit#271.workTime 2134
   r Unit#271.script null
   r Unit#271.id 271
   r Unit#271.killCount 0
   r Unit#271.playerIndex 1
-  r Unit#271.netDirtyFlags 0
   r Unit#271.owner Player#1
   r Unit#271.motion null
   r Unit#271.posX 135061640
@@ -8783,12 +8767,10 @@ call 1640 UpdateUnitWeapons
   r Unit#274.health 189
   r Unit#274.def UnitDef#140
   r Unit#274.flags 0x90240301
-  r Unit#274.workTime 2165
   r Unit#274.script CobScript#8
   r Unit#274.id 274
   r Unit#274.killCount 0
   r Unit#274.playerIndex 1
-  r Unit#274.netDirtyFlags 0
   r Unit#274.owner Player#1
   r Unit#274.motion UnitMotion#8
   r Unit#274.posX 90701823
@@ -8842,12 +8824,10 @@ call 1640 UpdateUnitWeapons
   r Unit#9.health 2669
   r Unit#9.def UnitDef#67
   r Unit#9.flags 0x90240325
-  r Unit#9.workTime 2187
   r Unit#9.script CobScript#9
   r Unit#9.id 9
   r Unit#9.killCount 1
   r Unit#9.playerIndex 0
-  r Unit#9.netDirtyFlags 0
   r Unit#9.owner Player#0
   r Unit#9.motion UnitMotion#9
   r Unit#9.posX 94465116
@@ -8885,12 +8865,10 @@ call 1640 UpdateUnitWeapons
   r Unit#13.health 400
   r Unit#13.def UnitDef#62
   r Unit#13.flags 0x90240321
-  r Unit#13.workTime 2179
   r Unit#13.script CobScript#10
   r Unit#13.id 13
   r Unit#13.killCount 0
   r Unit#13.playerIndex 0
-  r Unit#13.netDirtyFlags 0
   r Unit#13.owner Player#0
   r Unit#13.motion UnitMotion#10
   r Unit#13.posX 123731968
@@ -8928,12 +8906,10 @@ call 1640 UpdateUnitWeapons
   r Unit#272.health -69
   r Unit#272.def UnitDef#0
   r Unit#272.flags 0x80244305
-  r Unit#272.workTime 2093
   r Unit#272.script null
   r Unit#272.id 272
   r Unit#272.killCount 0
   r Unit#272.playerIndex 1
-  r Unit#272.netDirtyFlags 0
   r Unit#272.owner Player#1
   r Unit#272.motion null
   r Unit#272.posX 107593039
@@ -8971,12 +8947,10 @@ call 1640 UpdateUnitWeapons
   r Unit#270.health -144
   r Unit#270.def UnitDef#0
   r Unit#270.flags 0x80244301
-  r Unit#270.workTime 2061
   r Unit#270.script null
   r Unit#270.id 270
   r Unit#270.killCount 0
   r Unit#270.playerIndex 1
-  r Unit#270.netDirtyFlags 0
   r Unit#270.owner Player#1
   r Unit#270.motion null
   r Unit#270.posX 150471674
@@ -9030,12 +9004,10 @@ call 1640 UpdateUnitWeapons
   r Unit#12.health 2870
   r Unit#12.def UnitDef#67
   r Unit#12.flags 0x90240321
-  r Unit#12.workTime 2063
   r Unit#12.script CobScript#11
   r Unit#12.id 12
   r Unit#12.killCount 0
   r Unit#12.playerIndex 0
-  r Unit#12.netDirtyFlags 25600
   r Unit#12.owner Player#0
   r Unit#12.motion UnitMotion#11
   r Unit#12.posX 136314880
@@ -9073,12 +9045,10 @@ call 1640 UpdateUnitWeapons
   r Unit#273.health -63
   r Unit#273.def UnitDef#0
   r Unit#273.flags 0x80244301
-  r Unit#273.workTime 2047
   r Unit#273.script null
   r Unit#273.id 273
   r Unit#273.killCount 0
   r Unit#273.playerIndex 1
-  r Unit#273.netDirtyFlags 0
   r Unit#273.owner Player#1
   r Unit#273.motion null
   r Unit#273.posX 110098583
@@ -9224,12 +9194,10 @@ call 1640 UpdateUnitWeapons
   r Unit#3.health 5720
   r Unit#3.def UnitDef#15
   r Unit#3.flags 0x90240321
-  r Unit#3.workTime 2099
   r Unit#3.script CobScript#12
   r Unit#3.id 3
   r Unit#3.killCount 0
   r Unit#3.playerIndex 0
-  r Unit#3.netDirtyFlags 0
   r Unit#3.owner Player#0
   r Unit#3.motion UnitMotion#12
   r Unit#3.posX 122683392
@@ -9300,10 +9268,6 @@ call 1640 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
   w Unit#3.weapon1Flags 22
-call 1640 WeaponAimCobComplete
-  a callback Unit#3.weapons[0].aimCob
-  a result 1
-  w Unit#3.weapons[0].aimCob.nAimCobDone 1
 call 1640 UpdateUnitWeapons
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 1
@@ -9343,14 +9307,14 @@ call 1640 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#6 3 = (0,0,0)
   i scripts.QueryScript CobScript#5 "QuerySecondary" (0) null null null = 1
   o p2 (3)
+  i services.SchedPublish 6 112
   i los_radar.SoundHeardMask at=(131060434,3080192,61159377) = 1
   i services.RecordSimEvent 30 0 [48,131060434,3080192,61159377,1] 5
-  i scripts.StartScript CobScript#5 "FireSecondary" ? 0 = 0
-  i scripts.StartScriptWithArgs CobScript#5 "RockUnit" ? 0 2 88 795 0 0 = 0
+  i services.SchedPublish 6 112
+  i services.SchedPublish 6 112
+  i services.SchedPublish 6 112
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 4
-  w Unit#6.workTime 2240
-  w Unit#6.netDirtyFlags 1024
   w Unit#6.weapon0ReloadTimer 55
   w Unit#6.weapon1ReloadTimer 84
   w Unit#6.weapon1FireHeading 14784
@@ -9379,12 +9343,10 @@ call 1640 UpdateUnitWeapons
   r Unit#7.health 290
   r Unit#7.def UnitDef#75
   r Unit#7.flags 0x90240321
-  r Unit#7.workTime 0
   r Unit#7.script CobScript#13
   r Unit#7.id 7
   r Unit#7.killCount 0
   r Unit#7.playerIndex 0
-  r Unit#7.netDirtyFlags 0
   r Unit#7.owner Player#0
   r Unit#7.motion UnitMotion#13
   r Unit#7.posX 120586240
@@ -9450,12 +9412,10 @@ call 1640 UpdateUnitWeapons
   r Unit#8.health 3982
   r Unit#8.def UnitDef#25
   r Unit#8.flags 0x90240325
-  r Unit#8.workTime 2188
   r Unit#8.script CobScript#14
   r Unit#8.id 8
   r Unit#8.killCount 0
   r Unit#8.playerIndex 0
-  r Unit#8.netDirtyFlags 0
   r Unit#8.owner Player#0
   r Unit#8.motion UnitMotion#14
   r Unit#8.posX 103841409
@@ -9521,12 +9481,10 @@ call 1640 UpdateUnitWeapons
   r Unit#10.health 290
   r Unit#10.def UnitDef#75
   r Unit#10.flags 0x90240321
-  r Unit#10.workTime 0
   r Unit#10.script CobScript#15
   r Unit#10.id 10
   r Unit#10.killCount 0
   r Unit#10.playerIndex 0
-  r Unit#10.netDirtyFlags 0
   r Unit#10.owner Player#0
   r Unit#10.motion UnitMotion#15
   r Unit#10.posX 127926272
@@ -9577,12 +9535,10 @@ call 1640 UpdateUnitWeapons
   r Unit#11.health 2870
   r Unit#11.def UnitDef#67
   r Unit#11.flags 0x90240321
-  r Unit#11.workTime 0
   r Unit#11.script CobScript#16
   r Unit#11.id 11
   r Unit#11.killCount 0
   r Unit#11.playerIndex 0
-  r Unit#11.netDirtyFlags 0
   r Unit#11.owner Player#0
   r Unit#11.motion UnitMotion#16
   r Unit#11.posX 117440512
@@ -9666,12 +9622,10 @@ call 1640 UpdateUnitWeapons
   r Unit#15.health 528
   r Unit#15.def UnitDef#62
   r Unit#15.flags 0x90240321
-  r Unit#15.workTime 2203
   r Unit#15.script CobScript#17
   r Unit#15.id 15
   r Unit#15.killCount 1
   r Unit#15.playerIndex 0
-  r Unit#15.netDirtyFlags 16384
   r Unit#15.owner Player#0
   r Unit#15.motion UnitMotion#17
   r Unit#15.posX 132120576
@@ -9724,12 +9678,10 @@ call 1640 UpdateUnitWeapons
   r Unit#16.health 560
   r Unit#16.def UnitDef#62
   r Unit#16.flags 0x90240321
-  r Unit#16.workTime 0
   r Unit#16.script CobScript#18
   r Unit#16.id 16
   r Unit#16.killCount 0
   r Unit#16.playerIndex 0
-  r Unit#16.netDirtyFlags 0
   r Unit#16.owner Player#0
   r Unit#16.motion UnitMotion#18
   r Unit#16.posX 108003328
@@ -9781,12 +9733,10 @@ call 1640 UpdateUnitWeapons
   r Unit#17.health 560
   r Unit#17.def UnitDef#62
   r Unit#17.flags 0x90240321
-  r Unit#17.workTime 2036
   r Unit#17.script CobScript#19
   r Unit#17.id 17
   r Unit#17.killCount 0
   r Unit#17.playerIndex 0
-  r Unit#17.netDirtyFlags 16384
   r Unit#17.owner Player#0
   r Unit#17.motion UnitMotion#19
   r Unit#17.posX 146800640
@@ -9838,12 +9788,10 @@ call 1640 UpdateUnitWeapons
   r Unit#251.health 52
   r Unit#251.def UnitDef#153
   r Unit#251.flags 0x30280021
-  r Unit#251.workTime 0
   r Unit#251.script CobScript#20
   r Unit#251.id 251
   r Unit#251.killCount 0
   r Unit#251.playerIndex 1
-  r Unit#251.netDirtyFlags 0
   r Unit#251.owner Player#1
   r Unit#251.motion null
   r Unit#251.posX 106954752
@@ -9888,12 +9836,10 @@ call 1640 UpdateUnitWeapons
   r Unit#252.health 52
   r Unit#252.def UnitDef#153
   r Unit#252.flags 0x30280021
-  r Unit#252.workTime 0
   r Unit#252.script CobScript#21
   r Unit#252.id 252
   r Unit#252.killCount 0
   r Unit#252.playerIndex 1
-  r Unit#252.netDirtyFlags 0
   r Unit#252.owner Player#1
   r Unit#252.motion null
   r Unit#252.posX 165675008
@@ -9936,12 +9882,10 @@ call 1640 UpdateUnitWeapons
   r Unit#253.health 52
   r Unit#253.def UnitDef#153
   r Unit#253.flags 0x30280021
-  r Unit#253.workTime 0
   r Unit#253.script CobScript#22
   r Unit#253.id 253
   r Unit#253.killCount 0
   r Unit#253.playerIndex 1
-  r Unit#253.netDirtyFlags 0
   r Unit#253.owner Player#1
   r Unit#253.motion null
   r Unit#253.posX 62914560
@@ -9984,12 +9928,10 @@ call 1640 UpdateUnitWeapons
   r Unit#254.health 52
   r Unit#254.def UnitDef#153
   r Unit#254.flags 0x30280121
-  r Unit#254.workTime 0
   r Unit#254.script CobScript#23
   r Unit#254.id 254
   r Unit#254.killCount 0
   r Unit#254.playerIndex 1
-  r Unit#254.netDirtyFlags 0
   r Unit#254.owner Player#1
   r Unit#254.motion null
   r Unit#254.posX 115343360
@@ -10032,12 +9974,10 @@ call 1640 UpdateUnitWeapons
   r Unit#255.health 52
   r Unit#255.def UnitDef#153
   r Unit#255.flags 0x30280021
-  r Unit#255.workTime 0
   r Unit#255.script CobScript#24
   r Unit#255.id 255
   r Unit#255.killCount 0
   r Unit#255.playerIndex 1
-  r Unit#255.netDirtyFlags 0
   r Unit#255.owner Player#1
   r Unit#255.motion null
   r Unit#255.posX 178257920
@@ -10080,12 +10020,10 @@ call 1640 UpdateUnitWeapons
   r Unit#256.health 52
   r Unit#256.def UnitDef#153
   r Unit#256.flags 0x30280021
-  r Unit#256.workTime 0
   r Unit#256.script CobScript#25
   r Unit#256.id 256
   r Unit#256.killCount 0
   r Unit#256.playerIndex 1
-  r Unit#256.netDirtyFlags 0
   r Unit#256.owner Player#1
   r Unit#256.motion null
   r Unit#256.posX 85983232
@@ -10128,12 +10066,10 @@ call 1640 UpdateUnitWeapons
   r Unit#257.health 52
   r Unit#257.def UnitDef#153
   r Unit#257.flags 0x30280021
-  r Unit#257.workTime 0
   r Unit#257.script CobScript#26
   r Unit#257.id 257
   r Unit#257.killCount 0
   r Unit#257.playerIndex 1
-  r Unit#257.netDirtyFlags 0
   r Unit#257.owner Player#1
   r Unit#257.motion null
   r Unit#257.posX 14680064
@@ -10176,12 +10112,10 @@ call 1640 UpdateUnitWeapons
   r Unit#258.health 52
   r Unit#258.def UnitDef#153
   r Unit#258.flags 0x30280021
-  r Unit#258.workTime 0
   r Unit#258.script CobScript#27
   r Unit#258.id 258
   r Unit#258.killCount 0
   r Unit#258.playerIndex 1
-  r Unit#258.netDirtyFlags 0
   r Unit#258.owner Player#1
   r Unit#258.motion null
   r Unit#258.posX 15728640
@@ -10224,12 +10158,10 @@ call 1640 UpdateUnitWeapons
   r Unit#259.health 52
   r Unit#259.def UnitDef#153
   r Unit#259.flags 0x30280021
-  r Unit#259.workTime 0
   r Unit#259.script CobScript#28
   r Unit#259.id 259
   r Unit#259.killCount 0
   r Unit#259.playerIndex 1
-  r Unit#259.netDirtyFlags 0
   r Unit#259.owner Player#1
   r Unit#259.motion null
   r Unit#259.posX 13631488
@@ -10272,12 +10204,10 @@ call 1640 UpdateUnitWeapons
   r Unit#260.health 276
   r Unit#260.def UnitDef#151
   r Unit#260.flags 0x90240005
-  r Unit#260.workTime 0
   r Unit#260.script CobScript#29
   r Unit#260.id 260
   r Unit#260.killCount 0
   r Unit#260.playerIndex 1
-  r Unit#260.netDirtyFlags 0
   r Unit#260.owner Player#1
   r Unit#260.motion UnitMotion#20
   r Unit#260.posX 97040687
@@ -10343,12 +10273,10 @@ call 1640 UpdateUnitWeapons
   r Unit#261.health 590
   r Unit#261.def UnitDef#157
   r Unit#261.flags 0x90240005
-  r Unit#261.workTime 0
   r Unit#261.script CobScript#30
   r Unit#261.id 261
   r Unit#261.killCount 0
   r Unit#261.playerIndex 1
-  r Unit#261.netDirtyFlags 0
   r Unit#261.owner Player#1
   r Unit#261.motion UnitMotion#21
   r Unit#261.posX 164041333
@@ -10414,12 +10342,10 @@ call 1640 UpdateUnitWeapons
   r Unit#262.health 590
   r Unit#262.def UnitDef#157
   r Unit#262.flags 0x90240005
-  r Unit#262.workTime 0
   r Unit#262.script CobScript#31
   r Unit#262.id 262
   r Unit#262.killCount 0
   r Unit#262.playerIndex 1
-  r Unit#262.netDirtyFlags 0
   r Unit#262.owner Player#1
   r Unit#262.motion UnitMotion#22
   r Unit#262.posX 127449640
@@ -10467,12 +10393,10 @@ call 1640 UpdateUnitWeapons
   r Unit#263.health 590
   r Unit#263.def UnitDef#157
   r Unit#263.flags 0x90240005
-  r Unit#263.workTime 0
   r Unit#263.script CobScript#32
   r Unit#263.id 263
   r Unit#263.killCount 0
   r Unit#263.playerIndex 1
-  r Unit#263.netDirtyFlags 0
   r Unit#263.owner Player#1
   r Unit#263.motion UnitMotion#23
   r Unit#263.posX 62374146
@@ -10520,12 +10444,10 @@ call 1640 UpdateUnitWeapons
   r Unit#264.health 590
   r Unit#264.def UnitDef#157
   r Unit#264.flags 0x90240005
-  r Unit#264.workTime 0
   r Unit#264.script CobScript#33
   r Unit#264.id 264
   r Unit#264.killCount 0
   r Unit#264.playerIndex 1
-  r Unit#264.netDirtyFlags 0
   r Unit#264.owner Player#1
   r Unit#264.motion UnitMotion#24
   r Unit#264.posX 75884725
@@ -10573,12 +10495,10 @@ call 1640 UpdateUnitWeapons
   r Unit#265.health 590
   r Unit#265.def UnitDef#157
   r Unit#265.flags 0x90240005
-  r Unit#265.workTime 0
   r Unit#265.script CobScript#34
   r Unit#265.id 265
   r Unit#265.killCount 0
   r Unit#265.playerIndex 1
-  r Unit#265.netDirtyFlags 0
   r Unit#265.owner Player#1
   r Unit#265.motion UnitMotion#25
   r Unit#265.posX 58186913
@@ -10626,12 +10546,10 @@ call 1640 UpdateUnitWeapons
   r Unit#266.health 1250
   r Unit#266.def UnitDef#138
   r Unit#266.flags 0x90240105
-  r Unit#266.workTime 0
   r Unit#266.script CobScript#35
   r Unit#266.id 266
   r Unit#266.killCount 0
   r Unit#266.playerIndex 1
-  r Unit#266.netDirtyFlags 0
   r Unit#266.owner Player#1
   r Unit#266.motion UnitMotion#26
   r Unit#266.posX 158334969
@@ -10718,12 +10636,10 @@ call 1640 UpdateUnitWeapons
   r Unit#267.health 1250
   r Unit#267.def UnitDef#138
   r Unit#267.flags 0x90240005
-  r Unit#267.workTime 0
   r Unit#267.script CobScript#36
   r Unit#267.id 267
   r Unit#267.killCount 0
   r Unit#267.playerIndex 1
-  r Unit#267.netDirtyFlags 0
   r Unit#267.owner Player#1
   r Unit#267.motion UnitMotion#27
   r Unit#267.posX 177199597
@@ -10775,12 +10691,10 @@ call 1640 UpdateUnitWeapons
   r Unit#268.health 1250
   r Unit#268.def UnitDef#138
   r Unit#268.flags 0x90240005
-  r Unit#268.workTime 0
   r Unit#268.script CobScript#37
   r Unit#268.id 268
   r Unit#268.killCount 0
   r Unit#268.playerIndex 1
-  r Unit#268.netDirtyFlags 0
   r Unit#268.owner Player#1
   r Unit#268.motion UnitMotion#28
   r Unit#268.posX 182893277
@@ -10832,12 +10746,10 @@ call 1640 UpdateUnitWeapons
   r Unit#269.health 1250
   r Unit#269.def UnitDef#138
   r Unit#269.flags 0x90240105
-  r Unit#269.workTime 0
   r Unit#269.script CobScript#38
   r Unit#269.id 269
   r Unit#269.killCount 0
   r Unit#269.playerIndex 1
-  r Unit#269.netDirtyFlags 0
   r Unit#269.owner Player#1
   r Unit#269.motion UnitMotion#29
   r Unit#269.posX 143658252
@@ -10914,12 +10826,10 @@ call 1640 UpdateUnitWeapons
   r Unit#276.health 1250
   r Unit#276.def UnitDef#138
   r Unit#276.flags 0x90240001
-  r Unit#276.workTime 0
   r Unit#276.script CobScript#39
   r Unit#276.id 276
   r Unit#276.killCount 0
   r Unit#276.playerIndex 1
-  r Unit#276.netDirtyFlags 0
   r Unit#276.owner Player#1
   r Unit#276.motion UnitMotion#30
   r Unit#276.posX 105906176
@@ -11126,7 +11036,6 @@ call 1641 UpdateUnitWeapons
   r Projectile#3.directionY -5097
   r Projectile#3.anglesPitch 0
   r UnitMotion#1.speed 65541
-  r Unit#14.netDirtyFlags 0
   r Unit#14.weapon0TargetX 275
   a unit Unit#1
 call 1641 UpdateUnitWeapons
@@ -11140,6 +11049,7 @@ call 1641 UpdateUnitWeapons
   o y 0
   o z 0
 call 1641 UpdateUnitWeapons
+  r Unit#3.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 108331965
@@ -11154,7 +11064,7 @@ call 1641 UpdateUnitWeapons
   o z 57699187
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i scripts.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 53474 282 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53474 282 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 18
@@ -11279,7 +11189,7 @@ call 1641 UpdateUnitWeapons
   o z 57699187
   i scripts.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
-  i scripts.StartScriptWithArgs CobScript#6 "AimPrimary" ? 0 2 60760 64923 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 60760 64923 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#14 1 = 1
@@ -11300,21 +11210,9 @@ call 1641 WeaponCanReachUnit
   a target Unit#275
   a weapon 0
   o result 1
-call 1641 ClaimWeapons
-  a unit Unit#14
-  a unusedEdx 0
-  a index 0
-  i services.SchedPublish 6 28
-  w Unit#14.weapon0Flags 3
-call 1641 ClaimWeapons
-  r Unit#14.weapon0TargetX 0
-  a unit Unit#14
-  a unusedEdx 0
-  a index 2
 call 1641 UpdateUnitWeapons
   r rng.seed 0x43537d21
-  r Unit#15.netDirtyFlags 0
-  r Unit#14.weapon0TargetX 275
+  r Unit#14.weapon0Flags 3
   a unit Unit#15
   i services.ScheduleTargetingTargetPos Unit#15 0 = 0
   o x 0
@@ -11482,15 +11380,12 @@ call 1641 UpdateUnitWeapons
   o y 3577929
   o z 50234297
   w Unit#275.weapon1ReloadTimer 49
-call 1641 WeaponAimCobComplete
-  a callback Unit#275.weapons[0].aimCob
-  a result 1
-  w Unit#275.weapons[0].aimCob.nAimCobDone 1
 call 1641 UpdateUnitWeapons
   r Unit#275.posX 108476998
   r Unit#275.posZ 57783711
   r Unit#275.heading -21901
   r UnitMotion#3.speed 167860
+  r Unit#275.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
   o x 0
@@ -11629,7 +11524,7 @@ call 1642 UpdateUnitWeapons
   o z 57783711
   i scripts.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i scripts.StartScriptWithArgs CobScript#12 "AimPrimary" ? 0 2 55606 450 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 55606 450 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#3 1 = 1
@@ -11707,14 +11602,11 @@ call 1642 UpdateUnitWeapons
   o y 3246284
   o z 54001665
   w Unit#9.weapon1ReloadTimer 30
-call 1642 WeaponAimCobComplete
-  a callback Unit#9.weapons[0].aimCob
-  a result 1
-  w Unit#9.weapons[0].aimCob.nAimCobDone 1
 call 1642 UpdateUnitWeapons
   r Unit#9.posX 94477812
   r Unit#9.posZ 58857398
   r UnitMotion#9.speed 48462
+  r Unit#9.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#10
   i services.ScheduleTargetingTargetPos Unit#10 0 = 0
   o x 0
@@ -11995,10 +11887,6 @@ call 1643 UpdateUnitWeapons
   o y 3246284
   o z 57874529
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
-call 1643 WeaponAimCobComplete
-  a callback Unit#3.weapons[1].aimCob
-  a result 1
-  w Unit#3.weapons[1].aimCob.nAimCobDone 1
 call 1643 UpdateUnitWeapons
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 1
@@ -12266,10 +12154,6 @@ call 1643 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 1643 WeaponAimCobComplete
-  a callback Unit#269.weapons[0].aimCob
-  a result 1
-  w Unit#269.weapons[0].aimCob.nAimCobDone 1
 call 1643 UpdateUnitWeapons
   a unit Unit#274
   i services.ScheduleTargetingTargetPos Unit#274 0 = 1
@@ -12290,7 +12174,7 @@ call 1643 UpdateUnitWeapons
   o z 50250488
   i scripts.GetAimFromPosition Unit#275 0
   o out (107656468,3424255,57247264)
-  i scripts.StartScriptWithArgs CobScript#3 "AimPrimary" ? 0 2 15370 230 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#275 "AimPrimary" 2 15370 230 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
   i services.ScheduleTargetingTargetPos Unit#275 1 = 1
@@ -12351,6 +12235,7 @@ call 1644 UpdateUnitWeapons
   o y 0
   o z 0
 call 1644 UpdateUnitWeapons
+  r Unit#3.weapons[1].aimCob.nAimCobDone 1
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 108750525
@@ -12428,7 +12313,7 @@ call 1644 UpdateUnitWeapons
   o z 54001665
   i scripts.GetAimFromPosition Unit#9 0
   o out (94354876,4451562,57260103)
-  i scripts.StartScriptWithArgs CobScript#9 "AimPrimary" ? 0 2 40683 2217 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#9 "AimPrimary" 2 40683 2217 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
   i services.ScheduleTargetingTargetPos Unit#9 1 = 1
@@ -12563,10 +12448,6 @@ call 1644 WeaponCanReachUnit
   a target Unit#5
   a weapon 0
   o result 0
-call 1644 ReleaseWeapons
-  a unit Unit#261
-  a unusedEdx 0
-  a index 3
 call 1644 UpdateUnitWeapons
   r Unit#262.posZ 139104227
   a unit Unit#262
@@ -12636,6 +12517,7 @@ call 1644 UpdateUnitWeapons
   o z 0
 call 1644 UpdateUnitWeapons
   r Unit#269.posZ 143128396
+  r Unit#269.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#269
   i services.ScheduleTargetingTargetPos Unit#269 0 = 1
   o x 123748351
@@ -12647,19 +12529,19 @@ call 1644 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#269 0 = (328244,1998847,840607)
   i scripts.QueryScript CobScript#38 "QueryPrimary" (0) null null null = 1
   o p2 (0)
+  i services.SchedPublish 6 112
   i los_radar.SoundHeardMask at=(143986496,5079039,143969003) = 2
   i services.RecordSimEvent 30 0 [69,143986496,5079039,143969003,2] 5
-  i scripts.StartScript CobScript#38 "FirePrimary" ? 0 = 1
-  i scripts.StartScriptWithArgs CobScript#38 "RockUnit" ? 0 2 -771 -213 0 0 = 0
+  i services.SchedPublish 6 112
+  i services.SchedPublish 6 112
   i services.RecordSimEvent 9 0 [143986496,5079039,143969003,9] 4
+  i services.SchedPublish 6 112
   i services.ScheduleEconomySpend = 1
   i services.ScheduleTargetingTargetPos Unit#269 1 = 0
   o x 0
   o y 0
   o z 0
   w Game.projectileCount 5
-  w Unit#269.workTime 2244
-  w Unit#269.netDirtyFlags 1024
   w Unit#269.weapon0Flags 18
   w Unit#269.weapon0ReloadTimer 270
   w Unit#269.weapon0FireHeading 2791
@@ -12777,17 +12659,13 @@ call 1645 UpdateUnitWeapons
   o z 58075326
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i scripts.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 53860 315 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53860 315 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11676
   w Unit#3.weapon1FirePitch 315
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
-call 1645 WeaponAimCobComplete
-  a callback Unit#3.weapons[0].aimCob
-  a result 1
-  w Unit#3.weapons[0].aimCob.nAimCobDone 1
 call 1645 WeaponCanReachUnit
   a shooter Unit#3
   a target Unit#275
@@ -12798,17 +12676,6 @@ call 1645 WeaponCanReachUnit
   a target Unit#275
   a weapon 0
   o result 1
-call 1645 ClaimWeapons
-  a unit Unit#3
-  a unusedEdx 0
-  a index 0
-  i services.SchedPublish 6 28
-  w Unit#3.weapon0Flags 3
-call 1645 ClaimWeapons
-  r Unit#3.weapon0TargetX 0
-  a unit Unit#3
-  a unusedEdx 0
-  a index 2
 call 1645 UpdateUnitWeapons
   r rng.seed 0x7768a1ae
   a unit Unit#4
@@ -13066,7 +12933,7 @@ call 1645 UpdateUnitWeapons
   o x 123748351
   o y 3571711
   o z 70148095
-  i scripts.StartScriptWithArgs CobScript#38 "AimPrimary" ? 0 2 0 0 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#269 "AimPrimary" 2 0 0 0 0 = 0
   i services.ScheduleTargetingTargetPos Unit#269 1 = 0
   o x 0
@@ -13074,12 +12941,9 @@ call 1645 UpdateUnitWeapons
   o z 0
   w Unit#269.weapon0Flags 19
   w Unit#269.weapon0ReloadTimer 269
-call 1645 WeaponAimCobComplete
-  a callback Unit#269.weapons[0].aimCob
-  a result 1
-  w Unit#269.weapons[0].aimCob.nAimCobDone 1
 call 1645 UpdateUnitWeapons
   r Unit#269.posZ 143010432
+  r Unit#269.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#274
   i services.ScheduleTargetingTargetPos Unit#274 0 = 1
   o x 94493295
@@ -13196,7 +13060,6 @@ call 1646 UpdateUnitWeapons
   r Projectile#4.directionY 5824
   r Projectile#4.nextSmokeTick 1647
   r UnitMotion#1.speed 68816
-  r Unit#5.netDirtyFlags 8192
   a unit Unit#1
 call 1646 UpdateUnitWeapons
   a unit Unit#2
@@ -13209,7 +13072,8 @@ call 1646 UpdateUnitWeapons
   o y 0
   o z 0
 call 1646 UpdateUnitWeapons
-  r Unit#3.weapon0TargetX 275
+  r Unit#3.weapon0Flags 3
+  r Unit#3.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 108997751
@@ -13256,16 +13120,7 @@ call 1646 WeaponCanReachUnit
   a target Unit#275
   a weapon 0
   o result 1
-call 1646 ClaimWeapons
-  a unit Unit#5
-  a unusedEdx 0
-  a index 0
-call 1646 ClaimWeapons
-  a unit Unit#5
-  a unusedEdx 0
-  a index 2
 call 1646 UpdateUnitWeapons
-  r Unit#5.netDirtyFlags 0
   a unit Unit#6
   i services.ScheduleTargetingTargetPos Unit#6 0 = 1
   o x 108997751
@@ -13524,16 +13379,16 @@ call 1646 UpdateUnitWeapons
   i services.RandomInt 1369 = 1366
   i scripts.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 1
   o p2 (4)
+  i services.SchedPublish 6 112
   i los_radar.SoundHeardMask at=(89768043,3932159,54724910) = 3
   i services.RecordSimEvent 30 0 [78,89768043,3932159,54724910,3] 5
-  i scripts.StartScript CobScript#8 "FireSecondary" ? 0 = 0
-  i scripts.StartScriptWithArgs CobScript#8 "RockUnit" ? 0 2 -774 204 0 0 = 0
+  i services.SchedPublish 6 112
+  i services.SchedPublish 6 112
   i services.RecordSimEvent 9 0 [89768043,3932159,54724910,9] 4
+  i services.SchedPublish 6 112
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 5
   w rng.seed 0x31edc697
-  w Unit#274.workTime 2246
-  w Unit#274.netDirtyFlags 1024
   w Unit#274.weapon1Flags 22
   w Unit#274.weapon1ReloadTimer 85
   w Unit#274.weapon1FireHeading -10874
@@ -13642,7 +13497,7 @@ call 1647 UpdateUnitWeapons
   o z 58298598
   i scripts.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i scripts.StartScriptWithArgs CobScript#12 "AimPrimary" ? 0 2 56070 467 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 56070 467 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#3 1 = 1
@@ -13682,14 +13537,6 @@ call 1647 WeaponCanReachUnit
   a target Unit#275
   a weapon 0
   o result 1
-call 1647 ClaimWeapons
-  a unit Unit#5
-  a unusedEdx 0
-  a index 0
-call 1647 ClaimWeapons
-  a unit Unit#5
-  a unusedEdx 0
-  a index 2
 call 1647 UpdateUnitWeapons
   a unit Unit#6
   i services.ScheduleTargetingTargetPos Unit#6 0 = 1
@@ -13941,17 +13788,14 @@ call 1647 UpdateUnitWeapons
   o z 49087806
   i scripts.GetAimFromPosition Unit#274 1
   o out (89769800,3932159,54722482)
-  i scripts.StartScriptWithArgs CobScript#8 "AimSecondary" ? 0 2 65416 1182 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#274 "AimSecondary" 2 65416 1182 0 0 = 0
   w Unit#274.weapon1Flags 23
   w Unit#274.weapon1ReloadTimer 84
   w Unit#274.weapon1FireHeading -120
   w Unit#274.weapon1FirePitch 1182
-call 1647 WeaponAimCobComplete
-  a callback Unit#274.weapons[1].aimCob
-  a result 1
-  w Unit#274.weapons[1].aimCob.nAimCobDone 1
 call 1647 UpdateUnitWeapons
+  r Unit#274.weapons[1].aimCob.nAimCobDone 1
   a unit Unit#275
   i services.ScheduleTargetingTargetPos Unit#275 0 = 1
   o x 113259543
@@ -14032,10 +13876,6 @@ call 1648 UpdateUnitWeapons
   o y 3246284
   o z 58417153
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
-call 1648 WeaponAimCobComplete
-  a callback Unit#3.weapons[1].aimCob
-  a result 1
-  w Unit#3.weapons[1].aimCob.nAimCobDone 1
 call 1648 UpdateUnitWeapons
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 1
@@ -14153,11 +13993,8 @@ call 1648 UpdateUnitWeapons
   o y 3246284
   o z 58417153
   w Unit#14.weapon1ReloadTimer 50
-call 1648 WeaponAimCobComplete
-  a callback Unit#14.weapons[0].aimCob
-  a result 1
-  w Unit#14.weapons[0].aimCob.nAimCobDone 1
 call 1648 UpdateUnitWeapons
+  r Unit#14.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#15
   i services.ScheduleTargetingTargetPos Unit#15 0 = 0
   o x 0
@@ -14234,10 +14071,6 @@ call 1648 WeaponCanReachUnit
   a target Unit#6
   a weapon 0
   o result 0
-call 1648 ReleaseWeapons
-  a unit Unit#262
-  a unusedEdx 0
-  a index 3
 call 1648 UpdateUnitWeapons
   r Unit#263.posZ 116604760
   a unit Unit#263
@@ -14393,6 +14226,7 @@ call 1649 UpdateUnitWeapons
   o y 0
   o z 0
 call 1649 UpdateUnitWeapons
+  r Unit#3.weapons[1].aimCob.nAimCobDone 1
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 109319936
@@ -14640,10 +14474,6 @@ call 1649 WeaponCanReachUnit
   a target Unit#4
   a weapon 0
   o result 0
-call 1649 ReleaseWeapons
-  a unit Unit#266
-  a unusedEdx 0
-  a index 3
 call 1649 UpdateUnitWeapons
   r Unit#267.posZ 135081034
   a unit Unit#267
@@ -14800,9 +14630,7 @@ call 1650 UpdateUnitWeapons
   r Projectile#4.anglesHeading 56716
   r Projectile#4.anglesPitch -1279
   r Projectile#4.flags 2
-  r Unit#274.netDirtyFlags 17408
   r Unit#9.health 2474
-  r Unit#4.netDirtyFlags 9216
   a unit Unit#1
 call 1650 UpdateUnitWeapons
   r Unit#1.posX 95572177
@@ -14830,17 +14658,13 @@ call 1650 UpdateUnitWeapons
   o z 58666243
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i scripts.StartScriptWithArgs CobScript#12 "AimSecondary" ? 0 2 54377 332 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 54377 332 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11159
   w Unit#3.weapon1FirePitch 332
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
-call 1650 WeaponAimCobComplete
-  a callback Unit#3.weapons[0].aimCob
-  a result 1
-  w Unit#3.weapons[0].aimCob.nAimCobDone 1
 call 1650 UpdateUnitWeapons
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 1
@@ -14911,22 +14735,11 @@ call 1650 WeaponCanReachUnit
   a target Unit#274
   a weapon 0
   o result 1
-call 1650 ClaimWeapons
-  a unit Unit#9
-  a unusedEdx 0
-  a index 0
-  i services.SchedPublish 6 28
-  w Unit#9.weapon0Flags 3
-call 1650 ClaimWeapons
-  r Unit#9.weapon0TargetX 0
-  a unit Unit#9
-  a unusedEdx 0
-  a index 2
 call 1650 UpdateUnitWeapons
   r rng.seed 0x7188fd1c
   r Unit#9.posX 94508456
   r Unit#9.posZ 59213150
-  r Unit#9.weapon0TargetX 274
+  r Unit#9.weapon0Flags 3
   r UnitMotion#9.speed 41654
   a unit Unit#10
   i services.ScheduleTargetingTargetPos Unit#10 0 = 0
@@ -14972,7 +14785,7 @@ call 1650 UpdateUnitWeapons
   o z 58666243
   i scripts.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
-  i scripts.StartScriptWithArgs CobScript#6 "AimPrimary" ? 0 2 62017 64947 0 0 = 1
+  i services.SchedPublish 6 112
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 62017 64947 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#14 1 = 1
@@ -15086,10 +14899,6 @@ call 1650 WeaponCanReachUnit
   a target Unit#7
   a weapon 0
   o result 0
-call 1650 ReleaseWeapons
-  a unit Unit#265
-  a unusedEdx 0
-  a index 3
 call 1650 UpdateUnitWeapons
   r Unit#266.posZ 139916961
   a unit Unit#266

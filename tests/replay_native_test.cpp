@@ -93,6 +93,10 @@ void __stdcall HarnessPlayersEvent(const PlayersEvent*, int)
 {
 }
 
+void __stdcall HarnessWeaponsEvent(const WeaponsEvent*, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];

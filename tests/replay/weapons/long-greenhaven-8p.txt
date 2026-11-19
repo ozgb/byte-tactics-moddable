@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 1.6
+subsystem weapons 2.0
 call 30518 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 45
@@ -11,12 +11,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1.health 3000
   r Unit#1.def UnitDef#34
   r Unit#1.flags 0x90e40325
-  r Unit#1.workTime 24346
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
   r Unit#1.playerIndex 0
-  r Unit#1.netDirtyFlags 4
   r Unit#1.owner Player#0
   r Unit#1.motion UnitMotion#1
   r Unit#1.posX 43642210
@@ -8466,12 +8464,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1286.health 45
   r Unit#1286.def UnitDef#252
   r Unit#1286.flags 0x90282021
-  r Unit#1286.workTime 31070
   r Unit#1286.script CobScript#2
   r Unit#1286.id 1286
   r Unit#1286.killCount 3
   r Unit#1286.playerIndex 5
-  r Unit#1286.netDirtyFlags 1024
   r Unit#1286.owner Player#5
   r Unit#1286.motion UnitMotion#2
   r Unit#1286.posX 474618841
@@ -8525,12 +8521,10 @@ call 30518 UpdateUnitWeapons
   r Unit#539.health 718
   r Unit#539.def UnitDef#62
   r Unit#539.flags 0x90282025
-  r Unit#539.workTime 31087
   r Unit#539.script CobScript#3
   r Unit#539.id 539
   r Unit#539.killCount 1
   r Unit#539.playerIndex 2
-  r Unit#539.netDirtyFlags 25600
   r Unit#539.owner Player#2
   r Unit#539.motion UnitMotion#3
   r Unit#539.posX 461228733
@@ -8584,12 +8578,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1301.health 405
   r Unit#1301.def UnitDef#258
   r Unit#1301.flags 0x90282025
-  r Unit#1301.workTime 30193
   r Unit#1301.script CobScript#4
   r Unit#1301.id 1301
   r Unit#1301.killCount 0
   r Unit#1301.playerIndex 5
-  r Unit#1301.netDirtyFlags 4096
   r Unit#1301.owner Player#5
   r Unit#1301.motion UnitMotion#4
   r Unit#1301.posX 478745396
@@ -8627,12 +8619,10 @@ call 30518 UpdateUnitWeapons
   r Unit#526.health 667
   r Unit#526.def UnitDef#134
   r Unit#526.flags 0x90282025
-  r Unit#526.workTime 30090
   r Unit#526.script CobScript#5
   r Unit#526.id 526
   r Unit#526.killCount 1
   r Unit#526.playerIndex 2
-  r Unit#526.netDirtyFlags 4096
   r Unit#526.owner Player#2
   r Unit#526.motion UnitMotion#5
   r Unit#526.posX 466395013
@@ -8686,12 +8676,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1295.health -42
   r Unit#1295.def UnitDef#0
   r Unit#1295.flags 0x80286001
-  r Unit#1295.workTime 30066
   r Unit#1295.script null
   r Unit#1295.id 1295
   r Unit#1295.killCount 0
   r Unit#1295.playerIndex 5
-  r Unit#1295.netDirtyFlags 17408
   r Unit#1295.owner Player#5
   r Unit#1295.motion null
   r Unit#1295.posX 484841895
@@ -8729,12 +8717,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1292.health 0
   r Unit#1292.def UnitDef#0
   r Unit#1292.flags 0x80286001
-  r Unit#1292.workTime 30010
   r Unit#1292.script null
   r Unit#1292.id 1292
   r Unit#1292.killCount 0
   r Unit#1292.playerIndex 5
-  r Unit#1292.netDirtyFlags 0
   r Unit#1292.owner Player#5
   r Unit#1292.motion null
   r Unit#1292.posX 487665772
@@ -8772,12 +8758,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1523.health -8950
   r Unit#1523.def UnitDef#0
   r Unit#1523.flags 0x80286001
-  r Unit#1523.workTime 28978
   r Unit#1523.script null
   r Unit#1523.id 1523
   r Unit#1523.killCount 1
   r Unit#1523.playerIndex 6
-  r Unit#1523.netDirtyFlags 25600
   r Unit#1523.owner Player#6
   r Unit#1523.motion null
   r Unit#1523.posX 441975422
@@ -8831,12 +8815,10 @@ call 30518 UpdateUnitWeapons
   r Unit#251.health -25
   r Unit#251.def UnitDef#0
   r Unit#251.flags 0x80e45001
-  r Unit#251.workTime 28470
   r Unit#251.script null
   r Unit#251.id 251
   r Unit#251.killCount 2
   r Unit#251.playerIndex 1
-  r Unit#251.netDirtyFlags 4
   r Unit#251.owner Player#1
   r Unit#251.motion null
   r Unit#251.posX 437651507
@@ -8874,12 +8856,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1514.health 112
   r Unit#1514.def UnitDef#32
   r Unit#1514.flags 0x10e82021
-  r Unit#1514.workTime 0
   r Unit#1514.script CobScript#6
   r Unit#1514.id 1514
   r Unit#1514.killCount 0
   r Unit#1514.playerIndex 6
-  r Unit#1514.netDirtyFlags -32768
   r Unit#1514.owner Player#6
   r Unit#1514.motion UnitMotion#6
   r Unit#1514.posX 295699144
@@ -8917,12 +8897,10 @@ call 30518 UpdateUnitWeapons
   r Unit#279.health -42
   r Unit#279.def UnitDef#0
   r Unit#279.flags 0x20e86001
-  r Unit#279.workTime 0
   r Unit#279.script null
   r Unit#279.id 279
   r Unit#279.killCount 0
   r Unit#279.playerIndex 1
-  r Unit#279.netDirtyFlags 0
   r Unit#279.owner Player#1
   r Unit#279.motion null
   r Unit#279.posX 415236096
@@ -8960,12 +8938,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1530.health -7218
   r Unit#1530.def UnitDef#0
   r Unit#1530.flags 0x80286005
-  r Unit#1530.workTime 28526
   r Unit#1530.script null
   r Unit#1530.id 1530
   r Unit#1530.killCount 0
   r Unit#1530.playerIndex 6
-  r Unit#1530.netDirtyFlags 1024
   r Unit#1530.owner Player#6
   r Unit#1530.motion null
   r Unit#1530.posX 446685097
@@ -9019,12 +8995,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1525.health -7944
   r Unit#1525.def UnitDef#0
   r Unit#1525.flags 0x80286005
-  r Unit#1525.workTime 28858
   r Unit#1525.script null
   r Unit#1525.id 1525
   r Unit#1525.killCount 2
   r Unit#1525.playerIndex 6
-  r Unit#1525.netDirtyFlags 0
   r Unit#1525.owner Player#6
   r Unit#1525.motion null
   r Unit#1525.posX 429001469
@@ -9062,12 +9036,10 @@ call 30518 UpdateUnitWeapons
   r Unit#265.health -18
   r Unit#265.def UnitDef#0
   r Unit#265.flags 0x20e86001
-  r Unit#265.workTime 0
   r Unit#265.script null
   r Unit#265.id 265
   r Unit#265.killCount 0
   r Unit#265.playerIndex 1
-  r Unit#265.netDirtyFlags 4
   r Unit#265.owner Player#1
   r Unit#265.motion null
   r Unit#265.posX 415760384
@@ -9275,12 +9247,10 @@ call 30518 UpdateUnitWeapons
   r Unit#2.health 170
   r Unit#2.def UnitDef#78
   r Unit#2.flags 0x30282321
-  r Unit#2.workTime 0
   r Unit#2.script CobScript#7
   r Unit#2.id 2
   r Unit#2.killCount 0
   r Unit#2.playerIndex 0
-  r Unit#2.netDirtyFlags 0
   r Unit#2.owner Player#0
   r Unit#2.motion null
   r Unit#2.posX 48758784
@@ -9325,12 +9295,10 @@ call 30518 UpdateUnitWeapons
   r Unit#3.health 326
   r Unit#3.def UnitDef#112
   r Unit#3.flags 0x30282321
-  r Unit#3.workTime 0
   r Unit#3.script CobScript#8
   r Unit#3.id 3
   r Unit#3.killCount 0
   r Unit#3.playerIndex 0
-  r Unit#3.netDirtyFlags 4
   r Unit#3.owner Player#0
   r Unit#3.motion null
   r Unit#3.posX 41418752
@@ -9375,12 +9343,10 @@ call 30518 UpdateUnitWeapons
   r Unit#4.health 326
   r Unit#4.def UnitDef#112
   r Unit#4.flags 0x30282321
-  r Unit#4.workTime 0
   r Unit#4.script CobScript#9
   r Unit#4.id 4
   r Unit#4.killCount 0
   r Unit#4.playerIndex 0
-  r Unit#4.netDirtyFlags 4
   r Unit#4.owner Player#0
   r Unit#4.motion null
   r Unit#4.posX 50855936
@@ -9423,12 +9389,10 @@ call 30518 UpdateUnitWeapons
   r Unit#5.health 170
   r Unit#5.def UnitDef#78
   r Unit#5.flags 0x30282321
-  r Unit#5.workTime 0
   r Unit#5.script CobScript#10
   r Unit#5.id 5
   r Unit#5.killCount 0
   r Unit#5.playerIndex 0
-  r Unit#5.netDirtyFlags 0
   r Unit#5.owner Player#0
   r Unit#5.motion null
   r Unit#5.posX 67633152
@@ -9471,12 +9435,10 @@ call 30518 UpdateUnitWeapons
   r Unit#6.health 170
   r Unit#6.def UnitDef#78
   r Unit#6.flags 0x30282321
-  r Unit#6.workTime 0
   r Unit#6.script CobScript#11
   r Unit#6.id 6
   r Unit#6.killCount 0
   r Unit#6.playerIndex 0
-  r Unit#6.netDirtyFlags 0
   r Unit#6.owner Player#0
   r Unit#6.motion null
   r Unit#6.posX 67633152
@@ -9519,12 +9481,10 @@ call 30518 UpdateUnitWeapons
   r Unit#7.health 176
   r Unit#7.def UnitDef#135
   r Unit#7.flags 0x30282321
-  r Unit#7.workTime 0
   r Unit#7.script CobScript#12
   r Unit#7.id 7
   r Unit#7.killCount 0
   r Unit#7.playerIndex 0
-  r Unit#7.netDirtyFlags 0
   r Unit#7.owner Player#0
   r Unit#7.motion null
   r Unit#7.posX 51380224
@@ -9569,12 +9529,10 @@ call 30518 UpdateUnitWeapons
   r Unit#8.health 2580
   r Unit#8.def UnitDef#132
   r Unit#8.flags 0x3ce82321
-  r Unit#8.workTime 0
   r Unit#8.script CobScript#13
   r Unit#8.id 8
   r Unit#8.killCount 0
   r Unit#8.playerIndex 0
-  r Unit#8.netDirtyFlags 0
   r Unit#8.owner Player#0
   r Unit#8.motion null
   r Unit#8.posX 66060288
@@ -9619,12 +9577,10 @@ call 30518 UpdateUnitWeapons
   r Unit#9.health 870
   r Unit#9.def UnitDef#39
   r Unit#9.flags 0x10e82325
-  r Unit#9.workTime 0
   r Unit#9.script CobScript#14
   r Unit#9.id 9
   r Unit#9.killCount 0
   r Unit#9.playerIndex 0
-  r Unit#9.netDirtyFlags 0
   r Unit#9.owner Player#0
   r Unit#9.motion UnitMotion#7
   r Unit#9.posX 65730411
@@ -9670,12 +9626,10 @@ call 30518 UpdateUnitWeapons
   r Unit#10.health 2690
   r Unit#10.def UnitDef#68
   r Unit#10.flags 0x3ce82321
-  r Unit#10.workTime 0
   r Unit#10.script CobScript#15
   r Unit#10.id 10
   r Unit#10.killCount 0
   r Unit#10.playerIndex 0
-  r Unit#10.netDirtyFlags 0
   r Unit#10.owner Player#0
   r Unit#10.motion null
   r Unit#10.posX 68157440
@@ -9720,12 +9674,10 @@ call 30518 UpdateUnitWeapons
   r Unit#11.health 700
   r Unit#11.def UnitDef#32
   r Unit#11.flags 0x10e82325
-  r Unit#11.workTime 23865
   r Unit#11.script CobScript#16
   r Unit#11.id 11
   r Unit#11.killCount 0
   r Unit#11.playerIndex 0
-  r Unit#11.netDirtyFlags 4
   r Unit#11.owner Player#0
   r Unit#11.motion UnitMotion#8
   r Unit#11.posX 153775240
@@ -9769,12 +9721,10 @@ call 30518 UpdateUnitWeapons
   r Unit#12.health 170
   r Unit#12.def UnitDef#78
   r Unit#12.flags 0x30282321
-  r Unit#12.workTime 0
   r Unit#12.script CobScript#17
   r Unit#12.id 12
   r Unit#12.killCount 0
   r Unit#12.playerIndex 0
-  r Unit#12.netDirtyFlags 0
   r Unit#12.owner Player#0
   r Unit#12.motion null
   r Unit#12.posX 73924608
@@ -9817,12 +9767,10 @@ call 30518 UpdateUnitWeapons
   r Unit#13.health 176
   r Unit#13.def UnitDef#135
   r Unit#13.flags 0x30282321
-  r Unit#13.workTime 0
   r Unit#13.script CobScript#18
   r Unit#13.id 13
   r Unit#13.killCount 0
   r Unit#13.playerIndex 0
-  r Unit#13.netDirtyFlags 0
   r Unit#13.owner Player#0
   r Unit#13.motion null
   r Unit#13.posX 67108864
@@ -9865,12 +9813,10 @@ call 30518 UpdateUnitWeapons
   r Unit#14.health 170
   r Unit#14.def UnitDef#78
   r Unit#14.flags 0x30282321
-  r Unit#14.workTime 0
   r Unit#14.script CobScript#19
   r Unit#14.id 14
   r Unit#14.killCount 0
   r Unit#14.playerIndex 0
-  r Unit#14.netDirtyFlags 0
   r Unit#14.owner Player#0
   r Unit#14.motion null
   r Unit#14.posX 42467328
@@ -9913,12 +9859,10 @@ call 30518 UpdateUnitWeapons
   r Unit#15.health 700
   r Unit#15.def UnitDef#32
   r Unit#15.flags 0x10e82325
-  r Unit#15.workTime 26802
   r Unit#15.script CobScript#20
   r Unit#15.id 15
   r Unit#15.killCount 0
   r Unit#15.playerIndex 0
-  r Unit#15.netDirtyFlags 4
   r Unit#15.owner Player#0
   r Unit#15.motion UnitMotion#9
   r Unit#15.posX 165966993
@@ -9962,12 +9906,10 @@ call 30518 UpdateUnitWeapons
   r Unit#16.health 295
   r Unit#16.def UnitDef#97
   r Unit#16.flags 0xb0282321
-  r Unit#16.workTime 0
   r Unit#16.script CobScript#21
   r Unit#16.id 16
   r Unit#16.killCount 0
   r Unit#16.playerIndex 0
-  r Unit#16.netDirtyFlags 0
   r Unit#16.owner Player#0
   r Unit#16.motion null
   r Unit#16.posX 51904512
@@ -10032,12 +9974,10 @@ call 30518 UpdateUnitWeapons
   r Unit#17.health 470
   r Unit#17.def UnitDef#67
   r Unit#17.flags 0x90282321
-  r Unit#17.workTime 0
   r Unit#17.script CobScript#22
   r Unit#17.id 17
   r Unit#17.killCount 0
   r Unit#17.playerIndex 0
-  r Unit#17.netDirtyFlags 0
   r Unit#17.owner Player#0
   r Unit#17.motion UnitMotion#10
   r Unit#17.posX 56827881
@@ -10103,12 +10043,10 @@ call 30518 UpdateUnitWeapons
   r Unit#18.health 326
   r Unit#18.def UnitDef#112
   r Unit#18.flags 0x30282321
-  r Unit#18.workTime 0
   r Unit#18.script CobScript#23
   r Unit#18.id 18
   r Unit#18.killCount 0
   r Unit#18.playerIndex 0
-  r Unit#18.netDirtyFlags 4
   r Unit#18.owner Player#0
   r Unit#18.motion null
   r Unit#18.posX 66584576
@@ -10151,12 +10089,10 @@ call 30518 UpdateUnitWeapons
   r Unit#19.health 700
   r Unit#19.def UnitDef#32
   r Unit#19.flags 0x10e82325
-  r Unit#19.workTime 24346
   r Unit#19.script CobScript#24
   r Unit#19.id 19
   r Unit#19.killCount 0
   r Unit#19.playerIndex 0
-  r Unit#19.netDirtyFlags 4
   r Unit#19.owner Player#0
   r Unit#19.motion UnitMotion#11
   r Unit#19.posX 160059598
@@ -10200,12 +10136,10 @@ call 30518 UpdateUnitWeapons
   r Unit#20.health 176
   r Unit#20.def UnitDef#135
   r Unit#20.flags 0x30282321
-  r Unit#20.workTime 0
   r Unit#20.script CobScript#25
   r Unit#20.id 20
   r Unit#20.killCount 0
   r Unit#20.playerIndex 0
-  r Unit#20.netDirtyFlags 0
   r Unit#20.owner Player#0
   r Unit#20.motion null
   r Unit#20.posX 55574528
@@ -10248,12 +10182,10 @@ call 30518 UpdateUnitWeapons
   r Unit#21.health 2477
   r Unit#21.def UnitDef#61
   r Unit#21.flags 0xb0282321
-  r Unit#21.workTime 0
   r Unit#21.script CobScript#26
   r Unit#21.id 21
   r Unit#21.killCount 0
   r Unit#21.playerIndex 0
-  r Unit#21.netDirtyFlags 0
   r Unit#21.owner Player#0
   r Unit#21.motion null
   r Unit#21.posX 42467328
@@ -10318,12 +10250,10 @@ call 30518 UpdateUnitWeapons
   r Unit#22.health 1850
   r Unit#22.def UnitDef#14
   r Unit#22.flags 0x3ce82321
-  r Unit#22.workTime 0
   r Unit#22.script CobScript#27
   r Unit#22.id 22
   r Unit#22.killCount 0
   r Unit#22.playerIndex 0
-  r Unit#22.netDirtyFlags 0
   r Unit#22.owner Player#0
   r Unit#22.motion null
   r Unit#22.posX 81264640
@@ -10368,12 +10298,10 @@ call 30518 UpdateUnitWeapons
   r Unit#23.health 176
   r Unit#23.def UnitDef#135
   r Unit#23.flags 0x30282321
-  r Unit#23.workTime 0
   r Unit#23.script CobScript#28
   r Unit#23.id 23
   r Unit#23.killCount 0
   r Unit#23.playerIndex 0
-  r Unit#23.netDirtyFlags 0
   r Unit#23.owner Player#0
   r Unit#23.motion null
   r Unit#23.posX 52428800
@@ -10416,12 +10344,10 @@ call 30518 UpdateUnitWeapons
   r Unit#24.health 280
   r Unit#24.def UnitDef#29
   r Unit#24.flags 0x10e82326
-  r Unit#24.workTime 0
   r Unit#24.script CobScript#29
   r Unit#24.id 24
   r Unit#24.killCount 0
   r Unit#24.playerIndex 0
-  r Unit#24.netDirtyFlags 0
   r Unit#24.owner Player#0
   r Unit#24.motion UnitMotion#12
   r Unit#24.posX 56093719
@@ -10467,12 +10393,10 @@ call 30518 UpdateUnitWeapons
   r Unit#25.health 610
   r Unit#25.def UnitDef#98
   r Unit#25.flags 0x90282321
-  r Unit#25.workTime 0
   r Unit#25.script CobScript#30
   r Unit#25.id 25
   r Unit#25.killCount 0
   r Unit#25.playerIndex 0
-  r Unit#25.netDirtyFlags 0
   r Unit#25.owner Player#0
   r Unit#25.motion UnitMotion#13
   r Unit#25.posX 56674469
@@ -10538,12 +10462,10 @@ call 30518 UpdateUnitWeapons
   r Unit#26.health 850
   r Unit#26.def UnitDef#134
   r Unit#26.flags 0x90282321
-  r Unit#26.workTime 0
   r Unit#26.script CobScript#31
   r Unit#26.id 26
   r Unit#26.killCount 0
   r Unit#26.playerIndex 0
-  r Unit#26.netDirtyFlags 0
   r Unit#26.owner Player#0
   r Unit#26.motion UnitMotion#14
   r Unit#26.posX 55801992
@@ -10595,12 +10517,10 @@ call 30518 UpdateUnitWeapons
   r Unit#27.health 75
   r Unit#27.def UnitDef#54
   r Unit#27.flags 0x90282325
-  r Unit#27.workTime 0
   r Unit#27.script CobScript#32
   r Unit#27.id 27
   r Unit#27.killCount 0
   r Unit#27.playerIndex 0
-  r Unit#27.netDirtyFlags 0
   r Unit#27.owner Player#0
   r Unit#27.motion UnitMotion#15
   r Unit#27.posX 68137921
@@ -10666,12 +10586,10 @@ call 30518 UpdateUnitWeapons
   r Unit#28.health 43
   r Unit#28.def UnitDef#91
   r Unit#28.flags 0x10282321
-  r Unit#28.workTime 0
   r Unit#28.script CobScript#33
   r Unit#28.id 28
   r Unit#28.killCount 0
   r Unit#28.playerIndex 0
-  r Unit#28.netDirtyFlags -32768
   r Unit#28.owner Player#0
   r Unit#28.motion UnitMotion#16
   r Unit#28.posX 81332795
@@ -10717,12 +10635,10 @@ call 30518 UpdateUnitWeapons
   r Unit#29.health 19
   r Unit#29.def UnitDef#65
   r Unit#29.flags 0x30e82321
-  r Unit#29.workTime 0
   r Unit#29.script CobScript#34
   r Unit#29.id 29
   r Unit#29.killCount 0
   r Unit#29.playerIndex 0
-  r Unit#29.netDirtyFlags -32768
   r Unit#29.owner Player#0
   r Unit#29.motion null
   r Unit#29.posX 53477376
@@ -10767,12 +10683,10 @@ call 30518 UpdateUnitWeapons
   r Unit#30.health 3
   r Unit#30.def UnitDef#54
   r Unit#30.flags 0x90282321
-  r Unit#30.workTime 0
   r Unit#30.script CobScript#35
   r Unit#30.id 30
   r Unit#30.killCount 0
   r Unit#30.playerIndex 0
-  r Unit#30.netDirtyFlags -32768
   r Unit#30.owner Player#0
   r Unit#30.motion UnitMotion#17
   r Unit#30.posX 68168411
@@ -10820,12 +10734,10 @@ call 30518 UpdateUnitWeapons
   r Unit#501.health 3000
   r Unit#501.def UnitDef#34
   r Unit#501.flags 0x90e40025
-  r Unit#501.workTime 30192
   r Unit#501.script CobScript#36
   r Unit#501.id 501
   r Unit#501.killCount 0
   r Unit#501.playerIndex 2
-  r Unit#501.netDirtyFlags 4
   r Unit#501.owner Player#2
   r Unit#501.motion UnitMotion#18
   r Unit#501.posX 464532633
@@ -10877,12 +10789,10 @@ call 30518 UpdateUnitWeapons
   r Unit#502.health 170
   r Unit#502.def UnitDef#78
   r Unit#502.flags 0x30282021
-  r Unit#502.workTime 0
   r Unit#502.script CobScript#37
   r Unit#502.id 502
   r Unit#502.killCount 0
   r Unit#502.playerIndex 2
-  r Unit#502.netDirtyFlags 0
   r Unit#502.owner Player#2
   r Unit#502.motion null
   r Unit#502.posX 512229376
@@ -10925,12 +10835,10 @@ call 30518 UpdateUnitWeapons
   r Unit#503.health 326
   r Unit#503.def UnitDef#112
   r Unit#503.flags 0x30282021
-  r Unit#503.workTime 0
   r Unit#503.script CobScript#38
   r Unit#503.id 503
   r Unit#503.killCount 0
   r Unit#503.playerIndex 2
-  r Unit#503.netDirtyFlags 4
   r Unit#503.owner Player#2
   r Unit#503.motion null
   r Unit#503.posX 508035072
@@ -10973,12 +10881,10 @@ call 30518 UpdateUnitWeapons
   r Unit#504.health 326
   r Unit#504.def UnitDef#112
   r Unit#504.flags 0x30282021
-  r Unit#504.workTime 0
   r Unit#504.script CobScript#39
   r Unit#504.id 504
   r Unit#504.killCount 0
   r Unit#504.playerIndex 2
-  r Unit#504.netDirtyFlags 4
   r Unit#504.owner Player#2
   r Unit#504.motion null
   r Unit#504.posX 512229376
@@ -11021,12 +10927,10 @@ call 30518 UpdateUnitWeapons
   r Unit#505.health 1082
   r Unit#505.def UnitDef#61
   r Unit#505.flags 0xb0282021
-  r Unit#505.workTime 0
   r Unit#505.script CobScript#40
   r Unit#505.id 505
   r Unit#505.killCount 0
   r Unit#505.playerIndex 2
-  r Unit#505.netDirtyFlags -32768
   r Unit#505.owner Player#2
   r Unit#505.motion null
   r Unit#505.posX 331874304
@@ -11073,12 +10977,10 @@ call 30518 UpdateUnitWeapons
   r Unit#506.health 170
   r Unit#506.def UnitDef#78
   r Unit#506.flags 0x30282021
-  r Unit#506.workTime 0
   r Unit#506.script CobScript#41
   r Unit#506.id 506
   r Unit#506.killCount 0
   r Unit#506.playerIndex 2
-  r Unit#506.netDirtyFlags 0
   r Unit#506.owner Player#2
   r Unit#506.motion null
   r Unit#506.posX 482869248
@@ -11121,12 +11023,10 @@ call 30518 UpdateUnitWeapons
   r Unit#507.health 170
   r Unit#507.def UnitDef#78
   r Unit#507.flags 0x30282021
-  r Unit#507.workTime 0
   r Unit#507.script CobScript#42
   r Unit#507.id 507
   r Unit#507.killCount 0
   r Unit#507.playerIndex 2
-  r Unit#507.netDirtyFlags 0
   r Unit#507.owner Player#2
   r Unit#507.motion null
   r Unit#507.posX 474480640
@@ -11169,12 +11069,10 @@ call 30518 UpdateUnitWeapons
   r Unit#508.health 2580
   r Unit#508.def UnitDef#132
   r Unit#508.flags 0x3ce82021
-  r Unit#508.workTime 0
   r Unit#508.script CobScript#43
   r Unit#508.id 508
   r Unit#508.killCount 0
   r Unit#508.playerIndex 2
-  r Unit#508.netDirtyFlags 4
   r Unit#508.owner Player#2
   r Unit#508.motion null
   r Unit#508.posX 495976448
@@ -11217,12 +11115,10 @@ call 30518 UpdateUnitWeapons
   r Unit#509.health 650
   r Unit#509.def UnitDef#100
   r Unit#509.flags 0x90282025
-  r Unit#509.workTime 30504
   r Unit#509.script CobScript#44
   r Unit#509.id 509
   r Unit#509.killCount 0
   r Unit#509.playerIndex 2
-  r Unit#509.netDirtyFlags 17408
   r Unit#509.owner Player#2
   r Unit#509.motion UnitMotion#19
   r Unit#509.posX 442556366
@@ -11288,12 +11184,10 @@ call 30518 UpdateUnitWeapons
   r Unit#510.health 176
   r Unit#510.def UnitDef#135
   r Unit#510.flags 0x30282021
-  r Unit#510.workTime 0
   r Unit#510.script CobScript#45
   r Unit#510.id 510
   r Unit#510.killCount 0
   r Unit#510.playerIndex 2
-  r Unit#510.netDirtyFlags 0
   r Unit#510.owner Player#2
   r Unit#510.motion null
   r Unit#510.posX 344981504
@@ -11336,12 +11230,10 @@ call 30518 UpdateUnitWeapons
   r Unit#511.health 859
   r Unit#511.def UnitDef#39
   r Unit#511.flags 0x10e82025
-  r Unit#511.workTime 27217
   r Unit#511.script CobScript#46
   r Unit#511.id 511
   r Unit#511.killCount 0
   r Unit#511.playerIndex 2
-  r Unit#511.netDirtyFlags 4
   r Unit#511.owner Player#2
   r Unit#511.motion UnitMotion#20
   r Unit#511.posX 329747470
@@ -11385,12 +11277,10 @@ call 30518 UpdateUnitWeapons
   r Unit#512.health 170
   r Unit#512.def UnitDef#78
   r Unit#512.flags 0x30282021
-  r Unit#512.workTime 0
   r Unit#512.script CobScript#47
   r Unit#512.id 512
   r Unit#512.killCount 0
   r Unit#512.playerIndex 2
-  r Unit#512.netDirtyFlags 0
   r Unit#512.owner Player#2
   r Unit#512.motion null
   r Unit#512.posX 407371776
@@ -11433,12 +11323,10 @@ call 30518 UpdateUnitWeapons
   r Unit#513.health 870
   r Unit#513.def UnitDef#39
   r Unit#513.flags 0x10e82025
-  r Unit#513.workTime 30058
   r Unit#513.script CobScript#48
   r Unit#513.id 513
   r Unit#513.killCount 0
   r Unit#513.playerIndex 2
-  r Unit#513.netDirtyFlags 4
   r Unit#513.owner Player#2
   r Unit#513.motion UnitMotion#21
   r Unit#513.posX 349557342
@@ -11482,12 +11370,10 @@ call 30518 UpdateUnitWeapons
   r Unit#514.health 2690
   r Unit#514.def UnitDef#68
   r Unit#514.flags 0x3ce82021
-  r Unit#514.workTime 0
   r Unit#514.script CobScript#49
   r Unit#514.id 514
   r Unit#514.killCount 0
   r Unit#514.playerIndex 2
-  r Unit#514.netDirtyFlags 4
   r Unit#514.owner Player#2
   r Unit#514.motion null
   r Unit#514.posX 427819008
@@ -11530,12 +11416,10 @@ call 30518 UpdateUnitWeapons
   r Unit#515.health 1230
   r Unit#515.def UnitDef#64
   r Unit#515.flags 0xb0282021
-  r Unit#515.workTime 26576
   r Unit#515.script CobScript#50
   r Unit#515.id 515
   r Unit#515.killCount 6
   r Unit#515.playerIndex 2
-  r Unit#515.netDirtyFlags 1024
   r Unit#515.owner Player#2
   r Unit#515.motion null
   r Unit#515.posX 497025024
@@ -11600,12 +11484,10 @@ call 30518 UpdateUnitWeapons
   r Unit#516.health 700
   r Unit#516.def UnitDef#32
   r Unit#516.flags 0x10e82021
-  r Unit#516.workTime 30817
   r Unit#516.script CobScript#51
   r Unit#516.id 516
   r Unit#516.killCount 0
   r Unit#516.playerIndex 2
-  r Unit#516.netDirtyFlags 0
   r Unit#516.owner Player#2
   r Unit#516.motion UnitMotion#22
   r Unit#516.posX 334949149
@@ -11649,12 +11531,10 @@ call 30518 UpdateUnitWeapons
   r Unit#517.health 870
   r Unit#517.def UnitDef#39
   r Unit#517.flags 0x10e82021
-  r Unit#517.workTime 30817
   r Unit#517.script CobScript#52
   r Unit#517.id 517
   r Unit#517.killCount 0
   r Unit#517.playerIndex 2
-  r Unit#517.netDirtyFlags 0
   r Unit#517.owner Player#2
   r Unit#517.motion UnitMotion#23
   r Unit#517.posX 283646016
@@ -11698,12 +11578,10 @@ call 30518 UpdateUnitWeapons
   r Unit#518.health 170
   r Unit#518.def UnitDef#78
   r Unit#518.flags 0x30282021
-  r Unit#518.workTime 0
   r Unit#518.script CobScript#53
   r Unit#518.id 518
   r Unit#518.killCount 0
   r Unit#518.playerIndex 2
-  r Unit#518.netDirtyFlags 0
   r Unit#518.owner Player#2
   r Unit#518.motion null
   r Unit#518.posX 368574464
@@ -11746,12 +11624,10 @@ call 30518 UpdateUnitWeapons
   r Unit#519.health 170
   r Unit#519.def UnitDef#78
   r Unit#519.flags 0x30282021
-  r Unit#519.workTime 0
   r Unit#519.script CobScript#54
   r Unit#519.id 519
   r Unit#519.killCount 0
   r Unit#519.playerIndex 2
-  r Unit#519.netDirtyFlags 0
   r Unit#519.owner Player#2
   r Unit#519.motion null
   r Unit#519.posX 366477312
@@ -11794,12 +11670,10 @@ call 30518 UpdateUnitWeapons
   r Unit#520.health 176
   r Unit#520.def UnitDef#135
   r Unit#520.flags 0x30282021
-  r Unit#520.workTime 0
   r Unit#520.script CobScript#55
   r Unit#520.id 520
   r Unit#520.killCount 0
   r Unit#520.playerIndex 2
-  r Unit#520.netDirtyFlags 0
   r Unit#520.owner Player#2
   r Unit#520.motion null
   r Unit#520.posX 343932928
@@ -11842,12 +11716,10 @@ call 30518 UpdateUnitWeapons
   r Unit#521.health 700
   r Unit#521.def UnitDef#32
   r Unit#521.flags 0x10e82025
-  r Unit#521.workTime 25343
   r Unit#521.script CobScript#56
   r Unit#521.id 521
   r Unit#521.killCount 0
   r Unit#521.playerIndex 2
-  r Unit#521.netDirtyFlags 4
   r Unit#521.owner Player#2
   r Unit#521.motion UnitMotion#24
   r Unit#521.posX 312165466
@@ -11891,12 +11763,10 @@ call 30518 UpdateUnitWeapons
   r Unit#522.health 650
   r Unit#522.def UnitDef#100
   r Unit#522.flags 0x90282025
-  r Unit#522.workTime 30841
   r Unit#522.script CobScript#57
   r Unit#522.id 522
   r Unit#522.killCount 3
   r Unit#522.playerIndex 2
-  r Unit#522.netDirtyFlags 0
   r Unit#522.owner Player#2
   r Unit#522.motion UnitMotion#25
   r Unit#522.posX 474347287
@@ -11944,12 +11814,10 @@ call 30518 UpdateUnitWeapons
   r Unit#523.health 870
   r Unit#523.def UnitDef#39
   r Unit#523.flags 0x10e82021
-  r Unit#523.workTime 30677
   r Unit#523.script CobScript#58
   r Unit#523.id 523
   r Unit#523.killCount 0
   r Unit#523.playerIndex 2
-  r Unit#523.netDirtyFlags 4
   r Unit#523.owner Player#2
   r Unit#523.motion UnitMotion#26
   r Unit#523.posX 314478180
@@ -11993,12 +11861,10 @@ call 30518 UpdateUnitWeapons
   r Unit#524.health 78
   r Unit#524.def UnitDef#78
   r Unit#524.flags 0x30282021
-  r Unit#524.workTime 0
   r Unit#524.script CobScript#59
   r Unit#524.id 524
   r Unit#524.killCount 0
   r Unit#524.playerIndex 2
-  r Unit#524.netDirtyFlags 0
   r Unit#524.owner Player#2
   r Unit#524.motion null
   r Unit#524.posX 306708480
@@ -12043,6 +11909,7 @@ call 30518 UpdateUnitWeapons
   o x 478936456
   o y 6607804
   o z 146381921
+  i services.SchedPublish 6 112
   i services.ScheduleTargetingTargetPos Unit#526 1 = 0
   o x 0
   o y 0
@@ -12051,12 +11918,10 @@ call 30518 UpdateUnitWeapons
   r Unit#527.health 326
   r Unit#527.def UnitDef#112
   r Unit#527.flags 0x30282021
-  r Unit#527.workTime 0
   r Unit#527.script CobScript#60
   r Unit#527.id 527
   r Unit#527.killCount 0
   r Unit#527.playerIndex 2
-  r Unit#527.netDirtyFlags 4
   r Unit#527.owner Player#2
   r Unit#527.motion null
   r Unit#527.posX 347602944
@@ -12102,12 +11967,10 @@ call 30518 UpdateUnitWeapons
   r Unit#528.health 170
   r Unit#528.def UnitDef#78
   r Unit#528.flags 0x30282021
-  r Unit#528.workTime 0
   r Unit#528.script CobScript#61
   r Unit#528.id 528
   r Unit#528.killCount 0
   r Unit#528.playerIndex 2
-  r Unit#528.netDirtyFlags 0
   r Unit#528.owner Player#2
   r Unit#528.motion null
   r Unit#528.posX 292028416
@@ -12150,12 +12013,10 @@ call 30518 UpdateUnitWeapons
   r Unit#529.health 326
   r Unit#529.def UnitDef#112
   r Unit#529.flags 0x30282021
-  r Unit#529.workTime 0
   r Unit#529.script CobScript#62
   r Unit#529.id 529
   r Unit#529.killCount 0
   r Unit#529.playerIndex 2
-  r Unit#529.netDirtyFlags 4
   r Unit#529.owner Player#2
   r Unit#529.motion null
   r Unit#529.posX 317194240
@@ -12198,12 +12059,10 @@ call 30518 UpdateUnitWeapons
   r Unit#530.health 326
   r Unit#530.def UnitDef#112
   r Unit#530.flags 0x30282021
-  r Unit#530.workTime 0
   r Unit#530.script CobScript#63
   r Unit#530.id 530
   r Unit#530.killCount 0
   r Unit#530.playerIndex 2
-  r Unit#530.netDirtyFlags 4
   r Unit#530.owner Player#2
   r Unit#530.motion null
   r Unit#530.posX 294125568
@@ -12246,12 +12105,10 @@ call 30518 UpdateUnitWeapons
   r Unit#531.health 176
   r Unit#531.def UnitDef#135
   r Unit#531.flags 0x30282021
-  r Unit#531.workTime 0
   r Unit#531.script CobScript#64
   r Unit#531.id 531
   r Unit#531.killCount 0
   r Unit#531.playerIndex 2
-  r Unit#531.netDirtyFlags 0
   r Unit#531.owner Player#2
   r Unit#531.motion null
   r Unit#531.posX 320864256
@@ -12294,12 +12151,10 @@ call 30518 UpdateUnitWeapons
   r Unit#532.health 326
   r Unit#532.def UnitDef#112
   r Unit#532.flags 0x30282021
-  r Unit#532.workTime 0
   r Unit#532.script CobScript#65
   r Unit#532.id 532
   r Unit#532.killCount 0
   r Unit#532.playerIndex 2
-  r Unit#532.netDirtyFlags 4
   r Unit#532.owner Player#2
   r Unit#532.motion null
   r Unit#532.posX 360185856
@@ -12342,12 +12197,10 @@ call 30518 UpdateUnitWeapons
   r Unit#534.health 1528
   r Unit#534.def UnitDef#65
   r Unit#534.flags 0x30e82021
-  r Unit#534.workTime 0
   r Unit#534.script CobScript#66
   r Unit#534.id 534
   r Unit#534.killCount 0
   r Unit#534.playerIndex 2
-  r Unit#534.netDirtyFlags -32768
   r Unit#534.owner Player#2
   r Unit#534.motion null
   r Unit#534.posX 277872640
@@ -12390,12 +12243,10 @@ call 30518 UpdateUnitWeapons
   r Unit#535.health 176
   r Unit#535.def UnitDef#135
   r Unit#535.flags 0x30282021
-  r Unit#535.workTime 0
   r Unit#535.script CobScript#67
   r Unit#535.id 535
   r Unit#535.killCount 0
   r Unit#535.playerIndex 2
-  r Unit#535.netDirtyFlags 0
   r Unit#535.owner Player#2
   r Unit#535.motion null
   r Unit#535.posX 291504128
@@ -12438,12 +12289,10 @@ call 30518 UpdateUnitWeapons
   r Unit#536.health 176
   r Unit#536.def UnitDef#135
   r Unit#536.flags 0x30282021
-  r Unit#536.workTime 0
   r Unit#536.script CobScript#68
   r Unit#536.id 536
   r Unit#536.killCount 0
   r Unit#536.playerIndex 2
-  r Unit#536.netDirtyFlags 0
   r Unit#536.owner Player#2
   r Unit#536.motion null
   r Unit#536.posX 374341632
@@ -12493,12 +12342,10 @@ call 30518 UpdateUnitWeapons
   r Unit#540.health 170
   r Unit#540.def UnitDef#78
   r Unit#540.flags 0x30282021
-  r Unit#540.workTime 0
   r Unit#540.script CobScript#69
   r Unit#540.id 540
   r Unit#540.killCount 0
   r Unit#540.playerIndex 2
-  r Unit#540.netDirtyFlags 0
   r Unit#540.owner Player#2
   r Unit#540.motion null
   r Unit#540.posX 268959744
@@ -12543,12 +12390,10 @@ call 30518 UpdateUnitWeapons
   r Unit#541.health 1850
   r Unit#541.def UnitDef#14
   r Unit#541.flags 0x30e82021
-  r Unit#541.workTime 0
   r Unit#541.script CobScript#70
   r Unit#541.id 541
   r Unit#541.killCount 0
   r Unit#541.playerIndex 2
-  r Unit#541.netDirtyFlags 0
   r Unit#541.owner Player#2
   r Unit#541.motion null
   r Unit#541.posX 318242816
@@ -12591,12 +12436,10 @@ call 30518 UpdateUnitWeapons
   r Unit#542.health 170
   r Unit#542.def UnitDef#78
   r Unit#542.flags 0x30282021
-  r Unit#542.workTime 0
   r Unit#542.script CobScript#71
   r Unit#542.id 542
   r Unit#542.killCount 0
   r Unit#542.playerIndex 2
-  r Unit#542.netDirtyFlags 0
   r Unit#542.owner Player#2
   r Unit#542.motion null
   r Unit#542.posX 240648192
@@ -12639,12 +12482,10 @@ call 30518 UpdateUnitWeapons
   r Unit#751.health 3000
   r Unit#751.def UnitDef#167
   r Unit#751.flags 0x90e40025
-  r Unit#751.workTime 25487
   r Unit#751.script CobScript#72
   r Unit#751.id 751
   r Unit#751.killCount 0
   r Unit#751.playerIndex 3
-  r Unit#751.netDirtyFlags 4
   r Unit#751.owner Player#3
   r Unit#751.motion UnitMotion#27
   r Unit#751.posX 59781829
@@ -12700,12 +12541,10 @@ call 30518 UpdateUnitWeapons
   r Unit#752.health 175
   r Unit#752.def UnitDef#208
   r Unit#752.flags 0x30282021
-  r Unit#752.workTime 0
   r Unit#752.script CobScript#73
   r Unit#752.id 752
   r Unit#752.killCount 0
   r Unit#752.playerIndex 3
-  r Unit#752.netDirtyFlags 0
   r Unit#752.owner Player#3
   r Unit#752.motion null
   r Unit#752.posX 39321600
@@ -12750,12 +12589,10 @@ call 30518 UpdateUnitWeapons
   r Unit#753.health 175
   r Unit#753.def UnitDef#208
   r Unit#753.flags 0x30282021
-  r Unit#753.workTime 0
   r Unit#753.script CobScript#74
   r Unit#753.id 753
   r Unit#753.killCount 0
   r Unit#753.playerIndex 3
-  r Unit#753.netDirtyFlags 0
   r Unit#753.owner Player#3
   r Unit#753.motion null
   r Unit#753.posX 35127296
@@ -12798,12 +12635,10 @@ call 30518 UpdateUnitWeapons
   r Unit#754.health 320
   r Unit#754.def UnitDef#246
   r Unit#754.flags 0x30282021
-  r Unit#754.workTime 0
   r Unit#754.script CobScript#75
   r Unit#754.id 754
   r Unit#754.killCount 0
   r Unit#754.playerIndex 3
-  r Unit#754.netDirtyFlags 4
   r Unit#754.owner Player#3
   r Unit#754.motion null
   r Unit#754.posX 31981568
@@ -12848,12 +12683,10 @@ call 30518 UpdateUnitWeapons
   r Unit#755.health 179
   r Unit#755.def UnitDef#278
   r Unit#755.flags 0x30282021
-  r Unit#755.workTime 0
   r Unit#755.script CobScript#76
   r Unit#755.id 755
   r Unit#755.killCount 0
   r Unit#755.playerIndex 3
-  r Unit#755.netDirtyFlags 0
   r Unit#755.owner Player#3
   r Unit#755.motion null
   r Unit#755.posX 30408704
@@ -12898,12 +12731,10 @@ call 30518 UpdateUnitWeapons
   r Unit#756.health 175
   r Unit#756.def UnitDef#208
   r Unit#756.flags 0x30282021
-  r Unit#756.workTime 0
   r Unit#756.script CobScript#77
   r Unit#756.id 756
   r Unit#756.killCount 0
   r Unit#756.playerIndex 3
-  r Unit#756.netDirtyFlags 0
   r Unit#756.owner Player#3
   r Unit#756.motion null
   r Unit#756.posX 49807360
@@ -12946,12 +12777,10 @@ call 30518 UpdateUnitWeapons
   r Unit#757.health 179
   r Unit#757.def UnitDef#278
   r Unit#757.flags 0x30282021
-  r Unit#757.workTime 0
   r Unit#757.script CobScript#78
   r Unit#757.id 757
   r Unit#757.killCount 0
   r Unit#757.playerIndex 3
-  r Unit#757.netDirtyFlags 0
   r Unit#757.owner Player#3
   r Unit#757.motion null
   r Unit#757.posX 42991616
@@ -12994,12 +12823,10 @@ call 30518 UpdateUnitWeapons
   r Unit#758.health 320
   r Unit#758.def UnitDef#246
   r Unit#758.flags 0x30282021
-  r Unit#758.workTime 0
   r Unit#758.script CobScript#79
   r Unit#758.id 758
   r Unit#758.killCount 0
   r Unit#758.playerIndex 3
-  r Unit#758.netDirtyFlags 4
   r Unit#758.owner Player#3
   r Unit#758.motion null
   r Unit#758.posX 42467328
@@ -13042,12 +12869,10 @@ call 30518 UpdateUnitWeapons
   r Unit#759.health 1925
   r Unit#759.def UnitDef#147
   r Unit#759.flags 0x3ce82021
-  r Unit#759.workTime 0
   r Unit#759.script CobScript#80
   r Unit#759.id 759
   r Unit#759.killCount 0
   r Unit#759.playerIndex 3
-  r Unit#759.netDirtyFlags 0
   r Unit#759.owner Player#3
   r Unit#759.motion null
   r Unit#759.posX 8912896
@@ -13092,12 +12917,10 @@ call 30518 UpdateUnitWeapons
   r Unit#760.health 290
   r Unit#760.def UnitDef#161
   r Unit#760.flags 0x10e82026
-  r Unit#760.workTime 0
   r Unit#760.script CobScript#81
   r Unit#760.id 760
   r Unit#760.killCount 0
   r Unit#760.playerIndex 3
-  r Unit#760.netDirtyFlags 4
   r Unit#760.owner Player#3
   r Unit#760.motion UnitMotion#28
   r Unit#760.posX 239500849
@@ -13143,12 +12966,10 @@ call 30518 UpdateUnitWeapons
   r Unit#761.health 175
   r Unit#761.def UnitDef#208
   r Unit#761.flags 0x30282021
-  r Unit#761.workTime 0
   r Unit#761.script CobScript#82
   r Unit#761.id 761
   r Unit#761.killCount 0
   r Unit#761.playerIndex 3
-  r Unit#761.netDirtyFlags 0
   r Unit#761.owner Player#3
   r Unit#761.motion null
   r Unit#761.posX 57147392
@@ -13191,12 +13012,10 @@ call 30518 UpdateUnitWeapons
   r Unit#762.health 710
   r Unit#762.def UnitDef#204
   r Unit#762.flags 0xb0282021
-  r Unit#762.workTime 0
   r Unit#762.script CobScript#83
   r Unit#762.id 762
   r Unit#762.killCount 0
   r Unit#762.playerIndex 3
-  r Unit#762.netDirtyFlags 0
   r Unit#762.owner Player#3
   r Unit#762.motion null
   r Unit#762.posX 53477376
@@ -13261,12 +13080,10 @@ call 30518 UpdateUnitWeapons
   r Unit#763.health 175
   r Unit#763.def UnitDef#208
   r Unit#763.flags 0x30282021
-  r Unit#763.workTime 0
   r Unit#763.script CobScript#84
   r Unit#763.id 763
   r Unit#763.killCount 0
   r Unit#763.playerIndex 3
-  r Unit#763.netDirtyFlags 0
   r Unit#763.owner Player#3
   r Unit#763.motion null
   r Unit#763.posX 108527616
@@ -13309,12 +13126,10 @@ call 30518 UpdateUnitWeapons
   r Unit#764.health 320
   r Unit#764.def UnitDef#246
   r Unit#764.flags 0x30282021
-  r Unit#764.workTime 0
   r Unit#764.script CobScript#85
   r Unit#764.id 764
   r Unit#764.killCount 0
   r Unit#764.playerIndex 3
-  r Unit#764.netDirtyFlags 4
   r Unit#764.owner Player#3
   r Unit#764.motion null
   r Unit#764.posX 100139008
@@ -13357,12 +13172,10 @@ call 30518 UpdateUnitWeapons
   r Unit#765.health 320
   r Unit#765.def UnitDef#246
   r Unit#765.flags 0x30282021
-  r Unit#765.workTime 0
   r Unit#765.script CobScript#86
   r Unit#765.id 765
   r Unit#765.killCount 0
   r Unit#765.playerIndex 3
-  r Unit#765.netDirtyFlags 4
   r Unit#765.owner Player#3
   r Unit#765.motion null
   r Unit#765.posX 8912896
@@ -13405,12 +13218,10 @@ call 30518 UpdateUnitWeapons
   r Unit#766.health 290
   r Unit#766.def UnitDef#161
   r Unit#766.flags 0x10e82026
-  r Unit#766.workTime 0
   r Unit#766.script CobScript#87
   r Unit#766.id 766
   r Unit#766.killCount 0
   r Unit#766.playerIndex 3
-  r Unit#766.netDirtyFlags 0
   r Unit#766.owner Player#3
   r Unit#766.motion UnitMotion#29
   r Unit#766.posX 45253466
@@ -13454,12 +13265,10 @@ call 30518 UpdateUnitWeapons
   r Unit#767.health 175
   r Unit#767.def UnitDef#208
   r Unit#767.flags 0x30282021
-  r Unit#767.workTime 0
   r Unit#767.script CobScript#88
   r Unit#767.id 767
   r Unit#767.killCount 0
   r Unit#767.playerIndex 3
-  r Unit#767.netDirtyFlags 0
   r Unit#767.owner Player#3
   r Unit#767.motion null
   r Unit#767.posX 150470656
@@ -13502,12 +13311,10 @@ call 30518 UpdateUnitWeapons
   r Unit#768.health 179
   r Unit#768.def UnitDef#278
   r Unit#768.flags 0x30282021
-  r Unit#768.workTime 0
   r Unit#768.script CobScript#89
   r Unit#768.id 768
   r Unit#768.killCount 0
   r Unit#768.playerIndex 3
-  r Unit#768.netDirtyFlags 0
   r Unit#768.owner Player#3
   r Unit#768.motion null
   r Unit#768.posX 22020096
@@ -13550,12 +13357,10 @@ call 30518 UpdateUnitWeapons
   r Unit#769.health 175
   r Unit#769.def UnitDef#208
   r Unit#769.flags 0x30282021
-  r Unit#769.workTime 0
   r Unit#769.script CobScript#90
   r Unit#769.id 769
   r Unit#769.killCount 0
   r Unit#769.playerIndex 3
-  r Unit#769.netDirtyFlags 0
   r Unit#769.owner Player#3
   r Unit#769.motion null
   r Unit#769.posX 157810688
@@ -13598,12 +13403,10 @@ call 30518 UpdateUnitWeapons
   r Unit#770.health 315
   r Unit#770.def UnitDef#241
   r Unit#770.flags 0x90282026
-  r Unit#770.workTime 0
   r Unit#770.script CobScript#91
   r Unit#770.id 770
   r Unit#770.killCount 0
   r Unit#770.playerIndex 3
-  r Unit#770.netDirtyFlags 0
   r Unit#770.owner Player#3
   r Unit#770.motion UnitMotion#30
   r Unit#770.posX 123225862
@@ -13669,12 +13472,10 @@ call 30518 UpdateUnitWeapons
   r Unit#771.health 988
   r Unit#771.def UnitDef#273
   r Unit#771.flags 0xb0282021
-  r Unit#771.workTime 0
   r Unit#771.script CobScript#92
   r Unit#771.id 771
   r Unit#771.killCount 0
   r Unit#771.playerIndex 3
-  r Unit#771.netDirtyFlags 4
   r Unit#771.owner Player#3
   r Unit#771.motion null
   r Unit#771.posX 30408704
@@ -13739,12 +13540,10 @@ call 30518 UpdateUnitWeapons
   r Unit#772.health 175
   r Unit#772.def UnitDef#208
   r Unit#772.flags 0x30282021
-  r Unit#772.workTime 0
   r Unit#772.script CobScript#93
   r Unit#772.id 772
   r Unit#772.killCount 0
   r Unit#772.playerIndex 3
-  r Unit#772.netDirtyFlags 0
   r Unit#772.owner Player#3
   r Unit#772.motion null
   r Unit#772.posX 238551040
@@ -13787,12 +13586,10 @@ call 30518 UpdateUnitWeapons
   r Unit#773.health 2600
   r Unit#773.def UnitDef#202
   r Unit#773.flags 0x3ce82021
-  r Unit#773.workTime 0
   r Unit#773.script CobScript#94
   r Unit#773.id 773
   r Unit#773.killCount 0
   r Unit#773.playerIndex 3
-  r Unit#773.netDirtyFlags 4
   r Unit#773.owner Player#3
   r Unit#773.motion null
   r Unit#773.posX 216006656
@@ -13837,12 +13634,10 @@ call 30518 UpdateUnitWeapons
   r Unit#774.health 110
   r Unit#774.def UnitDef#161
   r Unit#774.flags 0x10e82026
-  r Unit#774.workTime 0
   r Unit#774.script CobScript#95
   r Unit#774.id 774
   r Unit#774.killCount 0
   r Unit#774.playerIndex 3
-  r Unit#774.netDirtyFlags 0
   r Unit#774.owner Player#3
   r Unit#774.motion UnitMotion#31
   r Unit#774.posX 410877414
@@ -13886,12 +13681,10 @@ call 30518 UpdateUnitWeapons
   r Unit#775.health 710
   r Unit#775.def UnitDef#165
   r Unit#775.flags 0x10e82025
-  r Unit#775.workTime 26245
   r Unit#775.script CobScript#96
   r Unit#775.id 775
   r Unit#775.killCount 0
   r Unit#775.playerIndex 3
-  r Unit#775.netDirtyFlags 4
   r Unit#775.owner Player#3
   r Unit#775.motion UnitMotion#32
   r Unit#775.posX 341397683
@@ -13937,12 +13730,10 @@ call 30518 UpdateUnitWeapons
   r Unit#776.health 320
   r Unit#776.def UnitDef#246
   r Unit#776.flags 0x30282021
-  r Unit#776.workTime 0
   r Unit#776.script CobScript#97
   r Unit#776.id 776
   r Unit#776.killCount 0
   r Unit#776.playerIndex 3
-  r Unit#776.netDirtyFlags 4
   r Unit#776.owner Player#3
   r Unit#776.motion null
   r Unit#776.posX 204996608
@@ -13985,12 +13776,10 @@ call 30518 UpdateUnitWeapons
   r Unit#777.health 710
   r Unit#777.def UnitDef#165
   r Unit#777.flags 0x10e82021
-  r Unit#777.workTime 30817
   r Unit#777.script CobScript#98
   r Unit#777.id 777
   r Unit#777.killCount 0
   r Unit#777.playerIndex 3
-  r Unit#777.netDirtyFlags 0
   r Unit#777.owner Player#3
   r Unit#777.motion UnitMotion#33
   r Unit#777.posX 238476839
@@ -14034,12 +13823,10 @@ call 30518 UpdateUnitWeapons
   r Unit#778.health 828
   r Unit#778.def UnitDef#138
   r Unit#778.flags 0x30e82021
-  r Unit#778.workTime 0
   r Unit#778.script CobScript#99
   r Unit#778.id 778
   r Unit#778.killCount 0
   r Unit#778.playerIndex 3
-  r Unit#778.netDirtyFlags -32768
   r Unit#778.owner Player#3
   r Unit#778.motion null
   r Unit#778.posX 43515904
@@ -14084,12 +13871,10 @@ call 30518 UpdateUnitWeapons
   r Unit#779.health 290
   r Unit#779.def UnitDef#161
   r Unit#779.flags 0x10e82026
-  r Unit#779.workTime 0
   r Unit#779.script CobScript#100
   r Unit#779.id 779
   r Unit#779.killCount 0
   r Unit#779.playerIndex 3
-  r Unit#779.netDirtyFlags 0
   r Unit#779.owner Player#3
   r Unit#779.motion UnitMotion#34
   r Unit#779.posX 22508336
@@ -14133,12 +13918,10 @@ call 30518 UpdateUnitWeapons
   r Unit#780.health 320
   r Unit#780.def UnitDef#246
   r Unit#780.flags 0x30282021
-  r Unit#780.workTime 0
   r Unit#780.script CobScript#101
   r Unit#780.id 780
   r Unit#780.killCount 0
   r Unit#780.playerIndex 3
-  r Unit#780.netDirtyFlags 4
   r Unit#780.owner Player#3
   r Unit#780.motion null
   r Unit#780.posX 21495808
@@ -14181,12 +13964,10 @@ call 30518 UpdateUnitWeapons
   r Unit#781.health 175
   r Unit#781.def UnitDef#208
   r Unit#781.flags 0x30282021
-  r Unit#781.workTime 0
   r Unit#781.script CobScript#102
   r Unit#781.id 781
   r Unit#781.killCount 0
   r Unit#781.playerIndex 3
-  r Unit#781.netDirtyFlags 0
   r Unit#781.owner Player#3
   r Unit#781.motion null
   r Unit#781.posX 179830784
@@ -14229,12 +14010,10 @@ call 30518 UpdateUnitWeapons
   r Unit#782.health 175
   r Unit#782.def UnitDef#208
   r Unit#782.flags 0x30282021
-  r Unit#782.workTime 0
   r Unit#782.script CobScript#103
   r Unit#782.id 782
   r Unit#782.killCount 0
   r Unit#782.playerIndex 3
-  r Unit#782.netDirtyFlags 0
   r Unit#782.owner Player#3
   r Unit#782.motion null
   r Unit#782.posX 258473984
@@ -14277,12 +14056,10 @@ call 30518 UpdateUnitWeapons
   r Unit#783.health 175
   r Unit#783.def UnitDef#208
   r Unit#783.flags 0x30282021
-  r Unit#783.workTime 0
   r Unit#783.script CobScript#104
   r Unit#783.id 783
   r Unit#783.killCount 0
   r Unit#783.playerIndex 3
-  r Unit#783.netDirtyFlags 0
   r Unit#783.owner Player#3
   r Unit#783.motion null
   r Unit#783.posX 258473984
@@ -14325,12 +14102,10 @@ call 30518 UpdateUnitWeapons
   r Unit#784.health 204
   r Unit#784.def UnitDef#165
   r Unit#784.flags 0x10e82025
-  r Unit#784.workTime 0
   r Unit#784.script CobScript#105
   r Unit#784.id 784
   r Unit#784.killCount 0
   r Unit#784.playerIndex 3
-  r Unit#784.netDirtyFlags 0
   r Unit#784.owner Player#3
   r Unit#784.motion UnitMotion#35
   r Unit#784.posX 307629895
@@ -14374,12 +14149,10 @@ call 30518 UpdateUnitWeapons
   r Unit#785.health 202
   r Unit#785.def UnitDef#272
   r Unit#785.flags 0x90282026
-  r Unit#785.workTime 0
   r Unit#785.script CobScript#106
   r Unit#785.id 785
   r Unit#785.killCount 0
   r Unit#785.playerIndex 3
-  r Unit#785.netDirtyFlags 0
   r Unit#785.owner Player#3
   r Unit#785.motion UnitMotion#36
   r Unit#785.posX 8912896
@@ -14445,12 +14218,10 @@ call 30518 UpdateUnitWeapons
   r Unit#786.health 2273
   r Unit#786.def UnitDef#275
   r Unit#786.flags 0x30e82021
-  r Unit#786.workTime 0
   r Unit#786.script CobScript#107
   r Unit#786.id 786
   r Unit#786.killCount 0
   r Unit#786.playerIndex 3
-  r Unit#786.netDirtyFlags -32768
   r Unit#786.owner Player#3
   r Unit#786.motion null
   r Unit#786.posX 239599616
@@ -14495,12 +14266,10 @@ call 30518 UpdateUnitWeapons
   r Unit#787.health 544
   r Unit#787.def UnitDef#227
   r Unit#787.flags 0xb0282021
-  r Unit#787.workTime 0
   r Unit#787.script CobScript#108
   r Unit#787.id 787
   r Unit#787.killCount 0
   r Unit#787.playerIndex 3
-  r Unit#787.netDirtyFlags -32768
   r Unit#787.owner Player#3
   r Unit#787.motion null
   r Unit#787.posX 20971520
@@ -14565,12 +14334,10 @@ call 30518 UpdateUnitWeapons
   r Unit#788.health 168
   r Unit#788.def UnitDef#208
   r Unit#788.flags 0x30282021
-  r Unit#788.workTime 0
   r Unit#788.script CobScript#109
   r Unit#788.id 788
   r Unit#788.killCount 0
   r Unit#788.playerIndex 3
-  r Unit#788.netDirtyFlags -32768
   r Unit#788.owner Player#3
   r Unit#788.motion null
   r Unit#788.posX 408420352
@@ -14613,12 +14380,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1001.health 3000
   r Unit#1001.def UnitDef#34
   r Unit#1001.flags 0x90e40025
-  r Unit#1001.workTime 28418
   r Unit#1001.script CobScript#110
   r Unit#1001.id 1001
   r Unit#1001.killCount 0
   r Unit#1001.playerIndex 4
-  r Unit#1001.netDirtyFlags 4
   r Unit#1001.owner Player#4
   r Unit#1001.motion UnitMotion#37
   r Unit#1001.posX 38994456
@@ -14672,12 +14437,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1002.health 170
   r Unit#1002.def UnitDef#78
   r Unit#1002.flags 0x30282021
-  r Unit#1002.workTime 0
   r Unit#1002.script CobScript#111
   r Unit#1002.id 1002
   r Unit#1002.killCount 0
   r Unit#1002.playerIndex 4
-  r Unit#1002.netDirtyFlags 0
   r Unit#1002.owner Player#4
   r Unit#1002.motion null
   r Unit#1002.posX 26738688
@@ -14720,12 +14483,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1003.health 170
   r Unit#1003.def UnitDef#78
   r Unit#1003.flags 0x30282021
-  r Unit#1003.workTime 0
   r Unit#1003.script CobScript#112
   r Unit#1003.id 1003
   r Unit#1003.killCount 0
   r Unit#1003.playerIndex 4
-  r Unit#1003.netDirtyFlags 0
   r Unit#1003.owner Player#4
   r Unit#1003.motion null
   r Unit#1003.posX 5767168
@@ -14768,12 +14529,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1004.health 326
   r Unit#1004.def UnitDef#112
   r Unit#1004.flags 0x30282021
-  r Unit#1004.workTime 0
   r Unit#1004.script CobScript#113
   r Unit#1004.id 1004
   r Unit#1004.killCount 0
   r Unit#1004.playerIndex 4
-  r Unit#1004.netDirtyFlags 4
   r Unit#1004.owner Player#4
   r Unit#1004.motion null
   r Unit#1004.posX 26738688
@@ -14816,12 +14575,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1005.health 170
   r Unit#1005.def UnitDef#78
   r Unit#1005.flags 0x30282021
-  r Unit#1005.workTime 0
   r Unit#1005.script CobScript#114
   r Unit#1005.id 1005
   r Unit#1005.killCount 0
   r Unit#1005.playerIndex 4
-  r Unit#1005.netDirtyFlags 0
   r Unit#1005.owner Player#4
   r Unit#1005.motion null
   r Unit#1005.posX 48758784
@@ -14864,12 +14621,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1006.health 176
   r Unit#1006.def UnitDef#135
   r Unit#1006.flags 0x30282021
-  r Unit#1006.workTime 0
   r Unit#1006.script CobScript#115
   r Unit#1006.id 1006
   r Unit#1006.killCount 0
   r Unit#1006.playerIndex 4
-  r Unit#1006.netDirtyFlags 0
   r Unit#1006.owner Player#4
   r Unit#1006.motion null
   r Unit#1006.posX 35651584
@@ -14912,12 +14667,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1007.health 326
   r Unit#1007.def UnitDef#112
   r Unit#1007.flags 0x30282021
-  r Unit#1007.workTime 0
   r Unit#1007.script CobScript#116
   r Unit#1007.id 1007
   r Unit#1007.killCount 0
   r Unit#1007.playerIndex 4
-  r Unit#1007.netDirtyFlags 4
   r Unit#1007.owner Player#4
   r Unit#1007.motion null
   r Unit#1007.posX 25690112
@@ -14960,12 +14713,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1008.health 176
   r Unit#1008.def UnitDef#135
   r Unit#1008.flags 0x30282021
-  r Unit#1008.workTime 0
   r Unit#1008.script CobScript#117
   r Unit#1008.id 1008
   r Unit#1008.killCount 0
   r Unit#1008.playerIndex 4
-  r Unit#1008.netDirtyFlags 0
   r Unit#1008.owner Player#4
   r Unit#1008.motion null
   r Unit#1008.posX 24117248
@@ -15008,12 +14759,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1009.health 176
   r Unit#1009.def UnitDef#135
   r Unit#1009.flags 0x30282021
-  r Unit#1009.workTime 0
   r Unit#1009.script CobScript#118
   r Unit#1009.id 1009
   r Unit#1009.killCount 0
   r Unit#1009.playerIndex 4
-  r Unit#1009.netDirtyFlags 0
   r Unit#1009.owner Player#4
   r Unit#1009.motion null
   r Unit#1009.posX 14680064
@@ -15056,12 +14805,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1010.health 170
   r Unit#1010.def UnitDef#78
   r Unit#1010.flags 0x30282021
-  r Unit#1010.workTime 0
   r Unit#1010.script CobScript#119
   r Unit#1010.id 1010
   r Unit#1010.killCount 0
   r Unit#1010.playerIndex 4
-  r Unit#1010.netDirtyFlags 0
   r Unit#1010.owner Player#4
   r Unit#1010.motion null
   r Unit#1010.posX 22544384
@@ -15104,12 +14851,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1011.health 1850
   r Unit#1011.def UnitDef#14
   r Unit#1011.flags 0x3ce82021
-  r Unit#1011.workTime 0
   r Unit#1011.script CobScript#120
   r Unit#1011.id 1011
   r Unit#1011.killCount 0
   r Unit#1011.playerIndex 4
-  r Unit#1011.netDirtyFlags 0
   r Unit#1011.owner Player#4
   r Unit#1011.motion null
   r Unit#1011.posX 48758784
@@ -15152,12 +14897,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1012.health 80
   r Unit#1012.def UnitDef#91
   r Unit#1012.flags 0x10282026
-  r Unit#1012.workTime 0
   r Unit#1012.script CobScript#121
   r Unit#1012.id 1012
   r Unit#1012.killCount 0
   r Unit#1012.playerIndex 4
-  r Unit#1012.netDirtyFlags 0
   r Unit#1012.owner Player#4
   r Unit#1012.motion UnitMotion#38
   r Unit#1012.posX 49061496
@@ -15201,12 +14944,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1013.health 1850
   r Unit#1013.def UnitDef#14
   r Unit#1013.flags 0x3ce82021
-  r Unit#1013.workTime 0
   r Unit#1013.script CobScript#122
   r Unit#1013.id 1013
   r Unit#1013.killCount 0
   r Unit#1013.playerIndex 4
-  r Unit#1013.netDirtyFlags 0
   r Unit#1013.owner Player#4
   r Unit#1013.motion null
   r Unit#1013.posX 60293120
@@ -15249,12 +14990,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1014.health 280
   r Unit#1014.def UnitDef#29
   r Unit#1014.flags 0x10e82026
-  r Unit#1014.workTime 21392
   r Unit#1014.script CobScript#123
   r Unit#1014.id 1014
   r Unit#1014.killCount 0
   r Unit#1014.playerIndex 4
-  r Unit#1014.netDirtyFlags 0
   r Unit#1014.owner Player#4
   r Unit#1014.motion UnitMotion#39
   r Unit#1014.posX 36687618
@@ -15298,12 +15037,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1015.health 280
   r Unit#1015.def UnitDef#29
   r Unit#1015.flags 0x10e82026
-  r Unit#1015.workTime 20459
   r Unit#1015.script CobScript#124
   r Unit#1015.id 1015
   r Unit#1015.killCount 0
   r Unit#1015.playerIndex 4
-  r Unit#1015.netDirtyFlags 0
   r Unit#1015.owner Player#4
   r Unit#1015.motion UnitMotion#40
   r Unit#1015.posX 198149690
@@ -15347,12 +15084,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1016.health 170
   r Unit#1016.def UnitDef#78
   r Unit#1016.flags 0x30282021
-  r Unit#1016.workTime 0
   r Unit#1016.script CobScript#125
   r Unit#1016.id 1016
   r Unit#1016.killCount 0
   r Unit#1016.playerIndex 4
-  r Unit#1016.netDirtyFlags 0
   r Unit#1016.owner Player#4
   r Unit#1016.motion null
   r Unit#1016.posX 48758784
@@ -15395,12 +15130,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1017.health 170
   r Unit#1017.def UnitDef#78
   r Unit#1017.flags 0x30282021
-  r Unit#1017.workTime 0
   r Unit#1017.script CobScript#126
   r Unit#1017.id 1017
   r Unit#1017.killCount 0
   r Unit#1017.playerIndex 4
-  r Unit#1017.netDirtyFlags 0
   r Unit#1017.owner Player#4
   r Unit#1017.motion null
   r Unit#1017.posX 38273024
@@ -15443,12 +15176,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1018.health 170
   r Unit#1018.def UnitDef#78
   r Unit#1018.flags 0x30282021
-  r Unit#1018.workTime 0
   r Unit#1018.script CobScript#127
   r Unit#1018.id 1018
   r Unit#1018.killCount 0
   r Unit#1018.playerIndex 4
-  r Unit#1018.netDirtyFlags 0
   r Unit#1018.owner Player#4
   r Unit#1018.motion null
   r Unit#1018.posX 91750400
@@ -15491,12 +15222,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1019.health 326
   r Unit#1019.def UnitDef#112
   r Unit#1019.flags 0x30282021
-  r Unit#1019.workTime 0
   r Unit#1019.script CobScript#128
   r Unit#1019.id 1019
   r Unit#1019.killCount 0
   r Unit#1019.playerIndex 4
-  r Unit#1019.netDirtyFlags 4
   r Unit#1019.owner Player#4
   r Unit#1019.motion null
   r Unit#1019.posX 24641536
@@ -15539,12 +15268,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1020.health 219
   r Unit#1020.def UnitDef#29
   r Unit#1020.flags 0x10e82026
-  r Unit#1020.workTime 0
   r Unit#1020.script CobScript#129
   r Unit#1020.id 1020
   r Unit#1020.killCount 0
   r Unit#1020.playerIndex 4
-  r Unit#1020.netDirtyFlags 0
   r Unit#1020.owner Player#4
   r Unit#1020.motion UnitMotion#41
   r Unit#1020.posX 381686942
@@ -15588,12 +15315,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1021.health 280
   r Unit#1021.def UnitDef#29
   r Unit#1021.flags 0x10e82026
-  r Unit#1021.workTime 0
   r Unit#1021.script CobScript#130
   r Unit#1021.id 1021
   r Unit#1021.killCount 0
   r Unit#1021.playerIndex 4
-  r Unit#1021.netDirtyFlags 0
   r Unit#1021.owner Player#4
   r Unit#1021.motion UnitMotion#42
   r Unit#1021.posX 212869614
@@ -15637,12 +15362,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1022.health 326
   r Unit#1022.def UnitDef#112
   r Unit#1022.flags 0x30282021
-  r Unit#1022.workTime 0
   r Unit#1022.script CobScript#131
   r Unit#1022.id 1022
   r Unit#1022.killCount 0
   r Unit#1022.playerIndex 4
-  r Unit#1022.netDirtyFlags 4
   r Unit#1022.owner Player#4
   r Unit#1022.motion null
   r Unit#1022.posX 38273024
@@ -15685,12 +15408,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1023.health 326
   r Unit#1023.def UnitDef#112
   r Unit#1023.flags 0x30282021
-  r Unit#1023.workTime 0
   r Unit#1023.script CobScript#132
   r Unit#1023.id 1023
   r Unit#1023.killCount 0
   r Unit#1023.playerIndex 4
-  r Unit#1023.netDirtyFlags 4
   r Unit#1023.owner Player#4
   r Unit#1023.motion null
   r Unit#1023.posX 48758784
@@ -15733,12 +15454,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1024.health 280
   r Unit#1024.def UnitDef#29
   r Unit#1024.flags 0x10e82026
-  r Unit#1024.workTime 30760
   r Unit#1024.script CobScript#133
   r Unit#1024.id 1024
   r Unit#1024.killCount 0
   r Unit#1024.playerIndex 4
-  r Unit#1024.netDirtyFlags 4
   r Unit#1024.owner Player#4
   r Unit#1024.motion UnitMotion#43
   r Unit#1024.posX 317950337
@@ -15782,12 +15501,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1025.health 280
   r Unit#1025.def UnitDef#29
   r Unit#1025.flags 0x10e82026
-  r Unit#1025.workTime 0
   r Unit#1025.script CobScript#134
   r Unit#1025.id 1025
   r Unit#1025.killCount 0
   r Unit#1025.playerIndex 4
-  r Unit#1025.netDirtyFlags 0
   r Unit#1025.owner Player#4
   r Unit#1025.motion UnitMotion#44
   r Unit#1025.posX 395594467
@@ -15831,12 +15548,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1026.health 2100
   r Unit#1026.def UnitDef#1
   r Unit#1026.flags 0x3ce82021
-  r Unit#1026.workTime 0
   r Unit#1026.script CobScript#135
   r Unit#1026.id 1026
   r Unit#1026.killCount 0
   r Unit#1026.playerIndex 4
-  r Unit#1026.netDirtyFlags 0
   r Unit#1026.owner Player#4
   r Unit#1026.motion null
   r Unit#1026.posX 37224448
@@ -15881,12 +15596,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1027.health 170
   r Unit#1027.def UnitDef#78
   r Unit#1027.flags 0x30282021
-  r Unit#1027.workTime 0
   r Unit#1027.script CobScript#136
   r Unit#1027.id 1027
   r Unit#1027.killCount 0
   r Unit#1027.playerIndex 4
-  r Unit#1027.netDirtyFlags 0
   r Unit#1027.owner Player#4
   r Unit#1027.motion null
   r Unit#1027.posX 149422080
@@ -15929,12 +15642,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1028.health 176
   r Unit#1028.def UnitDef#135
   r Unit#1028.flags 0x30282021
-  r Unit#1028.workTime 0
   r Unit#1028.script CobScript#137
   r Unit#1028.id 1028
   r Unit#1028.killCount 0
   r Unit#1028.playerIndex 4
-  r Unit#1028.netDirtyFlags 0
   r Unit#1028.owner Player#4
   r Unit#1028.motion null
   r Unit#1028.posX 59768832
@@ -15977,12 +15688,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1029.health 170
   r Unit#1029.def UnitDef#78
   r Unit#1029.flags 0x30282021
-  r Unit#1029.workTime 0
   r Unit#1029.script CobScript#138
   r Unit#1029.id 1029
   r Unit#1029.killCount 0
   r Unit#1029.playerIndex 4
-  r Unit#1029.netDirtyFlags 0
   r Unit#1029.owner Player#4
   r Unit#1029.motion null
   r Unit#1029.posX 30932992
@@ -16025,12 +15734,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1030.health 237
   r Unit#1030.def UnitDef#3
   r Unit#1030.flags 0x10e82021
-  r Unit#1030.workTime 0
   r Unit#1030.script CobScript#139
   r Unit#1030.id 1030
   r Unit#1030.killCount 0
   r Unit#1030.playerIndex 4
-  r Unit#1030.netDirtyFlags -32768
   r Unit#1030.owner Player#4
   r Unit#1030.motion UnitMotion#45
   r Unit#1030.posX 37292603
@@ -16076,12 +15783,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1031.health 378
   r Unit#1031.def UnitDef#65
   r Unit#1031.flags 0x30e82021
-  r Unit#1031.workTime 0
   r Unit#1031.script CobScript#140
   r Unit#1031.id 1031
   r Unit#1031.killCount 0
   r Unit#1031.playerIndex 4
-  r Unit#1031.netDirtyFlags -32768
   r Unit#1031.owner Player#4
   r Unit#1031.motion null
   r Unit#1031.posX 37748736
@@ -16124,12 +15829,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1032.health 147
   r Unit#1032.def UnitDef#51
   r Unit#1032.flags 0x90282021
-  r Unit#1032.workTime 0
   r Unit#1032.script CobScript#141
   r Unit#1032.id 1032
   r Unit#1032.killCount 0
   r Unit#1032.playerIndex 4
-  r Unit#1032.netDirtyFlags -32768
   r Unit#1032.owner Player#4
   r Unit#1032.motion UnitMotion#46
   r Unit#1032.posX 60361275
@@ -16195,12 +15898,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1033.health 360
   r Unit#1033.def UnitDef#65
   r Unit#1033.flags 0x30e82021
-  r Unit#1033.workTime 0
   r Unit#1033.script CobScript#142
   r Unit#1033.id 1033
   r Unit#1033.killCount 0
   r Unit#1033.playerIndex 4
-  r Unit#1033.netDirtyFlags -32768
   r Unit#1033.owner Player#4
   r Unit#1033.motion null
   r Unit#1033.posX 210763776
@@ -16243,12 +15944,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1034.health 139
   r Unit#1034.def UnitDef#51
   r Unit#1034.flags 0x90282021
-  r Unit#1034.workTime 0
   r Unit#1034.script CobScript#143
   r Unit#1034.id 1034
   r Unit#1034.killCount 0
   r Unit#1034.playerIndex 4
-  r Unit#1034.netDirtyFlags -32768
   r Unit#1034.owner Player#4
   r Unit#1034.motion UnitMotion#47
   r Unit#1034.posX 48826939
@@ -16296,12 +15995,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1035.health 295
   r Unit#1035.def UnitDef#97
   r Unit#1035.flags 0xb0282021
-  r Unit#1035.workTime 0
   r Unit#1035.script CobScript#144
   r Unit#1035.id 1035
   r Unit#1035.killCount 0
   r Unit#1035.playerIndex 4
-  r Unit#1035.netDirtyFlags 0
   r Unit#1035.owner Player#4
   r Unit#1035.motion null
   r Unit#1035.posX 46661632
@@ -16348,12 +16045,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1036.health 729
   r Unit#1036.def UnitDef#68
   r Unit#1036.flags 0x30e82021
-  r Unit#1036.workTime 0
   r Unit#1036.script CobScript#145
   r Unit#1036.id 1036
   r Unit#1036.killCount 0
   r Unit#1036.playerIndex 4
-  r Unit#1036.netDirtyFlags -32768
   r Unit#1036.owner Player#4
   r Unit#1036.motion null
   r Unit#1036.posX 198180864
@@ -16396,12 +16091,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1037.health 114
   r Unit#1037.def UnitDef#78
   r Unit#1037.flags 0x30282021
-  r Unit#1037.workTime 0
   r Unit#1037.script CobScript#146
   r Unit#1037.id 1037
   r Unit#1037.killCount 0
   r Unit#1037.playerIndex 4
-  r Unit#1037.netDirtyFlags -32768
   r Unit#1037.owner Player#4
   r Unit#1037.motion null
   r Unit#1037.posX 384303104
@@ -16444,12 +16137,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1038.health 118
   r Unit#1038.def UnitDef#112
   r Unit#1038.flags 0x30282021
-  r Unit#1038.workTime 0
   r Unit#1038.script CobScript#147
   r Unit#1038.id 1038
   r Unit#1038.killCount 0
   r Unit#1038.playerIndex 4
-  r Unit#1038.netDirtyFlags -32768
   r Unit#1038.owner Player#4
   r Unit#1038.motion null
   r Unit#1038.posX 393740288
@@ -16492,12 +16183,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1251.health 3000
   r Unit#1251.def UnitDef#167
   r Unit#1251.flags 0x90e40025
-  r Unit#1251.workTime 28876
   r Unit#1251.script CobScript#148
   r Unit#1251.id 1251
   r Unit#1251.killCount 0
   r Unit#1251.playerIndex 5
-  r Unit#1251.netDirtyFlags 4
   r Unit#1251.owner Player#5
   r Unit#1251.motion UnitMotion#48
   r Unit#1251.posX 469287171
@@ -16549,12 +16238,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1252.health 175
   r Unit#1252.def UnitDef#208
   r Unit#1252.flags 0x30282021
-  r Unit#1252.workTime 0
   r Unit#1252.script CobScript#149
   r Unit#1252.id 1252
   r Unit#1252.killCount 0
   r Unit#1252.playerIndex 5
-  r Unit#1252.netDirtyFlags 0
   r Unit#1252.owner Player#5
   r Unit#1252.motion null
   r Unit#1252.posX 516423680
@@ -16597,12 +16284,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1253.health 320
   r Unit#1253.def UnitDef#246
   r Unit#1253.flags 0x30282021
-  r Unit#1253.workTime 0
   r Unit#1253.script CobScript#150
   r Unit#1253.id 1253
   r Unit#1253.killCount 0
   r Unit#1253.playerIndex 5
-  r Unit#1253.netDirtyFlags 4
   r Unit#1253.owner Player#5
   r Unit#1253.motion null
   r Unit#1253.posX 508035072
@@ -16645,12 +16330,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1254.health 175
   r Unit#1254.def UnitDef#208
   r Unit#1254.flags 0x30282021
-  r Unit#1254.workTime 0
   r Unit#1254.script CobScript#151
   r Unit#1254.id 1254
   r Unit#1254.killCount 0
   r Unit#1254.playerIndex 5
-  r Unit#1254.netDirtyFlags 0
   r Unit#1254.owner Player#5
   r Unit#1254.motion null
   r Unit#1254.posX 493355008
@@ -16693,12 +16376,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1255.health 175
   r Unit#1255.def UnitDef#208
   r Unit#1255.flags 0x30282021
-  r Unit#1255.workTime 0
   r Unit#1255.script CobScript#152
   r Unit#1255.id 1255
   r Unit#1255.killCount 0
   r Unit#1255.playerIndex 5
-  r Unit#1255.netDirtyFlags 0
   r Unit#1255.owner Player#5
   r Unit#1255.motion null
   r Unit#1255.posX 467140608
@@ -16741,12 +16422,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1256.health 320
   r Unit#1256.def UnitDef#246
   r Unit#1256.flags 0x30282021
-  r Unit#1256.workTime 0
   r Unit#1256.script CobScript#153
   r Unit#1256.id 1256
   r Unit#1256.killCount 0
   r Unit#1256.playerIndex 5
-  r Unit#1256.netDirtyFlags 4
   r Unit#1256.owner Player#5
   r Unit#1256.motion null
   r Unit#1256.posX 462946304
@@ -16789,12 +16468,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1257.health 320
   r Unit#1257.def UnitDef#246
   r Unit#1257.flags 0x30282021
-  r Unit#1257.workTime 0
   r Unit#1257.script CobScript#154
   r Unit#1257.id 1257
   r Unit#1257.killCount 0
   r Unit#1257.playerIndex 5
-  r Unit#1257.netDirtyFlags 4
   r Unit#1257.owner Player#5
   r Unit#1257.motion null
   r Unit#1257.posX 475529216
@@ -16837,12 +16514,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1258.health 175
   r Unit#1258.def UnitDef#208
   r Unit#1258.flags 0x30282021
-  r Unit#1258.workTime 0
   r Unit#1258.script CobScript#155
   r Unit#1258.id 1258
   r Unit#1258.killCount 0
   r Unit#1258.playerIndex 5
-  r Unit#1258.netDirtyFlags 0
   r Unit#1258.owner Player#5
   r Unit#1258.motion null
   r Unit#1258.posX 471334912
@@ -16885,12 +16560,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1259.health 2600
   r Unit#1259.def UnitDef#202
   r Unit#1259.flags 0x3ce82021
-  r Unit#1259.workTime 0
   r Unit#1259.script CobScript#156
   r Unit#1259.id 1259
   r Unit#1259.killCount 0
   r Unit#1259.playerIndex 5
-  r Unit#1259.netDirtyFlags 4
   r Unit#1259.owner Player#5
   r Unit#1259.motion null
   r Unit#1259.posX 460324864
@@ -16933,12 +16606,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1260.health 710
   r Unit#1260.def UnitDef#165
   r Unit#1260.flags 0x10e82025
-  r Unit#1260.workTime 28092
   r Unit#1260.script CobScript#157
   r Unit#1260.id 1260
   r Unit#1260.killCount 0
   r Unit#1260.playerIndex 5
-  r Unit#1260.netDirtyFlags 4
   r Unit#1260.owner Player#5
   r Unit#1260.motion UnitMotion#49
   r Unit#1260.posX 361897389
@@ -16982,12 +16653,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1261.health 320
   r Unit#1261.def UnitDef#246
   r Unit#1261.flags 0x30282021
-  r Unit#1261.workTime 0
   r Unit#1261.script CobScript#158
   r Unit#1261.id 1261
   r Unit#1261.killCount 0
   r Unit#1261.playerIndex 5
-  r Unit#1261.netDirtyFlags 4
   r Unit#1261.owner Player#5
   r Unit#1261.motion null
   r Unit#1261.posX 473432064
@@ -17030,12 +16699,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1262.health 179
   r Unit#1262.def UnitDef#278
   r Unit#1262.flags 0x30282021
-  r Unit#1262.workTime 0
   r Unit#1262.script CobScript#159
   r Unit#1262.id 1262
   r Unit#1262.killCount 0
   r Unit#1262.playerIndex 5
-  r Unit#1262.netDirtyFlags 0
   r Unit#1262.owner Player#5
   r Unit#1262.motion null
   r Unit#1262.posX 472907776
@@ -17078,12 +16745,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1263.health 710
   r Unit#1263.def UnitDef#165
   r Unit#1263.flags 0x10e82021
-  r Unit#1263.workTime 30817
   r Unit#1263.script CobScript#160
   r Unit#1263.id 1263
   r Unit#1263.killCount 0
   r Unit#1263.playerIndex 5
-  r Unit#1263.netDirtyFlags 0
   r Unit#1263.owner Player#5
   r Unit#1263.motion UnitMotion#50
   r Unit#1263.posX 319196919
@@ -17127,12 +16792,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1264.health 1912
   r Unit#1264.def UnitDef#202
   r Unit#1264.flags 0x3ce82021
-  r Unit#1264.workTime 0
   r Unit#1264.script CobScript#161
   r Unit#1264.id 1264
   r Unit#1264.killCount 0
   r Unit#1264.playerIndex 5
-  r Unit#1264.netDirtyFlags 4
   r Unit#1264.owner Player#5
   r Unit#1264.motion null
   r Unit#1264.posX 489684992
@@ -17175,12 +16838,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1265.health 300
   r Unit#1265.def UnitDef#232
   r Unit#1265.flags 0xb0282021
-  r Unit#1265.workTime 0
   r Unit#1265.script CobScript#162
   r Unit#1265.id 1265
   r Unit#1265.killCount 0
   r Unit#1265.playerIndex 5
-  r Unit#1265.netDirtyFlags 0
   r Unit#1265.owner Player#5
   r Unit#1265.motion null
   r Unit#1265.posX 505937920
@@ -17245,12 +16906,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1266.health 710
   r Unit#1266.def UnitDef#165
   r Unit#1266.flags 0x10e82021
-  r Unit#1266.workTime 30817
   r Unit#1266.script CobScript#163
   r Unit#1266.id 1266
   r Unit#1266.killCount 0
   r Unit#1266.playerIndex 5
-  r Unit#1266.netDirtyFlags 0
   r Unit#1266.owner Player#5
   r Unit#1266.motion UnitMotion#51
   r Unit#1266.posX 289801632
@@ -17294,12 +16953,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1267.health 710
   r Unit#1267.def UnitDef#165
   r Unit#1267.flags 0x10e82021
-  r Unit#1267.workTime 30817
   r Unit#1267.script CobScript#164
   r Unit#1267.id 1267
   r Unit#1267.killCount 0
   r Unit#1267.playerIndex 5
-  r Unit#1267.netDirtyFlags 0
   r Unit#1267.owner Player#5
   r Unit#1267.motion UnitMotion#52
   r Unit#1267.posX 301378960
@@ -17343,12 +17000,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1268.health 175
   r Unit#1268.def UnitDef#208
   r Unit#1268.flags 0x30282021
-  r Unit#1268.workTime 0
   r Unit#1268.script CobScript#165
   r Unit#1268.id 1268
   r Unit#1268.killCount 0
   r Unit#1268.playerIndex 5
-  r Unit#1268.netDirtyFlags 0
   r Unit#1268.owner Player#5
   r Unit#1268.motion null
   r Unit#1268.posX 417857536
@@ -17391,12 +17046,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1269.health 175
   r Unit#1269.def UnitDef#208
   r Unit#1269.flags 0x30282021
-  r Unit#1269.workTime 0
   r Unit#1269.script CobScript#166
   r Unit#1269.id 1269
   r Unit#1269.killCount 0
   r Unit#1269.playerIndex 5
-  r Unit#1269.netDirtyFlags 0
   r Unit#1269.owner Player#5
   r Unit#1269.motion null
   r Unit#1269.posX 407371776
@@ -17439,12 +17092,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1270.health 175
   r Unit#1270.def UnitDef#208
   r Unit#1270.flags 0x30282021
-  r Unit#1270.workTime 0
   r Unit#1270.script CobScript#167
   r Unit#1270.id 1270
   r Unit#1270.killCount 0
   r Unit#1270.playerIndex 5
-  r Unit#1270.netDirtyFlags 0
   r Unit#1270.owner Player#5
   r Unit#1270.motion null
   r Unit#1270.posX 413663232
@@ -17487,12 +17138,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1271.health 320
   r Unit#1271.def UnitDef#246
   r Unit#1271.flags 0x30282021
-  r Unit#1271.workTime 0
   r Unit#1271.script CobScript#168
   r Unit#1271.id 1271
   r Unit#1271.killCount 0
   r Unit#1271.playerIndex 5
-  r Unit#1271.netDirtyFlags 4
   r Unit#1271.owner Player#5
   r Unit#1271.motion null
   r Unit#1271.posX 297271296
@@ -17535,12 +17184,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1272.health 710
   r Unit#1272.def UnitDef#165
   r Unit#1272.flags 0x10e82021
-  r Unit#1272.workTime 30817
   r Unit#1272.script CobScript#169
   r Unit#1272.id 1272
   r Unit#1272.killCount 0
   r Unit#1272.playerIndex 5
-  r Unit#1272.netDirtyFlags 0
   r Unit#1272.owner Player#5
   r Unit#1272.motion UnitMotion#53
   r Unit#1272.posX 287308469
@@ -17584,12 +17231,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1273.health 480
   r Unit#1273.def UnitDef#168
   r Unit#1273.flags 0x90282025
-  r Unit#1273.workTime 30985
   r Unit#1273.script CobScript#170
   r Unit#1273.id 1273
   r Unit#1273.killCount 1
   r Unit#1273.playerIndex 5
-  r Unit#1273.netDirtyFlags 1024
   r Unit#1273.owner Player#5
   r Unit#1273.motion UnitMotion#54
   r Unit#1273.posX 492084915
@@ -17655,12 +17300,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1274.health 1925
   r Unit#1274.def UnitDef#147
   r Unit#1274.flags 0x3ce82021
-  r Unit#1274.workTime 0
   r Unit#1274.script CobScript#171
   r Unit#1274.id 1274
   r Unit#1274.killCount 0
   r Unit#1274.playerIndex 5
-  r Unit#1274.netDirtyFlags 0
   r Unit#1274.owner Player#5
   r Unit#1274.motion null
   r Unit#1274.posX 433586176
@@ -17703,12 +17346,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1275.health 175
   r Unit#1275.def UnitDef#208
   r Unit#1275.flags 0x30282021
-  r Unit#1275.workTime 0
   r Unit#1275.script CobScript#172
   r Unit#1275.id 1275
   r Unit#1275.killCount 0
   r Unit#1275.playerIndex 5
-  r Unit#1275.netDirtyFlags 0
   r Unit#1275.owner Player#5
   r Unit#1275.motion null
   r Unit#1275.posX 403177472
@@ -17751,12 +17392,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1276.health 320
   r Unit#1276.def UnitDef#246
   r Unit#1276.flags 0x30282021
-  r Unit#1276.workTime 0
   r Unit#1276.script CobScript#173
   r Unit#1276.id 1276
   r Unit#1276.killCount 0
   r Unit#1276.playerIndex 5
-  r Unit#1276.netDirtyFlags 4
   r Unit#1276.owner Player#5
   r Unit#1276.motion null
   r Unit#1276.posX 301465600
@@ -17799,12 +17438,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1277.health 320
   r Unit#1277.def UnitDef#246
   r Unit#1277.flags 0x30282021
-  r Unit#1277.workTime 0
   r Unit#1277.script CobScript#174
   r Unit#1277.id 1277
   r Unit#1277.killCount 0
   r Unit#1277.playerIndex 5
-  r Unit#1277.netDirtyFlags 4
   r Unit#1277.owner Player#5
   r Unit#1277.motion null
   r Unit#1277.posX 285736960
@@ -17847,12 +17484,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1278.health 175
   r Unit#1278.def UnitDef#208
   r Unit#1278.flags 0x30282021
-  r Unit#1278.workTime 0
   r Unit#1278.script CobScript#175
   r Unit#1278.id 1278
   r Unit#1278.killCount 0
   r Unit#1278.playerIndex 5
-  r Unit#1278.netDirtyFlags 0
   r Unit#1278.owner Player#5
   r Unit#1278.motion null
   r Unit#1278.posX 347602944
@@ -17895,12 +17530,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1279.health 175
   r Unit#1279.def UnitDef#208
   r Unit#1279.flags 0x30282021
-  r Unit#1279.workTime 0
   r Unit#1279.script CobScript#176
   r Unit#1279.id 1279
   r Unit#1279.killCount 0
   r Unit#1279.playerIndex 5
-  r Unit#1279.netDirtyFlags 0
   r Unit#1279.owner Player#5
   r Unit#1279.motion null
   r Unit#1279.posX 400031744
@@ -17943,12 +17576,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1280.health 175
   r Unit#1280.def UnitDef#208
   r Unit#1280.flags 0x30282021
-  r Unit#1280.workTime 0
   r Unit#1280.script CobScript#177
   r Unit#1280.id 1280
   r Unit#1280.killCount 0
   r Unit#1280.playerIndex 5
-  r Unit#1280.netDirtyFlags 0
   r Unit#1280.owner Player#5
   r Unit#1280.motion null
   r Unit#1280.posX 360185856
@@ -17991,12 +17622,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1281.health 560
   r Unit#1281.def UnitDef#252
   r Unit#1281.flags 0x90282025
-  r Unit#1281.workTime 30750
   r Unit#1281.script CobScript#178
   r Unit#1281.id 1281
   r Unit#1281.killCount 3
   r Unit#1281.playerIndex 5
-  r Unit#1281.netDirtyFlags 0
   r Unit#1281.owner Player#5
   r Unit#1281.motion UnitMotion#55
   r Unit#1281.posX 487597353
@@ -18044,12 +17673,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1282.health 320
   r Unit#1282.def UnitDef#246
   r Unit#1282.flags 0x30282021
-  r Unit#1282.workTime 0
   r Unit#1282.script CobScript#179
   r Unit#1282.id 1282
   r Unit#1282.killCount 0
   r Unit#1282.playerIndex 5
-  r Unit#1282.netDirtyFlags 4
   r Unit#1282.owner Player#5
   r Unit#1282.motion null
   r Unit#1282.posX 434634752
@@ -18092,12 +17719,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1283.health 290
   r Unit#1283.def UnitDef#161
   r Unit#1283.flags 0x10e82026
-  r Unit#1283.workTime 0
   r Unit#1283.script CobScript#180
   r Unit#1283.id 1283
   r Unit#1283.killCount 0
   r Unit#1283.playerIndex 5
-  r Unit#1283.netDirtyFlags 4
   r Unit#1283.owner Player#5
   r Unit#1283.motion UnitMotion#56
   r Unit#1283.posX 402087356
@@ -18141,12 +17766,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1284.health 2542
   r Unit#1284.def UnitDef#275
   r Unit#1284.flags 0x3ce82021
-  r Unit#1284.workTime 0
   r Unit#1284.script CobScript#181
   r Unit#1284.id 1284
   r Unit#1284.killCount 0
   r Unit#1284.playerIndex 5
-  r Unit#1284.netDirtyFlags 4
   r Unit#1284.owner Player#5
   r Unit#1284.motion null
   r Unit#1284.posX 345505792
@@ -18189,12 +17812,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1285.health 320
   r Unit#1285.def UnitDef#246
   r Unit#1285.flags 0x30282021
-  r Unit#1285.workTime 0
   r Unit#1285.script CobScript#182
   r Unit#1285.id 1285
   r Unit#1285.killCount 0
   r Unit#1285.playerIndex 5
-  r Unit#1285.netDirtyFlags 4
   r Unit#1285.owner Player#5
   r Unit#1285.motion null
   r Unit#1285.posX 361234432
@@ -18244,12 +17865,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1287.health 179
   r Unit#1287.def UnitDef#278
   r Unit#1287.flags 0x30282021
-  r Unit#1287.workTime 0
   r Unit#1287.script CobScript#183
   r Unit#1287.id 1287
   r Unit#1287.killCount 0
   r Unit#1287.playerIndex 5
-  r Unit#1287.netDirtyFlags 0
   r Unit#1287.owner Player#5
   r Unit#1287.motion null
   r Unit#1287.posX 287309824
@@ -18292,12 +17911,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1288.health 480
   r Unit#1288.def UnitDef#168
   r Unit#1288.flags 0x90282025
-  r Unit#1288.workTime 30794
   r Unit#1288.script CobScript#184
   r Unit#1288.id 1288
   r Unit#1288.killCount 0
   r Unit#1288.playerIndex 5
-  r Unit#1288.netDirtyFlags 0
   r Unit#1288.owner Player#5
   r Unit#1288.motion UnitMotion#57
   r Unit#1288.posX 488715811
@@ -18345,12 +17962,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1289.health 175
   r Unit#1289.def UnitDef#208
   r Unit#1289.flags 0x30282021
-  r Unit#1289.workTime 0
   r Unit#1289.script CobScript#185
   r Unit#1289.id 1289
   r Unit#1289.killCount 0
   r Unit#1289.playerIndex 5
-  r Unit#1289.netDirtyFlags 0
   r Unit#1289.owner Player#5
   r Unit#1289.motion null
   r Unit#1289.posX 333971456
@@ -18393,12 +18008,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1290.health 175
   r Unit#1290.def UnitDef#208
   r Unit#1290.flags 0x30282021
-  r Unit#1290.workTime 0
   r Unit#1290.script CobScript#186
   r Unit#1290.id 1290
   r Unit#1290.killCount 0
   r Unit#1290.playerIndex 5
-  r Unit#1290.netDirtyFlags 0
   r Unit#1290.owner Player#5
   r Unit#1290.motion null
   r Unit#1290.posX 288882688
@@ -18441,12 +18054,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1291.health 175
   r Unit#1291.def UnitDef#208
   r Unit#1291.flags 0x30282021
-  r Unit#1291.workTime 0
   r Unit#1291.script CobScript#187
   r Unit#1291.id 1291
   r Unit#1291.killCount 0
   r Unit#1291.playerIndex 5
-  r Unit#1291.netDirtyFlags 0
   r Unit#1291.owner Player#5
   r Unit#1291.motion null
   r Unit#1291.posX 283639808
@@ -18489,12 +18100,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1293.health 290
   r Unit#1293.def UnitDef#161
   r Unit#1293.flags 0x10e82026
-  r Unit#1293.workTime 0
   r Unit#1293.script CobScript#188
   r Unit#1293.id 1293
   r Unit#1293.killCount 0
   r Unit#1293.playerIndex 5
-  r Unit#1293.netDirtyFlags 0
   r Unit#1293.owner Player#5
   r Unit#1293.motion UnitMotion#58
   r Unit#1293.posX 416942609
@@ -18538,12 +18147,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1294.health 320
   r Unit#1294.def UnitDef#246
   r Unit#1294.flags 0x30282021
-  r Unit#1294.workTime 0
   r Unit#1294.script CobScript#189
   r Unit#1294.id 1294
   r Unit#1294.killCount 0
   r Unit#1294.playerIndex 5
-  r Unit#1294.netDirtyFlags 4
   r Unit#1294.owner Player#5
   r Unit#1294.motion null
   r Unit#1294.posX 302514176
@@ -18586,12 +18193,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1296.health 320
   r Unit#1296.def UnitDef#246
   r Unit#1296.flags 0x30282021
-  r Unit#1296.workTime 0
   r Unit#1296.script CobScript#190
   r Unit#1296.id 1296
   r Unit#1296.killCount 0
   r Unit#1296.playerIndex 5
-  r Unit#1296.netDirtyFlags 4
   r Unit#1296.owner Player#5
   r Unit#1296.motion null
   r Unit#1296.posX 358088704
@@ -18634,12 +18239,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1297.health 320
   r Unit#1297.def UnitDef#246
   r Unit#1297.flags 0x30282021
-  r Unit#1297.workTime 0
   r Unit#1297.script CobScript#191
   r Unit#1297.id 1297
   r Unit#1297.killCount 0
   r Unit#1297.playerIndex 5
-  r Unit#1297.netDirtyFlags 4
   r Unit#1297.owner Player#5
   r Unit#1297.motion null
   r Unit#1297.posX 284688384
@@ -18682,12 +18285,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1298.health 320
   r Unit#1298.def UnitDef#246
   r Unit#1298.flags 0x30282021
-  r Unit#1298.workTime 0
   r Unit#1298.script CobScript#192
   r Unit#1298.id 1298
   r Unit#1298.killCount 0
   r Unit#1298.playerIndex 5
-  r Unit#1298.netDirtyFlags 4
   r Unit#1298.owner Player#5
   r Unit#1298.motion null
   r Unit#1298.posX 272105472
@@ -18730,12 +18331,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1299.health 825
   r Unit#1299.def UnitDef#172
   r Unit#1299.flags 0x10e82021
-  r Unit#1299.workTime 30817
   r Unit#1299.script CobScript#193
   r Unit#1299.id 1299
   r Unit#1299.killCount 0
   r Unit#1299.playerIndex 5
-  r Unit#1299.netDirtyFlags 0
   r Unit#1299.owner Player#5
   r Unit#1299.motion UnitMotion#59
   r Unit#1299.posX 353881562
@@ -18781,12 +18380,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1300.health 600
   r Unit#1300.def UnitDef#258
   r Unit#1300.flags 0x90282025
-  r Unit#1300.workTime 30731
   r Unit#1300.script CobScript#194
   r Unit#1300.id 1300
   r Unit#1300.killCount 1
   r Unit#1300.playerIndex 5
-  r Unit#1300.netDirtyFlags 0
   r Unit#1300.owner Player#5
   r Unit#1300.motion UnitMotion#60
   r Unit#1300.posX 477920711
@@ -18836,16 +18433,15 @@ call 30518 UpdateUnitWeapons
   o x 466474246
   o y 6654115
   o z 105463499
+  i services.SchedPublish 6 112
 call 30518 UpdateUnitWeapons
   r Unit#1302.health 320
   r Unit#1302.def UnitDef#246
   r Unit#1302.flags 0x30282021
-  r Unit#1302.workTime 0
   r Unit#1302.script CobScript#195
   r Unit#1302.id 1302
   r Unit#1302.killCount 0
   r Unit#1302.playerIndex 5
-  r Unit#1302.netDirtyFlags 4
   r Unit#1302.owner Player#5
   r Unit#1302.motion null
   r Unit#1302.posX 282591232
@@ -18890,12 +18486,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1303.health 179
   r Unit#1303.def UnitDef#278
   r Unit#1303.flags 0x30282021
-  r Unit#1303.workTime 0
   r Unit#1303.script CobScript#196
   r Unit#1303.id 1303
   r Unit#1303.killCount 0
   r Unit#1303.playerIndex 5
-  r Unit#1303.netDirtyFlags 0
   r Unit#1303.owner Player#5
   r Unit#1303.motion null
   r Unit#1303.posX 301989888
@@ -18938,12 +18532,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1304.health 179
   r Unit#1304.def UnitDef#278
   r Unit#1304.flags 0x30282021
-  r Unit#1304.workTime 0
   r Unit#1304.script CobScript#197
   r Unit#1304.id 1304
   r Unit#1304.killCount 0
   r Unit#1304.playerIndex 5
-  r Unit#1304.netDirtyFlags 0
   r Unit#1304.owner Player#5
   r Unit#1304.motion null
   r Unit#1304.posX 416284672
@@ -18986,12 +18578,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1305.health 253
   r Unit#1305.def UnitDef#246
   r Unit#1305.flags 0x30282021
-  r Unit#1305.workTime 0
   r Unit#1305.script CobScript#198
   r Unit#1305.id 1305
   r Unit#1305.killCount 0
   r Unit#1305.playerIndex 5
-  r Unit#1305.netDirtyFlags -32768
   r Unit#1305.owner Player#5
   r Unit#1305.motion null
   r Unit#1305.posX 417857536
@@ -19034,12 +18624,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1306.health 164
   r Unit#1306.def UnitDef#161
   r Unit#1306.flags 0x10e82021
-  r Unit#1306.workTime 0
   r Unit#1306.script CobScript#199
   r Unit#1306.id 1306
   r Unit#1306.killCount 0
   r Unit#1306.playerIndex 5
-  r Unit#1306.netDirtyFlags -32768
   r Unit#1306.owner Player#5
   r Unit#1306.motion UnitMotion#61
   r Unit#1306.posX 433586176
@@ -19083,12 +18671,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1307.health 800
   r Unit#1307.def UnitDef#258
   r Unit#1307.flags 0x90282025
-  r Unit#1307.workTime 0
   r Unit#1307.script CobScript#200
   r Unit#1307.id 1307
   r Unit#1307.killCount 0
   r Unit#1307.playerIndex 5
-  r Unit#1307.netDirtyFlags 0
   r Unit#1307.owner Player#5
   r Unit#1307.motion UnitMotion#62
   r Unit#1307.posX 474819293
@@ -19136,12 +18722,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1308.health 676
   r Unit#1308.def UnitDef#147
   r Unit#1308.flags 0x30e82021
-  r Unit#1308.workTime 0
   r Unit#1308.script CobScript#201
   r Unit#1308.id 1308
   r Unit#1308.killCount 0
   r Unit#1308.playerIndex 5
-  r Unit#1308.netDirtyFlags -32768
   r Unit#1308.owner Player#5
   r Unit#1308.motion null
   r Unit#1308.posX 314048512
@@ -19184,12 +18768,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1309.health 659
   r Unit#1309.def UnitDef#196
   r Unit#1309.flags 0x30e82021
-  r Unit#1309.workTime 0
   r Unit#1309.script CobScript#202
   r Unit#1309.id 1309
   r Unit#1309.killCount 0
   r Unit#1309.playerIndex 5
-  r Unit#1309.netDirtyFlags -32768
   r Unit#1309.owner Player#5
   r Unit#1309.motion null
   r Unit#1309.posX 285212672
@@ -19234,12 +18816,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1310.health 653
   r Unit#1310.def UnitDef#192
   r Unit#1310.flags 0x90282025
-  r Unit#1310.workTime 29995
   r Unit#1310.script CobScript#203
   r Unit#1310.id 1310
   r Unit#1310.killCount 1
   r Unit#1310.playerIndex 5
-  r Unit#1310.netDirtyFlags 17408
   r Unit#1310.owner Player#5
   r Unit#1310.motion UnitMotion#63
   r Unit#1310.posX 434081552
@@ -19289,12 +18869,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1311.health 555
   r Unit#1311.def UnitDef#204
   r Unit#1311.flags 0xb0282021
-  r Unit#1311.workTime 0
   r Unit#1311.script CobScript#204
   r Unit#1311.id 1311
   r Unit#1311.killCount 0
   r Unit#1311.playerIndex 5
-  r Unit#1311.netDirtyFlags -32768
   r Unit#1311.owner Player#5
   r Unit#1311.motion null
   r Unit#1311.posX 356515840
@@ -19341,12 +18919,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1312.health 249
   r Unit#1312.def UnitDef#232
   r Unit#1312.flags 0xb0282021
-  r Unit#1312.workTime 0
   r Unit#1312.script CobScript#205
   r Unit#1312.id 1312
   r Unit#1312.killCount 0
   r Unit#1312.playerIndex 5
-  r Unit#1312.netDirtyFlags -32768
   r Unit#1312.owner Player#5
   r Unit#1312.motion null
   r Unit#1312.posX 298319872
@@ -19393,12 +18969,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1501.health 3000
   r Unit#1501.def UnitDef#34
   r Unit#1501.flags 0x90e40021
-  r Unit#1501.workTime 30817
   r Unit#1501.script CobScript#206
   r Unit#1501.id 1501
   r Unit#1501.killCount 0
   r Unit#1501.playerIndex 6
-  r Unit#1501.netDirtyFlags 4096
   r Unit#1501.owner Player#6
   r Unit#1501.motion UnitMotion#64
   r Unit#1501.posX 271974654
@@ -19450,12 +19024,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1502.health 170
   r Unit#1502.def UnitDef#78
   r Unit#1502.flags 0x30282021
-  r Unit#1502.workTime 0
   r Unit#1502.script CobScript#207
   r Unit#1502.id 1502
   r Unit#1502.killCount 0
   r Unit#1502.playerIndex 6
-  r Unit#1502.netDirtyFlags 0
   r Unit#1502.owner Player#6
   r Unit#1502.motion null
   r Unit#1502.posX 267911168
@@ -19498,12 +19070,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1503.health 170
   r Unit#1503.def UnitDef#78
   r Unit#1503.flags 0x30282021
-  r Unit#1503.workTime 0
   r Unit#1503.script CobScript#208
   r Unit#1503.id 1503
   r Unit#1503.killCount 0
   r Unit#1503.playerIndex 6
-  r Unit#1503.netDirtyFlags 0
   r Unit#1503.owner Player#6
   r Unit#1503.motion null
   r Unit#1503.posX 295174144
@@ -19546,12 +19116,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1504.health 326
   r Unit#1504.def UnitDef#112
   r Unit#1504.flags 0x30282021
-  r Unit#1504.workTime 0
   r Unit#1504.script CobScript#209
   r Unit#1504.id 1504
   r Unit#1504.killCount 0
   r Unit#1504.playerIndex 6
-  r Unit#1504.netDirtyFlags 4
   r Unit#1504.owner Player#6
   r Unit#1504.motion null
   r Unit#1504.posX 282591232
@@ -19594,12 +19162,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1505.health 176
   r Unit#1505.def UnitDef#135
   r Unit#1505.flags 0x30282021
-  r Unit#1505.workTime 0
   r Unit#1505.script CobScript#210
   r Unit#1505.id 1505
   r Unit#1505.killCount 0
   r Unit#1505.playerIndex 6
-  r Unit#1505.netDirtyFlags 0
   r Unit#1505.owner Player#6
   r Unit#1505.motion null
   r Unit#1505.posX 276824064
@@ -19642,12 +19208,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1506.health 326
   r Unit#1506.def UnitDef#112
   r Unit#1506.flags 0x30282021
-  r Unit#1506.workTime 0
   r Unit#1506.script CobScript#211
   r Unit#1506.id 1506
   r Unit#1506.killCount 0
   r Unit#1506.playerIndex 6
-  r Unit#1506.netDirtyFlags 4
   r Unit#1506.owner Player#6
   r Unit#1506.motion null
   r Unit#1506.posX 283639808
@@ -19690,12 +19254,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1507.health 170
   r Unit#1507.def UnitDef#78
   r Unit#1507.flags 0x30282021
-  r Unit#1507.workTime 0
   r Unit#1507.script CobScript#212
   r Unit#1507.id 1507
   r Unit#1507.killCount 0
   r Unit#1507.playerIndex 6
-  r Unit#1507.netDirtyFlags 0
   r Unit#1507.owner Player#6
   r Unit#1507.motion null
   r Unit#1507.posX 297271296
@@ -19738,12 +19300,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1508.health 2580
   r Unit#1508.def UnitDef#132
   r Unit#1508.flags 0x3ce82021
-  r Unit#1508.workTime 0
   r Unit#1508.script CobScript#213
   r Unit#1508.id 1508
   r Unit#1508.killCount 0
   r Unit#1508.playerIndex 6
-  r Unit#1508.netDirtyFlags 4
   r Unit#1508.owner Player#6
   r Unit#1508.motion null
   r Unit#1508.posX 266338304
@@ -19786,12 +19346,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1509.health 295
   r Unit#1509.def UnitDef#97
   r Unit#1509.flags 0xb0282021
-  r Unit#1509.workTime 31084
   r Unit#1509.script CobScript#214
   r Unit#1509.id 1509
   r Unit#1509.killCount 0
   r Unit#1509.playerIndex 6
-  r Unit#1509.netDirtyFlags 1024
   r Unit#1509.owner Player#6
   r Unit#1509.motion null
   r Unit#1509.posX 316145664
@@ -19839,12 +19397,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1510.health 295
   r Unit#1510.def UnitDef#97
   r Unit#1510.flags 0xb0282021
-  r Unit#1510.workTime 31080
   r Unit#1510.script CobScript#215
   r Unit#1510.id 1510
   r Unit#1510.killCount 0
   r Unit#1510.playerIndex 6
-  r Unit#1510.netDirtyFlags 1024
   r Unit#1510.owner Player#6
   r Unit#1510.motion null
   r Unit#1510.posX 319291392
@@ -19892,12 +19448,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1511.health 2580
   r Unit#1511.def UnitDef#132
   r Unit#1511.flags 0x3ce82021
-  r Unit#1511.workTime 0
   r Unit#1511.script CobScript#216
   r Unit#1511.id 1511
   r Unit#1511.killCount 0
   r Unit#1511.playerIndex 6
-  r Unit#1511.netDirtyFlags 4
   r Unit#1511.owner Player#6
   r Unit#1511.motion null
   r Unit#1511.posX 278921216
@@ -19940,12 +19494,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1512.health 170
   r Unit#1512.def UnitDef#78
   r Unit#1512.flags 0x30282021
-  r Unit#1512.workTime 0
   r Unit#1512.script CobScript#217
   r Unit#1512.id 1512
   r Unit#1512.killCount 0
   r Unit#1512.playerIndex 6
-  r Unit#1512.netDirtyFlags 0
   r Unit#1512.owner Player#6
   r Unit#1512.motion null
   r Unit#1512.posX 273154048
@@ -19988,12 +19540,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1513.health 170
   r Unit#1513.def UnitDef#78
   r Unit#1513.flags 0x30282021
-  r Unit#1513.workTime 0
   r Unit#1513.script CobScript#218
   r Unit#1513.id 1513
   r Unit#1513.killCount 0
   r Unit#1513.playerIndex 6
-  r Unit#1513.netDirtyFlags 0
   r Unit#1513.owner Player#6
   r Unit#1513.motion null
   r Unit#1513.posX 279445504
@@ -20038,12 +19588,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1515.health 870
   r Unit#1515.def UnitDef#39
   r Unit#1515.flags 0x10e82021
-  r Unit#1515.workTime 30817
   r Unit#1515.script CobScript#219
   r Unit#1515.id 1515
   r Unit#1515.killCount 0
   r Unit#1515.playerIndex 6
-  r Unit#1515.netDirtyFlags 0
   r Unit#1515.owner Player#6
   r Unit#1515.motion UnitMotion#65
   r Unit#1515.posX 338633256
@@ -20082,19 +19630,16 @@ call 30518 UpdateUnitWeapons
   r Unit#1515.weapons[0].aimCob.nAimCobDone 0
   r Unit#1515.weapons[1].aimCob.nAimCobDone 0
   r Unit#1515.weapons[2].aimCob.nAimCobDone 0
-  r Unit#1514.netDirtyFlags 0
   r Unit#1514.heading -9164
   a unit Unit#1515
 call 30518 UpdateUnitWeapons
   r Unit#1516.health 170
   r Unit#1516.def UnitDef#78
   r Unit#1516.flags 0x30282021
-  r Unit#1516.workTime 0
   r Unit#1516.script CobScript#220
   r Unit#1516.id 1516
   r Unit#1516.killCount 0
   r Unit#1516.playerIndex 6
-  r Unit#1516.netDirtyFlags 0
   r Unit#1516.owner Player#6
   r Unit#1516.motion null
   r Unit#1516.posX 305659904
@@ -20137,12 +19682,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1517.health 170
   r Unit#1517.def UnitDef#78
   r Unit#1517.flags 0x30282021
-  r Unit#1517.workTime 0
   r Unit#1517.script CobScript#221
   r Unit#1517.id 1517
   r Unit#1517.killCount 0
   r Unit#1517.playerIndex 6
-  r Unit#1517.netDirtyFlags 0
   r Unit#1517.owner Player#6
   r Unit#1517.motion null
   r Unit#1517.posX 335020032
@@ -20185,12 +19728,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1518.health 152
   r Unit#1518.def UnitDef#22
   r Unit#1518.flags 0x30e82021
-  r Unit#1518.workTime 0
   r Unit#1518.script CobScript#222
   r Unit#1518.id 1518
   r Unit#1518.killCount 0
   r Unit#1518.playerIndex 6
-  r Unit#1518.netDirtyFlags -32768
   r Unit#1518.owner Player#6
   r Unit#1518.motion null
   r Unit#1518.posX 333447168
@@ -20235,12 +19776,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1520.health 170
   r Unit#1520.def UnitDef#78
   r Unit#1520.flags 0x30282021
-  r Unit#1520.workTime 0
   r Unit#1520.script CobScript#223
   r Unit#1520.id 1520
   r Unit#1520.killCount 0
   r Unit#1520.playerIndex 6
-  r Unit#1520.netDirtyFlags 0
   r Unit#1520.owner Player#6
   r Unit#1520.motion null
   r Unit#1520.posX 342360064
@@ -20283,12 +19822,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1521.health 170
   r Unit#1521.def UnitDef#78
   r Unit#1521.flags 0x30282021
-  r Unit#1521.workTime 0
   r Unit#1521.script CobScript#224
   r Unit#1521.id 1521
   r Unit#1521.killCount 0
   r Unit#1521.playerIndex 6
-  r Unit#1521.netDirtyFlags 0
   r Unit#1521.owner Player#6
   r Unit#1521.motion null
   r Unit#1521.posX 336068608
@@ -20331,12 +19868,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1522.health 870
   r Unit#1522.def UnitDef#39
   r Unit#1522.flags 0x10e82025
-  r Unit#1522.workTime 30605
   r Unit#1522.script CobScript#225
   r Unit#1522.id 1522
   r Unit#1522.killCount 0
   r Unit#1522.playerIndex 6
-  r Unit#1522.netDirtyFlags 4
   r Unit#1522.owner Player#6
   r Unit#1522.motion UnitMotion#66
   r Unit#1522.posX 340056088
@@ -20380,12 +19915,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1524.health 170
   r Unit#1524.def UnitDef#78
   r Unit#1524.flags 0x30282021
-  r Unit#1524.workTime 0
   r Unit#1524.script CobScript#226
   r Unit#1524.id 1524
   r Unit#1524.killCount 0
   r Unit#1524.playerIndex 6
-  r Unit#1524.netDirtyFlags 0
   r Unit#1524.owner Player#6
   r Unit#1524.motion null
   r Unit#1524.posX 378011648
@@ -20428,12 +19961,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1526.health 326
   r Unit#1526.def UnitDef#112
   r Unit#1526.flags 0x30282021
-  r Unit#1526.workTime 0
   r Unit#1526.script CobScript#227
   r Unit#1526.id 1526
   r Unit#1526.killCount 0
   r Unit#1526.playerIndex 6
-  r Unit#1526.netDirtyFlags 4
   r Unit#1526.owner Player#6
   r Unit#1526.motion null
   r Unit#1526.posX 370671616
@@ -20476,12 +20007,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1527.health 326
   r Unit#1527.def UnitDef#112
   r Unit#1527.flags 0x30282021
-  r Unit#1527.workTime 0
   r Unit#1527.script CobScript#228
   r Unit#1527.id 1527
   r Unit#1527.killCount 0
   r Unit#1527.playerIndex 6
-  r Unit#1527.netDirtyFlags 4
   r Unit#1527.owner Player#6
   r Unit#1527.motion null
   r Unit#1527.posX 314048512
@@ -20524,12 +20053,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1528.health 326
   r Unit#1528.def UnitDef#112
   r Unit#1528.flags 0x30282021
-  r Unit#1528.workTime 0
   r Unit#1528.script CobScript#229
   r Unit#1528.id 1528
   r Unit#1528.killCount 0
   r Unit#1528.playerIndex 6
-  r Unit#1528.netDirtyFlags 4
   r Unit#1528.owner Player#6
   r Unit#1528.motion null
   r Unit#1528.posX 285736960
@@ -20572,12 +20099,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1529.health 326
   r Unit#1529.def UnitDef#112
   r Unit#1529.flags 0x30282021
-  r Unit#1529.workTime 0
   r Unit#1529.script CobScript#230
   r Unit#1529.id 1529
   r Unit#1529.killCount 0
   r Unit#1529.playerIndex 6
-  r Unit#1529.netDirtyFlags 4
   r Unit#1529.owner Player#6
   r Unit#1529.motion null
   r Unit#1529.posX 278396928
@@ -20620,12 +20145,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1531.health 326
   r Unit#1531.def UnitDef#112
   r Unit#1531.flags 0x30282021
-  r Unit#1531.workTime 0
   r Unit#1531.script CobScript#231
   r Unit#1531.id 1531
   r Unit#1531.killCount 0
   r Unit#1531.playerIndex 6
-  r Unit#1531.netDirtyFlags 4
   r Unit#1531.owner Player#6
   r Unit#1531.motion null
   r Unit#1531.posX 297271296
@@ -20668,12 +20191,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1533.health 326
   r Unit#1533.def UnitDef#112
   r Unit#1533.flags 0x30282021
-  r Unit#1533.workTime 0
   r Unit#1533.script CobScript#232
   r Unit#1533.id 1533
   r Unit#1533.killCount 0
   r Unit#1533.playerIndex 6
-  r Unit#1533.netDirtyFlags 4
   r Unit#1533.owner Player#6
   r Unit#1533.motion null
   r Unit#1533.posX 299368448
@@ -20716,12 +20237,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1535.health 170
   r Unit#1535.def UnitDef#78
   r Unit#1535.flags 0x30282021
-  r Unit#1535.workTime 0
   r Unit#1535.script CobScript#233
   r Unit#1535.id 1535
   r Unit#1535.killCount 0
   r Unit#1535.playerIndex 6
-  r Unit#1535.netDirtyFlags 0
   r Unit#1535.owner Player#6
   r Unit#1535.motion null
   r Unit#1535.posX 350748672
@@ -20764,12 +20283,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1536.health 870
   r Unit#1536.def UnitDef#39
   r Unit#1536.flags 0x10e82021
-  r Unit#1536.workTime 30817
   r Unit#1536.script CobScript#234
   r Unit#1536.id 1536
   r Unit#1536.killCount 0
   r Unit#1536.playerIndex 6
-  r Unit#1536.netDirtyFlags 0
   r Unit#1536.owner Player#6
   r Unit#1536.motion UnitMotion#67
   r Unit#1536.posX 270005849
@@ -20813,12 +20330,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1537.health 170
   r Unit#1537.def UnitDef#78
   r Unit#1537.flags 0x30282021
-  r Unit#1537.workTime 0
   r Unit#1537.script CobScript#235
   r Unit#1537.id 1537
   r Unit#1537.killCount 0
   r Unit#1537.playerIndex 6
-  r Unit#1537.netDirtyFlags 0
   r Unit#1537.owner Player#6
   r Unit#1537.motion null
   r Unit#1537.posX 319291392
@@ -20861,12 +20376,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1538.health 870
   r Unit#1538.def UnitDef#39
   r Unit#1538.flags 0x10e82021
-  r Unit#1538.workTime 30817
   r Unit#1538.script CobScript#236
   r Unit#1538.id 1538
   r Unit#1538.killCount 0
   r Unit#1538.playerIndex 6
-  r Unit#1538.netDirtyFlags 0
   r Unit#1538.owner Player#6
   r Unit#1538.motion UnitMotion#68
   r Unit#1538.posX 329785479
@@ -20910,12 +20423,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1539.health 167
   r Unit#1539.def UnitDef#78
   r Unit#1539.flags 0x30282021
-  r Unit#1539.workTime 0
   r Unit#1539.script CobScript#237
   r Unit#1539.id 1539
   r Unit#1539.killCount 0
   r Unit#1539.playerIndex 6
-  r Unit#1539.netDirtyFlags 0
   r Unit#1539.owner Player#6
   r Unit#1539.motion null
   r Unit#1539.posX 375914496
@@ -20958,12 +20469,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1541.health 295
   r Unit#1541.def UnitDef#97
   r Unit#1541.flags 0xb0282021
-  r Unit#1541.workTime 31075
   r Unit#1541.script CobScript#238
   r Unit#1541.id 1541
   r Unit#1541.killCount 0
   r Unit#1541.playerIndex 6
-  r Unit#1541.netDirtyFlags 1024
   r Unit#1541.owner Player#6
   r Unit#1541.motion null
   r Unit#1541.posX 322437120
@@ -21011,12 +20520,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1542.health 2009
   r Unit#1542.def UnitDef#65
   r Unit#1542.flags 0x30e82021
-  r Unit#1542.workTime 0
   r Unit#1542.script CobScript#239
   r Unit#1542.id 1542
   r Unit#1542.killCount 0
   r Unit#1542.playerIndex 6
-  r Unit#1542.netDirtyFlags -32768
   r Unit#1542.owner Player#6
   r Unit#1542.motion null
   r Unit#1542.posX 264241152
@@ -21059,12 +20566,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1543.health 326
   r Unit#1543.def UnitDef#112
   r Unit#1543.flags 0x30282021
-  r Unit#1543.workTime 0
   r Unit#1543.script CobScript#240
   r Unit#1543.id 1543
   r Unit#1543.killCount 0
   r Unit#1543.playerIndex 6
-  r Unit#1543.netDirtyFlags 4
   r Unit#1543.owner Player#6
   r Unit#1543.motion null
   r Unit#1543.posX 303562752
@@ -21107,12 +20612,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1544.health 326
   r Unit#1544.def UnitDef#112
   r Unit#1544.flags 0x30282021
-  r Unit#1544.workTime 0
   r Unit#1544.script CobScript#241
   r Unit#1544.id 1544
   r Unit#1544.killCount 0
   r Unit#1544.playerIndex 6
-  r Unit#1544.netDirtyFlags 4
   r Unit#1544.owner Player#6
   r Unit#1544.motion null
   r Unit#1544.posX 353894400
@@ -21155,12 +20658,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1547.health 2690
   r Unit#1547.def UnitDef#68
   r Unit#1547.flags 0x3ce82021
-  r Unit#1547.workTime 0
   r Unit#1547.script CobScript#242
   r Unit#1547.id 1547
   r Unit#1547.killCount 0
   r Unit#1547.playerIndex 6
-  r Unit#1547.netDirtyFlags 0
   r Unit#1547.owner Player#6
   r Unit#1547.motion null
   r Unit#1547.posX 295698432
@@ -21203,12 +20704,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1751.health 3000
   r Unit#1751.def UnitDef#167
   r Unit#1751.flags 0x90e40025
-  r Unit#1751.workTime 26511
   r Unit#1751.script CobScript#243
   r Unit#1751.id 1751
   r Unit#1751.killCount 0
   r Unit#1751.playerIndex 7
-  r Unit#1751.netDirtyFlags 4
   r Unit#1751.owner Player#7
   r Unit#1751.motion UnitMotion#69
   r Unit#1751.posX 217680689
@@ -21249,7 +20748,6 @@ call 30518 UpdateUnitWeapons
   r Unit#1751.weapons[0].aimCob.nAimCobDone 0
   r Unit#1751.weapons[1].aimCob.nAimCobDone 0
   r Unit#1751.weapons[2].aimCob.nAimCobDone 0
-  r Unit#1514.netDirtyFlags -32768
   a unit Unit#1751
   i services.ScheduleTargetingTargetPos Unit#1751 0 = 0
   o x 0
@@ -21263,12 +20761,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1752.health 175
   r Unit#1752.def UnitDef#208
   r Unit#1752.flags 0x30282021
-  r Unit#1752.workTime 0
   r Unit#1752.script CobScript#244
   r Unit#1752.id 1752
   r Unit#1752.killCount 0
   r Unit#1752.playerIndex 7
-  r Unit#1752.netDirtyFlags 0
   r Unit#1752.owner Player#7
   r Unit#1752.motion null
   r Unit#1752.posX 257425408
@@ -21311,12 +20807,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1753.health 175
   r Unit#1753.def UnitDef#208
   r Unit#1753.flags 0x30282021
-  r Unit#1753.workTime 0
   r Unit#1753.script CobScript#245
   r Unit#1753.id 1753
   r Unit#1753.killCount 0
   r Unit#1753.playerIndex 7
-  r Unit#1753.netDirtyFlags 0
   r Unit#1753.owner Player#7
   r Unit#1753.motion null
   r Unit#1753.posX 252182528
@@ -21359,12 +20853,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1754.health 175
   r Unit#1754.def UnitDef#208
   r Unit#1754.flags 0x30282021
-  r Unit#1754.workTime 0
   r Unit#1754.script CobScript#246
   r Unit#1754.id 1754
   r Unit#1754.killCount 0
   r Unit#1754.playerIndex 7
-  r Unit#1754.netDirtyFlags 0
   r Unit#1754.owner Player#7
   r Unit#1754.motion null
   r Unit#1754.posX 220725248
@@ -21407,12 +20899,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1755.health 179
   r Unit#1755.def UnitDef#278
   r Unit#1755.flags 0x30282021
-  r Unit#1755.workTime 0
   r Unit#1755.script CobScript#247
   r Unit#1755.id 1755
   r Unit#1755.killCount 0
   r Unit#1755.playerIndex 7
-  r Unit#1755.netDirtyFlags 0
   r Unit#1755.owner Player#7
   r Unit#1755.motion null
   r Unit#1755.posX 229638144
@@ -21455,12 +20945,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1756.health 179
   r Unit#1756.def UnitDef#278
   r Unit#1756.flags 0x30282021
-  r Unit#1756.workTime 0
   r Unit#1756.script CobScript#248
   r Unit#1756.id 1756
   r Unit#1756.killCount 0
   r Unit#1756.playerIndex 7
-  r Unit#1756.netDirtyFlags 0
   r Unit#1756.owner Player#7
   r Unit#1756.motion null
   r Unit#1756.posX 232783872
@@ -21503,12 +20991,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1757.health 179
   r Unit#1757.def UnitDef#278
   r Unit#1757.flags 0x30282021
-  r Unit#1757.workTime 0
   r Unit#1757.script CobScript#249
   r Unit#1757.id 1757
   r Unit#1757.killCount 0
   r Unit#1757.playerIndex 7
-  r Unit#1757.netDirtyFlags 0
   r Unit#1757.owner Player#7
   r Unit#1757.motion null
   r Unit#1757.posX 233832448
@@ -21551,12 +21037,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1758.health 179
   r Unit#1758.def UnitDef#278
   r Unit#1758.flags 0x30282021
-  r Unit#1758.workTime 0
   r Unit#1758.script CobScript#250
   r Unit#1758.id 1758
   r Unit#1758.killCount 0
   r Unit#1758.playerIndex 7
-  r Unit#1758.netDirtyFlags 0
   r Unit#1758.owner Player#7
   r Unit#1758.motion null
   r Unit#1758.posX 218103808
@@ -21599,12 +21083,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1759.health 320
   r Unit#1759.def UnitDef#246
   r Unit#1759.flags 0x30282021
-  r Unit#1759.workTime 0
   r Unit#1759.script CobScript#251
   r Unit#1759.id 1759
   r Unit#1759.killCount 0
   r Unit#1759.playerIndex 7
-  r Unit#1759.netDirtyFlags 4
   r Unit#1759.owner Player#7
   r Unit#1759.motion null
   r Unit#1759.posX 217579520
@@ -21647,12 +21129,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1760.health 320
   r Unit#1760.def UnitDef#246
   r Unit#1760.flags 0x30282021
-  r Unit#1760.workTime 0
   r Unit#1760.script CobScript#252
   r Unit#1760.id 1760
   r Unit#1760.killCount 0
   r Unit#1760.playerIndex 7
-  r Unit#1760.netDirtyFlags 4
   r Unit#1760.owner Player#7
   r Unit#1760.motion null
   r Unit#1760.posX 216530944
@@ -21695,12 +21175,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1761.health 1925
   r Unit#1761.def UnitDef#147
   r Unit#1761.flags 0x3ce82021
-  r Unit#1761.workTime 0
   r Unit#1761.script CobScript#253
   r Unit#1761.id 1761
   r Unit#1761.killCount 0
   r Unit#1761.playerIndex 7
-  r Unit#1761.netDirtyFlags 0
   r Unit#1761.owner Player#7
   r Unit#1761.motion null
   r Unit#1761.posX 191365120
@@ -21743,12 +21221,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1762.health 175
   r Unit#1762.def UnitDef#208
   r Unit#1762.flags 0x30282021
-  r Unit#1762.workTime 0
   r Unit#1762.script CobScript#254
   r Unit#1762.id 1762
   r Unit#1762.killCount 0
   r Unit#1762.playerIndex 7
-  r Unit#1762.netDirtyFlags 0
   r Unit#1762.owner Player#7
   r Unit#1762.motion null
   r Unit#1762.posX 199753728
@@ -21791,12 +21267,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1763.health 16
   r Unit#1763.def UnitDef#208
   r Unit#1763.flags 0x30282021
-  r Unit#1763.workTime 0
   r Unit#1763.script CobScript#255
   r Unit#1763.id 1763
   r Unit#1763.killCount 0
   r Unit#1763.playerIndex 7
-  r Unit#1763.netDirtyFlags -32768
   r Unit#1763.owner Player#7
   r Unit#1763.motion null
   r Unit#1763.posX 341311488
@@ -21839,12 +21313,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1764.health 175
   r Unit#1764.def UnitDef#208
   r Unit#1764.flags 0x30282021
-  r Unit#1764.workTime 0
   r Unit#1764.script CobScript#256
   r Unit#1764.id 1764
   r Unit#1764.killCount 0
   r Unit#1764.playerIndex 7
-  r Unit#1764.netDirtyFlags 0
   r Unit#1764.owner Player#7
   r Unit#1764.motion null
   r Unit#1764.posX 150470656
@@ -21887,12 +21359,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1765.health 1925
   r Unit#1765.def UnitDef#147
   r Unit#1765.flags 0x3ce82021
-  r Unit#1765.workTime 0
   r Unit#1765.script CobScript#257
   r Unit#1765.id 1765
   r Unit#1765.killCount 0
   r Unit#1765.playerIndex 7
-  r Unit#1765.netDirtyFlags 0
   r Unit#1765.owner Player#7
   r Unit#1765.motion null
   r Unit#1765.posX 149422080
@@ -21935,12 +21405,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1766.health 290
   r Unit#1766.def UnitDef#161
   r Unit#1766.flags 0x10e82026
-  r Unit#1766.workTime 0
   r Unit#1766.script CobScript#258
   r Unit#1766.id 1766
   r Unit#1766.killCount 0
   r Unit#1766.playerIndex 7
-  r Unit#1766.netDirtyFlags 0
   r Unit#1766.owner Player#7
   r Unit#1766.motion UnitMotion#70
   r Unit#1766.posX 126199333
@@ -21984,12 +21452,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1767.health 202
   r Unit#1767.def UnitDef#272
   r Unit#1767.flags 0x9028202a
-  r Unit#1767.workTime 31073
   r Unit#1767.script CobScript#259
   r Unit#1767.id 1767
   r Unit#1767.killCount 0
   r Unit#1767.playerIndex 7
-  r Unit#1767.netDirtyFlags 21504
   r Unit#1767.owner Player#7
   r Unit#1767.motion UnitMotion#71
   r Unit#1767.posX 306715487
@@ -22038,12 +21504,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1768.health 1925
   r Unit#1768.def UnitDef#147
   r Unit#1768.flags 0x3ce82021
-  r Unit#1768.workTime 0
   r Unit#1768.script CobScript#260
   r Unit#1768.id 1768
   r Unit#1768.killCount 0
   r Unit#1768.playerIndex 7
-  r Unit#1768.netDirtyFlags 0
   r Unit#1768.owner Player#7
   r Unit#1768.motion null
   r Unit#1768.posX 177733632
@@ -22086,12 +21550,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1769.health 175
   r Unit#1769.def UnitDef#208
   r Unit#1769.flags 0x30282021
-  r Unit#1769.workTime 0
   r Unit#1769.script CobScript#261
   r Unit#1769.id 1769
   r Unit#1769.killCount 0
   r Unit#1769.playerIndex 7
-  r Unit#1769.netDirtyFlags 0
   r Unit#1769.owner Player#7
   r Unit#1769.motion null
   r Unit#1769.posX 192413696
@@ -22134,12 +21596,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1770.health 179
   r Unit#1770.def UnitDef#278
   r Unit#1770.flags 0x30282021
-  r Unit#1770.workTime 0
   r Unit#1770.script CobScript#262
   r Unit#1770.id 1770
   r Unit#1770.killCount 0
   r Unit#1770.playerIndex 7
-  r Unit#1770.netDirtyFlags 0
   r Unit#1770.owner Player#7
   r Unit#1770.motion null
   r Unit#1770.posX 176160768
@@ -22182,12 +21642,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1771.health 175
   r Unit#1771.def UnitDef#208
   r Unit#1771.flags 0x30282021
-  r Unit#1771.workTime 0
   r Unit#1771.script CobScript#263
   r Unit#1771.id 1771
   r Unit#1771.killCount 0
   r Unit#1771.playerIndex 7
-  r Unit#1771.netDirtyFlags 0
   r Unit#1771.owner Player#7
   r Unit#1771.motion null
   r Unit#1771.posX 138936320
@@ -22230,12 +21688,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1772.health 86
   r Unit#1772.def UnitDef#161
   r Unit#1772.flags 0x10e82026
-  r Unit#1772.workTime 0
   r Unit#1772.script CobScript#264
   r Unit#1772.id 1772
   r Unit#1772.killCount 0
   r Unit#1772.playerIndex 7
-  r Unit#1772.netDirtyFlags 0
   r Unit#1772.owner Player#7
   r Unit#1772.motion UnitMotion#72
   r Unit#1772.posX 501181722
@@ -22279,12 +21735,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1773.health 290
   r Unit#1773.def UnitDef#161
   r Unit#1773.flags 0x10e82026
-  r Unit#1773.workTime 0
   r Unit#1773.script CobScript#265
   r Unit#1773.id 1773
   r Unit#1773.killCount 0
   r Unit#1773.playerIndex 7
-  r Unit#1773.netDirtyFlags 0
   r Unit#1773.owner Player#7
   r Unit#1773.motion UnitMotion#73
   r Unit#1773.posX 138315411
@@ -22328,12 +21782,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1774.health 175
   r Unit#1774.def UnitDef#208
   r Unit#1774.flags 0x30282021
-  r Unit#1774.workTime 0
   r Unit#1774.script CobScript#266
   r Unit#1774.id 1774
   r Unit#1774.killCount 0
   r Unit#1774.playerIndex 7
-  r Unit#1774.netDirtyFlags 0
   r Unit#1774.owner Player#7
   r Unit#1774.motion null
   r Unit#1774.posX 119013376
@@ -22376,12 +21828,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1775.health 320
   r Unit#1775.def UnitDef#246
   r Unit#1775.flags 0x30282021
-  r Unit#1775.workTime 0
   r Unit#1775.script CobScript#267
   r Unit#1775.id 1775
   r Unit#1775.killCount 0
   r Unit#1775.playerIndex 7
-  r Unit#1775.netDirtyFlags 4
   r Unit#1775.owner Player#7
   r Unit#1775.motion null
   r Unit#1775.posX 123207680
@@ -22424,12 +21874,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1776.health 290
   r Unit#1776.def UnitDef#161
   r Unit#1776.flags 0x10e82026
-  r Unit#1776.workTime 0
   r Unit#1776.script CobScript#268
   r Unit#1776.id 1776
   r Unit#1776.killCount 0
   r Unit#1776.playerIndex 7
-  r Unit#1776.netDirtyFlags 0
   r Unit#1776.owner Player#7
   r Unit#1776.motion UnitMotion#74
   r Unit#1776.posX 216496465
@@ -22473,12 +21921,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1777.health 179
   r Unit#1777.def UnitDef#278
   r Unit#1777.flags 0x30282021
-  r Unit#1777.workTime 0
   r Unit#1777.script CobScript#269
   r Unit#1777.id 1777
   r Unit#1777.killCount 0
   r Unit#1777.playerIndex 7
-  r Unit#1777.netDirtyFlags 0
   r Unit#1777.owner Player#7
   r Unit#1777.motion null
   r Unit#1777.posX 136314880
@@ -22521,12 +21967,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1778.health 290
   r Unit#1778.def UnitDef#161
   r Unit#1778.flags 0x10e82026
-  r Unit#1778.workTime 0
   r Unit#1778.script CobScript#270
   r Unit#1778.id 1778
   r Unit#1778.killCount 0
   r Unit#1778.playerIndex 7
-  r Unit#1778.netDirtyFlags 0
   r Unit#1778.owner Player#7
   r Unit#1778.motion UnitMotion#75
   r Unit#1778.posX 341471917
@@ -22570,12 +22014,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1779.health 179
   r Unit#1779.def UnitDef#278
   r Unit#1779.flags 0x30282021
-  r Unit#1779.workTime 0
   r Unit#1779.script CobScript#271
   r Unit#1779.id 1779
   r Unit#1779.killCount 0
   r Unit#1779.playerIndex 7
-  r Unit#1779.netDirtyFlags 0
   r Unit#1779.owner Player#7
   r Unit#1779.motion null
   r Unit#1779.posX 258998272
@@ -22618,12 +22060,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1780.health 179
   r Unit#1780.def UnitDef#278
   r Unit#1780.flags 0x30282021
-  r Unit#1780.workTime 0
   r Unit#1780.script CobScript#272
   r Unit#1780.id 1780
   r Unit#1780.killCount 0
   r Unit#1780.playerIndex 7
-  r Unit#1780.netDirtyFlags 0
   r Unit#1780.owner Player#7
   r Unit#1780.motion null
   r Unit#1780.posX 163577856
@@ -22666,12 +22106,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1781.health 179
   r Unit#1781.def UnitDef#278
   r Unit#1781.flags 0x30282021
-  r Unit#1781.workTime 0
   r Unit#1781.script CobScript#273
   r Unit#1781.id 1781
   r Unit#1781.killCount 0
   r Unit#1781.playerIndex 7
-  r Unit#1781.netDirtyFlags 0
   r Unit#1781.owner Player#7
   r Unit#1781.motion null
   r Unit#1781.posX 136314880
@@ -22714,12 +22152,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1782.health 1919
   r Unit#1782.def UnitDef#275
   r Unit#1782.flags 0x30e82021
-  r Unit#1782.workTime 0
   r Unit#1782.script CobScript#274
   r Unit#1782.id 1782
   r Unit#1782.killCount 0
   r Unit#1782.playerIndex 7
-  r Unit#1782.netDirtyFlags -32768
   r Unit#1782.owner Player#7
   r Unit#1782.motion null
   r Unit#1782.posX 135790592
@@ -22762,12 +22198,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1783.health 315
   r Unit#1783.def UnitDef#241
   r Unit#1783.flags 0x90282026
-  r Unit#1783.workTime 0
   r Unit#1783.script CobScript#275
   r Unit#1783.id 1783
   r Unit#1783.killCount 0
   r Unit#1783.playerIndex 7
-  r Unit#1783.netDirtyFlags 0
   r Unit#1783.owner Player#7
   r Unit#1783.motion UnitMotion#76
   r Unit#1783.posX 341882358
@@ -22817,12 +22251,12 @@ call 30518 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#1783 0 = (221111,0,-43982)
   i scripts.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
   o p2 (0)
+  i services.SchedPublish 6 112
   i los_radar.SoundHeardMask at=(342103469,23199744,13069824) = 128
   i services.RecordSimEvent 30 0 [42,342103469,23199744,13069824,128] 5
+  i services.SchedPublish 6 112
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 3
-  w Unit#1783.workTime 31118
-  w Unit#1783.netDirtyFlags 2048
   w Unit#1783.weapon0ReloadTimer 5
   w Projectile#2.speed 0
   w Projectile#2.spawnTick 30518
@@ -22846,12 +22280,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1784.health 320
   r Unit#1784.def UnitDef#246
   r Unit#1784.flags 0x30282021
-  r Unit#1784.workTime 0
   r Unit#1784.script CobScript#276
   r Unit#1784.id 1784
   r Unit#1784.killCount 0
   r Unit#1784.playerIndex 7
-  r Unit#1784.netDirtyFlags 4
   r Unit#1784.owner Player#7
   r Unit#1784.motion null
   r Unit#1784.posX 166199296
@@ -22897,12 +22329,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1785.health 320
   r Unit#1785.def UnitDef#246
   r Unit#1785.flags 0x30282021
-  r Unit#1785.workTime 0
   r Unit#1785.script CobScript#277
   r Unit#1785.id 1785
   r Unit#1785.killCount 0
   r Unit#1785.playerIndex 7
-  r Unit#1785.netDirtyFlags 4
   r Unit#1785.owner Player#7
   r Unit#1785.motion null
   r Unit#1785.posX 246939648
@@ -22945,12 +22375,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1786.health 320
   r Unit#1786.def UnitDef#246
   r Unit#1786.flags 0x30282021
-  r Unit#1786.workTime 0
   r Unit#1786.script CobScript#278
   r Unit#1786.id 1786
   r Unit#1786.killCount 0
   r Unit#1786.playerIndex 7
-  r Unit#1786.netDirtyFlags 4
   r Unit#1786.owner Player#7
   r Unit#1786.motion null
   r Unit#1786.posX 134742016
@@ -22993,12 +22421,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1787.health 315
   r Unit#1787.def UnitDef#241
   r Unit#1787.flags 0x90282026
-  r Unit#1787.workTime 0
   r Unit#1787.script CobScript#279
   r Unit#1787.id 1787
   r Unit#1787.killCount 0
   r Unit#1787.playerIndex 7
-  r Unit#1787.netDirtyFlags 0
   r Unit#1787.owner Player#7
   r Unit#1787.motion UnitMotion#77
   r Unit#1787.posX 191365120
@@ -23046,12 +22472,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1788.health 307
   r Unit#1788.def UnitDef#241
   r Unit#1788.flags 0x90282021
-  r Unit#1788.workTime 0
   r Unit#1788.script CobScript#280
   r Unit#1788.id 1788
   r Unit#1788.killCount 0
   r Unit#1788.playerIndex 7
-  r Unit#1788.netDirtyFlags -32768
   r Unit#1788.owner Player#7
   r Unit#1788.motion UnitMotion#78
   r Unit#1788.posX 149422080
@@ -23099,12 +22523,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1789.health 320
   r Unit#1789.def UnitDef#246
   r Unit#1789.flags 0x30282021
-  r Unit#1789.workTime 0
   r Unit#1789.script CobScript#281
   r Unit#1789.id 1789
   r Unit#1789.killCount 0
   r Unit#1789.playerIndex 7
-  r Unit#1789.netDirtyFlags 4
   r Unit#1789.owner Player#7
   r Unit#1789.motion null
   r Unit#1789.posX 175636480
@@ -23147,12 +22569,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1790.health 175
   r Unit#1790.def UnitDef#208
   r Unit#1790.flags 0x30282021
-  r Unit#1790.workTime 0
   r Unit#1790.script CobScript#282
   r Unit#1790.id 1790
   r Unit#1790.killCount 0
   r Unit#1790.playerIndex 7
-  r Unit#1790.netDirtyFlags 0
   r Unit#1790.owner Player#7
   r Unit#1790.motion null
   r Unit#1790.posX 217579520
@@ -23195,12 +22615,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1791.health 86
   r Unit#1791.def UnitDef#272
   r Unit#1791.flags 0x90282021
-  r Unit#1791.workTime 0
   r Unit#1791.script CobScript#283
   r Unit#1791.id 1791
   r Unit#1791.killCount 0
   r Unit#1791.playerIndex 7
-  r Unit#1791.netDirtyFlags -32768
   r Unit#1791.owner Player#7
   r Unit#1791.motion UnitMotion#79
   r Unit#1791.posX 177733632
@@ -23248,12 +22666,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1792.health 160
   r Unit#1792.def UnitDef#246
   r Unit#1792.flags 0x30282021
-  r Unit#1792.workTime 0
   r Unit#1792.script CobScript#284
   r Unit#1792.id 1792
   r Unit#1792.killCount 0
   r Unit#1792.playerIndex 7
-  r Unit#1792.netDirtyFlags -32768
   r Unit#1792.owner Player#7
   r Unit#1792.motion null
   r Unit#1792.posX 124256256
@@ -23296,12 +22712,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1793.health 146
   r Unit#1793.def UnitDef#246
   r Unit#1793.flags 0x30282021
-  r Unit#1793.workTime 0
   r Unit#1793.script CobScript#285
   r Unit#1793.id 1793
   r Unit#1793.killCount 0
   r Unit#1793.playerIndex 7
-  r Unit#1793.netDirtyFlags -32768
   r Unit#1793.owner Player#7
   r Unit#1793.motion null
   r Unit#1793.posX 216530944
@@ -23344,12 +22758,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1794.health 91
   r Unit#1794.def UnitDef#208
   r Unit#1794.flags 0x30282021
-  r Unit#1794.workTime 0
   r Unit#1794.script CobScript#286
   r Unit#1794.id 1794
   r Unit#1794.killCount 0
   r Unit#1794.playerIndex 7
-  r Unit#1794.netDirtyFlags -32768
   r Unit#1794.owner Player#7
   r Unit#1794.motion null
   r Unit#1794.posX 502792192
@@ -23392,12 +22804,10 @@ call 30518 UpdateUnitWeapons
   r Unit#1795.health 4
   r Unit#1795.def UnitDef#241
   r Unit#1795.flags 0x90282021
-  r Unit#1795.workTime 0
   r Unit#1795.script CobScript#287
   r Unit#1795.id 1795
   r Unit#1795.killCount 0
   r Unit#1795.playerIndex 7
-  r Unit#1795.netDirtyFlags -32768
   r Unit#1795.owner Player#7
   r Unit#1795.motion UnitMotion#80
   r Unit#1795.posX 191365120

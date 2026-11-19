@@ -63,8 +63,10 @@ receives the converted call (the module for a slot, the host for an import). "ar
 the callee, each the index of a caller parameter of the same kind, or {"const": n} for an int parameter. "result"
 is "pass" (the callee's result is the caller's, of the same kind), "void" (the caller has no result) or
 {"const": n} (the caller's int result). Only reorders, drops and added constants fit; a conversion that needs
-code (linear and handle, int and f64) is refused by the loader. build writes "signatures" from the modules built
-against the current major; check fails when an older module has a changed slot or import with no adapter.
+code (linear and handle, int and f64) is refused by the loader. build writes "signatures" for the names the manifest's
+modules use and no others: from the modules built against the current major, else the old entry, and fails when only an
+older module uses a name its interface's header no longer declares; check fails when an older module has a changed slot
+or import with no adapter.
 
 adapters builds lib/wasmloader with clang for the build machine, together with tests/wasm/adapters/adapters.c, and runs it
 against the libwasmtime that the pinned wasmtime package ships (fetched with uv). tests/wasm/adapters holds a manifest of
@@ -84,6 +86,7 @@ majors name an interface it does not use, or are missing one it does, or are ahe
 
 import argparse
 import concurrent.futures
+import functools
 import hashlib
 import json
 import os
@@ -122,6 +125,8 @@ ADAPTERS = os.path.join(ROOT, "tests", "wasm", "adapters")
 LOADER = os.path.join(ROOT, "lib", "wasmloader")
 WASMTIME_INCLUDE = os.path.join(ROOT, "third_party", "wasmtime", "include")
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
+HOST_NAMED = {"services"}
+COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 
 
 def manifest():
@@ -245,19 +250,47 @@ def module_table(entry, interface):
     return entry["slots"] if interface == entry["interface"] else entry["imports"].get(interface, {})
 
 
-def current_signatures(game, modules, majors):
-    """The signatures of the manifest: the old ones, with those of every module built against the current major over them."""
-    out = {interface: dict(names) for interface, names in game.get("signatures", {}).items()}
-    seen = {}
+def header_declares(interface, name):
+    """Whether interfaces/<interface>.h still declares name. The services names are the host's (docs/module-abi.md, 9.3), not identifiers of its header."""
+    if interface in HOST_NAMED:
+        return True
+    return re.search(rf"\b{re.escape(name)}\b", header_text(interface)) is not None
+
+
+@functools.cache
+def header_text(interface):
+    path = os.path.join(INTERFACES, interface + ".h")
+    if not os.path.exists(path):
+        return ""
+    with open(path) as f:
+        return COMMENT.sub("", f.read())
+
+
+def current_signatures(game, modules, majors, declares=header_declares):
+    """The signatures of the manifest: the current one of every name a module uses, from the modules built against the current major, else the old entry."""
+    current, older = {}, {}
     for entry in modules:
         for interface in module_interfaces(entry):
-            if entry["majors"][interface] != majors[interface]:
-                continue
             for name, signature in module_table(entry, interface).items():
-                if seen.setdefault((interface, name), (entry["name"], signature))[1] != signature:
-                    sys.exit(f"{interface}.{name}: {seen[(interface, name)][0]} and {entry['name']} are both built against the current major "
+                if entry["majors"][interface] != majors[interface]:
+                    older.setdefault((interface, name), entry["name"])
+                elif current.setdefault((interface, name), (entry["name"], signature))[1] != signature:
+                    sys.exit(f"{interface}.{name}: {current[(interface, name)][0]} and {entry['name']} are both built against the current major "
                              "and disagree on its signature")
+    for (interface, name), module in older.items():
+        if (interface, name) not in current and not declares(interface, name):
+            sys.exit(f"{module}: uses {interface}.{name}, which interfaces/{interface}.h no longer declares: the module needs an adapter "
+                     "or a rebuild before the slot can go")
+    old = game.get("signatures", {})
+    out = {}
+    for interface, names in old.items():
+        for name, signature in names.items():
+            if (interface, name) in current:
+                out.setdefault(interface, {})[name] = current[(interface, name)][1]
+            elif (interface, name) in older:
                 out.setdefault(interface, {})[name] = signature
+    for (interface, name), (_, signature) in current.items():
+        out.setdefault(interface, {})[name] = signature
     return {interface: out[interface] for interface in sorted(out)}
 
 

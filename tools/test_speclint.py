@@ -228,5 +228,106 @@ class Lint(unittest.TestCase):
         self.assertEqual(speclint.main([str(spec), "--kit", str(self.kit_dir), "--root", str(self.root)]), 1)
 
 
+UNITS_H = """\
+// units.h: GetGroundHeight moved to map.h.
+#define UNITS_VERSION_MAJOR 3
+#define UNITS_VERSION_MINOR 2
+enum { UNITS_EVENT_KILLED = 1 };
+typedef struct UnitEvent { int kind; } UnitEvent;
+typedef struct UnitsSlots {
+    void (__stdcall *SetStateBits)(void* unit, int bits);
+    int (__stdcall *GetUnitCount)(void);
+} UnitsSlots;
+"""
+
+MAP_H = """\
+#define MAP_VERSION_MAJOR 5
+#define MAP_VERSION_MINOR 0
+typedef struct MapSlots { int (__stdcall *GetGroundHeight)(const void* pos); } MapSlots;
+"""
+
+
+class Interfaces(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.kit_dir = Path(self.tmp.name)
+        (self.kit_dir / "interfaces").mkdir()
+        (self.kit_dir / "interfaces" / "units.h").write_text(UNITS_H)
+        (self.kit_dir / "interfaces" / "map.h").write_text(MAP_H)
+        (self.kit_dir / "interfaces" / "seams.h").write_text("typedef struct Seam { int slots; } Seam;\n")
+        (self.kit_dir / "interfaces" / "services.h").write_text("int __stdcall RandomInt(int range);\n")
+        (self.kit_dir / "wasm").mkdir()
+        signatures = {"signatures": {"services": {"GameRand": [["int"], "int"]}}}
+        (self.kit_dir / "wasm" / "modules.json").write_text(json.dumps(signatures))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def problems(self, text):
+        return speclint.interface_problems(text, speclint.kit_headers(self.kit_dir), speclint.kit_signatures(self.kit_dir))
+
+    def test_a_slot_of_the_header_passes(self):
+        self.assertEqual(self.problems("| `units.SetStateBits` | `[block, int] -> void` |\n| `map.GetGroundHeight` |"), [])
+
+    def test_a_stale_import_is_refused(self):
+        got = self.problems("# s\n\n| `units.GetGroundHeight` | `[linear] -> int` | the height |\n")
+        self.assertEqual(got, [(3, "`units.GetGroundHeight` is not declared by the kit's interfaces/units.h")])
+
+    def test_a_name_only_in_a_comment_is_refused(self):
+        self.assertEqual(len(self.problems("`units.GetGroundHeight(pos)` gives the height.")), 1)
+
+    def test_a_declared_type_event_kind_or_constant_passes(self):
+        self.assertEqual(self.problems("`units.UnitEvent`, `units.UNITS_EVENT_KILLED` and `units.UNITS_VERSION_MAJOR`."), [])
+
+    def test_a_prefix_passes_when_a_name_has_it(self):
+        self.assertEqual(self.problems("The `units.Get*` imports."), [])
+        self.assertEqual(len(self.problems("The `units.Bank*` imports.")), 1)
+
+    def test_a_host_name_of_the_manifest_passes(self):
+        self.assertEqual(self.problems("`services.GameRand` and `services.RandomInt`."), [])
+        self.assertEqual(len(self.problems("`services.CommandArgs_GetIntArg`.")), 1)
+
+    def test_a_module_with_no_header_is_left_to_the_other_rules(self):
+        self.assertEqual(self.problems("`ghost.Apply`, `rng.Seed` and `scripts.GetSweetSpot`."), [])
+
+    def test_file_names_and_fields_are_not_imports(self):
+        text = "`interfaces/units.h`, `units.h`, `docs/units.Md`, `units.count` and `edges-units.Apply`."
+        self.assertEqual(self.problems(text), [])
+
+    def test_the_kit_version_passes(self):
+        self.assertEqual(self.problems("### Slots (`interfaces/units.h`, version 3.2)\n(`interfaces/map.h`, version 5.0)"), [])
+
+    def test_a_lower_minor_passes(self):
+        self.assertEqual(self.problems("(`interfaces/units.h`, version 3.0)"), [])
+
+    def test_a_stale_version_is_refused(self):
+        got = self.problems("# s\n### Slots (`interfaces/units.h`,\nversion 2.2)")
+        self.assertEqual(got, [(2, "the kit's interfaces/units.h is version 3.2, cited at version 2.2")])
+        self.assertEqual(len(self.problems("(`interfaces/map.h`, version 5.1)")), 1)
+
+    def test_a_header_without_version_or_missing_is_refused(self):
+        self.assertIn("no version macros", self.problems("(`interfaces/seams.h`, version 1.0)")[0][1])
+        self.assertIn("the kit has no interfaces/ghost.h", self.problems("(`interfaces/ghost.h`, version 1.0)")[0][1])
+
+    def test_a_kit_without_headers_refuses_only_a_cited_version(self):
+        self.assertEqual(speclint.interface_problems("`units.GetGroundHeight`", {}, {}), [])
+        self.assertEqual(len(speclint.interface_problems("(`interfaces/units.h`, version 1.0)", {}, {})), 1)
+
+    def test_the_repository_headers_moved_the_ground_height_to_map(self):
+        headers = speclint.kit_headers(Path(__file__).resolve().parent.parent)
+        self.assertEqual(speclint.interface_problems("`map.GetGroundHeight`", headers, {}), [])
+        self.assertEqual(len(speclint.interface_problems("`units.GetGroundHeight` and `units.GetSweetSpot`", headers, {})), 2)
+
+    def test_main_refuses_a_stale_import(self):
+        (self.kit_dir / "MANIFEST.json").write_text(json.dumps({"files": []}))
+        (self.kit_dir / "interfaces" / "sim_events.csv").write_text(SIM_EVENTS_CSV)
+        spec_path = self.kit_dir / "spec.md"
+        spec_path.write_text(spec("None.", "It imports `map.GetGroundHeight`.\n"))
+        argv = [str(spec_path), "--kit", str(self.kit_dir), "--root", str(self.kit_dir)]
+        self.assertEqual(speclint.main(argv), 0)
+        spec_path.write_text(spec("None.", "It imports `units.GetGroundHeight`.\n"))
+        self.assertEqual(speclint.main(argv), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -142,8 +142,7 @@ STATE = "state"
 EXCLUDED_PREFIXES = ("src/harness/", "build/", "toolchain/")
 COLUMNS = ["subsystem", "function", "file", "functions", "functions_entered", "lines", "lines_hit",
            "branches", "branches_covered", "decorated", "dead", "reason"]
-SORTED = ("ai", "economy", "features", "files", "game", "los_radar", "map", "movement", "network", "orders", "pathfinding", "players",
-          "scripts", "state", "units", "weapons", "wind_meteors")
+SORTED = tuple(sorted(set(coupling.SIM_SUBSYSTEMS) | {"files", "game", "network", "state"}))
 METRICS = (("functions", "functions", "functions_entered"), ("lines", "lines", "lines_hit"),
            ("branches", "branches", "branches_covered"))
 CODE_REGION = 0

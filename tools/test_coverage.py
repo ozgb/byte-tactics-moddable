@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import coupling
 import coverage as cov
 
 ROOT = cov.ROOT
@@ -223,8 +224,7 @@ class ReasonTest(unittest.TestCase):
         self.assertEqual(cov.unreasoned({"presentation": t, "platform": t, "seams": t}), "")
 
     def test_every_simulation_subsystem_is_sorted(self):
-        for name in ("players", "orders", "state", "units", "map", "weapons", "ai", "los_radar", "pathfinding",
-                     "economy", "features", "wind_meteors", "files", "game", "network"):
+        for name in [*coupling.SIM_SUBSYSTEMS, "state", "files", "game", "network"]:
             self.assertIn(name, cov.SORTED)
         for name in ("presentation", "platform", "seams"):
             self.assertNotIn(name, cov.SORTED)

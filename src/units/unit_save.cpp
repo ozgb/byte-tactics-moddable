@@ -102,9 +102,9 @@ struct MissionUnitIdTable {
 
 #include "../files/files_api.h"
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #pragma pack(push, 1)
 #include "../orders/order.h"
@@ -270,7 +270,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     LoadUnitAccounts(unit, file);
     if (rec.f27 != 0)
-        g_seams.orders->LoadMotion(unit->motion, 0, unit, file);
+        g_seams.movement->LoadMotion(unit->motion, 0, unit, file);
 
     Ref<Order>* normal = &unit->list;
     Ref<Order>* special = &unit->list2;
@@ -293,7 +293,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         g_seams.orders->ReattachFxToUnit((Order*)unit->list);
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
-    ((CobScript*)unit->script.get())->LoadScriptState(file);
+    g_seams.scripts->LoadScriptState((CobScript*)unit->script.get(), file);
 
     for (int j = 0; j < 3; j++) {
         *(int*)&unit->weapons[j] = rec.pieces[j].f0;
@@ -334,7 +334,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
-            ((CobScript*)unit->script.get())->SaveScriptState(file);
+            g_seams.scripts->SaveScriptState((CobScript*)unit->script.get(), file);
 
             int n = 0;
             Order* c = (Order*)unit->list;
@@ -353,7 +353,7 @@ void __stdcall SaveUnits(HapiBank* file)
             }
 
             if (unit->motion != 0)
-                g_seams.orders->SaveMotion(unit->motion, 0, unit, file);
+                g_seams.movement->SaveMotion(unit->motion, 0, unit, file);
             SaveUnitAccounts(unit, file);
 
             strcpy(rec.name, ((char*)unit->def.get() + 0x20));

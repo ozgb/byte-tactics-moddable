@@ -8883,7 +8883,7 @@ call 100 UpdateUnitWeapons
   o y 5045479
   o z 24442335
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 101 UpdateUnitWeapons
@@ -8944,9 +8944,9 @@ call 101 UpdateUnitWeapons
   o x 42734156
   o y 5115689
   o z 24532383
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 19006 5007 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 19006 5007 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 19006 5007 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9252,7 +9252,7 @@ call 106 UpdateUnitWeapons
   o y 5468182
   o z 24970695
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 107 UpdateUnitWeapons
@@ -9313,9 +9313,9 @@ call 107 UpdateUnitWeapons
   o x 43044217
   o y 5539216
   o z 25055918
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 19785 5546 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 19785 5546 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 19785 5546 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9632,7 +9632,7 @@ call 112 UpdateUnitWeapons
   o y 5894118
   o z 25470351
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 113 UpdateUnitWeapons
@@ -9702,9 +9702,9 @@ call 113 UpdateUnitWeapons
   o x 43399742
   o y 5965029
   o z 25550972
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 20578 6009 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 20578 6009 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 20578 6009 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9737,15 +9737,15 @@ call 114 UpdateUnitWeapons
   o y 735324
   o z 21995930
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#252
-  i units.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i units.GetPieceOffset Unit#2 0 = (799385,-82097,-1143869)
-  i units.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
+  i scripts.GetPieceOffset Unit#2 0 = (799385,-82097,-1143869)
+  i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (0)
   i los_radar.SoundHeardMask at=(40187277,3718991,18528182) = 3
   i services.RecordSimEvent 30 0 [46,40187277,3718991,18528182,3] 5
-  i units.StartScript CobScript#2 "FirePrimary" ? 0 = 1
-  i units.StartScriptWithArgs CobScript#2 "RockUnit" ? 0 2 -612 -515 0 0 = 0
+  i scripts.StartScript CobScript#2 "FirePrimary" ? 0 = 1
+  i scripts.StartScriptWithArgs CobScript#2 "RockUnit" ? 0 2 -612 -515 0 0 = 0
   i services.RecordSimEvent 9 0 [40187277,3718991,18528182,9] 4
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
@@ -10113,7 +10113,7 @@ call 118 UpdateUnitWeapons
   o y 5925380
   o z 25943497
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 119 UpdateUnitWeapons
@@ -10195,9 +10195,9 @@ call 119 UpdateUnitWeapons
   o x 43790177
   o y 5864640
   o z 26020046
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 21389 6069 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 21389 6069 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 21389 6069 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -10336,15 +10336,15 @@ call 121 UpdateUnitWeapons
   o y 735324
   o z 21986133
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#252
-  i units.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i units.GetPieceOffset Unit#3 0 = (800707,-53014,-1144661)
-  i units.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
+  i scripts.GetPieceOffset Unit#3 0 = (800707,-53014,-1144661)
+  i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
   o p2 (0)
   i los_radar.SoundHeardMask at=(42802113,3748074,18513840) = 3
   i services.RecordSimEvent 30 0 [46,42802113,3748074,18513840,3] 5
-  i units.StartScript CobScript#3 "FirePrimary" ? 0 = 1
-  i units.StartScriptWithArgs CobScript#3 "RockUnit" ? 0 2 -660 -453 0 0 = 0
+  i scripts.StartScript CobScript#3 "FirePrimary" ? 0 = 1
+  i scripts.StartScriptWithArgs CobScript#3 "RockUnit" ? 0 2 -660 -453 0 0 = 0
   i services.RecordSimEvent 9 0 [42802113,3748074,18513840,9] 4
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 2
@@ -10672,7 +10672,7 @@ call 124 UpdateUnitWeapons
   o y 5559153
   o z 26394073
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 125 UpdateUnitWeapons
@@ -10768,9 +10768,9 @@ call 125 UpdateUnitWeapons
   o x 44209257
   o y 5501565
   o z 26463558
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 22219 5759 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 22219 5759 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 22219 5759 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11166,7 +11166,7 @@ call 130 UpdateUnitWeapons
   o y 5517949
   o z 26798942
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 131 UpdateUnitWeapons
@@ -11235,9 +11235,9 @@ call 131 UpdateUnitWeapons
   o x 44676705
   o y 5522399
   o z 26862367
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 23067 5911 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 23067 5911 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 23067 5911 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11578,7 +11578,7 @@ call 136 UpdateUnitWeapons
   o y 5541542
   o z 27163338
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 137 UpdateUnitWeapons
@@ -11645,9 +11645,9 @@ call 137 UpdateUnitWeapons
   o x 45177827
   o y 5544978
   o z 27220589
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 23936 6043 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 23936 6043 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 23936 6043 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11984,7 +11984,7 @@ call 142 UpdateUnitWeapons
   o y 5556298
   o z 27494966
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 143 UpdateUnitWeapons
@@ -12052,9 +12052,9 @@ call 143 UpdateUnitWeapons
   o x 45700896
   o y 5555258
   o z 27547800
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 24831 6133 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 24831 6133 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 24831 6133 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -12390,7 +12390,7 @@ call 148 UpdateUnitWeapons
   o y 5551211
   o z 27804424
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 149 UpdateUnitWeapons
@@ -12456,9 +12456,9 @@ call 149 UpdateUnitWeapons
   o x 46236761
   o y 5550709
   o z 27854594
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 25754 6226 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 25754 6226 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 25754 6226 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -12796,7 +12796,7 @@ call 154 UpdateUnitWeapons
   o y 5549446
   o z 28102270
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 155 UpdateUnitWeapons
@@ -12863,9 +12863,9 @@ call 155 UpdateUnitWeapons
   o x 46780515
   o y 5549090
   o z 28150124
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 26703 6273 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 26703 6273 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 26703 6273 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -13202,7 +13202,7 @@ call 160 UpdateUnitWeapons
   o y 5542505
   o z 28374499
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 161 UpdateUnitWeapons
@@ -13276,22 +13276,22 @@ call 161 InitUnitWeaponSlots
   r UnitDef#112.weapon2 weapondef#0
   r weapondef#0.index 0
   a unit Unit#6
-  i units.QueryScript CobScript#8 "QueryPrimary" (0) null null null = 0
+  i scripts.QueryScript CobScript#8 "QueryPrimary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#6 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#6 0
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 0
   o out (45613056,65536,22544384)
-  i units.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 0
+  i scripts.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#6 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#6 1
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 1
   o out (45613056,65536,22544384)
-  i units.QueryScript CobScript#8 "QueryTertiary" (0) null null null = 0
+  i scripts.QueryScript CobScript#8 "QueryTertiary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#6 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#6 2
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 2
   o out (45613056,65536,22544384)
-  i units.StartScriptWithArgs CobScript#8 "SetMaxReloadTime" ? 0 1 0 0 0 0 = 0
+  i scripts.StartScriptWithArgs CobScript#8 "SetMaxReloadTime" ? 0 1 0 0 0 0 = 0
   w Unit#6.weapon0Def weapondef#0
   w Unit#6.weapon0Flags 16
   w Unit#6.weapon1Def weapondef#0
@@ -13377,9 +13377,9 @@ call 161 UpdateUnitWeapons
   o x 47344211
   o y 5541892
   o z 28417395
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 27674 6321 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 27674 6321 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 27674 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -13722,7 +13722,7 @@ call 166 UpdateUnitWeapons
   o y 5541517
   o z 28626544
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 166 GetWeaponRange
@@ -13793,9 +13793,9 @@ call 167 UpdateUnitWeapons
   o x 47915412
   o y 5541865
   o z 28667764
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 28654 6321 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 28654 6321 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 28654 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14120,7 +14120,7 @@ call 172 UpdateUnitWeapons
   o y 5544488
   o z 28873446
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 173 UpdateUnitWeapons
@@ -14186,9 +14186,9 @@ call 173 UpdateUnitWeapons
   o x 48487985
   o y 5545274
   o z 28914862
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 29631 6321 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 29631 6321 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 29631 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14522,7 +14522,7 @@ call 178 UpdateUnitWeapons
   o y 5549851
   o z 29125604
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 179 UpdateUnitWeapons
@@ -14589,9 +14589,9 @@ call 179 UpdateUnitWeapons
   o x 49057065
   o y 5550860
   o z 29168765
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 30586 6226 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 30586 6226 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 30586 6226 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14923,7 +14923,7 @@ call 184 UpdateUnitWeapons
   o y 5556298
   o z 29391430
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 185 UpdateUnitWeapons
@@ -14993,9 +14993,9 @@ call 185 UpdateUnitWeapons
   o x 49616560
   o y 5538545
   o z 29430019
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 31492 6133 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 31492 6133 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 31492 6133 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -15321,7 +15321,7 @@ call 190 UpdateUnitWeapons
   o y 5490895
   o z 29573646
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 191 UpdateUnitWeapons
@@ -15387,9 +15387,9 @@ call 191 UpdateUnitWeapons
   o x 50092379
   o y 5482065
   o z 29592774
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32220 5974 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32220 5974 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32220 5974 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -15724,7 +15724,7 @@ call 196 UpdateUnitWeapons
   o y 5443120
   o z 29642438
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 197 UpdateUnitWeapons
@@ -15792,9 +15792,9 @@ call 197 UpdateUnitWeapons
   o x 50452168
   o y 5436431
   o z 29643422
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32752 5861 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32752 5861 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32752 5861 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -16065,7 +16065,7 @@ call 201 UpdateUnitWeapons
   o y 5413218
   o z 29618651
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 202 UpdateUnitWeapons
@@ -16132,9 +16132,9 @@ call 202 UpdateUnitWeapons
   o x 50666224
   o y 5408239
   o z 29605448
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33069 5905 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33069 5905 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33069 5905 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -16228,9 +16228,9 @@ call 204 UpdateUnitWeapons
   o y 735324
   o z 21918821
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#252
-  i units.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (1)
-  i units.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
+  i scripts.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
   w Unit#2.weapon0ReloadTimer 0
   w Unit#2.weapon0FireHeading 13401
   w Unit#2.weapon0FirePitch -4549
@@ -16299,9 +16299,9 @@ call 205 UpdateUnitWeapons
   o y 735324
   o z 21918821
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#252
-  i units.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (1)
-  i units.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
+  i scripts.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
   w Unit#2.weapon0FireHeading 13412
   w Unit#2.weapon0FirePitch -4502
 call 205 UpdateUnitWeapons
@@ -16373,9 +16373,9 @@ call 206 UpdateUnitWeapons
   o y 735324
   o z 21918821
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#252
-  i units.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (1)
-  i units.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
+  i scripts.GetPieceOffset Unit#2 1 = (-856533,139569,1104149)
   w Unit#2.weapon0FireHeading 13423
   w Unit#2.weapon0FirePitch -4474
 call 206 UpdateUnitWeapons
@@ -16421,7 +16421,7 @@ call 206 UpdateUnitWeapons
   o y 5391422
   o z 29525545
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 207 UpdateUnitWeapons
@@ -16488,9 +16488,9 @@ call 207 UpdateUnitWeapons
   o x 50804746
   o y 5387903
   o z 29498953
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33281 5949 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33281 5949 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33281 5949 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -16763,19 +16763,19 @@ call 211 UpdateUnitWeapons
   o y 5376202
   o z 29367022
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.QueryScript CobScript#7 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#7 "QueryPrimary" (0) null null null = 1
   o p2 (3)
-  i units.GetPieceOffset Unit#252 3 = (-501248,1375355,1222902)
+  i scripts.GetPieceOffset Unit#252 3 = (-501248,1375355,1222902)
   i services.RandomInt 681 = 460
   i services.RandomInt 681 = 246
-  i units.QueryScript CobScript#7 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#7 "QueryPrimary" (0) null null null = 1
   o p2 (3)
   i los_radar.SoundHeardMask at=(49961472,1440891,23505142) = 3
   i services.RecordSimEvent 30 0 [57,49961472,1440891,23505142,3] 5
-  i units.StartScript CobScript#7 "FirePrimary" ? 0 = 1
-  i units.StartScriptWithArgs CobScript#7 "RockUnit" ? 0 2 799 49 0 0 = 0
+  i scripts.StartScript CobScript#7 "FirePrimary" ? 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "RockUnit" ? 0 2 799 49 0 0 = 0
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
   w rng.seed 0x36f30390
@@ -16884,9 +16884,9 @@ call 212 UpdateUnitWeapons
   o x 50869961
   o y 5439337
   o z 29327799
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33394 6086 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 33394 6086 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33394 6086 0 0 = 0
   w Unit#252.weapon0Flags 3
   w Unit#252.weapon0ReloadTimer 25
@@ -18536,7 +18536,7 @@ call 237 UpdateUnitWeapons
   o y 6956438
   o z 27631616
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
   w Unit#252.weapon0ReloadTimer 0
@@ -18604,9 +18604,9 @@ call 238 UpdateUnitWeapons
   o x 50137486
   o y 6901085
   o z 27541088
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32090 9126 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 32090 9126 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32090 9126 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -19501,7 +19501,7 @@ call 252 UpdateUnitWeapons
   o y 6083424
   o z 26225253
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2
 call 253 UpdateUnitWeapons
@@ -19565,9 +19565,9 @@ call 253 UpdateUnitWeapons
   o x 49526352
   o y 6021764
   o z 26129954
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i units.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 30101 9825 0 0 = 1
+  i scripts.StartScriptWithArgs CobScript#7 "AimPrimary" ? 0 2 30101 9825 0 0 = 1
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 30101 9825 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -20013,6 +20013,6 @@ call 260 UpdateUnitWeapons
   o y 5581480
   o z 25466754
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
   w Unit#252.weapon0Flags 2

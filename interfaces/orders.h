@@ -2,21 +2,17 @@
 #define INTERFACES_ORDERS_H
 
 class AiSearchGoal;
-class BitReader;
 class OrderBase;
 class OrderFx;
 class HapiBank;
-class UnitMotion;
 struct Unit;
 struct Order;
 struct Point16;
-struct PathEvent;
-struct PathPoint;
 struct Vec3;
 class MissionType;
 
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
-#define ORDERS_VERSION_MAJOR 3
+#define ORDERS_VERSION_MAJOR 4
 // Minor version of the orders interface, changed when a slot is added.
 #define ORDERS_VERSION_MINOR 0
 
@@ -57,20 +53,10 @@ struct OrdersSeam {
     void (__stdcall* RunOrders)(Unit* unit);
     // Runs the secondary orders of a unit for one tick. Hooks: none.
     void (__stdcall* RunSecondaryOrders)(Unit* unit);
-    // Frees what the movement of a unit holds (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* DestroyMotionObject)(UnitMotion* motion);
-    // Reads the movement of a unit from a saved game bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* LoadMotion)(UnitMotion* motion, int unusedEdx, Unit* unit, HapiBank* file);
-    // Writes the movement of a unit to a saved game bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* SaveMotion)(UnitMotion* motion, int unusedEdx, Unit* unit, HapiBank* file);
-    // Steers a unit, moves it and updates its move rate for one tick (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* UpdateMotion)(UnitMotion* motion, int unusedEdx, Unit* unit);
     // Registers the order types of every module in the order type table. Hooks: none.
     void (__stdcall* RegisterAllOrderTypes)(void);
     // Empties the order type table. Hooks: none.
     void (__stdcall* ClearOrderTypeTable)(void);
-    // Allocates the movement of a unit from the sim block, builds it and stores it in the unit. Hooks: none.
-    void (__stdcall* NewUnitMotion)(Unit* unit);
     // Allocates an order from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
     Order* (__stdcall* LoadOrder)(Unit* unit, HapiBank* file, char* name);
     // Returns the order kind a name in the order type table stands for. Hooks: none.
@@ -81,10 +67,6 @@ struct OrdersSeam {
     void (__stdcall* QueueBuildOrder)(char* name, Unit* unit, int count);
     // Sets status flags on an order that listens to a unit, through the status handler of its kind. Hooks: none.
     void (__stdcall* OrderOrStatusFlags)(OrderBase* order, unsigned int flags);
-    // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
-    void (__stdcall* UnitMotionReadNetState)(UnitMotion* motion, BitReader* reader);
-    // Applies an event of a path search to its requester, with the waypoints Poll copied for it: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
-    void (__stdcall* ApplyPathEvent)(const PathEvent* event, const PathPoint* waypoints);
 };
 
 #endif

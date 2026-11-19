@@ -63,7 +63,7 @@ public:
     virtual int GetUnitValue(int which, int a, int b, int c, int d);
     virtual int IsCarryingUnit(int id);
     virtual int GetTransporterId();
-    void SetObjectState(int newState);
+    void SetObjectState(ObjectState* newState);
 };
 
 struct Unit;

@@ -699,10 +699,10 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, ModelState* model)
 void __stdcall DrawUnit(void* context, UnitDrawView* unit)
 {
     if (unit->carrier == 0) {
-        g_seams.units->UpdateObjectState(unit);
+        g_seams.scripts->UpdateObjectState(unit);
         for (UnitDrawView* u = unit->cargo; u; u = u->cargoNext) {
             if (!(u->flags & 0x20000))
-                g_seams.units->UpdateObjectState(u);
+                g_seams.scripts->UpdateObjectState(u);
         }
         ((CMemoryCache *)g_game->unitTable)->DrawObjectState(unit->state, context);
     }

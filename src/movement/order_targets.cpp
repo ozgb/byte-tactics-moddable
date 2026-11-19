@@ -93,7 +93,7 @@ struct PathOrderRecord {
 #include "../../interfaces/seams.h"
 
 #pragma pack(push, 2)
-#include "order.h"
+#include "../orders/order.h"
 
 #pragma pack(pop)
 
@@ -134,9 +134,9 @@ struct PointVectorUfillAccess : UfillPointVector {
 
 #include "order_target_types.h"
 
-#include "../game/goal_owner.h"
+#include "goal_owner.h"
 
-#include "../ai/ai_search_goal.h"
+#include "ai_search_goal.h"
 #include "order_goals.h"
 
 #include "unit_motion.h"
@@ -712,16 +712,17 @@ void PathOrder::SerializeToBits(BitWriter* stream)
 
 // FUNCTION: 0x44de80 ??0PathOrder@@QAE@HPAVHapiBank@@PAD@Z
 PathOrder::PathOrder(int owner, HapiBank* file, char* name)
-    : OrderFx((Order*)owner), ref(0, 0)
+    : OrderFx((Order*)owner), ref()
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     PathOrderRecord rec;
-    ((PathOrderAttach*)&rec.ref_vt)->PathOrderAttach::PathOrderAttach(0, 0);
+    g_seams.units->UnitRefInit((UnitRef*)&rec.ref_vt, nullptr, nullptr);
     file->OpenNamedBox(name);
     file->SeekBox(0);
     if (file->ReadBox(&rec, 0x36) == 0x36) {
         unit = g_seams.units->LoadUnit(rec.id1, file);
-        ref.SetUnit((Unit*)g_seams.units->LoadUnit(rec.id2, file));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&ref, (Unit*)g_seams.units->LoadUnit(rec.id2, file));
         field_8 = rec.f1;
         approachRadius = rec.f2;
         altitude = rec.f3;
@@ -755,7 +756,7 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
 {
     PathOrderRecord rec;
     PathOrderAttach* ref = (PathOrderAttach*)&rec.ref_vt;
-    ref->PathOrderAttach::PathOrderAttach(0, 0);
+    g_seams.units->UnitRefInit((UnitRef*)ref, nullptr, nullptr);
     if (unit == 0)
         rec.id1 = 0;
     else
@@ -780,14 +781,15 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
 
 // FUNCTION: 0x44e080 ??0PathOrder@@QAE@PAUUnit@@PAVBitReader@@@Z
 PathOrder::PathOrder(Unit* owner_, BitReader* reader)
-    : OrderFx(0), unit(owner_), ref(0, 0)
+    : OrderFx(nullptr), unit(owner_), ref()
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     flags = reader->ReadBits(8);
     if (flags & 1) {
         piece = reader->ReadBits(0x10);
         unsigned short index = reader->ReadBits(0x10);
-        ref.SetUnit(index == 0 ? 0 : (Unit*)&g_game->units[index]);
+        g_seams.units->UnitRefSetUnit((UnitRef*)&ref, index == 0 ? nullptr : (Unit*)&g_game->units[index]);
     }
     if (flags & 0x10)
         approachRadius = reader->ReadBits(0x10);
@@ -810,10 +812,10 @@ PathOrder::PathOrder(Unit* owner_, BitReader* reader)
 
 // FUNCTION: 0x44e190 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z
 PathOrder::PathOrder(Order* order, Unit* unit)
-    : OrderFx(order), ref(0, 0)
+    : OrderFx(order), ref()
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
-    ref.SetUnit(unit);
     approachRadius = 0;
     altitude = 0;
     this->unit = order->unit;
@@ -833,21 +835,22 @@ PathOrder::PathOrder(Order* order, Unit* unit)
 
 // FUNCTION: 0x44e250 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@F@Z
 PathOrder::PathOrder(Order* source, Unit* unit, short value)
-    : OrderFx(source), piece(value), ref(0, 0)
+    : OrderFx(source), piece(value), ref()
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
     field_8 = 5;
     this->unit = source->unit;
     pos = this->unit->pos;
-    ref.SetUnit(unit);
 }
 
 // FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
 PathOrder::PathOrder(Order* source, const Vec3& p)
-    : OrderFx(source), ref(0, 0), pos(p)
+    : OrderFx(source), ref(), pos(p)
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
     approachRadius = 0;
     altitude = 0;
@@ -858,10 +861,10 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
 
 // FUNCTION: 0x44e330 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z
 PathOrder::PathOrder(Order* source, Unit* unit, const Vec3& p)
-    : OrderFx(source), ref(0, 0)
+    : OrderFx(source), ref()
 {
+    g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
-    ref.SetUnit(unit);
     pos = p;
     approachRadius = 0;
     altitude = 0;
@@ -895,7 +898,7 @@ int PathOrder::FillWorldPos(Vec3* out)
         if (ref.owner == 0 || (int)ref.owner->spatialBucket.get() == (int)g_game->overflowBucket.get())
             return 0;
         Vec3* p = &pos;
-        *p = g_seams.units->GetPiecePosition(ref.owner, piece);
+        *p = g_seams.scripts->GetPiecePosition(ref.owner, piece);
         if (flags & 2) {
             short angle = ref.owner->heading;
             if (flags & 0x40)

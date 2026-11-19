@@ -93,7 +93,7 @@ struct FixedWorldPos {
     short z;
 };
 
-#include "../ai/ai_search_goal.h"
+#include "../movement/ai_search_goal.h"
 
 class GoalDrawInterface {
 public:

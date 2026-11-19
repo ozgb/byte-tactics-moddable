@@ -129,7 +129,7 @@ LLVM 22.1.8's `clang-tidy` after configuring the modern build:
 ```sh
 cmake -S . -B build/modern -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 uv run tools/tidy.py origin/moddable...HEAD
-uv run tools/tidy.py --all src/units/cob.cpp     # every finding in a file
+uv run tools/tidy.py --all src/scripts/cob.cpp     # every finding in a file
 ```
 
 A finding on an added line is fixed, or, when it is a real 3.1c bug that

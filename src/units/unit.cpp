@@ -1,7 +1,7 @@
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
 
 #include "unit_def.h"
@@ -55,7 +55,7 @@ struct CargoLinkView {
 
 #include "../orders/order_base.h"
 
-#include "../orders/path_order_attach.h"
+#include "path_order_attach.h"
 
 #include "unit.h"
 
@@ -209,17 +209,17 @@ void Unit::SetStateBits(int mask, int set)
             gained = ~old & now;
             lost = (unsigned char)newLost;
             if (gained & 1) {
-                ((CobScript*)script.get())->StartScript("Activate", 0, 0);
+                g_seams.scripts->StartScript((CobScript*)script.get(), "Activate", 0, 0);
                 RecordUnitSpeech(this, 3, SIM_SPEECH_KIND_TEXT);
             }
             if (lost & 1) {
-                ((CobScript*)script.get())->StartScript("Deactivate", 0, 0);
+                g_seams.scripts->StartScript((CobScript*)script.get(), "Deactivate", 0, 0);
                 RecordUnitSpeech(this, 4, SIM_SPEECH_KIND_TEXT);
             }
             if (gained & 8)
-                ((CobScript*)script.get())->StartScript("StartBuilding", 0, 0);
+                g_seams.scripts->StartScript((CobScript*)script.get(), "StartBuilding", 0, 0);
             if (lost & 8)
-                ((CobScript*)script.get())->StartScript("StopBuilding", 0, 0);
+                g_seams.scripts->StartScript((CobScript*)script.get(), "StopBuilding", 0, 0);
             if (gained & 4) {
                 RecordUnitSpeech(this, 0xe, SIM_SPEECH_KIND_TEXT);
                 for (link = head; link; link = link->next) {

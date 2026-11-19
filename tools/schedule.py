@@ -32,14 +32,14 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import astcache
+import coupling
 import rwsets
 from rwsets import ROOT
 
 DEFAULT_BUILD_DIR = ROOT / "build/rwsets"
 DATA = ROOT / "data"
 DOC = ROOT / "docs" / "schedule.md"
-SIMS = ["wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar", "orders", "units",
-        "players", "map"]
+SIMS = coupling.SIM_SUBSYSTEMS
 SPLICE_SCALE = 1000
 SPLICE_DEPTH = 3
 PHASES = ["net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tail"]
@@ -1180,7 +1180,13 @@ LOOPS = {
 SILENT_INTENTS = {
     "pathfinding.CellsChanged": "a notification: what it does is left to the implementation, and the reference's does "
                                 "nothing.",
-    "orders.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
+    "movement.AirManeuverOrderSetAltitude": "the reference's does nothing: an air maneuver target keeps no altitude.",
+    "movement.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
+    "movement.GoalSetPathOrder": "it writes through a virtual call whose targets are not resolved.",
+    "orders.ReattachFxToUnit": "it writes through movement's GoalSetPathOrder, a virtual call whose targets are not "
+                               "resolved.",
+    "scripts.FindScript": "a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and "
+                          "drops the index, as 3.1c does.",
     "units.RefreshUnitIfStale": "it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself.",
     "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }

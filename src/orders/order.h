@@ -4,7 +4,7 @@
 #include "../util/vec3.h"
 #include "mission_type.h"
 #include "order_base.h"
-#include "path_order_attach.h"
+#include "../units/path_order_attach.h"
 #include "../../interfaces/ref.h"
 
 struct Unit;

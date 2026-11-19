@@ -107,7 +107,7 @@ its records go with the next tick's, and the shares of a scenario's last tick ar
 | 3.1c call | Effect | Subscriber's handler |
 |---|---|---|
 | `SetStateBits(unit, 4, paid)` in `UpdatePlayerEconomy`, for a cloaked unit's upkeep | CLOAK (synchronous) | `units.SetStateBits` |
-| the `SetSpeed` script call in `UpdateMetalExtraction` | EXTRACTOR | `units.StartScriptWithArgs` when the unit has a script |
+| the `SetSpeed` script call in `UpdateMetalExtraction` | EXTRACTOR | `scripts.StartScriptWithArgs` when the unit has a script |
 | `TransferEnergy`/`TransferMetal` in `UpdateResourceSharing` | SHARE | `players.TransferEnergy` or `TransferMetal`, whose own SPEND and INCOME follow it |
 
 `los_radar.GetMapCell`, economy's one query of another subsystem, became the world view's `CellMetal`. The share of

@@ -23,8 +23,8 @@
 #include "../src/map/plot_map.h"
 #include "../src/map/map_list.h"
 #include "../src/units/movement_class.h"
-#include "../src/units/weapon_aim_cob_cb.h"
-#include "../src/units/cob_script.h"
+#include "../src/weapons/weapon_aim_cob_cb.h"
+#include "../src/scripts/cob_script.h"
 #include "../src/weapons/weapons.h"
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
@@ -3720,6 +3720,7 @@ void VectorSelfTest()
     ResetBlock();
     RestoreText(calls.Data(), sets);
     rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    rebuiltSeen = (FixtureSeen*)ReplayResolveObject("FixtureSeen#1", nullptr, g_objects, AllocObject);
     g_rootKinds[0] = ROK_PLAYERAI;
     g_rootObjects[0] = rebuilt;
     g_rootKinds[1] = ROK_FIXTURESEEN;

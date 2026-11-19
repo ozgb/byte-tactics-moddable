@@ -30,7 +30,7 @@ public:
 
 #include "../network/packet_manager.h"
 
-#include "../units/cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../game/mission_conditions.h"
 
@@ -2578,7 +2578,7 @@ int HandleNetPackets()
             UnitScriptCallRecv* call = (UnitScriptCallRecv*)packet;
             Unit* unit = UnitAt(call->id);
             if (unit->flags & 0x10000000)
-                ((CobScript*)unit->script.get())->StartScriptWithArgsByIndex(call->index, 0, 0, call->argCount,
+                g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)unit->script.get(), call->index, 0, 0, call->argCount,
                                              call->arg0, call->arg1, call->arg2, call->arg3);
             break;
         }
@@ -2837,7 +2837,7 @@ void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
 {
     UnitScriptCallPacket packet;
-    int index = ((CobScript *)obj->script.get())->FindScript(name);
+    int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
@@ -2875,7 +2875,7 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
 {
     UnitScriptCallPacket packet;
-    short index = ((CobScript *)obj->script.get())->FindScript(name);
+    short index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), name);
     if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
@@ -2912,7 +2912,7 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
 #include "../weapons/unit_weapon_slot.h"
 #include "../weapons/projectile.h"
 #include "wire_packets.h"
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #pragma pack(push, 1)
 struct ActivateFlagsPacket {
@@ -3105,11 +3105,11 @@ void __stdcall NetSendUnitStates(Player* owner)
             continue;
         if (!u->motion)
             continue;
-        if (!u->motion->player->v7())
+        if (!g_seams.movement->GoalHasNetUnitState((PathGoal*)u->motion->player.get()))
             continue;
         stream.WriteBits(u->id - u->player->firstIndex, 0x10);
         stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
-        u->motion->player->WriteTo(&stream);
+        g_seams.movement->GoalSerializeNetUnitState((PathGoal*)u->motion->player.get(), &stream);
         if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
             break;
     }

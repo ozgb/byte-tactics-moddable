@@ -5,7 +5,7 @@
 #include "replay_objects.h"
 #include "replay_values.h"
 #include "../game/victory_conditions.h"
-#include "../units/cob_types.h"
+#include "../scripts/cob_types.h"
 
 class ReplayThunkUnitScanVisitor : public UnitScanVisitor {
 public:

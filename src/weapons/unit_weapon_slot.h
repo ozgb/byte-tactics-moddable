@@ -1,7 +1,7 @@
 #ifndef UNIT_WEAPON_SLOT_H
 #define UNIT_WEAPON_SLOT_H
 
-#include "../units/weapon_aim_cob_cb.h"
+#include "weapon_aim_cob_cb.h"
 #include "../../interfaces/ref.h"
 
 struct WeaponDef;

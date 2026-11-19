@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v29` is the fixed target for anyone writing a new
+The git tag `reference-traces-v30` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v29`**.
+code as a base. This page names the current tag: **`reference-traces-v30`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v29`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v29
+git checkout reference-traces-v30
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -131,7 +131,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v29
+git checkout reference-traces-v30
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -203,9 +203,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v30`
+the digests that should become a target gets a new tag (`reference-traces-v31`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v29`.
+`reference-traces-v30`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.

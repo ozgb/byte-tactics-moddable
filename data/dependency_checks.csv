@@ -7,6 +7,8 @@ los_radar,ai,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g1,89,equal,88
 los_radar,economy,Unit::workTime,players,g1,89,equal,88,0,0
 los_radar,pathfinding,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g3,89,equal,88,0,1688
 los_radar,players,bits_142f1,tail,g1,89,equal,88,0,0
+movement,orders,Order::subFlags,projectiles,g9,89,equal,88,0,0
+movement,units,PathOrder::pos_z,units,g9,89,equal,88,0,0
 orders,ai,Unit::group,units,g3,89,equal,88,0,1688
 orders,features,Unit::metal,units,g1,88,equal,87,0,0
 orders,los_radar,Order::pos,units,g1,89,equal,88,0,0
@@ -30,8 +32,10 @@ units,players,Unit::yFraction,units,g1,89,equal,88,0,0
 units,targeting,Unit::activateFlags,players,g2,89,equal,88,0,0
 units,targeting,Unit::activateFlags,units,g2,89,equal,88,0,0
 units,weapons,FeatureAnimEntry::bytes_10,units,g3,89,equal,88,0,1688
+units,weapons,Unit::weapon2AimCob,units,g9,89,equal,88,0,0
 units,weapons,Vec3::x,projectiles,g7,89,equal,88,0,0
 weapons,ai,Unit::lastDamageType,features,g1,89,equal,88,0,0
 weapons,orders,Unit::attacker,units,g3,89,equal,88,0,1688
 weapons,orders,Unit::field_1e,units,g3,89,equal,88,0,1688
 weapons,orders,Unit::lastDamageType,units,g3,89,equal,88,0,1688
+weapons,units,Unit::lastDamageType,features,g9,89,equal,88,0,0

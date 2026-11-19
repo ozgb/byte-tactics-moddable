@@ -181,6 +181,7 @@ static inline int Selectable(UnitCursorView* t) {
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
 
+// FUNCTION: 0x43e490
 int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCursorView* target,
                            FixedPosView* pos) {
     UnitDef* def;

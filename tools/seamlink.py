@@ -161,14 +161,14 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from objread import parse
+import coupling
 from aliases import definition_aliases
 from sources import ROOT, base_name
 
 SUBSYSTEMS = "data/subsystems.csv"
 EXCEPTIONS = "data/seam_exceptions.csv"
 COLUMNS = ["subsystem", "function", "symbol", "reason"]
-SIMULATION = ("wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar",
-              "orders", "units", "players", "map")
+SIMULATION = tuple(coupling.SIM_SUBSYSTEMS)
 STATE_DIR = "src/state/"
 LIBRARY_FILE = "src/util/operator_new.cpp"
 GAME_POINTER = "g_game"

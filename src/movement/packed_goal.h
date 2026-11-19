@@ -2,8 +2,8 @@
 #define PACKED_GOAL_H
 
 #include "goal_owner.h"
-#include "../ai/ai_search_goal.h"
-#include "../orders/order_fx.h"
+#include "ai_search_goal.h"
+#include "order_fx.h"
 
 #pragma pack(push, 1)
 class PackedGoal : public PathGoal {

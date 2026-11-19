@@ -2,7 +2,7 @@
 #define PATH_ORDER_H
 
 #include "order_fx.h"
-#include "path_order_attach.h"
+#include "../units/path_order_attach.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 

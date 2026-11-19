@@ -19,7 +19,7 @@ AiSearchGoal::SetWaypoints,ApproachRadius::ContainsUnit,"ContainsUnit is slot 4 
 AiSearchGoal::SetWaypoints,OrderFx::ContainsUnit,"ContainsUnit is slot 4 of the OrderFx family, src/data/vtables.cpp"
 AiSearchGoal::SetWaypoints,PathOrder::IsComplete,"ContainsUnit is slot 4 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 AiSearchGoal::SetWaypoints,RingApproach::ContainsUnit,"ContainsUnit is slot 4 of the OrderFx family, g_ringApproachVtable (src/data/vtables.cpp)"
-AiSearchGoal::TickTowardGoal,AiSearchGoal::SetPathOrder,"SetPathOrder(0) on this, AiSearchGoal has no subclass, src/orders/order_targets.cpp"
+AiSearchGoal::TickTowardGoal,AiSearchGoal::SetPathOrder,"SetPathOrder(0) on this, AiSearchGoal has no subclass, src/movement/order_targets.cpp"
 AiSearchGoal::TickTowardGoal,AirManeuverOrder::IsComplete,"target->ContainsUnit, slot 4 of the OrderFx family, g_airManeuverOrderVtable (src/data/vtables.cpp)"
 AiSearchGoal::TickTowardGoal,AirManeuverOrder::KeepAfterComplete,"target->KeepAfterComplete, slot 11 of the OrderFx family, g_airManeuverOrderVtable (src/data/vtables.cpp)"
 AiSearchGoal::TickTowardGoal,ApproachRadius::ContainsUnit,"target->ContainsUnit, slot 4 of the OrderFx family, g_approachRadiusVtable (src/data/vtables.cpp)"
@@ -28,7 +28,7 @@ AiSearchGoal::TickTowardGoal,PathOrder::IsComplete,"target->ContainsUnit, slot 4
 AiSearchGoal::TickTowardGoal,OrderFx::KeepAfterComplete,"target->KeepAfterComplete, slot 11 of the OrderFx family, src/data/vtables.cpp"
 AiSearchGoal::TickTowardGoal,PathOrder::KeepAfterComplete,"target->KeepAfterComplete, slot 11 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 AiSearchGoal::TickTowardGoal,RingApproach::ContainsUnit,"target->ContainsUnit, slot 4 of the OrderFx family, g_ringApproachVtable (src/data/vtables.cpp)"
-AirManeuverOrder::AirManeuverOrder,LoadUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::LoadUnit, AirManeuverOrder::AirManeuverOrder (src/orders/order_targets.cpp), src/seams/native.cpp"
+AirManeuverOrder::AirManeuverOrder,LoadUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::LoadUnit, AirManeuverOrder::AirManeuverOrder (src/movement/order_targets.cpp), src/seams/native.cpp"
 AirStrikeOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, AirStrikeOrder (src/orders/vtol_orders.cpp), src/seams/native.cpp"
 AirStrikeOrder,ReleaseWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ReleaseWeapons, AirStrikeOrder (src/orders/vtol_orders.cpp), src/seams/native.cpp"
 AirToAirOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, AirToAirOrder (src/orders/vtol_orders.cpp), src/seams/native.cpp"
@@ -209,8 +209,8 @@ DrawParticleList,ThrustParticles::Render,"Slot2 is Render, slot 2 of ParticleSys
 DrawParticleList,TimedSubParticles::Render,"Slot2 is Render, slot 2 of ParticleSystem; the lists hold the particle systems made by the Emit functions, TimedSubParticles::Render (src/graphics/particles.cpp)"
 DrawParticleList,WakeParticles::Render,"Slot2 is Render, slot 2 of ParticleSystem; the lists hold the particle systems made by the Emit functions, WakeParticles::Render (src/graphics/particles.cpp)"
 DrawProjectiles,IsPointVisible,"seam slot filled by InstallNativeSeams, AiSeam::IsPointVisible, DrawProjectiles (src/weapons/weapons.cpp), src/seams/native.cpp"
-DrawSelectedGoal,AiSearchGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/orders/order_targets.cpp"
-DrawSelectedGoal,PathGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/orders/order_targets.cpp"
+DrawSelectedGoal,AiSearchGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/movement/order_targets.cpp"
+DrawSelectedGoal,PathGoal::DrawOnSurface,"Method_28 is slot 10 (DrawOnSurface) of the PathGoal family, src/movement/order_targets.cpp"
 DumpPlayerAI,GetNameSlotNative,"seam slot filled by InstallNativeSeams, MapSeam::GetNameSlot, DumpPlayerAI (src/ai/ai_player.cpp), src/seams/native.cpp"
 EmitBlackSmoke,SmokeParticles::Init,"new SmokeParticles, no subclass, EmitBlackSmoke (src/graphics/particles.cpp)"
 EmitBubbles,WakeParticles::Init,"new WakeParticles, no subclass, EmitBubbles (src/graphics/particles.cpp)"
@@ -501,7 +501,7 @@ LiteGoal::SerializeNetUnitState,PathOrder::GetType,"target->GetType, slot 2 of t
 LiteGoal::SerializeNetUnitState,PathOrder::SerializeToBits,"target->SerializeToBits, slot 10 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 LiteGoal::SerializeNetUnitState,PointMarker::GetType,"target->GetType, slot 2 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 LiteGoal::SerializeNetUnitState,RingApproach::GetType,"target->GetType, slot 2 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
-LiteGoal::SetPathOrder,PathGoal::SetPathOrder,"qualified call of the base method, LiteGoal::SetPathOrder (src/game/victory.cpp)"
+LiteGoal::SetPathOrder,PathGoal::SetPathOrder,"qualified call of the base method, LiteGoal::SetPathOrder (src/movement/packed_goal.cpp)"
 LoadBattleAssets,AllocWeaponArray,"seam slot filled by InstallNativeSeams, WeaponsSeam::AllocWeaponArray, LoadBattleAssets (src/game/game_state.cpp), src/seams/native.cpp"
 LoadBattleAssets,AllocateUnitMemory,"seam slot filled by InstallNativeSeams, UnitsSeam::AllocateUnitMemory, LoadBattleAssets (src/game/game_state.cpp), src/seams/native.cpp"
 LoadBattleAssets,BuildAllPassMaps,"seam slot filled by InstallNativeSeams, MapSeam::BuildAllPassMaps, LoadBattleAssets (src/game/game_state.cpp), src/seams/native.cpp"
@@ -660,37 +660,37 @@ OpenSpeedOptions,HandleVideoModeSlider,"Gadget::sliderCallback assigned in menu 
 OpenSpeedOptions,UpdateEnergyReadout,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"
 OpenSpeedOptions,UpdateMetalReadout,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"
 OpenSpeedOptions,UpdateUnitSliders,"Gadget::sliderCallback assigned in menu code, see the HandleButtonInput edges; UpdateUnitSliders is passed at src/frontend/multi.cpp"
-Order::AttachApproachRadiusGoal,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachApproachRadiusGoal,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachApproachRadiusGoal,AirManeuverOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachApproachRadiusGoal,ApproachRadius::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachApproachRadiusGoal,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachApproachRadiusGoal,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachApproachRadiusGoal,OrderFx::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachApproachRadiusGoal,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachApproachRadiusGoal,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachApproachRadiusGoal,PathOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachApproachRadiusGoal,PointMarker::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachApproachRadiusGoal,RingApproach::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachBuildFootprintMarker,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachBuildFootprintMarker,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachBuildFootprintMarker,AirManeuverOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachBuildFootprintMarker,ApproachRadius::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachBuildFootprintMarker,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachBuildFootprintMarker,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachBuildFootprintMarker,OrderFx::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachBuildFootprintMarker,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachBuildFootprintMarker,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachBuildFootprintMarker,PathOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachBuildFootprintMarker,PointMarker::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachBuildFootprintMarker,RingApproach::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachRingApproachGoal,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachRingApproachGoal,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachRingApproachGoal,AirManeuverOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachRingApproachGoal,ApproachRadius::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachRingApproachGoal,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachRingApproachGoal,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachRingApproachGoal,OrderFx::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::AttachRingApproachGoal,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::AttachRingApproachGoal,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::AttachRingApproachGoal,PathOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachRingApproachGoal,PointMarker::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::AttachRingApproachGoal,RingApproach::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::Order,LoadUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::LoadUnit, Order::Order (src/orders/order_queue.cpp), src/seams/native.cpp"
-Order::ReattachFxToUnit,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
-Order::ReattachFxToUnit,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
-Order::ReattachFxToUnit,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::ReattachFxToUnit,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
+Order::ReattachFxToUnit,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
+Order::ReattachFxToUnit,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::SerializeToSave,AirManeuverOrder::GetType,"target->GetType, slot 2 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 Order::SerializeToSave,AirManeuverOrder::SerializeToSave,"attached->SerializeToSave, slot 1 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 Order::SerializeToSave,ApproachRadius::GetType,"target->GetType, slot 2 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
@@ -703,17 +703,17 @@ Order::SerializeToSave,PointMarker::Serialize,"attached->SerializeToSave, slot 1
 Order::SerializeToSave,RingApproach::GetType,"target->GetType, slot 2 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 Order::SerializeToSave,RingApproach::Serialize,"attached->SerializeToSave, slot 1 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 Order::SerializeToSave,SerializeSave,"attached->SerializeToSave, slot 1 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
-Order::SetAttachedFx,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::SetAttachedFx,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::SetAttachedFx,AirManeuverOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::SetAttachedFx,ApproachRadius::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::SetAttachedFx,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::SetAttachedFx,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::SetAttachedFx,OrderFx::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
-Order::SetAttachedFx,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::SetAttachedFx,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::SetAttachedFx,PathOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::SetAttachedFx,PointMarker::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::SetAttachedFx,RingApproach::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::~Order,ActivateOrder,"order type table entry, src/orders/unit_orders.cpp"
-Order::~Order,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::~Order,AiSearchGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::~Order,AirManeuverOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::~Order,AirStrikeOrder,"order type table entry, g_vtolOrders (src/orders/unit_orders.cpp)"
 Order::~Order,AirToAirOrder,"order type table entry, g_vtolOrders (src/orders/unit_orders.cpp)"
@@ -739,14 +739,14 @@ Order::~Order,GroundPickupOrder,"order type table entry, src/orders/unit_orders.
 Order::~Order,GroundUnloadOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,GuardNoMoveOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,HelpBuildOrder,"order type table entry, src/orders/unit_orders.cpp"
-Order::~Order,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::~Order,LiteGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::~Order,MakeSelectableOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,MobileBuildOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,MoveGroundOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,OrderFx::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::~Order,ParalyzeOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,ParkOrder,"order type table entry, src/orders/unit_orders.cpp"
-Order::~Order,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/orders/order_list.cpp"
+Order::~Order,PathGoal::SetPathOrder,"Slot_0043a1f0::Attach is slot 1 of the PathGoal family; Unit::motion->slot is the PathGoal of the UnitMotion (slot 1 is SetPathOrder), src/movement/motion.cpp"
 Order::~Order,PathOrder::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
 Order::~Order,PatrolOrder,"order type table entry, src/orders/unit_orders.cpp"
 Order::~Order,PointMarker::Destroy,"delete of an OrderFx, slot 0 (the destructor) of the OrderFx family, src/data/vtables.cpp"
@@ -799,9 +799,9 @@ PackedGoal::TickTowardGoal,ApproachRadius::ContainsUnit,"target->ContainsUnit, s
 PackedGoal::TickTowardGoal,ApproachRadius::FillWorldPos,"target->FillWorldPos, slot 8 of the OrderFx family, g_approachRadiusVtable (src/data/vtables.cpp)"
 PackedGoal::TickTowardGoal,OrderFx::ContainsUnit,"target->ContainsUnit, slot 4 of the OrderFx family, src/data/vtables.cpp"
 PackedGoal::TickTowardGoal,PathOrder::IsComplete,"target->ContainsUnit, slot 4 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
-PackedGoal::TickTowardGoal,LiteGoal::SetPathOrder,"SetPathOrder(0) on this, PackedGoal subclasses are LiteGoal and PackedPosGoal, LiteGoal::SetPathOrder (src/game/victory.cpp)"
+PackedGoal::TickTowardGoal,LiteGoal::SetPathOrder,"SetPathOrder(0) on this, PackedGoal subclasses are LiteGoal and PackedPosGoal, LiteGoal::SetPathOrder (src/movement/packed_goal.cpp)"
 PackedGoal::TickTowardGoal,OrderFx::KeepAfterComplete,"target->KeepAfterComplete, slot 11 of the OrderFx family, src/data/vtables.cpp"
-PackedGoal::TickTowardGoal,PathGoal::SetPathOrder,"SetPathOrder(0) on this, PackedGoal subclasses are LiteGoal and PackedPosGoal, LiteGoal::SetPathOrder (src/game/victory.cpp)"
+PackedGoal::TickTowardGoal,PathGoal::SetPathOrder,"SetPathOrder(0) on this, PackedGoal subclasses are LiteGoal and PackedPosGoal, LiteGoal::SetPathOrder (src/movement/packed_goal.cpp)"
 PackedGoal::TickTowardGoal,PathOrder::FillWorldPos,"target->FillWorldPos, slot 8 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 PackedGoal::TickTowardGoal,PathOrder::GetDesiredHeading,"target->GetDesiredHeading, slot 9 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
 PackedGoal::TickTowardGoal,PathOrder::KeepAfterComplete,"target->KeepAfterComplete, slot 11 of the OrderFx family, g_pathOrderVtable (src/data/vtables.cpp)"
@@ -825,12 +825,12 @@ ParalyzeOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, Weapon
 ParalyzeOrder,SetStateBitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::SetStateBits, ParalyzeOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 ParticleLists::AddToList,ParticleSystem::~ParticleSystem,"delete of a ParticleSystem, slot 0; the derived particle systems have implicit destructors that run ParticleSystem::~ParticleSystem, delete (src/graphics/particles.cpp)"
 ParticleLists::~ParticleLists,ParticleSystem::~ParticleSystem,"delete of a ParticleSystem, slot 0; the derived particle systems have implicit destructors that run ParticleSystem::~ParticleSystem, delete (src/graphics/particles.cpp)"
-PathOrder::Destroy,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, src/orders/order_targets.cpp, src/seams/native.cpp"
-PathOrder::FillWorldPos,GetPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPiecePosition, PathOrder::FillWorldPos (src/orders/order_targets.cpp), src/seams/native.cpp"
-PathOrder::PathOrder,LoadUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::LoadUnit, PathOrder::PathOrder (src/orders/order_targets.cpp), src/seams/native.cpp"
-PathOrder::PathOrder,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, src/orders/order_targets.cpp, src/seams/native.cpp"
-PathOrder::SerializeToSave,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, PathOrder::SerializeToSave (src/orders/order_targets.cpp), src/seams/native.cpp"
-PathOrder::SetAltitude,GetGroundHeightNative,"seam slot filled by InstallNativeSeams, UnitsSeam::GetGroundHeight, PathOrder::SetAltitude (src/orders/order_targets.cpp), src/seams/native.cpp"
+PathOrder::Destroy,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, src/movement/order_targets.cpp, src/seams/native.cpp"
+PathOrder::FillWorldPos,GetPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPiecePosition, PathOrder::FillWorldPos (src/movement/order_targets.cpp), src/seams/native.cpp"
+PathOrder::PathOrder,LoadUnit,"seam slot filled by InstallNativeSeams, UnitsSeam::LoadUnit, PathOrder::PathOrder (src/movement/order_targets.cpp), src/seams/native.cpp"
+PathOrder::PathOrder,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, src/movement/order_targets.cpp, src/seams/native.cpp"
+PathOrder::SerializeToSave,UnitRefUnlinkNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UnitRefUnlink, PathOrder::SerializeToSave (src/movement/order_targets.cpp), src/seams/native.cpp"
+PathOrder::SetAltitude,GetGroundHeightNative,"seam slot filled by InstallNativeSeams, UnitsSeam::GetGroundHeight, PathOrder::SetAltitude (src/movement/order_targets.cpp), src/seams/native.cpp"
 PatrolOrder,ReleaseWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ReleaseWeapons, PatrolOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 PickRandomReclaimableResourcesInRadius,GetCellFeature,"seam slot filled by InstallNativeSeams, FeaturesSeam::GetCellFeature, PickRandomReclaimableResourcesInRadius (src/map/terrain.cpp), src/seams/native.cpp"
 PickRandomReclaimableResourcesInRadius,GetMapCellAtPosition,"seam slot filled by InstallNativeSeams, LosRadarSeam::GetMapCellAtPosition, PickRandomReclaimableResourcesInRadius (src/map/terrain.cpp), src/seams/native.cpp"
@@ -1045,12 +1045,12 @@ SelfDestructOrder,DamageUnit,"seam slot filled by InstallNativeSeams, WeaponsSea
 SelfRepairOrder,AddRepairProgress,"seam slot filled by InstallNativeSeams, UnitsSeam::AddRepairProgress, SelfRepairOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 SelfRepairOrder,ClaimWeaponsNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::ClaimWeapons, SelfRepairOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
 SelfRepairOrder,GetNanoPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetNanoPiecePosition, SelfRepairOrder (src/orders/unit_orders.cpp), src/seams/native.cpp"
-NetSendUnitStates,AiSearchGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-NetSendUnitStates,AiSearchGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-NetSendUnitStates,LiteGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-NetSendUnitStates,LiteGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-NetSendUnitStates,PathGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
-NetSendUnitStates,PathGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/orders/order_targets.cpp"
+NetSendUnitStates,AiSearchGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
+NetSendUnitStates,AiSearchGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
+NetSendUnitStates,LiteGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
+NetSendUnitStates,LiteGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
+NetSendUnitStates,PathGoal::HasNetUnitState,"slot 7 HasNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
+NetSendUnitStates,PathGoal::SerializeNetUnitState,"slot 8 SerializeNetUnitState; PlayerData is the PathGoal family, src/movement/order_targets.cpp"
 SetupPlayerSlot,GetGameTypeNative,"seam slot filled by InstallNativeSeams, MapSeam::GetGameType, SetupPlayerSlot (src/game/players.cpp), src/seams/native.cpp"
 ShutdownGame,FreeOtaEnumCacheAndMission,"seam slot filled by InstallNativeSeams, MapSeam::FreeOtaEnumCacheAndMission, ShutdownGame (src/game/game_state.cpp), src/seams/native.cpp"
 ShutdownGame,FreeUnitInfo,"seam slot filled by InstallNativeSeams, UnitsSeam::FreeUnitInfo, ShutdownGame (src/game/game_state.cpp), src/seams/native.cpp"
@@ -1100,27 +1100,27 @@ UnitList::ForEach,VictoryKillAllMobileUnits::VisitUnit,"classes derived from Lis
 UnitList::ForEach,VictoryKillAllOfType::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
 UnitList::ForEach,VictoryUnitTypePassesX::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
 UnitList::ForEach,VictoryUnitTypePassesZ::VisitUnit,"classes derived from Listener_0048ff40 (int VisitUnit), src/game/victory.cpp"
-UnitMotion::DestroyObject,AiSearchGoal::~AiSearchGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::DestroyObject,PackedPosGoal::~PackedPosGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::DestroyObject,PathGoal::~PathGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SetFlightMode,SetStateBitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::SetStateBits, UnitMotion::SetFlightMode (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitMotion::SteerAircraft,PackedGoal::ExportGoalPose,v4 ExportGoalPose; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerAircraft,PathGoal::ExportGoalPose,v4 ExportGoalPose; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,AiSearchGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,AiSearchGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,PathGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,PathGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,PatrolGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::SteerGroundUnit,PatrolGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::UpdateMotion,AiSearchGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::UpdateMotion,LiteGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::UpdateMotion,PackedGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::UpdateMotion,PathGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::UpdateMotion,UpdateSfxOccupyNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UpdateSfxOccupy, UnitMotion::UpdateMotion (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitMotion::UpdateMoveRate,StartScriptNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScript, UnitMotion::UpdateMoveRate (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitMotion::UpdatePosition,GetPieceAngles,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPieceAngles, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitMotion::UpdatePosition,GetPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPiecePosition, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
-UnitMotion::UpdatePosition,SetUnitPosition,"seam slot filled by InstallNativeSeams, UnitsSeam::SetUnitPosition, UnitMotion::UpdatePosition (src/orders/order_list.cpp), src/seams/native.cpp"
+UnitMotion::DestroyObject,AiSearchGoal::~AiSearchGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::DestroyObject,PackedPosGoal::~PackedPosGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::DestroyObject,PathGoal::~PathGoal,v0 destructor; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SetFlightMode,SetStateBitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::SetStateBits, UnitMotion::SetFlightMode (src/movement/motion.cpp), src/seams/native.cpp"
+UnitMotion::SteerAircraft,PackedGoal::ExportGoalPose,v4 ExportGoalPose; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerAircraft,PathGoal::ExportGoalPose,v4 ExportGoalPose; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,AiSearchGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,AiSearchGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,PathGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,PathGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,PatrolGoal::FillWaypointWorldPos,v3 FillWaypointWorldPos; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::SteerGroundUnit,PatrolGoal::HasReadyWaypoints,v5 HasReadyWaypoints; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::UpdateMotion,AiSearchGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::UpdateMotion,LiteGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::UpdateMotion,PackedGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::UpdateMotion,PathGoal::TickTowardGoal,v2 TickTowardGoal; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::UpdateMotion,UpdateSfxOccupyNative,"seam slot filled by InstallNativeSeams, UnitsSeam::UpdateSfxOccupy, UnitMotion::UpdateMotion (src/movement/motion.cpp), src/seams/native.cpp"
+UnitMotion::UpdateMoveRate,StartScriptNative,"seam slot filled by InstallNativeSeams, UnitsSeam::StartScript, UnitMotion::UpdateMoveRate (src/movement/motion.cpp), src/seams/native.cpp"
+UnitMotion::UpdatePosition,GetPieceAngles,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPieceAngles, UnitMotion::UpdatePosition (src/movement/motion.cpp), src/seams/native.cpp"
+UnitMotion::UpdatePosition,GetPiecePosition,"seam slot filled by InstallNativeSeams, UnitsSeam::GetPiecePosition, UnitMotion::UpdatePosition (src/movement/motion.cpp), src/seams/native.cpp"
+UnitMotion::UpdatePosition,SetUnitPosition,"seam slot filled by InstallNativeSeams, UnitsSeam::SetUnitPosition, UnitMotion::UpdatePosition (src/movement/motion.cpp), src/seams/native.cpp"
 UnitRef::ClearRef,OrderOrStatusFlagsNative,"seam slot filled by InstallNativeSeams, OrdersSeam::OrderOrStatusFlags, UnitRef::ClearRef (src/units/unit_targets.cpp), src/seams/native.cpp"
 UnitRef::Unlink,PathOrderAttach::~PathOrderAttach,"qualified call of the destructor, UnitRef::Unlink (src/units/unit_targets.cpp)"
 UnitScript::EmitSfx,IsUnitVisibleToPlayer,"seam slot filled by InstallNativeSeams, LosRadarSeam::IsUnitVisibleToPlayer, UnitScript::EmitSfx (src/units/unit_script.cpp), src/seams/native.cpp"
@@ -1326,13 +1326,13 @@ MissionHolder::MissionHolder,MissionTypeFromNameNative,"seam slot filled by Inst
 ParalyzeUnit,MissionTypeFromNameNative,"seam slot filled by InstallNativeSeams, OrdersSeam::MissionTypeFromName, ParalyzeUnit (src/units/unit_targets.cpp), src/seams/native.cpp"
 ApplyUnitDamage,NewOrderNative,"seam slot filled by InstallNativeSeams, OrdersSeam::NewOrder, ApplyUnitDamage (src/units/unit_targets.cpp), src/seams/native.cpp"
 ParalyzeUnit,NewOrderNative,"seam slot filled by InstallNativeSeams, OrdersSeam::NewOrder, ParalyzeUnit (src/units/unit_targets.cpp), src/seams/native.cpp"
-UnitMotion::ClaimRepath,AiSearchGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::ClaimRepath,PathGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
+UnitMotion::ClaimRepath,AiSearchGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::ClaimRepath,PathGoal::TryClaimRepath,v6 TryClaimRepath; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
 OrderOrStatusFlagsNative,Order::OrStatusFlags,"slot 0 of Order; listener is the Order stored by Order constructor, src/orders/order_list.cpp"
 UnitMotionReadNetStateNative,UnitMotion::ReadNetState,"direct call of the method the slot holds, src/seams/native.cpp"
-UnitMotion::ReadNetState,PackedPosGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::ReadNetState,PathGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
-UnitMotion::ReadNetState,PatrolGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/orders/order_list.cpp
+UnitMotion::ReadNetState,PackedPosGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::ReadNetState,PathGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
+UnitMotion::ReadNetState,PatrolGoal::DeserializeNetUnitState,v9 DeserializeNetUnitState; UnitMotion obj is a PathGoal subclass chosen at src/movement/motion.cpp
 CobScript::RunThread,WeaponAimCobCompleteNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponAimCobComplete, CobScript::RunThread (src/units/cob.cpp), src/seams/native.cpp"
 CobScript::StartScriptWithArgsByIndex,WeaponAimCobCompleteNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponAimCobComplete, CobScript::StartScriptWithArgsByIndex (src/units/cob.cpp), src/seams/native.cpp"
 CobScript::RunThread,CobScriptExplodePieceNative,"seam slot filled by InstallNativeSeams, WeaponsSeam::CobScriptExplodePiece, CobScript::RunThread (src/units/cob.cpp), src/seams/native.cpp"
@@ -1348,9 +1348,9 @@ RefreshPassMapsForUnit,PathfindingCellsChanged,"seam slot filled by InstallNativ
 RefreshPassMapsForUnit,HpaCellsChanged,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::CellsChanged, RefreshPassMapsForUnit (src/units/movement_class.cpp), src/ai/pathfind_hpa.cpp"
 CmdSearch,PathfindingSetBaseScale,"seam slot filled by InstallNativeSeams, PathfindingSeam::SetSearchScale, CmdSearch (src/game/console_commands.cpp), src/seams/native.cpp"
 DrawMapDebugOverlay,PathfindingDebugCell,"seam slot filled by InstallNativeSeams, PathfindingSeam::DebugCell, DrawMapDebugOverlay (src/game/console_commands.cpp), src/seams/native.cpp"
-SubmitRepath,PathfindingSubmit,"seam slot filled by InstallNativeSeams, PathfindingSeam::Submit, SubmitRepath (src/orders/order_targets.cpp), src/seams/native.cpp"
-AiSearchGoal::SetPathOrder,PathfindingCancel,"seam slot filled by InstallNativeSeams, PathfindingSeam::Cancel, AiSearchGoal::SetPathOrder (src/orders/order_targets.cpp), src/seams/native.cpp"
-AiSearchGoal::~AiSearchGoal,PathfindingCancel,"seam slot filled by InstallNativeSeams, PathfindingSeam::Cancel, AiSearchGoal::~AiSearchGoal (src/orders/order_targets.cpp), src/seams/native.cpp"
+SubmitRepath,PathfindingSubmit,"seam slot filled by InstallNativeSeams, PathfindingSeam::Submit, SubmitRepath (src/movement/order_targets.cpp), src/seams/native.cpp"
+AiSearchGoal::SetPathOrder,PathfindingCancel,"seam slot filled by InstallNativeSeams, PathfindingSeam::Cancel, AiSearchGoal::SetPathOrder (src/movement/order_targets.cpp), src/seams/native.cpp"
+AiSearchGoal::~AiSearchGoal,PathfindingCancel,"seam slot filled by InstallNativeSeams, PathfindingSeam::Cancel, AiSearchGoal::~AiSearchGoal (src/movement/order_targets.cpp), src/seams/native.cpp"
 LoadBattleAssets,PathfindingInit,"seam slot filled by InstallNativeSeams, PathfindingSeam::Init, LoadBattleAssets (src/game/game_state.cpp), src/seams/native.cpp"
 ShutdownIngameSystems,PathfindingShutdown,"seam slot filled by InstallNativeSeams, PathfindingSeam::Shutdown, ShutdownIngameSystems (src/game/game_state.cpp), src/seams/native.cpp"
 Pathfinder::GetCellState,WorldInBounds,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::InBounds, Pathfinder::GetCellState (src/ai/pathfind.cpp)"
@@ -1373,9 +1373,9 @@ WorldInBounds,MovementClassInBoundsNative,"seam slot filled by InstallNativeSeam
 WorldPass,MovementClassGetNative,"seam slot filled by InstallNativeSeams, UnitsSeam::MovementClassGet, WorldPass (src/seams/pathfinding_world.cpp), src/seams/native.cpp"
 WorldBeginSearch,RefreshMovedUnitsNative,"seam slot filled by InstallNativeSeams, UnitsSeam::RefreshMovedUnits, WorldBeginSearch (src/seams/pathfinding_world.cpp), src/seams/native.cpp"
 WorldEndSearch,RefreshUnitIfStaleNative,"seam slot filled by InstallNativeSeams, UnitsSeam::RefreshUnitIfStale, WorldEndSearch (src/seams/pathfinding_world.cpp), src/seams/native.cpp"
-SubmitRepath,HpaSubmit,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Submit, SubmitRepath (src/orders/order_targets.cpp), src/ai/pathfind_hpa.cpp"
-AiSearchGoal::SetPathOrder,HpaCancel,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Cancel, AiSearchGoal::SetPathOrder (src/orders/order_targets.cpp), src/ai/pathfind_hpa.cpp"
-AiSearchGoal::~AiSearchGoal,HpaCancel,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Cancel, AiSearchGoal::~AiSearchGoal (src/orders/order_targets.cpp), src/ai/pathfind_hpa.cpp"
+SubmitRepath,HpaSubmit,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Submit, SubmitRepath (src/movement/order_targets.cpp), src/ai/pathfind_hpa.cpp"
+AiSearchGoal::SetPathOrder,HpaCancel,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Cancel, AiSearchGoal::SetPathOrder (src/movement/order_targets.cpp), src/ai/pathfind_hpa.cpp"
+AiSearchGoal::~AiSearchGoal,HpaCancel,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Cancel, AiSearchGoal::~AiSearchGoal (src/movement/order_targets.cpp), src/ai/pathfind_hpa.cpp"
 LoadBattleAssets,HpaInit,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Init, LoadBattleAssets (src/game/game_state.cpp), src/ai/pathfind_hpa.cpp"
 ShutdownIngameSystems,HpaShutdown,"seam slot filled by PathfindingHpaSeam, PathfindingSeam::Shutdown, ShutdownIngameSystems (src/game/game_state.cpp), src/ai/pathfind_hpa.cpp"
 CellExtra,WorldInBounds,"slot of the PathWorldView table filled by NativePathWorld (src/seams/pathfinding_world.cpp), PathWorldView::InBounds, CellExtra (src/ai/pathfind_hpa.cpp)"

@@ -91,7 +91,7 @@ call 25750 GetWeaponTargetPos
   r Unit#773.motion null
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -134,7 +134,7 @@ call 25750 GetWeaponTargetPos
 call 25750 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -171,7 +171,7 @@ call 25750 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -6
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182841,14571216,123667352)
   o pos.x 167182841
   o pos.y 14571216
@@ -287,7 +287,7 @@ call 25750 GetWeaponTargetPos
   r UnitMotion#12.velocityZ 0
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -368,7 +368,7 @@ call 25750 GetWeaponTargetPos
   r UnitMotion#14.velocityZ 0
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -381,7 +381,7 @@ call 25750 GetWeaponTargetUnit
 call 25750 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184079574,2082812,93695254)
   o pos.x 184079574
   o pos.y 2082812
@@ -411,7 +411,7 @@ call 25750 GetWeaponTargetPos
   r UnitMotion#15.velocityZ 0
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184079574,2082812,93695254)
   o pos.x 184079574
   o pos.y 2082812
@@ -865,7 +865,7 @@ call 25750 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -88344
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116485665,1369399,216868658)
   o pos.x 116485665
   o pos.y 1369399
@@ -977,7 +977,7 @@ call 25750 GetWeaponTargetPos
   r weapondef#50.speed 371370
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161023617,1823676,216103371)
   o pos.x 161023617
   o pos.y 1823676
@@ -1283,7 +1283,7 @@ call 25750 GetWeaponTargetPos
   r weapondef#85.speed 873813
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -1458,7 +1458,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -1471,7 +1471,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -1482,7 +1482,7 @@ call 25751 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -5
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182848,14571216,123667347)
   o pos.x 167182848
   o pos.y 14571216
@@ -1507,7 +1507,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -1524,7 +1524,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -1537,7 +1537,7 @@ call 25751 GetWeaponTargetUnit
 call 25751 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184073125,2082881,93687062)
   o pos.x 184073125
   o pos.y 2082881
@@ -1546,7 +1546,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184073125,2082881,93687062)
   o pos.x 184073125
   o pos.y 2082881
@@ -1627,7 +1627,7 @@ call 25751 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -90348
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116446859,1369399,216778463)
   o pos.x 116446859
   o pos.y 1369399
@@ -1660,7 +1660,7 @@ call 25751 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -74215
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161075985,1823676,216051003)
   o pos.x 161075985
   o pos.y 1823676
@@ -1703,7 +1703,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174159258,1716696,90816498)
   o pos.x 174159258
   o pos.y 1716696
@@ -1741,7 +1741,7 @@ call 25751 GetWeaponTargetPos
 call 25751 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -1797,7 +1797,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -1810,7 +1810,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -1820,7 +1820,7 @@ call 25752 GetWeaponTargetPos
   r UnitMotion#7.velocityX 6
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182854,14571216,123667342)
   o pos.x 167182854
   o pos.y 14571216
@@ -1845,7 +1845,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -1862,7 +1862,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -1875,7 +1875,7 @@ call 25752 GetWeaponTargetUnit
 call 25752 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184093194,2082609,93715128)
   o pos.x 184093194
   o pos.y 2082609
@@ -1884,7 +1884,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184093194,2082609,93715128)
   o pos.x 184093194
   o pos.y 2082609
@@ -1971,7 +1971,7 @@ call 25752 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -92148
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116412548,1369399,216686471)
   o pos.x 116412548
   o pos.y 1369399
@@ -2006,7 +2006,7 @@ call 25752 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -73097
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161106591,1806092,215976739)
   o pos.x 161106591
   o pos.y 1806092
@@ -2049,7 +2049,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174159258,1716696,90816498)
   o pos.x 174159258
   o pos.y 1716696
@@ -2086,7 +2086,7 @@ call 25752 GetWeaponTargetPos
 call 25752 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -2184,7 +2184,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -2197,7 +2197,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -2208,7 +2208,7 @@ call 25753 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -4
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182859,14571216,123667338)
   o pos.x 167182859
   o pos.y 14571216
@@ -2233,7 +2233,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -2250,7 +2250,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -2263,7 +2263,7 @@ call 25753 GetWeaponTargetUnit
 call 25753 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -2273,7 +2273,7 @@ call 25753 GetWeaponTargetPos
   r Unit#44.weapon0Flags 2
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -2358,7 +2358,7 @@ call 25753 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -93708
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116382805,1369399,216592923)
   o pos.x 116382805
   o pos.y 1369399
@@ -2391,7 +2391,7 @@ call 25753 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -73099
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161158959,1806092,215924371)
   o pos.x 161158959
   o pos.y 1806092
@@ -2434,7 +2434,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -2471,7 +2471,7 @@ call 25753 GetWeaponTargetPos
 call 25753 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -2675,7 +2675,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -2688,7 +2688,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -2698,7 +2698,7 @@ call 25754 GetWeaponTargetPos
   r UnitMotion#7.velocityX 4
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182863,14571216,123667334)
   o pos.x 167182863
   o pos.y 14571216
@@ -2723,7 +2723,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -2740,7 +2740,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -2753,7 +2753,7 @@ call 25754 GetWeaponTargetUnit
 call 25754 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -2763,7 +2763,7 @@ call 25754 GetWeaponTargetPos
   r Unit#44.weapon0Flags 3
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -2848,7 +2848,7 @@ call 25754 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -95052
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116357702,1369399,216498032)
   o pos.x 116357702
   o pos.y 1369399
@@ -2881,7 +2881,7 @@ call 25754 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -72542
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161211327,1806092,215872003)
   o pos.x 161211327
   o pos.y 1806092
@@ -2920,7 +2920,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -2957,7 +2957,7 @@ call 25754 GetWeaponTargetPos
 call 25754 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -3322,7 +3322,7 @@ call 25755 GetWeaponTargetPos
 call 25755 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -3335,7 +3335,7 @@ call 25755 GetWeaponTargetPos
 call 25755 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -3346,7 +3346,7 @@ call 25755 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -3
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182866,14571216,123667331)
   o pos.x 167182866
   o pos.y 14571216
@@ -3371,7 +3371,7 @@ call 25755 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -130073
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (180226455,17441044,103711884)
   o pos.x 170502831
   o pos.y 20246762
@@ -3385,7 +3385,7 @@ call 25755 GetWeaponTargetUnit
 call 25755 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -3402,7 +3402,7 @@ call 25755 GetWeaponTargetPos
 call 25755 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -3415,7 +3415,7 @@ call 25755 GetWeaponTargetUnit
 call 25755 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -3424,7 +3424,7 @@ call 25755 GetWeaponTargetPos
 call 25755 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105134,2082335,93736812)
   o pos.x 184105134
   o pos.y 2082335
@@ -3507,7 +3507,7 @@ call 25755 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -96168
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116337299,1369399,216402029)
   o pos.x 116337299
   o pos.y 1369399
@@ -3540,7 +3540,7 @@ call 25755 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -75055
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161242966,1785883,215798778)
   o pos.x 161242966
   o pos.y 1785883
@@ -3641,7 +3641,7 @@ call 25755 GetWeaponTargetPos
 call 25755 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -3984,7 +3984,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -3997,7 +3997,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -4006,7 +4006,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182869,14571216,123667328)
   o pos.x 167182869
   o pos.y 14571216
@@ -4030,7 +4030,7 @@ call 25756 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -121980
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (179837372,17563765,103589906)
   o pos.x 170757713
   o pos.y 20194833
@@ -4043,7 +4043,7 @@ call 25756 GetWeaponTargetUnit
 call 25756 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -4060,7 +4060,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -4073,7 +4073,7 @@ call 25756 GetWeaponTargetUnit
 call 25756 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100547,2082455,93727850)
   o pos.x 184100547
   o pos.y 2082455
@@ -4082,7 +4082,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100547,2082455,93727850)
   o pos.x 184100547
   o pos.y 2082455
@@ -4167,7 +4167,7 @@ call 25756 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -97056
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116321656,1369399,216305138)
   o pos.x 116321656
   o pos.y 1369399
@@ -4198,7 +4198,7 @@ call 25756 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -77982
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161295334,1785883,215746410)
   o pos.x 161295334
   o pos.y 1785883
@@ -4302,7 +4302,7 @@ call 25756 GetWeaponTargetPos
 call 25756 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -4323,7 +4323,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -4336,7 +4336,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -4345,7 +4345,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182872,14571216,123667325)
   o pos.x 167182872
   o pos.y 14571216
@@ -4369,7 +4369,7 @@ call 25757 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -113868
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (179474164,17679084,103476040)
   o pos.x 171028257
   o pos.y 20138474
@@ -4382,7 +4382,7 @@ call 25757 GetWeaponTargetUnit
 call 25757 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -4399,7 +4399,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -4412,7 +4412,7 @@ call 25757 GetWeaponTargetUnit
 call 25757 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095543,2082564,93719005)
   o pos.x 184095543
   o pos.y 2082564
@@ -4425,7 +4425,7 @@ call 25757 GetWeaponTargetUnit
 call 25757 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095543,2082564,93719005)
   o pos.x 184095543
   o pos.y 2082564
@@ -4510,7 +4510,7 @@ call 25757 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -97704
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116310797,1369399,216207601)
   o pos.x 116310797
   o pos.y 1369399
@@ -4543,7 +4543,7 @@ call 25757 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -80331
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161347702,1785883,215694042)
   o pos.x 161347702
   o pos.y 1785883
@@ -4586,7 +4586,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -4628,7 +4628,7 @@ call 25757 GetWeaponTargetPos
 call 25757 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -4649,7 +4649,7 @@ call 25758 GetWeaponTargetPos
 call 25758 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -4662,7 +4662,7 @@ call 25758 GetWeaponTargetPos
 call 25758 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -4673,7 +4673,7 @@ call 25758 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -2
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182874,14571216,123667323)
   o pos.x 167182874
   o pos.y 14571216
@@ -4697,7 +4697,7 @@ call 25758 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -105736
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (179136896,17786907,103370306)
   o pos.x 171316759
   o pos.y 20076936
@@ -4710,7 +4710,7 @@ call 25758 GetWeaponTargetUnit
 call 25758 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -4728,7 +4728,7 @@ call 25758 GetWeaponTargetPos
   r Unit#42.weapon1Flags 22
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -4741,7 +4741,7 @@ call 25758 GetWeaponTargetUnit
 call 25758 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -4750,7 +4750,7 @@ call 25758 GetWeaponTargetPos
 call 25758 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -4881,7 +4881,7 @@ call 25758 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -98124
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116304758,1369399,216109645)
   o pos.x 116304758
   o pos.y 1369399
@@ -4914,7 +4914,7 @@ call 25758 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -83008
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161396831,1768120,215638416)
   o pos.x 161396831
   o pos.y 1768120
@@ -4957,7 +4957,7 @@ call 25758 GetWeaponTargetPos
 call 25758 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -4994,7 +4994,7 @@ call 25758 GetWeaponTargetPos
 call 25758 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -5037,7 +5037,7 @@ call 25759 GetWeaponTargetPos
 call 25759 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5050,7 +5050,7 @@ call 25759 GetWeaponTargetPos
 call 25759 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -5059,7 +5059,7 @@ call 25759 GetWeaponTargetPos
 call 25759 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182876,14571216,123667321)
   o pos.x 167182876
   o pos.y 14571216
@@ -5083,7 +5083,7 @@ call 25759 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -97579
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (178825645,17887299,103272729)
   o pos.x 171625301
   o pos.y 20009749
@@ -5096,7 +5096,7 @@ call 25759 GetWeaponTargetUnit
 call 25759 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -5114,7 +5114,7 @@ call 25759 GetWeaponTargetPos
   r Unit#42.weapon1Flags 23
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5127,7 +5127,7 @@ call 25759 GetWeaponTargetUnit
 call 25759 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -5136,7 +5136,7 @@ call 25759 GetWeaponTargetPos
 call 25759 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -5221,7 +5221,7 @@ call 25759 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -98292
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116304666,1369399,216011522)
   o pos.x 116304666
   o pos.y 1369399
@@ -5254,7 +5254,7 @@ call 25759 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -85162
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161449199,1768120,215586048)
   o pos.x 161449199
   o pos.y 1768120
@@ -5359,7 +5359,7 @@ call 25759 GetWeaponTargetPos
 call 25759 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -5402,7 +5402,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5415,7 +5415,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -5424,7 +5424,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182878,14571216,123667319)
   o pos.x 167182878
   o pos.y 14571216
@@ -5448,7 +5448,7 @@ call 25760 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -89394
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (178540502,17980239,103183337)
   o pos.x 171955881
   o pos.y 19936414
@@ -5461,7 +5461,7 @@ call 25760 GetWeaponTargetUnit
 call 25760 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -5482,7 +5482,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5495,7 +5495,7 @@ call 25760 GetWeaponTargetUnit
 call 25760 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100600,2082453,93727948)
   o pos.x 184100600
   o pos.y 2082453
@@ -5504,7 +5504,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100600,2082453,93727948)
   o pos.x 184100600
   o pos.y 2082453
@@ -5587,7 +5587,7 @@ call 25760 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -49116
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116307166,1369399,216006778)
   o pos.x 116307166
   o pos.y 1369399
@@ -5620,7 +5620,7 @@ call 25760 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -87556
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161514339,1789070,215546530)
   o pos.x 161514339
   o pos.y 1789070
@@ -5724,7 +5724,7 @@ call 25760 GetWeaponTargetPos
 call 25760 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -5745,7 +5745,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5758,7 +5758,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -5767,7 +5767,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182880,14571216,123667317)
   o pos.x 167182880
   o pos.y 14571216
@@ -5791,7 +5791,7 @@ call 25761 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -81174
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (178281578,18065629,103102165)
   o pos.x 172310396
   o pos.y 19856356
@@ -5804,7 +5804,7 @@ call 25761 GetWeaponTargetUnit
 call 25761 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -5821,7 +5821,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -5834,7 +5834,7 @@ call 25761 GetWeaponTargetUnit
 call 25761 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095600,2082563,93719101)
   o pos.x 184095600
   o pos.y 2082563
@@ -5843,7 +5843,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095600,2082563,93719101)
   o pos.x 184095600
   o pos.y 2082563
@@ -5926,7 +5926,7 @@ call 25761 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -48972
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116311563,1369399,216006947)
   o pos.x 116311563
   o pos.y 1369399
@@ -5959,7 +5959,7 @@ call 25761 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -89485
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161582179,1799997,215509728)
   o pos.x 161582179
   o pos.y 1799997
@@ -6000,7 +6000,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#42
+  i scripts.GetSweetSpot Unit#42
   o out (177149124,1817133,89661494)
   o pos.x 177149124
   o pos.y 1817133
@@ -6038,7 +6038,7 @@ call 25761 GetWeaponTargetPos
 call 25761 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -6081,7 +6081,7 @@ call 25762 GetWeaponTargetPos
 call 25762 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6094,7 +6094,7 @@ call 25762 GetWeaponTargetPos
 call 25762 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -6104,7 +6104,7 @@ call 25762 GetWeaponTargetPos
   r UnitMotion#7.velocityX 1
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182881,14571216,123667315)
   o pos.x 167182881
   o pos.y 14571216
@@ -6139,7 +6139,7 @@ call 25762 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -72912
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (178049010,18143677,103029255)
   o pos.x 172690671
   o pos.y 19769363
@@ -6152,7 +6152,7 @@ call 25762 GetWeaponTargetUnit
 call 25762 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -6169,7 +6169,7 @@ call 25762 GetWeaponTargetPos
 call 25762 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6182,7 +6182,7 @@ call 25762 GetWeaponTargetUnit
 call 25762 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184079586,2082812,93695269)
   o pos.x 184079586
   o pos.y 2082812
@@ -6191,7 +6191,7 @@ call 25762 GetWeaponTargetPos
 call 25762 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184079586,2082812,93695269)
   o pos.x 184079586
   o pos.y 2082812
@@ -6274,7 +6274,7 @@ call 25762 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -48702
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116318457,1369399,216007114)
   o pos.x 116318457
   o pos.y 1369399
@@ -6307,7 +6307,7 @@ call 25762 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -91561
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161634547,1799997,215457360)
   o pos.x 161634547
   o pos.y 1799997
@@ -6410,7 +6410,7 @@ call 25762 GetWeaponTargetPos
 call 25762 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -6431,7 +6431,7 @@ call 25763 GetWeaponTargetPos
 call 25763 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6444,7 +6444,7 @@ call 25763 GetWeaponTargetPos
 call 25763 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -6454,7 +6454,7 @@ call 25763 GetWeaponTargetPos
   r UnitMotion#7.velocityZ -1
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182882,14571216,123667314)
   o pos.x 167182882
   o pos.y 14571216
@@ -6478,7 +6478,7 @@ call 25763 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -64595
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177842968,18216293,102964661)
   o pos.x 173098225
   o pos.y 19725451
@@ -6491,7 +6491,7 @@ call 25763 GetWeaponTargetUnit
 call 25763 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -6508,7 +6508,7 @@ call 25763 GetWeaponTargetPos
 call 25763 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6521,7 +6521,7 @@ call 25763 GetWeaponTargetUnit
 call 25763 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184073137,2082881,93687077)
   o pos.x 184073137
   o pos.y 2082881
@@ -6530,7 +6530,7 @@ call 25763 GetWeaponTargetPos
 call 25763 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184073137,2082881,93687077)
   o pos.x 184073137
   o pos.y 2082881
@@ -6613,7 +6613,7 @@ call 25763 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -48324
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116327838,1369399,216007281)
   o pos.x 116327838
   o pos.y 1369399
@@ -6646,7 +6646,7 @@ call 25763 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -93245
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161686915,1799997,215404992)
   o pos.x 161686915
   o pos.y 1799997
@@ -6691,7 +6691,7 @@ call 25763 GetWeaponTargetUnit
 call 25763 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -6729,7 +6729,7 @@ call 25763 GetWeaponTargetPos
 call 25763 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -6750,7 +6750,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6763,7 +6763,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -6772,7 +6772,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182883,14571216,123667313)
   o pos.x 167182883
   o pos.y 14571216
@@ -6795,7 +6795,7 @@ call 25764 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -56209
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177663675,18288504,102908454)
   o pos.x 173534464
   o pos.y 19797832
@@ -6808,7 +6808,7 @@ call 25764 GetWeaponTargetUnit
 call 25764 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -6825,7 +6825,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -6838,7 +6838,7 @@ call 25764 GetWeaponTargetUnit
 call 25764 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184093204,2082609,93715143)
   o pos.x 184093204
   o pos.y 2082609
@@ -6847,7 +6847,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184093204,2082609,93715143)
   o pos.x 184093204
   o pos.y 2082609
@@ -6934,7 +6934,7 @@ call 25764 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -47820
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116339685,1369399,216007446)
   o pos.x 116339685
   o pos.y 1369399
@@ -6967,7 +6967,7 @@ call 25764 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -94967
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161774800,1825031,215388361)
   o pos.x 161774800
   o pos.y 1825031
@@ -7008,7 +7008,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174158404,1716696,90822566)
   o pos.x 174158404
   o pos.y 1716696
@@ -7045,7 +7045,7 @@ call 25764 GetWeaponTargetPos
 call 25764 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -7066,7 +7066,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7079,7 +7079,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -7088,7 +7088,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182884,14571216,123667312)
   o pos.x 167182884
   o pos.y 14571216
@@ -7111,7 +7111,7 @@ call 25765 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -46324
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177515915,18360467,102862132)
   o pos.x 174110212
   o pos.y 19870988
@@ -7124,7 +7124,7 @@ call 25765 GetWeaponTargetUnit
 call 25765 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -7145,7 +7145,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7158,7 +7158,7 @@ call 25765 GetWeaponTargetUnit
 call 25765 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -7168,7 +7168,7 @@ call 25765 GetWeaponTargetPos
   r Unit#44.weapon0Flags 2
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -7251,7 +7251,7 @@ call 25765 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -47208
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116353967,1369399,216007609)
   o pos.x 116353967
   o pos.y 1369399
@@ -7284,7 +7284,7 @@ call 25765 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -96385
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161833282,1815495,215342145)
   o pos.x 161833282
   o pos.y 1815495
@@ -7325,7 +7325,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174159258,1716696,90816498)
   o pos.x 174159258
   o pos.y 1716696
@@ -7362,7 +7362,7 @@ call 25765 GetWeaponTargetPos
 call 25765 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -7405,7 +7405,7 @@ call 25766 GetWeaponTargetPos
 call 25766 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7418,7 +7418,7 @@ call 25766 GetWeaponTargetPos
 call 25766 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -7427,7 +7427,7 @@ call 25766 GetWeaponTargetPos
 call 25766 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182885,14571216,123667311)
   o pos.x 167182885
   o pos.y 14571216
@@ -7450,7 +7450,7 @@ call 25766 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -36798
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177398539,18432029,102825335)
   o pos.x 174689400
   o pos.y 19944656
@@ -7464,7 +7464,7 @@ call 25766 GetWeaponTargetPos
   r Unit#38.weapon0Flags 2
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -7485,7 +7485,7 @@ call 25766 GetWeaponTargetUnit
 call 25766 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7498,7 +7498,7 @@ call 25766 GetWeaponTargetUnit
 call 25766 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -7508,7 +7508,7 @@ call 25766 GetWeaponTargetPos
   r Unit#44.weapon0Flags 3
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184105182,2082334,93736910)
   o pos.x 184105182
   o pos.y 2082334
@@ -7593,7 +7593,7 @@ call 25766 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -46476
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116370648,1369399,216007769)
   o pos.x 116370648
   o pos.y 1369399
@@ -7626,7 +7626,7 @@ call 25766 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -97715
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161888725,1806548,215292870)
   o pos.x 161888725
   o pos.y 1806548
@@ -7729,7 +7729,7 @@ call 25766 GetWeaponTargetPos
 call 25766 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -7763,7 +7763,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7776,7 +7776,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -7785,7 +7785,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182886,14571216,123667310)
   o pos.x 167182886
   o pos.y 14571216
@@ -7808,7 +7808,7 @@ call 25767 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -27619
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177310444,18503347,102797717)
   o pos.x 175273151
   o pos.y 20018921
@@ -7822,7 +7822,7 @@ call 25767 GetWeaponTargetPos
   r Unit#38.weapon0Flags 3
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -7839,7 +7839,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -7852,7 +7852,7 @@ call 25767 GetWeaponTargetUnit
 call 25767 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100600,2082453,93727948)
   o pos.x 184100600
   o pos.y 2082453
@@ -7861,7 +7861,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184100600,2082453,93727948)
   o pos.x 184100600
   o pos.y 2082453
@@ -7946,7 +7946,7 @@ call 25767 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -45636
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116388738,1369399,216007927)
   o pos.x 116388738
   o pos.y 1369399
@@ -7978,7 +7978,7 @@ call 25767 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -98835
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161941093,1806548,215240502)
   o pos.x 161941093
   o pos.y 1806548
@@ -8019,7 +8019,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#42
+  i scripts.GetSweetSpot Unit#42
   o out (177149124,1817133,89661494)
   o pos.x 177149124
   o pos.y 1817133
@@ -8057,7 +8057,7 @@ call 25767 GetWeaponTargetPos
 call 25767 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -8100,7 +8100,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8113,7 +8113,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -8122,7 +8122,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182887,14571216,123667309)
   o pos.x 167182887
   o pos.y 14571216
@@ -8145,7 +8145,7 @@ call 25768 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -18773
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177250564,18574343,102778946)
   o pos.x 175862396
   o pos.y 20093631
@@ -8200,7 +8200,7 @@ call 25768 FindBestTargetIfFireAtWill
 call 25768 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -8217,7 +8217,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8230,7 +8230,7 @@ call 25768 GetWeaponTargetUnit
 call 25768 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184082386,2082777,93699044)
   o pos.x 184082386
   o pos.y 2082777
@@ -8239,7 +8239,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184082386,2082777,93699044)
   o pos.x 184082386
   o pos.y 2082777
@@ -8324,7 +8324,7 @@ call 25768 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -44688
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116388804,1369399,216008083)
   o pos.x 116388804
   o pos.y 1369399
@@ -8357,7 +8357,7 @@ call 25768 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -99859
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (161984282,1825031,215178879)
   o pos.x 161984282
   o pos.y 1825031
@@ -8459,7 +8459,7 @@ call 25768 GetWeaponTargetPos
 call 25768 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -8480,7 +8480,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8493,7 +8493,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -8502,7 +8502,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182888,14571216,123667308)
   o pos.x 167182888
   o pos.y 14571216
@@ -8525,7 +8525,7 @@ call 25769 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -10249
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177217874,18645098,102768698)
   o pos.x 176457828
   o pos.y 20168817
@@ -8538,7 +8538,7 @@ call 25769 GetWeaponTargetUnit
 call 25769 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -8555,7 +8555,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8568,7 +8568,7 @@ call 25769 GetWeaponTargetUnit
 call 25769 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184076098,2082851,93690756)
   o pos.x 184076098
   o pos.y 2082851
@@ -8581,7 +8581,7 @@ call 25769 GetWeaponTargetUnit
 call 25769 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184076098,2082851,93690756)
   o pos.x 184076098
   o pos.y 2082851
@@ -8666,7 +8666,7 @@ call 25769 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -43632
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116388878,1369399,216008234)
   o pos.x 116388878
   o pos.y 1369399
@@ -8699,7 +8699,7 @@ call 25769 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -100906
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (162018621,1823676,215108368)
   o pos.x 162018621
   o pos.y 1823676
@@ -8738,7 +8738,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174159258,1716696,90816498)
   o pos.x 174159258
   o pos.y 1716696
@@ -8776,7 +8776,7 @@ call 25769 GetWeaponTargetPos
 call 25769 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696
@@ -8797,7 +8797,7 @@ call 25770 GetWeaponTargetPos
 call 25770 GetWeaponTargetPos
   a unit Unit#12
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8810,7 +8810,7 @@ call 25770 GetWeaponTargetPos
 call 25770 GetWeaponTargetPos
   a unit Unit#26
   a weapon 1
-  i units.GetSweetSpot Unit#791
+  i scripts.GetSweetSpot Unit#791
   o out (178226568,1089282,112243845)
   o pos.x 178226568
   o pos.y 1089282
@@ -8820,7 +8820,7 @@ call 25770 GetWeaponTargetPos
   r UnitMotion#7.velocityZ 0
   a unit Unit#32
   a weapon 0
-  i units.GetSweetSpot Unit#772
+  i scripts.GetSweetSpot Unit#772
   o out (167182889,14571216,123667308)
   o pos.x 167182889
   o pos.y 14571216
@@ -8843,7 +8843,7 @@ call 25770 GetWeaponTargetPos
   r UnitMotion#36.velocityZ -2034
   a unit Unit#37
   a weapon 0
-  i units.GetSweetSpot Unit#775
+  i scripts.GetSweetSpot Unit#775
   o out (177211386,18715536,102766665)
   o pos.x 177060011
   o pos.y 20244351
@@ -8856,7 +8856,7 @@ call 25770 GetWeaponTargetUnit
 call 25770 GetWeaponTargetPos
   a unit Unit#38
   a weapon 0
-  i units.GetSweetSpot Unit#780
+  i scripts.GetSweetSpot Unit#780
   o out (128459262,1636657,107471554)
   o pos.x 128459262
   o pos.y 1636657
@@ -8874,7 +8874,7 @@ call 25770 GetWeaponTargetPos
   r Unit#42.weapon1Flags 22
   a unit Unit#42
   a weapon 0
-  i units.GetSweetSpot Unit#773
+  i scripts.GetSweetSpot Unit#773
   o out (189251623,856963,90700697)
   o pos.x 189251623
   o pos.y 856963
@@ -8887,7 +8887,7 @@ call 25770 GetWeaponTargetUnit
 call 25770 GetWeaponTargetPos
   a unit Unit#42
   a weapon 1
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095600,2082563,93719101)
   o pos.x 184095600
   o pos.y 2082563
@@ -8896,7 +8896,7 @@ call 25770 GetWeaponTargetPos
 call 25770 GetWeaponTargetPos
   a unit Unit#44
   a weapon 0
-  i units.GetSweetSpot Unit#751
+  i scripts.GetSweetSpot Unit#751
   o out (184095600,2082563,93719101)
   o pos.x 184095600
   o pos.y 2082563
@@ -8989,7 +8989,7 @@ call 25770 GetWeaponTargetPos
   r UnitMotion#27.velocityZ -42468
   a unit Unit#296
   a weapon 0
-  i units.GetSweetSpot Unit#535
+  i scripts.GetSweetSpot Unit#535
   o out (116388959,1369399,216008382)
   o pos.x 116388959
   o pos.y 1369399
@@ -9026,7 +9026,7 @@ call 25770 GetWeaponTargetPos
   r UnitMotion#30.velocityZ -101954
   a unit Unit#523
   a weapon 0
-  i units.GetSweetSpot Unit#297
+  i scripts.GetSweetSpot Unit#297
   o out (162071000,1823676,215055989)
   o pos.x 162071000
   o pos.y 1823676
@@ -9067,7 +9067,7 @@ call 25770 GetWeaponTargetPos
 call 25770 GetWeaponTargetPos
   a unit Unit#751
   a weapon 0
-  i units.GetSweetSpot Unit#44
+  i scripts.GetSweetSpot Unit#44
   o out (174159258,1716696,90816498)
   o pos.x 174159258
   o pos.y 1716696
@@ -9145,7 +9145,7 @@ call 25770 GetWeaponTargetPos
 call 25770 GetWeaponTargetPos
   a unit Unit#791
   a weapon 0
-  i units.GetSweetSpot Unit#36
+  i scripts.GetSweetSpot Unit#36
   o out (169299150,1716696,98967500)
   o pos.x 169299150
   o pos.y 1716696

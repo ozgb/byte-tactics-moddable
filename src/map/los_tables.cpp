@@ -39,7 +39,7 @@ struct IntValueElem {
     int value;
 };
 
-#include "../orders/approach_areas.h"
+#include "../movement/approach_areas.h"
 #include "../state/sim_globals.h"
 
 extern void __cdecl operator delete(void*);

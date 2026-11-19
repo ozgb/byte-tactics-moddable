@@ -122,7 +122,7 @@ machine and isn't deterministic.
 ### `units.render-pose-reads`
 
 - **Scope:** sim.
-- **Where:** `GetSweetSpot` (0x43e3c0), `src/units/unit_scripts.cpp`, which
+- **Where:** `GetSweetSpot` (0x43e3c0), `src/scripts/piece_queries.cpp`, which
   sets the aim point of every shot at a unit. Also `StartExplodePiece`
   (0x421620), `src/weapons/explosions.cpp`, which places exploded pieces and
   debris.

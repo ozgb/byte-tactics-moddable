@@ -7,7 +7,7 @@
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 #include "../util/vec3.h"
 
 #include "../map/cell.h"
@@ -40,8 +40,8 @@ struct UnitDefMetalWindView {
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
     if (((UnitDefMetalWindView*)unit->def.get())->windGenerator > 0.0f && g_game->windEnabled) {
-        ((CobScript*)unit->script.get())->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
-        ((CobScript*)unit->script.get())->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
 }
 

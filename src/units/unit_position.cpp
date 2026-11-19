@@ -17,7 +17,6 @@ struct Tail32 {
 
 class CobScript;
 class UnitMotion;
-class MotionSerializer;
 class BitWriter;
 class BitReader;
 struct Block;
@@ -42,7 +41,7 @@ union TerrainFlags {
     unsigned int all;
 };
 
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 
 #include "../map/spatial_bucket.h"
 
@@ -71,7 +70,7 @@ struct Block {
     int field_10;
 };
 
-#include "cob_script.h"
+#include "../scripts/cob_script.h"
 
 #include "../sound/sound.h"
 #include "../util/tdf.h"
@@ -269,7 +268,7 @@ void __stdcall UpdateUnit(Unit* u)
         }
     }
     if (u->script != 0) {
-        ((CobScript*)u->script.get())->RunScripts(1);
+        g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
     }
     if (u->recentlyDamagedTimer != 0) {
         u->recentlyDamagedTimer--;
@@ -312,7 +311,7 @@ void __stdcall UpdateUnit(Unit* u)
             g_seams.orders->RunOrders(u);
             g_seams.orders->RunSecondaryOrders(u);
             if (u->motion != 0) {
-                g_seams.orders->UpdateMotion(u->motion, 0, u);
+                g_seams.movement->UpdateMotion(u->motion, 0, u);
                 UpdateUnitHeight(u);
             }
         }
@@ -473,14 +472,14 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        g_seams.orders->UnitMotionReadNetState(unit->motion, &reader);
+        g_seams.movement->UnitMotionReadNetState(unit->motion, &reader);
         index = (short)reader.ReadBits(0x10);
     }
 
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            g_seams.orders->UpdateMotion(u->motion, 0, u);
+            g_seams.movement->UpdateMotion(u->motion, 0, u);
             UpdateUnitHeight(u);
         }
     }

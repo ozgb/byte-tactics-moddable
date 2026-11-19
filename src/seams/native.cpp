@@ -2,6 +2,8 @@
 #include <vector>
 
 #include "../../interfaces/seams.h"
+#include "../../interfaces/scripts.h"
+#include "../../interfaces/movement.h"
 #include "../../interfaces/network.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
@@ -12,22 +14,26 @@
 #include "../files/files_bank.h"
 #include "../game/unit_resources.h"
 #include "../units/movement_class.h"
-#include "../units/cob_script.h"
-#include "../units/cob_types.h"
+#include "../scripts/cob_script.h"
+#include "../scripts/cob_types.h"
+#include "../scripts/unit_script.h"
 #include "../util/vec3.h"
 #include "../map/mission.h"
 #include "../map/spatial_bucket.h"
 #include "../game/mission_conditions.h"
-#include "../units/object_state.h"
+#include "../scripts/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
-#include "../ai/ai_search_goal.h"
-#include "../orders/order_fx.h"
+#include "../movement/ai_search_goal.h"
+#include "../movement/order_fx.h"
+#include "../movement/path_order.h"
+#include "../movement/approach_areas.h"
+#include "../movement/air_maneuver_order.h"
 #include "../ai/squad_manager.h"
 #include "../units/unit_type_set.h"
 #include "../units/unit_ref.h"
 #include "../units/sfx_occupy.h"
-#include "../orders/unit_motion.h"
+#include "../movement/unit_motion.h"
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../util/angles.h"
@@ -69,7 +75,7 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
-#include "../orders/order_targets.h"
+#include "../movement/order_targets.h"
 #include "../game/players.h"
 #include "../units/unit_targets.h"
 
@@ -78,8 +84,9 @@ int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags);
 #include "../weapons/weapon_types.h"
 #include "../weapons/explosions.h"
 void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
-#include "../units/unit_scripts.h"
+#include "../scripts/piece_queries.h"
 Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
+struct ModelBuildList;
 #include "../ingame/info_panel.h"
 
 #include "../units/unit_commands.h"
@@ -112,7 +119,7 @@ int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char piece, char mode);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
-#include "../units/unit_scripts.h"
+#include "../scripts/piece_queries.h"
 #include "../units/unit_position.h"
 #include "../game/scheduler.h"
 #include "../../interfaces/rand_stream.h"
@@ -374,6 +381,51 @@ static int __stdcall StartScriptWithArgsByIndexNative(CobScript* script, int ind
     return script->StartScriptWithArgsByIndex(index, callback, update, count, a, b, c, d);
 }
 
+static void __stdcall NewUnitScriptNative(Unit* unit)
+{
+    NewUnitScript(unit);
+}
+
+static void __stdcall SetCobNative(CobScript* script, ScriptTable* data)
+{
+    script->SetCob(data);
+}
+
+static ModelState* __stdcall CreatePlayerObjectStateNative(Object3do* model, ScriptTable* data, Unit* owner)
+{
+    return CreatePlayerObjectState(model, (ModelBuildList*)data, owner);
+}
+
+static void __stdcall SetObjectStateNative(UnitScript* script, ModelState* state)
+{
+    script->SetObjectState((ObjectState*)state);
+}
+
+static void __stdcall RunScriptsNative(CobScript* script, int elapsed)
+{
+    script->RunScripts(elapsed);
+}
+
+static void __stdcall SaveScriptStateNative(CobScript* script, HapiBank* file)
+{
+    script->SaveScriptState(file);
+}
+
+static int __stdcall LoadScriptStateNative(CobScript* script, HapiBank* file)
+{
+    return script->LoadScriptState(file);
+}
+
+static void __stdcall DeleteScriptNative(CobScript* script)
+{
+    delete script;
+}
+
+static void __stdcall InitObjectStateNative(ModelState* state, Object3do* model)
+{
+    InitObjectState(state, model);
+}
+
 static void __fastcall UpdateSfxOccupyNative(UnitMotion* self, int unusedEdx, Unit* unit)
 {
     ((SfxOccupyTracker*)self)->UpdateSfxOccupy(unit);
@@ -389,16 +441,6 @@ static int __fastcall SerializeOrderToSaveNative(Order* self, int unusedEdx, Uni
     return self->SerializeToSave(unit, file, name);
 }
 
-static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
-{
-    self->DestroyObject();
-}
-
-static void __stdcall NewUnitMotionNative(Unit* unit)
-{
-    unit->motion = new (kSim) UnitMotion(unit);
-}
-
 static Order* __stdcall LoadOrderNative(Unit* unit, HapiBank* file, char* name)
 {
     return new (kSim) Order(unit, file, name);
@@ -412,21 +454,6 @@ static Order* __stdcall NewOrderNative(MissionType kind, Unit* target, void* pos
 static MissionType __stdcall MissionTypeFromNameNative(const char* name)
 {
     return MissionType(name);
-}
-
-static void __fastcall LoadMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
-{
-    self->LoadMotion(unit, file);
-}
-
-static void __fastcall SaveMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
-{
-    self->SaveMotion(unit, file);
-}
-
-static void __fastcall UpdateMotionNative(UnitMotion* self, int unusedEdx, Unit* unit)
-{
-    self->UpdateMotion(unit);
 }
 
 static int __stdcall MovementClassGetNative(MovementClass* self, int x, int y)
@@ -454,11 +481,6 @@ static void __stdcall OrderOrStatusFlagsNative(OrderBase* order, unsigned int fl
     order->OrStatusFlags(flags);
 }
 
-static void __stdcall UnitMotionReadNetStateNative(UnitMotion* motion, BitReader* reader)
-{
-    motion->ReadNetState(reader);
-}
-
 static void __stdcall WeaponAimCobCompleteNative(Callback* callback, int result)
 {
     callback->Complete(result);
@@ -467,6 +489,189 @@ static void __stdcall WeaponAimCobCompleteNative(Callback* callback, int result)
 static void __stdcall CobScriptExplodePieceNative(CobScript* script, int piece, unsigned int flags)
 {
     script->ExplodePiece(piece, flags);
+}
+
+static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
+{
+    self->DestroyObject();
+}
+
+static void __stdcall NewUnitMotionNative(Unit* unit)
+{
+    unit->motion = new (kSim) UnitMotion(unit);
+}
+
+static void __fastcall LoadMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
+{
+    self->LoadMotion(unit, file);
+}
+
+static void __fastcall SaveMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
+{
+    self->SaveMotion(unit, file);
+}
+
+static void __fastcall UpdateMotionNative(UnitMotion* self, int unusedEdx, Unit* unit)
+{
+    self->UpdateMotion(unit);
+}
+
+static void __stdcall UnitMotionReadNetStateNative(UnitMotion* motion, BitReader* reader)
+{
+    motion->ReadNetState(reader);
+}
+
+static void __stdcall SetFlightModeNative(UnitMotion* self, Unit* unit, int state)
+{
+    self->SetFlightMode(unit, state);
+}
+
+static void __stdcall PathOrderSetAltitudeNative(PathOrder* self, int altitude)
+{
+    self->SetAltitude(altitude);
+}
+
+static void __stdcall PathOrderSetApproachRadiusNative(PathOrder* self, short radius)
+{
+    self->SetApproachRadius(radius);
+}
+
+static void __stdcall PathOrderSetHeadingNative(PathOrder* self, short heading)
+{
+    self->SetHeading(heading);
+}
+
+static void __stdcall AirManeuverOrderSetAltitudeNative(AirManeuverOrder* self, int altitude)
+{
+    self->SetAltitude(altitude);
+}
+
+static PathOrder* __stdcall NewPathOrderAtNative(Order* source, const Vec3* pos)
+{
+    PathOrder* target = new (kSim) PathOrder(source, *pos);
+    return target;
+}
+
+static PathOrder* __stdcall NewPathOrderToUnitNative(Order* source, Unit* unit)
+{
+    PathOrder* target = new (kSim) PathOrder(source, unit);
+    return target;
+}
+
+static PathOrder* __stdcall NewPathOrderToUnitAtNative(Order* source, Unit* unit, const Vec3* pos)
+{
+    PathOrder* target = new (kSim) PathOrder(source, unit, *pos);
+    return target;
+}
+
+static PathOrder* __stdcall NewPathOrderToUnitAtAngleNative(Order* source, Unit* unit, short angle)
+{
+    PathOrder* target = new (kSim) PathOrder(source, unit, angle);
+    return target;
+}
+
+static AirManeuverOrder* __stdcall NewAirManeuverOrderNative(Order* source, const Vec3* from, const Vec3* to)
+{
+    AirManeuverOrder* target = new (kSim) AirManeuverOrder(source, *from, *to);
+    return target;
+}
+
+static ApproachRadius* __stdcall NewApproachRadiusNative(Order* source, int x, int y, int radius)
+{
+    ApproachRadius* target = new (kSim) ApproachRadius(source, x, y, radius);
+    return target;
+}
+
+static RingApproach* __stdcall NewRingApproachNative(Order* source, int x, int y, int inner, int outer)
+{
+    RingApproach* target = new (kSim) RingApproach(source, x, y, inner, outer);
+    return target;
+}
+
+static PointMarker* __stdcall NewPointMarkerNative(Order* source, Point16 pos, Point16 size)
+{
+    PointMarker* target = new (kSim) PointMarker(source, pos, size);
+    return target;
+}
+
+static PathOrder* __stdcall LoadPathOrderNative(Order* source, HapiBank* file, char* name)
+{
+    PathOrder* target = new (kSim) PathOrder((int)source, file, name);
+    return target;
+}
+
+static AirManeuverOrder* __stdcall LoadAirManeuverOrderNative(Order* source, HapiBank* file, char* name)
+{
+    AirManeuverOrder* target = new (kSim) AirManeuverOrder((int)source, file, name);
+    return target;
+}
+
+static ApproachRadius* __stdcall LoadApproachRadiusNative(Order* source, HapiBank* file, char* name)
+{
+    ApproachRadius* target = new (kSim) ApproachRadius((int)source, file, name);
+    return target;
+}
+
+static RingApproach* __stdcall LoadRingApproachNative(Order* source, HapiBank* file, char* name)
+{
+    RingApproach* target = new (kSim) RingApproach((int)source, file, name);
+    return target;
+}
+
+static PointMarker* __stdcall LoadPointMarkerNative(Order* source, HapiBank* file, char* name)
+{
+    PointMarker* target = new (kSim) PointMarker((int)source, file, name);
+    return target;
+}
+
+static PathGoal* __stdcall MotionGoalNative(UnitMotion* motion)
+{
+    return (PathGoal*)motion->obj.get();
+}
+
+static OrderFx* __stdcall GoalTargetNative(PathGoal* goal)
+{
+    return goal->target.get();
+}
+
+static void __stdcall GoalSetPathOrderNative(PathGoal* goal, void* target)
+{
+    goal->SetPathOrder(target);
+}
+
+static void __stdcall OrderFxDestroyNative(OrderFx* target)
+{
+    delete target;
+}
+
+static int __stdcall OrderFxGetTypeNative(OrderFx* target)
+{
+    return target->GetType();
+}
+
+static int __stdcall OrderFxSerializeToSaveNative(OrderFx* target, Order* order, HapiBank* file, char* name)
+{
+    return target->SerializeToSave(order, file, name);
+}
+
+static int __stdcall GoalHasNetUnitStateNative(PathGoal* goal)
+{
+    return goal->HasNetUnitState();
+}
+
+static void __stdcall GoalSerializeNetUnitStateNative(PathGoal* goal, BitWriter* stream)
+{
+    goal->SerializeNetUnitState(stream);
+}
+
+static void __stdcall UnitRefInitNative(UnitRef* ref, Unit* unit, OrderBase* value)
+{
+    ((PathOrderAttach*)ref)->PathOrderAttach::PathOrderAttach(unit, value);
+}
+
+static void __stdcall UnitRefSetUnitNative(UnitRef* ref, Unit* unit)
+{
+    ((PathOrderAttach*)ref)->SetUnit(unit);
 }
 
 Seams g_seams;
@@ -481,6 +686,8 @@ static TargetingSeam s_targeting;
 static LosRadarSeam s_los_radar;
 static OrdersSeam s_orders;
 static UnitsSeam s_units;
+static ScriptsSeam s_scripts;
+static MovementSeam s_movement;
 static PlayersSeam s_players;
 static MapSeam s_map;
 static FilesSeam s_files;
@@ -690,9 +897,9 @@ void InstallNativeSeams()
     s_pathfinding.WriteState = PathfindingWriteState;
     s_pathfinding.SetSearchScale = PathfindingSetBaseScale;
     s_pathfinding.DebugCell = PathfindingDebugCell;
-    s_orders.ApplyPathEvent = ApplyPathEvent;
+    s_movement.ApplyPathEvent = ApplyPathEvent;
     s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
-    s_orders.UnitMotionReadNetState = UnitMotionReadNetStateNative;
+    s_movement.UnitMotionReadNetState = UnitMotionReadNetStateNative;
     s_units.MovementClassGet = MovementClassGetNative;
     s_units.MovementClassInBounds = MovementClassInBoundsNative;
     s_units.RefreshMovedUnits = RefreshMovedUnitsNative;
@@ -717,9 +924,9 @@ void InstallNativeSeams()
     s_units.WriteState = UnitsWriteState;
     s_map.GetNameSlot = GetNameSlotNative;
     s_units.GetGroundHeight = GetGroundHeightNative;
-    s_units.GetSweetSpot = GetSweetSpotNative;
-    s_units.FindScript = FindScriptNative;
-    s_units.StartScriptWithArgs = StartScriptWithArgsNative;
+    s_scripts.GetSweetSpot = GetSweetSpotNative;
+    s_scripts.FindScript = FindScriptNative;
+    s_scripts.StartScriptWithArgs = StartScriptWithArgsNative;
     s_units.SetStateBits = SetStateBitsNative;
     s_map.GetCellMeanHeight = GetCellMeanHeightNative;
     s_map.GetGameType = GetGameTypeNative;
@@ -779,11 +986,11 @@ void InstallNativeSeams()
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
-    s_units.StartScript = StartScriptNative;
-    s_units.QueryScript = QueryScriptNative;
-    s_units.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
-    s_units.GetPieceOffset = GetPieceOffset;
-    s_units.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_scripts.StartScript = StartScriptNative;
+    s_scripts.QueryScript = QueryScriptNative;
+    s_scripts.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
+    s_scripts.GetPieceOffset = GetPieceOffset;
+    s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
     s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
@@ -858,8 +1065,8 @@ void InstallNativeSeams()
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_units.AttachUnitToPiece = AttachUnitToPiece;
-    s_units.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
-    s_units.GetPieceAngles = GetPieceAngles;
+    s_scripts.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
+    s_scripts.GetPieceAngles = GetPieceAngles;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;
     s_units.ApplyUnfinishedBuildDecay = ApplyUnfinishedBuildDecay;
@@ -869,28 +1076,65 @@ void InstallNativeSeams()
     s_units.CanReclaim = CanReclaimNative;
     s_units.CanRepair = CanRepairNative;
     s_units.UnitRefUnlink = UnitRefUnlinkNative;
-    s_units.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
+    s_movement.SetFlightMode = SetFlightModeNative;
+    s_movement.PathOrderSetAltitude = PathOrderSetAltitudeNative;
+    s_movement.PathOrderSetApproachRadius = PathOrderSetApproachRadiusNative;
+    s_movement.PathOrderSetHeading = PathOrderSetHeadingNative;
+    s_movement.AirManeuverOrderSetAltitude = AirManeuverOrderSetAltitudeNative;
+    s_movement.NewPathOrderAt = NewPathOrderAtNative;
+    s_movement.NewPathOrderToUnit = NewPathOrderToUnitNative;
+    s_movement.NewPathOrderToUnitAt = NewPathOrderToUnitAtNative;
+    s_movement.NewPathOrderToUnitAtAngle = NewPathOrderToUnitAtAngleNative;
+    s_movement.NewAirManeuverOrder = NewAirManeuverOrderNative;
+    s_movement.NewApproachRadius = NewApproachRadiusNative;
+    s_movement.NewRingApproach = NewRingApproachNative;
+    s_movement.NewPointMarker = NewPointMarkerNative;
+    s_movement.LoadPathOrder = LoadPathOrderNative;
+    s_movement.LoadAirManeuverOrder = LoadAirManeuverOrderNative;
+    s_movement.LoadApproachRadius = LoadApproachRadiusNative;
+    s_movement.LoadRingApproach = LoadRingApproachNative;
+    s_movement.LoadPointMarker = LoadPointMarkerNative;
+    s_movement.MotionGoal = MotionGoalNative;
+    s_movement.GoalTarget = GoalTargetNative;
+    s_movement.GoalSetPathOrder = GoalSetPathOrderNative;
+    s_movement.OrderFxDestroy = OrderFxDestroyNative;
+    s_movement.OrderFxGetType = OrderFxGetTypeNative;
+    s_movement.OrderFxSerializeToSave = OrderFxSerializeToSaveNative;
+    s_movement.GoalHasNetUnitState = GoalHasNetUnitStateNative;
+    s_movement.GoalSerializeNetUnitState = GoalSerializeNetUnitStateNative;
+    s_units.UnitRefInit = UnitRefInitNative;
+    s_units.UnitRefSetUnit = UnitRefSetUnitNative;
+    s_scripts.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
     s_units.UpdateSfxOccupy = UpdateSfxOccupyNative;
-    s_units.PoseUnitModel = PoseUnitModel;
-    s_units.CreateObjectState = CreateObjectState;
-    s_units.FreeObjectState = FreeObjectState;
-    s_units.UpdateObjectState = UpdateObjectState;
+    s_scripts.PoseUnitModel = PoseUnitModel;
+    s_scripts.CreateObjectState = CreateObjectState;
+    s_scripts.FreeObjectState = FreeObjectState;
+    s_scripts.UpdateObjectState = UpdateObjectState;
     s_units.UpdateUnit = UpdateUnit;
-    s_units.ObjectStateSize = ObjectStateSize;
+    s_scripts.ObjectStateSize = ObjectStateSize;
+    s_scripts.NewUnitScript = NewUnitScriptNative;
+    s_scripts.SetCob = SetCobNative;
+    s_scripts.CreatePlayerObjectState = CreatePlayerObjectStateNative;
+    s_scripts.SetObjectState = SetObjectStateNative;
+    s_scripts.RunScripts = RunScriptsNative;
+    s_scripts.SaveScriptState = SaveScriptStateNative;
+    s_scripts.LoadScriptState = LoadScriptStateNative;
+    s_scripts.DeleteScript = DeleteScriptNative;
+    s_scripts.InitObjectState = InitObjectStateNative;
     s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
     s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
     s_orders.AddBeCarriedOrder = AddBeCarriedOrder;
     s_orders.RunOrders = RunOrders;
     s_orders.RunSecondaryOrders = RunSecondaryOrders;
-    s_orders.DestroyMotionObject = DestroyMotionObjectNative;
-    s_orders.NewUnitMotion = NewUnitMotionNative;
+    s_movement.DestroyMotionObject = DestroyMotionObjectNative;
+    s_movement.NewUnitMotion = NewUnitMotionNative;
     s_orders.LoadOrder = LoadOrderNative;
     s_orders.MissionTypeFromName = MissionTypeFromNameNative;
     s_orders.NewOrder = NewOrderNative;
     s_orders.QueueBuildOrder = QueueBuildOrder;
-    s_orders.LoadMotion = LoadMotionNative;
-    s_orders.SaveMotion = SaveMotionNative;
-    s_orders.UpdateMotion = UpdateMotionNative;
+    s_movement.LoadMotion = LoadMotionNative;
+    s_movement.SaveMotion = SaveMotionNative;
+    s_movement.UpdateMotion = UpdateMotionNative;
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.SpawnProjectile = SpawnProjectile;
@@ -988,6 +1232,8 @@ void InstallNativeSeams()
     g_seams.units = &s_units;
     g_seams.players = &s_players;
     g_seams.map = &s_map;
+    g_seams.scripts = &s_scripts;
+    g_seams.movement = &s_movement;
     g_seams.files = &s_files;
     g_seams.network = &s_network;
     g_seams.pathworld = NativePathWorld();

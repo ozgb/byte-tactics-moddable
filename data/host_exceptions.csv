@@ -386,6 +386,10 @@ src/network/net_game.cpp,src/sound/sound.h,#392
 src/network/packets.cpp,interfaces/host.h,#392
 src/orders/order_list.cpp,src/ingame/markers.h,#392
 src/orders/order_queue.cpp,src/sound/sound.h,#392
+src/scripts/cob.cpp,src/graphics/display.h,#392
+src/scripts/cob.cpp,src/graphics/object_pool.h,#392
+src/scripts/piece_queries.cpp,src/graphics/spot_state.h,#392
+src/scripts/unit_script.cpp,src/graphics/particles.h,#392
 src/sound/cd_audio.cpp,interfaces/host.h,#392
 src/sound/cd_audio.cpp,src/graphics/display.h,#392
 src/sound/cd_audio.cpp,src/sound/cd_audio.h,#392
@@ -402,8 +406,6 @@ src/sound/sound.cpp,src/graphics/object_pool.h,#392
 src/sound/sound.cpp,src/ingame/selection.h,#392
 src/sound/sound.cpp,src/sound/play_sound.h,#392
 src/sound/sound.cpp,src/sound/sound.h,#392
-src/units/cob.cpp,src/graphics/display.h,#392
-src/units/cob.cpp,src/graphics/object_pool.h,#392
 src/units/movement_class.cpp,src/graphics/object_pool.h,#392
 src/units/squads.cpp,src/graphics/object_pool.h,#392
 src/units/unit.cpp,src/ingame/control_panel.h,#392
@@ -418,9 +420,6 @@ src/units/unit_position.cpp,src/gui/keyboard.h,#392
 src/units/unit_position.cpp,src/ingame/control_panel.h,#392
 src/units/unit_position.cpp,src/ingame/selection.h,#392
 src/units/unit_position.cpp,src/sound/sound.h,#392
-src/units/unit_script.cpp,src/graphics/particles.h,#392
-src/units/unit_scripts.cpp,src/graphics/spot_state.h,#392
-src/units/unit_scripts.cpp,src/sound/sound.h,#392
 src/units/unit_targets.cpp,interfaces/host.h,#392
 src/units/unit_targets.cpp,src/graphics/display.h,#392
 src/units/unit_targets.cpp,src/ingame/game_dialogs.h,#392

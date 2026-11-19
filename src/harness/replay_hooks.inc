@@ -26,6 +26,10 @@ const PlayersSeam* s_inner_players;
 PlayersSeam s_rec_players;
 const MapSeam* s_inner_map;
 MapSeam s_rec_map;
+const ScriptsSeam* s_inner_scripts;
+ScriptsSeam s_rec_scripts;
+const MovementSeam* s_inner_movement;
+MovementSeam s_rec_movement;
 const FilesSeam* s_inner_files;
 FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
@@ -1721,69 +1725,6 @@ void __stdcall RecOrdersRunSecondaryOrders(Unit* a0)
     }
 }
 
-void __fastcall RecOrdersDestroyMotionObject(UnitMotion* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    SlotScope scope(RSL_ORDERS_DESTROYMOTIONOBJECT, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-    }
-    s_inner_orders->DestroyMotionObject(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecOrdersLoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_ORDERS_LOADMOTION, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-        ArgHandle(s_call, "file", OBJ_BANK, a3);
-    }
-    s_inner_orders->LoadMotion(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecOrdersSaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_ORDERS_SAVEMOTION, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-        ArgHandle(s_call, "file", OBJ_BANK, a3);
-    }
-    s_inner_orders->SaveMotion(a0, a1, a2, a3);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecOrdersUpdateMotion(UnitMotion* a0, int a1, Unit* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    roots.Add(ROK_UNIT, a2);
-    SlotScope scope(RSL_ORDERS_UPDATEMOTION, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "unit", ROK_UNIT, a2);
-    }
-    s_inner_orders->UpdateMotion(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecOrdersRegisterAllOrderTypes()
 {
     ReplayRoots roots;
@@ -1802,19 +1743,6 @@ void __stdcall RecOrdersClearOrderTypeTable()
     if (scope.Open()) {
     }
     s_inner_orders->ClearOrderTypeTable();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersNewUnitMotion(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_ORDERS_NEWUNITMOTION, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_orders->NewUnitMotion(a0);
     if (scope.Open()) {
     }
 }
@@ -1921,33 +1849,6 @@ void __stdcall RecOrdersOrderOrStatusFlags(OrderBase* a0, unsigned int a1)
     }
 }
 
-void __stdcall RecOrdersUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNITMOTION, a0);
-    SlotScope scope(RSL_ORDERS_UNITMOTIONREADNETSTATE, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
-        ArgPending(s_call, "reader");
-    }
-    s_inner_orders->UnitMotionReadNetState(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecOrdersApplyPathEvent(const PathEvent* a0, const PathPoint* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ORDERS_APPLYPATHEVENT, SUB_ORDERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "event");
-        ArgPending(s_call, "waypoints");
-    }
-    s_inner_orders->ApplyPathEvent(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecUnitsUpdateAllUnits()
 {
     ReplayRoots roots;
@@ -1972,94 +1873,6 @@ int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
         ImportVec3Xz(line, "pos", a0);
     }
     int result = s_inner_units->GetGroundHeight(a0);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsGetSweetSpot(Unit* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETSWEETSPOT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetSweetSpot");
-        ImportObject(line, ROK_UNIT, a0);
-    }
-    s_inner_units->GetSweetSpot(a0, a1);
-    if (scope.Import()) {
-        ImportOutVec3(line, "out", a1);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecUnitsFindScript(CobScript* a0, const char* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_FINDSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.FindScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-    }
-    int result = s_inner_units->FindScript(a0, a1);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsStartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-        ArgValue(s_call, "count", a4);
-        ArgValue(s_call, "a", a5);
-        ArgValue(s_call, "b", a6);
-        ArgValue(s_call, "c", a7);
-        ArgValue(s_call, "d", a8);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.StartScriptWithArgs");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportPending(line);
-        ImportValue(line, a3);
-        ImportValue(line, a4);
-        ImportValue(line, a5);
-        ImportValue(line, a6);
-        ImportValue(line, a7);
-        ImportValue(line, a8);
-    }
-    int result = s_inner_units->StartScriptWithArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8);
     if (scope.Import()) {
         ImportResult(line, result);
         FinishImport(line);
@@ -2147,144 +1960,6 @@ void __stdcall RecUnitsRefreshUnitIfStale(MovementClass* a0, Unit* a1)
     s_inner_units->RefreshUnitIfStale(a0, a1);
     if (scope.Open()) {
     }
-}
-
-int __stdcall RecUnitsStartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.StartScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportPending(line);
-        ImportValue(line, a3);
-    }
-    int result = s_inner_units->StartScript(a0, a1, a2, a3);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_QUERYSCRIPT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "name", (const char*)a1);
-        ArgInOutScalar(s_call, "p2", a2);
-        ArgInOutScalar(s_call, "p3", a3);
-        ArgInOutScalar(s_call, "p4", a4);
-        ArgInOutScalar(s_call, "p5", a5);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.QueryScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-        ImportInOutScalar(line, a2);
-        ImportInOutScalar(line, a3);
-        ImportInOutScalar(line, a4);
-        ImportInOutScalar(line, a5);
-    }
-    int result = s_inner_units->QueryScript(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        ImportOutInOutScalar(line, "p2", a2);
-        ImportOutInOutScalar(line, "p3", a3);
-        ImportOutInOutScalar(line, "p4", a4);
-        ImportOutInOutScalar(line, "p5", a5);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgInOutScalarExit(s_tail, "p2", a2);
-        ArgInOutScalarExit(s_tail, "p3", a3);
-        ArgInOutScalarExit(s_tail, "p4", a4);
-        ArgInOutScalarExit(s_tail, "p5", a5);
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETAIMFROMPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "weapon", a2);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetAimFromPosition");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a2);
-    }
-    s_inner_units->GetAimFromPosition(a0, a1, a2);
-    if (scope.Import()) {
-        ImportOutVec3(line, "out", a1);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-Vec3 __stdcall RecUnitsGetPieceOffset(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEOFFSET, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetPieceOffset");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportValue(line, a1);
-    }
-    Vec3 result = s_inner_units->GetPieceOffset(a0, a1);
-    if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
-    }
-    return result;
-}
-
-Vec3 __stdcall RecUnitsGetPiecePosition(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    Vec3 result = s_inner_units->GetPiecePosition(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecUnitsMarkRecentlyDamaged(Unit* a0)
@@ -2625,35 +2300,6 @@ void __stdcall RecUnitsAttachUnitToPiece(Unit* a0, Unit* a1, char a2, char a3)
     }
 }
 
-void __stdcall RecUnitsGetNanoPiecePosition(Unit* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETNANOPIECEPOSITION, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgPending(s_call, "out");
-    }
-    s_inner_units->GetNanoPiecePosition(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-Angles16 __stdcall RecUnitsGetPieceAngles(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_GETPIECEANGLES, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "piece", a1);
-    }
-    Angles16 result = s_inner_units->GetPieceAngles(a0, a1);
-    if (scope.Open()) {
-    }
-    return result;
-}
-
 int __stdcall RecUnitsAddBuildProgress(Unit* a0, Unit* a1, float a2)
 {
     ReplayRoots roots;
@@ -2802,29 +2448,6 @@ void __fastcall RecUnitsUnitRefUnlink(UnitRef* a0)
     }
 }
 
-int __stdcall RecUnitsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPT, a0);
-    SlotScope scope(RSL_UNITS_STARTSCRIPTWITHARGSBYINDEX, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
-        ArgValue(s_call, "index", a1);
-        ArgPending(s_call, "callback");
-        ArgValue(s_call, "update", a3);
-        ArgValue(s_call, "count", a4);
-        ArgValue(s_call, "a", a5);
-        ArgValue(s_call, "b", a6);
-        ArgValue(s_call, "c", a7);
-        ArgValue(s_call, "d", a8);
-    }
-    int result = s_inner_units->StartScriptWithArgsByIndex(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
 {
     ReplayRoots roots;
@@ -2841,59 +2464,6 @@ void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall RecUnitsPoseUnitModel(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_POSEUNITMODEL, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_units->PoseUnitModel(a0);
-    if (scope.Open()) {
-    }
-}
-
-ModelState* __stdcall RecUnitsCreateObjectState(Object3do* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_OBJECT3DO, a0);
-    SlotScope scope(RSL_UNITS_CREATEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
-    }
-    ModelState* result = s_inner_units->CreateObjectState(a0);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsFreeObjectState(ModelState* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MODELSTATE, a0);
-    SlotScope scope(RSL_UNITS_FREEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
-    }
-    s_inner_units->FreeObjectState(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsUpdateObjectState(UnitDrawView* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UPDATEOBJECTSTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "unit");
-    }
-    s_inner_units->UpdateObjectState(a0);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecUnitsUpdateUnit(Unit* a0)
 {
     ReplayRoots roots;
@@ -2905,21 +2475,6 @@ void __stdcall RecUnitsUpdateUnit(Unit* a0)
     s_inner_units->UpdateUnit(a0);
     if (scope.Open()) {
     }
-}
-
-unsigned int __stdcall RecUnitsObjectStateSize(Object3do* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_OBJECT3DO, a0);
-    SlotScope scope(RSL_UNITS_OBJECTSTATESIZE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
-    }
-    unsigned int result = s_inner_units->ObjectStateSize(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
@@ -2969,6 +2524,35 @@ void __stdcall RecUnitsRefreshFactoryIndex(int a0)
         ArgValue(s_call, "player", a0);
     }
     s_inner_units->RefreshFactoryIndex(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsUnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_UNITS_UNITREFINIT, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "ref");
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+        ArgPending(s_call, "value");
+    }
+    s_inner_units->UnitRefInit(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsUnitRefSetUnit(UnitRef* a0, Unit* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_UNITS_UNITREFSETUNIT, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "ref");
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+    }
+    s_inner_units->UnitRefSetUnit(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -3454,6 +3038,993 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+int __stdcall RecScriptsStartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.StartScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+    }
+    int result = s_inner_scripts->StartScript(a0, a1, a2, a3);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsStartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPTWITHARGS, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+        ArgValue(s_call, "count", a4);
+        ArgValue(s_call, "a", a5);
+        ArgValue(s_call, "b", a6);
+        ArgValue(s_call, "c", a7);
+        ArgValue(s_call, "d", a8);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.StartScriptWithArgs");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportPending(line);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+        ImportValue(line, a6);
+        ImportValue(line, a7);
+        ImportValue(line, a8);
+    }
+    int result = s_inner_scripts->StartScriptWithArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_STARTSCRIPTWITHARGSBYINDEX, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "index", a1);
+        ArgPending(s_call, "callback");
+        ArgValue(s_call, "update", a3);
+        ArgValue(s_call, "count", a4);
+        ArgValue(s_call, "a", a5);
+        ArgValue(s_call, "b", a6);
+        ArgValue(s_call, "c", a7);
+        ArgValue(s_call, "d", a8);
+    }
+    int result = s_inner_scripts->StartScriptWithArgsByIndex(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_QUERYSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+        ArgInOutScalar(s_call, "p2", a2);
+        ArgInOutScalar(s_call, "p3", a3);
+        ArgInOutScalar(s_call, "p4", a4);
+        ArgInOutScalar(s_call, "p5", a5);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.QueryScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+        ImportInOutScalar(line, a2);
+        ImportInOutScalar(line, a3);
+        ImportInOutScalar(line, a4);
+        ImportInOutScalar(line, a5);
+    }
+    int result = s_inner_scripts->QueryScript(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ImportOutInOutScalar(line, "p2", a2);
+        ImportOutInOutScalar(line, "p3", a3);
+        ImportOutInOutScalar(line, "p4", a4);
+        ImportOutInOutScalar(line, "p5", a5);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgInOutScalarExit(s_tail, "p2", a2);
+        ArgInOutScalarExit(s_tail, "p3", a3);
+        ArgInOutScalarExit(s_tail, "p4", a4);
+        ArgInOutScalarExit(s_tail, "p5", a5);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_FINDSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "name", (const char*)a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.FindScript");
+        ImportObject(line, ROK_COBSCRIPT, a0);
+        ImportValue(line, (const char*)a1);
+    }
+    int result = s_inner_scripts->FindScript(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEOFFSET, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetPieceOffset");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
+    Vec3 result = s_inner_scripts->GetPieceOffset(a0, a1);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_VEC3, &result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+    }
+    return result;
+}
+
+Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETPIECEANGLES, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "piece", a1);
+    }
+    Angles16 result = s_inner_scripts->GetPieceAngles(a0, a1);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+void __stdcall RecScriptsGetNanoPiecePosition(Unit* a0, Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETNANOPIECEPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgPending(s_call, "out");
+    }
+    s_inner_scripts->GetNanoPiecePosition(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETAIMFROMPOSITION, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "weapon", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetAimFromPosition");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a2);
+    }
+    s_inner_scripts->GetAimFromPosition(a0, a1, a2);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsGetSweetSpot(Unit* a0, Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_GETSWEETSPOT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetSweetSpot");
+        ImportObject(line, ROK_UNIT, a0);
+    }
+    s_inner_scripts->GetSweetSpot(a0, a1);
+    if (scope.Import()) {
+        ImportOutVec3(line, "out", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsPoseUnitModel(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_POSEUNITMODEL, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_scripts->PoseUnitModel(a0);
+    if (scope.Open()) {
+    }
+}
+
+ModelState* __stdcall RecScriptsCreateObjectState(Object3do* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    SlotScope scope(RSL_SCRIPTS_CREATEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+    }
+    ModelState* result = s_inner_scripts->CreateObjectState(a0);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsFreeObjectState(ModelState* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a0);
+    SlotScope scope(RSL_SCRIPTS_FREEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
+    }
+    s_inner_scripts->FreeObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsUpdateObjectState(UnitDrawView* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_SCRIPTS_UPDATEOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "unit");
+    }
+    s_inner_scripts->UpdateObjectState(a0);
+    if (scope.Open()) {
+    }
+}
+
+unsigned int __stdcall RecScriptsObjectStateSize(Object3do* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    SlotScope scope(RSL_SCRIPTS_OBJECTSTATESIZE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+    }
+    unsigned int result = s_inner_scripts->ObjectStateSize(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsNewUnitScript(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_SCRIPTS_NEWUNITSCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_scripts->NewUnitScript(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsSetCob(CobScript* a0, ScriptTable* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_SETCOB, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgPending(s_call, "data");
+    }
+    s_inner_scripts->SetCob(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+ModelState* __stdcall RecScriptsCreatePlayerObjectState(Object3do* a0, ScriptTable* a1, Unit* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_OBJECT3DO, a0);
+    roots.Add(ROK_UNIT, a2);
+    SlotScope scope(RSL_SCRIPTS_CREATEPLAYEROBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
+        ArgPending(s_call, "data");
+        ArgObject(s_call, "owner", ROK_UNIT, a2);
+    }
+    ModelState* result = s_inner_scripts->CreatePlayerObjectState(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_MODELSTATE, result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsSetObjectState(UnitScript* a0, ModelState* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a1);
+    SlotScope scope(RSL_SCRIPTS_SETOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "script");
+        ArgObject(s_call, "state", ROK_MODELSTATE, a1);
+    }
+    s_inner_scripts->SetObjectState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsRunScripts(CobScript* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_RUNSCRIPTS, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgValue(s_call, "elapsed", a1);
+    }
+    s_inner_scripts->RunScripts(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsSaveScriptState(CobScript* a0, HapiBank* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_SAVESCRIPTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+    }
+    s_inner_scripts->SaveScriptState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecScriptsLoadScriptState(CobScript* a0, HapiBank* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_LOADSCRIPTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+    }
+    int result = s_inner_scripts->LoadScriptState(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecScriptsDeleteScript(CobScript* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_COBSCRIPT, a0);
+    SlotScope scope(RSL_SCRIPTS_DELETESCRIPT, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
+    }
+    s_inner_scripts->DeleteScript(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecScriptsInitObjectState(ModelState* a0, Object3do* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a0);
+    roots.Add(ROK_OBJECT3DO, a1);
+    SlotScope scope(RSL_SCRIPTS_INITOBJECTSTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "state", ROK_MODELSTATE, a0);
+        ArgObject(s_call, "model", ROK_OBJECT3DO, a1);
+    }
+    s_inner_scripts->InitObjectState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __fastcall RecMovementUpdateMotion(UnitMotion* a0, int a1, Unit* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    roots.Add(ROK_UNIT, a2);
+    SlotScope scope(RSL_MOVEMENT_UPDATEMOTION, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgValue(s_call, "unusedEdx", a1);
+        ArgObject(s_call, "unit", ROK_UNIT, a2);
+    }
+    s_inner_movement->UpdateMotion(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementApplyPathEvent(const PathEvent* a0, const PathPoint* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_APPLYPATHEVENT, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "event");
+        ArgPending(s_call, "waypoints");
+    }
+    s_inner_movement->ApplyPathEvent(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementNewUnitMotion(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWUNITMOTION, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_movement->NewUnitMotion(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __fastcall RecMovementLoadMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    roots.Add(ROK_UNIT, a2);
+    SlotScope scope(RSL_MOVEMENT_LOADMOTION, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgValue(s_call, "unusedEdx", a1);
+        ArgObject(s_call, "unit", ROK_UNIT, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a3);
+    }
+    s_inner_movement->LoadMotion(a0, a1, a2, a3);
+    if (scope.Open()) {
+    }
+}
+
+void __fastcall RecMovementSaveMotion(UnitMotion* a0, int a1, Unit* a2, HapiBank* a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    roots.Add(ROK_UNIT, a2);
+    SlotScope scope(RSL_MOVEMENT_SAVEMOTION, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgValue(s_call, "unusedEdx", a1);
+        ArgObject(s_call, "unit", ROK_UNIT, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a3);
+    }
+    s_inner_movement->SaveMotion(a0, a1, a2, a3);
+    if (scope.Open()) {
+    }
+}
+
+void __fastcall RecMovementDestroyMotionObject(UnitMotion* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_MOVEMENT_DESTROYMOTIONOBJECT, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+    }
+    s_inner_movement->DestroyMotionObject(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementUnitMotionReadNetState(UnitMotion* a0, BitReader* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_MOVEMENT_UNITMOTIONREADNETSTATE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgPending(s_call, "reader");
+    }
+    s_inner_movement->UnitMotionReadNetState(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementSetFlightMode(UnitMotion* a0, Unit* a1, int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MOVEMENT_SETFLIGHTMODE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+        ArgValue(s_call, "state", a2);
+    }
+    s_inner_movement->SetFlightMode(a0, a1, a2);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementPathOrderSetAltitude(PathOrder* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_PATHORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_PATHORDERSETALTITUDE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "order", ROK_PATHORDER, a0);
+        ArgValue(s_call, "altitude", a1);
+    }
+    s_inner_movement->PathOrderSetAltitude(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementPathOrderSetApproachRadius(PathOrder* a0, short a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_PATHORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_PATHORDERSETAPPROACHRADIUS, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "order", ROK_PATHORDER, a0);
+        ArgValue(s_call, "radius", a1);
+    }
+    s_inner_movement->PathOrderSetApproachRadius(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementPathOrderSetHeading(PathOrder* a0, short a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_PATHORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_PATHORDERSETHEADING, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "order", ROK_PATHORDER, a0);
+        ArgValue(s_call, "heading", a1);
+    }
+    s_inner_movement->PathOrderSetHeading(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementAirManeuverOrderSetAltitude(AirManeuverOrder* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_AIRMANEUVERORDERSETALTITUDE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "order");
+        ArgValue(s_call, "altitude", a1);
+    }
+    s_inner_movement->AirManeuverOrderSetAltitude(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+PathOrder* __stdcall RecMovementNewPathOrderAt(Order* a0, const Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWPATHORDERAT, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgPending(s_call, "pos");
+    }
+    PathOrder* result = s_inner_movement->NewPathOrderAt(a0, a1);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PATHORDER, result, "o");
+    }
+    return result;
+}
+
+PathOrder* __stdcall RecMovementNewPathOrderToUnit(Order* a0, Unit* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MOVEMENT_NEWPATHORDERTOUNIT, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+    }
+    PathOrder* result = s_inner_movement->NewPathOrderToUnit(a0, a1);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PATHORDER, result, "o");
+    }
+    return result;
+}
+
+PathOrder* __stdcall RecMovementNewPathOrderToUnitAt(Order* a0, Unit* a1, const Vec3* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MOVEMENT_NEWPATHORDERTOUNITAT, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+        ArgPending(s_call, "pos");
+    }
+    PathOrder* result = s_inner_movement->NewPathOrderToUnitAt(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PATHORDER, result, "o");
+    }
+    return result;
+}
+
+PathOrder* __stdcall RecMovementNewPathOrderToUnitAtAngle(Order* a0, Unit* a1, short a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MOVEMENT_NEWPATHORDERTOUNITATANGLE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+        ArgValue(s_call, "angle", a2);
+    }
+    PathOrder* result = s_inner_movement->NewPathOrderToUnitAtAngle(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PATHORDER, result, "o");
+    }
+    return result;
+}
+
+AirManeuverOrder* __stdcall RecMovementNewAirManeuverOrder(Order* a0, const Vec3* a1, const Vec3* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWAIRMANEUVERORDER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgPending(s_call, "from");
+        ArgPending(s_call, "to");
+    }
+    AirManeuverOrder* result = s_inner_movement->NewAirManeuverOrder(a0, a1, a2);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+ApproachRadius* __stdcall RecMovementNewApproachRadius(Order* a0, int a1, int a2, int a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWAPPROACHRADIUS, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+        ArgValue(s_call, "radius", a3);
+    }
+    ApproachRadius* result = s_inner_movement->NewApproachRadius(a0, a1, a2, a3);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_APPROACHRADIUS, result, "o");
+    }
+    return result;
+}
+
+RingApproach* __stdcall RecMovementNewRingApproach(Order* a0, int a1, int a2, int a3, int a4)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWRINGAPPROACH, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+        ArgValue(s_call, "inner", a3);
+        ArgValue(s_call, "outer", a4);
+    }
+    RingApproach* result = s_inner_movement->NewRingApproach(a0, a1, a2, a3, a4);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_RINGAPPROACH, result, "o");
+    }
+    return result;
+}
+
+PointMarker* __stdcall RecMovementNewPointMarker(Order* a0, Point16 a1, Point16 a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_NEWPOINTMARKER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgValue(s_call, "pos", a1);
+        ArgValue(s_call, "size", a2);
+    }
+    PointMarker* result = s_inner_movement->NewPointMarker(a0, a1, a2);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+PathOrder* __stdcall RecMovementLoadPathOrder(Order* a0, HapiBank* a1, char* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_LOADPATHORDER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+        ArgValue(s_call, "name", (const char*)a2);
+    }
+    PathOrder* result = s_inner_movement->LoadPathOrder(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_PATHORDER, result, "o");
+    }
+    return result;
+}
+
+AirManeuverOrder* __stdcall RecMovementLoadAirManeuverOrder(Order* a0, HapiBank* a1, char* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_LOADAIRMANEUVERORDER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+        ArgValue(s_call, "name", (const char*)a2);
+    }
+    AirManeuverOrder* result = s_inner_movement->LoadAirManeuverOrder(a0, a1, a2);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+ApproachRadius* __stdcall RecMovementLoadApproachRadius(Order* a0, HapiBank* a1, char* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_LOADAPPROACHRADIUS, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+        ArgValue(s_call, "name", (const char*)a2);
+    }
+    ApproachRadius* result = s_inner_movement->LoadApproachRadius(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_APPROACHRADIUS, result, "o");
+    }
+    return result;
+}
+
+RingApproach* __stdcall RecMovementLoadRingApproach(Order* a0, HapiBank* a1, char* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_LOADRINGAPPROACH, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+        ArgValue(s_call, "name", (const char*)a2);
+    }
+    RingApproach* result = s_inner_movement->LoadRingApproach(a0, a1, a2);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_RINGAPPROACH, result, "o");
+    }
+    return result;
+}
+
+PointMarker* __stdcall RecMovementLoadPointMarker(Order* a0, HapiBank* a1, char* a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDER, a0);
+    SlotScope scope(RSL_MOVEMENT_LOADPOINTMARKER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "source", ROK_ORDER, a0);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
+        ArgValue(s_call, "name", (const char*)a2);
+    }
+    PointMarker* result = s_inner_movement->LoadPointMarker(a0, a1, a2);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+PathGoal* __stdcall RecMovementMotionGoal(UnitMotion* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_MOVEMENT_MOTIONGOAL, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+    }
+    PathGoal* result = s_inner_movement->MotionGoal(a0);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+OrderFx* __stdcall RecMovementGoalTarget(PathGoal* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_GOALTARGET, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "goal");
+    }
+    OrderFx* result = s_inner_movement->GoalTarget(a0);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDERFX, result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecMovementGoalSetPathOrder(PathGoal* a0, void* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_GOALSETPATHORDER, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "goal");
+        ArgPending(s_call, "target");
+    }
+    s_inner_movement->GoalSetPathOrder(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMovementOrderFxDestroy(OrderFx* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
+    SlotScope scope(RSL_MOVEMENT_ORDERFXDESTROY, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "target", ROK_ORDERFX, a0);
+    }
+    s_inner_movement->OrderFxDestroy(a0);
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecMovementOrderFxGetType(OrderFx* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
+    SlotScope scope(RSL_MOVEMENT_ORDERFXGETTYPE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "target", ROK_ORDERFX, a0);
+    }
+    int result = s_inner_movement->OrderFxGetType(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMovementOrderFxSerializeToSave(OrderFx* a0, Order* a1, HapiBank* a2, char* a3)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_ORDERFX, a0);
+    roots.Add(ROK_ORDER, a1);
+    SlotScope scope(RSL_MOVEMENT_ORDERFXSERIALIZETOSAVE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "target", ROK_ORDERFX, a0);
+        ArgObject(s_call, "order", ROK_ORDER, a1);
+        ArgHandle(s_call, "file", OBJ_BANK, a2);
+        ArgValue(s_call, "name", (const char*)a3);
+    }
+    int result = s_inner_movement->OrderFxSerializeToSave(a0, a1, a2, a3);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMovementGoalHasNetUnitState(PathGoal* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_GOALHASNETUNITSTATE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "goal");
+    }
+    int result = s_inner_movement->GoalHasNetUnitState(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecMovementGoalSerializeNetUnitState(PathGoal* a0, BitWriter* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_GOALSERIALIZENETUNITSTATE, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "goal");
+        ArgPending(s_call, "stream");
+    }
+    s_inner_movement->GoalSerializeNetUnitState(a0, a1);
+    if (scope.Open()) {
+    }
 }
 
 FileHandle* __stdcall RecFilesOpenRead(char* a0)
@@ -4730,17 +5301,17 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_WEAPONS:
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
-        if (slot == RSL_UNITS_STARTSCRIPT)
+        if (slot == RSL_SCRIPTS_STARTSCRIPT)
             return true;
-        if (slot == RSL_UNITS_STARTSCRIPTWITHARGS)
+        if (slot == RSL_SCRIPTS_STARTSCRIPTWITHARGS)
             return true;
-        if (slot == RSL_UNITS_FINDSCRIPT)
+        if (slot == RSL_SCRIPTS_FINDSCRIPT)
             return true;
-        if (slot == RSL_UNITS_GETAIMFROMPOSITION)
+        if (slot == RSL_SCRIPTS_GETAIMFROMPOSITION)
             return true;
-        if (slot == RSL_UNITS_GETPIECEOFFSET)
+        if (slot == RSL_SCRIPTS_GETPIECEOFFSET)
             return true;
-        if (slot == RSL_UNITS_QUERYSCRIPT)
+        if (slot == RSL_SCRIPTS_QUERYSCRIPT)
             return true;
         if (slot == RSL_UNITS_MARKRECENTLYDAMAGED)
             return true;
@@ -4766,7 +5337,7 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_UNITS_GETGROUNDHEIGHT)
             return true;
-        if (slot == RSL_UNITS_GETSWEETSPOT)
+        if (slot == RSL_SCRIPTS_GETSWEETSPOT)
             return true;
         return false;
     case SUB_MAP:
@@ -4818,6 +5389,10 @@ void HookSeams(const bool* on)
     s_rec_players = *s_inner_players;
     s_inner_map = g_seams.map;
     s_rec_map = *s_inner_map;
+    s_inner_scripts = g_seams.scripts;
+    s_rec_scripts = *s_inner_scripts;
+    s_inner_movement = g_seams.movement;
+    s_rec_movement = *s_inner_movement;
     s_inner_files = g_seams.files;
     s_rec_files = *s_inner_files;
     s_inner_network = g_seams.network;
@@ -5063,19 +5638,9 @@ void HookSeams(const bool* on)
     if (on[SUB_ORDERS])
         s_rec_orders.RunSecondaryOrders = RecOrdersRunSecondaryOrders;
     if (on[SUB_ORDERS])
-        s_rec_orders.DestroyMotionObject = RecOrdersDestroyMotionObject;
-    if (on[SUB_ORDERS])
-        s_rec_orders.LoadMotion = RecOrdersLoadMotion;
-    if (on[SUB_ORDERS])
-        s_rec_orders.SaveMotion = RecOrdersSaveMotion;
-    if (on[SUB_ORDERS])
-        s_rec_orders.UpdateMotion = RecOrdersUpdateMotion;
-    if (on[SUB_ORDERS])
         s_rec_orders.RegisterAllOrderTypes = RecOrdersRegisterAllOrderTypes;
     if (on[SUB_ORDERS])
         s_rec_orders.ClearOrderTypeTable = RecOrdersClearOrderTypeTable;
-    if (on[SUB_ORDERS])
-        s_rec_orders.NewUnitMotion = RecOrdersNewUnitMotion;
     if (on[SUB_ORDERS])
         s_rec_orders.LoadOrder = RecOrdersLoadOrder;
     if (on[SUB_ORDERS] || on[SUB_WEAPONS])
@@ -5086,20 +5651,10 @@ void HookSeams(const bool* on)
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
-    if (on[SUB_ORDERS])
-        s_rec_orders.UnitMotionReadNetState = RecOrdersUnitMotionReadNetState;
-    if (on[SUB_ORDERS])
-        s_rec_orders.ApplyPathEvent = RecOrdersApplyPathEvent;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
     if (on[SUB_UNITS] || on[SUB_TARGETING])
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
-    if (on[SUB_UNITS] || on[SUB_TARGETING])
-        s_rec_units.GetSweetSpot = RecUnitsGetSweetSpot;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.FindScript = RecUnitsFindScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.StartScriptWithArgs = RecUnitsStartScriptWithArgs;
     if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
     if (on[SUB_UNITS])
@@ -5110,16 +5665,6 @@ void HookSeams(const bool* on)
         s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
     if (on[SUB_UNITS])
         s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.StartScript = RecUnitsStartScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.QueryScript = RecUnitsQueryScript;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.GetAimFromPosition = RecUnitsGetAimFromPosition;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
-        s_rec_units.GetPieceOffset = RecUnitsGetPieceOffset;
-    if (on[SUB_UNITS])
-        s_rec_units.GetPiecePosition = RecUnitsGetPiecePosition;
     if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
@@ -5173,10 +5718,6 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.AttachUnitToPiece = RecUnitsAttachUnitToPiece;
     if (on[SUB_UNITS])
-        s_rec_units.GetNanoPiecePosition = RecUnitsGetNanoPiecePosition;
-    if (on[SUB_UNITS])
-        s_rec_units.GetPieceAngles = RecUnitsGetPieceAngles;
-    if (on[SUB_UNITS])
         s_rec_units.AddBuildProgress = RecUnitsAddBuildProgress;
     if (on[SUB_UNITS])
         s_rec_units.AddRepairProgress = RecUnitsAddRepairProgress;
@@ -5195,21 +5736,9 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.UnitRefUnlink = RecUnitsUnitRefUnlink;
     if (on[SUB_UNITS])
-        s_rec_units.StartScriptWithArgsByIndex = RecUnitsStartScriptWithArgsByIndex;
-    if (on[SUB_UNITS])
         s_rec_units.UpdateSfxOccupy = RecUnitsUpdateSfxOccupy;
     if (on[SUB_UNITS])
-        s_rec_units.PoseUnitModel = RecUnitsPoseUnitModel;
-    if (on[SUB_UNITS])
-        s_rec_units.CreateObjectState = RecUnitsCreateObjectState;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeObjectState = RecUnitsFreeObjectState;
-    if (on[SUB_UNITS])
-        s_rec_units.UpdateObjectState = RecUnitsUpdateObjectState;
-    if (on[SUB_UNITS])
         s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.ObjectStateSize = RecUnitsObjectStateSize;
     if (on[SUB_UNITS])
         s_rec_units.GetFactoriesInRadius = RecUnitsGetFactoriesInRadius;
     if (on[SUB_UNITS])
@@ -5218,6 +5747,10 @@ void HookSeams(const bool* on)
         s_rec_units.FreeFactoryIndex = RecUnitsFreeFactoryIndex;
     if (on[SUB_UNITS])
         s_rec_units.RefreshFactoryIndex = RecUnitsRefreshFactoryIndex;
+    if (on[SUB_UNITS])
+        s_rec_units.UnitRefInit = RecUnitsUnitRefInit;
+    if (on[SUB_UNITS])
+        s_rec_units.UnitRefSetUnit = RecUnitsUnitRefSetUnit;
     if (on[SUB_UNITS])
         s_rec_units.WriteState = RecUnitsWriteState;
     if (on[SUB_PLAYERS])
@@ -5292,6 +5825,122 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.StartScript = RecScriptsStartScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.StartScriptWithArgs = RecScriptsStartScriptWithArgs;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.StartScriptWithArgsByIndex = RecScriptsStartScriptWithArgsByIndex;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.QueryScript = RecScriptsQueryScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.FindScript = RecScriptsFindScript;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.GetPieceOffset = RecScriptsGetPieceOffset;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetPiecePosition = RecScriptsGetPiecePosition;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetPieceAngles = RecScriptsGetPieceAngles;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.GetNanoPiecePosition = RecScriptsGetNanoPiecePosition;
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+        s_rec_scripts.GetAimFromPosition = RecScriptsGetAimFromPosition;
+    if (on[SUB_SCRIPTS] || on[SUB_TARGETING])
+        s_rec_scripts.GetSweetSpot = RecScriptsGetSweetSpot;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.PoseUnitModel = RecScriptsPoseUnitModel;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.CreateObjectState = RecScriptsCreateObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.FreeObjectState = RecScriptsFreeObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.UpdateObjectState = RecScriptsUpdateObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.ObjectStateSize = RecScriptsObjectStateSize;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.NewUnitScript = RecScriptsNewUnitScript;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SetCob = RecScriptsSetCob;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.CreatePlayerObjectState = RecScriptsCreatePlayerObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SetObjectState = RecScriptsSetObjectState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.RunScripts = RecScriptsRunScripts;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.SaveScriptState = RecScriptsSaveScriptState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.LoadScriptState = RecScriptsLoadScriptState;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.DeleteScript = RecScriptsDeleteScript;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.InitObjectState = RecScriptsInitObjectState;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.UpdateMotion = RecMovementUpdateMotion;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.ApplyPathEvent = RecMovementApplyPathEvent;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewUnitMotion = RecMovementNewUnitMotion;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadMotion = RecMovementLoadMotion;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.SaveMotion = RecMovementSaveMotion;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.DestroyMotionObject = RecMovementDestroyMotionObject;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.UnitMotionReadNetState = RecMovementUnitMotionReadNetState;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.SetFlightMode = RecMovementSetFlightMode;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.PathOrderSetAltitude = RecMovementPathOrderSetAltitude;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.PathOrderSetApproachRadius = RecMovementPathOrderSetApproachRadius;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.PathOrderSetHeading = RecMovementPathOrderSetHeading;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.AirManeuverOrderSetAltitude = RecMovementAirManeuverOrderSetAltitude;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewPathOrderAt = RecMovementNewPathOrderAt;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewPathOrderToUnit = RecMovementNewPathOrderToUnit;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewPathOrderToUnitAt = RecMovementNewPathOrderToUnitAt;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewPathOrderToUnitAtAngle = RecMovementNewPathOrderToUnitAtAngle;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewAirManeuverOrder = RecMovementNewAirManeuverOrder;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewApproachRadius = RecMovementNewApproachRadius;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewRingApproach = RecMovementNewRingApproach;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.NewPointMarker = RecMovementNewPointMarker;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadPathOrder = RecMovementLoadPathOrder;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadAirManeuverOrder = RecMovementLoadAirManeuverOrder;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadApproachRadius = RecMovementLoadApproachRadius;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadRingApproach = RecMovementLoadRingApproach;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.LoadPointMarker = RecMovementLoadPointMarker;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.MotionGoal = RecMovementMotionGoal;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.GoalTarget = RecMovementGoalTarget;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.GoalSetPathOrder = RecMovementGoalSetPathOrder;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.OrderFxDestroy = RecMovementOrderFxDestroy;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.OrderFxGetType = RecMovementOrderFxGetType;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.OrderFxSerializeToSave = RecMovementOrderFxSerializeToSave;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.GoalHasNetUnitState = RecMovementGoalHasNetUnitState;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.GoalSerializeNetUnitState = RecMovementGoalSerializeNetUnitState;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])
@@ -5466,6 +6115,8 @@ void HookSeams(const bool* on)
     g_seams.units = &s_rec_units;
     g_seams.players = &s_rec_players;
     g_seams.map = &s_rec_map;
+    g_seams.scripts = &s_rec_scripts;
+    g_seams.movement = &s_rec_movement;
     g_seams.files = &s_rec_files;
     g_seams.network = &s_rec_network;
 }

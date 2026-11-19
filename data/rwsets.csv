@@ -26924,6 +26924,7 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,call,LoadUnitAccounts
 0x487080,LoadUnit,src/units/unit_save.cpp,call,LosRadarPublishSightLoad
 0x487080,LoadUnit,src/units/unit_save.cpp,call,MapPublishUnit
+0x487080,LoadUnit,src/units/unit_save.cpp,call,TargetingPublishLoad
 0x487080,LoadUnit,src/units/unit_save.cpp,call,WeaponsPublishLoadSlot
 0x487080,LoadUnit,src/units/unit_save.cpp,call,get
 0x487080,LoadUnit,src/units/unit_save.cpp,call,operator Order *
@@ -26939,7 +26940,6 @@ address,function,file,kind,target
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::footprint
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::list
 0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::list2
-0x487080,LoadUnit,src/units/unit_save.cpp,field_escape,Unit::weapons
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a0
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a1
 0x487080,LoadUnit,src/units/unit_save.cpp,field_read,FlagBits::a2
@@ -43061,11 +43061,14 @@ address,function,file,kind,target
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,call,SetWeaponTargetPos
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,call,SetWeaponTargetUnit
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,call,UnitOfHandle
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_escape,Unit::weapons
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::kind
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::pos
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::target
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::unit
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,field_read,TargetingEvent::weapon
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetXOrUnitId
+,ApplyTargetingEvent,src/units/unit_targets.cpp,field_write,UnitWeaponSlot::aimTargetZOrUnitSentinel
 ,ApplyTargetingEvent,src/units/unit_targets.cpp,function,
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,Call1
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch

@@ -573,7 +573,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **map** (81 functions). No phase root. 26 functions are called from outside, by seams (11), game (9), orders (4), presentation (4) and los_radar (3); the busiest are `GetGroundHeight` (22), `SnapWorldPosToFootprint` (4), `IsPadSlotFree` (2) and `CanBuildAt` (2). It imports 16 functions: files 5, platform 4, game 3, los_radar 2, features 1, harness 1. It holds the terrain and the ground height, the pass maps and when they are current, and the footprints (`docs/map-interface.md`). Coverage: 94.5% of functions (69 of 73), 93.8% of lines, 82.7% of branches; 4 live functions no scenario enters, and 9 more are dead (data/coverage.csv).
 
-**mission** (41 functions). No phase root. The mission, the campaign and the list of maps (`src/mission`, `interfaces/mission.h`, #983). 26 functions are called from outside, by seams (24), game (2), harness (1), network (1) and presentation (1); the busiest are `SetMissionType` (12) and the 25 other slots' functions, each through its filler. It imports 42 functions: platform 25, files 6, seams 4, game 3, presentation 3, wind_meteors 1. Its calls into players (the conditions of a mission) and wind_meteors (`LoadMeteorDefaults`) go through their seams. The inventory is `docs/mission-interface.md`. Coverage: 55.3% of functions (21 of 38), 73.9% of lines, 63.4% of branches; 17 live functions no scenario enters, and 2 more are dead (data/coverage.csv). The list of those 17 is under **mission, functions no scenario enters** below.
+**mission** (41 functions). No phase root. The mission, the campaign and the list of maps (`src/mission`, `interfaces/mission.h`, #983). 26 functions are called from outside, by seams (24), game (2), harness (1), network (1) and presentation (1); the busiest are `SetMissionType` (12) and the 25 other slots' functions, each through its filler. It imports 42 functions: platform 25, files 6, seams 4, game 3, presentation 3, wind_meteors 1. Its calls into players (the conditions of a mission) and wind_meteors (`LoadMeteorDefaults`) go through their seams. The inventory is `docs/mission-interface.md`. Coverage: 57.5% of functions (23 of 40), 73.9% of lines, 63.3% of branches; 17 live functions no scenario enters, and 1 more are dead (data/coverage.csv). The list of those 17 is under **mission, functions no scenario enters** below.
 
 **map, functions no scenario enters** (4 of 73 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421) and `save-midgame` (#422), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 69 are entered, 94.5%), by reason:
 
@@ -582,7 +582,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Test only (1): `MapWriteState`. The seam's `WriteState` writes map's report (record 45, `mapState`), which the harness dumps but does not hash, and only at the tick `-testdump` names; the coverage run does not pass it.
 - No caller in the game (1): `GetTerrainPassValue`. Its only caller is the pathfinding world's `TerrainPass` (`src/seams/pathfinding_world.cpp`, #930), which only the HPA* demo calls; 3.1c's pathfinder reads the pass maps instead.
 
-**mission, functions no scenario enters** (17 of 38 after the scenarios of `reference/scenarios/`; 21 are entered, 55.3%), by reason:
+**mission, functions no scenario enters** (17 of 40 after the scenarios of `reference/scenarios/`; 23 are entered, 57.5%), by reason:
 
 - Shutdown only (1): `FreeOtaEnumCacheAndMission`. It is called from `ShutdownIngameSystems`, which no scenario runs because test mode ends with `host_exit(0)` right after the last tick.
 - Network lobby and map check only (6): `Mission::ComputeMapChecksum`, `MapCacheEntry::MapCacheEntry`, `MapCacheEntry::MapCacheEntry` (the two constructors), `MapCacheEntry::operator?4`, `MapCacheEntry::SetChecksum` (all four only from `ComputeMapChecksum`) and `Mission::GetTerrainLength` (the map check of a joining player).
@@ -776,15 +776,15 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **units** | 109 of 126 | 86.5% | 84.5% | 68.7% | 17 | 27 |
 | **players** | 101 of 153 | 66.0% | 67.5% | 61.1% | 52 | 10 |
 | **map** | 69 of 73 | 94.5% | 93.8% | 82.7% | 4 | 9 |
-| **mission** | 21 of 38 | 55.3% | 73.9% | 63.4% | 17 | 2 |
+| **mission** | 23 of 40 | 57.5% | 73.9% | 63.3% | 17 | 1 |
 | **scripts** | 58 of 76 | 76.3% | 89.4% | 84.8% | 18 | 6 |
 | **movement** | 94 of 148 | 63.5% | 69.1% | 63.8% | 54 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 222 of 304 | 73.0% | 57.7% | 36.7% | 82 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 399 of 747 | 53.4% | 40.8% | 27.9% | 348 | 86 |
-| presentation | 565 of 1149 | 49.2% | 36.3% | 29.6% | 584 | 295 |
-| seams | 177 of 200 | 88.5% | 91.1% | 49.0% | 23 | 0 |
+| presentation | 565 of 1150 | 49.1% | 36.3% | 29.6% | 585 | 295 |
+| seams | 177 of 201 | 88.1% | 90.9% | 49.0% | 24 | 0 |
 | state | 485 of 553 | 87.7% | 70.2% | 49.3% | 68 | 58 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

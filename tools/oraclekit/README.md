@@ -69,8 +69,8 @@ has `meteor` at bit 5). It carries no cross-references to the decompilation (the
 | `game` | `Game` | section 8.2, `g_game` |
 | `sim_globals` | `SimGlobals` | section 8.2, `g_simGlobals` |
 | `params` | `MeteorShowerParams` | the argument of `LoadMeteorDefaults` and the parameters of a PARAMS event, section 9 |
-| `vec3` | `Vec3` | the position and velocity of `weapons.SpawnProjectile`, section 9.2 |
-| `weapon` | `WeaponDef` | the first argument of `weapons.SpawnProjectile` and the result of `weapons.FindWeaponByName`, section 9.2 |
+| `vec3` | `Vec3` | the positions that a weapons query such as `weapons.WeaponCanReachPos` takes, section 9.2 |
+| `weapon` | `WeaponDef` | the result of `weapons.FindWeaponByName`, section 9.2 |
 
 A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (section 7.1).
 

@@ -16,6 +16,14 @@ The classes:
 - **mixed**: used both ways. Split it; the note says how.
 - **const**: read-only input to the sim: nothing writes it, it stays in the image, and `--check` fails if a strong writer appears (in load code or not). A weak writer (a `?` in `writers`, the address taken or the table passed to a function) is allowed when the `note` says what it does with the table; `--check` fails on weak writers with an empty note.
 
+Scripts and movement own their state since #993: the COB scripts (`UnitScript`, its piece table and statics, the
+read buffer of `LoadScriptState`) and the model state of a scripted unit are scripts', and `UnitMotion`, its goals and
+the movement targets (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) are
+movement's. Their notes name the owner. A movement target is allocated by the slot that makes it
+(`NewPathOrderAtNative` and the others in `src/seams/native.cpp`), so one heap row per slot replaces the rows of the
+orders that called `new` themselves. The classes did not change (sim), and the state stays hashed where it was
+(section 5 of `docs/scripts-interface.md` and of `docs/movement-interface.md`).
+
 `proposed` comes from the rules below and is rewritten on every run. `class` is the hand review, starts empty, and is kept by regeneration, as is `note`.
 
 ```sh
@@ -49,14 +57,14 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2456 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2414 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 4 | 28 | 552 | 0 | 11 | 595 |
+| static | 4 | 28 | 558 | 0 | 11 | 601 |
 | game-region | 119 | 490 | 129 | 44 | 0 | 782 |
-| heap | 198 | 45 | 88 | 0 | 0 | 331 |
+| heap | 150 | 45 | 88 | 0 | 0 | 283 |
 
 ## Mixed cases and how to split them
 

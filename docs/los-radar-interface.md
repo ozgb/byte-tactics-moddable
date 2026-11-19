@@ -168,7 +168,7 @@ los_radar's state as 3.1c did.
 
 | Route | Now | Why |
 |---|---|---|
-| units UPDATE_UNIT | synchronous | #952's rule. `SetUnitPosition` runs in the units phase, and later in the same phase orders (`order_dispatch.cpp`) and unit scripts (`unit_scripts.cpp`) test visibility through `IsUnitVisibleToPlayer`, and map's `CanPlace` reads what the viewing player sees: with the move pending they would see the unit's sight where it was. |
+| units UPDATE_UNIT | synchronous | #952's rule. `SetUnitPosition` runs in the units phase, and later in the same phase orders (`order_dispatch.cpp`) and the piece queries (`src/scripts/piece_queries.cpp`) test visibility through `IsUnitVisibleToPlayer`, and map's `CanPlace` reads what the viewing player sees: with the move pending they would see the unit's sight where it was. |
 | orders UPDATE_UNIT | synchronous | The gate (section 8). |
 | players UPDATE_UNIT | synchronous | Untested. `RefreshOwnedUnitsLineOfSight` has no caller, so no scenario publishes it, and a route nothing exercises takes 3.1c's order. |
 | units REMOVE_UNIT | synchronous | The gate (section 8). |

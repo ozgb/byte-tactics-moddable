@@ -277,7 +277,7 @@ Only pathfinding reads or writes the region and `Game::pathfinder`. Two checks h
 
 ## 9. The waypoints 3.1c's movement follows
 
-`UnitMotion::SteerGroundUnit` (`src/orders/order_list.cpp`) reads three consecutive waypoints of the goal object,
+`UnitMotion::SteerGroundUnit` (`src/movement/motion.cpp`) reads three consecutive waypoints of the goal object,
 `p[0]`, `p[1]` and `p[2]`, through `FillWaypointWorldPos` (it repeats the last one when the route runs out). It
 steers towards `p[1]` and brakes when `p[2]` is near. Waypoints are in world units (16 per cell), and the goal
 object keeps at most 20.

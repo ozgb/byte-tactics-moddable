@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5655 functions of `data/rwsets.csv` are in 21 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5659 functions of `data/rwsets.csv` are in 21 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -34,10 +34,10 @@ The subsystems and the issue each maps to:
 | [movement](#the-remaining-subsystems) | 144 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
 | [game](#the-remaining-subsystems) | 316 | none yet |
-| [harness](#the-remaining-subsystems) | 891 | none yet |
+| [harness](#the-remaining-subsystems) | 893 | none yet |
 | [presentation](#the-remaining-subsystems) | 1429 | none yet |
 | [platform](#the-remaining-subsystems) | 822 | none yet |
-| [seams](#the-remaining-subsystems) | 187 | none yet |
+| [seams](#the-remaining-subsystems) | 189 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The ten subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -585,7 +585,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - COB opcodes that no script of the game data uses (4): `UnitScript::IsCarryingUnit`, `UnitScript::GetTransporterId`, `UnitScript::PlaySoundNoop`, `Channel::XorOp`. No unit can reach them.
 - Needs a case no scenario sets up yet (2): `UnitScript::ExplodeLegacy` (the empty body of COB opcode 0x10009000, which no scenario's script runs) and `CreateObjectState` (the piece state of a unit whose type has no script; since #954 a feature's model takes `ObjectStateSize` and the INIT_STATE effect instead, and every unit type of the game data has a script).
 
-**movement** (144 functions). No phase root: units' `UpdateUnit` calls `UpdateMotion` through movement's seam. `UnitMotion`, the goal objects (`PathGoal`, `LiteGoal`, `PatrolGoal`, `PackedGoal`, `PackedPosGoal`, `AiSearchGoal`) and the move targets of an order (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) (`src/movement`, `interfaces/movement.h`, #993). 38 functions are called from outside, by orders (21), seams (10), network (6) and game (1); the busiest are `PathGoal::SetPathOrder` (6) and `AirManeuverOrder::Destroy` (5). It imports 33 functions: platform 12, seams 6, files 4, pathfinding 4, network 3, scripts 2, units 2. The inventory is `docs/movement-interface.md`. Coverage: 63.5% of functions (94 of 148), 69.2% of lines, 63.8% of branches; 54 live functions no scenario enters, and 8 more are dead (data/coverage.csv). The list of those 54 is under **movement, functions no scenario enters** below.
+**movement** (144 functions). No phase root: units' `UpdateUnit` calls `UpdateMotion` through movement's seam. `UnitMotion`, the goal objects (`PathGoal`, `LiteGoal`, `PatrolGoal`, `PackedGoal`, `PackedPosGoal`, `AiSearchGoal`) and the move targets of an order (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) (`src/movement`, `interfaces/movement.h`, #993). 38 functions are called from outside, by orders (21), seams (10), network (6) and game (1); the busiest are `PathGoal::SetPathOrder` (6) and `AirManeuverOrder::Destroy` (5). It imports 33 functions: platform 12, seams 6, files 4, pathfinding 4, network 3, scripts 2, units 2. The inventory is `docs/movement-interface.md`. Coverage: 63.5% of functions (94 of 148), 69.1% of lines, 63.8% of branches; 54 live functions no scenario enters, and 8 more are dead (data/coverage.csv). The list of those 54 is under **movement, functions no scenario enters** below.
 
 **movement, functions no scenario enters** (54 of 148 after the scenarios of `reference/scenarios/`; 94 are entered, 63.5%), by reason:
 
@@ -640,19 +640,19 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Developer tool only (2): `HAPI_CreateFile`, `RenameFile`. The GUI layout editor.
 - Game data only (8): `FreeArchiveRecord`, `HAPI_LoadOpenFile`, `HAPI_LoadOpenFile`, `HAPI_TellFile`, `RemoveFile`, `RemoveFile`, `WriteBufferToFile`, `WriteBufferToFile`. Entered only with files the stock install lacks (OVR banks, `download` TDFs, briefings) or with a cache missing (palette and shade tables written on first run). `AccountBank::GetIntegerItem`, `AccountBank::LoadAccount`, `HapiBank::GetIntegerItem`, the other copy of `HAPI_TellFile` and `SquashUnpackedSize` are entered by the load of `load-midgame` (#442).
 
-**state, functions no scenario enters** (68 of 555 after the scenarios of `reference/scenarios/`; 487 are entered, 87.7%), by reason:
+**state, functions no scenario enters** (68 of 553 after the scenarios of `reference/scenarios/`; 485 are entered, 87.7%), by reason:
 
 - Shutdown only (3): `BlockVector::~BlockVector`, `BlockVector::~BlockVector` and `BlockVector::~BlockVector`. They are the destructors of the damage table, LOS table and order table arrays, which are freed from `FreeWeaponTypes` and `FreeLosTables`, and no scenario runs the shutdown because test mode ends with `host_exit(0)` right after the last tick.
 - Template instances no entered function uses (64): `??8@YG_NABU?$Ref@D@@PAD@Z`, `??8@YG_NABU?$Ref@G@@PAG@Z`, `??8@YG_NABU?$Ref@UFrameRing@@@@PAUFrameRing@@@Z`, `??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z`, `??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@D@@PAD@Z`, `??9@YG_NABU?$Ref@UHotRadarSlot@@@@PAUHotRadarSlot@@@Z`, `??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z`, `??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z`, `BlockVector::Capacity`, `BlockVector::Capacity`, `BlockVector::Clear`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::operator?4`, `BlockVector::operator?4`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `Ref::Ref`, `Ref::Ref`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?D`. These are the `Ref` accessors and comparisons of `interfaces/ref.h` and the `BlockVector` members of `src/state/block_vector.h`, one instance for each type and member. No function a scenario enters calls them.
 - Error paths only (1): `RefOutsideBlock`. The fatal error of a `Ref` whose pointer lies outside the state block, which a passing run never reaches.
 
-**harness** (891 functions). The test harness of #3 (`src/harness`). No phase root. 43 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 81 functions (game 24, platform 28).
+**harness** (893 functions). The test harness of #3 (`src/harness`). No phase root. 43 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 81 functions (game 24, platform 28).
 
 **presentation** (1429 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 348 functions: platform 159, network 54, files 32, game 32, map 24. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
 **platform** (822 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 310 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (123), `operator delete` (80), then `Translate` (77) and `GameAllocIgnoreTag` (76). It imports 181 functions: game 84, presentation 46.
 
-**seams** (187 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 133 functions are called from outside. It imports 145 functions.
+**seams** (189 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 133 functions are called from outside. It imports 145 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 
@@ -765,14 +765,14 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **players** | 99 of 147 | 67.3% | 70.5% | 63.2% | 48 | 10 |
 | **map** | 85 of 104 | 81.7% | 87.5% | 77.0% | 19 | 11 |
 | **scripts** | 58 of 76 | 76.3% | 89.4% | 84.8% | 18 | 6 |
-| **movement** | 94 of 148 | 63.5% | 69.2% | 63.8% | 54 | 8 |
+| **movement** | 94 of 148 | 63.5% | 69.1% | 63.8% | 54 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
 | game | 221 of 303 | 72.9% | 57.7% | 36.7% | 82 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 399 of 747 | 53.4% | 40.8% | 27.9% | 348 | 86 |
 | presentation | 565 of 1149 | 49.2% | 36.3% | 29.6% | 584 | 295 |
-| seams | 170 of 187 | 90.9% | 92.1% | 50.0% | 17 | 0 |
-| state | 487 of 555 | 87.7% | 70.3% | 49.3% | 68 | 58 |
+| seams | 172 of 189 | 91.0% | 92.2% | 50.0% | 17 | 0 |
+| state | 485 of 553 | 87.7% | 70.2% | 49.3% | 68 | 58 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

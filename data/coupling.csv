@@ -1690,7 +1690,7 @@ harness,network,shared_write,ScriptsSeam::FindScript,2
 harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,131
+harness,orders,call,Add,133
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,FeaturesSeam::GetCellFeature,1
@@ -1704,6 +1704,8 @@ harness,orders,shared_write,MapSeam::IsPadSlotFree,2
 harness,orders,shared_write,MapSeam::SnapWorldPosToFootprint,2
 harness,orders,shared_write,MovementSeam::AirManeuverOrderSetAltitude,1
 harness,orders,shared_write,MovementSeam::GoalSetPathOrder,6
+harness,orders,shared_write,MovementSeam::GoalTarget,1
+harness,orders,shared_write,MovementSeam::MotionGoal,6
 harness,orders,shared_write,MovementSeam::NewAirManeuverOrder,1
 harness,orders,shared_write,MovementSeam::NewApproachRadius,1
 harness,orders,shared_write,MovementSeam::NewPathOrderAt,24
@@ -1929,6 +1931,8 @@ harness,seams,shared_write,MovementSeam::DestroyMotionObject,1
 harness,seams,shared_write,MovementSeam::GoalHasNetUnitState,1
 harness,seams,shared_write,MovementSeam::GoalSerializeNetUnitState,1
 harness,seams,shared_write,MovementSeam::GoalSetPathOrder,1
+harness,seams,shared_write,MovementSeam::GoalTarget,1
+harness,seams,shared_write,MovementSeam::MotionGoal,1
 harness,seams,shared_write,MovementSeam::NewAirManeuverOrder,1
 harness,seams,shared_write,MovementSeam::NewApproachRadius,1
 harness,seams,shared_write,MovementSeam::NewPathOrderAt,1
@@ -2758,11 +2762,13 @@ movement,seams,indirect,SetStateBitsNative,1
 movement,seams,indirect,StartScriptNative,1
 movement,seams,indirect,UnitRefUnlinkNative,3
 movement,seams,indirect,UpdateSfxOccupyNative,1
+movement,seams,shared_write,PathGoal::target,1
 movement,seams,shared_write,PathPoint::x,1
 movement,seams,shared_write,PathPoint::y,1
 movement,seams,shared_write,Point16::x,3
 movement,seams,shared_write,Point16::y,3
 movement,seams,shared_write,Unit::flags,1
+movement,seams,shared_write,UnitMotion::obj,1
 movement,seams,shared_write,Vec3::x,2
 movement,seams,shared_write,Vec3::y,2
 movement,seams,shared_write,Vec3::z,2
@@ -5274,6 +5280,8 @@ seams,harness,shared_write,MovementSeam::DestroyMotionObject,2
 seams,harness,shared_write,MovementSeam::GoalHasNetUnitState,2
 seams,harness,shared_write,MovementSeam::GoalSerializeNetUnitState,2
 seams,harness,shared_write,MovementSeam::GoalSetPathOrder,2
+seams,harness,shared_write,MovementSeam::GoalTarget,2
+seams,harness,shared_write,MovementSeam::MotionGoal,2
 seams,harness,shared_write,MovementSeam::NewAirManeuverOrder,2
 seams,harness,shared_write,MovementSeam::NewApproachRadius,2
 seams,harness,shared_write,MovementSeam::NewPathOrderAt,2
@@ -5545,6 +5553,8 @@ seams,orders,shared_write,MapSeam::IsPadSlotFree,2
 seams,orders,shared_write,MapSeam::SnapWorldPosToFootprint,2
 seams,orders,shared_write,MovementSeam::AirManeuverOrderSetAltitude,1
 seams,orders,shared_write,MovementSeam::GoalSetPathOrder,6
+seams,orders,shared_write,MovementSeam::GoalTarget,1
+seams,orders,shared_write,MovementSeam::MotionGoal,6
 seams,orders,shared_write,MovementSeam::NewAirManeuverOrder,1
 seams,orders,shared_write,MovementSeam::NewApproachRadius,1
 seams,orders,shared_write,MovementSeam::NewPathOrderAt,24

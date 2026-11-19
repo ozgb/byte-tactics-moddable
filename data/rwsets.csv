@@ -11220,13 +11220,14 @@ address,function,file,kind,target
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,call,operator!=
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,call,operator->
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,Order::attached
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,Order::unit
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,Seams::movement
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,Unit::motion
-0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,function,
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,global_read,g_seams
+0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x4388b0,Order::ReattachFxToUnit,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,call,get
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,call,operator OrderFx *
@@ -11234,17 +11235,18 @@ address,function,file,kind,target
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,call,operator->
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,call,operator=
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,MovementSeam::OrderFxDestroy
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,Order::attached
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,Order::subFlags
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,Order::unit
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,Seams::movement
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,Unit::motion
-0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_write,Order::attached
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,field_write,Order::subFlags
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,function,
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,global_read,g_seams
+0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,indirect_call,indirect via void (*)(OrderFx *) __attribute__((stdcall)) [MovementSeam::OrderFxDestroy]
 0x4388d0,Order::SetAttachedFx,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,call,get
@@ -11253,6 +11255,7 @@ address,function,file,kind,target
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,call,operator->
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,call,operator=
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,MovementSeam::NewApproachRadius
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,MovementSeam::OrderFxDestroy
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Order::attached
@@ -11262,7 +11265,6 @@ address,function,file,kind,target
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Unit::def
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Unit::motion
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,UnitDef::flags1
-0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Vec3::x
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_read,Vec3::z
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,field_write,Order::attached
@@ -11270,6 +11272,7 @@ address,function,file,kind,target
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,function,
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,global_read,g_seams
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,indirect_call,"indirect via ApproachRadius *(*)(Order *, int, int, int) __attribute__((stdcall)) [MovementSeam::NewApproachRadius]"
+0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,indirect_call,indirect via void (*)(OrderFx *) __attribute__((stdcall)) [MovementSeam::OrderFxDestroy]
 0x438930,Order::AttachApproachRadiusGoal,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,call,get
@@ -11278,6 +11281,7 @@ address,function,file,kind,target
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,call,operator->
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,call,operator=
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,MovementSeam::NewRingApproach
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,MovementSeam::OrderFxDestroy
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Order::attached
@@ -11287,13 +11291,13 @@ address,function,file,kind,target
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Unit::def
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Unit::motion
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,UnitDef::flags1
-0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Vec3::x
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_read,Vec3::z
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_write,Order::attached
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,field_write,Order::subFlags
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,function,
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,global_read,g_seams
+0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,indirect_call,"indirect via RingApproach *(*)(Order *, int, int, int, int) __attribute__((stdcall)) [MovementSeam::NewRingApproach]"
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,indirect_call,indirect via void (*)(OrderFx *) __attribute__((stdcall)) [MovementSeam::OrderFxDestroy]
 0x438a00,Order::AttachRingApproachGoal,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
@@ -11303,6 +11307,7 @@ address,function,file,kind,target
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,call,operator->
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,call,operator=
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,MovementSeam::NewPointMarker
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,MovementSeam::OrderFxDestroy
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Order::attached
@@ -11312,11 +11317,11 @@ address,function,file,kind,target
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Unit::def
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,Unit::motion
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,UnitDef::flags1
-0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_write,Order::attached
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,field_write,Order::subFlags
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,function,
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,global_read,g_seams
+0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,indirect_call,"indirect via PointMarker *(*)(Order *, Point16, Point16) __attribute__((stdcall)) [MovementSeam::NewPointMarker]"
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,indirect_call,indirect via void (*)(OrderFx *) __attribute__((stdcall)) [MovementSeam::OrderFxDestroy]
 0x438ad0,Order::AttachBuildFootprintMarker,src/orders/order_queue.cpp,indirect_call,"indirect via void (*)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
@@ -11643,8 +11648,8 @@ address,function,file,kind,target
 0x43a1e0,OrderBase::OrStatusFlags,src/orders/order_list.cpp,function,
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,get
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator OrderFx *
-0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator OrderFxSlot *
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator Unit *
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator bool
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator!=
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator->
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,call,operator=
@@ -11652,13 +11657,14 @@ address,function,file,kind,target
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_escape,Order::link
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,MissionType::index
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,MovementSeam::GoalSetPathOrder
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,MovementSeam::GoalTarget
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,MovementSeam::MotionGoal
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,MovementSeam::OrderFxDestroy
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,NetworkSeam::SendScriptCall
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Order::attached
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Order::flags
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Order::flags_42
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Order::unit
-0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,OrderFxSlot::current
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,OrderTableEntry::notify
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,ScriptsSeam::FindScript
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,ScriptsSeam::StartScriptWithArgsByIndex
@@ -11669,7 +11675,6 @@ address,function,file,kind,target
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Seams::weapons
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Unit::motion
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,Unit::script
-0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,UnitMotionSlotView::slot
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,UnitsSeam::UnitRefUnlink
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_read,WeaponsSeam::ReleaseWeapons
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,field_write,Order::attached
@@ -11677,6 +11682,8 @@ address,function,file,kind,target
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,function,
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,global_read,g_missionOrderTableVec
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,global_read,g_seams
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,indirect via OrderFx *(*)(PathGoal *) __attribute__((stdcall)) [MovementSeam::GoalTarget]
+0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,indirect via PathGoal *(*)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [ScriptsSeam::FindScript]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, int, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [ScriptsSeam::StartScriptWithArgsByIndex]"
 0x43a1f0,Order::~Order,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(Unit *, Order *, int) __attribute__((stdcall)) [OrderTableEntry::notify]"
@@ -15573,7 +15580,6 @@ address,function,file,kind,target
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitDef::flags1
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitWeaponSlot::weapon
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefInit
-0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefSetUnit
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,WeaponDef::range
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::altitude
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::approachRadius
@@ -15585,7 +15591,6 @@ address,function,file,kind,target
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,function,
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,global_maybe_written,g_pathOrderVtable
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,global_read,g_seams
-0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetUnit]"
 0x44e190,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *, OrderBase *) __attribute__((stdcall)) [UnitsSeam::UnitRefInit]"
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,call,OrderFx::SetVtable
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,call,operator->
@@ -15596,7 +15601,6 @@ address,function,file,kind,target
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,Seams::units
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,Unit::pos
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefInit
-0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefSetUnit
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::altitude
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::approachRadius
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::field_8
@@ -15605,7 +15609,6 @@ address,function,file,kind,target
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,function,
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,global_maybe_written,g_pathOrderVtable
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,global_read,g_seams
-0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetUnit]"
 0x44e250,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *, OrderBase *) __attribute__((stdcall)) [UnitsSeam::UnitRefInit]"
 0x44e2d0,PathOrder::PathOrder,src/movement/order_targets.cpp,call,OrderFx::SetVtable
 0x44e2d0,PathOrder::PathOrder,src/movement/order_targets.cpp,call,operator=
@@ -15628,7 +15631,6 @@ address,function,file,kind,target
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,Order::unit
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,Seams::units
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefInit
-0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_read,UnitsSeam::UnitRefSetUnit
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::altitude
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::approachRadius
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,field_write,PathOrder::field_8
@@ -15638,7 +15640,6 @@ address,function,file,kind,target
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,function,
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,global_maybe_written,g_pathOrderVtable
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,global_read,g_seams
-0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetUnit]"
 0x44e330,PathOrder::PathOrder,src/movement/order_targets.cpp,indirect_call,"indirect via void (*)(PathOrderAttach *, Unit *, OrderBase *) __attribute__((stdcall)) [UnitsSeam::UnitRefInit]"
 0x44e3a0,PathOrder::KeepAfterComplete,src/movement/order_targets.cpp,call,operator==
 0x44e3a0,PathOrder::KeepAfterComplete,src/movement/order_targets.cpp,field_read,PathOrder::flags
@@ -26629,7 +26630,7 @@ address,function,file,kind,target
 0x485d40,InitUnitScript,src/units/units.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [ScriptsSeam::StartScript]"
 0x485d40,InitUnitScript,src/units/units.cpp,indirect_call,"indirect via void (*)(CobScript *, ScriptTable *) __attribute__((stdcall)) [ScriptsSeam::SetCob]"
 0x485d40,InitUnitScript,src/units/units.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [ScriptsSeam::NewUnitScript]
-0x485d40,InitUnitScript,src/units/units.cpp,indirect_call,"indirect via void (*)(UnitScript *, int) __attribute__((stdcall)) [ScriptsSeam::SetObjectState]"
+0x485d40,InitUnitScript,src/units/units.cpp,indirect_call,"indirect via void (*)(UnitScript *, ModelState *) __attribute__((stdcall)) [ScriptsSeam::SetObjectState]"
 0x485e30,EmitUnitScriptDeletingDtor,src/scripts/unit_script_alloc.cpp,call,operator new
 0x485e30,EmitUnitScriptDeletingDtor,src/scripts/unit_script_alloc.cpp,function,
 0x485e50,CreateUnitMotion,src/units/units.cpp,call,operator->
@@ -46848,6 +46849,9 @@ address,function,file,kind,target
 ,GoalSerializeNetUnitStateNative,src/seams/native.cpp,indirect_call,virtual PathGoal::SerializeNetUnitState
 ,GoalSetPathOrderNative,src/seams/native.cpp,function,
 ,GoalSetPathOrderNative,src/seams/native.cpp,indirect_call,virtual PathGoal::SetPathOrder
+,GoalTargetNative,src/seams/native.cpp,call,get
+,GoalTargetNative,src/seams/native.cpp,field_read,PathGoal::target
+,GoalTargetNative,src/seams/native.cpp,function,
 ,Grid::Grid,src/map/grid.h,call,operator=
 ,Grid::Grid,src/map/grid.h,field_write,Grid::cells
 ,Grid::Grid,src/map/grid.h,field_write,Grid::count
@@ -48091,12 +48095,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GoalHasNetUnitState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GoalSerializeNetUnitState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GoalSetPathOrder
+,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GoalTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadAirManeuverOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadApproachRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadMotion
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadPathOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadPointMarker
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::LoadRingApproach
+,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::MotionGoal
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewAirManeuverOrder
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewApproachRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewPathOrderAt
@@ -48448,12 +48454,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGoalHasNetUnitState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGoalSerializeNetUnitState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGoalSetPathOrder
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGoalTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadAirManeuverOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadApproachRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadMotion
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadPathOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadPointMarker
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementLoadRingApproach
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementMotionGoal
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewAirManeuverOrder
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewApproachRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewPathOrderAt
@@ -49382,12 +49390,14 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::GoalHasNetUnitState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::GoalSerializeNetUnitState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::GoalSetPathOrder
+,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::GoalTarget
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadAirManeuverOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadApproachRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadMotion
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadPathOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadPointMarker
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::LoadRingApproach
+,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::MotionGoal
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::NewAirManeuverOrder
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::NewApproachRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MovementSeam::NewPathOrderAt
@@ -49771,6 +49781,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GoalHasNetUnitStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GoalSerializeNetUnitStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GoalSetPathOrderNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GoalTargetNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,HAPI_AddArchive
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,HAPI_CloseArchive
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,HAPI_CloseFile
@@ -49846,6 +49857,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MatchWildcard
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MissionExistsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MissionTypeFromNameNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,MotionGoalNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MovementClassGetNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MovementClassInBoundsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetBroadcastPlayerEconomy
@@ -51230,6 +51242,9 @@ address,function,file,kind,target
 ,Motion,src/movement/order_targets.cpp,call,operator UnitMotion *
 ,Motion,src/movement/order_targets.cpp,field_read,Unit::motion
 ,Motion,src/movement/order_targets.cpp,function,
+,MotionGoalNative,src/seams/native.cpp,call,get
+,MotionGoalNative,src/seams/native.cpp,field_read,UnitMotion::obj
+,MotionGoalNative,src/seams/native.cpp,function,
 ,MovableVec3::Length,src/ai/ai_player.cpp,call,bx_sqrt
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::x
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::y
@@ -54967,6 +54982,16 @@ address,function,file,kind,target
 ,RecMovementGoalSetPathOrder,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMovementGoalSetPathOrder,src/harness/replay_hooks.inc,global_read,s_inner_movement
 ,RecMovementGoalSetPathOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(PathGoal *, void *) __attribute__((stdcall)) [MovementSeam::GoalSetPathOrder]"
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,call,ArgObject
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,call,ArgPending
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,field_read,MovementSeam::GoalTarget
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,function,
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,global_read,s_call
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,global_read,s_inner_movement
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMovementGoalTarget,src/harness/replay_hooks.inc,indirect_call,indirect via OrderFx *(*const)(PathGoal *) __attribute__((stdcall)) [MovementSeam::GoalTarget]
 ,RecMovementLoadAirManeuverOrder,src/harness/replay_hooks.inc,call,Add
 ,RecMovementLoadAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecMovementLoadAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgObject
@@ -55036,6 +55061,15 @@ address,function,file,kind,target
 ,RecMovementLoadRingApproach,src/harness/replay_hooks.inc,global_read,s_inner_movement
 ,RecMovementLoadRingApproach,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMovementLoadRingApproach,src/harness/replay_hooks.inc,indirect_call,"indirect via RingApproach *(*const)(Order *, HapiBank *, char *) __attribute__((stdcall)) [MovementSeam::LoadRingApproach]"
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,call,Add
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,call,ArgObject
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,field_read,MovementSeam::MotionGoal
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,function,
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,global_read,s_call
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,global_read,s_inner_movement
+,RecMovementMotionGoal,src/harness/replay_hooks.inc,indirect_call,indirect via PathGoal *(*const)(UnitMotion *) __attribute__((stdcall)) [MovementSeam::MotionGoal]
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,Add
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgPending
@@ -56139,15 +56173,16 @@ address,function,file,kind,target
 ,RecScriptsSetCob,src/harness/replay_hooks.inc,global_read,s_call
 ,RecScriptsSetCob,src/harness/replay_hooks.inc,global_read,s_inner_scripts
 ,RecScriptsSetCob,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(CobScript *, ScriptTable *) __attribute__((stdcall)) [ScriptsSeam::SetCob]"
+,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,Add
+,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,ArgObject
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,ArgPending
-,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,ArgValue
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,field_read,ScriptsSeam::SetObjectState
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,function,
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,global_read,s_call
 ,RecScriptsSetObjectState,src/harness/replay_hooks.inc,global_read,s_inner_scripts
-,RecScriptsSetObjectState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitScript *, int) __attribute__((stdcall)) [ScriptsSeam::SetObjectState]"
+,RecScriptsSetObjectState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitScript *, ModelState *) __attribute__((stdcall)) [ScriptsSeam::SetObjectState]"
 ,RecScriptsStartScript,src/harness/replay_hooks.inc,call,Add
 ,RecScriptsStartScript,src/harness/replay_hooks.inc,call,ArgObject
 ,RecScriptsStartScript,src/harness/replay_hooks.inc,call,ArgPending

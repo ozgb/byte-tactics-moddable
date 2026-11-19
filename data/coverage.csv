@@ -293,7 +293,7 @@ map,Mission::SelectMission,src/map/map_list.cpp,1,0,0,0,0,0,?SelectMission@Missi
 map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
 map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
-movement,*,,148,94,1486,1028,414,264,,8,
+movement,*,,148,94,1483,1025,414,264,,8,
 movement,AiSearchGoal::HasNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 movement,AiSearchGoal::SerializeNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
 movement,AiSearchGoal::TruncateWaypointsFrom,src/movement/order_targets.cpp,0,0,0,0,0,0,?TruncateWaypointsFrom@AiSearchGoal@@QAEXH@Z,1,
@@ -674,7 +674,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,232,224,4938,4237,2814,1839,,17,
+orders,*,,232,224,4941,4239,2816,1841,,17,
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
 orders,ClassifyEighths,src/orders/unit_orders.cpp,0,0,0,0,0,0,?ClassifyEighths@@YGHN@Z,1,
@@ -2185,7 +2185,7 @@ scripts,UnitScript::ExplodeLegacy,src/scripts/unit_script.cpp,1,0,0,0,0,0,?Explo
 scripts,UnitScript::GetTransporterId,src/scripts/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0,unused-opcode
 scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0,unused-opcode
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
-seams,*,,187,170,1210,1115,96,48,,0,
+seams,*,,189,172,1218,1123,96,48,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YIHPAVMission@@@Z,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YIHPAVMission@@@Z,0,
 seams,FreeSquadManagerNative,src/seams/native.cpp,1,0,0,0,0,0,?FreeSquadManagerNative@@YGXPAUPlayer@@@Z,0,
@@ -2203,7 +2203,7 @@ seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@
 seams,UnitMotionReadNetStateNative,src/seams/native.cpp,1,0,0,0,0,0,?UnitMotionReadNetStateNative@@YGXPAVUnitMotion@@PAVBitReader@@@Z,0,
 seams,WorldLineOfSight,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldLineOfSight@@YGHIHHHH@Z,0,
 seams,WorldTerrainPass,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldTerrainPass@@YGHIHH@Z,0,
-state,*,,555,487,1711,1202,1170,577,,58,
+state,*,,553,485,1709,1200,1168,576,,58,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance

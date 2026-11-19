@@ -4,7 +4,6 @@
 
 #pragma pack(push, 1)
 
-#include "../mission/mission.h"
 #include "../../interfaces/seams.h"
 
 #include "player.h"

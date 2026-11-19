@@ -557,7 +557,6 @@ void __cdecl CycleCurrentPlayerSide()
     *p = (*p + 1) % g_game->sides;
 }
 
-#include "../mission/mission.h"
 
 #include "../graphics/object_pool.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);

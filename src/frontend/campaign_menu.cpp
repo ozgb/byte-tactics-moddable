@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/seams.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -113,7 +114,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 #include "../graphics/surface.h"
 void __stdcall SetCursorMode(int n);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-#include "../mission/map_list.h"
 #include "../game/main.h"
 
 // FUNCTION: 0x476740

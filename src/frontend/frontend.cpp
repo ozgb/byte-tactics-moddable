@@ -9,7 +9,7 @@
 
 #include "../sound/sound.h"
 
-#include "../mission/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "../network/player.h"
 
@@ -109,7 +109,6 @@ void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall FlipScreen(void);
 #include "../gui/keyboard.h"
 #include "../gui/keyboard.h"
-#include "../mission/map_list.h"
 #include "frontend.h"
 #include "../graphics/palette.h"
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);

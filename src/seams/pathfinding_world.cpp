@@ -2,6 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"

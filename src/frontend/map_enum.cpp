@@ -26,6 +26,7 @@ void __stdcall SetCursorMode(int n);
 
 
 #include "../../interfaces/services.h"
+#include "../../interfaces/seams.h"
 
 void FreeOtaEnumCache()
 {

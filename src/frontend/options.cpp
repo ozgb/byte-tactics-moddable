@@ -8,7 +8,6 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 
 #include "../sound/sound.h"
 
-#include "../mission/mission.h"
 #include "../../interfaces/seams.h"
 
 #include "../graphics/memory_cache.h"

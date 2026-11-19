@@ -41,7 +41,7 @@ struct Surface;
 
 #pragma pack(pop)
 
-#include "../mission/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "../orders/mission_type.h"
 #include "../state/sim_globals.h"

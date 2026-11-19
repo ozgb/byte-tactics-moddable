@@ -42,7 +42,6 @@
 
 #include "../../link/globals.h"
 
-#include "../mission/map_list.h"
 #include "../game/players.h"
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"

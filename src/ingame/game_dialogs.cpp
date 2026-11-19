@@ -7,7 +7,6 @@
 #include <math.h>
 #include <vector>
 
-#include "../mission/mission.h"
 
 #include "../sound/sound.h"
 

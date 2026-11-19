@@ -131,7 +131,6 @@ struct NetReportBlockView {
 };
 #pragma pack(pop)
 
-#include "../mission/mission.h"
 #include "../../interfaces/seams.h"
 #include "../units/unit_def.h"
 

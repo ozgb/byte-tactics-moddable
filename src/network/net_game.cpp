@@ -2831,7 +2831,6 @@ extern char g_cmdlineHostGameName[];
 extern char g_userNameSetting[];
 
 void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
-#include "../mission/map_list.h"
 
 // FUNCTION: 0x456110
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)

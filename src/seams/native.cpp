@@ -5,6 +5,7 @@
 #include "../../interfaces/scripts.h"
 #include "../../interfaces/movement.h"
 #include "../../interfaces/network.h"
+#include "../../interfaces/mission.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"

@@ -105,7 +105,6 @@ void FlipScreen();
 #include "../game/game_state.h"
 #include "../gui/keyboard.h"
 void __stdcall SetFrontendState(int state, int line, const char* file);
-#include "../mission/map_list.h"
 void __stdcall SetCursorMode(int n);
 #include "campaign_menu.h"
 #include "../gui/dialogs.h"

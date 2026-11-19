@@ -112,7 +112,6 @@ struct GameSessionRecord {
 
 #include "../network/player.h"
 
-#include "../mission/mission.h"
 
 #include "../gui/layer.h"
 typedef Layer SelectDialogLayer;

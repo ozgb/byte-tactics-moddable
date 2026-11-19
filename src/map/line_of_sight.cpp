@@ -1809,7 +1809,7 @@ void __stdcall LosRadarWriteState(const StateWriter* w)
     for (unsigned int e = 0; e < count; e++) {
         int player = -1;
         if (eyes[e].player.get() != nullptr) {
-            player = PlayerSlotChecked((Player*)eyes[e].player.get());
+            player = g_game->SlotOf((Player*)eyes[e].player.get());
         }
         w->Int("eyes[%u].player", e, 1, (unsigned int)player & 0xff);
         w->Int("eyes[%u].x", e, 2, (unsigned short)eyes[e].x);

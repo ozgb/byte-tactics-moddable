@@ -1281,6 +1281,7 @@ struct Game {
     Game(void);
     Player* Current(void);
     Player* Current2(void);
+    int SlotOf(const Player* p) const;
 };
 #pragma pack(pop)
 
@@ -1307,11 +1308,9 @@ inline Player* Game::Current2(void)
     return &players[i];
 }
 
-extern Game* g_game;
-
-inline int PlayerSlotChecked(const Player* p)
+inline int Game::SlotOf(const Player* p) const
 {
-    int slot = (int)(p - g_game->players);
+    int slot = (int)(p - players);
     return slot >= 0 && slot < 10 ? slot : -1;
 }
 

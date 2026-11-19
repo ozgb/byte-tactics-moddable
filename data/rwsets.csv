@@ -42669,9 +42669,10 @@ address,function,file,kind,target
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,field_write,AiEvent::unit
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,field_write,AiEvent::value
 ,AiOnWeaponsAttacked,src/seams/ai_world.cpp,function,
-,AiPlayerSlotOf,src/ai/ai_player.cpp,call,PlayerSlotChecked
+,AiPlayerSlotOf,src/ai/ai_player.cpp,call,Game::SlotOf
 ,AiPlayerSlotOf,src/ai/ai_player.cpp,call,get
 ,AiPlayerSlotOf,src/ai/ai_player.cpp,function,
+,AiPlayerSlotOf,src/ai/ai_player.cpp,global_read,g_game
 ,AiPublishLimit,src/game/ai_events.h,call,AiEventOf
 ,AiPublishLimit,src/game/ai_events.h,call,SchedPublish
 ,AiPublishLimit,src/game/ai_events.h,call,memcpy
@@ -46364,6 +46365,8 @@ address,function,file,kind,target
 ,Game::Game,src/game/game.h,field_write,Grid::height
 ,Game::Game,src/game/game.h,field_write,Grid::width
 ,Game::Game,src/game/game.h,function,
+,Game::SlotOf,src/game/game.h,field_escape,Game::players
+,Game::SlotOf,src/game/game.h,function,
 ,GameAt,src/harness/harness.cpp,function,
 ,GameAt,src/harness/harness.cpp,global_read,g_game
 ,GameHoldrand,src/state/game_rand.cpp,call,Stream
@@ -50615,7 +50618,7 @@ address,function,file,kind,target
 ,LosRadarSightCache,src/map/line_of_sight.cpp,deref_read,*LosSightCache
 ,LosRadarSightCache,src/map/line_of_sight.cpp,deref_write,*LosSightCache
 ,LosRadarSightCache,src/map/line_of_sight.cpp,function,
-,LosRadarWriteState,src/map/line_of_sight.cpp,call,PlayerSlotChecked
+,LosRadarWriteState,src/map/line_of_sight.cpp,call,Game::SlotOf
 ,LosRadarWriteState,src/map/line_of_sight.cpp,call,WriteLosUnitIndex
 ,LosRadarWriteState,src/map/line_of_sight.cpp,call,get
 ,LosRadarWriteState,src/map/line_of_sight.cpp,deref_read,*unsigned int
@@ -52590,9 +52593,6 @@ address,function,file,kind,target
 ,PlayerRecordAt,src/game/game_load.cpp,deref_escape,*LoadingPlayerRecord
 ,PlayerRecordAt,src/game/game_load.cpp,field_escape,Game::players
 ,PlayerRecordAt,src/game/game_load.cpp,function,
-,PlayerSlotChecked,src/game/game.h,field_escape,Game::players
-,PlayerSlotChecked,src/game/game.h,function,
-,PlayerSlotChecked,src/game/game.h,global_read,g_game
 ,PlayerSlotOf,src/game/players.cpp,field_escape,Game::players
 ,PlayerSlotOf,src/game/players.cpp,function,
 ,PlayerSlotOf,src/game/players.cpp,global_read,g_game

@@ -7,6 +7,7 @@ ai,features,shared_write,Ref<Unit>::offset,1
 ai,features,shared_write,Vec3::x,7
 ai,features,shared_write,Vec3::y,7
 ai,features,shared_write,Vec3::z,8
+ai,game,call,Game::SlotOf,1
 ai,game,call,RecordBuildQueueSound,2
 ai,game,call,SimAllocTagged,1
 ai,game,shared_write,AiSeam::UpdatePlayerAI,1
@@ -2091,6 +2092,7 @@ los_radar,features,shared_write,Vec3::y,7
 los_radar,features,shared_write,Vec3::z,8
 los_radar,game,call,FeaturesPublishPlace,1
 los_radar,game,call,Game::Current,1
+los_radar,game,call,Game::SlotOf,1
 los_radar,game,call,RecordMessage,3
 los_radar,game,call,RecordSimEvent,2
 los_radar,game,call,SimAlloc,1

@@ -378,7 +378,7 @@ int __stdcall AiApply(const AiEvent* e)
 
 static unsigned int AiPlayerSlotOf(const Ref<Player>& ref)
 {
-    int slot = PlayerSlotChecked(ref.get());
+    int slot = g_game->SlotOf(ref.get());
     return slot < 0 ? 0xffu : (unsigned int)slot;
 }
 

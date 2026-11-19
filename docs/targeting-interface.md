@@ -33,7 +33,7 @@ Targeting's place in it:
   first, and `ChooseWeapon`, which reads only the weapon slots' flags and is called directly (section 4).
 - **Effects out of targeting:** CLEARED, published to targeting's outbox (`SCHED_TARGETING`) when a weapon that had a
   target loses it. Units subscribes to it; its handler, `UnitsOnTargetingCleared` (`src/units/targeting_effects.cpp`),
-  is an adapter onto units' `FindScript` and `StartScriptWithArgs` slots, as 3.1c called them.
+  is an adapter onto scripts' `FindScript` and `StartScriptWithArgs` slots, as 3.1c called them.
 - **Runs:** none. Targeting has no phase of its own and no loop the scheduler holds: it runs only when an event is
   applied or a slot is called, inside the runs of orders, ai, weapons and units.
 - **A new outbox:** ai had none. Its SET_UNIT, SET_POS and CLEAR are published from `SCHED_AI`, which services 1.14 adds
@@ -64,7 +64,7 @@ marked synchronous, because its caller uses the answer in the same statement:
   orders gives its answer to `IssueAttackOrder` in the same statement.
 - **`GetWeaponTargetPos`** returns the point a weapon aims at to `UpdateUnitWeapons`, which aims and fires at it. When
   the target unit is gone it clears the pair and publishes CLEARED, as 3.1c ran the script there; and it calls
-  `units.GetSweetSpot`, which is mixed itself (it runs the target's SweetSpot query script and poses the target's model,
+  `scripts.GetSweetSpot`, which is mixed itself (it runs the target's SweetSpot query script and poses the target's model,
   writing its pieces' state). Both happen at 3.1c's statement because the slot is synchronous.
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 38) and returned to no
@@ -76,16 +76,16 @@ callers passed pointers and could publish none of these, so no trace moves; a mo
 
 | 3.1c call | Effect | Subscriber's handler |
 |---|---|---|
-| `units.FindScript(script, "StartBuilding")`, then `units.StartScriptWithArgs(script, "TargetCleared", ..., weapon)`, when a weapon that had a target loses it (`ClearWeaponTarget`, the dead target of `GetWeaponTargetPos`) | CLEARED, with the unit and the weapon | `UnitsOnTargetingCleared`: the same two calls |
+| `scripts.FindScript(script, "StartBuilding")`, then `scripts.StartScriptWithArgs(script, "TargetCleared", ..., weapon)`, when a weapon that had a target loses it (`ClearWeaponTarget`, the dead target of `GetWeaponTargetPos`) | CLEARED, with the unit and the weapon | `UnitsOnTargetingCleared`: the same two calls |
 
 The `FindScript` call looks up a function whose answer 3.1c threw away; the adapter keeps it, since the lookup is
-units' code and its cost is not targeting's to judge.
+scripts' code and its cost is not targeting's to judge.
 
 ## 4. Views
 
 **What targeting reads:** a unit's weapon slots (the weapon, its flags and range), the unit's and the target's
 position, flags, definition, player and kill count, the ground height (`units.GetGroundHeight`) and the sea level, a
-target's sweet spot (`units.GetSweetSpot`) and its motion's body offset, the units a weapon may pick among (through
+target's sweet spot (`scripts.GetSweetSpot`) and its motion's body offset, the units a weapon may pick among (through
 ai's and los_radar's views), all as of each module's last run. `FindWeaponTarget` calls the FilterTargets hook.
 
 **What others read of targeting:**

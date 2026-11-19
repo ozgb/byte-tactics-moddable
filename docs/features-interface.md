@@ -75,13 +75,13 @@ no spot of the pool, so its outcome is 0 though it stands on its cells. Features
 
 | 3.1c call | Effect | Subscriber's handler |
 |---|---|---|
-| `units.FreeObjectState` when a feature with a model goes | FREE_STATE | `units.FreeObjectState` |
-| `units.CreateObjectState` when a feature with a model is placed | `units.ObjectStateSize` (a query), features allocates the state, then INIT_STATE | the model's state is built as `CreateObjectState` built it |
+| `scripts.FreeObjectState` when a feature with a model goes | FREE_STATE | `scripts.FreeObjectState` |
+| `scripts.CreateObjectState` when a feature with a model is placed | `scripts.ObjectStateSize` (a query), features allocates the state, then INIT_STATE | the model's state is built as `CreateObjectState` built it |
 | `map.RefreshAllPassMaps` after a feature appears or goes | PASS_MAPS | `map.RefreshAllPassMaps` |
 | `weapons.ApplyAreaDamageAt` from a burning feature (`SpreadFire`) | AREA_DAMAGE | `weapons.ApplyAreaDamageAt` |
 
 **`CreateObjectState` split.** It was mixed: it allocated and built a model's piece state and returned it, and the
-spot kept it. The size is now a query (`units.ObjectStateSize`, units 1.9), features allocates the state where 3.1c
+spot kept it. The size is now a query (`scripts.ObjectStateSize`, scripts 1.0), features allocates the state where 3.1c
 did and keeps it, and the building is an intent. The trace hashes the state pointer as a heap pointer (`docs/trace-format.md`,
 section 5), so where the allocator puts it is not seen, and nothing in the simulation reads the pieces of a feature's
 model.
@@ -118,7 +118,7 @@ out of it can be pending: every route of features in `src/game/routes.cpp` is sy
 which `LoadTntMap` publishes only outside the tick, where the scheduler delivers every route at once (#970). So no
 query needs a delivery first. Each route that was queued at first fails the test, and is synchronous for it:
 - **REMOVE** from orders: a second resurrection or a reclaim in the same phase reads the wreck's cells (section 8).
-- **FREE_STATE:** `units.FreeObjectState` returns a model's point lists and state to the sim block's free list, and
+- **FREE_STATE:** `scripts.FreeObjectState` returns a model's point lists and state to the sim block's free list, and
   every allocation later in the phase reads that list. A feature that dies is replaced in the same call (its heap or
   burnt replacement, `PlaceFeatureAt`), whose `SimAllocTagged` would run with the free pending, and so would every
   `new (kSim)` of the rest of the phase (an order, a projectile). The trace does not hash where a block goes, but the

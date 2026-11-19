@@ -9273,22 +9273,22 @@ call 720 InitUnitWeaponSlots
   r UnitDef#208.weapon2 weapondef#0
   r weapondef#0.index 0
   a unit Unit#252
-  i units.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 0
+  i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#252 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#252 0
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 0
   o out (195559424,65536,83361792)
-  i units.QueryScript CobScript#4 "QuerySecondary" (0) null null null = 0
+  i scripts.QueryScript CobScript#4 "QuerySecondary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#252 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#252 1
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 1
   o out (195559424,65536,83361792)
-  i units.QueryScript CobScript#4 "QueryTertiary" (0) null null null = 0
+  i scripts.QueryScript CobScript#4 "QueryTertiary" (0) null null null = 0
   o p2 (0)
-  i units.GetPieceOffset Unit#252 0 = (0,0,0)
-  i units.GetAimFromPosition Unit#252 2
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 2
   o out (195559424,65536,83361792)
-  i units.StartScriptWithArgs CobScript#4 "SetMaxReloadTime" ? 0 1 0 0 0 0 = 0
+  i scripts.StartScriptWithArgs CobScript#4 "SetMaxReloadTime" ? 0 1 0 0 0 0 = 0
   w Unit#252.weapon0Def weapondef#0
   w Unit#252.weapon0Flags 16
   w Unit#252.weapon1Def weapondef#0

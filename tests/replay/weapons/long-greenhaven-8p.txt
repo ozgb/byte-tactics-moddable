@@ -22812,10 +22812,10 @@ call 30518 UpdateUnitWeapons
   o y 5505024
   o z 20447232
   i services.ScheduleTargetingTargetUnit Unit#1783 0 = null
-  i units.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
+  i scripts.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i units.GetPieceOffset Unit#1783 0 = (221111,0,-43982)
-  i units.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
+  i scripts.GetPieceOffset Unit#1783 0 = (221111,0,-43982)
+  i scripts.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
   o p2 (0)
   i los_radar.SoundHeardMask at=(342103469,23199744,13069824) = 128
   i services.RecordSimEvent 30 0 [42,342103469,23199744,13069824,128] 5

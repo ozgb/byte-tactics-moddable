@@ -94,6 +94,7 @@ public:
     char* GetNameSlot(int index);
     int CountMissions();
     int BuildMissionList(char** out);
+    int GetCampaignMissionName(int index, char* out, int size);
     int GetTerrainLength();
     char* GetDescription();
     char* GetPlanet();

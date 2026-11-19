@@ -154,7 +154,7 @@ COUPLING_CSV = ROOT / "data/coupling.csv"
 SUBSYSTEM_COLUMNS = ["function", "file", "subsystem", "rule", "override"]
 COUPLING_COLUMNS = ["from", "to", "kind", "target", "count"]
 SIM_SUBSYSTEMS = ["wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar",
-                  "orders", "units", "players", "map", "scripts", "movement"]
+                  "orders", "units", "players", "map", "scripts", "movement", "mission"]
 SUBSYSTEMS = SIM_SUBSYSTEMS + ["network", "game", "harness", "seams", "presentation", "platform",
               "files"]
 PHASE_SUBSYSTEMS = {"UpdateAllUnits": "units", "UpdateProjectiles": "weapons",
@@ -167,7 +167,7 @@ FOLDER_FIXED = [("src/harness/", "harness"), ("src/seams/", "seams"), ("src/debu
 DISPATCH_ROOTS = {"HandleNetPackets"}
 DRAW = re.compile(r"(^|::)(Draw|Render|Blit)")
 LIBRARY = re.compile(r"^(_Construct|_Destroy|operator new|operator delete|Unguarded_insert|Copy_backward)$")
-FILES = [("src/scripts/", "scripts"), ("src/movement/", "movement"), ("src/ai/pathfind", "pathfinding"), ("src/ai/", "ai"), ("src/network/", "network"),
+FILES = [("src/scripts/", "scripts"), ("src/movement/", "movement"), ("src/mission/", "mission"), ("src/ai/pathfind", "pathfinding"), ("src/ai/", "ai"), ("src/network/", "network"),
          ("src/weapons/", "weapons"), ("src/orders/", "orders"),
          ("src/map/features", "features"), ("src/map/line_of_sight", "los_radar"),
          ("src/map/los_tables", "los_radar"), ("src/map/los_lines", "los_radar"), ("src/map/radar", "los_radar"), ("src/map/meteors", "wind_meteors"),
@@ -189,7 +189,8 @@ NAMES = [("presentation", r"^(CMemoryCache|UnitTable|DebrisCache|CacheCore)::|^(
          ("network", r"Packet|Sync")]
 NAME_PATTERNS = [(subsystem, re.compile(pattern)) for subsystem, pattern in NAMES]
 FOLDER_DEFAULT = {"src/ai/": "ai", "src/units/": "units", "src/orders/": "orders", "src/weapons/": "weapons",
-                  "src/network/": "network", "src/game/": "game", "src/map/": "map", "src/scripts/": "scripts", "src/movement/": "movement"}
+                  "src/network/": "network", "src/game/": "game", "src/map/": "map", "src/scripts/": "scripts", "src/movement/": "movement",
+                  "src/mission/": "mission"}
 BIG = 1 << 40
 SHARED_VALUE_TYPES = {"Vec3", "Point", "Point16", "Fixed"}
 ADDRESS_COPY = re.compile(r"_[0-9a-f]{6,8}::")

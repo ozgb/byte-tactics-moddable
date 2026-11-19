@@ -41,7 +41,7 @@ struct Surface;
 
 #pragma pack(pop)
 
-#include "../map/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "../orders/mission_type.h"
 #include "../state/sim_globals.h"
@@ -390,7 +390,7 @@ void HandleGameKey(void)
         break;
 
     case 9:
-        if (g_game->net->GetGameType() == 3) {
+        if (g_seams.mission->GetGameType() == 3) {
             if (!g_game->ordersPanelFlags_37ebe.b2)
                 ToggleTabMenu();
             break;
@@ -530,7 +530,7 @@ void HandleGameKey(void)
     }
 
     case 0x68:
-        if (g_game->net->GetGameType() == 3)
+        if (g_seams.mission->GetGameType() == 3)
             OpenShareDialog();
         break;
 

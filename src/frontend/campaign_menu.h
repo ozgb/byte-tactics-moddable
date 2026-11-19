@@ -11,6 +11,7 @@ char* __stdcall BuildSideList();
 int __stdcall CampaignExists(const char* name);
 int __stdcall ListCampaignFiles(void** names);
 int __stdcall BuildCampaignNameList(char** out, int side);
+int __stdcall BuildMissionNameList(char** out);
 void __stdcall StartBriefingNarration();
 void __stdcall StartGlamourSound();
 char* __stdcall AllocColorMarkupText(char* s);

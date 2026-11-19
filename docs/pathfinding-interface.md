@@ -201,26 +201,36 @@ Every slot reads only, apart from `BeginSearch` and `EndSearch`.
 | `UnitsPerPlayer`, `FirstUnit`, `LastUnit`, `NextUnit` | each player's unit slots, as handles | the players' unit arrays, walked by the cursors |
 | `UnitState` | a unit's player, cell, heading, movement class and its class's footprint | the unit and its `UnitMotion` |
 | `MoveClass` | the movement classes by number | `g_movementClasses` |
-| `InBounds`, `Pass` | a class's pass map | `MovementClassInBounds`, `MovementClassGet` |
+| `InBounds`, `Pass` | a class's pass map, through map's queries `MovementClassInBounds` and `MovementClassGet` (map 5.0) | `MovementClassInBounds`, `MovementClassGet` |
 | `SeenSize`, `Seen` | a player's visibility grid, 2 by 2 cells a square | `visibilityMask` |
 | `LineOfSight` | a straight walk over a class's pass map | not in 3.1c; for any-angle implementations |
 | `TerrainPass` | the pass state from terrain and features alone, without the stamps of units | `GetPassMapFootprintValueWithEdgeStrips` with the unit test left out |
-| `BeginSearch`, `EndSearch` | bring the pass map up to date around a search for a unit | `RefreshMovedUnits`, `RefreshUnitIfStale` |
+| `BeginSearch`, `EndSearch` | bring the pass map up to date around a search for a unit: map's inbox is delivered, then map's synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` run (map 5.0) | `RefreshMovedUnits`, `RefreshUnitIfStale` |
 
 Units and classes are handles, and the view gives no pointer into the engine, so an implementation in
 a WASM module can use the same table through imports.
 
+The pass maps are map's since map 5.0 (#983, `docs/map-interface.md`, section 3): map answers `InBounds` and `Pass`,
+and the lazy refresh of `BeginSearch` and `EndSearch` is map's own work, which reports what it rewrote through its
+CELLS_CHANGED effect like map's other pass-map writes. Units kept the movement class definition (the classes read from
+`MOVEINFO.TDF`, `FindMovementClass` and the class fields a unit's motion reads); no slot of units is left in the world
+view.
+
 `CellsChanged` is the other way in. It names a rectangle of cells, the movement classes (a mask of `MoveClass`
-indexes) and the cause. The engine calls it once per class with the rectangle that class's pass map was rewritten in:
+indexes) and the cause. Map's CELLS_CHANGED calls it once per class with the rectangle that class's pass map was rewritten in:
 for a change of `width` by `height` cells at (x, y), from (x - footprint, y - footprint) to (x + width, y + height),
 clipped to the map.
-- `PATH_CHANGE_TERRAIN`: features changed (the `RefreshAllPassMaps` slot of the map seam, which `PlaceFeature` and
-  `RemoveFeature` call), so `TerrainPass` may differ;
+- `PATH_CHANGE_TERRAIN`: features changed (map's PASS_MAPS, which features' effect of the same name publishes when
+  `PlaceFeature` or `RemoveFeature` changes the cells), so `TerrainPass` may differ;
 - `PATH_CHANGE_UNITS`: the stamps of units on the pass maps were refreshed (building footprints in
-  `src/map/terrain.cpp`, and `RefreshPassMapsForUnit`, `RefreshMovedUnits` and `RefreshUnitIfStale` in
-  `src/units/movement_class.cpp`). `TerrainPass` did not change.
+  `src/map/terrain.cpp`, and `RefreshPassMapsForUnit`, `RefreshMovedUnits` and `RefreshUnitIfStale`, map's functions
+  in `src/units/movement_class.cpp`). `TerrainPass` did not change.
 
-A unit-stamp call can arrive while the implementation is inside `Step`, because `BeginSearch` triggers the refresh.
+Every call comes from map's CELLS_CHANGED effect, whose route is synchronous (`docs/map-interface.md`, section 4), so
+it arrives at the statement that rewrote the pass map, in 3.1c's order. Before map 5.0 the refreshes of
+`BeginSearch` and `EndSearch` called the slot from units' code directly.
+
+A unit-stamp call can arrive while the implementation is inside `Step`, because `BeginSearch` triggers map's refresh.
 The default ignores `CellsChanged`. The HPA\* demo marks its clusters stale for a terrain change only; it builds the
 cluster graph from `TerrainPass` and treats units as local obstacles (the refinement and flood steps read `Pass`). It
 restarts a running search only when the change is in that search's class and in a cluster the search has used.

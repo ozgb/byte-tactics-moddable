@@ -4,7 +4,7 @@
 #include "../../interfaces/ref.h"
 #include <string.h>
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
 #include "../files/files_api.h"
@@ -165,7 +165,7 @@ void __stdcall SetupPlayerSlot(int player, char type)
         p->info->memory = g_game->displayContext->availPhys / 0x100000 + 1;
     }
 
-    if (g_seams.map->GetGameType(g_game->net) == 1) {
+    if (g_seams.mission->GetGameType() == 1) {
         if (type == 1) {
             sprintf(p->name, Translate("Player"));
         } else if (type == 2) {
@@ -178,7 +178,7 @@ void __stdcall SetupPlayerSlot(int player, char type)
         strcpy(p->fullName, p->name);
     }
 
-    if (g_seams.map->GetGameType(g_game->net) == 2) {
+    if (g_seams.mission->GetGameType() == 2) {
         if (type == 1) {
             sprintf(p->name, Translate("Player"));
         } else if (type == 2) {
@@ -320,7 +320,7 @@ guard:
 void LoadDefaultAIScript()
 {
     int size;
-    char* name = g_seams.map->GetNameSlot(g_game->net, 7);
+    char* name = g_seams.mission->GetNameSlot(7);
     char* text = (char*)HAPI_LoadFile(name, &size);
     if (text == 0) {
         text = (char*)HAPI_LoadFile("ai\\default.txt", &size);
@@ -508,7 +508,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
     s_region->updateTime[bl] += 0x1e;
 
     if (bl == g_game->localPlayer) {
-        if (g_seams.map->GetGameType(g_game->net) == 1) {
+        if (g_seams.mission->GetGameType() == 1) {
             if (g_game->list_391ed->CheckVictory() == 0) {
                 if (g_game->list_391ed->CheckDefeat(stream) != 0) {
                     if (s_region->endGameCountdown < 0) {
@@ -634,7 +634,7 @@ skip508:
     return 1;
 
 watch_check:
-    if (g_seams.map->GetGameType(g_game->net) == 3 &&
+    if (g_seams.mission->GetGameType() == 3 &&
         pi->rejectReason == 0) {
         if ((g_game->players[FindHostSlot()].info->flags_9b & 0x80) != 0 ||
             CountActiveAIPlayers() > 0) {
@@ -689,7 +689,7 @@ void __stdcall UpdatePlayerTail(int player)
     unsigned char bl = (unsigned char)player;
     Player* pi = &g_game->players[bl];
     if (bl == g_game->playerIndex) {
-        if (g_seams.map->GetGameType(g_game->net) == 3) {
+        if (g_seams.mission->GetGameType() == 3) {
             g_economyPacketTick++;
             if ((g_economyPacketTick & 3) == 0)
                 g_seams.network->BroadcastPlayerEconomy(pi);
@@ -699,7 +699,7 @@ void __stdcall UpdatePlayerTail(int player)
 
 void __stdcall UpdatePlayersFinish()
 {
-    if (g_seams.map->GetGameType(g_game->net) == 3 &&
+    if (g_seams.mission->GetGameType() == 3 &&
         g_game->commanderDeath != 2 &&
         CountCombatPlayers() == 0) {
         if (s_region->endGameCountdown < 0) {
@@ -789,7 +789,7 @@ void InitPlayerResources()
     for (int i = 0; i < 10; i++) {
         Player* player = &g_game->players[i];
         if (g_game->pendingSaveStore == 0) {
-            switch (g_seams.map->GetGameType(g_game->net)) {
+            switch (g_seams.mission->GetGameType()) {
             case 1:
                 SetStartingStorageBonus(player, (int)g_game->net->startMetal[i],
                              (int)g_game->net->startEnergy[i]);

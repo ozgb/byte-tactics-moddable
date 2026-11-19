@@ -1,7 +1,7 @@
 
 
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 struct UnitCursorView;
 struct FeatureCursorView;

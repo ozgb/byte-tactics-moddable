@@ -1360,6 +1360,27 @@ static inline Cell* GetCellCachedWidth(int x, int y)
 #define BT_REPLAY_INJECT_MEAN_SHIFT 1
 #endif
 
+// FUNCTION: 0x485070
+int __stdcall GetGroundHeight(Vec3* p)
+{
+    int x = WholePart(p->x);
+    int z = WholePart(p->z);
+    int xc = x >> 4;
+    int zc = z >> 4;
+    int xf = x & 15;
+    int zf = z & 15;
+    if (xc < 0 || xc + 1 >= g_game->width || zc < 0 || zc + 1 >= g_game->height)
+        return -1;
+    Cell* c = &g_game->cells[zc * g_game->width + xc];
+    int a = c->height;
+    int b = c[1].height;
+    c += g_game->width;
+    int e = c->height;
+    int f = c[1].height;
+    int r1 = a + (b - a) * xf / 16;
+    return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
+}
+
 // FUNCTION: 0x485140
 int __stdcall GetCellMeanHeight(Vec3* p)
 {
@@ -1443,11 +1464,6 @@ static bool BucketHolds(SpatialBucket* bucket, Unit* unit)
 int __stdcall ApplyMapEvent(const MapEvent* e)
 {
     switch (e->kind) {
-    case MAP_REFRESH_PASS_MAP:
-        if (e->value < 0 || e->value > 31 || g_movementClasses.entries[e->value].name == nullptr)
-            return 0;
-        g_movementClasses.entries[e->value].RefreshPassMap(MapPoint(e->cell), MapPoint(e->size));
-        return 1;
     case MAP_PASS_MAPS:
         if (e->size[0] < 0 || e->size[1] < 0)
             return 0;

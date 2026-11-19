@@ -8,7 +8,7 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 
 #include "../sound/sound.h"
 
-#include "../map/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "../graphics/memory_cache.h"
 #include "../../include/display_mode.h"
@@ -918,7 +918,7 @@ Layer* __cdecl OpenOptionsLayout()
     Layer* result = LoadGuiLayer(&g_game->gui, buf, 0x80);
     SetGrayedOutByName(&g_game->gui, "MUSIC", *(int*)(Sound *)g_game->sound == 0);
     EnableKeyCommands(&g_game->gui);
-    if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).prefsWord.prefs && g_game->net->GetGameType() != 3) {
+    if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).prefsWord.prefs && g_seams.mission->GetGameType() != 3) {
         g_game->pauseFlags |= 1;
     }
     return result;
@@ -1661,7 +1661,7 @@ void ShowGameSettingsDialog()
     AddTextGadget(layer, "TEXT", Translate(deathStrs[g_game->commanderDeath]), 0x8c,
                  0x5a, 0x78, 2);
     AddTextGadget(layer, "TEXT", Translate("Starting Locations:"), 0x12, 0x6c, 0x6e, 2);
-    if (g_game->net->GetGameType() == 2) {
+    if (g_seams.mission->GetGameType() == 2) {
         AddTextGadget(layer, "TEXT", Translate(locStrs[g_game->options->fixedLocations]), 0x8c,
                      0x6c, 0x78, 2);
     } else {
@@ -1675,7 +1675,7 @@ void ShowGameSettingsDialog()
     int losIdx = !(losFlags & 2) ? 2 : (int)(((unsigned char)~losFlags >> 2) & 1);
     AddTextGadget(layer, "TEXT", Translate(losStrs[losIdx]), 0x8c, 0x90, 0x78, 2);
     int y;
-    if (g_game->net->GetGameType() == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         AddTextGadget(layer, "TEXT", Translate("Cheat Codes:"), 0x12, 0xa2, 0x6e, 2);
         AddTextGadget(layer, "TEXT", Translate(cheatStrs[opts->u.b.b13]), 0x8c,
                      0xa2, 0x78, 2);
@@ -1691,11 +1691,11 @@ void ShowGameSettingsDialog()
     }
     AddTextGadget(layer, "TEXT", Translate("Map:"), 0x12, y, 0x6e, 2);
     AddTextGadget(layer, "TEXT",
-                 Translate(g_game->net->GetMissionName()), 0x8c, y,
+                 Translate(g_seams.mission->GetMissionName()), 0x8c, y,
                  0x78, 2);
     y += 0x12;
     AddTextGadget(layer, "TEXT", Translate("Starting Metal:"), 0x12, y, 0x6e, 2);
-    if (g_game->net->GetGameType() == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         AddTextGadget(layer, "TEXT", _itoa(opts->startMetal * 100, num, 10), 0x8c, y, 0x78,
                      2);
     } else {
@@ -1703,7 +1703,7 @@ void ShowGameSettingsDialog()
     }
     y += 0x12;
     AddTextGadget(layer, "TEXT", Translate("Starting Energy:"), 0x12, y, 0x6e, 2);
-    if (g_game->net->GetGameType() == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         AddTextGadget(layer, "TEXT", _itoa(opts->startEnergy * 100, num, 10), 0x8c, y,
                      0x78, 2);
     } else {
@@ -2049,7 +2049,7 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
     PlaySoundByName("Options", 0);
     if (IsCurrentGadgetNamed(gui, "RESTART")) {
         int ok = 0;
-        int mode = g_game->net->GetGameType();
+        int mode = g_seams.mission->GetGameType();
         switch (mode) {
         case 1:
             ok = true;
@@ -2081,7 +2081,7 @@ void OpenRestartDialog()
     int index = FindGadgetIndex(gadgets, "MISSIONNAME", 5);
     g_game->gui.language = (FontGlyphTable*)g_game->gui.values[1];
     char* text = WordWrapText(&g_game->gui,
-                              g_game->net->GetMissionName(),
+                              g_seams.mission->GetMissionName(),
                               gadgets[index].width, -1);
     g_game->gui.language = (FontGlyphTable*)g_game->gui.values[0];
     char* first = strtok(text, "\n");
@@ -2186,12 +2186,12 @@ void OpenExitMenu()
     Layer* dialog = LoadGuiLayer(&g_game->gui, "EXITMENU.GUI", 0x1800);
     dialog->handler = HandleExitMenuClick;
     FindGadgetIndex(dialog->entries, "RESTART", 1);
-    if (g_game->net->GetGameType() == 1) {
+    if (g_seams.mission->GetGameType() == 1) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
         SetTranslatedTextByName(&g_game->gui, "RESTART", Translate("Restart"), 0x80);
         goto tail;
     }
-    if (g_game->net->GetGameType() == 2) {
+    if (g_seams.mission->GetGameType() == 2) {
         SetGadgetActiveByName(&g_game->gui, "RESTART", 1);
         SetTranslatedTextByName(&g_game->gui, "RESTART", Translate("Restart"), 0x80);
         goto tail;
@@ -2226,7 +2226,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
             g_optionsBackupSurface = 0;
         }
         if ((*(NetGameFlagsUnion*)&g_game->netGameFlags_2a44).byte & 4) {
-            if (g_game->net->GetGameType() != 3)
+            if (g_seams.mission->GetGameType() != 3)
                 g_game->otherFlags &= 0xfffe;
         }
         (*(OrdersPanelFlagsView*)&g_game->ordersPanelFlags_37ebe).word &= 0xfffe;
@@ -2261,7 +2261,7 @@ void __stdcall HandleInGameOptionsClick(Gui* gui)
     }
     if (IsCurrentGadgetNamed(gui, "MISSION")) {
         PlaySoundByName("Options", 0);
-        if (g_game->net->GetGameType() == 1) {
+        if (g_seams.mission->GetGameType() == 1) {
             Layer* g = LoadGuiLayer(&g_game->gui, "BRIEFING.GUI", 0);
             Gadget* gadgets = g->entries;
             g->handler = HandleBriefingClick;
@@ -2297,16 +2297,16 @@ void OpenInGameOptions()
     Layer* layer = LoadGuiLayer(&g_game->gui, "ARMOPT.GUI", 0x800);
     layer->handler = HandleInGameOptionsClick;
     SetGrayedOut(&g_game->gui, FindGadgetIndex(layer->entries, "SAVEGAME", 1),
-                 g_game->net->GetGameType() == 3);
+                 g_seams.mission->GetGameType() == 3);
     SetGrayedOut(&g_game->gui, FindGadgetIndex(layer->entries, "LOADGAME", 1),
-                 g_game->net->GetGameType() == 3);
-    if (g_game->net->GetGameType() == 3 || g_game->net->GetGameType() == 2) {
+                 g_seams.mission->GetGameType() == 3);
+    if (g_seams.mission->GetGameType() == 3 || g_seams.mission->GetGameType() == 2) {
         SetTranslatedTextByName(&g_game->gui, "MISSION", Translate("Settings"), 0x80);
     }
     EnableKeyCommands(&g_game->gui);
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
-    if (g_game->net->GetGameType() != 3) {
+    if (g_seams.mission->GetGameType() != 3) {
         g_game->pauseFlags |= 1;
     }
     ((Sound *)g_game->sound)->PauseCdAudio(1);

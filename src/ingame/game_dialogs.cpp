@@ -7,7 +7,6 @@
 #include <math.h>
 #include <vector>
 
-#include "../map/mission.h"
 
 #include "../sound/sound.h"
 
@@ -500,7 +499,7 @@ void OpenTalkDialog()
     if (g_game->flags_37ebe & 0x800)
         return;
     int multi = (g_game->lobbyUiDirtyFlags & 0x100)
-                && g_game->net->GetGameType() == 3;
+                && g_seams.mission->GetGameType() == 3;
     Layer* d = LoadGuiLayer(&g_game->gui,
                             multi ? "TALK2.GUI" : "TALK.GUI",
                             multi ? 0x800 : 0x880);
@@ -509,7 +508,7 @@ void OpenTalkDialog()
     g_game->flags_37ebe |= 4;
     SetTranslatedTextByName(&g_game->gui, "TALK", g_chatDraftText, 0);
     SetButtonStageByName(&g_game->gui, "SENDTO", multi);
-    if (g_game->net->GetGameType() != 3) {
+    if (g_seams.mission->GetGameType() != 3) {
         SetGadgetActiveByName(&g_game->gui, "SENDTO", 0);
     } else if (multi) {
         SetButtonStageByName(&g_game->gui, "SENDTYPE", g_game->mode_2bf0);
@@ -920,7 +919,7 @@ void ToggleTabMenu()
             continue;
         count++;
     }
-    int mode = g_game->net->GetGameType();
+    int mode = g_seams.mission->GetGameType();
     if (mode == 3 && !g_game->players_1b63[g_game->localPlayer].info->bit6) {
         int v = count > 0;
         SetGadgetActiveByName(&g_game->gui, "ALLIES", v);

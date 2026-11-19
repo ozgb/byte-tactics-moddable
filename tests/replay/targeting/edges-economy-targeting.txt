@@ -4919,8 +4919,8 @@ call 11 GetWeaponTargetPos
 call 11 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -34963,8 +34963,8 @@ call 68 GetWeaponTargetPos
 call 68 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -35655,8 +35655,8 @@ call 69 GetWeaponTargetPos
 call 69 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -36366,8 +36366,8 @@ call 70 GetWeaponTargetPos
 call 70 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -37036,8 +37036,8 @@ call 71 GetWeaponTargetPos
 call 71 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -37737,8 +37737,8 @@ call 72 GetWeaponTargetPos
 call 72 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -38541,8 +38541,8 @@ call 73 GetWeaponTargetPos
 call 73 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -39161,8 +39161,8 @@ call 74 GetWeaponTargetPos
 call 74 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -39828,8 +39828,8 @@ call 75 GetWeaponTargetPos
 call 75 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -40458,8 +40458,8 @@ call 76 GetWeaponTargetPos
 call 76 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -41056,8 +41056,8 @@ call 77 GetWeaponTargetPos
 call 77 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -41667,8 +41667,8 @@ call 78 GetWeaponTargetPos
 call 78 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -42303,8 +42303,8 @@ call 79 GetWeaponTargetPos
 call 79 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -42937,8 +42937,8 @@ call 80 GetWeaponTargetPos
 call 80 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -43581,8 +43581,8 @@ call 81 GetWeaponTargetPos
 call 81 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -44203,8 +44203,8 @@ call 82 GetWeaponTargetPos
 call 82 GetWeaponTargetPos
   a unit Unit#1
   a weapon 2
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
-  i units.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
+  i map.GetGroundHeight pos=(55705600,19660800) = 1
   o pos.x 55705600
   o pos.y 65536
   o pos.z 19660800
@@ -114159,7 +114159,7 @@ call 201 GetWeaponTargetPos
   r UnitMotion#1.velocityZ 11122
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -114671,7 +114671,7 @@ call 202 GetWeaponTargetPos
   r UnitMotion#1.velocityZ 1
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -115144,7 +115144,7 @@ call 203 GetWeaponTargetPos
   r UnitMotion#1.velocityZ 0
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -115583,7 +115583,7 @@ call 203 GetWeaponTargetPos
 call 204 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -116093,7 +116093,7 @@ call 204 GetWeaponTargetPos
 call 205 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -116493,7 +116493,7 @@ call 205 GetWeaponTargetPos
 call 206 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -116912,7 +116912,7 @@ call 206 GetWeaponTargetPos
 call 207 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -117332,7 +117332,7 @@ call 207 GetWeaponTargetPos
 call 208 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -117749,7 +117749,7 @@ call 208 GetWeaponTargetPos
 call 209 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -118134,7 +118134,7 @@ call 209 GetWeaponTargetPos
 call 210 GetWeaponTargetPos
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240
@@ -127738,7 +127738,7 @@ call 235 GetWeaponTargetPos
   r UnitMotion#1.velocityZ 1
   a unit Unit#1
   a weapon 0
-  i units.GetGroundHeight pos=(52428800,22282240) = 1
+  i map.GetGroundHeight pos=(52428800,22282240) = 1
   o pos.x 52428800
   o pos.y 2883584
   o pos.z 22282240

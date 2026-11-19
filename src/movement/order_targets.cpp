@@ -985,7 +985,7 @@ void PathOrder::SetAltitude(int param_1)
     field_8 |= 8;
     altitude = param_1;
     if ((unsigned char)field_8 & 0x20) {
-        pos.y = (max(g_seams.units->GetGroundHeight((Vec3*)&pos), g_game->seaLevel) + param_1) << 16;
+        pos.y = (max(g_seams.map->GetGroundHeight((Vec3*)&pos), g_game->seaLevel) + param_1) << 16;
         if (pos.y > 0x1ff0000)
             pos.y = 0x1ff0000;
     }

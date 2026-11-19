@@ -49,6 +49,7 @@ int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
 int __stdcall CanPlaceFootprintAt(Unit* unit, Vec3* pos);
 int __stdcall GetCellHeight(Point16* p);
 int __stdcall GetCellMeanHeight(Vec3* p);
+int __stdcall GetGroundHeight(Vec3* p);
 int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b);
 void __stdcall GetCellPosition(int x, int y, Vec3* out);
 

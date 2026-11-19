@@ -33,7 +33,7 @@
     "inject": {
       "define": "BT_REPLAY_INJECT_MEAN_SHIFT=0",
       "recording": "orders-air-repair.txt",
-      "expect": 7,
+      "expect": 63,
       "field": "result"
     }
   },

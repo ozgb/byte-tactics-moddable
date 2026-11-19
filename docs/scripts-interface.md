@@ -28,7 +28,7 @@ for movement, not for scripts.
 What scripts call out to. A thread runs a unit's COB code, and some of its operations reach other subsystems. They
 are scripts' imports, all through seams or services (`uv run tools/coupling.py --summary scripts`):
 - **units**, through `UnitsSeam`: `AttachUnitToPiece` (the ATTACH and DROP operations), `SetStateBits` (the unit values
-  that set the unit's flags), `GetGroundHeight` (a unit value);
+  that set the unit's flags); map, through `MapSeam`: `GetGroundHeight` (a unit value; units' until map 5.0);
 - **weapons**, through `WeaponsSeam`: `WeaponAimCobComplete` (a thread that ends or returns to a weapon's aim callback,
   `cob.cpp`) and `CobScriptExplodePiece` (the EXPLODE operation);
 - **los_radar**, through `LosRadarSeam`: `IsUnitVisibleToPlayer` (the effects that only the local player sees);

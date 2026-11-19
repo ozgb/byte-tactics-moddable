@@ -111,7 +111,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 int ScanDirectory(char*, char*, char*, int, int, int);
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../state/sim_globals.h"
 
 #include "../debug/debug_lib.h"
@@ -654,7 +654,7 @@ void LoadTntMap()
     Slot b;
     int* tnt;
 
-    tnt = (int*)g_seams.map->GetNameSlot(g_game->net, 1);
+    tnt = (int*)g_seams.mission->GetNameSlot(1);
     tnt = (int *)LoadFileWithProgress((char *)tnt);
     info.version = *tnt;
     switch (info.version) {
@@ -1093,7 +1093,7 @@ void __stdcall ClampWorldPosToTerrain(int x, int y, Vec3* out)
     int i;
     for (i = 0x80; i >= 0; i -= 0x10) {
         p.z = (t + i) << 16;
-        p.y = max(g_seams.units->GetGroundHeight(&p), g_game->seaLevel) << 16;
+        p.y = max(g_seams.map->GetGroundHeight(&p), g_game->seaLevel) << 16;
         s1 = ((short*)&p.z)[1] - (((short*)&p.y)[1] >> 1);
         if (s1 <= y)
             goto found;
@@ -1104,11 +1104,11 @@ found:
     {
         Vec3 q = p;
         q.z = p.z + 0x100000;
-        q.y = max(g_seams.units->GetGroundHeight(&q), g_game->seaLevel) << 16;
+        q.y = max(g_seams.map->GetGroundHeight(&q), g_game->seaLevel) << 16;
         s2 = ((short*)&q.z)[1] - (((short*)&q.y)[1] >> 1);
         if ((s1 < s2 && y >= s1) || y <= s2) {
             p.z = p.z + ((y - s1) << 20) / (s2 - s1);
-            p.y = max(g_seams.units->GetGroundHeight(&p), g_game->seaLevel) << 16;
+            p.y = max(g_seams.map->GetGroundHeight(&p), g_game->seaLevel) << 16;
         }
     }
 done:

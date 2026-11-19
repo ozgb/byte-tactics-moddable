@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stddef.h>
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../util/tdf.h"
 
 class MissionConditions;
@@ -107,26 +107,6 @@ struct ClampedPos {
 // GLOBAL: 0x511de8
 extern Game* g_game;
 
-// FUNCTION: 0x485070
-int __stdcall GetGroundHeight(GroundHeightPos* p)
-{
-    int x = p->x.whole;
-    int z = p->z.whole;
-    int xc = x >> 4;
-    int zc = z >> 4;
-    int xf = x & 15;
-    int zf = z & 15;
-    if (xc < 0 || xc + 1 >= g_game->width || zc < 0 || zc + 1 >= g_game->height)
-        return -1;
-    Cell* c = &g_game->cells[zc * g_game->width + xc];
-    int a = c->height;
-    int b = c[1].height;
-    c += g_game->width;
-    int e = c->height;
-    int f = c[1].height;
-    int r1 = a + (b - a) * xf / 16;
-    return r1 + ((e + (f - e) * xf / 16) - r1) * zf / 16;
-}
 
 // FUNCTION: 0x4853b0
 void __stdcall ClampPositionToMap(ClampedPos* p)
@@ -277,7 +257,7 @@ void __stdcall AllocateUnitMemory(void)
 // FUNCTION: 0x485940
 int __stdcall ComparePlayers(Player* a, Player* b)
 {
-    if (g_seams.map->GetGameType(g_game->net) == 3)
+    if (g_seams.mission->GetGameType() == 3)
         return a->id < b->id;
     return a < b;
 }
@@ -598,7 +578,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         void* target = g_seams.los_radar->GetMapCell(unit->cell.x, unit->cell.y);
         if (target != 0) {
             GroundHeightPos* pos = (GroundHeightPos*)&unit->pos;
-            if (GetGroundHeight(pos) <= g_game->seaLevel) {
+            if (g_seams.map->GetGroundHeight((Vec3*)pos) <= g_game->seaLevel) {
                 FeaturesEvent place = CorpseEvent(target, id, pos, unit);
                 if (!(unit->def->flags1 & 0x1000000))
                     place.flags |= FEATURES_SINK;
@@ -764,7 +744,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         Player* rec = &g_game->players[unit->lastAttackerSlot];
         if (rec->active != 0 && (rec->type == 1 || rec->type == 2 || rec->type == 3)
             && rec->index != 10
-            && (g_seams.map->GetGameType(g_game->net) == 3 || g_seams.map->GetGameType(g_game->net) == 2)
+            && (g_seams.mission->GetGameType() == 3 || g_seams.mission->GetGameType() == 2)
             && rec->rank > 0) {
             int rank = rec->rank;
             int best = rank;
@@ -844,9 +824,9 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->flags &= ~0x30;
     unit->player->unitCount--;
     if (unit->player->unitCount == 0) {
-        if (g_seams.map->GetGameType(g_game->net) == 3)
+        if (g_seams.mission->GetGameType() == 3)
             RecordPlayerLeft(unit->player->id);
-        if (g_seams.map->GetGameType(g_game->net) == 2)
+        if (g_seams.mission->GetGameType() == 2)
             RecordForcesDestroyed(unit->player->index);
     }
 }

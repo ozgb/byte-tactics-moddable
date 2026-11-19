@@ -310,40 +310,35 @@ int Mission::CountMissions()
 // FUNCTION: 0x435760
 int Mission::BuildMissionList(char** out)
 {
-    char buf[128];
     char temp[256];
-    if (strlen(campaign) == 0)
-        return 0;
-    int n;
-    if (strlen(&campaign[0]) == 0) {
-        n = 0;
-    } else {
-        int m = 0;
-        while (1) {
-            sprintf(buf, "MISSION%d", m);
-            list.ResetCurrentRecord();
-            if (list.SelectRecord(buf) == 0)
-                break;
-            m++;
-        }
-        n = m;
-    }
+    int n = CountMissions();
     if (n != 0) {
         char* p = (char*)GameAllocIgnoreTag("MissionList", n << 8);
         *out = p;
         *p = 0;
         for (int i = 0; i < n; i++) {
-            sprintf(buf, "MISSION%d", i);
-            list.ResetCurrentRecord();
-            if (list.SelectRecord(buf) == 0)
+            if (GetCampaignMissionName(i, temp, sizeof(temp)) == 0)
                 return 0;
-            if (GetLocalizedString(&list, temp, "missionname", 0x100, 0) != 0)
-                strcpy(SkipTextLines(*out, i), temp);
-            else
-                strcpy(SkipTextLines(*out, i), "Error -- Unnamed Mission");
+            strcpy(SkipTextLines(*out, i), temp);
         }
     }
     return n;
+}
+
+int Mission::GetCampaignMissionName(int index, char* out, int size)
+{
+    char buf[128];
+    if (strlen(campaign) == 0)
+        return 0;
+    sprintf(buf, "MISSION%d", index);
+    list.ResetCurrentRecord();
+    if (list.SelectRecord(buf) == 0)
+        return 0;
+    if (GetLocalizedString(&list, out, "missionname", size, nullptr) == 0) {
+        strncpy(out, "Error -- Unnamed Mission", size - 1);
+        out[size - 1] = 0;
+    }
+    return 1;
 }
 
 // FUNCTION: 0x4358f0

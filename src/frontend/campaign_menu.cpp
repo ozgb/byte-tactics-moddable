@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/seams.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,7 @@
 
 #include "../sound/sound.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 struct BriefingPlanetAnim {
     short index;
@@ -113,7 +114,6 @@ void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 #include "../graphics/surface.h"
 void __stdcall SetCursorMode(int n);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-#include "../map/map_list.h"
 #include "../game/main.h"
 
 // FUNCTION: 0x476740
@@ -249,11 +249,28 @@ int __stdcall BuildCampaignNameList(char** out, int side)
     return found;
 }
 
+int __stdcall BuildMissionNameList(char** out)
+{
+    char name[256];
+    int n = g_seams.mission->CountMissions();
+    if (n != 0) {
+        char* p = (char*)GameAllocIgnoreTag("MissionList", n << 8);
+        *out = p;
+        *p = 0;
+        for (int i = 0; i < n; i++) {
+            if (g_seams.mission->GetCampaignMissionName(i, name, sizeof(name)) == 0)
+                return 0;
+            strcpy(SkipTextLines(*out, i), name);
+        }
+    }
+    return n;
+}
+
 // FUNCTION: 0x476c70
 void StartBriefingNarration()
 {
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_game->net->GetNameSlot(3);
+        char* name = (char*)g_seams.mission->GetNameSlot(3);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -264,7 +281,7 @@ void StartBriefingNarration()
 void StartGlamourSound()
 {
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_game->net->GetNameSlot(8);
+        char* name = (char*)g_seams.mission->GetNameSlot(8);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -309,7 +326,7 @@ char* __stdcall AllocColorMarkupText(char* s)
 // FUNCTION: 0x476d80
 void InitBriefingText()
 {
-    char* text = g_game->net->GetBriefing();
+    char* text = g_seams.mission->GetBriefing();
     if (text) {
         Gadget* gadgets = g_game->gui.layer->entries;
         int i = FindGadgetIndex(gadgets, "SOLARSYSTEM", 0xe);
@@ -325,7 +342,7 @@ void InitBriefingText()
         DrawHelpPage();
     }
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_game->net->GetNameSlot(3);
+        char* name = (char*)g_seams.mission->GetNameSlot(3);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -618,7 +635,7 @@ void OpenSingleMenu()
         g_game->players_1b8a[g_game->localPlayer + 1].info->side = 0;
         break;
     }
-    SetMissionType(1);
+    g_seams.mission->SetMissionType(1);
     if (g_game->flags_38d7f & 1) {
         SetGadgetActiveByName(&g_game->gui, "AnyMsn", 1);
         g_game->flags_38d7f |= 1;
@@ -660,8 +677,8 @@ void __stdcall FillMissionList(Gui* menu, int unused)
     }
     Gadget* layout =
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
-    g_game->net->LoadCampaign(SkipTextLines(layout->u.list.lines, layout->u.list.selected));
-    int count = g_game->net->BuildMissionList(&g_missionNameList);
+    g_seams.mission->LoadCampaign(SkipTextLines(layout->u.list.lines, layout->u.list.selected));
+    int count = BuildMissionNameList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
@@ -692,9 +709,9 @@ static inline void FillMissionListInline(Gui* menu, Gadget* unused)
     }
     Gadget* layout =
         FindGadgetChecked(g_game->gui.layer->entries, "Campaign");
-    g_game->net->LoadCampaign(
+    g_seams.mission->LoadCampaign(
         SkipTextLines(layout->u.list.lines, layout->u.list.selected));
-    int count = g_game->net->BuildMissionList(&g_missionNameList);
+    int count = BuildMissionNameList(&g_missionNameList);
     ConfigureListBoxByName(menu, "Missions", g_missionNameList, count, 0);
     SyncAssocGadgets(&g_game->gui,
                  FindGadgetIndex(layer->entries, "Missions", 2));
@@ -727,18 +744,18 @@ void __stdcall HandleNewGameClick(Gui* menu)
             if (g_campaignSimplifiedLayout == 0) {
                 Gadget* e = FindGadgetChecked(entries, "Campaign");
                 name = SkipTextLines(e->u.list.lines, e->u.list.selected);
-                g_game->net->LoadCampaign(name);
+                g_seams.mission->LoadCampaign(name);
             } else if (*(unsigned char*)((int)(*(Ref<char>*)(playerInfo + 0x1b8a)).get() + 0x95) == 0) {
-                g_game->net->LoadCampaign("Arm Campaign");
+                g_seams.mission->LoadCampaign("Arm Campaign");
             } else {
-                g_game->net->LoadCampaign("Core Campaign");
+                g_seams.mission->LoadCampaign("Core Campaign");
             }
         }
         if (g_anyMissionMode != 0) {
             Gadget* e = FindGadgetChecked(entries, "Missions");
             index = e->u.list.selected;
         }
-        if (g_game->net->SelectMission(index) != 0) {
+        if (g_seams.mission->SelectMission(index) != 0) {
             SetCursorMode(0x14);
             *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1b8a)).get() + 0x96) = 0;
             *(unsigned char*)((int)(*(Ref<char>*)((char*)g_game + 0x1cd5)).get() + 0x96) = 1;
@@ -936,8 +953,8 @@ void __stdcall OpenNewGameMenu(int param_1)
             Gadget* m = FindGadgetChecked(g_game->gui.layer->entries,
                                              "Campaign");
             char* text = SkipTextLines(m->u.list.lines, m->u.list.selected);
-            g_game->net->LoadCampaign(text);
-            int mc = g_game->net->BuildMissionList(
+            g_seams.mission->LoadCampaign(text);
+            int mc = BuildMissionNameList(
                 &g_missionNameList);
             ConfigureListBoxByName(menu, "Missions", g_missionNameList, mc, 0);
             int mi = FindGadgetIndex(mlayer->entries, "Missions", 2);
@@ -1128,7 +1145,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         if (!GetButtonStageByName(menu, "SHUTUP")) {
             ((Sound *)g_game->sound)->StopStream();
         } else if (g_game->mode_391f1 != 6) {
-            char* text = (char*)g_game->net->GetNameSlot(3);
+            char* text = (char*)g_seams.mission->GetNameSlot(3);
             if (text) {
                 StreamSoundDelayed(text, 0, 0x3c);
             }
@@ -1195,7 +1212,7 @@ void OpenMissionBriefing(void)
                    HarnessViewRand() % (g_game->net->maxWindSpeed - g_game->net->minWindSpeed + 1);
     g_briefingWindTickCountdown = HarnessViewRand() % 64;
 
-    name = g_game->net->GetPlanet();
+    name = g_seams.mission->GetPlanet();
     if (strcmp(name, "Lunar") == 0 && g_game->flag_37ef2 != 0)
         strcat(name, "2");
 

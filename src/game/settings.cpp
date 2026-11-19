@@ -1,7 +1,7 @@
 #include "win_types.h"
 #include <stdio.h>
 #include <string.h>
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "settings.h"
 
 #pragma pack(push, 1)
@@ -360,11 +360,11 @@ void LoadSettings()
     value = 0x100;
     if (SettingGetString((void*)"Total Annihilation", (void*)"SkirmishMap",
                      g_game->options->mapName, &value) == 0) {
-        g_seams.map->SetMissionType(2);
-        g_seams.map->RefreshMapList(g_game->net, 0, 0);
+        g_seams.mission->SetMissionType(2);
+        g_seams.mission->RefreshMapList(0);
         strncpy(g_game->options->mapName,
-                g_seams.map->GetMissionName(g_game->net), 0x100);
-        g_seams.map->SetMissionType(0);
+                g_seams.mission->GetMissionName(), 0x100);
+        g_seams.mission->SetMissionType(0);
         SettingSetString((void*)"Total Annihilation", (void*)"SkirmishMap", g_game->options->mapName);
     }
     for (i = 0; i < g_game->playerCount; i++) {
@@ -511,7 +511,7 @@ void ApplyUseOnlyUnits()
 {
     TdfFile parser;
     char name[256];
-    char* file = g_seams.map->GetNameSlot(g_game->net, 6);
+    char* file = g_seams.mission->GetNameSlot(6);
     if (file == 0)
         return;
     if (!parser.LoadFile(file))

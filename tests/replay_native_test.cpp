@@ -18,10 +18,10 @@
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/map/terrain.h"
-#include "../src/map/mission.h"
+#include "../src/mission/mission.h"
 #include "../src/map/spatial_bucket.h"
 #include "../src/map/plot_map.h"
-#include "../src/map/map_list.h"
+#include "../src/mission/map_list.h"
 #include "../src/units/movement_class.h"
 #include "../src/weapons/weapon_aim_cob_cb.h"
 #include "../src/scripts/cob_script.h"
@@ -1684,6 +1684,26 @@ void __fastcall SpatialBucketUnlinkUnitSlot(SpatialBucket* self, int unusedEdx, 
 void __fastcall RefreshPassMapSlot(MovementClass* self, int unusedEdx, Point16 a, Point16 b)
 {
     self->RefreshPassMap(a, b);
+}
+
+int __stdcall MovementClassGetSlot(MovementClass* self, int x, int y)
+{
+    return self->Get(x, y);
+}
+
+int __stdcall MovementClassInBoundsSlot(MovementClass* self, unsigned int x, unsigned int y)
+{
+    return self->InBounds(x, y);
+}
+
+void __stdcall RefreshMovedUnitsSlot(MovementClass* self, Unit* unit)
+{
+    self->RefreshMovedUnits((UnitPassMapView*)unit);
+}
+
+void __stdcall RefreshUnitIfStaleSlot(MovementClass* self, Unit* unit)
+{
+    self->RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
 int __fastcall AdvanceMissionSlot(Mission* self)

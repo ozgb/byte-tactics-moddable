@@ -9,7 +9,7 @@
 
 #include "../sound/sound.h"
 
-#include "../map/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "../network/player.h"
 
@@ -109,7 +109,6 @@ void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall FlipScreen(void);
 #include "../gui/keyboard.h"
 #include "../gui/keyboard.h"
-#include "../map/map_list.h"
 #include "frontend.h"
 #include "../graphics/palette.h"
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
@@ -637,9 +636,9 @@ void __stdcall LoadWarpLevel(int param_1)
     host_file_config_string(path, "WARPLEVELS", key, "default", value, 0x100);
     sprintf(key, "warp%dmission", param_1);
     int n = host_file_config_int(path, "WARPLEVELS", key, 0);
-    SetMissionType(1);
-    g_game->net->LoadCampaign(value);
-    if (g_game->net->SelectMission(n)) {
+    g_seams.mission->SetMissionType(1);
+    g_seams.mission->LoadCampaign(value);
+    if (g_seams.mission->SelectMission(n)) {
         (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 1;
         (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
     }
@@ -683,9 +682,9 @@ void HandleFrontendDebugKey(void)
         sprintf(key, "warp%dmission", event - 0x30);
         {
             int n = host_file_config_int(path, "WARPLEVELS", key, 0);
-            SetMissionType(1);
-            g_game->net->LoadCampaign(buf);
-            if (g_game->net->SelectMission(n)) {
+            g_seams.mission->SetMissionType(1);
+            g_seams.mission->LoadCampaign(buf);
+            if (g_seams.mission->SelectMission(n)) {
                 (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 1;
                 (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b2 = 1;
             }
@@ -860,7 +859,7 @@ void RunFrontendStateMachine(void)
                 SetCursorOverlayEnabled(1);
                 return;
             }
-            SetMissionType(0);
+            g_seams.mission->SetMissionType(0);
             g_game->lobbyUiDirtyFlags_2bee.b4 = 0;
             OpenMainMenu();
             if (DAT_00512c80 == 0) {
@@ -875,7 +874,7 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 6:
-            SetMissionType(3);
+            g_seams.mission->SetMissionType(3);
             (*(NetGameFlagLowBits*)&g_game->netGameFlags_2a44).b3 = 0;
             SetState(0xf, 0x41c, g_frontendSourceFile);
             return;
@@ -954,7 +953,7 @@ void RunFrontendStateMachine(void)
             return;
         case 11:
             LoadSettings();
-            SetMissionType(2);
+            g_seams.mission->SetMissionType(2);
             SetState(9, 0x493, g_frontendSourceFile);
             return;
         case 13:
@@ -991,11 +990,11 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 15:
-            SetMissionType(1);
+            g_seams.mission->SetMissionType(1);
             SetState(0xb, 0x4c2, g_frontendSourceFile);
             return;
         case 16:
-            SetMissionType(1);
+            g_seams.mission->SetMissionType(1);
             SetState(0xc, 0x4c7, g_frontendSourceFile);
             return;
         case 3:
@@ -1202,7 +1201,7 @@ void RunFrontendStateMachine(void)
             unsigned char* q = (unsigned char*)g_game + 0x14b * (unsigned char)g_game->localPlayer + 0x1b84;
             *q = ((*(NetGameFlagLowBits*)&g_game->flags_2b4c).b4 << 1) | (*q & 0xfd);
             if ((*(NetGameFlagLowBits*)&g_game->flags_2b4c).b4) {
-                g_game->net->LoadMissionByName(g_game->buffer_2ab1);
+                g_seams.mission->LoadMissionByName(g_game->buffer_2ab1);
                 for (int i = 0; i < 10; i++) {
                     if (g_game->players[i].active) {
                         char t = g_game->players[i].type;

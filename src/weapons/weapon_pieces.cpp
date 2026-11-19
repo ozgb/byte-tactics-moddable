@@ -2,7 +2,7 @@
 #include "../util/vec3.h"
 
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 struct UnitCursorView;
 struct FeatureCursorView;

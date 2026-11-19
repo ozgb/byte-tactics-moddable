@@ -204,7 +204,7 @@ class Rules(unittest.TestCase):
 
     def ruled(self, rows, name):
         ann = annotations()
-        ann["rules"].append({"kind": "deref_write", "target": "*float", "rule": "fields", "functions": ["DamageUnit"], "writes": ["Unit.workTime"], "note": "test"})
+        ann["rules"].append({"kind": "deref_write", "target": "*float", "rule": "fields", "functions": ["WeaponCanReachUnit"], "writes": ["Unit.workTime"], "note": "test"})
         ann["rules"].append({"kind": "deref_write", "target": "*float", "rule": "fields", "functions": ["GetWeaponRange"], "writes": ["Unit.health"], "note": "test"})
         model, errors = build(rows, ann)
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
@@ -212,12 +212,12 @@ class Rules(unittest.TestCase):
         return {"reads": [names[i] for i in s["objectReads"]], "writes": [names[i] for i in s["objectWrites"]]}
 
     def test_a_write_through_a_float_pointer_lands_on_the_fields_of_its_rule(self):
-        s = self.ruled([row("DamageUnit", "deref_write", "*float")], "DamageUnit")
+        s = self.ruled([row("WeaponCanReachUnit", "deref_write", "*float")], "WeaponCanReachUnit")
         self.assertEqual(s["writes"], ["Unit.workTime"])
         self.assertEqual(s["reads"], [])
 
     def test_a_rule_of_functions_does_not_cover_the_others(self):
-        s = self.ruled([row("DamageUnit", "deref_write", "*float")], "DamageUnit")
+        s = self.ruled([row("WeaponCanReachUnit", "deref_write", "*float")], "WeaponCanReachUnit")
         self.assertEqual(s["writes"], ["Unit.workTime"])
         s = self.ruled([row("GetWeaponRange", "deref_write", "*float")], "GetWeaponRange")
         self.assertEqual(s["writes"], ["Unit.health"])
@@ -227,11 +227,11 @@ class Rules(unittest.TestCase):
         self.assertEqual(s["reads"], ["Unit.flags"])
 
     def test_a_plain_row_may_have_a_rule(self):
-        s = self.slot([row("DamageUnit", "field_read", "Point16::x")], "DamageUnit")
+        s = self.slot([row("WeaponCanReachUnit", "field_read", "Point16::x")], "WeaponCanReachUnit")
         self.assertEqual(s["reads"], ["Unit.cell", "Unit.footprint"])
 
     def test_an_all_of_rule_makes_every_slot_of_the_table_a_root(self):
-        s = self.slot([row("DamageUnit", "field_escape", "Game::players")], "DamageUnit")
+        s = self.slot([row("WeaponCanReachUnit", "field_escape", "Game::players")], "WeaponCanReachUnit")
         self.assertEqual(s["allOf"], ["Player"])
 
     def test_a_member_a_state_type_does_not_record_is_unaccounted_for(self):
@@ -518,27 +518,27 @@ class PendingList(unittest.TestCase):
 
 
 class IndirectCalls(unittest.TestCase):
-    SEAM = "indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::MarkRecentlyDamaged]"
+    SEAM = "indirect via int (*)(CobScript *, char *, int *, int *, int *, int *) __attribute__((stdcall)) [ScriptsSeam::QueryScript]"
     OTHER = "indirect via void (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::ClearWeaponTarget]"
     OWN = "indirect via void (*)(RandStream) __attribute__((cdecl)) [WindMeteorsSeam::UpdateWindOnStream]"
     TABLE = "indirect via int (*)(void *, Order *, unsigned int) __attribute__((stdcall)) [OrderTableEntry::notify]"
     VIRTUAL = "virtual OrderFx::GetType"
     CONCRETE = ["ApproachRadius::GetType", "RingApproach::GetType", "PathOrder::GetType"]
 
-    def pending(self, rows, ann=None, slot_name="DamageUnit"):
+    def pending(self, rows, ann=None, slot_name="WeaponCanReachUnit"):
         model, errors = build(rows, ann)
         return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["DamageUnit"].update(changes)
+        ann["subsystems"]["weapons"]["slots"]["WeaponCanReachUnit"].update(changes)
         return ann
 
     def test_a_call_through_an_import_is_accounted_for(self):
-        self.assertEqual(self.pending([row("DamageUnit", "indirect_call", self.SEAM)])[0], [])
+        self.assertEqual(self.pending([row("WeaponCanReachUnit", "indirect_call", self.SEAM)])[0], [])
 
     def test_a_call_through_a_seam_it_does_not_import_is_an_error(self):
-        errors, _ = self.pending([row("DamageUnit", "indirect_call", self.OTHER)])
+        errors, _ = self.pending([row("WeaponCanReachUnit", "indirect_call", self.OTHER)])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("weapons is complete but has pending indirect", errors[0])
         self.assertIn("ClearWeaponTarget", errors[0])
@@ -550,62 +550,62 @@ class IndirectCalls(unittest.TestCase):
         self.assertTrue(any("pending indirect" in e and "UpdateWindOnStream" in e for e in errors), errors)
 
     def test_a_code_pointer_is_an_error(self):
-        errors, _ = self.pending([row("DamageUnit", "indirect_call", self.TABLE)])
+        errors, _ = self.pending([row("WeaponCanReachUnit", "indirect_call", self.TABLE)])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("OrderTableEntry::notify", errors[0])
 
     def test_a_vtable_dispatch_needs_the_concrete_functions_in_the_closure(self):
-        rows = [row("DamageUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
         errors, _ = self.pending(rows)
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("ApproachRadius::GetType", errors[0])
         ann = self.economy()
-        ann["subsystems"]["weapons"]["slots"]["DamageUnit"]["functions"] += self.CONCRETE
+        ann["subsystems"]["weapons"]["slots"]["WeaponCanReachUnit"]["functions"] += self.CONCRETE
         self.assertEqual(self.pending(rows, ann)[0], [])
 
     def test_one_concrete_function_out_of_the_closure_is_still_an_error(self):
-        rows = [row("DamageUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.VIRTUAL)] + [row(f, "function", "") for f in self.CONCRETE]
         ann = self.economy()
-        ann["subsystems"]["weapons"]["slots"]["DamageUnit"]["functions"] += self.CONCRETE[:2]
+        ann["subsystems"]["weapons"]["slots"]["WeaponCanReachUnit"]["functions"] += self.CONCRETE[:2]
         errors, _ = self.pending(rows, ann)
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("PathOrder::GetType", errors[0])
 
     def test_a_dispatch_on_a_class_that_is_no_kind_is_an_error(self):
-        errors, _ = self.pending([row("DamageUnit", "indirect_call", "virtual DirectPlay::Close")])
+        errors, _ = self.pending([row("WeaponCanReachUnit", "indirect_call", "virtual DirectPlay::Close")])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("DirectPlay", errors[0])
 
     def test_through_adds_the_functions_to_the_closure(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "field_write", "Unit::health")]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE), row("StopOrder", "field_write", "Unit::health")]
         errors, slot = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         self.assertEqual(errors, [])
         model, _ = build(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
-        self.assertEqual([names[i] for i in model["subsystems"]["weapons"]["slots"]["DamageUnit"]["objectWrites"]], ["Unit.health"])
+        self.assertEqual([names[i] for i in model["subsystems"]["weapons"]["slots"]["WeaponCanReachUnit"]["objectWrites"]], ["Unit.health"])
 
     def test_through_may_be_named_by_the_field_in_brackets(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "function", "")]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE), row("StopOrder", "function", "")]
         self.assertEqual(self.pending(rows, self.economy(through={"OrderTableEntry::notify": ["StopOrder"]}))[0], [])
 
     def test_the_functions_of_through_are_held_to_the_same_checks(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE), row("StopOrder", "function", ""), row("StopOrder", "indirect_call", self.OTHER)]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE), row("StopOrder", "function", ""), row("StopOrder", "indirect_call", self.OTHER)]
         errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["StopOrder"]}))
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("ClearWeaponTarget", errors[0])
 
     def test_through_with_a_reason_is_a_call_that_does_nothing(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE)]
         self.assertEqual(self.pending(rows, self.economy(through={self.TABLE: {"reason": "the table is empty on the recorded paths"}}))[0], [])
 
     def test_through_with_nothing_and_no_reason_is_an_error(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE)]
         for entry in ([], {}):
             errors, _ = self.pending(rows, self.economy(through={self.TABLE: entry}))
             self.assertTrue(any("through" in e and "reason" in e for e in errors), errors)
 
     def test_through_that_names_no_function_is_an_error(self):
-        rows = [row("DamageUnit", "indirect_call", self.TABLE)]
+        rows = [row("WeaponCanReachUnit", "indirect_call", self.TABLE)]
         errors, _ = self.pending(rows, self.economy(through={self.TABLE: ["NoSuchFunction"]}))
         self.assertTrue(any("NoSuchFunction" in e and "no function" in e for e in errors), errors)
 
@@ -1025,10 +1025,13 @@ class Callbacks(unittest.TestCase):
     def generated(self, ann=None):
         return rs.generate(rs.read_rows(), ann or annotations())
 
-    def with_import(self, mutate=None):
+    def with_import(self, mutate=None, slot="StartScript", importer="wind_meteors"):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"] = {"callback": {"mode": "callback", "callback": "Callback", "line": "callback"}}
-        ann["subsystems"]["wind_meteors"]["imports"].append("weapons.WeaponAimCobComplete")
+        modes = {"script": {"mode": "object", "kind": "CobScript"}, "name": {"mode": "text"}, "callback": {"mode": "callback", "callback": "Callback", "line": "callback"}}
+        params = [x for x in rs.parse_interface("scripts", "ScriptsSeam")["slots"] if x["name"] == slot][0]["params"]
+        args = {x["name"]: modes.get(x["name"], {"mode": "scalar"}) for x in params}
+        ann["subsystems"]["scripts"]["slots"][slot] = {"args": args}
+        ann["subsystems"][importer]["imports"].append("scripts." + slot)
         if mutate:
             mutate(ann)
         return ann
@@ -1068,34 +1071,35 @@ class Callbacks(unittest.TestCase):
         files, errors, _ = self.generated(self.with_import())
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete("):]
+        body = hooks[hooks.index("RecScriptsStartScript("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ReplayCallbackScope cb0;", body)
-        self.assertIn("ImportCallback(line, cb0, RCB_CALLBACK, a0);", body)
-        self.assertLess(body.index("s_inner_weapons->WeaponAimCobComplete"), body.index("cb0.Stop();"))
-        self.assertLess(body.index("cb0.Stop();"), body.index("line.AddText(cb0.Lines());"))
-        self.assertLess(body.index("line.AddText(cb0.Lines());"), body.index("FinishImport(line);"))
+        self.assertIn("ReplayCallbackScope cb2;", body)
+        self.assertIn("ImportCallback(line, cb2, RCB_CALLBACK, a2);", body)
+        self.assertLess(body.index("s_inner_scripts->StartScript"), body.index("cb2.Stop();"))
+        self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
+        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
 
     def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
         files, _, _ = self.generated(self.with_import())
         slots = files[rs.SLOTS_H]
-        body = slots[slots.index("Imp_weapons_WeaponAimCobComplete("):]
+        body = slots[slots.index("Imp_scripts_StartScript("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a0);", body)
-        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_Callback(a0, OBJ_CALLBACK + RCB_CALLBACK, "weapons.WeaponAimCobComplete");'))
+        self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a2);", body)
+        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_Callback(a2, OBJ_CALLBACK + RCB_CALLBACK, "scripts.StartScript");'))
 
     def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_recorded_as_an_a_line(self):
         def only_note(ann):
-            ann["subsystems"]["wind_meteors"]["imports"].remove("weapons.WeaponAimCobComplete")
+            ann["subsystems"]["wind_meteors"]["imports"].remove("scripts.StartScript")
+            ann["subsystems"]["weapons"]["imports"].remove("scripts.StartScript")
         files, errors, _ = self.generated(self.with_import(only_note))
         self.assertFalse([e for e in errors if "callback argument" in e])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete("):]
+        body = hooks[hooks.index("RecScriptsStartScript("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ReplayCallbackScope held0;", body)
-        self.assertIn('ArgCallback(s_call, "callback", held0, RCB_CALLBACK, a0);', body)
-        self.assertLess(body.index("s_inner_weapons->WeaponAimCobComplete"), body.index("held0.Stop();"))
-        self.assertLess(body.index("held0.Stop();"), body.index("ArgCallbackExit(s_tail, held0);"))
+        self.assertIn("ReplayCallbackScope held2;", body)
+        self.assertIn('ArgCallback(s_call, "callback", held2, RCB_CALLBACK, a2);', body)
+        self.assertLess(body.index("s_inner_scripts->StartScript"), body.index("held2.Stop();"))
+        self.assertLess(body.index("held2.Stop();"), body.index("ArgCallbackExit(s_tail, held2);"))
         self.assertNotIn("ImportCallback", body)
 
     def test_the_runner_of_a_slot_binds_its_callback_argument_by_the_line(self):
@@ -1178,11 +1182,11 @@ class Callbacks(unittest.TestCase):
 
     def test_the_callback_names_an_entry_and_its_type(self):
         def unknown(ann):
-            ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"]["callback"]["callback"] = "Nowhere"
+            ann["subsystems"]["scripts"]["slots"]["StartScript"]["args"]["callback"]["callback"] = "Nowhere"
         self.assertTrue(any("needs a `callback` that is an entry of `callbacks`" in e for e in self.errors(self.with_import(unknown))))
 
         def wrong(ann):
-            ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"]["callback"]["callback"] = "UnitScanVisitor"
+            ann["subsystems"]["scripts"]["slots"]["StartScript"]["args"]["callback"]["callback"] = "UnitScanVisitor"
         self.assertTrue(any("the callback UnitScanVisitor is UnitScanVisitor*" in e for e in self.errors(self.with_import(wrong))))
 
     def test_the_methods_are_the_virtuals_of_the_class_in_order(self):
@@ -1771,9 +1775,9 @@ class AllOfKinds(unittest.TestCase):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1b8a", "rule": "all-of", "object": "FixtureCell", "note": "test"})
-        rows = [row("DamageUnit", "field_escape", t) for t in ("Game::p1cd5", "Game::players", "Game::p1b8a")]
+        rows = [row("WeaponCanReachUnit", "field_escape", t) for t in ("Game::p1cd5", "Game::players", "Game::p1b8a")]
         model, errors = build(rows + list(extra), ann)
-        return model["subsystems"]["weapons"]["slots"]["DamageUnit"], errors
+        return model["subsystems"]["weapons"]["slots"]["WeaponCanReachUnit"], errors
 
     def test_a_slot_lists_every_all_of_kind_in_kind_order(self):
         s, errors = self.rules()
@@ -1781,19 +1785,19 @@ class AllOfKinds(unittest.TestCase):
         self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
 
     def test_a_kind_named_twice_is_listed_once(self):
-        s, errors = self.rules([row("DamageUnit", "field_escape", "Game::players")])
+        s, errors = self.rules([row("WeaponCanReachUnit", "field_escape", "Game::players")])
         self.assertEqual([e for e in errors if "all-of" in e], [])
         self.assertEqual(s["allOf"], ["Player", "FixtureCell", "FixtureLane"])
 
     def test_the_generated_slot_has_a_list_of_kinds(self):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
-        files, errors, _ = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::p1cd5"), row("DamageUnit", "field_escape", "Game::players")], ann)
+        files, errors, _ = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn("kReplayWeaponsDamageUnitAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
-        slot = [l for l in text.split("\n") if l.startswith('    { "DamageUnit", SUB_WEAPONS')][0]
-        self.assertTrue(slot.endswith("kReplayWeaponsDamageUnitAllOf, 2 },"), slot)
+        self.assertIn("kReplayWeaponsWeaponCanReachUnitAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
+        slot = [l for l in text.split("\n") if l.startswith('    { "WeaponCanReachUnit", SUB_WEAPONS')][0]
+        self.assertTrue(slot.endswith("kReplayWeaponsWeaponCanReachUnitAllOf, 2 },"), slot)
 
     def test_a_slot_with_one_kind_is_a_list_of_one(self):
         files, _, _ = rs.generate(rs.read_rows())
@@ -1810,7 +1814,7 @@ class AllOfKinds(unittest.TestCase):
     def test_a_kind_with_no_table_is_an_error(self):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "Vec3", "note": "test"})
-        _, errors = build([row("DamageUnit", "field_escape", "Game::p1cd5")], ann)
+        _, errors = build([row("WeaponCanReachUnit", "field_escape", "Game::p1cd5")], ann)
         self.assertTrue(any("the all-of rule names Vec3, which is no table kind of the schema" in e for e in errors), errors)
 
 
@@ -2236,7 +2240,7 @@ class ElementForms(unittest.TestCase):
         self.has(ann, "a kind in a table behind a ref field is a state kind with no sites")
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::p1cd5"), row("DamageUnit", "field_escape", "Game::players")], ann)[1]
+        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)[1]
         self.assertTrue(any("the all-of rule names FixtureGroup, which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
@@ -2267,11 +2271,11 @@ class ElementForms(unittest.TestCase):
 
     def test_a_pointer_to_an_embedded_kind_is_an_object_argument_named_by_its_site(self):
         ann = annotations()
-        ann["subsystems"]["weapons"]["slots"]["WeaponAimCobComplete"]["args"] = {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}
+        ann["subsystems"]["weapons"]["slots"]["GetWeaponRange"]["args"] = {"unit": {"mode": "object", "kind": "FixtureCb", "line": "callback"}, "weapon": {"mode": "scalar"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWeaponsWeaponAimCobComplete"):]
+        body = hooks[hooks.index("RecWeaponsGetWeaponRange"):]
         body = body[:body.index("\n}\n")]
         self.assertIn('ArgObject(s_call, "callback", ROK_FIXTURECB, a0);', body)
         self.assertIn("roots.Add(ROK_FIXTURECB, a0);", body)
@@ -2349,10 +2353,10 @@ class CapacityTables(unittest.TestCase):
     def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
         ann = self.table(annotations(), capacity="hotRadarCount")
         ann["rules"].append({"kind": "field_escape", "target": "Game::hotRadar", "rule": "all-of", "object": "FixtureEye", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::hotRadar")], ann)[1]
-        self.assertTrue(any("weapons.DamageUnit reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
-        ann["subsystems"]["weapons"]["slots"].setdefault("DamageUnit", {})["reads"] = ["Game.hotRadarCount"]
-        errors = rs.generate(rs.read_rows() + [row("DamageUnit", "field_escape", "Game::hotRadar")], ann)[1]
+        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
+        self.assertTrue(any("weapons.WeaponCanReachUnit reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
+        ann["subsystems"]["weapons"]["slots"].setdefault("WeaponCanReachUnit", {})["reads"] = ["Game.hotRadarCount"]
+        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
         self.assertEqual([e for e in errors if "reaches" in e], [])
 
     def test_a_table_behind_a_ref_field_has_a_capacity_that_is_a_member_of_the_owner(self):

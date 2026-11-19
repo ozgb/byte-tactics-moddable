@@ -425,7 +425,17 @@ Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
         ArgPending(s_call, "cell");
         ArgObject(s_call, "def", ROK_FEATURE, a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i features.GetFootprintCentre");
+        ImportPending(line);
+        ImportObject(line, ROK_FEATURE, a1);
+    }
     Vec3 result = s_inner_features->GetFootprintCentre(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1130,7 +1140,16 @@ Cell* __stdcall RecLosRadarGetMapCellAtPosition(Vec3* a0)
     if (scope.Open()) {
         ArgPending(s_call, "pos");
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.GetMapCellAtPosition");
+        ImportPending(line);
+    }
     Cell* result = s_inner_los_radar->GetMapCellAtPosition(a0);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_CELL, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_CELL, result, "o");
     }
@@ -1376,7 +1395,17 @@ int __stdcall RecLosRadarIsPointVisible(Player* a0, Vec3* a1)
         ArgObject(s_call, "player", ROK_PLAYER, a0);
         ArgPending(s_call, "pos");
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.IsPointVisible");
+        ImportObject(line, ROK_PLAYER, a0);
+        ImportPending(line);
+    }
     int result = s_inner_los_radar->IsPointVisible(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1495,16 +1524,7 @@ void __stdcall RecOrdersAppendOrder(Unit* a0, Order* a1)
         ArgObject(s_call, "owner", ROK_UNIT, a0);
         ArgObject(s_call, "node", ROK_ORDER, a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i orders.AppendOrder");
-        ImportObject(line, ROK_UNIT, a0);
-        ImportObject(line, ROK_ORDER, a1);
-    }
     s_inner_orders->AppendOrder(a0, a1);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -1712,16 +1732,7 @@ MissionType __stdcall RecOrdersMissionTypeFromName(const char* a0)
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i orders.MissionTypeFromName");
-        ImportValue(line, (const char*)a0);
-    }
     MissionType result = s_inner_orders->MissionTypeFromName(a0);
-    if (scope.Import()) {
-        ImportResultValue(line, ROK_MISSIONTYPE, &result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_MISSIONTYPE, &result);
     }
@@ -1741,21 +1752,7 @@ Order* __stdcall RecOrdersNewOrder(MissionType a0, Unit* a1, void* a2, int a3, i
         ArgValue(s_call, "b", a4);
         ArgValue(s_call, "c", a5);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i orders.NewOrder");
-        ImportValueStruct(line, ROK_MISSIONTYPE, &a0);
-        ImportObject(line, ROK_UNIT, a1);
-        ImportPending(line);
-        ImportValue(line, a3);
-        ImportValue(line, a4);
-        ImportValue(line, a5);
-    }
     Order* result = s_inner_orders->NewOrder(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        ImportResultObject(line, ROK_ORDER, result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDER, result, "o");
     }
@@ -1911,15 +1908,7 @@ void __stdcall RecUnitsMarkRecentlyDamaged(Unit* a0)
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.MarkRecentlyDamaged");
-        ImportObject(line, ROK_UNIT, a0);
-    }
     s_inner_units->MarkRecentlyDamaged(a0);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
     if (scope.Open()) {
     }
 }
@@ -2892,7 +2881,15 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     if (scope.Open()) {
         ArgStruct(s_call, "a", "pos", ROK_VEC3, a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i map.GetCellMeanHeight");
+    }
     int result = s_inner_map->GetCellMeanHeight(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3138,17 +3135,7 @@ int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
         ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgValue(s_call, "name", (const char*)a1);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i scripts.FindScript");
-        ImportObject(line, ROK_COBSCRIPT, a0);
-        ImportValue(line, (const char*)a1);
-    }
     int result = s_inner_scripts->FindScript(a0, a1);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3190,7 +3177,17 @@ Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "piece", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.GetPiecePosition");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportValue(line, a1);
+    }
     Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -5011,7 +5008,17 @@ void __stdcall RecNetworkSendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
         ArgPending(s_call, "origin");
         ArgPending(s_call, "aimOrVel");
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendWeaponFireAt");
+        ImportValue(line, a0);
+        ImportPending(line);
+        ImportPending(line);
+    }
     s_inner_network->SendWeaponFireAt(a0, a1, a2);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -5026,7 +5033,16 @@ void __stdcall RecNetworkSendProjectileDetonated(Unit* a0, Projectile* a1)
         ArgObject(s_call, "attacker", ROK_UNIT, a0);
         ArgObject(s_call, "projectile", ROK_PROJECTILE, a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendProjectileDetonated");
+        ImportObject(line, ROK_UNIT, a0);
+        ImportObject(line, ROK_PROJECTILE, a1);
+    }
     s_inner_network->SendProjectileDetonated(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -5253,21 +5269,19 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         return false;
     case SUB_WEAPONS:
+        if (slot == RSL_FEATURES_GETFOOTPRINTCENTRE)
+            return true;
+        if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
+        if (slot == RSL_LOS_RADAR_GETMAPCELLATPOSITION)
+            return true;
+        if (slot == RSL_LOS_RADAR_ISPOINTVISIBLE)
+            return true;
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
-        if (slot == RSL_SCRIPTS_STARTSCRIPT)
+        if (slot == RSL_MAP_GETCELLMEANHEIGHT)
             return true;
-        if (slot == RSL_SCRIPTS_STARTSCRIPTWITHARGS)
-            return true;
-        if (slot == RSL_SCRIPTS_FINDSCRIPT)
-            return true;
-        if (slot == RSL_SCRIPTS_GETAIMFROMPOSITION)
-            return true;
-        if (slot == RSL_SCRIPTS_GETPIECEOFFSET)
-            return true;
-        if (slot == RSL_SCRIPTS_QUERYSCRIPT)
-            return true;
-        if (slot == RSL_UNITS_MARKRECENTLYDAMAGED)
+        if (slot == RSL_NETWORK_SENDPROJECTILEDETONATED)
             return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
             return true;
@@ -5275,11 +5289,21 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDWEAPONFIRE)
             return true;
-        if (slot == RSL_ORDERS_MISSIONTYPEFROMNAME)
+        if (slot == RSL_NETWORK_SENDWEAPONFIREAT)
             return true;
-        if (slot == RSL_ORDERS_APPENDORDER)
+        if (slot == RSL_SCRIPTS_STARTSCRIPT)
             return true;
-        if (slot == RSL_ORDERS_NEWORDER)
+        if (slot == RSL_SCRIPTS_STARTSCRIPTWITHARGS)
+            return true;
+        if (slot == RSL_SCRIPTS_GETAIMFROMPOSITION)
+            return true;
+        if (slot == RSL_SCRIPTS_GETPIECEOFFSET)
+            return true;
+        if (slot == RSL_SCRIPTS_GETPIECEPOSITION)
+            return true;
+        if (slot == RSL_SCRIPTS_QUERYSCRIPT)
+            return true;
+        if (slot == RSL_UNITS_GETGROUNDHEIGHT)
             return true;
         return false;
     case SUB_TARGETING:
@@ -5413,7 +5437,7 @@ void HookSeams(const bool* on)
         s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
     if (on[SUB_FEATURES])
         s_rec_features.FindOrLoadFeatureType = RecFeaturesFindOrLoadFeatureType;
-    if (on[SUB_FEATURES])
+    if (on[SUB_FEATURES] || on[SUB_WEAPONS])
         s_rec_features.GetFootprintCentre = RecFeaturesGetFootprintCentre;
     if (on[SUB_FEATURES])
         s_rec_features.SaveFeatures = RecFeaturesSaveFeatures;
@@ -5507,9 +5531,9 @@ void HookSeams(const bool* on)
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.Apply = RecLosRadarApply;
-    if (on[SUB_LOS_RADAR] || on[SUB_MAP])
+    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;
@@ -5543,7 +5567,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.GetVisibleEnemiesInRadiusList = RecLosRadarGetVisibleEnemiesInRadiusList;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])
         s_rec_los_radar.IsPointVisible = RecLosRadarIsPointVisible;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.CreateUnitIndex = RecLosRadarCreateUnitIndex;
@@ -5561,7 +5585,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.SightCache = RecLosRadarSightCache;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.WriteState = RecLosRadarWriteState;
-    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
+    if (on[SUB_ORDERS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.AddOrder = RecOrdersAddOrder;
@@ -5589,9 +5613,9 @@ void HookSeams(const bool* on)
         s_rec_orders.ClearOrderTypeTable = RecOrdersClearOrderTypeTable;
     if (on[SUB_ORDERS])
         s_rec_orders.LoadOrder = RecOrdersLoadOrder;
-    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
+    if (on[SUB_ORDERS])
         s_rec_orders.MissionTypeFromName = RecOrdersMissionTypeFromName;
-    if (on[SUB_ORDERS] || on[SUB_WEAPONS])
+    if (on[SUB_ORDERS])
         s_rec_orders.NewOrder = RecOrdersNewOrder;
     if (on[SUB_ORDERS])
         s_rec_orders.QueueBuildOrder = RecOrdersQueueBuildOrder;
@@ -5599,7 +5623,7 @@ void HookSeams(const bool* on)
         s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
-    if (on[SUB_UNITS] || on[SUB_TARGETING])
+    if (on[SUB_UNITS] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
     if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
@@ -5611,7 +5635,7 @@ void HookSeams(const bool* on)
         s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
     if (on[SUB_UNITS])
         s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
-    if (on[SUB_UNITS] || on[SUB_WEAPONS])
+    if (on[SUB_UNITS])
         s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
         s_rec_units.NotifyUnitRefs = RecUnitsNotifyUnitRefs;
@@ -5759,7 +5783,7 @@ void HookSeams(const bool* on)
         s_rec_players.WriteState = RecPlayersWriteState;
     if (on[SUB_MAP])
         s_rec_map.Apply = RecMapApply;
-    if (on[SUB_MAP])
+    if (on[SUB_MAP] || on[SUB_WEAPONS])
         s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
         s_rec_map.CanBuildAt = RecMapCanBuildAt;
@@ -5781,11 +5805,11 @@ void HookSeams(const bool* on)
         s_rec_scripts.StartScriptWithArgsByIndex = RecScriptsStartScriptWithArgsByIndex;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
         s_rec_scripts.QueryScript = RecScriptsQueryScript;
-    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
+    if (on[SUB_SCRIPTS])
         s_rec_scripts.FindScript = RecScriptsFindScript;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
         s_rec_scripts.GetPieceOffset = RecScriptsGetPieceOffset;
-    if (on[SUB_SCRIPTS])
+    if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
         s_rec_scripts.GetPiecePosition = RecScriptsGetPiecePosition;
     if (on[SUB_SCRIPTS])
         s_rec_scripts.GetPieceAngles = RecScriptsGetPieceAngles;
@@ -6023,9 +6047,9 @@ void HookSeams(const bool* on)
         s_rec_network.SendActivateFlags = RecNetworkSendActivateFlags;
     if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendWeaponFire = RecNetworkSendWeaponFire;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendWeaponFireAt = RecNetworkSendWeaponFireAt;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendProjectileDetonated = RecNetworkSendProjectileDetonated;
     if (on[SUB_NETWORK])
         s_rec_network.SendFeatureHit = RecNetworkSendFeatureHit;

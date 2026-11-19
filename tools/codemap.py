@@ -948,7 +948,7 @@ class Model:
         def visit(nodes):
             for node in nodes:
                 for call in node.get("calls", []):
-                    if not call["via"] and call["id"] is not None and re.fullmatch(r"Sched(Wind|Meteors)Phase", call["name"]):
+                    if not call["via"] and call["id"] is not None and re.fullmatch(r"Sched(Projectiles|Explosions|Wind|Meteors)Phase", call["name"]):
                         visit(self.functions[call["id"]].flow)
                     if call["via"] and call["id"] is not None and call["id"] not in seen:
                         seen.add(call["id"])

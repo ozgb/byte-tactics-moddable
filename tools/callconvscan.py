@@ -45,7 +45,7 @@ FUN_NAME = re.compile(r"^FUN_([0-9a-fA-F]{8})$")
 ECX = {"ecx", "cx", "cl", "ch"}
 EDX = {"edx", "dx", "dl", "dh"}
 
-KNOWN: set[tuple[str, str]] = {("src/map/meteors.cpp", "LoadMeteorDefaults")}
+KNOWN: set[tuple[str, str]] = {("src/map/meteors.cpp", "LoadMeteorDefaults"), ("src/weapons/piece_explode.cpp", "ExplodeUnitPiece")}
 
 
 def reads_ecx_first(insns, regs=ECX) -> bool:

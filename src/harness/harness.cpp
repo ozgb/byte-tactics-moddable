@@ -2023,7 +2023,6 @@ enum {
     CONDITIONS_VICTORY_COUNT = 0x40,
     CONDITIONS_DEFEAT = 0x44,
     CONDITIONS_DEFEAT_COUNT = 0x84,
-    CONDITIONS_LIMIT = 16,
     WEAPON_TABLE = 0x64,
     WEAPON_TABLE_FIRST = 0x5,
     WEAPON_TABLE_LAST = 0x9,
@@ -2792,6 +2791,7 @@ static int s_writerRunLeft = 0;
 
 static unsigned long long s_writerKept = 0;
 static int s_writerDumpOnly = 0;
+static int s_writerSection = 0;
 
 static void WriterEndRecord()
 {
@@ -2828,6 +2828,7 @@ static void __stdcall WriterBegin(int section, const char* name)
 {
     WriterEndRecord();
     s_writerDumpOnly = section != 24 && section != 25;
+    s_writerSection = section;
     s_writerKept = s_hash;
     HashByte((unsigned char)section);
     strncpy(s_writerRecord, name, sizeof s_writerRecord - 1);
@@ -2839,6 +2840,8 @@ static void __stdcall WriterBegin(int section, const char* name)
 
 static void __stdcall WriterInt(const char* field, int index, int size, unsigned int value)
 {
+    if (s_writerDumpOnly && !s_dumpNow)
+        return;
     WriterAdd((const unsigned char*)&value, (unsigned)size);
     if (s_dumpNow && field != nullptr) {
         char path[160];
@@ -2846,10 +2849,17 @@ static void __stdcall WriterInt(const char* field, int index, int size, unsigned
         DumpPrefix(path);
         fprintf(s_dump, "0x%0*x\n", size * 2, size == 4 ? value : value & ((1u << (size * 8)) - 1));
     }
+    if (s_dumpNow && s_writerSection == 46 && field != nullptr && strcmp(field, "class") == 0 && value == COND_UNKNOWN) {
+        char msg[128];
+        sprintf(msg, "testmode: unknown mission condition at %s\n", s_writerRecord);
+        Fail(msg);
+    }
 }
 
 static void __stdcall WriterBytes(const char* field, int index, const void* data, int size)
 {
+    if (s_writerDumpOnly && !s_dumpNow)
+        return;
     WriterAdd((const unsigned char*)data, (unsigned)size);
     if (s_dumpNow && field != nullptr) {
         char path[160];
@@ -3977,16 +3987,6 @@ enum TimerClass {
     TIMER_SCOUT,
     TIMER_BUILD
 };
-
-
-[[maybe_unused]] static int TimerClassOf(unsigned slot)
-{
-    static const unsigned char classes[SQUAD_TIMERS] = {
-        TIMER_UNKNOWN, TIMER_BUILD, TIMER_ASSAULT, TIMER_ESCORT, TIMER_SCOUT,
-        TIMER_SQUAD, TIMER_ASSAULT, TIMER_ESCORT, TIMER_SQUADSCOUT, TIMER_SPATIAL
-    };
-    return classes[slot];
-}
 
 static void VisitString(const char* path, const char* text)
 {

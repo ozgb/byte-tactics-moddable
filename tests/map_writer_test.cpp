@@ -481,3 +481,12 @@ int main()
     printf(g_failures ? "FAILED\n" : "map_writer_test: all passed\n");
     return g_failures != 0;
 }
+
+void __cdecl operator delete(void* p)
+{
+    if (SimOwns(p)) {
+        SimFree(p);
+        return;
+    }
+    free(p);
+}

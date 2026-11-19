@@ -876,7 +876,7 @@ void LoadTntMap()
     mapSettings->sortLineCount = (int*)GameAllocIgnoreTag("SORT LINE COUNT", mapSettings->sortRowCount << 1);
     g_seams.features->StampFeatureMetal();
     g_game->count_14277 = 0;
-    g_game->eyes = (Eye*)SimAllocTagged("EYEBALL MEMORY", 0x2d0);
+    g_game->eyes = (Eye*)SimAllocTagged("EYEBALL MEMORY", kEyeCapacity * sizeof(Eye));
     mapSettings->featureReproduceCursor = 0;
     g_game->loadProgress = 100;
 }
@@ -1297,7 +1297,7 @@ void __stdcall RevealAroundUnit(SightQuery* params)
 // FUNCTION: 0x482910
 int __stdcall AddEyeball(Vec3* src, int sightDistance, int eyeHeight, int lifetime)
 {
-    if ((g_game->mapFlags_14281.raw & 2) == 2 && g_game->count_14277 < 0x14) {
+    if ((g_game->mapFlags_14281.raw & 2) == 2 && g_game->count_14277 < kEyeCapacity) {
         Eye* e = &g_game->eyes[g_game->count_14277];
         e->player = (char*)&g_game->players[g_game->playerIndex];
         e->screen = &e->screenPos;
@@ -1794,7 +1794,7 @@ void __stdcall LosRadarSightCache(Unit* unit, LosSightCache* out)
 
 void __stdcall LosRadarWriteState(const StateWriter* w)
 {
-    unsigned int slots = g_game->poolCount;
+    unsigned int slots = s_sight == nullptr ? 0 : g_game->poolCount;
     w->Begin(44, "losRadarState");
     w->Int("unitSlots", 0, 4, slots);
     for (unsigned int i = 0; i < slots; i++) {
@@ -1803,15 +1803,13 @@ void __stdcall LosRadarWriteState(const StateWriter* w)
     }
     Eye* eyes = g_game->eyes.get();
     unsigned int count = g_game->count_14277;
-    if (eyes == nullptr || count > 20)
+    if (eyes == nullptr || count > (unsigned int)kEyeCapacity)
         count = 0;
     w->Int("eyes.count", 0, 4, count);
     for (unsigned int e = 0; e < count; e++) {
         int player = -1;
         if (eyes[e].player.get() != nullptr) {
-            int slot = (int)((Player*)eyes[e].player.get() - g_game->players);
-            if (slot >= 0 && slot < 10)
-                player = slot;
+            player = PlayerSlotChecked((Player*)eyes[e].player.get());
         }
         w->Int("eyes[%u].player", e, 1, (unsigned int)player & 0xff);
         w->Int("eyes[%u].x", e, 2, (unsigned short)eyes[e].x);

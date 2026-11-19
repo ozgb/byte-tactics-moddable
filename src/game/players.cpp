@@ -101,6 +101,8 @@ static void WriteCondition(const StateWriter* w, const char* name, MissionCondit
 
 void __stdcall PlayersWriteState(const StateWriter* w)
 {
+    if (s_region == nullptr)
+        return;
     w->Begin(46, "playersState");
     w->Int("endGameCountdown", 0, 2, (unsigned short)s_region->endGameCountdown);
     for (int i = 0; i < 10; i++) {
@@ -116,7 +118,7 @@ void __stdcall PlayersWriteState(const StateWriter* w)
     w->Int("conditions.active", 0, 4, (unsigned int)conditions->active);
     for (int list = 0; list < 2; list++) {
         unsigned int count = (unsigned int)(list == 0 ? conditions->victoryCount : conditions->defeatCount);
-        if (count > 16)
+        if (count > sizeof(conditions->victory) / sizeof(conditions->victory[0]))
             count = 0;
         for (unsigned int k = 0; k < count; k++) {
             MissionCondition* c = (list == 0 ? conditions->victory : conditions->defeat)[k].get();

@@ -378,10 +378,8 @@ int __stdcall AiApply(const AiEvent* e)
 
 static unsigned int AiPlayerSlotOf(const Ref<Player>& ref)
 {
-    const Player* p = ref.get();
-    if (p >= g_game->players && p <= g_game->players + 10)
-        return (unsigned int)(p - g_game->players);
-    return 0xff;
+    int slot = PlayerSlotChecked(ref.get());
+    return slot < 0 ? 0xffu : (unsigned int)slot;
 }
 
 template <class T>

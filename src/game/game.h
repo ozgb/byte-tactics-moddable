@@ -1307,6 +1307,14 @@ inline Player* Game::Current2(void)
     return &players[i];
 }
 
+extern Game* g_game;
+
+inline int PlayerSlotChecked(const Player* p)
+{
+    int slot = (int)(p - g_game->players);
+    return slot >= 0 && slot < 10 ? slot : -1;
+}
+
 #if defined(__clang__) || !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stddef.h>
 static_assert(sizeof(Game) == 0x3924e, "Game is 0x3924e bytes");

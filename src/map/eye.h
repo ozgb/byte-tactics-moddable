@@ -33,4 +33,6 @@ struct Eye {
     }
 };
 
+const int kEyeCapacity = 20;
+
 #endif

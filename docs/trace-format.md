@@ -121,7 +121,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 5. |
+| `trace_format` | The format number, 6. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |

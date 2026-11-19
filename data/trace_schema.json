@@ -841,18 +841,18 @@
         {"name": "", "offset": 237, "size": 32, "kind": "bytes", "target": null}
       ],
       "excluded": [
-        {"field": "visible", "reason": "the visit hashes the size and the unit IDs it holds"},
-        {"field": "known", "reason": "the visit hashes the size and the unit IDs it holds"},
-        {"field": "factories", "reason": "the visit hashes the size and the unit IDs it holds"},
-        {"field": "cells", "reason": "the visit hashes the size and the elements it holds, never the begin and end pointers"},
-        {"field": "vec_65", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "counts", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "vec_8d", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "weights", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "vec_ad", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "vec_bd", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "values", "reason": "the visit hashes the size and the elements it holds"},
-        {"field": "locked", "reason": "the visit hashes the size and the elements it holds"}
+        {"field": "visible", "reason": "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"},
+        {"field": "known", "reason": "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"},
+        {"field": "factories", "reason": "ai's WriteState does not write it: record 43 holds no size or unit IDs for it"},
+        {"field": "cells", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed, never the begin and end pointers"},
+        {"field": "vec_65", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "counts", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "vec_8d", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "weights", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "vec_ad", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "vec_bd", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "values", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"},
+        {"field": "locked", "reason": "ai's WriteState dumps the size and the raw elements it holds in record 43, which is not hashed"}
       ]
     },
     "PointMarker": {

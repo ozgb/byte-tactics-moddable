@@ -20,6 +20,8 @@ void SchedBeginTick();
 void SchedPhaseBoundary();
 void SchedEndTick();
 void SchedUnitsPhase();
+void SchedProjectilesPhase();
+void SchedExplosionsPhase();
 void SchedFeaturesPhase();
 void SchedPlayersPhase(RandStream stream);
 void SchedExpireEyeballs();

@@ -2549,8 +2549,8 @@ int HandleNetPackets()
                 const UnitDamagePacketOut* damage = (const UnitDamagePacketOut*)packet;
                 unsigned short victim = (unsigned short)damage->victimId;
                 unsigned short attacker = (unsigned short)damage->attackerId;
-                WeaponsPublishRemoteDamage(SCHED_ENGINE, victim == 0 ? 0 : &g_game->units[victim],
-                                           attacker == 0 ? 0 : &g_game->units[attacker],
+                WeaponsPublishRemoteDamage(SCHED_ENGINE, victim == 0 ? nullptr : &g_game->units[victim],
+                                           attacker == 0 ? nullptr : &g_game->units[attacker],
                                            (unsigned short)damage->amount, damage->damageKind, damage->headingByte);
             }
             break;

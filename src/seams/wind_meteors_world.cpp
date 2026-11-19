@@ -2,6 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/weapons.h"
 #include "../../interfaces/wind_meteors.h"
 #include "../util/vec3.h"
 #include "../weapons/weapon_def.h"

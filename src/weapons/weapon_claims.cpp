@@ -1,19 +1,12 @@
-#include "win_types.h"
-#include "../../interfaces/ref.h"
 
-#include "../scripts/cob_script.h"
 
-#include "../units/unit_def.h"
 
-#include "../files/files_api.h"
-#include "../map/mission.h"
 #include "../sound/sound.h"
 #include "../../interfaces/services.h"
 
 struct Unit;
 
 #include "../units/unit.h"
-#include "../../interfaces/seams.h"
 #include "../game/targeting_events.h"
 #include "weapon_slot_flags.h"
 

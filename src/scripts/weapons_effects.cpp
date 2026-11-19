@@ -1,13 +1,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "../util/vec3.h"
-
 #pragma pack(push, 1)
 #include "../units/unit.h"
 #pragma pack(pop)
 
-#include "../../interfaces/seams.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/ref.h"
 #include "cob_script.h"
@@ -18,9 +15,9 @@
 
 #pragma pack(push, 1)
 struct PieceFlagsView {
-    char unknown_0[0x28];
+    char padBeforeFlags[0x28];
     unsigned short flags;
-    char unknown_2a[0x36 - 0x2a];
+    char padAfterFlags[0x36 - 0x2a];
 };
 #pragma pack(pop)
 

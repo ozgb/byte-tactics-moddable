@@ -761,6 +761,6 @@ void CountExplosionTables(unsigned int* explosions, unsigned int* debris, unsign
     }
     *pieces = 0;
     for (int i = 0; i < 100; i++)
-        if (g_explodedPieces[i] != 0)
+        if (g_explodedPieces[i] != nullptr)
             ++*pieces;
 }

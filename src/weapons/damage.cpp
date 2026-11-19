@@ -1,10 +1,6 @@
 #include <stddef.h>
-#include <string.h>
 
 #pragma pack(push, 1)
-#include "../units/unit_type_set.h"
-#include "../weapons/weapon_def.h"
-#include "../weapons/unit_weapon_slot.h"
 #include "../orders/order.h"
 #include "../units/unit_def.h"
 #include "../network/player.h"
@@ -18,9 +14,7 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../game/weapons_events.h"
-#include "../state/sim_globals.h"
 #include "../state/sim_effects.h"
-#include "../ingame/game_dialogs.h"
 #include "../util/math.h"
 #include "damage.h"
 

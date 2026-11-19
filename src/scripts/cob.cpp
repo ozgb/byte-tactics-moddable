@@ -5,6 +5,7 @@
 #include "cob_script.h"
 #include "cob_types.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
 #include "../game/weapons_events.h"
 
 struct QueryChannelView {

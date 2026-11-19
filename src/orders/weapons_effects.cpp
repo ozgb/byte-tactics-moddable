@@ -80,5 +80,5 @@ void OrdersOnWeaponsParalyze(const void* event)
         first->ticks += e->value;
         return;
     }
-    g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, 0, 0, e->value, 0, 0));
+    g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, nullptr, nullptr, e->value, 0, 0));
 }

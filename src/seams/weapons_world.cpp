@@ -8,7 +8,6 @@
 #include "../game/weapons_events.h"
 #include "weapons_world.h"
 
-#include "../../link/globals.h"
 
 void WeaponsInbox(const void* event)
 {

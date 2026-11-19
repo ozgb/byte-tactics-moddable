@@ -1,7 +1,6 @@
 #include <stddef.h>
 
 #pragma pack(push, 1)
-#include "../units/unit_type_set.h"
 #include "../weapons/weapon_def.h"
 #include "../weapons/unit_weapon_slot.h"
 #include "../orders/order.h"
@@ -12,7 +11,6 @@
 #pragma pack(pop)
 
 #include "../util/vec3.h"
-#include "../../interfaces/seams.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"

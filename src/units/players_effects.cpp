@@ -2,6 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/players.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/ref.h"
 #include "../network/player.h"
 #include "../game/game.h"

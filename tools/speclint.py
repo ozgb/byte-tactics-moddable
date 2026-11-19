@@ -20,7 +20,14 @@ Runs on a spec writer's machine, because it reads src/, include/ and lib/. A spe
   * a use of a term of the Terms section of the kit's docs/sim-events.md (compared in lower case, with hex numbers as their
     values, as whole words) in a spec that nowhere contains the sentence "`docs/sim-events.md`, Terms": a spec that
     uses an internal term cites the section rather than defining it again. The terms are read from the table after the
-    page's `## Terms` heading, the one part of the page that is read.
+    page's `## Terms` heading, the one part of the page that is read;
+  * a `<module>.<Name>` (Name capitalised; `<module>.<Name>*` for every name with that prefix) whose module is a header
+    of the kit's interfaces/ and whose Name that header doesn't declare (as a word of its code, comments taken out:
+    a slot, an event kind, a type, a constant) and the kit's wasm/modules.json has no signature for (the host's
+    `services` names): an import that left its interface. A module with no header is left to the rules above;
+  * a `` `interfaces/<module>.h`, version N.M `` whose header the kit doesn't have, carries no `_VERSION_MAJOR` and
+    `_MINOR` macros, or carries another major or a minor below M. A minor bump only adds to an interface, so a spec
+    written against N.0 still holds at N.1, but not at another major or at a minor the kit hasn't reached.
 
 String literals and comments are taken out of the source first, and a double-quoted span out of the spec only when its
 content is observable data: a string literal of the source or text found in the kit. Any other quoted span is linted
@@ -31,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -239,6 +247,66 @@ def event_problems(spec: str, kinds: set[str] | None, terms: list[str], template
     return problems
 
 
+INTERFACES = "interfaces"
+MODULE_MANIFEST = "wasm/modules.json"
+HEADER_COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+MODULE_NAME = re.compile(r"(?<![\w./-])([a-z][a-z0-9_]*)\.([A-Z][A-Za-z0-9_]*)(\*?)")
+VERSION_CITED = re.compile(r"`interfaces/(\w+)\.h`,\s+version\s+(\d+)\.(\d+)")
+VERSION_MAJOR = re.compile(r"^\s*#\s*define\s+\w+_VERSION_MAJOR\s+(\d+)", re.M)
+VERSION_MINOR = re.compile(r"^\s*#\s*define\s+\w+_VERSION_MINOR\s+(\d+)", re.M)
+
+
+def kit_headers(kit: Path) -> dict[str, str]:
+    """{module: code} of the kit's interfaces/*.h with their comments taken out, the module being the file stem."""
+    folder = kit / INTERFACES
+    if not folder.is_dir():
+        return {}
+    return {p.stem: HEADER_COMMENT.sub(" ", p.read_text(encoding="utf-8")) for p in sorted(folder.glob("*.h"))}
+
+
+def kit_signatures(kit: Path) -> dict[str, set[str]]:
+    """{interface: names} of the `signatures` of the kit's wasm/modules.json, empty when the kit has none."""
+    path = kit / MODULE_MANIFEST
+    if not path.is_file():
+        return {}
+    signatures = json.loads(path.read_text(encoding="utf-8")).get("signatures", {})
+    return {interface: set(names) for interface, names in signatures.items()}
+
+
+def header_version(code: str) -> tuple[int, int] | None:
+    """The (major, minor) of a header's version macros, None when it has no pair."""
+    major, minor = VERSION_MAJOR.search(code), VERSION_MINOR.search(code)
+    return (int(major.group(1)), int(minor.group(1))) if major and minor else None
+
+
+def interface_problems(spec: str, headers: dict[str, str], signatures: dict[str, set[str]]) -> list[tuple[int, str]]:
+    """The problems of a spec's `module.Name` imports and cited header versions against the kit's headers."""
+    problems: set[tuple[int, str]] = set()
+    declared = {module: set(IDENTIFIER.findall(code)) | signatures.get(module, set()) for module, code in headers.items()}
+    for m in MODULE_NAME.finditer(spec):
+        module, name, prefix = m.groups()
+        if module not in declared:
+            continue
+        names = declared[module]
+        if (any(n.startswith(name) for n in names) if prefix else name in names):
+            continue
+        problems.add((spec.count("\n", 0, m.start()) + 1,
+                      f"`{module}.{name}{prefix}` is not declared by the kit's interfaces/{module}.h"))
+    for m in VERSION_CITED.finditer(spec):
+        module, major, minor = m.group(1), int(m.group(2)), int(m.group(3))
+        number = spec.count("\n", 0, m.start()) + 1
+        if module not in headers:
+            problems.add((number, f"the kit has no interfaces/{module}.h, cited at version {major}.{minor}"))
+            continue
+        version = header_version(headers[module])
+        if version is None:
+            problems.add((number, f"the kit's interfaces/{module}.h has no version macros, cited at version {major}.{minor}"))
+        elif major != version[0] or minor > version[1]:
+            problems.add((number, f"the kit's interfaces/{module}.h is version {version[0]}.{version[1]}, "
+                                  f"cited at version {major}.{minor}"))
+    return sorted(problems)
+
+
 def source_index(root: Path, run: int) -> tuple[set[str], set[int], set[str]]:
     """The identifiers of the source files, the hashes of their runs of run + 1 tokens, and their string literals."""
     ids: set[str] = set()
@@ -265,10 +333,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     source_ids, source_runs, literals = source_index(args.root, args.run)
     kit = kit_text(args.kit)
-    problems = lint(args.spec.read_text(encoding="utf-8"), source_ids, identifiers(kit), source_runs, args.run,
-                    literals, kit)
-    problems = sorted(problems + event_problems(args.spec.read_text(encoding="utf-8"), event_kinds(args.kit),
-                                                page_terms(args.kit), args.spec.name == "TEMPLATE.md"))
+    text = args.spec.read_text(encoding="utf-8")
+    problems = sorted(lint(text, source_ids, identifiers(kit), source_runs, args.run, literals, kit)
+                      + event_problems(text, event_kinds(args.kit), page_terms(args.kit), args.spec.name == "TEMPLATE.md")
+                      + interface_problems(text, kit_headers(args.kit), kit_signatures(args.kit)))
     for number, message in problems:
         print(f"{args.spec}:{number}: {message}")
     if problems:

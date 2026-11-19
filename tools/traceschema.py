@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 5
+TRACE_FORMAT = 6
 TYPES = ROOT / "include/ta_types.h"
 OUT = ROOT / "src/harness/trace_schema.h"
 
@@ -53,6 +53,13 @@ EXCLUDED_RANGES: list[tuple[str, int, int, str]] = [
 ]
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
+    ("Unit", "field_7a", "the sight cache cell, los_radar's private state"),
+    ("Unit", "field_f8", "the sight frame index, los_radar's private state"),
+    ("Rec", "a", "the spatial grid's private bookkeeping: orders reads b only"),
+    ("Rec", "flags", "the spatial grid's private bookkeeping: orders reads b only"),
+    ("Rec", "first", "the spatial grid's private bookkeeping: orders reads b only"),
+    ("Player", "field_f0", "the update time, players' private state"),
+    ("Player", "ff4", "the win and lose time, players' private state"),
     ("Eye", "screen", "points at the record's own screenPos"),
     ("Eye", "flagPtr", "points at the record's own flagB"),
     ("Node", "penalty", "NodeData(x, y, g, f, steps) leaves it unset for the start node; the visit hashes it when g is not 0"),
@@ -833,7 +840,6 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameCountdown", 0x39239, 2, None, 0),
     ("endGameFlags", 0x3923B, 2, None, 0),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]

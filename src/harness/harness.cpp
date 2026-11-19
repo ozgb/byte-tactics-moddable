@@ -2525,22 +2525,6 @@ static void VisitSpatial()
     EndSection();
 }
 
-static void VisitEyes()
-{
-    unsigned char* eyes = (unsigned char*)GameU32(GAME_EYES);
-    unsigned count = GameU32(GAME_EYE_COUNT);
-    char path[64];
-    HashByte(15);
-    if (eyes == NULL || count > EYE_CAPACITY)
-        count = 0;
-    VisitValue("eyes.count", count, 4);
-    for (unsigned e = 0; e < count; e++) {
-        sprintf(path, "eyes[%u]", e);
-        VisitElement(path, eyes + e * EYE_STRIDE, &kEyeTable);
-    }
-    EndSection();
-}
-
 static unsigned char s_nodeFree[NODE_LIMIT];
 
 static void VisitPathNodes(const unsigned char* pf)
@@ -3104,14 +3088,6 @@ static unsigned VectorCount(unsigned vec, unsigned elem, const unsigned char** f
     return (end - begin) / elem;
 }
 
-static void VisitRawVector(const char* path, unsigned vec, unsigned elem)
-{
-    const unsigned char* first;
-    unsigned n = VectorCount(vec, elem, &first);
-    VisitU32(path, n);
-    VisitRaw(path, first, n * elem);
-}
-
 static void VisitUnitVector(const char* path, unsigned vec)
 {
     const unsigned char* first;
@@ -3155,105 +3131,6 @@ struct VectorSpec {
     unsigned elem;
 };
 
-static void VisitPlayerAI()
-{
-    static const VectorSpec vectors[] = {
-        { "cells", 0x4d, 8 }, { "vec_65", 0x65, 3 }, { "counts", 0x7d, 2 }, { "vec_8d", 0x8d, 1 },
-        { "weights", 0x9d, 1 }, { "vec_ad", 0xad, 1 }, { "vec_bd", 0xbd, 4 }, { "values", 0xcd, 4 },
-        { "locked", 0xdd, 4 }
-    };
-    char path[96];
-    HashByte(24);
-    for (unsigned i = 0; i < MAX_PLAYERS; i++) {
-        unsigned ai = (unsigned)g_playerAI[i];
-        HashU32(i);
-        HashByte(ai != 0);
-        if (ai == 0)
-            continue;
-        sprintf(path, "players[%u].ai", i);
-        VisitElement(path, (const unsigned char*)ai, &kPlayerAITable);
-        sprintf(path, "players[%u].ai.visible", i);
-        VisitUnitVector(path, ai + 0x5);
-        sprintf(path, "players[%u].ai.known", i);
-        VisitUnitVector(path, ai + 0x15);
-        sprintf(path, "players[%u].ai.factories", i);
-        VisitUnitVector(path, ai + 0x25);
-        for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
-            sprintf(path, "players[%u].ai.%s", i, vectors[v].name);
-            VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);
-        }
-    }
-    EndSection();
-}
-
-static void VisitTimer(const char* path, unsigned slot, unsigned timer)
-{
-    char field[128];
-    int cls = TimerClassOf(slot);
-    sprintf(field, "%s.class", path);
-    VisitU32(field, (unsigned)cls);
-    switch (cls) {
-    case TIMER_ASSAULT:
-        VisitElement(path, (const unsigned char*)timer, &kAssaultTimerTable);
-        break;
-    case TIMER_ESCORT:
-        VisitElement(path, (const unsigned char*)timer, &kEscortTimerTable);
-        break;
-    case TIMER_SPATIAL:
-        VisitElement(path, (const unsigned char*)timer, &kSpatialTimerTable);
-        break;
-    default:
-        VisitElement(path, (const unsigned char*)timer, &kSquadTimerTable);
-        break;
-    }
-}
-
-static void VisitSquadManagers()
-{
-    char path[96];
-    HashByte(25);
-    for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned manager = ReadU32At((unsigned)PlayerAt(i), PLAYER_MANAGER);
-        HashU32(i);
-        HashByte(manager != 0);
-        if (manager == 0)
-            continue;
-        sprintf(path, "players[%u].squadManager", i);
-        VisitElement(path, (const unsigned char*)manager, &kSquadManagerTable);
-        for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
-            unsigned timer = ReadU32At(manager, MANAGER_TIMERS + t * 4);
-            HashByte((unsigned char)t);
-            HashByte(timer != 0);
-            if (timer == 0)
-                continue;
-            sprintf(path, "players[%u].squadManager.timers[%u]", i, t);
-            VisitTimer(path, t, timer);
-        }
-    }
-    EndSection();
-}
-
-static void VisitSquads()
-{
-    char path[96];
-    HashByte(26);
-    for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned squads = ReadU32At((unsigned)PlayerAt(i), PLAYER_SQUADS);
-        HashU32(i);
-        HashByte(squads != 0);
-        if (squads == 0)
-            continue;
-        for (unsigned s = 0; s < SQUAD_COUNT; s++) {
-            unsigned squad = squads + s * SQUAD_STRIDE;
-            sprintf(path, "players[%u].squads[%u]", i, s);
-            VisitElement(path, (const unsigned char*)squad, &kSquadTable);
-            strcat(path, ".items");
-            VisitUnitVector(path, squad + SQUAD_ITEMS);
-        }
-    }
-    EndSection();
-}
-
 static void VisitUnitResources()
 {
     char path[96];
@@ -3270,50 +3147,287 @@ static void VisitUnitResources()
     EndSection();
 }
 
-static void VisitCondition(const char* path, unsigned condition)
+static unsigned PlayerSlotOf(unsigned p)
 {
-    char field[128];
-    int cls = ConditionClassOf(condition);
-    sprintf(field, "%s.class", path);
-    VisitU32(field, (unsigned)cls);
-    if (cls == COND_UNKNOWN) {
-        char msg[160];
-        sprintf(msg, "testmode: unknown mission condition at %08x (vtable %08x) at %s\n", condition,
-                ReadU32At(condition, 0), path);
-        Fail(msg);
-    }
-    VisitElement(path, (const unsigned char*)condition, &kMissionConditionTable);
-    if (cls == COND_VICTORY_KILL_MOBILE)
-        VisitElement(path, (const unsigned char*)condition, &kConditionNumUnitsTable);
-    else if (cls == COND_VICTORY_KILL_TYPE || cls == COND_DEFEAT_TYPE_KILLED)
-        VisitElement(path, (const unsigned char*)condition, &kConditionNumLeftTable);
+    unsigned base = (unsigned)GameAt(GAME_PLAYERS);
+    if (p < base || (p - base) % PLAYER_STRIDE != 0 || (p - base) / PLAYER_STRIDE >= MAX_PLAYERS)
+        return 0xff;
+    return (p - base) / PLAYER_STRIDE;
 }
 
-static void VisitMissionConditions()
+static void VisitInts(const char* prefix, const unsigned char* base, const TraceField* fields, unsigned n,
+                      const char* skip)
+{
+    char path[160];
+    for (unsigned k = 0; k < n; k++) {
+        const TraceField* f = &fields[k];
+        unsigned v = 0;
+        if (skip != NULL && strcmp(f->name, skip) == 0)
+            continue;
+        sprintf(path, "%s.%s", prefix, f->name);
+        if (f->kind == TF_POINTER && f->target == TT_PLAYER) {
+            VisitValue(path, PlayerSlotOf(*(const unsigned*)(base + f->offset)), 1);
+        } else if (f->kind == TF_POINTER) {
+            VisitPointer(path, *(const unsigned*)(base + f->offset), f->target);
+        } else {
+            for (unsigned b = f->size; b > 0; b--)
+                v = (v << 8) | base[f->offset + b - 1];
+            if (f->mask != 0)
+                v &= f->mask;
+            VisitValue(path, v, f->size);
+        }
+    }
+}
+
+static void VisitLosIndex()
+{
+    char path[96];
+    char name[128];
+    for (unsigned i = 0; i < MAX_PLAYERS; i++) {
+        unsigned ai = (unsigned)g_playerAI[i];
+        if (ai == 0)
+            continue;
+        HashByte(24);
+        sprintf(path, "losRadarIndex[%u]", i);
+        sprintf(name, "%s.player", path);
+        VisitValue(name, i, 4);
+        sprintf(name, "%s.hasSpecial", path);
+        VisitValue(name, ReadU32At(ai, 0x79), 4);
+        sprintf(name, "%s.visible", path);
+        VisitUnitVector(name, ai + 0x5);
+        sprintf(name, "%s.known", path);
+        VisitUnitVector(name, ai + 0x15);
+        EndSection();
+    }
+}
+
+static void VisitFactoryIndex()
+{
+    char path[96];
+    char name[128];
+    for (unsigned i = 0; i < MAX_PLAYERS; i++) {
+        unsigned ai = (unsigned)g_playerAI[i];
+        if (ai == 0)
+            continue;
+        HashByte(25);
+        sprintf(path, "unitsFactories[%u]", i);
+        sprintf(name, "%s.player", path);
+        VisitValue(name, i, 4);
+        sprintf(name, "%s.factories", path);
+        VisitUnitVector(name, ai + 0x25);
+        EndSection();
+    }
+}
+
+static void VisitLosRadarState()
+{
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    unsigned char* eyes = (unsigned char*)GameU32(GAME_EYES);
+    unsigned count = GameU32(GAME_EYE_COUNT);
+    unsigned lo = s_hashLo;
+    unsigned hi = s_hashHi;
+    char path[96];
+    if (!s_dumpNow)
+        return;
+    HashByte(44);
+    VisitValue("losRadarState.unitSlots", slots, 4);
+    for (unsigned k = 0; k < slots; k++) {
+        const unsigned char* u = units + k * UNIT_STRIDE;
+        sprintf(path, "losRadarState.sight[%u].cell", k);
+        VisitValue(path, *(const unsigned*)(u + 0x7a), 4);
+        sprintf(path, "losRadarState.sight[%u].frameIdx", k);
+        VisitValue(path, u[0xf8], 1);
+    }
+    if (eyes == NULL || count > EYE_CAPACITY)
+        count = 0;
+    VisitValue("losRadarState.eyes.count", count, 4);
+    for (unsigned e = 0; e < count; e++) {
+        sprintf(path, "losRadarState.eyes[%u]", e);
+        VisitInts(path, eyes + e * EYE_STRIDE, kEyeTable.fields, kEyeTable.fieldCount, NULL);
+    }
+    EndSection();
+    s_hashLo = lo;
+    s_hashHi = hi;
+}
+
+static void VisitLosRadarAndUnitsIndex()
+{
+    VisitLosRadarState();
+    VisitLosIndex();
+    VisitFactoryIndex();
+}
+
+static void VisitAiState()
+{
+    static const VectorSpec vectors[] = {
+        { "cells", 0x4d, 8 }, { "vec_65", 0x65, 3 }, { "counts", 0x7d, 2 }, { "vec_8d", 0x8d, 1 },
+        { "weights", 0x9d, 1 }, { "vec_ad", 0xad, 1 }, { "vec_bd", 0xbd, 4 }, { "values", 0xcd, 4 },
+        { "locked", 0xdd, 4 }
+    };
+    char record[96];
+    char path[160];
+    unsigned i;
+    for (i = 0; i < MAX_PLAYERS; i++) {
+        unsigned ai = (unsigned)g_playerAI[i];
+        if (ai == 0)
+            continue;
+        HashByte(43);
+        sprintf(record, "aiState.players[%u]", i);
+        sprintf(path, "%s.ai", record);
+        VisitInts(path, (const unsigned char*)ai, kPlayerAITable.fields, kPlayerAITable.fieldCount, "hasSpecial");
+        for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
+            const unsigned char* first;
+            unsigned n = VectorCount(ai + vectors[v].offset, vectors[v].elem, &first);
+            sprintf(path, "%s.ai.%s.size", record, vectors[v].name);
+            VisitU32(path, n);
+            sprintf(path, "%s.ai.%s", record, vectors[v].name);
+            VisitRaw(path, first, n * vectors[v].elem);
+        }
+        EndSection();
+    }
+    for (i = 0; i < MAX_PLAYERS; i++) {
+        unsigned manager = ReadU32At((unsigned)PlayerAt(i), PLAYER_MANAGER);
+        if (manager == 0)
+            continue;
+        HashByte(43);
+        sprintf(record, "aiState.players[%u].squadManager", i);
+        VisitInts(record, (const unsigned char*)manager, kSquadManagerTable.fields, kSquadManagerTable.fieldCount,
+                  NULL);
+        for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
+            unsigned timer = ReadU32At(manager, MANAGER_TIMERS + t * 4);
+            const TraceTable* table;
+            int cls = TimerClassOf(t);
+            if (timer == 0)
+                continue;
+            sprintf(path, "%s.timers[%u].class", record, t);
+            VisitValue(path, (unsigned)cls, 4);
+            if (cls == TIMER_ASSAULT)
+                table = &kAssaultTimerTable;
+            else if (cls == TIMER_ESCORT)
+                table = &kEscortTimerTable;
+            else if (cls == TIMER_SPATIAL)
+                table = &kSpatialTimerTable;
+            else
+                table = &kSquadTimerTable;
+            sprintf(path, "%s.timers[%u]", record, t);
+            VisitInts(path, (const unsigned char*)timer, table->fields, table->fieldCount, NULL);
+        }
+        EndSection();
+    }
+    for (i = 0; i < MAX_PLAYERS; i++) {
+        unsigned squads = ReadU32At((unsigned)PlayerAt(i), PLAYER_SQUADS);
+        if (squads == 0)
+            continue;
+        for (unsigned s = 0; s < SQUAD_COUNT; s++) {
+            unsigned squad = squads + s * SQUAD_STRIDE;
+            HashByte(43);
+            sprintf(record, "aiState.players[%u].squads[%u]", i, s);
+            VisitInts(record, (const unsigned char*)squad, kSquadTable.fields, kSquadTable.fieldCount, NULL);
+            sprintf(path, "%s.items", record);
+            VisitUnitVector(path, squad + SQUAD_ITEMS);
+            EndSection();
+        }
+    }
+}
+
+static void VisitRecState(const char* prefix, const unsigned char* rec)
+{
+    char path[96];
+    sprintf(path, "%s.a", prefix);
+    VisitValue(path, rec[0], 1);
+    sprintf(path, "%s.flags", prefix);
+    VisitValue(path, *(const unsigned*)(rec + 2), 4);
+    sprintf(path, "%s.first", prefix);
+    VisitPointer(path, *(const unsigned*)(rec + 6), TT_UNIT);
+}
+
+static void VisitMapState()
+{
+    unsigned char* recs = (unsigned char*)GameU32(GAME_SPATIAL_CELLS);
+    unsigned count = GameU32(GAME_SPATIAL_COUNT);
+    unsigned char* overflow = (unsigned char*)GameU32(GAME_SPATIAL_OVERFLOW);
+    char path[64];
+    HashByte(45);
+    if (recs == NULL || count > REC_LIMIT)
+        count = 0;
+    VisitValue("mapState.spatial.count", count, 4);
+    for (unsigned r = 0; r < count; r++) {
+        sprintf(path, "mapState.spatial[%u]", r);
+        VisitRecState(path, recs + r * REC_STRIDE);
+    }
+    VisitValue("mapState.overflow.present", overflow != NULL, 1);
+    if (overflow != NULL)
+        VisitRecState("mapState.overflow", overflow);
+    EndSection();
+}
+
+static void VisitPlayersState()
 {
     unsigned conditions = GameU32(GAME_CONDITIONS);
     char path[96];
-    HashByte(28);
-    HashByte(conditions != 0);
+    HashByte(46);
+    VisitValue("playersState.endGameCountdown", *(const unsigned short*)GameAt(0x39239), 2);
+    for (unsigned i = 0; i < MAX_PLAYERS; i++) {
+        sprintf(path, "playersState.players[%u].updateTime", i);
+        VisitValue(path, ReadU32At((unsigned)PlayerAt(i), 0xf0), 4);
+        sprintf(path, "playersState.players[%u].winLoseTime", i);
+        VisitValue(path, ReadU32At((unsigned)PlayerAt(i), 0xf4), 4);
+    }
+    VisitValue("playersState.conditions.present", conditions != 0, 1);
     if (conditions != 0) {
-        VisitElement("conditions", (const unsigned char*)conditions, &kMissionConditionsTable);
+        VisitInts("playersState.conditions", (const unsigned char*)conditions, kMissionConditionsTable.fields,
+                  kMissionConditionsTable.fieldCount, NULL);
         for (unsigned list = 0; list < 2; list++) {
             unsigned count = ReadU32At(conditions, list == 0 ? CONDITIONS_VICTORY_COUNT : CONDITIONS_DEFEAT_COUNT);
             unsigned base = list == 0 ? CONDITIONS_VICTORY : CONDITIONS_DEFEAT;
             if (count > CONDITIONS_LIMIT)
                 count = 0;
-            HashByte((unsigned char)(list + 1));
             for (unsigned k = 0; k < count; k++) {
                 unsigned condition = ReadU32At(conditions, base + k * 4);
-                HashByte(condition != 0);
+                int cls;
                 if (condition == 0)
                     continue;
-                sprintf(path, "conditions.%s[%u]", list == 0 ? "victory" : "defeat", k);
-                VisitCondition(path, condition);
+                EndSection();
+                HashByte(46);
+                sprintf(path, "playersState.conditions.%s[%u]", list == 0 ? "victory" : "defeat", k);
+                cls = ConditionClassOf(condition);
+                if (cls == COND_UNKNOWN) {
+                    char msg[160];
+                    sprintf(msg, "testmode: unknown mission condition at %08x (vtable %08x) at %s\n", condition,
+                            ReadU32At(condition, 0), path);
+                    Fail(msg);
+                }
+                {
+                    char field[128];
+                    sprintf(field, "%s.class", path);
+                    VisitValue(field, (unsigned)cls, 4);
+                }
+                VisitInts(path, (const unsigned char*)condition, kMissionConditionTable.fields,
+                          kMissionConditionTable.fieldCount, NULL);
+                if (cls == COND_VICTORY_KILL_MOBILE)
+                    VisitInts(path, (const unsigned char*)condition, kConditionNumUnitsTable.fields,
+                              kConditionNumUnitsTable.fieldCount, NULL);
+                else if (cls == COND_VICTORY_KILL_TYPE || cls == COND_DEFEAT_TYPE_KILLED)
+                    VisitInts(path, (const unsigned char*)condition, kConditionNumLeftTable.fields,
+                              kConditionNumLeftTable.fieldCount, NULL);
             }
         }
     }
     EndSection();
+}
+
+static void VisitPrivateState()
+{
+    unsigned lo = s_hashLo;
+    unsigned hi = s_hashHi;
+    if (!s_dumpNow)
+        return;
+    VisitAiState();
+    VisitMapState();
+    VisitPlayersState();
+    s_hashLo = lo;
+    s_hashHi = hi;
 }
 
 static void VisitWeaponTable(const char* path, unsigned table)
@@ -3444,11 +3558,8 @@ static void VisitMission()
 
 static void VisitPlayerHeap()
 {
-    VisitPlayerAI();
-    VisitSquadManagers();
-    VisitSquads();
+    VisitLosRadarAndUnitsIndex();
     VisitUnitResources();
-    VisitMissionConditions();
 }
 
 static void VisitConstants()
@@ -3569,8 +3680,8 @@ static void VisitWorld()
     VisitVisibility();
     VisitExplored();
     VisitSpatial();
-    VisitEyes();
     VisitPrivatePathfinder();
+    VisitPrivateState();
     VisitMoveClasses();
     VisitPassMaps();
     VisitUnitHeap();

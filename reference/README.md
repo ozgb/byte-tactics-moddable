@@ -332,7 +332,7 @@ game state after each phase of each tick, then a hash of the world tables, flush
 every tick. LF line endings.
 
 ```
-bt-trace 5
+bt-trace 6
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -350,9 +350,9 @@ per phase, because they are large and no phase owns them:
 
 - the game scalars (`numPlayers`, `localPlayer`, `playerIndex`, `netGameFlags`, the spot pool
   header and free list heads, `scanIndex`, `mapFlags` without its camera bit,
-  `endGameCountdown`, `endGameFlags`, and the CD and economy packet counters);
+  `endGameFlags`, and the CD and economy packet counters);
 - the map: `Game.cells` (13 bytes a cell), the visibility mask, each player's explored
-  grid, the spatial grid (`Rec`, 10 bytes) with its overflow record, and the eyeball pool;
+  grid, the spatial grid (`Rec`, 10 bytes) with its overflow record (the `b` byte of each record only);
 - the pathfinder's state (the object, its node pool, the dirty `PathCell` groups and the budget
   globals) only in a dump (`pathfinder.*` lines): since format 4 it is not hashed;
 - the movement classes and their pass maps;
@@ -379,6 +379,14 @@ per phase, because they are large and no phase owns them:
 A unit's resource account (bytes `0xbc` to `0xeb` of a unit, economy's private state) is not
 hashed since format 5.
 
+Since format 6 the world row hashes only state that a re-implementation shares. Left out: the sight cache of
+each unit (bytes `0x7a` to `0x7d` and `0xf8`), the eyeball pool, `Rec` bytes other than `b`, each player's
+`updateTime` and `winLoseTime`, `endGameCountdown`, the squad managers with their timers, the squads and the
+mission conditions. Section 24 is one record per computer player (`losRadarIndex[i]`: the player, `hasSpecial`,
+and the visible and known unit lists) and section 25 one record per computer player (`unitsFactories[i]`: the
+player and the factory list), in slot order. A dump also holds `losRadarState.*` (record 44), `aiState.*` (43), `mapState.*` (45)
+and `playersState.*` (46), which no row hashes.
+
 The hash is 64-bit FNV-1a over a canonical serialisation of that state: 8-byte
 little-endian words first, then the remaining bytes one at a time (so the result does not
 depend on alignment). Two builds conform when their traces are identical.
@@ -403,7 +411,7 @@ A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 5
+bt-dump 6
 <tick> <phase> <path> <value>
 ```
 
@@ -412,7 +420,7 @@ Paths are `gameTick`, `rng.parkMiller`, `rng.crtHoldrand`, `units[i].<field>`,
 `debris[i].<field>`, `pieces[i].<field>` (with `.vertices` and `.faces[k]`),
 `players[i].<field>`, `features[i].<field>` (with `.list`), `wind.<field>` and
 `meteors.<field>`, and for the world tables `game.<field>`, `cells[i]`, `visibility[i]`,
-`players[i].explored[k]`, `spatial[i].<field>`, `eyes[i].<field>`,
+`players[i].explored[k]`, `spatial[i].<field>`,
 `pathfinder.<field>` (with `.pool[k]`, `.heap[k]`, `.dirty[w]`, `.cells[k].flags`),
 `pathfinder.playerTickLoad` and the other budget globals, `results.count` and
 `results[k].<field>` (the path results), `moveClasses[i].<field>` and
@@ -537,8 +545,8 @@ per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `wor
 The file:
 
 ```
-bt-digest 5
-trace_format bt-trace 5
+bt-digest 6
+trace_format bt-trace 6
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>

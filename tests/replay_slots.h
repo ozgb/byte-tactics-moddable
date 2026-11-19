@@ -476,6 +476,9 @@ MapSeam g_native_map = {
     SelectMissionSlot,
     ComputeMapChecksumSlot,
     GetTerrainLengthSlot,
+    AllocateBucketsSlot,
+    FreeBucketsSlot,
+    WriteStateSlot,
 };
 
 void Run_wind_meteors_UpdateWind()

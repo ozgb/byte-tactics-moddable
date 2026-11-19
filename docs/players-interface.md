@@ -234,22 +234,42 @@ class `immediate` with players as writer or reader. Each is served as follows:
 
 ## 5. State and the trace
 
-Players keeps no private region, and so it has no `WriteState` report: its state is view state, hashed where it was.
-It stays where it is and stays hashed in this change; #979 moves out of the hash what only its owner reads, for
-los_radar, players, ai and map in one format bump. The Head and Body split of a player's update stays as #962 made it,
-and so does the synchronous RECALCULATE to los_radar.
+Players has a private region since #979 and a `WriteState` report. The engine allocates the region (tag "Players
+region", one allocation beside economy's, sized by `RegionSize`, which feeds `MatchSetupSizeBlock` like economy's) and
+gives it to `Init` before `InitPlayers`; `Shutdown` returns it to the engine to free. The Head and Body split of a
+player's update stays as #962 made it, and so does the synchronous RECALCULATE to los_radar.
 
-**What only players reads, for #979.** Hashed state that no other subsystem reads inside the tick:
+**What left the hash, for #979.** Three pieces of state that only players reads and writes moved into the region:
 
-| Players' state | Where | Read by | Written by |
+| Players' private state | Was | Read by | Written by |
 |---|---|---|---|
-| The conditions: `MissionConditions`, the `MissionCondition` list and the 18 `Victory*` and `Defeat*` types | the conditions' allocation (`Game::list_391ed`), hashed (`trace_schema`'s `MissionCondition` rows) | players | players |
-| `Player::updateTime`, `Player::winLoseTime` | the `Player` records, hashed | players | players |
-| `Game::endGameCountdown` | the state block, hashed | players | players (the engine sets it at set-up) |
+| The per-player clocks `updateTime` and `winLoseTime` | `Player::updateTime`, `Player::winLoseTime` | players (`UpdatePlayerBody`, the saved game's `UpdateTime` and `WinLoseTime`) | players (`InitPlayerSlot`, `UpdatePlayerBody`, `LoadPlayers`) |
+| The end-game countdown | `Game::endGameCountdown` | players (`UpdatePlayerBody`) | players (`Init` sets it to 0xffff, `UpdatePlayerBody` counts it down) |
+
+The 12 bytes of the two `Player` fields and the 2 of the `Game` field stay in their records, renamed
+`unusedUpdateTime`, `unusedWinLoseTime` and `unusedEndGameCountdown`, so no offset moves, and they are no longer
+hashed. The engine used to write the countdown in the loading screen's first frame, before the loading thread starts
+the match; since `Init` runs inside the load, before `InitPlayers` and long before the first tick, and nothing reads
+the countdown in between, its value at every read is the one it had. A saved game restores the clocks through
+`LoadPlayers` as before, and does not store the countdown.
+
+**What stays hashed, and who reads it.** The conditions (`MissionConditions`, the `MissionCondition` list and the 18
+`Victory*` and `Defeat*` types, under `Game::list_391ed`) stay in their own allocation and stay where they were, and
+`WriteState` dumps them too (record 46). Players runs them, but they are reached from the engine and the other
+subsystems through players' condition slots (`DeactivateConditions`, `LoadConditions`, `SaveConditions`,
+`RegisterConditions`, `FreeConditions`, `DeleteConditions`, `NewConditions`) and the events UNIT_CREATED and
+UNIT_DIED, so their state is read by players alone. The rest of the `Player` record (the stores, the alliances, the
+`Player::ai` and `Player::groups` references, the unit range and the counts) is view state: economy, units, los_radar,
+orders and ai read it, and it stays hashed.
+
+**Record 46, `playersState`** (dumped, never hashed; `docs/trace-format.md`): the countdown, the two clocks of each of
+the ten players, whether the conditions exist, their two counts and `active`, then one record per condition in the
+victory list and then the defeat list, with its class number, `satisfied` and `celebrated`, and `numUnits` or
+`numLeftToKill` for the classes that have them. The default's report is required equal to the reference's.
 
 `privatestate.py --check` fails when another subsystem writes any of the items players alone writes: the conditions'
-types and `Player::updateTime` and `Player::winLoseTime`. `endGameCountdown` is not listed: the engine sets it when a
-game starts. `seamlink.py --pilot-seams` checks the seam: only players and the engine call `Apply` and the runs.
+types (the clocks and the countdown are in the region now, which no other subsystem can reach).
+`seamlink.py --pilot-seams` checks the seam: only players and the engine call `Apply` and the runs.
 
 **The trace dumps players' events** in section 41 (`docs/trace-format.md`, section 8.29), after map's section 40, and
 hashes none of them. Each record is an event with the outcome `Apply` gave (`outcome` 0 or 1), or an effect players

@@ -416,6 +416,47 @@ class DumpedOnlyTest(unittest.TestCase):
         self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
         self.assertEqual(w.pos, 8)
 
+    def test_map_and_players_reports_after_the_ai_report_are_skipped(self):
+        w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005"), ("aiState.players[0].ai.owner", "0x00"),
+                                ("mapState.spatial.count", "0x00000000"), ("playersState.endGameCountdown", "0x0000"),
+                                ("playersState.conditions.present", "0x00"), ("moveClasses[0].x", "0x00000001")])
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 5)
+
+    def test_los_radar_index_hashes_section_24_and_skips_the_sight_report(self):
+        w = tr.Walker(RESULTS, [("losRadarState.unitSlots", "0x00000000"), ("losRadarState.eyes.count", "0x00000000"),
+                                ("losRadarIndex[3].player", "0x00000003"), ("losRadarIndex[3].hasSpecial", "0x00000001"),
+                                ("losRadarIndex[3].visible.size", "0x00000001"), ("losRadarIndex[3].visible[0]", "unit:7"),
+                                ("losRadarIndex[3].known.size", "0x00000000"),
+                                ("unitsFactories[3].player", "0x00000003"), ("unitsFactories[3].factories.size", "0x00000000"),
+                                ("players[0].econ.x", "0x01")])
+        w.los_radar_index()
+        want = tr.Hasher()
+        want.h8(24)
+        want.h32(3)
+        want.h32(1)
+        want.h32(1)
+        want.pointer(2, 7)
+        want.h32(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, 7)
+        w.factory_index()
+        want.h8(25)
+        want.h32(3)
+        want.h32(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, 9)
+
+    def test_no_live_player_hashes_nothing(self):
+        w = tr.Walker(RESULTS, [("players[0].econ.x", "0x01")])
+        w.los_radar_index()
+        w.factory_index()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 0)
+
     def test_pathfinder_report_is_read_but_not_hashed(self):
         w = tr.Walker(RESULTS, [("pathfinder.counter", "0x00000005")])
         w.pathfinder()

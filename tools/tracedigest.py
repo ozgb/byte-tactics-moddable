@@ -8,7 +8,7 @@ the trace (the trace format, commit, scenario, seeds and fpu_control_word), then
 one `<tick> <digest>` line per tick, the digest in 16 lowercase hex digits.
 
     bt-digest 5
-    trace_format bt-trace 5
+    trace_format bt-trace 6
     commit <sha>
     scenario reference/scenarios/skirmish2.txt
     game_seed 1

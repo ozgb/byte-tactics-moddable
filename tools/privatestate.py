@@ -56,25 +56,23 @@ The other members of a slot (`Unit::field_8`, `Unit::unknown_24`, `Unit::weapon2
 weapons, so they are not listed. `Unit::netDirtyFlags` is not listed either: targeting clears bits of it, but weapons and orders write it too. Any
 writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events.
 
-Los_radar's state is written by los_radar alone and read by others: the visibility layer of the map, the allocation "MAPPED MEMORY" that LoadTntMap makes
+Los_radar's state is a region and a view. The region is one allocation, "LosRadar region" (allocated by the engine in LoadBattleAssets), which holds the
+unit sight cache (the 12 bytes of the Unit record that stay unused, `Unit::unusedLosCache` and `unusedLosSightFrame`): no subsystem but los_radar writes or reads a part of it. The eyeballs (the members of `Eye`, the count
+`count_14277` and `eyes`, the pointer to them) are private for reads and writes as well: nothing but los_radar reads them, and `losRadarState` reports them. The view is written by los_radar alone and read by others: the visibility layer of the map, the allocation "MAPPED MEMORY" that LoadTntMap makes
 (`LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY`), each player's explored map, the allocation of InitPlayerSlot (`InitPlayerSlot: operator new unsigned char`),
-the eyeballs: the members of `Eye` (the log names each, such as `Eye::pos` and `Eye::expires`) and their count, `count_14277`, and `eyes`, the pointer to them,
-and the unit index, each player's lists of the enemy units it sees and knows and its hasSpecial flag (the members of `LosUnitIndex` and `LosUnitIndexEntry`).
-The cells of the map (the allocation "PLOT MEMORY", which presentation, map and features write too), the unit's sight cache and flags (units and others write them)
-and the line of sight setting bits of the map flags are not listed. Any writer but los_radar fails, which is what makes every move, removal, reveal and
+and the unit index, each player's lists of the enemy units it sees and knows and its hasSpecial flag (the members of `LosUnitIndex` and `LosUnitIndexEntry`, read by ai through the seam).
+The cells of the map (the allocation "PLOT MEMORY", which presentation, map and features write too) and the line of sight setting bits of the map flags are not listed. Any writer but los_radar fails, which is what makes every move, removal, reveal and
 recalculation of line of sight reach these items through the scheduler's events.
 
-Map's state is written by map alone and read by others: the spatial buckets that hold the units (`Unit::spatialBucket`, and the members of the bucket types, `UnitBucket::first`
-and `SpatialBucket::head`), the pass maps of the movement classes (the allocation of BuildAllPassMaps, `BuildAllPassMaps: operator new unsigned int`) and the two results of
-the last placement test, `g_lastPlaceHeight` and `g_lastPlaceMetalSum`. The bucket array (`cells_1429f`) and the overflow bucket (`overflowBucket`) are not listed: los_radar's
-BuildDerivedLayers and FreeMapResources (src/map/line_of_sight.cpp) allocate and free them outside the tick. The cells of the map (the allocation "PLOT MEMORY", which
+Map's state is written by map alone. The members of the bucket types (`UnitBucket::first` and `SpatialBucket::head`) are private for reads and writes: only map reads them, and `mapState` reports them. Read elsewhere, so private for writes only: the spatial bucket index of a unit (`Unit::spatialBucket`, which orders reads: order_targets.cpp), the pass maps of the movement classes (the allocation of BuildAllPassMaps, `BuildAllPassMaps: operator new unsigned int`) and the two results of
+the last placement test, `g_lastPlaceHeight` and `g_lastPlaceMetalSum`. The bucket array (`cells_1429f`) and the overflow bucket (`overflowBucket`) are not listed: they are allocated and freed outside the tick, and the item that names their allocation is listed once map owns it. The cells of the map (the allocation "PLOT MEMORY", which
 presentation, features and los_radar write too) are not listed either, nor are `Unit::cargoNext` (units write it), `Unit::flags`, `Unit::bit2` and `Unit::cobStateFlags`. Any writer but
 map fails, which is what makes every placement, move and removal reach these items through the scheduler's events.
 
-Players' state is written by players alone and read by others: the mission conditions (the members of `MissionConditions`, `MissionCondition` and of each victory and defeat condition type, such as `VictoryTimerRunsOut` and `DefeatCommanderKilled`) and the two clocks of a player, `Player::updateTime` and `Player::winLoseTime`.
-The rest of a player's fields (units, the economy's accounts, the controller and the slot's set-up) are not listed: others write them. Any writer but players fails, which is what makes every capture, kill, transfer and creation or death of a unit reach the conditions through the scheduler's events.
+Players' state is one region, "Players region" (allocated by the engine in LoadBattleAssets), with the two clocks and the end-game countdown that the Player and Game records keep unused, and the mission conditions: the members of `MissionCondition` and of each victory and defeat condition type, such as `VictoryTimerRunsOut` and `DefeatCommanderKilled`, are private for reads and writes, and `playersState` reports them.
+Two items are read elsewhere, so private for writes only: `MissionConditions` (the list, whose registration the seams read) and `VictoryMoveUnitToRadius` (map's radius walk calls its visitor, which the log charges to map). The rest of a player's fields (units, the economy's accounts, the controller and the slot's set-up) are not listed: others write them. Any writer but players fails, which is what makes every capture, kill, transfer and creation or death of a unit reach the conditions through the scheduler's events.
 
-Ai's state is written by ai alone: the records of a computer player's AI (`PlayerAI` and the types it holds, `KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`), the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`), the pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI`.
+Ai's state is written by ai alone: the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`) and the records a computer player's AI holds (`KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`) are private for reads and writes, and `aiState` reports them. `PlayerAI` itself is private for writes only: the log charges reads of its `vec_65` and `vec_8d` to no subsystem (`unknown`), and they are ai's own code (PlayerAI::ComputeBaseWeights). The pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI` are private for writes only too: others read the pointers of `g_playerAI` through the indexes of los_radar and units.
 `Unit::group` is not listed: orders' GetBuiltOrder gives a human player's built unit its factory's group, a UI group, and LoadUnit writes it. `Player::ai` is not listed either: players' slot set-up writes it. Any writer but ai fails, which is what makes every reaction, squad change and weight or limit command reach these items through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
@@ -114,30 +112,36 @@ FEATURES_WRITE_ITEMS = ("scanIndex", "Cell::feature", "Cell::spot", "Cell::offse
 
 TARGETING_WRITE_ITEMS = ("Unit::current", "Unit::field_20", "Unit::weapon2Target")
 
-LOS_RADAR_WRITE_ITEMS = ("LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY", "InitPlayerSlot: operator new unsigned char", "count_14277", "eyes")
+LOS_RADAR_WRITE_ITEMS = ("LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY", "InitPlayerSlot: operator new unsigned char")
 
-LOS_RADAR_WRITE_TYPES = ("Eye", "LosUnitIndex", "LosUnitIndexEntry")
+LOS_RADAR_ITEMS = ("count_14277", "eyes")
+
+LOS_RADAR_TYPES = ("Eye",)
+
+LOS_RADAR_WRITE_TYPES = ("LosUnitIndex", "LosUnitIndexEntry")
 
 MAP_WRITE_ITEMS = ("Unit::spatialBucket", "BuildAllPassMaps: operator new unsigned int", "g_lastPlaceHeight", "g_lastPlaceMetalSum")
 
-MAP_WRITE_TYPES = ("UnitBucket", "SpatialBucket")
+MAP_TYPES = ("UnitBucket", "SpatialBucket")
 
-PLAYERS_WRITE_ITEMS = ("Player::updateTime", "Player::winLoseTime")
+PLAYERS_WRITE_TYPES = ("MissionConditions", "VictoryMoveUnitToRadius")
 
-PLAYERS_WRITE_TYPES = ("MissionConditions", "MissionCondition", "VictoryKillEnemyCommander", "VictoryDestroyAllUnits", "VictoryKillAllMobileUnits",
-                       "VictoryBuildUnitType", "VictoryCaptureUnitType", "VictoryKillAllOfType", "VictoryKillUnitType", "VictoryMoveUnitToRadius",
+PLAYERS_TYPES = ("MissionCondition", "VictoryKillEnemyCommander", "VictoryDestroyAllUnits", "VictoryKillAllMobileUnits",
+                       "VictoryBuildUnitType", "VictoryCaptureUnitType", "VictoryKillAllOfType", "VictoryKillUnitType",
                        "VictoryUnitTypePassesX", "VictoryUnitTypePassesZ", "VictoryTimerRunsOut", "DefeatCommanderKilled", "DefeatAllUnitsKilled",
                        "DefeatAllUnitsKilledOfType", "DefeatUnitTypeKilled", "DefeatDeathTimerRunsOut", "DefeatAnyUnitPassesX", "DefeatAnyUnitPassesZ")
 
 AI_WRITE_ITEMS = ("Player::groups", "g_aiCommandsEnabled", "g_playerAI")
 
-AI_WRITE_TYPES = ("PlayerAI", "KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "CenterPos", "AiVec3",
+AI_WRITE_TYPES = ("PlayerAI",)
+
+AI_TYPES = ("KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "CenterPos", "AiVec3",
                   "SquadManager", "SquadTimer", "AssaultTimer", "EscortTimer", "SquadScoutTimer", "ScoutTimer", "BuildTimer", "SpatialTimer", "Group")
 
 
 @dataclass(frozen=True)
 class Owner:
-    """A subsystem with private state: the items of its types, its region root and its allocation, the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
+    """A subsystem with private state: the items of its types, its region root and its allocation (an item named `<function>: <allocator> <tag>` of a region it allocates), the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
     name: str
     root: str
     types: tuple
@@ -158,10 +162,10 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("wind_meteors", "", (), NO_ALLOCATION, (), METEOR_GLOBALS, WIND_FIELDS),
           Owner("features", "", (), NO_ALLOCATION, write_items=FEATURES_WRITE_ITEMS),
           Owner("targeting", "", (), NO_ALLOCATION, write_items=TARGETING_WRITE_ITEMS),
-          Owner("los_radar", "", (), NO_ALLOCATION, write_types=LOS_RADAR_WRITE_TYPES, write_items=LOS_RADAR_WRITE_ITEMS),
-          Owner("map", "", (), NO_ALLOCATION, write_types=MAP_WRITE_TYPES, write_items=MAP_WRITE_ITEMS),
-          Owner("players", "", (), NO_ALLOCATION, write_types=PLAYERS_WRITE_TYPES, write_items=PLAYERS_WRITE_ITEMS),
-          Owner("ai", "", (), NO_ALLOCATION, write_types=AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS))
+          Owner("los_radar", "", LOS_RADAR_TYPES, re.compile(r"LosRadar region"), LOS_RADAR_WRITE_TYPES, LOS_RADAR_ITEMS, LOS_RADAR_WRITE_ITEMS),
+          Owner("map", "", MAP_TYPES, NO_ALLOCATION, write_items=MAP_WRITE_ITEMS),
+          Owner("players", "", PLAYERS_TYPES, re.compile(r"Players region"), PLAYERS_WRITE_TYPES),
+          Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

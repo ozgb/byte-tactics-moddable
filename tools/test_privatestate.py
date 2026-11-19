@@ -138,106 +138,129 @@ class TargetingOwnerTest(unittest.TestCase):
 class LosRadarOwnerTest(unittest.TestCase):
     MAPPED = "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY"
     EXPLORED = "InitPlayerSlot: operator new unsigned char"
+    REGION = "LoadBattleAssets: SimAllocRegion LosRadar region"
 
-    def test_the_visibility_layer_the_explored_maps_and_the_eyeballs_are_private_for_writes_only(self):
-        for item in (self.MAPPED, self.EXPLORED, "count_14277", "eyes", "Eye::pos", "Eye::expires", "Eye::screenPos"):
+    def test_the_visibility_layer_and_the_explored_maps_are_private_for_writes_only(self):
+        for item in (self.MAPPED, self.EXPLORED, "LosUnitIndexEntry::visible"):
             self.assertEqual(ps.private_to(item), ("los_radar", ("writer",)), item)
 
+    def test_the_eyeballs_and_the_region_are_private_for_reads_and_writes(self):
+        for item in ("count_14277", "eyes", "Eye::pos", "Eye::expires", "Eye::screenPos", self.REGION + ".sight"):
+            self.assertEqual(ps.private_to(item), ("los_radar", ("writer", "reader")), item)
+
     def test_the_cells_and_the_shared_state_are_not_private(self):
-        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::height", "Unit::losCacheCellX", "Unit::losSightFrameIdx", "Unit::flags",
+        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::height", "Unit::unusedLosCache", "Unit::flags",
                      "Game::mapFlags_14281", "InitPlayerSlot: operator new Group", "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY 2"):
             self.assertFalse(ps.is_private(item), item)
 
-    def test_a_los_radar_write_passes(self):
+    def test_a_los_radar_access_passes(self):
         rows = {"edges": [("los_radar", "units", self.MAPPED), ("los_radar", "-", self.EXPLORED), ("-", "los_radar", "count_14277")],
-                "cross": [("los_radar", "players", "Eye::pos")]}
+                "cross": [("los_radar", "los_radar", "Eye::pos")], "reads": [("-", "los_radar", self.REGION + ".sight")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_another_subsystem_write_fails(self):
-        rows = {"edges": [("players", "los_radar", self.EXPLORED), ("units", "-", "Eye::x"), ("map", "-", self.MAPPED), ("game", "-", "eyes")]}
+        rows = {"edges": [("players", "los_radar", self.EXPLORED), ("map", "-", self.MAPPED)]}
         self.assertEqual(ps.violations(rows),
-                         ["edges: writer game on eyes, which is written only by los_radar",
-                          "edges: writer map on %s, which is written only by los_radar" % self.MAPPED,
-                          "edges: writer players on %s, which is written only by los_radar" % self.EXPLORED,
-                          "edges: writer units on Eye::x, which is written only by los_radar"])
+                         ["edges: writer map on %s, which is written only by los_radar" % self.MAPPED,
+                          "edges: writer players on %s, which is written only by los_radar" % self.EXPLORED])
 
-    def test_a_read_by_anyone_passes(self):
-        rows = {"edges": [("-", "sound", self.EXPLORED), ("los_radar", "ai", self.MAPPED)], "reads": [("-", "weapons", "Eye::pos")],
-                "presentation": [("-", "presentation", self.MAPPED)]}
+    def test_another_subsystem_touching_the_eyeballs_or_the_region_fails(self):
+        rows = {"edges": [("units", "-", "Eye::x"), ("game", "-", "eyes")], "reads": [("-", "weapons", "Eye::pos"), ("-", "ai", self.REGION + ".sight")]}
+        self.assertEqual(len(ps.violations(rows)), 4)
+        self.assertTrue(all("private to los_radar" in line for line in ps.violations(rows)))
+
+    def test_a_read_of_the_visibility_layer_passes(self):
+        rows = {"edges": [("-", "sound", self.EXPLORED), ("los_radar", "ai", self.MAPPED)], "presentation": [("-", "presentation", self.MAPPED)]}
         self.assertEqual(ps.violations(rows), [])
 
 
 class MapOwnerTest(unittest.TestCase):
     PASS_MAPS = "BuildAllPassMaps: operator new unsigned int"
 
-    def test_the_buckets_the_pass_maps_and_the_placement_results_are_private_for_writes_only(self):
-        for item in ("Unit::spatialBucket", "UnitBucket::first", "SpatialBucket::head", self.PASS_MAPS, "g_lastPlaceHeight", "g_lastPlaceMetalSum"):
+    def test_the_unit_bucket_and_the_pass_maps_are_private_for_writes_only(self):
+        for item in ("Unit::spatialBucket", self.PASS_MAPS, "g_lastPlaceHeight", "g_lastPlaceMetalSum"):
             self.assertEqual(ps.private_to(item), ("map", ("writer",)), item)
+
+    def test_the_bucket_records_are_private_for_reads_and_writes(self):
+        for item in ("UnitBucket::first", "SpatialBucket::head"):
+            self.assertEqual(ps.private_to(item), ("map", ("writer", "reader")), item)
 
     def test_the_cells_and_the_shared_unit_state_are_not_private(self):
         for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::unit", "Cell::flags", "Unit::cargoNext", "Unit::flags", "Unit::bit2",
                      "Unit::cobStateFlags", "cells_1429f", "overflowBucket", "BuildAllPassMaps: operator new unsigned short"):
             self.assertFalse(ps.is_private(item), item)
 
-    def test_a_map_write_passes(self):
+    def test_a_map_access_passes(self):
         rows = {"edges": [("map", "units", "Unit::spatialBucket"), ("map", "-", self.PASS_MAPS), ("-", "map", "g_lastPlaceMetalSum")],
-                "cross": [("map", "ai", "g_lastPlaceHeight")]}
+                "cross": [("map", "ai", "g_lastPlaceHeight")], "reads": [("-", "map", "UnitBucket::first")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_another_subsystem_write_fails(self):
-        rows = {"edges": [("units", "map", "Unit::spatialBucket"), ("ai", "-", "g_lastPlaceMetalSum"), ("pathfinding", "-", self.PASS_MAPS),
-                          ("orders", "-", "UnitBucket::first")]}
+        rows = {"edges": [("units", "map", "Unit::spatialBucket"), ("ai", "-", "g_lastPlaceMetalSum"), ("pathfinding", "-", self.PASS_MAPS)]}
         self.assertEqual(ps.violations(rows),
                          ["edges: writer ai on g_lastPlaceMetalSum, which is written only by map",
-                          "edges: writer orders on UnitBucket::first, which is written only by map",
                           "edges: writer pathfinding on %s, which is written only by map" % self.PASS_MAPS,
                           "edges: writer units on Unit::spatialBucket, which is written only by map"])
 
-    def test_a_read_by_anyone_passes(self):
+    def test_another_subsystem_touching_the_bucket_records_fails(self):
+        rows = {"edges": [("orders", "-", "UnitBucket::first")], "reads": [("-", "orders", "SpatialBucket::head")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer orders on UnitBucket::first, which is private to map",
+                          "reads: reader orders on SpatialBucket::head, which is private to map"])
+
+    def test_a_read_of_the_unit_bucket_passes(self):
         rows = {"edges": [("-", "orders", "Unit::spatialBucket"), ("map", "ai", "g_lastPlaceMetalSum")], "reads": [("-", "units", self.PASS_MAPS)],
                 "presentation": [("-", "presentation", "g_lastPlaceHeight")]}
         self.assertEqual(ps.violations(rows), [])
 
 
 class PlayersOwnerTest(unittest.TestCase):
-    def test_the_conditions_and_the_two_clocks_are_private_for_writes_only(self):
-        for item in ("MissionConditions::active", "MissionCondition::met", "VictoryTimerRunsOut::deadline", "DefeatCommanderKilled::player",
-                     "Player::updateTime", "Player::winLoseTime"):
+    REGION = "LoadBattleAssets: SimAllocRegion Players region"
+
+    def test_the_conditions_and_the_region_are_private_for_reads_and_writes(self):
+        for item in ("MissionCondition::met", "VictoryTimerRunsOut::deadline", "DefeatCommanderKilled::player", self.REGION + ".clocks"):
+            self.assertEqual(ps.private_to(item), ("players", ("writer", "reader")), item)
+
+    def test_the_condition_list_and_the_radius_condition_are_private_for_writes_only(self):
+        for item in ("MissionConditions::active", "VictoryMoveUnitToRadius::pos"):
             self.assertEqual(ps.private_to(item), ("players", ("writer",)), item)
 
     def test_the_rest_of_a_player_is_not_private(self):
-        for item in ("Player::econ", "Player::units", "Player::controller"):
+        for item in ("Player::econ", "Player::units", "Player::controller", "Player::unusedUpdateTime"):
             self.assertFalse(ps.is_private(item), item)
 
-    def test_a_players_write_passes(self):
-        rows = {"edges": [("players", "units", "Player::updateTime"), ("players", "-", "MissionConditions::active")],
-                "cross": [("players", "ai", "Player::winLoseTime")]}
+    def test_a_players_access_passes(self):
+        rows = {"edges": [("players", "units", "MissionConditions::active"), ("players", "-", "MissionCondition::met")],
+                "cross": [("players", "ai", "VictoryMoveUnitToRadius::pos")], "reads": [("-", "map", "VictoryMoveUnitToRadius::pos")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_another_subsystem_write_fails(self):
-        rows = {"edges": [("units", "players", "Player::updateTime"), ("ai", "-", "VictoryTimerRunsOut::deadline")]}
+        rows = {"edges": [("units", "players", "MissionConditions::active"), ("ai", "-", "VictoryTimerRunsOut::deadline")]}
         self.assertEqual(ps.violations(rows),
-                         ["edges: writer ai on VictoryTimerRunsOut::deadline, which is written only by players",
-                          "edges: writer units on Player::updateTime, which is written only by players"])
+                         ["edges: writer ai on VictoryTimerRunsOut::deadline, which is private to players",
+                          "edges: writer units on MissionConditions::active, which is written only by players"])
 
-    def test_a_read_by_anyone_passes(self):
-        rows = {"edges": [("-", "orders", "Player::winLoseTime"), ("players", "ai", "MissionConditions::active")],
-                "presentation": [("-", "presentation", "Player::updateTime")]}
-        self.assertEqual(ps.violations(rows), [])
+    def test_another_subsystem_reading_a_condition_fails(self):
+        rows = {"reads": [("-", "orders", "DefeatCommanderKilled::player"), ("-", "ai", self.REGION + ".clocks")]}
+        self.assertEqual(len(ps.violations(rows)), 2)
 
 
 class AiOwnerTest(unittest.TestCase):
-    def test_the_records_the_squads_and_the_three_items_are_private_for_writes_only(self):
-        for item in ("PlayerAI::lastTick", "KeyedCell::key", "SquadManager::nextAction", "SquadTimer::next", "AssaultTimer::attacking", "SpatialTimer::best",
-                     "Group::units", "Player::groups", "g_aiCommandsEnabled", "g_playerAI"):
+    def test_the_squad_records_are_private_for_reads_and_writes(self):
+        for item in ("KeyedCell::key", "SquadManager::nextAction", "SquadTimer::next", "AssaultTimer::attacking", "SpatialTimer::best", "Group::units"):
+            self.assertEqual(ps.private_to(item), ("ai", ("writer", "reader")), item)
+
+    def test_the_player_record_and_the_three_items_are_private_for_writes_only(self):
+        for item in ("PlayerAI::lastTick", "Player::groups", "g_aiCommandsEnabled", "g_playerAI"):
             self.assertEqual(ps.private_to(item), ("ai", ("writer",)), item)
 
     def test_the_group_of_a_unit_and_the_ai_of_a_player_are_not_private(self):
         for item in ("Unit::group", "Player::ai", "Player::econ"):
             self.assertFalse(ps.is_private(item), item)
 
-    def test_an_ai_write_passes(self):
-        rows = {"edges": [("ai", "units", "Player::groups"), ("ai", "-", "g_aiCommandsEnabled")], "cross": [("ai", "orders", "SquadManager::countdown")]}
+    def test_an_ai_access_passes(self):
+        rows = {"edges": [("ai", "units", "Player::groups"), ("ai", "-", "g_aiCommandsEnabled")], "cross": [("ai", "ai", "SquadManager::countdown")],
+                "reads": [("-", "ai", "Group::units"), ("-", "orders", "PlayerAI::lastTick")]}
         self.assertEqual(ps.violations(rows), [])
 
     def test_another_subsystem_write_fails(self):
@@ -246,9 +269,9 @@ class AiOwnerTest(unittest.TestCase):
                          ["edges: writer players on g_playerAI, which is written only by ai",
                           "edges: writer units on Player::groups, which is written only by ai"])
 
-    def test_a_read_by_anyone_passes(self):
-        rows = {"edges": [("-", "orders", "g_aiCommandsEnabled"), ("-", "ai", "Group::units")]}
-        self.assertEqual(ps.violations(rows), [])
+    def test_another_subsystem_reading_a_squad_record_fails(self):
+        rows = {"reads": [("-", "orders", "SquadManager::nextAction")]}
+        self.assertEqual(ps.violations(rows), ["reads: reader orders on SquadManager::nextAction, which is private to ai"])
 
 
 class ViolationTest(unittest.TestCase):

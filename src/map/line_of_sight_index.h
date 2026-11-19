@@ -8,6 +8,7 @@
 struct Player;
 struct Unit;
 struct Vec3;
+struct StateWriter;
 
 #pragma pack(push, 1)
 struct LosUnitIndexEntry {
@@ -32,5 +33,6 @@ bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
 int __stdcall IsPointVisible(Player* player, Vec3* point);
 int __stdcall GetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
 const LosUnitIndexEntry* LosUnitIndexOf(int player);
+void WriteLosUnitIndex(const StateWriter* w);
 
 #endif

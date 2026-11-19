@@ -19,6 +19,8 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
 #include "../../link/globals.h"
 #include "factory_index.h"
+#include "../../interfaces/state_writer.h"
+#include <stdio.h>
 
 static FactoryIndex* s_index;
 
@@ -36,6 +38,25 @@ const BlockVector<Ref<Unit> >* FactoryIndexOf(int player)
     if (s_index == nullptr)
         return nullptr;
     return &s_index->players[player].factories;
+}
+
+void __stdcall UnitsWriteState(const StateWriter* w)
+{
+    if (s_index == nullptr)
+        return;
+    for (int i = 0; i < 10; i++) {
+        FactoryIndexEntry& entry = s_index->players[i];
+        if (!entry.live)
+            continue;
+        char name[32];
+        sprintf(name, "unitsFactories[%d]", i);
+        w->Begin(25, name);
+        w->Int("player", 0, 4, i);
+        w->Int("factories.size", 0, 4, entry.factories.Size());
+        unsigned int k = 0;
+        for (BlockVector<Ref<Unit> >::iterator it = entry.factories.Begin(); it != entry.factories.End(); ++it, ++k)
+            w->Handle("factories[%u]", k, STATE_HANDLE_UNIT, (*it).offset);
+    }
 }
 
 void __stdcall CreateFactoryIndex(int player)

@@ -194,6 +194,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "ai_player.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
+#include "../../interfaces/state_writer.h"
 #include "../quirks/quirks.h"
 #include "../state/sim_globals.h"
 #include "../state/sim_effects.h"
@@ -375,6 +376,145 @@ int __stdcall AiApply(const AiEvent* e)
     return 0;
 }
 
+static unsigned int AiPlayerSlotOf(const Ref<Player>& ref)
+{
+    int slot = g_game->SlotOf(ref.get());
+    return slot < 0 ? 0xffu : (unsigned int)slot;
+}
+
+template <class T>
+static void AiWriteRawVector(const StateWriter* w, const char* sizeField, const char* bytesField, BlockVector<T>& v, unsigned int elem)
+{
+    const unsigned char* begin = (const unsigned char*)v.Begin();
+    const unsigned char* end = (const unsigned char*)v.End();
+    int span = begin != nullptr ? (int)(end - begin) : 0;
+    unsigned int n = 0;
+    if (span > 0 && (unsigned int)span % elem == 0 && (unsigned int)span / elem <= (1u << 20))
+        n = (unsigned int)span / elem;
+    w->Int(sizeField, 0, 4, n);
+    w->Bytes(bytesField, 0, begin, (int)(n * elem));
+}
+
+#define AI_RAW_VECTOR(w, vec, name, elem) AiWriteRawVector(w, "ai." name ".size", "ai." name, vec, elem)
+
+static void AiWritePlayerAI(const StateWriter* w, const PlayerAI* ai)
+{
+    w->Int("ai.owner", 0, 1, AiPlayerSlotOf(ai->owner));
+    w->Int("ai.index", 0, 1, ai->index);
+    w->Int("ai.centre.x", 0, 4, (unsigned int)ai->centre.x);
+    w->Int("ai.centre.y", 0, 4, (unsigned int)ai->centre.y);
+    w->Int("ai.centre.z", 0, 4, (unsigned int)ai->centre.z);
+    w->Int("ai.pos_41.x", 0, 4, (unsigned int)ai->pos_41.x);
+    w->Int("ai.pos_41.y", 0, 4, (unsigned int)ai->pos_41.y);
+    w->Int("ai.pos_41.z", 0, 4, (unsigned int)ai->pos_41.z);
+    w->Int("ai.center.x", 0, 2, (unsigned short)ai->center.x);
+    w->Int("ai.center.y", 0, 2, (unsigned short)ai->center.y);
+    w->Int("ai.centerPad", 0, 4, ((const unsigned int*)&ai->center)[1]);
+    w->Int("ai.builders", 0, 4, (unsigned int)ai->builders);
+    w->Int("ai.lastTick", 0, 4, ai->lastTick);
+    w->Int("ai.spacing0.x", 0, 2, (unsigned short)ai->spacing0.x);
+    w->Int("ai.spacing0.y", 0, 2, (unsigned short)ai->spacing0.y);
+    w->Int("ai.offset0.x", 0, 2, (unsigned short)ai->offset0.x);
+    w->Int("ai.offset0.y", 0, 2, (unsigned short)ai->offset0.y);
+    w->Int("ai.margin0", 0, 4, (unsigned int)ai->margin0);
+    w->Int("ai.spacing1.x", 0, 2, (unsigned short)ai->spacing1.x);
+    w->Int("ai.spacing1.y", 0, 2, (unsigned short)ai->spacing1.y);
+    w->Int("ai.offset1.x", 0, 2, (unsigned short)ai->offset1.x);
+    w->Int("ai.offset1.y", 0, 2, (unsigned short)ai->offset1.y);
+    w->Int("ai.margin1", 0, 4, (unsigned int)ai->margin1);
+    w->Int("ai.searchRadius", 0, 4, (unsigned int)ai->searchRadius);
+    PlayerAI* m = const_cast<PlayerAI*>(ai);
+    AI_RAW_VECTOR(w, m->cells, "cells", 8);
+    AI_RAW_VECTOR(w, m->vec_65, "vec_65", 3);
+    AI_RAW_VECTOR(w, m->counts, "counts", 2);
+    AI_RAW_VECTOR(w, m->vec_8d, "vec_8d", 1);
+    AI_RAW_VECTOR(w, m->weights, "weights", 1);
+    AI_RAW_VECTOR(w, m->vec_ad, "vec_ad", 1);
+    AI_RAW_VECTOR(w, m->vec_bd, "vec_bd", 4);
+    AI_RAW_VECTOR(w, m->values, "values", 4);
+    AI_RAW_VECTOR(w, m->locked, "locked", 4);
+}
+
+static void AiWriteTimer(const StateWriter* w, unsigned int t, SquadTimer* timer)
+{
+    static const unsigned int classes[10] = { 0, 7, 2, 3, 6, 1, 2, 3, 4, 5 };
+    unsigned int cls = classes[t];
+    w->Int("timers[%u].class", t, 4, cls);
+    w->Int("timers[%u].next", t, 4, (unsigned int)timer->next);
+    w->Int("timers[%u].player", t, 4, timer->player);
+    if (cls == 2) {
+        AssaultTimer* a = static_cast<AssaultTimer*>(timer);
+        w->Int("timers[%u].minimum", t, 4, (unsigned int)a->minimum);
+        w->Int("timers[%u].maximum", t, 4, (unsigned int)a->maximum);
+        w->Int("timers[%u].limit", t, 4, (unsigned int)a->limit);
+        w->Int("timers[%u].kind", t, 4, (unsigned int)a->kind);
+        w->Int("timers[%u].attacking", t, 4, (unsigned int)a->attacking);
+    } else if (cls == 3) {
+        w->Int("timers[%u].other", t, 4, (unsigned int)static_cast<EscortTimer*>(timer)->other);
+    } else if (cls == 5) {
+        SpatialTimer* sp = static_cast<SpatialTimer*>(timer);
+        w->Int("timers[%u].best.x", t, 4, (unsigned int)sp->best.x);
+        w->Int("timers[%u].best.y", t, 4, (unsigned int)sp->best.y);
+        w->Int("timers[%u].best.z", t, 4, (unsigned int)sp->best.z);
+        w->Int("timers[%u].probe.x", t, 4, (unsigned int)sp->probe.x);
+        w->Int("timers[%u].probe.y", t, 4, (unsigned int)sp->probe.y);
+        w->Int("timers[%u].probe.z", t, 4, (unsigned int)sp->probe.z);
+        w->Int("timers[%u].step.x", t, 4, (unsigned int)sp->step.x);
+        w->Int("timers[%u].step.y", t, 4, (unsigned int)sp->step.y);
+        w->Int("timers[%u].step.z", t, 4, (unsigned int)sp->step.z);
+        w->Int("timers[%u].bestRating", t, 4, (unsigned int)sp->bestRating);
+    }
+}
+
+static void WriteAiRecords(const StateWriter* w)
+{
+    char name[64];
+    for (int i = 0; i < 10; i++) {
+        const PlayerAI* ai = g_playerAI[i].get();
+        if (ai == nullptr)
+            continue;
+        sprintf(name, "aiState.players[%d]", i);
+        w->Begin(43, name);
+        AiWritePlayerAI(w, ai);
+    }
+    for (int i = 0; i < 10; i++) {
+        SquadManager* manager = g_game->players[i].ai.get();
+        if (manager == nullptr)
+            continue;
+        sprintf(name, "aiState.players[%d].squadManager", i);
+        w->Begin(43, name);
+        w->Int("player", 0, 1, AiPlayerSlotOf(manager->player));
+        w->Int("index", 0, 1, manager->index);
+        w->Int("countdown", 0, 4, (unsigned int)manager->countdown);
+        w->Int("unused_9", 0, 4, (unsigned int)manager->unused_9);
+        w->Int("nextAction", 0, 4, (unsigned int)manager->nextAction);
+        w->Handle("cursor", 0, STATE_HANDLE_UNIT, manager->cursor.offset);
+        for (unsigned int t = 0; t < 10; t++) {
+            SquadTimer* timer = manager->timers[t].get();
+            if (timer != nullptr)
+                AiWriteTimer(w, t, timer);
+        }
+    }
+    for (int i = 0; i < 10; i++) {
+        Squad* squads = (Squad*)g_game->players[i].groups.get();
+        if (squads == nullptr)
+            continue;
+        for (int sq = 0; sq < 10; sq++) {
+            Squad* squad = &squads[sq];
+            sprintf(name, "aiState.players[%d].squads[%d]", i, sq);
+            w->Begin(43, name);
+            w->Int("owner", 0, 1, AiPlayerSlotOf(squad->owner));
+            w->Int("index", 0, 4, (unsigned int)squad->index);
+            w->Int("word8", 0, 4, ((const unsigned int*)squad)[2]);
+            w->Int("wordC", 0, 4, ((const unsigned int*)squad)[3]);
+            unsigned int n = squad->items.Size();
+            w->Int("items.size", 0, 4, n);
+            for (unsigned int k = 0; k < n; k++)
+                w->Handle("items[%u]", k, STATE_HANDLE_UNIT, squad->items[k].offset);
+        }
+    }
+}
+
 void __stdcall AiWriteState(const StateWriter* w)
 {
     unsigned int count = 0;
@@ -398,6 +538,7 @@ void __stdcall AiWriteState(const StateWriter* w)
         w->Bytes("manager[%u].timers", k, next, sizeof(next));
         k++;
     }
+    WriteAiRecords(w);
 }
 
 // FUNCTION: 0x4071f0

@@ -333,12 +333,21 @@ and so on), and this page is updated to name it. The current tag is
   player's anti-nuke silo intercepts a nuke in flight, so the retargeting of an interceptor at a projectile is
   judged. The format stays `bt-trace 5`. The 88 earlier digests, event digests, sound logs, UI logs, frames and
   the save are those of v28.
+- `reference-traces-v30`: the same 89 scenarios as v29 in trace format `bt-trace 6` (#979). The rows
+  no longer hash state that only its owner reads: the sight cache of a unit (bytes 0x7a to 0x7d and
+  0xf8 of a `Unit`), the eyeballs (section 15), the buckets' `a`, `flags` and unit lists (section 14
+  keeps `b`, which orders reads), the players' update and win/lose clocks, the end-game countdown, the
+  mission conditions (section 28) and ai's own state (the PlayerAI fields, the squad managers and the
+  squads, sections 24 to 26). Sections 24 and 25 now hash the unit lists los_radar keeps and the
+  factory lists units keeps, as the modules write them through the state writer. What left the rows is
+  dumped as los_radar's, map's, players' and ai's records (44, 45, 46 and 43). Every digest changes; the
+  event digests, sound logs, UI logs and frames are those of v29, and the save decodes equal to v29's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

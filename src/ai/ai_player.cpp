@@ -389,9 +389,10 @@ static void AiWriteRawVector(const StateWriter* w, const char* sizeField, const 
 {
     const unsigned char* begin = (const unsigned char*)v.Begin();
     const unsigned char* end = (const unsigned char*)v.End();
+    int span = begin != nullptr ? (int)(end - begin) : 0;
     unsigned int n = 0;
-    if (begin != nullptr && end >= begin && (unsigned int)(end - begin) % elem == 0 && (unsigned int)(end - begin) / elem <= (1u << 20))
-        n = (unsigned int)(end - begin) / elem;
+    if (span > 0 && (unsigned int)span % elem == 0 && (unsigned int)span / elem <= (1u << 20))
+        n = (unsigned int)span / elem;
     w->Int(sizeField, 0, 4, n);
     w->Bytes(bytesField, 0, begin, (int)(n * elem));
 }

@@ -503,9 +503,11 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     case 2:
         attached = g_seams.movement->LoadPathOrder(this, file, buf3);
         return;
-    case 3:
-        attached = g_seams.movement->LoadAirManeuverOrder(this, file, buf3);
+    case 3: {
+        AirManeuverOrder* maneuver = g_seams.movement->LoadAirManeuverOrder(this, file, buf3);
+        attached = maneuver;
         return;
+    }
     case 4:
         attached = g_seams.movement->LoadApproachRadius(this, file, buf3);
         return;

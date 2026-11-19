@@ -26,7 +26,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 2
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 1
+#define UNITS_VERSION_MINOR 0
 
 // Unit simulation.
 struct UnitsSeam {

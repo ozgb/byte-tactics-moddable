@@ -108,7 +108,7 @@ GetHostDpid,mismatch,"static risk rule: a convention, parameter count, or non-po
 GetLocalizedString,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 GetObjectBounds,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetObjectHeight,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
-GetOrderCursor,ambiguous,several definitions share the name
+GetOrderCursor,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetPieceAngles,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetPieceOffset,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"
 GetSessionGuidInstance,mismatch,"definition type not nameable in a header, or no clean cast at the call sites"

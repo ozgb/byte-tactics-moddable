@@ -1803,6 +1803,7 @@ the split lies in.
 | movement | weapons | units, each entity | split | `movement.NewUnitMotion` (step 24) | `weapons.Apply` again, after step 24 |  | by subsystem | 6 | 5 |
 | movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 |  | by item | 1 | 1 |
 | movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 47) | `players.Apply` again, after step 47 | `movement.UpdateMotion` | by item | 1 | 1 |
+| orders | features | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `players.Apply` (step 6) |  | by subsystem | 1 | 1 |
 | orders | map | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `players.Apply` (step 6) |  | by subsystem | 1 | 1 |
 | orders | movement | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `orders.AddBeCarriedOrder` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
 | orders | movement | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 4 | 4 |
@@ -1810,27 +1811,26 @@ the split lies in.
 | orders | scripts | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `scripts.StartScriptWithArgs` (step 5) |  | by subsystem | 2 | 2 |
 | orders | targeting | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 1 | 0 |
 | orders | units | units, each entity | apply before continuing | `orders.OrderOrStatusFlags` (step 4) | the caller |  | by subsystem | 1 | 1 |
-| orders | units | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 3 | 2 |
-| orders | weapons | units, each entity | split | `orders.OrderOrStatusFlags` (step 4) | `players.Apply` (step 6) |  | by subsystem | 2 | 2 |
+| orders | units | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 3 | 3 |
 | orders | weapons | units, each entity | split | `orders.RunOrders` (step 45) | `orders.RunSecondaryOrders` (step 46) | `orders.RunOrders` | by item | 2 | 2 |
 | scripts | map | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 1 | 1 |
 | scripts | movement | units, each entity | split | `scripts.NewUnitScript` (step 18) | `movement.UpdateMotion` (step 47) |  | by item | 1 | 1 |
 | scripts | orders | units, each entity | split | `scripts.NewUnitScript` (step 18) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
 | scripts | orders | units, each entity | split | `scripts.StartScript` (step 2) | `orders.OrderOrStatusFlags` (step 4) |  | by subsystem | 2 | 2 |
 | scripts | units | units, each entity | apply before continuing | `scripts.NewUnitScript` (step 18) | the caller |  | by item | 1 | 1 |
-| scripts | units | units, each entity | apply before continuing | `scripts.StartScript` (step 2) | the caller |  | by subsystem | 1 | 1 |
+| scripts | units | units, each entity | apply before continuing | `scripts.StartScript` (step 2) | the caller |  | by subsystem | 2 | 2 |
 | scripts | weapons | units, each entity | split | `scripts.NewUnitScript` (step 18) | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
-| scripts | weapons | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 12 | 5 |
+| scripts | weapons | units, each entity | split | `scripts.StartScript` (step 2) | `players.Apply` (step 6) |  | by subsystem | 10 | 3 |
 | targeting | orders | units, each entity | split | `players.Apply` (step 6) | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
 | targeting | scripts | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
-| targeting | weapons | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
+| targeting | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller |  | by item | 1 | 1 |
 | units | ai | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
 | units | ai | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 3 | 3 |
 | units | economy | units, each entity | write before calling | the caller, before the first step | `economy.Apply` (step 1) |  | by subsystem | 3 | 3 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 1 | `scripts.StartScript` (step 2) |  | by item | 1 | 1 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 16 | `scripts.StartScript` again, after the write |  | by item | 2 | 2 |
-| units | los_radar | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 8 | 8 |
+| units | los_radar | units, each entity | write before calling | the caller, before the first step | `scripts.StartScript` (step 2) |  | by subsystem | 5 | 5 |
 | units | map | units, each entity | write before calling | the caller, after step 16 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 5 | 5 |
 | units | map | units, each entity | write before calling | the caller, after step 36 | `orders.AddBeCarriedOrder` (step 37) |  | by item | 3 | 3 |
 | units | map | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 5 | 5 |
@@ -1865,17 +1865,13 @@ the split lies in.
 | units | weapons | units, each entity | write before calling | the caller, after step 19 | `economy.UpdateMetalExtraction` (step 23) |  | by item | 1 | 1 |
 | units | weapons | units, each entity | write before calling | the caller, after step 24 | `orders.RunOrders` (step 45) |  | by item | 1 | 1 |
 | units | weapons | units, each entity | write before calling | the caller, after step 1 | `players.Apply` (step 6) |  | by item | 1 | 1 |
-| units | weapons | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 8 | 8 |
+| units | weapons | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 6) |  | by subsystem | 7 | 7 |
 | units | weapons | units, each entity | write before calling | the caller, after step 17 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
 | units | weapons | units, each entity | write before calling | the caller, after step 21 | `weapons.UpdateUnitWeapons` (step 43) |  | by item | 1 | 1 |
 | units | weapons | units, each entity | split | `orders.AddBeCarriedOrder` (step 37) | `players.Apply` again, after step 37 | `orders.AddBeCarriedOrder` | by item | 1 | 1 |
-| weapons | map | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 1 |
-| weapons | movement | units, each entity | split | `players.Apply` (step 6) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 1 | 1 |
-| weapons | orders | units, each entity | split | `players.Apply` (step 6) | `orders.OrderOrStatusFlags` again, after step 6 |  | by subsystem | 7 | 7 |
-| weapons | players | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 1 | 0 |
-| weapons | scripts | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 8 | 8 |
+| weapons | orders | units, each entity | split | `players.Apply` (step 6) | `orders.OrderOrStatusFlags` again, after step 6 |  | by subsystem | 4 | 4 |
 | weapons | targeting | units, each entity | split | `players.Apply` (step 6) | `features.Apply` (step 7) | `players.Apply` | by subsystem | 6 | 6 |
-| weapons | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 8 | 5 |
+| weapons | units | units, each entity | apply before continuing | `players.Apply` (step 6) | the caller | `players.Apply` | by subsystem | 3 | 0 |
 
 ### Phase projectiles
 
@@ -1884,14 +1880,15 @@ the split lies in.
 | features | map | projectiles, each entity | split | `players.Apply` (step 11) | `features.Apply` (step 12) | `players.Apply` | by subsystem | 1 | 0 |
 | features | units | projectiles, each entity | split | `players.Apply` (step 11) | `features.Apply` (step 12) | `players.Apply` | by subsystem | 1 | 1 |
 | features | weapons | projectiles, each entity | apply before continuing | `players.Apply` (step 11) | the caller | `players.Apply` | by subsystem | 2 | 2 |
-| orders | targeting | projectiles, each entity | split | the delivery of a queued effect to a handler of orders (step 31) | `players.Apply` again, after step 31 |  | by item | 1 | 1 |
-| orders | units | projectiles, each entity | split | the delivery of a queued effect to a handler of orders (step 25) | the delivery of a queued effect to a handler of units (step 28) |  | by subsystem | 1 | 1 |
-| orders | weapons | projectiles, each entity | apply before continuing | the delivery of a queued effect to a handler of orders (step 25) | the caller |  | by subsystem | 1 | 1 |
+| orders | movement | projectiles, each entity | split | the delivery of a queued effect to a handler of units (step 9) | the delivery of a queued effect to a handler of units (step 21) |  | by subsystem | 1 | 0 |
+| orders | targeting | projectiles, each entity | split | the delivery of a queued effect to a handler of orders (step 31) | the delivery of a queued effect to a handler of orders (step 37) |  | by item | 1 | 1 |
+| orders | units | projectiles, each entity | split | the delivery of a queued effect to a handler of units (step 9) | the delivery of a queued effect to a handler of units (step 10) |  | by subsystem | 1 | 1 |
 | scripts | weapons | projectiles, each entity | apply before continuing | `scripts.QueryScript` (step 1) | the caller |  | by subsystem | 1 | 1 |
 | targeting | orders | projectiles, each entity | split | `players.Apply` (step 11) | the delivery of a queued effect to a handler of orders (step 31) |  | by item | 1 | 1 |
+| units | orders | projectiles, each entity | split | the delivery of a queued effect to a handler of units (step 21) | the delivery of a queued effect to a handler of orders (step 31) |  | by item | 1 | 1 |
+| units | weapons | projectiles, each entity | split | the delivery of a queued effect to a handler of units (step 21) | the delivery of a queued effect to a handler of units (step 22) |  | by item | 2 | 2 |
 | weapons | los_radar | projectiles, each entity | write before calling | the caller, after step 2 | `los_radar.SoundHeardMask` (step 3) |  | by subsystem | 1 | 1 |
-| weapons | orders | projectiles, each entity | write before calling | the caller, after step 2 | the delivery of a queued effect to a handler of orders (step 25) |  | by subsystem | 3 | 3 |
-| weapons | units | projectiles, each entity | write before calling | the caller, after step 2 | `units.GetGroundHeight` (step 6) |  | by subsystem | 3 | 3 |
+| weapons | orders | projectiles, each entity | write before calling | the caller, after step 2 | the delivery of a queued effect to a handler of units (step 9) |  | by subsystem | 2 | 2 |
 
 ### Phase explosions
 
@@ -1917,10 +1914,6 @@ the split lies in.
 | orders | ai | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by subsystem | 2 | 2 |
 | orders | movement | players, each entity, in `units.CreateUnit` | split | `orders.OrderOrStatusFlags` (step 5) | `movement.NewUnitMotion` (step 24) |  | by subsystem | 1 | 0 |
 | orders | units | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by subsystem | 1 | 0 |
-| players | ai | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 3 | 3 |
-| players | los_radar | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
-| players | targeting | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
-| players | units | players.los, each entity | write before calling | the caller, before the first step | `features.Apply` (step 4) |  | by subsystem | 2 | 2 |
 | units | ai | players, each entity | split | `units.RefreshFactoryIndex` (step 38) | `features.Apply` again, after step 38 |  | by subsystem | 2 | 2 |
 | units | los_radar | players, each entity | split | `units.CreateUnit` (step 47) | `features.Apply` again, after step 47 | `units.CreateUnit` | by item | 2 | 2 |
 | units | map | players, each entity | split | `units.RefreshFactoryIndex` (step 38) | `features.Apply` again, after step 38 |  | by subsystem | 2 | 0 |
@@ -1934,6 +1927,7 @@ the split lies in.
 | features | map | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `players.Apply` (step 4) |  | by subsystem | 3 | 0 |
 | features | units | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `players.Apply` (step 4) |  | by subsystem | 1 | 1 |
 | features | weapons | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `players.Apply` (step 4) |  | by subsystem | 1 | 1 |
+| units | weapons | features.anim, each entity of loop 2 | split | the delivery of a queued effect to a handler of units (step 14) | the delivery of a queued effect to a handler of units (step 15) |  | by item | 1 | 0 |
 
 ### Phase tail
 
@@ -1952,17 +1946,17 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 |---|---|---|---|---|---|---|---|
 | wind_meteors | 0 / 0 | 0 / 0 | 0 / 10 | 8 / 0 | 0 | 0 | 0 |
 | economy | 0 / 0 | 1 / 1 | 1 / 2 | 7 / 13 | 39 | 3 | 41 |
-| features | 1 / 0 | 5 / 5 | 1 / 0 | 7 / 11 | 15 | 2 | 17 |
-| ai | 0 / 0 | 2 / 0 | 1 / 2 | 9 / 10 | 0 | 21 | 21 |
+| features | 1 / 0 | 5 / 5 | 1 / 0 | 7 / 11 | 15 | 3 | 18 |
+| ai | 0 / 0 | 2 / 0 | 1 / 2 | 9 / 10 | 0 | 18 | 18 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 2 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 3 | 1 / 1 | 11 / 10 | 42 | 59 | 101 |
-| targeting | 1 / 0 | 3 / 4 | 1 / 0 | 8 / 13 | 4 | 33 | 37 |
-| los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 11 | 11 | 31 | 41 |
-| orders | 3 / 0 | 21 / 1 | 18 / 6 | 32 / 1 | 25 | 59 | 84 |
-| units | 3 / 1 | 3 / 12 | 25 / 14 | 13 / 10 | 136 | 47 | 183 |
-| players | 1 / 0 | 3 / 0 | 12 / 0 | 11 / 10 | 10 | 13 | 21 |
-| map | 0 / 4 | 3 / 8 | 1 / 0 | 7 / 14 | 16 | 33 | 49 |
-| scripts | 0 / 0 | 1 / 9 | 0 / 15 | 0 / 8 | 21 | 33 | 54 |
+| weapons | 0 / 2 | 10 / 3 | 1 / 1 | 11 / 10 | 19 | 55 | 74 |
+| targeting | 1 / 0 | 3 / 4 | 1 / 0 | 8 / 13 | 4 | 31 | 35 |
+| los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 11 | 11 | 26 | 36 |
+| orders | 3 / 0 | 21 / 1 | 18 / 6 | 32 / 1 | 24 | 56 | 80 |
+| units | 3 / 1 | 3 / 12 | 25 / 14 | 13 / 10 | 136 | 39 | 175 |
+| players | 1 / 0 | 3 / 0 | 12 / 0 | 11 / 10 | 1 | 12 | 11 |
+| map | 0 / 4 | 3 / 8 | 1 / 0 | 7 / 14 | 16 | 32 | 48 |
+| scripts | 0 / 0 | 1 / 9 | 0 / 15 | 0 / 8 | 20 | 25 | 45 |
 | movement | 0 / 3 | 3 / 0 | 6 / 12 | 12 / 13 | 48 | 33 | 81 |
 
 ## Limits

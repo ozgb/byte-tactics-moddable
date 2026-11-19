@@ -90,6 +90,8 @@ int GetTicks();
 #include "../frontend/multi.h"
 #include "../units/unit_position.h"
 #include "../units/unit_targets.h"
+#include "wire_packets.h"
+#include "../game/weapons_events.h"
 #include "../map/features.h"
 #include "../map/line_of_sight.h"
 #include "../ingame/control_panel.h"
@@ -2543,7 +2545,14 @@ int HandleNetPackets()
             ApplyAttachUnit((OrderView *)packet);
             break;
         case 11:
-            ApplyUnitDamage((UnitDamagePacket *)packet);
+            {
+                const UnitDamagePacketOut* damage = (const UnitDamagePacketOut*)packet;
+                unsigned short victim = (unsigned short)damage->victimId;
+                unsigned short attacker = (unsigned short)damage->attackerId;
+                WeaponsPublishRemoteDamage(SCHED_ENGINE, victim == 0 ? 0 : &g_game->units[victim],
+                                           attacker == 0 ? 0 : &g_game->units[attacker],
+                                           (unsigned short)damage->amount, damage->damageKind, damage->headingByte);
+            }
             break;
         case 12:
             ApplyUnitDeath((UnitKilledPacket *)packet, 0);

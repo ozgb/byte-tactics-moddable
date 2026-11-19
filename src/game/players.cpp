@@ -581,7 +581,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
                                 } while (--inner != 0);
                                 zacc += hh;
                             } while (--outer != 0);
-                            if (hits >= 9 && (short)g_seams.weapons->FindFeatureAtPos(&pos, 0, 0) == -1) {
+                            if (hits >= 9 && (short)g_seams.features->FindFeatureAtPos(&pos, 0, 0) == -1) {
                                 if (g_game->net->lavaWorld == 0)
                                     break;
                                 if (g_seams.map->GetCellMeanHeight(&pos) >

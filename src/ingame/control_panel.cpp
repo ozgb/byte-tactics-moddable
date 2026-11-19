@@ -102,6 +102,7 @@ void __stdcall SetGadgetActive(Gui* menu, int index, char value);
 #include "../files/files_api.h"
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
 #include "../network/net_game.h"
+#include "../game/weapons_events.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {
@@ -1015,7 +1016,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         unit->buildLeft = next;
         unit->flags |= 0x2000;
         if (next >= 1.0f)
-            g_seams.weapons->DamageUnit(unit, unit, 30000, 9, 0);
+            WeaponsPublishDamage(SCHED_ENGINE, unit, unit, 30000, 9, 0);
     } else if (EconRequestEnergyAndMetal(SCHED_UNITS, builder, energyCharge, metalCharge)) {
         unit->health = min(hp + unit->health, ((UnitDef*)unit->def.get())->maxHealth);
         unit->buildLeft = next;
@@ -1055,7 +1056,7 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
     if (n2 >= 1)
         n2 = 1;
     if (EconRequestEnergy(SCHED_UNITS, builder, (float)n2)) {
-        g_seams.weapons->DamageUnit(builder, unit, n1, 10, 0);
+        WeaponsPublishDamage(SCHED_ENGINE, builder, unit, n1, 10, 0);
         result = 1;
     }
     return result;

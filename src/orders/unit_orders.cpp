@@ -118,6 +118,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
 #include "../game/targeting_events.h"
+#include "../game/weapons_events.h"
 #include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
@@ -217,9 +218,9 @@ int __stdcall SelfDestructOrder(Unit* unit, Order* order, int flags)
                     order->flags|=2; return 1;
                 }
             }
-            g_seams.weapons->DamageUnit(unit,unit,30000,3,0);
+            WeaponsPublishDamage(SCHED_ORDERS, unit,unit,30000,3,0);
         }
-    } else g_seams.weapons->DamageUnit(unit,unit,30000,3,0);
+    } else WeaponsPublishDamage(SCHED_ORDERS, unit,unit,30000,3,0);
     return 5;
 }
 
@@ -233,12 +234,12 @@ int __stdcall AttackNoMoveOrder(Unit* unit, Order* order, int flags)
         order->AnnounceStatusIfFlagged(SIM_SPEECH_KIND_TEXT);
         return 1;
     case 1:
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         order->flags = 0x11808;
         return 1;
     case 2:
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         return 9;
     default:
         return 7;
@@ -254,7 +255,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
     }
     switch (order->state) {
     case 0:
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->SetDeadlineTicks(0x1e);
         return 1;
     case 1: {
@@ -262,7 +263,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         Unit* t = order->target;
         if (t != 0 && (t->flags & 0x10000000)) {
             order->pos = t->pos;
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->wait = 0;
             order->waitLimit = RandomInt(3) + 3;
@@ -315,7 +316,7 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
         if (!(order->target->def->flags1Byte & 0x40))
             return 7;
         if (order->target->buildLeft == 0.0f && (unit->activateFlags & 1)) {
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             return 1;
         }
         return 8;
@@ -364,7 +365,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             float refund = (unsigned int)((1.0f - order->target->buildLeft) * order->target->def->metalCost);
             EconPublish(SCHED_ORDERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
             g_seams.units->FinishConstruction(unit, order->target);
-            g_seams.weapons->DamageUnit(unit, order->target, 30000, 9, 0);
+            WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, 30000, 9, 0);
         }
         g_seams.units->SetStateBits(unit, 9, 0);
         RecordBuildMenuUpdate(unit);
@@ -506,7 +507,7 @@ int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
     }
     if (order->ticks > 0x708)
         order->ticks = 0x708;
-    g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+    WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
     for (char i = 0; i < 3; i++)
         TargetingPublishClear(SCHED_ORDERS, unit, i);
     order->SetAttachedFx(0);
@@ -553,7 +554,7 @@ int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
     state = order->state;
     switch (state) {
     case 0:
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         order->SetDeadlineTicks(300);
         order->Wait();
         return 1;
@@ -583,7 +584,7 @@ int __stdcall BeCarriedOrder(Unit* unit, Order* order, int unused)
     }
     switch (order->state) {
     case 0:
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         return 1;
     case 1:
         order->SetDeadlineTicks(10);
@@ -738,7 +739,7 @@ int __stdcall PatrolOrder(Unit* unit, Order* order, int flags)
         EnsurePatrolReturnOrder(unit,order);
         order->SetDeadlineTicks(1); return 1;
     case 1:
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->AttachApproachRadiusGoal(&order->pos,0);
         order->SetDeadlineTicks(15);
         order->flags|=0xe0; return 1;
@@ -800,8 +801,8 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
         order->SetAttachedFx(0);
         if (flags & 0x3000) return 1;
         if (!g_seams.weapons->WeaponCanReachUnit(unit, order->target, weapon)) return 1;
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 2);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 2);
         TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, weapon);
         order->flags = 0x13808;
         return 2;
@@ -846,14 +847,14 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
     case 3:
         if (flags & 0x40e0) { order->state = 1; return 4; }
         if (g_seams.weapons->WeaponCanReachUnit(unit, order->target, weapon)) {
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 2);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 2);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, weapon);
             order->flags = 0x148e8;
             order->SetDeadlineTicks(30);
             return 2;
         }
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->flags = 0x100e8;
         order->SetDeadlineTicks(30);
         return 2;
@@ -873,17 +874,17 @@ int __stdcall SuppressOrder(Unit* unit,Order* order,unsigned flags)
         order->radius=g_seams.weapons->GetWeaponRange(unit,(unsigned char)order->weapon); return 1;
     case 1:
         if(order->weapon==2) {
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,2);
             order->flags=0x1c00; return 1;
         }
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 0);
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 1);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 1);
         TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,0);
         TargetingPublishSetPos(SCHED_ORDERS, unit,&order->pos,1);
         order->flags=0x1c00; return 1;
     case 2:
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         if(flags&0x400) { order->state=1; return 6; }
         if(unit->motion) {
             if(order->radius<=0) return 9;
@@ -951,7 +952,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         int experience = 0;
         experience = order->link.Get()->killCount;
         order->duration = ((experience / 5 + 10) * order->duration * 10) / 100;
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         order->AttachBuildFootprintMarker(order->link.Get()->cell, order->link.Get()->footprint);
         order->flags = 0x100e8;
         return 1;
@@ -1034,7 +1035,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
                 return 8;
             }
             order->AnnounceStatusIfFlagged(SIM_SPEECH_RECLAIMING);
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             return 1;
         }
         RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
@@ -1064,7 +1065,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         int square = SquaredDistance(delta.x, delta.z);
         if (square <= range * range && g_seams.units->CanReclaim(unit, 0, order->link.Get())) {
             if (order->duration >= 15) {
-                g_seams.weapons->DamageUnit(unit, order->link.Get(), order->elapsed, 5, 0);
+                WeaponsPublishDamage(SCHED_ORDERS, unit, order->link.Get(), order->elapsed, 5, 0);
                 order->duration = 0;
             }
             unit->workTime = g_game->ticks + 900;
@@ -1126,7 +1127,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
             order->flags |= 0xe8;
             return 2;
         }
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angles.heading);
         return 1;
     }
@@ -1178,7 +1179,7 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
     case 0:
         if (!(unit->def->flags1Byte & 0x40)) return 7;
         if (target->buildLeft == kZeroFloatOrders && (unit->activateFlags & 1)) {
-            g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+            WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
             return 1;
         }
         return 8;
@@ -1233,7 +1234,7 @@ int __stdcall StandbyOrder(Unit* unit,Order* order,int flags)
     switch(state) {
     case 0:
         if(!unit->motion) return 7;
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->flags|=0x10000;
         order->SetDeadlineTicks(1); return 1;
     case 1:
@@ -1253,7 +1254,7 @@ int __stdcall StandbyMineOrder(Unit* unit, Order* order, int unused)
     switch (order->state) {
     case 0:
         if (!(unit->flags & 0x20000000)) return 7;
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->flags |= 0x10000;
         order->SetDeadlineTicks(1);
         return 1;
@@ -1470,7 +1471,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
             return 8;
         }
         if (target->buildLeft == 0.0f) return 5;
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angles.heading);
         RecordSelectionOrdersDirty(unit);
         return 1;
@@ -1664,7 +1665,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             order->SetDeadlineTicks(30);
             return 2;
         }
-        g_seams.weapons->ClaimWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
         g_seams.map->SnapWorldPosToFootprint(def, &order->pos);
         g_seams.units->UnitRefSetUnit((UnitRef*)((char*)order + 0x12),
             g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
@@ -1717,7 +1718,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
 {
     Point16 cell;
     Point16 size;
-    unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
+    unsigned short index = g_seams.features->FindFeatureAtPos(&order->pos, &cell, &size);
     if (index == 0xffff) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
         return 8;
@@ -1869,7 +1870,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
     switch(state) {
     case 0: {
         order->AnnounceStatusIfFlagged(SIM_SPEECH_GUARDING);
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         order->approachRadius=(unit->footprint.x + order->target->footprint.x + 2) << 4;
         int distance=order->approachRadius << 16;
         short angle=RandomInt(0x10000);
@@ -1964,7 +1965,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
     Point16 size;
     Feature* f = &g_game->features[0xffff];
     if (order->state <= 5) {
-        unsigned short index = g_seams.weapons->FindFeatureAtPos(&order->pos, &cell, &size);
+        unsigned short index = g_seams.features->FindFeatureAtPos(&order->pos, &cell, &size);
         if (index == 0xffff) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_RESURRECTION_FAILED);
             return 8;

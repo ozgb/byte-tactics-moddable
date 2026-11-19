@@ -69,6 +69,7 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 #pragma pack(pop)
 
 #include "order.h"
+#include "../game/weapons_events.h"
 extern int __cdecl _strcmpi(const char*, const char*);
 
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
@@ -376,7 +377,7 @@ Order::~Order()
         }
     }
     if (!(flags_42 & 0x10000)) {
-        g_seams.weapons->ReleaseWeapons((Unit*)unit, 0, 3);
+        WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
     }
     g_seams.units->UnitRefUnlink((UnitRef*)&link);
 }

@@ -3,5 +3,6 @@
 
 void OrdersOnWeaponsAttacked(const void* event);
 void OrdersOnWeaponsHit(const void* event);
+void OrdersOnWeaponsParalyze(const void* event);
 
 #endif

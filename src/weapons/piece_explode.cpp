@@ -1,4 +1,3 @@
-
 #include "../util/vec3.h"
 
 #pragma pack(push, 1)
@@ -28,15 +27,15 @@ struct ExplodedPieceInit {
 #include "../../interfaces/seams.h"
 #include "../util/math.h"
 #include "explosions.h"
-#include "../scripts/unit_script.h"
+#include "piece_explode.h"
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
 
 // FUNCTION: 0x481140
-void UnitScript::ExplodePiece(int a, unsigned int b)
+void __stdcall ExplodeUnitPiece(Unit* unit, int a, unsigned int b)
 {
     if (!(b & 0x20)) {
         ExplodedPieceInit h;
-        h.obj = state->unit;
+        h.obj = unit;
         h.index = a;
         h.r1 = RandomInt(3000);
         h.r2 = RandomInt(3000);
@@ -60,7 +59,7 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
     }
     if (b & 0x3f00) {
         Vec3 v;
-        v = g_seams.scripts->GetPiecePosition(state->unit, a);
+        v = g_seams.scripts->GetPiecePosition(unit, a);
         if (b & 0x100)
             AddExplosionEffect(&v, g_game->sources[0], 2, 0);
         if (b & 0x200)
@@ -75,9 +74,3 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
             AddExplosionEffect(&v, g_game->sources[5], 2, 0);
     }
 }
-
-// FUNCTION: 0x4b1eb0
-void CobScript::ExplodePiece(int, unsigned int)
-{
-}
-

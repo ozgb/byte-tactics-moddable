@@ -44,16 +44,6 @@ struct MotionRangeView {
 
 #include "weapon_def.h"
 
-union NetDirtyFlagBits {
-    unsigned short value;
-    struct {
-        unsigned short b0 : 1, b1 : 1, b2 : 1, b3 : 1;
-        unsigned short b4 : 1, b5 : 1, b6 : 1, b7 : 1;
-        unsigned short b8 : 1, b9 : 1, b10 : 1, b11 : 1;
-        unsigned short b12 : 1, b13 : 1, b14 : 1, b15 : 1;
-    } f;
-};
-
 struct ReachUnitVec3 {
     int x;
     Fixed y;
@@ -147,7 +137,7 @@ void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src)
     short angle = src->fireHeading - obj->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    g_seams.scripts->StartScriptWithArgs(obj->anims, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(obj, "RockUnit", 0, 0, 2, b, a, 0, 0);
 }
 
 
@@ -192,8 +182,7 @@ struct DamageScaleFlags {
 #pragma pack(pop)
 
 short __cdecl AngleOfVector(int x, int z);
-void __stdcall DamageUnit(Unit* source, Unit* target,
-                            int amount, int type, unsigned short extra);
+#include "damage.h"
 
 static inline int* FindDamageValue(DamageTable* table, char* name)
 {
@@ -800,7 +789,7 @@ void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
             if (unit->weapons[i].weapon == shot)
                 break;
         proj->piece = (short)QueryWeaponPiece((Object *)unit, i);
-        unit->workTime = g_game->ticks + 0x258;
+        WeaponsPublishBusy(unit, g_game->ticks + 0x258);
     } else {
         proj->owner = 0xa;
         proj->attacker = 0;
@@ -913,11 +902,11 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     proj->targetUnitPtr = (Unit*)param_5;
 
     proj->active = fire->weapon->burst;
-    g_seams.scripts->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(fire->flags >> 2) & 3], 0, 0);
+    WeaponsPublishStartScript(unit, g_fireScriptNames[(fire->flags >> 2) & 3], 0, 0);
     short angle = unit->weapons[(fire->flags >> 2) & 3].fireHeading - unit->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->weapon->flags.b.startSmoke)
         RecordWeaponSmoke(*p3, 9);
@@ -964,11 +953,11 @@ int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
     proj->targetUnitPtr = (Unit*)param_5;
     proj->interceptedProjectile = (Projectile*)param_6;
     proj->active = shot->weapon->burst;
-    g_seams.scripts->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+    WeaponsPublishStartScript(unit, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
     short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
     if (shot->weapon->flags.b.startSmoke)
         RecordWeaponSmoke(*pos, 9);
     return 1;
@@ -1007,11 +996,11 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         }
         proj->active = shot->weapon->burst;
         proj->targetUnitPtr = (Unit*)param_5;
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+        WeaponsPublishStartScript(unit, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
         int a = -ScaledSin((short)angle, 800);
         int b = -ScaledCos((short)angle, 800);
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "RockUnit", 0, 0, 2, b, a, 0, 0);
+        WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
         if (shot->weapon->flags.b.startSmoke)
             RecordWeaponSmoke(*pos, 9);
         return 1;
@@ -1257,7 +1246,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
         }
         if (!ok) {
             unit->flags &= 0xfe;
-            ((NetDirtyFlagBits*)&fire->netDirtyFlags)->f.b12 = 1;
+            WeaponsPublishNotice(fire, 0x1000);
             return 0;
         }
         if (!AimWithinTolerance(fire, unit, heading, pitch)) {
@@ -1508,7 +1497,7 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
         if (s->weapon->reloadTime > frame.maxTime)
             frame.maxTime = s->weapon->reloadTime;
     }
-    g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }
 
 void __stdcall SubtractVec3(Vec3* a, Vec3* b, int* dx, int* dy, int* dz);
@@ -1567,7 +1556,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->firePitch = angle;
                     e->fireHeading = heading;
                     e->aimCob.nAimCobDone = 0;
-                    g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2,
+                    WeaponsPublishStartScriptWithArgs(unit, g_aimScriptNames[(e->flags >> 2) & 3], Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2,
                                                heading, angle, 0, 0);
                     g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
@@ -1577,7 +1566,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             bool armed = attached->flags.b.vLaunch;
             if (armed && (!attached->flags.b.stockpile || e->stockpile) && !(e->flags & 1)) {
                 e->aimCob.nAimCobDone = 0;
-                g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2, 0, 0,
+                WeaponsPublishStartScriptWithArgs(unit, g_aimScriptNames[(e->flags >> 2) & 3], Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2, 0, 0,
                                            0, 0);
                 g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;
@@ -1612,11 +1601,11 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 e->reloadTimer = (short)((BT_REPLAY_INJECT_RELOAD_BASE - q) * (pct * attached->reloadTime / 100) / 100);
             }
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
-            *(unsigned short*)&unit->netDirtyFlags |= m;
+            WeaponsPublishNotice(unit, m);
             if (!attached->flags.b.stockpile)
                 EconSpend(unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
         } else {
-            ((unsigned char*)&unit->netDirtyFlags)[1] |= 0x10;
+            WeaponsPublishNotice(unit, 0x1000);
         }
     }
 }

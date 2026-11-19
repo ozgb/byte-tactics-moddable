@@ -16,7 +16,7 @@ void AiInbox(const void* event)
 
 void AiOnWeaponsAttacked(const void* event)
 {
-    const WeaponsEffect* effect = static_cast<const WeaponsEffect*>(event);
+    const WeaponsEvent* effect = static_cast<const WeaponsEvent*>(event);
     AiEvent e;
     memset(&e, 0, sizeof(e));
     e.kind = AI_REACT_TO_ATTACK;

@@ -52,6 +52,7 @@ void __stdcall RemoveAllFeatures(void);
 void __stdcall SaveFeatures(HapiBank* file);
 
 Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
+unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
 int __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
 int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon);
 int __stdcall RemoveFeature(Cell* cell, int flag);

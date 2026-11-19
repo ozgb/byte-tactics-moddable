@@ -16,7 +16,10 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
+#include "mission_type.h"
 #include "weapons_effects.h"
+
+#include "../../link/globals.h"
 
 static const float kZeroFloat = 0.0f;
 
@@ -29,7 +32,7 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 void OrdersOnWeaponsAttacked(const void* event)
 {
-    const WeaponsEffect* e = static_cast<const WeaponsEffect*>(event);
+    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
         return;
@@ -58,9 +61,24 @@ void OrdersOnWeaponsAttacked(const void* event)
 
 void OrdersOnWeaponsHit(const void* event)
 {
-    const WeaponsEffect* e = static_cast<const WeaponsEffect*>(event);
+    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
         return;
     unit->netDirtyFlags |= (e->value > e->extra * 2) ? 0x4000 : 0x2000;
+}
+
+void OrdersOnWeaponsParalyze(const void* event)
+{
+    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
+    Unit* unit = UnitOfOffset(e->unit);
+    if (unit == nullptr)
+        return;
+    MissionType kind = g_seams.orders->MissionTypeFromName(g_paralyzeMissionName);
+    Order* first = unit->list;
+    if (first && first->kind == kind) {
+        first->ticks += e->value;
+        return;
+    }
+    g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, 0, 0, e->value, 0, 0));
 }

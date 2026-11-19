@@ -110,6 +110,7 @@ void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src)
 #include "../util/math.h"
 int __stdcall StepGafSequence(GafRef* ref);
 #include "../../interfaces/seams.h"
+#include "../game/weapons_events.h"
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);
 #include "explosions.h"
@@ -610,10 +611,8 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
 void __stdcall StartExplodePiece(ExplodedPiece* piece)
 {
     Unit* obj = piece->unit;
-    if (!g_quirks.renderPoseReads)
-        g_seams.scripts->PoseUnitModel(obj);
+    WeaponsPublishDetachPiece(obj, piece->index, !g_quirks.renderPoseReads);
     PieceRec* rec = (PieceRec*)((char*)obj->state.get() + 0x22 + piece->index * 0x36);
-    rec->flags &= 0xfffe;
     if (piece->b2) {
         BreakPieceIntoDebris(piece);
         return;
@@ -749,25 +748,19 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
     }
 }
 
-// FUNCTION: 0x421da0
-unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
+void CountExplosionTables(unsigned int* explosions, unsigned int* debris, unsigned int* pieces)
 {
-    Point16 c;
-    c.x = (short)(pos->x >> 20);
-    c.y = (short)(pos->z >> 20);
-    Cell* p = g_seams.los_radar->GetMapCell(c.x, c.y);
-    if (p == 0)
-        return 0xffff;
-    if (p->feature == 0xfffe) {
-        c.x -= p->offsetX;
-        c.y -= p->offsetY;
-        p = g_seams.los_radar->GetMapCell(c.x, c.y);
+    DebrisView* entries = (DebrisView*)(&g_game->count_1491b + 1);
+    *explosions = 0;
+    *debris = 0;
+    for (int i = 0; i < g_game->count_1491b; i++) {
+        if (!entries[i].obj)
+            ++*explosions;
+        else
+            ++*debris;
     }
-    if (p->feature >= 0xfffb)
-        return 0xffff;
-    if (cell)
-        *cell = c;
-    if (size)
-        *size = g_game->features[p->feature].footprint;
-    return p->feature;
+    *pieces = 0;
+    for (int i = 0; i < 100; i++)
+        if (g_explodedPieces[i] != 0)
+            ++*pieces;
 }

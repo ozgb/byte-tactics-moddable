@@ -1072,16 +1072,40 @@ class Splits:
                                     stack + (n.slot,), loose)
                 if found:
                     return found
+        if direct:
+            for i in writes:
+                n = steps[i]
+                key = ("delivery", n.label)
+                if n.kind == "direct" and n.delivery and i in reads and key not in stack:
+                    found = self.locate("%s, in %s" % (where, code(n.label)), self.delivery_steps(n), n.sub, writer,
+                                        reader, item, stack + (key,), loose, direct=True)
+                    if found:
+                        return found
         return None
 
+    def delivery_steps(self, step: Node) -> list:
+        """The steps of a route table handler that a delivery calls."""
+        key = ("delivery", step.label, step.sub)
+        if key not in self.lists:
+            steps: list = []
+            for g in self.program.lookup(step.label):
+                steps += self.program.expand(g, step.sub)
+            self.lists[key] = steps
+        return self.lists[key]
+
     def direct_hits(self, step: Node, who: str, item: str, match, write: bool) -> bool:
-        """Whether a call outside an interface is the writer's write (or the reader's read) of the item."""
+        """Whether a call outside an interface, or a delivery and the entry points its handler calls, is the writer's write
+        (or the reader's read) of the item."""
         key = ("direct", step.label, step.sub, who, item if match is not None else "", write)
         if key not in self.memo:
             own: set = set()
             for g in self.program.lookup(step.label):
                 self.program.expand(g, step.sub, own=own)
-            self.memo[key] = self.hits(step.sub, own, who, match, write)
+            found = self.hits(step.sub, own, who, match, write)
+            if step.delivery and not found:
+                found = any(self.reach(n.slot, who, item, match, write)
+                            for n in self.delivery_steps(step) if n.kind == "entry")
+            self.memo[key] = found
         return self.memo[key]
 
     def splits_inside(self, step: Node, writer: str, reader: str, item: str, stack: tuple, loose: bool) -> bool:

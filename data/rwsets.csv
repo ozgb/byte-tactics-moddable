@@ -416,6 +416,7 @@ address,function,file,kind,target
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,EconRequestEnergyAndMetal
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
+0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,WeaponsPublishAddStockpile
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,operator WeaponDef *
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::progress
@@ -428,7 +429,6 @@ address,function,file,kind,target
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,WeaponDef::reloadTime
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_write,Order::count
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_write,Order::progress
-0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_write,UnitWeaponSlot::stockpile
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,function,
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,call,Order::SetAttachedFx
 0x402d10,ParalyzeOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
@@ -62909,6 +62909,7 @@ address,function,file,kind,target
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_maybe_written,Game::weapons
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,Unit::id
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::flags
+,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::stockpile
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,WeaponsEvent::args
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,WeaponsEvent::callback
 ,WeaponsApply,src/weapons/weapons_apply.cpp,field_read,WeaponsEvent::extra
@@ -62965,6 +62966,10 @@ address,function,file,kind,target
 ,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_write,WeaponsEvent::value
 ,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,field_write,WeaponsEvent::vel
 ,WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,function,
+,WeaponsPublishAddStockpile,src/game/weapons_events.h,call,SchedPublish
+,WeaponsPublishAddStockpile,src/game/weapons_events.h,call,WeaponsEventOf
+,WeaponsPublishAddStockpile,src/game/weapons_events.h,field_write,WeaponsEvent::value
+,WeaponsPublishAddStockpile,src/game/weapons_events.h,function,
 ,WeaponsPublishClaim,src/game/weapons_events.h,call,SchedPublish
 ,WeaponsPublishClaim,src/game/weapons_events.h,call,WeaponsEventOf
 ,WeaponsPublishClaim,src/game/weapons_events.h,field_write,WeaponsEvent::value

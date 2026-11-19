@@ -1509,7 +1509,7 @@ game,weapons,shared_write,WeaponsEvent::args,1
 game,weapons,shared_write,WeaponsEvent::extra,1
 game,weapons,shared_write,WeaponsEvent::kind,2
 game,weapons,shared_write,WeaponsEvent::target,1
-game,weapons,shared_write,WeaponsEvent::value,2
+game,weapons,shared_write,WeaponsEvent::value,3
 game,wind_meteors,indirect,EmptyShutdownPreCleanup,1
 game,wind_meteors,indirect,InitMeteors,1
 game,wind_meteors,indirect,LoadMeteors,1
@@ -3246,7 +3246,6 @@ orders,los_radar,shared_write,Ref<Unit>::offset,2
 orders,los_radar,shared_write,Unit::buildLeft,1
 orders,los_radar,shared_write,Unit::flags,9
 orders,los_radar,shared_write,Unit::workTime,1
-orders,los_radar,shared_write,UnitWeaponSlot::stockpile,1
 orders,los_radar,shared_write,Vec3::x,16
 orders,los_radar,shared_write,Vec3::y,13
 orders,los_radar,shared_write,Vec3::z,16
@@ -3303,7 +3302,6 @@ orders,network,shared_write,Unit::angles,2
 orders,network,shared_write,Unit::buildLeft,1
 orders,network,shared_write,Unit::flags,3
 orders,network,shared_write,Unit::health,1
-orders,network,shared_write,UnitWeaponSlot::stockpile,1
 orders,pathfinding,shared_write,Point16::x,9
 orders,pathfinding,shared_write,Point16::y,9
 orders,platform,call,GetHeadingBetween,20
@@ -3348,7 +3346,6 @@ orders,presentation,shared_write,Unit::flags,30
 orders,presentation,shared_write,Unit::group,5
 orders,presentation,shared_write,Unit::health,3
 orders,presentation,shared_write,Unit::moveOrder,1
-orders,presentation,shared_write,UnitWeaponSlot::stockpile,1
 orders,presentation,shared_write,Vec3::x,42
 orders,presentation,shared_write,Vec3::y,43
 orders,presentation,shared_write,Vec3::z,41
@@ -3427,16 +3424,15 @@ orders,units,shared_write,Unit::health,12
 orders,units,shared_write,Unit::moveOrder,1
 orders,units,shared_write,Unit::netDirtyFlags,5
 orders,units,shared_write,Unit::workTime,4
-orders,units,shared_write,UnitWeaponSlot::stockpile,2
 orders,units,shared_write,Vec3::x,6
 orders,units,shared_write,Vec3::y,6
 orders,units,shared_write,Vec3::z,6
+orders,weapons,call,WeaponsPublishAddStockpile,1
 orders,weapons,indirect,WeaponCanReachUnit,6
 orders,weapons,shared_write,Fixed::value,7
 orders,weapons,shared_write,Ref<Unit>::offset,1
 orders,weapons,shared_write,Unit::flags,6
 orders,weapons,shared_write,Unit::health,3
-orders,weapons,shared_write,UnitWeaponSlot::stockpile,5
 orders,weapons,shared_write,Vec3::x,27
 orders,weapons,shared_write,Vec3::y,28
 orders,weapons,shared_write,Vec3::z,28
@@ -5885,7 +5881,7 @@ seams,weapons,shared_write,Vec3::y,28
 seams,weapons,shared_write,Vec3::z,28
 seams,weapons,shared_write,WeaponsEvent::extra,1
 seams,weapons,shared_write,WeaponsEvent::pos,1
-seams,weapons,shared_write,WeaponsEvent::value,2
+seams,weapons,shared_write,WeaponsEvent::value,3
 seams,weapons,shared_write,WeaponsEvent::vel,1
 seams,wind_meteors,indirect,WindMeteorsApply,1
 seams,wind_meteors,shared_write,Point16::x,5
@@ -6727,9 +6723,10 @@ weapons,game,call,RecordSmoke,1
 weapons,game,call,RecordSoundAt,3
 weapons,game,call,RecordWeaponSmoke,3
 weapons,game,call,RecordWhiteSmoke,2
-weapons,game,call,SchedPublish,1
+weapons,game,call,SchedPublish,2
 weapons,game,call,SimAllocTagged,2
 weapons,game,call,StepGafSequence,1
+weapons,game,call,WeaponsEventOf,1
 weapons,game,call,WeaponsPublishDamageRecord,1
 weapons,game,call,WeaponsPublishHealth,1
 weapons,game,call,WeaponsPublishMarkDamaged,1
@@ -6739,10 +6736,12 @@ weapons,game,shared_write,Ref<Unit>::offset,4
 weapons,game,shared_write,Vec3::x,4
 weapons,game,shared_write,Vec3::y,2
 weapons,game,shared_write,Vec3::z,4
+weapons,game,shared_write,WeaponsEvent::value,9
 weapons,harness,shared_write,FeaturesEvent::value,1
 weapons,harness,shared_write,Vec3::x,2
 weapons,harness,shared_write,Vec3::y,1
 weapons,harness,shared_write,Vec3::z,2
+weapons,harness,shared_write,WeaponsEvent::value,1
 weapons,harness,shared_write,g_explodedPieces,1
 weapons,los_radar,indirect,GetMapCell,1
 weapons,los_radar,indirect,GetMapCellAtPosition,3
@@ -6810,6 +6809,7 @@ weapons,orders,shared_write,WeaponDef::energyPerShot,1
 weapons,orders,shared_write,WeaponDef::metalPerShot,1
 weapons,orders,shared_write,WeaponDef::range,7
 weapons,orders,shared_write,WeaponDef::reloadTime,2
+weapons,orders,shared_write,WeaponsEvent::value,2
 weapons,platform,call,AllocHandle,1
 weapons,platform,call,BindModelTextures,1
 weapons,platform,call,BuildDataPath,2
@@ -6919,6 +6919,7 @@ weapons,scripts,shared_write,Ref<Unit>::offset,1
 weapons,scripts,shared_write,Vec3::x,7
 weapons,scripts,shared_write,Vec3::y,7
 weapons,scripts,shared_write,Vec3::z,7
+weapons,scripts,shared_write,WeaponsEvent::value,2
 weapons,seams,call,ScheduleTargetingTargetPos,1
 weapons,seams,call,ScheduleTargetingTargetUnit,1
 weapons,seams,indirect,GetCellMeanHeightNative,2
@@ -6929,6 +6930,7 @@ weapons,seams,shared_write,Ref<Unit>::offset,8
 weapons,seams,shared_write,Vec3::x,1
 weapons,seams,shared_write,Vec3::y,1
 weapons,seams,shared_write,Vec3::z,1
+weapons,seams,shared_write,WeaponsEvent::value,3
 weapons,targeting,shared_write,Ref<Unit>::offset,2
 weapons,targeting,shared_write,UnitWeaponSlot::flags,2
 weapons,targeting,shared_write,UnitWeaponSlot::weapon,1
@@ -6953,6 +6955,7 @@ weapons,units,shared_write,Vec3::y,6
 weapons,units,shared_write,Vec3::z,6
 weapons,units,shared_write,WeaponAimCobCb::nAimCobDone,1
 weapons,units,shared_write,WeaponDef::index,1
+weapons,units,shared_write,WeaponsEvent::value,4
 weapons,wind_meteors,shared_write,Vec3::x,1
 weapons,wind_meteors,shared_write,Vec3::y,1
 weapons,wind_meteors,shared_write,Vec3::z,1

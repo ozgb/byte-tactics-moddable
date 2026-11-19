@@ -225,9 +225,9 @@ delivers it.
 | weapons DAMAGE to features | synchronous | As before (the gate, `docs/features-interface.md`, section 8). |
 | weapons CLEAR to targeting | synchronous | As before (the gate, `docs/targeting-interface.md`, section 8). |
 
-**The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 101 rows of class `immediate` with weapons as
-writer or reader. Each pair is served as follows (the access log attributes the writes of units' handlers of weapons'
-effects to weapons, which publishes them):
+**The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 74 rows of class `immediate` with weapons as
+writer or reader, from access logs recorded on this change. The writes of units' handlers of weapons' effects (health,
+flags, attacker, the damage record, the notice bits) are units' in them. Each pair is served as follows:
 
 | Writer → reader | Items | Phase | How it is served |
 |---|---|---|---|
@@ -235,18 +235,15 @@ effects to weapons, which publishes them):
 | features → weapons | `FeatureAnimEntry::bytes_8`, `bytes_10`, the cells (`LoadTntMap` allocation) | features, projectiles, units | A view: features' spots and the cells' feature fields, which features writes in its own phase; every route of features is synchronous but its map loader's, so nothing pends. |
 | los_radar, map → weapons | the cells (`LoadTntMap` allocation), `Unit::flags` (map's) | units | A view: the cells, as of the writer's last run, and the unit's flags map writes in its own pass, which the scheduler runs before weapons' step. |
 | movement, units → weapons | `Unit::pos`, `heading`, `pitch`, `yFraction`, `zFraction`, `yWhole`, `flags`, `UnitMotion::speed`, `velocity`, `Unit::motion` | units | A view: the unit's motion, written by `UpdateMotion` and units' body and read by `UpdateUnitWeapons` in the unit's update, in 3.1c's order (head, weapons, body). |
-| orders → weapons | `Order::pos`, `Unit::list` (projectiles), `flags`, `health`, `netDirtyFlags` | units, projectiles | A view: the order's target position and the unit's first order, as of orders' last statement; orders run after weapons in the unit's update, so weapons reads the previous tick's, as in 3.1c. |
-| scripts → weapons | `ModelState::*`, `Unit::script`, `UnitScript::state`, `Vec3::x`, `Unit::netDirtyFlags` | units, projectiles | A view of the piece state, through scripts' piece queries; the script's own writes happen in `RunScripts`, in units' body, so weapons reads the previous tick's. |
-| targeting → weapons | `Unit::netDirtyFlags` | units | A view: the notice bits targeting clears (SET_UNIT, SET_POS), read by weapons' fire step; targeting's routes are synchronous. |
-| units → weapons | `Unit::def`, `activateFlags`, `flags`, `health`, `killCount`, `owner`, `state`, `script`, `netDirtyFlags`, and the `Player` records | units | A view of the unit record, written by units' handlers and its own code, read by weapons in its run and in DAMAGE's rules at the caller's statement. |
+| orders → weapons | `Unit::flags`, `health` | units | A view of the unit record, written by orders in a unit's update (mission-kill-of-type, tick 182; orders-tier2-core, tick 615); orders run after weapons in the unit's update, so weapons reads the previous tick's, as in 3.1c. |
+| scripts → weapons | `ModelState::*`, `Unit::script`, `Vec3::x` | units, projectiles | A view of the piece state, through scripts' piece queries; the script's own writes happen in `RunScripts`, in units' body, so weapons reads the previous tick's. |
+| units → weapons | `Unit::def`, `activateFlags`, `flags`, `health`, `killCount`, `owner`, `state`, `script`, `pos`, `heading`, `pitch`, `motion`, and the `Player` records | features, projectiles, units | A view of the unit record, written by units' handlers and its own code, read by weapons in its run and in DAMAGE's rules at the caller's statement. |
 | weapons → ai | `Unit::f_1f`, `f_57` (the flags of slots 0 and 2) | players | A view: weapons' slots, read by ai's ticks in the players phase, as of weapons' last run. |
 | weapons → los_radar | `Projectile::position` | projectiles | A view: the projectile table, read by los_radar's line of sight pass after the projectile pass. |
-| weapons → map | `Debris::pos` (explosions), `Unit::flags` (units) | explosions, units | A view: the access log attributes to map the read of the debris position, which the explosion pass passes to map's `GetCellMeanHeight` (a query of map's, as of its last apply); and the unit's flags, written in damage's HEALTH handler and read by map's pass. |
-| weapons → movement, players | `Unit::flags` | units | A view: the dying flag written by HEALTH (synchronous), read by `UpdateMotion` and by players' synchronous UNIT_DIED, KILL_UNITS and GIVE_UNIT at the publisher's statement. |
-| weapons → orders | `Unit::f_1f`, `f_3b`, `f_57`, `weapon`, `flags`, `health`, `netDirtyFlags` | units, projectiles | A view: the slots and the unit's health and flags, read by orders in the unit's update (after weapons) and by return fire (the synchronous ATTACKED route) at weapons' statement. |
+| weapons → map | `Debris::pos` | explosions | A view: the access log attributes to map the read of the debris position, which the explosion pass passes to map's `GetCellMeanHeight` (a query of map's, as of its last apply). |
+| weapons → orders | `Unit::f_1f`, `f_3b`, `f_57`, `weapon` | units, projectiles | A view: the slots, read by orders in the unit's update (after weapons) and by return fire (the synchronous ATTACKED route) at weapons' statement. |
 | weapons → targeting | `Unit::weapon`, `f2c`, `f48`, `f_1f`, `f_3b`, `f_57` | units | A view: the slots' weapons and flags, read by targeting's `FindWeaponTarget` and `GetWeaponTargetPos`, synchronous slots called from `UpdateUnitWeapons` and ai. |
-| weapons → scripts | `ModelState::*`, `Unit::health`, `netDirtyFlags` | units | A view: the model state the explode opcode and DETACH_PIECE write (synchronous), and the health scripts read for the damage scripts. |
-| weapons → units | `Unit::attacker`, `flags`, `health`, `lastAttackerSlot`, `lastDamageType`, the slots | units, projectiles | The units' own record, written by units' handlers of HEALTH and DAMAGE_RECORD (synchronous: they are applied at the publisher's statement, as the writes were in 3.1c), and read by units after. |
+| weapons → units | `Unit::field_1e`, `b3a`, `b56` (the stockpiles of the three slots) | units | A view: the stockpiles ADD_STOCKPILE and SET_STOCKPILES write (both synchronous), read by units' handler of a capture to copy them into the new unit (mission-capture, tick 499). |
 
 ## 5. State and the trace
 

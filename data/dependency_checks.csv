@@ -27,6 +27,7 @@ units,orders,AirManeuverOrder::target,units,g6,89,equal,88,0,0
 units,orders,PathOrder::unit,units,g6,89,equal,88,0,0
 units,orders,Unit::activateFlags,units,g3,89,equal,88,0,1688
 units,orders,Unit::killCount,units,g3,89,equal,88,0,1688
+units,orders,Unit::lastDamageType,units,g10,89,equal,88,0,0
 units,orders,Unit::metal,units,g3,88,equal,87,0,1688
 units,players,Unit::yFraction,units,g1,89,equal,88,0,0
 units,targeting,Unit::activateFlags,players,g2,89,equal,88,0,0

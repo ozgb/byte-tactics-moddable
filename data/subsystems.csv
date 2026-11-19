@@ -5431,6 +5431,7 @@ WeaponsEventOf,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsInbox,src/seams/weapons_world.cpp,seams,folder:src/seams/,
 WeaponsOnFeaturesAreaDamage,src/seams/weapons_world.cpp,seams,folder:src/seams/,
 WeaponsOnMeteorSpawn,src/seams/wind_meteors_world.cpp,seams,folder:src/seams/,
+WeaponsPublishAddStockpile,src/game/weapons_events.h,weapons,name:Weapon,
 WeaponsPublishClaim,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsPublishDamage,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsPublishDamageRecord,src/game/weapons_events.h,game,name:Weapon,game

@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import coupling
 import replayschema as rs
 
 
@@ -442,7 +443,7 @@ class TargetingForms(unittest.TestCase):
 
     def test_two_subsystems_importing_one_slot_get_one_stub(self):
         files, _, _ = self.generated()
-        self.assertEqual(files[rs.SLOTS_H].count("int __stdcall Imp_units_StartScriptWithArgs("), 1)
+        self.assertEqual(files[rs.SLOTS_H].count("int __stdcall Imp_scripts_StartScriptWithArgs("), 1)
 
     def test_an_object_result_is_compared_by_name(self):
         files, _, _ = self.generated()
@@ -871,12 +872,12 @@ class StructForms(unittest.TestCase):
 
     def test_a_result_by_value_is_recorded_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
-        ann["subsystems"]["targeting"]["imports"].append("units.GetPieceAngles")
-        ann["subsystems"]["units"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "Angles16"}}
+        ann["subsystems"]["targeting"]["imports"].append("scripts.GetPieceAngles")
+        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "Angles16"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecUnitsGetPieceAngles"):]
+        body = hooks[hooks.index("RecScriptsGetPieceAngles"):]
         body = body[:body.index("\n}\n")]
         self.assertIn("ImportResultValue(line, ROK_ANGLES16, &result);", body)
         self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, &result);', body)
@@ -884,7 +885,7 @@ class StructForms(unittest.TestCase):
 
     def test_a_result_by_value_of_another_type_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["units"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "MissionType"}}
+        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "MissionType"}}
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("the result is Angles16" in e for e in errors), errors)
 
@@ -2076,7 +2077,7 @@ class ArgumentShapes(unittest.TestCase):
     def test_query_script_takes_its_four_values_as_scalar_in_out(self):
         files, errors, model = self.generated(annotations())
         self.assertEqual(errors, [])
-        args = model["subsystems"]["units"]["slots"]["QueryScript"]["args"]
+        args = model["subsystems"]["scripts"]["slots"]["QueryScript"]["args"]
         self.assertEqual([a["mode"] for a in args[2:]], ["value"] * 4)
         self.assertIn('ArgInOutScalar(s_call, "p5", a5);', files[rs.HOOKS_H])
 
@@ -2277,12 +2278,12 @@ class ElementForms(unittest.TestCase):
 
     def test_an_import_takes_the_same_object_argument(self):
         ann = annotations()
-        slot = ann["subsystems"]["units"]["slots"]["StartScriptWithArgs"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
-        ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["units.StartScriptWithArgs"]
+        slot = ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgs"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["scripts.StartScriptWithArgs"]
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecUnitsStartScriptWithArgs"):]
+        body = hooks[hooks.index("RecScriptsStartScriptWithArgs"):]
         body = body[:body.index("\n}\n")]
         self.assertIn("ImportObject(line, ROK_FIXTURECB, a2);", body)
         del slot
@@ -2813,7 +2814,7 @@ class Committed(unittest.TestCase):
         files, _, model = rs.generate(rs.read_rows())
         written = json.loads(files[rs.JSON_OUT])
         self.assertEqual(sorted(written["subsystems"]), sorted(m[0] for m in rs.seam_members()))
-        self.assertEqual(len(written["subsystems"]), 14)
+        self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network"})
 
     def test_every_manifest_slot_has_sets(self):
         manifest = json.loads((rs.ROOT / "wasm/modules.json").read_text())
@@ -2861,11 +2862,11 @@ class CompleteImports(unittest.TestCase):
     def test_a_vec3_the_slot_fills_is_an_out_line_of_the_import(self):
         files = self.generated()
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecUnitsGetSweetSpot"):]
+        body = hooks[hooks.index("RecScriptsGetSweetSpot"):]
         body = body[:body.index("\n}\n")]
         self.assertIn('ImportOutVec3(line, "out", a1);', body)
         slots = files[rs.SLOTS_H]
-        stub = slots[slots.index("Imp_units_GetSweetSpot("):]
+        stub = slots[slots.index("Imp_scripts_GetSweetSpot("):]
         stub = stub[:stub.index("\n}\n")]
         self.assertIn('ApplyVec3(a1, "out");', stub)
         self.assertNotIn('t.Add("?")', stub)

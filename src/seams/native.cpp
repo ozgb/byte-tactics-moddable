@@ -546,67 +546,80 @@ static void __stdcall AirManeuverOrderSetAltitudeNative(AirManeuverOrder* self, 
 
 static PathOrder* __stdcall NewPathOrderAtNative(Order* source, const Vec3* pos)
 {
-    return new (kSim) PathOrder(source, *pos);
+    PathOrder* target = new (kSim) PathOrder(source, *pos);
+    return target;
 }
 
 static PathOrder* __stdcall NewPathOrderToUnitNative(Order* source, Unit* unit)
 {
-    return new (kSim) PathOrder(source, unit);
+    PathOrder* target = new (kSim) PathOrder(source, unit);
+    return target;
 }
 
 static PathOrder* __stdcall NewPathOrderToUnitAtNative(Order* source, Unit* unit, const Vec3* pos)
 {
-    return new (kSim) PathOrder(source, unit, *pos);
+    PathOrder* target = new (kSim) PathOrder(source, unit, *pos);
+    return target;
 }
 
 static PathOrder* __stdcall NewPathOrderToUnitAtAngleNative(Order* source, Unit* unit, short angle)
 {
-    return new (kSim) PathOrder(source, unit, angle);
+    PathOrder* target = new (kSim) PathOrder(source, unit, angle);
+    return target;
 }
 
 static AirManeuverOrder* __stdcall NewAirManeuverOrderNative(Order* source, const Vec3* from, const Vec3* to)
 {
-    return new (kSim) AirManeuverOrder(source, *from, *to);
+    AirManeuverOrder* target = new (kSim) AirManeuverOrder(source, *from, *to);
+    return target;
 }
 
 static ApproachRadius* __stdcall NewApproachRadiusNative(Order* source, int x, int y, int radius)
 {
-    return new (kSim) ApproachRadius(source, x, y, radius);
+    ApproachRadius* target = new (kSim) ApproachRadius(source, x, y, radius);
+    return target;
 }
 
 static RingApproach* __stdcall NewRingApproachNative(Order* source, int x, int y, int inner, int outer)
 {
-    return new (kSim) RingApproach(source, x, y, inner, outer);
+    RingApproach* target = new (kSim) RingApproach(source, x, y, inner, outer);
+    return target;
 }
 
 static PointMarker* __stdcall NewPointMarkerNative(Order* source, Point16 pos, Point16 size)
 {
-    return new (kSim) PointMarker(source, pos, size);
+    PointMarker* target = new (kSim) PointMarker(source, pos, size);
+    return target;
 }
 
 static PathOrder* __stdcall LoadPathOrderNative(Order* source, HapiBank* file, char* name)
 {
-    return new (kSim) PathOrder((int)source, file, name);
+    PathOrder* target = new (kSim) PathOrder((int)source, file, name);
+    return target;
 }
 
 static AirManeuverOrder* __stdcall LoadAirManeuverOrderNative(Order* source, HapiBank* file, char* name)
 {
-    return new (kSim) AirManeuverOrder((int)source, file, name);
+    AirManeuverOrder* target = new (kSim) AirManeuverOrder((int)source, file, name);
+    return target;
 }
 
 static ApproachRadius* __stdcall LoadApproachRadiusNative(Order* source, HapiBank* file, char* name)
 {
-    return new (kSim) ApproachRadius((int)source, file, name);
+    ApproachRadius* target = new (kSim) ApproachRadius((int)source, file, name);
+    return target;
 }
 
 static RingApproach* __stdcall LoadRingApproachNative(Order* source, HapiBank* file, char* name)
 {
-    return new (kSim) RingApproach((int)source, file, name);
+    RingApproach* target = new (kSim) RingApproach((int)source, file, name);
+    return target;
 }
 
 static PointMarker* __stdcall LoadPointMarkerNative(Order* source, HapiBank* file, char* name)
 {
-    return new (kSim) PointMarker((int)source, file, name);
+    PointMarker* target = new (kSim) PointMarker((int)source, file, name);
+    return target;
 }
 
 static void __stdcall GoalSetPathOrderNative(PathGoal* goal, void* target)

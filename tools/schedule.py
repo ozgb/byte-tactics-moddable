@@ -1180,7 +1180,13 @@ LOOPS = {
 SILENT_INTENTS = {
     "pathfinding.CellsChanged": "a notification: what it does is left to the implementation, and the reference's does "
                                 "nothing.",
+    "movement.AirManeuverOrderSetAltitude": "the reference's does nothing: an air maneuver target keeps no altitude.",
     "movement.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
+    "movement.GoalSetPathOrder": "it writes through a virtual call whose targets are not resolved.",
+    "orders.ReattachFxToUnit": "it writes through movement's GoalSetPathOrder, a virtual call whose targets are not "
+                               "resolved.",
+    "scripts.FindScript": "a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and "
+                          "drops the index, as 3.1c does.",
     "units.RefreshUnitIfStale": "it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself.",
     "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }

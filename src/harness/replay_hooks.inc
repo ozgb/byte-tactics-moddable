@@ -3301,13 +3301,14 @@ ModelState* __stdcall RecScriptsCreatePlayerObjectState(Object3do* a0, ScriptTab
     return result;
 }
 
-void __stdcall RecScriptsSetObjectState(UnitScript* a0, int a1)
+void __stdcall RecScriptsSetObjectState(UnitScript* a0, ModelState* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MODELSTATE, a1);
     SlotScope scope(RSL_SCRIPTS_SETOBJECTSTATE, SUB_SCRIPTS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "script");
-        ArgValue(s_call, "state", a1);
+        ArgObject(s_call, "state", ROK_MODELSTATE, a1);
     }
     s_inner_scripts->SetObjectState(a0, a1);
     if (scope.Open()) {
@@ -3777,6 +3778,34 @@ PointMarker* __stdcall RecMovementLoadPointMarker(Order* a0, HapiBank* a1, char*
     }
     PointMarker* result = s_inner_movement->LoadPointMarker(a0, a1, a2);
     if (scope.Open()) {
+    }
+    return result;
+}
+
+PathGoal* __stdcall RecMovementMotionGoal(UnitMotion* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNITMOTION, a0);
+    SlotScope scope(RSL_MOVEMENT_MOTIONGOAL, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "motion", ROK_UNITMOTION, a0);
+    }
+    PathGoal* result = s_inner_movement->MotionGoal(a0);
+    if (scope.Open()) {
+    }
+    return result;
+}
+
+OrderFx* __stdcall RecMovementGoalTarget(PathGoal* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MOVEMENT_GOALTARGET, SUB_MOVEMENT, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "goal");
+    }
+    OrderFx* result = s_inner_movement->GoalTarget(a0);
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_ORDERFX, result, "o");
     }
     return result;
 }
@@ -5746,6 +5775,10 @@ void HookSeams(const bool* on)
         s_rec_movement.LoadRingApproach = RecMovementLoadRingApproach;
     if (on[SUB_MOVEMENT])
         s_rec_movement.LoadPointMarker = RecMovementLoadPointMarker;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.MotionGoal = RecMovementMotionGoal;
+    if (on[SUB_MOVEMENT])
+        s_rec_movement.GoalTarget = RecMovementGoalTarget;
     if (on[SUB_MOVEMENT])
         s_rec_movement.GoalSetPathOrder = RecMovementGoalSetPathOrder;
     if (on[SUB_MOVEMENT])

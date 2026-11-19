@@ -1495,6 +1495,8 @@ enum ReplaySlotId {
     RSL_MOVEMENT_LOADAPPROACHRADIUS,
     RSL_MOVEMENT_LOADRINGAPPROACH,
     RSL_MOVEMENT_LOADPOINTMARKER,
+    RSL_MOVEMENT_MOTIONGOAL,
+    RSL_MOVEMENT_GOALTARGET,
     RSL_MOVEMENT_GOALSETPATHORDER,
     RSL_MOVEMENT_ORDERFXDESTROY,
     RSL_MOVEMENT_ORDERFXGETTYPE,
@@ -2114,6 +2116,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "LoadApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadRingApproach", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadPointMarker", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "MotionGoal", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GoalTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GoalSetPathOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OrderFxDestroy", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OrderFxGetType", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2218,9 +2222,9 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "players", 3, 0, 0, 172, 24 },
     { "map", 4, 0, 1, 196, 8 },
     { "scripts", 1, 0, 0, 204, 25 },
-    { "movement", 1, 0, 0, 229, 31 },
-    { "files", 2, 0, 0, 260, 58 },
-    { "network", 1, 0, 0, 318, 22 },
+    { "movement", 1, 0, 0, 229, 33 },
+    { "files", 2, 0, 0, 262, 58 },
+    { "network", 1, 0, 0, 320, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

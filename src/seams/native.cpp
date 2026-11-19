@@ -396,9 +396,9 @@ static ModelState* __stdcall CreatePlayerObjectStateNative(Object3do* model, Scr
     return CreatePlayerObjectState(model, (ModelBuildList*)data, owner);
 }
 
-static void __stdcall SetObjectStateNative(UnitScript* script, int state)
+static void __stdcall SetObjectStateNative(UnitScript* script, ModelState* state)
 {
-    script->SetObjectState(state);
+    script->SetObjectState((ObjectState*)state);
 }
 
 static void __stdcall RunScriptsNative(CobScript* script, int elapsed)
@@ -622,6 +622,16 @@ static PointMarker* __stdcall LoadPointMarkerNative(Order* source, HapiBank* fil
 {
     PointMarker* target = new (kSim) PointMarker((int)source, file, name);
     return target;
+}
+
+static PathGoal* __stdcall MotionGoalNative(UnitMotion* motion)
+{
+    return (PathGoal*)motion->obj.get();
+}
+
+static OrderFx* __stdcall GoalTargetNative(PathGoal* goal)
+{
+    return goal->target.get();
 }
 
 static void __stdcall GoalSetPathOrderNative(PathGoal* goal, void* target)
@@ -1061,6 +1071,8 @@ void InstallNativeSeams()
     s_movement.LoadApproachRadius = LoadApproachRadiusNative;
     s_movement.LoadRingApproach = LoadRingApproachNative;
     s_movement.LoadPointMarker = LoadPointMarkerNative;
+    s_movement.MotionGoal = MotionGoalNative;
+    s_movement.GoalTarget = GoalTargetNative;
     s_movement.GoalSetPathOrder = GoalSetPathOrderNative;
     s_movement.OrderFxDestroy = OrderFxDestroyNative;
     s_movement.OrderFxGetType = OrderFxGetTypeNative;

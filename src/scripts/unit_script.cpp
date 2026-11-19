@@ -141,6 +141,7 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->bit1 = value;
         break;
     case 18:
+        // TODO(#986): publish from SCHED_SCRIPTS
         MapPublishSetYard(SCHED_UNITS, unit, value);
         break;
     case 19:
@@ -194,9 +195,9 @@ void UnitScript::SetPieceRotation(int index, int slot, int v)
 }
 
 // FUNCTION: 0x480d40
-void UnitScript::SetObjectState(int newState)
+void UnitScript::SetObjectState(ObjectState* newState)
 {
-    state = (ObjectState*)newState;
+    state = newState;
 }
 
 // FUNCTION: 0x480d50

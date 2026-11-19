@@ -76,9 +76,13 @@ struct MovementSeam {
     RingApproach* (__stdcall* LoadRingApproach)(Order* source, HapiBank* file, char* name);
     // Allocates a footprint marker target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
     PointMarker* (__stdcall* LoadPointMarker)(Order* source, HapiBank* file, char* name);
+    // Returns the goal that steers a unit's movement. Hooks: none.
+    PathGoal* (__stdcall* MotionGoal)(UnitMotion* motion);
+    // Returns the target a goal steers to, or null. Hooks: none.
+    OrderFx* (__stdcall* GoalTarget)(PathGoal* goal);
     // Hands a goal the target it steers to, or null (the virtual SetPathOrder). Hooks: none.
     void (__stdcall* GoalSetPathOrder)(PathGoal* goal, void* target);
-    // Destroys a target and frees its memory (the virtual deleting destructor). Hooks: none.
+    // Destroys a target and frees its memory (the virtual deleting destructor); the target is never null. Hooks: none.
     void (__stdcall* OrderFxDestroy)(OrderFx* target);
     // Returns the kind of a target, 0 for none (the virtual GetType). Hooks: none.
     int (__stdcall* OrderFxGetType)(OrderFx* target);

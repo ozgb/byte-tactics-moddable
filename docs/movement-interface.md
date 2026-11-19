@@ -28,7 +28,7 @@ need a scheduler:
   an order attaches to a goal (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`, all
   `OrderFx`). It steers a unit one tick at a time, takes the results of path searches, and builds, loads, saves and
   frees those objects.
-- **Versions.** Movement 1.0 (31 slots), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
+- **Versions.** Movement 1.0 (33 slots), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
   state slots left for scripts, #993; it gained `UnitRefInit` and `UnitRefSetUnit`, section 3).
 - **What it calls out.** Movement calls other subsystems only through their seams: pathfinding (`Submit`, `Cancel`),
   scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`GetGroundHeight`, `SetStateBits`,
@@ -70,8 +70,10 @@ Every slot has the harness replay hook as a caller of the inner seam in test mod
 | `LoadApproachRadius` | Builds a disc target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) ApproachRadius(order, file, name)` in `order_queue.cpp` |
 | `LoadRingApproach` | Builds a ring target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) RingApproach(order, file, name)` in `order_queue.cpp` |
 | `LoadPointMarker` | Builds a footprint marker target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) PointMarker(order, file, name)` in `order_queue.cpp` |
+| `MotionGoal` | Returns the goal that steers a unit's movement, a query | orders (`order_queue.cpp`: the same functions as `GoalSetPathOrder`) | both: as `GoalSetPathOrder` | new: was a read of `UnitMotion::obj` through orders' own view (`UnitMotionSlotView`) in `order_queue.cpp` |
+| `GoalTarget` | Returns the target a goal steers to, or null, a query | orders (`order_queue.cpp`: `Order::~Order`) | yes | new: was a read of `PathGoal::target` through orders' own view (`OrderFxSlot::current`) in `order_queue.cpp` |
 | `GoalSetPathOrder` | Hands a goal the target it steers to, or null | orders (`order_queue.cpp`: `Order::SetAttachedFx`, `Order::AttachApproachRadiusGoal`, `AttachRingApproachGoal`, `AttachBuildFootprintMarker`, `Order::~Order`, and `Order::ReattachFxToUnit`, which `LoadUnit` calls) | both: orders run in the tick; `ReattachFxToUnit` runs on load | new: was the virtual `SetPathOrder` (called through its vtable slot or as `slot->Attach`) from `order_queue.cpp` |
-| `OrderFxDestroy` | Destroys a target and frees it | orders (`order_queue.cpp`: the same functions) | both: as `GoalSetPathOrder`, and `Order::~Order` also runs when units are freed | new: was `delete (OrderFx*)attached` in `order_queue.cpp` |
+| `OrderFxDestroy` | Destroys a target and frees it; the target is never null (orders checks first, where 3.1c's `delete` did nothing on null) | orders (`order_queue.cpp`: the same functions) | both: as `GoalSetPathOrder`, and `Order::~Order` also runs when units are freed | new: was `delete (OrderFx*)attached` in `order_queue.cpp` |
 | `OrderFxGetType` | Returns the kind of a target | orders (`order_queue.cpp`: `Order::SerializeToSave`) | no: save | new: was the virtual `GetType` from `order_queue.cpp` |
 | `OrderFxSerializeToSave` | Writes a target to a saved game | orders (`order_queue.cpp`: `Order::SerializeToSave`) | no: save | new: was the virtual `SerializeToSave` from `order_queue.cpp` |
 | `GoalHasNetUnitState` | Says whether a goal has network state to send | network (`net_game.cpp`: `NetSendUnitStates`) | yes | new: was the virtual `HasNetUnitState` (`v7`) from `net_game.cpp` |
@@ -162,7 +164,8 @@ only its owner reads. The trace hashes the motions and goals in section 21 and t
 | `UnitMotion::flags`, `velocity`, `field_22` | the same | movement, orders (the VTOL orders: `PrepVtolClimb`, `VtolFollowOrder`, `VtolHelpBuildOrder`, `VtolMobileBuildOrder`, `VtolSeekAttackOrder`, `AirToAirOrder`, `AirStrikeOrder`) | no |
 | `UnitMotion::pathLockStamp` | the same | movement; map writes it by offset (`AddUnitToMap`, `+0x26`) | no |
 | `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (`src/seams/pathfinding_world.cpp`, by offset) | no |
-| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes it to the slots), pathfinding (by offset) | no: it is the object the slots take |
+| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes it to the slots), orders (through `MotionGoal`), pathfinding (by offset) | no: it is the object the slots take |
+| The target a goal steers to (`PathGoal::target`) | the goal, hashed | movement, orders (through `GoalTarget`) | no: orders reads it through the slot |
 | The goals' fields (`PatrolGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `AiSearchGoal`) | the goal's heap object, hashed (section 21) | movement; presentation (`AiSearchGoal::DrawOnSurface` reads `active`, `count` and `owner`, console debug overlay) | yes, in the simulation |
 | The goal areas (`PathGoalArea`) | filled by the goals | movement; pathfinding, through `PathGoalCells`, `PathGoalContains` and `PathGoalDistance` | no |
 | The targets' fields (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) | the order effect, hashed (section 22) | movement; `OrderFx::source` is the order | yes: orders reaches them only through the slots |

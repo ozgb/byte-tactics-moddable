@@ -413,7 +413,7 @@ void __stdcall InitUnitScript(Unit* self)
         g_seams.scripts->NewUnitScript(self);
         g_seams.scripts->SetCob((CobScript*)self->script.get(), (ScriptTable*)self->def->data);
         self->state = (SpotState*)g_seams.scripts->CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
-        g_seams.scripts->SetObjectState((UnitScript*)self->script.get(), (int)self->state.get());
+        g_seams.scripts->SetObjectState((UnitScript*)self->script.get(), (ModelState*)self->state.get());
         g_seams.scripts->StartScript((CobScript*)self->script.get(), "Create", 0, 1);
     } else {
         self->script = 0;

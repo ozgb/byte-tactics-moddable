@@ -59,7 +59,7 @@ struct ScriptsSeam {
     // Builds the piece state of a unit from its model and script data and returns it, in the state block. Hooks: none.
     ModelState* (__stdcall* CreatePlayerObjectState)(Object3do* model, ScriptTable* data, Unit* owner);
     // Gives a unit script the piece state of its unit (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* SetObjectState)(UnitScript* script, int state);
+    void (__stdcall* SetObjectState)(UnitScript* script, ModelState* state);
     // Runs the threads of a script for a number of elapsed ticks (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* RunScripts)(CobScript* script, int elapsed);
     // Writes the threads of a script to a bank of a saved game (thiscall in 3.1c, this first). Hooks: none.

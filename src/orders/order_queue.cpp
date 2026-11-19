@@ -14,11 +14,6 @@ class HapiBank;
 
 #pragma pack(push, 1)
 class CobScript;
-class OrderFxSlot;
-
-struct UnitMotionSlotView {
-    Ref<OrderFxSlot> slot;
-};
 
 #include "../units/unit.h"
 
@@ -51,13 +46,6 @@ struct OrderSaveRecord {
 
 #include "../util/vec3.h"
 #include "../state/sim_globals.h"
-
-class OrderFxSlot {
-public:
-    virtual void Slot0();
-    virtual void Attach(void* obj);
-    Ref<OrderFx> current;
-};
 
 #include "order_list.h"
 OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
@@ -238,24 +226,22 @@ void Order::AnnounceStatusIfFlagged(SimSpeechText text)
 void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
-        void* p1 = unit->motion.get();
-        void* p2 = ((UnitMotionSlotView*)p1)->slot.get();
-        g_seams.movement->GoalSetPathOrder((PathGoal*)p2, (OrderFx*)attached);
+        g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), (OrderFx*)attached);
     }
 }
 
 // FUNCTION: 0x4388d0
 void Order::SetAttachedFx(OrderFx* obj)
 {
-    if (((UnitMotionSlotView *)unit->motion.get())) {
+    if (unit->motion.get()) {
         if (attached) {
-            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
             g_seams.movement->OrderFxDestroy((OrderFx*)attached);
             attached = 0;
         }
         if (obj) {
             subFlags &= ~0x3e0;
-            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
+            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
             attached = obj;
         }
     }
@@ -266,21 +252,21 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
     if ((unit->def->flags1 & 0x800) == 0) {
         ApproachRadius* obj = g_seams.movement->NewApproachRadius(this, p->x, p->z, n);
-        if (((UnitMotionSlotView *)unit->motion.get())) {
+        if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
                 attached = obj;
             }
         }
     } else {
-        if (((UnitMotionSlotView *)unit->motion.get()) && attached) {
-            g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+        if (unit->motion.get() && attached) {
+            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
             g_seams.movement->OrderFxDestroy((OrderFx*)attached);
             attached = 0;
         }
@@ -292,22 +278,22 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
     if (!(unit->def->flags1 & 0x800)) {
         RingApproach* obj = g_seams.movement->NewRingApproach(this, pos->x, pos->z, radius1, radius2);
-        if (((UnitMotionSlotView *)unit->motion.get())) {
+        if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
                 attached = obj;
             }
         }
     } else {
-        if (((UnitMotionSlotView *)unit->motion.get())) {
+        if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
@@ -320,22 +306,22 @@ void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
         PointMarker* obj = g_seams.movement->NewPointMarker(this, cell, size);
-        if (((UnitMotionSlotView *)unit->motion.get())) {
+        if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), obj);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
                 attached = obj;
             }
         }
     } else {
-        if (((UnitMotionSlotView *)unit->motion.get())) {
+        if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)((UnitMotionSlotView *)unit->motion.get())->slot.get(), 0);
+                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
@@ -373,16 +359,19 @@ Order::~Order()
         g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         flags_42 &= ~0x400000;
     }
-    if (((UnitMotionSlotView *)unit->motion.get()) != 0) {
-        OrderFxSlot* slot = ((UnitMotionSlotView *)unit->motion.get())->slot;
-        if (slot->current.get() != 0 && slot->current.get() == attached.get()) {
+    if (unit->motion.get() != 0) {
+        PathGoal* goal = g_seams.movement->MotionGoal(unit->motion.get());
+        OrderFx* current = g_seams.movement->GoalTarget(goal);
+        if (current != 0 && current == attached.get()) {
             if (attached != 0) {
-                g_seams.movement->GoalSetPathOrder((PathGoal*)slot, 0);
+                g_seams.movement->GoalSetPathOrder(goal, 0);
                 g_seams.movement->OrderFxDestroy((OrderFx*)attached);
                 attached = 0;
             }
         } else {
-            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+            if (attached) {
+                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+            }
             attached = 0;
         }
     }

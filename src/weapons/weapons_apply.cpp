@@ -48,8 +48,8 @@ static int Valid(const WeaponsEvent* e, Unit* unit)
     case WEAPONS_RELEASE:
     case WEAPONS_CLAIM:
         return e->value >= 0 && e->value <= 3;
-    case WEAPONS_SET_STOCKPILES:
     case WEAPONS_LOAD_SLOT:
+    case WEAPONS_ADD_STOCKPILE:
         return e->value >= 0 && e->value <= 2;
     case WEAPONS_AIM_DONE:
         return e->callback != 0;
@@ -153,6 +153,9 @@ int __stdcall WeaponsApply(const WeaponsEvent* e)
         break;
     case WEAPONS_LOAD_SLOT:
         LoadSlot(unit, e->value, e->args);
+        break;
+    case WEAPONS_ADD_STOCKPILE:
+        unit->weapons[e->value].stockpile++;
         break;
     }
     return 1;

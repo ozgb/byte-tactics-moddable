@@ -111,6 +111,13 @@ inline void WeaponsPublishSetStockpiles(int outbox, Unit* unit, int first, int s
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void WeaponsPublishAddStockpile(int outbox, Unit* unit, int slot)
+{
+    WeaponsEvent event = WeaponsEventOf(WEAPONS_ADD_STOCKPILE, unit);
+    event.value = slot;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void WeaponsPublishLoadSlot(int outbox, Unit* unit, int slot, const int* args)
 {
     WeaponsEvent event = WeaponsEventOf(WEAPONS_LOAD_SLOT, unit);

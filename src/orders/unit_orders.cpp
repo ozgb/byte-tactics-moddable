@@ -489,7 +489,7 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
         return 2;
     }
     case 2:
-        unit->weapons[order->weapon].stockpile++;
+        WeaponsPublishAddStockpile(SCHED_ORDERS, unit, order->weapon);
         order->count--;
         RecordBuildMenuUpdate(unit);
         return 0;

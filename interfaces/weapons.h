@@ -34,7 +34,7 @@ enum WeaponsDamageEffectKind {
     WEAPONS_EFFECT_PARALYZE = 277
 };
 
-// The kinds of event other modules publish to weapons' inbox about weapons, projectiles and explosions; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when: it names a null unit (but SPAWN and AREA_DAMAGE, which name none); RELEASE or CLAIM names a weapon outside 0 to 3, SET_STOCKPILES or LOAD_SLOT one outside 0 to 2; AIM_DONE names no callback; SPAWN or AREA_DAMAGE names a weapon outside the table (SPAWN may name -1, no weapon); the kind is unknown.
+// The kinds of event other modules publish to weapons' inbox about weapons, projectiles and explosions; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when: it names a null unit (but SPAWN and AREA_DAMAGE, which name none); RELEASE or CLAIM names a weapon outside 0 to 3, LOAD_SLOT or ADD_STOCKPILE one outside 0 to 2; AIM_DONE names no callback; SPAWN or AREA_DAMAGE names a weapon outside the table (SPAWN may name -1, no weapon); the kind is unknown.
 enum WeaponsEventKind {
     // unit's death weapon explodes at its position: its self-destruct weapon when value is 1, the weapon it explodes as when 0; outcome 1.
     WEAPONS_DETONATE = 258,
@@ -57,7 +57,9 @@ enum WeaponsEventKind {
     // Each of unit's three weapons that stockpiles (flag bit 1) holds the stockpile args[0] to args[2], as a unit captured by another player keeps them; outcome 1.
     WEAPONS_SET_STOCKPILES = 267,
     // unit's weapon slot value takes the state of a saved game: args[0] whether its aim is done, args[1] a byte of its weapon type that the save keeps, args[2] the offset of its aim, args[3] its reload, args[4] and args[5] its heading and pitch, args[6] its stockpile and args[7] its flag bits (bits 0, 1, 2 to 3 and 4); outcome 1.
-    WEAPONS_LOAD_SLOT = 268
+    WEAPONS_LOAD_SLOT = 268,
+    // unit's weapon value (0 to 2) holds one more round in its stockpile, as a stockpile weapon's build order finishes one; outcome 1.
+    WEAPONS_ADD_STOCKPILE = 269
 };
 
 // The kinds of effect weapons publishes to its outbox about weapons, projectiles and explosions, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.

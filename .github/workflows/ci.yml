@@ -174,25 +174,49 @@ jobs:
       - name: Point apt at a reachable Ubuntu mirror
         if: steps.changed.outputs.run == 'true'
         run: &apt-mirror |
+          sudo tee /usr/local/bin/ci-apt-mirror > /dev/null <<'EOF'
+          #!/usr/bin/env bash
           list=/etc/apt/apt-mirrors.txt
+          saved=/etc/apt/apt-mirrors.ci
           if ! grep -rqs "mirror+file:$list" /etc/apt/sources.list /etc/apt/sources.list.d; then
             echo "apt reads no mirror list at $list; its sources stay as they are"
             exit 0
           fi
+          [ -f "$saved" ] || cp "$list" "$saved"
           suite="$(. /etc/os-release && echo "$VERSION_CODENAME")-security"
-          mirrors=$(cut -f1 "$list")
+          mirrors=$(cut -f1 "$saved")
           if [ "$(dpkg --print-architecture)" = amd64 ]; then
             mirrors="$mirrors http://archive.ubuntu.com/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ http://mirrors.mit.edu/ubuntu/"
+          fi
+          mirrors=$(echo "$mirrors" | tr ' ' '\n' | awk 'NF && !seen[$0]++')
+          if [ "${1:-}" = --next ]; then
+            current=$(head -n1 "$list" | cut -f1)
+            before=
+            after=
+            seen=
+            for mirror in $mirrors; do
+              if [ "$mirror" = "$current" ]; then
+                seen=1
+              elif [ -n "$seen" ]; then
+                after="$after $mirror"
+              else
+                before="$before $mirror"
+              fi
+            done
+            mirrors="$after $before"
           fi
           for mirror in $mirrors; do
             if curl -fsS -o /dev/null --connect-timeout 10 --max-time 60 "${mirror%/}/dists/$suite/InRelease"; then
               echo "apt mirror: $mirror"
-              echo "$mirror" | sudo tee "$list" > /dev/null
+              echo "$mirror" > "$list"
               exit 0
             fi
             echo "::warning::Ubuntu mirror $mirror is unreachable"
           done
-          echo "::warning::no Ubuntu mirror is reachable; $list stays as it was"
+          echo "::warning::no other Ubuntu mirror is reachable; $list stays as it was"
+          EOF
+          sudo chmod 755 /usr/local/bin/ci-apt-mirror
+          sudo ci-apt-mirror
 
       - name: Configure apt to keep and retry its downloads
         if: steps.changed.outputs.run == 'true'
@@ -206,7 +230,7 @@ jobs:
           EOF
           sudo tee /usr/local/bin/ci-apt-install > /dev/null <<'EOF'
           #!/usr/bin/env bash
-          pauses=(10 30)
+          pauses=(30 90)
           for try in 1 2 3; do
             if apt-get install -y --no-install-recommends "$@"; then
               exit 0
@@ -216,8 +240,11 @@ jobs:
               exit 1
             fi
             pause=${pauses[try - 1]}
-            echo "::warning::apt-get install $* failed (try $try of 3); updating the package lists and retrying in ${pause}s"
+            echo "::warning::apt-get install $* failed (try $try of 3); retrying in ${pause}s on the next reachable mirror"
             sleep "$pause"
+            if command -v ci-apt-mirror > /dev/null; then
+              ci-apt-mirror --next
+            fi
             apt-get update || echo "::warning::apt-get update failed; retrying with the package lists apt already has"
           done
           EOF

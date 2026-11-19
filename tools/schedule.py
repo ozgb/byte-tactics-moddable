@@ -71,7 +71,7 @@ NATIVE_SLOT = re.compile(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\(.*\))?\s*(\w+);", re.M)
 EFFECTS = {"RandomInt": "draw rng", "GameRand": "draw crt", "RecordSimEvent": "sim event"}
 TRANSPARENT = {None, "seams", "platform", "game"}
 OUTSIDE = "a call into %s outside its interface"
-DELIVERY = "the delivery of a queued effect to %s' handler"
+DELIVERY = "the delivery of a queued effect to a handler of %s"
 ROUTE_REASON = "route table entry"
 ENGINE = {"presentation", "harness", "network", "files"}
 
@@ -1193,7 +1193,6 @@ SILENT_INTENTS = {
     "scripts.FindScript": "a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and "
                           "drops the index, as 3.1c does.",
     "units.RefreshUnitIfStale": "it publishes map's REFRESH_PASS_MAP, a synchronous event, and writes nothing itself.",
-    "weapons.WeaponAimCobComplete": "it writes through a virtual call whose targets are not resolved.",
 }
 LIMITS = """\
 The orders are read from the program, not from a run. That decides what they claim:

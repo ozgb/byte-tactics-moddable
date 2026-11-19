@@ -277,9 +277,9 @@ class Splits(unittest.TestCase):
             p = sc.Page(sc.Program(fns, subs, route, SEAMS, NATIVE, SOURCES), [dep("economy", "orders")], [])
             (d, found), = p.placed
             self.assertEqual((found.kind, found.first, found.second, found.first_at, found.second_at),
-                             ("split", "economy.Spend", "the delivery of a queued effect to orders' handler", 1, 3))
+                             ("split", "economy.Spend", "the delivery of a queued effect to a handler of orders", 1, 3))
             text = sc.render(p)
-            self.assertIn("1. the delivery of a queued effect to orders' handler", text)
+            self.assertIn("1. the delivery of a queued effect to a handler of orders", text)
             self.assertNotIn("a call into orders outside its interface (step", text)
 
     def test_across_entities(self):

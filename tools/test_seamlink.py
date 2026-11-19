@@ -687,7 +687,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai"])
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -756,13 +756,13 @@ FeHelp,src/map/features.cpp,features,x,
 
     def test_a_query_slot_calling_any_other_slot_is_found(self):
         found = self.check([("FeCell", "src/map/features.cpp", "indirect_call", self.slot("Apply")),
-                            ("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("UpdateUnit", "UnitsSeam")),
+                            ("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("UpdateUnitBody", "UnitsSeam")),
                             ("FeCentre", "src/map/features.cpp", "call", "memset"),
                             ("FeCell", "src/map/features.cpp", "asm", "inline")])
         self.assertEqual(sorted(f[3] for f in found),
                          ["FeaturesSeam::GetCellFeature calls indirect via void (*)(int) __attribute__((stdcall)) [FeaturesSeam::Apply]",
                           "FeaturesSeam::GetCellFeature has inline assembly",
-                          "FeaturesSeam::GetFootprintCentre calls indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::UpdateUnit]",
+                          "FeaturesSeam::GetFootprintCentre calls indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::UpdateUnitBody]",
                           "FeaturesSeam::GetFootprintCentre calls memset, which data/rwsets.csv has no rows for"])
 
 
@@ -813,7 +813,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
-        self.assertEqual(seamlink.PILOTS[-5].owner, "targeting")
+        self.assertEqual(seamlink.PILOTS[-6].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -925,7 +925,7 @@ LrList,src/map/line_of_sight_index.cpp,los_radar,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_los_radar_before_map(self):
-        self.assertEqual(seamlink.PILOTS[-4].owner, "los_radar")
+        self.assertEqual(seamlink.PILOTS[-5].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex", "Init", "Shutdown"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"))
@@ -1052,7 +1052,7 @@ MpHelp,src/map/terrain.cpp,map,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_map_before_players(self):
-        self.assertEqual(seamlink.PILOTS[-3].owner, "map")
+        self.assertEqual(seamlink.PILOTS[-4].owner, "map")
         self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"))
         header = seamlink.ROOT / "interfaces/map.h"
         if header.exists():
@@ -1157,7 +1157,7 @@ PlBlink,src/game/players.cpp,players,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_players_before_ai(self):
-        self.assertEqual(seamlink.PILOTS[-2].owner, "players")
+        self.assertEqual(seamlink.PILOTS[-3].owner, "players")
         self.assertEqual(seamlink.PLAYERS.writing, ("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
                                                     "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink", "Init", "Shutdown"))
         self.assertEqual(seamlink.PLAYERS.query, ("RegionSize", "WriteState"))
@@ -1238,8 +1238,8 @@ UpdateSquadsNative,src/seams/native.cpp,seams,x,
     def test_the_tree_as_given_passes_with_a_cast_on_a_filler(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_ai_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "ai")
+    def test_the_pilots_table_lists_ai_before_weapons(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "ai")
         self.assertEqual(seamlink.AI.writing, ("Apply", "UpdateSquads", "UpdatePlayerAI"))
         self.assertEqual(seamlink.AI.engine_functions, ())
         header = seamlink.ROOT / "interfaces/ai.h"
@@ -1259,6 +1259,85 @@ UpdateSquadsNative,src/seams/native.cpp,seams,x,
                 ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("CreateSquads"))]
         self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other")])
 
+
+WEAPONS_HEADER = """struct WeaponsSeam {
+    int (__stdcall* Apply)(const WeaponsEvent* event);
+    void (__stdcall* UpdateUnitWeapons)(Unit* unit);
+    int (__stdcall* GetWeaponRange)(Unit* unit, unsigned int weapon);
+    void (__stdcall* WriteState)(const StateWriter* writer);
+    void (__stdcall* AllocWeaponArray)(void);
+};
+"""
+WEAPONS_NATIVE = """static WeaponsSeam s_weapons;
+s_weapons.Apply = WeaponsApply;
+s_weapons.UpdateUnitWeapons = UpdateUnitWeapons;
+s_weapons.GetWeaponRange = GetWeaponRangeNative;
+s_weapons.WriteState = WeaponsWriteState;
+s_weapons.AllocWeaponArray = AllocWeaponArray;
+"""
+WEAPONS_PILOT = dataclasses.replace(
+    seamlink.WEAPONS, writing=("Apply", "UpdateUnitWeapons"), query=("GetWeaponRange", "WriteState"), setup=("AllocWeaponArray",),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"),))
+
+
+class WeaponsPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+Tick,src/game/scheduler.cpp,game,x,
+Move,src/units/unit_position.cpp,units,x,
+LoadBattleAssets,src/game/game_state.cpp,game,x,
+Other,src/game/console_commands.cpp,game,x,
+WeaponsApply,src/weapons/weapons_apply.cpp,weapons,x,
+GetWeaponRangeNative,src/seams/native.cpp,seams,x,
+WeaponsWriteState,src/weapons/weapons_apply.cpp,weapons,x,
+CountExplosionTables,src/weapons/explosions.cpp,weapons,x,
+"""
+
+    def check(self, rows, native=WEAPONS_NATIVE):
+        rows = [("GetWeaponRangeNative", "src/seams/native.cpp", "function", ""),
+                ("WeaponsWriteState", "src/weapons/weapons_apply.cpp", "function", "")] + rows
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(native)
+            (root / "interfaces/weapons.h").write_text(WEAPONS_HEADER)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, WEAPONS_PILOT)
+
+    def slot(self, name):
+        return f"indirect via void (*)(Unit *) __attribute__((stdcall)) [WeaponsSeam::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_weapons_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "weapons")
+        self.assertEqual(seamlink.WEAPONS.writing, ("Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons"))
+        header = seamlink.ROOT / "interfaces/weapons.h"
+        if header.exists():
+            pilot = seamlink.WEAPONS
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "WeaponsSeam")))
+
+    def test_only_the_engine_and_weapons_call_a_writing_slot(self):
+        rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateUnitWeapons")),
+                ("Move", "src/units/unit_position.cpp", "indirect_call", self.slot("UpdateUnitWeapons")),
+                ("Other", "src/game/console_commands.cpp", "field_read", "WeaponsSeam::Apply")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("call", "game", "Other"), ("call", "units", "Move")])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("LoadBattleAssets", "src/game/game_state.cpp", "indirect_call", self.slot("AllocWeaponArray")),
+                ("Other", "src/game/console_commands.cpp", "indirect_call", self.slot("AllocWeaponArray"))]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "game", "Other")])
+
+    def test_a_query_that_writes_state_fails_but_the_frame_counters_of_write_state_pass(self):
+        rows = [("WeaponsWriteState", "src/weapons/weapons_apply.cpp", "call", "CountExplosionTables"),
+                ("CountExplosionTables", "src/weapons/explosions.cpp", "deref_write", "*unsigned int"),
+                ("GetWeaponRangeNative", "src/seams/native.cpp", "global_write", "g_game")]
+        found = self.check(rows)
+        self.assertEqual([f[:3] for f in found], [("query", "seams", "GetWeaponRangeNative")])
 
 
 if __name__ == "__main__":

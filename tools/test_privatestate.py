@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_players_and_ai(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_players_ai_and_weapons(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons"])
 
 
 class TargetingOwnerTest(unittest.TestCase):
@@ -114,7 +114,7 @@ class TargetingOwnerTest(unittest.TestCase):
             self.assertEqual(ps.private_to(item), ("targeting", ("writer",)), item)
 
     def test_other_unit_members_are_not_private(self):
-        for item in ("Unit::netDirtyFlags", "Unit::field_8", "Unit::unknown_24", "Unit::weapon2AimCob", "Unit::pos", "Unit::current2", "Unit::weapon2Target2"):
+        for item in ("Unit::netDirtyFlags", "Unit::pos", "Unit::current2", "Unit::weapon2Target2"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_targeting_write_passes(self):
@@ -272,6 +272,29 @@ class AiOwnerTest(unittest.TestCase):
     def test_another_subsystem_reading_a_squad_record_fails(self):
         rows = {"reads": [("-", "orders", "SquadManager::nextAction")]}
         self.assertEqual(ps.violations(rows), ["reads: reader orders on SquadManager::nextAction, which is private to ai"])
+
+
+class WeaponsOwnerTest(unittest.TestCase):
+    def test_the_projectiles_the_debris_and_the_slots_are_private_for_writes_only(self):
+        for item in ("Projectile::position", "projectileCount", "projectiles", "g_explodedPieces", "Debris::pos", "DebrisPiece::state",
+                     "Unit::weapon", "Unit::f_1f", "Unit::f2c", "Unit::f_3b", "Unit::f48", "Unit::f_57", "Unit::weapon2AimCob"):
+            self.assertEqual(ps.private_to(item), ("weapons", ("writer",)), item)
+
+    def test_the_aim_pairs_stay_targetings_and_the_rest_is_not_private(self):
+        self.assertEqual(ps.private_to("Unit::current")[0], "targeting")
+        for item in ("Unit::field_1e", "Unit::health", "Debris::ref1", "Debris::ref2", "WeaponDef::damage"):
+            self.assertFalse(ps.is_private(item), item)
+
+    def test_a_weapons_write_passes_and_a_read_by_anyone_passes(self):
+        rows = {"edges": [("weapons", "ai", "Projectile::attacker"), ("weapons", "-", "Unit::f_1f")],
+                "reads": [("-", "los_radar", "Projectile::position"), ("-", "map", "Debris::pos")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("units", "weapons", "Unit::f2c"), ("orders", "-", "Projectile::flags")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer orders on Projectile::flags, which is written only by weapons",
+                          "edges: writer units on Unit::f2c, which is written only by weapons"])
 
 
 class ViolationTest(unittest.TestCase):

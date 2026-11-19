@@ -334,7 +334,7 @@ int Mission::GetCampaignMissionName(int index, char* out, int size)
     list.ResetCurrentRecord();
     if (list.SelectRecord(buf) == 0)
         return 0;
-    if (GetLocalizedString(&list, out, "missionname", size, 0) == 0) {
+    if (GetLocalizedString(&list, out, "missionname", size, nullptr) == 0) {
         strncpy(out, "Error -- Unnamed Mission", size - 1);
         out[size - 1] = 0;
     }

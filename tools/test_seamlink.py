@@ -751,7 +751,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual([f[2:] for f in found], [("FeHelp", "FeaturesSeam::GetCellFeature field write Vec3::x")])
 
     def test_a_query_slot_may_call_the_read_only_slots_it_is_allowed(self):
-        self.assertEqual(self.check([("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("GetGroundHeight", "UnitsSeam")),
+        self.assertEqual(self.check([("FeCentre", "src/map/features.cpp", "indirect_call", self.slot("GetGroundHeight", "MapSeam")),
                                      ("FeCell", "src/map/features.cpp", "indirect_call", self.slot("GetMapCell", "LosRadarSeam"))]), [])
 
     def test_a_query_slot_calling_any_other_slot_is_found(self):
@@ -962,7 +962,7 @@ LrList,src/map/line_of_sight_index.cpp,los_radar,x,
 
     def test_the_filler_may_write_its_out_parameter_and_its_own_locals(self):
         rows = [("LrClamp", "src/map/line_of_sight.cpp", "deref_write", "*Vec3"),
-                ("LrClamp", "src/map/line_of_sight.cpp", "indirect_call", self.slot("GetGroundHeight", "UnitsSeam")),
+                ("LrClamp", "src/map/line_of_sight.cpp", "indirect_call", self.slot("GetGroundHeight", "MapSeam")),
                 ("LrVisible", "src/game/players.cpp", "field_write", "Vec3::x"),
                 ("LrVisible", "src/game/players.cpp", "field_maybe_written", "<anon>::words"),
                 ("LrVisible", "src/game/players.cpp", "call", "get"),
@@ -1053,7 +1053,8 @@ MpHelp,src/map/terrain.cpp,map,x,
 
     def test_the_pilots_table_lists_map_before_players(self):
         self.assertEqual(seamlink.PILOTS[-3].owner, "map")
-        self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius"))
+        self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius",
+                                                "RefreshMovedUnits", "RefreshUnitIfStale"))
         header = seamlink.ROOT / "interfaces/map.h"
         if header.exists():
             pilot = seamlink.MAP
@@ -1068,7 +1069,8 @@ MpHelp,src/map/terrain.cpp,map,x,
         rows = [("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply")),
                 ("MapInbox", "src/seams/map_world.cpp", "indirect_call", self.slot("CanBuildAt")),
                 ("RecMapApply", "src/harness/replay_hooks.inc", "indirect_call", self.slot("Apply")),
-                ("MpApply", "src/map/terrain.cpp", "indirect_call", self.slot("CanBuildAt"))]
+                ("MpApply", "src/map/terrain.cpp", "indirect_call", self.slot("CanBuildAt")),
+                ("WorldBeginSearch", "src/seams/pathfinding_world.cpp", "indirect_call", self.slot("CanBuildAt"))]
         self.assertEqual(self.check(rows), [])
 
     def test_a_set_up_slot_is_called_by_its_callers_only(self):

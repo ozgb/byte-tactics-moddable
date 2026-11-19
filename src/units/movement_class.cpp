@@ -87,7 +87,7 @@ struct UnitPassMapStampView {
 #include "../game/map_events.h"
 #include "../../interfaces/services.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -386,9 +386,6 @@ void FreeMovementClasses(void)
     (a).y + (b).y >= (int)(moveClass)->height ? (int)(moveClass)->height - 1 : (a).y + (b).y, \
     1u << (int)((moveClass) - g_movementClasses.entries)
 
-#define REPORT_PASS_MAP_CHANGE(moveClass, a, b, cause) \
-    g_seams.pathfinding->CellsChanged(PASS_MAP_CHANGE_ARGS(moveClass, a, b), cause)
-
 #define PUBLISH_PASS_MAP_CHANGE(moveClass, a, b, cause) \
     MapPublishCellsChanged(PASS_MAP_CHANGE_ARGS(moveClass, a, b), cause)
 
@@ -447,16 +444,16 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
     unsigned int prev = p->unit->lastTick;
     p->unit->lastTick = (unsigned int)g_game->ticks;
     if (prev < old) {
-        MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), p->a, p->b);
-        REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
+        RefreshPassMap(p->a, p->b);
+        PUBLISH_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
     if (start != old) {
         for (UnitPassMapRecordView* r = &((UnitPassMapRecordView *)g_game->units.get())[1]; r <= (UnitPassMapRecordView *)g_game->unitsEnd.get(); r++) {
             if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
                 unsigned int t = r->unit->lastTick;
                 if (t >= old && t < start) {
-                    MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), r->a, r->b);
-                    REPORT_PASS_MAP_CHANGE(this, r->a, r->b, PATH_CHANGE_UNITS);
+                    RefreshPassMap(r->a, r->b);
+                    PUBLISH_PASS_MAP_CHANGE(this, r->a, r->b, PATH_CHANGE_UNITS);
                 }
             }
         }
@@ -468,8 +465,8 @@ void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
 void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
 {
     if (p->unit->lastTick < lastTick) {
-        MapPublishRefreshPassMap(SCHED_UNITS, (int)(this - g_movementClasses.entries), p->a, p->b);
-        REPORT_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
+        RefreshPassMap(p->a, p->b);
+        PUBLISH_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
     }
 }
 

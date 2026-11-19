@@ -308,10 +308,10 @@ int main()
     memset(&losRadar, 0, sizeof losRadar);
     losRadar.GetVisibleEnemiesInRadius = GetVisibleEnemies;
     g_seams.los_radar = &losRadar;
-    static UnitsSeam units;
-    memset(&units, 0, sizeof units);
-    units.GetGroundHeight = GetGroundHeight;
-    g_seams.units = &units;
+    static MapSeam map;
+    memset(&map, 0, sizeof map);
+    map.GetGroundHeight = GetGroundHeight;
+    g_seams.map = &map;
     static ScriptsSeam scripts;
     memset(&scripts, 0, sizeof scripts);
     scripts.GetSweetSpot = GetSweetSpot;

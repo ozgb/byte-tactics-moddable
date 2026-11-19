@@ -5,7 +5,7 @@
 #include "../scripts/cob_script.h"
 
 #include "../files/files_api.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../sound/sound.h"
 struct BmpFileHeader;
 struct BmpInfo;
@@ -707,7 +707,7 @@ Vec3* __stdcall GetProjectileAimPoint(Projectile* p)
     }
     if (flag) {
         p->start = p->target;
-        p->start.y = max(g_seams.units->GetGroundHeight((Vec3*)&p->target), g_game->seaLevel) << 16;
+        p->start.y = max(g_seams.map->GetGroundHeight((Vec3*)&p->target), g_game->seaLevel) << 16;
         return &p->start;
     }
     return &p->target;

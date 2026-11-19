@@ -30,6 +30,8 @@ const ScriptsSeam* s_inner_scripts;
 ScriptsSeam s_rec_scripts;
 const MovementSeam* s_inner_movement;
 MovementSeam s_rec_movement;
+const MissionSeam* s_inner_mission;
+MissionSeam s_rec_mission;
 const FilesSeam* s_inner_files;
 FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
@@ -1860,29 +1862,6 @@ void __stdcall RecUnitsUpdateAllUnits()
     }
 }
 
-int __stdcall RecUnitsGetGroundHeight(Vec3* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_GETGROUNDHEIGHT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgVec3(s_call, "pos", a0);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i units.GetGroundHeight");
-        ImportVec3Xz(line, "pos", a0);
-    }
-    int result = s_inner_units->GetGroundHeight(a0);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
 {
     ReplayRoots roots;
@@ -1894,70 +1873,6 @@ void __stdcall RecUnitsSetStateBits(Unit* a0, int a1, int a2)
         ArgValue(s_call, "set", a2);
     }
     s_inner_units->SetStateBits(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecUnitsMovementClassGet(MovementClass* a0, int a1, int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    SlotScope scope(RSL_UNITS_MOVEMENTCLASSGET, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_units->MovementClassGet(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsMovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    SlotScope scope(RSL_UNITS_MOVEMENTCLASSINBOUNDS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
-        ArgValue(s_call, "x", a1);
-        ArgValue(s_call, "y", a2);
-    }
-    int result = s_inner_units->MovementClassInBounds(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsRefreshMovedUnits(MovementClass* a0, Unit* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_UNITS_REFRESHMOVEDUNITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-    }
-    s_inner_units->RefreshMovedUnits(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsRefreshUnitIfStale(MovementClass* a0, Unit* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_UNITS_REFRESHUNITIFSTALE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-    }
-    s_inner_units->RefreshUnitIfStale(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -3034,6 +2949,63 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
         ArgValue(s_call, "id", a1);
     }
     int result = s_inner_map->IsPadSlotFree(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMapGetGroundHeight(Vec3* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MAP_GETGROUNDHEIGHT, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgVec3(s_call, "pos", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i map.GetGroundHeight");
+        ImportVec3Xz(line, "pos", a0);
+    }
+    int result = s_inner_map->GetGroundHeight(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMapMovementClassGet(MovementClass* a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
+    SlotScope scope(RSL_MAP_MOVEMENTCLASSGET, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    int result = s_inner_map->MovementClassGet(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMapMovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_MOVEMENTCLASS, a0);
+    SlotScope scope(RSL_MAP_MOVEMENTCLASSINBOUNDS, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    int result = s_inner_map->MovementClassInBounds(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -5335,7 +5307,7 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_WEAPONS_WEAPONCANREACHUNIT)
             return true;
-        if (slot == RSL_UNITS_GETGROUNDHEIGHT)
+        if (slot == RSL_MAP_GETGROUNDHEIGHT)
             return true;
         if (slot == RSL_SCRIPTS_GETSWEETSPOT)
             return true;
@@ -5393,6 +5365,8 @@ void HookSeams(const bool* on)
     s_rec_scripts = *s_inner_scripts;
     s_inner_movement = g_seams.movement;
     s_rec_movement = *s_inner_movement;
+    s_inner_mission = g_seams.mission;
+    s_rec_mission = *s_inner_mission;
     s_inner_files = g_seams.files;
     s_rec_files = *s_inner_files;
     s_inner_network = g_seams.network;
@@ -5653,18 +5627,8 @@ void HookSeams(const bool* on)
         s_rec_orders.OrderOrStatusFlags = RecOrdersOrderOrStatusFlags;
     if (on[SUB_UNITS])
         s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
-    if (on[SUB_UNITS] || on[SUB_TARGETING])
-        s_rec_units.GetGroundHeight = RecUnitsGetGroundHeight;
     if (on[SUB_UNITS])
         s_rec_units.SetStateBits = RecUnitsSetStateBits;
-    if (on[SUB_UNITS])
-        s_rec_units.MovementClassGet = RecUnitsMovementClassGet;
-    if (on[SUB_UNITS])
-        s_rec_units.MovementClassInBounds = RecUnitsMovementClassInBounds;
-    if (on[SUB_UNITS])
-        s_rec_units.RefreshMovedUnits = RecUnitsRefreshMovedUnits;
-    if (on[SUB_UNITS])
-        s_rec_units.RefreshUnitIfStale = RecUnitsRefreshUnitIfStale;
     if (on[SUB_UNITS] || on[SUB_WEAPONS])
         s_rec_units.MarkRecentlyDamaged = RecUnitsMarkRecentlyDamaged;
     if (on[SUB_UNITS])
@@ -5825,6 +5789,12 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
+    if (on[SUB_MAP] || on[SUB_TARGETING])
+        s_rec_map.GetGroundHeight = RecMapGetGroundHeight;
+    if (on[SUB_MAP])
+        s_rec_map.MovementClassGet = RecMapMovementClassGet;
+    if (on[SUB_MAP])
+        s_rec_map.MovementClassInBounds = RecMapMovementClassInBounds;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
         s_rec_scripts.StartScript = RecScriptsStartScript;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
@@ -6117,6 +6087,7 @@ void HookSeams(const bool* on)
     g_seams.map = &s_rec_map;
     g_seams.scripts = &s_rec_scripts;
     g_seams.movement = &s_rec_movement;
+    g_seams.mission = &s_rec_mission;
     g_seams.files = &s_rec_files;
     g_seams.network = &s_rec_network;
 }

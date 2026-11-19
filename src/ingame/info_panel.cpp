@@ -58,7 +58,7 @@ struct Object3do;
 #include "../weapons/weapon_def.h"
 #include "../map/cell.h"
 #include "map_grid.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../orders/order_list.h"
 #include "../units/unit_commands.h"
 #include "../graphics/gaf_frame.h"
@@ -1228,8 +1228,8 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         else
             DrawRectangle(&ctx, &box, *colors);
     }
-    if (g_game->net->GetGameType() == 3 ||
-        g_game->net->GetGameType() == 2) {
+    if (g_seams.mission->GetGameType() == 3 ||
+        g_seams.mission->GetGameType() == 2) {
         ResetClipRect((int*)&ctx);
         DrawScorePanel((void*)&ctx);
         ctx.SetClipRect(g_game->rect);
@@ -1610,7 +1610,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 UnitDef* definition = unit->def;
                 unsigned int unitFlags = definition->flags2;
                 int flagsOk = ((unitFlags & 0x20000) | ((unitFlags >> 1) & 0x20000)) >> 0x11;
-                int gameMode = g_game->net->GetGameType();
+                int gameMode = g_seams.mission->GetGameType();
                 if (gameMode == 3 && flagsOk)
                     strcpy(text, unit->player->name);
                 else

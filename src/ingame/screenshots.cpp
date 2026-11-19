@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../../interfaces/seams.h"
 #include "screenshots.h"
 
@@ -44,7 +44,7 @@ void MainFrameTick()
         PopKey();
         PopUntilNamedLayout(0);
         g_game->flags_37ebe &= 0xfffe;
-        if (g_seams.map->GetGameType(g_game->net) != 3)
+        if (g_seams.mission->GetGameType() != 3)
             g_game->otherFlags &= 0xfffe;
     }
     if (key == 0xd6) {

@@ -23,7 +23,7 @@ struct SaveGamePlayerEntry {
 #include "game.h"
 #pragma pack(pop)
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../../link/globals.h"
 extern char* g_saveBankName;
@@ -119,18 +119,18 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     sprintf(buf, g_buildTimeFormat, g_game->build_time);
     (&file)->SetIntegerItem(buf, 0);
     (&file)->SetIntegerItem(g_maxUnitsKey, g_game->maxUnits_37eec);
-    (&file)->SetStringItem(g_campaignKey, g_seams.map->GetCampaignName(g_game->net));
+    (&file)->SetStringItem(g_campaignKey, g_seams.mission->GetCampaignName());
     if (g_game->mode_391f1 != 6) {
-        g_seams.map->AdvanceMission(g_game->net);
+        g_seams.mission->AdvanceMission();
     }
-    (&file)->SetStringItem(g_missionKey, g_seams.map->GetMissionName(g_game->net));
-    (&file)->SetStringItem(g_mapKey, g_seams.map->GetMissionName(g_game->net));
+    (&file)->SetStringItem(g_missionKey, g_seams.mission->GetMissionName());
+    (&file)->SetStringItem(g_mapKey, g_seams.mission->GetMissionName());
     (&file)->SetIntegerItem(g_difficultyKey, g_game->difficulty);
     (&file)->SetIntegerItem(g_sideKey, (*(SaveGamePlayerEntry(*)[10])&g_game->players_1b8a)[g_game->localPlayer].info->side);
     (&file)->SetIntegerItem(g_playersKey, g_game->numPlayers);
-    (&file)->SetIntegerItem(g_gameTypeKey, g_seams.map->GetGameType(g_game->net));
+    (&file)->SetIntegerItem(g_gameTypeKey, g_seams.mission->GetGameType());
     (&file)->SetStringItem(g_thumbsKey, g_game->campaignMissionStatus_391cf);
-    if (g_seams.map->GetGameType(g_game->net) == 2) {
+    if (g_seams.mission->GetGameType() == 2) {
         (&file)->SetIntegerItem(g_commanderDeathKey, g_game->options->commanderDeath);
         (&file)->SetIntegerItem(g_locationKey, g_game->options->fixedLocations);
         (&file)->SetIntegerItem(g_mappingKey, g_game->options->mapping);
@@ -139,7 +139,7 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
     }
     if (g_game->mode_391f1 != 6) {
         (&file)->SetIntegerItem(g_betweenMissionsKey, 1);
-        g_seams.map->SelectMission(g_game->net, 0, g_game->mission);
+        g_seams.mission->SelectMission(g_game->mission);
     }
     if (description != 0) {
         (&file)->SetStringItem(g_descriptionKey, description);

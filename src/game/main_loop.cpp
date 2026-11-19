@@ -35,7 +35,7 @@ struct GafSequenceSource;
 #include "mission_option_flags.h"
 #include "settings.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 
@@ -168,7 +168,7 @@ void InitFrame()
     g_game->bits_2a44.bit2 = 0;
     g_game->bits_2a44.bit3 = 0;
     g_game->bits_2a44.bit0 = 0;
-    g_seams.map->SetMissionType(0);
+    g_seams.mission->SetMissionType(0);
     g_game->endGameVictory = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
@@ -184,7 +184,7 @@ void ReturnToMainMenuFrame()
     g_game->bits_2a44.bit2 = 0;
     g_game->bits_2a44.bit3 = 0;
     g_game->bits_2a44.bit0 = 0;
-    g_seams.map->SetMissionType(0);
+    g_seams.mission->SetMissionType(0);
     g_game->endGameVictory = 0;
     g_game->bits_3923b.flag2_3923b = 0;
     ClearKeyQueue();
@@ -200,12 +200,12 @@ void MenuFrame()
     g_seams.units->RefreshUnitInfo();
     HarnessStartSkirmish();
     RunFrontendStateMachine();
-    if (g_game->bits_2a44.bit2 && g_seams.map->GetGameType(g_game->net) == 1) {
+    if (g_game->bits_2a44.bit2 && g_seams.mission->GetGameType() == 1) {
         HideSoftwareCursor();
         g_game->mode_391f1 = 4;
         g_game->handler = CampaignSetupFrame;
         SetCloseHandler(LeaveNetGameCallback, 0);
-    } else if (g_game->bits_2a44.bit2 && g_seams.map->GetGameType(g_game->net) == 2) {
+    } else if (g_game->bits_2a44.bit2 && g_seams.mission->GetGameType() == 2) {
         HideSoftwareCursor();
         g_game->mode_391f1 = 5;
         g_game->handler = LoadingScreenFrame;
@@ -307,7 +307,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     p->metalStorageBonus = (float)(v >= 200 ? v : 200);
 
     CreateUnitPos pos;
-    if (g_seams.map->GetStartPosition(g_game->net, 0, (Vec3*)&pos, startpos)) {
+    if (g_seams.mission->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = g_seams.units->FindUnitTypeId(
             g_game->sideDefs[g_game->players[team].info->side].commander);
         g_seams.units->CreateUnit(team, id, *(Vec3*)&pos, 1, 1, 0);

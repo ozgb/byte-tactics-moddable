@@ -8,7 +8,7 @@
 
 #include "../sound/sound.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../graphics/memory_cache.h"
 
@@ -105,7 +105,7 @@ void FlipScreen();
 #include "../game/game_state.h"
 #include "../gui/keyboard.h"
 void __stdcall SetFrontendState(int state, int line, const char* file);
-#include "../map/map_list.h"
+#include "../mission/map_list.h"
 void __stdcall SetCursorMode(int n);
 #include "campaign_menu.h"
 #include "../gui/dialogs.h"
@@ -179,10 +179,10 @@ void SetUpEndMissionScreen()
     *(float*)&g_game->savedPaletteBrightness = display->paletteBrightness;
     display->paletteBrightness = 1.0f;
     unsigned char* palette = (unsigned char*)GameAllocIgnoreTag("Palette", 0x400);
-    char* name = g_game->net->GetNameSlot(5);
+    char* name = g_seams.mission->GetNameSlot(5);
     if (name == 0)
         g_game->image_3907b = 0;
-    if (g_game->net->GetGameType() == 1
+    if (g_seams.mission->GetGameType() == 1
         && g_game->endGameVictory && name != 0) {
         BuildDataPath(path, "bitmaps\\glamour", name + 1, "PCX");
         if (HAPI_FileLengthByName(path) == 0)
@@ -193,7 +193,7 @@ void SetUpEndMissionScreen()
         g_game->palette_3907f = palette;
         return;
     }
-    if (g_game->net->GetGameType() == 1)
+    if (g_seams.mission->GetGameType() == 1)
         LoadPictureCached("Outcome1", 0, 0, 1);
     else
         LoadPictureCached("Outcome0", 0, 0, 1);
@@ -204,8 +204,8 @@ void CollectEndGameStats()
 {
     EndGamePlayerStat* stats = (EndGamePlayerStat*)g_game->slots_38dd9;
     g_game->won = g_game->endGameVictory;
-    if (g_game->net->GetGameType() == 1) {
-        g_game->mission = g_game->net->GetMissionIndex();
+    if (g_seams.mission->GetGameType() == 1) {
+        g_game->mission = g_seams.mission->GetMissionIndex();
         g_game->campaignMissionStatus[g_game->mission] = g_game->won ? 'W' : 'L';
     }
     g_game->maxKills = 10;
@@ -530,12 +530,12 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         g_game->frontendNextSubState = 10;
         SetCursorOverlayEnabled(1);
         SetCursorMode(0x14);
-        if (g_game->net->SelectMission(FindGadgetChecked(entries, "Missions")->u.list.selected)) {
+        if (g_seams.mission->SelectMission(FindGadgetChecked(entries, "Missions")->u.list.selected)) {
             EnterMainMenuState();
             g_game->bits_2a44.bit2 = 0;
             g_game->bits_2a44.bit3 = 1;
             g_game->bits_2a44.bit0 = 0;
-            SetMissionType(1);
+            g_seams.mission->SetMissionType(1);
             g_game->endGameVictory = 0;
             g_game->bits_3923b_2.bit2_3923b = 0;
             SetFrontendState(13, 757, "c:\\cavedog\\wargame\\endgame.cpp");
@@ -576,10 +576,10 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
 // FUNCTION: 0x41f040
 int ShouldShowNextMission()
 {
-    if (g_game->net->GetGameType() == 1 &&
+    if (g_seams.mission->GetGameType() == 1 &&
         ((g_game->won == 0 &&
-          g_game->net->MissionExists(g_game->mission + 1) == 0) ||
-         g_game->net->MissionExists(g_game->mission + 1) != 0)) {
+          g_seams.mission->MissionExists(g_game->mission + 1) == 0) ||
+         g_seams.mission->MissionExists(g_game->mission + 1) != 0)) {
         return 1;
     }
     return 0;
@@ -587,10 +587,10 @@ int ShouldShowNextMission()
 
 static inline int HasNextMission()
 {
-    if (g_game->net->GetGameType() == 1 &&
+    if (g_seams.mission->GetGameType() == 1 &&
         ((g_game->won == 0 &&
-          ((Mission*)g_game->net)->MissionExists(g_game->mission + 1) == 0) ||
-         ((Mission*)g_game->net)->MissionExists(g_game->mission + 1) != 0)) {
+          g_seams.mission->MissionExists(g_game->mission + 1) == 0) ||
+         g_seams.mission->MissionExists(g_game->mission + 1) != 0)) {
         return 1;
     }
     return 0;
@@ -610,7 +610,7 @@ void __stdcall OpenEndMissionScreen()
     char* entries = (char*)layer->entries;
     char next = HasNextMission();
     if (next) {
-        g_game->net->SelectMission(g_game->mission);
+        g_seams.mission->SelectMission(g_game->mission);
         LoadPictureCached("outcome1", 1, 1, 0);
         strcpy(layer->entries->u.names.choice, "Start");
     } else {
@@ -619,7 +619,7 @@ void __stdcall OpenEndMissionScreen()
     }
     next = HasNextMission();
     if (next) {
-        int count = g_game->net->BuildMissionList((char**)&data->items);
+        int count = g_seams.mission->BuildMissionList((char**)&data->items);
         data->items = BuildScrollItems1((char*)data->items, g_game->campaignMissionStatus, count);
         int i;
         for (i = 0; i < 0x19; i++) {
@@ -764,7 +764,7 @@ void __stdcall RunEndGameState()
     HandleNetPackets();
     switch(g_game->endGameState) {
     case 0:
-        if(g_seams.map->GetGameType(g_game->net)==3) {
+        if(g_seams.mission->GetGameType()==3) {
             Display* e=GetDisplay();
             g_game->lastFrame=AllocSurface("Copy of last game frame",e->width,e->height);
             DrawSurface(g_game->lastFrame,((void*)g_game->screen),e->width,e->height);
@@ -820,14 +820,14 @@ void __stdcall RunEndGameState()
         break;
     case 5: {
         SetUpEndMissionScreen();
-        int next=g_seams.map->MissionExists(g_game->net, 0, g_game->mission+1);
-        if(g_seams.map->GetGameType(g_game->net)==1 && g_game->endGameVictory && !next && !g_game->skip) {
+        int next=g_seams.mission->MissionExists(g_game->mission+1);
+        if(g_seams.mission->GetGameType()==1 && g_game->endGameVictory && !next && !g_game->skip) {
             if((unsigned char)GetDisplay()->flags.bits.fullscreen) {
                 if(!g_game->players[0].info->side) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");
                 else SetFrontendState(5,0x4d3,"c:\\cavedog\\wargame\\endgame.cpp");
             } else SetFrontendState(2,0x4d9,"c:\\cavedog\\wargame\\endgame.cpp");
             SetGameMode(2);
-        } else if(g_seams.map->GetGameType(g_game->net)==1 && g_game->endGameVictory && g_game->image_3907b) {
+        } else if(g_seams.mission->GetGameType()==1 && g_game->endGameVictory && g_game->image_3907b) {
             memset(palette,0,sizeof(palette));
             StartPaletteFade((unsigned char*)g_game->palette_3907f,(unsigned char*)palette,5);
             g_game->nextTime=GetTicks()+1;
@@ -872,7 +872,7 @@ void __stdcall RunEndGameState()
         UpdateMenu(&g_game->gui); BlitMenuLayers(&g_game->gui,0,0);
         int skip=0;
         int clicked=PopKey();
-        if(clicked && g_seams.map->GetGameType(g_game->net)!=3) skip=1;
+        if(clicked && g_seams.mission->GetGameType()!=3) skip=1;
         if(g_game->deadline<GetTicks() || skip) {
             if(clicked) {
                 { ENABLE_BARS("Kills") }
@@ -893,7 +893,7 @@ void __stdcall RunEndGameState()
             case 5: { ENABLE_BARS("MWasted") } PlaySoundByName("EndGameStatBar",0); break;
             case 6: { ENABLE_BARS("Score") } PlaySoundByName("EndGameScore",0); break;
             }
-            if(g_seams.map->GetGameType(g_game->net)==3) {
+            if(g_seams.mission->GetGameType()==3) {
                 Player* player=&g_game->players[g_game->localPlayer];
                 for(int j=0;j<2;++j) SendPlayerEconomy(player,0,0);
             }

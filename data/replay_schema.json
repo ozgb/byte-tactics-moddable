@@ -173,7 +173,7 @@
    "../map/pool.h",
    "../graphics/model_types.h",
    "pack1:../map/spatial_bucket.h",
-   "../map/mission.h",
+   "../mission/mission.h",
    "../weapons/weapons.h"
   ],
   "objects": {
@@ -2982,6 +2982,7 @@
      "FootprintValue",
      "GetCellCachedWidth",
      "GetFootprintHeight",
+     "GetGroundHeight",
      "GetPassMapFootprintValue",
      "IsFootprintClear",
      "MovementClassBuildView::BuildPassMap",
@@ -3032,16 +3033,6 @@
      "RefreshPassMapsForUnit"
     ],
     "note": "the movement class table"
-   },
-   {
-    "kind": "field_maybe_written",
-    "target": "MovementClassTable::entries",
-    "rule": "all-of",
-    "object": "MovementClass",
-    "functions": [
-     "ApplyMapEvent"
-    ],
-    "note": "the movement class table: REFRESH_PASS_MAP refreshes the pass map of the class its value names"
    },
    {
     "kind": "deref_read",
@@ -3371,6 +3362,7 @@
     "target": "*unsigned int",
     "rule": "fields",
     "functions": [
+     "MovementClass::Get",
      "MovementClass::RefreshPassMap",
      "MovementClassBuildView::BuildPassMap",
      "setcell"
@@ -4290,7 +4282,7 @@
      "los_radar.GetVisibleEnemiesInRadius",
      "weapons.GetWeaponRange",
      "weapons.WeaponCanReachUnit",
-     "units.GetGroundHeight",
+     "map.GetGroundHeight",
      "scripts.GetSweetSpot"
     ],
     "services": [
@@ -4477,15 +4469,6 @@
    "units": {
     "status": "pending",
     "slots": {
-     "GetGroundHeight": {
-      "args": {
-       "pos": {
-        "mode": "vec3",
-        "label": "pos",
-        "axes": "xz"
-       }
-      }
-     },
      "UnitTypeSetAddTypeOrCategory": {
       "args": {
        "self": {
@@ -4645,90 +4628,6 @@
       "record": false,
       "reason": "#660 part 3"
      },
-     "GetNameSlot": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetNameSlotSlot"
-     },
-     "SetMissionType": {
-      "record": false,
-      "reason": "#660 part 3"
-     },
-     "FreeOtaEnumCacheAndMission": {
-      "record": false,
-      "reason": "#660 part 3"
-     },
-     "AdvanceMission": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "AdvanceMissionSlot"
-     },
-     "GetCampaignName": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetCampaignNameSlot"
-     },
-     "GetMissionIndex": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionIndexSlot"
-     },
-     "GetMissionName": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionNameSlot"
-     },
-     "GetStartPosition": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetStartPositionSlot"
-     },
-     "LoadCampaign": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "LoadCampaignSlot"
-     },
-     "LoadMissionByName": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "LoadMissionByNameSlot"
-     },
-     "MissionExists": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "MissionExistsSlot"
-     },
-     "RefreshMapList": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "RefreshMapListSlot"
-     },
-     "SelectMission": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "SelectMissionSlot"
-     },
-     "ComputeMapChecksum": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "ComputeMapChecksumSlot"
-     },
-     "GetTerrainLength": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetTerrainLengthSlot"
-     },
-     "GetGameType": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetGameTypeSlot",
-      "args": {
-       "mission": {
-        "mode": "object",
-        "kind": "Mission"
-       }
-      }
-     },
      "CanBuildAt": {
       "functions": [
        "CanBuildAt",
@@ -4837,12 +4736,175 @@
       "record": false,
       "reason": "a dump query, called from the harness only",
       "native": "WriteStateSlot"
+     },
+     "GetGroundHeight": {
+      "args": {
+       "pos": {
+        "mode": "vec3",
+        "label": "pos",
+        "axes": "xz"
+       }
+      },
+      "functions": [
+       "GetGroundHeight",
+       "WholePart"
+      ]
+     },
+     "MovementClassGet": {
+      "native": "MovementClassGetSlot",
+      "functions": [
+       "MovementClass::Get"
+      ]
+     },
+     "MovementClassInBounds": {
+      "native": "MovementClassInBoundsSlot",
+      "functions": [
+       "MovementClass::InBounds"
+      ]
+     },
+     "RefreshMovedUnits": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "RefreshMovedUnitsSlot"
+     },
+     "RefreshUnitIfStale": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "RefreshUnitIfStaleSlot"
      }
     },
     "imports": [
      "los_radar.GetMapCell",
      "pathfinding.CellsChanged"
     ]
+   },
+   "mission": {
+    "status": "pending",
+    "slots": {
+     "GetGameType": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetGameTypeSlot"
+     },
+     "GetNameSlot": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetNameSlotSlot"
+     },
+     "SetMissionType": {
+      "record": false,
+      "reason": "#660 part 3"
+     },
+     "FreeOtaEnumCacheAndMission": {
+      "record": false,
+      "reason": "#660 part 3"
+     },
+     "AdvanceMission": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "AdvanceMissionSlot"
+     },
+     "GetCampaignName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetCampaignNameSlot"
+     },
+     "GetMissionIndex": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMissionIndexSlot"
+     },
+     "GetMissionName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetMissionNameSlot"
+     },
+     "GetStartPosition": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetStartPositionSlot"
+     },
+     "LoadCampaign": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "LoadCampaignSlot"
+     },
+     "LoadMissionByName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "LoadMissionByNameSlot"
+     },
+     "MissionExists": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "MissionExistsSlot"
+     },
+     "RefreshMapList": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "RefreshMapListSlot"
+     },
+     "SelectMission": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "SelectMissionSlot"
+     },
+     "ComputeMapChecksum": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "ComputeMapChecksumSlot"
+     },
+     "GetTerrainLength": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetTerrainLengthSlot"
+     },
+     "BuildMissionList": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "BuildMissionListSlot"
+     },
+     "CountStartPositions": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "CountStartPositionsSlot"
+     },
+     "GetBriefing": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetBriefingSlot"
+     },
+     "GetDescription": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetDescriptionSlot"
+     },
+     "GetPlanet": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetPlanetSlot"
+     },
+     "GetTerrainSizeTier": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetTerrainSizeTierSlot"
+     },
+     "GetTranslatedName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "GetTranslatedNameSlot"
+     },
+     "HasMissionName": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "HasMissionNameSlot"
+     },
+     "SelectSchema": {
+      "record": false,
+      "reason": "#660 part 3",
+      "native": "SelectSchemaSlot"
+     }
+    }
    },
    "network": {
     "status": "pending"
@@ -6357,7 +6419,7 @@
    }
   },
   "ai": {
-   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [5, 0], "status": "pending", "imports": [], "pending": {"untracked": 14, "ruleless": 3, "unresolvedSlots": ["Apply", "UpdateSquads", "CreateSquadManager", "FreeSquadManager", "WriteState"], "unannotatedArgs": ["Apply(event)", "DumpPlayerAI(file)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/ai.h", "struct": "AiSeam", "version": [5, 0], "status": "pending", "imports": [], "pending": {"untracked": 13, "ruleless": 3, "unresolvedSlots": ["Apply", "UpdateSquads", "CreateSquadManager", "FreeSquadManager", "WriteState"], "unannotatedArgs": ["Apply(event)", "DumpPlayerAI(file)", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "AiEvent*", "line": "event", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "DumpPlayerAI": {"conv": "__stdcall", "ret": "void", "functions": ["DumpPlayerAI"], "reads": ["Game.ticks", "Game.difficulty"], "writes": [], "objectReads": ["Player.type"], "objectWrites": [], "allOf": ["UnitDef"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "file", "type": "void*", "line": "file", "mode": "pending"}], "result": null, "native": "DumpPlayerAI"},
@@ -6406,7 +6468,7 @@
    }
   },
   "targeting": {
-   "header": {"interface": "interfaces/targeting.h", "struct": "TargetingSeam", "version": [2, 0], "status": "complete", "imports": ["los_radar.GetVisibleEnemiesInRadius", "weapons.GetWeaponRange", "weapons.WeaponCanReachUnit", "units.GetGroundHeight", "scripts.GetSweetSpot"], "issue": 669},
+   "header": {"interface": "interfaces/targeting.h", "struct": "TargetingSeam", "version": [2, 0], "status": "complete", "imports": ["los_radar.GetVisibleEnemiesInRadius", "weapons.GetWeaponRange", "weapons.WeaponCanReachUnit", "map.GetGroundHeight", "scripts.GetSweetSpot"], "issue": 669},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["SetWeaponTargetUnit", "SetWeaponTargetPos", "ClearWeaponTarget", "ResetWeaponTarget", "PublishCleared"], "reads": [], "writes": [], "objectReads": ["Unit.id", "Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "event", "type": "TargetingEvent*", "line": "event", "mode": "struct", "kind": "TargetingEvent", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyTargetingSlot"},
     "GetWeaponTargetUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["GetWeaponTargetUnit"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "GetWeaponTargetUnit"},
@@ -6473,15 +6535,10 @@
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [2, 0], "status": "pending", "imports": [], "pending": {"untracked": 64, "ruleless": 27, "unresolvedSlots": ["MovementClassGet", "MovementClassInBounds", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 64, "ruleless": 27, "unresolvedSlots": ["UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(pos)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "WriteState(writer)"]}},
    "slots": {
     "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateAllUnits"},
-    "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.height"], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
     "SetStateBits": {"conv": "__stdcall", "ret": "void", "functions": ["Unit::SetStateBits"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.player", "Unit.script"], "objectWrites": ["Unit.activateFlags"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "mask", "type": "int", "line": "mask", "mode": "scalar"}, {"name": "set", "type": "int", "line": "set", "mode": "scalar"}], "result": null, "native": "SetStateBits"},
-    "MovementClassGet": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "MovementClassGet"},
-    "MovementClassInBounds": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "x", "type": "unsigned int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "unsigned int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "MovementClassInBounds"},
-    "RefreshMovedUnits": {"conv": "__stdcall", "ret": "void", "functions": ["MovementClass::RefreshMovedUnits"], "reads": ["Game.ticks"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.width", "MovementClass.height", "MovementClass.lastTick", "MovementClass.footprintZ"], "objectWrites": ["UnitMotion.pathLockStamp", "MovementClass.lastTick"], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RefreshMovedUnits"},
-    "RefreshUnitIfStale": {"conv": "__stdcall", "ret": "void", "functions": ["MovementClass::RefreshUnitIfStale"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.width", "MovementClass.height", "MovementClass.lastTick", "MovementClass.footprintZ"], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "RefreshUnitIfStale"},
     "MarkRecentlyDamaged": {"conv": "__stdcall", "ret": "void", "functions": ["MarkRecentlyDamaged"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "MarkRecentlyDamaged"},
     "NotifyUnitRefs": {"conv": "__stdcall", "ret": "void", "functions": ["NotifyUnitRefs"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "event", "type": "int", "line": "event", "mode": "scalar"}], "result": null, "native": "NotifyUnitRefs"},
     "UnitTypeSetAddTypeOrCategory": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "UnitTypeSet*", "line": "self", "mode": "pending"}, {"name": "text", "type": "char*", "line": "text", "mode": "text"}, {"name": "out", "type": "int*", "line": "out", "mode": "pending"}], "result": null, "native": "UnitTypeSetAddTypeOrCategory"},
@@ -6562,7 +6619,7 @@
    }
   },
   "map": {
-   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [4, 1], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}}},
+   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [5, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "MovementClass::RefreshPassMap", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cobStateFlags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "MovementClass.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "MovementClass", "Feature"], "args": [{"name": "event", "type": "MapEvent*", "line": "event", "mode": "struct", "kind": "MapEvent", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
@@ -6571,7 +6628,10 @@
     "BuildAllPassMaps": {"conv": "__stdcall", "ret": "void", "functions": ["BuildAllPassMaps", "MovementClassBuildView::BuildPassMap", "GetPassMapCellValue", "setcell"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": ["Game.progress_38d73"], "objectReads": ["Unit.motion", "Cell.unit", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "MovementClass.footprintX", "MovementClass.maxSlope", "MovementClass.width", "MovementClass.height", "MovementClass.cells", "MovementClass.lastTick", "MovementClass.name", "MovementClass.footprintZ", "MovementClass.maxWaterDepth", "MovementClass.minWaterDepth", "MovementClass.badSlope", "MovementClass.maxWaterSlope", "MovementClass.badWaterSlope", "Feature.flags16"], "objectWrites": ["MovementClass.width", "MovementClass.height", "MovementClass.cells"], "allOf": ["Unit", "Cell", "MovementClass", "Feature"], "args": [], "result": null, "native": "BuildAllPassMaps"},
     "SnapWorldPosToFootprint": {"conv": "__stdcall", "ret": "void", "functions": ["SnapWorldPosToFootprint", "CellToWorld", "GetFootprintHeight", "WorldToCell"], "reads": ["Game.width", "Game.height", "Game.seaLevel"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "UnitDef.footprintx", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.mobile", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "inout"}], "result": null, "native": "SnapWorldPosToFootprint"},
     "CanPlaceFootprintAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceFootprintAt"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.poolCount"], "writes": [], "objectReads": ["Unit.def", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.playerIndex", "UnitDef.flags1", "UnitDef.maxslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Unit", "Cell", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceFootprintAt"},
-    "IsPadSlotFree": {"conv": "__stdcall", "ret": "int", "functions": ["IsPadSlotFree"], "reads": [], "writes": [], "objectReads": ["Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.transportPiece"], "objectWrites": [], "allOf": [], "args": [{"name": "pad", "type": "Unit*", "line": "pad", "mode": "object", "kind": "Unit"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPadSlotFree"}
+    "IsPadSlotFree": {"conv": "__stdcall", "ret": "int", "functions": ["IsPadSlotFree"], "reads": [], "writes": [], "objectReads": ["Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.transportPiece"], "objectWrites": [], "allOf": [], "args": [{"name": "pad", "type": "Unit*", "line": "pad", "mode": "object", "kind": "Unit"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPadSlotFree"},
+    "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.height"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
+    "MovementClassGet": {"conv": "__stdcall", "ret": "int", "functions": ["MovementClass::Get"], "reads": [], "writes": [], "objectReads": ["MovementClass.width", "MovementClass.cells"], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "MovementClassGetSlot"},
+    "MovementClassInBounds": {"conv": "__stdcall", "ret": "int", "functions": ["MovementClass::InBounds"], "reads": [], "writes": [], "objectReads": ["MovementClass.width", "MovementClass.height"], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "MovementClass*", "line": "self", "mode": "object", "kind": "MovementClass"}, {"name": "x", "type": "unsigned int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "unsigned int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "MovementClassInBoundsSlot"}
    }
   },
   "scripts": {
@@ -6640,6 +6700,12 @@
     "OrderFxSerializeToSave": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "target", "type": "OrderFx*", "line": "target", "mode": "object", "kind": "OrderFx", "poly": "OrderFx"}, {"name": "order", "type": "Order*", "line": "order", "mode": "object", "kind": "Order"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "OrderFxSerializeToSave"},
     "GoalHasNetUnitState": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "goal", "type": "PathGoal*", "line": "goal", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "GoalHasNetUnitState"},
     "GoalSerializeNetUnitState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "goal", "type": "PathGoal*", "line": "goal", "mode": "pending"}, {"name": "stream", "type": "BitWriter*", "line": "stream", "mode": "pending"}], "result": null, "native": "GoalSerializeNetUnitState"}
+   }
+  },
+  "mission": {
+   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [1, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "BuildMissionList": {"reason": "#660 part 3", "native": "BuildMissionListSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
+   "slots": {
+
    }
   },
   "files": {

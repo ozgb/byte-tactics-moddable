@@ -25,7 +25,7 @@ struct OrderView;
 struct Spawn;
 struct Player;
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../network/player.h"
 
@@ -81,7 +81,6 @@ struct Block {
 
 #pragma pack(pop)
 
-int __stdcall GetGroundHeight(Vec3* pos);
 #include "unit_targets.h"
 #include "../game/los_radar_events.h"
 #include "../../interfaces/seams.h"
@@ -105,9 +104,9 @@ void __stdcall SnapUnitToGround(Unit* unit)
 {
     extern Game* g_game;
     if (((TerrainFlags*)&unit->def->flags1)->bits.floats) {
-        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
+        unit->pos.y = max(g_seams.map->GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
     } else {
-        unit->pos.y = GetGroundHeight(&unit->pos) << 16;
+        unit->pos.y = g_seams.map->GetGroundHeight(&unit->pos) << 16;
     }
 }
 
@@ -120,9 +119,9 @@ void __stdcall UpdateUnitHeight(Unit* unit)
         if (unit->motion && (unit->flags & 3) == 1) {
             if (((TerrainFlags*)&unit->def->flags1)->bits.over_water) {
                 if (((TerrainFlags*)&unit->def->flags1)->bits.floats) {
-                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
+                    unit->pos.y = max(g_seams.map->GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
                 } else {
-                    unit->pos.y = GetGroundHeight(&unit->pos) << 16;
+                    unit->pos.y = g_seams.map->GetGroundHeight(&unit->pos) << 16;
                 }
             } else if (((TerrainFlags*)&unit->def->flags1)->bits.on_water) {
                 Fixed h;

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <vector>
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 class StringRef;
 
@@ -80,7 +80,7 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
         BuildDataPath(a.path, "Maps", files[s.i].data, "OTA");
         TdfFile parser;
         if (parser.LoadFile(a.path) != 0
-            && g_game->net->SelectSchema(3, &parser, 0) != 0) {
+            && g_seams.mission->SelectSchema(3, &parser, 0) != 0) {
             strcpy(a.name, files[s.i].data);
             StripExtension(a.name);
             strcpy(a.lower, a.name);

@@ -51,7 +51,7 @@ struct PieceList {
 
 #include "../map/feature.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 void WriteScreenshot(char*, char*, int, int, int, int);
 

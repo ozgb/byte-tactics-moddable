@@ -18,7 +18,8 @@
     "files": 2,
     "host": 2,
     "los_radar": 3,
-    "map": 4,
+    "map": 5,
+    "mission": 1,
     "movement": 1,
     "network": 1,
     "orders": 4,
@@ -30,7 +31,7 @@
     "services": 1,
     "state_writer": 1,
     "targeting": 2,
-    "units": 2,
+    "units": 3,
     "weapons": 1,
     "wind_meteors": 2
   },

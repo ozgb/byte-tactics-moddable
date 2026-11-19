@@ -112,7 +112,7 @@ struct GameSessionRecord {
 
 #include "../network/player.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../gui/layer.h"
 typedef Layer SelectDialogLayer;
@@ -550,7 +550,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../util/registry.h"
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
-#include "../map/map_list.h"
+#include "../mission/map_list.h"
 #include "../../interfaces/services.h"
 #include "../gui/file_list.h"
 #include "options.h"
@@ -1310,7 +1310,7 @@ void __stdcall OpenReportDialog(unsigned int* count, char** names)
 // FUNCTION: 0x4436e0
 int InitScoreReporting(void)
 {
-    if (g_game->net->GetGameType() != 3)
+    if (g_seams.mission->GetGameType() != 3)
         return 0;
     int saved = (signed char)g_game->cursorMode;
     SetCursorMode(0x14);
@@ -1558,7 +1558,7 @@ void ShowSelectedMapInfo()
 
     if (FindGadgetIndex(g_game->gui.layer->entries, "MAPNAME", 5) != -1) {
         SetTranslatedTextByName(&g_game->gui, "MAPNAME",
-                     (char*)g_game->net->GetTranslatedName(), 0);
+                     (char*)g_seams.mission->GetTranslatedName(), 0);
     }
 
     sprintf(buffer, "%s  %s: %s",
@@ -1573,14 +1573,14 @@ void ShowSelectedMapInfo()
         entry->u.hotspot.frame = 0;
     }
     void* bmp = LoadRadarPic(
-        (char*)g_game->net->GetNameSlot(1), &outX, &outY);
+        (char*)g_seams.mission->GetNameSlot(1), &outX, &outY);
     entry->u.hotspot.frame = (GafFrame*)bmp;
     if (bmp != 0) {
         ResizeRadarPicture((GafFrame *)bmp, entry->width, entry->height, outX << 4, outY << 4);
     }
 
     SetTranslatedTextByName(&g_game->gui, "DESCRIPTION",
-                 (char*)g_game->net->GetDescription(), 0);
+                 (char*)g_seams.mission->GetDescription(), 0);
     MarkChanged(&g_game->gui);
 }
 
@@ -1610,7 +1610,7 @@ void OpenViewMapDialog()
 void __stdcall UpdateMapSelection(Gui* menu, Gadget* unused)
 {
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
-    if (g_game->net->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) == 0) {
+    if (g_seams.mission->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) == 0) {
         SetGadgetActiveByName(menu, "MAPPIC", 0);
     } else {
         SetGadgetActiveByName(menu, "MAPPIC", 1);
@@ -1640,14 +1640,14 @@ void __stdcall HandleMapSelectClick(Gui* param_1)
     if (IsCurrentGadgetNamed(param_1, "MAPNAMES") || IsCurrentGadgetNamed(param_1, "LOAD")) {
         PlaySoundByName("Multi", 0);
         Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
-        g_game->net->LoadMissionByName(
+        g_seams.mission->LoadMissionByName(
             SkipTextLines(g->u.list.lines, g->u.list.selected));
 
         Player* player = &g_game->players[g_game->localPlayer];
         strcpy(player->info->map,
-               g_game->net->GetMissionName());
+               g_seams.mission->GetMissionName());
         player->info->mapCrc =
-            g_game->net->ComputeMapChecksum();
+            g_seams.mission->ComputeMapChecksum();
 
         BroadcastPlayerInfo();
         ReportGameEvent(5);
@@ -1664,7 +1664,7 @@ void __stdcall HandleMapSelectClick(Gui* param_1)
 
     if (IsCurrentGadgetNamed(param_1, "PREVMENU")) {
         PlaySoundByName("Previous", 0);
-        g_game->net->LoadMissionByName(g_oldMapName);
+        g_seams.mission->LoadMissionByName(g_oldMapName);
         BroadcastPlayerInfo();
         return;
     }
@@ -1677,7 +1677,7 @@ void OpenMultiMapSelector()
 {
     g_oldMapName = (char*)GameAllocIgnoreTag("OLDMAPNAME", 0xc8);
 
-    if (!g_game->net->HasMissionName()) {
+    if (!g_seams.mission->HasMissionName()) {
         OpenMessageBox(&g_game->gui,
                      Translate("There are no multiplayer maps to choose from"),
                      0x140, 1, 1);
@@ -1685,8 +1685,8 @@ void OpenMultiMapSelector()
     }
 
     strcpy(g_oldMapName,
-           g_game->net->GetMissionName());
-    g_game->net->RefreshMapList(0);
+           g_seams.mission->GetMissionName());
+    g_seams.mission->RefreshMapList(0);
 
     int n = LoadMapList(0, 0, 0);
     if (n == 0) {
@@ -1715,7 +1715,7 @@ void OpenMultiMapSelector()
 
     Gui* menu = &g_game->gui;
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
-    if (g_game->net->LoadMissionByName(
+    if (g_seams.mission->LoadMissionByName(
             SkipTextLines(g->u.list.lines, g->u.list.selected)) == 0) {
         SetGadgetActiveByName(menu, "MAPPIC", 0);
     } else {
@@ -2806,7 +2806,7 @@ inline int FindFreeLobbyLogo()
 
 int LobbyMapCrcMatches()
 {
-    if (!g_game->net->GetTerrainLength()) {
+    if (!g_seams.mission->GetTerrainLength()) {
         return 0;
     }
     unsigned char me = FindHostSlot();
@@ -2822,7 +2822,7 @@ int LobbyMapCrcMatches()
     if (!check) {
         return 1;
     }
-    if (g_game->net->ComputeMapChecksum() != data->mapCrc)
+    if (g_seams.mission->ComputeMapChecksum() != data->mapCrc)
         return 0;
     return 1;
 }
@@ -3090,7 +3090,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
                 return;
             }
         }
-        if (!g_game->net->HasMissionName()) {
+        if (!g_seams.mission->HasMissionName()) {
             PlaySoundByName("Multi", 0);
             OpenMultiMapSelector();
             goto done;
@@ -3227,19 +3227,19 @@ void RefreshBattleRoomRows()
     output->u.list.rowCount = count;
 
     Gadget* mapname = FindGadgetChecked_C(g_game->gui.layer->entries, "MAPNAME");
-    char* map = g_game->net->GetMissionName();
-    if (!g_game->net->HasMissionName()) {
+    char* map = g_seams.mission->GetMissionName();
+    if (!g_seams.mission->HasMissionName()) {
         mapname->colour = 0xc;
         SetTranslatedTextByName(&g_game->gui, "MAPNAME", "NOT SELECTED", 0);
     } else {
-        char* cur = g_game->net->GetTranslatedName();
+        char* cur = g_seams.mission->GetTranslatedName();
         str = mapname->u.text;
         int differs = strcmp(str, cur);
         if (differs) {
             if (IsScreenNamed(&g_game->gui, "viewmap.gui"))
                 ShowSelectedMapInfo();
             else
-                g_game->net->LoadMissionByName(map);
+                g_seams.mission->LoadMissionByName(map);
         }
         if (!LobbyMapCrcMatches()) {
             mapname->colour = ((int)GetTicks() / 30 & 1) ? 0xc : 0;
@@ -3256,7 +3256,7 @@ void RefreshBattleRoomRows()
             mapname->colour = 0;
             SetGadgetGrayedOutByName(&g_game->gui, "MAP", 0);
         }
-        strcpy(str, g_game->net->GetTranslatedName());
+        strcpy(str, g_seams.mission->GetTranslatedName());
     }
 
     int i;
@@ -3421,11 +3421,11 @@ void RefreshBattleRoomRows()
             e = FindGadgetChecked_C(entries, name);
             if (!IsLocalHumanInRefreshBattleRoomRows(p) && !IsRemoteHumanInRefreshBattleRoomRows(p)) {
                 sprintf(e->u.text, "%s", "n/a");
-                e->colour = p->info->memory < g_game->net->GetTerrainSizeTier() ? 0xc : 0;
+                e->colour = p->info->memory < g_seams.mission->GetTerrainSizeTier() ? 0xc : 0;
                 e->active = 1;
             } else {
                 sprintf(e->u.text, "%d", p->info->memory);
-                e->colour = p->info->memory < g_game->net->GetTerrainSizeTier() ? 0xc : 0;
+                e->colour = p->info->memory < g_seams.mission->GetTerrainSizeTier() ? 0xc : 0;
                 e->active = 1;
             }
             sprintf(name, "READY%d", n);
@@ -4194,7 +4194,7 @@ void FillProviderList()
     g_game->conns = (ConnectionBlob*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
     if (g_game->conns != nullptr)
         memset(g_game->conns, 0, 0x50);
-    g_game->net->RefreshMapList(1);
+    g_seams.mission->RefreshMapList(1);
     host_net_uninit((host_net*)g_game->net_14);
     host_net_get_connections((host_net*)g_game->net_14, g_game->sessions, g_game->conns, g_game->data[0], (const host_guid*)DAT_004fcfb8);
     Gadget* entries = menu->entries;
@@ -4334,7 +4334,7 @@ void OpenBattleRoom()
     *(char*)g_game->list = 0;
     {
         Gadget* mem = FindGadgetChecked_C(g_game->gui.layer->entries, "MEMx");
-        mem->colour = player->info.get()->memory < g_game->net->GetTerrainSizeTier() ? 0xc : 0;
+        mem->colour = player->info.get()->memory < g_seams.mission->GetTerrainSizeTier() ? 0xc : 0;
         sprintf(mem->u.text, "%d", g_game->players[g_game->localPlayer].info.get()->memory);
     }
     isHost = g_game->players[g_game->localPlayer].info.get()->host;
@@ -4362,13 +4362,13 @@ void OpenBattleRoom()
     }
     BindNamedSliderWithCallback("ENERGY", 0x2711, energy, UpdateEnergyText);
 
-    g_game->net->RefreshMapList(1);
+    g_seams.mission->RefreshMapList(1);
     if (isHost && IsOnlineConfigLoaded() && g_lobbyMapName[0])
-        g_game->net->LoadMissionByName(g_lobbyMapName);
-    if (!g_game->net->HasMissionName())
+        g_seams.mission->LoadMissionByName(g_lobbyMapName);
+    if (!g_seams.mission->HasMissionName())
         FatalError("Could not find the multiplayer map!!");
-    strcpy(info->map, g_game->net->GetMissionName());
-    info->mapCrc = g_game->net->ComputeMapChecksum();
+    strcpy(info->map, g_seams.mission->GetMissionName());
+    info->mapCrc = g_seams.mission->ComputeMapChecksum();
     BroadcastPlayerInfo();
     BeginTextEdit(&g_game->gui, FindGadgetIndex(g_game->gui.layer->entries, "MESSAGE", 0xe));
 
@@ -4438,7 +4438,7 @@ void UpdateBattleRoom()
             if (host != 10) {
                 if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
                     PlayerInfo* info = g_game->players[host].info;
-                    g_seams.map->LoadMissionByName(g_game->net, 0, (char*)info);
+                    g_seams.mission->LoadMissionByName((char*)info);
                     SetNamedSliderValue(&g_game->gui, "MAXUNITS", g_game->players[host].info->maxUnits - 0x14);
                     SetNamedSliderValue(&g_game->gui, "METAL", g_game->players[host].info->metal * 100);
                     SetNamedSliderValue(&g_game->gui, "ENERGY", g_game->players[host].info->energy * 100);
@@ -4447,8 +4447,8 @@ void UpdateBattleRoom()
                     UpdateMetalText(&g_game->gui, 0);
                 } else if (IsScreenNamed(&g_game->gui, "viewmap.gui") != 0) {
                     PlayerInfo* info = g_game->players[host].info;
-                    if (strcmp(g_seams.map->GetMissionName(g_game->net), info->map) != 0) {
-                        g_seams.map->LoadMissionByName(g_game->net, 0, (char*)g_game->players[host].info.get());
+                    if (strcmp(g_seams.mission->GetMissionName(), info->map) != 0) {
+                        g_seams.mission->LoadMissionByName((char*)g_game->players[host].info.get());
                         ShowSelectedMapInfo();
                         MarkLayerChanged(&g_game->gui);
                     }

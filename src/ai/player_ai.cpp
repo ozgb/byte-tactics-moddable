@@ -14,7 +14,7 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
 #include "../units/unit_def.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../map/feature.h"
 

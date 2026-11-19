@@ -224,7 +224,7 @@ struct UnitDefNameKeyView {
     char unknown_220[0x249 - 0x220];
 };
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../game/mission_conditions.h"
 
 #include "../game/game.h"

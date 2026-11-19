@@ -263,17 +263,6 @@ void __stdcall Imp_units_MarkRecentlyDamaged(Unit* a0)
     (void)r;
 }
 
-int __stdcall Imp_units_GetGroundHeight(Vec3* a0)
-{
-    ReplayText t;
-    StartImport(t, "units.GetGroundHeight");
-    Space(t);
-    t.Add("pos=");
-    AddVec3Xz(t, a0);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
 int __stdcall Imp_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayText t;
@@ -375,6 +364,17 @@ Order* __stdcall Imp_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3,
     return o;
 }
 
+int __stdcall Imp_map_GetGroundHeight(Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "map.GetGroundHeight");
+    Space(t);
+    t.Add("pos=");
+    AddVec3Xz(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
 {
     ReplayText t;
@@ -447,37 +447,26 @@ MapSeam g_native_map = {
     ApplyMapEventSlot,
     UnitsInRange,
     GetCellMeanHeight,
-    GetGameTypeSlot,
-    GetNameSlotSlot,
     CanBuildAt,
     CanPlaceUnitFootprint,
     BuildAllPassMaps,
-    FreeOtaEnumCacheAndMission,
     LoadMappingData,
     LoadMetalPlotmap,
     LoadPlayerFeaturesPlotmap,
     SaveMappingData,
     SaveMetalPlotmap,
     SavePlayerFeaturesPlotmap,
-    SetMissionType,
     SnapWorldPosToFootprint,
     CanPlaceFootprintAt,
     IsPadSlotFree,
     PickRandomReclaimableResourcesInRadius,
-    AdvanceMissionSlot,
-    GetCampaignNameSlot,
-    GetMissionIndexSlot,
-    GetMissionNameSlot,
-    GetStartPositionSlot,
-    LoadCampaignSlot,
-    LoadMissionByNameSlot,
-    MissionExistsSlot,
-    RefreshMapListSlot,
-    SelectMissionSlot,
-    ComputeMapChecksumSlot,
-    GetTerrainLengthSlot,
     AllocateBucketsSlot,
     FreeBucketsSlot,
+    GetGroundHeight,
+    MovementClassGetSlot,
+    MovementClassInBoundsSlot,
+    RefreshMovedUnitsSlot,
+    RefreshUnitIfStaleSlot,
     WriteStateSlot,
 };
 
@@ -876,6 +865,52 @@ void After_map_IsPadSlotFree()
     CompareResult(g_result_map_IsPadSlotFree);
 }
 
+int g_result_map_GetGroundHeight;
+
+void Run_map_GetGroundHeight()
+{
+    Vec3 p0 = ArgScalar<Vec3>("pos");
+    SetClosing("result");
+    g_result_map_GetGroundHeight = g_seams.map->GetGroundHeight(&p0);
+}
+
+void After_map_GetGroundHeight()
+{
+    CompareResult(g_result_map_GetGroundHeight);
+}
+
+int g_result_map_MovementClassGet;
+
+void Run_map_MovementClassGet()
+{
+    MovementClass* p0 = (MovementClass*)ArgObject("self", ROK_MOVEMENTCLASS);
+    int p1 = ArgScalar<int>("x");
+    int p2 = ArgScalar<int>("y");
+    SetClosing("result");
+    g_result_map_MovementClassGet = g_seams.map->MovementClassGet(p0, p1, p2);
+}
+
+void After_map_MovementClassGet()
+{
+    CompareResult(g_result_map_MovementClassGet);
+}
+
+int g_result_map_MovementClassInBounds;
+
+void Run_map_MovementClassInBounds()
+{
+    MovementClass* p0 = (MovementClass*)ArgObject("self", ROK_MOVEMENTCLASS);
+    unsigned int p1 = ArgScalar<unsigned int>("x");
+    unsigned int p2 = ArgScalar<unsigned int>("y");
+    SetClosing("result");
+    g_result_map_MovementClassInBounds = g_seams.map->MovementClassInBounds(p0, p1, p2);
+}
+
+void After_map_MovementClassInBounds()
+{
+    CompareResult(g_result_map_MovementClassInBounds);
+}
+
 void PlayNestedCalls(const char* import)
 {
     NestedScope scope;
@@ -1017,6 +1052,18 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_map_IsPadSlotFree();
         return true;
     }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetGroundHeight") == 0) {
+        Run_map_GetGroundHeight();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassGet") == 0) {
+        Run_map_MovementClassGet();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassInBounds") == 0) {
+        Run_map_MovementClassInBounds();
+        return true;
+    }
     return false;
 }
 
@@ -1058,6 +1105,12 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_CanPlaceFootprintAt();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "IsPadSlotFree") == 0)
         After_map_IsPadSlotFree();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetGroundHeight") == 0)
+        After_map_GetGroundHeight();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassGet") == 0)
+        After_map_MovementClassGet();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassInBounds") == 0)
+        After_map_MovementClassInBounds();
 }
 
 WeaponsSeam g_import_weapons;
@@ -1067,6 +1120,7 @@ ScriptsSeam g_import_scripts;
 UnitsSeam g_import_units;
 NetworkSeam g_import_network;
 OrdersSeam g_import_orders;
+MapSeam g_import_map;
 PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
@@ -1094,7 +1148,6 @@ void BindSeams()
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     g_seams.units = &g_import_units;
     g_import_units.MarkRecentlyDamaged = Imp_units_MarkRecentlyDamaged;
-    g_import_units.GetGroundHeight = Imp_units_GetGroundHeight;
     g_seams.network = &g_import_network;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
@@ -1116,5 +1169,7 @@ void BindSeams()
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+        g_seams.map = &g_import_map;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
     }
 }

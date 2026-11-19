@@ -343,13 +343,13 @@ static void CheckRejected()
     MapEvent noUnit[7];
     for (int k = 0; k < 7; k++)
         noUnit[k] = MapEventOf(MAP_ADD_UNIT + k);
-    MapEvent badClass = MapEventOf(MAP_REFRESH_PASS_MAP);
-    badClass.value = 40;
+    MapEvent retired = MapEventOf(167);
+    retired.value = 1;
     MapEvent badKind = MapEventOf(127);
     badKind.unit = Ref<Unit>(&s_units[kRunner]).offset;
     for (int k = 0; k < 7; k++)
         Check(g_seams.map->Apply(&noUnit[k]) == 0, "an event of a unit kind with a null unit has outcome 0");
-    Check(g_seams.map->Apply(&badClass) == 0, "a pass map refresh of a class that does not exist has outcome 0");
+    Check(g_seams.map->Apply(&retired) == 0, "an event of kind 167, which map 5.0 no longer has, has outcome 0");
     Check(g_seams.map->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
     Unit* loose = &s_units[0];
     Check(!loose->spatialBucket && s_units[kRunner].spatialBucket, "the unit outside the run has no bucket, and the runner has one");

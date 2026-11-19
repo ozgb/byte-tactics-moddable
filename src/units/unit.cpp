@@ -7,7 +7,7 @@
 #include "unit_def.h"
 
 #include "../files/files_api.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/services.h"

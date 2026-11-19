@@ -2,6 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -11,6 +12,7 @@
 #include "../units/unit.h"
 #include "../util/vec3.h"
 #include "../state/sim_globals.h"
+#include "../game/scheduler.h"
 #include "pathfinding_world.h"
 
 #include "../../link/globals.h"
@@ -111,12 +113,12 @@ static PathClass __stdcall WorldMoveClass(int index)
 
 static int __stdcall WorldInBounds(PathClass moveClass, int x, int y)
 {
-    return g_seams.units->MovementClassInBounds(ClassOf(moveClass), (unsigned int)x, (unsigned int)y);
+    return g_seams.map->MovementClassInBounds(ClassOf(moveClass), (unsigned int)x, (unsigned int)y);
 }
 
 static int __stdcall WorldPass(PathClass moveClass, int x, int y)
 {
-    return g_seams.units->MovementClassGet(ClassOf(moveClass), x, y);
+    return g_seams.map->MovementClassGet(ClassOf(moveClass), x, y);
 }
 
 static void __stdcall WorldSeenSize(int* width, int* height)
@@ -178,14 +180,16 @@ static void __stdcall WorldBeginSearch(PathUnit unit)
 {
     Unit* u = UnitOf(unit);
     MovementClass* moveClass = ((UnitMotionPlannerView*)u->motion.get())->owner.get();
-    g_seams.units->RefreshMovedUnits(moveClass, u);
+    SchedDeliver(SCHED_MAP);
+    g_seams.map->RefreshMovedUnits(moveClass, u);
 }
 
 static void __stdcall WorldEndSearch(PathUnit unit)
 {
     Unit* u = UnitOf(unit);
     MovementClass* moveClass = ((UnitMotionPlannerView*)u->motion.get())->owner.get();
-    g_seams.units->RefreshUnitIfStale(moveClass, u);
+    SchedDeliver(SCHED_MAP);
+    g_seams.map->RefreshUnitIfStale(moveClass, u);
 }
 
 static PathWorldView s_world = {

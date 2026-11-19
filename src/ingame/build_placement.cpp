@@ -10,7 +10,7 @@ struct LayerHeadView {
     int entries;
 };
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../sound/sound.h"
 
@@ -246,13 +246,13 @@ void BattleFrame(void)
     }
 
     if ((*(NetGameFlags*)&g_game->endGameFlags_3923b).bits.b2 || g_game->endGameVictory) {
-        if (g_seams.map->GetGameType(g_game->net) != 3 ||
-            (g_seams.map->GetGameType(g_game->net) == 3 &&
+        if (g_seams.mission->GetGameType() != 3 ||
+            (g_seams.mission->GetGameType() == 3 &&
              BroadcastPendingViewState() != 0)) {
             SetCursor(0x13);
             PopUntilNamedLayout(1);
             CloseTopScreen((Gui *)g_game->message);
-            if (g_seams.map->GetGameType(g_game->net) == 3) {
+            if (g_seams.mission->GetGameType() == 3) {
                 ResetChatHudIndices();
                 MainLoopTick();
             }
@@ -267,15 +267,15 @@ void BattleFrame(void)
     }
 
     if (g_game->restartMissionRequest != 0) {
-        if (g_seams.map->GetGameType(g_game->net) == 1) {
+        if (g_seams.mission->GetGameType() == 1) {
             ShutdownIngameSystems();
             PopUntilNamedLayout(1);
             CloseTopScreen((Gui *)g_game->message);
             BlankScreen();
-            int a = g_seams.map->GetMissionIndex(g_game->net);
-            char* b = g_seams.map->GetCampaignName(g_game->net);
-            g_seams.map->LoadCampaign(g_game->net, 0, b);
-            if (g_seams.map->SelectMission(g_game->net, 0, a) != 0) {
+            int a = g_seams.mission->GetMissionIndex();
+            char* b = g_seams.mission->GetCampaignName();
+            g_seams.mission->LoadCampaign(b);
+            if (g_seams.mission->SelectMission(a) != 0) {
                 g_game->netGameFlags_2a44.bits.b3 = 1;
                 g_game->netGameFlags_2a44.value |= 4;
             }
@@ -290,7 +290,7 @@ void BattleFrame(void)
             BlankScreen();
             SetCursor(0x14);
             g_game->numPlayers = saved;
-            g_seams.map->LoadMissionByName(g_game->net, 0, g_game->options->mapName);
+            g_seams.mission->LoadMissionByName(g_game->options->mapName);
             ApplySlotsToGamePlayers();
             g_game->netGameFlags_2a44.value |= 4;
             g_game->mode_391f1 = 2;

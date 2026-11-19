@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../../interfaces/seams.h"
 
 #pragma pack(push, 1)
@@ -129,7 +129,7 @@ int AIProfileParser::ReadInt()
     if (token != 0x101) {
         if (errorReported == 0) {
             sprintf(buffer, "parse error reading AI profile %s\n%s\nlast string =",
-                    (char*)g_seams.map->GetNameSlot(g_game->net, 7),
+                    (char*)g_seams.mission->GetNameSlot(7),
                     "expecting int", this);
         }
         errorReported = 1;
@@ -150,7 +150,7 @@ void AIProfileParser::ReportParseError(char* text)
     char buffer[256];
     if (!errorReported) {
         sprintf(buffer, "parse error reading AI profile %s\n%s\nlast string =",
-                (char*)g_seams.map->GetNameSlot(g_game->net, 7), text, this);
+                (char*)g_seams.mission->GetNameSlot(7), text, this);
     }
     errorReported = 1;
 }

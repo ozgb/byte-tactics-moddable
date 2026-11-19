@@ -55,7 +55,7 @@ union Flags_3923b {
 
 #include "../../link/globals.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../state/sim_globals.h"
 
 extern char* g_savegameDir;
@@ -291,13 +291,13 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
         if (((HapiBank*)g_game->pendingSaveStore) == 0)
             goto invalid;
         (((HapiBank*)g_game->pendingSaveStore))->OpenAccount("summary");
-        g_seams.map->SetMissionType((((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Gametype", 0));
+        g_seams.mission->SetMissionType((((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Gametype", 0));
         char* campaign = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Campaign", 0);
         if (campaign != 0)
-            g_seams.map->LoadCampaign(g_game->net, 0, campaign);
+            g_seams.mission->LoadCampaign(campaign);
         g_game->flag_37ef2 = (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Side", 0);
         g_game->difficulty = (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Difficulty", 0);
-        if (g_seams.map->GetGameType(g_game->net) == 1) {
+        if (g_seams.mission->GetGameType() == 1) {
             if (g_game->flag_37ef2 == 0) {
                 g_game->p1b8a->bSideId = 0;
                 g_game->p1cd5->bSideId = 1;
@@ -311,14 +311,14 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             goto invalid;
         if (strlen(mission) == 0)
             goto invalid;
-        if (g_seams.map->LoadMissionByName(g_game->net, 0, mission) == 0)
+        if (g_seams.mission->LoadMissionByName(mission) == 0)
             goto invalid;
         strcpy(g_game->options->mapName, mission);
         char* thumbs = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Thumbs", 0);
         strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
         if (strlen(g_game->campaignMissionStatus) != 0x19)
             InitMissionStatus();
-        if (g_seams.map->GetGameType(g_game->net) == 2) {
+        if (g_seams.mission->GetGameType() == 2) {
             (((HapiBank*)g_game->pendingSaveStore))->OpenAccount("summary");
             g_game->numPlayers =
                 (unsigned short)((short)(((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Players", 0));
@@ -350,7 +350,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             GameFreeThunk(g_savegameRadarPreview);
         g_savegameRadarPreview = 0;
         PopUntilNamedLayout(1);
-        if (g_seams.map->GetGameType(g_game->net) == 1 &&
+        if (g_seams.mission->GetGameType() == 1 &&
             (((HapiBank*)g_game->pendingSaveStore))->HasItem("BetweenMissions")) {
             (*(union Flags_2a44*)&g_game->netGameFlags_2a44).b3 = 1;
             if (((HapiBank*)g_game->pendingSaveStore)) {

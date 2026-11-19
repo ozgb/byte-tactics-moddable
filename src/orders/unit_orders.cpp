@@ -87,7 +87,7 @@ inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 #pragma pack(pop)
 #include "../map/feature.h"
 #include "../map/cell.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "vtol_orders.h"
 #include "../ingame/markers.h"
 #include "win_types.h"
@@ -1741,7 +1741,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
         Vec3 pos;
         pos.x = (size.x + cell.x * 2) << 19;
         pos.z = (size.y + cell.y * 2) << 19;
-        pos.y = (RandomInt(f->height) + g_seams.units->GetGroundHeight(&pos)) << 16;
+        pos.y = (RandomInt(f->height) + g_seams.map->GetGroundHeight(&pos)) << 16;
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - (unsigned short)unit->heading);
         return 1;
     }
@@ -1761,7 +1761,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;
-            box.lo.y = g_seams.units->GetGroundHeight(&box.lo) << 16;
+            box.lo.y = g_seams.map->GetGroundHeight(&box.lo) << 16;
             box.hi = box.lo;
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
@@ -1988,7 +1988,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         Vec3 pos;
         pos.x = (size.x + cell.x * 2) << 19;
         pos.z = (size.y + cell.y * 2) << 19;
-        pos.y = (RandomInt(f->height) + g_seams.units->GetGroundHeight(&pos)) << 16;
+        pos.y = (RandomInt(f->height) + g_seams.map->GetGroundHeight(&pos)) << 16;
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - unit->angles.heading);
         return 1;
     }
@@ -2026,7 +2026,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;
-            box.lo.y = g_seams.units->GetGroundHeight(&box.lo) << 16;
+            box.lo.y = g_seams.map->GetGroundHeight(&box.lo) << 16;
             box.hi = box.lo;
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;
@@ -2051,7 +2051,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         if (spot)
             order->target->angles = spot->rot;
         FeaturesPublishRemove(SCHED_ORDERS, g_seams.los_radar->GetMapCellAtPosition(&order->pos) - g_game->cells, g_game->width);
-        if (g_seams.map->GetGameType(g_game->net) == 3) {
+        if (g_seams.mission->GetGameType() == 3) {
             int n = c - g_game->cells;
             int w = g_game->width;
             Point16 xz;

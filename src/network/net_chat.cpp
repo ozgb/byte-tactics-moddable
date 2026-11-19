@@ -4,7 +4,7 @@
 
 #pragma pack(push, 1)
 
-#include "../map/mission.h"
+#include "../../interfaces/seams.h"
 
 #include "player.h"
 
@@ -69,7 +69,7 @@ void __stdcall SendChatMessage(Player* from, char* text, int key, char* to)
     sprintf(buf, "<%s%s%s> %s", from->fullName, to ? "->" : g_emptyText,
             to ? to : g_emptyText, text);
     SendChatPacket(buf);
-    if (g_game->net->GetGameType() == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         ReportGameChat(buf);
     }
     AddMessage(buf, key, 0, 10);

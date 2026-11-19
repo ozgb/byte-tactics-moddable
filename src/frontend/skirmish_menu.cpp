@@ -557,7 +557,6 @@ void __cdecl CycleCurrentPlayerSide()
     *p = (*p + 1) % g_game->sides;
 }
 
-#include "../map/mission.h"
 
 #include "../graphics/object_pool.h"
 void __stdcall PlaySoundByName(const char* name, int broadcast);
@@ -597,7 +596,7 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
     }
     Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
     strncpy(g_game->options->mapName, SkipTextLines(g->u.list.lines, g->u.list.selected), 0x100);
-    g_game->net->LoadMissionByName(g_game->options->mapName);
+    g_seams.mission->LoadMissionByName(g_game->options->mapName);
     strncpy(buffer, g_game->options->mapName, 0x100);
     SetControlTextByName(menu, "MapName", buffer);
 }
@@ -608,12 +607,12 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
 void __stdcall UpdateSkirmishMapSelection(Gui* menu, Gadget* unused)
 {
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
-    if (g_game->net->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) != 0) {
+    if (g_seams.mission->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) != 0) {
         ShowSelectedMapInfo();
     }
 }
 
-#include "../map/map_list.h"
+#include "../mission/map_list.h"
 #include "../../interfaces/services.h"
 #include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
@@ -648,7 +647,7 @@ void OpenSkirmishMapSelector()
     }
 
     Gadget* g = FindGadgetChecked(g_game->gui.layer->entries, "MAPNAMES");
-    if (g_game->net->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) != 0) {
+    if (g_seams.mission->LoadMissionByName(SkipTextLines(g->u.list.lines, g->u.list.selected)) != 0) {
         ShowSelectedMapInfo();
     }
     SetKeyboardInput(&g_game->gui, 1);
@@ -760,7 +759,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         }
         g_game->numPlayers = n + 1;
 
-        if (g_game->net->LoadMissionByName(g_game->options->mapName) == 0) {
+        if (g_seams.mission->LoadMissionByName(g_game->options->mapName) == 0) {
             OpenMessageBox(&g_game->gui,
                          Translate("The terrain for the selected map does not exist."),
                          0x1e0, 1, 1);
@@ -789,7 +788,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
                 }
             }
             if (c1 >= 1) {
-                int maxPlayers = g_game->net->CountStartPositions();
+                int maxPlayers = g_seams.mission->CountStartPositions();
                 if ((int)g_game->numPlayers > maxPlayers) {
                     OpenMessageBox(&g_game->gui,
                                  Translate("There are too many players enabled for this map"),
@@ -1070,9 +1069,9 @@ void OpenSkirmishMenu(void)
     }
     MarkChanged(&g_game->gui);
 
-    if (!g_game->net->LoadMissionByName(g_game->options->mapName)) {
-        g_game->net->RefreshMapList(0);
-        strncpy(g_game->options->mapName, g_game->net->GetMissionName(), 0x100);
+    if (!g_seams.mission->LoadMissionByName(g_game->options->mapName)) {
+        g_seams.mission->RefreshMapList(0);
+        strncpy(g_game->options->mapName, g_seams.mission->GetMissionName(), 0x100);
     }
 
     RefreshSkirmishSetup();

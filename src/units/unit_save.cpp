@@ -92,7 +92,7 @@ struct Mission;
 
 #include "../game/game.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 struct MissionUnitIdTable {
     char unknown_0[4];

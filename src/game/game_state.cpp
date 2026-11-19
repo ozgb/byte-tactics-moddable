@@ -3,7 +3,7 @@
 #include <string.h>
 #include "win_types.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../state/sim_events.h"
 #include "../state/sim_radar.h"
 #include "../state/game_rand.h"
@@ -146,7 +146,7 @@ void __cdecl UpdateWindOnStream(RandStream stream)
 // FUNCTION: 0x490da0
 void ResetGameSpeed()
 {
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         g_game->gameSpeed = (unsigned short)(10);
         g_game->effectiveGameSpeed = 10;
     }
@@ -342,8 +342,8 @@ void InitGame()
     g_game->endGameFlags &= 0xfffe;
     g_game->endGameFlags &= 0xfffd;
     g_game->restartMissionRequest = 0;
-    g_seams.map->SetMissionType(0);
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
+    g_seams.mission->SetMissionType(0);
+    if (g_seams.mission->GetGameType() == 3) {
         g_game->gameSpeed = (unsigned short)(10);
         g_game->effectiveGameSpeed = 10;
     }
@@ -451,7 +451,7 @@ void ShutdownGame(void)
     g_game->options = (SkirmishOptionsTable*)(0);
     g_seams.units->FreeUnitInfo();
     ReleasePacketData((PacketBufferOwnerView*)g_game->chatHudRing);
-    g_seams.map->FreeOtaEnumCacheAndMission();
+    g_seams.mission->FreeOtaEnumCacheAndMission();
 }
 
 #include "../../interfaces/seams.h"
@@ -509,7 +509,7 @@ void LoadBattleAssets()
     g_game->assemPoints = GameAllocIgnoreTag("ASSEM PTS", 0xa0);
     g_game->lastTick = GetTicks();
     g_game->ticks = (int)(0);
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         g_game->gameSpeed = (unsigned short)(10);
         g_game->effectiveGameSpeed = 10;
     }
@@ -644,7 +644,7 @@ void ShutdownIngameSystems()
     g_seams.weapons->FreeWeaponArray();
     g_seams.units->FreeMovementClasses();
     g_seams.units->FreeUnitCategories();
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         CloseNetSession();
     }
 }

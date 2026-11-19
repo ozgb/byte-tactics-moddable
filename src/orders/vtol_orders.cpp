@@ -43,7 +43,7 @@ struct Pair16 { short lo, hi; };
 #include "../scripts/cob_script.h"
 
 #include "../files/files_api.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/services.h"
@@ -309,8 +309,8 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         if (g_seams.map->CanPlaceFootprintAt(unit, &unit->pos)) {
             g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
             PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &unit->pos);
-            int h = max(g_seams.units->GetGroundHeight(&unit->pos), g_game->seaLevel);
-            g_seams.movement->PathOrderSetAltitude(obj, h <= g_game->seaLevel ? g_seams.units->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
+            int h = max(g_seams.map->GetGroundHeight(&unit->pos), g_game->seaLevel);
+            g_seams.movement->PathOrderSetAltitude(obj, h <= g_game->seaLevel ? g_seams.map->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
             order->SetAttachedFx(obj);
             order->flags = 0xe0;
             g_seams.units->SetStateBits(unit, 1, 0);
@@ -1750,7 +1750,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.y << 20;
-            box.lo.y = g_seams.units->GetGroundHeight(&box.lo) << 16;
+            box.lo.y = g_seams.map->GetGroundHeight(&box.lo) << 16;
             box.hi = box.lo;
             box.hi.x += f->footprintX << 20;
             box.hi.z += f->footprintZ << 20;

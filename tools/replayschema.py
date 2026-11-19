@@ -2567,6 +2567,9 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         elif m == "stream":
             L.append("    RandStream %s = ArgStream(\"%s\");" % (v, line))
             call.append(v)
+        elif m == "vec3" and a.get("dir", "in") == "in":
+            L.append("    Vec3 %s = ArgScalar<Vec3>(\"%s\");" % (v, line))
+            call.append("&" + v)
         elif m == "text":
             L.append("    char %s_text[256];\n    ArgText(\"%s\", %s_text, sizeof %s_text);" % (v, line, v, v))
             call.append("%s_text" % v)

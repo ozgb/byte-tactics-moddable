@@ -99,8 +99,8 @@ subsystem outside an interface. A reclaim in a multiplayer game still sends its 
 
 ## 4. Views
 
-**What features reads:** the cells (through `los_radar.GetMapCell`), the ground and the mean height of a cell (`units.GetGroundHeight`,
-`map.GetCellMeanHeight`), the game type (`map.GetGameType`), the wind (wind_meteors' state), the gravity and the sea
+**What features reads:** the cells (through `los_radar.GetMapCell`), the ground and the mean height of a cell (`map.GetGroundHeight`,
+`map.GetCellMeanHeight`), the game type (`mission.GetGameType`), the wind (wind_meteors' state), the gravity and the sea
 level, and the weapon definitions it names, all as of each module's last run.
 
 **What others read of features:**

@@ -12,7 +12,7 @@
 #include "../../interfaces/economy.h"
 
 #include "../game/game.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../orders/order_type_entry.h"
 #include "../units/unit.h"
 #include "../network/player_info.h"
@@ -43,7 +43,6 @@
 
 #include "../../link/globals.h"
 
-#include "../map/map_list.h"
 #include "../game/players.h"
 #include "../frontend/skirmish_menu.h"
 #include "../frontend/endgame.h"
@@ -1257,10 +1256,9 @@ static void SeedNetworkHost(int host)
 
 static OptionsTable* ScenarioTable() { return g_game->options; }
 
-static Mission* BeginMission(int type)
+static void BeginMission(int type)
 {
-    SetMissionType(type);
-    return (Mission*)g_game->net;
+    g_seams.mission->SetMissionType(type);
 }
 
 static void EnterLoadingFrontend()
@@ -1306,7 +1304,7 @@ static void SetUpSkirmish()
             active++;
     }
 
-    Mission* mission = BeginMission(s_gameType);
+    BeginMission(s_gameType);
     strcpy(t->mapName, s_map);
     t->difficulty = s_difficulty;
     t->commanderDeath = s_commanderDeath;
@@ -1319,20 +1317,20 @@ static void SetUpSkirmish()
     if (s_gameType == 3)
         SeedNetworkTable();
     if (s_gameType == 1) {
-        mission->LoadCampaign(s_campaign);
-        if (mission->GetCampaignName() == nullptr) {
+        g_seams.mission->LoadCampaign(s_campaign);
+        if (g_seams.mission->GetCampaignName() == nullptr) {
             char msg[600];
             sprintf(msg, "testmode: scenario line %d: no campaign named \"%s\"\n", s_campaignLine, s_campaign);
             Fail(msg);
         }
     }
-    if (mission->LoadMissionByName(t->mapName) == 0) {
+    if (g_seams.mission->LoadMissionByName(t->mapName) == 0) {
         char msg[600];
         sprintf(msg, "testmode: scenario line %d: no %s named \"%s\"\n", s_mapLine,
                 s_gameType == 1 ? "mission" : "map", t->mapName);
         Fail(msg);
     }
-    if (s_gameType != 1 && mission->CountStartPositions() < active) {
+    if (s_gameType != 1 && g_seams.mission->CountStartPositions() < active) {
         char msg[200];
         sprintf(msg, "testmode: map \"%s\" has fewer start positions than the scenario's %d players\n",
                 t->mapName, active);
@@ -1430,14 +1428,14 @@ static void SetUpLoadedGame()
     }
     HapiBank* bank = g_game->pendingSaveStore;
     bank->OpenAccount("summary");
-    Mission* mission = BeginMission(bank->GetIntegerItem("Gametype", 0));
+    BeginMission(bank->GetIntegerItem("Gametype", 0));
     char* campaign = bank->GetStringItem("Campaign", nullptr);
     if (campaign != nullptr)
-        mission->LoadCampaign(campaign);
+        g_seams.mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
     g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
     char* name = bank->GetStringItem("Mission", nullptr);
-    if (name == nullptr || strlen(name) == 0 || mission->LoadMissionByName(name) == 0) {
+    if (name == nullptr || strlen(name) == 0 || g_seams.mission->LoadMissionByName(name) == 0) {
         FailLoad("the save names a map the game cannot load: ", s_savePath);
         return;
     }

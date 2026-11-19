@@ -26,7 +26,7 @@ public:
     void DispatchPacket();
 };
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../network/packet_manager.h"
 
@@ -559,7 +559,7 @@ int __stdcall AddNetPlayer(int id)
         SendLobbySyncRequests();
         g_packetManager.SendAllQueued(1);
     }
-    if (g_game->net->GetGameType() == 3 && g_game->numPlayers > 1) {
+    if (g_seams.mission->GetGameType() == 3 && g_game->numPlayers > 1) {
         ReportGameEvent(2);
     }
     return 1;
@@ -691,7 +691,7 @@ void __stdcall BuildGameInfo(char* name, int* d, int* c, int* b, int* a)
     memset(name, ' ', 0x20);
     name[0x1f] = 0;
     strncpy(name, g_game->gameName, 0x10);
-    int src = (int)g_game->net->GetMissionName();
+    int src = (int)g_seams.mission->GetMissionName();
     strncpy(name + 0x10, (char*)src, 0xf);
     char* q = name;
     int n = 0x20;
@@ -1648,7 +1648,7 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
             g_packetManager.SendAllQueued(1);
         result = r;
     }
-    if (g_game->net->GetGameType() == 3)
+    if (g_seams.mission->GetGameType() == 3)
         ReportGameEvent(4);
     return result;
 }
@@ -1780,7 +1780,7 @@ void __stdcall RemovePlayer(int id)
     p->info->flags_9d_wide &= 0xfffb;
     memset(&p->allied, 0, 11);
 
-    if (g_game->net->GetGameType() == 3)
+    if (g_seams.mission->GetGameType() == 3)
         ReportGameEvent(3);
 
     if ((g_game->flags_2a44 & 4) && host != 0) {
@@ -2840,7 +2840,6 @@ extern char g_cmdlineHostGameName[];
 extern char g_userNameSetting[];
 
 void __stdcall SendPlayerEconomy(Player* from, Player* to, unsigned char flag);
-#include "../map/map_list.h"
 
 // FUNCTION: 0x456110
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
@@ -3662,7 +3661,7 @@ int InitLobbiedConnection()
         host_net_init_defaults((host_net*)g_game->net_14);
         g_game->netMode = 10;
         if (InitPacketManager(2, 100)) {
-            SetMissionType(3);
+            g_seams.mission->SetMissionType(3);
             char* name = g_game->dplConnection->desc->lpszSessionName;
             if (name != 0) {
                 strncpy(g_game->net_14, name, 0x10);

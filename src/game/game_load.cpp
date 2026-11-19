@@ -112,7 +112,7 @@ extern int g_usePacketManager;
 extern "C" unsigned char g_loadingBarPrevPercent[8];
 extern int g_nonCampaignGame;
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../network/packet_manager.h"
 
@@ -202,7 +202,7 @@ void __cdecl LoadMatch(void*)
     g_game->ticks = 0;
 
     const PlayerInfo* hostInfo = nullptr;
-    switch (g_seams.map->GetGameType(((Mission*)g_game->net))) {
+    switch (g_seams.mission->GetGameType()) {
     case 1:
         g_nonCampaignGame = 0;
         ApplyMissionOptionFlags(&g_game->singleSettings);
@@ -239,7 +239,7 @@ void __cdecl LoadMatch(void*)
             host_sleep_ms(0x32);
         }
 
-        g_seams.map->LoadMissionByName(((Mission*)g_game->net), 0, (char*)(*(LoadingPlayerRecord(*)[10])&g_game->players)[sel].data.get());
+        g_seams.mission->LoadMissionByName((char*)(*(LoadingPlayerRecord(*)[10])&g_game->players)[sel].data.get());
         if (FindHostSlot() == 10)
             break;
 
@@ -262,7 +262,7 @@ void __cdecl LoadMatch(void*)
         ((HapiBank*)g_game->pendingSaveStore)->OpenAccount("summary");
         if (((HapiBank*)g_game->pendingSaveStore)->HasItem("BetweenMissions") == 0) {
             g_seams.players->LoadPlayerControllers(((HapiBank*)g_game->pendingSaveStore));
-            if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2) {
+            if (g_seams.mission->GetGameType() == 2) {
                 int count = 0;
                 SkirmishPlayer* def = g_game->options->players;
                 int i = 0;
@@ -293,8 +293,8 @@ void __cdecl LoadMatch(void*)
 
     LoadBattleAssets();
 
-    if (g_seams.map->GetGameType(g_game->net) != 1) {
-        if (g_seams.map->GetGameType(g_game->net) == 3) {
+    if (g_seams.mission->GetGameType() != 1) {
+        if (g_seams.mission->GetGameType() == 3) {
             (*(volatile union LoadingFlags*)&g_game->loadingFlags).value |= 4;
             while (((*(volatile union LoadingFlags*)&g_game->loadingFlags).value & 8) == 0)
                 host_sleep_ms(0x32);
@@ -321,7 +321,7 @@ void __cdecl LoadMatch(void*)
                 PlayerInfo* pl2 = rec->data;
                 int side = pl2->side;
                 int which = rec->startPos;
-                g_seams.map->GetStartPosition(((Mission*)g_game->net), 0, (Vec3*)&pos, which);
+                g_seams.mission->GetStartPosition((Vec3*)&pos, which);
                 if (rec->active != 0 && rec->team == 1)
                     start = pos;
                 unsigned short id = g_seams.units->FindUnitTypeId(g_game->sideDefs[side].commander);
@@ -348,7 +348,7 @@ void __cdecl LoadMatch(void*)
             }
             SetCameraPosition(cx, cz, 0);
             ReportGameEvent(6);
-        } else if (g_seams.map->GetGameType(((Mission*)g_game->net)) == 2 &&
+        } else if (g_seams.mission->GetGameType() == 2 &&
             ((HapiBank*)g_game->pendingSaveStore) == 0) {
             if (g_game->options->fixedLocations != 0) {
                 for (int i1 = 0; i1 < 10; i1++) {
@@ -406,7 +406,7 @@ void __cdecl LoadMatch(void*)
             LoadSavedGameState(((HapiBank*)g_game->pendingSaveStore));
             goto tail;
         }
-    } else if (g_seams.map->GetGameType(((Mission*)g_game->net)) != 1) {
+    } else if (g_seams.mission->GetGameType() != 1) {
         goto tail;
     }
     CreateMissionUnits();
@@ -563,7 +563,7 @@ void LoadingScreenFrame(void)
         }
         SetFont(g_game->fontComix);
         SetPaletteColors((unsigned char *)g_game->paletteRgba, 0, 0x100);
-        if (g_seams.map->GetGameType(g_game->net) != 2) {
+        if (g_seams.mission->GetGameType() != 2) {
             SaveSettings();
         }
         while (((int)g_game->layer) != 0) {
@@ -689,9 +689,9 @@ void LoadingScreenFrame(void)
         }
         SetFont(g_game->fontComix);
         DrawSurface(&gadget, (void*)((int)g_game->surface), 0, 0);
-        if (g_seams.map->GetGameType(g_game->net) != 1) {
+        if (g_seams.mission->GetGameType() != 1) {
             SetTextColors(color, 0xfe);
-            char* name = g_seams.map->GetMissionName(g_game->net);
+            char* name = g_seams.mission->GetMissionName();
             strncpy(namebuf, name, 100);
             namebuf[99] = 0;
             if (GetPreferredLanguage() != 0 && _strcmpi((const char*)GetPreferredLanguage(), "english") != 0) {
@@ -719,7 +719,7 @@ void LoadingScreenFrame(void)
                          rect[1] + *((short*)lightbar + 3));
             DrawLoadingBar(&gadget, lightbar, 5, &g_loadingBarPrevPercent[5], g_loadingBarFlashAlpha + 4, 1, "Explosions", 0x15b, rect);
         }
-        if (g_seams.map->GetGameType(g_game->net) == 3) {
+        if (g_seams.mission->GetGameType() == 3) {
             DrawSyncStatus(&gadget);
             SendLoadProgress();
         }
@@ -743,7 +743,7 @@ void __stdcall MinimapCursorToWorldPos(MinimapWorldPos* out)
     memset(out, 0, sizeof(MinimapWorldPos));
     out->x.whole = g_game->mapWidth * dx / g_game->width_142eb;
     out->z.whole = g_game->mapHeight * dy / g_game->screen_h;
-    out->y.whole = g_seams.units->GetGroundHeight((Vec3*)out);
+    out->y.whole = g_seams.map->GetGroundHeight((Vec3*)out);
 }
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

@@ -52,13 +52,6 @@ inline MapEvent MapRectEventOf(int kind, int value, C cell, S size)
 }
 
 template <class C, class S>
-inline void MapPublishRefreshPassMap(int outbox, int movementClass, C cell, S size)
-{
-    MapEvent event = MapRectEventOf(MAP_REFRESH_PASS_MAP, movementClass, cell, size);
-    SchedPublish(outbox, &event, sizeof(event));
-}
-
-template <class C, class S>
 inline void MapPublishPassMaps(int outbox, C cell, S size)
 {
     MapEvent event = MapRectEventOf(MAP_PASS_MAPS, 0, cell, size);

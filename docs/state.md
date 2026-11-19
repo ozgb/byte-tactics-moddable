@@ -62,7 +62,7 @@ As of the last read of `data/state_classes.csv` (2411 rows). `tools/test_statecl
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 4 | 28 | 551 | 0 | 12 | 595 |
+| static | 4 | 28 | 552 | 0 | 12 | 596 |
 | game-region | 118 | 490 | 130 | 44 | 0 | 782 |
 | heap | 152 | 45 | 89 | 0 | 0 | 286 |
 

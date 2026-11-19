@@ -366,7 +366,7 @@ class TargetingForms(unittest.TestCase):
     def test_an_import_may_print_only_the_axes_it_reads(self):
         files, _, _ = self.generated()
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecUnitsGetGroundHeight"):]
+        body = hooks[hooks.index("RecMapGetGroundHeight"):]
         self.assertIn('ImportVec3Xz(line, "pos", a0);', body[:body.index("\n}\n")])
         self.assertIn("AddVec3Xz(t, a0);", files[rs.SLOTS_H])
 
@@ -817,6 +817,15 @@ class StructForms(unittest.TestCase):
         body = body[:body.index("\n}\n")]
         self.assertIn('Vec3* p1 = (Vec3*)ParseStructOpt("pos", ROK_VEC3, &p1_value);', body)
         self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, p1, p2)", body)
+
+    def test_a_vec3_read_by_value_is_parsed_and_passed_by_address(self):
+        files, _, _ = self.generated(annotations())
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_map_GetGroundHeight"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('Vec3 p0 = ArgScalar<Vec3>("pos");', body)
+        self.assertIn("g_seams.map->GetGroundHeight(&p0)", body)
+        self.assertNotIn("ArgPending", body)
 
     def test_a_weapon_argument_is_a_root_and_is_resolved_by_the_runner(self):
         weapon = {"name": "weapon", "type": "WeaponDef*", "line": "weapon", "mode": "weapon"}

@@ -84,7 +84,7 @@ scripts' code and its cost is not targeting's to judge.
 ## 4. Views
 
 **What targeting reads:** a unit's weapon slots (the weapon, its flags and range), the unit's and the target's
-position, flags, definition, player and kill count, the ground height (`units.GetGroundHeight`) and the sea level, a
+position, flags, definition, player and kill count, the ground height (`map.GetGroundHeight`) and the sea level, a
 target's sweet spot (`scripts.GetSweetSpot`) and its motion's body offset, the units a weapon may pick among (through
 ai's and los_radar's views), all as of each module's last run. `FindWeaponTarget` calls the FilterTargets hook.
 

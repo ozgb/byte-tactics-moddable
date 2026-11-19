@@ -392,7 +392,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
     if (e->aimTargetZOrUnitSentinel != (short)0x8000) {
         pos->x = e->aimTargetXOrUnitId << 16;
         pos->z = e->aimTargetZOrUnitSentinel << 16;
-        pos->y = max(g_seams.units->GetGroundHeight((Vec3*)pos), g_game->seaLevel) << 16;
+        pos->y = max(g_seams.map->GetGroundHeight((Vec3*)pos), g_game->seaLevel) << 16;
         return 1;
     }
     if (e->aimTargetXOrUnitId == 0) {

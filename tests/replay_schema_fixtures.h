@@ -47,7 +47,7 @@
 #pragma pack(push, 1)
 #include "../src/map/spatial_bucket.h"
 #pragma pack(pop)
-#include "../src/map/mission.h"
+#include "../src/mission/mission.h"
 #include "../src/weapons/weapons.h"
 #include "replay_fixtures.h"
 #include "../src/state/sim_globals.h"
@@ -748,9 +748,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "damagemodifier", offsetof(UnitDef, damagemodifier), sizeof(((UnitDef*)nullptr)->damagemodifier), ROK_UNITDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "maxHealth", offsetof(UnitDef, maxHealth), sizeof(((UnitDef*)nullptr)->maxHealth), ROK_UNITDEF, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "modelMaxYHigh", offsetof(UnitDef, modelMaxYHigh), sizeof(((UnitDef*)nullptr)->modelMaxYHigh), ROK_UNITDEF, RK_I16, 0, 0, 0, {}, 0, 0 },
-    { "weapon0", offsetof(UnitDef, weapons[0]), sizeof(((UnitDef*)nullptr)->weapons[0]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
-    { "weapon1", offsetof(UnitDef, weapons[1]), sizeof(((UnitDef*)nullptr)->weapons[1]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
-    { "weapon2", offsetof(UnitDef, weapons[2]), sizeof(((UnitDef*)nullptr)->weapons[2]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
+    { "weapons0", offsetof(UnitDef, weapons[0]), sizeof(((UnitDef*)nullptr)->weapons[0]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
+    { "weapons1", offsetof(UnitDef, weapons[1]), sizeof(((UnitDef*)nullptr)->weapons[1]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
+    { "weapons2", offsetof(UnitDef, weapons[2]), sizeof(((UnitDef*)nullptr)->weapons[2]), ROK_UNITDEF, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
     { "flags", offsetof(WeaponDef, flags.value), sizeof(((WeaponDef*)nullptr)->flags.value), ROK_WEAPONDEF, RK_FLAGS, 0, 0, 0, {}, 0, 0 },
     { "speed", offsetof(WeaponDef, speed), sizeof(((WeaponDef*)nullptr)->speed), ROK_WEAPONDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "acceleration", offsetof(WeaponDef, acceleration), sizeof(((WeaponDef*)nullptr)->acceleration), ROK_WEAPONDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1225,9 +1225,9 @@ static_assert(sizeof(((UnitDef*)nullptr)->mobile) == 1, "UnitDef::mobile has the
 static_assert(sizeof(((UnitDef*)nullptr)->damagemodifier) == 4, "UnitDef::damagemodifier has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->maxHealth) == 4, "UnitDef::maxHealth has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->modelMaxYHigh) == 2, "UnitDef::modelMaxYHigh has the size the schema says");
-static_assert(sizeof(((UnitDef*)nullptr)->weapons[0]) == 4, "UnitDef::weapon0 has the size the schema says");
-static_assert(sizeof(((UnitDef*)nullptr)->weapons[1]) == 4, "UnitDef::weapon1 has the size the schema says");
-static_assert(sizeof(((UnitDef*)nullptr)->weapons[2]) == 4, "UnitDef::weapon2 has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->weapons[0]) == 4, "UnitDef::weapons0 has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->weapons[1]) == 4, "UnitDef::weapons1 has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->weapons[2]) == 4, "UnitDef::weapons2 has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->flags.value) == 4, "WeaponDef::flags has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->speed) == 4, "WeaponDef::speed has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->acceleration) == 4, "WeaponDef::acceleration has the size the schema says");
@@ -1609,6 +1609,7 @@ enum ReplaySubsystemId {
     SUB_MAP,
     SUB_SCRIPTS,
     SUB_MOVEMENT,
+    SUB_MISSION,
     SUB_FILES,
     SUB_NETWORK,
     SUB_COUNT
@@ -1739,12 +1740,7 @@ enum ReplaySlotId {
     RSL_ORDERS_QUEUEBUILDORDER,
     RSL_ORDERS_ORDERORSTATUSFLAGS,
     RSL_UNITS_UPDATEALLUNITS,
-    RSL_UNITS_GETGROUNDHEIGHT,
     RSL_UNITS_SETSTATEBITS,
-    RSL_UNITS_MOVEMENTCLASSGET,
-    RSL_UNITS_MOVEMENTCLASSINBOUNDS,
-    RSL_UNITS_REFRESHMOVEDUNITS,
-    RSL_UNITS_REFRESHUNITIFSTALE,
     RSL_UNITS_MARKRECENTLYDAMAGED,
     RSL_UNITS_NOTIFYUNITREFS,
     RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY,
@@ -1826,6 +1822,9 @@ enum ReplaySlotId {
     RSL_MAP_SNAPWORLDPOSTOFOOTPRINT,
     RSL_MAP_CANPLACEFOOTPRINTAT,
     RSL_MAP_ISPADSLOTFREE,
+    RSL_MAP_GETGROUNDHEIGHT,
+    RSL_MAP_MOVEMENTCLASSGET,
+    RSL_MAP_MOVEMENTCLASSINBOUNDS,
     RSL_SCRIPTS_STARTSCRIPT,
     RSL_SCRIPTS_STARTSCRIPTWITHARGS,
     RSL_SCRIPTS_STARTSCRIPTWITHARGSBYINDEX,
@@ -2100,14 +2099,8 @@ static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 51, 52, 5
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 271, 273, 276 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 271 };
 static const unsigned short kReplayOrdersQueueBuildOrderObjReads[] = { 50 };
-static const unsigned char kReplayUnitsGetGroundHeightReads[] = { 1, 2 };
-static const unsigned short kReplayUnitsGetGroundHeightObjReads[] = { 173 };
 static const unsigned short kReplayUnitsSetStateBitsObjReads[] = { 0, 24, 36, 43 };
 static const unsigned short kReplayUnitsSetStateBitsObjWrites[] = { 38 };
-static const unsigned char kReplayUnitsRefreshMovedUnitsReads[] = { 0 };
-static const unsigned short kReplayUnitsRefreshMovedUnitsObjReads[] = { 41, 42, 185, 239, 241, 242, 244, 246 };
-static const unsigned short kReplayUnitsRefreshMovedUnitsObjWrites[] = { 185, 244 };
-static const unsigned short kReplayUnitsRefreshUnitIfStaleObjReads[] = { 41, 42, 185, 239, 241, 242, 244, 246 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayUnitsAllocateUnitMemoryReads[] = { 26 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryWrites[] = { 26 };
@@ -2211,6 +2204,11 @@ static const unsigned char kReplayMapCanPlaceFootprintAtAllOf[] = { ROK_UNIT, RO
 static const unsigned char kReplayMapCanPlaceFootprintAtReads[] = { 1, 2, 17, 19, 20, 26 };
 static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 35, 41, 42, 44, 47, 108, 118, 120, 121, 171, 172, 174, 175, 176, 177, 178, 179, 326 };
 static const unsigned short kReplayMapIsPadSlotFreeObjReads[] = { 70, 71, 72, 74 };
+static const unsigned char kReplayMapGetGroundHeightAllOf[] = { ROK_CELL };
+static const unsigned char kReplayMapGetGroundHeightReads[] = { 1, 2 };
+static const unsigned short kReplayMapGetGroundHeightObjReads[] = { 173 };
+static const unsigned short kReplayMapMovementClassGetObjReads[] = { 241, 243 };
+static const unsigned short kReplayMapMovementClassInBoundsObjReads[] = { 241, 242 };
 static const unsigned short kReplayScriptsGetPieceOffsetObjReads[] = { 230, 231 };
 static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 230, 231 };
 static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 230, 231 };
@@ -2357,12 +2355,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "QueueBuildOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersQueueBuildOrderObjReads, 1, nullptr, 0, nullptr, 0 },
     { "OrderOrStatusFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateAllUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetGroundHeight", SUB_UNITS, kReplayUnitsGetGroundHeightReads, 2, nullptr, 0, kReplayUnitsGetGroundHeightObjReads, 1, nullptr, 0, nullptr, 0 },
     { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
-    { "MovementClassGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "MovementClassInBounds", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "RefreshMovedUnits", SUB_UNITS, kReplayUnitsRefreshMovedUnitsReads, 1, nullptr, 0, kReplayUnitsRefreshMovedUnitsObjReads, 8, kReplayUnitsRefreshMovedUnitsObjWrites, 2, nullptr, 0 },
-    { "RefreshUnitIfStale", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsRefreshUnitIfStaleObjReads, 8, nullptr, 0, nullptr, 0 },
     { "MarkRecentlyDamaged", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NotifyUnitRefs", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitTypeSetAddTypeOrCategory", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2444,6 +2437,9 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SnapWorldPosToFootprint", SUB_MAP, kReplayMapSnapWorldPosToFootprintReads, 3, nullptr, 0, kReplayMapSnapWorldPosToFootprintObjReads, 9, nullptr, 0, kReplayMapSnapWorldPosToFootprintAllOf, 1 },
     { "CanPlaceFootprintAt", SUB_MAP, kReplayMapCanPlaceFootprintAtReads, 6, nullptr, 0, kReplayMapCanPlaceFootprintAtObjReads, 18, nullptr, 0, kReplayMapCanPlaceFootprintAtAllOf, 3 },
     { "IsPadSlotFree", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapIsPadSlotFreeObjReads, 4, nullptr, 0, nullptr, 0 },
+    { "GetGroundHeight", SUB_MAP, kReplayMapGetGroundHeightReads, 2, nullptr, 0, kReplayMapGetGroundHeightObjReads, 1, nullptr, 0, kReplayMapGetGroundHeightAllOf, 1 },
+    { "MovementClassGet", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapMovementClassGetObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "MovementClassInBounds", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapMovementClassInBoundsObjReads, 2, nullptr, 0, nullptr, 0 },
     { "StartScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "StartScriptWithArgs", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "StartScriptWithArgsByIndex", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2596,13 +2592,14 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "targeting", 2, 0, 1, 71, 6 },
     { "los_radar", 3, 2, 0, 77, 28 },
     { "orders", 4, 0, 0, 105, 18 },
-    { "units", 3, 0, 0, 123, 52 },
-    { "players", 3, 1, 0, 175, 28 },
-    { "map", 4, 1, 1, 203, 8 },
-    { "scripts", 1, 0, 0, 211, 25 },
-    { "movement", 1, 0, 0, 236, 33 },
-    { "files", 2, 0, 0, 269, 58 },
-    { "network", 1, 0, 0, 327, 22 },
+    { "units", 4, 0, 0, 123, 47 },
+    { "players", 3, 1, 0, 170, 28 },
+    { "map", 5, 0, 1, 198, 11 },
+    { "scripts", 1, 0, 0, 209, 25 },
+    { "movement", 1, 0, 0, 234, 33 },
+    { "mission", 1, 0, 0, 267, 0 },
+    { "files", 2, 0, 0, 267, 58 },
+    { "network", 1, 0, 0, 325, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

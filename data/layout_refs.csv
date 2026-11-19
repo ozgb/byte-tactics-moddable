@@ -74,7 +74,6 @@ LoadReporterDll,0x46bf30,src/frontend/reporter.cpp,end-of,g_dpspGuidModem,0,g_dp
 LoadReporterDll,0x46bf30,src/frontend/reporter.cpp,end-of,g_dpspGuidModem,0,g_dpspGuidSerial,,none
 LoadReporterDll,0x46bf30,src/frontend/reporter.cpp,end-of,g_dpspGuidSerial,0,g_dpspGuidIpx,,none
 ReportGameEvent,0x46c620,src/network/unit_sync.cpp,end-of,g_reportPlayerName,0,g_onlineReportScores,,none
-OpenNewGameMenu,0x478240,src/frontend/campaign_menu.cpp,end-of,g_missionNameList,0,g_campaignNameList,,none
 HandleSkirmishCheatText,0x47b9f0,src/frontend/skirmish_menu.cpp,end-of,g_cheatEightPlayers,0,g_cheatThreePlayers,,none
 HandleSkirmishCheatText,0x47b9f0,src/frontend/skirmish_menu.cpp,end-of,g_cheatFivePlayers,0,g_cheatSixPlayers,,none
 HandleSkirmishCheatText,0x47b9f0,src/frontend/skirmish_menu.cpp,end-of,g_cheatFourPlayers,0,g_cheatFivePlayers,,none

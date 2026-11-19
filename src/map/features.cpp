@@ -94,7 +94,7 @@ struct Model {
     Rot16 rot;
 };
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../game/game.h"
 #include "../state/sim_effects.h"
@@ -176,7 +176,7 @@ Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def)
     Vec3 p;
     p.x = (f.x + c.x * 2) << 19;
     p.z = (f.y + c.y * 2) << 19;
-    p.y = g_seams.units->GetGroundHeight(&p) << 16;
+    p.y = g_seams.map->GetGroundHeight(&p) << 16;
     return p;
 }
 
@@ -721,7 +721,7 @@ int __stdcall ReclaimFeature(Unit* unit, Vec3* pos)
     EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_ENERGY, f->energy, 0);
     EconPublish(SCHED_FEATURES, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, f->metal);
     KillFeature(x, z, 1);
-    if (g_seams.map->GetGameType(g_game->net) == 3)
+    if (g_seams.mission->GetGameType() == 3)
         g_seams.network->SendFeatureReclaimed(unit, x, z);
     return 1;
 }
@@ -885,7 +885,7 @@ static inline SmokePos FootprintCentreSmoke(Point16* cell, Feature* def)
     SmokePos p;
     p.x.value = (f.x + c.x * 2) << 19;
     p.z.value = (f.y + c.y * 2) << 19;
-    p.y.value = g_seams.units->GetGroundHeight((Vec3*)&p) << 16;
+    p.y.value = g_seams.map->GetGroundHeight((Vec3*)&p) << 16;
     return p;
 }
 
@@ -1016,7 +1016,7 @@ int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
         return 0;
     int send;
     int killed = 0;
-    if (g_seams.map->GetGameType(g_game->net) == 3) {
+    if (g_seams.mission->GetGameType() == 3) {
         if (!(g_game->players[g_game->playerIndex].info->flags_97 & 1)) {
             g_seams.network->SendFeatureHit(weapon, x, z);
             return 0;

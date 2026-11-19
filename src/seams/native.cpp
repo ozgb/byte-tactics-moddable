@@ -5,6 +5,7 @@
 #include "../../interfaces/scripts.h"
 #include "../../interfaces/movement.h"
 #include "../../interfaces/network.h"
+#include "../../interfaces/mission.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -18,7 +19,7 @@
 #include "../scripts/cob_types.h"
 #include "../scripts/unit_script.h"
 #include "../util/vec3.h"
-#include "../map/mission.h"
+#include "../mission/mission.h"
 #include "../map/spatial_bucket.h"
 #include "../game/mission_conditions.h"
 #include "../scripts/object_state.h"
@@ -55,7 +56,6 @@ struct Point16;
 struct Feature;
 struct Rot16;
 struct TntInfo;
-struct GroundHeightPos;
 struct SweetSpotObjectView;
 struct Vec;
 struct UnitDef;
@@ -94,7 +94,6 @@ struct ModelBuildList;
 
 #include "../map/line_of_sight.h"
 #include "../game/share_commands.h"
-int __stdcall GetGroundHeight(GroundHeightPos* p);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
 #include "../map/line_of_sight_index.h"
 
@@ -104,7 +103,7 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2);
 #include "../ingame/radar_picture.h"
 
 class HapiBank;
-#include "../map/map_list.h"
+#include "../mission/map_list.h"
 #include "../map/plot_map.h"
 #include "../map/terrain.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
@@ -206,19 +205,9 @@ static unsigned char __fastcall ChooseWeaponNative(Unit* self)
     return self->ChooseWeapon();
 }
 
-static int __fastcall GetGameTypeNative(Mission* self)
-{
-    return self->GetGameType();
-}
-
 static int __stdcall GetWeaponTargetPosNative(Unit* unit, Vec3* pos, int weapon)
 {
     return GetWeaponTargetPos(unit, (Vec3*)pos, weapon);
-}
-
-static int __stdcall GetGroundHeightNative(Vec3* pos)
-{
-    return GetGroundHeight((GroundHeightPos*)pos);
 }
 
 static void __stdcall GetSweetSpotNative(Unit* unit, Vec3* out)
@@ -241,69 +230,129 @@ static int __stdcall GetWeaponRangeNative(Unit* unit, unsigned int weapon)
     return GetWeaponRange((int)unit, weapon);
 }
 
-static char* __stdcall GetNameSlotNative(Mission* mission, int index)
+static Mission* TheMission()
 {
-    return mission->GetNameSlot(index);
+    return g_game->net.get();
 }
 
-static int __fastcall AdvanceMissionNative(Mission* self)
+static int __stdcall GetGameTypeNative()
 {
-    return self->AdvanceMission();
+    return TheMission()->GetGameType();
 }
 
-static char* __fastcall GetCampaignNameNative(Mission* self)
+static char* __stdcall GetNameSlotNative(int index)
 {
-    return self->GetCampaignName();
+    return TheMission()->GetNameSlot(index);
 }
 
-static int __fastcall GetMissionIndexNative(Mission* self)
+static int __stdcall AdvanceMissionNative()
 {
-    return self->GetMissionIndex();
+    return TheMission()->AdvanceMission();
 }
 
-static char* __fastcall GetMissionNameNative(Mission* self)
+static char* __stdcall GetCampaignNameNative()
 {
-    return self->GetMissionName();
+    return TheMission()->GetCampaignName();
 }
 
-static int __fastcall GetStartPositionNative(Mission* self, int unusedEdx, Vec3* out, int id)
+static int __stdcall GetMissionIndexNative()
 {
-    return self->GetStartPosition((Vec3*)out, id);
+    return TheMission()->GetMissionIndex();
 }
 
-static void __fastcall LoadCampaignNative(Mission* self, int unusedEdx, char* file)
+static char* __stdcall GetMissionNameNative()
 {
-    self->LoadCampaign(file);
+    return TheMission()->GetMissionName();
 }
 
-static int __fastcall LoadMissionByNameNative(Mission* self, int unusedEdx, char* name)
+static int __stdcall GetStartPositionNative(Vec3* out, int id)
 {
-    return self->LoadMissionByName(name);
+    return TheMission()->GetStartPosition(out, id);
 }
 
-static int __fastcall MissionExistsNative(Mission* self, int unusedEdx, int index)
+static void __stdcall LoadCampaignNative(char* file)
 {
-    return self->MissionExists(index);
+    TheMission()->LoadCampaign(file);
 }
 
-static void __fastcall RefreshMapListNative(Mission* self, int unusedEdx, int multiplayer)
+static int __stdcall LoadMissionByNameNative(char* name)
 {
-    self->RefreshMapList(multiplayer);
+    return TheMission()->LoadMissionByName(name);
 }
 
-static int __fastcall SelectMissionNative(Mission* self, int unusedEdx, int index)
+static int __stdcall MissionExistsNative(int index)
 {
-    return self->SelectMission(index);
+    return TheMission()->MissionExists(index);
 }
 
-static int __fastcall ComputeMapChecksumNative(Mission* self)
+static void __stdcall RefreshMapListNative(int multiplayer)
 {
-    return self->ComputeMapChecksum();
+    TheMission()->RefreshMapList(multiplayer);
 }
 
-static int __fastcall GetTerrainLengthNative(Mission* self)
+static int __stdcall SelectMissionNative(int index)
 {
-    return self->GetTerrainLength();
+    return TheMission()->SelectMission(index);
+}
+
+static int __stdcall ComputeMapChecksumNative()
+{
+    return TheMission()->ComputeMapChecksum();
+}
+
+static int __stdcall GetTerrainLengthNative()
+{
+    return TheMission()->GetTerrainLength();
+}
+
+static int __stdcall CountMissionsNative()
+{
+    return TheMission()->CountMissions();
+}
+
+static int __stdcall GetCampaignMissionNameNative(int index, char* out, int size)
+{
+    return TheMission()->GetCampaignMissionName(index, out, size);
+}
+
+static int __stdcall CountStartPositionsNative()
+{
+    return TheMission()->CountStartPositions();
+}
+
+static char* __stdcall GetBriefingNative()
+{
+    return TheMission()->GetBriefing();
+}
+
+static char* __stdcall GetDescriptionNative()
+{
+    return TheMission()->GetDescription();
+}
+
+static char* __stdcall GetPlanetNative()
+{
+    return TheMission()->GetPlanet();
+}
+
+static int __stdcall GetTerrainSizeTierNative()
+{
+    return TheMission()->GetTerrainSizeTier();
+}
+
+static char* __stdcall GetTranslatedNameNative()
+{
+    return TheMission()->GetTranslatedName();
+}
+
+static int __stdcall HasMissionNameNative()
+{
+    return TheMission()->HasMissionName() ? 1 : 0;
+}
+
+static int __stdcall SelectSchemaNative(int type, TdfFile* parser, char* schema)
+{
+    return TheMission()->SelectSchema(type, parser, schema);
 }
 
 static void __fastcall DeactivateConditionsNative(MissionConditions* self)
@@ -665,6 +714,7 @@ static ScriptsSeam s_scripts;
 static MovementSeam s_movement;
 static PlayersSeam s_players;
 static MapSeam s_map;
+static MissionSeam s_mission;
 static FilesSeam s_files;
 static NetworkSeam s_network;
 
@@ -876,10 +926,10 @@ void InstallNativeSeams()
     s_movement.ApplyPathEvent = ApplyPathEvent;
     s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
     s_movement.UnitMotionReadNetState = UnitMotionReadNetStateNative;
-    s_units.MovementClassGet = MovementClassGetNative;
-    s_units.MovementClassInBounds = MovementClassInBoundsNative;
-    s_units.RefreshMovedUnits = RefreshMovedUnitsNative;
-    s_units.RefreshUnitIfStale = RefreshUnitIfStaleNative;
+    s_map.MovementClassGet = MovementClassGetNative;
+    s_map.MovementClassInBounds = MovementClassInBoundsNative;
+    s_map.RefreshMovedUnits = RefreshMovedUnitsNative;
+    s_map.RefreshUnitIfStale = RefreshUnitIfStaleNative;
     s_los_radar.HasReadyUnitInRange = HasReadyUnitInRange;
     s_los_radar.IsPointVisible = IsPointVisible;
     s_los_radar.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
@@ -898,14 +948,12 @@ void InstallNativeSeams()
     s_units.FreeFactoryIndex = FreeFactoryIndex;
     s_units.RefreshFactoryIndex = RefreshFactoryIndex;
     s_units.WriteState = UnitsWriteState;
-    s_map.GetNameSlot = GetNameSlotNative;
-    s_units.GetGroundHeight = GetGroundHeightNative;
+    s_map.GetGroundHeight = GetGroundHeight;
     s_scripts.GetSweetSpot = GetSweetSpotNative;
     s_scripts.FindScript = FindScriptNative;
     s_scripts.StartScriptWithArgs = StartScriptWithArgsNative;
     s_units.SetStateBits = SetStateBitsNative;
     s_map.GetCellMeanHeight = GetCellMeanHeightNative;
-    s_map.GetGameType = GetGameTypeNative;
     s_weapons.FindWeaponByName = FindWeaponByNameNative;
     s_weapons.GetWeaponRange = GetWeaponRangeNative;
     s_weapons.WeaponCanReachUnit = WeaponCanReachUnit;
@@ -934,6 +982,32 @@ void InstallNativeSeams()
     s_ai.UpdateSquads = UpdateSquadsNative;
     s_ai.FreeSquadManager = FreeSquadManagerNative;
     s_ai.CreateSquadManager = CreateSquadManagerNative;
+    s_mission.GetGameType = GetGameTypeNative;
+    s_mission.GetNameSlot = GetNameSlotNative;
+    s_mission.SetMissionType = SetMissionType;
+    s_mission.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
+    s_mission.AdvanceMission = AdvanceMissionNative;
+    s_mission.GetCampaignName = GetCampaignNameNative;
+    s_mission.GetMissionIndex = GetMissionIndexNative;
+    s_mission.GetMissionName = GetMissionNameNative;
+    s_mission.GetStartPosition = GetStartPositionNative;
+    s_mission.LoadCampaign = LoadCampaignNative;
+    s_mission.LoadMissionByName = LoadMissionByNameNative;
+    s_mission.MissionExists = MissionExistsNative;
+    s_mission.RefreshMapList = RefreshMapListNative;
+    s_mission.SelectMission = SelectMissionNative;
+    s_mission.ComputeMapChecksum = ComputeMapChecksumNative;
+    s_mission.GetTerrainLength = GetTerrainLengthNative;
+    s_mission.CountMissions = CountMissionsNative;
+    s_mission.GetCampaignMissionName = GetCampaignMissionNameNative;
+    s_mission.CountStartPositions = CountStartPositionsNative;
+    s_mission.GetBriefing = GetBriefingNative;
+    s_mission.GetDescription = GetDescriptionNative;
+    s_mission.GetPlanet = GetPlanetNative;
+    s_mission.GetTerrainSizeTier = GetTerrainSizeTierNative;
+    s_mission.GetTranslatedName = GetTranslatedNameNative;
+    s_mission.HasMissionName = HasMissionNameNative;
+    s_mission.SelectSchema = SelectSchemaNative;
     s_map.Apply = ApplyMapEvent;
     s_map.AllocateBuckets = MapAllocateBuckets;
     s_map.FreeBuckets = MapFreeBuckets;
@@ -959,30 +1033,16 @@ void InstallNativeSeams()
     s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
     s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
-    s_map.FreeOtaEnumCacheAndMission = FreeOtaEnumCacheAndMission;
     s_map.LoadMappingData = LoadMappingData;
     s_map.LoadMetalPlotmap = LoadMetalPlotmap;
     s_map.LoadPlayerFeaturesPlotmap = LoadPlayerFeaturesPlotmap;
     s_map.SaveMappingData = SaveMappingData;
     s_map.SaveMetalPlotmap = SaveMetalPlotmap;
     s_map.SavePlayerFeaturesPlotmap = SavePlayerFeaturesPlotmap;
-    s_map.SetMissionType = SetMissionType;
     s_map.SnapWorldPosToFootprint = SnapWorldPosToFootprint;
     s_map.CanPlaceFootprintAt = CanPlaceFootprintAt;
     s_map.IsPadSlotFree = IsPadSlotFree;
     s_map.PickRandomReclaimableResourcesInRadius = PickRandomReclaimableResourcesInRadius;
-    s_map.AdvanceMission = AdvanceMissionNative;
-    s_map.GetCampaignName = GetCampaignNameNative;
-    s_map.GetMissionIndex = GetMissionIndexNative;
-    s_map.GetMissionName = GetMissionNameNative;
-    s_map.GetStartPosition = GetStartPositionNative;
-    s_map.LoadCampaign = LoadCampaignNative;
-    s_map.LoadMissionByName = LoadMissionByNameNative;
-    s_map.MissionExists = MissionExistsNative;
-    s_map.RefreshMapList = RefreshMapListNative;
-    s_map.SelectMission = SelectMissionNative;
-    s_map.ComputeMapChecksum = ComputeMapChecksumNative;
-    s_map.GetTerrainLength = GetTerrainLengthNative;
     s_players.RegionSize = PlayersRegionSize;
     s_players.Init = PlayersInit;
     s_players.Shutdown = PlayersShutdown;
@@ -1202,6 +1262,7 @@ void InstallNativeSeams()
     g_seams.map = &s_map;
     g_seams.scripts = &s_scripts;
     g_seams.movement = &s_movement;
+    g_seams.mission = &s_mission;
     g_seams.files = &s_files;
     g_seams.network = &s_network;
     g_seams.pathworld = NativePathWorld();

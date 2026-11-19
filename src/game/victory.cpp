@@ -81,7 +81,7 @@ struct PlayerName {
     char unknown_42[0x232 - 0x42];
 };
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "game.h"
 #pragma pack(pop)
@@ -858,7 +858,7 @@ void DefeatDeathTimerRunsOut::LoadState(HapiBank* obj)
 // FUNCTION: 0x48fdf0
 void MissionConditions::SaveConditions(HapiBank* file)
 {
-    if (g_seams.map->GetGameType(g_game->net) == 1) {
+    if (g_seams.mission->GetGameType() == 1) {
         int i;
         for (i = 0; i < victoryCount; i++) {
             victory[i]->SaveState(file);
@@ -872,7 +872,7 @@ void MissionConditions::SaveConditions(HapiBank* file)
 // FUNCTION: 0x48fe60
 void MissionConditions::LoadConditions(HapiBank* file)
 {
-    if (g_seams.map->GetGameType(g_game->net) == 1) {
+    if (g_seams.mission->GetGameType() == 1) {
         int i;
         for (i = 0; i < victoryCount; i++) {
             victory[i]->LoadState(file);
@@ -1004,7 +1004,7 @@ int MissionConditions::CheckVictory()
 {
     if (active == 0)
         return 0;
-    switch (g_seams.map->GetGameType(g_game->net)) {
+    switch (g_seams.mission->GetGameType()) {
     case 1:
         return AllVictoryConditionsMet();
     case 2: {
@@ -1031,7 +1031,7 @@ int MissionConditions::CheckVictory()
 int MissionConditions::CheckDefeat(RandStream stream)
 {
     if (active) {
-        switch (g_seams.map->GetGameType(g_game->net)) {
+        switch (g_seams.mission->GetGameType()) {
         case 1:
             return AnyDefeatConditionMet();
         case 2:

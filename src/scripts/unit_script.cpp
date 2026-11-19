@@ -106,7 +106,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         v.z = a << 16;
         if (v.z < 0)
             v.x += 0x10000;
-        return g_seams.units->GetGroundHeight(&v) << 16;
+        return g_seams.map->GetGroundHeight(&v) << 16;
     }
     case 17: {
         int result;

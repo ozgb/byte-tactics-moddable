@@ -142,7 +142,7 @@ void RegisterUnitOrders(void);
 
 #include "../map/cell.h"
 
-#include "../map/mission.h"
+#include "../mission/mission.h"
 
 #include "../game/game.h"
 
@@ -1654,7 +1654,7 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     Player* p=&g_game->players[player];
     if(p->energy<50.0f) return 0;
     if(p->metal<25.0f) return 0;
-    if(g_seams.map->GetGameType(g_game->net)==1 && (g_game->defs[type].flags1&0x20)) return 0;
+    if(g_seams.mission->GetGameType()==1 && (g_game->defs[type].flags1&0x20)) return 0;
     int energyCap=min(1000,(int)p->energyCapacity);
     int metalCap=min(500,(int)p->metalCapacity);
     int energy=(int)Max(0.0f,(energyCap-p->energy)*0.125f);
@@ -1762,8 +1762,8 @@ void __stdcall DumpPlayerAI(int player, void* file)
     default: strcpy(buffer,"INVALID"); break;
     }
     FilePrintf(file,"controller: %s\r\n",buffer);
-    FilePrintf(file,"terrain:    '%s'\r\n",g_seams.map->GetNameSlot(g_game->net,1));
-    FilePrintf(file,"profile:    '%s'\r\n",g_seams.map->GetNameSlot(g_game->net,7));
+    FilePrintf(file,"terrain:    '%s'\r\n",g_seams.mission->GetNameSlot(1));
+    FilePrintf(file,"profile:    '%s'\r\n",g_seams.mission->GetNameSlot(7));
     const char* difficulties[]={"EASY","MEDIUM","HARD"};
     FilePrintf(file,"difficulty: '%s'\r\n",difficulties[g_game->difficulty]);
     FilePrintf(file,"================================================\r\n");

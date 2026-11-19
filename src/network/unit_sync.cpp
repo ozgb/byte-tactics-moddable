@@ -131,7 +131,7 @@ struct NetReportBlockView {
 };
 #pragma pack(pop)
 
-#include "../map/mission.h"
+#include "../../interfaces/seams.h"
 #include "../units/unit_def.h"
 
 #pragma pack(push, 1)
@@ -194,7 +194,7 @@ int __stdcall ReportGameEvent(int msg)
         if (msg == 1 || msg == 6 || msg == 7)
             g_reportFlags = QueryOnlineFlags(msg == 1 ? 1 : 2 + (msg != 6));
         if (g_reportFlags & 3) {
-            int team = (int)g_game->net->GetMissionName();
+            int team = (int)g_seams.mission->GetMissionName();
             if (RIReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                              team, g_game->localPlayer,
                              id, g_onlineReportPlayers, g_onlineReportScoreBoards))
@@ -203,7 +203,7 @@ int __stdcall ReportGameEvent(int msg)
     }
 
     if (g_reporterDll) {
-        int team = (int)g_game->net->GetMissionName();
+        int team = (int)g_seams.mission->GetMissionName();
         g_riReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                      team, g_game->localPlayer,
                      id, g_onlineReportPlayers, g_onlineReportScoreBoards);

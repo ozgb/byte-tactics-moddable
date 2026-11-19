@@ -60,6 +60,7 @@ void* __stdcall FindGafEntry(void* a, char* b);
 extern void __cdecl operator delete(void*);
 #include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/mission.h"
 
 // FUNCTION: 0x42e310
 void LoadWeaponTypes()

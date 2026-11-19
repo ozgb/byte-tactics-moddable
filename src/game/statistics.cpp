@@ -39,6 +39,7 @@ extern RiReportGameChatFn g_riReportGameChat;
 #include "../network/online_report.h"
 #include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/mission.h"
 #include "../network/player_info.h"
 #include "../data/exe_only.h"
 

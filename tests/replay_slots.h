@@ -407,11 +407,11 @@ WindMeteorsSeam g_native_wind_meteors = {
 };
 
 WeaponsSeam g_native_weapons = {
+    ApplyWeaponsSlot,
     UpdateProjectiles,
     UpdateExplosions,
-    SpawnProjectile,
+    UpdateUnitWeapons,
     FindWeaponByNameSlot,
-    ApplyAreaDamageAtSlot,
     GetWeaponRangeSlot,
     WeaponCanReachUnit,
     FindTargetableProjectileSlot,
@@ -422,16 +422,7 @@ WeaponsSeam g_native_weapons = {
     FreeWeaponTypes,
     InitExplosions,
     FreeExplosions,
-    DamageUnit,
-    FindFeatureAtPos,
-    ReleaseWeaponsSlot,
-    ClaimWeaponsSlot,
-    DetonateUnitWeapon,
-    InitUnitWeaponSlots,
-    RemoveUnitProjectiles,
-    UpdateUnitWeapons,
-    WeaponAimCobCompleteSlot,
-    CobScriptExplodePieceSlot,
+    WriteWeaponsStateSlot,
 };
 
 TargetingSeam g_native_targeting = {
@@ -543,6 +534,13 @@ void Run_wind_meteors_LoadMeteors()
     g_seams.wind_meteors->LoadMeteors(p0);
 }
 
+void Run_weapons_UpdateUnitWeapons()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateUnitWeapons(p0);
+}
+
 int g_result_weapons_GetWeaponRange;
 
 void Run_weapons_GetWeaponRange()
@@ -608,57 +606,6 @@ void Run_weapons_WeaponCanReachPos()
 void After_weapons_WeaponCanReachPos()
 {
     CompareResult(g_result_weapons_WeaponCanReachPos);
-}
-
-void Run_weapons_DamageUnit()
-{
-    Unit* p0 = (Unit*)ArgObject("source", ROK_UNIT);
-    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
-    int p2 = ArgScalar<int>("amount");
-    int p3 = ArgScalar<int>("type");
-    unsigned short p4 = ArgScalar<unsigned short>("extra");
-    SetClosing(nullptr);
-    g_seams.weapons->DamageUnit(p0, p1, p2, p3, p4);
-}
-
-void Run_weapons_ReleaseWeapons()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    int p1 = ArgScalar<int>("unusedEdx");
-    unsigned char p2 = ArgScalar<unsigned char>("index");
-    SetClosing(nullptr);
-    g_seams.weapons->ReleaseWeapons(p0, p1, p2);
-}
-
-void Run_weapons_ClaimWeapons()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    int p1 = ArgScalar<int>("unusedEdx");
-    unsigned char p2 = ArgScalar<unsigned char>("index");
-    SetClosing(nullptr);
-    g_seams.weapons->ClaimWeapons(p0, p1, p2);
-}
-
-void Run_weapons_InitUnitWeaponSlots()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    SetClosing(nullptr);
-    g_seams.weapons->InitUnitWeaponSlots(p0);
-}
-
-void Run_weapons_UpdateUnitWeapons()
-{
-    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
-    SetClosing(nullptr);
-    g_seams.weapons->UpdateUnitWeapons(p0);
-}
-
-void Run_weapons_WeaponAimCobComplete()
-{
-    Callback* p0 = (Callback*)ArgObject("callback", ROK_WEAPONAIMCOBCB);
-    int p1 = ArgScalar<int>("result");
-    SetClosing(nullptr);
-    g_seams.weapons->WeaponAimCobComplete(p0, p1);
 }
 
 int g_result_targeting_Apply;
@@ -921,6 +868,10 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_LoadMeteors();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
+        Run_weapons_UpdateUnitWeapons();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0) {
         Run_weapons_GetWeaponRange();
         return true;
@@ -935,30 +886,6 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachPos") == 0) {
         Run_weapons_WeaponCanReachPos();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "DamageUnit") == 0) {
-        Run_weapons_DamageUnit();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "ReleaseWeapons") == 0) {
-        Run_weapons_ReleaseWeapons();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "ClaimWeapons") == 0) {
-        Run_weapons_ClaimWeapons();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "InitUnitWeaponSlots") == 0) {
-        Run_weapons_InitUnitWeaponSlots();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
-        Run_weapons_UpdateUnitWeapons();
-        return true;
-    }
-    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponAimCobComplete") == 0) {
-        Run_weapons_WeaponAimCobComplete();
         return true;
     }
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "Apply") == 0) {

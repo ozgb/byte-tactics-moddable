@@ -547,6 +547,22 @@ int __stdcall RecFeaturesUpdateFeatureSpot(int a0)
     return result;
 }
 
+unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_FINDFEATUREATPOS, SUB_FEATURES, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "pos");
+        ArgPending(s_call, "cell");
+        ArgPending(s_call, "size");
+    }
+    unsigned short result = s_inner_features->FindFeatureAtPos(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecAiApply(const AiEvent* a0)
 {
     ReplayRoots roots;
@@ -866,6 +882,19 @@ void __stdcall RecPathfindingWriteState(const StateWriter* a0)
     }
 }
 
+void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_WEAPONS_UPDATEUNITWEAPONS, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_weapons->UpdateUnitWeapons(a0);
+    if (scope.Open()) {
+    }
+}
+
 int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -953,94 +982,6 @@ int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecWeaponsDamageUnit(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_WEAPONS_DAMAGEUNIT, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "source", ROK_UNIT, a0);
-        ArgObject(s_call, "target", ROK_UNIT, a1);
-        ArgValue(s_call, "amount", a2);
-        ArgValue(s_call, "type", a3);
-        ArgValue(s_call, "extra", a4);
-    }
-    s_inner_weapons->DamageUnit(a0, a1, a2, a3, a4);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecWeaponsReleaseWeapons(Unit* a0, int a1, unsigned char a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_RELEASEWEAPONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "index", a2);
-    }
-    s_inner_weapons->ReleaseWeapons(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __fastcall RecWeaponsClaimWeapons(Unit* a0, int a1, unsigned char a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_CLAIMWEAPONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgValue(s_call, "index", a2);
-    }
-    s_inner_weapons->ClaimWeapons(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsInitUnitWeaponSlots(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_INITUNITWEAPONSLOTS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_weapons->InitUnitWeaponSlots(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_WEAPONS_UPDATEUNITWEAPONS, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-    }
-    s_inner_weapons->UpdateUnitWeapons(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecWeaponsWeaponAimCobComplete(Callback* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_WEAPONAIMCOBCB, a0);
-    SlotScope scope(RSL_WEAPONS_WEAPONAIMCOBCOMPLETE, SUB_WEAPONS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "callback", ROK_WEAPONAIMCOBCB, a0);
-        ArgValue(s_call, "result", a1);
-    }
-    s_inner_weapons->WeaponAimCobComplete(a0, a1);
-    if (scope.Open()) {
-    }
 }
 
 int __stdcall RecTargetingApply(const TargetingEvent* a0)
@@ -2464,15 +2405,28 @@ void __fastcall RecUnitsUpdateSfxOccupy(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall RecUnitsUpdateUnit(Unit* a0)
+void __stdcall RecUnitsUpdateUnitHead(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_UPDATEUNIT, SUB_UNITS, roots);
+    SlotScope scope(RSL_UNITS_UPDATEUNITHEAD, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
-    s_inner_units->UpdateUnit(a0);
+    s_inner_units->UpdateUnitHead(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsUpdateUnitBody(Unit* a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_UNITS_UPDATEUNITBODY, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+    }
+    s_inner_units->UpdateUnitBody(a0);
     if (scope.Open()) {
     }
 }
@@ -5479,6 +5433,8 @@ void HookSeams(const bool* on)
         s_rec_features.FirstFeatureSpot = RecFeaturesFirstFeatureSpot;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatureSpot = RecFeaturesUpdateFeatureSpot;
+    if (on[SUB_FEATURES])
+        s_rec_features.FindFeatureAtPos = RecFeaturesFindFeatureAtPos;
     if (on[SUB_AI])
         s_rec_ai.Apply = RecAiApply;
     if (on[SUB_AI])
@@ -5527,6 +5483,8 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.Poll = RecPathfindingPoll;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.WriteState = RecPathfindingWriteState;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
@@ -5535,18 +5493,6 @@ void HookSeams(const bool* on)
         s_rec_weapons.FindTargetableProjectile = RecWeaponsFindTargetableProjectile;
     if (on[SUB_WEAPONS])
         s_rec_weapons.WeaponCanReachPos = RecWeaponsWeaponCanReachPos;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.DamageUnit = RecWeaponsDamageUnit;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.ReleaseWeapons = RecWeaponsReleaseWeapons;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.ClaimWeapons = RecWeaponsClaimWeapons;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.InitUnitWeaponSlots = RecWeaponsInitUnitWeaponSlots;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
-    if (on[SUB_WEAPONS])
-        s_rec_weapons.WeaponAimCobComplete = RecWeaponsWeaponAimCobComplete;
     if (on[SUB_TARGETING])
         s_rec_targeting.Apply = RecTargetingApply;
     if (on[SUB_TARGETING])
@@ -5738,7 +5684,9 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.UpdateSfxOccupy = RecUnitsUpdateSfxOccupy;
     if (on[SUB_UNITS])
-        s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
+        s_rec_units.UpdateUnitHead = RecUnitsUpdateUnitHead;
+    if (on[SUB_UNITS])
+        s_rec_units.UpdateUnitBody = RecUnitsUpdateUnitBody;
     if (on[SUB_UNITS])
         s_rec_units.GetFactoriesInRadius = RecUnitsGetFactoriesInRadius;
     if (on[SUB_UNITS])

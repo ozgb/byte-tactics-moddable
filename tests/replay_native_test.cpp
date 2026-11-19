@@ -26,6 +26,7 @@
 #include "../src/weapons/weapon_aim_cob_cb.h"
 #include "../src/scripts/cob_script.h"
 #include "../src/weapons/weapons.h"
+#include "../src/weapons/weapons_apply.h"
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
 #include "../src/harness/replay_services.h"
@@ -41,7 +42,6 @@ struct ReachPosVec3;
 Projectile* __stdcall FindTargetableProjectile(InterceptorUnitView* table, int index);
 int __stdcall WeaponCanReachPos(Unit* a1, ReachPosVec3* a2, ReachPosVec3* a3, int a4);
 int __stdcall GetWeaponRange(int param1, unsigned int param2);
-void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra);
 
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 
@@ -1636,29 +1636,14 @@ WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
     return (WeaponDef*)FindWeaponByName(name);
 }
 
-void __stdcall ApplyAreaDamageAtSlot(WeaponDef* weapon, Vec3* pos)
+int __stdcall ApplyWeaponsSlot(const WeaponsEvent* event)
 {
-    ApplyAreaDamageAt(weapon, pos);
+    return WeaponsApply(event);
 }
 
-void __stdcall CobScriptExplodePieceSlot(CobScript* script, int piece, unsigned int flags)
+void __stdcall WriteWeaponsStateSlot(const StateWriter* writer)
 {
-    script->ExplodePiece(piece, flags);
-}
-
-void __fastcall ClaimWeaponsSlot(Unit* self, int unusedEdx, unsigned char index)
-{
-    self->ClaimWeapons(index);
-}
-
-void __fastcall ReleaseWeaponsSlot(Unit* self, int unusedEdx, unsigned char index)
-{
-    self->ReleaseWeapons(index);
-}
-
-void __stdcall WeaponAimCobCompleteSlot(Callback* callback, int result)
-{
-    ((WeaponAimCobCb*)callback)->OnAimCobReturn(result);
+    WeaponsWriteState(writer);
 }
 
 int __fastcall GetGameTypeSlot(Mission* self)

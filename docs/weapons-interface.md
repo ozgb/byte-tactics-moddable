@@ -22,7 +22,7 @@ run and drained at each phase boundary, synchronous slots that deliver the modul
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
 to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 168 and 176, players 192 to 196 and 208 to
-210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246, weapons 256 to 268 and 272 to 281 (its range is 256 to 287).
+210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246, weapons 256 to 269 and 272 to 281 (its range is 256 to 287).
 
 The human ruled on 2026-11-17 that **weapons owns the damage rules and units owns the record**: weapons computes the
 damage (the armour, the kill count, the network packet, the effects that tell ai, orders and units) and publishes the
@@ -30,14 +30,14 @@ writes to the unit record as effects (section 3).
 
 Weapons' place in it:
 - **Events into weapons:** DAMAGE, REMOTE_DAMAGE, DETONATE, RELEASE, CLAIM, INIT_SLOTS, REMOVE_PROJECTILES,
-  AIM_DONE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN, SET_STOCKPILES and LOAD_SLOT, published by units, orders, scripts,
+  AIM_DONE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN, SET_STOCKPILES, LOAD_SLOT and ADD_STOCKPILE, published by units, orders, scripts,
   features, wind_meteors and the engine (the network). Weapons' handler (`WeaponsInbox`,
   `src/seams/weapons_world.cpp`) passes each to `Apply`, and records it with its outcome in the trace's dump
   (section 5). Features' AREA_DAMAGE and wind_meteors' SPAWN reach it through `WeaponsOnFeaturesAreaDamage` and
   `WeaponsOnMeteorSpawn`, which build the event and hand it to the same handler; their routes in `src/game/routes.cpp`
   are as they were (AREA_DAMAGE synchronous, SPAWN queued).
-- **Routes:** of the fifteen routes into weapons, thirteen are synchronous (seven because the gate diverged with them
-  queued, five by #952's rule, and features' AREA_DAMAGE as it was). LOAD_SLOT and wind_meteors' SPAWN stay queued. Of weapons' effects, START_SCRIPT,
+- **Routes:** of the sixteen routes into weapons, fourteen are synchronous (seven because the gate diverged with them
+  queued, six by #952's rule, and features' AREA_DAMAGE as it was). LOAD_SLOT and wind_meteors' SPAWN stay queued. Of weapons' effects, START_SCRIPT,
   DETACH_PIECE and HEALTH are synchronous because the gate diverged with them queued, and MARK_DAMAGED,
   DAMAGE_RECORD, PARALYZE, NOTICE and BUSY by #952's rule; ATTACKED (four routes), HIT, DAMAGE to features and CLEAR to
   targeting are as they were (sections 4 and 8).
@@ -89,6 +89,7 @@ another machine already computed and announced, and skips the armour and the net
 | units: a unit dies (`ApplyUnitDeath`) | `RemoveUnitProjectiles` | REMOVE_PROJECTILES from units |
 | units: a unit captured by another player (`UnitsOnPlayersCaptureUnit`) | the stockpiles copied into the new unit's slots | SET_STOCKPILES from units |
 | units: a saved game loads (`unit_save.cpp`) | the slot's fields restored | LOAD_SLOT from units, outside the tick |
+| orders: a stockpile weapon's build order finishes a round (`BuildWeaponOrder`, `unit_orders.cpp`) | the slot's `stockpile` raised by one | ADD_STOCKPILE from orders, `value` the weapon (0 to 2) |
 | scripts: an aim thread ends, or the aim script is missing (`cob.cpp`) | `WeaponAimCobComplete` | AIM_DONE from scripts |
 | scripts: the explode opcode (`script_explode.cpp`) | `CobScriptExplodePiece` | EXPLODE_PIECE from scripts |
 | features: a burning feature (`SpreadFire`), by features' effect AREA_DAMAGE | `ApplyAreaDamageAt` | AREA_DAMAGE, through `WeaponsOnFeaturesAreaDamage` |
@@ -119,7 +120,7 @@ every same-statement order is a route's (section 4).
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 47) and returned to no
 one: 1 for every kind, and 0 for SPAWN when the table of projectiles is full. `Apply` first rejects, with outcome 0
 and no change, an event naming a null unit (all but SPAWN, AREA_DAMAGE and AIM_DONE), a RELEASE or CLAIM outside
-weapon 0 to 3, a SET_STOCKPILES or LOAD_SLOT outside 0 to 2, an AIM_DONE with no callback, a SPAWN or AREA_DAMAGE
+weapon 0 to 3, a LOAD_SLOT or ADD_STOCKPILE outside 0 to 2, an AIM_DONE with no callback, a SPAWN or AREA_DAMAGE
 naming a weapon outside the table (SPAWN may name -1), and an unknown kind.
 
 **Calls outside the interface.** `docs/schedule.md` listed, on the damage path of `DamageUnit`, `DetonateUnitWeapon`,
@@ -156,7 +157,7 @@ the rules, units owns the record.
 
 | Field of `Unit` | Whose | Written how |
 |---|---|---|
-| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`): `aimTargetXOrUnitId`, `aimTargetZOrUnitSentinel`, `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, LOAD_SLOT, AIM_DONE) and runs (`UpdateUnitWeapons`). The aim target fields are also written by targeting (`SetWeaponTargetUnit`, `SetWeaponTargetPos`, `GetWeaponTargetPos`, `src/units/unit_targets.cpp`), and `stockpile` by orders' `BuildWeaponOrder` |
+| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`): `aimTargetXOrUnitId`, `aimTargetZOrUnitSentinel`, `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, LOAD_SLOT, ADD_STOCKPILE, AIM_DONE) and runs (`UpdateUnitWeapons`). The aim target fields are also written by targeting (`SetWeaponTargetUnit`, `SetWeaponTargetPos`, `GetWeaponTargetPos`, `src/units/unit_targets.cpp`) |
 | `health`, `flags` (0x4000 dying), `attacker`, `lastAttackerSlot`, `lastDamageType` | units' record | by the effects HEALTH and DAMAGE_RECORD, units' handlers; `health` has other writers (self-repair, build progress, orders) |
 | `recentlyDamagedTimer` | units' record | by MARK_DAMAGED |
 | `workTime` | units' record | by BUSY (orders write it too) |
@@ -199,6 +200,7 @@ delivers it.
 | orders DAMAGE | synchronous | The gate (section 8). |
 | orders RELEASE | synchronous | The gate (section 8). |
 | orders CLAIM | synchronous | The gate (section 8). |
+| orders ADD_STOCKPILE | synchronous | #952's rule. Queued it stayed equal on the tier, but it can be pending while a later read in the same phase needs the stockpile: a capture later in the units phase copies the unit's stockpiles into the new unit (players' CAPTURE_UNIT, units' handler publishes SET_STOCKPILES with them), and the network's unit state packet sends them. |
 | units DAMAGE | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. The route also carries the build progress and repair damage of `AddBuildProgress` and `AddRepairProgress`, which units' functions publish on units' outbox. |
 | units DETONATE | synchronous | The gate (section 8). |
 | units RELEASE | synchronous | #952's rule. Queued it stayed equal on the tier, but `InitUnitFromType` releases each slot of a unit created in the units phase (a build), which is updated later in the same phase when its slot follows its builder's, and `UpdateUnitWeapons` reads the released slots. Queued, the release would also land after INIT_SLOTS (synchronous), reversing the two writes to the same slots. |
@@ -349,6 +351,7 @@ section 4).
 | orders DAMAGE | diverged | mission-victory, tick 181, units phase (`UpdateAllUnits`, 0x48ad30): `rng.parkMiller` (reference 0x613fc705, queued 0x01f484b2). |
 | orders RELEASE | diverged | orders-guard-attacked, tick 159, projectiles phase (`UpdateProjectiles`, 0x49b720): `units[251].+0xba` (reference 0x0000, queued 0x4000). |
 | orders CLAIM | diverged | mission-radius, tick 1325, units phase: `units[4].f_1f` (reference 0x03, queued 0x02). |
+| orders ADD_STOCKPILE | equal | none (synchronous by #952's rule, section 4; queued on its own at 1ac8a4a97's parent, with the tier equal) |
 | units DAMAGE | traces equal, events diverged | conditions-dark-side, tick 2674, units phase: the sim event digest, reference record `2674 units unit_speech 0x1 252 2 0` against `0x0 1 16 0`; also mission-capture, tick 499, units phase. |
 | units DETONATE | diverged | mission-victory, tick 188, units phase: `debris[45].obj` (reference piece 0, queued piece 1). |
 | units RELEASE | equal | none (synchronous by #952's rule, section 4) |
@@ -384,13 +387,14 @@ inside the outer `Apply`, where 3.1c called `ReleaseWeapons` from inside `ai.Rea
 **How often each route is taken.** A build that counts every publish into and out of weapons, over the 89 scenarios
 with native modules (all 89 equal to the reference): the events published inside the tick and outside it (when a game
 is set up or loaded, and the console's commands), and in how many scenarios each was published at all. A route with
-several subscribers (ATTACKED to units has two) counts once per subscriber.
+several subscribers (ATTACKED to units has two) counts once per subscriber. ADD_STOCKPILE came after the count.
 
 | Route | Inside the tick | Scenarios | Outside the tick | Scenarios |
 |---|---|---|---|---|
 | orders DAMAGE | 392 | 22 | 0 | 0 |
 | orders RELEASE | 37461 | 89 | 149 | 36 |
 | orders CLAIM | 17934 | 67 | 0 | 0 |
+| orders ADD_STOCKPILE | not counted | | | |
 | units DAMAGE | 17778 | 17 | 4 | 3 |
 | units DETONATE | 784 | 30 | 0 | 0 |
 | units RELEASE | 5976 | 53 | 4272 | 89 |

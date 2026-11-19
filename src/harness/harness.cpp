@@ -54,6 +54,9 @@
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
 #include "../ai/ai_idle.h"
+#include "../state/block_vector.h"
+#include "../map/line_of_sight_index.h"
+#include "../units/factory_index.h"
 #include "../game/match_setup.h"
 #include "share_packets.h"
 
@@ -4063,6 +4066,7 @@ static void VisitPlayerAI()
         { "weights", 0x9d, 1 }, { "vec_ad", 0xad, 1 }, { "vec_bd", 0xbd, 4 }, { "values", 0xcd, 4 },
         { "locked", 0xdd, 4 }
     };
+    static const unsigned char emptyVector[16] = {0};
     char path[96];
     HashByte(24);
     for (unsigned i = 0; i < MAX_PLAYERS; i++) {
@@ -4071,14 +4075,20 @@ static void VisitPlayerAI()
         HashByte(ai != 0);
         if (ai == 0)
             continue;
+        const LosUnitIndexEntry* los = LosUnitIndexOf((int)i);
+        const BlockVector<Ref<Unit> >* factoryList = FactoryIndexOf((int)i);
+        unsigned char view[0x10d];
+        memcpy(view, (const unsigned char*)ai, sizeof view);
+        int hasSpecial = los != nullptr ? los->hasSpecial : 0;
+        memcpy(view + 0x79, &hasSpecial, sizeof hasSpecial);
         FormatPath(path, "players[%u].ai", i);
-        VisitElement(path, (const unsigned char*)ai, &kPlayerAITable);
+        VisitElement(path, view, &kPlayerAITable);
         FormatPath(path, "players[%u].ai.visible", i);
-        VisitUnitVector(path, ai + 0x5);
+        VisitUnitVector(path, los != nullptr ? (unsigned)&los->visible : (unsigned)emptyVector);
         FormatPath(path, "players[%u].ai.known", i);
-        VisitUnitVector(path, ai + 0x15);
+        VisitUnitVector(path, los != nullptr ? (unsigned)&los->known : (unsigned)emptyVector);
         FormatPath(path, "players[%u].ai.factories", i);
-        VisitUnitVector(path, ai + 0x25);
+        VisitUnitVector(path, factoryList != nullptr ? (unsigned)factoryList : (unsigned)emptyVector);
         for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
             FormatPath(path, "players[%u].ai.%s", i, vectors[v].name);
             VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);

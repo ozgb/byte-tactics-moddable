@@ -3051,7 +3051,7 @@ void BeginImport()
 void EnemyListSelfTest()
 {
     printf("a unit list answered from the recorded vector form\n");
-    const char* call = "  i ai.GetVisibleEnemiesInRadius 1 pos=(100,0,200) 300 0\n  o out [Unit#3,Unit#9,Unit#5]\n";
+    const char* call = "  i los_radar.GetVisibleEnemiesInRadius 1 pos=(100,0,200) 300 0\n  o out [Unit#3,Unit#9,Unit#5]\n";
     Vec3 pos;
     pos.x = 100;
     pos.y = 0;
@@ -3062,7 +3062,7 @@ void EnemyListSelfTest()
     LoadCall(call);
     BeginImport();
     memset(wide, 0, sizeof wide);
-    int count = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    int count = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
     Check(g_diffs == 0 && count == 3 && wide[0].get() != nullptr && wide[1].get() != nullptr && wide[2].get() != nullptr && wide[3].get() == nullptr, "a capacity at or above the count gets every unit in one call");
     Check(wide[0].get() != wide[1].get() && wide[1].get() != wide[2].get(), "in the recorded order, one unit each");
 
@@ -3071,22 +3071,22 @@ void EnemyListSelfTest()
     BeginImport();
     memset(narrow, 0, sizeof narrow);
     memset(wide, 0, sizeof wide);
-    count = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
+    count = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
     Check(g_diffs == 0 && count == 3 && narrow[0].get() != nullptr && narrow[1].get() != nullptr, "a capacity below the count gets the first units and the full count");
-    int again = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    int again = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
     Check(g_diffs == 0 && again == 3 && g_importIndex == 1, "a repeat with a larger buffer is answered from the same line");
     Check(wide[0].get() == narrow[0].get() && wide[1].get() == narrow[1].get() && wide[2].get() != nullptr && wide[3].get() == nullptr, "with the same units in the same order");
-    again = Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    again = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
     printf("a third call: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
 
     ResetBlock();
     LoadCall(call);
     BeginImport();
-    Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
-    Imp_ai_GetVisibleEnemiesInRadiusList(1, &pos, 301, 0, wide, 5);
+    Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
+    Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 301, 0, wide, 5);
     printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 ai.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
 }
 
 void ShapeSelfTest()
@@ -3624,8 +3624,6 @@ void VectorSelfTest()
     first = &pool[3];
     Ref<Unit> second;
     second = &pool[9];
-    ai->visible.units.PushBack(first);
-    ai->visible.units.PushBack(second);
     ai->cells.PushBack(KeyedCell(3, 4, 1.5f));
     ai->cells.PushBack(KeyedCell(5, 6, 2.5f));
     ai->counts.PushBack(1);
@@ -3633,14 +3631,19 @@ void VectorSelfTest()
     ai->counts.PushBack(3);
     Check(ai->counts.Size() == 3 && ai->counts.Capacity() == 4, "the block vector grows as the module's does");
 
-    unsigned char kind = ROK_PLAYERAI;
-    void* root = ai;
+    FixtureSeen* seen = (FixtureSeen*)SimAlloc(sizeof(FixtureSeen));
+    memset((void*)seen, 0, sizeof(FixtureSeen));
+    seen->index = 4;
+    seen->units.PushBack(first);
+    seen->units.PushBack(second);
+    unsigned char kind[2] = { ROK_PLAYERAI, ROK_FIXTURESEEN };
+    void* root[2] = { ai, seen };
     Recorder recorder;
-    recorder.Record(&kind, &root, 1, sets);
+    recorder.Record(kind, root, 2, sets);
     ReplayText calls;
     const char* text = recorder.text.Data();
     printf("%s", text);
-    Check(strstr(text, "  r PlayerAI#1.visibleUnits [2/2] Unit#3,Unit#9\n") != nullptr, "pointer elements are the length, the capacity and the handles");
+    Check(strstr(text, "  r FixtureSeen#1.units [2/2] Unit#3,Unit#9\n") != nullptr, "pointer elements are the length, the capacity and the handles");
     Check(strstr(text, "  r Unit#9.health 90\n") != nullptr, "and the walker reaches the units held only by the vector");
     Check(strstr(text, "  r PlayerAI#1.counts [3/4] 0:010002000300\n") != nullptr, "scalar elements are runs, as in an array");
     Check(strstr(text, "  r PlayerAI#1.cells [2/2]\n  r PlayerAI#1.cells[0].pos (3,4)\n  r PlayerAI#1.cells[0].key f32:0x3fc00000\n  r PlayerAI#1.cells[1].pos (5,6)\n") != nullptr, "struct elements are the bracket and a line per field of each element");
@@ -3649,50 +3652,54 @@ void VectorSelfTest()
     firstCall.AddText(recorder.text);
 
     ai->counts[1] = 9;
-    recorder.Record(&kind, &root, 1, sets);
+    recorder.Record(kind, root, 2, sets);
     Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts 1:0900\n") == 0, "a changed scalar element is a delta run, with no length or capacity");
     calls.AddText(recorder.text);
     ai->counts.PushBack(4);
-    recorder.Record(&kind, &root, 1, sets);
+    recorder.Record(kind, root, 2, sets);
     Check(strcmp(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:01000900030004000\n") != 0 && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [4/4] 0:0100090003000400\n") != nullptr, "a push that grows the length writes the vector again");
     calls.AddText(recorder.text);
     ai->counts.PushBack(5);
     ai->cells.PushBack(KeyedCell(7, 8, 3.5f));
-    ai->visible.units.PushBack(first);
-    recorder.Record(&kind, &root, 1, sets);
+    seen->units.PushBack(first);
+    recorder.Record(kind, root, 2, sets);
     Check(strstr(recorder.text.Data(), "  r PlayerAI#1.counts [5/8] 0:01000900030004000500\n") != nullptr, "a push that grows the capacity writes both");
     Check(strstr(recorder.text.Data(), "  r PlayerAI#1.cells [3/4]\n  r PlayerAI#1.cells[2].pos (7,8)\n") != nullptr && strstr(recorder.text.Data(), "cells[0]") == nullptr, "a struct vector that moved writes only the element that is new");
-    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [3/4] Unit#3,Unit#9,Unit#3\n") != nullptr, "and a pointer vector is written whole");
+    Check(strstr(recorder.text.Data(), "  r FixtureSeen#1.units [3/4] Unit#3,Unit#9,Unit#3\n") != nullptr, "and a pointer vector is written whole");
     calls.AddText(recorder.text);
-    ai->visible.units.Clear();
+    seen->units.Clear();
     ai->counts.Clear();
-    recorder.Record(&kind, &root, 1, sets);
-    Check(strstr(recorder.text.Data(), "  r PlayerAI#1.visibleUnits [0/4]\n") != nullptr && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "a vector with no elements keeps its capacity");
+    recorder.Record(kind, root, 2, sets);
+    Check(strstr(recorder.text.Data(), "  r FixtureSeen#1.units [0/4]\n") != nullptr && strstr(recorder.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "a vector with no elements keeps its capacity");
     calls.AddText(recorder.text);
 
     PlayerAI* bare = (PlayerAI*)SimAlloc(sizeof(PlayerAI));
     memset((void*)bare, 0, sizeof(PlayerAI));
-    void* bareRoot = bare;
+    FixtureSeen* bareSeen = (FixtureSeen*)SimAlloc(sizeof(FixtureSeen));
+    memset((void*)bareSeen, 0, sizeof(FixtureSeen));
+    void* bareRoot[2] = { bare, bareSeen };
     Recorder empty;
-    empty.Record(&kind, &bareRoot, 1, sets);
-    Check(strstr(empty.text.Data(), "  r PlayerAI#1.counts [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.visibleUnits [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.cells [0/0]\n") != nullptr, "an empty vector is [0/0]");
+    empty.Record(kind, bareRoot, 2, sets);
+    Check(strstr(empty.text.Data(), "  r PlayerAI#1.counts [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r FixtureSeen#1.units [0/0]\n") != nullptr && strstr(empty.text.Data(), "  r PlayerAI#1.cells [0/0]\n") != nullptr, "an empty vector is [0/0]");
 
     ResetBlock();
     int lines = RestoreText(calls.Data(), sets);
     Check(lines > 10, "the lines of every call restore");
     PlayerAI* rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    FixtureSeen* rebuiltSeen = (FixtureSeen*)ReplayResolveObject("FixtureSeen#1", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && rebuilt->index == 4, "the object is rebuilt");
     Check(rebuilt != nullptr && rebuilt->counts.Size() == 0 && rebuilt->counts.Capacity() == 8, "a vector has the length and capacity of the last write");
     Check(rebuilt != nullptr && rebuilt->cells.Size() == 3 && rebuilt->cells.Capacity() == 4, "a struct vector too");
     Check(rebuilt != nullptr && rebuilt->cells[0].pos.x == 3 && rebuilt->cells[0].key == 1.5f && rebuilt->cells[2].pos.y == 8 && rebuilt->cells[2].key == 3.5f, "and the elements of every call, the old ones carried over the move");
-    Check(rebuilt != nullptr && rebuilt->visible.units.Size() == 0 && rebuilt->visible.units.Capacity() == 4, "a pointer vector too");
+    Check(rebuilt != nullptr && rebuiltSeen->units.Size() == 0 && rebuiltSeen->units.Capacity() == 4, "a pointer vector too");
 
     ResetBlock();
     RestoreText(calls.Data(), sets);
     rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
     Recorder replayed;
-    void* rebuiltRoot = rebuilt;
-    replayed.Record(&kind, &rebuiltRoot, 1, sets);
+    rebuiltSeen = (FixtureSeen*)ReplayResolveObject("FixtureSeen#1", nullptr, g_objects, AllocObject);
+    void* rebuiltRoot[2] = { rebuilt, rebuiltSeen };
+    replayed.Record(kind, rebuiltRoot, 2, sets);
     Check(rebuilt != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.cells [3/4]\n") != nullptr && strstr(replayed.text.Data(), "  r PlayerAI#1.counts [0/8]\n") != nullptr, "the rebuilt vectors record as they were");
 
     ResetBlock();
@@ -3700,7 +3707,9 @@ void VectorSelfTest()
     rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
     g_rootKinds[0] = ROK_PLAYERAI;
     g_rootObjects[0] = rebuilt;
-    g_rootCount = 1;
+    g_rootKinds[1] = ROK_FIXTURESEEN;
+    g_rootObjects[1] = rebuiltSeen;
+    g_rootCount = 2;
     BeginCompare();
     CompareObjects(&sets);
     Check(g_diffs == 0, "the unchanged vectors compare equal");
@@ -3719,25 +3728,27 @@ void VectorSelfTest()
     BeginCompare();
     CompareObjects(&sets);
     Check(strstr(g_detail.Data(), "PlayerAI#1.cells[1].key") != nullptr, "a changed field of a struct element is reported at its element and field");
-    rebuilt->visible.units.PushBack(first);
+    rebuiltSeen->units.PushBack(first);
     BeginCompare();
     CompareObjects(&sets);
-    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits.length") != nullptr, "a pointer vector that grew is reported");
+    Check(strstr(g_detail.Data(), "FixtureSeen#1.units.length") != nullptr, "a pointer vector that grew is reported");
 
     ResetBlock();
     RestoreText(firstCall.Data(), sets);
     rebuilt = (PlayerAI*)ReplayResolveObject("PlayerAI#1", nullptr, g_objects, AllocObject);
+    rebuiltSeen = (FixtureSeen*)ReplayResolveObject("FixtureSeen#1", nullptr, g_objects, AllocObject);
     g_rootObjects[0] = rebuilt;
+    g_rootObjects[1] = rebuiltSeen;
     BeginCompare();
     CompareObjects(&sets);
     Check(g_diffs == 0, "a vector restored from its first write compares equal");
     rebuilt->counts[1] = 5;
-    rebuilt->visible.units[0] = rebuilt->visible.units[1];
+    rebuiltSeen->units[0] = rebuiltSeen->units[1];
     BeginCompare();
     CompareObjects(&sets);
     printf("changed elements: %s\n%s", g_firstKey, g_detail.Data());
     Check(strstr(g_detail.Data(), "PlayerAI#1.counts[1]: recorded 0200, replayed 0500") != nullptr, "a changed scalar element is reported at its index");
-    Check(strstr(g_detail.Data(), "PlayerAI#1.visibleUnits[0]: recorded Unit#3, replayed Unit#9") != nullptr, "and a changed pointer element");
+    Check(strstr(g_detail.Data(), "FixtureSeen#1.units[0]: recorded Unit#3, replayed Unit#9") != nullptr, "and a changed pointer element");
     firstCall.Free();
     calls.Free();
 }

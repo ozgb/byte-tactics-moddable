@@ -557,65 +557,6 @@ int __stdcall RecAiApply(const AiEvent* a0)
     return result;
 }
 
-void __stdcall RecAiGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUS, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "flags", a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i ai.GetVisibleEnemiesInRadius");
-        ImportValue(line, a0);
-        ImportVec3(line, "pos", a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-    }
-    s_inner_ai->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
-    if (scope.Import()) {
-        ImportOutUnits(line, "out", a4, kReplayReachFields + 11, 7);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
-bool __stdcall RecAiHasReadyUnitInRange(int a0, Vec3* a1, int a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_HASREADYUNITINRANGE, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
-        ArgValue(s_call, "range", a2);
-    }
-    bool result = s_inner_ai->HasReadyUnitInRange(a0, a1, a2);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecAiIsPointVisible(Player* a0, Vec3* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_PLAYER, a0);
-    SlotScope scope(RSL_AI_ISPOINTVISIBLE, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "player", ROK_PLAYER, a0);
-        ArgPending(s_call, "pos");
-    }
-    int result = s_inner_ai->IsPointVisible(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 void __stdcall RecAiDumpPlayerAI(int a0, void* a1)
 {
     ReplayRoots roots;
@@ -636,21 +577,6 @@ void __stdcall RecAiResetAIPlayers()
     if (scope.Open()) {
     }
     s_inner_ai->ResetAIPlayers();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_GETFACTORIESINRADIUS, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
-        ArgValue(s_call, "radius", a2);
-        ArgPending(s_call, "out");
-    }
-    s_inner_ai->GetFactoriesInRadius(a0, a1, a2, a3);
     if (scope.Open()) {
     }
 }
@@ -789,24 +715,6 @@ void __stdcall RecAiFreeSquadManager(Player* a0)
     s_inner_ai->FreeSquadManager(a0);
     if (scope.Open()) {
     }
-}
-
-int __stdcall RecAiGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_GETVISIBLEENEMIESINRADIUSLIST, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "flags", a3);
-        ArgValue(s_call, "capacity", a5);
-    }
-    int result = s_inner_ai->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
 }
 
 void __stdcall RecAiWriteState(const StateWriter* a0)
@@ -1449,6 +1357,119 @@ void __stdcall RecLosRadarFreeMapResources()
     if (scope.Open()) {
     }
     s_inner_los_radar->FreeMapResources();
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgVec3(s_call, "pos", a1);
+        ArgValue(s_call, "radius", a2);
+        ArgValue(s_call, "flags", a3);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.GetVisibleEnemiesInRadius");
+        ImportValue(line, a0);
+        ImportVec3(line, "pos", a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+    }
+    s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        ImportOutUnits(line, "out", a4, kReplayReachFields + 11, 7);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecLosRadarGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUSLIST, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgVec3(s_call, "pos", a1);
+        ArgValue(s_call, "radius", a2);
+        ArgValue(s_call, "flags", a3);
+        ArgValue(s_call, "capacity", a5);
+    }
+    int result = s_inner_los_radar->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+bool __stdcall RecLosRadarHasReadyUnitInRange(int a0, Vec3* a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_HASREADYUNITINRANGE, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgPending(s_call, "pos");
+        ArgValue(s_call, "range", a2);
+    }
+    bool result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecLosRadarIsPointVisible(Player* a0, Vec3* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_PLAYER, a0);
+    SlotScope scope(RSL_LOS_RADAR_ISPOINTVISIBLE, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "player", ROK_PLAYER, a0);
+        ArgPending(s_call, "pos");
+    }
+    int result = s_inner_los_radar->IsPointVisible(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecLosRadarCreateUnitIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_CREATEUNITINDEX, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_los_radar->CreateUnitIndex(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarFreeUnitIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_FREEUNITINDEX, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_los_radar->FreeUnitIndex(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecLosRadarRefreshUnitIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_REFRESHUNITINDEX, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_los_radar->RefreshUnitIndex(a0);
     if (scope.Open()) {
     }
 }
@@ -2833,6 +2854,57 @@ unsigned int __stdcall RecUnitsObjectStateSize(Object3do* a0)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgPending(s_call, "pos");
+        ArgValue(s_call, "radius", a2);
+        ArgPending(s_call, "out");
+    }
+    s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsCreateFactoryIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_CREATEFACTORYINDEX, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_units->CreateFactoryIndex(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsFreeFactoryIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_FREEFACTORYINDEX, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_units->FreeFactoryIndex(a0);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecUnitsRefreshFactoryIndex(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_REFRESHFACTORYINDEX, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    s_inner_units->RefreshFactoryIndex(a0);
+    if (scope.Open()) {
+    }
 }
 
 int __stdcall RecPlayersApply(const PlayersEvent* a0)
@@ -4556,7 +4628,7 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         return false;
     case SUB_TARGETING:
-        if (slot == RSL_AI_GETVISIBLEENEMIESINRADIUS)
+        if (slot == RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS)
             return true;
         if (slot == RSL_WEAPONS_GETWEAPONRANGE)
             return true;
@@ -4704,18 +4776,10 @@ void HookSeams(const bool* on)
         s_rec_features.UpdateFeatureSpot = RecFeaturesUpdateFeatureSpot;
     if (on[SUB_AI])
         s_rec_ai.Apply = RecAiApply;
-    if (on[SUB_AI] || on[SUB_TARGETING])
-        s_rec_ai.GetVisibleEnemiesInRadius = RecAiGetVisibleEnemiesInRadius;
-    if (on[SUB_AI])
-        s_rec_ai.HasReadyUnitInRange = RecAiHasReadyUnitInRange;
-    if (on[SUB_AI])
-        s_rec_ai.IsPointVisible = RecAiIsPointVisible;
     if (on[SUB_AI])
         s_rec_ai.DumpPlayerAI = RecAiDumpPlayerAI;
     if (on[SUB_AI])
         s_rec_ai.ResetAIPlayers = RecAiResetAIPlayers;
-    if (on[SUB_AI])
-        s_rec_ai.GetFactoriesInRadius = RecAiGetFactoriesInRadius;
     if (on[SUB_AI])
         s_rec_ai.CreatePlayerAI = RecAiCreatePlayerAI;
     if (on[SUB_AI])
@@ -4738,8 +4802,6 @@ void HookSeams(const bool* on)
         s_rec_ai.CreateSquadManager = RecAiCreateSquadManager;
     if (on[SUB_AI])
         s_rec_ai.FreeSquadManager = RecAiFreeSquadManager;
-    if (on[SUB_AI])
-        s_rec_ai.GetVisibleEnemiesInRadiusList = RecAiGetVisibleEnemiesInRadiusList;
     if (on[SUB_AI])
         s_rec_ai.WriteState = RecAiWriteState;
     if (on[SUB_PATHFINDING])
@@ -4824,6 +4886,20 @@ void HookSeams(const bool* on)
         s_rec_los_radar.FreeRadar = RecLosRadarFreeRadar;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
+    if (on[SUB_LOS_RADAR] || on[SUB_TARGETING])
+        s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.GetVisibleEnemiesInRadiusList = RecLosRadarGetVisibleEnemiesInRadiusList;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.IsPointVisible = RecLosRadarIsPointVisible;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.CreateUnitIndex = RecLosRadarCreateUnitIndex;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.FreeUnitIndex = RecLosRadarFreeUnitIndex;
+    if (on[SUB_LOS_RADAR])
+        s_rec_los_radar.RefreshUnitIndex = RecLosRadarRefreshUnitIndex;
     if (on[SUB_ORDERS] || on[SUB_WEAPONS])
         s_rec_orders.AppendOrder = RecOrdersAppendOrder;
     if (on[SUB_ORDERS])
@@ -4994,6 +5070,14 @@ void HookSeams(const bool* on)
         s_rec_units.UpdateUnit = RecUnitsUpdateUnit;
     if (on[SUB_UNITS])
         s_rec_units.ObjectStateSize = RecUnitsObjectStateSize;
+    if (on[SUB_UNITS])
+        s_rec_units.GetFactoriesInRadius = RecUnitsGetFactoriesInRadius;
+    if (on[SUB_UNITS])
+        s_rec_units.CreateFactoryIndex = RecUnitsCreateFactoryIndex;
+    if (on[SUB_UNITS])
+        s_rec_units.FreeFactoryIndex = RecUnitsFreeFactoryIndex;
+    if (on[SUB_UNITS])
+        s_rec_units.RefreshFactoryIndex = RecUnitsRefreshFactoryIndex;
     if (on[SUB_PLAYERS])
         s_rec_players.Apply = RecPlayersApply;
     if (on[SUB_PLAYERS])

@@ -14,12 +14,6 @@ static Unit* UnitOfOffset(unsigned int offset)
     return ref.get();
 }
 
-void UnitsOnAiNotifyRefs(const void* event)
-{
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    g_seams.units->NotifyUnitRefs(UnitOfOffset(e->unit), e->value);
-}
-
 void UnitsOnAiActivate(const void* event)
 {
     const AiEvent* e = static_cast<const AiEvent*>(event);

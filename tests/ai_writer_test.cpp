@@ -24,7 +24,6 @@
 #pragma pack(pop)
 #include "../src/ai/ai_player.h"
 #include "../src/orders/ai_effects.h"
-#include "../src/units/ai_effects.h"
 #include "../src/ai/ai_idle.h"
 
 Game* g_game;
@@ -86,7 +85,7 @@ Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 enum {
     kTicks = 16,
     kDropTick = 4,
-    kRedirectTick = 9,
+    kRedirectTick = 10,
     kUnits = 6,
     kAi0 = 1,
     kAi1 = 2,
@@ -97,10 +96,7 @@ enum {
 };
 
 struct OrderRecord {
-    unsigned int attackTarget;
-    int attacks;
     int stops;
-    int notified;
 };
 
 static Unit* s_units;
@@ -128,38 +124,26 @@ static unsigned long long Fnv(unsigned long long h, const void* p, unsigned int 
 
 static const unsigned long long kFnvBasis = 0xcbf29ce484222325ull;
 
-static int OtherEnemy(unsigned int offset)
+static int OtherAi(unsigned int offset)
 {
-    return offset == Ref<Unit>(&s_units[kEnemy0]).offset ? kEnemy1 : kEnemy0;
+    return offset == Ref<Unit>(&s_units[kAi0]).offset ? kAi1 : kAi0;
 }
 
 void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
     AiEvent event;
     memcpy(&event, data, size < sizeof event ? size : sizeof event);
-    if (outbox == SCHED_AI && event.kind == AI_EFFECT_ATTACK && s_tick == s_redirectTick && s_redirected < 0) {
+    if (outbox == SCHED_AI && event.kind == AI_EFFECT_STOP && s_tick == s_redirectTick && s_redirected < 0) {
         s_redirected = s_tick;
-        event.target = Ref<Unit>(&s_units[OtherEnemy(event.target)]).offset;
+        event.unit = Ref<Unit>(&s_units[OtherAi(event.unit)]).offset;
     }
     s_effects = Fnv(s_effects, &outbox, sizeof outbox);
     s_effects = Fnv(s_effects, &event, sizeof event);
     s_effectCount++;
     if (outbox != SCHED_AI)
         return;
-    switch (event.kind) {
-    case AI_EFFECT_ATTACK:
-        OrdersOnAiAttack(&event);
-        break;
-    case AI_EFFECT_STOP:
+    if (event.kind == AI_EFFECT_STOP)
         OrdersOnAiStop(&event);
-        break;
-    case AI_EFFECT_HIT:
-        OrdersOnAiHit(&event);
-        break;
-    case AI_EFFECT_NOTIFY_REFS:
-        UnitsOnAiNotifyRefs(&event);
-        break;
-    }
 }
 
 static int IndexOf(Unit* unit)
@@ -167,39 +151,9 @@ static int IndexOf(Unit* unit)
     return (int)(unit - s_units);
 }
 
-static int __stdcall FakeIssueAttackOrder(Unit* unit, Unit* target, int)
-{
-    OrderRecord* r = &s_records[IndexOf(unit)];
-    r->attackTarget = Ref<Unit>(target).offset;
-    r->attacks++;
-    return 1;
-}
-
 static void __stdcall FakeDeleteOrders(Unit* unit, int)
 {
     s_records[IndexOf(unit)].stops++;
-}
-
-static int __stdcall FakeGetOrderFlags(Unit*)
-{
-    return 0;
-}
-
-static int s_orderType = 1;
-
-static MissionType __stdcall FakeGetOrderType(unsigned char, Unit*, Unit*, Vec3*)
-{
-    return MissionType((unsigned char)s_orderType);
-}
-
-static void __stdcall FakeNotifyUnitRefs(Unit* unit, int event)
-{
-    s_records[IndexOf(unit)].notified += event;
-}
-
-static int __stdcall FakeWeaponCanReachUnit(Unit*, Unit*, unsigned char)
-{
-    return 1;
 }
 
 static void SetUnit(int i, int player, int defIndex, unsigned int flags2)
@@ -245,19 +199,8 @@ static void Setup()
 
     static OrdersSeam orders;
     memset(&orders, 0, sizeof orders);
-    orders.IssueAttackOrder = FakeIssueAttackOrder;
     orders.DeleteOrders = FakeDeleteOrders;
-    orders.GetOrderFlags = FakeGetOrderFlags;
-    orders.GetOrderType = FakeGetOrderType;
     g_seams.orders = &orders;
-    static UnitsSeam units;
-    memset(&units, 0, sizeof units);
-    units.NotifyUnitRefs = FakeNotifyUnitRefs;
-    g_seams.units = &units;
-    static WeaponsSeam weapons;
-    memset(&weapons, 0, sizeof weapons);
-    weapons.WeaponCanReachUnit = FakeWeaponCanReachUnit;
-    g_seams.weapons = &weapons;
 }
 
 static void Restart()
@@ -265,8 +208,6 @@ static void Restart()
     for (int i = kAi0; i <= kHitter; i++) {
         s_units[i].flags = 0x10000000 | 0x40000 | 0x100000;
         s_units[i].netDirtyFlags = 0;
-        s_units[i].lastAttackerSlot = 1;
-        s_units[i].lastDamageType = 0;
     }
     for (int p = 0; p < kPlayers; p++)
         s_managers[p]->nextAction = 0;
@@ -355,12 +296,6 @@ static void Play(Run* run, int dropKind, int dropTick, int redirectTick, bool di
         int attacker = s_tick % 3 == 0 ? kEnemy0 : kEnemy1;
         int expected = (!direct && dropKind == AI_REACT_TO_ATTACK && s_tick == dropTick) ? 0 : 1;
         Check(Offer(Attacked(victim, attacker), direct) == expected, "an attack on a unit has outcome 1 unless the tampered module drops it");
-        if (s_tick % 4 == 1) {
-            AiEvent split = Event(AI_DAMAGE_SPLIT, kHitter);
-            split.value = s_tick % 8 == 1 ? 100 : 1;
-            split.extra = 10;
-            Check(Offer(split, direct) == 1, "a damage split has outcome 1");
-        }
         run->effects[s_tick] = s_effects;
         run->state[s_tick] = HashState();
     }
@@ -393,8 +328,6 @@ static void CheckRejected()
     int effects = s_effectCount;
     AiEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
     noUnit.unit = 0;
-    AiEvent splitNoUnit = noUnit;
-    splitNoUnit.kind = AI_DAMAGE_SPLIT;
     AiEvent badSquad = Event(AI_SET_SQUAD, kAi0);
     badSquad.value = 10;
     AiEvent badPlan = Event(AI_PLAN, kAi0);
@@ -405,7 +338,6 @@ static void CheckRejected()
     AiEvent noSquads = Event(AI_SET_SQUAD, kAi0);
     noSquads.value = 0;
     Check(g_seams.ai->Apply(&noUnit) == 0, "a reaction with a null unit has outcome 0");
-    Check(g_seams.ai->Apply(&splitNoUnit) == 0, "a damage split with a null unit has outcome 0");
     Check(g_seams.ai->Apply(&badSquad) == 0, "a squad above 9 has outcome 0");
     Check(g_seams.ai->Apply(&badPlan) == 0, "a plan with a bit above 3 has outcome 0");
     Check(g_seams.ai->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
@@ -415,34 +347,19 @@ static void CheckRejected()
     Check(s_effectCount == effects, "a rejected event publishes no effect");
 }
 
-static int AttacksAfterReaction(int attacker, unsigned int flags, int orderType)
-{
-    Restart();
-    s_units[kAi1].flags = flags;
-    s_orderType = orderType;
-    int attacks = s_records[kAi1].attacks;
-    AiEvent event = Attacked(kAi1, attacker);
-    Check(g_seams.ai->Apply(&event) == 1, "a reaction to an attack has outcome 1");
-    s_orderType = 1;
-    return s_records[kAi1].attacks - attacks;
-}
-
-static void CheckAttackGates()
-{
-    const unsigned int ready = 0x10000000 | 0x40000 | 0x100000;
-    Check(AttacksAfterReaction(kEnemy0, ready, 1) == 1, "an idle unit that may move and fire attacks its attacker");
-    Check(AttacksAfterReaction(kAi1, ready, 1) == 0, "a unit attacked by itself gives no attack order");
-    Check(AttacksAfterReaction(kEnemy0, 0x10000000 | 0x100000, 1) == 0, "a unit holding its position gives no attack order");
-    Check(AttacksAfterReaction(kEnemy0, 0x10000000 | 0x40000, 1) == 0, "a unit holding its fire gives no attack order");
-    Check(AttacksAfterReaction(kEnemy0, ready, 0) == 0, "a unit with no order type for the attack gives no attack order");
-}
-
-static int s_listRefreshes[kPlayers];
+static int s_standardApplies;
+static int s_listRefreshes;
 static int s_squadRuns;
 
-static void __stdcall CountListRefresh(int player)
+static int __stdcall CountApply(const AiEvent*)
 {
-    s_listRefreshes[player]++;
+    s_standardApplies++;
+    return 1;
+}
+
+static void __stdcall CountListRefresh(int)
+{
+    s_listRefreshes++;
 }
 
 static void __stdcall CountSquadRun(int)
@@ -450,10 +367,11 @@ static void __stdcall CountSquadRun(int)
     s_squadRuns++;
 }
 
-static void CheckIdleKeepsListRefresh()
+static void CheckIdleSeam()
 {
     AiSeam standard;
     memset(&standard, 0, sizeof standard);
+    standard.Apply = CountApply;
     standard.UpdatePlayerAI = CountListRefresh;
     standard.UpdateSquads = CountSquadRun;
     AiSeam* idle = AiIdleSeam(&standard);
@@ -461,8 +379,19 @@ static void CheckIdleKeepsListRefresh()
         idle->UpdatePlayerAI(p);
         idle->UpdateSquads(p);
     }
-    Check(s_listRefreshes[0] == 1 && s_listRefreshes[1] == 1, "the idle module runs the default UpdatePlayerAI for every player, so the visible and factory lists stay current");
+    Check(s_listRefreshes == 0, "the idle module's UpdatePlayerAI runs nothing");
     Check(s_squadRuns == 0, "the idle module runs no squads");
+
+    AiEvent computer = Attacked(kAi0, kEnemy0);
+    Check(idle->Apply(&computer) == 0 && s_standardApplies == 0, "the idle module rejects a reaction of a computer player's unit");
+    g_game->players[0].type = 1;
+    Check(idle->Apply(&computer) == 1 && s_standardApplies == 1, "the idle module passes a reaction of a human player's unit on");
+    g_game->players[0].type = 2;
+    AiEvent plan = Event(AI_PLAN, kAi0);
+    Check(idle->Apply(&plan) == 1 && s_standardApplies == 2, "the idle module passes other events on");
+    AiEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
+    noUnit.unit = 0;
+    Check(idle->Apply(&noUnit) == 1 && s_standardApplies == 3, "the idle module passes a reaction with no unit on");
 }
 
 int main()
@@ -481,17 +410,16 @@ int main()
     Play(&redirected, 0, -1, kRedirectTick, false);
 
     Check(plain.dropped == -1 && plain.redirected == -1, "the default module drops and redirects nothing");
-    Check(plain.records[kAi0].attacks > 0 && plain.records[kAi1].attacks > 0, "the faithful module orders both units to attack");
-    Check(plain.records[kAi0].stops > 0 && plain.records[kAi1].stops == 0, "only the unit that flags the stop is stopped");
+        Check(plain.records[kAi0].stops > 0 && plain.records[kAi1].stops == 0, "only the unit that flags the stop is stopped");
     Check(plain.nextAction[0] != 0, "a reaction sets the next action of the player's AI");
     Check(memcmp(&plain, &again, sizeof plain) == 0, "two runs of the default give the same hashes at every tick");
     Check(memcmp(plain.state, direct.state, sizeof plain.state) == 0, "a call through the seam hashes as a direct call of AiApply at every tick");
     Check(memcmp(plain.records, direct.records, sizeof plain.records) == 0, "a call through the seam leaves the records a direct call of AiApply leaves");
     Check(noReact.dropped == kDropTick, "the tampered module drops the reaction at the tampered tick");
-    Check(redirected.redirected == kRedirectTick, "the tampered module redirects the attack at the tampered tick");
+    Check(redirected.redirected == kRedirectTick, "the tampered module redirects the stop at the tampered tick");
     Check(noReact.applied == plain.applied && redirected.applied == plain.applied, "the tampered modules are offered the same events as the default");
     Check(noReact.effectCount < plain.effectCount, "the dropped reaction publishes fewer effects");
-    Check(redirected.effectCount == plain.effectCount, "the redirected attack publishes the same number of effects");
+    Check(redirected.effectCount == plain.effectCount, "the redirected stop publishes the same number of effects");
 
     int dropDiffering = 0, redirectDiffering = 0, redirectEffects = 0;
     int firstDrop = FirstDiffering(plain.state, noReact.state, &dropDiffering);
@@ -499,17 +427,16 @@ int main()
     FirstDiffering(plain.effects, redirected.effects, &redirectEffects);
     Check(firstDrop == kDropTick, "dropping a reaction differs first at the tampered tick");
     Check(dropDiffering == kTicks - kDropTick, "dropping a reaction differs at every tick from the tampered tick on");
-    Check(firstRedirect == kRedirectTick, "redirecting an attack differs first at the tampered tick");
-    Check(redirectDiffering == kTicks - kRedirectTick, "redirecting an attack differs at every tick from the tampered tick on");
-    Check(redirectEffects == kTicks - kRedirectTick, "redirecting an attack changes the published effects from the tampered tick on");
+    Check(firstRedirect == kRedirectTick, "redirecting a stop differs first at the tampered tick");
+    Check(redirectDiffering == kTicks - kRedirectTick, "redirecting a stop differs at every tick from the tampered tick on");
+    Check(redirectEffects == kTicks - kRedirectTick, "redirecting a stop changes the published effects from the tampered tick on");
     printf("tampered ticks drop %d redirect %d, first differing tick drop %d redirect %d, differing ticks drop %d redirect %d (redirect effects %d)\n",
         noReact.dropped, redirected.redirected, firstDrop, firstRedirect, dropDiffering, redirectDiffering, redirectEffects);
 
     CheckRejected();
     s_dropKind = 0;
     s_redirectTick = -1;
-    CheckAttackGates();
-    CheckIdleKeepsListRefresh();
+    CheckIdleSeam();
 
     printf(g_failures ? "FAILED\n" : "ai_writer_test: all passed\n");
     return g_failures != 0;

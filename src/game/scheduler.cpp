@@ -213,6 +213,10 @@ void SchedPlayersPhase(RandStream stream)
             continue;
         SchedDeliver(SCHED_AI);
         g_seams.ai->UpdateSquads(player);
+        SchedDeliver(SCHED_LOS_RADAR);
+        g_seams.los_radar->RefreshUnitIndex(player);
+        SchedDeliver(SCHED_UNITS);
+        g_seams.units->RefreshFactoryIndex(player);
         SchedDeliver(SCHED_AI);
         g_seams.ai->UpdatePlayerAI((unsigned char)player);
         {

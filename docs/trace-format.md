@@ -773,6 +773,11 @@ The dump paths of `rawVector` are `players[i].ai.<name>`. Each `rawVector` has t
 same path, in order: the count line (`0x` and 8 digits), then the `hex:` line of the bytes (`hex:`
 alone when the count is 0). The `statics` path of section 8.12 is the same.
 
+In the moddable build (#991) the three unit vectors and `hasSpecial` (byte 0x79 of the table) are not `PlayerAI`'s: the
+visible and known vectors and `hasSpecial` are los_radar's per-player index, and the factory vector is units'. The
+harness hashes them in the same place, with the same bytes and order as above: it writes `hasSpecial` at offset 0x79 of
+the copy of the table it hashes. `PlayerAI`'s bytes 0x05 to 0x34 and 0x79 to 0x7c are unused. The trace is unchanged.
+
 ### 8.14 squad managers (section 25)
 
 ```
@@ -1393,9 +1398,9 @@ for k in 0 .. n-1, in order:
 
 `aiEvents.count` and the numbers of a record are written as `0x` and 8 hex digits.
 
-- `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 225 DAMAGE_SPLIT, 226 SET_SQUAD, 227 PLAN,
-  228 WEIGHT, 229 LIMIT; or an effect ai publishes: 240 ADD_ORDER, 241 QUEUE_BUILD, 242 ATTACK, 243 STOP,
-  244 NOTIFY_REFS, 245 ACTIVATE, 246 SET_STATES, 247 HIT.
+- `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 226 SET_SQUAD, 227 PLAN, 228 WEIGHT, 229 LIMIT; or an
+  effect ai publishes: 240 ADD_ORDER, 241 QUEUE_BUILD, 243 STOP, 245 ACTIVATE, 246 SET_STATES. In ai 5.0 the
+  kinds 225 (DAMAGE_SPLIT), 242 (ATTACK), 244 (NOTIFY_REFS) and 247 (HIT) are gone and not reused.
 - `unit` is the unit the kind is about and `target` the other unit (the attacker of REACT_TO_ATTACK, the target
   of an order), each a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer
   that is not in the unit table. Each is null for a kind that names no such unit.

@@ -91,6 +91,24 @@ unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
     return ParseResult<unsigned int>(r);
 }
 
+void __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    ApplyUnits(a4, "out");
+    (void)r;
+}
+
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
 {
     ReplayText t;
@@ -103,6 +121,22 @@ Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
     Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
     ApplyReach(o, ROK_CELL, ".metal");
     return o;
+}
+
+int __stdcall Imp_los_radar_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    return EnterList(t, a4, a5);
 }
 
 int __stdcall Imp_units_StartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
@@ -339,40 +373,6 @@ Order* __stdcall Imp_orders_NewOrder(MissionType a0, Unit* a1, void* a2, int a3,
     const char* r = Enter(t);
     Order* o = (Order*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
     return o;
-}
-
-void __stdcall Imp_ai_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
-{
-    ReplayText t;
-    StartImport(t, "ai.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    ApplyUnits(a4, "out");
-    (void)r;
-}
-
-int __stdcall Imp_ai_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayText t;
-    StartImport(t, "ai.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    return EnterList(t, a4, a5);
 }
 
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
@@ -1063,7 +1063,6 @@ LosRadarSeam g_import_los_radar;
 UnitsSeam g_import_units;
 NetworkSeam g_import_network;
 OrdersSeam g_import_orders;
-AiSeam g_import_ai;
 PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
@@ -1078,7 +1077,9 @@ void BindSeams()
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+    g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+    g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;
     g_seams.units = &g_import_units;
     g_import_units.StartScript = Imp_units_StartScript;
     g_import_units.StartScriptWithArgs = Imp_units_StartScriptWithArgs;
@@ -1097,9 +1098,6 @@ void BindSeams()
     g_import_orders.MissionTypeFromName = Imp_orders_MissionTypeFromName;
     g_import_orders.AppendOrder = Imp_orders_AppendOrder;
     g_import_orders.NewOrder = Imp_orders_NewOrder;
-    g_seams.ai = &g_import_ai;
-    g_import_ai.GetVisibleEnemiesInRadius = Imp_ai_GetVisibleEnemiesInRadius;
-    g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {

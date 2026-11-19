@@ -1,9 +1,9 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 3.0), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 3.1), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
-the terrain height range of the cells, and the radar picture's snapshots. 3.1c's code is its default implementation.
+the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
 This page is the inventory the interface was cut from:
 - what other subsystems did to los_radar's state in 3.1c, and what each became;
 - what los_radar did to others, and what each became;
@@ -33,10 +33,12 @@ Los_radar's place in it:
   `UpdatePlayerHead` and `UpdatePlayerBody`; for the viewing player, `RecordRadarUnits` after it, and
   `UpdateSensorRadarAndCloak` and `RecordRadarMapped` after the player's economy and before `UpdatePlayerTail`; and,
   once a tick in the tail, `ExpireEyeballs` (`SchedExpireEyeballs`). Each is preceded by a delivery of los_radar's
-  inbox. Players no longer calls any of them: its update is split into `UpdatePlayerHead`, `UpdatePlayerBody` and
+  inbox. Every 30 ticks of a player, in the same players phase and right before ai's `UpdatePlayerAI`, the engine runs
+  `RefreshUnitIndex(player)` (section 5), with the inbox delivered first. Players no longer calls any of them: its update is split into `UpdatePlayerHead`, `UpdatePlayerBody` and
   `UpdatePlayerTail` (players 2.0), and the head's and body's answers tell the engine whether the player goes on.
-- **Queries:** `IsUnitVisibleToPlayer`, `SoundHeardMask` and `ClampWorldPosToTerrain`, called directly, as of
-  los_radar's last apply (section 4).
+- **Queries:** `IsUnitVisibleToPlayer`, `SoundHeardMask` and `ClampWorldPosToTerrain`, and, since 3.1,
+  `GetVisibleEnemiesInRadius`, `GetVisibleEnemiesInRadiusList`, `HasReadyUnitInRange`, `IsPointVisible` and
+  `GetSeenUnitsInRadius`, called directly, as of los_radar's last apply (section 4).
 - **Views:** the cell records, through `GetMapCell`, `GetMapCellAtPosition` and `GetOriginCellAtPosition`
   (section 4), and the sensor bits of `Unit::flags` (section 3).
 - **Effects out of los_radar:** none. What it changes in others' records stays view state that los_radar alone writes,
@@ -96,6 +98,17 @@ none of these, so no trace moves; a module publishing from WASM can.
 | `CmdShareMapping`, `CmdShareRadar` | events: SHARE_MAPPING, SHARE_RADAR |
 | `LoadTntMap`, `InitRadar`, `FreeRadar`, `FreeMapResources` | set-up slots, outside the tick |
 
+**The slots of 3.1.** Los_radar 3.1 adds nine slots (#991), five queries and the index's four:
+
+| Slot | What it is |
+|---|---|
+| `GetVisibleEnemiesInRadius`, `GetVisibleEnemiesInRadiusList` | queries, formerly ai's: the ready enemy units within a radius of a position that a player saw at its last `RefreshUnitIndex`, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, the ready enemy units with flag 0x100 there; the list form writes them as `Ref<Unit>` to a buffer. Their callers are orders' guard and wait and targeting's weapon search. |
+| `HasReadyUnitInRange` | query, formerly ai's: whether an enemy unit the player saw is within a range, ready (flag 0x10000000) and not dying (flag 0x4000); the info panel calls it |
+| `IsPointVisible` | query, formerly ai's: whether the viewing player sees a position, on the grid of the player's explored map; weapons' drawing and players' `IsVisible` call it |
+| `GetSeenUnitsInRadius` | new query, the buffer form of the visible query with no ready filter and no known fallback; ai's spatial timer sums its ratings from it (it read the list directly before) |
+| `CreateUnitIndex`, `FreeUnitIndex` | set-up slots, outside the tick: players' set-up creates and frees a player's index beside ai's per-player state (`InitPlayerSlot`, `FreePlayers`), under the same condition |
+| `RefreshUnitIndex` | the engine's run every 30 ticks of a player that has an index (section 5) |
+
 ## 3. Effects out of los_radar
 
 Los_radar publishes nothing. The issue counted two kinds of write into others' records; each stays view state that
@@ -119,9 +132,9 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
 **What los_radar reads:** a unit's position and fractions, flags, `activateFlags`, definition (sight, radar and sonar
 distances, jamming, cloak), player and the sight cache (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`);
 the players' alliances, sharing flags and the fields of the game record behind `pad_1df4`, `unknown_1b8e` and
-`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); ai's
-`HasReadyUnitInRange` and `IsPointVisible`, and map's `UnitsInRange` (through the engine's `VisitUnitsInRange`). All as
-of each module's last run.
+`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); and map's `UnitsInRange` (through the engine's `VisitUnitsInRange`). The
+queries `HasReadyUnitInRange` and `IsPointVisible` are its own since 3.1; they were ai's in 3.0. All as of each
+module's last run.
 
 **The cell view.** `GetMapCell`, `GetMapCellAtPosition` and `GetOriginCellAtPosition` return a pointer into the cell
 records that `LoadTntMap` allocates (the plot memory), and their callers (economy, features, map, units, weapons)
@@ -140,8 +153,10 @@ The layers of what each player sees and has explored and the eyeballs are not in
 los_radar's own allocations (section 5).
 
 **What others read of los_radar:**
-- **Queries:** `IsUnitVisibleToPlayer` (ai's visible list, orders' and unit scripts' visibility tests, the selection
-  and markers), `SoundHeardMask` (which players hear a sound) and `ClampWorldPosToTerrain`.
+- **Queries:** `IsUnitVisibleToPlayer` (the index refresh, orders' and unit scripts' visibility tests, the selection
+  and markers), `SoundHeardMask` (which players hear a sound), `ClampWorldPosToTerrain`, and the five of 3.1 (orders'
+  guard and wait, targeting's weapon search, the info panel, players, weapons and ai's spatial
+  timer; section 2).
 - **Views:** the cell records (above), and the sensor bits of `Unit::flags` (section 3).
 
 **As of los_radar's last apply.** The queries answer from los_radar's state with no delivery first. By #952's rule a
@@ -198,6 +213,14 @@ Los_radar keeps no private region, and so it has no `WriteState` report: its sta
   `privatestate.py --check` fails when another subsystem writes any of them. Moving them out of the hash
   would be a trace format bump with a reference half (#946's path), and the hash is what shows a wrong sight at the
   tick it happens (the negative test, `tests/los_radar_writer_test.cpp`), so they stay where they are.
+- **The per-player unit index** (3.1) is los_radar's: per player, the visible enemy list (`visible`), the known list
+  (`known`, enemy units with flag 0x100) and `hasSpecial`, in a record allocated in the sim block behind a tracked
+  pointer (`src/map/line_of_sight_index.cpp`). It left ai's `PlayerAI`, where 3.1c kept it. `CreateUnitIndex` and
+  `FreeUnitIndex` make and free it, and every 30 ticks, from the index's own `lastTick`, `RefreshUnitIndex` refills it
+  in the players phase right before ai's `UpdatePlayerAI`. 3.1c filled it, with the factory list (now units'), in one
+  walk of the units; the walks are now separate, but each list holds the same units in the same order, and no draw
+  moves. The trace is unchanged: section 24 hashes the same table (the harness writes `hasSpecial` at offset 0x79 of
+  the copy it hashes) and the same vectors, read from this record, at the same place in the stream.
 - **The unit sight cache** (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`) stays in the unit. Units zeroes
   it when it sets a unit up and a saved game restores it with the unit, and both are units' code; los_radar reads and
   writes it in `UpdateUnitLineOfSight`. Moving it would split the unit's record and its save for no change in what is

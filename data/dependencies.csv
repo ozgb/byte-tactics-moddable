@@ -1175,6 +1175,8 @@ ai,features,sim-event,features,ordered,2,long-greenhaven-8p@22962,
 ai,features,sim-event,projectiles,ordered,2,long-greenhaven-8p@22850,
 ai,features,sim-event,units,ordered,2,mission-kill-of-type@185,
 ai,los_radar,GetMapCell,-,unobserved,0,,indirect
+ai,los_radar,GetSeenUnitsInRadius,-,unobserved,0,,indirect
+ai,los_radar,IsPointVisible,-,unobserved,0,,indirect
 ai,los_radar,IsUnitVisibleToPlayer,-,unobserved,0,,indirect
 ai,los_radar,Point16::x,-,unobserved,0,,
 ai,los_radar,Point16::y,-,unobserved,0,,
@@ -1443,9 +1445,6 @@ features,wind_meteors,Vec3::z,-,unobserved,0,,
 los_radar,ai,Cell::feature,-,unobserved,0,,
 los_radar,ai,Game::mapHeight,-,unobserved,0,,
 los_radar,ai,Game::mapWidth,-,unobserved,0,,
-los_radar,ai,Game::visibilityMask,-,unobserved,0,,
-los_radar,ai,HasReadyUnitInRange,-,unobserved,0,,indirect
-los_radar,ai,IsPointVisible,-,unobserved,0,,indirect
 los_radar,ai,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,deferrable,4,ui-right-click@30,
 los_radar,ai,Point16::x,-,unobserved,0,,
 los_radar,ai,Point16::y,-,unobserved,0,,
@@ -1697,8 +1696,6 @@ orders,ai,Unit::zFraction,units,immediate,22,mission-build-unit@33,
 orders,ai,Vec3::x,-,unobserved,0,,
 orders,ai,Vec3::y,-,unobserved,0,,
 orders,ai,Vec3::z,-,unobserved,0,,
-orders,ai,Vec::x,-,unobserved,0,,
-orders,ai,Vec::z,-,unobserved,0,,
 orders,ai,sim-event,projectiles,ordered,1,long-greenhaven-8p@41408,
 orders,ai,sim-event,units,ordered,7,orders-tier2-vader@132,
 orders,economy,EconomyRequestGranted,-,unobserved,0,,indirect
@@ -1712,10 +1709,12 @@ orders,features,Vec3::y,-,unobserved,0,,
 orders,features,Vec3::z,-,unobserved,0,,
 orders,los_radar,GetMapCellAtPosition,-,unobserved,0,,indirect
 orders,los_radar,GetOriginCellAtPosition,-,unobserved,0,,indirect
+orders,los_radar,GetVisibleEnemiesInRadius,-,unobserved,0,,indirect
 orders,los_radar,Order::pos,units,deferrable,1,orders-tier2-core@615,
 orders,los_radar,Point16::x,-,unobserved,0,,
 orders,los_radar,Point16::y,-,unobserved,0,,
 orders,los_radar,Ref<Unit>::offset,-,unobserved,0,,
+orders,los_radar,Unit::buildLeft,-,unobserved,0,,
 orders,los_radar,Unit::flags,units,immediate,8,mission-capture@1,
 orders,los_radar,Unit::pos,units,immediate,77,mission-build-unit@1,
 orders,los_radar,Unit::workTime,-,unobserved,0,,
@@ -1787,6 +1786,7 @@ orders,units,CreateUnit,-,unobserved,0,,indirect
 orders,units,FindUnitTypeId,-,unobserved,0,,indirect
 orders,units,FinishConstruction,-,unobserved,0,,indirect
 orders,units,Fixed::value,-,unobserved,0,,
+orders,units,GetFactoriesInRadius,-,unobserved,0,,indirect
 orders,units,GetNanoPiecePosition,-,unobserved,0,,indirect
 orders,units,GetPieceAngles,-,unobserved,0,,indirect
 orders,units,GetPieceOffset,-,unobserved,0,,indirect
@@ -1911,7 +1911,6 @@ players,ai,CreateSquads,-,unobserved,0,,indirect
 players,ai,DestroyPlayerAI,-,unobserved,0,,indirect
 players,ai,FreeSquads,-,unobserved,0,,indirect
 players,ai,Game::mapFlags,-,unobserved,0,,
-players,ai,Game::playerIndex,-,unobserved,0,,
 players,ai,ParseDownloadableAiWeightScripts,-,unobserved,0,,indirect
 players,ai,Player::active,-,unobserved,0,,
 players,ai,Player::ai,-,unobserved,0,,
@@ -1977,6 +1976,8 @@ players,features,Vec3::x,-,unobserved,0,,
 players,features,Vec3::y,-,unobserved,0,,
 players,features,Vec3::z,-,unobserved,0,,
 players,los_radar,ClampWorldPosToTerrain,-,unobserved,0,,indirect
+players,los_radar,CreateUnitIndex,-,unobserved,0,,indirect
+players,los_radar,FreeUnitIndex,-,unobserved,0,,indirect
 players,los_radar,Game::localPlayer,-,unobserved,0,,
 players,los_radar,Game::mapFlags,-,unobserved,0,,
 players,los_radar,Game::playerIndex,-,unobserved,0,,
@@ -2043,12 +2044,15 @@ players,targeting,Vec3::y,-,unobserved,0,,
 players,targeting,Vec3::z,-,unobserved,0,,
 players,targeting,pad_1df4,players,immediate,1,eight-full-moon@8250,
 players,targeting,unknown_1b8e,players,immediate,3,mission-build-unit@60,
+players,units,CreateFactoryIndex,-,unobserved,0,,indirect
 players,units,CreateUnit,-,unobserved,0,,indirect
 players,units,FindUnitTypeId,-,unobserved,0,,indirect
+players,units,FreeFactoryIndex,-,unobserved,0,,indirect
 players,units,Game::localPlayer,-,unobserved,0,,
 players,units,Game::mapFlags,-,unobserved,0,,
 players,units,Game::playerIndex,-,unobserved,0,,
 players,units,Player::active,-,unobserved,0,,
+players,units,Player::allied,-,unobserved,0,,
 players,units,Player::commanderKills,-,unobserved,0,,
 players,units,Player::commanderLosses,-,unobserved,0,,
 players,units,Player::flags,-,unobserved,0,,
@@ -2102,6 +2106,7 @@ targeting,features,Ref<Unit>::offset,-,unobserved,0,,
 targeting,features,Vec3::x,-,unobserved,0,,
 targeting,features,Vec3::y,-,unobserved,0,,
 targeting,features,Vec3::z,-,unobserved,0,,
+targeting,los_radar,GetVisibleEnemiesInRadius,-,unobserved,0,,indirect
 targeting,los_radar,Ref<Unit>::offset,-,unobserved,0,,
 targeting,los_radar,Vec3::x,-,unobserved,0,,
 targeting,los_radar,Vec3::y,-,unobserved,0,,
@@ -2159,7 +2164,6 @@ units,ai,Unit::flags,players,immediate,73,combat-deaths@29,
 units,ai,Unit::flags,units,immediate,24,mission-build-unit@36,
 units,ai,Unit::group,-,unobserved,0,,
 units,ai,Unit::lastAttackerSlot,units,immediate,22,mission-build-unit@71,
-units,ai,Unit::lastDamageType,-,unobserved,0,,
 units,ai,Unit::mode,-,unobserved,0,,
 units,ai,Unit::motion,-,unobserved,0,,
 units,ai,Unit::player,-,unobserved,0,,
@@ -2171,7 +2175,6 @@ units,ai,Unit::zFraction,units,immediate,7,mission-capture@61,
 units,ai,UnitDef::c04,-,unobserved,0,,
 units,ai,UnitDef::c08,-,unobserved,0,,
 units,ai,UnitDef::canbuild,-,unobserved,0,,
-units,ai,UnitDef::categories,-,unobserved,0,,
 units,ai,UnitDef::energyCost,-,unobserved,0,,
 units,ai,UnitDef::energymake,-,unobserved,0,,
 units,ai,UnitDef::extractsMetal,-,unobserved,0,,
@@ -2229,6 +2232,7 @@ units,los_radar,Point16::y,-,unobserved,0,,
 units,los_radar,Ref<Unit>::offset,-,unobserved,0,,
 units,los_radar,Unit::activateFlags,players,immediate,87,ai-antinuke-intercept@30,
 units,los_radar,Unit::activateFlags,units,immediate,7,mission-capture@1,
+units,los_radar,Unit::buildLeft,-,unobserved,0,,
 units,los_radar,Unit::def,units,immediate,62,mission-build-unit@1,
 units,los_radar,Unit::flags,players,immediate,30,duel-coast-to-coast@29,
 units,los_radar,Unit::flags,units,immediate,11,mission-capture@5,
@@ -2244,6 +2248,7 @@ units,los_radar,Unit::workTime,-,unobserved,0,,
 units,los_radar,Unit::yFraction,units,immediate,10,mission-capture@5,
 units,los_radar,Unit::yWhole,-,unobserved,0,,
 units,los_radar,Unit::zFraction,units,immediate,5,ten-ring-atoll@3958,
+units,los_radar,UnitDef::flags1,-,unobserved,0,,
 units,los_radar,UnitDef::flags2,-,unobserved,0,,
 units,los_radar,UnitDef::modelMaxY,-,unobserved,0,,
 units,los_radar,UnitDef::modelMinX,-,unobserved,0,,
@@ -2325,6 +2330,7 @@ units,orders,Game::defs,-,unobserved,0,,
 units,orders,Game::unitDefCount,-,unobserved,0,,
 units,orders,Game::units,-,unobserved,0,,
 units,orders,Game::unitsEnd,-,unobserved,0,,
+units,orders,GetOrderFlags,-,unobserved,0,,indirect
 units,orders,Order::target,units,immediate,41,orders-guard-attacked@115,
 units,orders,Order::unknown_12,units,immediate,2,orders-air-fights@926,
 units,orders,Order::unknown_1a,units,immediate,4,orders-air-fights@1223,

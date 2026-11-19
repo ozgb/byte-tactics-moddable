@@ -1,6 +1,12 @@
 #ifndef INTERFACES_LOS_RADAR_H
 #define INTERFACES_LOS_RADAR_H
 
+namespace std {
+template<class T> class allocator;
+template<class T, class A> class vector;
+}
+
+template <class T> struct Ref;
 struct Cell;
 struct Player;
 struct Unit;
@@ -9,7 +15,7 @@ struct Vec3;
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
 #define LOS_RADAR_VERSION_MAJOR 3
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 0
+#define LOS_RADAR_VERSION_MINOR 1
 
 // The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a unit with a null unit changes nothing; outcome 0.
 enum LosRadarEventKind {
@@ -91,6 +97,22 @@ struct LosRadarSeam {
     void (__stdcall* FreeRadar)(void);
     // Releases the map's line of sight, sorting and icon data when a match shuts down. Hooks: none.
     void (__stdcall* FreeMapResources)(void);
+    // Appends to out the ready enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, the ready enemy units with flag 0x100 there; flags is unused. Hooks: none.
+    void (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*, std::allocator<Unit*> >* out);
+    // Writes to out, as Ref<Unit>, the first capacity of the units GetVisibleEnemiesInRadius appends and returns how many there are. Hooks: none.
+    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
+    // Returns whether an enemy unit a player saw at its last RefreshUnitIndex is within a range of a position, ready (flag 0x10000000) and not dying (flag 0x4000). Hooks: none.
+    bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
+    // Returns 1 when the viewing player sees a position, on the grid of a player's explored map. Hooks: none.
+    int (__stdcall* IsPointVisible)(Player* player, Vec3* pos);
+    // Writes to out, as Ref<Unit>, the first capacity of the enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, ready or not, and returns how many there are. Hooks: none.
+    int (__stdcall* GetSeenUnitsInRadius)(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
+    // Creates the empty index of the enemy units a player sees, refreshed by the next RefreshUnitIndex, outside the tick. Hooks: none.
+    void (__stdcall* CreateUnitIndex)(int player);
+    // Frees the index of the enemy units a player sees, outside the tick. Hooks: none.
+    void (__stdcall* FreeUnitIndex)(int player);
+    // Every 30 ticks of a player that has an index, refills it from the ready units: the enemy units the player sees, the enemy units with flag 0x100, and whether it has a finished unit of a type with flag 0x400 switched on. Hooks: none.
+    void (__stdcall* RefreshUnitIndex)(int player);
 };
 
 #endif

@@ -1,0 +1,66 @@
+#include <stddef.h>
+
+#pragma pack(push, 1)
+#include "../units/unit_type_set.h"
+#include "../weapons/weapon_def.h"
+#include "../weapons/unit_weapon_slot.h"
+#include "order.h"
+#include "../units/unit_def.h"
+#include "../network/player.h"
+#include "../units/unit.h"
+#pragma pack(pop)
+
+#include "../../interfaces/seams.h"
+#include "../../interfaces/weapons.h"
+#include "../../interfaces/orders.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
+#include "../game/targeting_events.h"
+#include "weapons_effects.h"
+
+static const float kZeroFloat = 0.0f;
+
+static Unit* UnitOfOffset(unsigned int offset)
+{
+    Ref<Unit> ref;
+    ref.offset = offset;
+    return ref.get();
+}
+
+void OrdersOnWeaponsAttacked(const void* event)
+{
+    const WeaponsEffect* e = static_cast<const WeaponsEffect*>(event);
+    Unit* unit = UnitOfOffset(e->unit);
+    if (unit == nullptr)
+        return;
+    Unit* attacker = UnitOfOffset(e->target);
+    if (attacker && !attacker->unitDefIndex) attacker=0;
+    if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
+        (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloat && !unit->player->allied[attacker->player->index]) {
+        int ordered=0;
+        if ((!unit->list || (unit->list->flags_42&ORDER_FLAG_IDLE)) &&
+            !unit->def->categories->Contains(attacker->unitDefIndex) &&
+            !unit->def->weaponCategories[0]->Contains(attacker->unitDefIndex) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,0))
+            ordered=g_seams.orders->IssueAttackOrder(unit,attacker,0);
+        if (!ordered && (unit->flags&0x300000)) {
+            for (unsigned char i=0;i<3;++i) {
+                UnitWeaponSlot* weapon=&unit->weapons[i];
+                if ((weapon->flags&2) && (weapon->flags&0x10) && g_seams.weapons->WeaponCanReachUnit(unit,attacker,i) &&
+                    !((unsigned char)(weapon->weapon->flags.value>>26)&1)) {
+                    Unit* target=ScheduleTargetingTargetUnit(unit,i);
+                    if (!target || !g_seams.weapons->WeaponCanReachUnit(unit,target,i) || unit->def->weaponCategories[i]->Contains(target->unitDefIndex))
+                        TargetingPublishSetUnit(SCHED_ORDERS, unit,attacker,i);
+                }
+            }
+        }
+    }
+}
+
+void OrdersOnWeaponsHit(const void* event)
+{
+    const WeaponsEffect* e = static_cast<const WeaponsEffect*>(event);
+    Unit* unit = UnitOfOffset(e->unit);
+    if (unit == nullptr)
+        return;
+    unit->netDirtyFlags |= (e->value > e->extra * 2) ? 0x4000 : 0x2000;
+}

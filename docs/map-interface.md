@@ -166,7 +166,7 @@ same update (the `immediate` rows of section 4), and would only move the write.
 **What map reads:** a unit's cell, position, `zFraction`, footprint, flags, definition (footprint, yard map, slope and
 water limits, `mobile`), motion and carrier chain (`carrier`, `cargo`, `cargoNext`); the cells (`los_radar.GetMapCell`
 and the cell records, section below), the feature on a cell (`features.GetCellFeature`) and a feature's flags, metal
-and energy; what the viewing player sees (`IsUnitVisibleToPlayer`, `ai.IsPointVisible` for `CanBuildAt`'s
+and energy; what the viewing player sees (`IsUnitVisibleToPlayer`, `los_radar.IsPointVisible` for `CanBuildAt`'s
 visibility check); the players' alliance words (`pad_1df4`, `unknown_1b8e`, `unknown_1cd9`); the movement classes
 (`g_movementClassEntries`). All as of each module's last run, read inside map's events, synchronous slots and
 queries, at the caller's statement.

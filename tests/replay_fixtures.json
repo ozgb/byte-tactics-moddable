@@ -607,6 +607,24 @@
     }
    ]
   },
+  "FixtureSeen": {
+   "type": "FixtureSeen",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "index",
+     "kind": "u8"
+    },
+    {
+     "name": "units",
+     "kind": "vector",
+     "elem": {
+      "mode": "object",
+      "kind": "Unit"
+     }
+    }
+   ]
+  },
   "FixtureNotify": {
    "type": "FixtureNotify",
    "scope": "state",

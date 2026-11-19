@@ -305,7 +305,7 @@ struct UnitDamagePacket {
 
 
 #include "../../interfaces/seams.h"
-#include "../game/ai_events.h"
+#include "../game/weapons_events.h"
 #include "../state/sim_globals.h"
 #include "../ingame/game_dialogs.h"
 #include "../util/math.h"
@@ -333,7 +333,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
     g_seams.units->MarkRecentlyDamaged(unit);
 
     if (ev->damageKind != 11)
-        AiPublishReactToAttack(SCHED_WEAPONS, unit, target, ev->amount);
+        WeaponsPublishAttacked(unit, target, ev->amount);
 
     unit->lastDamageType = ev->damageKind;
 
@@ -694,8 +694,8 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
     int bestDistance=0x7fffffff;
     Unit* best=0;
     std::vector<Unit*> candidates;
-    if(useRange) g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
-    else g_seams.ai->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
+    if(useRange) g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
+    else g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
     for(int count=0;count<50;++count) {
         if(candidates.empty()) break;
         std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());

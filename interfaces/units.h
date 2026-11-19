@@ -24,7 +24,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 1
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 9
+#define UNITS_VERSION_MINOR 10
 
 // Unit simulation.
 struct UnitsSeam {
@@ -148,6 +148,14 @@ struct UnitsSeam {
     void (__stdcall* UpdateUnit)(Unit* unit);
     // The bytes of the piece state of a 3DO model, which the caller allocates before it publishes the state to be built; a query. Hooks: none.
     unsigned int (__stdcall* ObjectStateSize)(Object3do* model);
+    // Appends to out the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
+    void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
+    // Creates the empty index of a player's factories, refreshed by the next RefreshFactoryIndex, outside the tick. Hooks: none.
+    void (__stdcall* CreateFactoryIndex)(int player);
+    // Frees the index of a player's factories, outside the tick. Hooks: none.
+    void (__stdcall* FreeFactoryIndex)(int player);
+    // Every 30 ticks of a player that has an index, refills it with the player's ready, finished units that have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
+    void (__stdcall* RefreshFactoryIndex)(int player);
 };
 
 #endif

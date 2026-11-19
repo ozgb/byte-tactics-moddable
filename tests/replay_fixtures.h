@@ -226,6 +226,11 @@ struct FixtureMid {
 struct FixtureRow : public BlockVector<short> {
 };
 
+struct FixtureSeen {
+    unsigned char index;
+    BlockVector<Ref<Unit> > units;
+};
+
 struct FixtureNest {
     int id;
     BlockVector<FixtureMid> mids;

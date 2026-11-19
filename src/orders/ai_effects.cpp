@@ -37,24 +37,8 @@ void OrdersOnAiQueueBuild(const void* event)
     g_seams.orders->QueueBuildOrder((char*)&g_game->defs[e->value].unitname[0], UnitOfOffset(e->unit), e->extra);
 }
 
-void OrdersOnAiAttack(const void* event)
-{
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    g_seams.orders->IssueAttackOrder(UnitOfOffset(e->unit), UnitOfOffset(e->target), 0);
-}
-
 void OrdersOnAiStop(const void* event)
 {
     const AiEvent* e = static_cast<const AiEvent*>(event);
     g_seams.orders->DeleteOrders(UnitOfOffset(e->unit), e->value);
-}
-
-void OrdersOnAiHit(const void* event)
-{
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
-    if (e->value == 1)
-        unit->netDirtyFlags |= 0x4000;
-    else
-        unit->netDirtyFlags |= 0x2000;
 }

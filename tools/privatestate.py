@@ -58,7 +58,8 @@ writer but targeting fails, which is what makes every aim, clear and reset of a 
 
 Los_radar's state is written by los_radar alone and read by others: the visibility layer of the map, the allocation "MAPPED MEMORY" that LoadTntMap makes
 (`LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY`), each player's explored map, the allocation of InitPlayerSlot (`InitPlayerSlot: operator new unsigned char`),
-and the eyeballs: the members of `Eye` (the log names each, such as `Eye::pos` and `Eye::expires`) and their count, `count_14277`, and `eyes`, the pointer to them.
+the eyeballs: the members of `Eye` (the log names each, such as `Eye::pos` and `Eye::expires`) and their count, `count_14277`, and `eyes`, the pointer to them,
+and the unit index, each player's lists of the enemy units it sees and knows and its hasSpecial flag (the members of `LosUnitIndex` and `LosUnitIndexEntry`).
 The cells of the map (the allocation "PLOT MEMORY", which presentation, map and features write too), the unit's sight cache and flags (units and others write them)
 and the line of sight setting bits of the map flags are not listed. Any writer but los_radar fails, which is what makes every move, removal, reveal and
 recalculation of line of sight reach these items through the scheduler's events.
@@ -73,7 +74,7 @@ map fails, which is what makes every placement, move and removal reach these ite
 Players' state is written by players alone and read by others: the mission conditions (the members of `MissionConditions`, `MissionCondition` and of each victory and defeat condition type, such as `VictoryTimerRunsOut` and `DefeatCommanderKilled`) and the two clocks of a player, `Player::updateTime` and `Player::winLoseTime`.
 The rest of a player's fields (units, the economy's accounts, the controller and the slot's set-up) are not listed: others write them. Any writer but players fails, which is what makes every capture, kill, transfer and creation or death of a unit reach the conditions through the scheduler's events.
 
-Ai's state is written by ai alone: the records of a computer player's AI (`PlayerAI` and the types it holds, `KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos`, `AiVec3`, `AiUnitList` and `FactoryUnitGroup`), the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`), the pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI`.
+Ai's state is written by ai alone: the records of a computer player's AI (`PlayerAI` and the types it holds, `KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`), the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`), the pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI`.
 `Unit::group` is not listed: orders' GetBuiltOrder gives a human player's built unit its factory's group, a UI group, and LoadUnit writes it. `Player::ai` is not listed either: players' slot set-up writes it. Any writer but ai fails, which is what makes every reaction, squad change and weight or limit command reach these items through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
@@ -115,7 +116,7 @@ TARGETING_WRITE_ITEMS = ("Unit::current", "Unit::field_20", "Unit::weapon2Target
 
 LOS_RADAR_WRITE_ITEMS = ("LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY", "InitPlayerSlot: operator new unsigned char", "count_14277", "eyes")
 
-LOS_RADAR_WRITE_TYPES = ("Eye",)
+LOS_RADAR_WRITE_TYPES = ("Eye", "LosUnitIndex", "LosUnitIndexEntry")
 
 MAP_WRITE_ITEMS = ("Unit::spatialBucket", "BuildAllPassMaps: operator new unsigned int", "g_lastPlaceHeight", "g_lastPlaceMetalSum")
 
@@ -130,7 +131,7 @@ PLAYERS_WRITE_TYPES = ("MissionConditions", "MissionCondition", "VictoryKillEnem
 
 AI_WRITE_ITEMS = ("Player::groups", "g_aiCommandsEnabled", "g_playerAI")
 
-AI_WRITE_TYPES = ("PlayerAI", "KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "CenterPos", "AiVec3", "AiUnitList", "FactoryUnitGroup",
+AI_WRITE_TYPES = ("PlayerAI", "KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "CenterPos", "AiVec3",
                   "SquadManager", "SquadTimer", "AssaultTimer", "EscortTimer", "SquadScoutTimer", "ScoutTimer", "BuildTimer", "SpatialTimer", "Group")
 
 

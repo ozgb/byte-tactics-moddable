@@ -12,7 +12,7 @@ const AiSeam* s_standard = nullptr;
 
 int __stdcall ApplyIdle(const AiEvent* event)
 {
-    if (event->kind == AI_REACT_TO_ATTACK || event->kind == AI_DAMAGE_SPLIT) {
+    if (event->kind == AI_REACT_TO_ATTACK) {
         Ref<Unit> ref;
         ref.offset = event->unit;
         Unit* unit = ref.get();
@@ -26,6 +26,10 @@ void __stdcall UpdateSquadsIdle(int)
 {
 }
 
+void __stdcall UpdatePlayerAIIdle(int)
+{
+}
+
 }
 
 AiSeam* AiIdleSeam(const AiSeam* standard)
@@ -34,5 +38,6 @@ AiSeam* AiIdleSeam(const AiSeam* standard)
     s_idle = *standard;
     s_idle.Apply = ApplyIdle;
     s_idle.UpdateSquads = UpdateSquadsIdle;
+    s_idle.UpdatePlayerAI = UpdatePlayerAIIdle;
     return &s_idle;
 }

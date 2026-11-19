@@ -376,7 +376,7 @@ class TargetingForms(unittest.TestCase):
 
     def test_a_unit_vector_out_carries_its_reach_into_the_table(self):
         files, _, model = self.generated()
-        out = [a for a in model["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"] if a["name"] == "out"][0]
+        out = [a for a in model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"] if a["name"] == "out"][0]
         self.assertEqual((out["mode"], out["reachCount"], out["depth"]), ("units", 7, 2))
         self.assertIn("ImportOutUnits(line, \"out\", a4, kReplayReachFields + %d, 7);" % out["reachFirst"], files[rs.HOOKS_H])
         self.assertIn("ApplyUnits(a4, \"out\");", files[rs.SLOTS_H])
@@ -384,35 +384,35 @@ class TargetingForms(unittest.TestCase):
     def test_a_unit_buffer_slot_is_played_as_the_recorded_vector_form(self):
         files, errors, model = self.generated()
         self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadiusList" in e], [])
-        slot = model["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]
+        slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]
         self.assertEqual(slot["playsAs"], "GetVisibleEnemiesInRadius")
         self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(pos)", model["subsystems"]["ai"]["pending"]["unannotatedArgs"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(out)", model["subsystems"]["ai"]["pending"]["unannotatedArgs"])
+        self.assertNotIn("GetVisibleEnemiesInRadiusList(pos)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
+        self.assertNotIn("GetVisibleEnemiesInRadiusList(out)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
         stub = files[rs.SLOTS_H]
-        body = stub[stub.index("Imp_ai_GetVisibleEnemiesInRadiusList"):]
+        body = stub[stub.index("Imp_los_radar_GetVisibleEnemiesInRadiusList"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('StartImport(t, "ai.GetVisibleEnemiesInRadius");', body)
+        self.assertIn('StartImport(t, "los_radar.GetVisibleEnemiesInRadius");', body)
         self.assertIn("return EnterList(t, a4, a5);", body)
-        self.assertIn("g_import_ai.GetVisibleEnemiesInRadiusList = Imp_ai_GetVisibleEnemiesInRadiusList;", stub)
+        self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;", stub)
 
     def test_a_unit_buffer_needs_a_slot_to_play_as_and_a_capacity(self):
         ann = annotations()
-        del ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"]
+        del ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"]
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("has a unit buffer and no `playsAs`" in e for e in errors), errors)
         ann = annotations()
-        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "HasReadyUnitInRange"
+        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "GetMapCell"
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("`playsAs` HasReadyUnitInRange takes the arguments" in e for e in errors), errors)
+        self.assertTrue(any("`playsAs` GetMapCell takes the arguments" in e for e in errors), errors)
         ann = annotations()
-        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
+        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
 
     def test_a_reach_deeper_than_its_depth_is_an_error(self):
         ann = annotations()
-        out = ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]
+        out = ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]
         out["reach"] = out["reach"] + ["UnitDef.flags1", "Unit.player", "Player.unitsBegin"]
         out["depth"] = 2
         _, errors, _ = self.generated(ann)
@@ -420,7 +420,7 @@ class TargetingForms(unittest.TestCase):
 
     def test_a_reach_that_names_no_field_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["ai"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"].append("Unit.noSuchField")
+        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"].append("Unit.noSuchField")
         _, errors, _ = self.generated(ann)
         self.assertTrue(any("unknown field Unit.noSuchField" in e for e in errors), errors)
 
@@ -1231,20 +1231,21 @@ class Vectors(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
+        fixtures = files[rs.FIXTURE_SCHEMA_H]
         self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"] if v["owner"] == "PlayerAI"],
-                         [("object", "Unit", "Ref<Unit>"), ("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
-        self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", text)
+                         [("value", "KeyedCell", "KeyedCell"), ("scalar", "", "short")])
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"] if v["owner"] == "FixtureSeen"],
+                         [("object", "Unit", "Ref<Unit>")])
+        self.assertIn("{ RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },", fixtures)
         self.assertIn("{ RV_VALUE, ROK_KEYEDCELL, sizeof(KeyedCell) },", text)
         self.assertIn("{ RV_SCALAR, 0, sizeof(short) },", text)
-        self.assertIn('static_assert(__is_same(decltype(((PlayerAI*)nullptr)->visible.units)::value_type, Ref<Unit>), "PlayerAI::visibleUnits holds Ref<Unit>");', text)
+        self.assertIn('static_assert(__is_same(decltype(((FixtureSeen*)nullptr)->units)::value_type, Ref<Unit>), "FixtureSeen::units holds Ref<Unit>");', fixtures)
         self.assertIn('static_assert(sizeof(decltype(((PlayerAI*)nullptr)->cells)) == 16, "PlayerAI::cells is a block vector");', text)
 
     def test_the_field_row_names_the_vector_and_the_element_kind_to_walk(self):
         files, _, _ = self.generated()
-        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "visibleUnits",')][0]
-        self.assertIn("offsetof(PlayerAI, visible.units)", row)
+        row = [l for l in files[rs.FIXTURE_SCHEMA_H].split("\n") if l.startswith('    { "units", offsetof(FixtureSeen,')][0]
         self.assertIn("RK_VECTOR, ROK_UNIT,", row)
-        self.assertTrue(row.rstrip(" },").endswith(", %d" % (1 + len(rs.load_annotations(fixtures=True)["fixture_sim"]))), row)
 
     def test_a_header_that_needs_the_packing_of_the_game_is_included_packed(self):
         files, _, _ = self.generated()
@@ -1263,8 +1264,8 @@ class Vectors(unittest.TestCase):
         self.field(ann, "counts")["elem"] = {"mode": "scalar", "type": "Widget"}
         self.assertTrue(any("a scalar element needs a `type` of" in e for e in self.errors(ann)))
         ann = annotations()
-        self.field(ann, "visibleUnits")["elem"] = {"mode": "object", "kind": "KeyedCell"}
-        self.assertTrue(any("PlayerAI.visibleUnits: an object element needs a `kind` that is a state kind" in e for e in self.errors(ann)))
+        [f for f in ann["objects"]["FixtureSeen"]["fields"] if f["name"] == "units"][0]["elem"] = {"mode": "object", "kind": "KeyedCell"}
+        self.assertTrue(any("FixtureSeen.units: an object element needs a `kind` that is a state kind" in e for e in self.errors(ann)))
         ann = annotations()
         self.field(ann, "cells")["elem"] = {"mode": "value", "kind": "Unit"}
         self.assertTrue(any("PlayerAI.cells: a value element needs a `kind` that is a value kind" in e for e in self.errors(ann)))

@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 4.0), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 4.1), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the spatial grid of units (the buckets), the pass map of each movement
@@ -236,9 +236,14 @@ item is every field of every cell, so a row with it is any field. Each is served
 
 ## 5. State and the trace
 
-Map keeps no private region, and so it has no `WriteState` report: its state is view state, hashed where it was. It
-stays where it is and stays hashed in this change (the human, 2026-11-16, on PR #978); #979 moves out of the hash
-what only its owner reads, for los_radar, players, ai and map in one format bump.
+Map keeps no private region, but it has a `WriteState` since 4.1 (#979) and it allocates and frees the bucket array.
+What only map reads left the hash in trace format 6 and is reported by `WriteState`, dumped and required equal for the
+default, as record 45 `mapState`: for each bucket (`spatial.count` of them) the fields `a`, `flags` and `first`, and
+for the bucket of units off the map `overflow.present` and the same three. What other subsystems read stays hashed:
+orders reads the byte `b` of a bucket (`src/orders/order_targets.cpp`, the bucket of a unit) through
+`Unit::spatialBucket`, and orders and others compare `Unit::spatialBucket` with `overflowBucket`, so section 14 keeps
+`spatial.width`, `spatial.height`, `spatial.count`, each `spatial[r].b` and `spatial.overflow.b`, and drops `a`, `flags`
+and `first`.
 
 | Map's state | Where | Read by | Only map reads it |
 |---|---|---|---|
@@ -253,9 +258,13 @@ what only its owner reads, for los_radar, players, ai and map in one format bump
 
 `privatestate.py --check` fails when another subsystem writes any of the items map alone writes: `Unit::spatialBucket`,
 the bucket heads (`UnitBucket::first`, `SpatialBucket::head`), the pass maps and the placement record
-(`g_lastPlaceHeight`, `g_lastPlaceMetalSum`). The bucket array (`cells_1429f`) and `overflowBucket` are not listed:
-los_radar allocates and frees them with the map's other layers, outside the tick (`BuildDerivedLayers`,
-`FreeMapResources`). The cells are not listed (presentation, features and los_radar write other fields of the same
+(`g_lastPlaceHeight`, `g_lastPlaceMetalSum`). The bucket array (`cells_1429f`) and `overflowBucket` are map's own since 4.1: map's `AllocateBuckets` and
+`FreeBuckets` make and free them, and los_radar's `BuildDerivedLayers` and `FreeMapResources` call the slots at the
+statements that allocated and freed them (the allocations, their sizes, tags and order are those of 3.1c). The
+allocation fills `a` (the highest ground in the bucket), `b` (the highest of its neighbours) and the edge bits of
+`flags`, which the one function wrote together with the allocation, so it moved with it. After this change `Rec::first`
+is written by `SetOwner`, `UnlinkBucketUnit`, `SpatialBucket::UnlinkUnit` and `SpatialBucket::PrependUnit` (map's
+events), and `a`, `b` and `flags` by `AllocateBuckets` only. The cells are not listed (presentation, features and los_radar write other fields of the same
 records, and the access log names them as one item), nor are `Unit::cargoNext`, `Unit::flags`, `Unit::bit2` and
 `Unit::cobStateFlags`, which units writes too.
 

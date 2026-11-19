@@ -45,6 +45,22 @@ inline void LosRadarPublishRevealUnit(int outbox, U* unit)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+template <class U>
+inline void LosRadarPublishSightReset(int outbox, U* unit)
+{
+    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, unit);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+template <class U>
+inline void LosRadarPublishSightLoad(int outbox, U* unit, int cell, unsigned char frameIdx)
+{
+    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD, unit);
+    event.sight.cell = cell;
+    event.sight.frameIdx = frameIdx;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class P>
 inline void LosRadarPublishAddEyeball(int outbox, const P* pos, int sightDistance, int eyeHeight, int lifetime)
 {

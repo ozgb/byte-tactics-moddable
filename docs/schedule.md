@@ -2112,8 +2112,8 @@ the split lies in.
 | units | ai | units, each entity | split | `weapons.DamageUnit` (step 17) | `weapons.DetonateUnitWeapon` (step 18) | `weapons.DamageUnit` | by item | 1 | 1 |
 | units | economy | units, each entity | write before calling | the caller, before the first step | `economy.Apply` (step 1) |  | by subsystem | 3 | 3 |
 | units | los_radar | units, each entity | write before calling | the caller, after step 1 | `los_radar.IsUnitVisibleToPlayer` (step 2) |  | by item | 1 | 1 |
-| units | los_radar | units, each entity | write before calling | the caller, before the first step | `los_radar.IsUnitVisibleToPlayer` (step 2) |  | by subsystem | 7 | 7 |
-| units | los_radar | units, each entity | split | `weapons.DamageUnit` (step 17) | `weapons.DetonateUnitWeapon` (step 18) | `weapons.DamageUnit` | by item | 4 | 4 |
+| units | los_radar | units, each entity | write before calling | the caller, before the first step | `los_radar.IsUnitVisibleToPlayer` (step 2) |  | by subsystem | 8 | 8 |
+| units | los_radar | units, each entity | split | `weapons.DamageUnit` (step 17) | `weapons.DetonateUnitWeapon` (step 18) | `weapons.DamageUnit` | by item | 3 | 3 |
 | units | map | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 8) |  | by subsystem | 5 | 5 |
 | units | map | units, each entity | split | `weapons.DamageUnit` (step 17) | `weapons.DetonateUnitWeapon` (step 18) | `weapons.DamageUnit` | by item | 9 | 9 |
 | units | orders | units, each entity | write before calling | the caller, before the first step | `orders.OrderOrStatusFlags` (step 7) |  | by subsystem | 15 | 15 |

@@ -82,13 +82,7 @@ struct Unit {
         };
     };
     Point16 cell;
-    union {
-        int losCacheCell;
-        struct {
-            short losCacheCellX;
-            short losCacheCellZ;
-        };
-    };
+    int unusedLosCache;
     Point16 footprint;
     Ref<SpatialBucket> spatialBucket;
     Ref<Unit> carrier;
@@ -121,7 +115,7 @@ struct Unit {
     unsigned char lastDamageType;
     unsigned char healthPercent;
     unsigned char prevHealthPercent;
-    unsigned char losSightFrameIdx;
+    unsigned char unusedLosSightFrame;
     unsigned char transportPiece;
     unsigned char recentlyDamagedTimer;
     int postTransferHoldoff;
@@ -241,7 +235,7 @@ static_assert(offsetof(Unit, weapons) == 0x4, "weapons");
 static_assert(offsetof(Unit, angles) == 0x64, "angles");
 static_assert(offsetof(Unit, pos) == 0x6a, "pos");
 static_assert(offsetof(Unit, netDirtyFlags) == 0xba, "netDirtyFlags");
-static_assert(offsetof(Unit, losCacheCell) == 0x7a, "losCacheCell");
+static_assert(offsetof(Unit, unusedLosCache) == 0x7a, "unusedLosCache");
 static_assert(offsetof(Unit, unusedAccount) == 0xbc, "unusedAccount");
 static_assert(offsetof(Unit, owner) == 0xec, "owner");
 static_assert(offsetof(Unit, buildLeft) == 0x104, "buildLeft");

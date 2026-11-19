@@ -2,7 +2,7 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 5
+#define TRACE_FORMAT 6
 
 enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
@@ -74,7 +74,6 @@ static const TraceField kUnitFields[] = {
     { "pos.z", 0x72, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "cell.x", 0x76, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "cell.y", 0x78, 2, TF_SCALAR, TT_NONE, 0x0 },
-    { "losCacheCell", 0x7a, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "footprint.x", 0x7e, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "footprint.y", 0x80, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "", 0x82, 4, TF_REF, TT_REC, 0x0 },
@@ -100,7 +99,6 @@ static const TraceField kUnitFields[] = {
     { "lastDamageType", 0xf5, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "healthPercent", 0xf6, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "prevHealthPercent", 0xf7, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "losSightFrameIdx", 0xf8, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "transportPiece", 0xf9, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "recentlyDamagedTimer", 0xfa, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "postTransferHoldoff", 0xfb, 4, TF_SCALAR, TT_NONE, 0x0 },
@@ -132,7 +130,8 @@ static const TraceField kUnitPlan[] = {
     { "", 0x4c, 16, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x5c, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x60, 4, TF_REF, TT_HEAP, 0x0 },
-    { "", 0x64, 30, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x64, 22, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x7e, 4, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x82, 4, TF_REF, TT_REC, 0x0 },
     { "", 0x86, 4, TF_REF, TT_UNIT, 0x0 },
     { "", 0x8a, 4, TF_REF, TT_UNIT, 0x0 },
@@ -145,7 +144,8 @@ static const TraceField kUnitPlan[] = {
     { "", 0xa6, 22, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xec, 4, TF_REF, TT_PLAYER, 0x0 },
     { "", 0xf0, 4, TF_REF, TT_UNIT, 0x0 },
-    { "", 0xf4, 36, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0xf4, 4, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0xf9, 31, TF_BYTES, TT_NONE, 0x0 },
 };
 
 static const TraceField kProjectileFields[] = {
@@ -239,8 +239,6 @@ static const TraceField kPlayerFields[] = {
     { "shareMetal", 0xe4, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "shareEnergy", 0xe8, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "econ", 0xec, 4, TF_REF, TT_HEAP, 0x0 },
-    { "updateTime", 0xf0, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "winLoseTime", 0xf4, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "displayTimer", 0xf8, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "kills", 0xfc, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "losses", 0xfe, 2, TF_SCALAR, TT_NONE, 0x0 },
@@ -274,7 +272,7 @@ static const TraceField kPlayerPlan[] = {
     { "", 0x7c, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x80, 108, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xec, 4, TF_REF, TT_HEAP, 0x0 },
-    { "", 0xf0, 91, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0xf8, 83, TF_BYTES, TT_NONE, 0x0 },
 };
 
 static const TraceField kDebrisFields[] = {
@@ -475,15 +473,11 @@ static const TraceField kSpotAnimPlan[] = {
 };
 
 static const TraceField kRecFields[] = {
-    { "a", 0x0, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "b", 0x1, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "flags", 0x2, 4, TF_SCALAR, TT_NONE, 0x0 },
-    { "first", 0x6, 4, TF_REF, TT_UNIT, 0x0 },
 };
 
 static const TraceField kRecPlan[] = {
-    { "", 0x0, 6, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x6, 4, TF_REF, TT_UNIT, 0x0 },
+    { "", 0x1, 1, TF_BYTES, TT_NONE, 0x0 },
 };
 
 static const TraceField kEyeFields[] = {
@@ -1291,9 +1285,9 @@ static const TraceField kUnitDefDataPlan[] = {
     { "", 0x241, 8, TF_BYTES, TT_NONE, 0x0 },
 };
 
-static const TraceTable kUnitTable = { kUnitFields, 78, kUnitPlan, 30, 0x118 };
+static const TraceTable kUnitTable = { kUnitFields, 76, kUnitPlan, 32, 0x118 };
 static const TraceTable kProjectileTable = { kProjectileFields, 33, kProjectilePlan, 6, 0x6b };
-static const TraceTable kPlayerTable = { kPlayerFields, 66, kPlayerPlan, 12, 0x14b };
+static const TraceTable kPlayerTable = { kPlayerFields, 64, kPlayerPlan, 12, 0x14b };
 static const TraceTable kDebrisTable = { kDebrisFields, 27, kDebrisPlan, 6, 0x54 };
 static const TraceTable kPieceTable = { kPieceFields, 14, kPiecePlan, 8, 0x34 };
 static const TraceTable kExplodedPieceTable = { kExplodedPieceFields, 12, kExplodedPiecePlan, 4, 0x30 };
@@ -1301,7 +1295,7 @@ static const TraceTable kPieceRecTable = { kPieceRecFields, 14, kPieceRecPlan, 7
 static const TraceTable kFaceTable = { kFaceFields, 9, kFacePlan, 6, 0x20 };
 static const TraceTable kSpotObjectTable = { kSpotObjectFields, 18, kSpotObjectPlan, 3, 0x30 };
 static const TraceTable kSpotAnimTable = { kSpotAnimFields, 22, kSpotAnimPlan, 5, 0x30 };
-static const TraceTable kRecTable = { kRecFields, 4, kRecPlan, 2, 0xa };
+static const TraceTable kRecTable = { kRecFields, 1, kRecPlan, 1, 0xa };
 static const TraceTable kEyeTable = { kEyeFields, 9, kEyePlan, 3, 0x24 };
 static const TraceTable kNodeTable = { kNodeFields, 6, kNodePlan, 2, 0x14 };
 static const TraceTable kMoveClassTable = { kMoveClassFields, 13, kMoveClassPlan, 4, 0x20 };
@@ -1376,12 +1370,11 @@ static const TraceField kGameScalarFields[] = {
     { "spotField_1421f", 0x1421f, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "scanIndex", 0x14257, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "mapFlags", 0x14281, 2, TF_SCALAR, TT_NONE, 0xfff7 },
-    { "endGameCountdown", 0x39239, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "endGameFlags", 0x3923b, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "uiOptionFlags", 0x37f2f, 2, TF_SCALAR, TT_NONE, 0x788 },
 };
 
-static const unsigned kGameScalarFieldCount = 14;
+static const unsigned kGameScalarFieldCount = 13;
 
 #include <stddef.h>
 #include "../state/sim_globals.h"

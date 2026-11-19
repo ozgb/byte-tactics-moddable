@@ -1,5 +1,5 @@
 {
-  "trace_format": 5,
+  "trace_format": 6,
   "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
   "tables": {
     "AiSearchGoal": {
@@ -764,8 +764,6 @@
         {"name": "shareMetal", "offset": 228, "size": 4, "kind": "scalar", "target": null},
         {"name": "shareEnergy", "offset": 232, "size": 4, "kind": "scalar", "target": null},
         {"name": "econ", "offset": 236, "size": 4, "kind": "ref", "target": "heap"},
-        {"name": "updateTime", "offset": 240, "size": 4, "kind": "scalar", "target": null},
-        {"name": "winLoseTime", "offset": 244, "size": 4, "kind": "scalar", "target": null},
         {"name": "displayTimer", "offset": 248, "size": 4, "kind": "scalar", "target": null},
         {"name": "kills", "offset": 252, "size": 2, "kind": "scalar", "target": null},
         {"name": "losses", "offset": 254, "size": 2, "kind": "scalar", "target": null},
@@ -798,10 +796,11 @@
         {"name": "explored", "offset": 124, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "", "offset": 128, "size": 108, "kind": "bytes", "target": null},
         {"name": "econ", "offset": 236, "size": 4, "kind": "ref", "target": "heap"},
-        {"name": "", "offset": 240, "size": 91, "kind": "bytes", "target": null}
+        {"name": "", "offset": 248, "size": 83, "kind": "bytes", "target": null}
       ],
       "excluded": [
-
+        {"field": "unusedUpdateTime", "reason": "players' private region: reported by playersState"},
+        {"field": "unusedWinLoseTime", "reason": "players' private region: reported by playersState"}
       ]
     },
     "PlayerAI": {
@@ -925,17 +924,15 @@
     "Rec": {
       "size": 10,
       "fields": [
-        {"name": "a", "offset": 0, "size": 1, "kind": "scalar", "target": null},
-        {"name": "b", "offset": 1, "size": 1, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 2, "size": 4, "kind": "scalar", "target": null},
-        {"name": "first", "offset": 6, "size": 4, "kind": "ref", "target": "unit"}
+        {"name": "b", "offset": 1, "size": 1, "kind": "scalar", "target": null}
       ],
       "plan": [
-        {"name": "", "offset": 0, "size": 6, "kind": "bytes", "target": null},
-        {"name": "first", "offset": 6, "size": 4, "kind": "ref", "target": "unit"}
+        {"name": "", "offset": 1, "size": 1, "kind": "bytes", "target": null}
       ],
       "excluded": [
-
+        {"field": "a", "reason": "read only by map: reported by mapState"},
+        {"field": "flags", "reason": "read only by map: reported by mapState"},
+        {"field": "first", "reason": "read only by map: reported by mapState"}
       ]
     },
     "RingApproach": {
@@ -1233,7 +1230,6 @@
         {"name": "pos.z", "offset": 114, "size": 4, "kind": "scalar", "target": null},
         {"name": "cell.x", "offset": 118, "size": 2, "kind": "scalar", "target": null},
         {"name": "cell.y", "offset": 120, "size": 2, "kind": "scalar", "target": null},
-        {"name": "losCacheCell", "offset": 122, "size": 4, "kind": "scalar", "target": null},
         {"name": "footprint.x", "offset": 126, "size": 2, "kind": "scalar", "target": null},
         {"name": "footprint.y", "offset": 128, "size": 2, "kind": "scalar", "target": null},
         {"name": "", "offset": 130, "size": 4, "kind": "ref", "target": "rec"},
@@ -1259,7 +1255,6 @@
         {"name": "lastDamageType", "offset": 245, "size": 1, "kind": "scalar", "target": null},
         {"name": "healthPercent", "offset": 246, "size": 1, "kind": "scalar", "target": null},
         {"name": "prevHealthPercent", "offset": 247, "size": 1, "kind": "scalar", "target": null},
-        {"name": "losSightFrameIdx", "offset": 248, "size": 1, "kind": "scalar", "target": null},
         {"name": "transportPiece", "offset": 249, "size": 1, "kind": "scalar", "target": null},
         {"name": "recentlyDamagedTimer", "offset": 250, "size": 1, "kind": "scalar", "target": null},
         {"name": "postTransferHoldoff", "offset": 251, "size": 4, "kind": "scalar", "target": null},
@@ -1290,7 +1285,8 @@
         {"name": "", "offset": 76, "size": 16, "kind": "bytes", "target": null},
         {"name": "list", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "list2", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
-        {"name": "", "offset": 100, "size": 30, "kind": "bytes", "target": null},
+        {"name": "", "offset": 100, "size": 22, "kind": "bytes", "target": null},
+        {"name": "", "offset": 126, "size": 4, "kind": "bytes", "target": null},
         {"name": "", "offset": 130, "size": 4, "kind": "ref", "target": "rec"},
         {"name": "", "offset": 134, "size": 4, "kind": "ref", "target": "unit"},
         {"name": "cargo", "offset": 138, "size": 4, "kind": "ref", "target": "unit"},
@@ -1303,10 +1299,13 @@
         {"name": "", "offset": 166, "size": 22, "kind": "bytes", "target": null},
         {"name": "owner", "offset": 236, "size": 4, "kind": "ref", "target": "player"},
         {"name": "attacker", "offset": 240, "size": 4, "kind": "ref", "target": "unit"},
-        {"name": "", "offset": 244, "size": 36, "kind": "bytes", "target": null}
+        {"name": "", "offset": 244, "size": 4, "kind": "bytes", "target": null},
+        {"name": "", "offset": 249, "size": 31, "kind": "bytes", "target": null}
       ],
       "excluded": [
-        {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"}
+        {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"},
+        {"field": "unusedLosCache", "reason": "los_radar's sight cache, in its private region: reported by losRadarState"},
+        {"field": "unusedLosSightFrame", "reason": "los_radar's sight cache, in its private region: reported by losRadarState"}
       ]
     },
     "UnitDefData": {
@@ -1541,7 +1540,6 @@
     {"name": "spotField_1421f", "offset": 82463, "size": 4, "kind": "pointer", "target": "heap"},
     {"name": "scanIndex", "offset": 82519, "size": 4, "kind": "scalar", "target": null},
     {"name": "mapFlags", "offset": 82561, "size": 2, "kind": "scalar", "target": null, "mask": 65527, "mask_reason": "bit 3 is cleared by the camera, which is presentation"},
-    {"name": "endGameCountdown", "offset": 234041, "size": 2, "kind": "scalar", "target": null},
     {"name": "endGameFlags", "offset": 234043, "size": 2, "kind": "scalar", "target": null},
     {"name": "uiOptionFlags", "offset": 229167, "size": 2, "kind": "scalar", "target": null, "mask": 1928, "mask_reason": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept"}
   ],
@@ -1669,6 +1667,8 @@
       {"name": "lifetime", "size": 4, "kind": "scalar", "target": null},
       {"name": "cell", "size": 8, "kind": "bytes", "target": null},
       {"name": "size", "size": 8, "kind": "bytes", "target": null},
+      {"name": "sightCell", "size": 4, "kind": "scalar", "target": null},
+      {"name": "sightFrameIdx", "size": 4, "kind": "scalar", "target": null},
       {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
     ]
   },

@@ -1,6 +1,8 @@
 #ifndef INTERFACES_MAP_H
 #define INTERFACES_MAP_H
 
+#include "state_writer.h"
+
 struct Vec3;
 struct Point16;
 struct Unit;
@@ -12,7 +14,7 @@ class HapiBank;
 // Major version of the map interface, changed when a slot is removed or its signature changes.
 #define MAP_VERSION_MAJOR 4
 // Minor version of the map interface, changed when a slot is added.
-#define MAP_VERSION_MINOR 0
+#define MAP_VERSION_MINOR 1
 
 // The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a null unit, a movement class that does not exist, a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
 enum MapEventKind {
@@ -128,6 +130,12 @@ struct MapSeam {
     int (__fastcall* ComputeMapChecksum)(Mission* mission);
     // Returns the size of the terrain file of a mission, or 0 when it has none (thiscall in 3.1c: this in ecx). Hooks: none.
     int (__fastcall* GetTerrainLength)(Mission* mission);
+    // Allocates the spatial grid buckets, and the bucket of units off the map, for the terrain the map holds, and fills their heights and edge flags; called when the terrain's derived layers are built, outside the tick. Hooks: none.
+    void (__stdcall* AllocateBuckets)(void);
+    // Frees the spatial grid buckets and the bucket of units off the map when a match shuts down, outside the tick. Hooks: none.
+    void (__stdcall* FreeBuckets)(void);
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

@@ -142,6 +142,10 @@ int __stdcall GiveUnitToPlayer(Unit*, Player*, const PlayersEvent*)
     return 0;
 }
 void __stdcall KillPlayerUnits(unsigned char) {}
+int __stdcall HarnessConditionClass(void*)
+{
+    return 0;
+}
 int MissionConditions::CheckVictory()
 {
     return 0;
@@ -364,6 +368,11 @@ static void Setup()
     memset((void*)s_units, 0, kUnits * sizeof(Unit));
     g_game->units = s_units;
     g_game->unitsEnd = &s_units[kUnits - 1];
+    g_game->poolCount = kUnits;
+    LosRadarMapInfo info;
+    info.unitSlots = kUnits;
+    unsigned int regionSize = LosRadarRegionSize(&info);
+    LosRadarInit(&info, SimAllocRegion("LosRadar region", regionSize), regionSize);
 
     UnitDef* scoutDef = (UnitDef*)SimAlloc(sizeof(UnitDef));
     memset((void*)scoutDef, 0, sizeof(UnitDef));
@@ -408,8 +417,8 @@ static void Restart()
     for (int p = 0; p < kPlayers; p++)
         memset(s_players[p].explored.get(), 0, kLosCells);
     for (int i = 1; i < kUnits; i++) {
-        s_units[i].losCacheCell = 0;
-        s_units[i].losSightFrameIdx = 0;
+        LosRadarEvent reset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, &s_units[i]);
+        ApplyLosRadarEvent(&reset);
     }
     Move(0);
 }
@@ -431,8 +440,11 @@ static unsigned long long HashSight()
     for (int i = 1; i < kUnits; i++) {
         Unit* u = &s_units[i];
         h = Fnv(h, &u->flags, sizeof u->flags);
-        h = Fnv(h, &u->losCacheCell, sizeof u->losCacheCell);
-        h = Fnv(h, &u->losSightFrameIdx, sizeof u->losSightFrameIdx);
+        LosSightCache sight;
+        memset(&sight, 0, sizeof sight);
+        LosRadarSightCache(u, &sight);
+        h = Fnv(h, &sight.cell, sizeof sight.cell);
+        h = Fnv(h, &sight.frameIdx, sizeof sight.frameIdx);
     }
     for (int p = 0; p < kPlayers; p++)
         h = Fnv(h, s_players[p].explored.get(), kLosCells);
@@ -534,7 +546,9 @@ static void CheckRejected()
     LosRadarEvent badPlayer = LosRadarEventOf(LOS_RADAR_SHARE_MAP);
     badPlayer.player = 10;
     LosRadarEvent badKind = LosRadarEventOf(127);
-    const LosRadarEvent* rejected[] = { &noUnit, &badPlayer, &badKind };
+    LosRadarEvent noUnitReset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET);
+    LosRadarEvent noUnitLoad = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD);
+    const LosRadarEvent* rejected[] = { &noUnit, &badPlayer, &badKind, &noUnitReset, &noUnitLoad };
     for (const LosRadarEvent* e : rejected)
         Check(g_seams.los_radar->Apply(e) == 0, "an event with a null unit, a player outside 0 to 9 or an unknown kind has outcome 0");
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
@@ -573,6 +587,79 @@ static int KnownCount(int player)
 {
     const LosUnitIndexEntry* entry = LosUnitIndexOf(player);
     return (int)(entry->known.End() - entry->known.Begin());
+}
+
+struct Recorded {
+    int sections[64];
+    char names[64][40];
+    int count;
+    int sights;
+    int eyes;
+    unsigned int firstCell;
+};
+static Recorded s_recorded;
+
+static void __stdcall RecBegin(int section, const char* name)
+{
+    int n = s_recorded.count++;
+    if (n < 64) {
+        s_recorded.sections[n] = section;
+        strncpy(s_recorded.names[n], name, 39);
+        s_recorded.names[n][39] = 0;
+    }
+}
+
+static void __stdcall RecInt(const char* field, int index, int, unsigned int value)
+{
+    if (strcmp(field, "sight[%u].cell") == 0) {
+        if (index == 1)
+            s_recorded.firstCell = value;
+        s_recorded.sights++;
+    }
+    if (strcmp(field, "eyes.count") == 0)
+        s_recorded.eyes = (int)value;
+}
+
+static void __stdcall RecBytes(const char*, int, const void*, int) {}
+static void __stdcall RecHandle(const char*, int, int, unsigned int) {}
+static void __stdcall RecRun(int) {}
+
+static void CheckSightCache()
+{
+    const LosRadarSeam& seam = *g_seams.los_radar;
+    LosRadarEvent load = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD, &s_units[1]);
+    load.sight.cell = 0x00070009;
+    load.sight.frameIdx = 3;
+    Check(seam.Apply(&load) == 1, "SIGHT_LOAD of a unit has outcome 1");
+    LosSightCache sight;
+    memset(&sight, 0, sizeof sight);
+    seam.SightCache(&s_units[1], &sight);
+    Check(sight.cell == 0x00070009 && sight.frameIdx == 3, "SightCache gives what SIGHT_LOAD set");
+    memset(&s_recorded, 0, sizeof s_recorded);
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    seam.WriteState(&writer);
+    Check(s_recorded.count >= 1 && s_recorded.sections[0] == 44 && strcmp(s_recorded.names[0], "losRadarState") == 0, "WriteState starts with record 44 losRadarState");
+    Check(s_recorded.sights == kUnits && s_recorded.firstCell == 0x00070009u, "record 44 holds the sight cache of every unit slot");
+    Check(s_recorded.eyes == 0, "record 44 holds the eyeball count");
+    LosRadarEvent reset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, &s_units[1]);
+    Check(seam.Apply(&reset) == 1, "SIGHT_RESET of a unit has outcome 1");
+    seam.SightCache(&s_units[1], &sight);
+    Check(sight.cell == 0 && sight.frameIdx == 0, "SIGHT_RESET clears the cache");
+}
+
+static void CheckIndexRecords()
+{
+    memset(&s_recorded, 0, sizeof s_recorded);
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    g_seams.los_radar->WriteState(&writer);
+    bool zero = false, one = false;
+    for (int i = 1; i < s_recorded.count && i < 64; i++) {
+        if (s_recorded.sections[i] != 24)
+            continue;
+        zero |= strcmp(s_recorded.names[i], "losRadarIndex[0]") == 0;
+        one |= strcmp(s_recorded.names[i], "losRadarIndex[1]") == 0;
+    }
+    Check(zero && one, "WriteState writes a section 24 record for each live unit index");
 }
 
 static void CheckUnitIndex()
@@ -621,6 +708,7 @@ static void CheckUnitIndex()
     Check(KnownCount(0) == 2, "the known list holds the enemy units with flag 0x100");
     Check(LosUnitIndexOf(0)->hasSpecial == 0, "an unfinished unit of a type with flag 0x400 does not set hasSpecial");
     Check(LosUnitIndexOf(0)->lastTick == 30, "a refresh stores its tick");
+    CheckIndexRecords();
 
     s_units[kBase].buildLeft = 0;
     g_game->ticks = 59;
@@ -730,6 +818,11 @@ int main()
     seam.HasReadyUnitInRange = HasReadyUnitInRange;
     seam.IsPointVisible = IsPointVisible;
     seam.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
+    seam.RegionSize = LosRadarRegionSize;
+    seam.Init = LosRadarInit;
+    seam.Shutdown = LosRadarShutdown;
+    seam.SightCache = LosRadarSightCache;
+    seam.WriteState = LosRadarWriteState;
     g_seams.los_radar = &seam;
 
     static Run plain, again, tampered;
@@ -775,6 +868,7 @@ int main()
     printf("tampered tick %d, first differing tick %d, %d differing ticks\n", tampered.tampered, firstState, stateDiffering);
 
     CheckRejected();
+    CheckSightCache();
     CheckUnitIndex();
 
     printf(g_failures ? "FAILED\n" : "los_radar_writer_test: all passed\n");

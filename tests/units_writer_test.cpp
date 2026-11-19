@@ -312,6 +312,7 @@ static void Setup()
     units.FreeFactoryIndex = FreeFactoryIndex;
     units.RefreshFactoryIndex = RefreshFactoryIndex;
     units.GetFactoriesInRadius = GetFactoriesInRadius;
+    units.WriteState = UnitsWriteState;
     g_seams.units = &units;
     static WeaponsSeam weapons;
     memset(&weapons, 0, sizeof weapons);
@@ -428,6 +429,46 @@ static int Idx(Unit* u)
     return u == 0 ? 0 : IndexOf(u);
 }
 
+struct Recorded {
+    int sections[8];
+    int count;
+    unsigned int size;
+    int handles;
+};
+static Recorded s_recorded;
+
+static void __stdcall RecBegin(int section, const char*)
+{
+    if (s_recorded.count < 8)
+        s_recorded.sections[s_recorded.count] = section;
+    s_recorded.count++;
+}
+
+static void __stdcall RecInt(const char* field, int, int, unsigned int value)
+{
+    if (strcmp(field, "factories.size") == 0)
+        s_recorded.size = value;
+}
+
+static void __stdcall RecBytes(const char*, int, const void*, int) {}
+
+static void __stdcall RecHandle(const char* field, int, int, unsigned int)
+{
+    if (strcmp(field, "factories[%u]") == 0)
+        s_recorded.handles++;
+}
+
+static void __stdcall RecRun(int) {}
+
+static void CheckFactoryRecords(const UnitsSeam& units, unsigned int factories)
+{
+    memset(&s_recorded, 0, sizeof s_recorded);
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    units.WriteState(&writer);
+    Check(s_recorded.count == 1 && s_recorded.sections[0] == 25, "WriteState writes a section 25 record for each live factory index");
+    Check(s_recorded.size == factories && (unsigned int)s_recorded.handles == factories, "the section 25 record lists the factories of the index");
+}
+
 static void CheckFactoryIndex()
 {
     Reset(1, 2);
@@ -448,6 +489,7 @@ static void CheckFactoryIndex()
     units.RefreshFactoryIndex(0);
     Check(Count(*FactoryIndexOf(0)) == 1 && *FactoryIndexOf(0)->Begin() == &s_units[kPad],
           "the index holds own finished ready units with flags 0x40 and 0x200 that are switched on, and no padless, switched-off or enemy ones");
+    CheckFactoryRecords(units, 1);
     s_units[kPadOff].activateFlags = 1;
     s_units[kPadOff].buildLeft = 1.0f;
     g_game->ticks = 60;

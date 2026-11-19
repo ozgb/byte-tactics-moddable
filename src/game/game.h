@@ -1241,7 +1241,7 @@ struct Game {
     int multiMapping;
     int multiLineOfSight;
     int multiLOSType;
-    short endGameCountdown;
+    short unusedEndGameCountdown;
     union {
         unsigned short endGameFlags;
         unsigned char flagsByte_3923b;

@@ -55,8 +55,6 @@
 #include "../ai/pathfind_hpa.h"
 #include "../ai/ai_idle.h"
 #include "../state/block_vector.h"
-#include "../map/line_of_sight_index.h"
-#include "../units/factory_index.h"
 #include "../game/match_setup.h"
 #include "share_packets.h"
 
@@ -2786,32 +2784,21 @@ static void VisitSpatial()
     EndSection();
 }
 
-static void VisitEyes()
-{
-    unsigned char* eyes = (unsigned char*)GameRef(GAME_EYES);
-    unsigned count = GameU32(GAME_EYE_COUNT);
-    char path[64];
-    HashByte(15);
-    if (eyes == NULL || count > EYE_CAPACITY)
-        count = 0;
-    VisitValue("eyes.count", count, 4);
-    for (unsigned e = 0; e < count; e++) {
-        FormatPath(path, "eyes[%u]", e);
-        VisitElement(path, eyes + e * EYE_STRIDE, &kEyeTable);
-    }
-    EndSection();
-}
-
 static int s_writerOpen = 0;
 static char s_writerRecord[64];
 static unsigned char s_writerRun[256];
 static unsigned s_writerRunLength = 0;
 static int s_writerRunLeft = 0;
 
+static unsigned long long s_writerKept = 0;
+static int s_writerDumpOnly = 0;
+
 static void WriterEndRecord()
 {
     if (s_writerOpen) {
         EndSection();
+        if (s_writerDumpOnly)
+            s_hash = s_writerKept;
         s_writerOpen = 0;
     }
 }
@@ -2840,6 +2827,8 @@ static void WriterPath(char* out, const char* field, int index)
 static void __stdcall WriterBegin(int section, const char* name)
 {
     WriterEndRecord();
+    s_writerDumpOnly = section != 24 && section != 25;
+    s_writerKept = s_hash;
     HashByte((unsigned char)section);
     strncpy(s_writerRecord, name, sizeof s_writerRecord - 1);
     s_writerRecord[sizeof s_writerRecord - 1] = '\0';
@@ -2918,6 +2907,8 @@ static void VisitModuleState()
     g_seams.pathfinding->WriteState(&s_stateWriter);
     g_seams.economy->WriteState(&s_stateWriter);
     g_seams.ai->WriteState(&s_stateWriter);
+    g_seams.map->WriteState(&s_stateWriter);
+    g_seams.players->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -3234,6 +3225,12 @@ static void VisitLosRadarResults()
         sprintf(path, "los_radar[%u].size", k);
         DumpPrefix(path);
         DumpHexBytes(e->size, sizeof e->size);
+        sprintf(path, "los_radar[%u].sightCell", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->sight.cell);
+        sprintf(path, "los_radar[%u].sightFrameIdx", k);
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", (unsigned)e->sight.frameIdx);
         sprintf(path, "los_radar[%u].outcome", k);
         DumpPrefix(path);
         fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
@@ -3982,51 +3979,13 @@ enum TimerClass {
 };
 
 
-static int TimerClassOf(unsigned slot)
+[[maybe_unused]] static int TimerClassOf(unsigned slot)
 {
     static const unsigned char classes[SQUAD_TIMERS] = {
         TIMER_UNKNOWN, TIMER_BUILD, TIMER_ASSAULT, TIMER_ESCORT, TIMER_SCOUT,
         TIMER_SQUAD, TIMER_ASSAULT, TIMER_ESCORT, TIMER_SQUADSCOUT, TIMER_SPATIAL
     };
     return classes[slot];
-}
-
-#include "../game/victory.h"
-
-static int ConditionClassOf(unsigned condition)
-{
-    return HarnessConditionClass((void*)condition);
-}
-
-static unsigned VectorCount(unsigned vec, unsigned elem, const unsigned char** first)
-{
-    unsigned begin = ReadRefAt(vec, VECTOR_FIRST);
-    unsigned end = ReadRefAt(vec, VECTOR_LAST);
-    *first = (const unsigned char*)begin;
-    if (begin == 0 || end < begin || (end - begin) % elem != 0 || (end - begin) / elem > VECTOR_LIMIT)
-        return 0;
-    return (end - begin) / elem;
-}
-
-static void VisitRawVector(const char* path, unsigned vec, unsigned elem)
-{
-    const unsigned char* first;
-    unsigned n = VectorCount(vec, elem, &first);
-    VisitU32(path, n);
-    VisitRaw(path, first, n * elem);
-}
-
-static void VisitUnitVector(const char* path, unsigned vec)
-{
-    const unsigned char* first;
-    char name[128];
-    unsigned n = VectorCount(vec, 4, &first);
-    FormatPath(name, "%s.size", path);
-    VisitU32(name, n);
-    for (unsigned k = 0; k < n; k++) {
-        FormatPath(name, "%s[%u]", path, k);
-        VisitPointer(name, ReadU32At((unsigned)first, k * 4), TT_UNIT, true);
-    }
 }
 
 static void VisitString(const char* path, const char* text)
@@ -4053,119 +4012,6 @@ static unsigned char* PlayerAt(unsigned slot)
     return GameAt(GAME_PLAYERS) + slot * PLAYER_STRIDE;
 }
 
-struct VectorSpec {
-    const char* name;
-    unsigned offset;
-    unsigned elem;
-};
-
-static void VisitPlayerAI()
-{
-    static const VectorSpec vectors[] = {
-        { "cells", 0x4d, 8 }, { "vec_65", 0x65, 3 }, { "counts", 0x7d, 2 }, { "vec_8d", 0x8d, 1 },
-        { "weights", 0x9d, 1 }, { "vec_ad", 0xad, 1 }, { "vec_bd", 0xbd, 4 }, { "values", 0xcd, 4 },
-        { "locked", 0xdd, 4 }
-    };
-    static const unsigned char emptyVector[16] = {0};
-    char path[96];
-    HashByte(24);
-    for (unsigned i = 0; i < MAX_PLAYERS; i++) {
-        unsigned ai = (unsigned)g_playerAI[i].get();
-        HashU32(i);
-        HashByte(ai != 0);
-        if (ai == 0)
-            continue;
-        const LosUnitIndexEntry* los = LosUnitIndexOf((int)i);
-        const BlockVector<Ref<Unit> >* factoryList = FactoryIndexOf((int)i);
-        unsigned char view[0x10d];
-        memcpy(view, (const unsigned char*)ai, sizeof view);
-        int hasSpecial = los != nullptr ? los->hasSpecial : 0;
-        memcpy(view + 0x79, &hasSpecial, sizeof hasSpecial);
-        FormatPath(path, "players[%u].ai", i);
-        VisitElement(path, view, &kPlayerAITable);
-        FormatPath(path, "players[%u].ai.visible", i);
-        VisitUnitVector(path, los != nullptr ? (unsigned)&los->visible : (unsigned)emptyVector);
-        FormatPath(path, "players[%u].ai.known", i);
-        VisitUnitVector(path, los != nullptr ? (unsigned)&los->known : (unsigned)emptyVector);
-        FormatPath(path, "players[%u].ai.factories", i);
-        VisitUnitVector(path, factoryList != nullptr ? (unsigned)factoryList : (unsigned)emptyVector);
-        for (unsigned v = 0; v < sizeof vectors / sizeof vectors[0]; v++) {
-            FormatPath(path, "players[%u].ai.%s", i, vectors[v].name);
-            VisitRawVector(path, ai + vectors[v].offset, vectors[v].elem);
-        }
-    }
-    EndSection();
-}
-
-static void VisitTimer(const char* path, unsigned slot, unsigned timer)
-{
-    char field[128];
-    int cls = TimerClassOf(slot);
-    FormatPath(field, "%s.class", path);
-    VisitU32(field, (unsigned)cls);
-    switch (cls) {
-    case TIMER_ASSAULT:
-        VisitElement(path, (const unsigned char*)timer, &kAssaultTimerTable);
-        break;
-    case TIMER_ESCORT:
-        VisitElement(path, (const unsigned char*)timer, &kEscortTimerTable);
-        break;
-    case TIMER_SPATIAL:
-        VisitElement(path, (const unsigned char*)timer, &kSpatialTimerTable);
-        break;
-    default:
-        VisitElement(path, (const unsigned char*)timer, &kSquadTimerTable);
-        break;
-    }
-}
-
-static void VisitSquadManagers()
-{
-    char path[96];
-    HashByte(25);
-    for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned manager = ReadRefAt((unsigned)PlayerAt(i), PLAYER_MANAGER);
-        HashU32(i);
-        HashByte(manager != 0);
-        if (manager == 0)
-            continue;
-        FormatPath(path, "players[%u].squadManager", i);
-        VisitElement(path, (const unsigned char*)manager, &kSquadManagerTable);
-        for (unsigned t = 0; t < SQUAD_TIMERS; t++) {
-            unsigned timer = ReadRefAt(manager, MANAGER_TIMERS + t * 4);
-            HashByte((unsigned char)t);
-            HashByte(timer != 0);
-            if (timer == 0)
-                continue;
-            FormatPath(path, "players[%u].squadManager.timers[%u]", i, t);
-            VisitTimer(path, t, timer);
-        }
-    }
-    EndSection();
-}
-
-static void VisitSquads()
-{
-    char path[96];
-    HashByte(26);
-    for (unsigned i = 0; i < PLAYER_SLOTS; i++) {
-        unsigned squads = ReadRefAt((unsigned)PlayerAt(i), PLAYER_SQUADS);
-        HashU32(i);
-        HashByte(squads != 0);
-        if (squads == 0)
-            continue;
-        for (unsigned s = 0; s < SQUAD_COUNT; s++) {
-            unsigned squad = squads + s * SQUAD_STRIDE;
-            FormatPath(path, "players[%u].squads[%u]", i, s);
-            VisitElement(path, (const unsigned char*)squad, &kSquadTable);
-            if (s_dumpNow)
-                strcat(path, ".items");
-            VisitUnitVector(path, squad + SQUAD_ITEMS);
-        }
-    }
-    EndSection();
-}
-
 static void VisitUnitResources()
 {
     char path[96];
@@ -4178,52 +4024,6 @@ static void VisitUnitResources()
             continue;
         FormatPath(path, "players[%u].econ", i);
         VisitElement(path, (const unsigned char*)econ, &kUnitResourcesTable);
-    }
-    EndSection();
-}
-
-static void VisitCondition(const char* path, unsigned condition)
-{
-    char field[128];
-    int cls = ConditionClassOf(condition);
-    FormatPath(field, "%s.class", path);
-    VisitU32(field, (unsigned)cls);
-    if (cls == COND_UNKNOWN) {
-        char msg[160];
-        sprintf(msg, "testmode: unknown mission condition at %08x (vtable %08x) at %s\n", condition,
-                ReadU32At(condition, 0), path);
-        Fail(msg);
-    }
-    VisitElement(path, (const unsigned char*)condition, &kMissionConditionTable);
-    if (cls == COND_VICTORY_KILL_MOBILE)
-        VisitElement(path, (const unsigned char*)condition, &kConditionNumUnitsTable);
-    else if (cls == COND_VICTORY_KILL_TYPE || cls == COND_DEFEAT_TYPE_KILLED)
-        VisitElement(path, (const unsigned char*)condition, &kConditionNumLeftTable);
-}
-
-static void VisitMissionConditions()
-{
-    unsigned conditions = GameRef(GAME_CONDITIONS);
-    char path[96];
-    HashByte(28);
-    HashByte(conditions != 0);
-    if (conditions != 0) {
-        VisitElement("conditions", (const unsigned char*)conditions, &kMissionConditionsTable);
-        for (unsigned list = 0; list < 2; list++) {
-            unsigned count = ReadU32At(conditions, list == 0 ? CONDITIONS_VICTORY_COUNT : CONDITIONS_DEFEAT_COUNT);
-            unsigned base = list == 0 ? CONDITIONS_VICTORY : CONDITIONS_DEFEAT;
-            if (count > CONDITIONS_LIMIT)
-                count = 0;
-            HashByte((unsigned char)(list + 1));
-            for (unsigned k = 0; k < count; k++) {
-                unsigned condition = ReadRefAt(conditions, base + k * 4);
-                HashByte(condition != 0);
-                if (condition == 0)
-                    continue;
-                sprintf(path, "conditions.%s[%u]", list == 0 ? "victory" : "defeat", k);
-                VisitCondition(path, condition);
-            }
-        }
     }
     EndSection();
 }
@@ -4358,11 +4158,11 @@ static void VisitMission()
 
 static void VisitPlayerHeap()
 {
-    VisitPlayerAI();
-    VisitSquadManagers();
-    VisitSquads();
+    s_writerOpen = 0;
+    g_seams.los_radar->WriteState(&s_stateWriter);
+    g_seams.units->WriteState(&s_stateWriter);
+    WriterEndRecord();
     VisitUnitResources();
-    VisitMissionConditions();
 }
 
 static void VisitConstants()
@@ -4379,7 +4179,6 @@ static void VisitWorld()
     VisitVisibility();
     VisitExplored();
     VisitSpatial();
-    VisitEyes();
     VisitModuleState();
     VisitMoveClasses();
     VisitPassMaps();

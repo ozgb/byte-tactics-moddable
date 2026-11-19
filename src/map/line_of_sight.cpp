@@ -126,6 +126,25 @@ void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
+#include "../../interfaces/los_radar.h"
+
+static LosSightCache* s_sight;
+
+static LosSightCache* SightOf(Unit* unit)
+{
+    return &s_sight[unit - g_game->units.get()];
+}
+
+static short* SightCellOf(Unit* unit)
+{
+    return reinterpret_cast<short*>(&SightOf(unit)->cell);
+}
+
+static unsigned char* SightFrameOf(Unit* unit)
+{
+    return &SightOf(unit)->frameIdx;
+}
+
 struct Expired {
     int operator()(const Eye& e) const { return e.expires < (unsigned int)g_game->ticks; }
 };
@@ -234,9 +253,9 @@ void __stdcall RemoveUnitLineOfSight(Unit* unit)
 {
     SightQuery p;
     p.player = unit->player;
-    p.cacheCell = &unit->losCacheCellX;
+    p.cacheCell = SightCellOf(unit);
     p.sightDistance = unit->def->range;
-    p.frameIdx = &unit->losSightFrameIdx;
+    p.frameIdx = SightFrameOf(unit);
     p.pos = unit->pos;
     p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
@@ -345,9 +364,9 @@ void __stdcall UpdateUnitLineOfSight(Unit* unit)
 {
     SightQuery p;
     p.player = unit->player;
-    p.cacheCell = &unit->losCacheCellX;
+    p.cacheCell = SightCellOf(unit);
     p.sightDistance = unit->def->range;
-    p.frameIdx = &unit->losSightFrameIdx;
+    p.frameIdx = SightFrameOf(unit);
     p.pos = unit->pos;
     p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
@@ -391,88 +410,10 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
 // FUNCTION: 0x482c20
 void BuildDerivedLayers(void)
 {
-    Rec* rec = new (kSim) Rec;
-    g_game->overflowBucket = (SpatialBucket*)rec;
-    ((Rec *)g_game->overflowBucket.get())->flags = 0x1f;
-
-    Grid2* grid2 = &g_game->spatialGrid_1429f;
-    int b = g_game->baseY * 0x10000;
-    int a = g_game->baseX * 0x10000;
-    grid2->heightFixed = b;
-    grid2->widthFixed = a;
-    int w2;
-    int h2;
-    h2 = (b + 0x7fffff) >> 0x17;
-    w2 = (a + 0x7fffff) >> 0x17;
-    grid2->width = w2;
-    grid2->height = h2;
-    operator delete(grid2->cells);
-    int count2 = (h2 * w2 + 7) & 0xfffffff8;
-    grid2->count = count2;
-
-    grid2->cells = count2 != 0 ? (FogCell*)new (kSim) Rec[count2] : 0;
+    g_seams.map->AllocateBuckets();
     int outer;
-    unsigned char* cells2 = (unsigned char*)grid2->cells.get();
-    unsigned char* cellp = (unsigned char*)g_game->cells.get();
     int inner;
     int accum;
-
-    for (unsigned int lb1 = 0; lb1 < (unsigned int)grid2->width; lb1++)
-        ((Rec*)grid2->cells.get())[lb1].flags |= 1;
-    for (unsigned int lb2 = 0; lb2 < (unsigned int)grid2->width; lb2++)
-        ((Rec*)grid2->cells.get())[(grid2->height - 1) * grid2->width + lb2].flags |= 2;
-    for (unsigned int lb3 = 0; lb3 < (unsigned int)grid2->height; lb3++)
-        ((Rec*)grid2->cells.get())[lb3 * grid2->width].flags |= 4;
-    for (unsigned int i = 0; i < (unsigned int)grid2->height; i++) {
-        int* fp = &((Rec*)grid2->cells.get())[(i + 1) * grid2->width - 1].flags;
-        *fp = *fp | 8;
-    }
-
-    for (int d = 0; d < grid2->count; d++)
-        ((unsigned char*)grid2->cells.get())[d * 10] = g_game->seaLevel;
-
-    {
-        for (int y = 0; y < g_game->height; y++) {
-            unsigned char* recp = cells2;
-            for (int x = 0; x < g_game->width; x++, cellp += 0xd) {
-                if (cellp[5] > recp[0])
-                    recp[0] = cellp[5];
-                if ((x & 7) == 7)
-                    recp += 10;
-            }
-            if ((y & 7) == 7)
-                cells2 += grid2->width * 10;
-        }
-    }
-
-    for (unsigned int r = 0; r < (unsigned int)grid2->height; r++) {
-        unsigned char* p = (unsigned char*)grid2->cells.get() + r * grid2->width * 10;
-        unsigned char prev = 0;
-        for (unsigned int fr = 1; fr < (unsigned int)grid2->width; fr++, p += 10) {
-            unsigned char t = p[10];
-            unsigned char last = prev;
-            prev = p[0];
-            if (prev <= t)
-                prev = t;
-            p[1] = last > prev ? last : prev;
-        }
-        p[1] = prev;
-    }
-
-    for (outer = 0; (unsigned int)outer < (unsigned int)grid2->width; outer++) {
-        unsigned char* p = (unsigned char*)grid2->cells.get() + outer * 10;
-        unsigned char prev = 0;
-        for (unsigned int gc = 1; gc < (unsigned int)grid2->height; gc++, p += grid2->width * 10) {
-            unsigned char t = p[grid2->width * 10 + 1];
-            unsigned char last = prev;
-            prev = p[1];
-            if (prev <= t)
-                prev = t;
-            p[1] = last > prev ? last : prev;
-
-        }
-        p[1] = prev;
-    }
 
     FogGrid* grid1 = (FogGrid*)&g_game->grid1;
     int w1, h1;
@@ -701,6 +642,7 @@ struct MapSettings {
 #include "../../interfaces/seams.h"
 #include "../../interfaces/los_radar.h"
 #include "../game/share_commands.h"
+#include "line_of_sight_index.h"
 
 // FUNCTION: 0x483610
 void LoadTntMap()
@@ -977,15 +919,7 @@ void FreeMapResources()
     g1->count = 0;
     g1->cells = 0;
 
-    Grid2* g2 = &g_game->spatialGrid_1429f;
-    g2->width = 0;
-    g2->height = 0;
-    operator delete(g2->cells);
-    g2->count = 0;
-    g2->cells = 0;
-
-    operator delete(g_game->overflowBucket.get());
-    g_game->overflowBucket = 0;
+    g_seams.map->FreeBuckets();
 }
 
 // FUNCTION: 0x483fa0
@@ -1201,9 +1135,9 @@ void __stdcall RecalculateLineOfSight(int arg)
             continue;
         SightQuery params;
         params.player = u->player;
-        params.cacheCell = &u->losCacheCellX;
+        params.cacheCell = SightCellOf(u);
         params.sightDistance = u->def->range;
-        params.frameIdx = &u->losSightFrameIdx;
+        params.frameIdx = SightFrameOf(u);
         params.pos = u->pos;
         params.eyeHeight = (unsigned char)u->def->modelMaxYHigh;
         if (params.pos.y < (int)((g_game->seaLevel + 1) << 16))
@@ -1410,9 +1344,9 @@ void __stdcall RevealNewUnit(Unit* unit)
 {
     SightQuery p;
     p.player = unit->player;
-    p.cacheCell = &unit->losCacheCellX;
+    p.cacheCell = SightCellOf(unit);
     p.sightDistance = unit->def->range;
-    p.frameIdx = &unit->losSightFrameIdx;
+    p.frameIdx = SightFrameOf(unit);
     p.pos = unit->pos;
     p.eyeHeight = (unsigned char)unit->def->modelMaxYHigh;
     int min_y = (g_game->seaLevel + 1) << 16;
@@ -1817,6 +1751,77 @@ int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e)
             return 0;
         ShareMapInfo((unsigned char)e->player, (unsigned char)e->value);
         return 1;
+    case LOS_RADAR_SIGHT_RESET: {
+        Unit* unit = LosUnitOfHandle(e->unit);
+        if (!unit)
+            return 0;
+        memset(SightOf(unit), 0, sizeof(LosSightCache));
+        return 1;
+    }
+    case LOS_RADAR_SIGHT_LOAD: {
+        Unit* unit = LosUnitOfHandle(e->unit);
+        if (!unit)
+            return 0;
+        *SightOf(unit) = e->sight;
+        return 1;
+    }
     }
     return 0;
+}
+
+unsigned int __stdcall LosRadarRegionSize(const LosRadarMapInfo* map)
+{
+    return (unsigned int)map->unitSlots * sizeof(LosSightCache);
+}
+
+void __stdcall LosRadarInit(const LosRadarMapInfo*, void* region, unsigned int)
+{
+    s_sight = static_cast<LosSightCache*>(region);
+    SimBlockTrack(reinterpret_cast<void**>(&s_sight));
+}
+
+void* __stdcall LosRadarShutdown()
+{
+    void* region = s_sight;
+    s_sight = nullptr;
+    return region;
+}
+
+void __stdcall LosRadarSightCache(Unit* unit, LosSightCache* out)
+{
+    *out = *SightOf(unit);
+}
+
+void __stdcall LosRadarWriteState(const StateWriter* w)
+{
+    unsigned int slots = g_game->poolCount;
+    w->Begin(44, "losRadarState");
+    w->Int("unitSlots", 0, 4, slots);
+    for (unsigned int i = 0; i < slots; i++) {
+        w->Int("sight[%u].cell", i, 4, (unsigned int)s_sight[i].cell);
+        w->Int("sight[%u].frameIdx", i, 1, s_sight[i].frameIdx);
+    }
+    Eye* eyes = g_game->eyes.get();
+    unsigned int count = g_game->count_14277;
+    if (eyes == nullptr || count > 20)
+        count = 0;
+    w->Int("eyes.count", 0, 4, count);
+    for (unsigned int e = 0; e < count; e++) {
+        int player = -1;
+        if (eyes[e].player.get() != nullptr) {
+            int slot = (int)((Player*)eyes[e].player.get() - g_game->players);
+            if (slot >= 0 && slot < 10)
+                player = slot;
+        }
+        w->Int("eyes[%u].player", e, 1, (unsigned int)player & 0xff);
+        w->Int("eyes[%u].x", e, 2, (unsigned short)eyes[e].x);
+        w->Int("eyes[%u].flagA", e, 1, eyes[e].flagA);
+        w->Int("eyes[%u].flagB", e, 1, (unsigned char)eyes[e].flagB);
+        w->Int("eyes[%u].pos.x", e, 4, (unsigned int)eyes[e].pos.x);
+        w->Int("eyes[%u].pos.y", e, 4, (unsigned int)eyes[e].pos.y);
+        w->Int("eyes[%u].pos.z", e, 4, (unsigned int)eyes[e].pos.z);
+        w->Int("eyes[%u].expires", e, 4, eyes[e].expires);
+        w->Int("eyes[%u].screenPos", e, 4, *(unsigned int*)&eyes[e].screenPos);
+    }
+    WriteLosUnitIndex(w);
 }

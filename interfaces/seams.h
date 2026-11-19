@@ -47,4 +47,10 @@ const PathfindingSeam* DefaultPathfindingSeam();
 // 3.1c's economy, whichever implementation g_seams.economy holds.
 const EconomySeam* DefaultEconomySeam();
 
+// 3.1c's los_radar, whichever implementation g_seams.los_radar holds.
+const LosRadarSeam* DefaultLosRadarSeam();
+
+// 3.1c's players, whichever implementation g_seams.players holds.
+const PlayersSeam* DefaultPlayersSeam();
+
 #endif

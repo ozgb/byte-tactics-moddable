@@ -2,6 +2,7 @@
 #define INTERFACES_PLAYERS_H
 
 #include "rand_stream.h"
+#include "state_writer.h"
 
 class HapiBank;
 class MissionConditions;
@@ -10,7 +11,7 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 3
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 0
+#define PLAYERS_VERSION_MINOR 1
 
 // The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
 enum PlayersEventKind {
@@ -64,6 +65,12 @@ struct PlayersEvent {
     unsigned char stockpiles[3];
 };
 
+// The match players sets its private state up for.
+struct PlayersMapInfo {
+    // The number of players.
+    int playerCount;
+};
+
 // Per-player state: the players, their mission conditions and the end of the game. The engine delivers players' pending inbox, through Apply, before each run (UpdatePlayerHead, UpdatePlayerBody, UpdatePlayerTail, UpdatePlayersFinish), and at each phase boundary.
 struct PlayersSeam {
     // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
@@ -114,6 +121,14 @@ struct PlayersSeam {
     void (__stdcall* UpdatePlayerTail)(int player);
     // Runs what is left of the players' tick after the last player: the end of a network game when no player is left to fight. Hooks: none.
     void (__stdcall* UpdatePlayersFinish)(void);
+    // The bytes of private state the implementation needs for a match; called before Init.
+    unsigned int (__stdcall* RegionSize)(const PlayersMapInfo* info);
+    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before InitPlayers and before any event.
+    void (__stdcall* Init)(const PlayersMapInfo* info, void* region, unsigned int size);
+    // Ends the match and returns the region, which the engine frees.
+    void* (__stdcall* Shutdown)(void);
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

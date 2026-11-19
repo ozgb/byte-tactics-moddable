@@ -153,6 +153,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../../interfaces/economy.h"
 #include "../../interfaces/services.h"
 #include "../game/ai_events.h"
+#include "../game/los_radar_events.h"
 
 // FUNCTION: 0x4010b0
 static void SaveUnitAccounts(Unit* info, HapiBank* file)
@@ -231,7 +232,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->lastAttackerSlot = rec.b8e;
     unit->extraction = rec.f8f;
     *(int*)&unit->cell = rec.f93;
-    unit->losCacheCell = rec.f97;
+    LosRadarPublishSightLoad(SCHED_UNITS, unit, rec.f97, rec.bb0);
     *(int*)&unit->footprint = rec.f9b;
     unit->group = rec.f9f;
     AiPublishSetSquad(SCHED_UNITS, unit, rec.f9f);
@@ -240,7 +241,6 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     unit->healthPercent = rec.bac;
     unit->prevHealthPercent = rec.bad;
     unit->netDirtyFlags = rec.bae;
-    unit->losSightFrameIdx = rec.bb0;
     unit->recentlyDamagedTimer = rec.bb1;
     unit->activateFlags = rec.bb2;
 
@@ -385,12 +385,14 @@ void __stdcall SaveUnits(HapiBank* file)
             rec.b8e = unit->lastAttackerSlot;
             rec.f8f = unit->extraction;
             rec.f9f = unit->group;
-            rec.f97 = unit->losCacheCell;
+            LosSightCache sight;
+            g_seams.los_radar->SightCache(unit, &sight);
+            rec.f97 = sight.cell;
             rec.f9b = *(int*)&unit->footprint;
             rec.bac = unit->healthPercent;
             rec.fa7 = unit->speed_bits;
             rec.bab = unit->lastDamageType;
-            rec.bb0 = unit->losSightFrameIdx;
+            rec.bb0 = sight.frameIdx;
             rec.bad = unit->prevHealthPercent;
             rec.bae = unit->netDirtyFlags;
             rec.fa3 = unit->workTime;

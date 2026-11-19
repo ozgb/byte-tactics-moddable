@@ -22,6 +22,7 @@
 #pragma pack(pop)
 #include "../src/game/map_events.h"
 #include "../src/map/terrain.h"
+#include "../src/map/line_of_sight.h"
 
 Game* g_game;
 Seams g_seams;
@@ -371,6 +372,61 @@ static void CheckRejected()
     Check(memcmp(&cells[0], g_game->cells.get(), cells.size()) == 0, "a rejected event changes no cell");
 }
 
+struct Recorded {
+    int sections[8];
+    int count;
+    unsigned int spatialCount;
+    int rows;
+    int overflowPresent;
+    unsigned int overflowFlags;
+};
+static Recorded s_recorded;
+
+static void __stdcall RecBegin(int section, const char*)
+{
+    if (s_recorded.count < 8)
+        s_recorded.sections[s_recorded.count] = section;
+    s_recorded.count++;
+}
+
+static void __stdcall RecInt(const char* field, int, int, unsigned int value)
+{
+    if (strcmp(field, "spatial.count") == 0)
+        s_recorded.spatialCount = value;
+    if (strcmp(field, "spatial[%u].flags") == 0)
+        s_recorded.rows++;
+    if (strcmp(field, "overflow.present") == 0)
+        s_recorded.overflowPresent = (int)value;
+    if (strcmp(field, "overflow.flags") == 0)
+        s_recorded.overflowFlags = value;
+}
+
+static void __stdcall RecBytes(const char*, int, const void*, int) {}
+static void __stdcall RecHandle(const char*, int, int, unsigned int) {}
+static void __stdcall RecRun(int) {}
+
+static void CheckBuckets()
+{
+    const MapSeam& seam = *g_seams.map;
+    seam.FreeBuckets();
+    Check(g_game->cells_1429f.get() == 0 && g_game->overflowBucket.get() == 0 && g_game->spatialGrid_1429f.count == 0, "FreeBuckets frees the buckets and clears them");
+    g_game->baseX = 256;
+    g_game->baseY = 256;
+    seam.AllocateBuckets();
+    Check(g_game->spatialGrid_1429f.count == 8 && g_game->spatialGrid_1429f.width == 2 && g_game->spatialGrid_1429f.height == 2, "AllocateBuckets sizes the grid from the map");
+    Check(g_game->overflowBucket.get() != 0 && ((Rec*)g_game->overflowBucket.get())->flags == 0x1f, "AllocateBuckets makes the overflow bucket with flags 0x1f");
+    memset(&s_recorded, 0, sizeof s_recorded);
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    seam.WriteState(&writer);
+    Check(s_recorded.count == 1 && s_recorded.sections[0] == 45, "WriteState writes the one record 45");
+    Check(s_recorded.spatialCount == 8 && s_recorded.rows == 8, "record 45 holds every bucket");
+    Check(s_recorded.overflowPresent == 1 && s_recorded.overflowFlags == 0x1f, "record 45 holds the overflow bucket");
+    seam.FreeBuckets();
+    memset(&s_recorded, 0, sizeof s_recorded);
+    seam.WriteState(&writer);
+    Check(s_recorded.spatialCount == 0 && s_recorded.overflowPresent == 0, "record 45 holds no buckets after FreeBuckets");
+}
+
 int main()
 {
     Setup();
@@ -381,6 +437,9 @@ int main()
     MapSeam seam;
     memset(&seam, 0, sizeof seam);
     seam.Apply = TamperedApply;
+    seam.AllocateBuckets = MapAllocateBuckets;
+    seam.FreeBuckets = MapFreeBuckets;
+    seam.WriteState = MapWriteState;
     g_seams.map = &seam;
 
     static Run plain, again, tampered;
@@ -417,6 +476,7 @@ int main()
         tampered.dropped, firstState, stateDiffering, cellsDiffering, bucketsDiffering, conflictsDiffering);
 
     CheckRejected();
+    CheckBuckets();
 
     printf(g_failures ? "FAILED\n" : "map_writer_test: all passed\n");
     return g_failures != 0;

@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 5`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 6`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 5
+bt-trace 6
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -288,13 +288,14 @@ section 8 wind             (7.6)
 section 9 meteors          (7.7)
 ```
 
-**The world row** starts again from the offset basis and hashes sections 10 to 28 in order, leaving
-out sections 16 and 17, then sections 29 to 31 when the tick is 1. It has no tick or random preamble.
+**The world row** starts again from the offset basis and hashes sections 10 to 14, 18 to 23, 24, 25 and 27 in order,
+then sections 29 to 31 when the tick is 1. It has no tick or random preamble. Sections 15, 26 and 28 are not in
+the row since format 6, and sections 24 and 25 hold other content (sections 8.13 and 8.14).
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) and ai's events (section 42, section 8.30) are in a dump and in no row, as diagnostics. Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) and ai's events (section 42, section 8.30) are in a dump and in no row, as diagnostics, and so are the records 43 to 46 (ai's, los_radar's, map's and players' reports, sections 8.30, 8.6, 8.28 and 8.17). Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -489,23 +490,33 @@ H32(u32 at game+0x142a7)                     # dump: spatial.height
 recs = ref at game+0x1429f;  count = u32 at game+0x142ab
 if recs is null or count > 2^20: count = 0
 H32(count)                                   # dump: spatial.count
-for r in 0 .. count-1: HT(Rec, recs + r*10)  # dump: spatial[r].<field>
+for r in 0 .. count-1: HT(Rec, recs + r*10)  # dump: spatial[r].b
 overflow = ref at game+0x142b7
 H8(overflow != null)
-if overflow != null: HT(Rec, overflow)       # dump: spatial.overflow.<field>
+if overflow != null: HT(Rec, overflow)       # dump: spatial.overflow.b
 END
 ```
+Since format 6 the table `Rec` holds only `b` (byte 1 of a record): `a`, `flags` and `first` are read only by map, and
+map's report (record 45, section 8.28) dumps them. Orders reads `b` through the spatial bucket of a unit.
 
-### 8.6 eyes (section 15)
+### 8.6 eyes and the sight cache (section 15 until format 5, now record 44)
+
+Section 15 is not in the world row since format 6: only los_radar reads the eyeballs, and its effect is in the visibility
+mask (section 8.3). los_radar reports them, with the unit sight cache that left the `Unit` table, in record 44, through
+the `StateWriter` of the seam's `WriteState`, in the same call as section 24 (section 8.13), before it. The record is dumped
+and never hashed, with the prefix `losRadarState.`:
 
 ```
-H8(15)
-eyes = the u32 (plain address) at game+0x1427b;  count = u32 at game+0x14277
-if eyes is null or count > 20: count = 0
-H32(count)                                   # dump: eyes.count
-for e in 0 .. count-1: HT(Eye, eyes + e*0x24)    # dump: eyes[e].<field>
-END
+losRadarState.unitSlots                       # n, the unit slots: the pool count at los_radar's Init
+for s in 0 .. n-1:
+    losRadarState.sight[s].cell               # 4 bytes: the cell of the last sight (was Unit+0x7a, x low short, z high short)
+    losRadarState.sight[s].frameIdx           # 1 byte (was Unit+0xf8)
+losRadarState.eyes.count                      # game+0x14277, 0 when the table is null or the count is above 20
+for e in 0 .. count-1, the fields of the table Eye in order, without `screen`:
+    losRadarState.eyes[e].<field>             # player (1 byte, the index), x, flagA, flagB, pos.x, pos.y, pos.z, expires, screenPos
 ```
+The bytes 0x7a to 0x7d and 0xf8 of a `Unit` stay in the record, unused (`unusedLosCache`, `unusedLosSightFrame`), and the table
+`Unit` no longer hashes them.
 
 ### 8.7 pathfinder (sections 16 and 17, dumped only)
 
@@ -740,80 +751,50 @@ then the `hex:` line of the bytes (`hex:` alone when the count is 0).
 The stack holds the words up to and including `sp`: the channel's stack pointer `sp` is the index of
 the top word, so `sp + 1` words are live.
 
-### 8.13 player AI (section 24)
+### 8.13 los_radar's unit index (section 24)
+
+Since format 6 los_radar writes this section itself, through the `StateWriter` of its `WriteState` seam slot, and the
+harness hashes the records of sections 24 and 25 into the row (a record of any other section is only dumped). The harness calls
+los_radar's `WriteState` and then units' at the start of the player records of the world row, in every phase.
 
 ```
-H8(24)
-for i in 0 .. 9:
-    ai = the AI record of player i       # 10 refs held in a simulation global
-    H32(i);  H8(ai != null)
-    if ai == null: continue
-    HT(PlayerAI, ai)                                    # dump: players[i].ai.<field>
-    unitVector("players[i].ai.visible",   ai + 0x05)
-    unitVector("players[i].ai.known",     ai + 0x15)
-    unitVector("players[i].ai.factories", ai + 0x25)
-    rawVector(name, ai + offset, elementSize)  for these, in this order:
-        cells 0x4d 8;  vec_65 0x65 3;  counts 0x7d 2;  vec_8d 0x8d 1;  weights 0x9d 1;
-        vec_ad 0xad 1;  vec_bd 0xbd 4;  values 0xcd 4;  locked 0xdd 4
-END
+for i in 0 .. 9 whose index entry is live:       # the player has an AI record: the simulation global of 10 refs is not null
+    H8(24)                                       # Begin(24, "losRadarIndex[i]")
+    H32(i)                                       # dump: losRadarIndex[i].player
+    H32(hasSpecial)                              # dump: losRadarIndex[i].hasSpecial
+    unitVector("losRadarIndex[i].visible")       # the enemy units the player sees
+    unitVector("losRadarIndex[i].known")         # the enemy units the player knows
+    END
 ```
-A **vector** at address V has a begin address (the u32 at V+4) and an end address (the u32 at V+8).
-Its element count is `(end - begin) / elementSize` when `begin != 0`, `end >= begin`,
-`(end - begin)` is a multiple of `elementSize` and the count is at most 2^20; otherwise 0.
+A **vector** has a begin address and an end address, and `unitVector` is as in the earlier formats:
 
 ```
-unitVector(path, V):   n = count with element size 4
-                       H32(n)                       # dump: <path>.size
-                       for k in 0 .. n-1: HP(u32 at begin + 4k, unit, is_ref=false)     # dump: <path>[k]
-rawVector(path, V, e): n = count with element size e
-                       H32(n)                       # dump: <path>
-                       HB(n*e bytes at begin)       # dump: <path> (hex:)
+unitVector(path):   n = the element count
+                    H32(n)                       # dump: <path>.size
+                    for k in 0 .. n-1: HP(the unit ref k, unit, is_ref=false)     # dump: <path>[k]
 ```
-The dump paths of `rawVector` are `players[i].ai.<name>`. Each `rawVector` has two lines with the
-same path, in order: the count line (`0x` and 8 digits), then the `hex:` line of the bytes (`hex:`
-alone when the count is 0). The `statics` path of section 8.12 is the same.
+A player without a live entry has no record, no hash input and no line. The values are the ones the earlier `players[i].ai.visible`,
+`players[i].ai.known` and `players[i].ai.hasSpecial` held. Nothing of the `PlayerAI` record is hashed now: the table PlayerAI and its
+raw vectors (`cells`, `vec_65`, `counts`, `vec_8d`, `weights`, `vec_ad`, `vec_bd`, `values`, `locked`) are only dumped (record 43, section 8.30).
 
-In the moddable build (#991) the three unit vectors and `hasSpecial` (byte 0x79 of the table) are not `PlayerAI`'s: the
-visible and known vectors and `hasSpecial` are los_radar's per-player index, and the factory vector is units'. The
-harness hashes them in the same place, with the same bytes and order as above: it writes `hasSpecial` at offset 0x79 of
-the copy of the table it hashes. `PlayerAI`'s bytes 0x05 to 0x34 and 0x79 to 0x7c are unused. The trace is unchanged.
+### 8.14 units' factory index (section 25)
 
-### 8.14 squad managers (section 25)
+Units writes this section, as los_radar writes section 24, and the harness hashes it in the same way, after it:
 
 ```
-H8(25)
-for i in 0 .. 10:
-    mgr = ref at (game+0x1b63 + i*0x14b) + 0x74
-    H32(i);  H8(mgr != null)
-    if mgr == null: continue
-    HT(SquadManager, mgr)                               # dump: players[i].squadManager.<field>
-    for t in 0 .. 9:
-        timer = ref at mgr + 0x11 + t*4
-        H8(t);  H8(timer != null)
-        if timer == null: continue
-        class = timerClass[t]       # t=0:0 1:7 2:2 3:3 4:6 5:1 6:2 7:3 8:4 9:5
-        H32(class)                                      # dump: players[i].squadManager.timers[t].class
-        class 2 (assault): HT(AssaultTimer, timer); class 3 (escort): HT(EscortTimer, timer)
-        class 5 (spatial): HT(SpatialTimer, timer);  any other class: HT(SquadTimer, timer)
-END
+for i in 0 .. 9 whose index entry is live:       # the player has an AI record
+    H8(25)                                       # Begin(25, "unitsFactories[i]")
+    H32(i)                                       # dump: unitsFactories[i].player
+    unitVector("unitsFactories[i].factories")    # the player's factories
+    END
 ```
+The squad managers and their timers that section 25 hashed until format 5 are only dumped now (`aiState.players[i].squadManager.*`, section 8.30).
 The timer classes are: unknown 0, squad 1, assault 2, escort 3, squad scout 4, spatial 5, scout 6,
-build 7. The class follows from the slot `t`.
+build 7. The class follows from the slot `t` (t=0:0 1:7 2:2 3:3 4:6 5:1 6:2 7:3 8:4 9:5).
 
-### 8.15 squads (section 26)
+### 8.15 squads (section 26, until format 5)
 
-```
-H8(26)
-for i in 0 .. 10:
-    sq = ref at (player i) + 0x78
-    H32(i);  H8(sq != null)
-    if sq == null: continue
-    for s in 0 .. 9:
-        squad = sq + s*0x20
-        HT(Squad, squad)                                # dump: players[i].squads[s].<field>
-        unitVector("players[i].squads[s].items", squad + 0x10)
-END
-```
+Section 26 is not in the world row since format 6. The squads are only dumped (`aiState.players[i].squads[s].*`, section 8.30).
 
 ### 8.16 unit resources (section 27)
 
@@ -826,38 +807,33 @@ for i in 0 .. 10:
 END
 ```
 
-### 8.17 mission conditions (section 28)
+### 8.17 mission conditions (section 28 until format 5, now record 46)
+
+Section 28 is not in the world row since format 6. Players reports the conditions and the clocks it owns in record 46,
+through the `StateWriter` of its `WriteState`, dumped and never hashed, with the prefix `playersState.`, after
+`mapState.*`:
 
 ```
-H8(28)
-cs = ref at game+0x391ed
-H8(cs != null)
-if cs != null:
-    HT(MissionConditions, cs)                           # dump: conditions.<field>
-    for list in (0, 1):                                 # 0: victory, 1: defeat
-        count = u32 at cs + (list == 0 ? 0x40 : 0x84);  base = (list == 0 ? 0x00 : 0x44)
-        if count > 16: count = 0
-        H8(list + 1)
-        for k in 0 .. count-1:
-            c = ref at cs + base + k*4
-            H8(c != null)
-            if c == null: continue
-            H32(class of c)                             # dump: conditions.victory[k].class (or defeat)
-            HT(MissionCondition, c)
-            if class == 16: HT(ConditionNumUnits, c)
-            elif class == 12 or class == 4: HT(ConditionNumLeft, c)
-END
+playersState.endGameCountdown                  # 2 bytes (game+0x39239, set by the engine at set-up, unused)
+for i in 0 .. 9:
+    playersState.players[i].updateTime         # 4 bytes (Player's unused words)
+    playersState.players[i].winLoseTime        # 4 bytes
+playersState.conditions.present                # 1 when the list ref at game+0x391ed is not null
+if present:
+    playersState.conditions.victoryCount       # the u32 at 0x40 of the list
+    playersState.conditions.defeatCount        # the u32 at 0x84
+    playersState.conditions.active
+    for list in victory, defeat; k in 0 .. count-1 (a count above 16 counts as 0) whose entry is not null:
+        playersState.conditions.victory[k].class (or defeat)     # the class below
+        playersState.conditions.victory[k].satisfied
+        playersState.conditions.victory[k].celebrated
+        playersState.conditions.victory[k].numUnits              # class 16 only
+        playersState.conditions.victory[k].numLeftToKill         # classes 12 and 4 only
 ```
-The counts are the dumped fields `conditions.victoryCount` (offset 0x40) and
-`conditions.defeatCount` (offset 0x84): read them from the lines of the table itself (a count above
-16 counts as 0 for the loop). A null entry has no line, so its index `k` is simply missing from the
-dump; the entries that are present are those with a `conditions.victory[k].class` (or `defeat`)
-line.
-
-Condition classes: 0 unknown (fails the run), defeat: passes z 1, passes x 2, death timer 3,
+Condition classes: 0 unknown, defeat: passes z 1, passes x 2, death timer 3,
 type killed 4, all of type 5, all killed 6, commander 7; victory: timer 8, passes z 9, passes x 10,
 move to radius 11, kill type 12, kill all of type 13, capture 14, build 15, kill mobile 16, destroy
-all 17, kill commander 18.
+all 17, kill commander 18. A null entry has no lines. The numbers are written as `0x` and twice the byte count of hex digits.
 
 ### 8.18 unit definitions (section 29, tick 1 only)
 
@@ -1005,7 +981,7 @@ The string refs of a unit entry are relative to the start of the state block, as
 
 The events pathfinding delivered in this tick, in the order the engine took them from its `Poll` slot
 (`interfaces/pathfinding.h`) in the `players` phase, with a buffer of 64 waypoints. No row hashes them
-(section 6): a dump holds their lines, after those of section 28 (of section 31 at tick 1), as a diagnostic. The
+(section 6): a dump holds their lines, after those of section 27 (of section 31 at tick 1), as a diagnostic. The
 host records each event as it takes it, before the engine acts on it, and empties the record after the
 world row of the tick, so the lines a dump writes after an earlier phase hold the events delivered so
 far. The fields are `results.fields` of the schema, in this order.
@@ -1265,7 +1241,8 @@ for k in 0 .. n-1, in application order:
 - `unit` is the unit whose line of sight changes, a pointer ID with target `unit` (section 5): `units:N`,
   `null`, or `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
 - `player` is the player of SHARE_MAPPING and SHARE_RADAR and the player whose map SHARE_MAP shares, 0 to 9;
-  `value` is the argument of RECALCULATE, 1 when each cell is first reset to show nothing to every player, and
+  `value` is the argument of RECALCULATE, 1 when each cell is first reset (to show nothing to every player when
+  mapping is on, to show every cell to every player when it is off), and
   for SHARE_MAP the player it shows the map to, 0 to 9. Fields a kind does not use are 0.
 - `pos`, `sightDistance`, `eyeHeight` and `lifetime` are those of an ADD_EYEBALL: the position in world
   coordinates with 16 fractional bits, x, y and z, the sight distance and the height of the eye above the
@@ -1320,6 +1297,19 @@ for k in 0 .. n-1, in order:
 - `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
   null, or names a movement class that does not exist; for SET_YARD 0 when the footprint was not clear. It is
   1 for an effect.
+
+Map's own report (record 45, written through the `StateWriter` of the seam's `WriteState`) is dumped and never hashed, with the
+prefix `mapState.`, after the `aiState.*` lines:
+
+```
+mapState.spatial.count                         # as section 14 counts it
+for r in 0 .. count-1:
+    mapState.spatial[r].a                      # 1 byte
+    mapState.spatial[r].flags                  # 4 bytes
+    mapState.spatial[r].first                  # a pointer ID with target unit
+mapState.overflow.present                      # 1 when the overflow record exists
+if present: mapState.overflow.a, .flags, .first   # as a record above
+```
 
 ### 8.29 players events (section 41, dumped only)
 
@@ -1424,6 +1414,24 @@ for k in 0 .. n-1, in player order:
     aiState.manager[k].timers                  # hex: the 40 bytes, the tick each of the 10 squad timers runs next, 0 for none
 ```
 
+Since format 6 the same report holds, after those lines, what sections 24 to 26 hashed of `PlayerAI`, the squad managers and the squads
+(each a record 43 begun by the name shown, the fields as `<name>.<field>`):
+
+```
+for i in 0 .. 9 whose AI record is not null:
+    aiState.players[i].ai.<field>              # the table PlayerAI in order, without hasSpecial (los_radar's, section 8.13)
+    aiState.players[i].ai.<vector>.size        # each raw vector: cells 0x4d 8; vec_65 0x65 3; counts 0x7d 2; vec_8d 0x8d 1;
+    aiState.players[i].ai.<vector>             #   weights 0x9d 1; vec_ad 0xad 1; vec_bd 0xbd 4; values 0xcd 4; locked 0xdd 4
+                                               #   (the element count, then the hex: bytes)
+for i in 0 .. 9 whose player has a squad manager:
+    aiState.players[i].squadManager.<field>    # the table SquadManager
+    aiState.players[i].squadManager.timers[t].class    # for each of the 10 slots t with a timer, the class of section 8.14
+    aiState.players[i].squadManager.timers[t].<field>  # the table of that class: SquadTimer, AssaultTimer, EscortTimer or SpatialTimer
+for i in 0 .. 9 whose player has squads, s in 0 .. 9:
+    aiState.players[i].squads[s].<field>       # the table Squad
+    aiState.players[i].squads[s].items.size, aiState.players[i].squads[s].items[k]   # the unit vector
+```
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1442,7 +1450,7 @@ The digest file is:
 
 ```
 bt-digest 5
-trace_format bt-trace 5
+trace_format bt-trace 6
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1469,15 +1477,15 @@ with single spaces between the first three fields and the value, which runs to t
 
 **Order.** For each phase of the tick that runs (`units` to `meteors`; `net` first if it runs) the
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
-then sections 1 to 9), then the lines of the world sections (10 to 28, and 29 to 31 when the
+then sections 1 to 9), then the lines of the world sections (10 to 14, 18 to 25 and 27, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 28), then the lines of sections 32, 33, 37, 36, 38, 39, 40, 41 and 42, in that order, which end the block and are
+lines of section 27), then the lines of sections 32, 33, 37, 36, 38, 39, 40, 41 and 42, in that order, which end the block and are
 not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29 and 8.30). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
-sections 16 and 17, and the `economyState.*` and `aiState.*` lines of economy's and ai's own reports that follow them, sit between those of
-sections 15 and 18 but are not hash input (sections 8.7 and 8.22). Every
+sections 16 and 17, and the `economyState.*`, `aiState.*`, `mapState.*` and `playersState.*` lines of economy's, ai's, map's and players' own reports that follow them, sit between those of
+sections 14 and 18 but are not hash input (sections 8.7, 8.22, 8.30, 8.28 and 8.17), and the `losRadarState.*` lines sit before those of section 24 (section 8.6). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*`, `losRadarState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1570,7 +1578,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 5.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 6.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
@@ -1584,6 +1592,14 @@ and a reader must skip `features.*` too. Section 38 (targeting's events, section
 same way, after section 36's lines: a reader must also skip `targeting.*`. Section 39 (los_radar's events, section 8.27) was added
 the same way, after section 38's lines: a reader must also skip `los_radar.*`. Section 40 (map's events, section 8.28) was added the same way, after
 section 39's lines: a reader must also skip `map.*`. Section 41 (players' events, section 8.29) was added the same way, after section 40's lines: a reader must also skip `playersEvents.*`. Section 42 (ai's events, section 8.30) and record 43 (ai's report, `aiState.*`) were added the same way: a reader must also skip `aiEvents.*` and `aiState.*`. Section 42 is new in the trace format.
+
+Format 6 took the state that only its owner reads out of the hash (#979). Sections 15 (the eyes), 26 (the squads) and 28 (the mission conditions)
+left the world row, and section 25 (the squad managers) and section 24 (the player AI) were replaced by the records that units and los_radar write
+(sections 8.13 and 8.14: the factory index, the unit index and `hasSpecial`, in the new `Begin(24 or 25)` records of the `StateWriter`); the table Rec
+hashes `b` only; the sight cache of a unit (`Unit::unusedLosCache`, `unusedLosSightFrame`), the clocks of a player (`Player::unusedUpdateTime`,
+`unusedWinLoseTime`) and the end-game countdown (game scalar `endGameCountdown`) left the tables. What left is dumped, never hashed, in the
+records 43 (ai, extended), 44 (los_radar), 45 (map) and 46 (players), with the prefixes `aiState.`, `losRadarState.`, `mapState.` and `playersState.`. A reader of
+format 5 must read the new world row; a reader of the dump must skip the four prefixes. The digests of the stored scenarios change, and so does the tag.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

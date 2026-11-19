@@ -523,6 +523,8 @@ void LoadBattleAssets()
         if (g_seams.pathworld->MoveClass(i) != 0)
             mapInfo.moveClassCount++;
     }
+    LosRadarMapInfo losInfo;
+    losInfo.unitSlots = g_game->poolCount;
     EconMapInfo econInfo;
     econInfo.unitSlots = g_game->poolCount;
     econInfo.playerCount = g_game->numPlayers;
@@ -530,10 +532,22 @@ void LoadBattleAssets()
     unsigned int defaultRegionSize = DefaultPathfindingSeam()->RegionSize(&mapInfo);
     unsigned int econRegionSize = g_seams.economy->RegionSize(&econInfo);
     unsigned int defaultEconRegionSize = DefaultEconomySeam()->RegionSize(&econInfo);
+    PlayersMapInfo playersInfo;
+    playersInfo.playerCount = g_game->numPlayers;
+    unsigned int playersRegionSize = g_seams.players->RegionSize(&playersInfo);
+    unsigned int defaultPlayersRegionSize = DefaultPlayersSeam()->RegionSize(&playersInfo);
+    unsigned int losRegionSize = g_seams.los_radar->RegionSize(&losInfo);
+    unsigned int defaultLosRegionSize = DefaultLosRadarSeam()->RegionSize(&losInfo);
     MatchSetupSizeBlock((pathRegionSize > defaultRegionSize ? pathRegionSize - defaultRegionSize : 0)
-        + (econRegionSize > defaultEconRegionSize ? econRegionSize - defaultEconRegionSize : 0));
+        + (econRegionSize > defaultEconRegionSize ? econRegionSize - defaultEconRegionSize : 0)
+        + (losRegionSize > defaultLosRegionSize ? losRegionSize - defaultLosRegionSize : 0)
+        + (playersRegionSize > defaultPlayersRegionSize ? playersRegionSize - defaultPlayersRegionSize : 0));
     void* econRegion = SimAllocRegion("Economy region", econRegionSize);
     g_seams.economy->Init(&econInfo, NativeEconomyWorld(), econRegion, econRegionSize);
+    void* losRegion = SimAllocRegion("LosRadar region", losRegionSize);
+    g_seams.los_radar->Init(&losInfo, losRegion, losRegionSize);
+    void* playersRegion = SimAllocRegion("Players region", playersRegionSize);
+    g_seams.players->Init(&playersInfo, playersRegion, playersRegionSize);
     g_seams.players->InitPlayers();
     void* pathRegion = SimAllocRegion("AISearch region", pathRegionSize);
     g_seams.pathfinding->Init(&mapInfo, pathRegion, pathRegionSize);
@@ -606,7 +620,13 @@ void ShutdownIngameSystems()
     void* econRegion = g_seams.economy->Shutdown();
     if (econRegion != nullptr)
         SimFree(econRegion);
+    void* losRegion = g_seams.los_radar->Shutdown();
+    if (losRegion != nullptr)
+        SimFree(losRegion);
     g_seams.players->FreePlayers();
+    void* playersRegion = g_seams.players->Shutdown();
+    if (playersRegion != nullptr)
+        SimFree(playersRegion);
     g_seams.los_radar->FreeRadar();
     g_seams.los_radar->FreeMapResources();
     GameFreeThunk((int*)g_game->assemPoints);

@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 3.1), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 3.2), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -18,11 +18,12 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136 (effects would take 144 to 159; it has none).
+to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 138 (effects would take 144 to 159; it has none).
 
 Los_radar's place in it:
 - **Events into los_radar:** UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT, ADD_EYEBALL, CELL_HEIGHTS, RECALCULATE,
-  SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players, economy and the engine.
+  SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players, economy and the engine; and,
+  since 3.2, SIGHT_RESET and SIGHT_LOAD, which units applies through `Apply` as it sets a unit up and loads a saved game.
   Los_radar's handler (`LosRadarInbox`, `src/seams/los_radar_world.cpp`) passes each to `Apply`.
 - **Routes:** of the fourteen routes, every one that can be published inside the tick is synchronous except map's
   CELL_HEIGHTS: three because the gate diverged with them queued, two by #952's rule, and three because no scenario
@@ -108,6 +109,16 @@ none of these, so no trace moves; a module publishing from WASM can.
 | `GetSeenUnitsInRadius` | new query, the buffer form of the visible query with no ready filter and no known fallback; ai's spatial timer sums its ratings from it (it read the list directly before) |
 | `CreateUnitIndex`, `FreeUnitIndex` | set-up slots, outside the tick: players' set-up creates and frees a player's index beside ai's per-player state (`InitPlayerSlot`, `FreePlayers`), under the same condition |
 | `RefreshUnitIndex` | the engine's run every 30 ticks of a player that has an index (section 5) |
+
+**The slots and events of 3.2.** Los_radar 3.2 adds five slots at the end, and two event kinds (#979):
+
+| Name | What it is |
+|---|---|
+| `RegionSize`, `Init`, `Shutdown` | as economy's: the engine asks for the bytes of the private region for a map (`LosRadarMapInfo`, the unit slots), allocates it in `LoadBattleAssets`, gives it to `Init`, and frees what `Shutdown` returns |
+| `SightCache` | query: fills a `LosSightCache` (`cell`, `frameIdx`) with a unit's cache, for a saved game |
+| `WriteState` | writes record 44 `losRadarState` and the hashed records of section 24 (section 5) |
+| SIGHT_RESET (137) | event: sets a unit's cache back to zero, as units' set-up did to the bytes; outcome 1, 0 for a null unit |
+| SIGHT_LOAD (138) | event: sets a unit's cache to the `sight` field (`LosRadarEvent::sight`), as a saved game restores it; outcome 1, 0 for a null unit |
 
 ## 3. Effects out of los_radar
 
@@ -204,30 +215,54 @@ cells share a row.
 
 ## 5. State and the trace
 
-Los_radar keeps no private region, and so it has no `WriteState` report: its state is view state, hashed where it was.
+Los_radar has a private region since 3.2 (`RegionSize`, `Init` and `Shutdown`, as economy's), allocated in
+`LoadBattleAssets` with the tag "LosRadar region" and freed in `ShutdownIngameSystems`, and a `WriteState` that reports
+what left the hash: record 44 `losRadarState` (the sight cache of every unit slot and the eyeballs), dumped and
+required equal for the default, and the hashed records of section 24 (the unit index). Section 24 and record 44 are
+written in one call, record 44 first.
 
 - **The sight, radar and mapped layers and the eyeballs** are los_radar's own allocations in the state block: the
   visibility mask (a 16-bit word per square of the map, a bit per player that sees it, in the allocation `LoadTntMap` tags "MAPPED
   MEMORY"), each player's explored grid (a count per cell of the units that see it, allocated by `InitPlayerSlot`),
-  and the eyeball table (`eyes`) with its count. All three are hashed (sections 12, 13 and 15 of the trace).
-  `privatestate.py --check` fails when another subsystem writes any of them. Moving them out of the hash
-  would be a trace format bump with a reference half (#946's path), and the hash is what shows a wrong sight at the
-  tick it happens (the negative test, `tests/los_radar_writer_test.cpp`), so they stay where they are.
+  and the eyeball table (`eyes`) with its count. The mask and the explored grids are hashed (sections 12 and 13 of the
+  trace): they are what other subsystems read (`IsUnitVisibleToPlayer`, `IsPointVisible`, ai's and orders' reads of the
+  visible lists, the radar picture), the contract a replacement is judged on, and the hash is what shows a wrong sight at
+  the tick it happens (the negative test, `tests/los_radar_writer_test.cpp`).
+  `privatestate.py --check` fails when another subsystem writes any of them.
+- **The eyeballs** (`eyes` and `count_14277`) left the hash in trace format 6 (section 15 is gone). Only los_radar
+  reads them (`ExpireEyeballs`, `AddEyeball`, and the sight of the eyeball it draws), and their effect is in the mask.
+  They stay in the allocation `LoadTntMap` makes, and `WriteState` dumps them in record 44 (`eyes.count` and, per
+  eyeball, `player`, `x`, `flagA`, `flagB`, `pos`, `expires` and `screenPos`).
 - **The per-player unit index** (3.1) is los_radar's: per player, the visible enemy list (`visible`), the known list
   (`known`, enemy units with flag 0x100) and `hasSpecial`, in a record allocated in the sim block behind a tracked
   pointer (`src/map/line_of_sight_index.cpp`). It left ai's `PlayerAI`, where 3.1c kept it. `CreateUnitIndex` and
   `FreeUnitIndex` make and free it, and every 30 ticks, from the index's own `lastTick`, `RefreshUnitIndex` refills it
   in the players phase right before ai's `UpdatePlayerAI`. 3.1c filled it, with the factory list (now units'), in one
   walk of the units; the walks are now separate, but each list holds the same units in the same order, and no draw
-  moves. The trace is unchanged: section 24 hashes the same table (the harness writes `hasSpecial` at offset 0x79 of
-  the copy it hashes) and the same vectors, read from this record, at the same place in the stream.
-- **The unit sight cache** (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`) stays in the unit. Units zeroes
-  it when it sets a unit up and a saved game restores it with the unit, and both are units' code; los_radar reads and
-  writes it in `UpdateUnitLineOfSight`. Moving it would split the unit's record and its save for no change in what is
-  hashed: the cache is what showed two of the gate's divergences (section 8).
+  moves. Since trace format 6 `WriteState` writes the index: section 24 holds one record `losRadarIndex[i]` for each live
+  player (`player`, `hasSpecial`, then `visible.size` and `visible[k]`, `known.size` and `known[k]` as unit handles),
+  hashed, at the place where the harness read the index before, so a replacement los_radar's lists are the ones
+  hashed, not the default's. The harness no longer reaches into the index.
+- **The unit sight cache** (3.2) moved out of the unit into the region: one entry per unit slot (`LosSightCache`: the
+  `cell` of the last sight circle, x in the low 16 bits and z in the high 16, and the `frameIdx` of the table frame).
+  Only `UpdateUnitLineOfSight`, `RemoveUnitLineOfSight`, `RevealNewUnit` and `RecalculateLineOfSight` read or write it.
+  The 12 bytes of the unit record stay, unused (`Unit::unusedLosCache` at 0x7a and `unusedLosSightFrame` at 0xf8), so
+  no other offset moves, as economy's 48. Units' set-up applies SIGHT_RESET (the cache back to zero, as it zeroed the
+  bytes), the saved game reads it through `SightCache` and the load applies SIGHT_LOAD. Both events are applied through
+  `Apply` at the statement that wrote the bytes in 3.1c, not queued. It is dumped in record 44, as `sight[s].cell` and
+  `sight[s].frameIdx` for each unit slot s, and is not hashed. **A wrong cache still diverges in hashed state.** The
+  two divergences that showed the cache in #978 differ in what they reach. Conditions-dark-side's fault (tick 1243)
+  never reaches the view state: the mask and the explored grids stay equal, so a wrong cache there is seen only
+  in record 44. Eight-full-moon's first diverges at tick 6946, phase world, `players[0].explored[6786]` (05 against 04): a sight circle drawn from a wrong cache leaves a different count in the explored grid. The hash catches
+  a cache that changes what a player sees; one that does not is los_radar's own bookkeeping, and `WriteState` is
+  what shows it.
+- **The bucket array moved to map** (3.2 of this interface and 4.1 of map's): los_radar no longer allocates or frees
+  `Game::cells_1429f` and `overflowBucket`. `BuildDerivedLayers` and `FreeMapResources` call map's `AllocateBuckets`
+  and `FreeBuckets` at the statements that did it, so the allocations, their sizes, tags and order are the same
+  (`docs/map-interface.md`, section 5).
 - **The trace dumps los_radar's events** in section 39 (`docs/trace-format.md`, section 8.27), after targeting's
-  section 38, and hashes none of them: no trace format bump and no reference half. Each record is an event with the
-  outcome `Apply` gave, in los_radar's order.
+  section 38, and hashes none of them. Each record is an event with the outcome `Apply` gave, in los_radar's order.
+  SIGHT_RESET and SIGHT_LOAD are applied directly by units and are not in section 39.
 
 ## 6. Random draws and sim events
 

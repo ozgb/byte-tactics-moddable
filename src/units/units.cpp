@@ -350,8 +350,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     unit->angles.heading = (short)(RandomInt(unit->def->buildangleUnsigned)
                                     + (0x8000 - unit->def->buildangleUnsigned / 2));
     unit->angles.bank = 0;
-    unit->losCacheCellX = 0;
-    unit->losCacheCellZ = 0;
+    LosRadarPublishSightReset(SCHED_UNITS, unit);
     unit->recentlyDamagedTimer = 0;
     unit->postTransferHoldoff = 0;
     unit->ownerIsLocal = (unit->player->index == g_game->playerIndex);
@@ -378,7 +377,6 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
         unit->f24_25 = 0;
     }
 
-    unit->losSightFrameIdx = 0;
     unit->owner = &g_game->players[unit->playerIndex];
     EconPublish(SCHED_UNITS, ECONOMY_RESET, unit->playerIndex, EconHandleOf(unit), 0, 0, 0);
     unit->transportPiece = 0xff;

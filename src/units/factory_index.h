@@ -7,6 +7,7 @@
 
 struct Unit;
 struct Vec3;
+struct StateWriter;
 
 #pragma pack(push, 1)
 struct FactoryIndexEntry {
@@ -25,5 +26,6 @@ void __stdcall FreeFactoryIndex(int player);
 void __stdcall RefreshFactoryIndex(int player);
 void __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, std::vector<Unit*>* out);
 const BlockVector<Ref<Unit> >* FactoryIndexOf(int player);
+void __stdcall UnitsWriteState(const StateWriter* w);
 
 #endif

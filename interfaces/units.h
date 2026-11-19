@@ -1,6 +1,8 @@
 #ifndef INTERFACES_UNITS_H
 #define INTERFACES_UNITS_H
 
+#include "state_writer.h"
+
 namespace std {
 template<class T> class allocator;
 template<class T, class A> class vector;
@@ -24,7 +26,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 1
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 10
+#define UNITS_VERSION_MINOR 11
 
 // Unit simulation.
 struct UnitsSeam {
@@ -156,6 +158,8 @@ struct UnitsSeam {
     void (__stdcall* FreeFactoryIndex)(int player);
     // Every 30 ticks of a player that has an index, refills it with the player's ready, finished units that have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
     void (__stdcall* RefreshFactoryIndex)(int player);
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

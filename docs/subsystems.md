@@ -213,7 +213,7 @@ Coverage: 98.2% of functions (55 of 56), 86.4% of lines, 73.5% of branches; 1 li
 
 Issue #13. 132 functions. The computer player: `UpdatePlayerAI`, build ratings, weight scripts and squads (`src/ai/ai_player*.cpp`, `player_ai.cpp`, `ai_profile.cpp`, most of `src/units/squads.cpp`).
 
-Coverage: 79.4% of functions (85 of 107), 75.1% of lines, 72.8% of branches; 22 live functions no scenario enters, and 31 more are dead (data/coverage.csv).
+Coverage: 79.4% of functions (85 of 107), 75.2% of lines, 73.0% of branches; 22 live functions no scenario enters, and 31 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (22 of 107 after #420 and `console-sight` (#445); 85 are entered, 79.4%), by reason:
 
@@ -429,7 +429,7 @@ Coverage: 100.0% of functions (19 of 19), 95.6% of lines, 81.6% of branches; 0 l
 
 Issue #17. 113 functions. Line of sight, radar and sonar, the LOS tables, the map cell accessor and the TNT loader (`src/map/line_of_sight*.cpp`, `los_tables*.cpp`, `radar.cpp`, and two `src/game/players_46*.cpp` files).
 
-Coverage: 90.7% of functions (88 of 97), 87.8% of lines, 74.4% of branches; 9 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
+Coverage: 90.7% of functions (88 of 97), 87.7% of lines, 74.5% of branches; 9 live functions no scenario enters, and 22 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (9 of 97 after `sensors-los-off`, `los-off-mapped-ai` and `hailstorm-los-off` (#421), `sensors-sonar-jam` and `orders-tier2-core` (#426) and `sensors-floating-teeth` and `sensors-floating-teeth-los-off` (#437), and the six `console-` scenarios (#445); 88 are entered, 90.7%), by reason:
 
@@ -558,7 +558,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 - Slot no code calls (1): `AimCobStub` (slot 1 of `g_weaponAimCobVtable`). It returns 0; not explained further.
 
-**players** (147 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 33 functions are called from outside, mostly by game (18) and presentation (3); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 61 functions: platform 13, network 5, seams 7, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 66.0% of functions (101 of 153), 67.6% of lines, 61.2% of branches; 52 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 52 follows this paragraph.
+**players** (147 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 33 functions are called from outside, mostly by game (18) and presentation (3); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 61 functions: platform 13, network 5, seams 7, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 66.0% of functions (101 of 153), 67.5% of lines, 61.1% of branches; 52 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 52 follows this paragraph.
 
 **players, functions no scenario enters** (52 of 153 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 101 are entered, 66.0%), by reason:
 
@@ -598,7 +598,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (317 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 185 functions are called from outside, by platform (84 distinct functions) and presentation (32); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 568 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 36.
 
-**game, functions no scenario enters** (82 of 303 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 221 are entered, 72.9%), by reason:
+**game, functions no scenario enters** (82 of 304 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 222 are entered, 73.0%), by reason:
 
 - Network only (3): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`. Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
@@ -744,17 +744,17 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **wind_meteors** | 0 of 15 | 0.0% | 0.0% | 0.0% | 15 | 0 |
 | **economy** | 48 of 51 | 94.1% | 91.0% | 74.5% | 3 | 3 |
 | **features** | 55 of 56 | 98.2% | 86.4% | 73.5% | 1 | 4 |
-| **ai** | 85 of 107 | 79.4% | 75.1% | 72.8% | 22 | 31 |
+| **ai** | 85 of 107 | 79.4% | 75.2% | 73.0% | 22 | 31 |
 | **pathfinding** | 68 of 77 | 88.3% | 82.1% | 69.5% | 9 | 10 |
 | **weapons** | 85 of 97 | 87.6% | 89.5% | 74.5% | 12 | 17 |
 | **targeting** | 19 of 19 | 100.0% | 95.6% | 81.6% | 0 | 1 |
-| **los_radar** | 88 of 97 | 90.7% | 87.8% | 74.4% | 9 | 22 |
+| **los_radar** | 88 of 97 | 90.7% | 87.7% | 74.5% | 9 | 22 |
 | **orders** | 317 of 378 | 83.9% | 82.1% | 65.3% | 61 | 25 |
 | **units** | 172 of 208 | 82.7% | 86.2% | 74.1% | 36 | 33 |
-| **players** | 101 of 153 | 66.0% | 67.6% | 61.2% | 52 | 10 |
+| **players** | 101 of 153 | 66.0% | 67.5% | 61.1% | 52 | 10 |
 | **map** | 86 of 107 | 80.4% | 86.7% | 77.2% | 21 | 11 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 221 of 303 | 72.9% | 57.7% | 36.7% | 82 | 23 |
+| game | 222 of 304 | 73.0% | 57.7% | 36.7% | 82 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 399 of 747 | 53.4% | 40.8% | 27.9% | 348 | 85 |
 | presentation | 565 of 1149 | 49.2% | 36.3% | 29.6% | 584 | 295 |

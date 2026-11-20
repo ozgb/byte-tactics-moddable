@@ -899,6 +899,24 @@ void __stdcall RecPathfindingWriteState(const StateWriter* a0)
     }
 }
 
+int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
+{
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_DETONATE || a0->kind == WEAPONS_REMOVE_PROJECTILES || a0->kind == WEAPONS_EXPLODE_PIECE || a0->kind == WEAPONS_AREA_DAMAGE || a0->kind == WEAPONS_SPAWN))
+        return s_inner_weapons->Apply(a0, a1);
+    ReplayRoots roots;
+    EventRoots(roots, RET_WEAPONS, a0, a1);
+    SlotScope scope(RSL_WEAPONS_APPLY, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgEvent(s_call, "event", RET_WEAPONS, a0, a1);
+        ArgValue(s_call, "size", a1);
+    }
+    int result = s_inner_weapons->Apply(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
 {
     ReplayRoots roots;
@@ -5501,6 +5519,8 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.Poll = RecPathfindingPoll;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.WriteState = RecPathfindingWriteState;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.Apply = RecWeaponsApply;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])

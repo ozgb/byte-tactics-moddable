@@ -262,6 +262,8 @@ void AddSiteMember(ReplayText& t, const ReplayInsideSite& s, unsigned index)
 
 }
 
+static_assert(ROK_COUNT <= REPLAY_OBJECT_KINDS, "every kind of the schema has a row of the object table");
+
 bool ReplayKindFits(unsigned declared, unsigned actual)
 {
     if (declared == actual)
@@ -277,7 +279,9 @@ bool ReplayKindFits(unsigned declared, unsigned actual)
 unsigned ReplayConcreteKind(unsigned kind, const void* p)
 {
     const ReplayObjectKind& base = kReplayObjectKinds[kind];
-    if (p != nullptr && base.polyCount == 0 && ReplayVtable(kind) != nullptr && *(const void* const*)p != ReplayVtable(kind)) {
+    const void* word = p != nullptr ? *(const void* const*)p : nullptr;
+    bool unsetAllowed = word == nullptr && base.vptrUnset;
+    if (p != nullptr && base.polyCount == 0 && ReplayVtable(kind) != nullptr && word != ReplayVtable(kind) && !unsetAllowed) {
         char message[200];
         sprintf(message, "a %s has a vptr that is not %s", base.name, ReplayVtableName(kind));
         ReplayFail(message);

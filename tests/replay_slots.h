@@ -544,6 +544,23 @@ void Run_wind_meteors_LoadMeteors()
     g_seams.wind_meteors->LoadMeteors(p0);
 }
 
+int g_result_weapons_Apply;
+
+void Run_weapons_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_WEAPONS, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_weapons_Apply = g_seams.weapons->Apply((WeaponsEventHeader*)p0, p1);
+}
+
+void After_weapons_Apply()
+{
+    CompareResult(g_result_weapons_Apply);
+}
+
 void Run_weapons_UpdateUnitWeapons()
 {
     Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
@@ -929,6 +946,10 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_LoadMeteors();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_weapons_Apply();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
         Run_weapons_UpdateUnitWeapons();
         return true;
@@ -1024,6 +1045,8 @@ void RunAfter(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0)
         After_wind_meteors_LoadMeteorDefaults();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
+        After_weapons_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
         After_weapons_GetWeaponRange();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachUnit") == 0)

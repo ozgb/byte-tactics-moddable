@@ -5,22 +5,9 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/map.h"
+#include "map_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
-
-inline unsigned int MapEventSize(int kind)
-{
-    switch (kind) {
-    case MAP_SET_YARD:
-        return sizeof(MapSetYard);
-    case MAP_PASS_MAPS:
-        return sizeof(MapPassMaps);
-    case MAP_EFFECT_CELLS_CHANGED:
-        return sizeof(MapCellsChanged);
-    default:
-        return sizeof(MapEventHeader);
-    }
-}
 
 template <class U>
 inline void MapPublishUnit(int outbox, int kind, U* unit)

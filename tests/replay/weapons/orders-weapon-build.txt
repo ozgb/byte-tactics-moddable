@@ -9209,34 +9209,54 @@ call 720 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
-call 720 UpdateUnitWeapons
-  r rng.seed 0x5e0f5cdb
+call 720 Apply
+  r Game.localPlayer 0
+  r Unit#251.player Player#1
+  r Unit#251.activateFlags 1
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.damagemodifier 65536
+  r UnitDef#167.weapons0 weapondef#21
+  r UnitDef#167.weapons1 weapondef#0
+  r UnitDef#167.weapons2 weapondef#23
+  r Player#1.active 1
+  r Player#1.type 2
+  r weapondef#21.index 21
+  r weapondef#0.index 0
+  r weapondef#23.index 23
+  a event.kind 260
+  a event.unit Unit#251
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  i services.SchedPublish 6 12
+  w Unit#251.weapon0Flags 2
+  w Unit#251.weapon2Flags 10
+  o result 1
+call 720 Apply
   r Unit#252.health 0
   r Unit#252.def UnitDef#208
-  r Unit#252.flags 0x30280021
-  r Unit#252.script CobScript#4
+  r Unit#252.player Player#1
+  r Unit#252.flags 0x30010021
+  r Unit#252.activateFlags 0
+  r Unit#252.script null
   r Unit#252.id 252
   r Unit#252.killCount 0
   r Unit#252.playerIndex 1
-  r Unit#252.owner Player#1
-  r Unit#252.motion null
   r Unit#252.posX 195559424
   r Unit#252.posY 65536
   r Unit#252.posZ 83361792
   r Unit#252.weapon0TargetX 0
   r Unit#252.weapon0TargetZ 0
-  r Unit#252.weapon0Def weapondef#0
-  r Unit#252.weapon0Flags 16
+  r Unit#252.weapon0Def null
+  r Unit#252.weapon0Flags 0
   r Unit#252.weapon1TargetX 0
   r Unit#252.weapon1TargetZ 0
-  r Unit#252.weapon1Def weapondef#0
-  r Unit#252.weapon1Flags 20
+  r Unit#252.weapon1Def null
+  r Unit#252.weapon1Flags 0
   r Unit#252.weapon2TargetX 0
   r Unit#252.weapon2TargetZ 0
-  r Unit#252.weapon2Def weapondef#0
-  r Unit#252.weapon2Flags 24
-  r Unit#252.heading -32382
-  r Unit#252.pitch 0
+  r Unit#252.weapon2Def null
+  r Unit#252.weapon2Flags 0
   r Unit#252.weapon0ReloadTimer 0
   r Unit#252.weapon0FireHeading 0
   r Unit#252.weapon0FirePitch 0
@@ -9252,12 +9272,76 @@ call 720 UpdateUnitWeapons
   r Unit#252.weapon2FirePitch 0
   r Unit#252.weapon2Stockpile 0
   r Unit#252.weapon2MuzzleDelta 0
+  r UnitDef#208.flags1 0x0084008a
+  r UnitDef#208.damagemodifier 65536
   r UnitDef#208.maxHealth 175
-  r UnitDef#208.modelMaxYHigh 22
+  r UnitDef#208.weapons0 weapondef#0
+  r UnitDef#208.weapons1 weapondef#0
+  r UnitDef#208.weapons2 weapondef#0
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0
   r Unit#252.weapons[2].aimCob.nAimCobDone 0
+  a event.kind 259
+  a event.unit Unit#252
+  a event.weapon 0
+  a size 12
+  o result 1
+call 720 Apply
+  a event.kind 259
+  a event.unit Unit#252
+  a event.weapon 1
+  a size 12
+  o result 1
+call 720 Apply
+  a event.kind 259
+  a event.unit Unit#252
+  a event.weapon 2
+  a size 12
+  o result 1
+call 720 Apply
+  r Unit#252.flags 0x30290021
+  r Unit#252.script CobScript#4
+  a event.kind 261
+  a event.unit Unit#252
+  a size 8
+  i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 0
+  o out (195559424,65536,83361792)
+  i scripts.QueryScript CobScript#4 "QuerySecondary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 1
+  o out (195559424,65536,83361792)
+  i scripts.QueryScript CobScript#4 "QueryTertiary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#252 2
+  o out (195559424,65536,83361792)
+  i services.SchedPublish 6 44
+  w Unit#252.weapon0Def weapondef#0
+  w Unit#252.weapon0Flags 16
+  w Unit#252.weapon1Def weapondef#0
+  w Unit#252.weapon1Flags 20
+  w Unit#252.weapon2Def weapondef#0
+  w Unit#252.weapon2Flags 24
+  o result 1
+call 720 UpdateUnitWeapons
+  r rng.seed 0x5e0f5cdb
+  r Unit#252.flags 0x30280021
+  r Unit#252.owner Player#1
+  r Unit#252.motion null
+  r Unit#252.heading -32382
+  r Unit#252.pitch 0
+  r UnitDef#208.modelMaxYHigh 22
   a unit Unit#252
+call 720 Apply
+  a event.kind 260
+  a event.unit Unit#252
+  a event.weapon 3
+  a size 12
+  o result 1
 call 721 UpdateUnitWeapons
   r rng.seed 0x62f160c5
   r Player#0.energy f32:0x47651200
@@ -9280,8 +9364,6 @@ call 721 UpdateUnitWeapons
 call 721 UpdateUnitWeapons
   r Unit#251.posX 198631176
   r Unit#251.posZ 86374546
-  r Unit#251.weapon0Flags 2
-  r Unit#251.weapon2Flags 10
   r UnitMotion#2.speed 28181
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0

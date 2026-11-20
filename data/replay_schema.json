@@ -123,7 +123,8 @@
    "<anon>::halves": "the halves of a stack union that holds the height difference of a shot",
    "<anon>::value": "a stack union that holds the height difference of a shot (the weapon flags word is read through the rule of the line-of-sight shot)",
    "g_aimScriptNames": "a constant table of script names",
-   "g_fireScriptNames": "a constant table of script names"
+   "g_fireScriptNames": "a constant table of script names",
+   "WeaponAimCobCb::ppVtbl": "the vtable word of a weapon's aim callback, which the kind's `vptr` checks and the replayer sets"
   },
   "exempt_types": {
    "Ref<Unit>": "the handle of a unit, built from its pointer and turned back into it by the event of targeting",
@@ -3588,6 +3589,26 @@
      "WeaponAimCobCb.nAimCobDone"
     ],
     "note": "a field the module writes only some of the time: the entry value is read, so that a change made outside the seam is an r line and not a w line"
+   },
+   {
+    "kind": "field_escape",
+    "target": "UnitWeaponSlot::flags",
+    "functions": [
+     "Unit::ClaimWeapons",
+     "Unit::ReleaseWeapons"
+    ],
+    "rule": "fields",
+    "reads": [
+     "Unit.weapon0Flags",
+     "Unit.weapon1Flags",
+     "Unit.weapon2Flags"
+    ],
+    "writes": [
+     "Unit.weapon0Flags",
+     "Unit.weapon1Flags",
+     "Unit.weapon2Flags"
+    ],
+    "note": "a slot's flag bits are set through a view of its flags word"
    }
   ],
   "subsystems": {
@@ -3815,8 +3836,38 @@
       "native": "FindWeaponByNameSlot"
      },
      "Apply": {
-      "record": false,
-      "reason": "#711",
+      "functions": [
+       "WeaponsApply",
+       "Valid",
+       "KnownKind",
+       "UnitOfOffset",
+       "DamageUnit",
+       "ApplyUnitDamage",
+       "UnitFromId",
+       "Unit::ClaimWeapons",
+       "Unit::ReleaseWeapons",
+       "InitUnitWeaponSlots",
+       "GetWeaponPiecePosition",
+       "QueryWeaponPiece",
+       "WeaponAimCobCb::OnAimCobReturn"
+      ],
+      "args": {
+       "event": {
+        "mode": "event",
+        "events": "weapons",
+        "size": "size",
+        "refs": {
+         "callback": "WeaponAimCobCb"
+        },
+        "unrecorded": {
+         "WEAPONS_DETONATE": "#711",
+         "WEAPONS_REMOVE_PROJECTILES": "#711",
+         "WEAPONS_EXPLODE_PIECE": "#711",
+         "WEAPONS_AREA_DAMAGE": "#711",
+         "WEAPONS_SPAWN": "#711"
+        }
+       }
+      },
       "native": "ApplyWeaponsSlot"
      },
      "WriteState": {
@@ -6036,7 +6087,26 @@
   {"name": "MapEventHeader", "type": "MapEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
   {"name": "MapSetYard", "type": "MapSetYard", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "open", "kind": "i32"}]},
   {"name": "MapPassMaps", "type": "MapPassMaps", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "cell0", "kind": "i32", "member": "cell[0]"}, {"name": "cell1", "kind": "i32", "member": "cell[1]"}, {"name": "size0", "kind": "i32", "member": "size[0]"}, {"name": "size1", "kind": "i32", "member": "size[1]"}]},
-  {"name": "MapCellsChanged", "type": "MapCellsChanged", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "rect0", "kind": "i32", "member": "rect[0]"}, {"name": "rect1", "kind": "i32", "member": "rect[1]"}, {"name": "rect2", "kind": "i32", "member": "rect[2]"}, {"name": "rect3", "kind": "i32", "member": "rect[3]"}, {"name": "classes", "kind": "u32"}, {"name": "cause", "kind": "i32"}]}
+  {"name": "MapCellsChanged", "type": "MapCellsChanged", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "rect0", "kind": "i32", "member": "rect[0]"}, {"name": "rect1", "kind": "i32", "member": "rect[1]"}, {"name": "rect2", "kind": "i32", "member": "rect[2]"}, {"name": "rect3", "kind": "i32", "member": "rect[3]"}, {"name": "classes", "kind": "u32"}, {"name": "cause", "kind": "i32"}]},
+  {"name": "WeaponsEventHeader", "type": "WeaponsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
+  {"name": "WeaponsDamage", "type": "WeaponsDamage", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "source", "kind": "ref", "target": "Unit"}, {"name": "amount", "kind": "i32"}, {"name": "damageKind", "kind": "i32"}, {"name": "direction", "kind": "i32"}]},
+  {"name": "WeaponsDetonate", "type": "WeaponsDetonate", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "selfDestruct", "kind": "i32"}]},
+  {"name": "WeaponsRelease", "type": "WeaponsRelease", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "weapon", "kind": "i32"}]},
+  {"name": "WeaponsClaim", "type": "WeaponsClaim", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "weapon", "kind": "i32"}]},
+  {"name": "WeaponsAimDone", "type": "WeaponsAimDone", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "callback", "kind": "ref", "target": "WeaponAimCobCb"}, {"name": "result", "kind": "i32"}]},
+  {"name": "WeaponsExplodePiece", "type": "WeaponsExplodePiece", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "piece", "kind": "i32"}, {"name": "flags", "kind": "u32"}]},
+  {"name": "WeaponsAreaDamage", "type": "WeaponsAreaDamage", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "weapon", "kind": "i32"}, {"name": "pos0", "kind": "i32", "member": "pos[0]"}, {"name": "pos1", "kind": "i32", "member": "pos[1]"}, {"name": "pos2", "kind": "i32", "member": "pos[2]"}]},
+  {"name": "WeaponsSpawn", "type": "WeaponsSpawn", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "weapon", "kind": "i32"}, {"name": "pos0", "kind": "i32", "member": "pos[0]"}, {"name": "pos1", "kind": "i32", "member": "pos[1]"}, {"name": "pos2", "kind": "i32", "member": "pos[2]"}, {"name": "vel0", "kind": "i32", "member": "vel[0]"}, {"name": "vel1", "kind": "i32", "member": "vel[1]"}, {"name": "vel2", "kind": "i32", "member": "vel[2]"}, {"name": "announce", "kind": "i32"}]},
+  {"name": "WeaponsSetStockpiles", "type": "WeaponsSetStockpiles", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "stockpiles0", "kind": "i32", "member": "stockpiles[0]"}, {"name": "stockpiles1", "kind": "i32", "member": "stockpiles[1]"}, {"name": "stockpiles2", "kind": "i32", "member": "stockpiles[2]"}]},
+  {"name": "WeaponsAddStockpile", "type": "WeaponsAddStockpile", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "weapon", "kind": "i32"}]},
+  {"name": "WeaponsAttacked", "type": "WeaponsAttacked", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "attacker", "kind": "ref", "target": "Unit"}, {"name": "amount", "kind": "i32"}]},
+  {"name": "WeaponsHit", "type": "WeaponsHit", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "enemyDamage", "kind": "i32"}, {"name": "friendlyDamage", "kind": "i32"}]},
+  {"name": "WeaponsDamageRecord", "type": "WeaponsDamageRecord", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "damageKind", "kind": "i32"}, {"name": "attacker", "kind": "ref", "target": "Unit"}]},
+  {"name": "WeaponsHealth", "type": "WeaponsHealth", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "health", "kind": "i32"}, {"name": "dying", "kind": "i32"}]},
+  {"name": "WeaponsParalyze", "type": "WeaponsParalyze", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "ticks", "kind": "i32"}]},
+  {"name": "WeaponsStartScript", "type": "WeaponsStartScript", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "script", "kind": "i32"}, {"name": "callback", "kind": "ref", "target": "WeaponAimCobCb"}, {"name": "update", "kind": "i32"}, {"name": "withArgs", "kind": "i32"}, {"name": "count", "kind": "i32"}, {"name": "args0", "kind": "i32", "member": "args[0]"}, {"name": "args1", "kind": "i32", "member": "args[1]"}, {"name": "args2", "kind": "i32", "member": "args[2]"}, {"name": "args3", "kind": "i32", "member": "args[3]"}]},
+  {"name": "WeaponsDetachPiece", "type": "WeaponsDetachPiece", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "piece", "kind": "i32"}, {"name": "pose", "kind": "i32"}]},
+  {"name": "WeaponsBusy", "type": "WeaponsBusy", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "until", "kind": "i32"}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -6131,8 +6201,9 @@
    }
   },
   "weapons": {
-   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [3, 0], "status": "complete", "imports": ["features.GetFootprintCentre", "los_radar.GetMapCell", "los_radar.GetMapCellAtPosition", "los_radar.IsPointVisible", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "network.SendProjectileDetonated", "network.SendScriptCallByName", "network.SendUnitDamage", "network.SendWeaponFire", "network.SendWeaponFireAt", "scripts.StartScript", "scripts.StartScriptWithArgs", "scripts.GetAimFromPosition", "scripts.GetPieceOffset", "scripts.GetPiecePosition", "scripts.QueryScript"], "issue": 712, "unrecorded": {"Apply": {"reason": "#711", "native": "ApplyWeaponsSlot"}, "UpdateProjectiles": {"reason": "#711", "native": "UpdateProjectiles"}, "UpdateExplosions": {"reason": "#711", "native": "UpdateExplosions"}, "FindWeaponByName": {"reason": "#711", "native": "FindWeaponByNameSlot", "conv": "__stdcall", "ret": "WeaponDef*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "WeaponDef*", "mode": "weapon", "reach": ["flags"]}}, "AllocWeaponArray": {"reason": "load class", "native": "AllocWeaponArray"}, "FreeWeaponArray": {"reason": "load class", "native": "FreeWeaponArray"}, "LoadWeaponTypes": {"reason": "load class", "native": "LoadWeaponTypes"}, "FreeWeaponTypes": {"reason": "load class", "native": "FreeWeaponTypes"}, "InitExplosions": {"reason": "load class", "native": "InitExplosions"}, "FreeExplosions": {"reason": "load class", "native": "FreeExplosions"}, "LoadState": {"reason": "load class", "native": "LoadWeaponsStateSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteWeaponsStateSlot"}}},
+   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [3, 0], "status": "complete", "imports": ["features.GetFootprintCentre", "los_radar.GetMapCell", "los_radar.GetMapCellAtPosition", "los_radar.IsPointVisible", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "network.SendProjectileDetonated", "network.SendScriptCallByName", "network.SendUnitDamage", "network.SendWeaponFire", "network.SendWeaponFireAt", "scripts.StartScript", "scripts.StartScriptWithArgs", "scripts.GetAimFromPosition", "scripts.GetPieceOffset", "scripts.GetPiecePosition", "scripts.QueryScript"], "issue": 712, "unrecorded": {"UpdateProjectiles": {"reason": "#711", "native": "UpdateProjectiles"}, "UpdateExplosions": {"reason": "#711", "native": "UpdateExplosions"}, "FindWeaponByName": {"reason": "#711", "native": "FindWeaponByNameSlot", "conv": "__stdcall", "ret": "WeaponDef*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "WeaponDef*", "mode": "weapon", "reach": ["flags"]}}, "AllocWeaponArray": {"reason": "load class", "native": "AllocWeaponArray"}, "FreeWeaponArray": {"reason": "load class", "native": "FreeWeaponArray"}, "LoadWeaponTypes": {"reason": "load class", "native": "LoadWeaponTypes"}, "FreeWeaponTypes": {"reason": "load class", "native": "FreeWeaponTypes"}, "InitExplosions": {"reason": "load class", "native": "InitExplosions"}, "FreeExplosions": {"reason": "load class", "native": "FreeExplosions"}, "LoadState": {"reason": "load class", "native": "LoadWeaponsStateSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteWeaponsStateSlot"}}},
    "slots": {
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["WeaponsApply", "Valid", "KnownKind", "UnitOfOffset", "DamageUnit", "ApplyUnitDamage", "UnitFromId", "Unit::ClaimWeapons", "Unit::ReleaseWeapons", "InitUnitWeaponSlots", "GetWeaponPiecePosition", "QueryWeaponPiece", "WeaponAimCobCb::OnAimCobReturn"], "reads": ["Game.localPlayer"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.health", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.aimCob", "UnitDef.flags1", "UnitDef.damagemodifier", "UnitDef.maxHealth", "UnitDef.weapons0", "UnitDef.weapons1", "UnitDef.weapons2", "weapondef.index", "weapondef.reloadTime", "WeaponAimCobCb.nAimCobDone"], "objectWrites": ["Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "WeaponAimCobCb.nAimCobDone"], "allOf": [], "args": [{"name": "event", "type": "WeaponsEventHeader*", "line": "event", "mode": "event", "events": "weapons", "size": "size", "refs": {"callback": "WeaponAimCobCb"}, "unrecorded": {"WEAPONS_DETONATE": "#711", "WEAPONS_REMOVE_PROJECTILES": "#711", "WEAPONS_EXPLODE_PIECE": "#711", "WEAPONS_AREA_DAMAGE": "#711", "WEAPONS_SPAWN": "#711"}, "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyWeaponsSlot"},
     "UpdateUnitWeapons": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitWeapons", "CalcAimAngles", "RecordBuildMenuUpdate", "SolveLaunchAngle", "SubtractVec3", "WeaponCanReachPos", "RecordUnitEvent", "ReachPosLineOfFire"], "reads": ["Game.ticks", "Game.flags_2a44", "Game.seaLevel", "Game.gravity", "Game.projectileCount", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.projectileCount", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.energy", "Player.metal", "Unit.health", "Unit.def", "Unit.flags", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.owner", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.heading", "Unit.pitch", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.aimCob", "UnitDef.maxHealth", "UnitDef.modelMaxYHigh", "weapondef.flags", "weapondef.speed", "weapondef.acceleration", "weapondef.accuracy", "weapondef.burst", "weapondef.coverage", "weapondef.energyPerShot", "weapondef.metalPerShot", "weapondef.pitch", "weapondef.lifetime", "weapondef.pitchTolerance", "weapondef.range", "weapondef.reloadTime", "weapondef.sound", "weapondef.startSpeed", "weapondef.tolerance", "UnitMotion.speed", "Projectile.speed", "Projectile.spawnTick", "Projectile.attacker", "Projectile.active", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ", "Projectile.startX", "Projectile.startY", "Projectile.startZ", "Projectile.directionX", "Projectile.directionY", "Projectile.directionZ", "Projectile.targetX", "Projectile.targetY", "Projectile.targetZ", "Projectile.anglesHeading", "Projectile.anglesPitch", "Projectile.range", "Projectile.time", "Projectile.nextSmokeTick", "Projectile.targetUnit", "Projectile.interceptedProjectile", "Projectile.piece", "Projectile.flags", "WeaponAimCobCb.nAimCobDone", "WeaponFire.fire"], "objectWrites": ["Unit.weapon0Flags", "Unit.weapon1Flags", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Projectile.speed", "Projectile.spawnTick", "Projectile.attacker", "Projectile.active", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ", "Projectile.startX", "Projectile.startY", "Projectile.startZ", "Projectile.directionX", "Projectile.directionY", "Projectile.directionZ", "Projectile.targetX", "Projectile.targetY", "Projectile.targetZ", "Projectile.anglesHeading", "Projectile.anglesPitch", "Projectile.range", "Projectile.time", "Projectile.nextSmokeTick", "Projectile.targetUnit", "Projectile.interceptedProjectile", "Projectile.piece", "Projectile.flags", "WeaponAimCobCb.nAimCobDone"], "allOf": ["Projectile", "WeaponFire"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitWeapons"},
     "GetWeaponRange": {"conv": "__stdcall", "ret": "int", "functions": ["GetWeaponRange"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "weapondef.range"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetWeaponRangeSlot"},
     "WeaponCanReachUnit": {"conv": "__stdcall", "ret": "int", "functions": ["WeaponCanReachUnit", "ReachUnitDistSquared", "ReachUnitLineOfFire", "SolveLaunchAngle"], "reads": ["Game.seaLevel", "Game.gravity"], "writes": [], "objectReads": ["Unit.def", "Unit.flags", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon2Def", "UnitDef.flags1", "UnitDef.modelMaxYHigh", "weapondef.flags", "weapondef.speed", "weapondef.pitch", "weapondef.range"], "objectWrites": [], "allOf": [], "args": [{"name": "shooter", "type": "Unit*", "line": "shooter", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "WeaponCanReachUnit"},

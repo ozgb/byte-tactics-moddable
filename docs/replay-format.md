@@ -406,7 +406,8 @@ A `ref` with no `ctype` is checked for its size only, as before. An array of ref
 
 `"vptr": "<global>"` on a kind says that its first word is a pointer to a global table of 2 functions that
 the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a AimCallback has a vptr that
-is not <global>` when it differs. The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
+is not <global>` when it differs. A word of 0 is an object the code has not set up yet (a unit's aim callbacks before weapons' `INIT_SLOTS` event), and is read as any other.
+The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
 
 ### An embedded polymorphic object
 
@@ -509,7 +510,7 @@ the type, in the recorder and in the stub. A `cast` on an argument that is not `
 
 ## Event arguments
 
-The `Apply` slot of `wind_meteors`, `targeting`, `los_radar` and `map` takes `(const <Module>EventHeader* event, unsigned int size)`: the
+The `Apply` slot of `wind_meteors`, `targeting`, `los_radar`, `map` and `weapons` takes `(const <Module>EventHeader* event, unsigned int size)`: the
 header every event of the module starts with (its `kind`, and the fields all kinds share), and the size in bytes of the whole
 event, payload included. Each kind has its own payload struct, which starts with the header (`TargetingSetPos` is a
 `TargetingEventHeader h` and `int pos[3]`), or is the header alone (`TARGETING_CLEAR`). The annotation is
@@ -524,6 +525,16 @@ scalar it is. The elements of an array member are `name0`, `name1` and so on; a 
 the table does not list is recorded as the header. Exactly `size` bytes of the event are copied before the lines are made, so
 a payload field beyond `size` reads as 0 (an event shorter than its payload is recorded, and the slot answers it with outcome 0);
 the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.
+
+`"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
+`WEAPONS_DETONATE`, `WEAPONS_EXPLODE_PIECE`, `WEAPONS_AREA_DAMAGE`, `WEAPONS_SPAWN` and `WEAPONS_REMOVE_PROJECTILES` to #711,
+whose explosion and debris state is not in the schema yet. The recorder passes an event of such a kind (one at least as long
+as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
+recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
+`"refs"` maps a payload member to the state kind its block offset leads to, for a ref that is no unit:
+`{"callback": "WeaponAimCobCb"}` makes `callback` of `WeaponsAimDone` and `WeaponsStartScript` a ref to a weapon's aim callback,
+named by its site (`a event.callback Unit#3.aimCob[1]`). The check fails for a kind that is no state kind and for a member
+that is no `unsigned int` of a payload of the table.
 
 The `WindMeteorsEmit` service, which wind_meteors calls to publish an effect, is one `value` of the `WindMeteorsSpawn` payload
 (its only effect), followed by the `size` as an `int`. The value is made from the first `size` bytes of the effect, the rest
@@ -972,7 +983,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
 | `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local); a `Vec3` out of an import is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds, and its stub writes it (`weapons` imports `targeting.GetWeaponTargetPos`) |
-| `event` (`events`, `size`) | a pointer to a subsystem's event header and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
+| `event` (`events`, `size`, optional `unrecorded` and `refs`) | a pointer to a subsystem's event header and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
@@ -1166,7 +1177,9 @@ weapons:
 
 - A shot of an interceptor (a vertical-launch weapon with the interceptor flag): the scenarios before #975 reach the vertical-launch handler 887 times and fire 32 missiles from it (`mission-radius` and `long-greenhaven-8p`), none with an interceptor weapon; `ai-antinuke-intercept` (#975) fires the suite's one interceptor shot at tick 5696, which no recording holds, so its `FindTargetableProjectile` call and `Projectile.interceptedProjectile` are never reached by a recorded shot. The anti-nuke of `orders-weapon-build` searches (the `FindTargetableProjectile` slot returns null at its 3 calls) and never fires. The vertical-launch shot of a missile is recorded in `mission-radius`.
 - `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
-- The hit of a paralyzer weapon, a DAMAGE event of kind 2: weapons' `Apply` is not recorded (#1004), and the paralysis order is orders' handler of weapons' PARALYZE effect.
+- The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
+- `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
+- `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded` (#711), so the self-destructs of `combat-deaths` reach the recording only through what they change.
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
 
 ## Replaying
@@ -1244,19 +1257,19 @@ The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a
 of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game.overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
 `occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.
 
-`replay_inject_test.exe` is also built with the reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`), and the divergence is reported at call 265 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15):
+`replay_inject_test.exe` is also built with the reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`), and the divergence is reported at call 295 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15):
 
 ```sh
-wine build/modern/replay_inject_test.exe --expect 265 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
+wine build/modern/replay_inject_test.exe --expect 295 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0). They hold weapons' slots but not `Apply`: the replay schema does not yet replay weapons' `Apply`, so the damage, claims, releases and aim answers that reach weapons as events are not replayed (#1004):
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0). They hold weapons' slots and the `Apply` of every kind but the five it leaves to #711 ("Event arguments"): the damage, claims, releases, slot set-ups and aim answers that reach weapons as events. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
 
-- `orders-guard-attacked`, ticks 1 to 250: two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
-- `orders-air-fights`, ticks 100 to 260: fighters shoot at each other (the line-of-sight handler, `WeaponCanReachUnit`).
-- `orders-weapon-build`, ticks 700 to 780: an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
-- `combat-deaths`, ticks 850 to 1000: a solar plant and a laser tower self-destruct; the window holds the `UpdateUnitWeapons` of the units around them.
-- `mission-radius`, ticks 1640 to 1650: a missile ship fires its vertical-launch weapon at tick 1644 (`Unit#269`, `weapondef#130`, whose `WeaponFire#130.fire` is `weaponFire[1]`). The shot reads its target (`targeting.GetWeaponTargetPos`, `targeting.GetWeaponTargetUnit`), queries the fire script (`scripts.QueryScript` `QueryPrimary`, `scripts.GetPieceOffset`) and starts it and the unit's rock script as START_SCRIPT effects (`services.SchedPublish`), records the sound and smoke events, pays (`economy.SpendEnergyAndMetal`) and writes the new `Projectile#4`. The window also holds a turret shot and a line-of-sight shot.
+- `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 104 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
+- `orders-air-fights`, ticks 100 to 260 (`Apply`: 5 RELEASE, 9 CLAIM, 1 INIT_SLOTS and 22 AIM_DONE): fighters shoot at each other (the line-of-sight handler, `WeaponCanReachUnit`).
+- `orders-weapon-build`, ticks 700 to 780 (`Apply`: 3 RELEASE, 2 CLAIM and 1 INIT_SLOTS): an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
+- `combat-deaths`, ticks 850 to 1000 (`Apply`: 7 DAMAGE and 7 RELEASE): a solar plant and a laser tower self-destruct; the window holds the `UpdateUnitWeapons` of the units around them.
+- `mission-radius`, ticks 1640 to 1650 (`Apply`: 4 RELEASE, 10 CLAIM and 11 AIM_DONE): a missile ship fires its vertical-launch weapon at tick 1644 (`Unit#269`, `weapondef#130`, whose `WeaponFire#130.fire` is `weaponFire[1]`). The shot reads its target (`targeting.GetWeaponTargetPos`, `targeting.GetWeaponTargetUnit`), queries the fire script (`scripts.QueryScript` `QueryPrimary`, `scripts.GetPieceOffset`) and starts it and the unit's rock script as START_SCRIPT effects (`services.SchedPublish`), records the sound and smoke events, pays (`economy.SpendEnergyAndMetal`) and writes the new `Projectile#4`. The window also holds a turret shot and a line-of-sight shot.
 - `long-greenhaven-8p`, tick 30518 only: a bomber drops a bomb (`Unit#1783`, `weapondef#5`, whose `WeaponFire#5.fire` is `weaponFire[3]`), the first dropped shot of the suite: it reads its target and the weapon piece, records the sound event, pays and writes `Projectile#2` with the bomber's heading. One tick of the eight-player match is 287 calls.
 
 `Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which a new projectile writes and reads for the camera, are `exempt`.

@@ -119,14 +119,15 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons")
 
 
 def event_table(subsystem: str) -> dict:
-    """The header struct of a subsystem's events and each kind's payload struct (None for the header alone), from traceschema's EVENT_MODULES."""
+    """The header struct of a subsystem's events, each kind's payload struct (None for the header alone) and each kind's value by its enum name, from traceschema's EVENT_MODULES."""
     module = traceschema.module_of_header(subsystem + ".h")
     kinds = traceschema.event_kinds(module)
-    return {"header": module.header, "kinds": {value: None if struct == module.header else struct for value, (_, struct, _, _) in kinds.items()}}
+    return {"header": module.header, "kinds": {value: None if struct == module.header else struct for value, (_, struct, _, _) in kinds.items()},
+            "names": {name: value for value, (name, _, _, _) in kinds.items()}}
 
 
 EVENTS = {sub: event_table(sub) for sub in EVENT_SUBSYSTEMS}
@@ -147,12 +148,13 @@ def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | No
     return out
 
 
-def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]:
-    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit."""
+def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | None = None) -> list[dict]:
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit, and a block offset that `refs` names (member to kind) as a ref to that kind."""
     fields = []
+    refs = refs or {}
     for ctype, member, length in structs[name]:
         if ctype in structs:
-            fields += flatten_event_fields(structs, ctype, path + member + ".")
+            fields += flatten_event_fields(structs, ctype, path + member + ".", refs)
             continue
         if ctype == "char" and length:
             field = {"name": member, "kind": "string", "size": length}
@@ -164,6 +166,8 @@ def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]
             field = {"name": member if length is None else "%s%d" % (member, i)}
             if traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
+            elif member in refs and ctype == "unsigned int" and length is None:
+                field.update({"kind": "ref", "target": refs[member]})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]
             else:
@@ -191,15 +195,28 @@ def with_events(ann: dict) -> dict:
         return ann
     ann = copy.deepcopy(ann)
     ann["events"] = {}
+    refs = event_refs(ann)
     for sub, spec in EVENTS.items():
         check_event_kinds(sub, spec["kinds"])
         structs = interface_structs(sub)
         for name in dict.fromkeys([spec["header"]] + [x for x in spec["kinds"].values() if x]):
             if name not in structs:
                 raise Error("interfaces/%s.h has no struct %s" % (sub, name))
-            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name)}
-        ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())}}
+            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name, refs=refs.get(sub))}
+        ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())},
+                              "names": dict(spec["names"])}
     return ann
+
+
+def event_refs(ann: dict) -> dict:
+    """Per table of events, the payload members that the `refs` of its event arguments record as refs, and the kind each leads to."""
+    out: dict = {}
+    for spec in ann.get("subsystems", {}).values():
+        for note in spec.get("slots", {}).values():
+            for arg in note.get("args", {}).values():
+                if arg.get("mode") == "event" and isinstance(arg.get("refs"), dict):
+                    out.setdefault(arg.get("events"), {}).update(arg["refs"])
+    return out
 
 
 def without_events(ann: dict) -> dict:
@@ -1171,6 +1188,32 @@ def check_length(where: str, a: dict, label: str, args: list[dict], errors: list
         errors.append("%s: the `elem` of %s is one of %s" % (where, label, ", ".join(sorted(SIZES))))
 
 
+def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict) -> list[str]:
+    """Errors for the `unrecorded` kinds (an enum name of the table, each with a reason) and the `refs` (a block offset member of a payload, leading to a state kind) of an event argument."""
+    errors = []
+    unrecorded = a.get("unrecorded", {})
+    if not isinstance(unrecorded, dict):
+        errors.append("%s: `unrecorded` of %s maps the name of a kind to the reason it is not recorded" % (where, label))
+        unrecorded = {}
+    for name, reason in unrecorded.items():
+        if name not in table["names"]:
+            errors.append("%s: %s leaves %s unrecorded, which is no kind of the events of %s" % (where, label, name, a["events"]))
+        elif not isinstance(reason, str) or not reason:
+            errors.append("%s: %s leaves %s unrecorded with no reason" % (where, label, name))
+    refs = a.get("refs", {})
+    if not isinstance(refs, dict):
+        errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
+        refs = {}
+    payloads = dict.fromkeys(table["kinds"].values())
+    for member, kind in refs.items():
+        if kinds.get(kind, {}).get("scope") != "state":
+            errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, member, kind))
+        elif not any(f["name"] == member and f["kind"] == "ref" and f.get("target") == kind
+                     for p in payloads for f in kinds.get(p, {}).get("fields", [])):
+            errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a payload of %s" % (where, label, member, a["events"]))
+    return errors
+
+
 def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) -> list[str]:
     """Errors for the struct forms of a slot: the kind must be a value kind of the argument's type, a count must name an integer argument."""
     errors = []
@@ -1222,6 +1265,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s is %s, and the events of %s start with %s*" % (where, label, arg_type(a), a["events"], table["header"]))
             if size not in names or size == a["name"] or args[names.index(size)]["type"] not in INTEGER_ARGS:
                 errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
+            if table is not None:
+                errors += check_event_extras(where, label, a, table, kinds)
         elif a["mode"] == "vector":
             check_vector_arg(where, a, label, kinds, errors)
         elif a["mode"] == "units-buffer":
@@ -1571,7 +1616,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                             if "w" in OBJECT_KINDS[kind]:
                                 obj_writes.add(i)
                         owner_type = target.split("::")[0]
-                        if not hits and owner_type in state_types and (kind, target) not in rules_of:
+                        if not hits and owner_type in state_types and (kind, target) not in rules_of and target not in ann["exempt"]:
                             pending["untracked"].add(target)
                         elif (not hits and "::" in target and owner_type not in kind_types and owner_type not in exempt_types
                               and owner_type not in seam_types and not any(n == owner_type or n.startswith(owner_type + "_") for n in spec.get("services", []))
@@ -2217,6 +2262,11 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         if a.get("size") in names:
             a["sizeIndex"] = names.index(a["size"])
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "event" and a.get("unrecorded"):
+            kinds = " || ".join("a%d->kind == %s" % (i, name) for name in a["unrecorded"])
+            L.append("    if (a%d != nullptr && a%d >= sizeof(*a%d) && (%s))" % (i, a["sizeIndex"], i, kinds))
+            L.append("        return s_inner_%s->%s(%s);" % (sub, slot, call_args))
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
         if a["mode"] == "object":

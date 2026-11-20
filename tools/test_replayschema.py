@@ -2883,6 +2883,44 @@ class EventForms(unittest.TestCase):
         _, errors, _ = rs.generate(rs.read_rows(), ann)
         self.assertTrue(any("needs a `size`" in e for e in errors))
 
+    def test_a_kind_left_unrecorded_is_passed_through_before_any_line(self):
+        files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecWeaponsApply"):]
+        body = body[:body.index("\n}\n")]
+        unrecorded = rs.load_annotations()["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
+        self.assertEqual(set(unrecorded), {"WEAPONS_DETONATE", "WEAPONS_EXPLODE_PIECE", "WEAPONS_AREA_DAMAGE", "WEAPONS_SPAWN", "WEAPONS_REMOVE_PROJECTILES"})
+        guard = body.index("if (a0 != nullptr && a1 >= sizeof(*a0) && (")
+        self.assertLess(guard, body.index("ReplayRoots roots;"))
+        for name in unrecorded:
+            self.assertIn("a0->kind == %s" % name, body[guard:body.index("ReplayRoots roots;")])
+        self.assertIn("return s_inner_weapons->Apply(a0, a1);", body)
+        self.assertIn('ArgEvent(s_call, "event", RET_WEAPONS, a0, a1);', body)
+
+    def test_a_payload_member_that_refs_names_is_a_ref_to_that_kind(self):
+        objects = rs.load_annotations()["objects"]
+        fields = {f["name"]: f for f in objects["WeaponsAimDone"]["fields"]}
+        self.assertEqual((fields["callback"]["kind"], fields["callback"]["target"]), ("ref", "WeaponAimCobCb"))
+        fields = {f["name"]: f for f in objects["WeaponsStartScript"]["fields"]}
+        self.assertEqual((fields["callback"]["kind"], fields["callback"]["target"]), ("ref", "WeaponAimCobCb"))
+
+    def test_unrecorded_names_a_kind_of_the_table_with_a_reason(self):
+        for unrecorded, want in (({"WEAPONS_NOTHING": "#711"}, "which is no kind of the events of weapons"),
+                                 ({"WEAPONS_DETONATE": ""}, "unrecorded with no reason"),
+                                 (["WEAPONS_DETONATE"], "maps the name of a kind")):
+            ann = annotations()
+            ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"] = unrecorded
+            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            self.assertTrue(any(want in e for e in errors), (unrecorded, errors))
+
+    def test_refs_names_a_payload_member_and_a_state_kind(self):
+        for refs, want in (({"callback": "Nothing"}, "which is no state kind"),
+                           ({"result": "WeaponAimCobCb"}, "no unsigned int member of a payload")):
+            ann = annotations()
+            ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["refs"] = refs
+            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            self.assertTrue(any(want in e for e in errors), (refs, errors))
+
 
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):

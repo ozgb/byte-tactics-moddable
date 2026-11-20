@@ -1,18 +1,14 @@
 #ifndef INTERFACES_ORDERS_H
 #define INTERFACES_ORDERS_H
 
-class AiSearchGoal;
-class OrderBase;
-class OrderFx;
 class HapiBank;
 struct Unit;
-struct Order;
-struct Point16;
 struct Vec3;
+struct StateWriter;
 class MissionType;
 
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
-#define ORDERS_VERSION_MAJOR 4
+#define ORDERS_VERSION_MAJOR 5
 // Minor version of the orders interface, changed when a slot is added.
 #define ORDERS_VERSION_MINOR 0
 
@@ -29,44 +25,234 @@ class MissionType;
 // Order flag: a unit with this first order raises no under attack line.
 #define ORDER_FLAG_NO_UNDERATTACK_LINE 0x80
 
+// The fields every orders event and effect starts with.
+struct OrdersEventHeader {
+    // A kind of event or of effect.
+    int kind;
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none).
+    unsigned int unit;
+};
+
+// The kinds of event other modules publish to orders' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but STATUS_FLAGS, which names an order), or its kind is unknown.
+enum OrdersEventKind {
+    // unit gets an order of a kind against a target unit or a position (OrdersAdd); outcome 1.
+    ORDERS_ADD = 288,
+    // The count of a unit type queued in unit's build list changes, by the type's name (OrdersQueueBuild); outcome 1.
+    ORDERS_QUEUE_BUILD = 289,
+    // unit's orders are deleted (OrdersStop); outcome 1.
+    ORDERS_STOP = 290,
+    // unit's orders that do not stay are dropped and it waits to be carried by its carrier; the header alone; outcome 1.
+    ORDERS_BE_CARRIED = 291,
+    // Status flags are set on an order, as the unit it listens to changes or the target that moves its unit reports progress (OrdersStatusFlags); outcome 1, or 0 for no order.
+    ORDERS_STATUS_FLAGS = 292,
+    // unit was damaged by an attacker (OrdersAttacked): a unit of an active player of type 1 or 2 that can return fire attacks it, or aims its free weapons at it; outcome 1.
+    ORDERS_ATTACKED = 293,
+    // unit is paralysed for more ticks (OrdersParalyze): when its first order is a paralysis, that order lasts longer, else a paralysis order is added after its orders; outcome 1.
+    ORDERS_PARALYZE = 294
+};
+
+// The kinds of effect orders publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
+enum OrdersEffectKind {
+    // unit's state bits change (OrdersSetStateBits).
+    ORDERS_EFFECT_SET_STATE_BITS = 304,
+    // unit is placed at a position (OrdersSetPosition).
+    ORDERS_EFFECT_SET_POSITION = 305,
+    // unit is attached to a piece of another unit, or detached from it (OrdersAttachToPiece).
+    ORDERS_EFFECT_ATTACH_TO_PIECE = 306,
+    // unit, which a builder built, is finished (OrdersFinishConstruction).
+    ORDERS_EFFECT_FINISH_CONSTRUCTION = 307,
+    // unit, unfinished and left alone, decays for a number of ticks (OrdersBuildDecay).
+    ORDERS_EFFECT_BUILD_DECAY = 308,
+    // unit is repaired by a builder (OrdersRepair).
+    ORDERS_EFFECT_REPAIR = 309,
+    // A reference an order holds to a unit is unlinked from that unit (OrdersUnlink).
+    ORDERS_EFFECT_UNLINK = 310,
+    // A script of unit starts (OrdersStartScript).
+    ORDERS_EFFECT_START_SCRIPT = 311
+};
+
+// The payload of ADD.
+struct OrdersAdd {
+    // The kind and the unit ordered.
+    OrdersEventHeader h;
+    // The order's type, as GetOrderType returns it.
+    int type;
+    // 0 to replace the unit's orders that are not marked to stay, 1 to queue it behind them.
+    int queue;
+    // The target unit, as its block offset (0 for none).
+    unsigned int target;
+    // 1 when pos holds the order's position.
+    int hasPos;
+    // The order's position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The order's two arguments.
+    int params[2];
+};
+
+// The payload of QUEUE_BUILD.
+struct OrdersQueueBuild {
+    // The kind and the factory unit.
+    OrdersEventHeader h;
+    // How many more to queue, or, below 0, how many fewer.
+    int count;
+    // The name of the unit type, or of a weapon to stockpile (MAKENUKE, MAKEANTI), zero-terminated.
+    char name[32];
+};
+
+// The payload of STOP.
+struct OrdersStop {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // 1 to delete every order, 0 only the ones not marked to stay.
+    int all;
+};
+
+// The payload of STATUS_FLAGS.
+struct OrdersStatusFlags {
+    // The kind and the unit of the order, or 0.
+    OrdersEventHeader h;
+    // The order, as its block offset.
+    unsigned int order;
+    // The flags to set.
+    unsigned int flags;
+};
+
+// The payload of ATTACKED.
+struct OrdersAttacked {
+    // The kind and the unit damaged.
+    OrdersEventHeader h;
+    // The attacker, as its block offset (0 for none).
+    unsigned int attacker;
+};
+
+// The payload of PARALYZE.
+struct OrdersParalyze {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The ticks of paralysis added.
+    int ticks;
+};
+
+// The payload of SET_STATE_BITS.
+struct OrdersSetStateBits {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The state bits to change.
+    int mask;
+    // 1 to set them, 0 to clear them.
+    int set;
+};
+
+// The payload of SET_POSITION.
+struct OrdersSetPosition {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The flight mode the unit is placed in.
+    int mode;
+};
+
+// The payload of ATTACH_TO_PIECE.
+struct OrdersAttachToPiece {
+    // The kind and the unit attached.
+    OrdersEventHeader h;
+    // The unit carrying it, as its block offset (0 for none).
+    unsigned int target;
+    // The piece of the carrying unit.
+    int piece;
+    // How the unit is attached.
+    int mode;
+};
+
+// The payload of FINISH_CONSTRUCTION.
+struct OrdersFinishConstruction {
+    // The kind and the unit finished.
+    OrdersEventHeader h;
+    // The builder, as its block offset.
+    unsigned int builder;
+};
+
+// The payload of BUILD_DECAY.
+struct OrdersBuildDecay {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The ticks of decay.
+    int ticks;
+};
+
+// The payload of REPAIR.
+struct OrdersRepair {
+    // The kind and the unit repaired.
+    OrdersEventHeader h;
+    // The builder, as its block offset.
+    unsigned int builder;
+    // The repair progress added.
+    float amount;
+};
+
+// The payload of UNLINK.
+struct OrdersUnlink {
+    // The kind and the unit the reference points at.
+    OrdersEventHeader h;
+    // The reference, as its block offset.
+    unsigned int ref;
+};
+
+// The forms of a START_SCRIPT effect.
+enum OrdersScriptForm {
+    // The script by name, with no arguments.
+    ORDERS_SCRIPT_BY_NAME = 0,
+    // The script by name, with count arguments.
+    ORDERS_SCRIPT_BY_NAME_WITH_ARGS = 1,
+    // The script by its index in the unit's script, with count arguments.
+    ORDERS_SCRIPT_BY_INDEX_WITH_ARGS = 2
+};
+
+// The payload of START_SCRIPT.
+struct OrdersStartScript {
+    // The kind and the unit whose script starts.
+    OrdersEventHeader h;
+    // The form (OrdersScriptForm).
+    int form;
+    // The script's index, for BY_INDEX_WITH_ARGS.
+    int index;
+    // The script's name, zero-terminated, for the forms by name.
+    char name[32];
+    // The callback told when the script returns, as its block offset (0 for none).
+    unsigned int callback;
+    // The update argument of the start.
+    int update;
+    // The count of arguments.
+    int count;
+    // The arguments.
+    int args[4];
+};
+
 // Unit orders and command queues.
 struct OrdersSeam {
-    // Adds an order to the end of a unit's order list. Hooks: none.
-    void (__stdcall* AppendOrder)(Unit* owner, Order* node);
-    // Gives a unit an order of a kind against a target unit or a position (the order is queued behind the others unless remove is set). Hooks: none.
-    void (__stdcall* AddOrder)(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int param_6, int param_7);
-    // Deletes the orders of a unit, except the ones marked to stay when all is 0. Hooks: none.
-    void (__stdcall* DeleteOrders)(Unit* owner, int all);
-    // Returns the flags of the first order of a unit, or 0 when it has none. Hooks: none.
-    int (__stdcall* GetOrderFlags)(Unit* unit);
-    // Returns the kind of order a unit gets against a target unit or position for a relation mode. Hooks: none.
-    MissionType (__stdcall* GetOrderType)(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
-    // Orders a unit to attack a target and returns 1 when it did. Hooks: none.
-    int (__stdcall* IssueAttackOrder)(Unit* unit, Unit* target, int param_3);
-    // Makes a unit that was just read from a saved game take the effects of its first order back (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* ReattachFxToUnit)(Order* order);
-    // Writes an order of a unit to a saved game bank under a name and returns 1 when it was written (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* SerializeOrderToSave)(Order* order, int unusedEdx, Unit* unit, HapiBank* file, char* name);
-    // Adds the order that makes a unit wait to be carried. Hooks: none.
-    void (__stdcall* AddBeCarriedOrder)(Unit* unit);
-    // Runs the first order of a unit for one tick. Hooks: none.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const OrdersEventHeader* event, unsigned int size);
+    // Runs the first order of a unit for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: none.
     void (__stdcall* RunOrders)(Unit* unit);
-    // Runs the secondary orders of a unit for one tick. Hooks: none.
+    // Runs the secondary orders of a unit for one tick, after RunOrders. Hooks: none.
     void (__stdcall* RunSecondaryOrders)(Unit* unit);
-    // Registers the order types of every module in the order type table. Hooks: none.
-    void (__stdcall* RegisterAllOrderTypes)(void);
-    // Empties the order type table. Hooks: none.
-    void (__stdcall* ClearOrderTypeTable)(void);
-    // Allocates an order from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    Order* (__stdcall* LoadOrder)(Unit* unit, HapiBank* file, char* name);
-    // Returns the order kind a name in the order type table stands for. Hooks: none.
+    // Returns the flags of the first order of a unit, or 0 when it has none; a query. Hooks: none.
+    int (__stdcall* GetOrderFlags)(Unit* unit);
+    // Returns the kind of order a unit gets against a target unit or position for a relation mode; a query. Hooks: none.
+    MissionType (__stdcall* GetOrderType)(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
+    // Returns the order kind a name in the order type table stands for; a query. Hooks: none.
     MissionType (__stdcall* MissionTypeFromName)(const char* name);
-    // Allocates an order from the sim block, builds it from a kind, a target, a position and three values and returns it. Hooks: none.
-    Order* (__stdcall* NewOrder)(MissionType kind, Unit* target, void* pos, int a, int b, int c);
-    // Changes the queued count of a unit type in the build list of a unit, by name, and never plays a sound. Hooks: none.
-    void (__stdcall* QueueBuildOrder)(char* name, Unit* unit, int count);
-    // Sets status flags on an order that listens to a unit, through the status handler of its kind. Hooks: none.
-    void (__stdcall* OrderOrStatusFlags)(OrderBase* order, unsigned int flags);
+    // Registers the order types of every module in the order type table, outside the tick. Hooks: none.
+    void (__stdcall* RegisterAllOrderTypes)(void);
+    // Empties the order type table, outside the tick. Hooks: none.
+    void (__stdcall* ClearOrderTypeTable)(void);
+    // Reads count orders of a unit from a saved game bank, gives them to the unit and lets its first order take back its effects, outside the tick. Hooks: none.
+    void (__stdcall* LoadOrders)(Unit* unit, HapiBank* file, int count);
+    // Writes the orders of a unit to a saved game bank and returns how many it wrote, outside the tick. Hooks: none.
+    int (__stdcall* SaveOrders)(Unit* unit, HapiBank* file);
+    // Writes orders' state as records of the trace, which the engine dumps and does not hash.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

@@ -18,7 +18,7 @@ class UnitRef;
 class UnitTypeSet;
 
 // Major version of the units interface, changed when a slot is removed or its signature changes.
-#define UNITS_VERSION_MAJOR 4
+#define UNITS_VERSION_MAJOR 5
 // Minor version of the units interface, changed when a slot is added.
 #define UNITS_VERSION_MINOR 0
 
@@ -102,8 +102,10 @@ struct UnitsSeam {
     void (__fastcall* UpdateSfxOccupy)(UnitMotion* motion, int unusedEdx, Unit* unit);
     // Starts one unit's update for one tick, before its weapons: the count of units updated and its wind generator; UpdateAllUnits calls it for each unit of each player. Hooks: none.
     void (__stdcall* UpdateUnitHead)(Unit* unit);
-    // Finishes one unit's update for one tick, after its weapons: its scripts, timers, health percentage, water damage, self-repair, orders, motion and a pending death. Hooks: none.
-    void (__stdcall* UpdateUnitBody)(Unit* unit);
+    // Continues one unit's update for one tick, after its weapons: its scripts, timers, health percentage, water damage and self-repair; returns 1 when the unit's player is active and of type 1 or 2, so that its orders and its movement run next. Hooks: none.
+    int (__stdcall* UpdateUnitBody)(Unit* unit);
+    // Finishes one unit's update for one tick, after its orders and its movement: its height when moved is 1 (its movement ran), then a pending death. Hooks: none.
+    void (__stdcall* UpdateUnitTail)(Unit* unit, int moved);
     // Appends to out the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
     void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
     // Creates the empty index of a player's factories, refreshed by the next RefreshFactoryIndex, outside the tick. Hooks: none.
@@ -116,6 +118,10 @@ struct UnitsSeam {
     void (__stdcall* UnitRefInit)(UnitRef* ref, Unit* unit, OrderBase* value);
     // Points a reference at another unit, or at none, and links it into the list of that unit (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* UnitRefSetUnit)(UnitRef* ref, Unit* unit);
+    // Returns the unit a reference points at, or null; a view read. Hooks: none.
+    Unit* (__stdcall* UnitRefGet)(UnitRef* ref);
+    // Gives a reference the order that listens to the unit it points at. Hooks: none.
+    void (__stdcall* UnitRefSetValue)(UnitRef* ref, OrderBase* value);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };

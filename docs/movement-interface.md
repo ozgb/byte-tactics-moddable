@@ -112,8 +112,8 @@ that movement reads, as a view.
   `UnitRefInit` and `UnitRefSetUnit`, and through the existing `UnitRefUnlink` (units 2.0); all three take a `UnitRef*`. Where the caller built the
   reference in place (`link(o, 0)`), the constructor now runs empty and `UnitRefInit` fills it; its destructor body
   moved into `UnitRef::Unlink`. The header moved from `src/orders/` to `src/units/`.
-- **`MovementClass`** (`src/units/movement_class.cpp`): the pass map and the movement class table are units' and map's
-  (`docs/map-interface.md`), not the motion's. `UnitMotion::movementClass` only points at one.
+- **`MovementClass`** (`src/units/movement_class.cpp`): the movement class definition is units' and the pass maps are map's `PassMap` (`src/map/pass_map.cpp`,
+  `docs/map-interface.md`), not the motion's. `UnitMotion::movementClass` only points at one.
 - **Pathfinding.** `src/ai/pathfind*.cpp` stays pathfinding's. It reads a goal's areas through `PathGoalCells`,
   `PathGoalContains` and `PathGoalDistance` in `src/util/path_goal.cpp` (platform), not through a slot.
 - **`UpdateUnitHeight`** and the unit's position code stay units'. Movement writes `Unit::pos` and `Unit::angles` through

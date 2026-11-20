@@ -255,15 +255,15 @@ void __stdcall FreePassMaps(void)
     }
 }
 
-#define PASS_MAP_CHANGE_ARGS(passMap, a, b) \
-    (a).x - (passMap)->footprintX < 0 ? 0 : (a).x - (passMap)->footprintX, \
-    (a).y - (passMap)->footprintZ < 0 ? 0 : (a).y - (passMap)->footprintZ, \
-    (a).x + (b).x >= (int)(passMap)->width ? (int)(passMap)->width - 1 : (a).x + (b).x, \
-    (a).y + (b).y >= (int)(passMap)->height ? (int)(passMap)->height - 1 : (a).y + (b).y, \
-    1u << (int)((passMap) - g_passMaps.entries)
+#define PASS_MAP_CHANGE_ARGS(pm, a, b) \
+    (a).x - (pm)->footprintX < 0 ? 0 : (a).x - (pm)->footprintX, \
+    (a).y - (pm)->footprintZ < 0 ? 0 : (a).y - (pm)->footprintZ, \
+    (a).x + (b).x >= (int)(pm)->width ? (int)(pm)->width - 1 : (a).x + (b).x, \
+    (a).y + (b).y >= (int)(pm)->height ? (int)(pm)->height - 1 : (a).y + (b).y, \
+    1u << (int)((pm) - g_passMaps.entries)
 
-#define PUBLISH_PASS_MAP_CHANGE(passMap, a, b, cause) \
-    MapPublishCellsChanged(PASS_MAP_CHANGE_ARGS(passMap, a, b), cause)
+#define PUBLISH_PASS_MAP_CHANGE(pm, a, b, cause) \
+    MapPublishCellsChanged(PASS_MAP_CHANGE_ARGS(pm, a, b), cause)
 
 static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
 {

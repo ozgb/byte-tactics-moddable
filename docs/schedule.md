@@ -742,8 +742,8 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `map.RefreshMovedUnits`: intent
 1. `map.RefreshUnitIfStale`: intent
-1. `map.MovementClassInBounds`: query
-1. `map.MovementClassGet`: view read
+1. `map.PassMapInBounds`: query
+1. `map.PassMapGet`: view read
 
 ### `players.Apply`
 
@@ -1206,8 +1206,8 @@ is not listed.
 | orders | `weapons.Apply` | mixed |
 | orders | `weapons.GetWeaponRange` | view read |
 | orders | `weapons.WeaponCanReachUnit` | query |
-| pathfinding | `map.MovementClassGet` | view read |
-| pathfinding | `map.MovementClassInBounds` | query |
+| pathfinding | `map.PassMapGet` | view read |
+| pathfinding | `map.PassMapInBounds` | query |
 | pathfinding | `map.RefreshMovedUnits` | intent |
 | pathfinding | `map.RefreshUnitIfStale` | intent |
 | players | `ai.UpdatePlayerAI` | intent |

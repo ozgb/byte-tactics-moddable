@@ -8,7 +8,7 @@ code as a base. This page names the current tag: **`reference-traces-v30`**.
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (compiled into the test-mode build).
-- The trace format: `bt-trace 6` (the digest files are `bt-digest 6`). The
+- The trace format: `bt-trace 7` (the digest files are `bt-digest 7`). The
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.

@@ -149,7 +149,7 @@ def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | No
 
 
 def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | None = None) -> list[dict]:
-    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit, and a block offset that `refs` names (member to kind) as a ref to that kind."""
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit, and a block offset that `refs` names (`Struct.member` to kind) as a ref to that kind."""
     fields = []
     refs = refs or {}
     for ctype, member, length in structs[name]:
@@ -166,8 +166,8 @@ def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | 
             field = {"name": member if length is None else "%s%d" % (member, i)}
             if traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
-            elif member in refs and ctype == "unsigned int" and length is None:
-                field.update({"kind": "ref", "target": refs[member]})
+            elif "%s.%s" % (name, member) in refs and ctype == "unsigned int" and length is None:
+                field.update({"kind": "ref", "target": refs["%s.%s" % (name, member)]})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]
             else:
@@ -209,7 +209,7 @@ def with_events(ann: dict) -> dict:
 
 
 def event_refs(ann: dict) -> dict:
-    """Per table of events, the payload members that the `refs` of its event arguments record as refs, and the kind each leads to."""
+    """Per table of events, the payload members (`Struct.member`) that the `refs` of its event arguments record as refs, and the kind each leads to."""
     out: dict = {}
     for spec in ann.get("subsystems", {}).values():
         for note in spec.get("slots", {}).values():
@@ -745,6 +745,8 @@ def check_vptr(ann: dict) -> list[str]:
     errors = []
     taken = {spec["vtable"]: name for name, spec in ann["objects"].items() if isinstance(spec.get("vtable"), str)}
     for name, spec in ann["objects"].items():
+        if "vptr_unset" in spec and ("vptr" not in spec or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
+            errors.append("%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % name)
         if "vptr" not in spec:
             continue
         if not isinstance(spec["vptr"], str) or not VTABLE_NAME.match(spec["vptr"]):
@@ -1189,7 +1191,7 @@ def check_length(where: str, a: dict, label: str, args: list[dict], errors: list
 
 
 def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict) -> list[str]:
-    """Errors for the `unrecorded` kinds (an enum name of the table, each with a reason) and the `refs` (a block offset member of a payload, leading to a state kind) of an event argument."""
+    """Errors for the `unrecorded` kinds (an enum name of the table, each with a reason) and the `refs` (`Struct.member`, an unsigned int member of a struct of the module's interface that is no unit ref, leading to a state kind) of an event argument."""
     errors = []
     unrecorded = a.get("unrecorded", {})
     if not isinstance(unrecorded, dict):
@@ -1204,13 +1206,16 @@ def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict
     if not isinstance(refs, dict):
         errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
         refs = {}
-    payloads = dict.fromkeys(table["kinds"].values())
-    for member, kind in refs.items():
+    structs = interface_structs(a["events"])
+    for key, kind in refs.items():
+        struct, _, member = key.partition(".")
+        ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
         if kinds.get(kind, {}).get("scope") != "state":
-            errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, member, kind))
-        elif not any(f["name"] == member and f["kind"] == "ref" and f.get("target") == kind
-                     for p in payloads for f in kinds.get(p, {}).get("fields", [])):
-            errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a payload of %s" % (where, label, member, a["events"]))
+            errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, key, kind))
+        elif ctype != "unsigned int":
+            errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
+        elif traceschema.is_unit_ref(ctype, member):
+            errors.append("%s: `refs` of %s names %s, which is a unit ref already" % (where, label, key))
     return errors
 
 
@@ -1445,7 +1450,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vptr", "kinds", "delta"):
+        for key in ("vtable", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         objects.append(entry)
@@ -2009,7 +2014,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
         inside_first, inside_count = site_at[o["name"]]
-        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True)))
+        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]

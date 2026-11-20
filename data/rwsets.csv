@@ -58108,6 +58108,7 @@ address,function,file,kind,target
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::name
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vptrUnset
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,function,
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h

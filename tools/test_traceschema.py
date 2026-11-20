@@ -348,7 +348,7 @@ class EventKindsTest(unittest.TestCase):
         self.assertIn("    case WEAPONS_DAMAGE:\n    case WEAPONS_REMOTE_DAMAGE:\n        return sizeof(WeaponsDamage);\n", text)
         self.assertIn("    default:\n        return sizeof(WeaponsEventHeader);\n", text)
         self.assertNotIn("WEAPONS_INIT_SLOTS", text)
-        self.assertEqual(text.count("return sizeof("), len(set(ts.EVENT_MODULES[-1].payloads.values()) - {None}) + 1)
+        self.assertEqual(text.count("return sizeof("), len(set(ts.module_of_header("weapons.h").payloads.values()) - {None}) + 1)
 
     def test_a_module_is_found_by_its_header(self):
         self.assertEqual(ts.module_of_header("weapons.h").c_name, "Weapons")

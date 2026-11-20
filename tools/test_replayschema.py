@@ -918,11 +918,11 @@ class Polymorphic(unittest.TestCase):
         text = files[rs.SCHEMA_H]
         vtables = files[rs.VTABLES_CPP]
         self.assertIn("extern void (* const g_approachRadiusVtable[])();", vtables)
-        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },', text)
         self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('0, 0, 0, 3, 0 },'), base)
+        self.assertTrue(base.endswith('0, 0, 0, 3, 0, 0 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
@@ -1686,8 +1686,8 @@ class InsideSites(unittest.TestCase):
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
-        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 6, 0, 0, 0 },', text)
-        self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 6, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0, 0 },', text)
 
     def test_the_sites_of_a_kind_are_in_the_model(self):
         _, _, model = self.generated()
@@ -1843,8 +1843,8 @@ class DeltaKinds(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertTrue(any(l.startswith('    { "FixtureCell", sizeof(FixtureCell), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 1 },") for l in text.split("\n")))
-        self.assertTrue(any(l.startswith('    { "FixtureLane", sizeof(FixtureLane), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 0 },") for l in text.split("\n")))
+        self.assertTrue(any(l.startswith('    { "FixtureCell", sizeof(FixtureCell), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 1, 0 },") for l in text.split("\n")))
+        self.assertTrue(any(l.startswith('    { "FixtureLane", sizeof(FixtureLane), RS_STATE,') and l.endswith(", 0, 0, 0, 0, 0, 0 },") for l in text.split("\n")))
         self.assertTrue([o for o in model["objects"] if o["name"] == "FixtureCell"][0]["delta"])
         self.assertNotIn("delta", [o for o in model["objects"] if o["name"] == "Player"][0])
 
@@ -2274,6 +2274,16 @@ class ElementForms(unittest.TestCase):
             ann = annotations()
             ann["objects"]["FixtureCb"].update(change)
             self.has(ann, message)
+
+    def test_vptr_unset_is_a_reason_on_a_vptr_kind_and_reaches_its_row(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "WeaponAimCobCb", sizeof\(WeaponAimCobCb\), RS_STATE, RT_ORDER, \d+, 1, 0, 0, 0, 1 \},')
+        self.assertRegex(files[rs.FIXTURE_SCHEMA_H], r'\{ "FixtureCb", sizeof\(FixtureCb\), RS_STATE, \w+, \d+, \d+, 0, 0, 0, 0 \},')
+        for kind, value in (("FixtureCb", ""), ("FixtureCb", True), ("FixtureCell", "a reason")):
+            ann = annotations()
+            ann["objects"][kind]["vptr_unset"] = value
+            self.has(ann, "%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % kind)
 
     def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
         files, errors, _ = self.generated()
@@ -2817,8 +2827,8 @@ class EventForms(unittest.TestCase):
                 self.assertEqual(rs.EVENTS[sub]["kinds"][value] or module.header, struct, (sub, value))
 
     def test_both_schemas_record_the_same_payload_fields_as_unit_refs(self):
-        for sub in rs.EVENT_SUBSYSTEMS + ("weapons",):
-            module = rs.traceschema.module_of_header(sub + ".h")
+        for module in rs.traceschema.EVENT_MODULES:
+            sub = module.header_file[:-len(".h")]
             structs = rs.interface_structs(sub)
             for value, (_, struct, _, fields) in rs.traceschema.event_kinds(module).items():
                 trace = {name for name, _, kind, _, _ in fields if kind == "ref"}
@@ -2897,6 +2907,14 @@ class EventForms(unittest.TestCase):
         self.assertIn("return s_inner_weapons->Apply(a0, a1);", body)
         self.assertIn('ArgEvent(s_call, "event", RET_WEAPONS, a0, a1);', body)
 
+    def test_refs_name_a_member_of_one_struct(self):
+        structs = rs.interface_structs("weapons")
+        refs = {"WeaponsAimDone.callback": "WeaponAimCobCb"}
+        aim = {f["name"]: f for f in rs.flatten_event_fields(structs, "WeaponsAimDone", refs=refs)}
+        script = {f["name"]: f for f in rs.flatten_event_fields(structs, "WeaponsStartScript", refs=refs)}
+        self.assertEqual(aim["callback"]["kind"], "ref")
+        self.assertEqual(script["callback"]["kind"], "u32")
+
     def test_a_payload_member_that_refs_names_is_a_ref_to_that_kind(self):
         objects = rs.load_annotations()["objects"]
         fields = {f["name"]: f for f in objects["WeaponsAimDone"]["fields"]}
@@ -2914,8 +2932,11 @@ class EventForms(unittest.TestCase):
             self.assertTrue(any(want in e for e in errors), (unrecorded, errors))
 
     def test_refs_names_a_payload_member_and_a_state_kind(self):
-        for refs, want in (({"callback": "Nothing"}, "which is no state kind"),
-                           ({"result": "WeaponAimCobCb"}, "no unsigned int member of a payload")):
+        for refs, want in (({"WeaponsAimDone.callback": "Nothing"}, "which is no state kind"),
+                           ({"WeaponsAimDone.result": "WeaponAimCobCb"}, "no unsigned int member of a struct of interfaces/weapons.h"),
+                           ({"callback": "WeaponAimCobCb"}, "no unsigned int member of a struct of interfaces/weapons.h"),
+                           ({"WeaponsDamage.source": "Unit"}, "WeaponsDamage.source, which is a unit ref already"),
+                           ({"WeaponsDamage.source": "WeaponAimCobCb"}, "WeaponsDamage.source, which is a unit ref already")):
             ann = annotations()
             ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["refs"] = refs
             _, errors, _ = rs.generate(rs.read_rows(), ann)

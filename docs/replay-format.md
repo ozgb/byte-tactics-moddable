@@ -406,8 +406,16 @@ A `ref` with no `ctype` is checked for its size only, as before. An array of ref
 
 `"vptr": "<global>"` on a kind says that its first word is a pointer to a global table of 2 functions that
 the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a AimCallback has a vptr that
-is not <global>` when it differs. A word of 0 is an object the code has not set up yet (a unit's aim callbacks before weapons' `INIT_SLOTS` event), and is read as any other.
+is not <global>` when it differs, 0 included. `"vptr_unset": "<reason>"` on such a kind lets the word be 0 as well, for an object
+the code has not set up yet, which is then read as any other: `WeaponAimCobCb` has it, since a unit's aim callbacks hold 0 until
+weapons' `INIT_SLOTS` event stores the global. `replayschema.py --check` fails for a `vptr_unset` with no reason or on a kind with no `vptr`.
 The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
+
+The store of the word is not checked: the replayer has the global in the word before the call, and the recording has no
+line for it. An `Apply` of `INIT_SLOTS` that leaves a unit's aim callbacks at 0 replays equal (an AIM_DONE replays equal too, since
+the replayer sets the word again when it resolves the callback), and only a game fails, at the first AIM_DONE of that weapon,
+which calls through the word. The six recorded `INIT_SLOTS` calls check the rest of what the event sets up (the imports and
+each slot's `weapon<N>Def` and `weapon<N>Flags`), not the three words.
 
 ### An embedded polymorphic object
 
@@ -531,10 +539,11 @@ the replayer builds a zeroed buffer, restores the lines, and passes the buffer w
 whose explosion and debris state is not in the schema yet. The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
-`"refs"` maps a payload member to the state kind its block offset leads to, for a ref that is no unit:
-`{"callback": "WeaponAimCobCb"}` makes `callback` of `WeaponsAimDone` and `WeaponsStartScript` a ref to a weapon's aim callback,
-named by its site (`a event.callback Unit#3.aimCob[1]`). The check fails for a kind that is no state kind and for a member
-that is no `unsigned int` of a payload of the table.
+`"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
+`{"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}` makes `callback` of those
+two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
+for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
+a member that is a unit ref already.
 
 The `WindMeteorsEmit` service, which wind_meteors calls to publish an effect, is one `value` of the `WindMeteorsSpawn` payload
 (its only effect), followed by the `size` as an `int`. The value is made from the first `size` bytes of the effect, the rest
@@ -933,8 +942,8 @@ from the layout), and the export refuses a copy that names any other source name
   the other targets of the rows that one field records (a bit field is recorded as its word). `replayschema.py --check` fails for a site
   that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
 - Array forms and hand-made vtables (see An array of refs, An array of embedded structs, A table behind a ref field, A vtable pointer the code sets by hand):
-  field kinds `refs` and `embeds` with a `count`, a `table` whose `base` is `{"object", "field"}`, `inside` members with `[]`, and `vptr` on a kind.
-  `replayschema.py --check` fails for a count that is no positive integer, a base that is no ref field leading to the kind, a site no `embeds` field leads to, and a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable.
+  field kinds `refs` and `embeds` with a `count`, a `table` whose `base` is `{"object", "field"}`, `inside` members with `[]`, and `vptr` (with an optional `vptr_unset` reason) on a kind.
+  `replayschema.py --check` fails for a count that is no positive integer, a base that is no ref field leading to the kind, a site no `embeds` field leads to, a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable, and a `vptr_unset` with no reason or on a kind with no `vptr`.
 - `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
   a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
   a mask and a value that can never meet.
@@ -1180,6 +1189,7 @@ weapons:
 - The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
 - `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
 - `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded` (#711), so the self-destructs of `combat-deaths` reach the recording only through what they change.
+- The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
 
 ## Replaying

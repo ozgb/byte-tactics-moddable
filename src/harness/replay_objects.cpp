@@ -262,6 +262,8 @@ void AddSiteMember(ReplayText& t, const ReplayInsideSite& s, unsigned index)
 
 }
 
+static_assert(ROK_COUNT <= REPLAY_OBJECT_KINDS, "every kind of the schema has a row of the object table");
+
 bool ReplayKindFits(unsigned declared, unsigned actual)
 {
     if (declared == actual)

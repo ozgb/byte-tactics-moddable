@@ -299,12 +299,12 @@ IMPORT(WindMeteorsEmitImport)
     WindMeteorsSpawn effect;
     memset(&effect, 0, sizeof effect);
     memcpy(&effect, Linear(a[0].i32), size);
-    if (effect.h.kind == WIND_METEORS_EFFECT_SPAWN) {
-        if (size < sizeof(WindMeteorsSpawn))
-            return ImportError("WindMeteorsEmit", "the effect is smaller than its kind");
-        if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
-            return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
-    }
+    if (effect.h.kind != WIND_METEORS_EFFECT_SPAWN)
+        return ImportError("WindMeteorsEmit", "the kind is not an effect of wind_meteors");
+    if (size < sizeof(WindMeteorsSpawn))
+        return ImportError("WindMeteorsEmit", "the effect is smaller than its kind");
+    if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
+        return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
     WindMeteorsEmit(&effect.h, size);
     return nullptr;
 }

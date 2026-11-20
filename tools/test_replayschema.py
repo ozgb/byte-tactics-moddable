@@ -1448,7 +1448,10 @@ class ReentrantServices(unittest.TestCase):
 
     def test_a_value_argument_is_written_as_the_tuple_of_its_fields_in_both_directions(self):
         spec = [x for x in annotations()["services"] if x["name"] == "WindMeteorsEmit"][0]
-        self.assertEqual(spec["args"][0], {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn"})
+        self.assertEqual(spec["args"][0], {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn", "size": "size"})
+        self.assertIn("ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, a[0].v.p, (unsigned)a[1].v.i, Table());", rs.render_service_end([spec]))
+        self.assertIn("ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, effect, (unsigned int)size, g_objects);", rs.render_service_answers([spec]))
+        del spec["args"][0]["size"]
         self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, a[0].v.p, Table());", rs.render_service_end([spec]))
         self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, effect, g_objects);", rs.render_service_answers([spec]))
 
@@ -1457,6 +1460,9 @@ class ReentrantServices(unittest.TestCase):
         wm = [s for s in ann["services"] if s["name"] == "WindMeteorsEmit"][0]
         self.assertEqual(wm["args"][0]["mode"], "value")
         self.assertEqual(rs.check_service_specs(ann["services"], ann), [])
+        wm["args"][0]["size"] = "effect"
+        self.assertTrue(any("names no int argument" in e for e in rs.check_service_specs(ann["services"], ann)))
+        wm["args"][0]["size"] = "size"
         wm["args"][0]["kind"] = "Unit"
         self.assertTrue(any("value kind" in e for e in rs.check_service_specs(ann["services"], ann)))
 

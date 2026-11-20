@@ -5315,7 +5315,8 @@
      {
       "mode": "value",
       "param": "effect",
-      "kind": "WindMeteorsSpawn"
+      "kind": "WindMeteorsSpawn",
+      "size": "size"
      },
      {
       "mode": "int",

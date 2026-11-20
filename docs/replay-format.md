@@ -525,7 +525,8 @@ a payload field beyond `size` reads as 0 (an event shorter than its payload is r
 the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.
 
 The `WindMeteorsEmit` service, which wind_meteors calls to publish an effect, is one `value` of the `WindMeteorsSpawn` payload
-(its only effect), followed by the `size` as an `int`.
+(its only effect), followed by the `size` as an `int`. The value is made from the first `size` bytes of the effect, the rest
+zero (the annotation's `size` names the argument), so a shorter effect is never read past its end.
 
 ## Polymorphic objects
 

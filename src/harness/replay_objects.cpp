@@ -2580,6 +2580,19 @@ void ReplayAddValueOrNull(ReplayText& t, unsigned kind, const void* p, ReplayObj
         ReplayAddValue(t, kind, p, table);
 }
 
+void ReplayAddValueSized(ReplayText& t, unsigned kind, const void* p, unsigned size, ReplayObjectTable& table)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    unsigned char copy[REPLAY_EVENT_MAX];
+    memset(copy, 0, sizeof copy);
+    unsigned limit = kReplayObjectKinds[kind].size < sizeof copy ? kReplayObjectKinds[kind].size : (unsigned)sizeof copy;
+    memcpy(copy, p, size < limit ? size : limit);
+    ReplayAddValue(t, kind, copy, table);
+}
+
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table)
 {
     t.AddChar('[');

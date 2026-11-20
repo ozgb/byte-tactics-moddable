@@ -461,7 +461,7 @@ void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned in
     ReplayText t;
     StartImport(t, RI_WIND_METEORS_EMIT);
     Space(t);
-    ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, effect, g_objects);
+    ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, effect, (unsigned int)size, g_objects);
     Space(t);
     t.AddInt((int)(unsigned int)size);
     const char* r = Enter(t);

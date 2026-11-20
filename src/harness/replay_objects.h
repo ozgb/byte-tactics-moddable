@@ -78,6 +78,7 @@ void ReplayAddEvent(ReplayText& t, const char* name, unsigned table, const void*
 void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table);
 void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
 void ReplayAddValueOrNull(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
+void ReplayAddValueSized(ReplayText& t, unsigned kind, const void* p, unsigned size, ReplayObjectTable& table);
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table);
 bool ReplayNextListValue(const char** cursor, char* piece, unsigned size);

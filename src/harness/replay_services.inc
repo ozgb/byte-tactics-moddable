@@ -362,7 +362,7 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_WIND_METEORS_EMIT:
     {
         AddSpace(t);
-        ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, a[0].v.p, Table());
+        ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, a[0].v.p, (unsigned)a[1].v.i, Table());
         AddSpace(t);
         t.AddInt(a[1].v.i);
         break;

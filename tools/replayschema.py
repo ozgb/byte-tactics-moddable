@@ -2958,6 +2958,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s needs a `kind` of file, rec or bank" % (where, a["param"]))
             elif m == "value" and (a.get("kind") not in kinds or kinds[a["kind"]]["scope"] != "value"):
                 errors.append("%s: the argument %s needs a `kind` that is a value kind of the schema" % (where, a["param"]))
+            elif m == "value" and "size" in a and params.get(a["size"], {}).get("mode") != "int":
+                errors.append("%s: the argument %s has a `size` that names no int argument" % (where, a["param"]))
             if "reach" in a:
                 if m != "object":
                     errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
@@ -3047,6 +3049,8 @@ def service_input_lines(s: dict, ctx: str) -> list[str]:
             L.append("ReplayAddTextN(t, %s, (int)%s);" % (v, service_param_expr(s, a["length"], ctx)))
         elif m == "commandargs":
             L.append("ReplayAddArgs(t, (const CommandArgs*)%s);" % v)
+        elif m == "value" and "size" in a:
+            L.append("ReplayAddValueSized(t, ROK_%s, %s, %s, g_objects);" % (upper(a["kind"]), v, service_param_expr(s, a["size"], ctx)))
         elif m == "value":
             L.append("ReplayAddValueOrNull(t, ROK_%s, %s, g_objects);" % (upper(a["kind"]), v))
     return L
@@ -3088,6 +3092,8 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddTextN(t, (const char*)a[%d].v.p, a[%d].v.i);" % (i, index[a["length"]]))
             elif m == "commandargs":
                 L.append("        ReplayAddArgs(t, (const CommandArgs*)a[%d].v.p);" % i)
+            elif m == "value" and "size" in a:
+                L.append("        ReplayAddValueSized(t, ROK_%s, a[%d].v.p, (unsigned)a[%d].v.i, Table());" % (upper(a["kind"]), i, index[a["size"]]))
             elif m == "value":
                 L.append("        ReplayAddValueOrNull(t, ROK_%s, a[%d].v.p, Table());" % (upper(a["kind"]), i))
         res = s.get("result")

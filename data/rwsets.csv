@@ -44954,7 +44954,6 @@ address,function,file,kind,target
 ,EconHeader,src/game/economy_events.h,field_write,EconomyEventHeader::unit
 ,EconHeader,src/game/economy_events.h,function,
 ,EconPublish,src/game/economy_events.h,call,EconHeader
-,EconPublish,src/game/economy_events.h,call,EconomyEventSize
 ,EconPublish,src/game/economy_events.h,call,SchedPublish
 ,EconPublish,src/game/economy_events.h,call,operator=
 ,EconPublish,src/game/economy_events.h,field_write,EconomyIncome::energy

@@ -216,7 +216,7 @@ PLAYERS_EVENTS = event_rows("playersEvents", [
 AI_EVENTS = event_rows("aiEvents", [
     [("kind", "0x000000e0"), ("unit", "unit:3"), ("attacker", "unit:4"), ("damage", "0x00000009"),
      ("outcome", "0x00000001")],
-    [("kind", "0x000000f1"), ("unit", "unit:3"), ("type", "0x00000001"), ("queue", "0x00000000"), ("target", "null"),
+    [("kind", "0x000000f0"), ("unit", "unit:3"), ("type", "0x00000001"), ("queue", "0x00000000"), ("target", "null"),
      ("hasPos", "0x00000001"), ("pos", "hex:" + bytes(range(12)).hex()), ("params", "hex:" + bytes(8).hex()),
      ("outcome", "0x00000001")],
 ])
@@ -224,7 +224,7 @@ AI_EVENTS = event_rows("aiEvents", [
 WEAPONS_EVENTS = event_rows("weaponsEvents", [
     [("kind", "0x00000100"), ("unit", "unit:3"), ("source", "unit:4"), ("amount", "0x00000001"),
      ("damageKind", "0x00000002"), ("direction", "0x00001234"), ("outcome", "0x00000001")],
-    [("kind", "0x00000115"), ("unit", "unit:3"), ("outcome", "0x00000001")],
+    [("kind", "0x00000112"), ("unit", "unit:3"), ("outcome", "0x00000001")],
 ])
 
 

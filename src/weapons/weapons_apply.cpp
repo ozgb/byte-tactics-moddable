@@ -77,7 +77,7 @@ static int Valid(const WeaponsEventHeader* e, unsigned int size, Unit* unit)
 
 void __stdcall WeaponsLoadState(Unit* unit, int slot, const WeaponsSlotState* state)
 {
-    if (slot < 0 || slot > 2)
+    if (unit == nullptr || slot < 0 || slot > 2)
         return;
     UnitWeaponSlot* s = &unit->weapons[slot];
     s->aimCob.nAimCobDone = state->aimDone;
@@ -97,6 +97,8 @@ void __stdcall WeaponsLoadState(Unit* unit, int slot, const WeaponsSlotState* st
 
 int __stdcall WeaponsApply(const WeaponsEventHeader* e, unsigned int size)
 {
+    if (size < sizeof(WeaponsEventHeader))
+        return 0;
     Unit* unit = UnitOfOffset(e->unit);
     if (!Valid(e, size, unit))
         return 0;

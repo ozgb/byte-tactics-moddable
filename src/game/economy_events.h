@@ -56,7 +56,7 @@ inline void EconPublish(int outbox, int kind, int player, EconUnit unit, unsigne
     event.resources = resources;
     event.energy = energy;
     event.metal = metal;
-    SchedPublish(outbox, &event, EconomyEventSize(kind));
+    SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void EconPublishLoad(int outbox, int player, EconUnit unit, const EconAccount& account)

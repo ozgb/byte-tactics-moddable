@@ -173,12 +173,12 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
             if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
-                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
-                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, MissionType("MOBILEBUILD").index, remove, (Unit*)0, &pos, index, 0);
+                HarnessUiOrder(g_seams.orders->MissionTypeFromName("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
+                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("MOBILEBUILD").index, remove, (Unit*)0, &pos, index, 0);
             } else {
                 if (((UnitDef*)u->def.get())->flying) {
-                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
-                    OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, MissionType("VTOL_MOBILEBUILD").index, remove, (Unit*)0, &pos, index, 0);
+                    HarnessUiOrder(g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
+                    OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD").index, remove, (Unit*)0, &pos, index, 0);
                 }
             }
         }

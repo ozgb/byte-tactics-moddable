@@ -1570,7 +1570,7 @@ for k in 0 .. n-1, in order, by the kind of the record:
 | 288 | ORDERS_ADD | `unit` (unit), `type`, `queue`, `target` (unit), `hasPos`, `pos` (12 bytes), `params` (8 bytes), `outcome` |
 | 289 | ORDERS_QUEUE_BUILD | `unit` (unit), `count`, `name` (32 bytes), `outcome` |
 | 290 | ORDERS_STOP | `unit` (unit), `all`, `outcome` |
-| 291 | ORDERS_BE_CARRIED | `unit` (unit), `target` (unit), `piece`, `mode`, `outcome` |
+| 291 | ORDERS_BE_CARRIED | `unit` (unit), `outcome` |
 | 292 | ORDERS_STATUS_FLAGS | `unit` (unit), `order` (handle), `flags`, `outcome` |
 | 293 | ORDERS_ATTACKED | `unit` (unit), `attacker` (unit), `outcome` |
 | 294 | ORDERS_PARALYZE | `unit` (unit), `ticks`, `outcome` |

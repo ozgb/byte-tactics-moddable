@@ -21,13 +21,19 @@
 #include "../units/players_effects.h"
 #include "../../interfaces/ai.h"
 #include "../seams/ai_world.h"
-#include "../orders/ai_effects.h"
 #include "../units/ai_effects.h"
 #include "../../interfaces/weapons.h"
-#include "../orders/weapons_effects.h"
 #include "../units/weapons_effects.h"
 #include "../scripts/weapons_effects.h"
 #include "../seams/weapons_world.h"
+#include "../../interfaces/orders.h"
+#include "../../interfaces/movement.h"
+#include "../seams/orders_world.h"
+#include "../seams/movement_world.h"
+#include "../units/orders_effects.h"
+#include "../units/movement_effects.h"
+#include "../scripts/orders_effects.h"
+#include "../scripts/movement_effects.h"
 #include "players.h"
 #include "scheduler.h"
 
@@ -66,7 +72,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_WEAPONS, WEAPONS_EFFECT_ATTACKED, SCHED_AI, AiOnWeaponsAttacked, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_ATTACKED, SCHED_ORDERS, OrdersOnWeaponsAttacked, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_ATTACKED, SCHED_UNITS, UnitsOnWeaponsAttackedSpeech, 1},
-    {SCHED_WEAPONS, WEAPONS_EFFECT_HIT, SCHED_ORDERS, OrdersOnWeaponsHit, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_HIT, SCHED_UNITS, UnitsOnWeaponsHit, 1},
     {SCHED_ORDERS, WEAPONS_DAMAGE, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_ORDERS, WEAPONS_RELEASE, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_ORDERS, WEAPONS_CLAIM, SCHED_WEAPONS, WeaponsInbox, 1},
@@ -120,7 +126,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_WEAPONS, TARGETING_CLEAR, SCHED_TARGETING, TargetingInbox, 1},
     {SCHED_TARGETING, TARGETING_EFFECT_CLEARED, SCHED_UNITS, UnitsOnTargetingCleared, 1},
     {SCHED_UNITS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
-    {SCHED_ORDERS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
+    {SCHED_MOVEMENT, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
     {SCHED_PLAYERS, LOS_RADAR_UPDATE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
     {SCHED_UNITS, LOS_RADAR_REMOVE_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
     {SCHED_UNITS, LOS_RADAR_REVEAL_UNIT, SCHED_LOS_RADAR, LosRadarInbox, 1},
@@ -136,15 +142,59 @@ static const SchedRoute s_routes[] = {
     {SCHED_ECONOMY, LOS_RADAR_SHARE_RADAR, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ENGINE, LOS_RADAR_SHARE_MAP, SCHED_LOS_RADAR, LosRadarInbox, 1},
     {SCHED_UNITS, MAP_ADD_UNIT, SCHED_MAP, MapInbox, 1},
-    {SCHED_ORDERS, MAP_ADD_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_MOVEMENT, MAP_ADD_UNIT, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_REMOVE_UNIT, SCHED_MAP, MapInbox, 1},
-    {SCHED_ORDERS, MAP_REMOVE_UNIT, SCHED_MAP, MapInbox, 1},
+    {SCHED_MOVEMENT, MAP_REMOVE_UNIT, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_CLEAR_UNIT, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_RECLAIM_FOOTPRINT, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_SET_YARD, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_BUCKET_UNLINK, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_BUCKET_PREPEND, SCHED_MAP, MapInbox, 1},
     {SCHED_MAP, MAP_EFFECT_CELLS_CHANGED, SCHED_PATHFINDING, PathfindingOnMapCellsChanged, 1},
+    {SCHED_UNITS, ORDERS_ADD, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_ENGINE, ORDERS_COMMAND, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_ENGINE, ORDERS_QUEUE_BUILD, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_UNITS, ORDERS_STOP, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_UNITS, ORDERS_BE_CARRIED, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_UNITS, ORDERS_STATUS_FLAGS, SCHED_ORDERS, OrdersInbox, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_ORDER_FLAGS, SCHED_ORDERS, OrdersOnMovementOrderFlags, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_STATE_BITS, SCHED_UNITS, UnitsOnOrdersSetStateBits, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_POSITION, SCHED_UNITS, UnitsOnOrdersSetPosition, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_ATTACH_TO_PIECE, SCHED_UNITS, UnitsOnOrdersAttachToPiece, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_FINISH_CONSTRUCTION, SCHED_UNITS, UnitsOnOrdersFinishConstruction, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_BUILD_DECAY, SCHED_UNITS, UnitsOnOrdersBuildDecay, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_REPAIR, SCHED_UNITS, UnitsOnOrdersRepair, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_UNLINK, SCHED_UNITS, UnitsOnOrdersUnlink, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_BUSY, SCHED_UNITS, UnitsOnOrdersBusy, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_FLAGS, SCHED_UNITS, UnitsOnOrdersSetFlags, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_CLEAR_NET_DIRTY, SCHED_UNITS, UnitsOnOrdersClearNetDirty, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_STANCE, SCHED_UNITS, UnitsOnOrdersSetStance, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_ANGLES, SCHED_UNITS, UnitsOnOrdersSetAngles, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_SET_BUILD_STATE, SCHED_UNITS, UnitsOnOrdersSetBuildState, 1},
+    {SCHED_ORDERS, ORDERS_EFFECT_START_SCRIPT, SCHED_SCRIPTS, ScriptsOnOrdersStartScript, 1},
+    {SCHED_UNITS, MOVEMENT_NEW, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_UNITS, MOVEMENT_DESTROY, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_UNITS, MOVEMENT_LOAD, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_UNITS, MOVEMENT_SET_MODE, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_UNITS, MOVEMENT_SET_SPEED, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_MAP, MOVEMENT_PLACED, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_SET_TARGET, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_ORDERS, MOVEMENT_SET_HEADING, SCHED_MOVEMENT, MovementInbox, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_TURN, SCHED_UNITS, UnitsOnMovementTurn, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_TILT, SCHED_UNITS, UnitsOnMovementTilt, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_ANGLES, SCHED_UNITS, UnitsOnMovementAngles, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_MOVE, SCHED_UNITS, UnitsOnMovementMove, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_MOVED, SCHED_UNITS, UnitsOnMovementMoved, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_CHANGE_CELL, SCHED_UNITS, UnitsOnMovementChangeCell, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_MOVE_RATE, SCHED_UNITS, UnitsOnMovementMoveRate, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_SET_POSITION, SCHED_UNITS, UnitsOnMovementSetPosition, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_SET_STATE_BITS, SCHED_UNITS, UnitsOnMovementSetStateBits, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_SFX_OCCUPY, SCHED_UNITS, UnitsOnMovementSfxOccupy, 1},
+    {SCHED_MOVEMENT, MOVEMENT_EFFECT_START_SCRIPT, SCHED_SCRIPTS, ScriptsOnMovementStartScript, 1},
     {SCHED_ENGINE, WIND_METEORS_ENABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_DISABLE, SCHED_WIND_METEORS, WindMeteorsInbox, 0},
     {SCHED_ENGINE, WIND_METEORS_PARAMS, SCHED_WIND_METEORS, WindMeteorsInbox, 0},

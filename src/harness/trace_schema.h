@@ -2209,13 +2209,10 @@ static const TraceField kEventOrdersStop[] = {
     { "all", offsetof(OrdersStop, all), 4, TF_SCALAR, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
-static_assert(sizeof(OrdersAttachToPiece) == 20, "OrdersAttachToPiece");
+static_assert(sizeof(OrdersEventHeader) == 8, "OrdersEventHeader");
 static const TraceField kEventOrdersBeCarried[] = {
-    { "kind", offsetof(OrdersAttachToPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
-    { "unit", offsetof(OrdersAttachToPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
-    { "target", offsetof(OrdersAttachToPiece, target), 4, TF_REF, TT_UNIT, 0 },
-    { "piece", offsetof(OrdersAttachToPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
-    { "mode", offsetof(OrdersAttachToPiece, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "kind", offsetof(OrdersEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
 static_assert(sizeof(OrdersStatusFlags) == 16, "OrdersStatusFlags");
@@ -2372,7 +2369,7 @@ static const TraceEventKind kOrdersKinds[] = {
     { 288, "ORDERS_ADD", sizeof(OrdersAdd), kEventOrdersAdd, 9 },
     { 289, "ORDERS_QUEUE_BUILD", sizeof(OrdersQueueBuild), kEventOrdersQueueBuild, 5 },
     { 290, "ORDERS_STOP", sizeof(OrdersStop), kEventOrdersStop, 4 },
-    { 291, "ORDERS_BE_CARRIED", sizeof(OrdersAttachToPiece), kEventOrdersBeCarried, 6 },
+    { 291, "ORDERS_BE_CARRIED", sizeof(OrdersEventHeader), kEventOrdersBeCarried, 3 },
     { 292, "ORDERS_STATUS_FLAGS", sizeof(OrdersStatusFlags), kEventOrdersStatusFlags, 5 },
     { 293, "ORDERS_ATTACKED", sizeof(OrdersAttacked), kEventOrdersAttacked, 4 },
     { 294, "ORDERS_PARALYZE", sizeof(OrdersParalyze), kEventOrdersParalyze, 4 },

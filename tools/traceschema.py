@@ -1001,7 +1001,7 @@ EVENT_MODULES = [
     EventModule("ordersEvents", 48, "Orders", "orders.h", "OrdersEventHeader",
                 ["OrdersEventKind", "OrdersEffectKind"],
                 {"ORDERS_ADD": "OrdersAdd", "ORDERS_QUEUE_BUILD": "OrdersQueueBuild", "ORDERS_STOP": "OrdersStop",
-                 "ORDERS_BE_CARRIED": "OrdersAttachToPiece", "ORDERS_STATUS_FLAGS": "OrdersStatusFlags",
+                 "ORDERS_BE_CARRIED": None, "ORDERS_STATUS_FLAGS": "OrdersStatusFlags",
                  "ORDERS_ATTACKED": "OrdersAttacked", "ORDERS_PARALYZE": "OrdersParalyze",
                  "ORDERS_COMMAND": "OrdersAdd",
                  "ORDERS_EFFECT_SET_STATE_BITS": "OrdersSetStateBits", "ORDERS_EFFECT_SET_POSITION": "OrdersSetPosition",

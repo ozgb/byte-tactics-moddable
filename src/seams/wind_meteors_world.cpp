@@ -44,6 +44,7 @@ void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned in
 {
     ReplayImport call(RI_WIND_METEORS_EMIT);
     call.Ptr(effect);
+    call.Int(size);
     HarnessWindMeteorsEvent(effect, size);
     SchedPublish(SCHED_WIND_METEORS, effect, size);
 }

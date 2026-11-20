@@ -1,6 +1,6 @@
 # The economy interface
 
-Economy sits behind `interfaces/economy.h` (version 4.0), the pilot of the scheduler decided on #180 (2026-11-08).
+Economy sits behind `interfaces/economy.h` (version 5.0), the pilot of the scheduler decided on #180 (2026-11-08).
 3.1c's resource code is its default implementation (`src/game/economy.cpp`). This page is the inventory the interface
 was cut from (#937):
 - what other subsystems did to economy's state in 3.1c, and what each became;
@@ -13,8 +13,8 @@ was cut from (#937):
 The model is the human's of 2026-11-12 (#937). The scheduler is the engine's (`src/game/scheduler.cpp`), and it knows no
 event kind:
 - **Reads.** A module reads any module's state as of that module's last run, through views and queries.
-- **Outboxes and the router.** A module changes another only by publishing an event, plain data whose first word is
-  its kind, to its own outbox (the service `SchedPublish`). The router is a table of (outbox, kind, subscriber,
+- **Outboxes and the router.** A module changes another only by publishing an event, plain data that starts with
+  its kind (a payload of its own per kind, section 3), to its own outbox (the service `SchedPublish`). The router is a table of (outbox, kind, subscriber,
   handler) rows in a fixed order (`src/game/routes.cpp`), 3.1c's by default: it copies each event into the inbox of
   every subscriber whose row matches, in table order, when the event is published. Each subscriber owns its handler.
 - **Inboxes.** A module consumes its whole inbox before every run: economy before `UpdatePlayerEconomy`,
@@ -28,7 +28,7 @@ event kind:
   fills an inbox: economy's holds at most 76 events in the units phase (section 8).
 - **Synchronous slots.** A same-statement answer comes only from a slot the interface marks synchronous. The engine
   delivers the module's pending inbox before it calls one, so the slot sees every event published before it.
-- **Plain data.** Events carry no pointers: a LOAD carries the account's twelve words.
+- **Plain data.** Events carry no pointers: a LOAD (`EconomyLoad`) carries the account's twelve words.
 
 Economy's place in it:
 - **Queued events into economy:** RESET, LOAD, REQUEST and INCOME, published by units, orders, players and features.
@@ -112,6 +112,19 @@ its records go with the next tick's, and the shares of a scenario's last tick ar
 
 `los_radar.GetMapCell`, economy's one query of another subsystem, became the world view's `CellMetal`. The share of
 maps in `UpdateResourceSharing` stays as it is: it is sent at once, not published (section 8 has the order this changes).
+
+**Payloads.** Every event and effect starts with `EconomyEventHeader`: `kind`, `player` (the account's player, or who gives in a share) and `unit` (the account's unit, 0 for the player's own). Each kind has the payload of `interfaces/economy.h` (version 5.0) that starts with it, or is the header alone; a publisher passes the payload's size, and `Apply(event, size)` refuses an event smaller than its kind's payload with outcome 0 and no change.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| RESET 0 | the header alone | none |
+| LOAD 1 | `EconomyLoad` | `account`: the twelve floats of the account the unit's is set to |
+| REQUEST 2 | `EconomyRequest` | `resources` (the `EconResource` bits asked for), `energy`, `metal` |
+| SPEND 3 | `EconomySpend` | `resources`, `energy`, `metal` spent; also what `Spend(const EconomySpend*)` takes |
+| INCOME 4 | `EconomyIncome` | `resources`, `energy`, `metal` gained |
+| CLOAK 16 | `EconomyCloak` | `keep`: 1 to keep the unit cloaked, 0 to uncloak it |
+| EXTRACTOR 17 | `EconomyExtractor` | `metal`: the metal under the extractor's footprint |
+| SHARE 18 | `EconomyShare` | `resources` (the bit given), `energy`, `metal`, `to` (the player given it; the header's `player` gives) |
 
 ## 4. Views
 

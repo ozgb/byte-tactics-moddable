@@ -1,6 +1,6 @@
 # The ai interface
 
-Ai sits behind `interfaces/ai.h` (version 5.0), the seventh module on the scheduler after economy
+Ai sits behind `interfaces/ai.h` (version 6.0), the seventh module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`) and players (`docs/players-interface.md`)
 (#968). It is the computer players: what each one sees and wants, its squads and their timers, and the orders and
@@ -154,6 +154,21 @@ order list) and asks targeting through orders' outbox, so ai no longer checks or
 **Writes ai keeps.** After this change ai writes no field of another subsystem: `tools/rwsets.py` gives it no write of
 `Unit` other than `Unit::group` (the squad, ai's own field of the unit), and none of `Order` or `UnitMotion`. It writes
 its own: the `PlayerAI` of each player, the squad managers and their timers, the squads, `g_aiCommandsEnabled`.
+
+**Payloads.** Every event and effect starts with `AiEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for PLAN, WEIGHT and LIMIT). Each kind has the payload of `interfaces/ai.h` (version 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| REACT_TO_ATTACK 224 | `AiReactToAttack` | `attacker` (a block offset, 0 for none or dead), `damage` |
+| SET_SQUAD 226 | `AiSetSquad` | `squad`: 0 to 9, or -1 to only leave the squad |
+| PLAN 227 | `AiPlan` | `difficulties`: bit 0 easy, 1 medium, 2 hard, 3 any |
+| WEIGHT 228 | `AiWeight` | `scale`, `fix` (1 to fix the weights), `types[16]` (a set of unit types: type n is bit n % 32 of word n / 32) |
+| LIMIT 229 | `AiLimit` | `limit`, `fix` (1 to fix the limits), `types[16]` (as in WEIGHT) |
+| ADD_ORDER 240 | `AiAddOrder` | `type` (the order's type), `queue` (0 replace, 1 queue behind), `target` (a block offset, 0 for none), `hasPos`, `pos[3]` (world coordinates, 16 fractional bits), `params[2]` |
+| QUEUE_BUILD 241 | `AiQueueBuild` | `type` (the unit type), `count` |
+| STOP 243 | `AiStop` | `all`: 1 to delete every order, 0 only those not marked to stay |
+| ACTIVATE 245 | `AiActivate` | `bits` (the state bits, bit 0 switched on), `on` (1 set, 0 clear) |
+| SET_STATES 246 | `AiSetStates` | `movement` (0 hold position, 1 manoeuvre, 2 roam), `firing` (0 hold fire, 1 return fire, 2 fire at will) |
 
 ## 4. Views and queries
 

@@ -226,7 +226,7 @@ This issue leaves the following to the issues that put the module on the model, 
   Whether `RunScripts`, called from `UpdateUnitBody` for each unit in 3.1c's order, becomes a pass of scripts, and where
   scripts' draws of `RandomInt` sit in it.
 - **#984 (weapons), done (`docs/weapons-interface.md`).** Weapons publishes its script starts as the effect
-  START_SCRIPT and a piece's detaching as DETACH_PIECE, both to scripts; scripts publishes a weapon's aim callback
+  START_SCRIPT (its `WeaponsScript` names the script, which scripts maps back to the unit script's name) and a piece's detaching as DETACH_PIECE, both to scripts; scripts publishes a weapon's aim callback
   (`WeaponAimCobComplete`) as weapons' event AIM_DONE and the explode opcode (`CobScriptExplodePiece`) as
   EXPLODE_PIECE. `QueryScript` and `GetAimFromPosition` stay synchronous slots of scripts (mixed: they run a unit's
   script, and weapons uses the answer in the same statement), for #986.

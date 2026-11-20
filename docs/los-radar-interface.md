@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 3.2), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 4.0), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -118,7 +118,7 @@ none of these, so no trace moves; a module publishing from WASM can.
 | `SightCache` | query: fills a `LosSightCache` (`cell`, `frameIdx`) with a unit's cache, for a saved game |
 | `WriteState` | writes record 44 `losRadarState` and the hashed records of section 24 (section 5) |
 | SIGHT_RESET (137) | event: sets a unit's cache back to zero, as units' set-up did to the bytes; outcome 1, 0 for a null unit |
-| SIGHT_LOAD (138) | event: sets a unit's cache to the `sight` field (`LosRadarEvent::sight`), as a saved game restores it; outcome 1, 0 for a null unit |
+| SIGHT_LOAD (138) | event: sets a unit's cache to the `cell` and `frameIdx` of the payload (`LosRadarSightLoad`), as a saved game restores it; outcome 1, 0 for a null unit |
 
 ## 3. Effects out of los_radar
 
@@ -137,6 +137,18 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
   units as settings. Bit 3 is a redraw request for the fog of war, set by `RecalculateLineOfSight` and
   `RevealAroundUnit` and cleared by the fog's drawing; the trace masks it out (0xfff7). The field stays in the game
   record as view state: the settings' writers are the engine's, and los_radar writes only bit 3.
+
+**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 4.0) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| UPDATE_UNIT 128, REMOVE_UNIT 129, REVEAL_UNIT 130, SIGHT_RESET 137 | `LosRadarUnit` | `unit`: the unit, a block offset |
+| ADD_EYEBALL 131 | `LosRadarAddEyeball` | `pos[3]` (world coordinates, 16 fractional bits), `sightDistance` (world units), `eyeHeight` (world units), `lifetime` (ticks) |
+| CELL_HEIGHTS 132 | `LosRadarCellHeights` | `cell[2]` (the rectangle's first cell), `size[2]` (its width and height in cells) |
+| RECALCULATE 133 | `LosRadarRecalculate` | `reset`: 1 to first reset what each cell shows |
+| SHARE_MAPPING 134, SHARE_RADAR 135 | `LosRadarSharePlayer` | `player`: the player whose sharing toggles |
+| SHARE_MAP 136 | `LosRadarShareMap` | `from` (the player whose sight is shown), `to` (the player it is shown to) |
+| SIGHT_LOAD 138 | `LosRadarSightLoad` | `unit`, `cell` (as `LosSightCache::cell`), `frameIdx` (as `LosSightCache::frameIdx`, 0 to 255) |
 
 ## 4. Views
 

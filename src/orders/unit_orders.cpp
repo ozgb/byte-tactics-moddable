@@ -1684,7 +1684,9 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             return 2;
         }
         WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-        g_seams.map->SnapWorldPosToFootprint(def, &order->pos);
+        Vec3 snapped = order->pos;
+        g_seams.map->SnapWorldPosToFootprint(def, &snapped);
+        order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)((char*)order + 0x12),
             g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
         if (!order->target) {

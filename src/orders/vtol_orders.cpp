@@ -648,7 +648,9 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             order->SetDeadlineTicks(30);
             return 2;
         }
-        g_seams.map->SnapWorldPosToFootprint(def,&order->pos);
+        Vec3 snapped = order->pos;
+        g_seams.map->SnapWorldPosToFootprint(def, &snapped);
+        order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,order->pos,0,1,0));
         if (!order->target) { RecordUnitSpeech(unit,7,SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS); return 8; }
         RecordUnitSpeech(unit,9,SIM_SPEECH_STARTING_CONSTRUCTION);

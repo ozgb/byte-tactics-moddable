@@ -696,6 +696,7 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_read,Vec3::z
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_write,Fixed::value
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_write,Order::flags
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_write,Order::pos
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,field_write,Order::retries
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,function,
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,global_read,g_game
@@ -3843,6 +3844,7 @@ address,function,file,kind,target
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Vec3::x
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_read,Vec3::z
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_write,Order::flags
+0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_write,Order::pos
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,field_write,Order::retries
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,function,
 0x413d80,VtolMobileBuildOrder,src/orders/vtol_orders.cpp,global_read,g_game

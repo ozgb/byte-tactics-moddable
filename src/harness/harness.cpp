@@ -23,6 +23,8 @@
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
 #include "../state/sim_events.h"
+#include "../units/movement_class.h"
+#include "../map/pass_map.h"
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "path_results.h"

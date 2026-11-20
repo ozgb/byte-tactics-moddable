@@ -105,7 +105,7 @@ void FreeMovementClasses(void)
 {
     for (int i = 0; i < 32; i++) {
         GameFreeThunk(g_movementClasses.entries[i].name);
-        g_movementClasses.entries[i].name = 0;
+        g_movementClasses.entries[i].name = nullptr;
     }
 }
 

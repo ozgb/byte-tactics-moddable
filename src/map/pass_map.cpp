@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include "../state/block.h"
 
 #include "../../interfaces/ref.h"
@@ -233,7 +232,7 @@ void __stdcall BuildAllPassMaps(const MapMoveLimits* limits, int count)
         if (n != 0) {
             m->cells = (unsigned int*)SimAlloc(n * 4);
         } else {
-            m->cells = (unsigned int*)0;
+            m->cells = nullptr;
         }
         m->Build();
         progress += 100;
@@ -251,7 +250,7 @@ void __stdcall FreePassMaps(void)
         m->width = 0;
         m->height = 0;
         operator delete(c);
-        m->cells = 0;
+        m->cells = nullptr;
         m->defined = 0;
     }
 }

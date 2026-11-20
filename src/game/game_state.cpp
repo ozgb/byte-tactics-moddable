@@ -8,6 +8,7 @@
 #include "../state/sim_radar.h"
 #include "../state/game_rand.h"
 #include "../../interfaces/seams.h"
+#include "../../interfaces/map.h"
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/los_radar.h"

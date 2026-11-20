@@ -305,6 +305,29 @@ void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, 
     ReplayAddStruct(t, tag, name, kind, p, Table());
 }
 
+void ArgEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size)
+{
+    ReplayAddEvent(t, name, table, p, size, Table());
+}
+
+void EventRoots(ReplayRoots& roots, unsigned table, const void* p, unsigned size)
+{
+    if (p == nullptr)
+        return;
+    unsigned char copy[REPLAY_EVENT_MAX];
+    memset(copy, 0, sizeof copy);
+    memcpy(copy, p, size < sizeof copy ? size : sizeof copy);
+    unsigned object = ReplayEventObject(table, *(int*)copy);
+    for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object != object || f.kind != RK_REF)
+            continue;
+        unsigned offset = *(unsigned*)(copy + f.offset);
+        if (offset != 0)
+            roots.Add(f.target, (char*)SimBlockBase() + offset);
+    }
+}
+
 void ArgStructs(ReplayText& t, const char* name, unsigned kind, const void* p, int count)
 {
     ReplayAddStructs(t, "a", name, kind, p, count, Table());

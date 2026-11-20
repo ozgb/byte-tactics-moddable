@@ -60,14 +60,16 @@ void __stdcall RecWindMeteorsUpdateMeteors()
     }
 }
 
-void __stdcall RecWindMeteorsApply(const WindMeteorsEvent* a0)
+void __stdcall RecWindMeteorsApply(const WindMeteorsEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
+    EventRoots(roots, RET_WIND_METEORS, a0, a1);
     SlotScope scope(RSL_WIND_METEORS_APPLY, SUB_WIND_METEORS, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "event", ROK_WINDMETEORSEVENT, a0);
+        ArgEvent(s_call, "event", RET_WIND_METEORS, a0, a1);
+        ArgValue(s_call, "size", a1);
     }
-    s_inner_wind_meteors->Apply(a0);
+    s_inner_wind_meteors->Apply(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -171,21 +173,22 @@ void* __stdcall RecEconomyShutdown()
     return result;
 }
 
-int __stdcall RecEconomyApply(const EconomyEvent* a0)
+int __stdcall RecEconomyApply(const EconomyEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_APPLY, SUB_ECONOMY, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_economy->Apply(a0);
+    int result = s_inner_economy->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __stdcall RecEconomySpend(const EconomyEvent* a0)
+int __stdcall RecEconomySpend(const EconomySpend* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SPEND, SUB_ECONOMY, roots);
@@ -467,21 +470,22 @@ void __stdcall RecFeaturesLoadFeatures(HapiBank* a0)
     }
 }
 
-int __stdcall RecFeaturesApply(const FeaturesEvent* a0)
+int __stdcall RecFeaturesApply(const FeaturesEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_APPLY, SUB_FEATURES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_features->Apply(a0);
+    int result = s_inner_features->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __stdcall RecFeaturesPlace(const FeaturesEvent* a0)
+int __stdcall RecFeaturesPlace(const FeaturesPlace* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_PLACE, SUB_FEATURES, roots);
@@ -574,14 +578,15 @@ unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Poin
     return result;
 }
 
-int __stdcall RecAiApply(const AiEvent* a0)
+int __stdcall RecAiApply(const AiEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_AI_APPLY, SUB_AI, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_ai->Apply(a0);
+    int result = s_inner_ai->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -865,16 +870,17 @@ void __stdcall RecPathfindingStep()
     }
 }
 
-int __stdcall RecPathfindingPoll(PathEvent* a0, PathPoint* a1, int a2)
+int __stdcall RecPathfindingPoll(PathfindingEventHeader* a0, unsigned int a1, PathPoint* a2, int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_POLL, SUB_PATHFINDING, roots);
     if (scope.Open()) {
         ArgPending(s_call, "out");
+        ArgValue(s_call, "size", a1);
         ArgPending(s_call, "points");
-        ArgValue(s_call, "capacity", a2);
+        ArgValue(s_call, "capacity", a3);
     }
-    int result = s_inner_pathfinding->Poll(a0, a1, a2);
+    int result = s_inner_pathfinding->Poll(a0, a1, a2, a3);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -995,18 +1001,16 @@ int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
     return result;
 }
 
-int __stdcall RecTargetingApply(const TargetingEvent* a0)
+int __stdcall RecTargetingApply(const TargetingEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
-    if (a0 != nullptr && a0->unit != 0)
-        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
-    if (a0 != nullptr && a0->target != 0)
-        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->target);
+    EventRoots(roots, RET_TARGETING, a0, a1);
     SlotScope scope(RSL_TARGETING_APPLY, SUB_TARGETING, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "event", ROK_TARGETINGEVENT, a0);
+        ArgEvent(s_call, "event", RET_TARGETING, a0, a1);
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_targeting->Apply(a0);
+    int result = s_inner_targeting->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1093,16 +1097,16 @@ unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
     return result;
 }
 
-int __stdcall RecLosRadarApply(const LosRadarEvent* a0)
+int __stdcall RecLosRadarApply(const LosRadarEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
-    if (a0 != nullptr && a0->unit != 0)
-        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
+    EventRoots(roots, RET_LOS_RADAR, a0, a1);
     SlotScope scope(RSL_LOS_RADAR_APPLY, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "event", ROK_LOSRADAREVENT, a0);
+        ArgEvent(s_call, "event", RET_LOS_RADAR, a0, a1);
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_los_radar->Apply(a0);
+    int result = s_inner_los_radar->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2426,14 +2430,15 @@ void __stdcall RecUnitsWriteState(const StateWriter* a0)
     }
 }
 
-int __stdcall RecPlayersApply(const PlayersEvent* a0)
+int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_players->Apply(a0);
+    int result = s_inner_players->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2772,16 +2777,16 @@ void __stdcall RecPlayersWriteState(const StateWriter* a0)
     }
 }
 
-int __stdcall RecMapApply(const MapEvent* a0)
+int __stdcall RecMapApply(const MapEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
-    if (a0 != nullptr && a0->unit != 0)
-        roots.Add(ROK_UNIT, (char*)SimBlockBase() + a0->unit);
+    EventRoots(roots, RET_MAP, a0, a1);
     SlotScope scope(RSL_MAP_APPLY, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "event", ROK_MAPEVENT, a0);
+        ArgEvent(s_call, "event", RET_MAP, a0, a1);
+        ArgValue(s_call, "size", a1);
     }
-    int result = s_inner_map->Apply(a0);
+    int result = s_inner_map->Apply(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3455,15 +3460,16 @@ void __fastcall RecMovementUpdateMotion(UnitMotion* a0, int a1, Unit* a2)
     }
 }
 
-void __stdcall RecMovementApplyPathEvent(const PathEvent* a0, const PathPoint* a1)
+void __stdcall RecMovementApplyPathEvent(const PathfindingEventHeader* a0, unsigned int a1, const PathPoint* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MOVEMENT_APPLYPATHEVENT, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgPending(s_call, "event");
+        ArgValue(s_call, "size", a1);
         ArgPending(s_call, "waypoints");
     }
-    s_inner_movement->ApplyPathEvent(a0, a1);
+    s_inner_movement->ApplyPathEvent(a0, a1, a2);
     if (scope.Open()) {
     }
 }

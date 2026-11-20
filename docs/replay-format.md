@@ -507,6 +507,26 @@ A `void*` argument that always points at one kind takes `"cast": "Vec3*"` beside
 and `vec3`) and the kind is checked against the cast type. The interface keeps `void*`: the generated code casts the parameter to
 the type, in the recorder and in the stub. A `cast` on an argument that is not `void*`, or on a mode that takes no pointer, is an error.
 
+## Event arguments
+
+The `Apply` slot of `wind_meteors`, `targeting`, `los_radar` and `map` takes `(const <Module>EventHeader* event, unsigned int size)`: the
+header every event of the module starts with (its `kind`, and the fields all kinds share), and the size in bytes of the whole
+event, payload included. Each kind has its own payload struct, which starts with the header (`TargetingSetPos` is a
+`TargetingEventHeader h` and `int pos[3]`), or is the header alone (`TARGETING_CLEAR`). The annotation is
+`{"mode": "event", "events": "targeting", "size": "size"}`; the table of kinds is the one the interface header declares: each
+kind of its kind enums and the payload struct it carries, with the header struct for a kind that has no payload.
+
+The argument is recorded as the lines of the payload struct of the event's `kind`, header fields first (`a event.kind 97`,
+`a event.unit Unit#1`, `a event.weapon 2`, `a event.pos0 10`, `a event.pos1 -20`, `a event.pos2 30`), and then `a size 24` as the
+scalar it is. The elements of an array member are `name0`, `name1` and so on; a block offset named `unit` or `target` is a ref
+to a unit, recorded as an object name, so that the slot's reads of that unit are recorded as an object argument's are. A kind
+the table does not list is recorded as the header. Exactly `size` bytes of the event are copied before the lines are made, so
+a payload field beyond `size` reads as 0 (an event shorter than its payload is recorded, and the slot answers it with outcome 0);
+the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.
+
+The `WindMeteorsEmit` service, which wind_meteors calls to publish an effect, is one `value` of the `WindMeteorsSpawn` payload
+(its only effect), followed by the `size` as an `int`.
+
 ## Polymorphic objects
 
 An object with a vptr is written as the concrete kind it is, chosen by comparing the object's vptr with the vtable of each kind
@@ -950,6 +970,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
 | `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local); a `Vec3` out of an import is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds, and its stub writes it (`weapons` imports `targeting.GetWeaponTargetPos`) |
+| `event` (`events`, `size`) | a pointer to a subsystem's event header and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |

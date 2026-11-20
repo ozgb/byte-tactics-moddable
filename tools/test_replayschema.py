@@ -34,7 +34,7 @@ class Interface(unittest.TestCase):
         names = [s["name"] for s in iface["slots"]]
         self.assertEqual(names[0], "UpdateWind")
         self.assertEqual(len(names), 8)
-        self.assertEqual(iface["version"], [2, 0])
+        self.assertEqual(iface["version"], [3, 0])
         update = iface["slots"][0]
         self.assertEqual((update["conv"], update["ret"], update["params"]), ("__cdecl", "void", [{"type": "RandStream", "name": "stream"}]))
 
@@ -1448,9 +1448,9 @@ class ReentrantServices(unittest.TestCase):
 
     def test_a_value_argument_is_written_as_the_tuple_of_its_fields_in_both_directions(self):
         spec = [x for x in annotations()["services"] if x["name"] == "WindMeteorsEmit"][0]
-        self.assertEqual(spec["args"], [{"mode": "value", "param": "effect", "kind": "WindMeteorsEffect"}])
-        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, a[0].v.p, Table());", rs.render_service_end([spec]))
-        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, effect, g_objects);", rs.render_service_answers([spec]))
+        self.assertEqual(spec["args"][0], {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn"})
+        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, a[0].v.p, Table());", rs.render_service_end([spec]))
+        self.assertIn("ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, effect, g_objects);", rs.render_service_answers([spec]))
 
     def test_a_value_argument_needs_a_value_kind(self):
         ann = annotations()
@@ -2792,6 +2792,65 @@ class SimVectors(unittest.TestCase):
         ann = annotations()
         ann["game_fields"]["tidal"] = {"kind": "vector", "elem": {"mode": "scalar", "type": "int"}}
         self.has(ann, "Game.tidal: a vector is a member of SimGlobals, not of Game")
+
+
+class EventForms(unittest.TestCase):
+    def test_every_kind_of_a_header_is_in_the_table_and_each_table_kind_is_in_the_header(self):
+        ann = rs.with_events(annotations())
+        for sub, spec in rs.EVENTS.items():
+            rs.check_event_kinds(sub, spec["kinds"])
+            self.assertEqual(set(ann["events"][sub]["kinds"]), {str(k) for k in spec["kinds"]})
+
+    def test_a_kind_missing_from_the_table_is_an_error(self):
+        kinds = dict(rs.EVENTS["targeting"]["kinds"])
+        del kinds[100]
+        with self.assertRaises(rs.Error):
+            rs.check_event_kinds("targeting", kinds)
+
+    def test_a_payload_is_a_value_kind_of_the_header_fields_then_its_own(self):
+        objects = rs.with_events(annotations())["objects"]
+        names = [f["name"] for f in objects["TargetingSetPos"]["fields"]]
+        self.assertEqual(names, ["kind", "unit", "weapon", "pos0", "pos1", "pos2"])
+        self.assertEqual(objects["TargetingSetPos"]["scope"], "value")
+        fields = {f["name"]: f for f in objects["TargetingSetUnit"]["fields"]}
+        self.assertEqual((fields["unit"]["kind"], fields["unit"]["target"], fields["unit"]["member"]), ("ref", "Unit", "h.unit"))
+        self.assertEqual((fields["target"]["kind"], fields["target"]["target"]), ("ref", "Unit"))
+        params = {f["name"]: f for f in objects["WindMeteorsParams"]["fields"]}
+        self.assertEqual((params["weapon"]["kind"], params["weapon"]["size"], params["weapon"]["member"]), ("string", 32, "params.weapon"))
+
+    def test_a_kind_without_a_payload_is_the_header(self):
+        table = rs.with_events(annotations())["events"]["targeting"]["kinds"]
+        self.assertEqual(table["98"], "TargetingEventHeader")
+        self.assertEqual(table["97"], "TargetingSetPos")
+
+    def test_the_events_are_not_written_into_the_annotations(self):
+        ann = rs.without_events(rs.with_events(annotations()))
+        self.assertNotIn("events", ann)
+        self.assertNotIn("TargetingSetPos", ann["objects"])
+
+    def test_an_event_is_recorded_with_its_size_and_replayed_into_a_zeroed_buffer(self):
+        files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecTargetingApply"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("EventRoots(roots, RET_TARGETING, a0, a1);", body)
+        self.assertIn('ArgEvent(s_call, "event", RET_TARGETING, a0, a1);', body)
+        self.assertIn('ArgValue(s_call, "size", a1);', body)
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_targeting_Apply"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('ParseEvent("event", RET_TARGETING, p0);', body)
+        self.assertIn("Apply((TargetingEventHeader*)p0, p1)", body)
+
+    def test_an_event_needs_a_table_and_a_size(self):
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["Apply"]["args"]["event"] = {"mode": "event", "events": "nothing", "size": "size"}
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("needs `events`" in e for e in errors))
+        ann = annotations()
+        ann["subsystems"]["targeting"]["slots"]["Apply"]["args"]["event"] = {"mode": "event", "events": "targeting", "size": "event"}
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("needs a `size`" in e for e in errors))
 
 
 class Committed(unittest.TestCase):

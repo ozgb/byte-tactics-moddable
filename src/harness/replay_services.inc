@@ -362,7 +362,9 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_WIND_METEORS_EMIT:
     {
         AddSpace(t);
-        ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, a[0].v.p, Table());
+        ReplayAddValueOrNull(t, ROK_WINDMETEORSSPAWN, a[0].v.p, Table());
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
         break;
     }
     case RI_SCHEDULE_FEATURES_PLACE:

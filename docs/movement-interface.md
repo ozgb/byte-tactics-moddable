@@ -1,6 +1,6 @@
 # The movement interface
 
-Movement sits behind `interfaces/movement.h` (version 1.0), the seam over a unit's motion, the goals it steers to and
+Movement sits behind `interfaces/movement.h` (version 2.0), the seam over a unit's motion, the goals it steers to and
 the targets orders hand those goals (#993). 3.1c's code is its default implementation. It is cut from orders (which held
 `UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference), and the
 cut left orders at 4.0 and units at 2.0. This page is the inventory the interface was cut from, written from the code
@@ -28,7 +28,7 @@ need a scheduler:
   an order attaches to a goal (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`, all
   `OrderFx`). It steers a unit one tick at a time, takes the results of path searches, and builds, loads, saves and
   frees those objects.
-- **Versions.** Movement 1.0 (33 slots), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
+- **Versions.** Movement 2.0 (33 slots; 2.0 since `ApplyPathEvent` takes a pathfinding event header and its size, #1009), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
   state slots left for scripts, #993; it gained `UnitRefInit` and `UnitRefSetUnit`, section 3).
 - **What it calls out.** Movement calls other subsystems only through their seams: pathfinding (`Submit`, `Cancel`),
   scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`SetStateBits`,

@@ -1663,6 +1663,11 @@ void __stdcall WriteWeaponsStateSlot(const StateWriter* writer)
     WeaponsWriteState(writer);
 }
 
+void __stdcall LoadWeaponsStateSlot(Unit* unit, int slot, const WeaponsSlotState* state)
+{
+    WeaponsLoadState(unit, slot, state);
+}
+
 int __fastcall GetGameTypeSlot(Mission* self)
 {
     return self->GetGameType();

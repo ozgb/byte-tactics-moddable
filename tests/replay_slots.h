@@ -440,7 +440,7 @@ WeaponsSeam g_native_weapons = {
     FreeWeaponTypes,
     InitExplosions,
     FreeExplosions,
-    WeaponsLoadState,
+    LoadWeaponsStateSlot,
     WriteWeaponsStateSlot,
 };
 

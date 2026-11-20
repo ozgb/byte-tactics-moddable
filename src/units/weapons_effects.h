@@ -2,6 +2,7 @@
 #define UNITS_WEAPONS_EFFECTS_H
 
 void UnitsOnWeaponsAttacked(const void* event, unsigned int size);
+void UnitsOnWeaponsHit(const void* event, unsigned int size);
 void UnitsOnWeaponsAttackedSpeech(const void* event, unsigned int size);
 void UnitsOnWeaponsMarkDamaged(const void* event, unsigned int size);
 void UnitsOnWeaponsDamageRecord(const void* event, unsigned int size);

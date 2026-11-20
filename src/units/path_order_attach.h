@@ -16,8 +16,6 @@ public:
     PathOrderAttach(Unit* o, OrderBase* v);
     virtual ~PathOrderAttach() {}
     void SetUnit(Unit* o);
-    void SetValue(OrderBase* v) { value = v; }
-    Unit* Get() { return owner; }
 };
 
 #endif

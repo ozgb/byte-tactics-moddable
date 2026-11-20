@@ -39,6 +39,17 @@ void UnitsOnWeaponsAttacked(const void* event, unsigned int size)
     g_seams.units->NotifyUnitRefs(unit, 16);
 }
 
+void UnitsOnWeaponsHit(const void* event, unsigned int size)
+{
+    if (size < sizeof(WeaponsHit))
+        return;
+    const WeaponsHit* e = static_cast<const WeaponsHit*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
+    if (unit == nullptr)
+        return;
+    unit->netDirtyFlags |= (e->enemyDamage > e->friendlyDamage * 2) ? 0x4000 : 0x2000;
+}
+
 void UnitsOnWeaponsAttackedSpeech(const void* event, unsigned int size)
 {
     if (size < sizeof(WeaponsAttacked))

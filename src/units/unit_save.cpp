@@ -158,6 +158,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../game/weapons_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/targeting_events.h"
+#include "../game/movement_events.h"
 
 // FUNCTION: 0x4010b0
 static void SaveUnitAccounts(Unit* info, HapiBank* file)
@@ -187,6 +188,9 @@ static void LoadUnitAccounts(Unit* info, HapiBank* file)
     }
 }
 
+static void LoadUnitMotion(Unit* unit, HapiBank* file);
+static void SaveUnitMotion(Unit* unit, HapiBank* file);
+
 // FUNCTION: 0x487080
 Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 {
@@ -199,7 +203,6 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         return unit;
 
     SaveRec rec;
-    char name[32];
     char script[32];
     int n = file->GetIntegerItem("Number of Units", 0);
     int found = 0;
@@ -273,27 +276,9 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     LoadUnitAccounts(unit, file);
     if (rec.f27 != 0)
-        g_seams.movement->LoadMotion(unit->motion, 0, unit, file);
+        LoadUnitMotion(unit, file);
 
-    Ref<Order>* normal = &unit->list;
-    Ref<Order>* special = &unit->list2;
-    int k = 0;
-    if (rec.f23 > 0) {
-        do {
-            sprintf(name, "u%04xm%04x", unit->id, k);
-            Order* p = g_seams.orders->LoadOrder(unit, file, name);
-            if (p->flags_42 & ORDER_FLAG_SECOND_LIST) {
-                *special = p;
-                special = &p->next;
-            } else {
-                *normal = p;
-                normal = &p->next;
-            }
-            k++;
-        } while (k < rec.f23);
-    }
-    if (unit->list != 0)
-        g_seams.orders->ReattachFxToUnit((Order*)unit->list);
+    g_seams.orders->LoadOrders(unit, file, rec.f23);
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
     g_seams.scripts->LoadScriptState((CobScript*)unit->script.get(), file);
@@ -319,6 +304,65 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     return 0;
 }
 
+#pragma pack(push, 1)
+struct UnitMotionSaveRecord {
+    int velocity[3];
+    int p2[3];
+    int speed;
+    short turn;
+    int pathLockStamp;
+    unsigned char mode : 2;
+    unsigned char flag : 1;
+};
+#pragma pack(pop)
+
+static void LoadUnitMotion(Unit* unit, HapiBank* file)
+{
+    char name[32];
+    UnitMotionSaveRecord rec;
+    sprintf(name, "u%04xmob", unit->id);
+    file->OpenNamedBox(name);
+    file->SeekBox(0);
+    file->ReadBox(&rec, 0x23);
+    MovementMotionState state;
+    state.velocity[0] = rec.velocity[0];
+    state.velocity[1] = rec.velocity[1];
+    state.velocity[2] = rec.velocity[2];
+    state.p2[0] = rec.p2[0];
+    state.p2[1] = rec.p2[1];
+    state.p2[2] = rec.p2[2];
+    state.speed = rec.speed;
+    state.turn = rec.turn;
+    state.pathLockStamp = rec.pathLockStamp;
+    state.mode = rec.mode;
+    state.flag = rec.flag;
+    MovementPublishLoad(SCHED_UNITS, unit, &state);
+}
+
+static void SaveUnitMotion(Unit* unit, HapiBank* file)
+{
+    char name[32];
+    MovementMotionState state;
+    g_seams.movement->GetMotionState(unit, &state);
+    UnitMotionSaveRecord hdr;
+    memset(&hdr, 0, sizeof(hdr));
+    hdr.velocity[0] = state.velocity[0];
+    hdr.velocity[1] = state.velocity[1];
+    hdr.velocity[2] = state.velocity[2];
+    hdr.p2[0] = state.p2[0];
+    hdr.p2[1] = state.p2[1];
+    hdr.p2[2] = state.p2[2];
+    hdr.speed = state.speed;
+    hdr.turn = (short)state.turn;
+    hdr.pathLockStamp = state.pathLockStamp;
+    hdr.mode = state.mode;
+    hdr.flag = state.flag;
+    sprintf(name, "u%04xmob", unit->id);
+    file->OpenNamedBox(name);
+    file->SeekBox(0);
+    file->WriteBox(&hdr, 0x23);
+}
+
 // FUNCTION: 0x4876c0
 void __stdcall SaveUnits(HapiBank* file)
 {
@@ -331,31 +375,16 @@ void __stdcall SaveUnits(HapiBank* file)
     for (; unit <= end; unit = (Unit*)((char*)unit + 0x118)) {
         if (unit->flags & 0x10000000) {
             SaveRec rec;
-            char bufTail[32], script[32];
-            char bufHead[32];
+            char script[32];
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
             g_seams.scripts->SaveScriptState((CobScript*)unit->script.get(), file);
 
-            int n = 0;
-            Order* c = (Order*)unit->list;
-            while (c != 0) {
-                sprintf(bufHead, "u%04xm%04x", unit->id, n);
-                g_seams.orders->SerializeOrderToSave(c, 0, unit, file, bufHead);
-                c = c->next;
-                n++;
-            }
-            c = (Order*)unit->list2;
-            while (c != 0) {
-                sprintf(bufTail, "u%04xm%04x", unit->id, n);
-                g_seams.orders->SerializeOrderToSave(c, 0, unit, file, bufTail);
-                c = c->next;
-                n++;
-            }
+            int n = g_seams.orders->SaveOrders(unit, file);
 
             if (unit->motion != 0)
-                g_seams.movement->SaveMotion(unit->motion, 0, unit, file);
+                SaveUnitMotion(unit, file);
             SaveUnitAccounts(unit, file);
 
             strcpy(rec.name, ((char*)unit->def.get() + 0x20));

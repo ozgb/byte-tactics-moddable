@@ -1,3 +1,5 @@
+#include "../game/orders_events.h"
+#include "../game/movement_events.h"
 #include <stdio.h>
 #include "unit_def.h"
 #include "../state/block.h"
@@ -407,7 +409,7 @@ void __stdcall InitUnitScript(Unit* self)
 // FUNCTION: 0x485e50
 void __stdcall CreateUnitMotion(Unit* unit)
 {
-    g_seams.movement->NewUnitMotion(unit);
+    MovementPublishUnit(SCHED_UNITS, MOVEMENT_NEW, unit);
     unit->angles.heading = unit->def->buildangleUnsigned;
 }
 
@@ -421,7 +423,7 @@ void __stdcall InitUnit(int unitType, Vec3 pos, int param_5, Unit* unit)
     WeaponsPublishInitSlots(SCHED_UNITS, unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
-        g_seams.movement->NewUnitMotion(unit);
+        MovementPublishUnit(SCHED_UNITS, MOVEMENT_NEW, unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }
@@ -443,7 +445,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
     WeaponsPublishInitSlots(SCHED_UNITS, unit);
     ScheduleMetalExtraction(EconHandleOf(unit));
     if (type->mobile == 1) {
-        g_seams.movement->NewUnitMotion(unit);
+        MovementPublishUnit(SCHED_UNITS, MOVEMENT_NEW, unit);
         unit->angles.heading = unit->def->buildangleUnsigned;
     }
 }
@@ -677,7 +679,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     unit->attacker = parent;
     unit->lastAttackerSlot = FindSlotByDpid(cmd->attackerPlayerNetId);
     PlayersPublishUnit(SCHED_UNITS, PLAYERS_UNIT_DIED, unit);
-    g_seams.orders->DeleteOrders(unit, 1);
+    OrdersPublishStop(SCHED_UNITS, unit, 1);
     RecordRemoveUnitSpeech(unit);
     AiPublishSetSquad(SCHED_UNITS, unit, -1);
     WeaponsPublishRemoveProjectiles(SCHED_UNITS, unit);
@@ -803,11 +805,8 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
         g_seams.scripts->FreeObjectState((ModelState*)unit->state.get());
         unit->state = 0;
     }
-    UnitMotion* head = unit->motion;
-    if (head != 0) {
-        g_seams.movement->DestroyMotionObject(head);
-        operator delete(head);
-        unit->motion = 0;
+    if (unit->motion != 0) {
+        MovementPublishUnit(SCHED_UNITS, MOVEMENT_DESTROY, unit);
     }
     unit->unitDefIndex = 0;
     unit->flags &= ~0x10000000;

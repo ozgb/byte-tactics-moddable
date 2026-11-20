@@ -154,7 +154,20 @@ void SchedUnitsPhase()
                             }
                         }
                         SchedDeliver(SCHED_UNITS);
-                        g_seams.units->UpdateUnitBody(u);
+                        int moved = 0;
+                        if (g_seams.units->UpdateUnitBody(u)) {
+                            SchedDeliver(SCHED_ORDERS);
+                            g_seams.orders->RunOrders(u);
+                            SchedDeliver(SCHED_ORDERS);
+                            g_seams.orders->RunSecondaryOrders(u);
+                            if (u->motion != 0) {
+                                SchedDeliver(SCHED_MOVEMENT);
+                                g_seams.movement->UpdateMotion(u);
+                                moved = 1;
+                            }
+                        }
+                        SchedDeliver(SCHED_UNITS);
+                        g_seams.units->UpdateUnitTail(u, moved);
                     }
                     u = (Unit*)((char*)u + 0x118);
                 }

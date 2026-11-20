@@ -1,3 +1,4 @@
+#include "../game/orders_events.h"
 #include "unit_type_set.h"
 #include "win_types.h"
 #include "unit_def.h"
@@ -159,6 +160,16 @@ PathOrderAttach::PathOrderAttach(Unit* o, OrderBase* v)
     next = 0;
 }
 
+Unit* __stdcall UnitRefGet(UnitRef* ref)
+{
+    return ((PathOrderAttach*)ref)->owner;
+}
+
+void __stdcall UnitRefSetValue(UnitRef* ref, OrderBase* value)
+{
+    ((PathOrderAttach*)ref)->value = value;
+}
+
 // FUNCTION: 0x489600 ??_GPathOrderAttach@@UAEPAXI@Z
 
 // FUNCTION: 0x489650
@@ -201,7 +212,7 @@ void UnitRef::ClearRef(void)
 {
     Unit* saved = owner;
     if (listener)
-        g_seams.orders->OrderOrStatusFlags(listener.get(), 8);
+        OrdersPublishStatusFlags(SCHED_UNITS, saved, listener.get(), 8);
     if (owner == saved && owner) {
         Ref<UnitRef>* pp = (Ref<UnitRef>*)&owner->head;
         while (*pp != this)
@@ -218,7 +229,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = (UnitRef*)obj->head.get()) {
         Unit* saved = n->owner;
         if (n->listener)
-            g_seams.orders->OrderOrStatusFlags(n->listener.get(), 8);
+            OrdersPublishStatusFlags(SCHED_UNITS, saved, n->listener.get(), 8);
         if (n->owner == saved && n->owner) {
             Ref<UnitRef>* pp = (Ref<UnitRef>*)&n->owner->head;
             while (*pp != n)
@@ -235,7 +246,7 @@ void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
     for (UnitRef* n = (UnitRef*)obj->head.get(); n != 0; n = n->next) {
         if (n->listener)
-            g_seams.orders->OrderOrStatusFlags(n->listener.get(), event);
+            OrdersPublishStatusFlags(SCHED_UNITS, obj, n->listener.get(), event);
     }
 }
 

@@ -1,3 +1,4 @@
+#include "../game/orders_events.h"
 #include "win_types.h"
 #include "../../interfaces/ref.h"
 
@@ -180,7 +181,7 @@ void Unit::SetStateBits(int mask, int set)
                 RecordUnitSpeech(this, 0xe, SIM_SPEECH_KIND_TEXT);
                 for (link = head; link; link = link->next) {
                     if (link->value)
-                        g_seams.orders->OrderOrStatusFlags(link->value, 0x10000);
+                        OrdersPublishStatusFlags(SCHED_UNITS, this, link->value.get(), 0x10000);
                 }
             }
             if (lost & 4)

@@ -8,6 +8,7 @@ template<class T> class allocator;
 template<class T, class A> class vector;
 }
 
+struct MapMoveLimits;
 struct Unit;
 struct UnitDef;
 struct Vec3;
@@ -20,7 +21,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 4
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 0
+#define UNITS_VERSION_MINOR 1
 
 // Unit simulation.
 struct UnitsSeam {
@@ -118,6 +119,8 @@ struct UnitsSeam {
     void (__stdcall* UnitRefSetUnit)(UnitRef* ref, Unit* unit);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Writes to out the footprint and limits of each movement class the game data defines, in index order, at most capacity of them, and returns how many it wrote; a query, outside the tick. Hooks: none.
+    int (__stdcall* GetMovementLimits)(MapMoveLimits* out, int capacity);
 };
 
 #endif

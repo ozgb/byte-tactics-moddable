@@ -44,7 +44,7 @@ features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-
 features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,10,mission-kill-mobile@189
 features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,SpreadFire,same-record,3,mission-timer@268
 features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,StartFeatureBurning,same-record,1,long-great-divide-2p@31478
-features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,4,mission-timer@204
+features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,same-record,4,mission-timer@204
 features,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,3,mission-timer@268
 features,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,5,mission-kill-of-type@186
 features,list_1421b,features,AllocFeatureSpot,same-record,10,mission-kill-mobile@189
@@ -259,7 +259,7 @@ projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,DamageFeature,sa
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,KillFeature,same-record,1,long-greenhaven-8p@25352
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,RemoveFeature,same-record,1,long-greenhaven-8p@25352
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,ReplaceFeatureWithDead,same-record,1,long-greenhaven-8p@25352
-projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,3,skirmish4-long@22750
+projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,same-record,3,skirmish4-long@22750
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,3,skirmish4-long@22750
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,CheckProjectileCollision,same-record,4,orders-guard-attacked@159
 projectiles,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,DetonateProjectile,same-record,3,skirmish4-long@22750
@@ -497,11 +497,11 @@ units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceUnitFootprint,same-
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,ClaimFootprintCells,same-record,8,mission-kill-of-type@98
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,FootprintValue,same-record,2,edges-economy-targeting@244
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetFootprintHeight,same-record,4,six-painted-desert@12453
+units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,same-record,22,mission-build-unit@1
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,IsFootprintClear,same-record,8,mission-kill-of-type@98
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,RemoveUnitFromMap,same-record,32,mission-build-unit@1
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,seams,WorldCellMetal,same-record,3,skirmish4-long@13614
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,AlignUnitToGround,same-record,19,mission-build-unit@1
-units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,22,mission-build-unit@1
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,same-record,1,edges-economy-targeting@244
 units,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,DetonateProjectile,same-record,1,edges-economy-targeting@244
 units,MissionConditions::RegisterConditions: new VictoryKillAllOfType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-timer@194
@@ -1385,6 +1385,7 @@ units,Unit::pos,los_radar,GetVisibleEnemiesInRadius,other-record,11,mission-buil
 units,Unit::pos,los_radar,IsUnitVisibleToPlayer,other-record,11,mission-capture@5
 units,Unit::pos,los_radar,RemoveUnitLineOfSight,other-record,14,mission-build-unit@1
 units,Unit::pos,map,CanPlaceFootprintAt,other-record,7,mission-timer@186
+units,Unit::pos,map,GetGroundHeight,other-record,9,mission-build-unit@1
 units,Unit::pos,map,PickRandomReclaimableResourcesInRadius,other-record,5,mission-kill-of-type@128
 units,Unit::pos,map,UnitsInRange,other-record,6,edges-targeting-lead@6
 units,Unit::pos,map,UnitsInRange,same-record,4,edges-targeting-lead@6
@@ -1616,6 +1617,7 @@ units,Unit::zBufferFlag,units,InitUnitFromType,other-record,5,mission-kill-of-ty
 units,Unit::zFraction,los_radar,GetVisibleEnemiesInRadius,other-record,11,mission-build-unit@33
 units,Unit::zFraction,los_radar,IsUnitVisibleToPlayer,other-record,11,mission-capture@5
 units,Unit::zFraction,map,CanPlaceFootprintAt,other-record,7,mission-timer@186
+units,Unit::zFraction,map,GetGroundHeight,other-record,9,mission-build-unit@1
 units,Unit::zFraction,map,PickRandomReclaimableResourcesInRadius,other-record,5,mission-kill-of-type@128
 units,Unit::zFraction,map,UnitsInRange,other-record,6,edges-targeting-lead@6
 units,Unit::zFraction,map,UnitsInRange,same-record,4,edges-targeting-lead@6
@@ -1951,11 +1953,11 @@ units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceFootprintAt
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,CanPlaceUnitFootprint,same-record,40,mission-build-unit@1
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,ClaimFootprintCells,same-record,6,long-greenhaven-8p@5445
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetFootprintHeight,same-record,17,ten-ring-atoll@103
+units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,same-record,46,conditions-dark-side@17
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,IsFootprintClear,same-record,6,long-greenhaven-8p@5445
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,RemoveUnitFromMap,same-record,44,mission-build-unit@1
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,seams,WorldCellMetal,same-record,14,ten-ring-atoll@103
 units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,AlignUnitToGround,same-record,13,mission-kill-mobile@1
-units.players,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,same-record,46,conditions-dark-side@17
 units.players,MissionConditions::RegisterConditions: new DefeatUnitTypeKilled,players,MissionConditions::NotifyUnitDied,same-record,1,mission-radius@2523
 units.players,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitCreated,same-record,1,mission-capture@499
 units.players,MissionConditions::RegisterConditions: new VictoryCaptureUnitType,players,MissionConditions::NotifyUnitDied,same-record,1,mission-capture@499
@@ -2268,7 +2270,6 @@ units.players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,
 units.players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,same-record,1,long-greenhaven-8p@44215
 units.players,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,4,edges-economy-targeting@245
 units.players,PathPending::requester,pathfinding,Pathfinder::FindPending,other-record,10,edges-economy-targeting@203
-units.players,PathPending::requester,pathfinding,Pathfinder::FindPending,same-record,1,long-greenhaven-8p@50624
 units.players,PathPending::unit,pathfinding,Pathfinder::Cancel,other-record,3,skirmish4-long@15161
 units.players,PathPending::unit,pathfinding,Pathfinder::FindPending,other-record,10,edges-economy-targeting@203
 units.players,Pathfinder::object,pathfinding,Pathfinder::FindPending,same-record,7,edges-economy-targeting@173
@@ -2428,7 +2429,7 @@ units.players,Unit::def,units,AddRepairProgress,other-record,3,skirmish4-long@24
 units.players,Unit::def,units,AlignUnitToGround,other-record,12,mission-build-unit@1
 units.players,Unit::def,units,ApplyUnfinishedBuildDecay,other-record,1,long-greenhaven-8p@40206
 units.players,Unit::def,units,ApplyUnitDeath,other-record,6,edges-economy-targeting@245
-units.players,Unit::def,units,CreateUnitCorpse,other-record,8,mission-build-unit@1
+units.players,Unit::def,units,CreateUnitCorpse,other-record,9,mission-build-unit@1
 units.players,Unit::def,units,FinishConstruction,other-record,2,eight-greenhaven@4808
 units.players,Unit::def,units,KillUnit,other-record,11,mission-build-unit@1
 units.players,Unit::def,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,10,mission-defeat@181
@@ -2681,6 +2682,7 @@ units.players,Unit::pos,los_radar,GetVisibleEnemiesInRadius,same-record,13,edges
 units.players,Unit::pos,los_radar,IsUnitVisibleToPlayer,other-record,6,mission-capture@150
 units.players,Unit::pos,los_radar,RemoveUnitLineOfSight,other-record,8,mission-build-unit@71
 units.players,Unit::pos,map,CanPlaceFootprintAt,other-record,1,long-greenhaven-8p@25356
+units.players,Unit::pos,map,GetGroundHeight,other-record,5,orders-air-fights@709
 units.players,Unit::pos,map,PickRandomReclaimableResourcesInRadius,other-record,6,mission-build-unit@1
 units.players,Unit::pos,map,UnitsInRange,other-record,4,edges-targeting-lead@61
 units.players,Unit::pos,movement,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,other-record,2,long-greenhaven-8p@8428
@@ -2885,6 +2887,7 @@ units.players,Unit::zFraction,los_radar,GetVisibleEnemiesInRadius,other-record,1
 units.players,Unit::zFraction,los_radar,GetVisibleEnemiesInRadius,same-record,13,edges-targeting-lead@34
 units.players,Unit::zFraction,los_radar,IsUnitVisibleToPlayer,other-record,6,mission-capture@150
 units.players,Unit::zFraction,map,CanPlaceFootprintAt,other-record,1,long-greenhaven-8p@25356
+units.players,Unit::zFraction,map,GetGroundHeight,other-record,5,orders-air-fights@709
 units.players,Unit::zFraction,map,PickRandomReclaimableResourcesInRadius,other-record,6,mission-build-unit@1
 units.players,Unit::zFraction,map,UnitsInRange,other-record,4,edges-targeting-lead@61
 units.players,Unit::zFraction,movement,AiSearchGoal::SetPathOrder,other-record,8,mission-capture@70

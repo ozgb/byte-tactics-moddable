@@ -460,6 +460,7 @@ MapSeam g_native_map = {
     CanBuildAt,
     CanPlaceUnitFootprint,
     BuildAllPassMaps,
+    FreePassMaps,
     LoadMappingData,
     LoadMetalPlotmap,
     LoadPlayerFeaturesPlotmap,
@@ -473,8 +474,8 @@ MapSeam g_native_map = {
     AllocateBucketsSlot,
     FreeBucketsSlot,
     GetGroundHeight,
-    MovementClassGetSlot,
-    MovementClassInBoundsSlot,
+    PassMapGetSlot,
+    PassMapInBoundsSlot,
     RefreshMovedUnitsSlot,
     RefreshUnitIfStaleSlot,
     WriteStateSlot,
@@ -797,8 +798,11 @@ void After_map_CanPlaceUnitFootprint()
 
 void Run_map_BuildAllPassMaps()
 {
+    StructsHolder p0;
+    p0.Parse("limits", ROK_MAPMOVELIMITS, ArgScalar<int>("count"));
+    int p1 = ArgScalar<int>("count");
     SetClosing(nullptr);
-    g_seams.map->BuildAllPassMaps();
+    g_seams.map->BuildAllPassMaps((MapMoveLimits*)p0.data, p1);
 }
 
 Vec3 g_inout_map_SnapWorldPosToFootprint_1;
@@ -865,36 +869,36 @@ void After_map_GetGroundHeight()
     CompareResult(g_result_map_GetGroundHeight);
 }
 
-int g_result_map_MovementClassGet;
+int g_result_map_PassMapGet;
 
-void Run_map_MovementClassGet()
+void Run_map_PassMapGet()
 {
-    MovementClass* p0 = (MovementClass*)ArgObject("self", ROK_MOVEMENTCLASS);
+    int p0 = ArgScalar<int>("moveClass");
     int p1 = ArgScalar<int>("x");
     int p2 = ArgScalar<int>("y");
     SetClosing("result");
-    g_result_map_MovementClassGet = g_seams.map->MovementClassGet(p0, p1, p2);
+    g_result_map_PassMapGet = g_seams.map->PassMapGet(p0, p1, p2);
 }
 
-void After_map_MovementClassGet()
+void After_map_PassMapGet()
 {
-    CompareResult(g_result_map_MovementClassGet);
+    CompareResult(g_result_map_PassMapGet);
 }
 
-int g_result_map_MovementClassInBounds;
+int g_result_map_PassMapInBounds;
 
-void Run_map_MovementClassInBounds()
+void Run_map_PassMapInBounds()
 {
-    MovementClass* p0 = (MovementClass*)ArgObject("self", ROK_MOVEMENTCLASS);
+    int p0 = ArgScalar<int>("moveClass");
     unsigned int p1 = ArgScalar<unsigned int>("x");
     unsigned int p2 = ArgScalar<unsigned int>("y");
     SetClosing("result");
-    g_result_map_MovementClassInBounds = g_seams.map->MovementClassInBounds(p0, p1, p2);
+    g_result_map_PassMapInBounds = g_seams.map->PassMapInBounds(p0, p1, p2);
 }
 
-void After_map_MovementClassInBounds()
+void After_map_PassMapInBounds()
 {
-    CompareResult(g_result_map_MovementClassInBounds);
+    CompareResult(g_result_map_PassMapInBounds);
 }
 
 void PlayNestedCalls(const char* import)
@@ -1026,12 +1030,12 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_map_GetGroundHeight();
         return true;
     }
-    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassGet") == 0) {
-        Run_map_MovementClassGet();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapGet") == 0) {
+        Run_map_PassMapGet();
         return true;
     }
-    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassInBounds") == 0) {
-        Run_map_MovementClassInBounds();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0) {
+        Run_map_PassMapInBounds();
         return true;
     }
     return false;
@@ -1079,10 +1083,10 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_IsPadSlotFree();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetGroundHeight") == 0)
         After_map_GetGroundHeight();
-    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassGet") == 0)
-        After_map_MovementClassGet();
-    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "MovementClassInBounds") == 0)
-        After_map_MovementClassInBounds();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapGet") == 0)
+        After_map_PassMapGet();
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0)
+        After_map_PassMapInBounds();
 }
 
 WeaponsSeam g_import_weapons;

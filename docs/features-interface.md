@@ -143,10 +143,10 @@ query needs a delivery first. Each route that was queued at first fails the test
   themselves are read only between ticks (the feature's drawing, `info_panel.cpp`, and the save), and nothing in the
   tick reads the state before it is built; the allocations alone fail the test.
 - **PASS_MAPS:** `RefreshAllPassMaps` rewrites the pass map words around the footprint from the cells and the units
-  stamped on them as they are when it runs (`MovementClass::RefreshPassMap` through
+  stamped on them as they are when it runs (`PassMap::Refresh` through
   `GetPassMapFootprintValueWithEdgeStrips`), and reports the change to pathfinding (`CellsChanged`). In the units
-  phase units' own refreshes (`RefreshPassMapsForUnit`, `MovementClass::RefreshMovedUnits`,
-  `MovementClass::RefreshUnitIfStale`) write the same words and report their own changes, and units move between
+  phase units' own refreshes (`RefreshPassMapsForUnit`, `PassMap::RefreshMovedUnits`,
+  `PassMap::RefreshUnitIfStale`) write the same words and report their own changes, and units move between
   them. A queued refresh would read the stamps after every unit's move and write last, so the words, and the order of
   the changes pathfinding is told of, would not be 3.1c's. Pathfinding reads the pass maps only in the players phase
   (`WorldPass`, `WorldTerrainPass` in `pathfinding_world.cpp`), but the writes race each other.

@@ -1,13 +1,14 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 6.0), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 7.0), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
 map of each movement class and when it is current, and the placement tests. 3.1c's code is its default
 implementation. Map 5.0 (#983) gave the mission and campaign data their own interface (`docs/mission-interface.md`)
 and took the pass maps over from units end to end, their reads and their lazy refresh, by the human's ruling of
-2026-11-18 on #986. This page is the inventory the interface was cut from:
+2026-11-18 on #986. Map 7.0 (#1002) split the pass maps out of units' `MovementClass` into map's own record,
+`PassMap`, so that no slot of map takes a units record (section 5). This page is the inventory the interface was cut from:
 - what other subsystems did to map's state in 3.1c, and what each became;
 - what map did to others, and what each became;
 - what map reads, and what others read of it;
@@ -43,7 +44,8 @@ Map's place in it:
   world view at the start and end of a search (`WorldBeginSearch`, `WorldEndSearch`, `src/seams/pathfinding_world.cpp`),
   which deliver map's inbox first too.
 - **Queries:** `UnitsInRange`, `GetCellMeanHeight`, `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`,
-  `IsPadSlotFree`, and since 5.0 `GetGroundHeight`, `MovementClassGet` and `MovementClassInBounds`, called directly, as
+  `IsPadSlotFree`, and since 5.0 `GetGroundHeight`, `PassMapGet` and `PassMapInBounds` (`MovementClassGet` and
+  `MovementClassInBounds` before 7.0), called directly, as
   of map's last apply.
 - **Views:** the footprint fields of the cell records, through los_radar's cell view (section 4); a unit's bucket
   (`Unit::spatialBucket`) and the bucket of units off the map (`Game::overflowBucket`); the pass maps; the placement
@@ -68,7 +70,7 @@ Map's place in it:
 | units: a unit's script sets YARD_OPEN (`UnitScript::SetUnitValue`) | `SetYardOpen` | SET_YARD from units |
 | units: a unit boards a carrier (`ApplyAttachUnit`) | `SpatialBucketUnlinkUnit` | BUCKET_UNLINK from units |
 | units: a unit leaves a carrier (`ApplyAttachUnit`) | `SpatialBucketPrependUnit` | BUCKET_PREPEND from units |
-| a stale pass map under a unit, found by pathfinding's world view (`MovementClass::RefreshMovedUnits`, `RefreshUnitIfStale`) | `RefreshPassMap` | map's own work since 5.0: the synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` (REFRESH_PASS_MAP from units in 4.x) |
+| a stale pass map under a unit, found by pathfinding's world view (`PassMap::RefreshMovedUnits`, `RefreshUnitIfStale`) | `RefreshPassMap` (`PassMap::Refresh` since 7.0) | map's own work since 5.0: the synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` (REFRESH_PASS_MAP from units in 4.x) |
 | features: the PASS_MAPS effect (a feature placed or removed) | `RefreshAllPassMaps` | PASS_MAPS, through `MapOnFeaturesPassMaps` |
 
 **Answers.** No caller used a value: 3.1c's `AddUnitToMap`, `RemoveUnitFromMap`, `ClearFootprintAndUnlink`,
@@ -122,6 +124,16 @@ can.
 | units' `GetGroundHeight` | a query of map: it interpolates the heights of the cells, terrain map alone keeps |
 | every other slot | unchanged |
 
+**Every slot of 6.0.** What map 7.0 changed (#1002):
+
+| 6.0 | 7.0 |
+|---|---|
+| `BuildAllPassMaps(void)`, which read the limits from units' movement classes | `BuildAllPassMaps(limits, count)`: the limits as plain data in a buffer the engine owns, which map copies (`MapMoveLimits`, from units' new slot `GetMovementLimits`, units 4.1) |
+| `MovementClassGet(MovementClass*, x, y)`, `MovementClassInBounds(MovementClass*, x, y)` | `PassMapGet(moveClass, x, y)`, `PassMapInBounds(moveClass, x, y)`: the class by its index, 0 to 31 |
+| `RefreshMovedUnits(MovementClass*, Unit*)`, `RefreshUnitIfStale(MovementClass*, Unit*)` | the same, with the class by its index |
+| units' `FreeMovementClasses`, which also freed the pass maps | map's `FreePassMaps`, a shutdown slot the engine calls after units' `FreeMovementClasses`, which now frees only the names |
+| every other slot | unchanged |
+
 **`VisitObjectsInRange` became a query.** 3.1c's took a `UnitVisitor` and called its `Visit` for each unit within
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
 inside map's. Map 4.0's `UnitsInRange` writes the ids of the units in range to a buffer the caller gives, in the
@@ -149,9 +161,10 @@ refresh is map's own synchronous work, and the event is gone. The refresh writes
 (`MovementClass::lastTick`) and a unit's stamp (`UnitMotion::pathLockStamp`), both map's bookkeeping of when a pass
 map is current, and reports each rewrite through CELLS_CHANGED (section 3). The movement class definition stays in
 units: the classes read from `MOVEINFO.TDF` (`ReadMoveInfo`, the `MovementClass` constructor and destructor,
-`FindMovementClass`, `FreeMovementClasses`, `CopyPathLockFields`) are units' functions in
-`src/units/movement_class.cpp`, and the pass-map functions of that file are map's (the `name:PassMap` rule and the
-overrides of `data/subsystems.csv`).
+`FindMovementClass`, `FreeMovementClasses`, `GetMovementLimits`, `CopyPathLockFields`) are units' functions in
+`src/units/movement_class.cpp`. Since 7.0 the pass maps are map's own record, `PassMap` in `src/map/pass_map.cpp`
+(the `file:src/map/pass_map` rule of `data/subsystems.csv`, with no hand-set row), and the stamp window is
+`PassMap::lastTick` (section 5).
 
 ## 3. Effects out of map
 
@@ -190,7 +203,7 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
 An effect for any of these would need a synchronous route, because units and orders read each of them back in the
 same update (the `immediate` rows of section 4), and would only move the write.
 
-**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size.
+**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 7.0, unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -206,7 +219,8 @@ water limits, `mobile`), motion and carrier chain (`carrier`, `cargo`, `cargoNex
 and the cell records, section below), the feature on a cell (`features.GetCellFeature`) and a feature's flags, metal
 and energy; what the viewing player sees (`IsUnitVisibleToPlayer`, `los_radar.IsPointVisible` for `CanBuildAt`'s
 visibility check); the players' alliance words (`pad_1df4`, `unknown_1b8e`, `unknown_1cd9`); the movement classes
-(`g_movementClassEntries`: their sizes, footprints and limits, which units reads from `MOVEINFO.TDF` at load). All as
+(until 7.0 units' table, whose footprints and limits units reads from `MOVEINFO.TDF` at load; since 7.0 map reads its
+own copy of them in `g_passMaps`, which `BuildAllPassMaps` is given). All as
 of each module's last run, read inside map's events, synchronous slots and
 queries, at the caller's statement.
 
@@ -217,9 +231,10 @@ section 4), all through its events:
 - **`flags`, the footprint bit:** bit 1, a building's yard cell, which ADD_UNIT sets and REMOVE_UNIT clears where bit 0
   of the building's yard map is set. The owner and spot bits are features' (#954) and the rest are set at load.
 
-The pass maps are not cell fields: they are the movement classes' allocations (`BuildAllPassMaps`), which map's
-PASS_MAPS and the refresh slots write and pathfinding reads through map's queries `MovementClassGet` and
-`MovementClassInBounds`, called by its world view (`WorldPass`, `WorldInBounds`, in the players phase).
+The pass maps are not cell fields: they are map's `PassMap` records (`g_passMaps`) and their words (allocated by
+`BuildAllPassMaps`), which map's PASS_MAPS and the refresh slots write and pathfinding reads through map's queries
+`PassMapGet` and `PassMapInBounds`, called by its world view (`WorldPass`, `WorldInBounds`, in the players phase) with
+the class's index.
 Map's CELL_HEIGHTS to los_radar, published by ADD_UNIT and REMOVE_UNIT for a building's footprint, stays queued, as
 #965 left it: it rewrites `high` and `low` from the cells' `height`, which nothing writes in the tick, so no read in the
 phase can see a difference while it is pending (`docs/los-radar-interface.md`, section 4).
@@ -228,7 +243,7 @@ phase can see a difference while it is pending (`docs/los-radar-interface.md`, s
 - **Queries:** `UnitsInRange` (through the service `VisitUnitsInRange`), `GetCellMeanHeight` (features, players,
   weapons),
   `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` (orders), `GetGroundHeight` (features, los_radar,
-  movement, orders, scripts, targeting, units, weapons and the minimap's cursor), `MovementClassGet` and `MovementClassInBounds`
+  movement, orders, scripts, targeting, units, weapons and the minimap's cursor), `PassMapGet` and `PassMapInBounds`
   (pathfinding's world view).
 - **Views:** the footprint fields of the cells; `Unit::spatialBucket` and `overflowBucket` (orders, units); the claim
   bits of `Unit::flags`; the pass maps (pathfinding); `g_lastPlaceMetalSum` (ai, right after a synchronous call).
@@ -271,7 +286,7 @@ item is every field of every cell, so a row with it is any field. Each is served
 | map → ai | `g_lastPlaceMetalSum` | players | Written by the synchronous `CanBuildAt` and `CanPlaceUnitFootprint`, read by the same caller right after. |
 | units, orders, weapons → map | `Unit::cell`, `pos`, `zFraction`, `flags`, `footprint`, `def`, `motion`, `carrier`, `cargo`, `cargoNext`, `cobStateFlags` | units | Map reads them inside its synchronous events and slots, at the publisher's statement: REMOVE_UNIT before the publisher writes the new cell, ADD_UNIT after it, as 3.1c's calls did. |
 | orders → map | `Order::pos` | units | Read by the synchronous `CanPlaceUnitFootprint` and the queries at the caller's statement. |
-| units → map | `UnitMotion::pathLockStamp`, `g_movementClassEntries` | players | In 4.x read by the synchronous REFRESH_PASS_MAP, which units published from pathfinding's world view in the players phase. Since 5.0 the refresh that writes them is map's synchronous `RefreshMovedUnits` and `RefreshUnitIfStale`, run at the search's statement, so the writer is map itself; the row names units until `data/dependencies.csv` is next regenerated from access logs. |
+| units → map | `UnitMotion::pathLockStamp`, the pass maps | players | In 4.x read by the synchronous REFRESH_PASS_MAP, which units published from pathfinding's world view in the players phase. Since 5.0 the refresh that writes them is map's synchronous `RefreshMovedUnits` and `RefreshUnitIfStale`, run at the search's statement, so the writer is map itself, and since 7.0 the pass maps are map's `g_passMaps`; the access data re-recorded for 7.0 (#1002) has no units → map row for them. |
 | economy, units → map | `pad_1df4`, `unknown_1b8e`, `unknown_1cd9` | units | The players' alliance words, read by `CanBuildAt` and the claim at the caller's statement. |
 | features, los_radar → map | `PLOT MEMORY`, `MAPPED MEMORY`, `FeatureAnimEntry::bytes_8`, `bytes_10` | units, features, projectiles | Features' and los_radar's fields of the cells and the spots, written by their own synchronous routes and runs; map reads them in its synchronous events and slots, after those writes, as in 3.1c. |
 | weapons → map | `Debris::pos` | explosions | Read by `GetCellMeanHeight`, a query, at the caller's statement. |
@@ -294,7 +309,7 @@ and `first`.
 | A unit's bucket and chain link (`Unit::spatialBucket`; `Unit::cargoNext` of a unit not carried) | the unit, hashed | map, orders, units | no |
 | The footprints: `unit`, `unit2` and the yard bit of the cells | the cell records, hashed (section 11) | map, units, orders, weapons, los_radar, features | no |
 | The claim bits of `Unit::flags`, `Unit::bit2` | the unit, hashed | map, units | no: units reads the word |
-| The pass maps (`BuildAllPassMaps`' allocations) | state block, hashed | map, pathfinding (through its world view) | no |
+| The pass maps (`g_passMaps`, the 32 `PassMap` records, and the words `BuildAllPassMaps` allocates) | sim globals and state block; `width`, `height`, `lastTick` and the words are hashed, the copied limits and `defined` are not (section 5) | map, pathfinding (through its world view) | no |
 | The placement record: `g_lastPlaceMetalSum` | sim globals, hashed | map, ai | no |
 | The placement record: `g_lastPlaceHeight` | sim globals, hashed | map (the sim); presentation's `movies.cpp` | yes, in the simulation |
 
@@ -309,6 +324,48 @@ is written by `SetOwner`, `UnlinkBucketUnit`, `SpatialBucket::UnlinkUnit` and `S
 events), and `a`, `b` and `flags` by `AllocateBuckets` only. The cells are not listed (presentation, features and los_radar write other fields of the same
 records, and the access log names them as one item), nor are `Unit::cargoNext`, `Unit::flags`, `Unit::bit2` and
 `Unit::cobStateFlags`, which units writes too.
+
+**The movement class split (7.0, #1002).** 3.1c's `MovementClass` was one 32-byte record per class, 32 of them in
+`g_movementClasses`, holding units' definition and map's pass map side by side. Every field and what it does:
+
+| Field (3.1c offset) | Job | Written by | Read by | 7.0 |
+|---|---|---|---|---|
+| `name` (+0x00) | the class's name, a game heap string; 0 marks an undefined class | units (`ReadMoveInfo`, `FreeMovementClasses`) | units (`FindMovementClass`); map's `BuildAllPassMaps` tested it to skip a class | units'. Map keeps `PassMap::defined` instead, set for each class `GetMovementLimits` returns |
+| `footprintX`, `footprintZ` (+0x04, +0x06) | the footprint the pass map is built for | units (`ReadMoveInfo`) | units (`LoadUnitFbi`, into the unit type); map (the build, the refresh and the terrain values) | units' definition; map reads its own copy in `PassMap` |
+| `maxWaterDepth`, `minWaterDepth` (+0x08, +0x0a) | the water depth limits of a passable cell | units | units (`LoadUnitFbi`); map (`GetPassMapCellValue`) | as the footprint |
+| `maxSlope`, `badSlope`, `maxWaterSlope`, `badWaterSlope` (+0x0c to +0x0f) | the slope limits of a passable and of a costly cell | units | units (`LoadUnitFbi`); map (`GetPassMapCellValue`) | as the footprint |
+| `width`, `height` (+0x10, +0x14) | the pass map's size in cells, the map's | map (`BuildAllPassMaps`, `Resize`) | map (the reads, the refresh) | map's, `PassMap` |
+| `cells` (+0x18) | the pass map words, 2 bits a cell, 16 rows a word | map (`BuildAllPassMaps`, `Build`, `Refresh`), freed by units' `FreeMovementClasses` | map; pathfinding through map's queries | map's, `PassMap`; freed by map's `FreePassMaps` |
+| `lastTick` (+0x1c) | the window of stale stamps of the lazy refresh | map (`RefreshMovedUnits`) | map (`RefreshPassMapsForUnit`, `RefreshUnitIfStale`) | map's, `PassMap` |
+
+Units keeps the first 16 bytes (`MovementClass`, a 512-byte `g_movementClasses`); map keeps `PassMap` (32 bytes:
+a copy of the 12 bytes of limits, `defined`, `width`, `height`, `cells` and `lastTick`), 32 of them in `g_passMaps` in
+the sim globals, a row of `data/state_classes.csv` of its own. The sim globals grow by 512 bytes, and the fields after
+the table move. At load the engine (`LoadBattleAssets`) asks units for the limits of the named classes into a buffer it
+owns (`GetMovementLimits(out, capacity)`, which returns the count, each entry carrying its class index) and hands them
+to `BuildAllPassMaps(limits, count)`, which copies them; no memory changes owner across the seam. The progress bar
+counts the classes `BuildAllPassMaps` was given, as 3.1c counted the named ones.
+
+Every place a `MovementClass*` crossed a seam in 6.0, and what it became:
+
+| Where | 6.0 | 7.0 |
+|---|---|---|
+| map's slots `MovementClassGet`, `MovementClassInBounds`, `RefreshMovedUnits`, `RefreshUnitIfStale` | a `MovementClass*` into units' table | the class index (`PassMapGet`, `PassMapInBounds`, and the two refreshes) |
+| map's `BuildAllPassMaps` | read every class of units' table | the limits as `MapMoveLimits` |
+| pathfinding's world view (`src/seams/pathfinding_world.cpp`: `WorldPass`, `WorldInBounds`, `WorldTerrainPass`, `WorldBeginSearch`, `WorldEndSearch`) | passed the class pathfinding names (`PathClass`, the block offset of units' record) or the motion's `owner` to map | turns it into the index first (`ClassIndex`); `PathClass` and the pathfinding interface are unchanged |
+| `UnitMotion::owner` and `movementClass` (`src/movement/unit_motion.h`), `UnitDef::movementclass` (`src/units/unit_def.h`, and its view in `src/movement/unit_def_move_view.h`) | `Ref`s to units' record | unchanged: they name the definition, which stays units'; map never reads them |
+| units' `LoadUnitFbi` (`src/units/unit_types.cpp`) | read the definition and named the class by `FindMovementClass` | unchanged, inside units |
+| map's terrain values (`src/map/terrain.cpp`: `GetPassMapCellValue`, `GetPassMapFootprintValue`, `GetPassMapFootprintValueWithEdgeStrips`, `FootprintValue`, `FootprintValueWithEdgeStrips`, `GetTerrainPassValue`) | took a `MovementClass*` | take map's `PassMap*`, and `GetTerrainPassValue` the index |
+| the replay (`ROK_MOVEMENTCLASS`) | one object kind for the whole record, the slot `MovementClassGet` recorded its class as an object | `MovementClass` holds the definition fields only, a new kind `PassMap` (`g_passMaps.entries`) the pass map fields, and the slots record the index |
+| `src/state/layout_asserts.cpp`, `src/state/sim_globals.*` | the 32-byte record | the generated asserts of both records, and `g_passMaps` in `SimGlobals` |
+
+**The trace does not change.** The harness hashes the same 32-byte `MoveClass` record for each class
+(`kMoveClassTable`, which `tools/traceschema.py` keeps as a synthetic 32-byte `MovementClass`): bytes 0 to 15 from units' `g_movementClasses` and bytes 16 to 31 from
+map's `g_passMaps`, in 3.1c's order, and the `moveclass` refs (a unit's motion and type) resolve to the same index, as
+the stride is now units' 16-byte record. So the format and every stored trace are unchanged, and the gate is the tier.
+Map's copy of the 12 bytes of limits and `PassMap::defined` are hashed nowhere: the record takes those bytes from
+units' definition, which is what `BuildAllPassMaps` was handed, so they are checked only through that definition and
+through the sizes and words of the pass maps built from them.
 
 **The trace dumps map's events** in section 40 (`docs/trace-format.md`, section 8.28), after los_radar's section 39,
 and hashes none of them. Each record is an event with the outcome `Apply` gave, or a CELLS_CHANGED map published, in
@@ -335,10 +392,10 @@ Map records no sim event.
 per 8 by 8 cells, 10 bytes each), the overflow bucket, the yard map's encoding, the pass map words and their edge
 strips, the 32 movement classes, the placement record, and the scratch lists of `PickRandomReclaimableResourcesInRadius`.
 An event carries a unit as its block offset, a movement class as its index, and a rectangle in cells. The set-up,
-save and load slots stay in `MapSeam` as 3.1c's code. The movement class slots (`MovementClassGet`,
-`MovementClassInBounds`, `RefreshMovedUnits`, `RefreshUnitIfStale`) take the class as 3.1c's `MovementClass*`, and the
-refreshes a `Unit*`, of which they read the motion's stamp, its cell and footprint: 3.1c's types where the change
-needed no new decision. The window of 30 ticks and the stamps are the default's. The movement class definition, which
+save and load slots stay in `MapSeam` as 3.1c's code. The pass map slots (`PassMapGet`, `PassMapInBounds`,
+`RefreshMovedUnits`, `RefreshUnitIfStale`) take the class by its index since 7.0, and the refreshes a `Unit*`, of which
+they read the motion's stamp, its cell and footprint: 3.1c's types where the change needed no new decision. The 32
+classes and the copied limits (`MapMoveLimits`) are the default's too. The window of 30 ticks and the stamps are the default's. The movement class definition, which
 `MOVEINFO.TDF` gives, is units' (section 2); the mission, campaign and map-list slots are the mission interface's.
 
 ## 8. What the gate decided
@@ -392,3 +449,8 @@ update (`UpdateUnit`) was 4, in mission-timer at tick 186 (unit 361).
 tier was equal (38 of 38 scenarios); the fallback (only the two reads move, the refresh stays a synchronous slot of
 units) was not needed. The CELLS_CHANGED effects of the refreshes reach pathfinding through the synchronous route at
 the statements units' direct calls stood at, so no draw or write moved.
+
+**Map 7.0 (#1002).** The pass maps left units' `MovementClass` for map's own `PassMap` table, and map's slots take the
+class index. The trace format and every stored trace are unchanged (section 5), and the tier was equal in both modes
+(76 of 76 games, 38 scenarios). The sim globals grew by 512 bytes, so the smoke, full, music and mp play-tests were
+run too, and passed.

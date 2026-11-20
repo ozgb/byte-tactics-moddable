@@ -708,6 +708,7 @@ game,los_radar,shared_write,Vec3::x,16
 game,los_radar,shared_write,Vec3::y,13
 game,los_radar,shared_write,Vec3::z,16
 game,map,indirect,BuildAllPassMaps,1
+game,map,indirect,FreePassMaps,1
 game,map,indirect,GetGroundHeight,1
 game,map,indirect,LoadMappingData,1
 game,map,indirect,LoadMetalPlotmap,1
@@ -1378,6 +1379,7 @@ game,units,indirect,FreeUnitCategories,1
 game,units,indirect,FreeUnitInfo,1
 game,units,indirect,FreeUnitMemory,1
 game,units,indirect,FreeUnitTypes,1
+game,units,indirect,GetMovementLimits,1
 game,units,indirect,InitUnitCategories,1
 game,units,indirect,KillAllUnits,1
 game,units,indirect,KillUnitsOfType,1
@@ -1624,7 +1626,7 @@ harness,game,shared_write,Seams::ai,3
 harness,game,shared_write,Seams::economy,4
 harness,game,shared_write,Seams::features,6
 harness,game,shared_write,Seams::los_radar,8
-harness,game,shared_write,Seams::map,6
+harness,game,shared_write,Seams::map,7
 harness,game,shared_write,Seams::mission,20
 harness,game,shared_write,Seams::movement,1
 harness,game,shared_write,Seams::network,1
@@ -1701,7 +1703,7 @@ harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,126
+harness,orders,call,Add,124
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,shared_write,FeaturesSeam::FindFeatureAtPos,3
@@ -1944,8 +1946,8 @@ harness,seams,shared_write,MapSeam::CanPlaceUnitFootprint,2
 harness,seams,shared_write,MapSeam::GetCellMeanHeight,1
 harness,seams,shared_write,MapSeam::GetGroundHeight,1
 harness,seams,shared_write,MapSeam::IsPadSlotFree,1
-harness,seams,shared_write,MapSeam::MovementClassGet,2
-harness,seams,shared_write,MapSeam::MovementClassInBounds,2
+harness,seams,shared_write,MapSeam::PassMapGet,2
+harness,seams,shared_write,MapSeam::PassMapInBounds,2
 harness,seams,shared_write,MapSeam::SnapWorldPosToFootprint,1
 harness,seams,shared_write,MovementSeam::AirManeuverOrderSetAltitude,1
 harness,seams,shared_write,MovementSeam::ApplyPathEvent,1
@@ -2440,11 +2442,16 @@ map,game,shared_write,Vec3::x,4
 map,game,shared_write,Vec3::y,2
 map,game,shared_write,Vec3::z,4
 map,harness,call,HarnessMapEvent,1
+map,harness,shared_write,PassMap::cells,1
+map,harness,shared_write,PassMap::height,2
+map,harness,shared_write,PassMap::lastTick,1
+map,harness,shared_write,PassMap::width,2
 map,harness,shared_write,Point16::x,1
 map,harness,shared_write,Point16::y,1
 map,harness,shared_write,Vec3::x,2
 map,harness,shared_write,Vec3::y,1
 map,harness,shared_write,Vec3::z,2
+map,harness,shared_write,g_passMaps,2
 map,los_radar,indirect,GetMapCell,1
 map,los_radar,indirect,GetMapCellAtPosition,1
 map,los_radar,shared_write,Grid::cells,2
@@ -2488,7 +2495,7 @@ map,pathfinding,shared_write,MapCellsChanged::rect,1
 map,pathfinding,shared_write,Point16::x,9
 map,pathfinding,shared_write,Point16::y,9
 map,platform,call,RandomInt,1
-map,platform,call,operator delete,10
+map,platform,call,operator delete,11
 map,platform,call,operator new,6
 map,platform,call,operator==,5
 map,platform,shared_write,Fixed::value,2
@@ -2529,16 +2536,13 @@ map,seams,shared_write,Unit::flags,1
 map,seams,shared_write,Vec3::x,1
 map,seams,shared_write,Vec3::y,1
 map,seams,shared_write,Vec3::z,1
+map,seams,shared_write,g_passMaps,4
 map,targeting,shared_write,Ref<Unit>::offset,2
 map,targeting,shared_write,Unit::flags,1
 map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
 map,targeting,shared_write,Vec3::z,3
 map,units,shared_write,Fixed::value,4
-map,units,shared_write,MovementClass::cells,2
-map,units,shared_write,MovementClass::height,1
-map,units,shared_write,MovementClass::lastTick,1
-map,units,shared_write,MovementClass::width,1
 map,units,shared_write,Point16::x,7
 map,units,shared_write,Point16::y,7
 map,units,shared_write,Ref<Unit>::offset,6
@@ -5277,7 +5281,7 @@ seams,game,shared_write,Seams::ai,3
 seams,game,shared_write,Seams::economy,4
 seams,game,shared_write,Seams::features,6
 seams,game,shared_write,Seams::los_radar,8
-seams,game,shared_write,Seams::map,6
+seams,game,shared_write,Seams::map,7
 seams,game,shared_write,Seams::mission,20
 seams,game,shared_write,Seams::movement,1
 seams,game,shared_write,Seams::network,1
@@ -5369,8 +5373,8 @@ seams,harness,shared_write,MapSeam::CanPlaceUnitFootprint,2
 seams,harness,shared_write,MapSeam::GetCellMeanHeight,2
 seams,harness,shared_write,MapSeam::GetGroundHeight,2
 seams,harness,shared_write,MapSeam::IsPadSlotFree,2
-seams,harness,shared_write,MapSeam::MovementClassGet,2
-seams,harness,shared_write,MapSeam::MovementClassInBounds,2
+seams,harness,shared_write,MapSeam::PassMapGet,2
+seams,harness,shared_write,MapSeam::PassMapInBounds,2
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
 seams,harness,shared_write,MovementSeam::AirManeuverOrderSetAltitude,2
 seams,harness,shared_write,MovementSeam::ApplyPathEvent,2
@@ -5543,10 +5547,10 @@ seams,los_radar,shared_write,Vec3::y,13
 seams,los_radar,shared_write,Vec3::z,16
 seams,map,call,GetCellMeanHeight,1
 seams,map,call,GetTerrainPassValue,1
-seams,map,call,MovementClass::Get,1
-seams,map,call,MovementClass::InBounds,1
-seams,map,call,MovementClass::RefreshMovedUnits,1
-seams,map,call,MovementClass::RefreshUnitIfStale,1
+seams,map,call,PassMap::Get,1
+seams,map,call,PassMap::InBounds,1
+seams,map,call,PassMap::RefreshMovedUnits,1
+seams,map,call,PassMap::RefreshUnitIfStale,1
 seams,map,indirect,ApplyMapEvent,1
 seams,map,indirect,CanBuildAt,1
 seams,map,indirect,CanPlaceUnitFootprint,1
@@ -6235,19 +6239,15 @@ units,map,indirect,GetGroundHeight,3
 units,map,shared_write,Fixed::value,2
 units,map,shared_write,Game::units,6
 units,map,shared_write,Game::unitsEnd,1
-units,map,shared_write,MovementClass::badSlope,2
-units,map,shared_write,MovementClass::badWaterSlope,2
-units,map,shared_write,MovementClass::cells,4
-units,map,shared_write,MovementClass::footprintX,6
-units,map,shared_write,MovementClass::footprintZ,6
-units,map,shared_write,MovementClass::height,7
-units,map,shared_write,MovementClass::lastTick,5
-units,map,shared_write,MovementClass::maxSlope,2
-units,map,shared_write,MovementClass::maxWaterDepth,2
-units,map,shared_write,MovementClass::maxWaterSlope,2
-units,map,shared_write,MovementClass::minWaterDepth,2
-units,map,shared_write,MovementClass::name,1
-units,map,shared_write,MovementClass::width,9
+units,map,shared_write,MapMoveLimits::badSlope,1
+units,map,shared_write,MapMoveLimits::badWaterSlope,1
+units,map,shared_write,MapMoveLimits::footprintX,1
+units,map,shared_write,MapMoveLimits::footprintZ,1
+units,map,shared_write,MapMoveLimits::index,1
+units,map,shared_write,MapMoveLimits::maxSlope,1
+units,map,shared_write,MapMoveLimits::maxWaterDepth,1
+units,map,shared_write,MapMoveLimits::maxWaterSlope,1
+units,map,shared_write,MapMoveLimits::minWaterDepth,1
 units,map,shared_write,Point16::x,17
 units,map,shared_write,Point16::y,17
 units,map,shared_write,Ref<Unit>::offset,2
@@ -6489,7 +6489,7 @@ units,platform,call,UsesDataArchives,2
 units,platform,call,WorldToCell,1
 units,platform,call,host_message,1
 units,platform,call,host_time_ms,1
-units,platform,call,operator delete,5
+units,platform,call,operator delete,3
 units,platform,call,operator new,4
 units,platform,call,operator-,1
 units,platform,call,operator==,9
@@ -6679,7 +6679,6 @@ units,seams,shared_write,Game::units,2
 units,seams,shared_write,Game::unitsPerPlayer,1
 units,seams,shared_write,MovementClass::footprintX,1
 units,seams,shared_write,MovementClass::footprintZ,1
-units,seams,shared_write,MovementClass::name,1
 units,seams,shared_write,Player::flags,1
 units,seams,shared_write,Player::unitCount,1
 units,seams,shared_write,Player::unitsCreated,1

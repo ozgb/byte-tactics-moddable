@@ -40,6 +40,11 @@ static MovementClass* ClassOf(PathClass moveClass)
     return ref.get();
 }
 
+static int ClassIndex(PathClass moveClass)
+{
+    return (int)(ClassOf(moveClass) - g_movementClasses.entries);
+}
+
 static unsigned int __stdcall WorldTick()
 {
     return (unsigned int)g_game->ticks;
@@ -113,12 +118,12 @@ static PathClass __stdcall WorldMoveClass(int index)
 
 static int __stdcall WorldInBounds(PathClass moveClass, int x, int y)
 {
-    return g_seams.map->MovementClassInBounds(ClassOf(moveClass), (unsigned int)x, (unsigned int)y);
+    return g_seams.map->PassMapInBounds(ClassIndex(moveClass), (unsigned int)x, (unsigned int)y);
 }
 
 static int __stdcall WorldPass(PathClass moveClass, int x, int y)
 {
-    return g_seams.map->MovementClassGet(ClassOf(moveClass), x, y);
+    return g_seams.map->PassMapGet(ClassIndex(moveClass), x, y);
 }
 
 static void __stdcall WorldSeenSize(int* width, int* height)
@@ -173,13 +178,13 @@ static int __stdcall WorldTerrainPass(PathClass moveClass, int x, int y)
 {
     if (!WorldInBounds(moveClass, x, y))
         return 0;
-    return (int)GetTerrainPassValue(ClassOf(moveClass), x, y);
+    return (int)GetTerrainPassValue(ClassIndex(moveClass), x, y);
 }
 
 static void __stdcall WorldBeginSearch(PathUnit unit)
 {
     Unit* u = UnitOf(unit);
-    MovementClass* moveClass = ((UnitMotionPlannerView*)u->motion.get())->owner.get();
+    int moveClass = ClassIndex(((UnitMotionPlannerView*)u->motion.get())->owner.offset);
     SchedDeliver(SCHED_MAP);
     g_seams.map->RefreshMovedUnits(moveClass, u);
 }
@@ -187,7 +192,7 @@ static void __stdcall WorldBeginSearch(PathUnit unit)
 static void __stdcall WorldEndSearch(PathUnit unit)
 {
     Unit* u = UnitOf(unit);
-    MovementClass* moveClass = ((UnitMotionPlannerView*)u->motion.get())->owner.get();
+    int moveClass = ClassIndex(((UnitMotionPlannerView*)u->motion.get())->owner.offset);
     SchedDeliver(SCHED_MAP);
     g_seams.map->RefreshUnitIfStale(moveClass, u);
 }

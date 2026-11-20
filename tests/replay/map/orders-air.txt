@@ -289860,6 +289860,7 @@ call 1351 PassMapInBounds
   a y 87
   o result 1
 call 1351 PassMapGet
+  r PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff 265:00d0ffff00d0ffff00d0ffff00d0ffff 1306:f4ffff01f4ffff01f57f5501ff7f0000ff7f0000
   a moveClass 2
   a x 188
   a y 87
@@ -294164,7 +294165,7 @@ call 1366 Apply
   r Unit#1.posX 40492961
   r Unit#1.posZ 21206452
   r Unit#1.cobStateFlags 1
-  r PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff 265:00d0ffff00d0ffff00d0ffff00d0ffff
+  r PassMap#2.cells 1306:f457f501f407f401f5075401ff070000ff570000
   r PassMap#2.lastTick 1321
   a event.kind 161
   a event.unit Unit#251
@@ -304034,6 +304035,7 @@ call 1502 PassMapInBounds
   a y 19
   o result 1
 call 1502 PassMapGet
+  r PassMap#2.cells 260:ffffffffffffffff55d5ffff
   a moveClass 2
   a x 38
   a y 19
@@ -305076,6 +305078,7 @@ call 1514 Apply
   r Unit#1.cobStateFlags 0
   r Unit#3.flags 0x10242326
   r Unit#3.posY 998325
+  r PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff
   r PassMap#2.lastTick 1472
   a event.kind 161
   a event.unit Unit#251

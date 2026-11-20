@@ -2906,6 +2906,20 @@
    },
    {
     "kind": "field_read",
+    "target": "PassMap::width",
+    "rule": "all-of",
+    "object": "PassMap",
+    "functions": [
+     "PassMap::Get",
+     "PassMap::InBounds"
+    ],
+    "reads": [
+     "PassMap.width"
+    ],
+    "note": "the queries name a pass map by its class index: every pass map is a root of the call"
+   },
+   {
+    "kind": "field_read",
     "target": "Game::cells_1429f",
     "rule": "all-of",
     "object": "SpatialBucket",
@@ -6356,8 +6370,8 @@
     "CanPlaceFootprintAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceFootprintAt"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.poolCount"], "writes": [], "objectReads": ["Unit.def", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.playerIndex", "UnitDef.flags1", "UnitDef.maxslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Unit", "Cell", "Feature"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceFootprintAt"},
     "IsPadSlotFree": {"conv": "__stdcall", "ret": "int", "functions": ["IsPadSlotFree"], "reads": [], "writes": [], "objectReads": ["Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.transportPiece"], "objectWrites": [], "allOf": [], "args": [{"name": "pad", "type": "Unit*", "line": "pad", "mode": "object", "kind": "Unit"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPadSlotFree"},
     "GetGroundHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetGroundHeight", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.height"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetGroundHeight"},
-    "PassMapGet": {"conv": "__stdcall", "ret": "int", "functions": ["PassMap::Get"], "reads": [], "writes": [], "objectReads": ["PassMap.width", "PassMap.cells"], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "int", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "PassMapGetSlot"},
-    "PassMapInBounds": {"conv": "__stdcall", "ret": "int", "functions": ["PassMap::InBounds"], "reads": [], "writes": [], "objectReads": ["PassMap.width", "PassMap.height"], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "int", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "unsigned int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "unsigned int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "PassMapInBoundsSlot"}
+    "PassMapGet": {"conv": "__stdcall", "ret": "int", "functions": ["PassMap::Get"], "reads": [], "writes": [], "objectReads": ["PassMap.width", "PassMap.cells"], "objectWrites": [], "allOf": ["PassMap"], "args": [{"name": "moveClass", "type": "int", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "PassMapGetSlot"},
+    "PassMapInBounds": {"conv": "__stdcall", "ret": "int", "functions": ["PassMap::InBounds"], "reads": [], "writes": [], "objectReads": ["PassMap.width", "PassMap.height"], "objectWrites": [], "allOf": ["PassMap"], "args": [{"name": "moveClass", "type": "int", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "unsigned int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "unsigned int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "PassMapInBoundsSlot"}
    }
   },
   "scripts": {

@@ -324477,6 +324477,7 @@ call 60 PassMapInBounds
   a y 14
   o result 1
 call 60 PassMapGet
+  r PassMap#2.cells 1328:ff17f401ff07f401ff07f401ff07f401ff57f501
   a moveClass 2
   a x 35
   a y 14
@@ -324855,7 +324856,6 @@ call 64 CanPlaceUnitFootprint
 call 64 Apply
   r Unit#1.posX 38252666
   r Unit#1.posZ 16022729
-  r PassMap#2.cells 1328:ff17f401ff07f401ff07f401ff07f401ff57f501
   r PassMap#2.lastTick 30
   a event.kind 161
   a event.unit Unit#1

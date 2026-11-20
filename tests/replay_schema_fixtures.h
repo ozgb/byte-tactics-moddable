@@ -2415,7 +2415,9 @@ static const unsigned short kReplayMapIsPadSlotFreeObjReads[] = { 70, 71, 72, 74
 static const unsigned char kReplayMapGetGroundHeightAllOf[] = { ROK_CELL };
 static const unsigned char kReplayMapGetGroundHeightReads[] = { 1, 2 };
 static const unsigned short kReplayMapGetGroundHeightObjReads[] = { 158 };
+static const unsigned char kReplayMapPassMapGetAllOf[] = { ROK_PASSMAP };
 static const unsigned short kReplayMapPassMapGetObjReads[] = { 221, 223 };
+static const unsigned char kReplayMapPassMapInBoundsAllOf[] = { ROK_PASSMAP };
 static const unsigned short kReplayMapPassMapInBoundsObjReads[] = { 221, 222 };
 static const unsigned short kReplayScriptsGetPieceOffsetObjReads[] = { 194, 195 };
 static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 194, 195 };
@@ -2647,8 +2649,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CanPlaceFootprintAt", SUB_MAP, kReplayMapCanPlaceFootprintAtReads, 6, nullptr, 0, kReplayMapCanPlaceFootprintAtObjReads, 18, nullptr, 0, kReplayMapCanPlaceFootprintAtAllOf, 3 },
     { "IsPadSlotFree", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapIsPadSlotFreeObjReads, 4, nullptr, 0, nullptr, 0 },
     { "GetGroundHeight", SUB_MAP, kReplayMapGetGroundHeightReads, 2, nullptr, 0, kReplayMapGetGroundHeightObjReads, 1, nullptr, 0, kReplayMapGetGroundHeightAllOf, 1 },
-    { "PassMapGet", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapGetObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "PassMapInBounds", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapInBoundsObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "PassMapGet", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapGetObjReads, 2, nullptr, 0, kReplayMapPassMapGetAllOf, 1 },
+    { "PassMapInBounds", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapInBoundsObjReads, 2, nullptr, 0, kReplayMapPassMapInBoundsAllOf, 1 },
     { "StartScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "StartScriptWithArgs", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "StartScriptWithArgsByIndex", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },

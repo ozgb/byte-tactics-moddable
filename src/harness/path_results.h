@@ -23,7 +23,7 @@ struct PathResults {
     unsigned int capacity;
 };
 
-int PathResultsAdd(PathResults* results, const PathEvent* event, const PathPoint* points, int capacity);
+int PathResultsAdd(PathResults* results, const PathfindingEventHeader* event, unsigned int size, const PathPoint* points, int capacity);
 void PathResultsClear(PathResults* results);
 
 #endif

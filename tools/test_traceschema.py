@@ -247,15 +247,6 @@ class SchemaJsonTest(unittest.TestCase):
         for f in results["fields"]:
             self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
-    def test_economy_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
-        economy = self.model["economy"]
-        header = (ts.ROOT / "src/harness/economy_results.h").read_text()
-        constants = dict(re.findall(r"(ECONOMY_RESULT_\w+) = (\d+)", header))
-        self.assertEqual(economy["section"], int(constants["ECONOMY_RESULT_SECTION"]))
-        self.assertEqual(economy["account"]["size"], 4 * int(constants["ECONOMY_RESULT_ACCOUNT_WORDS"]))
-        self.assertEqual([f["name"] for f in economy["fields"]],
-                         ["kind", "player", "unit", "resources", "energy", "metal", "value", "outcome"])
-
     def test_packets_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
         packets = self.model["packets"]
         header = (ts.ROOT / "src/harness/share_packets.h").read_text()
@@ -264,97 +255,68 @@ class SchemaJsonTest(unittest.TestCase):
         self.assertEqual([f["name"] for f in packets["fields"]], ["type", "subtype", "from", "to", "amount"])
         self.assertEqual({(f["size"], f["kind"], f["target"]) for f in packets["fields"]}, {(4, "scalar", None)})
 
-    def test_features_section_matches_the_harness_and_names_its_fields_in_dump_order(self):
-        features = self.model["features"]
-        header = (ts.ROOT / "src/harness/features_results.h").read_text()
-        constants = dict(re.findall(r"(FEATURES_RESULT_\w+) = (\d+)", header))
-        self.assertEqual(features["section"], int(constants["FEATURES_RESULT_SECTION"]))
-        self.assertEqual([f["name"] for f in features["fields"]],
-                         ["kind", "flags", "x", "z", "feature", "owner", "unit", "value", "state",
-                          "width", "height", "pos", "rot", "outcome"])
+    def test_every_event_section_has_one_field_list_per_kind(self):
+        sections = {m.key: m.section for m in ts.EVENT_MODULES}
+        self.assertEqual(sections, {"economy": 33, "features": 36, "windMeteors": 37, "targeting": 38, "los_radar": 39,
+                                    "map": 40, "playersEvents": 41, "aiEvents": 42, "weaponsEvents": 47})
         targets = {t["name"] for t in self.model["targets"]}
-        for f in features["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+        for module in ts.EVENT_MODULES:
+            section = self.model[module.key]
+            self.assertEqual(section["section"], module.section)
+            self.assertNotIn("fields", section)
+            self.assertNotIn("account", section)
+            self.assertEqual(len(section["kinds"]), len(module.payloads), module.key)
+            for value, kind in section["kinds"].items():
+                names = [f["name"] for f in kind["fields"]]
+                self.assertEqual(names[0], "kind", kind["name"])
+                self.assertEqual(len(names), len(set(names)), kind["name"])
+                self.assertEqual(names[-1] == "outcome", module.outcome, kind["name"])
+                self.assertEqual(sum(f["size"] for f in kind["fields"]) - (4 if module.outcome else 0), kind["size"], kind["name"])
+                for f in kind["fields"]:
+                    self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
 
-    def test_wind_meteors_section_names_its_fields_in_dump_order(self):
-        wind_meteors = self.model["windMeteors"]
-        self.assertEqual(wind_meteors["section"], 37)
-        self.assertEqual([(f["name"], f["kind"], f["target"]) for f in wind_meteors["fields"]],
-                         [("kind", "scalar", None), ("data", "bytes", None)])
-        self.assertEqual(wind_meteors["fields"][0]["size"], 4)
+    def test_targeting_kinds_carry_only_their_own_fields(self):
+        kinds = self.model["targeting"]["kinds"]
+        fields = lambda value: [(f["name"], f["size"], f["kind"]) for f in kinds[value]["fields"]]
+        head = [("kind", 4, "scalar"), ("unit", 4, "ref"), ("weapon", 4, "scalar")]
+        self.assertEqual(kinds["96"]["name"], "TARGETING_SET_UNIT")
+        self.assertEqual(fields("96"), head + [("target", 4, "ref"), ("outcome", 4, "scalar")])
+        self.assertEqual(fields("97"), head + [("pos", 12, "bytes"), ("outcome", 4, "scalar")])
+        self.assertEqual(fields("98"), head + [("outcome", 4, "scalar")])
+        self.assertEqual(fields("100"), head + [("xOrUnit", 4, "scalar"), ("zOrSentinel", 4, "scalar"), ("outcome", 4, "scalar")])
 
-    def test_targeting_section_names_its_fields_in_dump_order(self):
-        targeting = self.model["targeting"]
-        self.assertEqual(targeting["section"], 38)
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in targeting["fields"]],
-                         [("kind", 4, "scalar", None), ("unit", 4, "ref", "unit"), ("weapon", 4, "scalar", None),
-                          ("target", 4, "ref", "unit"), ("pos", 12, "bytes", None), ("outcome", 4, "scalar", None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in targeting["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+    def test_economy_load_holds_the_account_and_wind_meteors_has_no_outcome(self):
+        load = self.model["economy"]["kinds"]["1"]
+        self.assertEqual([(f["name"], f["size"], f["kind"]) for f in load["fields"]],
+                         [("kind", 4, "scalar"), ("player", 4, "scalar"), ("unit", 4, "ref"), ("account", 48, "bytes"),
+                          ("outcome", 4, "scalar")])
+        params = self.model["windMeteors"]["kinds"]["66"]
+        self.assertEqual([(f["name"], f["size"], f["kind"]) for f in params["fields"]],
+                         [("kind", 4, "scalar"), ("params", 48, "bytes")])
+        self.assertEqual([f["name"] for f in self.model["windMeteors"]["kinds"]["67"]["fields"]], ["kind"])
 
-    def test_los_radar_section_names_its_fields_in_dump_order(self):
-        los_radar = self.model["los_radar"]
-        self.assertEqual(los_radar["section"], 39)
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in los_radar["fields"]],
-                         [("kind", 4, "scalar", None), ("unit", 4, "ref", "unit"), ("player", 4, "scalar", None), ("value", 4, "scalar", None),
-                          ("pos", 12, "bytes", None), ("sightDistance", 4, "scalar", None), ("eyeHeight", 4, "scalar", None),
-                          ("lifetime", 4, "scalar", None), ("cell", 8, "bytes", None), ("size", 8, "bytes", None), ("sightCell", 4, "scalar", None),
-                          ("sightFrameIdx", 4, "scalar", None), ("outcome", 4, "scalar", None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in los_radar["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+    def test_features_state_is_a_handle_and_players_record_is_flattened(self):
+        free = self.model["features"]["kinds"]["48"]
+        self.assertEqual([(f["name"], f["kind"]) for f in free["fields"]],
+                         [("kind", "scalar"), ("state", "handle"), ("outcome", "scalar")])
+        give = [f["name"] for f in self.model["playersEvents"]["kinds"]["192"]["fields"]]
+        self.assertEqual(give, ["kind", "unit", "player", "record.present", "record.hitPoints", "record.buildPercent",
+                                "record.angles", "record.stockpiles", "outcome"])
 
-    def test_map_section_names_its_fields_in_dump_order(self):
-        map_ = self.model["map"]
-        self.assertEqual(map_["section"], 40)
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in map_["fields"]],
-                         [("kind", 4, "scalar", None), ("unit", 4, "ref", "unit"), ("value", 4, "scalar", None),
-                          ("cell", 8, "bytes", None), ("size", 8, "bytes", None), ("rect", 16, "bytes", None),
-                          ("classes", 4, "scalar", None), ("cause", 4, "scalar", None), ("outcome", 4, "scalar", None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in map_["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+    def test_the_header_has_the_kind_tables_with_offsetof_and_payload_sizes(self):
+        for module in ts.EVENT_MODULES:
+            found = re.search(r'static const TraceEventModule k%sEvents = \{ "%s", %d, k%sKinds, (\d+) \};'
+                              % (module.c_name, module.key, module.section, module.c_name), self.header)
+            self.assertIsNotNone(found, module.key)
+            self.assertEqual(int(found.group(1)), len(self.model[module.key]["kinds"]))
+        self.assertIn("{ \"target\", offsetof(TargetingSetUnit, target), 4, TF_REF, TT_UNIT, 0 },", self.header)
+        self.assertIn("{ 96, \"TARGETING_SET_UNIT\", sizeof(TargetingSetUnit), kEvent_TARGETING_SET_UNIT, 5 },", self.header)
+        self.assertIn("#define TRACE_EVENT_MAX_BYTES 80", self.header)
 
-    def test_players_events_section_names_its_fields_in_dump_order(self):
-        events = self.model["playersEvents"]
-        self.assertEqual(events["section"], 41)
-        s = "scalar"
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in events["fields"]],
-                         [("kind", 4, s, None), ("unit", 4, "ref", "unit"), ("player", 4, s, None),
-                          ("from", 4, s, None), ("value", 4, s, None), ("amount", 4, s, None),
-                          ("announce", 4, s, None), ("record", 4, s, None), ("hitPoints", 4, s, None),
-                          ("buildPercent", 4, s, None), ("angles", 6, "bytes", None),
-                          ("stockpiles", 3, "bytes", None), ("outcome", 4, s, None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in events["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
-
-    def test_ai_events_section_names_its_fields_in_dump_order(self):
-        events = self.model["aiEvents"]
-        self.assertEqual(events["section"], 42)
-        s = "scalar"
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in events["fields"]],
-                         [("kind", 4, s, None), ("unit", 4, "ref", "unit"), ("target", 4, "ref", "unit"),
-                          ("value", 4, s, None), ("extra", 4, s, None), ("params", 8, "bytes", None),
-                          ("hasPos", 4, s, None), ("pos", 12, "bytes", None), ("scale", 4, s, None),
-                          ("types", 64, "bytes", None), ("outcome", 4, s, None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in events["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
-
-    def test_weapons_events_section_names_its_fields_in_dump_order(self):
-        events = self.model["weaponsEvents"]
-        self.assertEqual(events["section"], 47)
-        s = "scalar"
-        self.assertEqual([(f["name"], f["size"], f["kind"], f["target"]) for f in events["fields"]],
-                         [("kind", 4, s, None), ("unit", 4, "ref", "unit"), ("target", 4, "ref", "unit"),
-                          ("value", 4, s, None), ("extra", 4, s, None), ("callback", 4, s, None),
-                          ("pos", 12, "bytes", None), ("vel", 12, "bytes", None), ("args", 32, "bytes", None),
-                          ("name", 32, "bytes", None), ("outcome", 4, s, None)])
-        targets = {t["name"] for t in self.model["targets"]}
-        for f in events["fields"]:
-            self.assertEqual(f["target"] in targets, f["kind"] == "ref", f["name"])
+    def test_a_header_with_an_unknown_payload_is_refused(self):
+        module = ts.EventModule("x", 1, "X", "targeting.h", "TargetingEventHeader", ["TargetingEventKind"], {})
+        with self.assertRaises(ValueError):
+            ts.event_kinds(module)
 
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
@@ -368,8 +330,8 @@ class OwnerOnlyStateTest(unittest.TestCase):
     def setUp(self):
         self.model = json.loads(ts.JSON_OUT.read_text())
 
-    def test_the_format_is_6(self):
-        self.assertEqual(ts.TRACE_FORMAT, 6)
+    def test_the_format_is_7(self):
+        self.assertEqual(ts.TRACE_FORMAT, 7)
 
     def test_rec_hashes_only_b(self):
         rec = self.model["tables"]["Rec"]

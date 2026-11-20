@@ -419,7 +419,7 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(pathfinding_writer_test DEPENDS "${CMAKE_BINARY_DIR}/pathfinding_writer_test.exe")
 
-add_library(economy_writer_test_objects OBJECT src/game/economy.cpp src/harness/economy_results.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/economy_writer_test.cpp)
+add_library(economy_writer_test_objects OBJECT src/game/economy.cpp src/harness/event_results.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/economy_writer_test.cpp)
 target_include_directories(economy_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(economy_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(economy_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

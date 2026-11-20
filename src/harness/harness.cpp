@@ -26,16 +26,8 @@
 #include "../state/sim_globals.h"
 #include "block_scan.h"
 #include "path_results.h"
-#include "economy_results.h"
-#include "features_results.h"
-#include "targeting_results.h"
-#include "los_radar_results.h"
-#include "map_results.h"
-#include "players_results.h"
-#include "ai_results.h"
-#include "weapons_results.h"
+#include "event_results.h"
 #include "../game/ai_events.h"
-#include "wind_meteors_results.h"
 #include "../state/block.h"
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -2926,11 +2918,11 @@ static void VisitModuleState()
 static PathResults s_pathResults;
 static bool s_pathResultsLost;
 
-void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity)
+void __stdcall HarnessPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* points, int capacity)
 {
     if (!HarnessTestMode() || s_trace == nullptr)
         return;
-    if (!PathResultsAdd(&s_pathResults, event, points, capacity))
+    if (!PathResultsAdd(&s_pathResults, event, size, points, capacity))
         s_pathResultsLost = true;
 }
 
@@ -2977,79 +2969,92 @@ static void VisitPathResults()
     }
 }
 
-static EconomyResults s_economyResults;
-static bool s_economyResultsLost;
+static_assert(TRACE_EVENT_MAX_BYTES == EVENT_RESULT_BYTES, "the largest event payload is the size of a recorded event");
+static_assert(TRACE_EVENT_MAX_REFS <= EVENT_RESULT_REFS, "a recorded event holds the unit refs of its kind");
 
-void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome)
+struct EventSection {
+    const TraceEventModule* module;
+    EventResults results;
+    bool lost;
+};
+
+enum { ES_ECONOMY, ES_WIND_METEORS, ES_FEATURES, ES_TARGETING, ES_LOS_RADAR, ES_MAP, ES_PLAYERS, ES_AI, ES_WEAPONS, ES_COUNT };
+
+static EventSection s_eventSections[ES_COUNT] = {
+    { &kEconomyEvents },  { &kWindMeteorsEvents }, { &kFeaturesEvents }, { &kTargetingEvents }, { &kLosRadarEvents },
+    { &kMapEvents },      { &kPlayersEvents },     { &kAiEvents },       { &kWeaponsEvents },
+};
+
+static const TraceEventKind* FindEventKind(const TraceEventModule* module, int kind)
+{
+    for (unsigned k = 0; k < module->kindCount; k++)
+        if (module->kinds[k].kind == kind)
+            return &module->kinds[k];
+    return nullptr;
+}
+
+static void RecordEvent(int index, const void* event, unsigned int size, int outcome)
 {
     if (!HarnessTestMode() || s_trace == nullptr)
         return;
-    if (!EconomyResultsAdd(&s_economyResults, event, outcome))
-        s_economyResultsLost = true;
+    EventSection* section = &s_eventSections[index];
+    char message[120];
+    if (size < sizeof(int) || size > EVENT_RESULT_BYTES) {
+        sprintf(message, "testmode: a %s event is not between 4 and %d bytes\n", section->module->prefix, EVENT_RESULT_BYTES);
+        Fail(message);
+    }
+    int kind = *(const int*)event;
+    if (FindEventKind(section->module, kind) == nullptr) {
+        sprintf(message, "testmode: a %s event has the unknown kind %d\n", section->module->prefix, kind);
+        Fail(message);
+    }
+    if (EventResultsAdd(&section->results, event, size, outcome) == EVENT_RESULT_NO_MEMORY)
+        section->lost = true;
 }
 
-static void VisitEconomyResults()
+void __stdcall HarnessEconomyEvent(const EconomyEventHeader* event, unsigned int size, int outcome)
 {
-    if (s_economyResultsLost)
-        Fail("testmode: no memory for the economy events\n");
-    for (unsigned k = 0; k < s_economyResults.count; k++) {
-        EconomyResult* r = &s_economyResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->unitRef, true, TT_UNIT, &r->unitTag, &r->unitId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("economy.count");
-    fprintf(s_dump, "0x%08x\n", s_economyResults.count);
-    for (unsigned k = 0; k < s_economyResults.count; k++) {
-        const EconomyResult* r = &s_economyResults.items[k];
-        unsigned energyBits, metalBits;
-        memcpy(&energyBits, &r->energy, sizeof energyBits);
-        memcpy(&metalBits, &r->metal, sizeof metalBits);
-        sprintf(path, "economy[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
-        sprintf(path, "economy[%u].player", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->player);
-        sprintf(path, "economy[%u].unit", k);
-        DumpPrefix(path);
-        if (r->unitTag == 0)
-            fputs("null", s_dump);
-        else if (r->unitTag == TT_HEAP)
-            fputs("heap", s_dump);
-        else
-            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
-        fputc('\n', s_dump);
-        static const char* const kNames[] = { "resources", "energy", "metal", "value", "outcome" };
-        const unsigned values[] = { r->resources, energyBits, metalBits, (unsigned)r->value, (unsigned)r->outcome };
-        for (int f = 0; f < 5; f++) {
-            sprintf(path, "economy[%u].%s", k, kNames[f]);
-            DumpPrefix(path);
-            fprintf(s_dump, "0x%08x\n", values[f]);
-        }
-        if (r->kind != ECONOMY_LOAD)
-            continue;
-        sprintf(path, "economy[%u].account", k);
-        DumpPrefix(path);
-        fputs("hex:", s_dump);
-        const unsigned char* bytes = (const unsigned char*)r->account;
-        const unsigned accountSize = sizeof r->account;
-        for (unsigned b = 0; b < accountSize; b++)
-            fprintf(s_dump, "%02x", bytes[b]);
-        fputc('\n', s_dump);
-    }
+    RecordEvent(ES_ECONOMY, event, size, outcome);
 }
 
-static FeaturesResults s_featuresResults;
-static bool s_featuresResultsLost;
-
-void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome)
+void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader* event, unsigned int size, int outcome)
 {
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!FeaturesResultsAdd(&s_featuresResults, event, outcome))
-        s_featuresResultsLost = true;
+    RecordEvent(ES_FEATURES, event, size, outcome);
+}
+
+void __stdcall HarnessTargetingEvent(const TargetingEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_TARGETING, event, size, outcome);
+}
+
+void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_LOS_RADAR, event, size, outcome);
+}
+
+void __stdcall HarnessMapEvent(const MapEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_MAP, event, size, outcome);
+}
+
+void __stdcall HarnessPlayersEvent(const PlayersEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_PLAYERS, event, size, outcome);
+}
+
+void __stdcall HarnessAiEvent(const AiEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_AI, event, size, outcome);
+}
+
+void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_WEAPONS, event, size, outcome);
+}
+
+void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)
+{
+    RecordEvent(ES_WIND_METEORS, record, size, 0);
 }
 
 static void DumpHexBytes(const void* bytes, unsigned size)
@@ -3058,75 +3063,6 @@ static void DumpHexBytes(const void* bytes, unsigned size)
     for (unsigned b = 0; b < size; b++)
         fprintf(s_dump, "%02x", ((const unsigned char*)bytes)[b]);
     fputc('\n', s_dump);
-}
-
-static void VisitFeaturesResults()
-{
-    if (s_featuresResultsLost)
-        Fail("testmode: no memory for the features events\n");
-    for (unsigned k = 0; k < s_featuresResults.count; k++) {
-        FeaturesResult* r = &s_featuresResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("features.count");
-    fprintf(s_dump, "0x%08x\n", s_featuresResults.count);
-    for (unsigned k = 0; k < s_featuresResults.count; k++) {
-        const FeaturesResult* r = &s_featuresResults.items[k];
-        const FeaturesEvent* e = &r->event;
-        static const char* const kBefore[] = { "kind", "flags", "x", "z", "feature", "owner" };
-        const unsigned before[] = { (unsigned)e->kind, (unsigned)e->flags, (unsigned)e->x, (unsigned)e->z,
-                                    (unsigned)e->feature, (unsigned)e->owner };
-        for (int f = 0; f < 6; f++) {
-            sprintf(path, "features[%u].%s", k, kBefore[f]);
-            DumpPrefix(path);
-            fprintf(s_dump, "0x%08x\n", before[f]);
-        }
-        sprintf(path, "features[%u].unit", k);
-        DumpPrefix(path);
-        if (r->unitTag == 0)
-            fputs("null", s_dump);
-        else if (r->unitTag == TT_HEAP)
-            fputs("heap", s_dump);
-        else
-            fprintf(s_dump, "%s:%u", s_targetNames[r->unitTag], r->unitId);
-        fputc('\n', s_dump);
-        sprintf(path, "features[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "features[%u].state", k);
-        DumpPrefix(path);
-        fputs(e->state == 0 ? "null\n" : "heap\n", s_dump);
-        static const char* const kSize[] = { "width", "height" };
-        const unsigned size[] = { (unsigned)e->width, (unsigned)e->height };
-        for (int f = 0; f < 2; f++) {
-            sprintf(path, "features[%u].%s", k, kSize[f]);
-            DumpPrefix(path);
-            fprintf(s_dump, "0x%08x\n", size[f]);
-        }
-        sprintf(path, "features[%u].pos", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->pos, sizeof e->pos);
-        sprintf(path, "features[%u].rot", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->rot, sizeof e->rot);
-        sprintf(path, "features[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static TargetingResults s_targetingResults;
-static bool s_targetingResultsLost;
-
-void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!TargetingResultsAdd(&s_targetingResults, event, outcome))
-        s_targetingResultsLost = true;
 }
 
 static void DumpUnitName(unsigned tag, unsigned id)
@@ -3140,407 +3076,60 @@ static void DumpUnitName(unsigned tag, unsigned id)
     fputc('\n', s_dump);
 }
 
-static void VisitTargetingResults()
+static void VisitEventSection(EventSection* section)
 {
-    if (s_targetingResultsLost)
-        Fail("testmode: no memory for the targeting events\n");
-    for (unsigned k = 0; k < s_targetingResults.count; k++) {
-        TargetingResult* r = &s_targetingResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
+    const TraceEventModule* module = section->module;
+    if (section->lost) {
+        char message[120];
+        sprintf(message, "testmode: no memory for the %s events\n", module->prefix);
+        Fail(message);
+    }
+    for (unsigned k = 0; k < section->results.count; k++) {
+        EventResult* r = &section->results.items[k];
+        const TraceEventKind* kind = FindEventKind(module, *(const int*)r->data);
+        unsigned refs = 0;
+        for (unsigned f = 0; f < kind->fieldCount; f++) {
+            if (kind->fields[f].kind != TF_REF)
+                continue;
+            Resolve((unsigned)SimBlockBase(), *(const unsigned*)(r->data + kind->fields[f].offset), true, TT_UNIT,
+                    &r->tag[refs], &r->id[refs]);
+            refs++;
+        }
     }
     if (!s_dumpNow)
         return;
-    char path[64];
-    DumpPrefix("targeting.count");
-    fprintf(s_dump, "0x%08x\n", s_targetingResults.count);
-    for (unsigned k = 0; k < s_targetingResults.count; k++) {
-        const TargetingResult* r = &s_targetingResults.items[k];
-        const TargetingEvent* e = &r->event;
-        sprintf(path, "targeting[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "targeting[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "targeting[%u].weapon", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->weapon);
-        sprintf(path, "targeting[%u].target", k);
-        DumpPrefix(path);
-        DumpUnitName(r->targetTag, r->targetId);
-        sprintf(path, "targeting[%u].pos", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->pos, sizeof e->pos);
-        sprintf(path, "targeting[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+    char path[96];
+    sprintf(path, "%s.count", module->prefix);
+    DumpPrefix(path);
+    fprintf(s_dump, "0x%08x\n", section->results.count);
+    for (unsigned k = 0; k < section->results.count; k++) {
+        const EventResult* r = &section->results.items[k];
+        const TraceEventKind* kind = FindEventKind(module, *(const int*)r->data);
+        unsigned refs = 0;
+        for (unsigned f = 0; f < kind->fieldCount; f++) {
+            const TraceField* field = &kind->fields[f];
+            sprintf(path, "%s[%u].%s", module->prefix, k, field->name);
+            DumpPrefix(path);
+            if (field->offset == TRACE_EVENT_OUTCOME) {
+                fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
+            } else if (field->kind == TF_REF) {
+                DumpUnitName(r->tag[refs], r->id[refs]);
+                refs++;
+            } else if (field->kind == TF_HANDLE) {
+                fputs(*(const unsigned*)(r->data + field->offset) == 0 ? "null\n" : "heap\n", s_dump);
+            } else if (field->kind == TF_BYTES) {
+                DumpHexBytes(r->data + field->offset, field->size);
+            } else {
+                fprintf(s_dump, "0x%08x\n", *(const unsigned*)(r->data + field->offset));
+            }
+        }
     }
 }
 
-static LosRadarResults s_losRadarResults;
-static bool s_losRadarResultsLost;
-
-void __stdcall HarnessLosRadarEvent(const LosRadarEvent* event, int outcome)
+static void VisitEventResults()
 {
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!LosRadarResultsAdd(&s_losRadarResults, event, outcome))
-        s_losRadarResultsLost = true;
-}
-
-static void VisitLosRadarResults()
-{
-    if (s_losRadarResultsLost)
-        Fail("testmode: no memory for the los_radar events\n");
-    for (unsigned k = 0; k < s_losRadarResults.count; k++) {
-        LosRadarResult* r = &s_losRadarResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("los_radar.count");
-    fprintf(s_dump, "0x%08x\n", s_losRadarResults.count);
-    for (unsigned k = 0; k < s_losRadarResults.count; k++) {
-        const LosRadarResult* r = &s_losRadarResults.items[k];
-        const LosRadarEvent* e = &r->event;
-        sprintf(path, "los_radar[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "los_radar[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "los_radar[%u].player", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->player);
-        sprintf(path, "los_radar[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "los_radar[%u].pos", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->pos, sizeof e->pos);
-        sprintf(path, "los_radar[%u].sightDistance", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->sightDistance);
-        sprintf(path, "los_radar[%u].eyeHeight", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->eyeHeight);
-        sprintf(path, "los_radar[%u].lifetime", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->lifetime);
-        sprintf(path, "los_radar[%u].cell", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->cell, sizeof e->cell);
-        sprintf(path, "los_radar[%u].size", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->size, sizeof e->size);
-        sprintf(path, "los_radar[%u].sightCell", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->sight.cell);
-        sprintf(path, "los_radar[%u].sightFrameIdx", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->sight.frameIdx);
-        sprintf(path, "los_radar[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static MapResults s_mapResults;
-static bool s_mapResultsLost;
-
-void __stdcall HarnessMapEvent(const MapEvent* event, int outcome)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!MapResultsAdd(&s_mapResults, event, outcome))
-        s_mapResultsLost = true;
-}
-
-static void VisitMapResults()
-{
-    if (s_mapResultsLost)
-        Fail("testmode: no memory for the map events\n");
-    for (unsigned k = 0; k < s_mapResults.count; k++) {
-        MapResult* r = &s_mapResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("map.count");
-    fprintf(s_dump, "0x%08x\n", s_mapResults.count);
-    for (unsigned k = 0; k < s_mapResults.count; k++) {
-        const MapResult* r = &s_mapResults.items[k];
-        const MapEvent* e = &r->event;
-        sprintf(path, "map[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "map[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "map[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "map[%u].cell", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->cell, sizeof e->cell);
-        sprintf(path, "map[%u].size", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->size, sizeof e->size);
-        sprintf(path, "map[%u].rect", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->rect, sizeof e->rect);
-        sprintf(path, "map[%u].classes", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", e->classes);
-        sprintf(path, "map[%u].cause", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->cause);
-        sprintf(path, "map[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static PlayersResults s_playersResults;
-static bool s_playersResultsLost;
-
-void __stdcall HarnessPlayersEvent(const PlayersEvent* event, int outcome)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!PlayersResultsAdd(&s_playersResults, event, outcome))
-        s_playersResultsLost = true;
-}
-
-static void VisitPlayersResults()
-{
-    if (s_playersResultsLost)
-        Fail("testmode: no memory for the players events\n");
-    for (unsigned k = 0; k < s_playersResults.count; k++) {
-        PlayersResult* r = &s_playersResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("playersEvents.count");
-    fprintf(s_dump, "0x%08x\n", s_playersResults.count);
-    for (unsigned k = 0; k < s_playersResults.count; k++) {
-        const PlayersResult* r = &s_playersResults.items[k];
-        const PlayersEvent* e = &r->event;
-        sprintf(path, "playersEvents[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "playersEvents[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "playersEvents[%u].player", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->player);
-        sprintf(path, "playersEvents[%u].from", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->from);
-        sprintf(path, "playersEvents[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "playersEvents[%u].amount", k);
-        DumpPrefix(path);
-        unsigned amountBits;
-        memcpy(&amountBits, &e->amount, sizeof amountBits);
-        fprintf(s_dump, "0x%08x\n", amountBits);
-        sprintf(path, "playersEvents[%u].announce", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->announce);
-        sprintf(path, "playersEvents[%u].record", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->record);
-        sprintf(path, "playersEvents[%u].hitPoints", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->hitPoints);
-        sprintf(path, "playersEvents[%u].buildPercent", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->buildPercent);
-        sprintf(path, "playersEvents[%u].angles", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->angles, sizeof e->angles);
-        sprintf(path, "playersEvents[%u].stockpiles", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->stockpiles, sizeof e->stockpiles);
-        sprintf(path, "playersEvents[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static AiResults s_aiResults;
-static bool s_aiResultsLost;
-
-void __stdcall HarnessAiEvent(const AiEvent* event, int outcome)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!AiResultsAdd(&s_aiResults, event, outcome))
-        s_aiResultsLost = true;
-}
-
-static void VisitAiResults()
-{
-    if (s_aiResultsLost)
-        Fail("testmode: no memory for the ai events\n");
-    for (unsigned k = 0; k < s_aiResults.count; k++) {
-        AiResult* r = &s_aiResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("aiEvents.count");
-    fprintf(s_dump, "0x%08x\n", s_aiResults.count);
-    for (unsigned k = 0; k < s_aiResults.count; k++) {
-        const AiResult* r = &s_aiResults.items[k];
-        const AiEvent* e = &r->event;
-        sprintf(path, "aiEvents[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "aiEvents[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "aiEvents[%u].target", k);
-        DumpPrefix(path);
-        DumpUnitName(r->targetTag, r->targetId);
-        sprintf(path, "aiEvents[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "aiEvents[%u].extra", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->extra);
-        sprintf(path, "aiEvents[%u].params", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->params, sizeof e->params);
-        sprintf(path, "aiEvents[%u].hasPos", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->hasPos);
-        sprintf(path, "aiEvents[%u].pos", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->pos, sizeof e->pos);
-        sprintf(path, "aiEvents[%u].scale", k);
-        DumpPrefix(path);
-        unsigned scaleBits;
-        memcpy(&scaleBits, &e->scale, sizeof scaleBits);
-        fprintf(s_dump, "0x%08x\n", scaleBits);
-        sprintf(path, "aiEvents[%u].types", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->types, sizeof e->types);
-        sprintf(path, "aiEvents[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static WeaponsResults s_weaponsResults;
-static bool s_weaponsResultsLost;
-
-void __stdcall HarnessWeaponsEvent(const WeaponsEvent* event, int outcome)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    if (!WeaponsResultsAdd(&s_weaponsResults, event, outcome))
-        s_weaponsResultsLost = true;
-}
-
-static void VisitWeaponsResults()
-{
-    if (s_weaponsResultsLost)
-        Fail("testmode: no memory for the weapons events\n");
-    for (unsigned k = 0; k < s_weaponsResults.count; k++) {
-        WeaponsResult* r = &s_weaponsResults.items[k];
-        Resolve((unsigned)SimBlockBase(), r->event.unit, true, TT_UNIT, &r->unitTag, &r->unitId);
-        Resolve((unsigned)SimBlockBase(), r->event.target, true, TT_UNIT, &r->targetTag, &r->targetId);
-    }
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("weaponsEvents.count");
-    fprintf(s_dump, "0x%08x\n", s_weaponsResults.count);
-    for (unsigned k = 0; k < s_weaponsResults.count; k++) {
-        const WeaponsResult* r = &s_weaponsResults.items[k];
-        const WeaponsEvent* e = &r->event;
-        sprintf(path, "weaponsEvents[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->kind);
-        sprintf(path, "weaponsEvents[%u].unit", k);
-        DumpPrefix(path);
-        DumpUnitName(r->unitTag, r->unitId);
-        sprintf(path, "weaponsEvents[%u].target", k);
-        DumpPrefix(path);
-        DumpUnitName(r->targetTag, r->targetId);
-        sprintf(path, "weaponsEvents[%u].value", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->value);
-        sprintf(path, "weaponsEvents[%u].extra", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)e->extra);
-        sprintf(path, "weaponsEvents[%u].callback", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", e->callback);
-        sprintf(path, "weaponsEvents[%u].pos", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->pos, sizeof e->pos);
-        sprintf(path, "weaponsEvents[%u].vel", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->vel, sizeof e->vel);
-        sprintf(path, "weaponsEvents[%u].args", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->args, sizeof e->args);
-        sprintf(path, "weaponsEvents[%u].name", k);
-        DumpPrefix(path);
-        DumpHexBytes(e->name, sizeof e->name);
-        sprintf(path, "weaponsEvents[%u].outcome", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->outcome);
-    }
-}
-
-static WindMeteorsResults s_windMeteorsResults;
-static bool s_windMeteorsResultsLost;
-
-void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)
-{
-    if (!HarnessTestMode() || s_trace == nullptr)
-        return;
-    int added = WindMeteorsResultsAdd(&s_windMeteorsResults, record, size);
-    if (added == WIND_METEORS_RESULT_TOO_LARGE)
-        Fail("testmode: a wind_meteors record is not between 4 and 52 bytes\n");
-    if (added == WIND_METEORS_RESULT_NO_MEMORY)
-        s_windMeteorsResultsLost = true;
-}
-
-static void VisitWindMeteorsResults()
-{
-    if (s_windMeteorsResultsLost)
-        Fail("testmode: no memory for the wind_meteors events\n");
-    if (!s_dumpNow)
-        return;
-    char path[64];
-    DumpPrefix("windMeteors.count");
-    fprintf(s_dump, "0x%08x\n", s_windMeteorsResults.count);
-    for (unsigned k = 0; k < s_windMeteorsResults.count; k++) {
-        const WindMeteorsResult* r = &s_windMeteorsResults.items[k];
-        sprintf(path, "windMeteors[%u].kind", k);
-        DumpPrefix(path);
-        fprintf(s_dump, "0x%08x\n", (unsigned)r->kind);
-        sprintf(path, "windMeteors[%u].data", k);
-        DumpPrefix(path);
-        fputs("hex:", s_dump);
-        const unsigned char* bytes = (const unsigned char*)r->data;
-        for (unsigned b = 0; b < r->size - sizeof(int); b++)
-            fprintf(s_dump, "%02x", bytes[b]);
-        fputc('\n', s_dump);
-    }
+    for (int i = 0; i < ES_COUNT; i++)
+        VisitEventSection(&s_eventSections[i]);
 }
 
 int __stdcall HarnessSharing()
@@ -4251,15 +3840,7 @@ static void VisitWorld()
     if (s_traceTick == 1)
         VisitConstants();
     VisitPathResults();
-    VisitEconomyResults();
-    VisitWindMeteorsResults();
-    VisitFeaturesResults();
-    VisitTargetingResults();
-    VisitLosRadarResults();
-    VisitMapResults();
-    VisitPlayersResults();
-    VisitAiResults();
-    VisitWeaponsResults();
+    VisitEventResults();
 }
 
 enum {
@@ -4947,15 +4528,8 @@ void HarnessPhase(int phase)
     }
     if (phase == 7) {
         PathResultsClear(&s_pathResults);
-        EconomyResultsClear(&s_economyResults);
-        FeaturesResultsClear(&s_featuresResults);
-        TargetingResultsClear(&s_targetingResults);
-        LosRadarResultsClear(&s_losRadarResults);
-        MapResultsClear(&s_mapResults);
-        PlayersResultsClear(&s_playersResults);
-        AiResultsClear(&s_aiResults);
-        WeaponsResultsClear(&s_weaponsResults);
-        WindMeteorsResultsClear(&s_windMeteorsResults);
+        for (int i = 0; i < ES_COUNT; i++)
+            EventResultsClear(&s_eventSections[i].results);
         fflush(s_trace);
         if (s_sound != nullptr)
             fflush(s_sound);

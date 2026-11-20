@@ -6,12 +6,13 @@
 The JSON is the same tables as data, for a re-implementation that has no use for the header:
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
 and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
-holds for each path event the host delivers (section 32), in dump order; its "economy" entry is the
-record for each economy event (section 33), with the account that only a LOAD adds; its "packets" entry
-is the record for each resource share packet the step sends (section 35); its "features" entry is the
-record for each features event (section 36); its "windMeteors" entry is the record for each wind_meteors
-event consumed or effect published (section 37), the kind and then the record's bytes after it; its "targeting" entry is the
-record for each targeting event or effect (section 38); its "los_radar" entry is the record for each los_radar event (section 39); its "map" entry is the record for each map event or effect (section 40); its "playersEvents" entry is the record for each players event or effect (section 41); its "weaponsEvents" entry is the record for each weapons event consumed or effect published (section 47); its "aiEvents" entry is the record for each ai event consumed or effect published (section 42). No row hashes any of them.
+holds for each path event the host delivers (section 32), in dump order; its "packets" entry
+is the record for each resource share packet the step sends (section 35). The event sections (economy 33,
+features 36, windMeteors 37, targeting 38, los_radar 39, map 40, playersEvents 41, aiEvents 42, weaponsEvents 47)
+each have "kinds": per kind value its enum name, the size of its payload and its own field list (the header's
+fields, then the payload's, then the outcome, which windMeteors has not), generated from the structs and enums
+of interfaces/ with the table EVENT_MODULES. The generated header holds the same lists with each field's offset
+from offsetof. No row hashes any of them.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -31,7 +32,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 6
+TRACE_FORMAT = 7
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",
@@ -910,36 +911,6 @@ PATH_GLOBALS: list[tuple[str, str, int, str | None]] = [
 
 RESULTS_SECTION = 32
 RESULT_POINTS = 64
-ECONOMY_SECTION = 33
-ECONOMY_ACCOUNT_WORDS = 12
-ECONOMY_LOAD_KIND = 1
-ECONOMY_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("player", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("resources", 4, "scalar", None),
-    ("energy", 4, "scalar", None),
-    ("metal", 4, "scalar", None),
-    ("value", 4, "scalar", None),
-    ("outcome", 4, "scalar", None),
-]
-FEATURES_SECTION = 36
-FEATURES_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("flags", 4, "scalar", None),
-    ("x", 4, "scalar", None),
-    ("z", 4, "scalar", None),
-    ("feature", 4, "scalar", None),
-    ("owner", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("value", 4, "scalar", None),
-    ("state", 4, "handle", None),
-    ("width", 4, "scalar", None),
-    ("height", 4, "scalar", None),
-    ("pos", 12, "bytes", None),
-    ("rot", 12, "bytes", None),
-    ("outcome", 4, "scalar", None),
-]
 PACKETS_SECTION = 35
 PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("type", 4, "scalar", None),
@@ -948,92 +919,162 @@ PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("to", 4, "scalar", None),
     ("amount", 4, "scalar", None),
 ]
-WIND_METEORS_SECTION = 37
-WIND_METEORS_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("data", 4, "bytes", None),
+INTERFACES = ROOT / "interfaces"
+EVENT_REF_NAMES = ("unit", "target", "source", "attacker")
+EVENT_HANDLE_NAMES = ("state",)
+EVENT_FLATTENED = ("PlayersOwnershipRecord",)
+EVENT_OUTCOME_OFFSET = "TRACE_EVENT_OUTCOME"
+SCALAR_TYPES = {"int": 4, "unsigned int": 4, "unsigned": 4, "float": 4, "EconUnit": 4, "EconType": 4,
+                "PathUnit": 4, "PathHandle": 4, "char": 1, "unsigned char": 1}
+UNIT_TYPES = ("unsigned int", "EconUnit", "PathUnit")
+
+
+class EventModule:
+    """One event section: where it is dumped, which header and enums name its kinds, and each kind's payload."""
+
+    def __init__(self, key, section, c_name, header_file, header, enums, payloads, outcome=True):
+        self.key, self.section, self.c_name = key, section, c_name
+        self.header_file, self.header, self.enums = header_file, header, enums
+        self.payloads, self.outcome = payloads, outcome
+
+
+EVENT_MODULES = [
+    EventModule("economy", 33, "Economy", "economy.h", "EconomyEventHeader",
+                ["EconomyEventKind", "EconomyEffectKind"],
+                {"ECONOMY_RESET": None, "ECONOMY_LOAD": "EconomyLoad", "ECONOMY_REQUEST": "EconomyRequest",
+                 "ECONOMY_SPEND": "EconomySpend", "ECONOMY_INCOME": "EconomyIncome",
+                 "ECONOMY_EFFECT_CLOAK": "EconomyCloak", "ECONOMY_EFFECT_EXTRACTOR": "EconomyExtractor",
+                 "ECONOMY_EFFECT_SHARE": "EconomyShare"}),
+    EventModule("features", 36, "Features", "features.h", "FeaturesEventHeader",
+                ["FeaturesEventKind", "FeaturesEffectKind"],
+                {"FEATURES_PLACE": "FeaturesPlace", "FEATURES_REMOVE": "FeaturesRemove",
+                 "FEATURES_DAMAGE": "FeaturesDamage", "FEATURES_RECLAIM": "FeaturesReclaim",
+                 "FEATURES_EFFECT_FREE_STATE": "FeaturesFreeState", "FEATURES_EFFECT_INIT_STATE": "FeaturesInitState",
+                 "FEATURES_EFFECT_PASS_MAPS": "FeaturesPassMaps",
+                 "FEATURES_EFFECT_AREA_DAMAGE": "FeaturesAreaDamage"}),
+    EventModule("windMeteors", 37, "WindMeteors", "wind_meteors.h", "WindMeteorsEventHeader",
+                ["WindMeteorsEventKind", "WindMeteorsEffectKind"],
+                {"WIND_METEORS_ENABLE": None, "WIND_METEORS_DISABLE": None, "WIND_METEORS_PARAMS": "WindMeteorsParams",
+                 "WIND_METEORS_START": None, "WIND_METEORS_EFFECT_SPAWN": "WindMeteorsSpawn"}, outcome=False),
+    EventModule("targeting", 38, "Targeting", "targeting.h", "TargetingEventHeader",
+                ["TargetingEventKind", "TargetingEffectKind"],
+                {"TARGETING_SET_UNIT": "TargetingSetUnit", "TARGETING_SET_POS": "TargetingSetPos",
+                 "TARGETING_CLEAR": None, "TARGETING_RESET": None, "TARGETING_LOAD": "TargetingLoad",
+                 "TARGETING_EFFECT_CLEARED": None}),
+    EventModule("los_radar", 39, "LosRadar", "los_radar.h", "LosRadarEventHeader", ["LosRadarEventKind"],
+                {"LOS_RADAR_UPDATE_UNIT": "LosRadarUnit", "LOS_RADAR_REMOVE_UNIT": "LosRadarUnit",
+                 "LOS_RADAR_REVEAL_UNIT": "LosRadarUnit", "LOS_RADAR_ADD_EYEBALL": "LosRadarAddEyeball",
+                 "LOS_RADAR_CELL_HEIGHTS": "LosRadarCellHeights", "LOS_RADAR_RECALCULATE": "LosRadarRecalculate",
+                 "LOS_RADAR_SHARE_MAPPING": "LosRadarSharePlayer", "LOS_RADAR_SHARE_RADAR": "LosRadarSharePlayer",
+                 "LOS_RADAR_SHARE_MAP": "LosRadarShareMap", "LOS_RADAR_SIGHT_RESET": "LosRadarUnit",
+                 "LOS_RADAR_SIGHT_LOAD": "LosRadarSightLoad"}),
+    EventModule("map", 40, "Map", "map.h", "MapEventHeader", ["MapEventKind", "MapEffectKind"],
+                {"MAP_ADD_UNIT": None, "MAP_REMOVE_UNIT": None, "MAP_CLEAR_UNIT": None, "MAP_RECLAIM_FOOTPRINT": None,
+                 "MAP_SET_YARD": "MapSetYard", "MAP_BUCKET_UNLINK": None, "MAP_BUCKET_PREPEND": None,
+                 "MAP_PASS_MAPS": "MapPassMaps", "MAP_EFFECT_CELLS_CHANGED": "MapCellsChanged"}),
+    EventModule("playersEvents", 41, "Players", "players.h", "PlayersEventHeader",
+                ["PlayersEventKind", "PlayersEffectKind"],
+                {"PLAYERS_GIVE_UNIT": "PlayersGiveUnit", "PLAYERS_KILL_UNITS": "PlayersKillUnits",
+                 "PLAYERS_UNIT_CREATED": None, "PLAYERS_UNIT_DIED": None, "PLAYERS_TRANSFER": "PlayersTransfer",
+                 "PLAYERS_EFFECT_KILL_UNIT": "PlayersKillUnit", "PLAYERS_EFFECT_SEND_UNIT": "PlayersSendUnit",
+                 "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}),
+    EventModule("aiEvents", 42, "Ai", "ai.h", "AiEventHeader", ["AiEventKind", "AiEffectKind"],
+                {"AI_REACT_TO_ATTACK": "AiReactToAttack", "AI_SET_SQUAD": "AiSetSquad", "AI_PLAN": "AiPlan",
+                 "AI_WEIGHT": "AiWeight", "AI_LIMIT": "AiLimit", "AI_EFFECT_ADD_ORDER": "AiAddOrder",
+                 "AI_EFFECT_QUEUE_BUILD": "AiQueueBuild", "AI_EFFECT_STOP": "AiStop",
+                 "AI_EFFECT_ACTIVATE": "AiActivate", "AI_EFFECT_SET_STATES": "AiSetStates"}),
+    EventModule("weaponsEvents", 47, "Weapons", "weapons.h", "WeaponsEventHeader",
+                ["WeaponsDamageEventKind", "WeaponsDamageEffectKind", "WeaponsEventKind", "WeaponsEffectKind"],
+                {"WEAPONS_DAMAGE": "WeaponsDamage", "WEAPONS_REMOTE_DAMAGE": "WeaponsDamage",
+                 "WEAPONS_DETONATE": "WeaponsDetonate", "WEAPONS_RELEASE": "WeaponsRelease",
+                 "WEAPONS_CLAIM": "WeaponsClaim", "WEAPONS_INIT_SLOTS": None, "WEAPONS_REMOVE_PROJECTILES": None,
+                 "WEAPONS_AIM_DONE": "WeaponsAimDone", "WEAPONS_EXPLODE_PIECE": "WeaponsExplodePiece",
+                 "WEAPONS_AREA_DAMAGE": "WeaponsAreaDamage", "WEAPONS_SPAWN": "WeaponsSpawn",
+                 "WEAPONS_SET_STOCKPILES": "WeaponsSetStockpiles", "WEAPONS_ADD_STOCKPILE": "WeaponsAddStockpile",
+                 "WEAPONS_EFFECT_ATTACKED": "WeaponsAttacked", "WEAPONS_EFFECT_HIT": "WeaponsHit",
+                 "WEAPONS_EFFECT_MARK_DAMAGED": None, "WEAPONS_EFFECT_DAMAGE_RECORD": "WeaponsDamageRecord",
+                 "WEAPONS_EFFECT_HEALTH": "WeaponsHealth", "WEAPONS_EFFECT_PARALYZE": "WeaponsParalyze",
+                 "WEAPONS_EFFECT_START_SCRIPT": "WeaponsStartScript", "WEAPONS_EFFECT_DETACH_PIECE": "WeaponsDetachPiece",
+                 "WEAPONS_EFFECT_SHOT_FIRED": None, "WEAPONS_EFFECT_BUSY": "WeaponsBusy",
+                 "WEAPONS_EFFECT_COMMAND_SHOT_FIRED": None, "WEAPONS_EFFECT_OUT_OF_REACH": None}),
 ]
-TARGETING_SECTION = 38
-TARGETING_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("weapon", 4, "scalar", None),
-    ("target", 4, "ref", "unit"),
-    ("pos", 12, "bytes", None),
-    ("outcome", 4, "scalar", None),
-]
-LOS_RADAR_SECTION = 39
-LOS_RADAR_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("player", 4, "scalar", None),
-    ("value", 4, "scalar", None),
-    ("pos", 12, "bytes", None),
-    ("sightDistance", 4, "scalar", None),
-    ("eyeHeight", 4, "scalar", None),
-    ("lifetime", 4, "scalar", None),
-    ("cell", 8, "bytes", None),
-    ("size", 8, "bytes", None),
-    ("sightCell", 4, "scalar", None),
-    ("sightFrameIdx", 4, "scalar", None),
-    ("outcome", 4, "scalar", None),
-]
-MAP_SECTION = 40
-MAP_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("value", 4, "scalar", None),
-    ("cell", 8, "bytes", None),
-    ("size", 8, "bytes", None),
-    ("rect", 16, "bytes", None),
-    ("classes", 4, "scalar", None),
-    ("cause", 4, "scalar", None),
-    ("outcome", 4, "scalar", None),
-]
-PLAYERS_EVENTS_SECTION = 41
-PLAYERS_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("player", 4, "scalar", None),
-    ("from", 4, "scalar", None),
-    ("value", 4, "scalar", None),
-    ("amount", 4, "scalar", None),
-    ("announce", 4, "scalar", None),
-    ("record", 4, "scalar", None),
-    ("hitPoints", 4, "scalar", None),
-    ("buildPercent", 4, "scalar", None),
-    ("angles", 6, "bytes", None),
-    ("stockpiles", 3, "bytes", None),
-    ("outcome", 4, "scalar", None),
-]
-WEAPONS_EVENTS_SECTION = 47
-WEAPONS_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("target", 4, "ref", "unit"),
-    ("value", 4, "scalar", None),
-    ("extra", 4, "scalar", None),
-    ("callback", 4, "scalar", None),
-    ("pos", 12, "bytes", None),
-    ("vel", 12, "bytes", None),
-    ("args", 32, "bytes", None),
-    ("name", 32, "bytes", None),
-    ("outcome", 4, "scalar", None),
-]
-AI_EVENTS_SECTION = 42
-AI_EVENTS_FIELDS: list[tuple[str, int, str, str | None]] = [
-    ("kind", 4, "scalar", None),
-    ("unit", 4, "ref", "unit"),
-    ("target", 4, "ref", "unit"),
-    ("value", 4, "scalar", None),
-    ("extra", 4, "scalar", None),
-    ("params", 8, "bytes", None),
-    ("hasPos", 4, "scalar", None),
-    ("pos", 12, "bytes", None),
-    ("scale", 4, "scalar", None),
-    ("types", 64, "bytes", None),
-    ("outcome", 4, "scalar", None),
-]
+
+
+def interface_text(module):
+    text = (INTERFACES / module.header_file).read_text(encoding="latin-1")
+    return re.sub(r"//[^\n]*", "", text)
+
+
+def parse_struct(text, name):
+    """The members of a plain-data struct as (type, name, count) in order, or None when text has none."""
+    m = re.search(r"\bstruct %s \{([^{}]*)\};" % re.escape(name), text)
+    if not m:
+        return None
+    members = []
+    for line in m.group(1).split(";"):
+        line = line.strip()
+        if not line:
+            continue
+        d = re.fullmatch(r"(.+?)\s+(\w+)(?:\[(\d+)\])?", line)
+        if not d:
+            raise ValueError("cannot parse %r in struct %s" % (line, name))
+        members.append((d.group(1), d.group(2), int(d.group(3) or 1) if d.group(3) else 0))
+    return members
+
+
+def struct_size(text, name):
+    total = 0
+    for ctype, _, count in parse_struct(text, name):
+        each = SCALAR_TYPES[ctype] if ctype in SCALAR_TYPES else struct_size(text, ctype)
+        total += each * (count or 1)
+    return total
+
+
+def event_fields(module, text, struct, prefix="", cprefix="", first=True):
+    """The fields of one payload (or header) as (name, size, kind, target, C member expression), in order."""
+    out = []
+    for ctype, name, count in parse_struct(text, struct):
+        if first and name == "h" and ctype == module.header:
+            out += event_fields(module, text, ctype, prefix, cprefix + "h.", False)
+        elif ctype in EVENT_FLATTENED:
+            out += event_fields(module, text, ctype, prefix + name + ".", cprefix + name + ".", False)
+        elif ctype in SCALAR_TYPES and not count:
+            kind, target = "scalar", None
+            if name in EVENT_REF_NAMES and ctype in UNIT_TYPES:
+                kind, target = "ref", "unit"
+            elif name in EVENT_HANDLE_NAMES:
+                kind = "handle"
+            out.append((prefix + name, SCALAR_TYPES[ctype], kind, target, cprefix + name))
+        else:
+            each = SCALAR_TYPES[ctype] if ctype in SCALAR_TYPES else struct_size(text, ctype)
+            out.append((prefix + name, each * (count or 1), "bytes", None, cprefix + name))
+        first = False
+    return out
+
+
+def event_kinds(module):
+    """Per kind value: (enum name, payload struct, size, fields), from the interface header and the module's table."""
+    text = interface_text(module)
+    kinds = {}
+    for enum in module.enums:
+        m = re.search(r"\benum %s \{([^{}]*)\};" % enum, text)
+        if not m:
+            raise ValueError("%s has no enum %s" % (module.header_file, enum))
+        for member in m.group(1).split(","):
+            name, value = [part.strip() for part in member.split("=")]
+            if name not in module.payloads:
+                raise ValueError("no payload for %s" % name)
+            struct = module.payloads[name] or module.header
+            fields = event_fields(module, text, struct)
+            if module.outcome:
+                fields.append(("outcome", 4, "scalar", None, EVENT_OUTCOME_OFFSET))
+            kinds[int(value)] = (name, struct, struct_size(text, struct), fields)
+    unused = set(module.payloads) - {k[0] for k in kinds.values()}
+    if unused:
+        raise ValueError("payloads for kinds the header lacks: %s" % sorted(unused))
+    return dict(sorted(kinds.items()))
+
+
 RESULT_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("kind", 4, "scalar", None),
     ("status", 4, "scalar", None),
@@ -1356,7 +1397,7 @@ def emit_table(lines, cname, entries, with_name):
     lines.append("")
 
 
-KIND_NAMES = {"TF_SCALAR": "scalar", "TF_BYTES": "bytes", "TF_POINTER": "pointer", "TF_REF": "ref"}
+KIND_NAMES = {"TF_SCALAR": "scalar", "TF_BYTES": "bytes", "TF_POINTER": "pointer", "TF_REF": "ref", "TF_HANDLE": "handle"}
 
 
 def model_field(entry, mask_reason=None):
@@ -1426,59 +1467,57 @@ def render_json(model):
     out.append('    "points": %d,' % results["points"])
     out.append('    "fields": %s' % many(results["fields"], "    "))
     out.append("  },")
-    economy = model["economy"]
-    out.append('  "economy": {')
-    out.append('    "section": %d,' % economy["section"])
-    out.append('    "fields": %s,' % many(economy["fields"], "    "))
-    out.append('    "account": %s' % one(economy["account"]))
-    out.append("  },")
-    features = model["features"]
-    out.append('  "features": {')
-    out.append('    "section": %d,' % features["section"])
-    out.append('    "fields": %s' % many(features["fields"], "    "))
-    out.append("  },")
-    packets = model["packets"]
-    out.append('  "packets": {')
-    out.append('    "section": %d,' % packets["section"])
-    out.append('    "fields": %s' % many(packets["fields"], "    "))
-    out.append("  },")
-    wind_meteors = model["windMeteors"]
-    out.append('  "windMeteors": {')
-    out.append('    "section": %d,' % wind_meteors["section"])
-    out.append('    "fields": %s' % many(wind_meteors["fields"], "    "))
-    out.append("  },")
-    targeting = model["targeting"]
-    out.append('  "targeting": {')
-    out.append('    "section": %d,' % targeting["section"])
-    out.append('    "fields": %s' % many(targeting["fields"], "    "))
-    out.append("  },")
-    los_radar = model["los_radar"]
-    out.append('  "los_radar": {')
-    out.append('    "section": %d,' % los_radar["section"])
-    out.append('    "fields": %s' % many(los_radar["fields"], "    "))
-    out.append("  },")
-    map_ = model["map"]
-    out.append('  "map": {')
-    out.append('    "section": %d,' % map_["section"])
-    out.append('    "fields": %s' % many(map_["fields"], "    "))
-    out.append("  },")
-    players_events = model["playersEvents"]
-    out.append('  "playersEvents": {')
-    out.append('    "section": %d,' % players_events["section"])
-    out.append('    "fields": %s' % many(players_events["fields"], "    "))
-    out.append("  },")
-    ai_events = model["aiEvents"]
-    out.append('  "aiEvents": {')
-    out.append('    "section": %d,' % ai_events["section"])
-    out.append('    "fields": %s' % many(ai_events["fields"], "    "))
-    out.append("  },")
-    weapons_events = model["weaponsEvents"]
-    out.append('  "weaponsEvents": {')
-    out.append('    "section": %d,' % weapons_events["section"])
-    out.append('    "fields": %s' % many(weapons_events["fields"], "    "))
-    out.append("  }")
+    def event_section(key, last):
+        section = model[key]
+        out.append('  %s: {' % one(key))
+        out.append('    "section": %d,' % section["section"])
+        out.append('    "kinds": {')
+        values = list(section["kinds"])
+        for n, value in enumerate(values):
+            kind = section["kinds"][value]
+            out.append('      %s: {"name": %s, "size": %d, "fields": %s}%s' % (
+                one(value), one(kind["name"]), kind["size"], one(kind["fields"]), "," if n + 1 < len(values) else ""))
+        out.append("    }")
+        out.append("  }" + ("" if last else ","))
+
+    def plain_section(key):
+        section = model[key]
+        out.append('  %s: {' % one(key))
+        out.append('    "section": %d,' % section["section"])
+        out.append('    "fields": %s' % many(section["fields"], "    "))
+        out.append("  },")
+
+    plain_section("packets")
+    for n, module in enumerate(EVENT_MODULES):
+        event_section(module.key, n + 1 == len(EVENT_MODULES))
     out.append("}")
     return "\n".join(out) + "\n"
+
+
+def event_tables(event_models, schema):
+    """The C tables of the event sections: per kind its fields with offsets from offsetof, per module its kinds."""
+    biggest = max(size for _, kinds in event_models for _, _, size, _ in kinds.values())
+    refs = max(sum(1 for f in fields if f[2] == "ref") for _, kinds in event_models for *_, fields in kinds.values())
+    lines = ["#define TRACE_EVENT_OUTCOME 0xffffffffu", "#define TRACE_EVENT_MAX_BYTES %d" % biggest,
+             "#define TRACE_EVENT_MAX_REFS %d" % refs, ""]
+    cnames = {"scalar": "TF_SCALAR", "bytes": "TF_BYTES", "ref": "TF_REF", "handle": "TF_HANDLE"}
+    for module, kinds in event_models:
+        for value, (name, struct, size, fields) in kinds.items():
+            lines.append("static_assert(sizeof(%s) == %d, \"%s\");" % (struct, size, struct))
+            lines.append("static const TraceField kEvent_%s[] = {" % name)
+            for fname, fsize, kind, target, expr in fields:
+                offset = expr if expr == EVENT_OUTCOME_OFFSET else "offsetof(%s, %s)" % (struct, expr)
+                lines.append("    { %s, %s, %d, %s, %s, 0 }," % (
+                    c_string(fname), offset, fsize, cnames[kind], "TT_" + target.upper() if target else "TT_NONE"))
+            lines.append("};")
+        lines.append("static const TraceEventKind k%sKinds[] = {" % module.c_name)
+        for value, (name, struct, size, fields) in kinds.items():
+            lines.append("    { %d, %s, sizeof(%s), kEvent_%s, %d }," % (value, c_string(name), struct, name, len(fields)))
+        lines.append("};")
+        lines.append("static const TraceEventModule k%sEvents = { %s, %d, k%sKinds, %d };" % (
+            module.c_name, c_string(module.key), module.section, module.c_name, len(kinds)))
+        lines.append("")
+    return lines
 
 
 def generate():
@@ -1491,7 +1530,10 @@ def generate():
         "",
         "#define TRACE_FORMAT %d" % TRACE_FORMAT,
         "",
-        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };",
+        "#include <stddef.h>",
+    ] + ['#include "../../interfaces/%s"' % m.header_file for m in EVENT_MODULES] + [
+        "",
+        "enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF, TF_HANDLE };",
         "enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,",
         "                   TT_FEATURE, TT_PIECE, TT_REC, TT_NODE, TT_MOVECLASS, TT_ORDER, TT_ORDERFX, TT_LINK };",
         "",
@@ -1513,6 +1555,21 @@ def generate():
         "    unsigned char relative;",
         "};",
         "",
+        "struct TraceEventKind {",
+        "    int kind;",
+        "    const char* name;",
+        "    unsigned payloadSize;",
+        "    const TraceField* fields;",
+        "    unsigned fieldCount;",
+        "};",
+        "",
+        "struct TraceEventModule {",
+        "    const char* prefix;",
+        "    unsigned section;",
+        "    const TraceEventKind* kinds;",
+        "    unsigned kindCount;",
+        "};",
+        "",
         "struct TraceTable {",
         "    const TraceField* fields;",
         "    unsigned fieldCount;",
@@ -1522,6 +1579,7 @@ def generate():
         "};",
         "",
     ]
+    event_models = [(m, event_kinds(m)) for m in EVENT_MODULES]
     tables = []
     model_tables = {}
     for ctype, key in TYPE_ORDER:
@@ -1547,6 +1605,7 @@ def generate():
         lines.append("static const TraceTable k%sTable = { k%sFields, %d, k%sPlan, %d, 0x%x };"
                      % (key, key, nf, key, npl, size))
     lines.append("")
+    lines += event_tables(event_models, schema)
 
     game_fields = {l["name"]: l for l in schema.layout("Game")[0]}
     wind = []
@@ -1636,37 +1695,15 @@ def generate():
     model["results"] = {"section": RESULTS_SECTION, "points": RESULT_POINTS,
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in RESULT_FIELDS]}
-    model["economy"] = {"section": ECONOMY_SECTION,
-                        "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                   for n, size, kind, target in ECONOMY_FIELDS],
-                        "account": {"kind": ECONOMY_LOAD_KIND, "size": 4 * ECONOMY_ACCOUNT_WORDS}}
-    model["features"] = {"section": FEATURES_SECTION,
-                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                    for n, size, kind, target in FEATURES_FIELDS]}
     model["packets"] = {"section": PACKETS_SECTION,
                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
                                    for n, size, kind, target in PACKET_FIELDS]}
-    model["windMeteors"] = {"section": WIND_METEORS_SECTION,
-                            "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                       for n, size, kind, target in WIND_METEORS_FIELDS]}
-    model["targeting"] = {"section": TARGETING_SECTION,
-                          "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                     for n, size, kind, target in TARGETING_FIELDS]}
-    model["los_radar"] = {"section": LOS_RADAR_SECTION,
-                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                    for n, size, kind, target in LOS_RADAR_FIELDS]}
-    model["map"] = {"section": MAP_SECTION,
-                    "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                               for n, size, kind, target in MAP_FIELDS]}
-    model["playersEvents"] = {"section": PLAYERS_EVENTS_SECTION,
-                              "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                         for n, size, kind, target in PLAYERS_EVENTS_FIELDS]}
-    model["aiEvents"] = {"section": AI_EVENTS_SECTION,
-                         "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                    for n, size, kind, target in AI_EVENTS_FIELDS]}
-    model["weaponsEvents"] = {"section": WEAPONS_EVENTS_SECTION,
-                              "fields": [{"name": n, "size": size, "kind": kind, "target": target}
-                                         for n, size, kind, target in WEAPONS_EVENTS_FIELDS]}
+    for module, kinds in event_models:
+        model[module.key] = {"section": module.section,
+                             "kinds": {str(value): {"name": name, "size": size,
+                                                    "fields": [{"name": n, "size": sz, "kind": kind, "target": target}
+                                                               for n, sz, kind, target, _ in fields]}
+                                       for value, (name, _, size, fields) in kinds.items()}}
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 

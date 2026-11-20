@@ -55,6 +55,8 @@ weapon slots of a unit (`UnitWeaponSlot::aimTargetXOrUnitId` and `aimTargetZOrUn
 The other members of a slot (`Unit::field_8`, `Unit::unknown_24`, `Unit::weapon2AimCob`) are not the pair and are shared with the unit's own set-up and
 weapons, so they are not listed. `Unit::netDirtyFlags` is not listed either: targeting clears bits of it, but weapons and orders write it too. Any
 writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events.
+Like every check here it sees the windows of a tick only, and a saved game loads outside them: no stored summary covers LoadUnit, whose restore
+of the pair goes through targeting's LOAD by the same rule (#1010) but is not checked.
 
 Los_radar's state is a region and a view. The region is one allocation, "LosRadar region" (allocated by the engine in LoadBattleAssets), which holds the
 unit sight cache (the 12 bytes of the Unit record that stay unused, `Unit::unusedLosCache` and `unusedLosSightFrame`): no subsystem but los_radar writes or reads a part of it. The eyeballs (the members of `Eye`, the count

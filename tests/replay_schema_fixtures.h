@@ -2120,8 +2120,8 @@ static const unsigned short kReplayUnitsKillUnitObjReads[] = { 0, 22, 23, 24, 33
 static const unsigned short kReplayUnitsKillUnitObjWrites[] = { 23 };
 static const unsigned short kReplayUnitsSaveUnitsObjReads[] = { 33, 35, 37, 38, 39, 40, 42, 43, 44, 46, 47, 48, 50, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 69, 72, 74, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 138, 273, 349 };
 static const unsigned short kReplayUnitsSaveUnitsObjWrites[] = { 54, 55, 59, 60, 64, 65 };
-static const unsigned short kReplayUnitsLoadUnitObjReads[] = { 37, 39, 42, 43, 44, 50, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 69, 77, 78, 79, 80 };
-static const unsigned short kReplayUnitsLoadUnitObjWrites[] = { 33, 37, 38, 39, 40, 46, 48, 54, 55, 59, 60, 64, 65, 69, 74, 77, 78, 79 };
+static const unsigned short kReplayUnitsLoadUnitObjReads[] = { 37, 39, 42, 43, 44, 50, 69, 77, 78, 79, 80 };
+static const unsigned short kReplayUnitsLoadUnitObjWrites[] = { 33, 37, 38, 39, 40, 46, 48, 69, 74, 77, 78, 79 };
 static const unsigned short kReplayUnitsCreateUnitObjReads[] = { 4, 5, 26, 27, 35, 45, 79, 108, 122 };
 static const unsigned short kReplayUnitsCreateUnitObjWrites[] = { 26, 27, 79 };
 static const unsigned char kReplayUnitsFindUnitTypeAllOf[] = { ROK_UNITDEF };
@@ -2376,7 +2376,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "KillUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsKillUnitObjReads, 15, kReplayUnitsKillUnitObjWrites, 1, nullptr, 0 },
     { "LoadUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SaveUnits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSaveUnitsObjReads, 50, kReplayUnitsSaveUnitsObjWrites, 6, nullptr, 0 },
-    { "LoadUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsLoadUnitObjReads, 23, kReplayUnitsLoadUnitObjWrites, 18, nullptr, 0 },
+    { "LoadUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsLoadUnitObjReads, 11, kReplayUnitsLoadUnitObjWrites, 12, nullptr, 0 },
     { "CreateUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCreateUnitObjReads, 9, kReplayUnitsCreateUnitObjWrites, 3, nullptr, 0 },
     { "FindUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeAllOf, 1 },
     { "FindUnitTypeId", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeIdAllOf, 1 },
@@ -2589,7 +2589,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "ai", 5, 0, 0, 42, 15 },
     { "pathfinding", 3, 0, 0, 57, 9 },
     { "weapons", 2, 0, 1, 66, 5 },
-    { "targeting", 2, 0, 1, 71, 6 },
+    { "targeting", 2, 1, 1, 71, 6 },
     { "los_radar", 3, 2, 0, 77, 28 },
     { "orders", 4, 0, 0, 105, 18 },
     { "units", 4, 0, 0, 123, 47 },

@@ -156,6 +156,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../game/ai_events.h"
 #include "../game/weapons_events.h"
 #include "../game/los_radar_events.h"
+#include "../game/targeting_events.h"
 
 // FUNCTION: 0x4010b0
 static void SaveUnitAccounts(Unit* info, HapiBank* file)
@@ -297,7 +298,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     g_seams.scripts->LoadScriptState((CobScript*)unit->script.get(), file);
 
     for (int j = 0; j < 3; j++) {
-        *(int*)&unit->weapons[j] = rec.pieces[j].f0;
+        TargetingPublishLoad(SCHED_UNITS, unit, j, (short)rec.pieces[j].f0, (short)(rec.pieces[j].f0 >> 16));
         int args[8];
         args[0] = rec.pieces[j].f4;
         args[1] = rec.pieces[j].f8b;

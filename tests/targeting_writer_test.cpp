@@ -288,10 +288,39 @@ static void CheckRejected()
     TargetingEvent high = TargetingEventOf(TARGETING_SET_POS, shooter, 3);
     TargetingEvent low = TargetingEventOf(TARGETING_RESET, shooter, -1);
     TargetingEvent clearHigh = TargetingEventOf(TARGETING_CLEAR, shooter, 3);
-    const TargetingEvent* rejected[] = { &noUnit, &noTarget, &high, &low, &clearHigh };
+    TargetingEvent loadHigh = TargetingEventOf(TARGETING_LOAD, shooter, 3);
+    const TargetingEvent* rejected[] = { &noUnit, &noTarget, &high, &low, &clearHigh, &loadHigh };
     for (const TargetingEvent* e : rejected)
         Check(ApplyTargetingEvent(e) == 0, "an event with a null unit, a null target or a weapon outside 0 to 2 has outcome 0");
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
+}
+
+static void CheckLoad()
+{
+    Restart();
+    Unit* shooter = UnitById(kShooter);
+    shooter->netDirtyFlags = 0x7c00;
+    std::vector<char> before((char*)s_units, (char*)(s_units + kUnits));
+
+    TargetingEvent unitTarget = TargetingEventOf(TARGETING_LOAD, shooter, 0);
+    unitTarget.pos[0] = kFirstEnemy;
+    unitTarget.pos[2] = (short)0x8000;
+    TargetingEvent ground = TargetingEventOf(TARGETING_LOAD, shooter, 1);
+    ground.pos[0] = 12;
+    ground.pos[2] = -7;
+    TargetingEvent none = TargetingEventOf(TARGETING_LOAD, shooter, 2);
+    none.pos[2] = (short)0x8000;
+    Check(ApplyTargetingEvent(&unitTarget) == 1 && ApplyTargetingEvent(&ground) == 1 && ApplyTargetingEvent(&none) == 1, "LOAD has outcome 1");
+
+    UnitWeaponSlot* slots = shooter->weapons;
+    Check(slots[0].aimTargetXOrUnitId == kFirstEnemy && slots[0].aimTargetZOrUnitSentinel == (short)0x8000, "LOAD keeps a target unit's pair as saved");
+    Check(slots[1].aimTargetXOrUnitId == 12 && slots[1].aimTargetZOrUnitSentinel == -7, "LOAD keeps a ground point's pair as saved");
+    Check(slots[2].aimTargetXOrUnitId == 0 && slots[2].aimTargetZOrUnitSentinel == (short)0x8000, "LOAD keeps an empty pair as saved");
+    Check(GetWeaponTargetUnit(shooter, 0) == UnitById(kFirstEnemy), "a loaded target unit is the weapon's target");
+    Check(shooter->netDirtyFlags == 0x7c00, "LOAD leaves the dirty flags");
+
+    Restart();
+    Check(memcmp(&before[0], s_units, before.size()) == 0, "LOAD writes the target pairs and nothing else");
 }
 
 int main()
@@ -353,6 +382,7 @@ int main()
     printf("tampered tick %d, first differing tick %d, %d differing ticks\n", tampered.tampered, firstUnit, differingUnit);
 
     CheckRejected();
+    CheckLoad();
 
     printf(g_failures ? "FAILED\n" : "targeting_writer_test: all passed\n");
     return g_failures != 0;

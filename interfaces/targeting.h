@@ -7,7 +7,7 @@ struct Vec3;
 // Major version of the targeting interface, changed when a slot is removed or its signature changes.
 #define TARGETING_VERSION_MAJOR 2
 // Minor version of the targeting interface, changed when a slot is added.
-#define TARGETING_VERSION_MINOR 0
+#define TARGETING_VERSION_MINOR 1
 
 // The kinds of event other modules publish to targeting's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event with a null unit, a weapon outside 0 to 2, or (SET_UNIT) a null target changes nothing; outcome 0.
 enum TargetingEventKind {
@@ -18,7 +18,9 @@ enum TargetingEventKind {
     // Stops weapon of unit aiming; when it had a target, TARGETING_EFFECT_CLEARED tells the unit's script; outcome 1 when it had a target, 0 when not.
     TARGETING_CLEAR = 98,
     // Drops the target of weapon of unit without telling its script, as a unit is set up; outcome 1 when it had a target, 0 when not.
-    TARGETING_RESET = 99
+    TARGETING_RESET = 99,
+    // Sets the target pair of weapon of unit to the two halves a saved game keeps, pos[0] and pos[2] as 16-bit values (a unit's number and 0x8000 for a target unit, a ground point's x and z in whole units, or 0 and 0x8000 for none), and writes nothing else; outcome 1.
+    TARGETING_LOAD = 100
 };
 
 // The kinds of effect targeting publishes to its outbox, for the modules that subscribe to them.
@@ -37,7 +39,7 @@ struct TargetingEvent {
     int weapon;
     // The unit aimed at, as its block offset.
     unsigned int target;
-    // The position aimed at, in world coordinates with 16 fractional bits.
+    // The position aimed at, in world coordinates with 16 fractional bits; for LOAD, the halves of the target pair, as the kind says.
     int pos[3];
 };
 

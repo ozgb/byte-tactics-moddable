@@ -1198,14 +1198,14 @@ for k in 0 .. n-1, in application order:
 
 `targeting.count` and the numbers of a record are written as `0x` and 8 hex digits.
 
-- `kind` is an event: 96 SET_UNIT, 97 SET_POS, 98 CLEAR, 99 RESET; or an effect: 112 CLEARED.
+- `kind` is an event: 96 SET_UNIT, 97 SET_POS, 98 CLEAR, 99 RESET, 100 LOAD; or an effect: 112 CLEARED.
 - `unit` is the unit whose weapon aims, a pointer ID with target `unit` (section 5): `units:N`, `null`, or
   `heap` for a pointer that is not in the unit table.
 - `weapon` is the weapon of the unit, 0 to 2. `target` is the unit aimed at, resolved as `unit` is, null for
   the kinds that name none.
-- `pos` is the position aimed at in world coordinates with 16 fractional bits, x, y and z. Fields a kind does
-  not use are 0.
-- `outcome` is the result of `Apply` (1 for SET_UNIT and SET_POS; for CLEAR and RESET 1 when the weapon had a
+- `pos` is the position aimed at in world coordinates with 16 fractional bits, x, y and z; for LOAD, `pos[0]` and
+  `pos[2]` are the two halves of the saved target pair. Fields a kind does not use are 0.
+- `outcome` is the result of `Apply` (1 for SET_UNIT, SET_POS and LOAD; for CLEAR and RESET 1 when the weapon had a
   target and 0 when not), or 1 for an effect.
 
 ### 8.27 los_radar events (section 39, dumped only)

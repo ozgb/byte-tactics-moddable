@@ -606,6 +606,39 @@ class SyntaxTree(unittest.TestCase):
         self.assertEqual(self.functions["B::B"]["items"], [])
 
 
+class Visitors(unittest.TestCase):
+    def labels(self, sweep, sub, edges=None, sweeps=("EconSweep", "OrdersSweep")):
+        fns = [fn("Walk", "src/walk.cpp", 1, 4, [(2, "indirect_call", "virtual Visitor::Visit", False)]),
+               fn("AVisitor::Visit", "src/a.cpp", 1, 3, [(2, "call", "RandomInt", True)]),
+               fn("BVisitor::Visit", "src/b.cpp", 1, 3, [(2, "call", "Spend", False)]),
+               fn("EconSweep", "src/e.cpp", 1, 3, [(2, "call", "Walk", False)]),
+               fn("OrdersSweep", "src/o.cpp", 1, 3, [(2, "call", "Walk", False)]),
+               fn("Spend", "src/economy.cpp", 1, 3, items=[("field_write", "Player::energy")])]
+        subs = [{"function": "Walk", "file": "src/walk.cpp", "subsystem": "game"},
+                {"function": "AVisitor::Visit", "file": "src/a.cpp", "subsystem": "economy"},
+                {"function": "BVisitor::Visit", "file": "src/b.cpp", "subsystem": "orders"},
+                {"function": "EconSweep", "file": "src/e.cpp", "subsystem": "economy"},
+                {"function": "OrdersSweep", "file": "src/o.cpp", "subsystem": "orders"},
+                {"function": "Spend", "file": "src/economy.cpp", "subsystem": "economy"}]
+        reasons = edges or [("AVisitor::Visit", "EconSweep (src/e.cpp)"), ("BVisitor::Visit", "OrdersSweep (src/o.cpp)")]
+        rows = [{"caller": "Walk", "target": t, "reason": "visitor passed at " + r} for t, r in reasons]
+        sources = dict(SOURCES, **{f: "\n" * 10 for f in ("src/walk.cpp", "src/a.cpp", "src/b.cpp", "src/e.cpp", "src/o.cpp")})
+        p = sc.Program(fns, subs, rows, SEAMS, NATIVE, sources)
+        return [(n.kind, n.label) for n in p.expand(p.fns[sweep][0], sub)]
+
+    def test_each_sweep_sees_only_its_own_visitor(self):
+        self.assertEqual(self.labels("EconSweep", "economy"), [("effect", "draw rng")])
+        self.assertEqual(self.labels("OrdersSweep", "orders"), [("direct", "Spend")])
+
+    def test_a_visitor_of_the_other_sweep_is_not_followed(self):
+        self.assertNotIn(("direct", "BVisitor::Visit"), self.labels("EconSweep", "economy"))
+        self.assertNotIn(("direct", "AVisitor::Visit"), self.labels("OrdersSweep", "orders"))
+
+    def test_a_row_naming_the_visitor_itself_keeps_every_caller(self):
+        edges = [("AVisitor::Visit", "AVisitor::Visit (src/a.cpp)")]
+        self.assertEqual(self.labels("OrdersSweep", "orders", edges), [("direct", "AVisitor::Visit")])
+
+
 class Main(unittest.TestCase):
     def run_main(self, args, doc):
         out, err = io.StringIO(), io.StringIO()

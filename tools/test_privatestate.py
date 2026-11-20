@@ -108,6 +108,7 @@ class FeaturesOwnerTest(unittest.TestCase):
         self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons", "orders", "movement"])
 
 
+
 class TargetingOwnerTest(unittest.TestCase):
     def test_the_weapon_target_pairs_are_private_for_writes_only(self):
         for item in ("Unit::current", "Unit::field_20", "Unit::weapon2Target"):
@@ -315,11 +316,16 @@ class OrdersOwnerTest(unittest.TestCase):
         self.assertEqual(ps.violations(rows), [])
 
     def test_another_subsystem_write_or_second_list_read_fails(self):
-        rows = {"edges": [("units", "orders", "Order::target"), ("movement", "-", "Order::subFlags")], "reads": [("-", "ai", "Unit::list2")]}
+        rows = {"edges": [("map", "orders", "Order::pos"), ("movement", "-", "Order::subFlags"), ("ai", "-", "Order::target")], "reads": [("-", "ai", "Unit::list2")]}
         self.assertEqual(ps.violations(rows),
-                         ["edges: writer movement on Order::subFlags, which is written only by orders",
-                          "edges: writer units on Order::target, which is written only by orders",
+                         ["edges: writer ai on Order::target, which is written only by orders",
+                          "edges: writer map on Order::pos, which is written only by orders",
+                          "edges: writer movement on Order::subFlags, which is written only by orders",
                           "reads: reader ai on Unit::list2, which is private to orders"])
+
+    def test_units_may_write_the_link(self):
+        rows = {"edges": [("units", "-", "Order::unknown_12"), ("units", "orders", "Order::target"), ("units", "-", "Order::unknown_1a")]}
+        self.assertEqual(ps.violations(rows), [])
 
 
 class MovementOwnerTest(unittest.TestCase):
@@ -345,6 +351,10 @@ class MovementOwnerTest(unittest.TestCase):
                          ["edges: writer orders on PathOrder::ref, which is written only by movement",
                           "edges: writer seams on Unit::motion, which is written only by movement",
                           "edges: writer units on Unit::motion, which is written only by movement"])
+
+    def test_units_may_write_the_link_and_no_other_item(self):
+        rows = {"edges": [("units", "movement", "PathOrder::ref"), ("units", "-", "PathOrder::pos_z")]}
+        self.assertEqual(ps.violations(rows), ["edges: writer units on PathOrder::pos_z, which is written only by movement"])
 
     def test_the_owners_list_ends_with_orders_and_movement(self):
         self.assertEqual([o.name for o in ps.OWNERS][-2:], ["orders", "movement"])

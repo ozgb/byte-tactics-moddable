@@ -79,9 +79,9 @@ Ai's state is written by ai alone: the squad manager and its timers (`SquadManag
 
 Weapons' state is written by weapons alone and read by others: the projectile table and its count (`Game::projectiles`, `Game::projectileCount` and the members of `Projectile`, which ai and los_radar read), the explosions and debris (`Game::count_1491b`, the `debris` array, the members of `Explosion`, `ExplodedPiece` and `Debris` but `Debris::ref1` and `Debris::ref2`, which the GAF helpers of game and presentation write, `DebrisPiece::state` and `DebrisCache::cur`, `Debris::pos` is read by map) and the exploded pieces (`g_explodedPieces`), and the weapon slots of a unit (`Unit::weapons`, src/weapons/unit_weapon_slot.h), which the log names by the members of the union of `Unit` that starts each word of a slot: the cob callback, the weapon, the reload timer, the fire angles, the flags and the three pads of each slot. Not listed: the aim target pair of each slot (targeting's, above). The stockpile of each slot (`Unit::field_1e`, `Unit::b3a` and `Unit::b56`) is listed: orders' build order adds a round through ADD_STOCKPILE. Any writer but weapons fails, which is what makes every damage, claim, release, detonation, stockpile and aim reach these items through the scheduler's events.
 
-Orders' state is the orders of a unit, written by orders alone and read by others: the members of `Order` (the order objects; ai, features, map, movement and presentation read them) and the head of the unit's first order list (`Unit::list`, read by ai, movement and presentation) are private for writes only, and the head of its second list (`Unit::list2`, which only orders reads) for reads and writes. `Unit::netDirtyFlags` is not listed: orders, scripts, targeting and units write it. The unit record's position, heading, cell and flags stay units': orders publishes effects that units' handlers apply. Any writer but orders fails, which is what makes every command, stop, queue, attack and paralysis reach the orders through the scheduler's events.
+Orders' state is the orders of a unit, written by orders alone and read by others: the members of `Order` (the order objects; ai, features, map, movement and presentation read them) and the head of the unit's first order list (`Unit::list`, read by ai, movement and presentation) are private for writes only, and the head of its second list (`Unit::list2`, which only orders reads) for reads and writes. `Unit::netDirtyFlags` is not listed: orders, scripts, targeting and units write it. The unit record's position, heading, cell and flags stay units': orders publishes effects that units' handlers apply. An order's link (`PathOrderAttach`, the words `Order::unknown_12`, `Order::target` and `Order::unknown_1a`) is an entry of the list of references to its target unit, which units keeps (UnitRefSetUnit, UnitRefSetValue and the link's constructor and destructor), so units may write those three items too (ALSO_WRITTEN_BY). Any other writer but orders fails, which is what makes every command, stop, queue, attack and paralysis reach the orders through the scheduler's events.
 
-Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `UnitMotion::pathLockStamp` is not listed: it is map's bookkeeping, kept in the motion record. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. Any writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
+Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `UnitMotion::pathLockStamp` is not listed: it is map's bookkeeping, kept in the motion record. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -169,6 +169,10 @@ MOVEMENT_WRITE_ITEMS = ("Unit::motion",)
 
 MOVEMENT_EXCEPT = ("UnitMotion::pathLockStamp",)
 
+ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "units"), ("Order::unknown_1a", "units"))
+
+MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"),)
+
 
 @dataclass(frozen=True)
 class Owner:
@@ -181,6 +185,7 @@ class Owner:
     items: tuple = ()
     write_items: tuple = ()
     except_items: tuple = ()
+    also_written_by: tuple = ()
 
 
 METEOR_GLOBALS = ("g_meteorNextStrikeTime", "g_meteorWeaponName", "g_meteorSpawnMagnitude", "g_meteorSpawnInterval", "g_meteorActive",
@@ -199,8 +204,9 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("players", "", PLAYERS_TYPES, re.compile(r"Players region"), PLAYERS_WRITE_TYPES),
           Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS),
           Owner("weapons", "", (), NO_ALLOCATION, WEAPONS_WRITE_TYPES, write_items=WEAPONS_WRITE_ITEMS),
-          Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS),
-          Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS, except_items=MOVEMENT_EXCEPT))
+          Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS, also_written_by=ORDERS_ALSO_WRITTEN_BY),
+          Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS, except_items=MOVEMENT_EXCEPT,
+                also_written_by=MOVEMENT_ALSO_WRITTEN_BY))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -299,8 +305,9 @@ def violations(rows: dict[str, list[tuple[str, str, str]]]) -> list[str]:
             owner, roles = private_to(item)
             if not owner:
                 continue
+            also = {w for i, w in next(o for o in OWNERS if o.name == owner).also_written_by if i == item}
             for role, who in (("writer", writer), ("reader", reader)):
-                if role in roles and who not in (NONE, owner):
+                if role in roles and who not in (NONE, owner) and not (role == "writer" and who in also):
                     found.add((kind, role, who, item, owner, "private" if len(roles) > 1 else "written only by"))
     return ["%s: %s %s on %s, which is %s %s" % (k, r, w, i, "private to" if how == "private" else "written only by", o)
             for k, r, w, i, o, how in sorted(found)]

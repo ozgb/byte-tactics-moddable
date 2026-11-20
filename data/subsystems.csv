@@ -4068,7 +4068,8 @@ MovementClass::Get,src/units/movement_class.h,map,default:src/units/,map
 MovementClass::InBounds,src/units/movement_class.h,map,default:src/units/,map
 MovementClassGetNative,src/seams/native.cpp,seams,folder:src/seams/,
 MovementClassInBoundsNative,src/seams/native.cpp,seams,folder:src/seams/,
-MovementEventSize,src/game/movement_events.h,game,default:src/game/,
+MovementEventSize,src/game/movement_event_size.h,game,default:src/game/,
+MovementEventValid,src/movement/movement_apply.cpp,movement,file:src/movement/,
 MovementGetMotionState,src/movement/movement_apply.cpp,movement,file:src/movement/,
 MovementHasNetState,src/movement/movement_apply.cpp,movement,file:src/movement/,
 MovementHeaderOf,src/game/movement_events.h,game,default:src/game/,
@@ -4188,7 +4189,7 @@ OrderTarget,src/orders/vtol_orders.cpp,orders,file:src/orders/,
 OrderVec3,src/movement/motion.cpp,movement,file:src/movement/,
 OrdersApply,src/orders/orders_apply.cpp,orders,file:src/orders/,
 OrdersClearOrderTypeTable,src/orders/orders_slots.cpp,orders,file:src/orders/,
-OrdersEventSize,src/game/orders_events.h,game,name:Order,game
+OrdersEventSize,src/game/orders_event_size.h,game,name:Order,game
 OrdersGetOrderFlags,src/orders/orders_slots.cpp,orders,file:src/orders/,
 OrdersGetOrderType,src/orders/orders_slots.cpp,orders,file:src/orders/,
 OrdersHeaderOf,src/game/orders_events.h,game,name:Order,game
@@ -5405,7 +5406,6 @@ UseEnergy,src/game/economy.cpp,economy,file:src/game/economy,
 UseEnergyD,src/game/economy.cpp,economy,file:src/game/economy,
 UseService,src/frontend/frontend.cpp,presentation,presentation,
 UseServiceCalls,src/frontend/frontend.cpp,presentation,presentation,
-Valid,src/movement/movement_apply.cpp,movement,file:src/movement/,
 Valid,src/weapons/weapons_apply.cpp,weapons,file:src/weapons/,
 Vec3::Scale,src/util/vec3.h,platform,folder:src/util/,
 Vec3::SquareXZ,src/util/vec3.h,platform,folder:src/util/,

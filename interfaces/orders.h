@@ -135,7 +135,7 @@ struct OrdersStatusFlags {
 struct OrdersAttacked {
     // The kind and the unit damaged.
     OrdersEventHeader h;
-    // The attacker, as its block offset (0 for none).
+    // The attacking unit, as its block offset (0 for none).
     unsigned int attacker;
 };
 
@@ -183,7 +183,7 @@ struct OrdersAttachToPiece {
 struct OrdersFinishConstruction {
     // The kind and the unit finished.
     OrdersEventHeader h;
-    // The builder, as its block offset.
+    // The building unit, as its block offset.
     unsigned int builder;
 };
 
@@ -199,7 +199,7 @@ struct OrdersBuildDecay {
 struct OrdersRepair {
     // The kind and the unit repaired.
     OrdersEventHeader h;
-    // The builder, as its block offset.
+    // The building unit, as its block offset.
     unsigned int builder;
     // The repair progress added.
     float amount;

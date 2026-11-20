@@ -42,7 +42,7 @@ static int TargetKind(int kind)
            kind == MOVEMENT_SET_HEADING;
 }
 
-static int Valid(const MovementEventHeader* e, Unit* unit, OrderFx* target)
+static int MovementEventValid(const MovementEventHeader* e, Unit* unit, OrderFx* target)
 {
     if (e->kind < MOVEMENT_NEW || e->kind > MOVEMENT_SET_HEADING)
         return 0;
@@ -81,7 +81,7 @@ int __stdcall MovementApply(const MovementEventHeader* e, unsigned int size)
     OrderFx* target = nullptr;
     if (e->kind == MOVEMENT_SET_TARGET || TargetKind(e->kind))
         target = TargetOfOffset(reinterpret_cast<const MovementTarget*>(e)->target);
-    if (!Valid(e, unit, target))
+    if (!MovementEventValid(e, unit, target))
         return 0;
     switch (e->kind) {
     case MOVEMENT_NEW:

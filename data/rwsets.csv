@@ -11532,7 +11532,6 @@ address,function,file,kind,target
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,MovementSeam::LoadTarget
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,Order::unitType
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::field_26
-0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::field_4
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::flag5
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::flags
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::flags6
@@ -11542,6 +11541,7 @@ address,function,file,kind,target
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::progress
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::radius
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::subFlags
+0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::targetType
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderSaveRecord::unitType
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,OrderTableEntry::name
 0x43a420,Order::Order,src/orders/order_queue.cpp,field_read,Ref<Order>::offset
@@ -11617,7 +11617,7 @@ address,function,file,kind,target
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Order::unit
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Order::unitType
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Order::wakeFrame
-0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,OrderSaveRecord::field_4
+0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,OrderSaveRecord::targetType
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,OrderTableEntry::name
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,PathOrderAttach::owner
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Ref<Order>::offset
@@ -11627,7 +11627,6 @@ address,function,file,kind,target
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_read,Unit::id
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::cached
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::field_26
-0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::field_4
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::flag5
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::flags
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::flags6
@@ -11639,6 +11638,7 @@ address,function,file,kind,target
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::radius
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::start
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::subFlags
+0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::targetType
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,field_write,OrderSaveRecord::unitType
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,function,
 0x43a970,Order::SerializeToSave,src/orders/order_queue.cpp,global_read,g_game
@@ -51216,6 +51216,7 @@ address,function,file,kind,target
 ,MovementApply,src/movement/movement_apply.cpp,call,AirManeuverOrder::SetAltitude
 ,MovementApply,src/movement/movement_apply.cpp,call,LoadMotionState
 ,MovementApply,src/movement/movement_apply.cpp,call,MovementEventSize
+,MovementApply,src/movement/movement_apply.cpp,call,MovementEventValid
 ,MovementApply,src/movement/movement_apply.cpp,call,OrderFx::~OrderFx
 ,MovementApply,src/movement/movement_apply.cpp,call,PathOrder::SetAltitude
 ,MovementApply,src/movement/movement_apply.cpp,call,PathOrder::SetApproachRadius
@@ -51225,7 +51226,6 @@ address,function,file,kind,target
 ,MovementApply,src/movement/movement_apply.cpp,call,UnitMotion::DestroyObject
 ,MovementApply,src/movement/movement_apply.cpp,call,UnitMotion::SetFlightMode
 ,MovementApply,src/movement/movement_apply.cpp,call,UnitOfOffset
-,MovementApply,src/movement/movement_apply.cpp,call,Valid
 ,MovementApply,src/movement/movement_apply.cpp,call,get
 ,MovementApply,src/movement/movement_apply.cpp,call,operator UnitMotion *
 ,MovementApply,src/movement/movement_apply.cpp,call,operator delete
@@ -51281,7 +51281,12 @@ address,function,file,kind,target
 ,MovementClassGetNative,src/seams/native.cpp,function,
 ,MovementClassInBoundsNative,src/seams/native.cpp,call,MovementClass::InBounds
 ,MovementClassInBoundsNative,src/seams/native.cpp,function,
-,MovementEventSize,src/game/movement_events.h,function,
+,MovementEventSize,src/game/movement_event_size.h,function,
+,MovementEventValid,src/movement/movement_apply.cpp,call,TargetKind
+,MovementEventValid,src/movement/movement_apply.cpp,call,operator==
+,MovementEventValid,src/movement/movement_apply.cpp,field_read,MovementEventHeader::kind
+,MovementEventValid,src/movement/movement_apply.cpp,field_read,Unit::motion
+,MovementEventValid,src/movement/movement_apply.cpp,function,
 ,MovementGetMotionState,src/movement/movement_apply.cpp,call,memset
 ,MovementGetMotionState,src/movement/movement_apply.cpp,call,operator UnitMotion *
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,Unit::motion
@@ -52169,7 +52174,7 @@ address,function,file,kind,target
 ,OrdersApply,src/orders/orders_apply.cpp,indirect_call,virtual OrderBase::OrStatusFlags
 ,OrdersClearOrderTypeTable,src/orders/orders_slots.cpp,call,ClearOrderTypeTable
 ,OrdersClearOrderTypeTable,src/orders/orders_slots.cpp,function,
-,OrdersEventSize,src/game/orders_events.h,function,
+,OrdersEventSize,src/game/orders_event_size.h,function,
 ,OrdersGetOrderFlags,src/orders/orders_slots.cpp,call,GetOrderFlags
 ,OrdersGetOrderFlags,src/orders/orders_slots.cpp,function,
 ,OrdersGetOrderType,src/orders/orders_slots.cpp,call,GetOrderType
@@ -62170,11 +62175,6 @@ address,function,file,kind,target
 ,UseServiceCalls,src/frontend/frontend.cpp,global_maybe_written,g_frontendSourceFile
 ,UseServiceCalls,src/frontend/frontend.cpp,global_maybe_written,g_serviceErrorMessage
 ,UseServiceCalls,src/frontend/frontend.cpp,global_read,g_game
-,Valid,src/movement/movement_apply.cpp,call,TargetKind
-,Valid,src/movement/movement_apply.cpp,call,operator==
-,Valid,src/movement/movement_apply.cpp,field_read,MovementEventHeader::kind
-,Valid,src/movement/movement_apply.cpp,field_read,Unit::motion
-,Valid,src/movement/movement_apply.cpp,function,
 ,Valid,src/weapons/weapons_apply.cpp,call,KnownKind
 ,Valid,src/weapons/weapons_apply.cpp,call,WeaponsEventSize
 ,Valid,src/weapons/weapons_apply.cpp,field_read,WeaponsAddStockpile::weapon

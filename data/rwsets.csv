@@ -48231,6 +48231,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitBody
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitHead
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::WriteState
+,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::GetWeaponRange
@@ -48579,6 +48580,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitBody
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitHead
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsWriteState
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsGetWeaponRange
@@ -57090,6 +57092,18 @@ address,function,file,kind,target
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [UnitsSeam::WriteState]
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgEvent
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,EventRoots
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWeaponsApply,src/harness/replay_hooks.inc,field_read,WeaponsEventHeader::kind
+,RecWeaponsApply,src/harness/replay_hooks.inc,field_read,WeaponsSeam::Apply
+,RecWeaponsApply,src/harness/replay_hooks.inc,function,
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_inner_weapons
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecWeaponsApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const WeaponsEventHeader *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::Apply]"
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgValue

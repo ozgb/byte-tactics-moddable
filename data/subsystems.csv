@@ -4721,6 +4721,7 @@ RecUnitsUpdateSfxOccupy,src/harness/replay_hooks.inc,harness,folder:src/harness/
 RecUnitsUpdateUnitBody,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecUnitsUpdateUnitHead,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecUnitsWriteState,src/harness/replay_hooks.inc,harness,folder:src/harness/,
+RecWeaponsApply,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecWeaponsFindWeaponByName,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,harness,folder:src/harness/,

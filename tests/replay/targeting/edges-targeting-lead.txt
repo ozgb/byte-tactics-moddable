@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem targeting 2.1
+subsystem targeting 3.0
 call 0 Apply
   r Unit#1.id 1
   r Unit#1.netDirtyFlags 0
@@ -18,30 +18,21 @@ call 0 Apply
   a event.kind 99
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#1.weapon0TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#1
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#1.weapon1TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#1.weapon2TargetZ -32768
   o result 1
 call 0 Apply
@@ -62,30 +53,21 @@ call 0 Apply
   a event.kind 99
   a event.unit Unit#251
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#251.weapon0TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#251
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#251.weapon1TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#251
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#251.weapon2TargetZ -32768
   o result 1
 call 0 Apply
@@ -106,30 +88,21 @@ call 0 Apply
   a event.kind 99
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#501.weapon0TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#501
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#501.weapon1TargetZ -32768
   o result 1
 call 0 Apply
   a event.kind 99
   a event.unit Unit#501
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#501.weapon2TargetZ -32768
   o result 1
 call 0 GetWeaponTargetUnit
@@ -180,10 +153,7 @@ call 0 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 0 GetWeaponTargetUnit
   r Unit#251.weapon0Def weapondef#20
@@ -218,10 +188,7 @@ call 0 Apply
   a event.kind 98
   a event.unit Unit#251
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 0 GetWeaponTargetUnit
   r Unit#501.weapon0Def weapondef#21
@@ -264,10 +231,7 @@ call 0 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1 GetWeaponTargetPos
   r Game.seaLevel 0
@@ -425,30 +389,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#502
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#502.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#502
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#502.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#502
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#502.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -469,30 +424,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#2
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#2.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#2
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#2.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#2
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#2.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -513,30 +459,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#503
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#503.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#503
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#503.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#503
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#503.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -557,30 +494,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#504
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#504.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#504
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#504.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#504
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#504.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -601,30 +529,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#505
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#505.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#505
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#505.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#505
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#505.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -645,30 +564,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#506
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#506.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#506
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#506.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#506
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#506.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -689,30 +599,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#507
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#507.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#507
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#507.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#507
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#507.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -733,30 +634,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#508
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#508.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#508
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#508.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#508
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#508.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -777,30 +669,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#509
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#509.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#509
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#509.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#509
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#509.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -821,30 +704,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#510
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#510.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#510
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#510.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#510
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#510.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -865,30 +739,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#511
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#511.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#511
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#511.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#511
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#511.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -909,30 +774,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#512
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#512.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#512
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#512.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#512
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#512.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -953,30 +809,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#513
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#513.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#513
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#513.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#513
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#513.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -997,30 +844,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#514
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#514.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#514
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#514.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#514
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#514.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -1041,30 +879,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#515
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#515.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#515
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#515.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#515
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#515.weapon2TargetZ -32768
   o result 1
 call 5 Apply
@@ -1085,30 +914,21 @@ call 5 Apply
   a event.kind 99
   a event.unit Unit#516
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#516.weapon0TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#516
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#516.weapon1TargetZ -32768
   o result 1
 call 5 Apply
   a event.kind 99
   a event.unit Unit#516
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   w Unit#516.weapon2TargetZ -32768
   o result 1
 call 5 GetWeaponTargetPos
@@ -1279,29 +1099,23 @@ call 10 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 10 Apply
   r Unit#1.weapon2Flags 10
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 10 Apply
   a event.kind 97
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 55705600
-  a event.posY 65536
-  a event.posZ 19660800
+  a event.pos0 55705600
+  a event.pos1 65536
+  a event.pos2 19660800
+  a size 24
   w Unit#1.weapon2TargetX 850
   w Unit#1.weapon2TargetZ 300
   o result 1
@@ -1343,21 +1157,15 @@ call 11 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 11 Apply
   r Unit#1.weapon2Flags 27
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
-  i services.SchedPublish 9 28
+  a size 12
+  i services.SchedPublish 9 12
   w Unit#1.weapon2TargetX 0
   w Unit#1.weapon2TargetZ -32768
   o result 1
@@ -1915,10 +1723,7 @@ call 27 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#2
@@ -1947,10 +1752,7 @@ call 27 Apply
   a event.kind 98
   a event.unit Unit#2
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#251
@@ -1968,10 +1770,7 @@ call 27 Apply
   a event.kind 98
   a event.unit Unit#251
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 27 GetWeaponTargetUnit
   a unit Unit#501
@@ -1989,10 +1788,7 @@ call 27 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 28 GetWeaponTargetPos
   r UnitMotion#1.velocityX 77923
@@ -3022,10 +2818,7 @@ call 55 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 55 GetWeaponTargetUnit
   a unit Unit#2
@@ -3109,9 +2902,7 @@ call 55 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#504
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#2.weapon0TargetX 504
   o result 1
 call 55 GetWeaponTargetUnit
@@ -3183,9 +2974,7 @@ call 55 Apply
   a event.unit Unit#251
   a event.weapon 0
   a event.target Unit#510
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#251.weapon0TargetX 510
   o result 1
 call 55 GetWeaponTargetUnit
@@ -3204,10 +2993,7 @@ call 55 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 56 GetWeaponTargetPos
   a unit Unit#1
@@ -3767,11 +3553,8 @@ call 66 Apply
   a event.kind 98
   a event.unit Unit#2
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
-  i services.SchedPublish 9 28
+  a size 12
+  i services.SchedPublish 9 12
   w Unit#2.weapon0TargetX 0
   o result 1
 call 66 Apply
@@ -3779,9 +3562,7 @@ call 66 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#504
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#2.weapon0TargetX 504
   o result 1
 call 66 GetWeaponTargetPos
@@ -3826,29 +3607,23 @@ call 67 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 67 Apply
   r Unit#1.weapon2Flags 10
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 67 Apply
   a event.kind 97
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 55705600
-  a event.posY 65536
-  a event.posZ 19660800
+  a event.pos0 55705600
+  a event.pos1 65536
+  a event.pos2 19660800
+  a size 24
   w Unit#1.weapon2TargetX 850
   w Unit#1.weapon2TargetZ 300
   o result 1
@@ -4657,21 +4432,15 @@ call 82 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 82 Apply
   r Unit#1.weapon2Flags 26
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
-  i services.SchedPublish 9 28
+  a size 12
+  i services.SchedPublish 9 12
   w Unit#1.weapon2TargetX 0
   w Unit#1.weapon2TargetZ -32768
   o result 1
@@ -4773,9 +4542,7 @@ call 83 Apply
   a event.unit Unit#1
   a event.weapon 0
   a event.target Unit#502
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#1.weapon0TargetX 502
   o result 1
 call 83 GetWeaponTargetUnit
@@ -4798,10 +4565,7 @@ call 83 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 84 GetWeaponTargetPos
   r Unit#502.motion null
@@ -6234,10 +5998,7 @@ call 111 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 112 GetWeaponTargetPos
   a unit Unit#1
@@ -7537,10 +7298,7 @@ call 138 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 139 GetWeaponTargetPos
   a unit Unit#1
@@ -8801,10 +8559,7 @@ call 166 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 167 GetWeaponTargetPos
   a unit Unit#1
@@ -10127,10 +9882,7 @@ call 194 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 195 GetWeaponTargetPos
   a unit Unit#1
@@ -11433,10 +11185,7 @@ call 222 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 223 GetWeaponTargetPos
   a unit Unit#1
@@ -12735,10 +12484,7 @@ call 250 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 251 GetWeaponTargetPos
   a unit Unit#1
@@ -14021,10 +13767,7 @@ call 277 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 278 GetWeaponTargetPos
   a unit Unit#1
@@ -15329,10 +15072,7 @@ call 305 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 306 GetWeaponTargetPos
   a unit Unit#1
@@ -16606,10 +16346,7 @@ call 333 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 334 GetWeaponTargetPos
   a unit Unit#1
@@ -17926,10 +17663,7 @@ call 361 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 362 GetWeaponTargetPos
   a unit Unit#1
@@ -19056,7 +18790,7 @@ call 386 GetWeaponTargetPos
   r Unit#504.motion null
   a unit Unit#2
   a weapon 0
-  i services.SchedPublish 9 28
+  i services.SchedPublish 9 12
   w Unit#2.weapon0TargetX 0
   o result 0
 call 386 Apply
@@ -19072,9 +18806,7 @@ call 386 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#513
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#2.netDirtyFlags 0
   w Unit#2.weapon0TargetX 513
   o result 1
@@ -19087,9 +18819,7 @@ call 386 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#513
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   o result 1
 call 386 GetWeaponTargetPos
   a unit Unit#251
@@ -19229,10 +18959,7 @@ call 388 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 389 GetWeaponTargetPos
   a unit Unit#1
@@ -20506,10 +20233,7 @@ call 416 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 417 GetWeaponTargetPos
   a unit Unit#1
@@ -21821,10 +21545,7 @@ call 444 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 445 GetWeaponTargetPos
   a unit Unit#1
@@ -22666,7 +22387,7 @@ call 464 GetWeaponTargetPos
   r Unit#502.unitDefIndex 0
   a unit Unit#1
   a weapon 0
-  i services.SchedPublish 9 28
+  i services.SchedPublish 9 12
   w Unit#1.weapon0TargetX 0
   o result 0
 call 464 GetWeaponTargetPos
@@ -23033,10 +22754,7 @@ call 472 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 472 GetWeaponTargetUnit
   a unit Unit#251
@@ -23058,10 +22776,7 @@ call 472 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 473 GetWeaponTargetPos
   a unit Unit#1
@@ -24209,10 +23924,7 @@ call 500 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 500 GetWeaponTargetUnit
   a unit Unit#251
@@ -24234,10 +23946,7 @@ call 500 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 501 GetWeaponTargetPos
   a unit Unit#1
@@ -25301,10 +25010,7 @@ call 527 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 527 GetWeaponTargetUnit
   a unit Unit#251
@@ -25326,10 +25032,7 @@ call 527 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 528 GetWeaponTargetPos
   a unit Unit#1
@@ -26487,10 +26190,7 @@ call 555 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 555 GetWeaponTargetUnit
   a unit Unit#251
@@ -26512,10 +26212,7 @@ call 555 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 556 GetWeaponTargetPos
   a unit Unit#1
@@ -27670,10 +27367,7 @@ call 583 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 583 GetWeaponTargetUnit
   a unit Unit#251
@@ -27695,10 +27389,7 @@ call 583 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 584 GetWeaponTargetPos
   a unit Unit#1
@@ -28845,10 +28536,7 @@ call 611 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 611 GetWeaponTargetUnit
   a unit Unit#251
@@ -28870,10 +28558,7 @@ call 611 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 612 GetWeaponTargetPos
   a unit Unit#1
@@ -30032,10 +29717,7 @@ call 638 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 638 GetWeaponTargetUnit
   a unit Unit#251
@@ -30057,10 +29739,7 @@ call 638 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 639 GetWeaponTargetPos
   a unit Unit#1
@@ -31208,10 +30887,7 @@ call 666 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 666 GetWeaponTargetUnit
   a unit Unit#251
@@ -31233,10 +30909,7 @@ call 666 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 667 GetWeaponTargetPos
   a unit Unit#1
@@ -32336,10 +32009,7 @@ call 694 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 694 GetWeaponTargetUnit
   a unit Unit#251
@@ -32361,10 +32031,7 @@ call 694 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 695 GetWeaponTargetPos
   a unit Unit#1
@@ -33514,10 +33181,7 @@ call 722 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 722 GetWeaponTargetUnit
   a unit Unit#251
@@ -33539,10 +33203,7 @@ call 722 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 723 GetWeaponTargetPos
   a unit Unit#1
@@ -34638,10 +34299,7 @@ call 750 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 750 GetWeaponTargetUnit
   a unit Unit#251
@@ -34664,10 +34322,7 @@ call 750 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 751 GetWeaponTargetPos
   a unit Unit#1
@@ -35777,10 +35432,7 @@ call 777 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 777 GetWeaponTargetUnit
   a unit Unit#251
@@ -35802,10 +35454,7 @@ call 777 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 778 GetWeaponTargetPos
   a unit Unit#1
@@ -36947,10 +36596,7 @@ call 805 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 805 GetWeaponTargetUnit
   a unit Unit#251
@@ -36972,10 +36618,7 @@ call 805 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 806 GetWeaponTargetPos
   a unit Unit#1
@@ -38138,10 +37781,7 @@ call 833 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 833 GetWeaponTargetUnit
   a unit Unit#251
@@ -38163,10 +37803,7 @@ call 833 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 834 GetWeaponTargetPos
   a unit Unit#1
@@ -39307,10 +38944,7 @@ call 861 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 861 GetWeaponTargetUnit
   a unit Unit#251
@@ -39332,10 +38966,7 @@ call 861 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 862 GetWeaponTargetPos
   a unit Unit#1
@@ -39437,7 +39068,7 @@ call 864 GetWeaponTargetPos
   r Unit#510.motion null
   a unit Unit#251
   a weapon 0
-  i services.SchedPublish 9 28
+  i services.SchedPublish 9 12
   w Unit#251.weapon0TargetX 0
   o result 0
 call 864 GetWeaponTargetPos
@@ -40311,10 +39942,7 @@ call 888 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 888 GetWeaponTargetUnit
   a unit Unit#251
@@ -40372,9 +40000,7 @@ call 888 Apply
   a event.unit Unit#251
   a event.weapon 0
   a event.target Unit#506
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#251.netDirtyFlags 0
   w Unit#251.weapon0TargetX 506
   o result 1
@@ -40394,10 +40020,7 @@ call 888 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 889 GetWeaponTargetPos
   a unit Unit#1
@@ -41602,10 +41225,7 @@ call 916 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 916 GetWeaponTargetUnit
   a unit Unit#251
@@ -41627,10 +41247,7 @@ call 916 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 917 GetWeaponTargetPos
   a unit Unit#1
@@ -42796,10 +42413,7 @@ call 944 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 944 GetWeaponTargetUnit
   a unit Unit#251
@@ -42821,10 +42435,7 @@ call 944 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 945 GetWeaponTargetPos
   a unit Unit#1
@@ -43925,10 +43536,7 @@ call 972 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 972 GetWeaponTargetUnit
   a unit Unit#251
@@ -43950,10 +43558,7 @@ call 972 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 973 GetWeaponTargetPos
   a unit Unit#1
@@ -44935,7 +44540,7 @@ call 997 GetWeaponTargetPos
   r Unit#513.motion null
   a unit Unit#2
   a weapon 0
-  i services.SchedPublish 9 28
+  i services.SchedPublish 9 12
   w Unit#2.weapon0TargetX 0
   o result 0
 call 997 Apply
@@ -44952,9 +44557,7 @@ call 997 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#515
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   w Unit#2.netDirtyFlags 0
   w Unit#2.weapon0TargetX 515
   o result 1
@@ -44967,9 +44570,7 @@ call 997 Apply
   a event.unit Unit#2
   a event.weapon 0
   a event.target Unit#515
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 16
   o result 1
 call 997 GetWeaponTargetPos
   a unit Unit#251
@@ -45132,10 +44733,7 @@ call 1000 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1000 GetWeaponTargetUnit
   a unit Unit#251
@@ -45157,10 +44755,7 @@ call 1000 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1001 GetWeaponTargetPos
   a unit Unit#1
@@ -46258,10 +45853,7 @@ call 1027 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1027 GetWeaponTargetUnit
   a unit Unit#251
@@ -46283,10 +45875,7 @@ call 1027 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1028 GetWeaponTargetPos
   a unit Unit#1
@@ -47386,10 +46975,7 @@ call 1055 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1055 GetWeaponTargetUnit
   a unit Unit#251
@@ -47411,10 +46997,7 @@ call 1055 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1056 GetWeaponTargetPos
   a unit Unit#1
@@ -48559,10 +48142,7 @@ call 1083 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1083 GetWeaponTargetUnit
   a unit Unit#251
@@ -48584,10 +48164,7 @@ call 1083 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1084 GetWeaponTargetPos
   a unit Unit#1
@@ -49717,10 +49294,7 @@ call 1111 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1111 GetWeaponTargetUnit
   a unit Unit#251
@@ -49742,10 +49316,7 @@ call 1111 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1112 GetWeaponTargetPos
   a unit Unit#1
@@ -50860,10 +50431,7 @@ call 1138 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1138 GetWeaponTargetUnit
   a unit Unit#251
@@ -50885,10 +50453,7 @@ call 1138 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1139 GetWeaponTargetPos
   a unit Unit#1
@@ -52052,10 +51617,7 @@ call 1166 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1166 GetWeaponTargetUnit
   a unit Unit#251
@@ -52077,10 +51639,7 @@ call 1166 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1167 GetWeaponTargetPos
   a unit Unit#1
@@ -53200,10 +52759,7 @@ call 1194 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1194 GetWeaponTargetUnit
   a unit Unit#251
@@ -53225,10 +52781,7 @@ call 1194 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1195 GetWeaponTargetPos
   a unit Unit#1
@@ -54369,10 +53922,7 @@ call 1222 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1222 GetWeaponTargetUnit
   a unit Unit#251
@@ -54394,10 +53944,7 @@ call 1222 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1223 GetWeaponTargetPos
   a unit Unit#1
@@ -55521,10 +55068,7 @@ call 1250 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1250 GetWeaponTargetUnit
   a unit Unit#251
@@ -55546,10 +55090,7 @@ call 1250 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1251 GetWeaponTargetPos
   a unit Unit#1
@@ -56646,10 +56187,7 @@ call 1277 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1277 GetWeaponTargetUnit
   a unit Unit#251
@@ -56671,10 +56209,7 @@ call 1277 Apply
   a event.kind 98
   a event.unit Unit#501
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 1278 GetWeaponTargetPos
   a unit Unit#1

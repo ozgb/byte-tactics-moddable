@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem targeting 2.1
+subsystem targeting 3.0
 call 740 GetWeaponTargetPos
   r Game.seaLevel 0
   r Unit#1.unitDefIndex 34
@@ -318,28 +318,19 @@ call 750 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 750 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 750 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 750 GetWeaponTargetPos
   a unit Unit#3
@@ -557,28 +548,19 @@ call 760 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 0
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 760 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 1
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 760 Apply
   a event.kind 98
   a event.unit Unit#1
   a event.weapon 2
-  a event.target null
-  a event.posX 0
-  a event.posY 0
-  a event.posZ 0
+  a size 12
   o result 0
 call 760 GetWeaponTargetPos
   a unit Unit#3

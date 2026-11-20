@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 2.0
+subsystem weapons 3.0
 call 1640 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 47
@@ -9307,12 +9307,12 @@ call 1640 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#6 3 = (0,0,0)
   i scripts.QueryScript CobScript#5 "QuerySecondary" (0) null null null = 1
   o p2 (3)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(131060434,3080192,61159377) = 1
   i services.RecordSimEvent 30 0 [48,131060434,3080192,61159377,1] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 4
   w Unit#6.weapon0ReloadTimer 55
@@ -11064,7 +11064,7 @@ call 1641 UpdateUnitWeapons
   o z 57699187
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53474 282 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 18
@@ -11189,7 +11189,7 @@ call 1641 UpdateUnitWeapons
   o z 57699187
   i scripts.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 60760 64923 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#14 1 = 1
@@ -11524,7 +11524,7 @@ call 1642 UpdateUnitWeapons
   o z 57783711
   i scripts.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 55606 450 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#3 1 = 1
@@ -12174,7 +12174,7 @@ call 1643 UpdateUnitWeapons
   o z 50250488
   i scripts.GetAimFromPosition Unit#275 0
   o out (107656468,3424255,57247264)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#275 "AimPrimary" 2 15370 230 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#275 0 = Unit#14
   i services.ScheduleTargetingTargetPos Unit#275 1 = 1
@@ -12313,7 +12313,7 @@ call 1644 UpdateUnitWeapons
   o z 54001665
   i scripts.GetAimFromPosition Unit#9 0
   o out (94354876,4451562,57260103)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#9 "AimPrimary" 2 40683 2217 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#9 0 = Unit#274
   i services.ScheduleTargetingTargetPos Unit#9 1 = 1
@@ -12529,13 +12529,13 @@ call 1644 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#269 0 = (328244,1998847,840607)
   i scripts.QueryScript CobScript#38 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(143986496,5079039,143969003) = 2
   i services.RecordSimEvent 30 0 [69,143986496,5079039,143969003,2] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
   i services.RecordSimEvent 9 0 [143986496,5079039,143969003,9] 4
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   i services.ScheduleTargetingTargetPos Unit#269 1 = 0
   o x 0
@@ -12659,7 +12659,7 @@ call 1645 UpdateUnitWeapons
   o z 58075326
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53860 315 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
@@ -12933,7 +12933,7 @@ call 1645 UpdateUnitWeapons
   o x 123748351
   o y 3571711
   o z 70148095
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#269 "AimPrimary" 2 0 0 0 0 = 0
   i services.ScheduleTargetingTargetPos Unit#269 1 = 0
   o x 0
@@ -13379,13 +13379,13 @@ call 1646 UpdateUnitWeapons
   i services.RandomInt 1369 = 1366
   i scripts.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 1
   o p2 (4)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(89768043,3932159,54724910) = 3
   i services.RecordSimEvent 30 0 [78,89768043,3932159,54724910,3] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
   i services.RecordSimEvent 9 0 [89768043,3932159,54724910,9] 4
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 5
   w rng.seed 0x31edc697
@@ -13497,7 +13497,7 @@ call 1647 UpdateUnitWeapons
   o z 58298598
   i scripts.GetAimFromPosition Unit#3 0
   o out (122503554,5472256,46240783)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimPrimary" 2 56070 467 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#3 1 = 1
@@ -13788,7 +13788,7 @@ call 1647 UpdateUnitWeapons
   o z 49087806
   i scripts.GetAimFromPosition Unit#274 1
   o out (89769800,3932159,54722482)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#274 "AimSecondary" 2 65416 1182 0 0 = 0
   w Unit#274.weapon1Flags 23
   w Unit#274.weapon1ReloadTimer 84
@@ -14658,7 +14658,7 @@ call 1650 UpdateUnitWeapons
   o z 58666243
   i scripts.GetAimFromPosition Unit#3 1
   o out (122641366,4825333,50173726)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 54377 332 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon1Flags 23
@@ -14785,7 +14785,7 @@ call 1650 UpdateUnitWeapons
   o z 58666243
   i scripts.GetAimFromPosition Unit#14 0
   o out (113262592,3915775,47693825)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#14 "AimPrimary" 2 62017 64947 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#14 0 = Unit#275
   i services.ScheduleTargetingTargetPos Unit#14 1 = 1

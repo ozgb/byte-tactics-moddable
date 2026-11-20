@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem wind_meteors 2.0
+subsystem wind_meteors 3.0
 call 0 Apply
   r Game.width 0
   r Game.height 0
@@ -12,11 +12,7 @@ call 0 Apply
   r rng.load 0x00000001
   r rng.seed 0x00000000
   a event.kind 65
-  a event.weapon ""
-  a event.radius 0
-  a event.density f32:0x00000000
-  a event.duration f32:0x00000000
-  a event.interval f32:0x00000000
+  a size 4
   w SimGlobals.g_meteorNextStrikeTime 0
   w SimGlobals.g_meteorSpawnMagnitude 0
   w SimGlobals.g_meteorSpawnInterval 0
@@ -51,6 +47,7 @@ call 0 Apply
   a event.density f32:0x40000000
   a event.duration f32:0x40a00000
   a event.interval f32:0x42700000
+  a size 52
   w SimGlobals.g_meteorWeaponName "Meteor"
   w SimGlobals.g_meteorSpawnMagnitude 300
   w SimGlobals.g_meteorSpawnInterval 15
@@ -58,11 +55,7 @@ call 0 Apply
   w SimGlobals.g_meteorScheduleGap 1800
 call 0 Apply
   a event.kind 65
-  a event.weapon ""
-  a event.radius 0
-  a event.density f32:0x00000000
-  a event.duration f32:0x00000000
-  a event.interval f32:0x00000000
+  a size 4
 call 0 LoadMeteorDefaults
   i services.TdfFile_Construct file#1
   i services.BuildDataPath "gamedata" "meteor" "tdf" = "gamedata\\meteor.tdf"
@@ -90,6 +83,7 @@ call 0 Apply
   a event.density f32:0x40000000
   a event.duration f32:0x40a00000
   a event.interval f32:0x42700000
+  a size 52
 call 0 UpdateWind
   r Game.windCounter 0
   r Game.windSpeedDenominator 5000
@@ -351,11 +345,7 @@ call 69 UpdateWind
 call 69 UpdateMeteors
 call 70 Apply
   a event.kind 67
-  a event.weapon ""
-  a event.radius 0
-  a event.density f32:0x00000000
-  a event.duration f32:0x00000000
-  a event.interval f32:0x00000000
+  a size 4
   i services.GameRand main = 11777
   i services.GameRand main = 5660
   i services.GameRand main = 8954
@@ -372,7 +362,7 @@ call 70 UpdateWind
 call 70 UpdateMeteors
   i services.GameRand main = 16514
   i services.GameRand main = 20469
-  i services.WindMeteorsEmit (80,225,61523896,88473600,31115192,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,61523896,88473600,31115192,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 85
   w rng.main 0x4ff5d899
 call 71 UpdateWind
@@ -423,7 +413,7 @@ call 85 UpdateWind
 call 85 UpdateMeteors
   i services.GameRand main = 26520
   i services.GameRand main = 1382
-  i services.WindMeteorsEmit (80,225,50483584,88473600,8782192,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,50483584,88473600,8782192,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 100
   w rng.main 0x056653db
 call 86 UpdateWind
@@ -471,18 +461,14 @@ call 99 UpdateWind
 call 99 UpdateMeteors
 call 100 Apply
   a event.kind 64
-  a event.weapon ""
-  a event.radius 0
-  a event.density f32:0x00000000
-  a event.duration f32:0x00000000
-  a event.interval f32:0x00000000
+  a size 4
   w SimGlobals.g_meteorsEnabled 1
 call 100 UpdateWind
   a stream main
 call 100 UpdateMeteors
   i services.GameRand main = 6602
   i services.GameRand main = 32613
-  i services.WindMeteorsEmit (80,225,54670912,88473600,20187968,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,54670912,88473600,20187968,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 115
   w rng.main 0xff65792d
 call 101 UpdateWind
@@ -533,7 +519,7 @@ call 115 UpdateWind
 call 115 UpdateMeteors
   i services.GameRand main = 25005
   i services.GameRand main = 20287
-  i services.WindMeteorsEmit (80,225,64694752,88473600,35064896,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,64694752,88473600,35064896,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 130
   w rng.main 0x4f3f190f
 call 116 UpdateWind
@@ -586,7 +572,7 @@ call 130 UpdateWind
 call 130 UpdateMeteors
   i services.GameRand main = 8254
   i services.GameRand main = 6993
-  i services.WindMeteorsEmit (80,225,49743952,88473600,22981448,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,49743952,88473600,22981448,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 145
   w rng.main 0x1b518801
 call 131 UpdateWind
@@ -636,7 +622,7 @@ call 145 UpdateWind
 call 145 UpdateMeteors
   i services.GameRand main = 28245
   i services.GameRand main = 15681
-  i services.WindMeteorsEmit (80,225,52251424,88473600,40870736,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,52251424,88473600,40870736,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 160
   w rng.main 0xbd41be83
 call 146 UpdateWind
@@ -654,11 +640,7 @@ call 149 UpdateWind
 call 149 UpdateMeteors
 call 150 Apply
   a event.kind 65
-  a event.weapon ""
-  a event.radius 0
-  a event.density f32:0x00000000
-  a event.duration f32:0x00000000
-  a event.interval f32:0x00000000
+  a size 4
   w SimGlobals.g_meteorsEnabled 0
 call 150 UpdateWind
   r rng.seed 0x479ae38a
@@ -696,7 +678,7 @@ call 160 UpdateWind
 call 160 UpdateMeteors
   i services.GameRand main = 31365
   i services.GameRand main = 32464
-  i services.WindMeteorsEmit (80,225,55678544,88473600,5342856,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,55678544,88473600,5342856,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 175
   w rng.main 0x7ed07915
 call 161 UpdateWind
@@ -747,7 +729,7 @@ call 175 UpdateWind
 call 175 UpdateMeteors
   i services.GameRand main = 20253
   i services.GameRand main = 21080
-  i services.WindMeteorsEmit (80,225,63992032,88473600,31693368,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,63992032,88473600,31693368,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 190
   w rng.main 0x52585837
 call 176 UpdateWind
@@ -811,7 +793,7 @@ call 190 UpdateWind
 call 190 UpdateMeteors
   i services.GameRand main = 3133
   i services.GameRand main = 4294
-  i services.WindMeteorsEmit (80,225,53181504,88473600,22868448,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,53181504,88473600,22868448,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 205
   w rng.main 0x10c68188
 call 191 UpdateWind
@@ -862,7 +844,7 @@ call 205 UpdateWind
 call 205 UpdateMeteors
   i services.GameRand main = 3283
   i services.GameRand main = 9121
-  i services.WindMeteorsEmit (80,225,52588912,88473600,24453488,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,52588912,88473600,24453488,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorNextHitTime 220
   w rng.main 0xa3a15c42
 call 206 UpdateWind
@@ -913,7 +895,7 @@ call 220 UpdateWind
 call 220 UpdateMeteors
   i services.GameRand main = 1674
   i services.GameRand main = 20294
-  i services.WindMeteorsEmit (80,225,55194952,88473600,24837488,-163111,-983040,151460,1)
+  i services.WindMeteorsEmit (80,225,55194952,88473600,24837488,-163111,-983040,151460,1) 36
   w SimGlobals.g_meteorActive 0
   w SimGlobals.g_meteorNextHitTime 235
   w rng.main 0xcf469ccc

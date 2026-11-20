@@ -12557,25 +12557,17 @@ address,function,file,kind,target
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,global_read,g_seams
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanLoad]"
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]"
-0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,call,operator=
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::badSlope
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::badWaterSlope
-0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::cells
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::footprintX
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::footprintZ
-0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::height
-0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::lastTick
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::maxSlope
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::maxWaterDepth
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::maxWaterSlope
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::minWaterDepth
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::name
-0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,field_write,MovementClass::width
 0x4402e0,MovementClass::MovementClass,src/units/movement_class.cpp,function,
 0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,call,GameFreeThunk
-0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,call,operator delete
-0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,call,operator unsigned int *
-0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,field_read,MovementClass::cells
 0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,field_read,MovementClass::name
 0x440320,MovementClass::~MovementClass,src/units/movement_class.cpp,function,
 0x440340,MovementClass::ReadMoveInfo,src/units/movement_class.cpp,call,TdfRecord::GetFieldInt
@@ -12601,147 +12593,174 @@ address,function,file,kind,target
 0x440420,FindMovementClass,src/units/movement_class.cpp,function,
 0x440420,FindMovementClass,src/units/movement_class.cpp,global_escape,g_movementClasses
 0x440420,FindMovementClass,src/units/movement_class.cpp,global_read,g_movementClasses
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,call,operator delete
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,call,operator new
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,call,operator unsigned int *
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,call,operator=
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,field_read,MovementClass::cells
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,field_write,MovementClass::cells
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,field_write,MovementClass::height
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,field_write,MovementClass::width
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,function,
-0x440470,MovementClass::ResizePassMap,src/units/movement_class.cpp,global_read,kSim
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,call,operator unsigned int *
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,deref_read,*unsigned int
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,deref_write,*unsigned int
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,field_read,MovementClass::cells
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,field_read,MovementClass::width
-0x4404c0,MovementClass::SetPassMapCell,src/units/movement_class.cpp,function,
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,GetPassMapCellValue
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,SimAlloc
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,operator Cell *
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,operator delete
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,operator unsigned int *
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,call,setcell
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,deref_escape,*Cell
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,deref_maybe_written,*unsigned int
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,deref_read,*unsigned char
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,deref_read,*unsigned int
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,deref_write,*unsigned char
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,Game::cells
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,MovementClassBuildView::cells
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,MovementClassBuildView::footprintX
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,MovementClassBuildView::footprintZ
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,MovementClassBuildView::height
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,field_read,MovementClassBuildView::width
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,function,
-0x440500,MovementClassBuildView::BuildPassMap,src/units/movement_class.cpp,global_read,g_game
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,call,GetPassMapFootprintValueWithEdgeStrips
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,call,operator unsigned int *
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,deref_escape,*unsigned int
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,deref_read,*unsigned int
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,deref_write,*unsigned int
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,MovementClass::cells
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,MovementClass::footprintX
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,MovementClass::height
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,MovementClass::width
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,Point16::x
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,field_read,Point16::y
-0x440830,MovementClass::RefreshPassMap,src/units/movement_class.cpp,function,
+0x440470,PassMap::Resize,src/map/pass_map.cpp,call,operator delete
+0x440470,PassMap::Resize,src/map/pass_map.cpp,call,operator new
+0x440470,PassMap::Resize,src/map/pass_map.cpp,call,operator unsigned int *
+0x440470,PassMap::Resize,src/map/pass_map.cpp,call,operator=
+0x440470,PassMap::Resize,src/map/pass_map.cpp,field_read,PassMap::cells
+0x440470,PassMap::Resize,src/map/pass_map.cpp,field_write,PassMap::cells
+0x440470,PassMap::Resize,src/map/pass_map.cpp,field_write,PassMap::height
+0x440470,PassMap::Resize,src/map/pass_map.cpp,field_write,PassMap::width
+0x440470,PassMap::Resize,src/map/pass_map.cpp,function,
+0x440470,PassMap::Resize,src/map/pass_map.cpp,global_read,kSim
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,call,operator unsigned int *
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,deref_read,*unsigned int
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,deref_write,*unsigned int
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,field_read,PassMap::cells
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,field_read,PassMap::width
+0x4404c0,PassMap::SetCell,src/map/pass_map.cpp,function,
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,GetPassMapCellValue
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,SimAlloc
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,operator Cell *
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,operator delete
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,operator unsigned int *
+0x440500,PassMap::Build,src/map/pass_map.cpp,call,setcell
+0x440500,PassMap::Build,src/map/pass_map.cpp,deref_escape,*Cell
+0x440500,PassMap::Build,src/map/pass_map.cpp,deref_maybe_written,*unsigned int
+0x440500,PassMap::Build,src/map/pass_map.cpp,deref_read,*unsigned char
+0x440500,PassMap::Build,src/map/pass_map.cpp,deref_read,*unsigned int
+0x440500,PassMap::Build,src/map/pass_map.cpp,deref_write,*unsigned char
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,Game::cells
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,PassMap::cells
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,PassMap::footprintX
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,PassMap::height
+0x440500,PassMap::Build,src/map/pass_map.cpp,field_read,PassMap::width
+0x440500,PassMap::Build,src/map/pass_map.cpp,function,
+0x440500,PassMap::Build,src/map/pass_map.cpp,global_read,g_game
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,call,GetPassMapFootprintValueWithEdgeStrips
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,call,operator unsigned int *
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,deref_escape,*unsigned int
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,deref_read,*unsigned int
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,deref_write,*unsigned int
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,PassMap::cells
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,PassMap::footprintX
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,PassMap::height
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,PassMap::width
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,Point16::x
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,field_read,Point16::y
+0x440830,PassMap::Refresh,src/map/pass_map.cpp,function,
 0x440930,NopAfterFeatureEnum,src/units/movement_class.cpp,function,
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,call,MovementClassBuildView::BuildPassMap
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,call,SimAlloc
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,call,get
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,call,operator delete
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,call,operator=
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,deref_read,*int
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,deref_read,*unsigned int
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,deref_write,*Ref<unsigned int>
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,deref_write,*unsigned int
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,field_read,Game::height
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,field_read,Game::width
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,field_write,Game::progress_38d73
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,function,
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClassEntries
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
-0x440940,BuildAllPassMaps,src/units/movement_class.cpp,global_read,g_game
-0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,FreeA
-0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,FreeC
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,call,PassMap::Build
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,call,SimAlloc
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,call,get
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,call,operator delete
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,call,operator=
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,deref_escape,*MapMoveLimits
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,Game::height
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,Game::width
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::badSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::badWaterSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::footprintX
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::footprintZ
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::index
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::maxSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::maxWaterDepth
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::maxWaterSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,MapMoveLimits::minWaterDepth
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::cells
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::defined
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::height
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::width
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,Game::progress_38d73
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::badSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::badWaterSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::cells
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::defined
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::footprintX
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::footprintZ
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::height
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::maxSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::maxWaterDepth
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::maxWaterSlope
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::minWaterDepth
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,field_write,PassMap::width
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,function,
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,global_escape,g_passMaps
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,global_read,g_game
+0x440940,BuildAllPassMaps,src/map/pass_map.cpp,global_write,g_passMaps
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,call,GameFreeThunk
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,field_read,MovementClass::name
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,field_write,MovementClass::name
 0x440a00,FreeMovementClasses,src/units/movement_class.cpp,function,
-0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_escape,g_movementClassEntries
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
-0x440a40,RefreshAllPassMaps,src/units/movement_class.cpp,function,
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,MapPublishCellsChanged
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,RefreshAllPassMapsForUnits
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,operator!=
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,call,operator->
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Game::ticks
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintX
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::height
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::lastTick
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,MovementClass::width
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::x
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,Point16::y
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::a
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::b
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_read,UnitPassMapStampView::unit
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,field_write,MotionTickView::lastTick
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,function,
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_escape,g_movementClasses
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_game
-0x440a70,RefreshPassMapsForUnit,src/units/movement_class.cpp,global_read,g_movementClasses
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,MapPublishCellsChanged
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,get
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator!=
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,call,operator->
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,deref_escape,*UnitPassMapRecordView
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::ticks
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::units
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Game::unitsEnd
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintX
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::height
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::lastTick
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,MovementClass::width
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::x
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,Point16::y
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::a
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::b
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::flags
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapRecordView::unit
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapView::a
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapView::b
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_read,UnitPassMapView::unit
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_write,MotionTickView::lastTick
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,field_write,MovementClass::lastTick
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,function,
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_escape,g_movementClasses
-0x440af0,MovementClass::RefreshMovedUnits,src/units/movement_class.cpp,global_read,g_game
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,MapPublishCellsChanged
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,call,operator->
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MotionTickView::lastTick
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintX
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::height
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::lastTick
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,MovementClass::width
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::x
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,Point16::y
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::a
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::b
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,field_read,UnitPassMapView::unit
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,function,
-0x440be0,MovementClass::RefreshUnitIfStale,src/units/movement_class.cpp,global_escape,g_movementClasses
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_read,g_movementClasses
+0x440a00,FreeMovementClasses,src/units/movement_class.cpp,global_write,g_movementClasses
+0x440a40,RefreshAllPassMaps,src/map/pass_map.cpp,call,RefreshAndReportAllPassMaps
+0x440a40,RefreshAllPassMaps,src/map/pass_map.cpp,function,
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,call,MapPublishCellsChanged
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,call,PassMap::Refresh
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,call,RefreshAllPassMapsForUnits
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,call,operator!=
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,call,operator->
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_maybe_written,PassMapTable::entries
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,Game::ticks
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,MotionTickView::lastTick
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::footprintX
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::height
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::lastTick
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::width
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,Point16::x
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,Point16::y
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::a
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::b
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::unit
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_write,MotionTickView::lastTick
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,function,
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,global_escape,g_passMaps
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,global_maybe_written,g_passMaps
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,global_read,g_game
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,global_read,g_passMaps
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,call,MapPublishCellsChanged
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,call,PassMap::Refresh
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,call,get
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,call,operator!=
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,call,operator->
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,deref_escape,*UnitPassMapRecordView
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,Game::ticks
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,Game::units
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,Game::unitsEnd
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,MotionTickView::lastTick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,PassMap::footprintX
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,PassMap::height
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,PassMap::lastTick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,PassMap::width
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,Point16::x
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,Point16::y
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapRecordView::a
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapRecordView::b
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapRecordView::flags
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapRecordView::unit
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapView::a
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapView::b
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_read,UnitPassMapView::unit
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_write,MotionTickView::lastTick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,field_write,PassMap::lastTick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,function,
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,global_escape,g_passMaps
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,global_read,g_game
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,call,MapPublishCellsChanged
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,call,PassMap::Refresh
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,call,operator->
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,MotionTickView::lastTick
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,PassMap::footprintX
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,PassMap::height
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,PassMap::lastTick
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,PassMap::width
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,Point16::x
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,Point16::y
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,UnitPassMapView::a
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,UnitPassMapView::b
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,field_read,UnitPassMapView::unit
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,function,
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,global_escape,g_passMaps
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,call,operator=
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_read,PathLockSrcView::rect
 0x440ca0,CopyPathLockFields,src/units/movement_class.cpp,field_write,PathLockDstView::rect
@@ -24782,13 +24801,13 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::features
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::seaLevel
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::units
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::badSlope
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::badWaterSlope
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::lastTick
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::maxSlope
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterDepth
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterSlope
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MovementClass::minWaterDepth
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::badSlope
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::badWaterSlope
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::lastTick
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::maxSlope
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::maxWaterDepth
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::maxWaterSlope
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::minWaterDepth
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Unit::lastTick
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,global_read,g_game
@@ -29667,6 +29686,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::weapons
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,Seams::wind_meteors
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,UnitsSeam::AllocateUnitMemory
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,UnitsSeam::GetMovementLimits
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,UnitsSeam::InitUnitCategories
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,UnitsSeam::LoadDownloadMenus
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_read,UnitsSeam::LoadUnitTypes
@@ -29718,6 +29738,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,global_write,g_scorePanelSlidePos
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via PathClass (*)(int) __attribute__((stdcall)) [PathWorldView::MoveClass]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via int (*)(MapMoveLimits *, int) __attribute__((stdcall)) [UnitsSeam::GetMovementLimits]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const EconMapInfo *) __attribute__((stdcall)) [EconomySeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const LosRadarMapInfo *) __attribute__((stdcall)) [LosRadarSeam::RegionSize]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via unsigned int (*)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
@@ -29732,7 +29753,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FeaturesSeam::ResolveFeatureLinks]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::InitRadar]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::LoadTntMap]
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [MapSeam::BuildAllPassMaps]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::InitPlayers]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::AllocateUnitMemory]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::InitUnitCategories]
@@ -29744,6 +29764,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [WindMeteorsSeam::InitMeteors]
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const EconMapInfo *, const EconomyWorldView *, void *, unsigned int) __attribute__((stdcall)) [EconomySeam::Init]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const LosRadarMapInfo *, void *, unsigned int) __attribute__((stdcall)) [LosRadarSeam::Init]"
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const MapMoveLimits *, int) __attribute__((stdcall)) [MapSeam::BuildAllPassMaps]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,indirect_call,"indirect via void (*)(const PlayersMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PlayersSeam::Init]"
 0x491a70,Force640x480Surfaces,src/game/game_state.cpp,call,AllocSurface
@@ -29785,12 +29806,14 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,LosRadarSeam::FreeMapResources
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,LosRadarSeam::FreeRadar
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,LosRadarSeam::Shutdown
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,MapSeam::FreePassMaps
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,MissionSeam::GetGameType
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,PathfindingSeam::Shutdown
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,PlayersSeam::FreePlayers
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,PlayersSeam::Shutdown
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::economy
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::los_radar
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::map
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::mission
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::pathfinding
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,field_read,Seams::players
@@ -29818,6 +29841,7 @@ address,function,file,kind,target
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::FreeMapResources]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [LosRadarSeam::FreeRadar]
+0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [MapSeam::FreePassMaps]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::FreePlayers]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeDownloadMenus]
 0x491b60,ShutdownIngameSystems,src/game/game_state.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::FreeMovementClasses]
@@ -44013,6 +44037,10 @@ address,function,file,kind,target
 ,ClassBitOfActive,src/ai/pathfind_hpa.cpp,field_read,Hdr::slot
 ,ClassBitOfActive,src/ai/pathfind_hpa.cpp,field_read,Hdr::slotOf
 ,ClassBitOfActive,src/ai/pathfind_hpa.cpp,function,
+,ClassIndex,src/seams/pathfinding_world.cpp,call,ClassOf
+,ClassIndex,src/seams/pathfinding_world.cpp,field_escape,MovementClassTable::entries
+,ClassIndex,src/seams/pathfinding_world.cpp,function,
+,ClassIndex,src/seams/pathfinding_world.cpp,global_escape,MovementClassTable::g_movementClasses
 ,ClassOf,src/seams/pathfinding_world.cpp,call,get
 ,ClassOf,src/seams/pathfinding_world.cpp,field_write,Ref<MovementClass>::offset
 ,ClassOf,src/seams/pathfinding_world.cpp,function,
@@ -45978,19 +46006,19 @@ address,function,file,kind,target
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::seaLevel
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::units
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::width
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::badSlope
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::badWaterSlope
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::lastTick
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxSlope
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterDepth
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::maxWaterSlope
-,FootprintValue,src/map/terrain.cpp,field_read,MovementClass::minWaterDepth
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::badSlope
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::badWaterSlope
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::lastTick
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::maxSlope
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::maxWaterDepth
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::maxWaterSlope
+,FootprintValue,src/map/terrain.cpp,field_read,PassMap::minWaterDepth
 ,FootprintValue,src/map/terrain.cpp,field_read,Unit::lastTick
 ,FootprintValue,src/map/terrain.cpp,function,
 ,FootprintValue,src/map/terrain.cpp,global_read,g_game
 ,FootprintValueWithEdgeStrips,src/map/terrain.cpp,call,FootprintValue
-,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintX
-,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,MovementClass::footprintZ
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,PassMap::footprintX
+,FootprintValueWithEdgeStrips,src/map/terrain.cpp,field_read,PassMap::footprintZ
 ,FootprintValueWithEdgeStrips,src/map/terrain.cpp,function,
 ,ForgetEmbedded,src/harness/replay_objects.cpp,call,ForgetEmbedded
 ,ForgetEmbedded,src/harness/replay_objects.cpp,call,ReplayKnown::Get
@@ -46125,10 +46153,6 @@ address,function,file,kind,target
 ,FrameRing::Push,src/network/frame_ring.h,field_write,FrameRing::count
 ,FrameRing::Push,src/network/frame_ring.h,field_write,FrameRing::tail
 ,FrameRing::Push,src/network/frame_ring.h,function,
-,FreeA,src/units/movement_class.cpp,call,GameFreeThunk
-,FreeA,src/units/movement_class.cpp,deref_read,*void
-,FreeA,src/units/movement_class.cpp,deref_write,*void
-,FreeA,src/units/movement_class.cpp,function,
 ,FreeArchiveRecord,src/files/hpi.cpp,call,GameFreeThunk
 ,FreeArchiveRecord,src/files/hpi.cpp,call,host_file_close
 ,FreeArchiveRecord,src/files/hpi.cpp,field_read,OPENHAPIFILE::fp
@@ -46318,10 +46342,6 @@ address,function,file,kind,target
 ,FreeBlockPoolAllocator::Allocate,src/debug/debug_lib.cpp,function,
 ,FreeBlockRange::FreeBlockRange,src/debug/debug_lib.h,function,
 ,FreeBlockUpperBoundIter::FreeBlockUpperBoundIter,src/debug/debug_lib.cpp,function,
-,FreeC,src/units/movement_class.cpp,call,get
-,FreeC,src/units/movement_class.cpp,call,operator delete
-,FreeC,src/units/movement_class.cpp,deref_write,*void
-,FreeC,src/units/movement_class.cpp,function,
 ,FreeConditionsNative,src/seams/native.cpp,call,MissionConditions::FreeConditions
 ,FreeConditionsNative,src/seams/native.cpp,function,
 ,FreeFactoryIndex,src/units/factory_index.cpp,call,BlockVector::~BlockVector
@@ -46365,6 +46385,17 @@ address,function,file,kind,target
 ,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileCount
 ,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileList
 ,FreeOtaEnumCache,src/frontend/map_enum.cpp,global_write,g_otaEnumFileListBytes
+,FreePassMaps,src/map/pass_map.cpp,call,get
+,FreePassMaps,src/map/pass_map.cpp,call,operator delete
+,FreePassMaps,src/map/pass_map.cpp,call,operator=
+,FreePassMaps,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+,FreePassMaps,src/map/pass_map.cpp,field_read,PassMap::cells
+,FreePassMaps,src/map/pass_map.cpp,field_write,PassMap::cells
+,FreePassMaps,src/map/pass_map.cpp,field_write,PassMap::defined
+,FreePassMaps,src/map/pass_map.cpp,field_write,PassMap::height
+,FreePassMaps,src/map/pass_map.cpp,field_write,PassMap::width
+,FreePassMaps,src/map/pass_map.cpp,function,
+,FreePassMaps,src/map/pass_map.cpp,global_escape,g_passMaps
 ,FreePresented,src/host/win32/headless.cpp,call,free
 ,FreePresented,src/host/win32/headless.cpp,function,
 ,FreePresented,src/host/win32/headless.cpp,global_read,g_presented
@@ -46702,6 +46733,28 @@ address,function,file,kind,target
 ,GetMissionUnitNative,src/seams/native.cpp,call,Mission::GetUnit
 ,GetMissionUnitNative,src/seams/native.cpp,call,TheMission
 ,GetMissionUnitNative,src/seams/native.cpp,function,
+,GetMovementLimits,src/units/movement_class.cpp,deref_escape,*MapMoveLimits
+,GetMovementLimits,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::badSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::badWaterSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::footprintX
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::maxSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::maxWaterDepth
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::maxWaterSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::minWaterDepth
+,GetMovementLimits,src/units/movement_class.cpp,field_read,MovementClass::name
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::badSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::badWaterSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::footprintX
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::footprintZ
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::index
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::maxSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::maxWaterDepth
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::maxWaterSlope
+,GetMovementLimits,src/units/movement_class.cpp,field_write,MapMoveLimits::minWaterDepth
+,GetMovementLimits,src/units/movement_class.cpp,function,
+,GetMovementLimits,src/units/movement_class.cpp,global_escape,g_movementClasses
 ,GetNameSlotNative,src/seams/native.cpp,call,Mission::GetNameSlot
 ,GetNameSlotNative,src/seams/native.cpp,call,TheMission
 ,GetNameSlotNative,src/seams/native.cpp,function,
@@ -46759,7 +46812,9 @@ address,function,file,kind,target
 ,GetTerrainLengthNative,src/seams/native.cpp,call,TheMission
 ,GetTerrainLengthNative,src/seams/native.cpp,function,
 ,GetTerrainPassValue,src/map/terrain.cpp,call,FootprintValueWithEdgeStrips
+,GetTerrainPassValue,src/map/terrain.cpp,field_maybe_written,PassMapTable::entries
 ,GetTerrainPassValue,src/map/terrain.cpp,function,
+,GetTerrainPassValue,src/map/terrain.cpp,global_maybe_written,g_passMaps
 ,GetTerrainSizeTierNative,src/seams/native.cpp,call,Mission::GetTerrainSizeTier
 ,GetTerrainSizeTierNative,src/seams/native.cpp,call,TheMission
 ,GetTerrainSizeTierNative,src/seams/native.cpp,function,
@@ -48023,8 +48078,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetCellMeanHeight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::GetGroundHeight
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::IsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::MovementClassGet
-,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::MovementClassInBounds
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapGet
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::AirManeuverOrderSetAltitude
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::ApplyPathEvent
@@ -48206,6 +48261,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitMemory
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitTypes
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::GetFactoriesInRadius
+,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::GetMovementLimits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::InitUnitCategories
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::KillAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::KillUnit
@@ -48388,8 +48444,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetCellMeanHeight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapGetGroundHeight
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapIsPadSlotFree
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapMovementClassGet
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapMovementClassInBounds
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapGet
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementAirManeuverOrderSetAltitude
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementApplyPathEvent
@@ -48554,6 +48610,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitMemory
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitTypes
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsGetFactoriesInRadius
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsGetMovementLimits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsInitUnitCategories
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsKillAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsKillUnit
@@ -49323,14 +49380,15 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::CanPlaceFootprintAt
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::CanPlaceUnitFootprint
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::FreeBuckets
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::FreePassMaps
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetCellMeanHeight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetGroundHeight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::IsPadSlotFree
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadMetalPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadPlayerFeaturesPlotmap
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::MovementClassGet
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::MovementClassInBounds
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PassMapGet
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PassMapInBounds
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshMovedUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshUnitIfStale
@@ -49557,6 +49615,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::FreeUnitMemory
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::FreeUnitTypes
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::GetFactoriesInRadius
+,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::GetMovementLimits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::InitUnitCategories
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::KillAllUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::KillUnit
@@ -49718,6 +49777,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeMovementClasses
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeObjectState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeOtaEnumCacheAndMission
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreePassMaps
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreePlayers
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeRadar
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,FreeSquadManagerNative
@@ -49750,6 +49810,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionNameNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionParamsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMissionUnitNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetMovementLimits
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNameSlotNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNanoPiecePosition
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,GetNumPlayersNative
@@ -49860,8 +49921,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MissionExistsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MissionTypeFromNameNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,MotionGoalNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,MovementClassGetNative
-,InstallNativeSeams,src/seams/native.cpp,fn_ref,MovementClassInBoundsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetBroadcastPlayerEconomy
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetSendActivateFlags
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,NetSendAttach
@@ -49898,6 +49957,8 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderFxSerializeToSaveNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,OrderOrStatusFlagsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PassMapGetNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PassMapInBoundsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathOrderSetAltitudeNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathOrderSetApproachRadiusNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathOrderSetHeadingNative
@@ -51445,8 +51506,9 @@ address,function,file,kind,target
 ,MovableVec3::Scale,src/ai/ai_player.cpp,field_write,MovableVec3::y
 ,MovableVec3::Scale,src/ai/ai_player.cpp,field_write,MovableVec3::z
 ,MovableVec3::Scale,src/ai/ai_player.cpp,function,
+,MoveClasses,src/harness/harness.cpp,field_escape,MovementClassTable::entries
 ,MoveClasses,src/harness/harness.cpp,function,
-,MoveClasses,src/harness/harness.cpp,global_escape,g_movementClassEntries
+,MoveClasses,src/harness/harness.cpp,global_escape,MovementClassTable::g_movementClasses
 ,MoveOrderToTail,src/orders/order_list.cpp,call,operator Order *
 ,MoveOrderToTail,src/orders/order_list.cpp,call,operator=
 ,MoveOrderToTail,src/orders/order_list.cpp,deref_read,*Ref<Order>
@@ -51467,18 +51529,6 @@ address,function,file,kind,target
 ,MoveTowards,src/ai/ai_player.cpp,field_write,Vec3::y
 ,MoveTowards,src/ai/ai_player.cpp,field_write,Vec3::z
 ,MoveTowards,src/ai/ai_player.cpp,function,
-,MovementClass::Get,src/units/movement_class.h,call,operator unsigned int *
-,MovementClass::Get,src/units/movement_class.h,deref_read,*unsigned int
-,MovementClass::Get,src/units/movement_class.h,field_read,MovementClass::cells
-,MovementClass::Get,src/units/movement_class.h,field_read,MovementClass::width
-,MovementClass::Get,src/units/movement_class.h,function,
-,MovementClass::InBounds,src/units/movement_class.h,field_read,MovementClass::height
-,MovementClass::InBounds,src/units/movement_class.h,field_read,MovementClass::width
-,MovementClass::InBounds,src/units/movement_class.h,function,
-,MovementClassGetNative,src/seams/native.cpp,call,MovementClass::Get
-,MovementClassGetNative,src/seams/native.cpp,function,
-,MovementClassInBoundsNative,src/seams/native.cpp,call,MovementClass::InBounds
-,MovementClassInBoundsNative,src/seams/native.cpp,function,
 ,MulFixed,src/movement/motion.cpp,function,
 ,NameLess::operator(),src/util/tdf.cpp,call,_strcmpi
 ,NameLess::operator(),src/util/tdf.cpp,function,
@@ -52446,6 +52496,26 @@ address,function,file,kind,target
 ,ParseTestDump,src/harness/harness.cpp,global_write,s_dumpEnabled@src/harness/harness.cpp
 ,ParseTestDump,src/harness/harness.cpp,global_write,s_dumpTick@src/harness/harness.cpp
 ,Pass,src/network/unit_sync.cpp,function,
+,PassMap::Get,src/map/pass_map.h,call,operator unsigned int *
+,PassMap::Get,src/map/pass_map.h,deref_read,*unsigned int
+,PassMap::Get,src/map/pass_map.h,field_read,PassMap::cells
+,PassMap::Get,src/map/pass_map.h,field_read,PassMap::width
+,PassMap::Get,src/map/pass_map.h,function,
+,PassMap::InBounds,src/map/pass_map.h,field_read,PassMap::height
+,PassMap::InBounds,src/map/pass_map.h,field_read,PassMap::width
+,PassMap::InBounds,src/map/pass_map.h,function,
+,PassMap::~PassMap,src/map/pass_map.cpp,call,operator delete
+,PassMap::~PassMap,src/map/pass_map.cpp,call,operator unsigned int *
+,PassMap::~PassMap,src/map/pass_map.cpp,field_read,PassMap::cells
+,PassMap::~PassMap,src/map/pass_map.cpp,function,
+,PassMapGetNative,src/seams/native.cpp,call,PassMap::Get
+,PassMapGetNative,src/seams/native.cpp,field_read,PassMapTable::entries
+,PassMapGetNative,src/seams/native.cpp,function,
+,PassMapGetNative,src/seams/native.cpp,global_read,g_passMaps
+,PassMapInBoundsNative,src/seams/native.cpp,call,PassMap::InBounds
+,PassMapInBoundsNative,src/seams/native.cpp,field_read,PassMapTable::entries
+,PassMapInBoundsNative,src/seams/native.cpp,function,
+,PassMapInBoundsNative,src/seams/native.cpp,global_read,g_passMaps
 ,PathAnimTrail::Run,src/ingame/markers.cpp,call,DrawFrame
 ,PathAnimTrail::Run,src/ingame/markers.cpp,call,ScaledPosOffset
 ,PathAnimTrail::Run,src/ingame/markers.cpp,deref_read,*void
@@ -55172,12 +55242,15 @@ address,function,file,kind,target
 ,RecMapApply,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapApply,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const MapEventHeader *, unsigned int) __attribute__((stdcall)) [MapSeam::Apply]"
+,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,ArgStructs
+,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,field_read,MapSeam::BuildAllPassMaps
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,function,
+,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [MapSeam::BuildAllPassMaps]
+,RecMapBuildAllPassMaps,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const MapMoveLimits *, int) __attribute__((stdcall)) [MapSeam::BuildAllPassMaps]"
 ,RecMapCanBuildAt,src/harness/replay_hooks.inc,call,Add
 ,RecMapCanBuildAt,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapCanBuildAt,src/harness/replay_hooks.inc,call,ArgValue
@@ -55252,28 +55325,24 @@ address,function,file,kind,target
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int) __attribute__((stdcall)) [MapSeam::IsPadSlotFree]"
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,call,Add
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,field_read,MapSeam::MovementClassGet
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,function,
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapMovementClassGet,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(MovementClass *, int, int) __attribute__((stdcall)) [MapSeam::MovementClassGet]"
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,call,Add
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,call,ArgObject
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,field_read,MapSeam::MovementClassInBounds
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,function,
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,global_read,s_call
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,global_read,s_inner_map
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,global_read,s_tail
-,RecMapMovementClassInBounds,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(MovementClass *, unsigned int, unsigned int) __attribute__((stdcall)) [MapSeam::MovementClassInBounds]"
+,RecMapPassMapGet,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapPassMapGet,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapPassMapGet,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapPassMapGet,src/harness/replay_hooks.inc,field_read,MapSeam::PassMapGet
+,RecMapPassMapGet,src/harness/replay_hooks.inc,function,
+,RecMapPassMapGet,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapPassMapGet,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapPassMapGet,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMapPassMapGet,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, int, int) __attribute__((stdcall)) [MapSeam::PassMapGet]"
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,field_read,MapSeam::PassMapInBounds
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,function,
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMapPassMapInBounds,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, unsigned int, unsigned int) __attribute__((stdcall)) [MapSeam::PassMapInBounds]"
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,Add
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
@@ -56880,6 +56949,16 @@ address,function,file,kind,target
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, const Vec3 *, int, std::vector<Unit *, std::allocator<Unit *>> *) __attribute__((stdcall)) [UnitsSeam::GetFactoriesInRadius]"
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetMovementLimits
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,function,
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_call
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_inner_units
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_tail
+,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(MapMoveLimits *, int) __attribute__((stdcall)) [UnitsSeam::GetMovementLimits]"
 ,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,field_read,UnitsSeam::InitUnitCategories
@@ -57423,21 +57502,23 @@ address,function,file,kind,target
 ,Recording::Recording,src/harness/replay.cpp,function,
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
-,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,call,RefreshAndReportAllPassMaps
-,RefreshAllPassMapsForUnits,src/units/movement_class.cpp,function,
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,call,MapPublishCellsChanged
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,call,MovementClass::RefreshPassMap
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_escape,MovementClassTable::entries
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::footprintX
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::footprintZ
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::height
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::name
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,MovementClass::width
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::x
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,field_read,Point16::y
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,function,
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_escape,g_movementClasses
-,RefreshAndReportAllPassMaps,src/units/movement_class.cpp,global_read,g_movementClasses
+,RefreshAllPassMapsForUnits,src/map/pass_map.cpp,call,RefreshAndReportAllPassMaps
+,RefreshAllPassMapsForUnits,src/map/pass_map.cpp,function,
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,call,MapPublishCellsChanged
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,call,PassMap::Refresh
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_escape,PassMapTable::entries
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_maybe_written,PassMapTable::entries
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::defined
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::footprintX
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::footprintZ
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::height
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,PassMap::width
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,Point16::x
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,field_read,Point16::y
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,function,
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,global_escape,g_passMaps
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,global_maybe_written,g_passMaps
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,global_read,g_passMaps
 ,RefreshFactoryIndex,src/units/factory_index.cpp,call,BlockVector::Clear
 ,RefreshFactoryIndex,src/units/factory_index.cpp,call,BlockVector::PushBack
 ,RefreshFactoryIndex,src/units/factory_index.cpp,call,Unit::PlayerIndex
@@ -57465,8 +57546,10 @@ address,function,file,kind,target
 ,RefreshMapListNative,src/seams/native.cpp,call,Mission::RefreshMapList
 ,RefreshMapListNative,src/seams/native.cpp,call,TheMission
 ,RefreshMapListNative,src/seams/native.cpp,function,
-,RefreshMovedUnitsNative,src/seams/native.cpp,call,MovementClass::RefreshMovedUnits
+,RefreshMovedUnitsNative,src/seams/native.cpp,call,PassMap::RefreshMovedUnits
+,RefreshMovedUnitsNative,src/seams/native.cpp,field_maybe_written,PassMapTable::entries
 ,RefreshMovedUnitsNative,src/seams/native.cpp,function,
+,RefreshMovedUnitsNative,src/seams/native.cpp,global_maybe_written,g_passMaps
 ,RefreshPassMaps,src/map/features.cpp,call,FeaturesHeaderOf
 ,RefreshPassMaps,src/map/features.cpp,call,PublishEffect
 ,RefreshPassMaps,src/map/features.cpp,call,operator=
@@ -57479,8 +57562,10 @@ address,function,file,kind,target
 ,RefreshPassMaps,src/map/features.cpp,field_write,FeaturesPassMaps::x
 ,RefreshPassMaps,src/map/features.cpp,field_write,FeaturesPassMaps::z
 ,RefreshPassMaps,src/map/features.cpp,function,
-,RefreshUnitIfStaleNative,src/seams/native.cpp,call,MovementClass::RefreshUnitIfStale
+,RefreshUnitIfStaleNative,src/seams/native.cpp,call,PassMap::RefreshUnitIfStale
+,RefreshUnitIfStaleNative,src/seams/native.cpp,field_maybe_written,PassMapTable::entries
 ,RefreshUnitIfStaleNative,src/seams/native.cpp,function,
+,RefreshUnitIfStaleNative,src/seams/native.cpp,global_maybe_written,g_passMaps
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,BlockVector::Clear
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,BlockVector::PushBack
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,IsUnitVisibleToPlayer
@@ -62567,7 +62652,14 @@ address,function,file,kind,target
 ,VisitMoveClasses,src/harness/harness.cpp,call,HashByte
 ,VisitMoveClasses,src/harness/harness.cpp,call,MoveClasses
 ,VisitMoveClasses,src/harness/harness.cpp,call,VisitElement
+,VisitMoveClasses,src/harness/harness.cpp,call,memcpy
+,VisitMoveClasses,src/harness/harness.cpp,field_escape,PassMapTable::entries
+,VisitMoveClasses,src/harness/harness.cpp,field_read,PassMap::height
+,VisitMoveClasses,src/harness/harness.cpp,field_read,PassMap::lastTick
+,VisitMoveClasses,src/harness/harness.cpp,field_read,PassMap::width
+,VisitMoveClasses,src/harness/harness.cpp,field_read,Ref<unsigned int>::offset
 ,VisitMoveClasses,src/harness/harness.cpp,function,
+,VisitMoveClasses,src/harness/harness.cpp,global_escape,g_passMaps
 ,VisitMoveClasses,src/harness/harness.cpp,global_read,kMoveClassTable@src/harness/trace_schema.h
 ,VisitOrders,src/harness/harness.cpp,call,EndSection
 ,VisitOrders,src/harness/harness.cpp,call,HashByte
@@ -62586,11 +62678,15 @@ address,function,file,kind,target
 ,VisitPassMaps,src/harness/harness.cpp,call,FormatPath
 ,VisitPassMaps,src/harness/harness.cpp,call,HashByte
 ,VisitPassMaps,src/harness/harness.cpp,call,HashU32
-,VisitPassMaps,src/harness/harness.cpp,call,MoveClasses
-,VisitPassMaps,src/harness/harness.cpp,call,ReadRefAt
 ,VisitPassMaps,src/harness/harness.cpp,call,VisitBlob
+,VisitPassMaps,src/harness/harness.cpp,call,get
 ,VisitPassMaps,src/harness/harness.cpp,deref_read,*unsigned int
+,VisitPassMaps,src/harness/harness.cpp,field_escape,PassMapTable::entries
+,VisitPassMaps,src/harness/harness.cpp,field_read,PassMap::cells
+,VisitPassMaps,src/harness/harness.cpp,field_read,PassMap::height
+,VisitPassMaps,src/harness/harness.cpp,field_read,PassMap::width
 ,VisitPassMaps,src/harness/harness.cpp,function,
+,VisitPassMaps,src/harness/harness.cpp,global_escape,g_passMaps
 ,VisitPassMaps,src/harness/harness.cpp,global_escape,s_passRow@src/harness/harness.cpp
 ,VisitPassMaps,src/harness/harness.cpp,global_write,s_passRow@src/harness/harness.cpp
 ,VisitPathResults,src/harness/harness.cpp,call,DumpPrefix
@@ -63324,16 +63420,17 @@ address,function,file,kind,target
 ,WorldAllied,src/seams/economy_world.cpp,field_read,Player::allied
 ,WorldAllied,src/seams/economy_world.cpp,function,
 ,WorldAllied,src/seams/economy_world.cpp,global_read,g_game
+,WorldBeginSearch,src/seams/pathfinding_world.cpp,call,ClassIndex
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,call,SchedDeliver
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,call,UnitOf
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,call,get
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,field_read,MapSeam::RefreshMovedUnits
+,WorldBeginSearch,src/seams/pathfinding_world.cpp,field_read,Ref<MovementClass>::offset
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,field_read,Seams::map
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,field_read,Unit::motion
-,WorldBeginSearch,src/seams/pathfinding_world.cpp,field_read,UnitMotionPlannerView::owner
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,function,
 ,WorldBeginSearch,src/seams/pathfinding_world.cpp,global_read,g_seams
-,WorldBeginSearch,src/seams/pathfinding_world.cpp,indirect_call,"indirect via void (*)(MovementClass *, Unit *) __attribute__((stdcall)) [MapSeam::RefreshMovedUnits]"
+,WorldBeginSearch,src/seams/pathfinding_world.cpp,indirect_call,"indirect via void (*)(int, Unit *) __attribute__((stdcall)) [MapSeam::RefreshMovedUnits]"
 ,WorldCellMetal,src/seams/economy_world.cpp,field_read,Cell::metal
 ,WorldCellMetal,src/seams/economy_world.cpp,field_read,LosRadarSeam::GetMapCell
 ,WorldCellMetal,src/seams/economy_world.cpp,field_read,Seams::los_radar
@@ -63346,28 +63443,29 @@ address,function,file,kind,target
 ,WorldEmit,src/seams/economy_world.cpp,call,HarnessEconomyEvent
 ,WorldEmit,src/seams/economy_world.cpp,call,SchedPublish
 ,WorldEmit,src/seams/economy_world.cpp,function,
+,WorldEndSearch,src/seams/pathfinding_world.cpp,call,ClassIndex
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,call,SchedDeliver
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,call,UnitOf
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,call,get
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,field_read,MapSeam::RefreshUnitIfStale
+,WorldEndSearch,src/seams/pathfinding_world.cpp,field_read,Ref<MovementClass>::offset
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,field_read,Seams::map
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,field_read,Unit::motion
-,WorldEndSearch,src/seams/pathfinding_world.cpp,field_read,UnitMotionPlannerView::owner
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,function,
 ,WorldEndSearch,src/seams/pathfinding_world.cpp,global_read,g_seams
-,WorldEndSearch,src/seams/pathfinding_world.cpp,indirect_call,"indirect via void (*)(MovementClass *, Unit *) __attribute__((stdcall)) [MapSeam::RefreshUnitIfStale]"
+,WorldEndSearch,src/seams/pathfinding_world.cpp,indirect_call,"indirect via void (*)(int, Unit *) __attribute__((stdcall)) [MapSeam::RefreshUnitIfStale]"
 ,WorldFirstUnit,src/seams/economy_world.cpp,field_read,Ref<Unit>::offset
 ,WorldFirstUnit,src/seams/economy_world.cpp,function,
 ,WorldFirstUnit,src/seams/economy_world.cpp,global_read,g_game
 ,WorldFirstUnit,src/seams/pathfinding_world.cpp,field_read,Ref<Unit>::offset
 ,WorldFirstUnit,src/seams/pathfinding_world.cpp,function,
 ,WorldFirstUnit,src/seams/pathfinding_world.cpp,global_read,g_game
-,WorldInBounds,src/seams/pathfinding_world.cpp,call,ClassOf
-,WorldInBounds,src/seams/pathfinding_world.cpp,field_read,MapSeam::MovementClassInBounds
+,WorldInBounds,src/seams/pathfinding_world.cpp,call,ClassIndex
+,WorldInBounds,src/seams/pathfinding_world.cpp,field_read,MapSeam::PassMapInBounds
 ,WorldInBounds,src/seams/pathfinding_world.cpp,field_read,Seams::map
 ,WorldInBounds,src/seams/pathfinding_world.cpp,function,
 ,WorldInBounds,src/seams/pathfinding_world.cpp,global_read,g_seams
-,WorldInBounds,src/seams/pathfinding_world.cpp,indirect_call,"indirect via int (*)(MovementClass *, unsigned int, unsigned int) __attribute__((stdcall)) [MapSeam::MovementClassInBounds]"
+,WorldInBounds,src/seams/pathfinding_world.cpp,indirect_call,"indirect via int (*)(int, unsigned int, unsigned int) __attribute__((stdcall)) [MapSeam::PassMapInBounds]"
 ,WorldIsPlaying,src/seams/pathfinding_world.cpp,field_escape,Game::players
 ,WorldIsPlaying,src/seams/pathfinding_world.cpp,field_read,Player::active
 ,WorldIsPlaying,src/seams/pathfinding_world.cpp,field_read,Player::index
@@ -63394,12 +63492,12 @@ address,function,file,kind,target
 ,WorldNextUnit,src/seams/pathfinding_world.cpp,call,UnitOf
 ,WorldNextUnit,src/seams/pathfinding_world.cpp,field_read,Ref<Unit>::offset
 ,WorldNextUnit,src/seams/pathfinding_world.cpp,function,
-,WorldPass,src/seams/pathfinding_world.cpp,call,ClassOf
-,WorldPass,src/seams/pathfinding_world.cpp,field_read,MapSeam::MovementClassGet
+,WorldPass,src/seams/pathfinding_world.cpp,call,ClassIndex
+,WorldPass,src/seams/pathfinding_world.cpp,field_read,MapSeam::PassMapGet
 ,WorldPass,src/seams/pathfinding_world.cpp,field_read,Seams::map
 ,WorldPass,src/seams/pathfinding_world.cpp,function,
 ,WorldPass,src/seams/pathfinding_world.cpp,global_read,g_seams
-,WorldPass,src/seams/pathfinding_world.cpp,indirect_call,"indirect via int (*)(MovementClass *, int, int) __attribute__((stdcall)) [MapSeam::MovementClassGet]"
+,WorldPass,src/seams/pathfinding_world.cpp,indirect_call,"indirect via int (*)(int, int, int) __attribute__((stdcall)) [MapSeam::PassMapGet]"
 ,WorldPlayerCount,src/seams/pathfinding_world.cpp,field_read,Game::numPlayers
 ,WorldPlayerCount,src/seams/pathfinding_world.cpp,function,
 ,WorldPlayerCount,src/seams/pathfinding_world.cpp,global_read,g_game
@@ -63456,7 +63554,7 @@ address,function,file,kind,target
 ,WorldSharingEnabled,src/seams/economy_world.cpp,field_read,Game::netGameFlags
 ,WorldSharingEnabled,src/seams/economy_world.cpp,function,
 ,WorldSharingEnabled,src/seams/economy_world.cpp,global_read,g_game
-,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,ClassOf
+,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,ClassIndex
 ,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,GetTerrainPassValue
 ,WorldTerrainPass,src/seams/pathfinding_world.cpp,call,WorldInBounds
 ,WorldTerrainPass,src/seams/pathfinding_world.cpp,function,
@@ -64825,9 +64923,9 @@ address,function,file,kind,target
 ,operator==,src/weapons/weapon_types.cpp,function,
 ,set_mem,src/graphics/surface.cpp,call,memset
 ,set_mem,src/graphics/surface.cpp,function,
-,setcell,src/units/movement_class.cpp,deref_read,*unsigned int
-,setcell,src/units/movement_class.cpp,deref_write,*unsigned int
-,setcell,src/units/movement_class.cpp,function,
+,setcell,src/map/pass_map.cpp,deref_read,*unsigned int
+,setcell,src/map/pass_map.cpp,deref_write,*unsigned int
+,setcell,src/map/pass_map.cpp,function,
 ,shade_bias,src/graphics/model_render.cpp,call,operator->
 ,shade_bias,src/graphics/model_render.cpp,field_read,UnitDef::flags1
 ,shade_bias,src/graphics/model_render.cpp,field_read,UnitDrawView::def

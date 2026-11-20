@@ -46,9 +46,11 @@ TYPE_OVERRIDES = {
     "g_missionOrderTableBegin": "char*",
     "g_playerAI": "PlayerAI*[10]",
     "g_quirks": "Quirks",
+    "g_passMaps": "PassMapTable",
 }
 REF_FIELDS = {"g_explodedPieces", "g_meteorWeapon", "g_playerAI"}
 STATIC_FILES = {"g_movementClasses": "src/units/movement_class.cpp"}
+SIZE_OVERRIDES = {"g_movementClasses": 512}
 ELEMENT_SIZES = {"char": 1, "unsigned char": 1, "signed char": 1, "short": 2, "unsigned short": 2, "int": 4,
                  "unsigned int": 4, "float": 4}
 
@@ -65,6 +67,7 @@ HEADER_INCLUDES = [
     '"../network/packet_manager.h"',
     '"../quirks/quirks.h"',
     '"../units/movement_class.h"',
+    '"../map/pass_map.h"',
     '"../util/vec3.h"',
 ]
 FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct PlayerAI;", "struct WeaponDef;"]
@@ -143,7 +146,7 @@ def load_rows() -> list[Row]:
         if m:
             row.container = m.group(1).split("::")[-1]
             row.offset = int(m.group(2), 16)
-        row.size = int(row.csv["size"])
+        row.size = SIZE_OVERRIDES.get(row.leaf, int(row.csv["size"]))
         row.type = row.csv["type"]
         row.init = row.csv["init"]
     return [r for r in rows if not in_vector(r, rows)]

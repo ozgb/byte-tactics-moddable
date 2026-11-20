@@ -94,9 +94,9 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 LoadUnitFbi (src/units/unit_types.cpp).
                 Los_radar's set-up slots, LoadTntMap, InitRadar, FreeRadar, FreeMapResources, CreateUnitIndex and FreeUnitIndex, run outside the tick too;
                 their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and FreePlayers and InitPlayerSlot (src/game/players.cpp).
-                Map's set-up slots, BuildAllPassMaps, LoadMappingData, LoadMetalPlotmap, LoadPlayerFeaturesPlotmap, SaveMappingData,
+                Map's set-up slots, BuildAllPassMaps, FreePassMaps, LoadMappingData, LoadMetalPlotmap, LoadPlayerFeaturesPlotmap, SaveMappingData,
                 SaveMetalPlotmap, SavePlayerFeaturesPlotmap, AllocateBuckets and FreeBuckets, run outside the tick, from the loader and the saved game
-                (the mission's slots left map for the mission interface, #983); their callers are LoadBattleAssets (src/game/game_state.cpp),
+                (the mission's slots left map for the mission interface, #983); their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp),
                 LoadSavedGameState and SaveGameFile (src/game/settings_campaign.cpp) and BuildDerivedLayers and FreeMapResources (src/map/line_of_sight.cpp).
                 Players' set-up slots, LoadDefaultAIScript, InitPlayers, FreePlayers, InitPlayerResources, LoadPlayerControllers, LoadPlayers, SavePlayers, RebuildAIFeatureCells,
                 SetupPlayerSlot and the conditions slots (DeactivateConditions, LoadConditions, SaveConditions, RegisterConditions, FreeConditions, DeleteConditions,
@@ -115,7 +115,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 FirstFeatureSpot, FindFeatureAtPos; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
                 GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
-                SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, MovementClassGet, MovementClassInBounds; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
+                SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
@@ -134,7 +134,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   operator unsigned short *, the conversions of a Ref to the pointer it holds, and get and operator->, which read it, operator!=
                   (which compares two Refs) and strlen, and for the pilot's own rowless_calls (los_radar's: operator[],
                   BlockVector::Begin, BlockVector::End, empty, size and push_back, the vectors its queries read and fill; map's: operator unsigned int *,
-                  the conversion of a movement class's pass-map Ref that MovementClassGet reads);
+                  the conversion of a pass map's Ref that PassMapGet reads);
                   or has inline assembly.
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
@@ -313,14 +313,15 @@ MAP = Pilot(
     owner="map", header="interfaces/map.h", seam="MapSeam",
     writing=("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius", "RefreshMovedUnits", "RefreshUnitIfStale"),
     query=("UnitsInRange", "GetCellMeanHeight", "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "GetGroundHeight",
-           "MovementClassGet", "MovementClassInBounds", "WriteState"),
+           "PassMapGet", "PassMapInBounds", "WriteState"),
     engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, PATHFINDING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
-    setup=("BuildAllPassMaps", "LoadMappingData", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap", "SaveMappingData",
+    setup=("BuildAllPassMaps", "FreePassMaps", "LoadMappingData", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap", "SaveMappingData",
            "SaveMetalPlotmap", "SavePlayerFeaturesPlotmap", "AllocateBuckets", "FreeBuckets"),
     allowed_indirect=("LosRadarSeam::GetMapCell", "FeaturesSeam::GetCellFeature"),
     filler_locals=(("SnapWorldPosToFootprint", "Point16"),),
     rowless_calls=("operator unsigned int *",),
-    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
+                   ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
                    ("SaveGameFile", "src/game/settings_campaign.cpp"), ("BuildDerivedLayers", "src/map/line_of_sight.cpp"),
                    ("FreeMapResources", "src/map/line_of_sight.cpp")))
 PLAYERS = Pilot(

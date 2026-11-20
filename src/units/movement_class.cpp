@@ -5,89 +5,18 @@
 
 #include "../util/tdf.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/map.h"
 
 #include "../graphics/object_pool.h"
-
-void __cdecl operator delete(void* p);
-
-struct MovementClass;
-#include "../map/terrain.h"
 
 struct TdfParserView {
     char unknown_0[4];
     TdfRecord* tdf;
 };
 
-#include "../util/vec3.h"
-
-#pragma pack(push, 2)
-struct MotionTickView {
-    char unknown_0[0x26];
-    unsigned int lastTick;
-};
-
-struct UnitPassMapView {
-    Ref<MotionTickView> unit;
-    char unknown_4[0x76 - 0x4];
-    Point16 a;
-    char unknown_7a[0x7e - 0x7a];
-    Point16 b;
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-struct UnitPassMapRecordView {
-    Ref<MotionTickView> unit;
-    char unknown_4[0x76 - 0x4];
-    Point16 a;
-    char unknown_7a[0x7e - 0x7a];
-    Point16 b;
-    char unknown_82[0x110 - 0x82];
-    unsigned int flags;
-    char unknown_114[0x118 - 0x114];
-};
-
-#include "../map/cell.h"
-#pragma pack(pop)
-
 #include "movement_class.h"
 
-class MovementClassBuildView {
-public:
-    int* name;
-    short footprintX;
-    short footprintZ;
-    short maxWaterDepth;
-    short minWaterDepth;
-    unsigned char maxSlope;
-    unsigned char badSlope;
-    unsigned char maxWaterSlope;
-    unsigned char badWaterSlope;
-    unsigned int width;
-    unsigned int height;
-    Ref<unsigned int> cells;
-    int lastTick;
-
-    void BuildPassMap();
-};
-
-#pragma pack(push, 2)
-struct UnitPassMapStampView {
-    Ref<MotionTickView> unit;
-    char unknown_4[0x76 - 0x4];
-    Point16 a;
-    char unknown_7a[0x7e - 0x7a];
-    Point16 b;
-};
-#pragma pack(pop)
-
-#include "../network/player.h"
-#include "../../interfaces/seams.h"
-#include "../../interfaces/pathfinding.h"
-#include "../game/map_events.h"
 #include "../../interfaces/services.h"
-
-#include "../mission/mission.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -127,17 +56,12 @@ MovementClass::MovementClass()
     maxWaterSlope = 0xff;
     badSlope = 0xff;
     badWaterSlope = 0xff;
-    width = 0;
-    height = 0;
-    cells = 0;
-    lastTick = 0;
 }
 
 // FUNCTION: 0x440320
 MovementClass::~MovementClass()
 {
     GameFreeThunk(name);
-    operator delete(cells);
 }
 
 // FUNCTION: 0x440340
@@ -171,303 +95,39 @@ MovementClass* __stdcall FindMovementClass(char* name)
     return 0;
 }
 
-// FUNCTION: 0x440470
-void MovementClass::ResizePassMap(unsigned int w, unsigned int h)
-{
-    width = w;
-    height = h;
-    unsigned int n = ((h + 15) >> 4) * w;
-    delete cells;
-    if (n != 0) {
-        cells = new (kSim) unsigned int[n];
-    } else {
-        cells = 0;
-    }
-}
-
-// FUNCTION: 0x4404c0
-void MovementClass::SetPassMapCell(int x, int y, int value)
-{
-    int shift = (y & 0xf) << 1;
-    int row = (y >> 4) * width + x;
-    unsigned int* p = cells + row;
-    *p = (value << shift) | (~(3 << shift) & *p);
-}
-
-static inline void setcell(unsigned int* q, int sh, unsigned int val)
-{
-    *q = (*q & ~(3 << sh)) | (val << sh);
-}
-
-// FUNCTION: 0x440500
-void MovementClassBuildView::BuildPassMap()
-{
-    unsigned char b;
-    unsigned char* p;
-    unsigned char* buf;
-    int n;
-    unsigned char* v;
-    unsigned int size;
-    if (width + footprintX > footprintZ + height)
-        size = width + footprintX;
-    else
-        size = footprintZ + height;
-
-    buf = (unsigned char*)SimAlloc(size + 3);
-    v = buf + 2;
-
-    {
-    for (int j = 0; j < height; j++) {
-        Cell* c = &g_game->cells[j * width];
-        for (n = 0; n < width; n++, c++)
-            v[n] = (unsigned char)GetPassMapCellValue((MovementClass *)this, c);
-        v[-2] = 0;
-        v[-1] = 0;
-        for (n = 0; n <= footprintX; n++)
-            (v + n)[width] = 0;
-        b = 0;
-        p = v;
-        n = 0;
-        for (; n < width; n++, p++) {
-            int e = n + footprintX - 1;
-            if (v[e] <= b) {
-                b = v[e];
-            } else if (p[-1] <= b) {
-                b = p[0];
-                int k;
-                for (k = n + 1; k <= e; k++)
-                    if (b >= v[k]) b = v[k];
-            }
-            if (b == 3 && (p[-1] < 3 || v[e + 1] < 3))
-                setcell(&cells[(j >> 4) * width + n], (j & 0xf) * 2, 1);
-            else
-                setcell(&cells[(j >> 4) * width + n], (j & 0xf) * 2, b);
-        }
-    }
-    }
-
-    {
-    for (int j = 0; j < width; j++) {
-        for (n = 0; n < height; n++)
-            v[n] = (unsigned char)((cells[(n >> 4) * width + j]
-                                    >> ((n & 0xf) * 2)) & 3);
-        v[-2] = 0;
-        v[-1] = 0;
-        for (n = 0; n <= footprintZ; n++)
-            (v + n)[height] = 0;
-        b = 0;
-        n = 0;
-        for (; n < height; n++) {
-            int e = n + footprintZ - 1;
-            if (v[e] <= b) {
-                b = v[e];
-            } else if (v[n - 1] <= b) {
-                b = v[n];
-                int k;
-                for (k = n + 1; k <= e; k++)
-                    if (b >= v[k]) b = v[k];
-            }
-            if (b == 3 && (v[n - 1] < 3 || v[e + 1] < 3))
-                setcell(&cells[(n >> 4) * width + j], (n & 0xf) * 2, 1);
-            else
-                setcell(&cells[(n >> 4) * width + j], (n & 0xf) * 2, b);
-        }
-    }
-    }
-
-    operator delete(buf);
-}
-
-// FUNCTION: 0x440830
-void MovementClass::RefreshPassMap(Point16 a, Point16 b)
-{
-    int left = a.x - footprintX;
-    int top = a.y - footprintZ;
-    int right = a.x + b.x + 1;
-    int bottom = a.y + b.y + 1;
-    if (left < 0) {
-        left = 0;
-    }
-    if (top < 0) {
-        top = 0;
-    }
-    if (right > width) {
-        right = width;
-    }
-    if (bottom > height) {
-        bottom = height;
-    }
-    if (left < right && top < bottom) {
-        for (int y = top; y < bottom; y++) {
-            for (int x = left; x < right; x++) {
-                unsigned int v = GetPassMapFootprintValueWithEdgeStrips(this, x, y);
-                unsigned int m = 3 << ((y & 0xf) * 2);
-                unsigned int* p = &cells[(y >> 4) * width + x];
-                *p = (*p & ~m) | (v << ((y & 0xf) * 2));
-            }
-        }
-    }
-}
-
 // FUNCTION: 0x440930
 void NopAfterFeatureEnum(void)
 {
 }
 
-// FUNCTION: 0x440940
-void BuildAllPassMaps(void)
-{
-    int count = 0;
-    unsigned int n;
-    int p = (int)&g_movementClasses;
-    do {
-        if (*(int*)p != 0) {
-            count++;
-        }
-        p += 0x20;
-    } while (p < (int)&g_movementClasses + (int)sizeof(MovementClassTable));
-
-    int progress = 100;
-    unsigned int* q = (unsigned int*)g_movementClassEntries;
-    do {
-        if (q[-6] != 0) {
-            unsigned int h = (unsigned int)g_game->height;
-            unsigned int w = (unsigned int)g_game->width;
-            q[-2] = w;
-            q[-1] = h;
-            n = ((unsigned)(q[-1] + 0xf) >> 4) * q[-2];
-            Ref<unsigned int>* slot = (Ref<unsigned int>*)q;
-            operator delete((void*)slot->get());
-            if (n != 0) {
-                *slot = (unsigned int*)SimAlloc(n * 4);
-            } else {
-                *slot = (unsigned int*)0;
-            }
-            ((MovementClassBuildView*)(q - 6))->BuildPassMap();
-            progress += 100;
-            g_game->progress_38d73 = progress / count;
-        }
-        q += 8;
-    } while ((int)q < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
-
-    g_game->progress_38d73 = 100;
-}
-
-static inline void FreeA(int p)
-{
-    GameFreeThunk(*(void**)(p - 0x18));
-    *(void**)(p - 0x18) = 0;
-}
-
-static inline void FreeC(int p)
-{
-    void* c = ((Ref<unsigned int>*)p)->get();
-    *(void**)(p - 8) = 0;
-    *(void**)(p - 4) = 0;
-    operator delete(c);
-    *(void**)p = 0;
-}
-
 // FUNCTION: 0x440a00
 void FreeMovementClasses(void)
 {
-    int p = (int)g_movementClassEntries;
-    do {
-        FreeA(p);
-        FreeC(p);
-        p += 0x20;
-    } while (p < (int)g_movementClassEntries + (int)sizeof(MovementClassTable));
-}
-
-#define PASS_MAP_CHANGE_ARGS(moveClass, a, b) \
-    (a).x - (moveClass)->footprintX < 0 ? 0 : (a).x - (moveClass)->footprintX, \
-    (a).y - (moveClass)->footprintZ < 0 ? 0 : (a).y - (moveClass)->footprintZ, \
-    (a).x + (b).x >= (int)(moveClass)->width ? (int)(moveClass)->width - 1 : (a).x + (b).x, \
-    (a).y + (b).y >= (int)(moveClass)->height ? (int)(moveClass)->height - 1 : (a).y + (b).y, \
-    1u << (int)((moveClass) - g_movementClasses.entries)
-
-#define PUBLISH_PASS_MAP_CHANGE(moveClass, a, b, cause) \
-    MapPublishCellsChanged(PASS_MAP_CHANGE_ARGS(moveClass, a, b), cause)
-
-static void RefreshAndReportAllPassMaps(Point16 a, Point16 b, int cause)
-{
     for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != nullptr) {
-            ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(a, b);
-        }
-    }
-    for (int i = 0; i < 32; i++) {
-        if (g_movementClasses.entries[i].name != nullptr) {
-            PUBLISH_PASS_MAP_CHANGE(&g_movementClasses.entries[i], a, b, cause);
-        }
+        GameFreeThunk(g_movementClasses.entries[i].name);
+        g_movementClasses.entries[i].name = 0;
     }
 }
 
-// FUNCTION: 0x440a40
-void __stdcall RefreshAllPassMaps(Point16 a, Point16 b)
+int __stdcall GetMovementLimits(MapMoveLimits* out, int capacity)
 {
-    RefreshAndReportAllPassMaps(a, b, PATH_CHANGE_TERRAIN);
-}
-
-void __stdcall RefreshAllPassMapsForUnits(Point16 a, Point16 b)
-{
-    RefreshAndReportAllPassMaps(a, b, PATH_CHANGE_UNITS);
-}
-
-// FUNCTION: 0x440a70
-void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
-{
-    if (p->unit != 0) {
-        unsigned int last = p->unit->lastTick;
-        p->unit->lastTick = (unsigned int)g_game->ticks;
-        for (int i = 0; i < 32; i++) {
-            if (last < g_movementClasses.entries[i].lastTick) {
-                ((MovementClass*)&g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
-                PUBLISH_PASS_MAP_CHANGE(&g_movementClasses.entries[i], p->a, p->b, PATH_CHANGE_UNITS);
-            }
-        }
-        return;
+    int count = 0;
+    for (int i = 0; i < 32 && count < capacity; i++) {
+        const MovementClass* c = &g_movementClasses.entries[i];
+        if (c->name == nullptr)
+            continue;
+        MapMoveLimits* l = &out[count++];
+        l->index = i;
+        l->footprintX = c->footprintX;
+        l->footprintZ = c->footprintZ;
+        l->maxWaterDepth = c->maxWaterDepth;
+        l->minWaterDepth = c->minWaterDepth;
+        l->maxSlope = c->maxSlope;
+        l->badSlope = c->badSlope;
+        l->maxWaterSlope = c->maxWaterSlope;
+        l->badWaterSlope = c->badWaterSlope;
     }
-    RefreshAllPassMapsForUnits(p->a, p->b);
-}
-
-// FUNCTION: 0x440af0
-void MovementClass::RefreshMovedUnits(UnitPassMapView* p)
-{
-    unsigned int now = (unsigned int)g_game->ticks;
-    unsigned int old = lastTick;
-    if (now <= 0x1e) {
-        now = 0x1e;
-    }
-    unsigned int start = now - 0x1e;
-    lastTick = start;
-    unsigned int prev = p->unit->lastTick;
-    p->unit->lastTick = (unsigned int)g_game->ticks;
-    if (prev < old) {
-        RefreshPassMap(p->a, p->b);
-        PUBLISH_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
-    }
-    if (start != old) {
-        for (UnitPassMapRecordView* r = &((UnitPassMapRecordView *)g_game->units.get())[1]; r <= (UnitPassMapRecordView *)g_game->unitsEnd.get(); r++) {
-            if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
-                unsigned int t = r->unit->lastTick;
-                if (t >= old && t < start) {
-                    RefreshPassMap(r->a, r->b);
-                    PUBLISH_PASS_MAP_CHANGE(this, r->a, r->b, PATH_CHANGE_UNITS);
-                }
-            }
-        }
-    }
-    p->unit->lastTick = prev;
-}
-
-// FUNCTION: 0x440be0
-void MovementClass::RefreshUnitIfStale(UnitPassMapView* p)
-{
-    if (p->unit->lastTick < lastTick) {
-        RefreshPassMap(p->a, p->b);
-        PUBLISH_PASS_MAP_CHANGE(this, p->a, p->b, PATH_CHANGE_UNITS);
-    }
+    return count;
 }
 
 #include "../network/player_info.h"

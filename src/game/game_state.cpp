@@ -500,7 +500,9 @@ void LoadBattleAssets()
     g_seams.units->AllocateUnitMemory();
     g_seams.features->ResolveFeatureLinks();
     g_seams.features->FreeFeatureFileList();
-    g_seams.map->BuildAllPassMaps();
+    MapMoveLimits limits[32];
+    int classes = g_seams.units->GetMovementLimits(limits, 32);
+    g_seams.map->BuildAllPassMaps(limits, classes);
     g_game->windSpeedDenominator = 5000;
     g_game->windCounter = 0;
     SchedWindPhase(RAND_STREAM_LOAD);
@@ -643,6 +645,7 @@ void ShutdownIngameSystems()
     FreeTextureGafs();
     g_seams.weapons->FreeWeaponArray();
     g_seams.units->FreeMovementClasses();
+    g_seams.map->FreePassMaps();
     g_seams.units->FreeUnitCategories();
     if (g_seams.mission->GetGameType() == 3) {
         CloseNetSession();

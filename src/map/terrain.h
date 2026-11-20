@@ -3,11 +3,10 @@
 #include <vector>
 #include "../util/vec3.h"
 
-class MovementClass;
+class PassMap;
 struct Cell;
 
 class ClaimFootprintVisitor;
-class MovementClass;
 class UnitDef;
 struct Player;
 struct Point16;
@@ -29,9 +28,9 @@ int __stdcall IsFootprintClear(Unit* obj, int flag);
 int __stdcall SetYardOpen(Unit* obj, int flag);
 void __stdcall ForceNeighborFootprintReclaim(Unit* obj);
 void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos);
-int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h);
-unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
-unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y);
+int __stdcall GetPassMapFootprintValue(PassMap* obj, int x, int y, int w, int h);
+unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(PassMap* obj, int x, int y);
+unsigned int __stdcall GetTerrainPassValue(int moveClass, int x, int y);
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 int __stdcall UnitsInRange(const Vec3* at, int range, int skip, unsigned short* ids, int capacity);
@@ -42,7 +41,7 @@ void __stdcall MapFreeBuckets();
 void __stdcall MapWriteState(const StateWriter* w);
 int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size);
 
-int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
+int __stdcall GetPassMapCellValue(PassMap* obj, Cell* cell);
 void __stdcall AddUnitToMap(Unit* obj);
 void __stdcall RemoveUnitFromMap(Unit* obj);
 int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);

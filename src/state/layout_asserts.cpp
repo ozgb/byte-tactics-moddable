@@ -85,6 +85,7 @@
 #include "../map/los_lines.h"
 #include "../map/los_tables.h"
 #include "../map/map_info.h"
+#include "../map/pass_map.h"
 #include "../map/player_grid.h"
 #include "../map/pool.h"
 #include "../map/radar_timer.h"
@@ -1617,7 +1618,7 @@ static_assert(offsetof(MouseEvent, keyFlags) == 8, "");
 static_assert(offsetof(MouseEvent, scaledTick) == 12, "");
 static_assert(offsetof(MouseEvent, msg) == 16, "");
 static_assert(offsetof(MouseEvent, dblClick) == 20, "");
-static_assert(sizeof(MovementClass) == 32, "");
+static_assert(sizeof(MovementClass) == 16, "");
 static_assert(offsetof(MovementClass, name) == 0, "");
 static_assert(offsetof(MovementClass, footprintX) == 4, "");
 static_assert(offsetof(MovementClass, footprintZ) == 6, "");
@@ -1627,11 +1628,7 @@ static_assert(offsetof(MovementClass, maxSlope) == 12, "");
 static_assert(offsetof(MovementClass, badSlope) == 13, "");
 static_assert(offsetof(MovementClass, maxWaterSlope) == 14, "");
 static_assert(offsetof(MovementClass, badWaterSlope) == 15, "");
-static_assert(offsetof(MovementClass, width) == 16, "");
-static_assert(offsetof(MovementClass, height) == 20, "");
-static_assert(offsetof(MovementClass, cells) == 24, "");
-static_assert(offsetof(MovementClass, lastTick) == 28, "");
-static_assert(sizeof(MovementClassTable) == 1024, "");
+static_assert(sizeof(MovementClassTable) == 512, "");
 static_assert(offsetof(MovementClassTable, entries) == 0, "");
 static_assert(sizeof(NetGameFlagLowBits) == 2, "");
 static_assert(sizeof(NetGameFlags) == 2, "");
@@ -1816,6 +1813,22 @@ static_assert(offsetof(PacketRing, count) == 0, "");
 static_assert(offsetof(PacketRing, readIdx) == 4, "");
 static_assert(offsetof(PacketRing, writeIdx) == 8, "");
 static_assert(offsetof(PacketRing, buf) == 12, "");
+static_assert(sizeof(PassMap) == 32, "");
+static_assert(offsetof(PassMap, footprintX) == 0, "");
+static_assert(offsetof(PassMap, footprintZ) == 2, "");
+static_assert(offsetof(PassMap, maxWaterDepth) == 4, "");
+static_assert(offsetof(PassMap, minWaterDepth) == 6, "");
+static_assert(offsetof(PassMap, maxSlope) == 8, "");
+static_assert(offsetof(PassMap, badSlope) == 9, "");
+static_assert(offsetof(PassMap, maxWaterSlope) == 10, "");
+static_assert(offsetof(PassMap, badWaterSlope) == 11, "");
+static_assert(offsetof(PassMap, defined) == 12, "");
+static_assert(offsetof(PassMap, width) == 16, "");
+static_assert(offsetof(PassMap, height) == 20, "");
+static_assert(offsetof(PassMap, cells) == 24, "");
+static_assert(offsetof(PassMap, lastTick) == 28, "");
+static_assert(sizeof(PassMapTable) == 1024, "");
+static_assert(offsetof(PassMapTable, entries) == 0, "");
 static_assert(sizeof(PathGoal) == 12, "");
 static_assert(offsetof(PathGoal, target) == 4, "");
 static_assert(offsetof(PathGoal, owner) == 8, "");

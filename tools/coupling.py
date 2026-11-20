@@ -171,7 +171,7 @@ FILES = [("src/scripts/", "scripts"), ("src/movement/", "movement"), ("src/missi
          ("src/weapons/", "weapons"), ("src/orders/", "orders"),
          ("src/map/features", "features"), ("src/map/line_of_sight", "los_radar"),
          ("src/map/los_tables", "los_radar"), ("src/map/los_lines", "los_radar"), ("src/map/radar", "los_radar"), ("src/map/meteors", "wind_meteors"),
-         ("src/map/terrain", "map"), ("src/map/map_", "map"), ("src/map/plot_map", "map"),
+         ("src/map/terrain", "map"), ("src/map/map_", "map"), ("src/map/plot_map", "map"), ("src/map/pass_map", "map"),
          ("src/game/economy", "economy"), ("src/game/share_commands", "economy"),
          ("src/game/players_4658e0", "los_radar"), ("src/game/players_465ac0", "los_radar"),
          ("src/game/players", "players"), ("src/game/victory", "players"), ("src/game/statistics", "players"),

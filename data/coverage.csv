@@ -281,13 +281,13 @@ map,FUN_0047caf0,src/map/terrain.cpp,0,0,0,0,0,0,?FUN_0047caf0@@YGXXZ,1,
 map,FindHighestPointOnLine,src/map/terrain.cpp,0,0,0,0,0,0,?FindHighestPointOnLine@@YGHUVec3@@0@Z,1,
 map,ForceNeighborFootprintReclaim,src/map/terrain.cpp,1,0,0,0,0,0,?ForceNeighborFootprintReclaim@@YGXPAUUnit@@@Z,0,load-only
 map,GetCellPosition,src/map/terrain.cpp,0,0,0,0,0,0,?GetCellPosition@@YGXHHPAUVec3@@@Z,1,
-map,GetPassMapFootprintValue,src/map/terrain.cpp,0,0,0,0,0,0,?GetPassMapFootprintValue@@YGHPAVMovementClass@@HHHH@Z,1,
-map,GetTerrainPassValue,src/map/terrain.cpp,1,0,0,0,0,0,?GetTerrainPassValue@@YGIPAVMovementClass@@HH@Z,0,no-caller
+map,GetPassMapFootprintValue,src/map/terrain.cpp,0,0,0,0,0,0,?GetPassMapFootprintValue@@YGHPAVPassMap@@HHHH@Z,1,
+map,GetTerrainPassValue,src/map/terrain.cpp,1,0,0,0,0,0,?GetTerrainPassValue@@YGIHHH@Z,0,no-caller
 map,Grid::Grid,src/map/grid.h,0,0,0,0,0,0,??0Grid@@QAE@XZ,1,
 map,MapFreeBuckets,src/map/terrain.cpp,1,0,0,0,0,0,?MapFreeBuckets@@YGXXZ,0,shutdown
 map,MapWriteState,src/map/terrain.cpp,1,0,0,0,0,0,?MapWriteState@@YGXPBUStateWriter@@@Z,0,test-only
-map,MovementClass::ResizePassMap,src/units/movement_class.cpp,0,0,0,0,0,0,?ResizePassMap@MovementClass@@QAEXII@Z,1,
-map,MovementClass::SetPassMapCell,src/units/movement_class.cpp,0,0,0,0,0,0,?SetPassMapCell@MovementClass@@QAEXHHH@Z,1,
+map,PassMap::Resize,src/map/pass_map.cpp,0,0,0,0,0,0,?Resize@PassMap@@QAEXII@Z,1,
+map,PassMap::SetCell,src/map/pass_map.cpp,0,0,0,0,0,0,?SetCell@PassMap@@QAEXHHH@Z,1,
 map,SetWholePart,src/map/terrain.cpp,0,0,0,0,0,0,?SetWholePart@@YGXPAHH@Z,1,
 mission,*,,47,28,865,648,322,202,,1,
 mission,FreeOtaEnumCacheAndMission,src/mission/map_list.cpp,1,0,0,0,0,0,?FreeOtaEnumCacheAndMission@@YGXXZ,0,shutdown

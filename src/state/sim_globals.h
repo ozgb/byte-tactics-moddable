@@ -15,6 +15,7 @@
 #include "../network/packet_manager.h"
 #include "../quirks/quirks.h"
 #include "../units/movement_class.h"
+#include "../map/pass_map.h"
 #include "../util/vec3.h"
 
 struct ExplodedPiece;
@@ -62,6 +63,7 @@ struct SimGlobals {
     unsigned char pad_be2c[4];
     unsigned int g_randomSeed;
     unsigned char pad_be3c[4];
+    PassMapTable g_passMaps;
     Quirks g_quirks;
 };
 
@@ -97,7 +99,6 @@ static_assert(__builtin_offsetof(SimGlobals, pad_28c) - __builtin_offsetof(SimGl
 static_assert(__builtin_offsetof(SimGlobals, g_missionOrderTableVec) - __builtin_offsetof(SimGlobals, pad_28c) == 4, "pad_28c is followed by g_missionOrderTableVec");
 static_assert(__builtin_offsetof(SimGlobals, pad_2a0) - __builtin_offsetof(SimGlobals, g_missionOrderTableVec) == 16, "g_missionOrderTableVec is followed by pad_2a0");
 static_assert(__builtin_offsetof(SimGlobals, g_movementClasses) - __builtin_offsetof(SimGlobals, pad_2a0) == 8, "pad_2a0 is followed by g_movementClasses");
-static_assert(__builtin_offsetof(SimGlobals, pad_6a8) - __builtin_offsetof(SimGlobals, g_movementClasses) == 1024, "g_movementClasses is followed by pad_6a8");
 static_assert(__builtin_offsetof(SimGlobals, pad_764) - __builtin_offsetof(SimGlobals, g_packetHandlers) == 180, "g_packetHandlers is followed by pad_764");
 static_assert(__builtin_offsetof(SimGlobals, g_packetSizes) - __builtin_offsetof(SimGlobals, pad_764) == 4, "pad_764 is followed by g_packetSizes");
 static_assert(__builtin_offsetof(SimGlobals, pad_81c) - __builtin_offsetof(SimGlobals, g_packetSizes) == 180, "g_packetSizes is followed by pad_81c");
@@ -106,7 +107,7 @@ static_assert(__builtin_offsetof(SimGlobals, g_lastPlaceMetalSum) - __builtin_of
 static_assert(__builtin_offsetof(SimGlobals, pad_be2c) - __builtin_offsetof(SimGlobals, g_losTables) == 16, "g_losTables is followed by pad_be2c");
 static_assert(__builtin_offsetof(SimGlobals, pad_be3c) - __builtin_offsetof(SimGlobals, g_randomSeed) == 4, "g_randomSeed is followed by pad_be3c");
 static_assert(sizeof(((SimGlobals*)0)->g_missionOrderTableVec) == 16, "g_missionOrderTableVec size");
-static_assert(sizeof(((SimGlobals*)0)->g_movementClasses) == 1024, "g_movementClasses size");
+static_assert(sizeof(((SimGlobals*)0)->g_movementClasses) == 512, "g_movementClasses size");
 static_assert(sizeof(((SimGlobals*)0)->g_packetManager) == 46396, "g_packetManager size");
 static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #pragma clang diagnostic pop
@@ -153,6 +154,7 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define pad_be2c (Sim().pad_be2c)
 #define g_randomSeed (Sim().g_randomSeed)
 #define pad_be3c (Sim().pad_be3c)
+#define g_passMaps (Sim().g_passMaps)
 #define g_quirks (Sim().g_quirks)
 typedef unsigned char SimType_g_meteorWeaponNameTail[28];
 #define g_meteorWeaponNameTail (*reinterpret_cast<SimType_g_meteorWeaponNameTail*>(reinterpret_cast<char*>(&g_meteorWeaponName) + 0x4))

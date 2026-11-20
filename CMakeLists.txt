@@ -463,7 +463,7 @@ add_custom_command(
   DEPENDS los_radar_writer_test_objects $<TARGET_OBJECTS:los_radar_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(los_radar_writer_test DEPENDS "${CMAKE_BINARY_DIR}/los_radar_writer_test.exe")
-add_library(map_writer_test_objects OBJECT src/map/terrain.cpp src/units/movement_class.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/map_writer_test.cpp)
+add_library(map_writer_test_objects OBJECT src/map/terrain.cpp src/map/pass_map.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/map_writer_test.cpp)
 target_include_directories(map_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(map_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(map_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

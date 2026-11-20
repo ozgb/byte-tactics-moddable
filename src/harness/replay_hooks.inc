@@ -2430,6 +2430,21 @@ void __stdcall RecUnitsWriteState(const StateWriter* a0)
     }
 }
 
+int __stdcall RecUnitsGetMovementLimits(MapMoveLimits* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_UNITS_GETMOVEMENTLIMITS, SUB_UNITS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "out");
+        ArgValue(s_call, "capacity", a1);
+    }
+    int result = s_inner_units->GetMovementLimits(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -2852,13 +2867,15 @@ int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point1
     return result;
 }
 
-void __stdcall RecMapBuildAllPassMaps()
+void __stdcall RecMapBuildAllPassMaps(const MapMoveLimits* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_BUILDALLPASSMAPS, SUB_MAP, roots);
     if (scope.Open()) {
+        ArgStructs(s_call, "limits", ROK_MAPMOVELIMITS, a0, (int)a1);
+        ArgValue(s_call, "count", a1);
     }
-    s_inner_map->BuildAllPassMaps();
+    s_inner_map->BuildAllPassMaps(a0, a1);
     if (scope.Open()) {
     }
 }
@@ -2933,34 +2950,32 @@ int __stdcall RecMapGetGroundHeight(Vec3* a0)
     return result;
 }
 
-int __stdcall RecMapMovementClassGet(MovementClass* a0, int a1, int a2)
+int __stdcall RecMapPassMapGet(int a0, int a1, int a2)
 {
     ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    SlotScope scope(RSL_MAP_MOVEMENTCLASSGET, SUB_MAP, roots);
+    SlotScope scope(RSL_MAP_PASSMAPGET, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
+        ArgValue(s_call, "moveClass", a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
-    int result = s_inner_map->MovementClassGet(a0, a1, a2);
+    int result = s_inner_map->PassMapGet(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __stdcall RecMapMovementClassInBounds(MovementClass* a0, unsigned int a1, unsigned int a2)
+int __stdcall RecMapPassMapInBounds(int a0, unsigned int a1, unsigned int a2)
 {
     ReplayRoots roots;
-    roots.Add(ROK_MOVEMENTCLASS, a0);
-    SlotScope scope(RSL_MAP_MOVEMENTCLASSINBOUNDS, SUB_MAP, roots);
+    SlotScope scope(RSL_MAP_PASSMAPINBOUNDS, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "self", ROK_MOVEMENTCLASS, a0);
+        ArgValue(s_call, "moveClass", a0);
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "y", a2);
     }
-    int result = s_inner_map->MovementClassInBounds(a0, a1, a2);
+    int result = s_inner_map->PassMapInBounds(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -5694,6 +5709,8 @@ void HookSeams(const bool* on)
         s_rec_units.UnitRefSetUnit = RecUnitsUnitRefSetUnit;
     if (on[SUB_UNITS])
         s_rec_units.WriteState = RecUnitsWriteState;
+    if (on[SUB_UNITS])
+        s_rec_units.GetMovementLimits = RecUnitsGetMovementLimits;
     if (on[SUB_PLAYERS])
         s_rec_players.Apply = RecPlayersApply;
     if (on[SUB_PLAYERS])
@@ -5769,9 +5786,9 @@ void HookSeams(const bool* on)
     if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_map.GetGroundHeight = RecMapGetGroundHeight;
     if (on[SUB_MAP])
-        s_rec_map.MovementClassGet = RecMapMovementClassGet;
+        s_rec_map.PassMapGet = RecMapPassMapGet;
     if (on[SUB_MAP])
-        s_rec_map.MovementClassInBounds = RecMapMovementClassInBounds;
+        s_rec_map.PassMapInBounds = RecMapPassMapInBounds;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])
         s_rec_scripts.StartScript = RecScriptsStartScript;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS])

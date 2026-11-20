@@ -8,13 +8,34 @@ struct Point16;
 struct Unit;
 class UnitDef;
 struct Player;
-class MovementClass;
 class HapiBank;
 
 // Major version of the map interface, changed when a slot is removed or its signature changes.
-#define MAP_VERSION_MAJOR 6
+#define MAP_VERSION_MAJOR 7
 // Minor version of the map interface, changed when a slot is added.
 #define MAP_VERSION_MINOR 0
+
+// A movement class's footprint and limits, as units reads them from the game data; map copies them when it builds the pass maps.
+struct MapMoveLimits {
+    // The class's index, 0 to 31.
+    int index;
+    // The footprint's width, in cells.
+    short footprintX;
+    // The footprint's height, in cells.
+    short footprintZ;
+    // The greatest depth of water the class enters, below sea level.
+    short maxWaterDepth;
+    // The least depth of water the class needs, below sea level (negative when it can stand above it).
+    short minWaterDepth;
+    // The steepest slope on land the class crosses (a cell whose lowest corner is at or above sea level).
+    unsigned char maxSlope;
+    // The slope on land from which a cell is passable only at a cost.
+    unsigned char badSlope;
+    // The steepest slope under water the class crosses (a cell whose lowest corner is below sea level).
+    unsigned char maxWaterSlope;
+    // The slope under water from which a cell is passable only at a cost.
+    unsigned char badWaterSlope;
+};
 
 // The fields every map event and effect starts with.
 struct MapEventHeader {
@@ -92,8 +113,10 @@ struct MapSeam {
     int (__stdcall* CanBuildAt)(UnitDef* unit, Point16 cell, short type, Player* player);
     // Synchronous: returns 1 when the footprint of a unit type fits at a cell (flags 2 counts a cell off the map as a fit); for a type that does not move it answers and fills the placement record as CanBuildAt does. Hooks: none.
     int (__stdcall* CanPlaceUnitFootprint)(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
-    // Builds the pass map of every movement class for the loaded terrain, outside the tick. Hooks: none.
-    void (__stdcall* BuildAllPassMaps)(void);
+    // Copies the footprint and limits of count movement classes and builds their pass maps for the loaded terrain, outside the tick; the classes not given have none. Hooks: none.
+    void (__stdcall* BuildAllPassMaps)(const MapMoveLimits* limits, int count);
+    // Frees the pass maps when a match shuts down, outside the tick. Hooks: none.
+    void (__stdcall* FreePassMaps)(void);
     // Reads the explored-map state of a saved game from a bank. Hooks: none.
     void (__stdcall* LoadMappingData)(HapiBank* file);
     // Reads the metal plot map of a saved game from a bank. Hooks: none.
@@ -120,14 +143,14 @@ struct MapSeam {
     void (__stdcall* FreeBuckets)(void);
     // Returns the height of the ground at a position, between the heights of the four cells around it, or -1 off the map; a query. Hooks: none.
     int (__stdcall* GetGroundHeight)(Vec3* pos);
-    // Returns the 2-bit passability of a cell in a movement class's pass map (thiscall in 3.1c, this first); a query. Hooks: none.
-    int (__stdcall* MovementClassGet)(MovementClass* self, int x, int y);
-    // Returns 1 when a cell is inside a movement class's pass map (thiscall in 3.1c, this first); a query. Hooks: none.
-    int (__stdcall* MovementClassInBounds)(MovementClass* self, unsigned int x, unsigned int y);
-    // Synchronous, before a path search for a unit: moves the class's window of stale stamps on to the 30 ticks before now, computes again the class's pass map over the cells of unit when its stamp is older than the window was, and over the cells of each moving unit whose stamp fell in the ticks the window left, publishing CELLS_CHANGED for each (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* RefreshMovedUnits)(MovementClass* self, Unit* unit);
-    // Synchronous, after a path search for a unit: computes again the class's pass map over the cells of unit when its stamp is older than the class's window, publishing CELLS_CHANGED (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* RefreshUnitIfStale)(MovementClass* self, Unit* unit);
+    // Returns the 2-bit passability of a cell in the pass map of the movement class of an index; a query. Hooks: none.
+    int (__stdcall* PassMapGet)(int moveClass, int x, int y);
+    // Returns 1 when a cell is inside the pass map of the movement class of an index; a query. Hooks: none.
+    int (__stdcall* PassMapInBounds)(int moveClass, unsigned int x, unsigned int y);
+    // Synchronous, before a path search for a unit: moves the window of stale stamps of the movement class of an index on to the 30 ticks before now, computes again the class's pass map over the cells of unit when its stamp is older than the window was, and over the cells of each moving unit whose stamp fell in the ticks the window left, publishing CELLS_CHANGED for each. Hooks: none.
+    void (__stdcall* RefreshMovedUnits)(int moveClass, Unit* unit);
+    // Synchronous, after a path search for a unit: computes again the pass map of the movement class of an index over the cells of unit when its stamp is older than the class's window, publishing CELLS_CHANGED. Hooks: none.
+    void (__stdcall* RefreshUnitIfStale)(int moveClass, Unit* unit);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };

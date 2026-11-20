@@ -1922,7 +1922,9 @@ enum {
     NODE_LIMIT = 1 << 19,
     NODE_PENALTY = 0x10,
     NODE_G = 8,
-    MOVECLASS_STRIDE = 0x20,
+    MOVECLASS_STRIDE = sizeof(MovementClass),
+    MOVECLASS_RECORD = 0x20,
+    MOVECLASS_DEFINITION = 0x10,
     MOVECLASS_COUNT = 32,
     PASSMAP_LIMIT = 1 << 22,
     PASSMAP_ROW_LIMIT = 4096,
@@ -2048,7 +2050,7 @@ enum {
 
 static unsigned char* MoveClasses()
 {
-    return (unsigned char*)g_movementClassEntries - 0x18;
+    return (unsigned char*)g_movementClasses.entries;
 }
 
 typedef Ref<unsigned char> SimView_g_explodedPieces[EXPLODED_SLOTS];
@@ -3203,9 +3205,16 @@ static void VisitMoveClasses()
     unsigned char* classes = MoveClasses();
     char path[64];
     HashByte(18);
+    unsigned char record[MOVECLASS_RECORD];
     for (unsigned c = 0; c < MOVECLASS_COUNT; c++) {
+        const PassMap* map = &g_passMaps.entries[c];
+        memcpy(record, classes + c * MOVECLASS_STRIDE, MOVECLASS_DEFINITION);
+        memcpy(record + 0x10, &map->width, 4);
+        memcpy(record + 0x14, &map->height, 4);
+        memcpy(record + 0x18, &map->cells.offset, 4);
+        memcpy(record + 0x1c, &map->lastTick, 4);
         FormatPath(path, "moveClasses[%u]", c);
-        VisitElement(path, classes + c * MOVECLASS_STRIDE, &kMoveClassTable);
+        VisitElement(path, record, &kMoveClassTable);
     }
     EndSection();
 }
@@ -3216,14 +3225,13 @@ static unsigned ReadRefAt(unsigned p, unsigned offset);
 
 static void VisitPassMaps()
 {
-    unsigned char* classes = MoveClasses();
     char path[64];
     HashByte(19);
     for (unsigned c = 0; c < MOVECLASS_COUNT; c++) {
-        unsigned char* e = classes + c * MOVECLASS_STRIDE;
-        const unsigned* cells = (const unsigned*)ReadRefAt((unsigned)e, 0x18);
-        unsigned width = *(unsigned*)(e + 0x10);
-        unsigned height = *(unsigned*)(e + 0x14);
+        const PassMap* map = &g_passMaps.entries[c];
+        const unsigned* cells = map->cells.get();
+        unsigned width = map->width;
+        unsigned height = map->height;
         unsigned full = height >> 4;
         unsigned tail = height & 15;
         if (cells == NULL || width == 0 || height == 0 || width > PASSMAP_ROW_LIMIT

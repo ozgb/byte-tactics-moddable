@@ -48,7 +48,7 @@ struct BucketGrid {
 #include "../game/game.h"
 #include "../quirks/quirks.h"
 
-#include "../units/movement_class.h"
+#include "pass_map.h"
 
 static inline int InsideExplored(Player* los, unsigned int tx, unsigned int ty)
 {
@@ -893,7 +893,7 @@ void __stdcall SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
 }
 
 // FUNCTION: 0x47de60
-int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
+int __stdcall GetPassMapCellValue(PassMap* obj, Cell* cell)
 {
     int blocked;
     unsigned short feature = cell->feature;
@@ -941,7 +941,7 @@ int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell)
     return 3;
 }
 
-static int FootprintValue(MovementClass* obj, int x, int y, int w, int h, int stampUnits)
+static int FootprintValue(PassMap* obj, int x, int y, int w, int h, int stampUnits)
 {
     if (x < 0 || y < 0)
         return 0;
@@ -1012,12 +1012,12 @@ static int FootprintValue(MovementClass* obj, int x, int y, int w, int h, int st
 }
 
 // FUNCTION: 0x47dfc0
-int __stdcall GetPassMapFootprintValue(MovementClass* obj, int x, int y, int w, int h)
+int __stdcall GetPassMapFootprintValue(PassMap* obj, int x, int y, int w, int h)
 {
     return FootprintValue(obj, x, y, w, h, 1);
 }
 
-static unsigned int FootprintValueWithEdgeStrips(MovementClass* obj, int x, int y, int stampUnits)
+static unsigned int FootprintValueWithEdgeStrips(PassMap* obj, int x, int y, int stampUnits)
 {
     int h = obj->footprintZ;
     int w = obj->footprintX;
@@ -1034,14 +1034,14 @@ static unsigned int FootprintValueWithEdgeStrips(MovementClass* obj, int x, int 
 }
 
 // FUNCTION: 0x47e1f0
-unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y)
+unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(PassMap* obj, int x, int y)
 {
     return FootprintValueWithEdgeStrips(obj, x, y, 1);
 }
 
-unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y)
+unsigned int __stdcall GetTerrainPassValue(int moveClass, int x, int y)
 {
-    return FootprintValueWithEdgeStrips(obj, x, y, 0);
+    return FootprintValueWithEdgeStrips(&g_passMaps.entries[moveClass], x, y, 0);
 }
 
 // FUNCTION: 0x47e2d0

@@ -33,7 +33,7 @@
 
 static void PathfindingOnMapCellsChanged(const void* event)
 {
-    const MapEvent* e = static_cast<const MapEvent*>(event);
+    const MapCellsChanged* e = static_cast<const MapCellsChanged*>(event);
     g_seams.pathfinding->CellsChanged(e->rect[0], e->rect[1], e->rect[2], e->rect[3], e->classes, e->cause);
 }
 

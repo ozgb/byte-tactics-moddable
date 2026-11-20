@@ -5,9 +5,9 @@
 #include <string.h>
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
-#define SERVICES_VERSION_MAJOR 1
+#define SERVICES_VERSION_MAJOR 2
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 20
+#define SERVICES_VERSION_MINOR 0
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -41,33 +41,33 @@ int __stdcall PathGoalContains(const PathGoalArea* goal, int x, int y);
 int __stdcall PathGoalDistance(const PathGoalArea* goal, int x, int y);
 // Writes up to max of the cells of a goal area that a search may mark as its goals and returns how many it has; with a null out it only counts them.
 int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max);
-struct PathEvent;
-// In test mode, records a pathfinding event as the engine delivers it, with its waypoints, for the trace's path results.
-void __stdcall HarnessPathEvent(const PathEvent* event, const PathPoint* points, int capacity);
-struct EconomyEvent;
-// In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, with its outcome, for the dump's economy events.
-void __stdcall HarnessEconomyEvent(const EconomyEvent* event, int outcome);
-struct FeaturesEvent;
-// In test mode, records a features event as features consumes or answers it, or an effect as features publishes it, with its outcome, for the dump's features events.
-void __stdcall HarnessFeaturesEvent(const FeaturesEvent* event, int outcome);
-struct TargetingEvent;
-// In test mode, records a targeting event as targeting consumes it, or an effect as targeting publishes it, with its outcome, for the dump's targeting events.
-void __stdcall HarnessTargetingEvent(const TargetingEvent* event, int outcome);
-struct LosRadarEvent;
-// In test mode, records a los_radar event as los_radar consumes it, with its outcome, for the dump's los_radar events.
-void __stdcall HarnessLosRadarEvent(const LosRadarEvent* event, int outcome);
-struct MapEvent;
-// In test mode, records a map event as map consumes it, or an effect as map publishes it, with its outcome, for the dump's map events.
-void __stdcall HarnessMapEvent(const MapEvent* event, int outcome);
-struct PlayersEvent;
-// In test mode, records a players event as players consumes it, or an effect as players publishes it, with its outcome, for the dump's players events.
-void __stdcall HarnessPlayersEvent(const PlayersEvent* event, int outcome);
-struct AiEvent;
-// In test mode, records an ai event as ai consumes it, or an effect as ai publishes it, with its outcome, for the dump's ai events.
-void __stdcall HarnessAiEvent(const AiEvent* event, int outcome);
-struct WeaponsEvent;
-// In test mode, records a weapons event as weapons consumes it, or an effect as weapons publishes it, with its outcome, for the dump's weapons events.
-void __stdcall HarnessWeaponsEvent(const WeaponsEvent* event, int outcome);
+struct PathfindingEventHeader;
+// In test mode, records a pathfinding event as the engine delivers it, its payload of size bytes, with its waypoints, for the trace's path results.
+void __stdcall HarnessPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* points, int capacity);
+struct EconomyEventHeader;
+// In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, its payload of size bytes, with its outcome, for the dump's economy events.
+void __stdcall HarnessEconomyEvent(const EconomyEventHeader* event, unsigned int size, int outcome);
+struct FeaturesEventHeader;
+// In test mode, records a features event as features consumes or answers it, or an effect as features publishes it, its payload of size bytes, with its outcome, for the dump's features events.
+void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader* event, unsigned int size, int outcome);
+struct TargetingEventHeader;
+// In test mode, records a targeting event as targeting consumes it, or an effect as targeting publishes it, its payload of size bytes, with its outcome, for the dump's targeting events.
+void __stdcall HarnessTargetingEvent(const TargetingEventHeader* event, unsigned int size, int outcome);
+struct LosRadarEventHeader;
+// In test mode, records a los_radar event as los_radar consumes it, its payload of size bytes, with its outcome, for the dump's los_radar events.
+void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader* event, unsigned int size, int outcome);
+struct MapEventHeader;
+// In test mode, records a map event as map consumes it, or an effect as map publishes it, its payload of size bytes, with its outcome, for the dump's map events.
+void __stdcall HarnessMapEvent(const MapEventHeader* event, unsigned int size, int outcome);
+struct PlayersEventHeader;
+// In test mode, records a players event as players consumes it, or an effect as players publishes it, its payload of size bytes, with its outcome, for the dump's players events.
+void __stdcall HarnessPlayersEvent(const PlayersEventHeader* event, unsigned int size, int outcome);
+struct AiEventHeader;
+// In test mode, records an ai event as ai consumes it, or an effect as ai publishes it, its payload of size bytes, with its outcome, for the dump's ai events.
+void __stdcall HarnessAiEvent(const AiEventHeader* event, unsigned int size, int outcome);
+struct WeaponsEventHeader;
+// In test mode, records a weapons event as weapons consumes it, or an effect as weapons publishes it, its payload of size bytes, with its outcome, for the dump's weapons events.
+void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader* event, unsigned int size, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -105,20 +105,22 @@ enum SchedModule {
 };
 // Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
-// Calls economy's synchronous Spend slot for a spend (an event of kind ECONOMY_SPEND) after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
-int __stdcall ScheduleEconomySpend(const EconomyEvent* spend);
+struct EconomySpend;
+// Calls economy's synchronous Spend slot for a spend after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
+int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
 // Calls economy's RequestGranted query for a unit (an EconUnit, its block offset) and the resources it asks for, as of economy's last run: economy's pending inbox is not delivered first.
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an EconUnit, its block offset) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
-struct WindMeteorsEffect;
-// Publishes an effect of wind_meteors (interfaces/wind_meteors.h) to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
-void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect);
+struct WindMeteorsEventHeader;
+// Publishes an effect of wind_meteors (interfaces/wind_meteors.h), its payload of size bytes, to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
 // In test mode, records a wind_meteors event as wind_meteors consumes it, or an effect as it publishes it, for the dump's wind_meteors events: size bytes of plain data whose first int is its kind.
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
 
-// Calls features' synchronous Place slot for a placement (an event of kind FEATURES_PLACE) after delivering features' pending inbox, records it, and returns its outcome, visible at once.
-int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place);
+struct FeaturesPlace;
+// Calls features' synchronous Place slot for a placement after delivering features' pending inbox, records it, and returns its outcome, visible at once.
+int __stdcall ScheduleFeaturesPlace(const FeaturesPlace* place);
 
 struct Unit;
 // Calls targeting's GetWeaponTargetUnit query after delivering targeting's pending inbox, and returns its answer.

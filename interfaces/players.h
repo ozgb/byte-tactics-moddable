@@ -9,72 +9,120 @@ class MissionConditions;
 class TdfFile;
 
 // Major version of the players interface, changed when a slot is removed or its signature changes.
-#define PLAYERS_VERSION_MAJOR 3
+#define PLAYERS_VERSION_MAJOR 4
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 1
+#define PLAYERS_VERSION_MINOR 0
 
-// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
+// The fields every players event and effect starts with.
+struct PlayersEventHeader {
+    // A PlayersEventKind or a PlayersEffectKind.
+    int kind;
+    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS and TRANSFER name none), as economy's events give a unit.
+    unsigned int unit;
+};
+
+// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
 enum PlayersEventKind {
-    // Hands unit to player: the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of an ownership record when record is 1); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it.
+    // Hands unit to a player (PlayersGiveUnit): the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of the ownership record when it is present); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it.
     PLAYERS_GIVE_UNIT = 192,
-    // Kills every unit of player that is alive and not dying, one by one in the order of the player's units: by its own damage when its owner plays, else by self-destruct; outcome 1.
+    // Kills every unit of a player that is alive and not dying, one by one in the order of the player's units: by its own damage when its owner plays, else by self-destruct (PlayersKillUnits); outcome 1.
     PLAYERS_KILL_UNITS = 193,
-    // Tells the victory and defeat conditions that unit was created; outcome 1.
+    // Tells the victory and defeat conditions that unit was created; the header alone; outcome 1.
     PLAYERS_UNIT_CREATED = 194,
-    // Tells the victory and defeat conditions that unit died; outcome 1.
+    // Tells the victory and defeat conditions that unit died; the header alone; outcome 1.
     PLAYERS_UNIT_DIED = 195,
-    // Moves amount of resource (0 energy, 1 metal) from player from to player: when announce is 1 it is clamped to what from has, spent from from's store and sent to the other machines; outcome 1, or 0 when either player is 10 or the amount is 0.
+    // Moves an amount of a resource from one player to another (PlayersTransfer): when it is announced it is clamped to what the giver has, spent from the giver's store and sent to the other machines; outcome 1, or 0 when either player is 10 or the amount is 0.
     PLAYERS_TRANSFER = 196
 };
 
 // The kinds of effect players publishes to its outbox, for the modules that subscribe to them.
 enum PlayersEffectKind {
-    // unit dies as its player's units are killed: value 0 by 30000 damage it deals itself, value 1 by self-destruct (its weapon detonates, it is marked dying and killed).
+    // unit dies as its player's units are killed (PlayersKillUnit).
     PLAYERS_EFFECT_KILL_UNIT = 208,
-    // unit goes to player, who plays on another machine: it stops being selectable by its old owner, waits out the transfer holdoff, is announced to the other machines and takes 30000 damage.
+    // unit goes to a player who plays on another machine (PlayersSendUnit): it stops being selectable by its old owner, waits out the transfer holdoff, is announced to the other machines and takes 30000 damage.
     PLAYERS_EFFECT_SEND_UNIT = 209,
-    // A copy of unit is made for player, with the health, build progress, angles and stockpiles of the ownership record when record is 1, else with unit's own and unit takes 30000 damage, and with unit's state bits.
+    // A copy of unit is made for a player (PlayersCaptureUnit), with the health, build progress, angles and stockpiles of the ownership record when it is present, else with unit's own and unit takes 30000 damage, and with unit's state bits.
     PLAYERS_EFFECT_CAPTURE_UNIT = 210
 };
 
-// An event (PlayersEventKind) or an effect (PlayersEffectKind), as plain data with no pointers; fields a kind does not use are 0.
-struct PlayersEvent {
-    // A PlayersEventKind or a PlayersEffectKind.
-    int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
-    unsigned int unit;
-    // The player the kind is about (0 to 9, 10 for none): the receiver of a unit or a transfer, or the player whose units are killed.
-    int player;
-    // The giver of a transfer.
-    int from;
-    // The argument of the kind, as the kind says.
-    int value;
-    // The amount of a transfer.
-    float amount;
-    // 1 when a transfer is announced (clamped, spent and sent to the other machines), 0 when it only credits the receiver.
-    int announce;
-    // 1 when the fields below come from an ownership record received from another machine.
-    int record;
+// The fields of an ownership record another machine sent with a unit it handed over.
+struct PlayersOwnershipRecord {
+    // 1 when the fields below come from an ownership record, 0 when there is none and they are 0.
+    int present;
     // The record's health.
     int hitPoints;
     // The record's build progress.
     int buildPercent;
-    // The record's angles: bank, heading and pitch.
-    short angles[3];
-    // The record's stockpiles of the unit's three weapons.
-    unsigned char stockpiles[3];
+    // The record's angles, 16-bit values: bank, heading and pitch.
+    int angles[3];
+    // The record's stockpiles of the unit's three weapons, 0 to 255.
+    int stockpiles[3];
 };
 
-// The match players sets its private state up for.
-struct PlayersMapInfo {
-    // The number of players.
-    int playerCount;
+// The payload of GIVE_UNIT.
+struct PlayersGiveUnit {
+    // The kind and the unit handed over.
+    PlayersEventHeader h;
+    // The player who is given the unit, 0 to 9.
+    int player;
+    // The ownership record that came with it.
+    PlayersOwnershipRecord record;
+};
+
+// The payload of KILL_UNITS.
+struct PlayersKillUnits {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // The player whose units are killed, 0 to 10.
+    int player;
+};
+
+// The payload of TRANSFER.
+struct PlayersTransfer {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // The player who gives.
+    int from;
+    // The player who receives.
+    int to;
+    // The resource: 0 energy, 1 metal.
+    int resource;
+    // The amount.
+    float amount;
+    // 1 when the transfer is announced (clamped, spent and sent to the other machines), 0 when it only credits the receiver.
+    int announce;
+};
+
+// The payload of KILL_UNIT.
+struct PlayersKillUnit {
+    // The kind and the unit that dies.
+    PlayersEventHeader h;
+    // 0 by 30000 damage the unit deals itself, 1 by self-destruct (its weapon detonates, it is marked dying and killed).
+    int selfDestruct;
+};
+
+// The payload of SEND_UNIT.
+struct PlayersSendUnit {
+    // The kind and the unit.
+    PlayersEventHeader h;
+    // The player it goes to, 0 to 9.
+    int player;
+};
+
+// The payload of CAPTURE_UNIT.
+struct PlayersCaptureUnit {
+    // The kind and the unit copied.
+    PlayersEventHeader h;
+    // The player the copy is made for, 0 to 9.
+    int player;
+    // The ownership record the copy takes its fields from.
+    PlayersOwnershipRecord record;
 };
 
 // Per-player state: the players, their mission conditions and the end of the game. The engine delivers players' pending inbox, through Apply, before each run (UpdatePlayerHead, UpdatePlayerBody, UpdatePlayerTail, UpdatePlayersFinish), and at each phase boundary.
 struct PlayersSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
-    int (__stdcall* Apply)(const PlayersEvent* event);
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const PlayersEventHeader* event, unsigned int size);
     // Advances every player's state for one tick.
     void (__stdcall* UpdatePlayers)(void);
     // Runs the AI script of the mission, or the default one, and parses the AI weight scripts of the computer players. Hooks: none.

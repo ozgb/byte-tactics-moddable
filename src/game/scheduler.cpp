@@ -222,11 +222,13 @@ void SchedPlayersPhase(RandStream stream)
     AccessLogPassScope accessPass(ACCESS_PASS_PLAYERS);
 #endif
     g_seams.pathfinding->Step();
-    PathEvent event;
+    PathfindingFinished event;
     PathPoint waypoints[64];
-    while (g_seams.pathfinding->Poll(&event, waypoints, 64)) {
-        HarnessPathEvent(&event, waypoints, 64);
-        g_seams.movement->ApplyPathEvent(&event, waypoints);
+    int size;
+    while ((size = g_seams.pathfinding->Poll(&event.h, sizeof event, waypoints, 64)) != 0) {
+        unsigned int got = (unsigned int)size < sizeof event ? (unsigned int)size : sizeof event;
+        HarnessPathEvent(&event.h, got, waypoints, 64);
+        g_seams.movement->ApplyPathEvent(&event.h, got, waypoints);
     }
     for (int player = 0; player < 10; player++) {
         SchedDeliver(SCHED_PLAYERS);

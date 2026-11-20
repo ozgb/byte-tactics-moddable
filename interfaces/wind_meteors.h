@@ -6,7 +6,7 @@
 class HapiBank;
 
 // Major version of the wind_meteors interface, changed when a slot is removed or its signature changes.
-#define WIND_METEORS_VERSION_MAJOR 2
+#define WIND_METEORS_VERSION_MAJOR 3
 // Minor version of the wind_meteors interface, changed when a slot is added.
 #define WIND_METEORS_VERSION_MINOR 0
 
@@ -24,43 +24,49 @@ struct MeteorShowerParams {
     float interval;
 };
 
-// The kinds of event the engine publishes to wind_meteors' inbox; each is consumed by Apply in the order it was published, at once outside a tick.
+// The field every wind_meteors event and effect starts with.
+struct WindMeteorsEventHeader {
+    // A WindMeteorsEventKind or a WindMeteorsEffectKind.
+    int kind;
+};
+
+// The kinds of event the engine publishes to wind_meteors' inbox; each is consumed by Apply in the order it was published, at once outside a tick; one smaller than its payload changes nothing.
 enum WindMeteorsEventKind {
-    // Meteor showers fall from the next one due.
+    // Meteor showers fall from the next one due; the header alone.
     WIND_METEORS_ENABLE = 64,
-    // A shower that falls due from now on drops no meteor, though its centre and the next one's time are still drawn and set; one already falling ends as planned.
+    // A shower that falls due from now on drops no meteor, though its centre and the next one's time are still drawn and set; one already falling ends as planned; the header alone.
     WIND_METEORS_DISABLE = 65,
-    // Sets the meteor weapon's name and the shower timing from params; InitMeteors looks the weapon up.
+    // Sets the meteor weapon's name and the shower timing (WindMeteorsParams); InitMeteors looks the weapon up.
     WIND_METEORS_PARAMS = 66,
-    // Starts a shower now, centred on a random cell, whether showers are enabled or not.
+    // Starts a shower now, centred on a random cell, whether showers are enabled or not; the header alone.
     WIND_METEORS_START = 67
 };
 
 // The kinds of effect wind_meteors publishes to its outbox, for the modules that subscribe to them.
 enum WindMeteorsEffectKind {
-    // A meteor falls: a projectile of the meteor weapon starts at the position with the velocity.
+    // A meteor falls: a projectile of the meteor weapon starts at a position with a velocity (WindMeteorsSpawn).
     WIND_METEORS_EFFECT_SPAWN = 80
 };
 
-// An event of wind_meteors' inbox, as plain data with no pointers; fields a kind does not use are 0.
-struct WindMeteorsEvent {
-    // A WindMeteorsEventKind.
-    int kind;
-    // The parameters a PARAMS event sets.
+// The payload of PARAMS.
+struct WindMeteorsParams {
+    // The kind.
+    WindMeteorsEventHeader h;
+    // The parameters it sets.
     MeteorShowerParams params;
 };
 
-// An effect of wind_meteors' outbox, as plain data with no pointers.
-struct WindMeteorsEffect {
-    // A WindMeteorsEffectKind.
-    int kind;
+// The payload of SPAWN.
+struct WindMeteorsSpawn {
+    // The kind.
+    WindMeteorsEventHeader h;
     // The meteor weapon, as its slot in the match's table of weapons.
     int weapon;
-    // The position the projectile starts at, in world units.
-    int x, y, z;
-    // The projectile's velocity per tick, in world units.
-    int vx, vy, vz;
-    // Whether the spawn is announced to the other players of a network game.
+    // The position the projectile starts at, in world units: x, y and z.
+    int pos[3];
+    // The projectile's velocity per tick, in world units: x, y and z.
+    int vel[3];
+    // 1 when the spawn is announced to the other players of a network game.
     int announce;
 };
 
@@ -70,8 +76,8 @@ struct WindMeteorsSeam {
     void (__cdecl* UpdateWind)(RandStream stream);
     // Runs the meteors pass, once a tick in the meteors phase; a meteor that falls is published as a SPAWN effect. Hooks: none.
     void (__stdcall* UpdateMeteors)(void);
-    // Consumes one event of the inbox; called by the engine only, and the event's effect is visible when it returns. Hooks: none.
-    void (__stdcall* Apply)(const WindMeteorsEvent* event);
+    // Consumes one event of the inbox, its payload of size bytes; called by the engine only, and the event's effect is visible when it returns. Hooks: none.
+    void (__stdcall* Apply)(const WindMeteorsEventHeader* event, unsigned int size);
     // Resets the meteor schedule and looks up the meteor weapon by name, at match start, outside the tick. Hooks: none.
     void (__stdcall* InitMeteors)(void);
     // Called when a match shuts down, outside the tick; does nothing in 3.1c. Hooks: none.

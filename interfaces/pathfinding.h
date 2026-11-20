@@ -4,7 +4,7 @@
 #include "state_writer.h"
 
 // Major version of the pathfinding interface, changed when a slot is removed or its signature changes.
-#define PATHFINDING_VERSION_MAJOR 3
+#define PATHFINDING_VERSION_MAJOR 4
 // Minor version of the pathfinding interface, changed when a slot is added.
 #define PATHFINDING_VERSION_MINOR 0
 
@@ -69,11 +69,11 @@ struct PathRequest {
 
 // The kinds of event a step produces.
 enum PathEventKind {
-    // A search started; status is a PathStart.
+    // A search started (PathfindingStarted).
     PATH_EVENT_STARTED = 0,
-    // A search has a route so far and goes on; points hold it.
+    // A search has a route so far and goes on (PathfindingProgress); the points hold it.
     PATH_EVENT_PROGRESS = 1,
-    // A search ended; status is a PathStatus and points hold the route.
+    // A search ended (PathfindingFinished); the points hold the route.
     PATH_EVENT_FINISHED = 2
 };
 
@@ -91,18 +91,16 @@ enum PathStatus {
     PATH_FOUND = 0,
     // The route was cut short and leads towards the goal.
     PATH_PARTIAL = 1,
-    // There is no route; count is 0.
+    // There is no route, and no waypoints.
     PATH_FAILED = 2,
     // The goal cannot be reached; the route ends at the reachable cell nearest to it, measured as the straight-line distance in cells to the nearest cell of the goal area, among the cells the search expanded.
     PATH_NEAREST = 3
 };
 
-// What happened to a request in the last step; its waypoints are in world units, and the default movement follows only segments along the eight grid directions (the default search and the demo emit cell * 16 + footprint * 8).
-struct PathEvent {
+// The fields every event of a step starts with: the request it is about; its waypoints are in world units, and the default movement follows only segments along the eight grid directions (the default search and the demo emit cell * 16 + footprint * 8).
+struct PathfindingEventHeader {
     // A PathEventKind.
     int kind;
-    // A PathStart or a PathStatus, by kind.
-    int status;
     // The request's unit.
     PathUnit unit;
     // The request's requester.
@@ -111,6 +109,30 @@ struct PathEvent {
     PathHandle target;
     // The tick of the step.
     unsigned int tick;
+};
+
+// The payload of STARTED.
+struct PathfindingStarted {
+    // The kind and the request.
+    PathfindingEventHeader h;
+    // How the search started, a PathStart.
+    int start;
+};
+
+// The payload of PROGRESS.
+struct PathfindingProgress {
+    // The kind and the request.
+    PathfindingEventHeader h;
+    // The number of waypoints of the route so far; Poll copies as many as fit the caller's buffer, from the start of the route.
+    int count;
+};
+
+// The payload of FINISHED.
+struct PathfindingFinished {
+    // The kind and the request.
+    PathfindingEventHeader h;
+    // How the search ended, a PathStatus.
+    int status;
     // The number of waypoints of the route; Poll copies as many as fit the caller's buffer, from the start of the route.
     int count;
 };
@@ -203,8 +225,8 @@ struct PathfindingSeam {
     void (__stdcall* CellsChanged)(int left, int top, int right, int bottom, unsigned int classes, int cause);
     // Does this tick's search work, as much as the implementation chooses; called once per tick, in the players phase.
     void (__stdcall* Step)(void);
-    // Takes the next event of the last step, in the order they happened, and copies the first min(count, capacity) waypoints of its route to points; returns 0 when none is left. Called after Step, in the same phase.
-    int (__stdcall* Poll)(PathEvent* out, PathPoint* points, int capacity);
+    // Takes the next event of the last step, in the order they happened, copies its payload to out, at most size bytes of it, and the first min(count, capacity) waypoints of its route to points; returns the payload's size, or 0 when none is left. Called after Step, in the same phase.
+    int (__stdcall* Poll)(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
     // Optional, null when the implementation has none: applies the second number of the search console command, in 16.16 fixed point.

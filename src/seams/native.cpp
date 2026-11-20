@@ -1213,6 +1213,7 @@ void InstallNativeSeams()
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.Apply = WeaponsApply;
+    s_weapons.LoadState = WeaponsLoadState;
     s_weapons.WriteState = WeaponsWriteState;
     s_units.UpdateAllUnits = UpdateAllUnits;
     s_players.UpdatePlayers = UpdatePlayers;

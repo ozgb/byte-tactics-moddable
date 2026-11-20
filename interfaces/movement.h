@@ -14,7 +14,7 @@ class PointMarker;
 class AirManeuverOrder;
 struct Unit;
 struct Order;
-struct PathEvent;
+struct PathfindingEventHeader;
 struct PathPoint;
 struct Point16;
 struct Vec3;
@@ -28,8 +28,8 @@ struct Vec3;
 struct MovementSeam {
     // Steers a unit, moves it and updates its move rate for one tick (thiscall in 3.1c: this in ecx). Hooks: none.
     void (__fastcall* UpdateMotion)(UnitMotion* motion, int unusedEdx, Unit* unit);
-    // Applies an event of a path search to its requester, with the waypoints Poll copied for it: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
-    void (__stdcall* ApplyPathEvent)(const PathEvent* event, const PathPoint* waypoints);
+    // Applies an event of a path search, its payload of size bytes, to its requester, with the waypoints Poll copied for it; an event smaller than its payload changes nothing: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
+    void (__stdcall* ApplyPathEvent)(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints);
     // Allocates the movement of a unit from the sim block, builds it and stores it in the unit. Hooks: none.
     void (__stdcall* NewUnitMotion)(Unit* unit);
     // Reads the movement of a unit from a saved game bank (thiscall in 3.1c: this in ecx). Hooks: none.

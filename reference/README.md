@@ -332,7 +332,7 @@ game state after each phase of each tick, then a hash of the world tables, flush
 every tick. LF line endings.
 
 ```
-bt-trace 6
+bt-trace 7
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -387,6 +387,9 @@ and the visible and known unit lists) and section 25 one record per computer pla
 player and the factory list), in slot order. A dump also holds `losRadarState.*` (record 44), `aiState.*` (43), `mapState.*` (45)
 and `playersState.*` (46), which no row hashes.
 
+Format 7 changes no row and no digest of the reference: it is the number of moddable's dump, whose event sections
+describe one field list per kind of event (#1009). The reference writes no event sections, so only its number moves.
+
 The hash is 64-bit FNV-1a over a canonical serialisation of that state: 8-byte
 little-endian words first, then the remaining bytes one at a time (so the result does not
 depend on alignment). Two builds conform when their traces are identical.
@@ -411,7 +414,7 @@ A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 6
+bt-dump 7
 <tick> <phase> <path> <value>
 ```
 
@@ -545,8 +548,8 @@ per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `wor
 The file:
 
 ```
-bt-digest 6
-trace_format bt-trace 6
+bt-digest 7
+trace_format bt-trace 7
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>

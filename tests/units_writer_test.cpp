@@ -124,8 +124,8 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int, const unsigned in
         s_log.push_back(TAG_SPEECH);
 }
 
-void __stdcall HarnessAiEvent(const AiEvent*, int) {}
-void __stdcall HarnessWeaponsEvent(const WeaponsEvent*, int) {}
+void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int) {}
+void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
 
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
@@ -619,7 +619,9 @@ static void CheckSplitAttack()
     s_units[kGuard].lastAttackerSlot = 1;
     s_units[kGuard].lastDamageType = 0;
 
-    WeaponsEvent none = WeaponsEventOf(WEAPONS_EFFECT_ATTACKED);
+    WeaponsAttacked none;
+    memset(&none, 0, sizeof none);
+    none.h = WeaponsHeaderOf(WEAPONS_EFFECT_ATTACKED);
     s_log.clear();
     SchedPublish(SCHED_WEAPONS, &none, sizeof none);
     Check(s_log.empty(), "an attack with a null unit does nothing");
@@ -631,7 +633,9 @@ static void CheckSplitAttack()
     Check(s_units[kGuard].netDirtyFlags == 0x2000, "a hit with enemy damage of twice the friendly damage sets 0x2000");
     WeaponsPublishHit(&s_units[kGuard], 10, 4);
     Check(s_units[kGuard].netDirtyFlags == 0x6000, "the hit flags accumulate");
-    WeaponsEvent noShooter = WeaponsEventOf(WEAPONS_EFFECT_HIT);
+    WeaponsHit noShooter;
+    memset(&noShooter, 0, sizeof noShooter);
+    noShooter.h = WeaponsHeaderOf(WEAPONS_EFFECT_HIT);
     s_units[kGuard].netDirtyFlags = 0;
     SchedPublish(SCHED_WEAPONS, &noShooter, sizeof noShooter);
     Check(s_units[kGuard].netDirtyFlags == 0, "a hit with a null unit does nothing");
@@ -640,10 +644,11 @@ static void CheckSplitAttack()
 static int ReturnFire(int unit, int attacker)
 {
     s_log.clear();
-    WeaponsEvent e = WeaponsEventOf(WEAPONS_EFFECT_ATTACKED);
-    e.unit = Ref<Unit>(&s_units[unit]).offset;
-    e.target = attacker == 0 ? 0 : Ref<Unit>(&s_units[attacker]).offset;
-    e.value = 10;
+    WeaponsAttacked e;
+    memset(&e, 0, sizeof e);
+    e.h = WeaponsHeaderOf(WEAPONS_EFFECT_ATTACKED, &s_units[unit]);
+    e.attacker = attacker == 0 ? 0 : Ref<Unit>(&s_units[attacker]).offset;
+    e.amount = 10;
     OrdersOnWeaponsAttacked(&e);
     int attacks = 0;
     for (size_t i = 0; i < s_log.size(); i++)

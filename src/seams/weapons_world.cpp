@@ -11,15 +11,17 @@
 
 void WeaponsInbox(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    HarnessWeaponsEvent(e, g_seams.weapons->Apply(e));
+    const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
+    unsigned int size = WeaponsEventSize(e->kind);
+    HarnessWeaponsEvent(e, size, g_seams.weapons->Apply(e, size));
 }
 
 void WeaponsOnFeaturesAreaDamage(const void* event)
 {
-    const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
-    WeaponsEvent e = WeaponsEventOf(WEAPONS_AREA_DAMAGE);
-    e.value = effect->value;
+    const FeaturesAreaDamage* effect = static_cast<const FeaturesAreaDamage*>(event);
+    WeaponsAreaDamage e;
+    e.h = WeaponsHeaderOf(WEAPONS_AREA_DAMAGE);
+    e.weapon = effect->weapon;
     memcpy(e.pos, effect->pos, sizeof(e.pos));
     WeaponsInbox(&e);
 }

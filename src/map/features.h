@@ -1,7 +1,8 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 struct TntInfo;
-struct FeaturesEvent;
+struct FeaturesEventHeader;
+struct FeaturesPlace;
 
 struct Cell;
 struct Feature;
@@ -46,8 +47,8 @@ void __stdcall AnimateFeatureType(int k);
 void __stdcall ScanFeatureCell();
 int __stdcall FirstFeatureSpot();
 int __stdcall UpdateFeatureSpot(int i);
-int __stdcall PlaceEvent(const FeaturesEvent* e);
-int __stdcall ApplyEvent(const FeaturesEvent* e);
+int __stdcall PlaceEvent(const FeaturesPlace* e);
+int __stdcall ApplyEvent(const FeaturesEventHeader* e, unsigned int size);
 void __stdcall RemoveAllFeatures(void);
 void __stdcall SaveFeatures(HapiBank* file);
 

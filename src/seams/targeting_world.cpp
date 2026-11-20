@@ -7,12 +7,14 @@
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"
+#include "../game/targeting_events.h"
 #include "targeting_world.h"
 
 void TargetingInbox(const void* event)
 {
-    const TargetingEvent* e = static_cast<const TargetingEvent*>(event);
-    HarnessTargetingEvent(e, g_seams.targeting->Apply(e));
+    const TargetingEventHeader* e = static_cast<const TargetingEventHeader*>(event);
+    unsigned int size = TargetingEventSize(e->kind);
+    HarnessTargetingEvent(e, size, g_seams.targeting->Apply(e, size));
 }
 
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit* unit, int weapon)

@@ -10,6 +10,7 @@
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/weapons_events.h"
+#include "../game/wind_meteors_events.h"
 #include "weapons_world.h"
 #include "wind_meteors_world.h"
 
@@ -17,39 +18,44 @@
 
 void PublishWindMeteors(int kind, const MeteorShowerParams* params)
 {
-    WindMeteorsEvent event;
-    memset(&event, 0, sizeof event);
+    if (kind == WIND_METEORS_PARAMS) {
+        WindMeteorsParams event;
+        memset(&event, 0, sizeof event);
+        event.h.kind = kind;
+        if (params != nullptr)
+            event.params = *params;
+        SchedPublish(SCHED_ENGINE, &event, sizeof event);
+        return;
+    }
+    WindMeteorsEventHeader event;
     event.kind = kind;
-    if (params != nullptr)
-        event.params = *params;
     SchedPublish(SCHED_ENGINE, &event, sizeof event);
 }
 
 void WindMeteorsInbox(const void* event)
 {
-    g_seams.wind_meteors->Apply(static_cast<const WindMeteorsEvent*>(event));
-    HarnessWindMeteorsEvent(event, sizeof(WindMeteorsEvent));
+    const WindMeteorsEventHeader* e = static_cast<const WindMeteorsEventHeader*>(event);
+    unsigned int size = WindMeteorsEventSize(e->kind);
+    g_seams.wind_meteors->Apply(e, size);
+    HarnessWindMeteorsEvent(event, size);
 }
 
-void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect)
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
 {
     ReplayImport call(RI_WIND_METEORS_EMIT);
     call.Ptr(effect);
-    HarnessWindMeteorsEvent(effect, sizeof *effect);
-    SchedPublish(SCHED_WIND_METEORS, effect, sizeof *effect);
+    HarnessWindMeteorsEvent(effect, size);
+    SchedPublish(SCHED_WIND_METEORS, effect, size);
 }
 
 void WeaponsOnMeteorSpawn(const void* event)
 {
-    const WindMeteorsEffect* effect = static_cast<const WindMeteorsEffect*>(event);
-    WeaponsEvent e = WeaponsEventOf(WEAPONS_SPAWN);
-    e.value = effect->weapon;
-    e.pos[0] = effect->x;
-    e.pos[1] = effect->y;
-    e.pos[2] = effect->z;
-    e.vel[0] = effect->vx;
-    e.vel[1] = effect->vy;
-    e.vel[2] = effect->vz;
-    e.extra = effect->announce;
+    const WindMeteorsSpawn* effect = static_cast<const WindMeteorsSpawn*>(event);
+    WeaponsSpawn e;
+    e.h = WeaponsHeaderOf(WEAPONS_SPAWN);
+    e.weapon = effect->weapon;
+    memcpy(e.pos, effect->pos, sizeof(e.pos));
+    memcpy(e.vel, effect->vel, sizeof(e.vel));
+    e.announce = effect->announce;
     WeaponsInbox(&e);
 }

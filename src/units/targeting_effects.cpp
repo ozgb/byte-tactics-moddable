@@ -9,7 +9,7 @@
 
 void UnitsOnTargetingCleared(const void* event)
 {
-    const TargetingEvent* effect = static_cast<const TargetingEvent*>(event);
+    const TargetingEventHeader* effect = static_cast<const TargetingEventHeader*>(event);
     Ref<Unit> ref;
     ref.offset = effect->unit;
     Unit* unit = ref.get();

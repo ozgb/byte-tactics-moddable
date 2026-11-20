@@ -17,10 +17,21 @@ static Unit* UnitOfOffset(unsigned int offset)
     return ref.get();
 }
 
+static int NoticeBit(int kind)
+{
+    switch (kind) {
+    case WEAPONS_EFFECT_SHOT_FIRED:
+        return 0x400;
+    case WEAPONS_EFFECT_COMMAND_SHOT_FIRED:
+        return 0x800;
+    }
+    return 0x1000;
+}
+
 void UnitsOnWeaponsAttacked(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
     g_seams.units->NotifyUnitRefs(unit, 16);
@@ -28,8 +39,8 @@ void UnitsOnWeaponsAttacked(const void* event)
 
 void UnitsOnWeaponsAttackedSpeech(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
     if (!(g_seams.orders->GetOrderFlags(unit) & ORDER_FLAG_NO_UNDERATTACK_LINE) &&
@@ -39,7 +50,7 @@ void UnitsOnWeaponsAttackedSpeech(const void* event)
 
 void UnitsOnWeaponsMarkDamaged(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
+    const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
         return;
@@ -48,12 +59,12 @@ void UnitsOnWeaponsMarkDamaged(const void* event)
 
 void UnitsOnWeaponsDamageRecord(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsDamageRecord* e = static_cast<const WeaponsDamageRecord*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
-    unit->lastDamageType = (unsigned char)e->value;
-    Unit* attacker = UnitOfOffset(e->target);
+    unit->lastDamageType = (unsigned char)e->damageKind;
+    Unit* attacker = UnitOfOffset(e->attacker);
     if (attacker) {
         unit->lastAttackerSlot = attacker->playerIndex;
         unit->attacker = attacker;
@@ -62,29 +73,29 @@ void UnitsOnWeaponsDamageRecord(const void* event)
 
 void UnitsOnWeaponsHealth(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsHealth* e = static_cast<const WeaponsHealth*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
-    unit->health = (short)e->value;
-    if (e->extra == 1)
+    unit->health = (short)e->health;
+    if (e->dying == 1)
         unit->flags |= 0x4000;
 }
 
 void UnitsOnWeaponsNotice(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
+    const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
         return;
-    unit->netDirtyFlags |= (unsigned short)e->value;
+    unit->netDirtyFlags |= (unsigned short)NoticeBit(e->kind);
 }
 
 void UnitsOnWeaponsBusy(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsBusy* e = static_cast<const WeaponsBusy*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
-    unit->workTime = e->value;
+    unit->workTime = e->until;
 }

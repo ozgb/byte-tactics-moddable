@@ -51,7 +51,7 @@
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
-      "WindMeteorsEmit": [["linear"], "void"]
+      "WindMeteorsEmit": [["linear", "int"], "void"]
     },
     "weapons": {
       "FindWeaponByName": [["linear"], "block"]
@@ -59,7 +59,7 @@
     "wind_meteors": {
       "UpdateWind": [["int"], "void"],
       "UpdateMeteors": [[], "void"],
-      "Apply": [["linear"], "void"],
+      "Apply": [["linear", "int"], "void"],
       "InitMeteors": [[], "void"],
       "EmptyShutdownPreCleanup": [[], "void"],
       "LoadMeteorDefaults": [["linear"], "void"],
@@ -89,7 +89,7 @@
       "slots": {
         "UpdateWind": [["int"], "void"],
         "UpdateMeteors": [[], "void"],
-        "Apply": [["linear"], "void"],
+        "Apply": [["linear", "int"], "void"],
         "InitMeteors": [[], "void"],
         "EmptyShutdownPreCleanup": [[], "void"],
         "LoadMeteorDefaults": [["linear"], "void"],
@@ -115,7 +115,7 @@
           "HapiBank_OpenAccount": [["handle", "linear"], "int"],
           "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
           "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
-          "WindMeteorsEmit": [["linear"], "void"]
+          "WindMeteorsEmit": [["linear", "int"], "void"]
         }
       }
     }

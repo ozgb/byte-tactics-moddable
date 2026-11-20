@@ -66,7 +66,7 @@ SimGlobals& __stdcall SimCreate()
     static char storage[sizeof(SimGlobals)];
     return *(SimGlobals*)storage;
 }
-void __stdcall HarnessFeaturesEvent(const FeaturesEvent*, int) {}
+void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader*, unsigned int, int) {}
 void __stdcall SchedPublish(int, const void*, unsigned int)
 {
     s_effects++;
@@ -204,19 +204,36 @@ static int PlacedZ(int i)
     return (i / 8) * 2;
 }
 
-static FeaturesEvent Event(int kind, int i)
+struct ScriptedEvent {
+    union {
+        FeaturesEventHeader h;
+        FeaturesPlace place;
+        FeaturesRemove remove;
+    };
+    unsigned int size;
+};
+
+static ScriptedEvent Event(int kind, int i)
 {
-    FeaturesEvent e;
+    ScriptedEvent e;
     memset(&e, 0, sizeof e);
-    e.kind = kind;
-    e.x = PlacedX(i);
-    e.z = PlacedZ(i);
-    e.feature = i % kTypes;
-    e.owner = 10;
+    if (kind == FEATURES_PLACE) {
+        e.place.h.kind = kind;
+        e.place.x = PlacedX(i);
+        e.place.z = PlacedZ(i);
+        e.place.feature = i % kTypes;
+        e.place.owner = 10;
+        e.size = sizeof(FeaturesPlace);
+    } else {
+        e.remove.h.kind = kind;
+        e.remove.x = PlacedX(i);
+        e.remove.z = PlacedZ(i);
+        e.size = sizeof(FeaturesRemove);
+    }
     return e;
 }
 
-static int Scripted(FeaturesEvent* out, int index, int tick)
+static int Scripted(ScriptedEvent* out, int index, int tick)
 {
     if (index != 0)
         return 0;
@@ -246,14 +263,14 @@ static void Play(Run* run, bool tamper)
     run->placed = 0;
     run->removed = 0;
     for (int t = 0; t < kTicks; t++) {
-        FeaturesEvent e;
+        ScriptedEvent e;
         for (int i = 0; Scripted(&e, i, t); i++) {
-            if (tamper && t == kTamperTick && e.kind == FEATURES_REMOVE && run->tampered < 0) {
+            if (tamper && t == kTamperTick && e.h.kind == FEATURES_REMOVE && run->tampered < 0) {
                 run->tampered = t;
                 continue;
             }
-            int outcome = g_seams.features->Apply(&e);
-            if (e.kind == FEATURES_PLACE)
+            int outcome = g_seams.features->Apply(&e.h, e.size);
+            if (e.h.kind == FEATURES_PLACE)
                 run->placed += outcome;
             else
                 run->removed += outcome;

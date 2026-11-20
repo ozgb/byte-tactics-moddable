@@ -15,7 +15,7 @@ void __stdcall EnableMeteors();
 void __stdcall DisableMeteors();
 void __stdcall SetMeteorParams(const MeteorShowerParams* p);
 void __stdcall UpdateMeteors();
-void __stdcall WindMeteorsApply(const WindMeteorsEvent* event);
+void __stdcall WindMeteorsApply(const WindMeteorsEventHeader* event, unsigned int size);
 void __stdcall LoadMeteorDefaults(MeteorShowerParams* params);
 void __stdcall StartMeteorShower();
 void __stdcall SaveMeteors(HapiBank* file);

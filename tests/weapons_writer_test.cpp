@@ -96,7 +96,7 @@ int __stdcall RandomInt(int n)
 }
 
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall HarnessWeaponsEvent(const WeaponsEvent*, int) {}
+void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
 
 static bool IsHandled(SchedHandler handler)
 {
@@ -127,19 +127,19 @@ static int s_dropped = -1;
 
 static int s_applied;
 
-static int __stdcall PlainApply(const WeaponsEvent* e)
+static int __stdcall PlainApply(const WeaponsEventHeader* e, unsigned int size)
 {
     s_applied++;
-    return WeaponsApply(e);
+    return WeaponsApply(e, size);
 }
 
-static int __stdcall TamperedApply(const WeaponsEvent* e)
+static int __stdcall TamperedApply(const WeaponsEventHeader* e, unsigned int size)
 {
     if (e->kind == WEAPONS_DAMAGE && s_tick == s_tamperAt && s_dropped < 0) {
         s_dropped = s_tick;
         return 0;
     }
-    return PlainApply(e);
+    return PlainApply(e, size);
 }
 
 static int Amount(int tick)
@@ -204,9 +204,11 @@ static void Play(Run* run, bool tamper)
     for (int t = 0; t < kTicks; t++) {
         s_tick = t;
         g_game->ticks = t;
-        WeaponsEvent e = WeaponsEventOf(WEAPONS_DAMAGE, &s_units[kVictim]);
-        e.value = Amount(t);
-        e.extra = 0;
+        WeaponsDamage e;
+        memset(&e, 0, sizeof e);
+        e.h = WeaponsHeaderOf(WEAPONS_DAMAGE, &s_units[kVictim]);
+        e.amount = Amount(t);
+        e.damageKind = 0;
         SchedPublish(SCHED_UNITS, &e, sizeof e);
         run->health[t] = s_units[kVictim].health;
         run->dying[t] = (s_units[kVictim].flags & 0x4000) != 0;

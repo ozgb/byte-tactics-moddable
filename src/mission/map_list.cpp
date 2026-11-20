@@ -511,11 +511,17 @@ void Mission::RefreshMapList(int multiplayer)
 
 static void PublishMeteorSetUp(int kind, const MeteorShowerParams* params)
 {
-    WindMeteorsEvent event;
-    memset(&event, 0, sizeof event);
+    if (kind == WIND_METEORS_PARAMS) {
+        WindMeteorsParams event;
+        memset(&event, 0, sizeof event);
+        event.h.kind = kind;
+        if (params != nullptr)
+            event.params = *params;
+        SchedPublish(SCHED_ENGINE, &event, sizeof event);
+        return;
+    }
+    WindMeteorsEventHeader event;
     event.kind = kind;
-    if (params != nullptr)
-        event.params = *params;
     SchedPublish(SCHED_ENGINE, &event, sizeof event);
 }
 

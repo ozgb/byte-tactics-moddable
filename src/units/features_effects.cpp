@@ -22,12 +22,12 @@ static ModelState* StateOfHandle(unsigned int handle)
 // TODO(#986): route FREE_STATE and INIT_STATE to SCHED_SCRIPTS
 void UnitsOnFeaturesFreeState(const void* event)
 {
-    const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
+    const FeaturesFreeState* effect = static_cast<const FeaturesFreeState*>(event);
     g_seams.scripts->FreeObjectState(StateOfHandle(effect->state));
 }
 
 void UnitsOnFeaturesInitState(const void* event)
 {
-    const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
+    const FeaturesInitState* effect = static_cast<const FeaturesInitState*>(event);
     g_seams.scripts->InitObjectState(StateOfHandle(effect->state), (Object3do*)g_game->features[effect->feature].object);
 }

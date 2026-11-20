@@ -32,11 +32,11 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 void OrdersOnWeaponsAttacked(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
-    Unit* attacker = UnitOfOffset(e->target);
+    Unit* attacker = UnitOfOffset(e->attacker);
     if (attacker && !attacker->unitDefIndex) attacker=0;
     if (attacker && unit->player->active && (unit->player->type==1 || unit->player->type==2) &&
         (unit->def->flags1&0x10010000) && unit->buildLeft==kZeroFloat && !unit->player->allied[attacker->player->index]) {
@@ -61,24 +61,24 @@ void OrdersOnWeaponsAttacked(const void* event)
 
 void OrdersOnWeaponsHit(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsHit* e = static_cast<const WeaponsHit*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
-    unit->netDirtyFlags |= (e->value > e->extra * 2) ? 0x4000 : 0x2000;
+    unit->netDirtyFlags |= (e->enemyDamage > e->friendlyDamage * 2) ? 0x4000 : 0x2000;
 }
 
 void OrdersOnWeaponsParalyze(const void* event)
 {
-    const WeaponsEvent* e = static_cast<const WeaponsEvent*>(event);
-    Unit* unit = UnitOfOffset(e->unit);
+    const WeaponsParalyze* e = static_cast<const WeaponsParalyze*>(event);
+    Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
         return;
     MissionType kind = g_seams.orders->MissionTypeFromName(g_paralyzeMissionName);
     Order* first = unit->list;
     if (first && first->kind == kind) {
-        first->ticks += e->value;
+        first->ticks += e->ticks;
         return;
     }
-    g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, nullptr, nullptr, e->value, 0, 0));
+    g_seams.orders->AppendOrder(unit, g_seams.orders->NewOrder(kind, nullptr, nullptr, e->ticks, 0, 0));
 }

@@ -299,16 +299,16 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
 
     for (int j = 0; j < 3; j++) {
         TargetingPublishLoad(SCHED_UNITS, unit, j, (short)rec.pieces[j].f0, (short)(rec.pieces[j].f0 >> 16));
-        int args[8];
-        args[0] = rec.pieces[j].f4;
-        args[1] = rec.pieces[j].f8b;
-        args[2] = rec.pieces[j].fc;
-        args[3] = rec.pieces[j].f10;
-        args[4] = rec.pieces[j].f12;
-        args[5] = rec.pieces[j].f14;
-        args[6] = rec.pieces[j].f16;
-        args[7] = rec.pieces[j].fl.b0 | rec.pieces[j].fl.b1 << 1 | rec.pieces[j].fl.b23 << 2 | rec.pieces[j].fl.b4 << 4;
-        WeaponsPublishLoadSlot(SCHED_UNITS, unit, j, args);
+        WeaponsSlotState state;
+        state.aimDone = rec.pieces[j].f4;
+        state.typeByte = rec.pieces[j].f8b;
+        state.aimOffset = rec.pieces[j].fc;
+        state.reload = rec.pieces[j].f10;
+        state.heading = rec.pieces[j].f12;
+        state.pitch = rec.pieces[j].f14;
+        state.stockpile = rec.pieces[j].f16;
+        state.flags = rec.pieces[j].fl.b0 | rec.pieces[j].fl.b1 << 1 | rec.pieces[j].fl.b23 << 2 | rec.pieces[j].fl.b4 << 4;
+        g_seams.weapons->LoadState(unit, j, &state);
     }
 
     if (unit->cobStateFlags & 4)

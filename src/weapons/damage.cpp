@@ -100,13 +100,13 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         if (ev->damageKind == 1) {
             int a = ScaledCos((unsigned short)(ev->headingByte << 8), 400);
             int b = ScaledSin((short)(ev->headingByte << 8), 400);
-            WeaponsPublishStartScriptWithArgs(unit, g_hitByWeaponScriptName, 0, 0, 2, a, b, 0, 0);
+            WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_HIT_BY_WEAPON, 0, 0, 2, a, b, 0, 0);
             int pct = health * 100 / unit->def->maxHealth;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
                 pct = 100;
-            WeaponsPublishStartScriptWithArgs(unit, g_takeDamageScriptName, 0, 0, 1, pct, 0, 0, 0);
+            WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_TAKE_DAMAGE, 0, 0, 1, pct, 0, 0, 0);
         }
     }
 }

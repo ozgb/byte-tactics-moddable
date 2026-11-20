@@ -291,13 +291,21 @@ IMPORT(WindMeteorsEmitImport)
 {
     (void)user;
     NEED("WindMeteorsEmit", 0);
-    if (!InMemory((unsigned)a[0].i32 + sizeof(WindMeteorsEffect) - 1))
+    unsigned size = (unsigned)a[1].i32;
+    if (size < sizeof(WindMeteorsEventHeader) || size > sizeof(WindMeteorsSpawn))
+        return ImportError("WindMeteorsEmit", "the size is outside the effects");
+    if (!InMemory((unsigned)a[0].i32 + size - 1))
         return ImportError("WindMeteorsEmit", "the effect is outside the module memory");
-    WindMeteorsEffect effect;
-    memcpy(&effect, Linear(a[0].i32), sizeof effect);
-    if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
-        return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
-    WindMeteorsEmit(&effect);
+    WindMeteorsSpawn effect;
+    memset(&effect, 0, sizeof effect);
+    memcpy(&effect, Linear(a[0].i32), size);
+    if (effect.h.kind == WIND_METEORS_EFFECT_SPAWN) {
+        if (size < sizeof(WindMeteorsSpawn))
+            return ImportError("WindMeteorsEmit", "the effect is smaller than its kind");
+        if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
+            return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
+    }
+    WindMeteorsEmit(&effect.h, size);
     return nullptr;
 }
 
@@ -334,7 +342,7 @@ const ImportDef kImports[] = {
     {"services", "HapiBank_OpenAccount", "ii>i", HapiBankOpenAccountImport},
     {"services", "HapiBank_SetIntegerItem", "iii>i", HapiBankSetIntegerItemImport},
     {"services", "HapiBank_GetIntegerItem", "iii>i", HapiBankGetIntegerItemImport},
-    {"services", "WindMeteorsEmit", "i>", WindMeteorsEmitImport},
+    {"services", "WindMeteorsEmit", "ii>", WindMeteorsEmitImport},
     {"weapons", "FindWeaponByName", "i>i", FindWeaponByNameImport},
 };
 
@@ -487,6 +495,14 @@ void Call1(Slot slot, unsigned arg)
     Call(slot, a, 1);
 }
 
+void Call2(Slot slot, unsigned arg0, unsigned arg1)
+{
+    wasmtime_val_raw_t a[2];
+    a[0].i32 = (int)arg0;
+    a[1].i32 = (int)arg1;
+    Call(slot, a, 2);
+}
+
 unsigned ToScratch(Slot slot, const void* source, unsigned size, int copyIn)
 {
     if (size > ModulesMemory()->scratchSize)
@@ -513,9 +529,11 @@ void __stdcall UpdateMeteorsThunk()
     Call0(SLOT_UPDATE_METEORS);
 }
 
-void __stdcall ApplyThunk(const WindMeteorsEvent* event)
+void __stdcall ApplyThunk(const WindMeteorsEventHeader* event, unsigned int size)
 {
-    Call1(SLOT_APPLY, ToScratch(SLOT_APPLY, event, sizeof(WindMeteorsEvent), 1));
+    if (size > sizeof(WindMeteorsParams))
+        size = sizeof(WindMeteorsParams);
+    Call2(SLOT_APPLY, ToScratch(SLOT_APPLY, event, size, 1), size);
 }
 
 void __stdcall InitMeteorsThunk()

@@ -271,12 +271,11 @@ unsigned char Unit::ChooseWeapon()
 
 static void PublishCleared(Unit* unit, int weapon)
 {
-    TargetingEvent effect;
-    memset(&effect, 0, sizeof(effect));
+    TargetingEventHeader effect;
     effect.kind = TARGETING_EFFECT_CLEARED;
     effect.unit = Ref<Unit>(unit).offset;
     effect.weapon = weapon;
-    HarnessTargetingEvent(&effect, 1);
+    HarnessTargetingEvent(&effect, sizeof(effect), 1);
     SchedPublish(SCHED_TARGETING, &effect, sizeof(effect));
 }
 
@@ -331,7 +330,7 @@ static int ResetWeaponTarget(Unit* obj, int index)
     return had;
 }
 
-int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
+int __stdcall ApplyTargetingEvent(const TargetingEventHeader* e, unsigned int size)
 {
     Unit* unit = UnitOfHandle(e->unit);
     if (!unit || e->weapon < 0 || e->weapon > 2) {
@@ -339,7 +338,9 @@ int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
     }
     switch (e->kind) {
     case TARGETING_SET_UNIT: {
-        Unit* target = UnitOfHandle(e->target);
+        if (size < sizeof(TargetingSetUnit))
+            return 0;
+        Unit* target = UnitOfHandle(reinterpret_cast<const TargetingSetUnit*>(e)->target);
         if (!target) {
             return 0;
         }
@@ -347,16 +348,21 @@ int __stdcall ApplyTargetingEvent(const TargetingEvent* e)
         return 1;
     }
     case TARGETING_SET_POS:
-        SetWeaponTargetPos(unit, e->pos, e->weapon);
+        if (size < sizeof(TargetingSetPos))
+            return 0;
+        SetWeaponTargetPos(unit, reinterpret_cast<const TargetingSetPos*>(e)->pos, e->weapon);
         return 1;
     case TARGETING_CLEAR:
         return ClearWeaponTarget(unit, e->weapon);
     case TARGETING_RESET:
         return ResetWeaponTarget(unit, e->weapon);
     case TARGETING_LOAD: {
+        if (size < sizeof(TargetingLoad))
+            return 0;
+        const TargetingLoad* load = reinterpret_cast<const TargetingLoad*>(e);
         UnitWeaponSlot* elem = &unit->weapons[e->weapon];
-        elem->aimTargetXOrUnitId = (short)e->pos[0];
-        elem->aimTargetZOrUnitSentinel = (short)e->pos[2];
+        elem->aimTargetXOrUnitId = (short)load->xOrUnit;
+        elem->aimTargetZOrUnitSentinel = (short)load->zOrSentinel;
         return 1;
     }
     }

@@ -68,7 +68,7 @@ Orders' place in it:
 
 | 4.0 slot | 5.0 |
 |---|---|
-| `AddOrder` | event: ADD, from units (the commands of a saved or network order, `unit_commands.cpp`) and from ai (ADD_ORDER); `Apply` calls `AddOrder` |
+| `AddOrder` | event: ADD, from units (a unit's initial mission, `unit_commands.cpp`) and from ai (ADD_ORDER); `Apply` calls `AddOrder` |
 | (not a slot: `IssueOrCancelOrder`, the player's command) | event: COMMAND, from the engine (the UI), with the `queue` of the order's cancel rule |
 | `QueueBuildOrder` | event: QUEUE_BUILD, from the engine (the build menu) and from ai (QUEUE_BUILD, by unit type name) |
 | `DeleteOrders` | event: STOP, from units (`units.cpp`: a unit about to be freed) and from ai (STOP) |
@@ -92,7 +92,7 @@ are the UI, the console, the harness and the saved game's load.
 
 | 3.1c site | 3.1c call | Event |
 |---|---|---|
-| units: a command from a packet or a script (`unit_commands.cpp`, 14 sites) | `AddOrder` | ADD from units |
+| units: a unit's initial mission, when a game loads (`unit_commands.cpp`, `RunInitialMission`, 14 sites) | `AddOrder` | ADD from units |
 | units: a unit about to be freed (`units.cpp`) | `DeleteOrders(unit, 1)` | STOP from units, with `all` 1 |
 | units: a unit that a carrier picks up (`UpdateUnitBody`, `unit_position.cpp`) | `AddBeCarriedOrder` | BE_CARRIED from units |
 | units: the unit a listener order follows changes or is lost (`unit_targets.cpp`, `unit.cpp`) | `OrderOrStatusFlags` | STATUS_FLAGS from units, with the order's block offset |
@@ -106,7 +106,9 @@ are the UI, the console, the harness and the saved game's load.
 **Writers outside the tick** (the player's commands and the saved game):
 - **The UI, the console and the harness** publish COMMAND and QUEUE_BUILD from `SCHED_ENGINE` between ticks, so each
   event is delivered at once (#970).
-- **The net phase's order packets** reach orders as units' ADD, published while `HandleNetPackets` runs, in the tick.
+- **A unit's initial mission** is units' ADD, published by `RunInitialMission`, which `CreateMissionUnits` calls while a
+  game loads (`game_load.cpp`), before the first tick. The net phase publishes no event into orders: `net_game.cpp`
+  calls none of the publish helpers.
 - **A saved game's load** calls the slot `LoadOrders` for each unit from units' `LoadUnit` (`unit_save.cpp`), outside
   the tick, and publishes movement's LOAD (`docs/movement-interface.md`, section 2). `SaveOrders` is its writer's mirror.
 - **The network's `ReceiveUnitStates`** (`unit_position.cpp`) calls movement's `ReadNetState` and `UpdateMotion`
@@ -223,7 +225,10 @@ view. Everything is in `docs/movement-interface.md`, sections 2 and 3.
   `UnitRefGet` and `UnitRefSetValue` (units 5.0), so orders' calls to them go through `units.*` and pass
   `coupling --seams`. Orders calls `UnitRefGet` 39 times and `UnitRefSetValue` twice.
 - `docs/schedule.md` at this change lists no call into ai or units outside its interface in `RunOrders` and
-  `RunSecondaryOrders`. TBD(which calls the issue's two entries were: the two lists were of an older `schedule.md`).
+  `RunSecondaryOrders`. The issue's two entries, from the page at 768629d1a, were a call into ai after `map.GetGameType` and a call into units
+  after `map.IsPadSlotFree`. The committed page has, in the same places, `units.SetUnitPosition` and
+  `movement.PathOrderSetHeading`, and `movement.NewPathOrderToUnitAtAngle`: the goal and target objects they called moved
+  to movement (#993) and are movement's slots now. `src/orders/` calls no function of ai.
 
 ## 4. Views and routes
 
@@ -242,40 +247,43 @@ module's last run.
   UI).
 
 **As of orders' last run.** By #952's rule a query needs a delivery first only when an event that can be pending writes
-what it reads. TBD(the argument for each query, once the routes into orders are decided: section 8).
+what it reads. Every route into orders that is published inside the tick is synchronous, and the three queued ones
+(section 8) are published only outside it, so no event is pending when a query runs: `GetOrderFlags` reads the first
+order's `flags_42` and `GetOrderType` a unit's order table and flags, both written only by orders' own handlers at
+their publisher's statement, and `MissionTypeFromName` reads a table that no event writes.
 
 **The routes.** Every route, with its reason. The routes below that orders published before this change are final and
-cite the document that decided them; the routes new in this change are filled in at section 8.
+cite the document that decided them; the routes new in this change cite the gate (section 8) or #952's rule.
 
 | Route | Now | Why |
 |---|---|---|
-| units ADD, to orders | TBD | TBD |
-| engine COMMAND, to orders | TBD | TBD |
-| engine QUEUE_BUILD, to orders | TBD | TBD |
-| units STOP, to orders | TBD | TBD |
-| units BE_CARRIED, to orders | TBD | TBD |
-| units STATUS_FLAGS, to orders | TBD | TBD |
-| movement ORDER_FLAGS, to orders | TBD | TBD |
-| ai ADD_ORDER, to orders (`OrdersOnAiAddOrder`) | TBD | TBD |
-| ai QUEUE_BUILD, to orders (`OrdersOnAiQueueBuild`) | TBD | TBD |
-| ai STOP, to orders (`OrdersOnAiStop`) | TBD | TBD |
-| weapons ATTACKED, to orders (`OrdersOnWeaponsAttacked`) | TBD | TBD |
-| weapons PARALYZE, to orders (`OrdersOnWeaponsParalyze`) | TBD | TBD |
-| weapons HIT, to units (`UnitsOnWeaponsHit`; was orders' `OrdersOnWeaponsHit`) | TBD | TBD |
-| orders SET_STATE_BITS, to units | TBD | TBD |
-| orders SET_POSITION, to units | TBD | TBD |
-| orders ATTACH_TO_PIECE, to units | TBD | TBD |
-| orders FINISH_CONSTRUCTION, to units | TBD | TBD |
-| orders BUILD_DECAY, to units | TBD | TBD |
-| orders REPAIR, to units | TBD | TBD |
-| orders UNLINK, to units | TBD | TBD |
-| orders BUSY, to units | TBD | TBD |
-| orders SET_FLAGS, to units | TBD | TBD |
-| orders CLEAR_NET_DIRTY, to units | TBD | TBD |
-| orders SET_STANCE, to units | TBD | TBD |
-| orders SET_ANGLES, to units | TBD | TBD |
-| orders SET_BUILD_STATE, to units | TBD | TBD |
-| orders START_SCRIPT, to scripts | TBD | TBD |
+| units ADD, to orders | synchronous | Published only by `RunInitialMission`, which `CreateMissionUnits` calls while a game loads (`game_load.cpp`), before the first tick, so it is delivered at once whichever its mode and no read can find it pending. Queued it stayed equal on the tier, as it must. |
+| engine COMMAND, to orders | queued | Published only from the player's UI (`IssueOrderToSelection` in `selection.cpp`, `IssueMobileBuildOrders` in `control_panel.cpp`, called by the panels, the keys and the console's Assign) and by the harness's scripted orders (`HarnessBeforeStep`, before `SchedBeginTick`), all between ticks, where `SchedPublish` delivers at once (#970). No network path reaches them: `HandleNetPackets` calls none of these functions. Queued it stayed equal (section 8). |
+| engine QUEUE_BUILD, to orders | queued | The same: published only by `QueueBuildOrderWithSound` (`control_panel.cpp`), from the build menu's click and the harness's scripted orders, between ticks. |
+| units STOP, to orders | synchronous | The gate (section 8): queued, the scenarios crashed (exit code 3). |
+| units BE_CARRIED, to orders | synchronous | The gate (section 8). |
+| units STATUS_FLAGS, to orders | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes an order's `flags_42` (`ClearRef`, `ClearUnitRefs`, `NotifyUnitRefs` in `unit_targets.cpp`, `Unit::SetStateBits` in `unit.cpp`), which orders reads in `RunOrders` and `RunSecondaryOrders` of the order's own unit, after the scheduler's delivery of orders' inbox, and movement's goals read in `UpdateMotion`, after movement's; I found no reader between the publish and those deliveries) |
+| movement ORDER_FLAGS, to orders | synchronous | The gate (section 8). |
+| ai ADD_ORDER, to orders (`OrdersOnAiAddOrder`) | synchronous | As before (the gate, `docs/ai-interface.md`, section 8). |
+| ai QUEUE_BUILD, to orders (`OrdersOnAiQueueBuild`) | synchronous | As before (#952's rule, `docs/ai-interface.md`, section 4). |
+| ai STOP, to orders (`OrdersOnAiStop`) | synchronous | As before (the gate, `docs/ai-interface.md`, section 8). |
+| weapons ATTACKED, to orders (`OrdersOnWeaponsAttacked`) | synchronous | As before (the gate, `docs/ai-interface.md`, section 8). |
+| weapons PARALYZE, to orders (`OrdersOnWeaponsParalyze`) | synchronous | As before (#952's rule, `docs/weapons-interface.md`, section 4). |
+| weapons HIT, to units (`UnitsOnWeaponsHit`; was orders' `OrdersOnWeaponsHit`) | synchronous | As before (#952's rule, `docs/ai-interface.md`, section 4): the handler is units' now, and the write, `Unit::netDirtyFlags`, is the same. |
+| orders SET_STATE_BITS, to units | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. |
+| orders SET_POSITION, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `TeleportOrder`, which moves the other units whose position lies in a box around the teleporter, and each unit is read once, before its own move, in that loop; a moved unit's own update comes later, after units' inbox is delivered at its head) |
+| orders ATTACH_TO_PIECE, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but a transport detaches itself (`OrdersPublishAttachToPiece(unit, 0, -1, 2)` in `PrepVtolClimb` and the VTOL orders that follow it), and the same unit's `UpdateMotion`, which the scheduler runs after `RunSecondaryOrders` with only movement's inbox delivered, reads `u->carrier` in `UnitMotion::UpdatePosition`; and the attach's handler publishes movement's SET_MODE, which the next statement reads (`unit->motion->flags & 3`). |
+| orders FINISH_CONSTRUCTION, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `BuildingBuildOrder`'s cancel branch publishes it for the half-built target and, in the next statement, a synchronous DAMAGE of 30000 on the same unit, and `ApplyUnitDamage` (`damage.cpp`) returns for a victim whose `flags & 0x4000` is set, a bit `FinishConstruction` sets (with `buildLeft` and `lastDamageType`) for a type with `b24`. |
+| orders BUILD_DECAY, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `GetBuiltOrder`, for the unit being built, and its handler (`ApplyUnfinishedBuildDecay`) is `AddBuildProgress` on that unit; the readers of `buildLeft` and `health` in `src/orders/` I found are of `order->target`, another unit, or in later runs of the order) |
+| orders REPAIR, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its handler is `AddRepairProgress`, which requests energy from economy and publishes a DAMAGE of type 10, and its publisher (`VtolRepairUnitOrder`, `vtol_orders.cpp`) reads nothing of the repaired unit after it but the target's position for the nano particles) |
+| orders UNLINK, to units | synchronous | The gate (section 8). |
+| orders BUSY, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; `Unit::workTime` is read by economy's cloak upkeep (`economy.cpp`, through `WorldUnitInfo`) in the players phase, after a phase boundary has delivered it, and by the info panel, outside the tick; nothing in `src/orders/` reads it) |
+| orders SET_FLAGS, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it sets and clears bits 0x20, 0x800 and 0x8000 of `Unit::flags` (`MakeSelectableOrder`, `CloakOnOrder`, `CloakOffOrder`), whose readers I found are economy's and victory's in the players phase and the UI) |
+| orders CLEAR_NET_DIRTY, to units | synchronous | The gate (section 8). |
+| orders SET_STANCE, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; the stance is read back only at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, and by the orders panel, outside the tick) |
+| orders SET_ANGLES, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head) |
+| orders SET_BUILD_STATE, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` I found run in later states of the order or in the unit's own update) |
+| orders START_SCRIPT, to scripts | synchronous | The gate (section 8). |
 | orders REQUEST, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
 | orders INCOME, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
 | orders GIVE_UNIT, to players | synchronous | As before (the gate, `docs/players-interface.md`, section 8). |
@@ -288,7 +296,7 @@ cite the document that decided them; the routes new in this change are filled in
 | orders SET_UNIT, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders SET_POS, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders CLEAR, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
-| orders to movement (six routes) | TBD | TBD (`docs/movement-interface.md`, section 4) |
+| orders to movement (six routes) | synchronous | Each with its reason in `docs/movement-interface.md`, section 4. |
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 80 rows of class `immediate` with orders as
 writer or reader and the other side not movement alone (the rows between orders and movement are in the table too; the
@@ -318,7 +326,8 @@ reads of the unit record are of units' view. Each pair is served as follows:
 How a pair is served, in the three ways of the table: **a view** is read directly from the state block as of the writer's
 last run; **in 3.1c's order within a unit's update** means the scheduler's order (head, weapons, body, orders,
 movement, tail) is the order of 3.1c's `UpdateUnit`; **a synchronous route** is the route of section 4 that is made
-synchronous because a later read needs its write. Which of the effect routes are synchronous is section 8's (TBD).
+synchronous because a later read needs its write. Every effect route inside the tick is synchronous, each for the reason
+in the table of routes above.
 
 ## 5. State and the trace
 
@@ -364,8 +373,8 @@ deliver units; UpdateUnitTail(u, moved)
 ```
 
 3.1c called these from inside `UpdateUnit`; the split keeps 3.1c's order. Every route around these draws is either
-synchronous, so the draw or record is made at the publisher's statement, or queued but its handler draws nothing and
-records nothing that a later statement in the same phase depends on (TBD(which routes: section 8)).
+synchronous, so the draw or record is made at the publisher's statement, or queued but published only outside the tick, where it is
+delivered at once (section 8): the three queued routes are the engine's COMMAND and QUEUE_BUILD and movement's LOAD.
 
 The class `ordered` of `data/dependencies.csv` has 18 rows with orders as writer or reader (the issue counted 16 when
 it was filed; movement has none, because the access logs predate movement's module), on `rng.parkMiller` and on
@@ -373,20 +382,20 @@ it was filed; movement has none, because the access logs predate movement's modu
 
 | Writer to reader | Kind | Phase | Runs | How it is kept in order |
 |---|---|---|---|---|
-| map to orders | `rng.parkMiller` | units | 4 | Map's draw inside a unit's update and orders' in its state machines, in the scheduler's order (head, weapons, body, orders, movement); the routes between them (`ADD_UNIT`, `REMOVE_UNIT` from movement, section 4) are synchronous or hold no draw (TBD(each route's mode: section 8)). |
+| map to orders | `rng.parkMiller` | units | 4 | Map's draw inside a unit's update and orders' in its state machines, in the scheduler's order (head, weapons, body, orders, movement); the routes between them (`ADD_UNIT`, `REMOVE_UNIT` from movement, section 4) are synchronous (section 4). |
 | orders to map | `rng.parkMiller` | units | 3 | The same: map's `Apply` draws nothing between orders' draws, and the order of the two runs in a unit's update is the scheduler's. |
-| orders to scripts | `rng.parkMiller` | units | 12 | START_SCRIPT is orders' effect to scripts; a script's start can draw, so the route is synchronous when queueing it moves a draw (TBD(mode: section 8)). The statement that publishes it is where the draw is made. |
+| orders to scripts | `rng.parkMiller` | units | 12 | START_SCRIPT is orders' effect to scripts; a script's start can draw, so the route is synchronous: queued, it diverged (section 8). The statement that publishes it is where the draw is made. |
 | orders to scripts | `sim-event` | units | 8 | The same for the sim events a started script records. |
 | orders to targeting | `rng.parkMiller` | units | 7 | Targeting's draw (`FindBestTargetIfFireAtWill`, a synchronous slot) and SET_UNIT, SET_POS and CLEAR (synchronous routes, as before) are made at orders' statement. |
-| orders to units | `rng.parkMiller` | units | 11 | The units adapters of orders' effects (REPAIR, FINISH_CONSTRUCTION, SET_POSITION, ATTACH_TO_PIECE, UNLINK, the state bits) call units' slots; the route is synchronous where a queued handler would move a draw (TBD(each effect's mode: section 8)). Units' `CreateUnit` and `AddBuildProgress` are synchronous slots. |
+| orders to units | `rng.parkMiller` | units | 11 | The units adapters of orders' effects (REPAIR, FINISH_CONSTRUCTION, SET_POSITION, ATTACH_TO_PIECE, UNLINK, the state bits) call units' slots; every one of these effects is synchronous (section 4), so each draw is made at the publisher's statement. Units' `CreateUnit` and `AddBuildProgress` are synchronous slots. |
 | orders to units | `sim-event` | projectiles | 1 | Units' record under a projectile's hit: orders' effect and weapons' route are in the same call chain (`docs/weapons-interface.md`, section 6). |
-| orders to units | `sim-event` | units | 41 | The same adapters and slots: each record is made where the call was, when the route is synchronous (TBD(mode: section 8)). |
+| orders to units | `sim-event` | units | 41 | The same adapters and slots: each record is made where the call was, because every one of these effects is synchronous (section 4). |
 | orders to weapons | `rng.parkMiller` | units | 15 | DAMAGE, RELEASE, CLAIM and ADD_STOCKPILE from orders and PARALYZE and ATTACKED to orders are synchronous routes (`docs/weapons-interface.md`, section 4), so each draw is made at the publisher's statement; orders run after weapons in a unit's update, as in 3.1c. |
 | orders to weapons | `sim-event` | units | 11 | The same for the sim events. |
 | scripts to orders | `rng.parkMiller` | units | 10 | Scripts' draws (a unit's `RunScripts` in its body) come before orders' step in the unit's update; no event of orders lies between them. |
 | scripts to orders | `sim-event` | units | 8 | The same. |
 | targeting to orders | `rng.parkMiller` | units | 11 | Targeting's retargeting draw and orders' in the unit's update: its routes (SET_UNIT, SET_POS, CLEAR) are synchronous, and `FindBestTargetIfFireAtWill` is a synchronous slot. |
-| units to orders | `rng.parkMiller` | units | 13 | Units' draws and orders' inside a unit's update: ADD, STOP, BE_CARRIED and STATUS_FLAGS from units and the effects to units are in 3.1c's order by the scheduler's; TBD(each route's mode: section 8). |
+| units to orders | `rng.parkMiller` | units | 13 | Units' draws and orders' inside a unit's update: ADD, STOP, BE_CARRIED and STATUS_FLAGS from units and the effects to units are in 3.1c's order by the scheduler's; STOP, BE_CARRIED and STATUS_FLAGS are synchronous and ADD is published only outside the tick (section 4). |
 | units to orders | `sim-event` | units | 50 | The same for the sim events (speech, smoke). |
 | weapons to orders | `rng.parkMiller` | units | 13 | ATTACKED and PARALYZE to orders and DAMAGE, RELEASE and CLAIM from orders are synchronous routes (`docs/weapons-interface.md`, section 6), so each draw is made at the publisher's statement. |
 | weapons to orders | `sim-event` | projectiles | 1 | The same, under a projectile. |
@@ -405,4 +414,48 @@ results, stays the engine's delivery as before, now movement's slot (`docs/movem
 
 ## 8. What the gate decided
 
-TBD
+Every route into and out of orders that is new in this change was queued first, each on its own, with every other
+route as in `src/game/routes.cpp` at the end of this change (the tier, with `--no-cache`, on the modern build; the gate
+line of an equal run names the commit it ran at, 1a3180607, c5c394dfe, 0274316fe or 1f78163f3, since commits landed
+meanwhile, and the table of routes was the same in each). A route whose queueing diverged stays synchronous. The
+divergences are against the reference, with the first tick, phase and field of the comparison's report. Where the report's
+first field is an `aiState` squad record that one side lacks, that is an artifact of the comparison, and the row gives the
+tick and phase and the scenario's first `DIFF` line instead. A route that stayed equal is still synchronous when it can be
+pending while a later read in the same phase needs what it writes (#952's rule, section 4); where I found no such read,
+section 4 says so. The engine's COMMAND and QUEUE_BUILD and movement's LOAD stay queued, since they are published only
+outside the tick; with them and map's PLACED queued together, the tier was equal (38 of 38 scenarios at fdfcd3cae033).
+
+| Route queued | Tier | First divergence |
+|---|---|---|
+| units ADD | equal | none (published only outside the tick, section 4) |
+| engine COMMAND | equal | none (queued, section 4; queued with QUEUE_BUILD, LOAD and PLACED: 38 of 38 equal) |
+| engine QUEUE_BUILD | equal | none (queued, section 4) |
+| units STOP | crashed | mission-kill-of-type ended at tick 181 of 360 (exit code 3), and `stopped: 16 scenarios not finished`; eight-full-moon's first run failed too. No complete trace to compare. |
+| units BE_CARRIED | diverged | orders-air, tick 1025: stored eca9728ab3cc3df1, got ff5198cece061df9. The comparison's replay of the scenario exited with code 2, so it gave no report. |
+| units STATUS_FLAGS | equal | none (synchronous, section 4: no same-phase read found) |
+| movement ORDER_FLAGS | diverged | orders-air, tick 940, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): stored 394b77cd380e1e61, got a3baa9ecf36255af. |
+| orders SET_STATE_BITS | traces equal, events diverged | eight-full-moon, tick 5636, units phase: the sim event digest (`5636 units 8`, stored 4bb93f76561b11ce, got ff3dbf0252c62e3c); also mission-kill-of-type tick 90, mission-passes-z tick 99, orders-air tick 1025 and ui-build-menu tick 87. |
+| orders SET_POSITION | equal | none (synchronous, section 4: no same-phase read found) |
+| orders ATTACH_TO_PIECE | equal | none (synchronous by #952's rule, section 4) |
+| orders FINISH_CONSTRUCTION | equal | none (synchronous by #952's rule, section 4) |
+| orders BUILD_DECAY | equal | none (synchronous, section 4: no same-phase read found) |
+| orders REPAIR | equal | none (synchronous, section 4: no same-phase read found) |
+| orders UNLINK | diverged | conditions-dark-side, tick 302: stored 75eb1125904e65c8, got d190d9504c9ba36a. The comparison's report timed out after 300 s. |
+| orders BUSY | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_FLAGS | equal | none (synchronous, section 4: no same-phase read found) |
+| orders CLEAR_NET_DIRTY | diverged | mission-build-unit, tick 79, units phase (`UpdateAllUnits`, 0x48ad30): `rng.parkMiller` (reference 0x770d7425, queued 0x1219520c). |
+| orders SET_STANCE | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_ANGLES | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_BUILD_STATE | equal | none (synchronous, section 4: no same-phase read found) |
+| orders START_SCRIPT | diverged | orders-air, tick 1688, world phase: stored 2f9520d4ff7b7f17, got 151c8cc16975ad77. |
+| ai ADD_ORDER, QUEUE_BUILD, STOP | unchanged | synchronous as before (`docs/ai-interface.md`, section 8) |
+| weapons ATTACKED, PARALYZE, HIT | unchanged | synchronous as before (`docs/ai-interface.md`, section 8, and `docs/weapons-interface.md`, section 8) |
+| orders to movement (six routes) | | in `docs/movement-interface.md`, section 8 |
+
+**Inbox depths.** Every route into orders that is published inside the tick is synchronous, and the three queued routes
+(the engine's COMMAND and QUEUE_BUILD, and movement's LOAD) are published only outside it, where each event is delivered
+at once (#970). So orders' inbox never holds an event inside the tick, `SchedEndTick` never finds one, and its depth is 0.
+No scenario counted it. A synchronous delivery into movement runs inside one into orders: `Apply` of STOP calls
+`DeleteOrders`, and `Order::~Order` publishes movement's SET_TARGET and DESTROY_TARGET (`order_queue.cpp`) through
+`SchedPublish`. A delivery into orders also runs inside orders' own run: `SelfDestructOrder` (in `RunOrders`) publishes
+weapons' DAMAGE, which publishes ATTACKED, whose route reaches orders' `Apply`.

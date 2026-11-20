@@ -251,36 +251,40 @@ the cells' heights and whether a footprint can be placed (map's `GetGroundHeight
 - **Queries:** `UnitTarget` and `TargetType` (orders), `GetMotionState` (units, a save) and `HasNetState` (the network).
 
 **As of movement's last run.** By #952's rule a query needs a delivery first only when an event that can be pending
-writes what it reads. TBD(the argument for each query, once the routes into movement are decided: section 8).
+writes what it reads. Every route into movement that is published inside the tick is synchronous, and the three queued
+ones (section 8) are published only outside it, so no event is pending when a query runs. `UnitTarget` reads the goal's
+target, which SET_TARGET writes at its publisher's statement (the reason for that route's mode, below), and `TargetType`
+the class of a target that the synchronous `New*` slots built. `GetMotionState` reads the motion record for a saved game,
+outside the tick, after LOAD has been delivered, and `HasNetState` reads the goal's net state, which no event writes.
 
-**The routes.** Every route, with its reason. The routes new in this change are filled in at section 8.
+**The routes.** Every route, with its reason. The routes new in this change cite the gate (section 8) or #952's rule.
 
 | Route | Now | Why |
 |---|---|---|
-| units NEW, to movement | TBD | TBD |
-| units DESTROY, to movement | TBD | TBD |
-| units LOAD, to movement | TBD | TBD |
-| units SET_MODE, to movement | TBD | TBD |
-| units SET_SPEED, to movement | TBD | TBD |
-| map PLACED, to movement | TBD | TBD |
-| orders SET_TARGET, to movement | TBD | TBD |
-| orders DESTROY_TARGET, to movement | TBD | TBD |
-| orders SET_FLIGHT_MODE, to movement | TBD | TBD |
-| orders SET_ALTITUDE, to movement | TBD | TBD |
-| orders SET_APPROACH_RADIUS, to movement | TBD | TBD |
-| orders SET_HEADING, to movement | TBD | TBD |
-| movement ORDER_FLAGS, to orders (`OrdersOnMovementOrderFlags`) | TBD | TBD |
-| movement TURN, to units | TBD | TBD |
-| movement TILT, to units | TBD | TBD |
-| movement ANGLES, to units | TBD | TBD |
-| movement MOVE, to units | TBD | TBD |
-| movement MOVED, to units | TBD | TBD |
-| movement CHANGE_CELL, to units | TBD | TBD |
-| movement MOVE_RATE, to units | TBD | TBD |
-| movement SET_POSITION, to units | TBD | TBD |
-| movement SET_STATE_BITS, to units | TBD | TBD |
-| movement SFX_OCCUPY, to units | TBD | TBD |
-| movement START_SCRIPT, to scripts | TBD | TBD |
+| units NEW, to movement | synchronous | The gate (section 8). |
+| units DESTROY, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit can be killed inside its own update (`SelfDestructOrder` publishes a DAMAGE of 30000 on itself in `RunOrders`, and `ApplyUnitDeath` publishes DESTROY), and `SchedUnitsPhase` then tests `u->motion != 0`, delivers movement's inbox and calls `UpdateMotion(u)`, which would take the pointer the delivered DESTROY has just cleared. |
+| units LOAD, to movement | queued | Published only by `LoadUnitMotion` (`unit_save.cpp`), which `LoadUnit` calls from `LoadUnits` (`settings_campaign.cpp`) while a saved game loads, outside the tick, where `SchedPublish` delivers at once (#970). Queued, with COMMAND, QUEUE_BUILD and PLACED, it stayed equal (section 8). |
+| units SET_MODE, to movement | synchronous | #952's rule. Queued it stayed equal on the tier (which has no transport), but `ApplyAttachUnit` publishes it when a unit is attached or detached, and `PrepVtolClimb` and the VTOL orders that follow it read `unit->motion->flags & 3`, the mode bits, in the statements after their ATTACH_TO_PIECE, before movement's inbox is delivered ahead of `UpdateMotion` (`vtol_orders.cpp`: `PrepVtolClimb` and the cases of lines 618, 1059, 1645 and 1894). |
+| units SET_SPEED, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: `ReadUnitState` publishes it in the net phase, and the next `ReceiveUnitStates` of the same phase calls `UpdateMotion` directly for every unit of its player (`TODO(#948)`), without a delivery, and `UpdateMotion` reads the speed. The same argument as the engine's REMOTE_DAMAGE row of `docs/weapons-interface.md`. |
+| map PLACED, to movement | synchronous | TBD(no same-phase read found: queued, alone and with COMMAND, QUEUE_BUILD and LOAD, it stayed equal on the tier; it writes `UnitMotion::pathLockStamp` (the tick), which I find read only by `GetMotionState` (the saved game, outside the tick) and the trace's hash, taken after a phase boundary; map's `AddUnitToMap`, its refresh and `spatialBucket` code do not read it) |
+| orders SET_TARGET, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but an order can set its target and be deleted in the same `RunOrders` (or `AddOrder`'s pruning), and `Order::~Order` reads `UnitTarget` (`order_queue.cpp`) to decide whether the goal still steers to its own target: a pending SET_TARGET leaves the old target and the wrong branch. |
+| orders DESTROY_TARGET, to movement | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it deletes the target object, always published after a SET_TARGET (0) in `SetAttachedFx`, the attach functions and `Order::~Order`, which clears the goal's pointer first (FIFO), and only `UnitTarget` (compares the offset) and `SaveOrders`' `TargetType` (outside the tick) read targets in `src/orders/`) |
+| orders SET_FLIGHT_MODE, to movement | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes the motion's mode, read by `PrepVtolClimb` and the VTOL orders (`unit->motion->flags & 3`) before they publish it, and by `UpdateMotion`, after movement's delivery) |
+| orders SET_ALTITUDE, to movement | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes a target's altitude, read by the goal in `UpdateMotion` (after movement's delivery) and not by any statement of `src/orders/` or `src/units/`) |
+| orders SET_APPROACH_RADIUS, to movement | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes a target's radius, read by the goal in `UpdateMotion` and by pathfinding's `Submit` through the goal's areas, called from that goal, both after movement's delivery) |
+| orders SET_HEADING, to movement | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes a target's heading, read by the goal in `UpdateMotion`, after movement's delivery) |
+| movement ORDER_FLAGS, to orders (`OrdersOnMovementOrderFlags`) | synchronous | The gate (section 8). |
+| movement TURN, to units | synchronous | The gate (section 8). |
+| movement TILT, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes the unit's bank and pitch, read by scripts' piece queries (`piece_queries.cpp`), and any later synchronous publish to units delivers units' inbox first, and the publishes after it in `UpdateMotion` call no piece query) |
+| movement ANGLES, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it is published in the carried branch of `UpdatePosition`, after SET_POSITION, and the statement after it is MOVED; any later synchronous publish to units delivers units' inbox first, and no statement between it and that delivery reads the angles) |
+| movement MOVE, to units | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. |
+| movement MOVED, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes `Unit::moved`, which no function of `src/` reads (it is written at five sites, and the scheduler hands `UpdateUnitTail` its own `moved`)) |
+| movement CHANGE_CELL, to units | synchronous | The gate (section 8). |
+| movement MOVE_RATE, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes bits 2 and 3 of `Unit::flags`, which `UpdateMoveRate` reads before it publishes, and economy and the UI read later (the players phase, after a phase boundary)) |
+| movement SET_POSITION, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it is published in the carried branch of `UpdatePosition`, whose next statements read the carrier's piece angles and motion, not the unit's position; any later synchronous publish to units delivers units' inbox first, and SFX_OCCUPY's handler reads `yWhole` after that delivery) |
+| movement SET_STATE_BITS, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it is published in `SetFlightMode` (from SET_FLIGHT_MODE's handler and the steering), whose next statements write the mode and call no reader of the state bits) |
+| movement SFX_OCCUPY, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it is the last publish of `UpdateMotion`, and its handler (`UpdateSfxOccupy`) reads `yWhole` and `flags & 3` and starts `setSFXoccupy` only when the state changed; nothing between it and units' delivery before the tail reads what it writes) |
+| movement START_SCRIPT, to scripts | synchronous | The gate (section 8). |
 | movement ADD_UNIT, to map | synchronous | As before (the gate, `docs/map-interface.md`, section 8); published from `SCHED_MOVEMENT` now, `SCHED_ORDERS` before. |
 | movement REMOVE_UNIT, to map | synchronous | As before (`docs/map-interface.md`, section 8); published from `SCHED_MOVEMENT` now. |
 | movement UPDATE_UNIT, to los_radar | synchronous | As before (`docs/los-radar-interface.md`, section 8); published from `SCHED_MOVEMENT` now. |
@@ -305,8 +309,8 @@ cell, mode, moved, flags) are units' in them. Each pair is served as follows:
 
 How a pair is served, in the three ways of the table: **a view** is read directly from the state block as of the writer's
 last run; **in 3.1c's order within a unit's update** means the scheduler's order is the order of 3.1c's `UpdateUnit`; **a
-synchronous route** is the route above that is made synchronous because a later read needs its write. Which of the
-effect routes are synchronous is section 8's (TBD).
+synchronous route** is the route above that is made synchronous because a later read needs its write. Every effect
+route inside the tick is synchronous, each for the reason in the table of routes above.
 
 ## 5. State and the trace
 
@@ -375,8 +379,8 @@ orders and units): the draws that fall inside a unit's update around movement's 
 
 The scheduler keeps the order of runs in a unit's update: units' head, weapons' step, units' body, orders' two runs, then
 `UpdateMotion`, then units' tail. A route that carries a script's start (START_SCRIPT, whose script can draw and record)
-or map's and los_radar's updates (which record sim events) is made synchronous when queueing moves them: TBD(each route's
-mode: section 8). The three publishes in `UpdatePosition` keep 3.1c's order: map's REMOVE_UNIT, the position effect
+or map's and los_radar's updates (which record sim events) is made synchronous when queueing moves them, and every route of section 4 inside the tick is synchronous: START_SCRIPT
+diverged queued, and map's and los_radar's routes are as before (section 8). The three publishes in `UpdatePosition` keep 3.1c's order: map's REMOVE_UNIT, the position effect
 (CHANGE_CELL), map's ADD_UNIT, the MOVED effect, los_radar's UPDATE_UNIT.
 
 ## 7. What stays inside the default
@@ -468,4 +472,49 @@ After this change:
 
 ## 8. What the gate decided
 
-TBD
+Every route into and out of movement that is new in this change was queued first, each on its own, with every other
+route as in `src/game/routes.cpp` at the end of this change (the tier, with `--no-cache`, on the modern build; the gate
+line of an equal run names the commit it ran at, 1a3180607, c5c394dfe, 0274316fe or 1f78163f3, since commits landed
+meanwhile, and the table of routes was the same in each). A route whose queueing diverged stays synchronous. The
+divergences are against the reference, with the first tick, phase and field of the comparison's report. Where the report's
+first field is an `aiState` squad record that one side lacks, that is an artifact of the comparison, and the row gives the
+tick and phase and the scenario's first `DIFF` line instead. A route that stayed equal is still synchronous when it can be
+pending while a later read in the same phase needs what it writes (#952's rule, section 4); where I found no such read,
+section 4 says so. Movement's LOAD stays queued, since it is published only while a saved game loads; with map's PLACED and
+the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 38 scenarios at fdfcd3cae033).
+
+| Route queued | Tier | First divergence |
+|---|---|---|
+| units NEW | diverged | orders-air, tick 1025, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): stored eca9728ab3cc3df1, got f8e6f6d49f962c8f. |
+| units DESTROY | equal | none (synchronous by #952's rule, section 4) |
+| units LOAD | equal | none (queued, section 4) |
+| units SET_MODE | equal | none (synchronous by #952's rule, section 4) |
+| units SET_SPEED | equal | none (synchronous by #952's rule, section 4; the tier has no network path) |
+| map PLACED | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_TARGET | equal | none (synchronous by #952's rule, section 4) |
+| orders DESTROY_TARGET | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_FLIGHT_MODE | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_ALTITUDE | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_APPROACH_RADIUS | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_HEADING | equal | none (synchronous, section 4: no same-phase read found) |
+| movement ORDER_FLAGS | diverged | orders-air, tick 940, world phase: stored 394b77cd380e1e61, got a3baa9ecf36255af. |
+| movement TURN | diverged | mission-radius, tick 1, units phase (`UpdateAllUnits`, 0x48ad30): `units[9].pos.x` (reference 0x070000a1, queued 0x07000081). |
+| movement TILT | equal | none (synchronous, section 4: no same-phase read found) |
+| movement ANGLES | equal | none (synchronous, section 4: no same-phase read found) |
+| movement MOVE | traces equal, events diverged | mission-capture, tick 1, units phase: the sim event digest (`1 units 36`, stored fb5750c1bbf846e8, got 555fb8667eecd559); also mission-passes-x, tick 5, and mission-radius, tick 1. |
+| movement MOVED | equal | none (synchronous, section 4: no same-phase read found) |
+| movement CHANGE_CELL | diverged | mission-radius, tick 20, world phase: `cells[3408]` (reference first byte 0x00, queued 0x09), 328 fields in all: the cell records of a unit's old and new footprint (map's ADD_UNIT and REMOVE_UNIT, synchronous, read the unit's cell, which CHANGE_CELL writes). |
+| movement MOVE_RATE | equal | none (synchronous, section 4: no same-phase read found) |
+| movement SET_POSITION | equal | none (synchronous, section 4: no same-phase read found) |
+| movement SET_STATE_BITS | equal | none (synchronous, section 4: no same-phase read found) |
+| movement SFX_OCCUPY | equal | none (synchronous, section 4: no same-phase read found) |
+| movement START_SCRIPT | diverged | mission-capture, tick 181, world phase: stored ea630c9c9a33e44c, got e83cde9c9860c414. |
+| movement ADD_UNIT, REMOVE_UNIT to map; UPDATE_UNIT to los_radar | unchanged | synchronous as before (`docs/map-interface.md` and `docs/los-radar-interface.md`, section 8); published from `SCHED_MOVEMENT` now |
+
+**Inbox depths.** Every route into movement that is published inside the tick is synchronous, and the one queued route
+(units' LOAD) is published only while a saved game loads, outside the tick, where each event is delivered at once (#970).
+So movement's inbox never holds an event inside the tick, `SchedEndTick` never finds one, and its depth is 0. No scenario
+counted it. A synchronous delivery into movement runs inside another delivery in two places the code shows: `Apply` of
+orders' STOP calls `DeleteOrders`, and `Order::~Order` publishes SET_TARGET and DESTROY_TARGET (`order_queue.cpp`), so
+movement's `Apply` runs inside orders' `Apply`; and `ApplyAttachUnit`, the handler of orders' ATTACH_TO_PIECE, publishes
+SET_MODE. The network's `ReceiveUnitStates` calls `UpdateMotion` directly, without a delivery (`TODO(#948)`).

@@ -36,7 +36,7 @@ Weapons' place in it:
   (section 5). Features' AREA_DAMAGE and wind_meteors' SPAWN reach it through `WeaponsOnFeaturesAreaDamage` and
   `WeaponsOnMeteorSpawn`, which build the event and hand it to the same handler; their routes in `src/game/routes.cpp`
   are as they were (AREA_DAMAGE synchronous, SPAWN queued).
-- **Routes:** of the sixteen routes into weapons, fourteen are synchronous (seven because the gate diverged with them
+- **Routes:** of the fifteen routes into weapons, fourteen are synchronous (seven because the gate diverged with them
   queued, six by #952's rule, and features' AREA_DAMAGE as it was). Only wind_meteors' SPAWN stays queued (the saved game's slots no longer go through an event: the slot `LoadState`, below). Of weapons' effects, START_SCRIPT,
   DETACH_PIECE and HEALTH are synchronous because the gate diverged with them queued, and MARK_DAMAGED,
   DAMAGE_RECORD, PARALYZE, SHOT_FIRED, COMMAND_SHOT_FIRED, OUT_OF_REACH and BUSY by #952's rule; ATTACKED (four routes), HIT, DAMAGE to features and CLEAR to
@@ -201,7 +201,7 @@ as the effects above. It writes its own state: the projectile table, the explosi
 | SHOT_FIRED 280, COMMAND_SHOT_FIRED 282, OUT_OF_REACH 283 | the header alone | none: these three are the notices its orders wait on, 0x400, 0x800 and 0x1000 of the unit's `netDirtyFlags` |
 | BUSY 281 | `WeaponsBusy` | `until`: the tick the unit is busy until |
 
-**`WeaponsScript`.** START_SCRIPT names the script by an enum, not by a name: NONE 0 (a script of an empty name, as a weapon of slot 3 starts), FIRE_PRIMARY 1, FIRE_SECONDARY 2, FIRE_TERTIARY 3 (the first, second and third weapon fires), AIM_PRIMARY 4, AIM_SECONDARY 5, AIM_TERTIARY 6, ROCK_UNIT 7, SET_MAX_RELOAD_TIME 8 (the longest reload of the unit's weapons, in milliseconds), HIT_BY_WEAPON 9 (the direction a hit came from) and TAKE_DAMAGE 10 (the share of its health a hit took). The scripts side maps each back to the name of the unit script it starts.
+**`WeaponsScript`.** START_SCRIPT names the script by an enum, not by a name: NONE 0 (a script of an empty name, as a fire script's index 3 does), FIRE_PRIMARY 1, FIRE_SECONDARY 2, FIRE_TERTIARY 3 (the first, second and third weapon fires), AIM_PRIMARY 4, AIM_SECONDARY 5, AIM_TERTIARY 6, ROCK_UNIT 7, SET_MAX_RELOAD_TIME 8 (the longest reload of the unit's weapons, in milliseconds), HIT_BY_WEAPON 9 (the direction a hit came from) and TAKE_DAMAGE 10 (the share of its health a hit took). The scripts side maps each back to the name of the unit script it starts.
 
 **`LoadState`.** `LoadState(unit, slot, state)` replaces the LOAD_SLOT event of weapons 2.0. Units calls it for each of a unit's slots while a saved game loads, outside the tick, with a `WeaponsSlotState`: `aimDone`, `typeByte` (a byte of the weapon's type that the save keeps), `aimOffset`, `reload`, `heading`, `pitch`, `stockpile` and `flags` (the slot's flag bits 0, 1, 2 to 3 and 4). It sets the slot's fields as the save held them and writes nothing else; the slot's target pair is restored by targeting's LOAD.
 

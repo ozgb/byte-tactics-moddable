@@ -61,7 +61,7 @@ struct TargetingLoad {
     TargetingEventHeader h;
     // The first half of the target pair, a 16-bit value: a target unit's number, or a ground point's x in whole units (0 for none).
     int xOrUnit;
-    // The second half of the target pair, a 16-bit value: 0x8000 for a target unit or for none, or a ground point's z in whole units.
+    // The second half of the target pair, a 16-bit value sign-extended: -32768 (0xffff8000) for a target unit or for none, or a ground point's z in whole units.
     int zOrSentinel;
 };
 

@@ -129,15 +129,15 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
 | `results` | The path results section (section 8.21), which is dumped and not hashed: its `section` number, the most waypoints of an event it dumps (`points`), and the `fields` of an event in dump order. |
 | `packets` | The share packets section (section 8.23), which is dumped and not hashed: its `section` number and the `fields` of a packet in dump order. |
-| `economy` | The 8.22 section (section economy events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `windMeteors` | The 8.24 section (section wind_meteors events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `features` | The 8.25 section (section features events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `targeting` | The 8.26 section (section targeting events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `los_radar` | The 8.27 section (section los_radar events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `map` | The 8.28 section (section map events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `playersEvents` | The 8.29 section (section players events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `aiEvents` | The 8.30 section (section ai events), which is dumped and not hashed: its `section` number and its `kinds`. |
-| `weaponsEvents` | The 8.31 section (section weapons events), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `economy` | The economy events section (section 8.22), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `windMeteors` | The wind_meteors events section (section 8.24), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `features` | The features events section (section 8.25), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `targeting` | The targeting events section (section 8.26), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `los_radar` | The los_radar events section (section 8.27), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `map` | The map events section (section 8.28), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `playersEvents` | The players events section (section 8.29), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `aiEvents` | The ai events section (section 8.30), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `weaponsEvents` | The weapons events section (section 8.31), which is dumped and not hashed: its `section` number and its `kinds`. |
 
 The event sections (the last nine rows above) are not lists of fields but of kinds. `kinds` maps each kind value
 (the first int of a record, as a decimal string) to an object with the kind's enum `name`, the `size` in bytes of its
@@ -1037,6 +1037,9 @@ outbox, with outcome 1. So the records are in economy's order of consumption and
 events that an effect causes (a share's SPEND and INCOME) follow it. The host empties
 the record after the world row of the tick, so the lines a dump writes after an earlier phase hold the
 records made so far. Each record has the fields of its kind, the `fields` of its entry in `economy.kinds` of the schema, in the order of that list.
+An event shorter than its kind's payload is recorded zero-filled past its size and dumped with every field of its kind, so
+it reads as a full event whose missing fields are 0, with outcome 0; the dump does not write its size. The same holds for
+the event sections 8.24 to 8.31.
 
 ```
 economy.count                                  # n
@@ -1524,7 +1527,8 @@ for k in 0 .. n-1, in order, by the kind of the record:
   their aim scripts, 7 rock unit, 8 set max reload time, 9 hit by weapon, 10 take damage; `update`, `withArgs`,
   `count` and `args` (four i32) are how it starts.
 - `pos` is a position in world coordinates with 16 fractional bits (x, y and z), `vel` a velocity in world units per
-  tick with 16 fractional bits (x, y and z). `weapon` is a weapon definition's number, `stockpiles` the three weapon
+  tick with 16 fractional bits (x, y and z). `weapon` is a weapon definition's number for AREA_DAMAGE and SPAWN, the unit's weapon slot (0 to 2, or 3 for all
+  three) for RELEASE and CLAIM, and the slot (0 to 2) for ADD_STOCKPILE; `stockpiles` the three weapon
   stockpiles of SET_STOCKPILES, and `amount`, `damageKind`, `direction`, `enemyDamage`, `friendlyDamage`, `health`,
   `dying`, `ticks`, `until`, `piece`, `flags`, `pose`, `selfDestruct`, `announce` and `result` the arguments of their
   kinds, as the kind says.

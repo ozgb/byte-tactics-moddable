@@ -372,7 +372,7 @@ The events and effects of a module with an inbox share one convention. Each modu
 starts with `int kind` and holds the fields every kind of the module has (pathfinding's is `PathfindingEventHeader`).
 Each kind has a payload struct `<Module><Kind>` (`TargetingSetUnit`, `EconomySpend`) that starts with the header and adds
 the fields of that kind, or has no payload struct, in which case the event is the header alone and its size is the
-header's. A payload is plain data: 4-byte fields and arrays of them, no pointers; a unit or a piece state is a block
+header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
 offset. Two kinds share one payload struct only when their fields mean the same.
 
 The publisher passes the payload's size with it: `SchedPublish(outbox, &payload, sizeof payload)`. The scheduler copies

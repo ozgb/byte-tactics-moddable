@@ -274,7 +274,8 @@ written in one call, record 44 first.
   (`docs/map-interface.md`, section 5).
 - **The trace dumps los_radar's events** in section 39 (`docs/trace-format.md`, section 8.27), after targeting's
   section 38, and hashes none of them. Each record is an event with the outcome `Apply` gave, in los_radar's order.
-  SIGHT_RESET and SIGHT_LOAD are in section 39 like the other events, with the fields `sightCell` and `sightFrameIdx`.
+  SIGHT_RESET and SIGHT_LOAD are in section 39 like the other events: SIGHT_RESET with the field `unit`, and SIGHT_LOAD
+  with `unit`, `cell` and `frameIdx`.
 
 ## 6. Random draws and sim events
 

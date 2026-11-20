@@ -163,7 +163,7 @@ scenario plays (section 6).
 `Unit`, `UnitMotion` or `Order`. It writes its own: the `Player` records' fields it owns (section 4), the conditions'
 objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
 
-**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

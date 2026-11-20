@@ -88,7 +88,7 @@ enum WeaponsEffectKind {
 
 // The scripts of a unit that weapons starts, by a START_SCRIPT effect.
 enum WeaponsScript {
-    // No script: a script of an empty name, as a weapon of slot 3 starts.
+    // No script: a script of an empty name, as a fire script's index 3 does.
     WEAPONS_SCRIPT_NONE = 0,
     // FirePrimary, when the first weapon fires.
     WEAPONS_SCRIPT_FIRE_PRIMARY = 1,

@@ -122,7 +122,7 @@ The consumer applies a polled event with `ApplyPathEvent(event, size, waypoints)
 ## 4. What the consumers read
 
 The consumers are the order (`AiSearchGoal`, `OrderFx`, `Order`) and the unit's movement (`UnitMotion`).
-Orders apply each polled event, with its size, with `ApplyPathEvent` (`src/orders/order_targets.cpp`).
+Orders apply each polled event, with its size, with `ApplyPathEvent` (`src/movement/order_targets.cpp`).
 
 | What the consumer reads | Who reads it | Marked |
 |---|---|---|

@@ -1248,7 +1248,7 @@ of a chain are recorded whole before a cell's `occupant` reaches them with a lim
 wine build/modern/replay_inject_test.exe --expect 265 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0). They hold weapons' slots but not `Apply`: the replay schema has no `WeaponsEvent` kind yet, so the damage, claims, releases and aim answers that reach weapons as events are not replayed (#1004):
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0). They hold weapons' slots but not `Apply`: the replay schema does not yet replay weapons' `Apply`, so the damage, claims, releases and aim answers that reach weapons as events are not replayed (#1004):
 
 - `orders-guard-attacked`, ticks 1 to 250: two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
 - `orders-air-fights`, ticks 100 to 260: fighters shoot at each other (the line-of-sight handler, `WeaponCanReachUnit`).

@@ -89,7 +89,7 @@ scripts' code and its cost is not targeting's to judge.
 | SET_UNIT 96 | `TargetingSetUnit` | `target`: the unit aimed at, a block offset |
 | SET_POS 97 | `TargetingSetPos` | `pos[3]`: the position aimed at (world coordinates, 16 fractional bits); the weapon aims at x and z |
 | CLEAR 98, RESET 99, CLEARED 112 | the header alone | none |
-| LOAD 100 | `TargetingLoad` | `xOrUnit` (the first half of the saved target pair: a target unit's number, or a ground point's x in whole units, 0 for none), `zOrSentinel` (the second half: 0x8000 for a target unit or none, else the ground point's z) |
+| LOAD 100 | `TargetingLoad` | `xOrUnit` (the first half of the saved target pair: a target unit's number, or a ground point's x in whole units, 0 for none), `zOrSentinel` (the second half, a 16-bit value sign-extended: -32768, 0xffff8000, for a target unit or none, else the ground point's z) |
 
 ## 4. Views
 

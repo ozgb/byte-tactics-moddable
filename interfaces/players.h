@@ -53,7 +53,7 @@ struct PlayersOwnershipRecord {
     int hitPoints;
     // The record's build progress.
     int buildPercent;
-    // The record's angles, 16-bit values: bank, heading and pitch.
+    // The record's angles, 16-bit values sign-extended: bank, heading and pitch.
     int angles[3];
     // The record's stockpiles of the unit's three weapons, 0 to 255.
     int stockpiles[3];

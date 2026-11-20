@@ -82,7 +82,7 @@ struct MapCellsChanged {
 
 // Terrain and map data: the cells units stand on and their heights, the spatial grid of units, the pass maps and when they are current, and the placement tests. The engine delivers map's pending inbox, through Apply, before each synchronous slot below, and at each phase boundary.
 struct MapSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
     int (__stdcall* Apply)(const MapEventHeader* event, unsigned int size);
     // Writes to ids the unit ids of the units within range of pos, in the order the spatial grid holds them, skipping the first skip of them, and returns how many it wrote, at most capacity; a query. Hooks: none.
     int (__stdcall* UnitsInRange)(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity);

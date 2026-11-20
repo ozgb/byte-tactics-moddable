@@ -7,6 +7,7 @@ los_radar,ai,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g1,89,equal,88
 los_radar,economy,Unit::workTime,players,g1,89,equal,88,0,0
 los_radar,pathfinding,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,players,g3,89,equal,88,0,1688
 los_radar,players,bits_142f1,tail,g1,89,equal,88,0,0
+movement,map,PathOrder::pos_z,units,g11,89,equal,88,0,0
 movement,orders,Order::subFlags,projectiles,g9,89,equal,88,0,0
 movement,units,PathOrder::pos_z,units,g9,89,equal,88,0,0
 orders,ai,Unit::group,units,g3,89,equal,88,0,1688

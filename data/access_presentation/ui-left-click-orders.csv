@@ -13,11 +13,11 @@ LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUnitAccount,L
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,Visible,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,GetFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
-LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
-Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
+Mission::type,mission,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::animDirty,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::animDirty,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
@@ -185,6 +185,7 @@ Unit::playerIndex,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIg
 Unit::playerIndex,presentation,QueueUnitSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::playerIndex,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::playerIndex,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::pos,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::pos,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::pos,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::pos,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -213,20 +214,19 @@ Unit::weapon,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT M
 Unit::weapon,orders,GetOrderType,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::weapon,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::xWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::yFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::yFraction,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::yFraction,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::yWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zBufferFlag,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zBufferFlag,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::zFraction,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zFraction,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zFraction,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zFraction,presentation,IssueOrderToSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::zWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 UnitDef::buildMenuPageCount,presentation,BuildEntryGuiName,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitDef::buildMenuPageCount,presentation,RefreshOrderButtons,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitDef::buildMenuPageCount,presentation,SetPrevNextGadgetNames,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
@@ -274,8 +274,8 @@ bits_38a51,game,MainLoopTick,bits_38a51,1,
 bits_38a51,presentation,DrawBattleFrame,bits_38a51,1,
 cells,los_radar,FreeLosTables,cells,1,
 cells,los_radar,GetMapCellAtPosition,cells,0,
+cells,map,GetGroundHeight,cells,1,
 cells,presentation,DrawBattleFrame,cells,1,
-cells,units,GetGroundHeight,cells,1,
 count_1491b,presentation,DrawExplosions,count_1491b,1,
 defs,presentation,BuildEntryGuiName,defs,0,-
 defs,units,FindUnitTypeId,defs,0,
@@ -291,8 +291,8 @@ g_missionOrderTableVec,orders,MissionType::GetTableEntry,g_missionOrderTableVec,
 height,los_radar,BuildFogTiles,height,0,
 height,los_radar,FreeLosTables,height,1,
 height,los_radar,GetMapCellAtPosition,height,0,
+height,map,GetGroundHeight,height,1,
 height,presentation,DrawBattleFrame,height,1,
-height,units,GetGroundHeight,height,1,
 localPlayer,presentation,BuildEntryGuiName,localPlayer,0,-
 localPlayer,presentation,ClickSelectHoverUnit,localPlayer,0,-
 localPlayer,presentation,DisableUnavailableBuildMenuEntries,localPlayer,0,-
@@ -307,8 +307,7 @@ mapWidth,game,MinimapCursorToWorldPos,mapWidth,0,
 mapWidth,presentation,CalcRadarViewportRect,mapWidth,0,-
 mapWidth,presentation,CenterCameraOnRadarClick,mapWidth,0,-
 mapWidth,presentation,ClampCameraPosition,mapWidth,0,-
-net,presentation,DrawBattleFrame,net,1,
-net,presentation,DrawUnitInfoPanel,net,0,-
+net,seams,GetGameTypeNative,net,1,
 p1b8a,presentation,DrawBattleFrame,p1b8a,1,
 p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,
 p1b8a,presentation,UnitTable::DrawPieces,p1b8a,0,
@@ -361,7 +360,7 @@ unknown_1b8e,presentation,ResolveCursorModeForSelection,unknown_1b8e,0,
 width,los_radar,BuildFogTiles,width,0,
 width,los_radar,FreeLosTables,width,1,
 width,los_radar,GetMapCellAtPosition,width,0,
+width,map,GetGroundHeight,width,1,
 width,presentation,BlitFeatureGaf,width,1,
 width,presentation,DrawBattleFrame,width,1,
 width,presentation,DrawMapTiles,width,1,
-width,units,GetGroundHeight,width,1,

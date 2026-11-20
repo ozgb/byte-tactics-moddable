@@ -1349,7 +1349,7 @@ the split lies in.
 | movement | los_radar | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 2 | 2 |
 | movement | map | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 |  | by item | 1 | 1 |
 | movement | map | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 | `movement.UpdateMotion` | by item | 1 | 1 |
-| movement | map | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 2 | 2 |
+| movement | map | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 3 | 2 |
 | movement | orders | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 |  | by item | 1 | 1 |
 | movement | orders | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 | `movement.UpdateMotion` | by item | 1 | 1 |
 | movement | orders | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 6 | 6 |
@@ -1358,7 +1358,7 @@ the split lies in.
 | movement | scripts | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 6 | 6 |
 | movement | targeting | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 4 | 4 |
 | movement | units | units, each entity | apply before continuing | `movement.UpdateMotion` (step 15) | the caller | `movement.UpdateMotion` | by item | 2 | 2 |
-| movement | units | units, each entity | apply before continuing | `players.Apply` (step 2) | the caller |  | by subsystem | 10 | 8 |
+| movement | units | units, each entity | apply before continuing | `players.Apply` (step 2) | the caller |  | by subsystem | 9 | 8 |
 | movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 |  | by item | 1 | 1 |
 | movement | weapons | units, each entity | split | `movement.UpdateMotion` (step 15) | `players.Apply` again, after step 15 | `movement.UpdateMotion` | by item | 1 | 1 |
 | movement | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 6 | 5 |
@@ -1415,8 +1415,7 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| features | map | projectiles, each entity | split | `features.Apply` (step 10) | `features.Apply` again, after step 10 | `features.Apply` | by subsystem | 1 | 0 |
-| features | units | projectiles, each entity | split | `features.Apply` (step 10) | `targeting.Apply` (step 11) | `features.Apply` | by subsystem | 1 | 1 |
+| features | map | projectiles, each entity | split | `features.Apply` (step 10) | `features.Apply` again, after step 10 | `features.Apply` | by subsystem | 1 | 1 |
 | features | weapons | projectiles, each entity | apply before continuing | `features.Apply` (step 10) | the caller | `features.Apply` | by subsystem | 2 | 2 |
 | orders | movement | projectiles, each entity | split | `features.Apply` (step 10) | `features.Apply` again, after step 10 | `features.Apply` | by subsystem | 1 | 0 |
 | orders | targeting | projectiles, each entity | split | `features.Apply` (step 10) | `targeting.Apply` (step 11) | `features.Apply` | by item | 1 | 1 |
@@ -1454,7 +1453,6 @@ the split lies in.
 | orders | units | players, each entity | split | `units.CreateUnit` (step 16) | `economy.UpdatePlayerEconomy` (step 21) | `units.CreateUnit` | by subsystem | 1 | 0 |
 | units | ai | players, each entity | split | `units.RefreshFactoryIndex` (step 6) | `ai.UpdatePlayerAI` (step 7) |  | by subsystem | 2 | 2 |
 | units | los_radar | players, each entity | split | `units.CreateUnit` (step 16) | `los_radar.Apply` again, after step 16 | `units.CreateUnit` | by item | 2 | 2 |
-| units | map | players, each entity | split | `units.RefreshFactoryIndex` (step 6) | `map.CanPlaceUnitFootprint` (step 12) |  | by subsystem | 2 | 0 |
 | units | targeting | players, each entity | split | `units.RefreshFactoryIndex` (step 6) | `units.CreateUnit` (step 16) |  | by subsystem | 1 | 1 |
 | weapons | ai | players, each entity | split | `units.CreateUnit` (step 16) | `economy.UpdatePlayerEconomy` (step 21) | `units.CreateUnit` | by subsystem | 2 | 2 |
 
@@ -1462,8 +1460,7 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| features | map | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 3) |  | by subsystem | 3 | 0 |
-| features | units | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 3) |  | by subsystem | 1 | 1 |
+| features | map | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 3) |  | by subsystem | 3 | 1 |
 | features | weapons | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 3) |  | by subsystem | 1 | 1 |
 | units | weapons | features.anim, each entity of loop 2 | split | `weapons.Apply` (step 3) | `weapons.Apply` again, after step 3 | `weapons.Apply` | by item | 1 | 0 |
 
@@ -1484,16 +1481,16 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 |---|---|---|---|---|---|---|---|
 | wind_meteors | 0 / 0 | 0 / 0 | 0 / 0 | 1 / 0 | 0 | 0 | 0 |
 | economy | 0 / 0 | 1 / 1 | 0 / 2 | 2 / 8 | 39 | 3 | 41 |
-| features | 1 / 0 | 5 / 5 | 0 / 0 | 3 / 5 | 15 | 3 | 18 |
+| features | 1 / 0 | 5 / 5 | 0 / 0 | 3 / 5 | 13 | 3 | 16 |
 | ai | 0 / 0 | 2 / 0 | 0 / 2 | 3 / 2 | 0 | 18 | 18 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 1 | 0 / 1 | 0 | 0 | 0 |
 | weapons | 0 / 2 | 10 / 3 | 0 / 2 | 8 / 5 | 19 | 55 | 74 |
 | targeting | 1 / 0 | 3 / 4 | 0 / 0 | 1 / 8 | 4 | 31 | 35 |
 | los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 6 | 11 | 26 | 36 |
 | orders | 3 / 0 | 21 / 1 | 17 / 6 | 32 / 1 | 24 | 56 | 80 |
-| units | 3 / 0 | 4 / 6 | 24 / 12 | 14 / 10 | 136 | 39 | 175 |
+| units | 3 / 0 | 4 / 6 | 24 / 12 | 14 / 10 | 134 | 36 | 170 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 7 / 4 | 1 | 12 | 11 |
-| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 16 | 32 | 48 |
+| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 16 | 31 | 47 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 15 | 0 / 8 | 20 | 25 | 45 |
 | movement | 0 / 3 | 3 / 0 | 5 / 12 | 10 / 13 | 48 | 33 | 81 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |

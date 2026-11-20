@@ -22,13 +22,6 @@ struct UnitPassMapView {
     Point16 b;
 };
 
-struct UnitPassMapStampView {
-    Ref<MotionTickView> unit;
-    char unknown_4[0x76 - 0x4];
-    Point16 a;
-    char unknown_7a[0x7e - 0x7a];
-    Point16 b;
-};
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -203,7 +196,7 @@ void __stdcall BuildAllPassMaps(const MapMoveLimits* limits, int count)
         g_passMaps.entries[i].defined = 0;
     for (int i = 0; i < count; i++) {
         const MapMoveLimits* l = &limits[i];
-        PassMap* m = &g_passMaps.entries[l->index & 31];
+        PassMap* m = &g_passMaps.entries[l->index];
         m->footprintX = l->footprintX;
         m->footprintZ = l->footprintZ;
         m->maxWaterDepth = l->maxWaterDepth;
@@ -286,7 +279,7 @@ void __stdcall RefreshAllPassMapsForUnits(Point16 a, Point16 b)
 }
 
 // FUNCTION: 0x440a70
-void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p)
+void __stdcall RefreshPassMapsForUnit(UnitPassMapView* p)
 {
     if (p->unit != 0) {
         unsigned int last = p->unit->lastTick;

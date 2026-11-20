@@ -497,8 +497,6 @@ remove:
     SetOwner(obj, (UnitBucket*)g_game->overflowBucket.get());
 }
 
-struct UnitPassMapStampView;
-
 // FUNCTION: 0x47d0e0
 void __stdcall RemoveUnitFromMap(Unit* obj)
 {
@@ -548,7 +546,7 @@ void __stdcall RemoveUnitFromMap(Unit* obj)
         ClaimFootprintVisitor visitor;
         VisitObjectsInArea(obj->cell, obj->footprint, &visitor);
     }
-    RefreshPassMapsForUnit((UnitPassMapStampView*)obj);
+    RefreshPassMapsForUnit((UnitPassMapView*)obj);
 }
 
 struct BuildCenterFixed {

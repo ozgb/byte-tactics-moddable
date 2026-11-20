@@ -6,7 +6,6 @@
 struct MapMoveLimits;
 struct Point16;
 struct UnitPassMapView;
-struct UnitPassMapStampView;
 
 class PassMap {
 public:
@@ -48,6 +47,6 @@ void __stdcall BuildAllPassMaps(const MapMoveLimits* limits, int count);
 void __stdcall FreePassMaps(void);
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
 void __stdcall RefreshAllPassMapsForUnits(Point16 a, Point16 b);
-void __stdcall RefreshPassMapsForUnit(UnitPassMapStampView* p);
+void __stdcall RefreshPassMapsForUnit(UnitPassMapView* p);
 
 #endif

@@ -12705,9 +12705,9 @@ address,function,file,kind,target
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,PassMap::width
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,Point16::x
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,Point16::y
-0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::a
-0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::b
-0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapStampView::unit
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapView::a
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapView::b
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_read,UnitPassMapView::unit
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,field_write,MotionTickView::lastTick
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,function,
 0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,global_escape,g_passMaps

@@ -219,7 +219,8 @@ water limits, `mobile`), motion and carrier chain (`carrier`, `cargo`, `cargoNex
 and the cell records, section below), the feature on a cell (`features.GetCellFeature`) and a feature's flags, metal
 and energy; what the viewing player sees (`IsUnitVisibleToPlayer`, `los_radar.IsPointVisible` for `CanBuildAt`'s
 visibility check); the players' alliance words (`pad_1df4`, `unknown_1b8e`, `unknown_1cd9`); the movement classes
-(`g_movementClassEntries`: their sizes, footprints and limits, which units reads from `MOVEINFO.TDF` at load). All as
+(until 7.0 units' table, whose footprints and limits units reads from `MOVEINFO.TDF` at load; since 7.0 map reads its
+own copy of them in `g_passMaps`, which `BuildAllPassMaps` is given). All as
 of each module's last run, read inside map's events, synchronous slots and
 queries, at the caller's statement.
 
@@ -308,7 +309,7 @@ and `first`.
 | A unit's bucket and chain link (`Unit::spatialBucket`; `Unit::cargoNext` of a unit not carried) | the unit, hashed | map, orders, units | no |
 | The footprints: `unit`, `unit2` and the yard bit of the cells | the cell records, hashed (section 11) | map, units, orders, weapons, los_radar, features | no |
 | The claim bits of `Unit::flags`, `Unit::bit2` | the unit, hashed | map, units | no: units reads the word |
-| The pass maps (`g_passMaps`, the 32 `PassMap` records, and the words `BuildAllPassMaps` allocates) | sim globals and state block, hashed | map, pathfinding (through its world view) | no |
+| The pass maps (`g_passMaps`, the 32 `PassMap` records, and the words `BuildAllPassMaps` allocates) | sim globals and state block; `width`, `height`, `lastTick` and the words are hashed, the copied limits and `defined` are not (section 5) | map, pathfinding (through its world view) | no |
 | The placement record: `g_lastPlaceMetalSum` | sim globals, hashed | map, ai | no |
 | The placement record: `g_lastPlaceHeight` | sim globals, hashed | map (the sim); presentation's `movies.cpp` | yes, in the simulation |
 
@@ -362,6 +363,9 @@ Every place a `MovementClass*` crossed a seam in 6.0, and what it became:
 (`kMoveClassTable`, which `tools/traceschema.py` keeps as a synthetic 32-byte `MovementClass`): bytes 0 to 15 from units' `g_movementClasses` and bytes 16 to 31 from
 map's `g_passMaps`, in 3.1c's order, and the `moveclass` refs (a unit's motion and type) resolve to the same index, as
 the stride is now units' 16-byte record. So the format and every stored trace are unchanged, and the gate is the tier.
+Map's copy of the 12 bytes of limits and `PassMap::defined` are hashed nowhere: the record takes those bytes from
+units' definition, which is what `BuildAllPassMaps` was handed, so they are checked only through that definition and
+through the sizes and words of the pass maps built from them.
 
 **The trace dumps map's events** in section 40 (`docs/trace-format.md`, section 8.28), after los_radar's section 39,
 and hashes none of them. Each record is an event with the outcome `Apply` gave, or a CELLS_CHANGED map published, in

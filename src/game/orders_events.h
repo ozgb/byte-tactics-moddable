@@ -29,6 +29,7 @@ inline unsigned int OrdersEventSize(int kind)
 {
     switch (kind) {
     case ORDERS_ADD:
+    case ORDERS_COMMAND:
         return sizeof(OrdersAdd);
     case ORDERS_QUEUE_BUILD:
         return sizeof(OrdersQueueBuild);
@@ -67,10 +68,10 @@ inline void OrdersPublishEffect(const void* effect, unsigned int size)
 }
 
 template <class V>
-inline void OrdersPublishAdd(int outbox, Unit* unit, int type, int queue, Unit* target, const V* pos, int param0, int param1)
+inline void OrdersPublishAdd(int outbox, int kind, Unit* unit, int type, int queue, Unit* target, const V* pos, int param0, int param1)
 {
     OrdersAdd event;
-    event.h = OrdersHeaderOf(ORDERS_ADD, unit);
+    event.h = OrdersHeaderOf(kind, unit);
     event.type = type;
     event.queue = queue;
     event.target = Ref<Unit>(target).offset;

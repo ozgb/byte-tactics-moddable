@@ -48,7 +48,9 @@ enum OrdersEventKind {
     // unit was damaged by an attacker (OrdersAttacked): a unit of an active player of type 1 or 2 that can return fire attacks it, or aims its free weapons at it; outcome 1.
     ORDERS_ATTACKED = 293,
     // unit is paralysed for more ticks (OrdersParalyze): when its first order is a paralysis, that order lasts longer, else a paralysis order is added after its orders; outcome 1.
-    ORDERS_PARALYZE = 294
+    ORDERS_PARALYZE = 294,
+    // The player commands unit (OrdersAdd): with queue 1, an order of the same type against the same target, at the same position give or take 16 world units, is deleted from unit's orders when it has one, and is otherwise added as ADD adds it; outcome 1.
+    ORDERS_COMMAND = 295
 };
 
 // The kinds of effect orders publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
@@ -71,7 +73,7 @@ enum OrdersEffectKind {
     ORDERS_EFFECT_START_SCRIPT = 311
 };
 
-// The payload of ADD.
+// The payload of ADD and COMMAND.
 struct OrdersAdd {
     // The kind and the unit ordered.
     OrdersEventHeader h;

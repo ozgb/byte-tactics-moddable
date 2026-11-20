@@ -262,7 +262,7 @@ cite the document that decided them; the routes new in this change cite the gate
 | engine QUEUE_BUILD, to orders | queued | The same: published only by `QueueBuildOrderWithSound` (`control_panel.cpp`), from the build menu's click and the harness's scripted orders, between ticks. |
 | units STOP, to orders | synchronous | The gate (section 8): queued, the scenarios crashed (exit code 3). |
 | units BE_CARRIED, to orders | synchronous | The gate (section 8). |
-| units STATUS_FLAGS, to orders | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it writes an order's `flags_42` (`ClearRef`, `ClearUnitRefs`, `NotifyUnitRefs` in `unit_targets.cpp`, `Unit::SetStateBits` in `unit.cpp`), which orders reads in `RunOrders` and `RunSecondaryOrders` of the order's own unit, after the scheduler's delivery of orders' inbox, and movement's goals read in `UpdateMotion`, after movement's; I found no reader between the publish and those deliveries) |
+| units STATUS_FLAGS, to orders | synchronous | #952's rule. Queued it stayed equal on the tier, but an order's own reference publishes it: `Order::~Order` and `UnitRefSetValue` clear the order's `link` through `ClearRef`, whose listener is that order, so a queued event would reach an order `RunOrders` has already freed; and `RunOrders` loops over the unit's orders in one call, reading the next order's `subFlags` (where `OrStatusFlags` writes) before orders' next delivery. |
 | movement ORDER_FLAGS, to orders | synchronous | The gate (section 8). |
 | ai ADD_ORDER, to orders (`OrdersOnAiAddOrder`) | synchronous | As before (the gate, `docs/ai-interface.md`, section 8). |
 | ai QUEUE_BUILD, to orders (`OrdersOnAiQueueBuild`) | synchronous | As before (#952's rule, `docs/ai-interface.md`, section 4). |
@@ -271,18 +271,18 @@ cite the document that decided them; the routes new in this change cite the gate
 | weapons PARALYZE, to orders (`OrdersOnWeaponsParalyze`) | synchronous | As before (#952's rule, `docs/weapons-interface.md`, section 4). |
 | weapons HIT, to units (`UnitsOnWeaponsHit`; was orders' `OrdersOnWeaponsHit`) | synchronous | As before (#952's rule, `docs/ai-interface.md`, section 4): the handler is units' now, and the write, `Unit::netDirtyFlags`, is the same. |
 | orders SET_STATE_BITS, to units | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. |
-| orders SET_POSITION, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `TeleportOrder`, which moves the other units whose position lies in a box around the teleporter, and each unit is read once, before its own move, in that loop; a moved unit's own update comes later, after units' inbox is delivered at its head) |
+| orders SET_POSITION, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `TeleportOrder` moves other units, and the rest of the step reads every unit's position: `RunSecondaryOrders`' target searches and map's `UnitsInRange` read `Unit::pos` and the cells `SetUnitPosition` writes, before units' delivery after `UpdateMotion`. |
 | orders ATTACH_TO_PIECE, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but a transport detaches itself (`OrdersPublishAttachToPiece(unit, 0, -1, 2)` in `PrepVtolClimb` and the VTOL orders that follow it), and the same unit's `UpdateMotion`, which the scheduler runs after `RunSecondaryOrders` with only movement's inbox delivered, reads `u->carrier` in `UnitMotion::UpdatePosition`; and the attach's handler publishes movement's SET_MODE, which the next statement reads (`unit->motion->flags & 3`). |
 | orders FINISH_CONSTRUCTION, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `BuildingBuildOrder`'s cancel branch publishes it for the half-built target and, in the next statement, a synchronous DAMAGE of 30000 on the same unit, and `ApplyUnitDamage` (`damage.cpp`) returns for a victim whose `flags & 0x4000` is set, a bit `FinishConstruction` sets (with `buildLeft` and `lastDamageType`) for a type with `b24`. |
-| orders BUILD_DECAY, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `GetBuiltOrder`, for the unit being built, and its handler (`ApplyUnfinishedBuildDecay`) is `AddBuildProgress` on that unit; the readers of `buildLeft` and `health` in `src/orders/` I found are of `order->target`, another unit, or in later runs of the order) |
-| orders REPAIR, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its handler is `AddRepairProgress`, which requests energy from economy and publishes a DAMAGE of type 10, and its publisher (`VtolRepairUnitOrder`, `vtol_orders.cpp`) reads nothing of the repaired unit after it but the target's position for the nano particles) |
+| orders BUILD_DECAY, to units | queued | #952's rule finds no read: its only publisher is `GetBuiltOrder`, for the unit being built, and its handler (`ApplyUnfinishedBuildDecay`) is `AddBuildProgress` on that unit; the readers of `buildLeft` and `health` in `src/orders/` are of `order->target`, another unit, or in later runs of the order. |
+| orders REPAIR, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but its handler (`AddRepairProgress`) spends the player's energy through economy's synchronous request, and `RunOrders`' loop and `RunSecondaryOrders` request energy for the unit's other orders before units' next delivery, reading the energy it would have spent. |
 | orders UNLINK, to units | synchronous | The gate (section 8). |
-| orders BUSY, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; `Unit::workTime` is read by economy's cloak upkeep (`economy.cpp`, through `WorldUnitInfo`) in the players phase, after a phase boundary has delivered it, and by the info panel, outside the tick; nothing in `src/orders/` reads it) |
-| orders SET_FLAGS, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; it sets and clears bits 0x20, 0x800 and 0x8000 of `Unit::flags` (`MakeSelectableOrder`, `CloakOnOrder`, `CloakOffOrder`), whose readers I found are economy's and victory's in the players phase and the UI) |
+| orders BUSY, to units | queued | #952's rule finds no read: `Unit::workTime` is read by economy's cloak upkeep (`economy.cpp`, through `WorldUnitInfo`) in the players phase, after a phase boundary has delivered it, and by the info panel, outside the tick; nothing in `src/orders/` reads it. |
+| orders SET_FLAGS, to units | queued | #952's rule finds no read: it sets and clears bits 0x20, 0x800 and 0x8000 of `Unit::flags` (`MakeSelectableOrder`, `CloakOnOrder`, `CloakOffOrder`), whose readers are economy's and victory's in the players phase and the UI. |
 | orders CLEAR_NET_DIRTY, to units | synchronous | The gate (section 8). |
-| orders SET_STANCE, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; the stance is read back only at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, and by the orders panel, outside the tick) |
-| orders SET_ANGLES, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head) |
-| orders SET_BUILD_STATE, to units | synchronous | TBD(no same-phase read found: queued it stayed equal on the tier; its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` I found run in later states of the order or in the unit's own update) |
+| orders SET_STANCE, to units | queued | #952's rule finds no read: the stance is read back only at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, and by the orders panel, outside the tick. |
+| orders SET_ANGLES, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head. |
+| orders SET_BUILD_STATE, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` run in later states of the order or in the unit's own update. |
 | orders START_SCRIPT, to scripts | synchronous | The gate (section 8). |
 | orders REQUEST, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
 | orders INCOME, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
@@ -421,8 +421,8 @@ meanwhile, and the table of routes was the same in each). A route whose queueing
 divergences are against the reference, with the first tick, phase and field of the comparison's report. Where the report's
 first field is an `aiState` squad record that one side lacks, that is an artifact of the comparison, and the row gives the
 tick and phase and the scenario's first `DIFF` line instead. A route that stayed equal is still synchronous when it can be
-pending while a later read in the same phase needs what it writes (#952's rule, section 4); where I found no such read,
-section 4 says so. The engine's COMMAND and QUEUE_BUILD and movement's LOAD stay queued, since they are published only
+pending while a later read in the same phase needs what it writes (#952's rule, section 4); the routes it
+finds no such read for are queued together (section 4), and the gate of this change ran with them queued. The engine's COMMAND and QUEUE_BUILD and movement's LOAD stay queued, since they are published only
 outside the tick; with them and map's PLACED queued together, the tier was equal (38 of 38 scenarios at fdfcd3cae033).
 
 | Route queued | Tier | First divergence |
@@ -432,21 +432,21 @@ outside the tick; with them and map's PLACED queued together, the tier was equal
 | engine QUEUE_BUILD | equal | none (queued, section 4) |
 | units STOP | crashed | mission-kill-of-type ended at tick 181 of 360 (exit code 3), and `stopped: 16 scenarios not finished`; eight-full-moon's first run failed too. No complete trace to compare. |
 | units BE_CARRIED | diverged | orders-air, tick 1025: stored eca9728ab3cc3df1, got ff5198cece061df9. The comparison's replay of the scenario exited with code 2, so it gave no report. |
-| units STATUS_FLAGS | equal | none (synchronous, section 4: no same-phase read found) |
+| units STATUS_FLAGS | equal | none (synchronous by #952's rule, section 4) |
 | movement ORDER_FLAGS | diverged | orders-air, tick 940, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): stored 394b77cd380e1e61, got a3baa9ecf36255af. |
 | orders SET_STATE_BITS | traces equal, events diverged | eight-full-moon, tick 5636, units phase: the sim event digest (`5636 units 8`, stored 4bb93f76561b11ce, got ff3dbf0252c62e3c); also mission-kill-of-type tick 90, mission-passes-z tick 99, orders-air tick 1025 and ui-build-menu tick 87. |
-| orders SET_POSITION | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_POSITION | equal | none (synchronous by #952's rule, section 4) |
 | orders ATTACH_TO_PIECE | equal | none (synchronous by #952's rule, section 4) |
 | orders FINISH_CONSTRUCTION | equal | none (synchronous by #952's rule, section 4) |
-| orders BUILD_DECAY | equal | none (synchronous, section 4: no same-phase read found) |
-| orders REPAIR | equal | none (synchronous, section 4: no same-phase read found) |
+| orders BUILD_DECAY | equal | none (queued, section 4: #952's rule finds no read) |
+| orders REPAIR | equal | none (synchronous by #952's rule, section 4) |
 | orders UNLINK | diverged | conditions-dark-side, tick 302: stored 75eb1125904e65c8, got d190d9504c9ba36a. The comparison's report timed out after 300 s. |
-| orders BUSY | equal | none (synchronous, section 4: no same-phase read found) |
-| orders SET_FLAGS | equal | none (synchronous, section 4: no same-phase read found) |
+| orders BUSY | equal | none (queued, section 4: #952's rule finds no read) |
+| orders SET_FLAGS | equal | none (queued, section 4: #952's rule finds no read) |
 | orders CLEAR_NET_DIRTY | diverged | mission-build-unit, tick 79, units phase (`UpdateAllUnits`, 0x48ad30): `rng.parkMiller` (reference 0x770d7425, queued 0x1219520c). |
-| orders SET_STANCE | equal | none (synchronous, section 4: no same-phase read found) |
-| orders SET_ANGLES | equal | none (synchronous, section 4: no same-phase read found) |
-| orders SET_BUILD_STATE | equal | none (synchronous, section 4: no same-phase read found) |
+| orders SET_STANCE | equal | none (queued, section 4: #952's rule finds no read) |
+| orders SET_ANGLES | equal | none (queued, section 4: #952's rule finds no read) |
+| orders SET_BUILD_STATE | equal | none (queued, section 4: #952's rule finds no read) |
 | orders START_SCRIPT | diverged | orders-air, tick 1688, world phase: stored 2f9520d4ff7b7f17, got 151c8cc16975ad77. |
 | ai ADD_ORDER, QUEUE_BUILD, STOP | unchanged | synchronous as before (`docs/ai-interface.md`, section 8) |
 | weapons ATTACKED, PARALYZE, HIT | unchanged | synchronous as before (`docs/ai-interface.md`, section 8, and `docs/weapons-interface.md`, section 8) |

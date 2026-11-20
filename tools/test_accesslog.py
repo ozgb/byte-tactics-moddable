@@ -486,6 +486,20 @@ class MapTest(unittest.TestCase):
         self.assertEqual(al.subsystem_of("?Guess@@YAXXZ", "0005_unlisted.cpp.obj", self.rows), "presentation")
         self.assertEqual(al.subsystem_of("?Guess@@YAXXZ", "0006_nowhere.cpp.obj", self.rows), al.UNKNOWN)
 
+    def test_a_deleting_destructor_is_its_classs_destructors_else_its_members_only_subsystem(self):
+        path = Path(self.tmp.name) / "mixed.csv"
+        path.write_text("function,file,subsystem,rule,override\n"
+                        "Goal::~Goal,src/movement/goal.cpp,movement,file:src/movement/,\n"
+                        "Lite::Tick,src/movement/goal.cpp,movement,file:src/movement/,\n"
+                        "Pos::Pos,src/movement/goal.cpp,movement,file:src/movement/,\n"
+                        "Pos::Load,src/movement/goal.cpp,units,file:src/movement/,units\n"
+                        "MakeVec,src/movement/goal.cpp,platform,file:src/movement/,platform\n")
+        rows = al.read_subsystems(path)
+        self.assertEqual(al.subsystem_of("??_GGoal@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), "movement")
+        self.assertEqual(al.subsystem_of("??_ELite@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), "movement")
+        self.assertEqual(al.subsystem_of("??_EPos@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), al.UNKNOWN)
+        self.assertEqual(al.subsystem_of("??_GOther@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), al.UNKNOWN)
+
     def test_attribution_table_ignores_the_block_and_the_ref_helpers(self):
         subs, ranges, counts = al.attribution_table(self.info, self.rows)
         def sub_at(address):

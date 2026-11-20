@@ -2832,7 +2832,7 @@ class EventForms(unittest.TestCase):
             structs = rs.interface_structs(sub)
             for value, (_, struct, _, fields) in rs.traceschema.event_kinds(module).items():
                 trace = {name for name, _, kind, _, _ in fields if kind == "ref"}
-                replay = {f["name"] for f in rs.flatten_event_fields(structs, struct) if f["kind"] == "ref"}
+                replay = {f["name"] for f in rs.flatten_event_fields(structs, struct, handles=module.handles) if f["kind"] == "ref"}
                 self.assertEqual(replay, trace, (sub, value))
 
     def test_every_weapons_field_that_holds_a_unit_is_a_ref(self):

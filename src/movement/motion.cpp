@@ -525,7 +525,7 @@ void UnitMotion::UpdatePosition(Unit* u)
     }
 
     MapPublishUnit(SCHED_MOVEMENT, MAP_REMOVE_UNIT, u);
-    MovementPublishChangeCell(u, pos.x, pos.y, pos.z, cell.x, cell.y, m);
+    MovementPublishChangeCell(u, pos, cell.x, cell.y, m);
     MapPublishUnit(SCHED_MOVEMENT, MAP_ADD_UNIT, u);
     MovementPublishMoved(u, 1);
     LosRadarPublishUpdateUnit(SCHED_MOVEMENT, u);

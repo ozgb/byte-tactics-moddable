@@ -139,14 +139,14 @@ inline void MovementPublishMoved(U* unit, int moved)
     MovementPublishEffect(&effect, sizeof(effect));
 }
 
-template <class U>
-inline void MovementPublishChangeCell(U* unit, int x, int y, int z, int cellX, int cellY, int mode)
+template <class U, class P>
+inline void MovementPublishChangeCell(U* unit, const P& pos, int cellX, int cellY, int mode)
 {
     MovementChangeCell effect;
     effect.h = MovementHeaderOf(MOVEMENT_EFFECT_CHANGE_CELL, unit);
-    effect.pos[0] = x;
-    effect.pos[1] = y;
-    effect.pos[2] = z;
+    effect.pos[0] = pos.x;
+    effect.pos[1] = pos.y;
+    effect.pos[2] = pos.z;
     effect.cell[0] = cellX;
     effect.cell[1] = cellY;
     effect.mode = mode;

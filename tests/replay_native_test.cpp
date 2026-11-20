@@ -77,23 +77,23 @@ int HarnessTestMode()
     return 1;
 }
 
-void __stdcall HarnessTargetingEvent(const TargetingEvent*, int)
+void __stdcall HarnessTargetingEvent(const TargetingEventHeader*, unsigned int, int)
 {
 }
 
-void __stdcall HarnessLosRadarEvent(const LosRadarEvent*, int)
+void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader*, unsigned int, int)
 {
 }
 
-void __stdcall HarnessMapEvent(const MapEvent*, int)
+void __stdcall HarnessMapEvent(const MapEventHeader*, unsigned int, int)
 {
 }
 
-void __stdcall HarnessPlayersEvent(const PlayersEvent*, int)
+void __stdcall HarnessPlayersEvent(const PlayersEventHeader*, unsigned int, int)
 {
 }
 
-void __stdcall HarnessWeaponsEvent(const WeaponsEvent*, int)
+void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int)
 {
 }
 
@@ -809,6 +809,19 @@ void ParseStruct(const char* name, unsigned kind, void* object)
             g_rootObjects[g_rootCount++] = target;
         }
     }
+}
+
+void ParseEvent(const char* name, unsigned table, void* buffer)
+{
+    char key[96];
+    sprintf(key, "%s.kind", name);
+    const char* value = ArgLine(key);
+    for (unsigned i = 0; value != nullptr && i < kReplayObjectFieldCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object == kReplayEventTables[table].header && strcmp(f.name, "kind") == 0)
+            ReplayRestoreObjectField(f, buffer, value, g_objects, AllocObject);
+    }
+    ParseStruct(name, ReplayEventObject(table, *(int*)buffer), buffer);
 }
 
 void* ParseStructOpt(const char* name, unsigned kind, void* storage)
@@ -1605,19 +1618,19 @@ void __cdecl UpdateWindSlot(RandStream stream)
     UpdateWindOnStream(stream);
 }
 
-void __stdcall ApplySlot(const WindMeteorsEvent* event)
+void __stdcall ApplySlot(const WindMeteorsEventHeader* event, unsigned int size)
 {
-    WindMeteorsApply(event);
+    WindMeteorsApply(event, size);
 }
 
-int __stdcall ApplyTargetingSlot(const TargetingEvent* event)
+int __stdcall ApplyTargetingSlot(const TargetingEventHeader* event, unsigned int size)
 {
-    return ApplyTargetingEvent(event);
+    return ApplyTargetingEvent(event, size);
 }
 
-int __stdcall ApplyMapEventSlot(const MapEvent* event)
+int __stdcall ApplyMapEventSlot(const MapEventHeader* event, unsigned int size)
 {
-    return ApplyMapEvent(event);
+    return ApplyMapEvent(event, size);
 }
 
 void __stdcall AllocateBucketsSlot()
@@ -1640,14 +1653,19 @@ WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
     return (WeaponDef*)FindWeaponByName(name);
 }
 
-int __stdcall ApplyWeaponsSlot(const WeaponsEvent* event)
+int __stdcall ApplyWeaponsSlot(const WeaponsEventHeader* event, unsigned int size)
 {
-    return WeaponsApply(event);
+    return WeaponsApply(event, size);
 }
 
 void __stdcall WriteWeaponsStateSlot(const StateWriter* writer)
 {
     WeaponsWriteState(writer);
+}
+
+void __stdcall LoadWeaponsStateSlot(Unit* unit, int slot, const WeaponsSlotState* state)
+{
+    WeaponsLoadState(unit, slot, state);
 }
 
 int __fastcall GetGameTypeSlot(Mission* self)
@@ -2946,6 +2964,33 @@ void FormSelfTest()
     }
     printf("a changed field: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "pos.z") == 0, "a changed field of a struct in is reported at its name");
+
+    printf("events\n");
+    TargetingSetPos aim;
+    memset(&aim, 0, sizeof aim);
+    aim.h.kind = TARGETING_SET_POS;
+    aim.h.weapon = 2;
+    aim.pos[0] = 10;
+    aim.pos[1] = -20;
+    aim.pos[2] = 30;
+    t.Clear();
+    ReplayAddEvent(t, "event", RET_TARGETING, &aim, sizeof aim, g_objects);
+    Check(strstr(t.Data(), "  a event.pos2 30\n") != nullptr && strstr(t.Data(), "  a event.target ") == nullptr, "an event in is the lines of its kind's payload");
+    LoadCall(t.Data());
+    unsigned char buffer[REPLAY_EVENT_MAX];
+    memset(buffer, 0, sizeof buffer);
+    ParseEvent("event", RET_TARGETING, buffer);
+    TargetingSetPos* eventBack = (TargetingSetPos*)buffer;
+    Check(eventBack->h.kind == TARGETING_SET_POS && eventBack->h.weapon == 2 && eventBack->pos[0] == 10 && eventBack->pos[1] == -20 && eventBack->pos[2] == 30, "and replays to the same payload");
+    TargetingEventHeader clear;
+    memset(&clear, 0, sizeof clear);
+    clear.kind = TARGETING_CLEAR;
+    t.Clear();
+    ReplayAddEvent(t, "event", RET_TARGETING, &clear, sizeof clear, g_objects);
+    Check(strstr(t.Data(), "event.pos") == nullptr && strstr(t.Data(), "event.weapon") != nullptr, "an event of the header alone is the lines of the header");
+    t.Clear();
+    ReplayAddEvent(t, "event", RET_TARGETING, &aim, sizeof(TargetingEventHeader), g_objects);
+    Check(strstr(t.Data(), "  a event.pos0 0\n") != nullptr, "an event copies exactly its size: the payload beyond it reads as zero");
 
     printf("arrays of structs\n");
     Point16 points[3] = { { 1, 2 }, { 3, 4 }, { -5, 6 } };

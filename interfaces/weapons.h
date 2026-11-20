@@ -8,102 +8,316 @@ struct Projectile;
 struct StateWriter;
 
 // Major version of the weapons interface, changed when a slot is removed or its signature changes.
-#define WEAPONS_VERSION_MAJOR 2
+#define WEAPONS_VERSION_MAJOR 3
 // Minor version of the weapons interface, changed when a slot is added.
 #define WEAPONS_VERSION_MINOR 0
 
-// The kinds of damage event other modules publish to weapons' inbox: every kind of damage to a unit, a weapon's or not, enters weapons here; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it names a null unit.
+// The fields every weapons event and effect starts with.
+struct WeaponsEventHeader {
+    // A kind of event or of effect.
+    int kind;
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none: SPAWN, AREA_DAMAGE and AIM_DONE name none), as economy's events give a unit.
+    unsigned int unit;
+};
+
+// The kinds of damage event other modules publish to weapons' inbox: every kind of damage to a unit, a weapon's or not, enters weapons here; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it names a null unit or is smaller than its payload.
 enum WeaponsDamageEventKind {
-    // unit takes value points of damage of the kind extra (1 a weapon, 2 a paralyser, 10 a repair that heals, 11 the water, others the cause of a death) from target (0 for none), hit from the direction args[0]; unless the kind is 10, the amount is first scaled by unit's armour (its damage modifier while it is closed, and its experience), and the damage the unit takes is announced to the other machines when unit's player is remote; outcome 1.
+    // unit takes damage (WeaponsDamage); unless the kind of damage is 10, the amount is first scaled by unit's armour (its damage modifier while it is closed, and its experience), and the damage the unit takes is announced to the other machines when unit's player is remote; outcome 1.
     WEAPONS_DAMAGE = 256,
-    // unit takes value points of damage of the kind extra from target (0 for none), hit from the direction args[0], as another machine already computed and announced it; outcome 1.
+    // unit takes damage (WeaponsDamage) as another machine already computed and announced it; outcome 1.
     WEAPONS_REMOTE_DAMAGE = 257
 };
 
 // The kinds of effect weapons publishes to its outbox when a unit takes damage, in the order given; a unit that is not alive or is already dying takes none, and a repair (kind 10) only HEALTH.
 enum WeaponsDamageEffectKind {
-    // unit was damaged by target (0 when no unit attacked it) for value points, by damage of any kind but repair (10) and 11.
+    // unit was damaged (WeaponsAttacked), by damage of any kind but repair (10) and 11.
     WEAPONS_EFFECT_ATTACKED = 272,
-    // unit was damaged, of any kind but repair, for its health bar; published before ATTACKED.
+    // unit was damaged, of any kind but repair, for its health bar; published before ATTACKED; the header alone.
     WEAPONS_EFFECT_MARK_DAMAGED = 274,
-    // unit's last damage was of the kind value, and when target is not 0, target and target's player are unit's last attacker; published after ATTACKED.
+    // unit's last damage and attacker change (WeaponsDamageRecord); published after ATTACKED.
     WEAPONS_EFFECT_DAMAGE_RECORD = 275,
-    // unit's health becomes value, and when extra is 1 unit is marked to die (a unit of a player who plays on this machine whose health fell to 0 or below).
+    // unit's health changes (WeaponsHealth).
     WEAPONS_EFFECT_HEALTH = 276,
-    // unit is paralysed for value more ticks: when its first order is a paralysis, that order lasts value ticks longer, else a paralysis order of value ticks is added after its orders.
+    // unit is paralysed for more ticks (WeaponsParalyze): when its first order is a paralysis, that order lasts longer, else a paralysis order is added after its orders.
     WEAPONS_EFFECT_PARALYZE = 277
 };
 
-// The kinds of event other modules publish to weapons' inbox about weapons, projectiles and explosions; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when: it names a null unit (but SPAWN and AREA_DAMAGE, which name none, and AIM_DONE, which names a callback and no unit); RELEASE or CLAIM names a weapon outside 0 to 3, LOAD_SLOT or ADD_STOCKPILE one outside 0 to 2; AIM_DONE names no callback; SPAWN or AREA_DAMAGE names a weapon outside the table (SPAWN may name -1, no weapon); the kind is unknown.
+// The kinds of event other modules publish to weapons' inbox about weapons, projectiles and explosions; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when: it is smaller than its payload; it names a null unit (but SPAWN, AREA_DAMAGE and AIM_DONE, which name none); RELEASE or CLAIM names a weapon outside 0 to 3, ADD_STOCKPILE one outside 0 to 2; AIM_DONE names no callback; SPAWN or AREA_DAMAGE names a weapon outside the table (SPAWN may name -1, no weapon); the kind is unknown.
 enum WeaponsEventKind {
-    // unit's death weapon explodes at its position: its self-destruct weapon when value is 1, the weapon it explodes as when 0; outcome 1.
+    // unit's death weapon explodes at its position (WeaponsDetonate); outcome 1.
     WEAPONS_DETONATE = 258,
-    // unit's weapon value (0 to 2, or 3 for all three) is released from its orders, to choose its own targets; a weapon that was claimed has its target cleared; outcome 1.
+    // unit's weapon is released from its orders, to choose its own targets (WeaponsRelease); a weapon that was claimed has its target cleared; outcome 1.
     WEAPONS_RELEASE = 259,
-    // unit's weapon value (0 to 2, or 3 for all three) is claimed by its orders, which choose its targets; a weapon that was released has its target cleared; outcome 1.
+    // unit's weapon is claimed by its orders, which choose its targets (WeaponsClaim); a weapon that was released has its target cleared; outcome 1.
     WEAPONS_CLAIM = 260,
-    // unit's three weapon slots are set up from its unit type: each slot's weapon, a reload of 0, an empty stockpile and the offset of its aim; then unit's script is told the longest reload of its weapons; outcome 1.
+    // unit's three weapon slots are set up from its unit type: each slot's weapon, a reload of 0, an empty stockpile and the offset of its aim; then unit's script is told the longest reload of its weapons; the header alone; outcome 1.
     WEAPONS_INIT_SLOTS = 261,
-    // The projectiles unit fired are removed; outcome 1.
+    // The projectiles unit fired are removed; the header alone; outcome 1.
     WEAPONS_REMOVE_PROJECTILES = 262,
-    // The aim script that a START_SCRIPT effect started with callback returned value: a weapon whose aim returned nonzero is aimed; outcome 1.
+    // The aim script that a START_SCRIPT effect started returned (WeaponsAimDone): a weapon whose aim returned nonzero is aimed; outcome 1.
     WEAPONS_AIM_DONE = 263,
-    // Piece value of unit's model is blown off with the flags extra, as the explode opcode of a unit's script does: the piece flies, or shatters into debris, and the flags 0x100 to 0x2000 add explosions at it; outcome 1.
+    // A piece of unit's model is blown off, as the explode opcode of a unit's script does (WeaponsExplodePiece): the piece flies, or shatters into debris, and the flags 0x100 to 0x2000 add explosions at it; outcome 1.
     WEAPONS_EXPLODE_PIECE = 264,
-    // The weapon value (its index in the table of weapons) deals its area damage at pos, to the units around it; outcome 1.
+    // A weapon deals its area damage to the units around a position (WeaponsAreaDamage); outcome 1.
     WEAPONS_AREA_DAMAGE = 265,
-    // A projectile of the weapon value (-1 for none) starts at pos with the velocity vel, announced to the other machines when extra is 1; outcome 1, or 0 when the table of projectiles is full.
+    // A projectile starts (WeaponsSpawn); outcome 1, or 0 when the table of projectiles is full.
     WEAPONS_SPAWN = 266,
-    // Each of unit's three weapons that stockpiles (flag bit 1) holds the stockpile args[0] to args[2], as a unit captured by another player keeps them; outcome 1.
+    // Each of unit's three weapons that stockpiles (flag bit 1) holds a stockpile (WeaponsSetStockpiles), as a unit captured by another player keeps them; outcome 1.
     WEAPONS_SET_STOCKPILES = 267,
-    // unit's weapon slot value takes the state of a saved game, all but its target pair (targeting's LOAD): args[0] whether its aim is done, args[1] a byte of its weapon type that the save keeps, args[2] the offset of its aim, args[3] its reload, args[4] and args[5] its heading and pitch, args[6] its stockpile and args[7] its flag bits (bits 0, 1, 2 to 3 and 4); outcome 1.
-    WEAPONS_LOAD_SLOT = 268,
-    // unit's weapon value (0 to 2) holds one more round in its stockpile, as a stockpile weapon's build order finishes one; outcome 1.
+    // unit's weapon holds one more round in its stockpile, as a stockpile weapon's build order finishes one (WeaponsAddStockpile); outcome 1.
     WEAPONS_ADD_STOCKPILE = 269
 };
 
 // The kinds of effect weapons publishes to its outbox about weapons, projectiles and explosions, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
 enum WeaponsEffectKind {
-    // A shot of unit hit, dealing value damage to units of other players and extra damage to units of unit's own player.
+    // A shot of unit hit (WeaponsHit).
     WEAPONS_EFFECT_HIT = 273,
-    // The script name of unit starts with the callback (0 for none) and the flag update; when extra is 1 it is given the value arguments of args, as a script started with arguments; when 0 it takes none.
+    // A script of unit starts (WeaponsStartScript).
     WEAPONS_EFFECT_START_SCRIPT = 278,
-    // Piece value of unit's model is hidden, as the piece flies off; when extra is 1 the model is first posed from its angles and animation.
+    // A piece of unit's model is hidden, as the piece flies off (WeaponsDetachPiece).
     WEAPONS_EFFECT_DETACH_PIECE = 279,
-    // unit's network notice bits value (bits 10 to 12 of its dirty flags: a shot fired, a command shot fired, a target out of reach) are set.
-    WEAPONS_EFFECT_NOTICE = 280,
-    // unit is busy, as for its idle animation, until the tick value.
-    WEAPONS_EFFECT_BUSY = 281
+    // unit fired a shot, a notice its orders wait on; the header alone.
+    WEAPONS_EFFECT_SHOT_FIRED = 280,
+    // unit is busy, as for its idle animation, until a tick (WeaponsBusy).
+    WEAPONS_EFFECT_BUSY = 281,
+    // unit fired a shot of a command-fire weapon, a notice its orders wait on; the header alone.
+    WEAPONS_EFFECT_COMMAND_SHOT_FIRED = 282,
+    // unit's target is out of the reach of its weapon, a notice its orders wait on; the header alone.
+    WEAPONS_EFFECT_OUT_OF_REACH = 283
 };
 
-// An event (WeaponsDamageEventKind, WeaponsEventKind) or an effect (WeaponsDamageEffectKind, WeaponsEffectKind), as plain data with no pointers; fields a kind does not use are 0.
-struct WeaponsEvent {
-    // A kind of event or of effect.
-    int kind;
-    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
-    unsigned int unit;
-    // The other unit, as its block offset: the source of DAMAGE, the attacker of ATTACKED and DAMAGE_RECORD.
-    unsigned int target;
-    // The argument of the kind, as the kind says.
-    int value;
-    // The second argument of the kind, as the kind says.
-    int extra;
-    // The aim callback of a weapon, as its block offset (0 for none): the one a START_SCRIPT effect passes and an AIM_DONE event names.
+// The scripts of a unit that weapons starts, by a START_SCRIPT effect.
+enum WeaponsScript {
+    // No script: a script of an empty name, as a fire script's index 3 does.
+    WEAPONS_SCRIPT_NONE = 0,
+    // FirePrimary, when the first weapon fires.
+    WEAPONS_SCRIPT_FIRE_PRIMARY = 1,
+    // FireSecondary, when the second weapon fires.
+    WEAPONS_SCRIPT_FIRE_SECONDARY = 2,
+    // FireTertiary, when the third weapon fires.
+    WEAPONS_SCRIPT_FIRE_TERTIARY = 3,
+    // AimPrimary, to aim the first weapon.
+    WEAPONS_SCRIPT_AIM_PRIMARY = 4,
+    // AimSecondary, to aim the second weapon.
+    WEAPONS_SCRIPT_AIM_SECONDARY = 5,
+    // AimTertiary, to aim the third weapon.
+    WEAPONS_SCRIPT_AIM_TERTIARY = 6,
+    // RockUnit, as a shot rocks the unit that fired it.
+    WEAPONS_SCRIPT_ROCK_UNIT = 7,
+    // SetMaxReloadTime, the longest reload of the unit's weapons, in milliseconds.
+    WEAPONS_SCRIPT_SET_MAX_RELOAD_TIME = 8,
+    // HitByWeapon, the direction a hit came from.
+    WEAPONS_SCRIPT_HIT_BY_WEAPON = 9,
+    // TakeDamage, the share of its health a hit took.
+    WEAPONS_SCRIPT_TAKE_DAMAGE = 10
+};
+
+// The payload of DAMAGE and REMOTE_DAMAGE: unit takes damage.
+struct WeaponsDamage {
+    // The kind and the unit that takes the damage.
+    WeaponsEventHeader h;
+    // The unit that dealt it, as its block offset (0 for none).
+    unsigned int source;
+    // The points of damage.
+    int amount;
+    // The kind of damage: 1 a weapon, 2 a paralyser, 10 a repair that heals, 11 the water, others the cause of a death.
+    int damageKind;
+    // The direction the damage came from, a 16-bit heading.
+    int direction;
+};
+
+// The payload of DETONATE.
+struct WeaponsDetonate {
+    // The kind and the unit whose death weapon explodes.
+    WeaponsEventHeader h;
+    // 1 for the unit's self-destruct weapon, 0 for the weapon it explodes as.
+    int selfDestruct;
+};
+
+// The payload of RELEASE.
+struct WeaponsRelease {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The weapon, 0 to 2, or 3 for all three.
+    int weapon;
+};
+
+// The payload of CLAIM.
+struct WeaponsClaim {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The weapon, 0 to 2, or 3 for all three.
+    int weapon;
+};
+
+// The payload of AIM_DONE.
+struct WeaponsAimDone {
+    // The kind; the unit is 0.
+    WeaponsEventHeader h;
+    // The aim callback of the weapon, as its block offset: the one the START_SCRIPT effect passed.
     unsigned int callback;
-    // A position in world coordinates with 16 fractional bits: x, y and z.
+    // What the aim script returned.
+    int result;
+};
+
+// The payload of EXPLODE_PIECE.
+struct WeaponsExplodePiece {
+    // The kind and the unit whose piece is blown off.
+    WeaponsEventHeader h;
+    // The piece of the unit's model.
+    int piece;
+    // The explode flags of the script's opcode.
+    unsigned int flags;
+};
+
+// The payload of AREA_DAMAGE.
+struct WeaponsAreaDamage {
+    // The kind; the unit is 0.
+    WeaponsEventHeader h;
+    // The weapon, as its index in the table of weapons.
+    int weapon;
+    // The centre of the damage, in world coordinates with 16 fractional bits: x, y and z.
     int pos[3];
-    // A velocity in world units per tick with 16 fractional bits: x, y and z.
+};
+
+// The payload of SPAWN.
+struct WeaponsSpawn {
+    // The kind; the unit is 0.
+    WeaponsEventHeader h;
+    // The weapon of the projectile, as its index in the table of weapons, or -1 for none.
+    int weapon;
+    // The position the projectile starts at, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The projectile's velocity, in world units per tick with 16 fractional bits: x, y and z.
     int vel[3];
-    // The further arguments of the kind, as the kind says.
-    int args[8];
-    // The name of a script, ended by a 0.
-    char name[32];
+    // 1 when the projectile is announced to the other machines.
+    int announce;
+};
+
+// The payload of SET_STOCKPILES.
+struct WeaponsSetStockpiles {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The stockpile of each of the unit's three weapons.
+    int stockpiles[3];
+};
+
+// The payload of ADD_STOCKPILE.
+struct WeaponsAddStockpile {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The weapon, 0 to 2.
+    int weapon;
+};
+
+// The payload of ATTACKED.
+struct WeaponsAttacked {
+    // The kind and the unit that was damaged.
+    WeaponsEventHeader h;
+    // The unit that attacked it, as its block offset (0 when no unit did).
+    unsigned int attacker;
+    // The points of damage.
+    int amount;
+};
+
+// The payload of DAMAGE_RECORD.
+struct WeaponsDamageRecord {
+    // The kind and the unit that was damaged.
+    WeaponsEventHeader h;
+    // The kind of the unit's last damage.
+    int damageKind;
+    // The unit that attacked it, as its block offset; when it is not 0, it and its player become the unit's last attacker.
+    unsigned int attacker;
+};
+
+// The payload of HEALTH.
+struct WeaponsHealth {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The unit's new health.
+    int health;
+    // 1 when the unit is marked to die (a unit of a player who plays on this machine whose health fell to 0 or below).
+    int dying;
+};
+
+// The payload of PARALYZE.
+struct WeaponsParalyze {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The ticks of paralysis to add.
+    int ticks;
+};
+
+// The payload of HIT.
+struct WeaponsHit {
+    // The kind and the unit whose shot hit.
+    WeaponsEventHeader h;
+    // The damage dealt to units of other players.
+    int enemyDamage;
+    // The damage dealt to units of the unit's own player.
+    int friendlyDamage;
+};
+
+// The payload of START_SCRIPT.
+struct WeaponsStartScript {
+    // The kind and the unit whose script starts.
+    WeaponsEventHeader h;
+    // The script, a WeaponsScript.
+    int script;
+    // The aim callback the script returns to, as its block offset (0 for none).
+    unsigned int callback;
+    // The script's flag update.
+    int update;
+    // 1 when the script is started with arguments, 0 when it takes none.
+    int withArgs;
+    // The number of arguments, when withArgs is 1.
+    int count;
+    // The arguments, when withArgs is 1.
+    int args[4];
+};
+
+// The payload of DETACH_PIECE.
+struct WeaponsDetachPiece {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The piece of the unit's model.
+    int piece;
+    // 1 when the model is first posed from its angles and animation.
+    int pose;
+};
+
+// The payload of BUSY.
+struct WeaponsBusy {
+    // The kind and the unit.
+    WeaponsEventHeader h;
+    // The tick the unit is busy until.
+    int until;
+};
+
+// The state of one weapon slot of a unit that a saved game keeps, all but its target pair (targeting's LOAD).
+struct WeaponsSlotState {
+    // Whether the weapon's aim is done.
+    int aimDone;
+    // A byte of the weapon's type that the save keeps.
+    int typeByte;
+    // The offset of the weapon's aim.
+    int aimOffset;
+    // The weapon's reload.
+    int reload;
+    // The weapon's heading.
+    int heading;
+    // The weapon's pitch.
+    int pitch;
+    // The weapon's stockpile.
+    int stockpile;
+    // The slot's flag bits 0, 1, 2 to 3 and 4.
+    int flags;
 };
 
 // Weapons, projectiles and explosions, and the damage rules for every kind of damage to a unit. The engine delivers weapons' pending inbox, through Apply, before each run (UpdateProjectiles, UpdateExplosions, UpdateUnitWeapons), and at each phase boundary.
 struct WeaponsSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
-    int (__stdcall* Apply)(const WeaponsEvent* event);
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const WeaponsEventHeader* event, unsigned int size);
     // Moves every projectile and resolves its hits for one tick.
     void (__stdcall* UpdateProjectiles)(void);
     // Advances every explosion, exploded piece and piece of debris for one tick.
@@ -132,6 +346,8 @@ struct WeaponsSeam {
     void (__stdcall* InitExplosions)(void);
     // Frees the explosion tables, outside the tick. Hooks: none.
     void (__stdcall* FreeExplosions)(void);
+    // Sets one of a unit's weapon slots (0 to 2) to the state a saved game keeps, outside the tick; a slot outside 0 to 2 changes nothing. Hooks: none.
+    void (__stdcall* LoadState)(Unit* unit, int slot, const WeaponsSlotState* state);
     // Writes weapons' state as records of the trace, which the engine dumps and does not hash.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };

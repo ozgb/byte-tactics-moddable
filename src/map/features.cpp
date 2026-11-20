@@ -143,6 +143,7 @@ unsigned short __stdcall GetCellFeature(Cell* cell)
 
 #include "../../interfaces/seams.h"
 #include "../game/economy_events.h"
+#include "../game/features_events.h"
 #include "../../interfaces/economy.h"
 
 // FUNCTION: 0x421da0
@@ -234,36 +235,29 @@ void StampFeatureMetal(void)
     }
 }
 
-static FeaturesEvent EffectOf(int kind)
+static void PublishEffect(const FeaturesEventHeader* effect, unsigned int size)
 {
-    FeaturesEvent effect;
-    memset(&effect, 0, sizeof(effect));
-    effect.kind = kind;
-    effect.owner = 10;
-    return effect;
-}
-
-static void PublishEffect(const FeaturesEvent& effect)
-{
-    HarnessFeaturesEvent(&effect, 1);
-    SchedPublish(SCHED_FEATURES, &effect, sizeof(effect));
+    HarnessFeaturesEvent(effect, size, 1);
+    SchedPublish(SCHED_FEATURES, effect, size);
 }
 
 static void FreeState(unsigned int state)
 {
-    FeaturesEvent effect = EffectOf(FEATURES_EFFECT_FREE_STATE);
+    FeaturesFreeState effect;
+    effect.h = FeaturesHeaderOf(FEATURES_EFFECT_FREE_STATE);
     effect.state = state;
-    PublishEffect(effect);
+    PublishEffect(&effect.h, sizeof(effect));
 }
 
 static void RefreshPassMaps(Point16 at, Point16 footprint)
 {
-    FeaturesEvent effect = EffectOf(FEATURES_EFFECT_PASS_MAPS);
+    FeaturesPassMaps effect;
+    effect.h = FeaturesHeaderOf(FEATURES_EFFECT_PASS_MAPS);
     effect.x = at.x;
     effect.z = at.y;
     effect.width = footprint.x;
     effect.height = footprint.y;
-    PublishEffect(effect);
+    PublishEffect(&effect.h, sizeof(effect));
 }
 
 // FUNCTION: 0x422170
@@ -771,12 +765,13 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
     }
     if (f->burnweapon) {
         Vec3 pos = GetFootprintCentre(cell, f);
-        FeaturesEvent fire = EffectOf(FEATURES_EFFECT_AREA_DAMAGE);
-        fire.value = (int)((WeaponDef*)f->burnweapon.get() - g_game->weapons);
+        FeaturesAreaDamage fire;
+        fire.h = FeaturesHeaderOf(FEATURES_EFFECT_AREA_DAMAGE);
+        fire.weapon = (int)((WeaponDef*)f->burnweapon.get() - g_game->weapons);
         fire.pos[0] = pos.x;
         fire.pos[1] = pos.y;
         fire.pos[2] = pos.z;
-        PublishEffect(fire);
+        PublishEffect(&fire.h, sizeof(fire));
     }
 }
 
@@ -840,10 +835,11 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
             memset(&spot->rot, 0, sizeof(spot->rot));
         unsigned int size = g_seams.scripts->ObjectStateSize((Object3do*)f->object);
         spot->state = (SpotState*)SimAllocTagged("Object State", size);
-        FeaturesEvent init = EffectOf(FEATURES_EFFECT_INIT_STATE);
+        FeaturesInitState init;
+        init.h = FeaturesHeaderOf(FEATURES_EFFECT_INIT_STATE);
         init.state = spot->state.offset;
         init.feature = feature;
-        PublishEffect(init);
+        PublishEffect(&init.h, sizeof(init));
         cell->feature = feature;
         cell->spot = i;
         cell->flag0 = 1;
@@ -1107,19 +1103,19 @@ void RemoveAllFeatures(void)
     }
 }
 
-static Cell* EventCell(const FeaturesEvent* e)
+static Cell* CellAt(int x, int z)
 {
-    return &g_game->cells[e->z * g_game->width + e->x];
+    return &g_game->cells[z * g_game->width + x];
 }
 
-int __stdcall PlaceEvent(const FeaturesEvent* e)
+int __stdcall PlaceEvent(const FeaturesPlace* e)
 {
     Vec3 pos = FeatureVec3(e->pos[0], e->pos[1], e->pos[2]);
     Rot16 rot;
     rot.x = (short)e->rot[0];
     rot.y = (short)e->rot[1];
     rot.z = (short)e->rot[2];
-    Spot* spot = PlaceFeature(EventCell(e), (unsigned short)e->feature, (e->flags & FEATURES_HAS_POS) ? &pos : nullptr,
+    Spot* spot = PlaceFeature(CellAt(e->x, e->z), (unsigned short)e->feature, (e->flags & FEATURES_HAS_POS) ? &pos : nullptr,
                               (e->flags & FEATURES_HAS_ROT) ? &rot : nullptr, (unsigned char)e->owner);
     if (spot != nullptr && (e->flags & FEATURES_SINK)) {
         spot->vel.y = -11468;
@@ -1128,19 +1124,34 @@ int __stdcall PlaceEvent(const FeaturesEvent* e)
     return spot != nullptr;
 }
 
-int __stdcall ApplyEvent(const FeaturesEvent* e)
+int __stdcall ApplyEvent(const FeaturesEventHeader* e, unsigned int size)
 {
+    if (size < sizeof(FeaturesEventHeader))
+        return 0;
     switch (e->kind) {
     case FEATURES_PLACE:
-        return PlaceEvent(e);
-    case FEATURES_REMOVE:
-        return RemoveFeature(EventCell(e), e->value);
-    case FEATURES_DAMAGE:
-        return DamageFeature(EventCell(e), e->x, e->z, &g_game->weapons[e->value]);
+        if (size < sizeof(FeaturesPlace))
+            return 0;
+        return PlaceEvent(reinterpret_cast<const FeaturesPlace*>(e));
+    case FEATURES_REMOVE: {
+        if (size < sizeof(FeaturesRemove))
+            return 0;
+        const FeaturesRemove* p = reinterpret_cast<const FeaturesRemove*>(e);
+        return RemoveFeature(CellAt(p->x, p->z), p->force);
+    }
+    case FEATURES_DAMAGE: {
+        if (size < sizeof(FeaturesDamage))
+            return 0;
+        const FeaturesDamage* p = reinterpret_cast<const FeaturesDamage*>(e);
+        return DamageFeature(CellAt(p->x, p->z), p->x, p->z, &g_game->weapons[p->weapon]);
+    }
     case FEATURES_RECLAIM: {
+        if (size < sizeof(FeaturesReclaim))
+            return 0;
+        const FeaturesReclaim* p = reinterpret_cast<const FeaturesReclaim*>(e);
         Ref<Unit> unit;
-        unit.offset = e->unit;
-        Vec3 pos = FeatureVec3(e->pos[0], e->pos[1], e->pos[2]);
+        unit.offset = p->unit;
+        Vec3 pos = FeatureVec3(p->pos[0], p->pos[1], p->pos[2]);
         return ReclaimFeature(unit.get(), &pos);
     }
     }

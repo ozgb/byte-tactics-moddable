@@ -15,33 +15,39 @@ struct Unit;
 struct Vec3;
 
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
-#define LOS_RADAR_VERSION_MAJOR 3
+#define LOS_RADAR_VERSION_MAJOR 4
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 2
+#define LOS_RADAR_VERSION_MINOR 0
 
-// The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a unit with a null unit changes nothing; outcome 0.
+// The field every los_radar event starts with.
+struct LosRadarEventHeader {
+    // A LosRadarEventKind.
+    int kind;
+};
+
+// The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, or one that names a unit with a null unit, changes nothing; outcome 0.
 enum LosRadarEventKind {
-    // Moves the line of sight of unit to where it now is; outcome 1.
+    // Moves the line of sight of a unit to where it now is (LosRadarUnit); outcome 1.
     LOS_RADAR_UPDATE_UNIT = 128,
-    // Takes the line of sight of unit off the map, as it dies; outcome 1.
+    // Takes the line of sight of a unit off the map, as it dies (LosRadarUnit); outcome 1.
     LOS_RADAR_REMOVE_UNIT = 129,
-    // Gives a new unit its first line of sight; outcome 1.
+    // Gives a new unit its first line of sight (LosRadarUnit); outcome 1.
     LOS_RADAR_REVEAL_UNIT = 130,
-    // Adds an eyeball, a temporary view of the viewing player at pos, with sightDistance and eyeHeight, for lifetime ticks; outcome 1 when it was added, 0 when line of sight is off or no eyeball is free.
+    // Adds an eyeball, a temporary view of the viewing player (LosRadarAddEyeball); outcome 1 when it was added, 0 when line of sight is off or no eyeball is free.
     LOS_RADAR_ADD_EYEBALL = 131,
-    // Recomputes the terrain height range of the cells in the rectangle of cell and size, in cells; outcome 1.
+    // Recomputes the terrain height range of the cells of a rectangle (LosRadarCellHeights); outcome 1.
     LOS_RADAR_CELL_HEIGHTS = 132,
-    // Rebuilds the line of sight of every unit and the radar picture; value 1 first resets what each cell shows: to nothing for every player when mapping is on, to everything when it is off; outcome 1.
+    // Rebuilds the line of sight of every unit and the radar picture (LosRadarRecalculate); outcome 1.
     LOS_RADAR_RECALCULATE = 133,
-    // Toggles whether player shares its map with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
+    // Toggles whether a player shares its map with its allies and tells the other players, in a network game (LosRadarSharePlayer); outcome 1 when it toggled, 0 outside a network game.
     LOS_RADAR_SHARE_MAPPING = 134,
-    // Toggles whether player shares its radar with its allies and tells the other players, in a network game; outcome 1 when it toggled, 0 outside a network game.
+    // Toggles whether a player shares its radar with its allies and tells the other players, in a network game (LosRadarSharePlayer); outcome 1 when it toggled, 0 outside a network game.
     LOS_RADAR_SHARE_RADAR = 135,
-    // Shows player value every cell that player sees now; outcome 1.
+    // Shows a player every cell that another player sees now (LosRadarShareMap); outcome 1.
     LOS_RADAR_SHARE_MAP = 136,
-    // Sets the sight cache of unit back to what units' set-up wrote, no cell and no frame; outcome 1.
+    // Sets the sight cache of a unit back to what units' set-up wrote, no cell and no frame (LosRadarUnit); outcome 1.
     LOS_RADAR_SIGHT_RESET = 137,
-    // Sets the sight cache of unit to sight, read from a saved game; outcome 1.
+    // Sets the sight cache of a unit to the one a saved game holds (LosRadarSightLoad); outcome 1.
     LOS_RADAR_SIGHT_LOAD = 138
 };
 
@@ -59,16 +65,18 @@ struct LosRadarMapInfo {
     int unitSlots;
 };
 
-// An event (LosRadarEventKind), as plain data with no pointers; fields a kind does not use are 0.
-struct LosRadarEvent {
-    // A LosRadarEventKind.
-    int kind;
+// The payload of UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT and SIGHT_RESET: the unit they are about.
+struct LosRadarUnit {
+    // The kind.
+    LosRadarEventHeader h;
     // The unit, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
     unsigned int unit;
-    // The player, 0 to 9.
-    int player;
-    // The argument of the kind, as the kind says.
-    int value;
+};
+
+// The payload of ADD_EYEBALL.
+struct LosRadarAddEyeball {
+    // The kind.
+    LosRadarEventHeader h;
     // The eyeball's position, in world coordinates with 16 fractional bits.
     int pos[3];
     // The eyeball's sight distance, in world units.
@@ -77,18 +85,60 @@ struct LosRadarEvent {
     int eyeHeight;
     // The eyeball's lifetime, in ticks.
     int lifetime;
+};
+
+// The payload of CELL_HEIGHTS.
+struct LosRadarCellHeights {
+    // The kind.
+    LosRadarEventHeader h;
     // The first cell of the rectangle, x and y.
     int cell[2];
     // The width and height of the rectangle, in cells.
     int size[2];
-    // The cache a LOS_RADAR_SIGHT_LOAD sets; 0 for the other kinds.
-    LosSightCache sight;
+};
+
+// The payload of RECALCULATE.
+struct LosRadarRecalculate {
+    // The kind.
+    LosRadarEventHeader h;
+    // 1 to first reset what each cell shows: to nothing for every player when mapping is on, to everything when it is off.
+    int reset;
+};
+
+// The payload of SHARE_MAPPING and SHARE_RADAR: the player whose sharing toggles.
+struct LosRadarSharePlayer {
+    // The kind.
+    LosRadarEventHeader h;
+    // The player, 0 to 9.
+    int player;
+};
+
+// The payload of SHARE_MAP.
+struct LosRadarShareMap {
+    // The kind.
+    LosRadarEventHeader h;
+    // The player whose sight is shown, 0 to 9.
+    int from;
+    // The player it is shown to, 0 to 9.
+    int to;
+};
+
+// The payload of SIGHT_LOAD.
+struct LosRadarSightLoad {
+    // The kind.
+    LosRadarEventHeader h;
+    // The unit, as its block offset.
+    unsigned int unit;
+    // The cell of the sight cache, as LosSightCache::cell.
+    int cell;
+    // The frame of the sight cache, as LosSightCache::frameIdx (0 to 255).
+    int frameIdx;
 };
 
 // Line of sight and radar. The engine delivers los_radar's pending inbox, through Apply, before each pass below and at each phase boundary.
 struct LosRadarSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
-    int (__stdcall* Apply)(const LosRadarEvent* event);
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const LosRadarEventHeader* event, unsigned int size);
     // Returns the map cell at a position, or null outside the map; the cell records are read only, a view as of each owner's last run. Hooks: none.
     Cell* (__stdcall* GetMapCell)(int x, int y);
     // Returns the map cell under a world position, or null outside the map; a view, as GetMapCell. Hooks: none.

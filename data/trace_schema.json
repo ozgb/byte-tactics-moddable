@@ -1,5 +1,5 @@
 {
-  "trace_format": 6,
+  "trace_format": 7,
   "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}, {"tag": 3, "name": "player"}, {"tag": 4, "name": "unitdef"}, {"tag": 5, "name": "weapondef"}, {"tag": 6, "name": "projectile"}, {"tag": 7, "name": "feature"}, {"tag": 8, "name": "piece"}, {"tag": 9, "name": "rec"}, {"tag": 10, "name": "node"}, {"tag": 11, "name": "moveclass"}, {"tag": 12, "name": "order"}, {"tag": 13, "name": "orderfx"}, {"tag": 14, "name": "link"}],
   "tables": {
     "AiSearchGoal": {
@@ -1593,39 +1593,6 @@
       {"name": "points", "size": 4, "kind": "bytes", "target": null}
     ]
   },
-  "economy": {
-    "section": 33,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "player", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "resources", "size": 4, "kind": "scalar", "target": null},
-      {"name": "energy", "size": 4, "kind": "scalar", "target": null},
-      {"name": "metal", "size": 4, "kind": "scalar", "target": null},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ],
-    "account": {"kind": 1, "size": 48}
-  },
-  "features": {
-    "section": 36,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "flags", "size": 4, "kind": "scalar", "target": null},
-      {"name": "x", "size": 4, "kind": "scalar", "target": null},
-      {"name": "z", "size": 4, "kind": "scalar", "target": null},
-      {"name": "feature", "size": 4, "kind": "scalar", "target": null},
-      {"name": "owner", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "state", "size": 4, "kind": "handle", "target": null},
-      {"name": "width", "size": 4, "kind": "scalar", "target": null},
-      {"name": "height", "size": 4, "kind": "scalar", "target": null},
-      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
-      {"name": "rot", "size": 12, "kind": "bytes", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
-  },
   "packets": {
     "section": 35,
     "fields": [
@@ -1636,104 +1603,139 @@
       {"name": "amount", "size": 4, "kind": "scalar", "target": null}
     ]
   },
+  "economy": {
+    "section": 33,
+    "kinds": {
+      "0": {"name": "ECONOMY_RESET", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "1": {"name": "ECONOMY_LOAD", "size": 60, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "account", "size": 48, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "2": {"name": "ECONOMY_REQUEST", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "resources", "size": 4, "kind": "scalar", "target": null}, {"name": "energy", "size": 4, "kind": "scalar", "target": null}, {"name": "metal", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "3": {"name": "ECONOMY_SPEND", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "resources", "size": 4, "kind": "scalar", "target": null}, {"name": "energy", "size": 4, "kind": "scalar", "target": null}, {"name": "metal", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "4": {"name": "ECONOMY_INCOME", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "resources", "size": 4, "kind": "scalar", "target": null}, {"name": "energy", "size": 4, "kind": "scalar", "target": null}, {"name": "metal", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "16": {"name": "ECONOMY_EFFECT_CLOAK", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "keep", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "17": {"name": "ECONOMY_EFFECT_EXTRACTOR", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "metal", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "18": {"name": "ECONOMY_EFFECT_SHARE", "size": 28, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "resources", "size": 4, "kind": "scalar", "target": null}, {"name": "energy", "size": 4, "kind": "scalar", "target": null}, {"name": "metal", "size": 4, "kind": "scalar", "target": null}, {"name": "to", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
+  },
+  "features": {
+    "section": 36,
+    "kinds": {
+      "32": {"name": "FEATURES_PLACE", "size": 48, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "x", "size": 4, "kind": "scalar", "target": null}, {"name": "z", "size": 4, "kind": "scalar", "target": null}, {"name": "feature", "size": 4, "kind": "scalar", "target": null}, {"name": "flags", "size": 4, "kind": "scalar", "target": null}, {"name": "owner", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "rot", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "33": {"name": "FEATURES_REMOVE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "x", "size": 4, "kind": "scalar", "target": null}, {"name": "z", "size": 4, "kind": "scalar", "target": null}, {"name": "force", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "34": {"name": "FEATURES_DAMAGE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "x", "size": 4, "kind": "scalar", "target": null}, {"name": "z", "size": 4, "kind": "scalar", "target": null}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "35": {"name": "FEATURES_RECLAIM", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "48": {"name": "FEATURES_EFFECT_FREE_STATE", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "state", "size": 4, "kind": "handle", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "49": {"name": "FEATURES_EFFECT_INIT_STATE", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "state", "size": 4, "kind": "handle", "target": null}, {"name": "feature", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "50": {"name": "FEATURES_EFFECT_PASS_MAPS", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "x", "size": 4, "kind": "scalar", "target": null}, {"name": "z", "size": 4, "kind": "scalar", "target": null}, {"name": "width", "size": 4, "kind": "scalar", "target": null}, {"name": "height", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "51": {"name": "FEATURES_EFFECT_AREA_DAMAGE", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
+  },
   "windMeteors": {
     "section": 37,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "data", "size": 4, "kind": "bytes", "target": null}
-    ]
+    "kinds": {
+      "64": {"name": "WIND_METEORS_ENABLE", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
+      "65": {"name": "WIND_METEORS_DISABLE", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
+      "66": {"name": "WIND_METEORS_PARAMS", "size": 52, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "params", "size": 48, "kind": "bytes", "target": null}]},
+      "67": {"name": "WIND_METEORS_START", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
+      "80": {"name": "WIND_METEORS_EFFECT_SPAWN", "size": 36, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "vel", "size": 12, "kind": "bytes", "target": null}, {"name": "announce", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "targeting": {
     "section": 38,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "weapon", "size": 4, "kind": "scalar", "target": null},
-      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "96": {"name": "TARGETING_SET_UNIT", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "target", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "97": {"name": "TARGETING_SET_POS", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "98": {"name": "TARGETING_CLEAR", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "99": {"name": "TARGETING_RESET", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "100": {"name": "TARGETING_LOAD", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "xOrUnit", "size": 4, "kind": "scalar", "target": null}, {"name": "zOrSentinel", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "112": {"name": "TARGETING_EFFECT_CLEARED", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "los_radar": {
     "section": 39,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "player", "size": 4, "kind": "scalar", "target": null},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
-      {"name": "sightDistance", "size": 4, "kind": "scalar", "target": null},
-      {"name": "eyeHeight", "size": 4, "kind": "scalar", "target": null},
-      {"name": "lifetime", "size": 4, "kind": "scalar", "target": null},
-      {"name": "cell", "size": 8, "kind": "bytes", "target": null},
-      {"name": "size", "size": 8, "kind": "bytes", "target": null},
-      {"name": "sightCell", "size": 4, "kind": "scalar", "target": null},
-      {"name": "sightFrameIdx", "size": 4, "kind": "scalar", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "128": {"name": "LOS_RADAR_UPDATE_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "129": {"name": "LOS_RADAR_REMOVE_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "130": {"name": "LOS_RADAR_REVEAL_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "131": {"name": "LOS_RADAR_ADD_EYEBALL", "size": 28, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "sightDistance", "size": 4, "kind": "scalar", "target": null}, {"name": "eyeHeight", "size": 4, "kind": "scalar", "target": null}, {"name": "lifetime", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "132": {"name": "LOS_RADAR_CELL_HEIGHTS", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "cell", "size": 8, "kind": "bytes", "target": null}, {"name": "size", "size": 8, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "133": {"name": "LOS_RADAR_RECALCULATE", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "reset", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "134": {"name": "LOS_RADAR_SHARE_MAPPING", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "135": {"name": "LOS_RADAR_SHARE_RADAR", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "136": {"name": "LOS_RADAR_SHARE_MAP", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "from", "size": 4, "kind": "scalar", "target": null}, {"name": "to", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "137": {"name": "LOS_RADAR_SIGHT_RESET", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "138": {"name": "LOS_RADAR_SIGHT_LOAD", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "cell", "size": 4, "kind": "scalar", "target": null}, {"name": "frameIdx", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "map": {
     "section": 40,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "cell", "size": 8, "kind": "bytes", "target": null},
-      {"name": "size", "size": 8, "kind": "bytes", "target": null},
-      {"name": "rect", "size": 16, "kind": "bytes", "target": null},
-      {"name": "classes", "size": 4, "kind": "scalar", "target": null},
-      {"name": "cause", "size": 4, "kind": "scalar", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "160": {"name": "MAP_ADD_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "161": {"name": "MAP_REMOVE_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "162": {"name": "MAP_CLEAR_UNIT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "163": {"name": "MAP_RECLAIM_FOOTPRINT", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "164": {"name": "MAP_SET_YARD", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "open", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "165": {"name": "MAP_BUCKET_UNLINK", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "166": {"name": "MAP_BUCKET_PREPEND", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "168": {"name": "MAP_PASS_MAPS", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "cell", "size": 8, "kind": "bytes", "target": null}, {"name": "size", "size": 8, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "176": {"name": "MAP_EFFECT_CELLS_CHANGED", "size": 32, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "rect", "size": 16, "kind": "bytes", "target": null}, {"name": "classes", "size": 4, "kind": "scalar", "target": null}, {"name": "cause", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "playersEvents": {
     "section": 41,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "player", "size": 4, "kind": "scalar", "target": null},
-      {"name": "from", "size": 4, "kind": "scalar", "target": null},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "amount", "size": 4, "kind": "scalar", "target": null},
-      {"name": "announce", "size": 4, "kind": "scalar", "target": null},
-      {"name": "record", "size": 4, "kind": "scalar", "target": null},
-      {"name": "hitPoints", "size": 4, "kind": "scalar", "target": null},
-      {"name": "buildPercent", "size": 4, "kind": "scalar", "target": null},
-      {"name": "angles", "size": 6, "kind": "bytes", "target": null},
-      {"name": "stockpiles", "size": 3, "kind": "bytes", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "192": {"name": "PLAYERS_GIVE_UNIT", "size": 48, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "record.present", "size": 4, "kind": "scalar", "target": null}, {"name": "record.hitPoints", "size": 4, "kind": "scalar", "target": null}, {"name": "record.buildPercent", "size": 4, "kind": "scalar", "target": null}, {"name": "record.angles", "size": 12, "kind": "bytes", "target": null}, {"name": "record.stockpiles", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "193": {"name": "PLAYERS_KILL_UNITS", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "194": {"name": "PLAYERS_UNIT_CREATED", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "195": {"name": "PLAYERS_UNIT_DIED", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "196": {"name": "PLAYERS_TRANSFER", "size": 28, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "from", "size": 4, "kind": "scalar", "target": null}, {"name": "to", "size": 4, "kind": "scalar", "target": null}, {"name": "resource", "size": 4, "kind": "scalar", "target": null}, {"name": "amount", "size": 4, "kind": "scalar", "target": null}, {"name": "announce", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "208": {"name": "PLAYERS_EFFECT_KILL_UNIT", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "selfDestruct", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "209": {"name": "PLAYERS_EFFECT_SEND_UNIT", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "210": {"name": "PLAYERS_EFFECT_CAPTURE_UNIT", "size": 48, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "player", "size": 4, "kind": "scalar", "target": null}, {"name": "record.present", "size": 4, "kind": "scalar", "target": null}, {"name": "record.hitPoints", "size": 4, "kind": "scalar", "target": null}, {"name": "record.buildPercent", "size": 4, "kind": "scalar", "target": null}, {"name": "record.angles", "size": 12, "kind": "bytes", "target": null}, {"name": "record.stockpiles", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "aiEvents": {
     "section": 42,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "extra", "size": 4, "kind": "scalar", "target": null},
-      {"name": "params", "size": 8, "kind": "bytes", "target": null},
-      {"name": "hasPos", "size": 4, "kind": "scalar", "target": null},
-      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
-      {"name": "scale", "size": 4, "kind": "scalar", "target": null},
-      {"name": "types", "size": 64, "kind": "bytes", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "224": {"name": "AI_REACT_TO_ATTACK", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "attacker", "size": 4, "kind": "ref", "target": "unit"}, {"name": "damage", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "226": {"name": "AI_SET_SQUAD", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "squad", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "227": {"name": "AI_PLAN", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "difficulties", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "228": {"name": "AI_WEIGHT", "size": 80, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "scale", "size": 4, "kind": "scalar", "target": null}, {"name": "fix", "size": 4, "kind": "scalar", "target": null}, {"name": "types", "size": 64, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "229": {"name": "AI_LIMIT", "size": 80, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "limit", "size": 4, "kind": "scalar", "target": null}, {"name": "fix", "size": 4, "kind": "scalar", "target": null}, {"name": "types", "size": 64, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "240": {"name": "AI_EFFECT_ADD_ORDER", "size": 44, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "type", "size": 4, "kind": "scalar", "target": null}, {"name": "queue", "size": 4, "kind": "scalar", "target": null}, {"name": "target", "size": 4, "kind": "ref", "target": "unit"}, {"name": "hasPos", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "params", "size": 8, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "241": {"name": "AI_EFFECT_QUEUE_BUILD", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "type", "size": 4, "kind": "scalar", "target": null}, {"name": "count", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "243": {"name": "AI_EFFECT_STOP", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "all", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "245": {"name": "AI_EFFECT_ACTIVATE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "bits", "size": 4, "kind": "scalar", "target": null}, {"name": "on", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "246": {"name": "AI_EFFECT_SET_STATES", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "movement", "size": 4, "kind": "scalar", "target": null}, {"name": "firing", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   },
   "weaponsEvents": {
     "section": 47,
-    "fields": [
-      {"name": "kind", "size": 4, "kind": "scalar", "target": null},
-      {"name": "unit", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "target", "size": 4, "kind": "ref", "target": "unit"},
-      {"name": "value", "size": 4, "kind": "scalar", "target": null},
-      {"name": "extra", "size": 4, "kind": "scalar", "target": null},
-      {"name": "callback", "size": 4, "kind": "scalar", "target": null},
-      {"name": "pos", "size": 12, "kind": "bytes", "target": null},
-      {"name": "vel", "size": 12, "kind": "bytes", "target": null},
-      {"name": "args", "size": 32, "kind": "bytes", "target": null},
-      {"name": "name", "size": 32, "kind": "bytes", "target": null},
-      {"name": "outcome", "size": 4, "kind": "scalar", "target": null}
-    ]
+    "kinds": {
+      "256": {"name": "WEAPONS_DAMAGE", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "source", "size": 4, "kind": "ref", "target": "unit"}, {"name": "amount", "size": 4, "kind": "scalar", "target": null}, {"name": "damageKind", "size": 4, "kind": "scalar", "target": null}, {"name": "direction", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "257": {"name": "WEAPONS_REMOTE_DAMAGE", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "source", "size": 4, "kind": "ref", "target": "unit"}, {"name": "amount", "size": 4, "kind": "scalar", "target": null}, {"name": "damageKind", "size": 4, "kind": "scalar", "target": null}, {"name": "direction", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "258": {"name": "WEAPONS_DETONATE", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "selfDestruct", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "259": {"name": "WEAPONS_RELEASE", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "260": {"name": "WEAPONS_CLAIM", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "261": {"name": "WEAPONS_INIT_SLOTS", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "262": {"name": "WEAPONS_REMOVE_PROJECTILES", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "263": {"name": "WEAPONS_AIM_DONE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "callback", "size": 4, "kind": "scalar", "target": null}, {"name": "result", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "264": {"name": "WEAPONS_EXPLODE_PIECE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "piece", "size": 4, "kind": "scalar", "target": null}, {"name": "flags", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "265": {"name": "WEAPONS_AREA_DAMAGE", "size": 24, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "266": {"name": "WEAPONS_SPAWN", "size": 40, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "vel", "size": 12, "kind": "bytes", "target": null}, {"name": "announce", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "267": {"name": "WEAPONS_SET_STOCKPILES", "size": 20, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "stockpiles", "size": 12, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "269": {"name": "WEAPONS_ADD_STOCKPILE", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "272": {"name": "WEAPONS_EFFECT_ATTACKED", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "attacker", "size": 4, "kind": "ref", "target": "unit"}, {"name": "amount", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "273": {"name": "WEAPONS_EFFECT_HIT", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "enemyDamage", "size": 4, "kind": "scalar", "target": null}, {"name": "friendlyDamage", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "274": {"name": "WEAPONS_EFFECT_MARK_DAMAGED", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "275": {"name": "WEAPONS_EFFECT_DAMAGE_RECORD", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "damageKind", "size": 4, "kind": "scalar", "target": null}, {"name": "attacker", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "276": {"name": "WEAPONS_EFFECT_HEALTH", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "health", "size": 4, "kind": "scalar", "target": null}, {"name": "dying", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "277": {"name": "WEAPONS_EFFECT_PARALYZE", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "ticks", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "278": {"name": "WEAPONS_EFFECT_START_SCRIPT", "size": 44, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "script", "size": 4, "kind": "scalar", "target": null}, {"name": "callback", "size": 4, "kind": "scalar", "target": null}, {"name": "update", "size": 4, "kind": "scalar", "target": null}, {"name": "withArgs", "size": 4, "kind": "scalar", "target": null}, {"name": "count", "size": 4, "kind": "scalar", "target": null}, {"name": "args", "size": 16, "kind": "bytes", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "279": {"name": "WEAPONS_EFFECT_DETACH_PIECE", "size": 16, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "piece", "size": 4, "kind": "scalar", "target": null}, {"name": "pose", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "280": {"name": "WEAPONS_EFFECT_SHOT_FIRED", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "281": {"name": "WEAPONS_EFFECT_BUSY", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "until", "size": 4, "kind": "scalar", "target": null}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "282": {"name": "WEAPONS_EFFECT_COMMAND_SHOT_FIRED", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]},
+      "283": {"name": "WEAPONS_EFFECT_OUT_OF_REACH", "size": 8, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "unit", "size": 4, "kind": "ref", "target": "unit"}, {"name": "outcome", "size": 4, "kind": "scalar", "target": null}]}
+    }
   }
 }

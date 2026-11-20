@@ -10,39 +10,56 @@
 
 struct Unit;
 
-inline FeaturesEvent FeaturesEventAt(int kind, int x, int z)
+inline FeaturesEventHeader FeaturesHeaderOf(int kind)
 {
-    FeaturesEvent event;
+    FeaturesEventHeader header;
+    header.kind = kind;
+    return header;
+}
+
+inline FeaturesPlace FeaturesPlaceOf(int cellIndex, int width)
+{
+    FeaturesPlace event;
     memset(&event, 0, sizeof(event));
-    event.kind = kind;
-    event.x = x;
-    event.z = z;
+    event.h = FeaturesHeaderOf(FEATURES_PLACE);
+    event.x = cellIndex % width;
+    event.z = cellIndex / width;
     event.owner = 10;
     return event;
 }
 
-inline FeaturesEvent FeaturesEventOf(int kind, int cellIndex, int width)
-{
-    return FeaturesEventAt(kind, cellIndex % width, cellIndex / width);
-}
-
 inline void FeaturesPublishPlace(int outbox, int cellIndex, int width, int feature)
 {
-    FeaturesEvent event = FeaturesEventOf(FEATURES_PLACE, cellIndex, width);
+    FeaturesPlace event = FeaturesPlaceOf(cellIndex, width);
     event.feature = feature;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void FeaturesPublishRemove(int outbox, int cellIndex, int width)
 {
-    FeaturesEvent event = FeaturesEventOf(FEATURES_REMOVE, cellIndex, width);
+    FeaturesRemove event;
+    event.h = FeaturesHeaderOf(FEATURES_REMOVE);
+    event.x = cellIndex % width;
+    event.z = cellIndex / width;
+    event.force = 0;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void FeaturesPublishDamage(int outbox, int x, int z, int weapon)
+{
+    FeaturesDamage event;
+    event.h = FeaturesHeaderOf(FEATURES_DAMAGE);
+    event.x = x;
+    event.z = z;
+    event.weapon = weapon;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U, class V>
 inline void FeaturesPublishReclaim(int outbox, U* unit, const V* pos)
 {
-    FeaturesEvent event = FeaturesEventAt(FEATURES_RECLAIM, 0, 0);
+    FeaturesReclaim event;
+    event.h = FeaturesHeaderOf(FEATURES_RECLAIM);
     event.unit = Ref<U>(unit).offset;
     event.pos[0] = pos->x;
     event.pos[1] = pos->y;

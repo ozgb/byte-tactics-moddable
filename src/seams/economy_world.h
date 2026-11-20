@@ -4,6 +4,6 @@
 struct EconomyWorldView;
 
 const EconomyWorldView* __stdcall NativeEconomyWorld();
-void EconomyInbox(const void* event);
+void EconomyInbox(const void* event, unsigned int size);
 
 #endif

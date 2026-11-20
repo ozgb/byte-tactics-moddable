@@ -78,12 +78,12 @@ int TdfRecord::GetFieldInt(const char*, int fallback)
 {
     return fallback;
 }
-int __stdcall ScheduleEconomySpend(const EconomyEvent*)
+int __stdcall ScheduleEconomySpend(const EconomySpend*)
 {
     return 1;
 }
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall HarnessPlayersEvent(const PlayersEvent*, int) {}
+void __stdcall HarnessPlayersEvent(const PlayersEventHeader*, unsigned int, int) {}
 
 enum {
     kTicks = 20,
@@ -127,16 +127,7 @@ static const unsigned long long kFnvBasis = 0xcbf29ce484222325ull;
 void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
     s_effects = Fnv(s_effects, &outbox, sizeof outbox);
-    if (size == sizeof(PlayersEvent)) {
-        const PlayersEvent* e = (const PlayersEvent*)data;
-        s_effects = Fnv(s_effects, &e->kind, sizeof e->kind);
-        s_effects = Fnv(s_effects, &e->unit, sizeof e->unit);
-        s_effects = Fnv(s_effects, &e->player, sizeof e->player);
-        s_effects = Fnv(s_effects, &e->value, sizeof e->value);
-        s_effects = Fnv(s_effects, &e->record, sizeof e->record);
-    } else {
-        s_effects = Fnv(s_effects, data, size);
-    }
+    s_effects = Fnv(s_effects, data, size);
     s_effectCount++;
 }
 
@@ -205,14 +196,14 @@ static void Restart()
     g_game->list_391ed = s_conditions;
 }
 
-static int __stdcall TamperedApply(const PlayersEvent* e)
+static int __stdcall TamperedApply(const PlayersEventHeader* e, unsigned int size)
 {
     s_applied++;
     if (s_tamperKind != 0 && s_tick == s_tamperTick && e->kind == s_tamperKind && s_dropped < 0) {
         s_dropped = s_tick;
         return 0;
     }
-    return PlayersApply(e);
+    return PlayersApply(e, size);
 }
 
 struct Run {
@@ -251,26 +242,31 @@ static unsigned long long HashState()
     return Fnv(kFnvBasis, parts, sizeof parts);
 }
 
-static int Offer(const PlayersEvent& e)
+static int Offer(const PlayersEventHeader& e)
 {
-    return g_seams.players->Apply(&e);
+    return g_seams.players->Apply(&e, sizeof e);
 }
 
-static PlayersEvent Died(int unit)
+template <class E>
+static int Offer(const E& e)
 {
-    PlayersEvent e;
-    memset(&e, 0, sizeof e);
+    return g_seams.players->Apply(&e.h, sizeof e);
+}
+
+static PlayersEventHeader Died(int unit)
+{
+    PlayersEventHeader e;
     e.kind = PLAYERS_UNIT_DIED;
     e.unit = Ref<Unit>(&s_units[unit]).offset;
     return e;
 }
 
-static PlayersEvent Give(int unit, int player)
+static PlayersGiveUnit Give(int unit, int player)
 {
-    PlayersEvent e;
+    PlayersGiveUnit e;
     memset(&e, 0, sizeof e);
-    e.kind = PLAYERS_GIVE_UNIT;
-    e.unit = Ref<Unit>(&s_units[unit]).offset;
+    e.h.kind = PLAYERS_GIVE_UNIT;
+    e.h.unit = Ref<Unit>(&s_units[unit]).offset;
     e.player = player;
     return e;
 }
@@ -299,9 +295,9 @@ static void Play(Run* run, int tamperKind, int tamperTick)
         if (s_tick == 12)
             Check(Offer(Give(kPyro2, 0)) == 1, "giving a unit to a computer player has outcome 1");
         if (s_tick == 15) {
-            PlayersEvent kill;
+            PlayersKillUnits kill;
             memset(&kill, 0, sizeof kill);
-            kill.kind = PLAYERS_KILL_UNITS;
+            kill.h.kind = PLAYERS_KILL_UNITS;
             kill.player = 1;
             Check(Offer(kill) == 1, "killing a player's units has outcome 1");
         }
@@ -335,32 +331,32 @@ static void CheckRejected()
     unsigned long long before = HashState();
     int effects = s_effectCount;
     std::vector<char> units((char*)s_units, (char*)(s_units + kUnits + 1));
-    PlayersEvent diedNoUnit = Died(kSolar);
+    PlayersEventHeader diedNoUnit = Died(kSolar);
     diedNoUnit.unit = 0;
-    PlayersEvent createdNoUnit = diedNoUnit;
+    PlayersEventHeader createdNoUnit = diedNoUnit;
     createdNoUnit.kind = PLAYERS_UNIT_CREATED;
-    PlayersEvent giveNoUnit = Give(kSolar, 0);
-    giveNoUnit.unit = 0;
-    PlayersEvent giveBadPlayer = Give(kFlash1, 10);
-    PlayersEvent giveOwn = Give(kFlash1, 0);
-    PlayersEvent giveDead = Give(kPyro1, 0);
-    PlayersEvent killBadPlayer;
+    PlayersGiveUnit giveNoUnit = Give(kSolar, 0);
+    giveNoUnit.h.unit = 0;
+    PlayersGiveUnit giveBadPlayer = Give(kFlash1, 10);
+    PlayersGiveUnit giveOwn = Give(kFlash1, 0);
+    PlayersGiveUnit giveDead = Give(kPyro1, 0);
+    PlayersKillUnits killBadPlayer;
     memset(&killBadPlayer, 0, sizeof killBadPlayer);
-    killBadPlayer.kind = PLAYERS_KILL_UNITS;
+    killBadPlayer.h.kind = PLAYERS_KILL_UNITS;
     killBadPlayer.player = 11;
-    PlayersEvent transferNone;
+    PlayersTransfer transferNone;
     memset(&transferNone, 0, sizeof transferNone);
-    transferNone.kind = PLAYERS_TRANSFER;
+    transferNone.h.kind = PLAYERS_TRANSFER;
     transferNone.from = 10;
-    PlayersEvent transferZero = transferNone;
+    PlayersTransfer transferZero = transferNone;
     transferZero.from = 0;
-    PlayersEvent transferBadKind = transferZero;
-    transferBadKind.value = 5;
+    PlayersTransfer transferBadKind = transferZero;
+    transferBadKind.resource = 5;
     transferBadKind.amount = 1.0f;
-    PlayersEvent badKind;
-    memset(&badKind, 0, sizeof badKind);
+    PlayersEventHeader badKind;
     badKind.kind = 127;
     badKind.unit = Ref<Unit>(&s_units[kSolar]).offset;
+    PlayersGiveUnit giveShort = Give(kFlash1, 1);
     s_units[kPyro1].flags = 0x10000000 | 0x4000;
     std::vector<char> withDying((char*)s_units, (char*)(s_units + kUnits + 1));
     Check(Offer(diedNoUnit) == 0, "a death with a null unit has outcome 0");
@@ -374,6 +370,7 @@ static void CheckRejected()
     Check(Offer(transferZero) == 0, "a transfer of nothing has outcome 0");
     Check(Offer(transferBadKind) == 0, "a transfer of an unknown resource has outcome 0");
     Check(Offer(badKind) == 0, "an event of an unknown kind has outcome 0");
+    Check(g_seams.players->Apply(&giveShort.h, sizeof giveShort - 1) == 0, "a gift smaller than its payload has outcome 0");
     Check(HashState() == before, "a rejected event changes no hashed state");
     Check(s_effectCount == effects, "a rejected event publishes no effect");
     Check(memcmp(&withDying[0], s_units, withDying.size()) == 0, "a rejected event changes no unit");

@@ -33,7 +33,7 @@ IMPORT("services", "TdfRecord_GetFieldDouble") double service_TdfRecord_GetField
 IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, char* key, size_t size, char* def);
 IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(HapiBank* self, char* name);
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
-IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEffect* effect);
+IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
 IMPORT("services", "HapiBank_GetIntegerItem") int service_HapiBank_GetIntegerItem(HapiBank* self, char* name, int def);
 IMPORT("weapons", "FindWeaponByName") WeaponDef* weapons_FindWeaponByName(char* name);
 }
@@ -56,7 +56,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
 {
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }
-void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect) { service_WindMeteorsEmit(effect); }
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size) { service_WindMeteorsEmit(effect, size); }
 
 SimGlobals& SimCreate() { __builtin_trap(); }
 
@@ -100,7 +100,7 @@ Seams g_seams = {
 extern "C" {
 EXPORT("UpdateWind") void export_UpdateWind(RandStream stream) { s_windMeteors.UpdateWind(stream); }
 EXPORT("UpdateMeteors") void export_UpdateMeteors(void) { s_windMeteors.UpdateMeteors(); }
-EXPORT("Apply") void export_Apply(const WindMeteorsEvent* event) { s_windMeteors.Apply(event); }
+EXPORT("Apply") void export_Apply(const WindMeteorsEventHeader* event, unsigned int size) { s_windMeteors.Apply(event, size); }
 EXPORT("InitMeteors") void export_InitMeteors(void) { s_windMeteors.InitMeteors(); }
 EXPORT("EmptyShutdownPreCleanup") void export_EmptyShutdownPreCleanup(void) { s_windMeteors.EmptyShutdownPreCleanup(); }
 EXPORT("LoadMeteorDefaults") void export_LoadMeteorDefaults(MeteorShowerParams* params) { s_windMeteors.LoadMeteorDefaults(params); }

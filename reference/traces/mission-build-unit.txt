@@ -1,6 +1,6 @@
-bt-digest 6
-trace_format bt-trace 6
-commit f0d727d6d17e7bbb91874709fb52517e16b9da8c
+bt-digest 7
+trace_format bt-trace 7
+commit 2c51282d9e9cf37e66f347a08031d016a3c128cf
 scenario reference/scenarios/mission-build-unit.txt
 game_seed 463
 crt_seed 1463

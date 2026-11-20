@@ -12,14 +12,14 @@ class UnitDef;
 struct Unit;
 struct Vec3;
 
-struct AiEvent;
+struct AiEventHeader;
 struct StateWriter;
 class UnitDef;
 struct Unit;
 
 void __stdcall EnableAICommands();
 void __stdcall FUN_00406f40(void);
-int __stdcall AiApply(const AiEvent* event);
+int __stdcall AiApply(const AiEventHeader* event, unsigned int size);
 void __stdcall AiWriteState(const StateWriter* writer);
 void __stdcall UpdateConverter(Unit* unit);
 void __stdcall RetargetWeapon(Unit* unit, unsigned int weapon);

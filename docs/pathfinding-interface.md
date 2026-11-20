@@ -1,6 +1,6 @@
 # The pathfinding interface
 
-Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 3.0). 3.1c's search is
+Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 4.0). 3.1c's search is
 its default implementation (`src/ai/pathfind.cpp`). This page is the inventory that interface was cut
 from (#883):
 - what 3.1c's search takes, when it runs, and what it leaves;
@@ -103,23 +103,33 @@ in progress if it is that goal's. There is no pending queue to cancel from, sinc
 
 The goal object keeps at most 20 waypoints (`SetWaypoints` cuts the rest), so a long route is always
 partial in practice. The unit asks again when it runs out (section 1). The cut belongs to the consumer:
-the event's `count` is the route's full length, and `Poll` copies as many waypoints as the caller's
+the event's `count` (in `PathfindingProgress` or `PathfindingFinished`) is the route's full length, and `Poll` copies as many waypoints as the caller's
 buffer holds (orders pass 64).
 
 Partial results over several ticks don't happen in 3.1c (a search reports once, at its end). The
 interface has `PATH_EVENT_PROGRESS` for implementations that do.
 
+**Payloads.** Every event starts with `PathfindingEventHeader`: `kind`, `unit`, `requester`, `target` and `tick` (the tick of the step). Each kind has the payload of `interfaces/pathfinding.h` (version 4.0) that starts with it. `Poll(out, size, points, capacity)` copies the next payload to `out`, at most `size` bytes of it, and the first min(count, capacity) waypoints to `points`; it returns the payload's size, or 0 when no event is left. The engine zeroes `out` before each `Poll` and stops polling for the step at a return smaller than the header (0, a negative number, or the 1 of an older module).
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| STARTED 0 | `PathfindingStarted` | `start`: how the search started, a `PathStart` |
+| PROGRESS 1 | `PathfindingProgress` | `count`: the number of waypoints of the route so far |
+| FINISHED 2 | `PathfindingFinished` | `status` (a `PathStatus`: FOUND, PARTIAL, FAILED or NEAREST), `count` (the number of waypoints; none when FAILED) |
+
+The consumer applies a polled event with `ApplyPathEvent(event, size, waypoints)`, which changes nothing for an event smaller than its kind's payload. The trace's path results (section 32) record each event as `HarnessPathEvent(event, size, points, capacity)`.
+
 ## 4. What the consumers read
 
 The consumers are the order (`AiSearchGoal`, `OrderFx`, `Order`) and the unit's movement (`UnitMotion`).
-Orders apply each polled event with `ApplyPathEvent` (`src/orders/order_targets.cpp`).
+Orders apply each polled event, with its size, with `ApplyPathEvent` (`src/movement/order_targets.cpp`).
 
 | What the consumer reads | Who reads it | Marked |
 |---|---|---|
 | The waypoints, their count and `active` in the goal object | movement (`SteerGroundUnit`, through `HasReadyWaypoints` and `FillWaypointWorldPos`) | in the result: `FINISHED` points |
 | `flag_1` (a repath is wanted) | orders and the goal object | in the result: orders keep it, and it mirrors a pending request |
 | `repathClaimTick` (the 60-tick throttle) | the goal object | in the result: written from the `STARTED` event's tick; the request's `notBefore` carries it back |
-| Order flags 0x100 and 0x200 (`Order::subFlags`) | the order's own update | in the result: the `STARTED` event's `PathStart` |
+| Order flags 0x100 and 0x200 (`Order::subFlags`) | the order's own update | in the result: the `STARTED` event's `start` (`PathfindingStarted`, a `PathStart`) |
 | Order flag 0x40 (no route) | the order's own update | in the result: a `FINISHED` event with no points |
 | The cut to 20 waypoints | the goal object (`SetWaypoints`) | in the result: the consumer cuts, `Poll` copies as many as its buffer holds |
 | The pass maps re-stamped for the searching unit's class | movement, for its own collision tests | **internal**: every implementation must call `BeginSearch` and `EndSearch` around a search, which are 3.1c's lazy refresh (section 7) |

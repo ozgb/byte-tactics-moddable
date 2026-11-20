@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"
@@ -79,8 +80,18 @@ struct Local {
     unsigned char st[MAX_LOCAL];
 };
 
+struct HpaEvent {
+    int kind;
+    int status;
+    PathUnit unit;
+    PathHandle requester;
+    PathHandle target;
+    unsigned int tick;
+    int count;
+};
+
 struct Ev {
-    PathEvent e;
+    HpaEvent e;
     int first;
 };
 
@@ -520,14 +531,14 @@ inline PathPoint WorldPoint(const Hdr* h, int cell)
     return p;
 }
 
-PathEvent* NewEvent(HpaView* v, int kind, int status)
+HpaEvent* NewEvent(HpaView* v, int kind, int status)
 {
     Hdr* h = v->h;
     if (h->evCount >= EVENT_CAP)
         return nullptr;
     Ev* rec = &v->ev[h->evCount++];
     rec->first = h->nPts;
-    PathEvent* e = &rec->e;
+    HpaEvent* e = &rec->e;
     e->kind = kind;
     e->status = status;
     e->unit = h->req.unit;
@@ -540,7 +551,7 @@ PathEvent* NewEvent(HpaView* v, int kind, int status)
 
 void EmitCells(HpaView* v, int kind, int status, const int* cells, int n)
 {
-    PathEvent* e = NewEvent(v, kind, status);
+    HpaEvent* e = NewEvent(v, kind, status);
     if (e == nullptr)
         return;
     if (n > MAX_WAYPOINTS)
@@ -1409,7 +1420,36 @@ void __stdcall HpaStep()
         EmitProgress(&v);
 }
 
-int __stdcall HpaPoll(PathEvent* out, PathPoint* points, int capacity)
+static unsigned int HpaPayload(const HpaEvent& e, PathfindingEventHeader* out, unsigned int size)
+{
+    PathfindingFinished payload;
+    memset(&payload, 0, sizeof(payload));
+    payload.h.kind = e.kind;
+    payload.h.unit = e.unit;
+    payload.h.requester = e.requester;
+    payload.h.target = e.target;
+    payload.h.tick = e.tick;
+    unsigned int total = sizeof(PathfindingEventHeader);
+    switch (e.kind) {
+    case PATH_EVENT_STARTED:
+        reinterpret_cast<PathfindingStarted*>(&payload)->start = e.status;
+        total = sizeof(PathfindingStarted);
+        break;
+    case PATH_EVENT_PROGRESS:
+        reinterpret_cast<PathfindingProgress*>(&payload)->count = e.count;
+        total = sizeof(PathfindingProgress);
+        break;
+    case PATH_EVENT_FINISHED:
+        payload.status = e.status;
+        payload.count = e.count;
+        total = sizeof(PathfindingFinished);
+        break;
+    }
+    memcpy(out, &payload, size < total ? size : total);
+    return total;
+}
+
+int __stdcall HpaPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
 {
     HpaView v;
     if (!Open(&v))
@@ -1418,10 +1458,10 @@ int __stdcall HpaPoll(PathEvent* out, PathPoint* points, int capacity)
     if (h->evHead >= h->evCount)
         return 0;
     const Ev* rec = &v.ev[h->evHead++];
-    *out = rec->e;
+    unsigned int total = HpaPayload(rec->e, out, size);
     for (int i = 0; i < rec->e.count && i < capacity; i++)
         points[i] = v.pts[rec->first + i];
-    return 1;
+    return (int)total;
 }
 
 void WriteRequest(const StateWriter* w, int pending, int index, const PathRequest* r, unsigned seq)

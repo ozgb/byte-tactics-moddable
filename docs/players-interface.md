@@ -1,6 +1,6 @@
 # The players interface
 
-Players sits behind `interfaces/players.h` (version 3.0), the sixth module on the scheduler after economy
+Players sits behind `interfaces/players.h` (version 4.0), the sixth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`) and map (`docs/map-interface.md`) (#967). It is the players as the
 simulation sees them: each player's update (its resources' bookkeeping, the commander's respawn, the end of the game),
@@ -87,7 +87,7 @@ Players' place in it:
 - **KILL_UNITS** walks the player's units and publishes a KILL_UNIT for each that is alive and not dying (section 3).
 - **TRANSFER** clamps an announced amount to the giver's store, spends it through economy's synchronous `Spend`
   (`ScheduleEconomySpend`), publishes INCOME to the receiver, and sends the share packet when announced. 3.1c's names
-  are kept: `TransferMetal` moves energy and `TransferEnergy` moves metal, so TRANSFER's `value` names the resource
+  are kept: `TransferMetal` moves energy and `TransferEnergy` moves metal, so `PlayersTransfer::resource` names the resource
   (0 energy, 1 metal) instead.
 
 **Answers.** One caller used a value: none. `GiveUnitToPlayer`, `KillPlayerUnits`, the conditions' notices and the
@@ -133,7 +133,7 @@ seam.
 ## 3. Effects out of players
 
 **KILL_UNIT, SEND_UNIT and CAPTURE_UNIT, to units.** Each holds a write into a unit that 3.1c made inside players:
-- **KILL_UNIT** (`value` 0 or 1): a unit of a player whose units are killed dies, by 30000 damage dealt by itself
+- **KILL_UNIT** (`PlayersKillUnit::selfDestruct` 0 or 1): a unit of a player whose units are killed dies, by 30000 damage dealt by itself
   (`weapons.DamageUnit`) when its owner plays on this machine, or by self-destruct (`weapons.DetonateUnitWeapon`, the
   dying flag 0x4000 of `Unit::flags`, `units.KillUnit`) otherwise.
 - **SEND_UNIT:** a unit given to a player on another machine stops being selectable (`Unit::flags` 0x10), waits out
@@ -162,6 +162,18 @@ scenario plays (section 6).
 **Writes players keeps.** After this change players writes no field of a unit: `tools/rwsets.py` gives it no write of
 `Unit`, `UnitMotion` or `Order`. It writes its own: the `Player` records' fields it owns (section 4), the conditions'
 objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
+
+**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| GIVE_UNIT 192 | `PlayersGiveUnit` | `player` (who is given the unit, 0 to 9), `record` (a `PlayersOwnershipRecord`) |
+| KILL_UNITS 193 | `PlayersKillUnits` | `player`: whose units are killed, 0 to 10 |
+| UNIT_CREATED 194, UNIT_DIED 195 | the header alone | none |
+| TRANSFER 196 | `PlayersTransfer` | `from`, `to` (the players), `resource` (0 energy, 1 metal), `amount`, `announce` (1 when clamped, spent and sent to the other machines, 0 when it only credits the receiver) |
+| KILL_UNIT 208 | `PlayersKillUnit` | `selfDestruct`: 0 by 30000 damage the unit deals itself, 1 by self-destruct |
+| SEND_UNIT 209 | `PlayersSendUnit` | `player`: the player it goes to |
+| CAPTURE_UNIT 210 | `PlayersCaptureUnit` | `player` (the player the copy is made for), `record` (a `PlayersOwnershipRecord`) |
 
 ## 4. Views
 

@@ -363,8 +363,27 @@ exits 0 when the file passes, 1 when it prints problems, and 2 when the check co
 
 A slot is a function export of the module's wasm instance, named exactly like the interface's slot
 (`UpdateWind`, `Apply`). The module's `exports` lists them, in the interface's slot order.
-`Apply` takes a `linear` address of a `WindMeteorsEvent` record, the event of the `wind_meteors`
-module's inbox.
+`Apply` takes a `linear` address of a `WindMeteorsEventHeader` record, the event of the `wind_meteors`
+module's inbox, and the size in bytes of the event's payload (6.1).
+
+### 6.1 Event payloads
+
+The events and effects of a module with an inbox share one convention. Each module has an `<Module>EventHeader` that
+starts with `int kind` and holds the fields every kind of the module has (pathfinding's is `PathfindingEventHeader`).
+Each kind has a payload struct `<Module><Kind>` (`TargetingSetUnit`, `EconomySpend`) that starts with the header and adds
+the fields of that kind, or has no payload struct, in which case the event is the header alone and its size is the
+header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
+offset. Two kinds share one payload struct only when their fields mean the same.
+
+The publisher passes the payload's size with it: `SchedPublish(outbox, &payload, sizeof payload)`. An event of fewer
+than 4 bytes has no kind to route by, and is a fatal error. The scheduler copies `size` bytes into a 128-byte inbox entry,
+keeps the size with it, and hands the subscriber the event as a pointer to the header together with the size the publisher
+gave, whether it delivers the event at once or from the inbox. A slot that consumes an event takes the header and that
+size, `Apply(header, size)`: it first refuses a size smaller than the header with outcome 0, before it reads `kind`; then
+it switches on `kind`, checks that `size` is at least the size of that kind's payload, and refuses a smaller one with
+outcome 0 and no change (a `void` `Apply`, as wind_meteors', just ignores it); only then does it read the payload's fields.
+The module's interface header says which struct belongs to which kind. An effect is routed by its kind, so its subscriber
+reads the payload of the kind it subscribed to, and does nothing with an effect smaller than that payload.
 
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
@@ -398,7 +417,7 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `scratch` | a linear address in the scratch area, where the host put a copy of a native object for this call |
 | `handle` | an opaque u32 (section 8) |
 
-A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsEvent` (the `Apply` argument) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
+A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsParams` (a payload the `Apply` slot reads) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
 
 ### 7.1 The pointer rule for Milestone 2
 
@@ -481,7 +500,7 @@ and not in the start function.
 | `g_extTdf` | the 4 bytes `tdf` plus a terminating 0, the extension of TDF data files | building a data path |
 | `g_blockBase` | the linear address of the block's first byte (`block_base`, 1048576 today) | adding to a block offset, section 7.1 |
 
-The `MeteorShowerParams` and `WindMeteorsEvent` records are not data words: they reach a module as the `linear` argument of a slot (section 6).
+The `MeteorShowerParams` record and the event payloads (6.1) are not data words: they reach a module as the `linear` argument of a slot (section 6).
 
 The host writes the words directly, not through an import. They are excluded from the hash of
 section 12.
@@ -541,18 +560,18 @@ signatures are below; those the manifest's modules import are also `signatures.s
 | `TdfRecord_GetFieldString` | `[handle, linear, linear, int, linear] -> int` | copies a field's text into a buffer (arguments: record, destination, key, size, default) |
 | `CommandArgs_GetIntArg` | `[scratch, int, int] -> int` | reads argument *index* of a console command as an integer, or the default |
 | `CommandArgs_Count` | `[scratch] -> int` | the number of arguments of a console command, its name included (`meteor 1` has 2); the recordings carry it as the `a args.count` line |
-| `WindMeteorsEmit` | `[linear] -> void` | publishes a `WindMeteorsEffect` (a meteor's SPAWN: weapon slot, position, velocity and whether it is announced) to the engine's outbox; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
+| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the host refuses, as an import error, any kind but SPAWN, a size other than SPAWN's payload, and a weapon slot outside the table of weapons; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
-| `SchedPublish` | `[int, linear, int] -> void` | publishes the event or effect at the second argument (plain data whose first int is its kind, as many bytes as the third argument says) to the outbox the first argument names (a `SchedModule`); the scheduler's router copies it to the inbox of each module that subscribes to its kind |
-| `HarnessEconomyEvent` | `[linear, int] -> void` | in test mode, records an `EconomyEvent` with its outcome (second argument) for the dump's economy events; outside test mode it does nothing |
-| `HarnessFeaturesEvent` | `[linear, int] -> void` | the same for a `FeaturesEvent` and the dump's features events |
-| `HarnessTargetingEvent` | `[linear, int] -> void` | the same for a `TargetingEvent` and the dump's targeting events |
-| `HarnessLosRadarEvent` | `[linear, int] -> void` | the same for a `LosRadarEvent` and the dump's los_radar events |
-| `HarnessMapEvent` | `[linear, int] -> void` | the same for a `MapEvent` and the dump's map events |
-| `HarnessPlayersEvent` | `[linear, int] -> void` | the same for a `PlayersEvent` and the dump's players events |
-| `HarnessAiEvent` | `[linear, int] -> void` | the same for an `AiEvent` and the dump's ai events |
+| `SchedPublish` | `[int, linear, int] -> void` | publishes the event or effect at the second argument (a payload, 6.1: plain data that starts with its kind, as many bytes as the third argument says) to the outbox the first argument names (a `SchedModule`); the scheduler's router copies it to the inbox of each module that subscribes to its kind, with its size, which the subscriber's `Apply` receives; fewer than 4 bytes is a fatal error |
+| `HarnessEconomyEvent` | `[linear, int, int] -> void` | in test mode, records an economy event or effect, its payload of the size in bytes that the second argument gives, with its outcome (third argument) for the dump's economy events; outside test mode it does nothing |
+| `HarnessFeaturesEvent` | `[linear, int, int] -> void` | the same for a features event or effect and the dump's features events |
+| `HarnessTargetingEvent` | `[linear, int, int] -> void` | the same for a targeting event or effect and the dump's targeting events |
+| `HarnessLosRadarEvent` | `[linear, int, int] -> void` | the same for a los_radar event and the dump's los_radar events |
+| `HarnessMapEvent` | `[linear, int, int] -> void` | the same for a map event or effect and the dump's map events |
+| `HarnessPlayersEvent` | `[linear, int, int] -> void` | the same for a players event or effect and the dump's players events |
+| `HarnessAiEvent` | `[linear, int, int] -> void` | the same for an ai event or effect and the dump's ai events |
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
 (`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30), and two parties record them. The engine records each event
@@ -568,7 +587,7 @@ through what its subscribers do with it. The `services` list of a subsystem in t
 `imports.services` of its manifest entry: targeting's names only `RandomInt`, and its recordings still carry
 `SchedPublish` lines.
 
-The services interface is at major 1 and minor 19 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 2 and minor 0 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). `CommandArgs_Count` came with minor 8, the goal-area services (`PathGoalContains`,
 `PathGoalDistance`, `PathGoalCells`) with minor 9 and `HarnessPathEvent`, which the players phase calls for the trace's
 path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls for the trace's economy events, with minor 11,
@@ -577,7 +596,7 @@ path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls
 targeting (`ScheduleTargetingTargetUnit`, `ScheduleTargetingTargetPos`, `ScheduleTargetingFind`,
 `ScheduleTargetingFireAtWill`) with minor 14, `HarnessLosRadarEvent` with minor 15, and `HarnessMapEvent`, the calls into
 map (`ScheduleMapCanBuildAt`, `ScheduleMapCanPlaceUnitFootprint`, `ScheduleMapPickReclaimable`) and the module id
-`SCHED_PATHFINDING` with minor 16, `HarnessPlayersEvent` with minor 17, `HarnessAiEvent` with minor 18, and the module ids `SCHED_SCRIPTS` and `SCHED_MOVEMENT` with minor 19. Each is an addition: a module built without it needs nothing.
+`SCHED_PATHFINDING` with minor 16, `HarnessPlayersEvent` with minor 17, `HarnessAiEvent` with minor 18, and the module ids `SCHED_SCRIPTS` and `SCHED_MOVEMENT` with minor 19, all of the 1.x line. Major 2 gives every `Harness<X>Event` the payload's size (`Harness<X>Event(header, size, outcome)`, `HarnessPathEvent(header, size, points, capacity)`) and `WindMeteorsEmit` its size (`WindMeteorsEmit(header, size)`), and `ScheduleEconomySpend` and `ScheduleFeaturesPlace` take their payloads (`const EconomySpend*`, `const FeaturesPlace*`). Each minor addition is an addition: a module built without it needs nothing.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
@@ -597,7 +616,7 @@ An interface has a major version that changes when a slot is removed or its sign
 ### 10.1 What the manifest records
 
 - `majors`: the current major of each interface and of each import group's interface, read from the
-  interface headers. The game manifest has, for example, `services` 1 and `wind_meteors` 2.
+  interface headers. The game manifest has, for example, `services` 2 and `wind_meteors` 3.
 - `modules[].interface`: the interface whose slots the module implements.
 - `modules[].majors`: for its own interface and for every import group, the major the module was
   built against.

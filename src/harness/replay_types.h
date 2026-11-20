@@ -90,6 +90,19 @@ struct ReplayObjectKind {
     unsigned char delta;
 };
 
+#define REPLAY_EVENT_MAX 256
+
+struct ReplayEventKind {
+    int kind;
+    unsigned char object;
+};
+
+struct ReplayEventTable {
+    unsigned char header;
+    unsigned first;
+    unsigned count;
+};
+
 struct ReplayCallbackType {
     const char* name;
     const char* handle;

@@ -87,7 +87,6 @@ OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_mediumGadgetNa
 OpenSkirmishMenu,0x47bbb0,src/frontend/skirmish_menu.cpp,end-of,g_skirmishGuiName,0,g_skirmishSetupPictureName,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_noDirectSoundKey,0,g_useWindowsSoundKey,,none
 InitSound,0x47ed40,src/sound/sound.cpp,end-of,g_useWindowsSoundKey,0,g_soundInitError,,none
-ApplyUnitDamage,0x489ce0,src/weapons/damage.cpp,end-of,g_hitByWeaponScriptName,0,g_takeDamageScriptName,,
 VictoryKillEnemyCommander::SaveState,0x48eac0,src/game/victory.cpp,end-of,g_killEnemyCommanderKey,0,g_satisfiedKey,,none
 VictoryKillEnemyCommander::SaveState,0x48eac0,src/game/victory.cpp,end-of,g_satisfiedKey,0,g_celebratedKey,,none
 VictoryKillEnemyCommander::LoadState,0x48eb00,src/game/victory.cpp,end-of,g_killEnemyCommanderKey,0,g_satisfiedKey,,none
@@ -135,6 +134,9 @@ LzssCompress,0x4d0f60,src/files/sqsh.cpp,end-of,g_lzssPresetTree,0,g_lzssPresetW
 LzssCompress,0x4d0f60,src/files/sqsh.cpp,end-of,g_squashThreadLockTicket,0,g_squashThreadLockEvent,,none
 LzssExpand,0x4d1480,src/files/sqsh.cpp,end-of,g_squashThreadLockTicket,0,g_squashThreadLockEvent,,none
 LzssSetPreset,0x4d1670,src/files/sqsh.cpp,end-of,g_lzssPresetTree,0,g_lzssPresetWindow,,none
+ScriptsOnWeaponsStartScript,,src/scripts/weapons_effects.cpp,end-of,g_hitByWeaponScriptName,0,g_takeDamageScriptName,,
+ScriptsOnWeaponsStartScript,,src/scripts/weapons_effects.cpp,past-end,g_aimScriptNames,-16,g_aimScriptNames,g_fireScriptNames+0x0,none
+ScriptsOnWeaponsStartScript,,src/scripts/weapons_effects.cpp,past-end,g_fireScriptNames,-4,g_fireScriptNames,g_screenshotPrefix+0x8,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_packedPosGoalVtable,0,g_liteGoalVtable,,none
 VisitWorld,,src/harness/harness.cpp,end-of,g_patrolGoalVtable,0,g_aiSearchGoalVtable,,none

@@ -31,9 +31,11 @@
 #include "players.h"
 #include "scheduler.h"
 
-static void PathfindingOnMapCellsChanged(const void* event)
+static void PathfindingOnMapCellsChanged(const void* event, unsigned int size)
 {
-    const MapEvent* e = static_cast<const MapEvent*>(event);
+    if (size < sizeof(MapCellsChanged))
+        return;
+    const MapCellsChanged* e = static_cast<const MapCellsChanged*>(event);
     g_seams.pathfinding->CellsChanged(e->rect[0], e->rect[1], e->rect[2], e->rect[3], e->classes, e->cause);
 }
 
@@ -75,7 +77,6 @@ static const SchedRoute s_routes[] = {
     {SCHED_UNITS, WEAPONS_INIT_SLOTS, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_UNITS, WEAPONS_REMOVE_PROJECTILES, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_UNITS, WEAPONS_SET_STOCKPILES, SCHED_WEAPONS, WeaponsInbox, 1},
-    {SCHED_UNITS, WEAPONS_LOAD_SLOT, SCHED_WEAPONS, WeaponsInbox, 0},
     {SCHED_ENGINE, WEAPONS_REMOTE_DAMAGE, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_SCRIPTS, WEAPONS_AIM_DONE, SCHED_WEAPONS, WeaponsInbox, 1},
     {SCHED_SCRIPTS, WEAPONS_EXPLODE_PIECE, SCHED_WEAPONS, WeaponsInbox, 1},
@@ -85,7 +86,9 @@ static const SchedRoute s_routes[] = {
     {SCHED_WEAPONS, WEAPONS_EFFECT_PARALYZE, SCHED_ORDERS, OrdersOnWeaponsParalyze, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_START_SCRIPT, SCHED_SCRIPTS, ScriptsOnWeaponsStartScript, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_DETACH_PIECE, SCHED_SCRIPTS, ScriptsOnWeaponsDetachPiece, 1},
-    {SCHED_WEAPONS, WEAPONS_EFFECT_NOTICE, SCHED_UNITS, UnitsOnWeaponsNotice, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_SHOT_FIRED, SCHED_UNITS, UnitsOnWeaponsNotice, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_COMMAND_SHOT_FIRED, SCHED_UNITS, UnitsOnWeaponsNotice, 1},
+    {SCHED_WEAPONS, WEAPONS_EFFECT_OUT_OF_REACH, SCHED_UNITS, UnitsOnWeaponsNotice, 1},
     {SCHED_WEAPONS, WEAPONS_EFFECT_BUSY, SCHED_UNITS, UnitsOnWeaponsBusy, 1},
     {SCHED_UNITS, AI_SET_SQUAD, SCHED_AI, AiInbox, 1},
     {SCHED_ENGINE, AI_SET_SQUAD, SCHED_AI, AiInbox, 0},

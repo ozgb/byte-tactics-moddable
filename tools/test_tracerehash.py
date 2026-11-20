@@ -143,37 +143,27 @@ PATH_RESULTS = [
     ("results[0].points", "hex:1800280038004800"),
 ]
 
-ECONOMY_EVENTS = [
-    ("economy.count", "0x00000001"),
-    ("economy[0].kind", "0x00000001"),
-    ("economy[0].player", "0x00000000"),
-    ("economy[0].unit", "unit:7"),
-    ("economy[0].resources", "0x00000000"),
-    ("economy[0].energy", "0x00000000"),
-    ("economy[0].metal", "0x00000000"),
-    ("economy[0].value", "0x00000000"),
-    ("economy[0].outcome", "0x00000001"),
-    ("economy[0].account", "hex:" + bytes(range(48)).hex()),
-]
+def event_rows(prefix, events):
+    rows = [(prefix + ".count", "0x%08x" % len(events))]
+    for k, fields in enumerate(events):
+        rows += [("%s[%d].%s" % (prefix, k, name), value) for name, value in fields]
+    return rows
 
-FEATURES_EVENTS = [
-    ("features.count", "0x00000001"),
-    ("features[0].kind", "0x00000020"),
-    ("features[0].flags", "0x00000003"),
-    ("features[0].x", "0x00000004"),
-    ("features[0].z", "0x00000005"),
-    ("features[0].feature", "0x00000006"),
-    ("features[0].owner", "0x0000000a"),
-    ("features[0].player", "0x00000000"),
-    ("features[0].unit", "null"),
-    ("features[0].value", "0x00000000"),
-    ("features[0].state", "heap"),
-    ("features[0].width", "0x00000002"),
-    ("features[0].height", "0x00000002"),
-    ("features[0].pos", "hex:" + bytes(range(12)).hex()),
-    ("features[0].rot", "hex:" + bytes(range(12)).hex()),
-    ("features[0].outcome", "0x00000001"),
-]
+
+ECONOMY_EVENTS = event_rows("economy", [
+    [("kind", "0x00000001"), ("player", "0x00000000"), ("unit", "unit:7"), ("account", "hex:" + bytes(range(48)).hex()),
+     ("outcome", "0x00000001")],
+    [("kind", "0x00000002"), ("player", "0x00000001"), ("unit", "null"), ("resources", "0x00000003"),
+     ("energy", "0x3f800000"), ("metal", "0x40000000"), ("outcome", "0x00000001")],
+    [("kind", "0x00000000"), ("player", "0x00000001"), ("unit", "null"), ("outcome", "0x00000001")],
+])
+
+FEATURES_EVENTS = event_rows("features", [
+    [("kind", "0x00000020"), ("x", "0x00000004"), ("z", "0x00000005"), ("feature", "0x00000006"),
+     ("flags", "0x00000003"), ("owner", "0x0000000a"), ("pos", "hex:" + bytes(range(12)).hex()),
+     ("rot", "hex:" + bytes(range(12)).hex()), ("outcome", "0x00000001")],
+    [("kind", "0x00000031"), ("state", "heap"), ("feature", "0x00000006"), ("outcome", "0x00000001")],
+])
 
 SHARE_PACKETS = [
     ("packets.count", "0x00000001"),
@@ -185,116 +175,57 @@ SHARE_PACKETS = [
 ]
 
 
-WIND_METEORS_EVENTS = [
-    ("windMeteors.count", "0x00000002"),
-    ("windMeteors[0].kind", "0x00000023"),
-    ("windMeteors[0].data", "hex:" + bytes(range(48)).hex()),
-    ("windMeteors[1].kind", "0x00000030"),
-    ("windMeteors[1].data", "hex:" + bytes(range(32)).hex()),
-]
+WIND_METEORS_EVENTS = event_rows("windMeteors", [
+    [("kind", "0x00000042"), ("params", "hex:" + bytes(range(48)).hex())],
+    [("kind", "0x00000050"), ("weapon", "0x00000001"), ("pos", "hex:" + bytes(12).hex()),
+     ("vel", "hex:" + bytes(12).hex()), ("announce", "0x00000000")],
+    [("kind", "0x00000043")],
+])
 
-TARGETING_EVENTS = [
-    ("targeting.count", "0x00000002"),
-    ("targeting[0].kind", "0x00000061"),
-    ("targeting[0].unit", "unit:3"),
-    ("targeting[0].weapon", "0x00000001"),
-    ("targeting[0].target", "null"),
-    ("targeting[0].pos", "hex:" + bytes(range(12)).hex()),
-    ("targeting[0].outcome", "0x00000001"),
-    ("targeting[1].kind", "0x00000070"),
-    ("targeting[1].unit", "unit:4"),
-    ("targeting[1].weapon", "0x00000000"),
-    ("targeting[1].target", "unit:5"),
-    ("targeting[1].pos", "hex:" + bytes(12).hex()),
-    ("targeting[1].outcome", "0x00000001"),
-]
+TARGETING_EVENTS = event_rows("targeting", [
+    [("kind", "0x00000061"), ("unit", "unit:3"), ("weapon", "0x00000001"), ("pos", "hex:" + bytes(range(12)).hex()),
+     ("outcome", "0x00000001")],
+    [("kind", "0x00000060"), ("unit", "unit:4"), ("weapon", "0x00000000"), ("target", "unit:5"),
+     ("outcome", "0x00000001")],
+    [("kind", "0x00000070"), ("unit", "unit:4"), ("weapon", "0x00000000"), ("outcome", "0x00000001")],
+])
 
-LOS_RADAR_EVENTS = [
-    ("los_radar.count", "0x00000002"),
-    ("los_radar[0].kind", "0x00000080"),
-    ("los_radar[0].unit", "unit:3"),
-    ("los_radar[0].player", "0x00000001"),
-    ("los_radar[0].value", "0x00000000"),
-    ("los_radar[0].pos", "hex:" + bytes(12).hex()),
-    ("los_radar[0].sightDistance", "0x00000000"),
-    ("los_radar[0].eyeHeight", "0x00000000"),
-    ("los_radar[0].lifetime", "0x00000000"),
-    ("los_radar[0].cell", "hex:" + bytes(8).hex()),
-    ("los_radar[0].size", "hex:" + bytes(8).hex()),
-    ("los_radar[0].outcome", "0x00000001"),
-    ("los_radar[1].kind", "0x00000083"),
-    ("los_radar[1].unit", "null"),
-    ("los_radar[1].player", "0x00000000"),
-    ("los_radar[1].value", "0x00000000"),
-    ("los_radar[1].pos", "hex:" + bytes(range(12)).hex()),
-    ("los_radar[1].sightDistance", "0x00000140"),
-    ("los_radar[1].eyeHeight", "0x00000010"),
-    ("los_radar[1].lifetime", "0x0000003c"),
-    ("los_radar[1].cell", "hex:" + bytes(8).hex()),
-    ("los_radar[1].size", "hex:" + bytes(8).hex()),
-    ("los_radar[1].outcome", "0x00000000"),
-]
+LOS_RADAR_EVENTS = event_rows("los_radar", [
+    [("kind", "0x00000080"), ("unit", "unit:3"), ("outcome", "0x00000001")],
+    [("kind", "0x00000083"), ("pos", "hex:" + bytes(range(12)).hex()), ("sightDistance", "0x00000140"),
+     ("eyeHeight", "0x00000010"), ("lifetime", "0x0000003c"), ("outcome", "0x00000000")],
+    [("kind", "0x0000008a"), ("unit", "null"), ("cell", "0x00000001"), ("frameIdx", "0x00000002"),
+     ("outcome", "0x00000001")],
+])
 
-MAP_EVENTS = [
-    ("map.count", "0x00000002"),
-    ("map[0].kind", "0x000000a0"),
-    ("map[0].unit", "unit:3"),
-    ("map[0].value", "0x00000000"),
-    ("map[0].cell", "hex:" + bytes(8).hex()),
-    ("map[0].size", "hex:" + bytes(8).hex()),
-    ("map[0].rect", "hex:" + bytes(16).hex()),
-    ("map[0].classes", "0x00000000"),
-    ("map[0].cause", "0x00000000"),
-    ("map[0].outcome", "0x00000001"),
-    ("map[1].kind", "0x000000b0"),
-    ("map[1].unit", "null"),
-    ("map[1].value", "0x00000000"),
-    ("map[1].cell", "hex:" + bytes(8).hex()),
-    ("map[1].size", "hex:" + bytes(8).hex()),
-    ("map[1].rect", "hex:" + bytes(range(16)).hex()),
-    ("map[1].classes", "0x00000005"),
-    ("map[1].cause", "0x00000001"),
-    ("map[1].outcome", "0x00000001"),
-]
+MAP_EVENTS = event_rows("map", [
+    [("kind", "0x000000a0"), ("unit", "unit:3"), ("outcome", "0x00000001")],
+    [("kind", "0x000000b0"), ("unit", "null"), ("rect", "hex:" + bytes(range(16)).hex()),
+     ("classes", "0x00000005"), ("cause", "0x00000001"), ("outcome", "0x00000001")],
+])
 
 
-def players_event(k, kind, unit, outcome):
-    names = ["player", "from", "value", "amount", "announce", "record", "hitPoints", "buildPercent"]
-    rows = [("playersEvents[%d].kind" % k, "0x%08x" % kind), ("playersEvents[%d].unit" % k, unit)]
-    rows += [("playersEvents[%d].%s" % (k, n), "0x%08x" % i) for i, n in enumerate(names)]
-    rows += [("playersEvents[%d].angles" % k, "hex:" + bytes(range(6)).hex()),
-             ("playersEvents[%d].stockpiles" % k, "hex:" + bytes(3).hex()),
-             ("playersEvents[%d].outcome" % k, "0x%08x" % outcome)]
-    return rows
+PLAYERS_EVENTS = event_rows("playersEvents", [
+    [("kind", "0x000000c0"), ("unit", "unit:3"), ("player", "0x00000001"), ("record.present", "0x00000001"),
+     ("record.hitPoints", "0x00000002"), ("record.buildPercent", "0x00000003"),
+     ("record.angles", "hex:" + bytes(range(12)).hex()), ("record.stockpiles", "hex:" + bytes(12).hex()),
+     ("outcome", "0x00000001")],
+    [("kind", "0x000000c3"), ("unit", "null"), ("outcome", "0x00000001")],
+])
 
+AI_EVENTS = event_rows("aiEvents", [
+    [("kind", "0x000000e0"), ("unit", "unit:3"), ("attacker", "unit:4"), ("damage", "0x00000009"),
+     ("outcome", "0x00000001")],
+    [("kind", "0x000000f0"), ("unit", "unit:3"), ("type", "0x00000001"), ("queue", "0x00000000"), ("target", "null"),
+     ("hasPos", "0x00000001"), ("pos", "hex:" + bytes(range(12)).hex()), ("params", "hex:" + bytes(8).hex()),
+     ("outcome", "0x00000001")],
+])
 
-PLAYERS_EVENTS = [("playersEvents.count", "0x00000002")] + players_event(0, 0xc0, "unit:3", 1) + players_event(1, 0xd1, "null", 1)
-
-
-def ai_event(k, kind, unit, target, outcome):
-    names = ["value", "extra"]
-    rows = [("aiEvents[%d].kind" % k, "0x%08x" % kind), ("aiEvents[%d].unit" % k, unit), ("aiEvents[%d].target" % k, target)]
-    rows += [("aiEvents[%d].%s" % (k, n), "0x%08x" % i) for i, n in enumerate(names)]
-    rows += [("aiEvents[%d].params" % k, "hex:" + bytes(8).hex()), ("aiEvents[%d].hasPos" % k, "0x00000001"),
-             ("aiEvents[%d].pos" % k, "hex:" + bytes(range(12)).hex()), ("aiEvents[%d].scale" % k, "0x3f800000"),
-             ("aiEvents[%d].types" % k, "hex:" + bytes(64).hex()), ("aiEvents[%d].outcome" % k, "0x%08x" % outcome)]
-    return rows
-
-
-AI_EVENTS = [("aiEvents.count", "0x00000002")] + ai_event(0, 0xe0, "unit:3", "unit:4", 1) + ai_event(1, 0xf0, "unit:3", "null", 1)
-
-
-def weapons_event(k, kind, unit, target, outcome):
-    p = "weaponsEvents[%d]." % k
-    rows = [(p + "kind", "0x%08x" % kind), (p + "unit", unit), (p + "target", target), (p + "value", "0x00000001"),
-            (p + "extra", "0x00000002"), (p + "callback", "0x00001234"), (p + "pos", "hex:" + bytes(range(12)).hex()),
-            (p + "vel", "hex:" + bytes(12).hex()), (p + "args", "hex:" + bytes(32).hex()),
-            (p + "name", "hex:" + bytes(32).hex()), (p + "outcome", "0x%08x" % outcome)]
-    return rows
-
-
-WEAPONS_EVENTS = ([("weaponsEvents.count", "0x00000002")] + weapons_event(0, 0x100, "unit:3", "unit:4", 1)
-                  + weapons_event(1, 0x110, "unit:3", "null", 1))
+WEAPONS_EVENTS = event_rows("weaponsEvents", [
+    [("kind", "0x00000100"), ("unit", "unit:3"), ("source", "unit:4"), ("amount", "0x00000001"),
+     ("damageKind", "0x00000002"), ("direction", "0x00001234"), ("outcome", "0x00000001")],
+    [("kind", "0x00000112"), ("unit", "unit:3"), ("outcome", "0x00000001")],
+])
 
 
 class DumpedOnlyTest(unittest.TestCase):

@@ -14,35 +14,46 @@ inline EconUnit EconHandleOf(Unit* unit)
     return Ref<Unit>(unit).offset;
 }
 
-inline EconomyEvent EconEvent(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
+inline EconomyEventHeader EconHeader(int kind, int player, EconUnit unit)
 {
-    EconomyEvent event;
-    memset(&event, 0, sizeof(event));
-    event.kind = kind;
-    event.player = player;
-    event.unit = unit;
-    event.resources = resources;
-    event.energy = energy;
-    event.metal = metal;
-    return event;
+    EconomyEventHeader header;
+    header.kind = kind;
+    header.player = player;
+    header.unit = unit;
+    return header;
 }
+
 
 inline void EconPublish(int outbox, int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
 {
-    EconomyEvent event = EconEvent(kind, player, unit, resources, energy, metal);
+    if (kind == ECONOMY_RESET) {
+        EconomyEventHeader event = EconHeader(kind, player, unit);
+        SchedPublish(outbox, &event, sizeof(event));
+        return;
+    }
+    EconomyIncome event;
+    event.h = EconHeader(kind, player, unit);
+    event.resources = resources;
+    event.energy = energy;
+    event.metal = metal;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void EconPublishLoad(int outbox, int player, EconUnit unit, const EconAccount& account)
 {
-    EconomyEvent event = EconEvent(ECONOMY_LOAD, player, unit, 0, 0, 0);
+    EconomyLoad event;
+    event.h = EconHeader(ECONOMY_LOAD, player, unit);
     event.account = account;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline int EconSpend(int player, EconUnit unit, unsigned int resources, float energy, float metal)
 {
-    EconomyEvent event = EconEvent(ECONOMY_SPEND, player, unit, resources, energy, metal);
+    struct EconomySpend event;
+    event.h = EconHeader(ECONOMY_SPEND, player, unit);
+    event.resources = resources;
+    event.energy = energy;
+    event.metal = metal;
     return ScheduleEconomySpend(&event);
 }
 
@@ -50,7 +61,12 @@ template <class U>
 inline int EconRequest(int outbox, U* unit, unsigned int resources, float energy, float metal)
 {
     int granted = ScheduleEconomyRequestGranted(EconHandleOf(unit), resources);
-    EconPublish(outbox, ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit), resources, energy, metal);
+    EconomyRequest event;
+    event.h = EconHeader(ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit));
+    event.resources = resources;
+    event.energy = energy;
+    event.metal = metal;
+    SchedPublish(outbox, &event, sizeof(event));
     return granted;
 }
 

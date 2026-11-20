@@ -10,8 +10,10 @@ namespace {
 AiSeam s_idle;
 const AiSeam* s_standard = nullptr;
 
-int __stdcall ApplyIdle(const AiEvent* event)
+int __stdcall ApplyIdle(const AiEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(AiEventHeader))
+        return 0;
     if (event->kind == AI_REACT_TO_ATTACK) {
         Ref<Unit> ref;
         ref.offset = event->unit;
@@ -19,7 +21,7 @@ int __stdcall ApplyIdle(const AiEvent* event)
         if (unit != nullptr && unit->player != nullptr && unit->player->type == 2)
             return 0;
     }
-    return s_standard->Apply(event);
+    return s_standard->Apply(event, size);
 }
 
 void __stdcall UpdateSquadsIdle(int)

@@ -109,7 +109,7 @@ unsigned char FindHostSlot()
 {
     return 10;
 }
-int __stdcall ScheduleEconomySpend(const EconomyEvent*)
+int __stdcall ScheduleEconomySpend(const EconomySpend*)
 {
     return 0;
 }
@@ -137,7 +137,7 @@ int __stdcall ExecuteCommandText(char*, int, CommandArgs*, int)
 }
 void MissionConditions::NotifyUnitCreated(Unit*) {}
 void MissionConditions::NotifyUnitDied(Unit*) {}
-int __stdcall GiveUnitToPlayer(Unit*, Player*, const PlayersEvent*)
+int __stdcall GiveUnitToPlayer(Unit*, Player*, const PlayersGiveUnit*)
 {
     return 0;
 }
@@ -417,8 +417,8 @@ static void Restart()
     for (int p = 0; p < kPlayers; p++)
         memset(s_players[p].explored.get(), 0, kLosCells);
     for (int i = 1; i < kUnits; i++) {
-        LosRadarEvent reset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, &s_units[i]);
-        ApplyLosRadarEvent(&reset);
+        LosRadarUnit reset = LosRadarUnitEventOf(LOS_RADAR_SIGHT_RESET, &s_units[i]);
+        ApplyLosRadarEvent(&reset.h, sizeof reset);
     }
     Move(0);
 }
@@ -487,8 +487,8 @@ static void Play(Run* run, bool tamper)
         Move(s_tick);
         if (s_tick == 0) {
             for (int i = 1; i < kUnits; i++) {
-                LosRadarEvent reveal = LosRadarEventOf(LOS_RADAR_REVEAL_UNIT, &s_units[i]);
-                Check(seam.Apply(&reveal) == 1, "REVEAL_UNIT of a unit has outcome 1");
+                LosRadarUnit reveal = LosRadarUnitEventOf(LOS_RADAR_REVEAL_UNIT, &s_units[i]);
+                Check(seam.Apply(&reveal.h, sizeof reveal) == 1, "REVEAL_UNIT of a unit has outcome 1");
             }
         }
         if (s_tick == kEyeTick) {
@@ -498,13 +498,15 @@ static void Play(Run* run, bool tamper)
             at.x = WorldOfLosCell(x);
             at.y = 0;
             at.z = WorldOfLosCell(z - 1);
-            LosRadarEvent eye = LosRadarEventOf(LOS_RADAR_ADD_EYEBALL);
+            LosRadarAddEyeball eye;
+            memset(&eye, 0, sizeof eye);
+            eye.h.kind = LOS_RADAR_ADD_EYEBALL;
             eye.pos[0] = at.x;
             eye.pos[1] = at.y;
             eye.pos[2] = at.z;
             eye.sightDistance = kSightBase;
             eye.lifetime = kEyeLifetime;
-            run->eyeballs += seam.Apply(&eye);
+            run->eyeballs += seam.Apply(&eye.h, sizeof eye);
         }
         for (int p = 0; p < kPlayers; p++) {
             Player* owner = &s_players[p];
@@ -542,15 +544,31 @@ static int FirstDiffering(const unsigned long long* a, const unsigned long long*
 static void CheckRejected()
 {
     std::vector<char> before((char*)s_units, (char*)(s_units + kUnits));
-    LosRadarEvent noUnit = LosRadarEventOf(LOS_RADAR_UPDATE_UNIT);
-    LosRadarEvent badPlayer = LosRadarEventOf(LOS_RADAR_SHARE_MAP);
-    badPlayer.player = 10;
-    LosRadarEvent badKind = LosRadarEventOf(127);
-    LosRadarEvent noUnitReset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET);
-    LosRadarEvent noUnitLoad = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD);
-    const LosRadarEvent* rejected[] = { &noUnit, &badPlayer, &badKind, &noUnitReset, &noUnitLoad };
-    for (const LosRadarEvent* e : rejected)
-        Check(g_seams.los_radar->Apply(e) == 0, "an event with a null unit, a player outside 0 to 9 or an unknown kind has outcome 0");
+    LosRadarUnit noUnit;
+    memset(&noUnit, 0, sizeof noUnit);
+    noUnit.h.kind = LOS_RADAR_UPDATE_UNIT;
+    LosRadarShareMap badPlayer;
+    memset(&badPlayer, 0, sizeof badPlayer);
+    badPlayer.h.kind = LOS_RADAR_SHARE_MAP;
+    badPlayer.from = 10;
+    LosRadarEventHeader badKind;
+    badKind.kind = 127;
+    LosRadarUnit noUnitReset = noUnit;
+    noUnitReset.h.kind = LOS_RADAR_SIGHT_RESET;
+    LosRadarSightLoad noUnitLoad;
+    memset(&noUnitLoad, 0, sizeof noUnitLoad);
+    noUnitLoad.h.kind = LOS_RADAR_SIGHT_LOAD;
+    const LosRadarEventHeader* rejected[] = { &noUnit.h, &badPlayer.h, &badKind, &noUnitReset.h, &noUnitLoad.h };
+    const unsigned int sizes[] = { sizeof noUnit, sizeof badPlayer, sizeof badKind, sizeof noUnitReset, sizeof noUnitLoad };
+    for (int i = 0; i < 5; i++)
+        Check(g_seams.los_radar->Apply(rejected[i], sizes[i]) == 0, "an event with a null unit, a player outside 0 to 9 or an unknown kind has outcome 0");
+    LosRadarUnit valid = LosRadarUnitEventOf(LOS_RADAR_UPDATE_UNIT, &s_units[1]);
+    Check(g_seams.los_radar->Apply(&valid.h, sizeof valid - 1) == 0, "an event smaller than its payload has outcome 0");
+    LosRadarSightLoad shortLoad;
+    memset(&shortLoad, 0, sizeof shortLoad);
+    shortLoad.h.kind = LOS_RADAR_SIGHT_LOAD;
+    shortLoad.unit = valid.unit;
+    Check(g_seams.los_radar->Apply(&shortLoad.h, sizeof shortLoad - 1) == 0, "a SIGHT_LOAD smaller than its payload has outcome 0");
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
 }
 
@@ -627,10 +645,13 @@ static void __stdcall RecRun(int) {}
 static void CheckSightCache()
 {
     const LosRadarSeam& seam = *g_seams.los_radar;
-    LosRadarEvent load = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD, &s_units[1]);
-    load.sight.cell = 0x00070009;
-    load.sight.frameIdx = 3;
-    Check(seam.Apply(&load) == 1, "SIGHT_LOAD of a unit has outcome 1");
+    LosRadarSightLoad load;
+    memset(&load, 0, sizeof load);
+    load.h.kind = LOS_RADAR_SIGHT_LOAD;
+    load.unit = LosRadarUnitEventOf(LOS_RADAR_SIGHT_LOAD, &s_units[1]).unit;
+    load.cell = 0x00070009;
+    load.frameIdx = 3;
+    Check(seam.Apply(&load.h, sizeof load) == 1, "SIGHT_LOAD of a unit has outcome 1");
     LosSightCache sight;
     memset(&sight, 0, sizeof sight);
     seam.SightCache(&s_units[1], &sight);
@@ -641,8 +662,8 @@ static void CheckSightCache()
     Check(s_recorded.count >= 1 && s_recorded.sections[0] == 44 && strcmp(s_recorded.names[0], "losRadarState") == 0, "WriteState starts with record 44 losRadarState");
     Check(s_recorded.sights == kUnits && s_recorded.firstCell == 0x00070009u, "record 44 holds the sight cache of every unit slot");
     Check(s_recorded.eyes == 0, "record 44 holds the eyeball count");
-    LosRadarEvent reset = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, &s_units[1]);
-    Check(seam.Apply(&reset) == 1, "SIGHT_RESET of a unit has outcome 1");
+    LosRadarUnit reset = LosRadarUnitEventOf(LOS_RADAR_SIGHT_RESET, &s_units[1]);
+    Check(seam.Apply(&reset.h, sizeof reset) == 1, "SIGHT_RESET of a unit has outcome 1");
     seam.SightCache(&s_units[1], &sight);
     Check(sight.cell == 0 && sight.frameIdx == 0, "SIGHT_RESET clears the cache");
 }

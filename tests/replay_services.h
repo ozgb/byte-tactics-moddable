@@ -426,7 +426,7 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     (void)r;
 }
 
-int __stdcall ScheduleEconomySpend(const EconomyEvent* spend)
+int __stdcall ScheduleEconomySpend(const EconomySpend* spend)
 {
     ReplayText t;
     StartImport(t, RI_SCHEDULE_ECONOMY_SPEND);
@@ -456,17 +456,19 @@ void __stdcall ScheduleMetalExtraction(unsigned int unit)
     (void)r;
 }
 
-void __stdcall WindMeteorsEmit(const WindMeteorsEffect* effect)
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
 {
     ReplayText t;
     StartImport(t, RI_WIND_METEORS_EMIT);
     Space(t);
-    ReplayAddValueOrNull(t, ROK_WINDMETEORSEFFECT, effect, g_objects);
+    ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, effect, (unsigned int)size, g_objects);
+    Space(t);
+    t.AddInt((int)(unsigned int)size);
     const char* r = Enter(t);
     (void)r;
 }
 
-int __stdcall ScheduleFeaturesPlace(const FeaturesEvent* place)
+int __stdcall ScheduleFeaturesPlace(const FeaturesPlace* place)
 {
     ReplayText t;
     StartImport(t, RI_SCHEDULE_FEATURES_PLACE);

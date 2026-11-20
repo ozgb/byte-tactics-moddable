@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 5.0), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 6.0), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -189,6 +189,15 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
 
 An effect for any of these would need a synchronous route, because units and orders read each of them back in the
 same update (the `immediate` rows of section 4), and would only move the write.
+
+**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| ADD_UNIT 160, REMOVE_UNIT 161, CLEAR_UNIT 162, RECLAIM_FOOTPRINT 163, BUCKET_UNLINK 165, BUCKET_PREPEND 166 | the header alone | none |
+| SET_YARD 164 | `MapSetYard` | `open`: 1 to open the yard, 0 to close it |
+| PASS_MAPS 168 | `MapPassMaps` | `cell[2]` (the rectangle's first cell), `size[2]` (width and height in cells) |
+| CELLS_CHANGED 176 | `MapCellsChanged` | `rect[4]` (left, top, right, bottom), `classes` (a bit for each movement class whose pass maps changed), `cause` (a `PathChange`) |
 
 ## 4. Views
 

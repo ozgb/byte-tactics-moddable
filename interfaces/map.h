@@ -12,60 +12,78 @@ class MovementClass;
 class HapiBank;
 
 // Major version of the map interface, changed when a slot is removed or its signature changes.
-#define MAP_VERSION_MAJOR 5
+#define MAP_VERSION_MAJOR 6
 // Minor version of the map interface, changed when a slot is added.
 #define MAP_VERSION_MINOR 0
 
-// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
+// The fields every map event and effect starts with.
+struct MapEventHeader {
+    // A MapEventKind or a MapEffectKind.
+    int kind;
+    // The unit, as its block offset (an offset from the block base, 0 for none: PASS_MAPS and CELLS_CHANGED name none), as economy's events give a unit.
+    unsigned int unit;
+};
+
+// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
 enum MapEventKind {
-    // Puts unit on the cells its footprint covers at its cell and in the spatial grid bucket of its position, or in the bucket of units off the map; outcome 1.
+    // Puts unit on the cells its footprint covers at its cell and in the spatial grid bucket of its position, or in the bucket of units off the map; the header alone; outcome 1.
     MAP_ADD_UNIT = 160,
-    // Takes unit off the cells its footprint covers, and lets the units it overlapped claim them again; outcome 1.
+    // Takes unit off the cells its footprint covers, and lets the units it overlapped claim them again; the header alone; outcome 1.
     MAP_REMOVE_UNIT = 161,
-    // Takes unit off the cells, as MAP_REMOVE_UNIT does, and out of the spatial grid, as it dies; outcome 1.
+    // Takes unit off the cells, as MAP_REMOVE_UNIT does, and out of the spatial grid, as it dies; the header alone; outcome 1.
     MAP_CLEAR_UNIT = 162,
-    // Makes the units whose footprints overlap unit's give up the cells unit covers; outcome 1.
+    // Makes the units whose footprints overlap unit's give up the cells unit covers; the header alone; outcome 1.
     MAP_RECLAIM_FOOTPRINT = 163,
-    // Opens (value 1) or closes (value 0) the yard of unit when its footprint is clear for that state, and claims its cells for the state; outcome 1 when it changed, 0 when the footprint was not clear.
+    // Opens or closes the yard of unit when its footprint is clear for that state, and claims its cells for the state (MapSetYard); outcome 1 when it changed, 0 when the footprint was not clear.
     MAP_SET_YARD = 164,
-    // Takes unit out of the spatial grid bucket it is in, as it boards a carrier; outcome 1, or 0 when unit has no bucket or is not in its bucket's chain.
+    // Takes unit out of the spatial grid bucket it is in, as it boards a carrier; the header alone; outcome 1, or 0 when unit has no bucket or is not in its bucket's chain.
     MAP_BUCKET_UNLINK = 165,
-    // Puts unit at the front of its spatial grid bucket, as it leaves a carrier; outcome 1, or 0 when unit has no bucket or is already in its bucket's chain.
+    // Puts unit at the front of its spatial grid bucket, as it leaves a carrier; the header alone; outcome 1, or 0 when unit has no bucket or is already in its bucket's chain.
     MAP_BUCKET_PREPEND = 166,
-    // Computes again the pass maps of every movement class over the rectangle of cell and size, after the terrain or the features on it changed; outcome 1, or 0 when either size is negative.
+    // Computes again the pass maps of every movement class over a rectangle, after the terrain or the features on it changed (MapPassMaps); outcome 1, or 0 when either size is negative.
     MAP_PASS_MAPS = 168
 };
 
 // The kinds of effect map publishes to its outbox, for the modules that subscribe to them.
 enum MapEffectKind {
-    // The pass maps of the movement classes whose index bits are set in classes changed over rect (left, top, right, bottom, in cells), for cause, a PathChange.
+    // The pass maps of some movement classes changed over a rectangle (MapCellsChanged).
     MAP_EFFECT_CELLS_CHANGED = 176
 };
 
-// An event (MapEventKind) or an effect (MapEffectKind), as plain data with no pointers; fields a kind does not use are 0.
-struct MapEvent {
-    // A MapEventKind or a MapEffectKind.
-    int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
-    unsigned int unit;
-    // The argument of the kind, as the kind says.
-    int value;
-    // The first cell of a rectangle, x and y.
+// The payload of SET_YARD.
+struct MapSetYard {
+    // The kind and the unit.
+    MapEventHeader h;
+    // 1 to open the yard, 0 to close it.
+    int open;
+};
+
+// The payload of PASS_MAPS.
+struct MapPassMaps {
+    // The kind; the unit is 0.
+    MapEventHeader h;
+    // The first cell of the rectangle, x and y.
     int cell[2];
-    // The width and height of a rectangle, in cells.
+    // The width and height of the rectangle, in cells.
     int size[2];
-    // The rectangle of an effect, in cells: left, top, right and bottom.
+};
+
+// The payload of CELLS_CHANGED.
+struct MapCellsChanged {
+    // The kind; the unit is 0.
+    MapEventHeader h;
+    // The rectangle, in cells: left, top, right and bottom.
     int rect[4];
-    // The movement classes of an effect, a bit for each class index.
+    // The movement classes whose pass maps changed, a bit for each class index.
     unsigned int classes;
-    // The cause of an effect, a PathChange.
+    // Why they changed, a PathChange.
     int cause;
 };
 
 // Terrain and map data: the cells units stand on and their heights, the spatial grid of units, the pass maps and when they are current, and the placement tests. The engine delivers map's pending inbox, through Apply, before each synchronous slot below, and at each phase boundary.
 struct MapSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
-    int (__stdcall* Apply)(const MapEvent* event);
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const MapEventHeader* event, unsigned int size);
     // Writes to ids the unit ids of the units within range of pos, in the order the spatial grid holds them, skipping the first skip of them, and returns how many it wrote, at most capacity; a query. Hooks: none.
     int (__stdcall* UnitsInRange)(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity);
     // Returns the mean ground height of the cell under a position; a query. Hooks: none.

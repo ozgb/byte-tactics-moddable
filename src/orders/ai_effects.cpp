@@ -20,25 +20,31 @@ static Unit* UnitOfOffset(unsigned int offset)
     return ref.get();
 }
 
-void OrdersOnAiAddOrder(const void* event)
+void OrdersOnAiAddOrder(const void* event, unsigned int size)
 {
-    const AiEvent* e = static_cast<const AiEvent*>(event);
+    if (size < sizeof(AiAddOrder))
+        return;
+    const AiAddOrder* e = static_cast<const AiAddOrder*>(event);
     Vec3 pos;
     pos.x = e->pos[0];
     pos.y = e->pos[1];
     pos.z = e->pos[2];
-    g_seams.orders->AddOrder(MissionType((unsigned char)e->value), e->extra, UnitOfOffset(e->unit), UnitOfOffset(e->target),
+    g_seams.orders->AddOrder(MissionType((unsigned char)e->type), e->queue, UnitOfOffset(e->h.unit), UnitOfOffset(e->target),
                              e->hasPos ? &pos : nullptr, e->params[0], e->params[1]);
 }
 
-void OrdersOnAiQueueBuild(const void* event)
+void OrdersOnAiQueueBuild(const void* event, unsigned int size)
 {
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    g_seams.orders->QueueBuildOrder((char*)&g_game->defs[e->value].unitname[0], UnitOfOffset(e->unit), e->extra);
+    if (size < sizeof(AiQueueBuild))
+        return;
+    const AiQueueBuild* e = static_cast<const AiQueueBuild*>(event);
+    g_seams.orders->QueueBuildOrder((char*)&g_game->defs[e->type].unitname[0], UnitOfOffset(e->h.unit), e->count);
 }
 
-void OrdersOnAiStop(const void* event)
+void OrdersOnAiStop(const void* event, unsigned int size)
 {
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    g_seams.orders->DeleteOrders(UnitOfOffset(e->unit), e->value);
+    if (size < sizeof(AiStop))
+        return;
+    const AiStop* e = static_cast<const AiStop*>(event);
+    g_seams.orders->DeleteOrders(UnitOfOffset(e->h.unit), e->all);
 }

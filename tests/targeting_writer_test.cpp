@@ -57,7 +57,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall HarnessTargetingEvent(const TargetingEvent*, int) {}
+void __stdcall HarnessTargetingEvent(const TargetingEventHeader*, unsigned int, int) {}
 void __stdcall SchedPublish(int, const void*, unsigned int) {}
 void __stdcall FatalError(char* text)
 {
@@ -247,16 +247,17 @@ static void Play(Run* run, bool tamper)
     for (s_tick = 0; s_tick < kTicks; s_tick++) {
         const TargetingSeam& seam = *g_seams.targeting;
         if (s_tick == kLostTick) {
-            TargetingEvent lost = TargetingEventOf(TARGETING_CLEAR, shooter, 0);
-            seam.Apply(&lost);
+            TargetingEventHeader lost = TargetingHeaderOf(TARGETING_CLEAR, shooter, 0);
+            seam.Apply(&lost, sizeof lost);
         }
         if (seam.GetWeaponTargetUnit(shooter, 0) == 0) {
             Unit* pick = seam.FindWeaponTarget(shooter, 0, 0);
             run->answers[s_tick] = pick ? pick->id : 0;
             if (pick) {
-                TargetingEvent aim = TargetingEventOf(TARGETING_SET_UNIT, shooter, 0);
+                TargetingSetUnit aim;
+                aim.h = TargetingHeaderOf(TARGETING_SET_UNIT, shooter, 0);
                 aim.target = HandleOf(pick);
-                seam.Apply(&aim);
+                seam.Apply(&aim.h, sizeof aim);
             }
         }
         Vec3 pos;
@@ -277,21 +278,30 @@ static void CheckRejected()
 {
     Restart();
     Unit* shooter = UnitById(kShooter);
-    TargetingEvent aim = TargetingEventOf(TARGETING_SET_UNIT, shooter, 0);
+    TargetingSetUnit aim;
+    aim.h = TargetingHeaderOf(TARGETING_SET_UNIT, shooter, 0);
     aim.target = HandleOf(UnitById(kFirstEnemy));
-    Check(ApplyTargetingEvent(&aim) == 1, "a valid SET_UNIT is applied");
+    Check(ApplyTargetingEvent(&aim.h, sizeof aim) == 1, "a valid SET_UNIT is applied");
     std::vector<char> before((char*)s_units, (char*)(s_units + kUnits));
 
-    TargetingEvent noUnit = TargetingEventOf(TARGETING_CLEAR, shooter, 0);
+    TargetingEventHeader noUnit = TargetingHeaderOf(TARGETING_CLEAR, shooter, 0);
     noUnit.unit = 0;
-    TargetingEvent noTarget = TargetingEventOf(TARGETING_SET_UNIT, shooter, 1);
-    TargetingEvent high = TargetingEventOf(TARGETING_SET_POS, shooter, 3);
-    TargetingEvent low = TargetingEventOf(TARGETING_RESET, shooter, -1);
-    TargetingEvent clearHigh = TargetingEventOf(TARGETING_CLEAR, shooter, 3);
-    TargetingEvent loadHigh = TargetingEventOf(TARGETING_LOAD, shooter, 3);
-    const TargetingEvent* rejected[] = { &noUnit, &noTarget, &high, &low, &clearHigh, &loadHigh };
-    for (const TargetingEvent* e : rejected)
-        Check(ApplyTargetingEvent(e) == 0, "an event with a null unit, a null target or a weapon outside 0 to 2 has outcome 0");
+    TargetingSetUnit noTarget;
+    memset(&noTarget, 0, sizeof noTarget);
+    noTarget.h = TargetingHeaderOf(TARGETING_SET_UNIT, shooter, 1);
+    TargetingSetPos high;
+    memset(&high, 0, sizeof high);
+    high.h = TargetingHeaderOf(TARGETING_SET_POS, shooter, 3);
+    TargetingEventHeader low = TargetingHeaderOf(TARGETING_RESET, shooter, -1);
+    TargetingEventHeader clearHigh = TargetingHeaderOf(TARGETING_CLEAR, shooter, 3);
+    TargetingLoad loadHigh;
+    memset(&loadHigh, 0, sizeof loadHigh);
+    loadHigh.h = TargetingHeaderOf(TARGETING_LOAD, shooter, 3);
+    const TargetingEventHeader* rejected[] = { &noUnit, &noTarget.h, &high.h, &low, &clearHigh, &loadHigh.h };
+    const unsigned int sizes[] = { sizeof noUnit, sizeof noTarget, sizeof high, sizeof low, sizeof clearHigh, sizeof loadHigh };
+    for (int i = 0; i < 6; i++)
+        Check(ApplyTargetingEvent(rejected[i], sizes[i]) == 0, "an event with a null unit, a null target or a weapon outside 0 to 2 has outcome 0");
+    Check(ApplyTargetingEvent(&aim.h, sizeof(TargetingEventHeader)) == 0, "an event smaller than its payload has outcome 0");
     Check(memcmp(&before[0], s_units, before.size()) == 0, "a rejected event changes no unit");
 }
 
@@ -302,15 +312,22 @@ static void CheckLoad()
     shooter->netDirtyFlags = 0x7c00;
     std::vector<char> before((char*)s_units, (char*)(s_units + kUnits));
 
-    TargetingEvent unitTarget = TargetingEventOf(TARGETING_LOAD, shooter, 0);
-    unitTarget.pos[0] = kFirstEnemy;
-    unitTarget.pos[2] = (short)0x8000;
-    TargetingEvent ground = TargetingEventOf(TARGETING_LOAD, shooter, 1);
-    ground.pos[0] = 12;
-    ground.pos[2] = -7;
-    TargetingEvent none = TargetingEventOf(TARGETING_LOAD, shooter, 2);
-    none.pos[2] = (short)0x8000;
-    Check(ApplyTargetingEvent(&unitTarget) == 1 && ApplyTargetingEvent(&ground) == 1 && ApplyTargetingEvent(&none) == 1, "LOAD has outcome 1");
+    TargetingLoad unitTarget;
+    memset(&unitTarget, 0, sizeof unitTarget);
+    unitTarget.h = TargetingHeaderOf(TARGETING_LOAD, shooter, 0);
+    unitTarget.xOrUnit = kFirstEnemy;
+    unitTarget.zOrSentinel = (short)0x8000;
+    TargetingLoad ground;
+    memset(&ground, 0, sizeof ground);
+    ground.h = TargetingHeaderOf(TARGETING_LOAD, shooter, 1);
+    ground.xOrUnit = 12;
+    ground.zOrSentinel = -7;
+    TargetingLoad none;
+    memset(&none, 0, sizeof none);
+    none.h = TargetingHeaderOf(TARGETING_LOAD, shooter, 2);
+    none.zOrSentinel = (short)0x8000;
+    Check(ApplyTargetingEvent(&unitTarget.h, sizeof unitTarget) == 1 && ApplyTargetingEvent(&ground.h, sizeof ground) == 1 &&
+          ApplyTargetingEvent(&none.h, sizeof none) == 1, "LOAD has outcome 1");
 
     UnitWeaponSlot* slots = shooter->weapons;
     Check(slots[0].aimTargetXOrUnitId == kFirstEnemy && slots[0].aimTargetZOrUnitSentinel == (short)0x8000, "LOAD keeps a target unit's pair as saved");

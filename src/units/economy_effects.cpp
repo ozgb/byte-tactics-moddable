@@ -14,16 +14,20 @@ static Unit* UnitOfHandle(EconUnit handle)
     return ref.get();
 }
 
-void UnitsOnEconomyCloak(const void* event)
+void UnitsOnEconomyCloak(const void* event, unsigned int size)
 {
-    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
-    g_seams.units->SetStateBits(UnitOfHandle(effect->unit), 4, effect->value);
+    if (size < sizeof(EconomyCloak))
+        return;
+    const EconomyCloak* effect = static_cast<const EconomyCloak*>(event);
+    g_seams.units->SetStateBits(UnitOfHandle(effect->h.unit), 4, effect->keep);
 }
 
-void UnitsOnEconomyExtractor(const void* event)
+void UnitsOnEconomyExtractor(const void* event, unsigned int size)
 {
-    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
-    Unit* unit = UnitOfHandle(effect->unit);
+    if (size < sizeof(EconomyExtractor))
+        return;
+    const EconomyExtractor* effect = static_cast<const EconomyExtractor*>(event);
+    Unit* unit = UnitOfHandle(effect->h.unit);
     if (unit->script != nullptr)
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", nullptr, 0, 1, effect->value, 0, 0, 0);
+        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", nullptr, 0, 1, effect->metal, 0, 0, 0);
 }

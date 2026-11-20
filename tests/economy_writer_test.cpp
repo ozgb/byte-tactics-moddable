@@ -3,6 +3,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
+#include "../interfaces/services.h"
 #include "../src/game/economy.h"
 #pragma pack(push, 1)
 #include "../src/game/unit_resources.h"
@@ -106,7 +107,7 @@ static void __stdcall WTypeInfo(EconType type, EconTypeInfo* out)
     }
 }
 static int __stdcall WCellMetal(int, int) { return 10; }
-static void __stdcall WEmit(const EconomyEvent*)
+static void __stdcall WEmit(const EconomyEventHeader*, unsigned int)
 {
     s_effects++;
 }
@@ -208,16 +209,22 @@ static void Setup()
     Restart();
 }
 
-static EconomyEvent Event(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
+struct ScriptedEvent {
+    EconomyIncome body;
+    unsigned int size;
+};
+
+static ScriptedEvent Event(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
 {
-    EconomyEvent e;
+    ScriptedEvent e;
     memset(&e, 0, sizeof e);
-    e.kind = kind;
-    e.player = player;
-    e.unit = unit;
-    e.resources = resources;
-    e.energy = energy;
-    e.metal = metal;
+    e.body.h.kind = kind;
+    e.body.h.player = player;
+    e.body.h.unit = unit;
+    e.body.resources = resources;
+    e.body.energy = energy;
+    e.body.metal = metal;
+    e.size = kind == ECONOMY_RESET ? sizeof(EconomyEventHeader) : sizeof(EconomyIncome);
     return e;
 }
 
@@ -230,7 +237,7 @@ struct Run {
     int spent;
 };
 
-static int Scripted(EconomyEvent* out, int index, int tick)
+static int Scripted(ScriptedEvent* out, int index, int tick)
 {
     EconUnit unit = (EconUnit)(tick % kUnits + 1);
     int player = unit <= 2 ? 0 : 1;
@@ -263,14 +270,19 @@ static unsigned long long HashStores()
     return h;
 }
 
-static int PilotSpend(Run* run, bool tamper, int tick, const EconomyEvent* e)
+static int PilotSpend(Run* run, bool tamper, int tick, const ScriptedEvent* e)
 {
-    Player* pl = &g_game->players[e->player];
-    if (tamper && tick == kTamperTick && run->tampered < 0 && pl->energy >= e->energy && pl->metal >= e->metal) {
+    Player* pl = &g_game->players[e->body.h.player];
+    if (tamper && tick == kTamperTick && run->tampered < 0 && pl->energy >= e->body.energy && pl->metal >= e->body.metal) {
         run->tampered = tick;
         return 0;
     }
-    return EconomySpend(e);
+    struct EconomySpend spend;
+    spend.h = e->body.h;
+    spend.resources = e->body.resources;
+    spend.energy = e->body.energy;
+    spend.metal = e->body.metal;
+    return EconomySpend(&spend);
 }
 
 static void Play(Run* run, bool tamper)
@@ -280,29 +292,29 @@ static void Play(Run* run, bool tamper)
     run->granted = 0;
     run->spent = 0;
     for (int p = 0; p < kPlayers; p++) {
-        EconomyEvent reset = Event(ECONOMY_RESET, p, 0, 0, 0, 0);
-        EconomyApply(&reset);
+        ScriptedEvent reset = Event(ECONOMY_RESET, p, 0, 0, 0, 0);
+        EconomyApply(&reset.body.h, reset.size);
     }
     for (EconUnit u = 1; u <= kUnits; u++) {
-        EconomyEvent reset = Event(ECONOMY_RESET, u <= 2 ? 0 : 1, u, 0, 0, 0);
-        EconomyApply(&reset);
+        ScriptedEvent reset = Event(ECONOMY_RESET, u <= 2 ? 0 : 1, u, 0, 0, 0);
+        EconomyApply(&reset.body.h, reset.size);
     }
     for (int t = 0; t < kTicks; t++) {
         s_tick++;
-        EconomyEvent e;
+        ScriptedEvent e;
         for (int i = 0; Scripted(&e, i, t); i++) {
-            if (e.kind == ECONOMY_SPEND) {
+            if (e.body.h.kind == ECONOMY_SPEND) {
                 run->spent += PilotSpend(run, tamper, t, &e);
                 continue;
             }
-            if (e.kind == ECONOMY_REQUEST) {
-                int granted = EconomyRequestGranted(e.unit, e.resources);
-                int outcome = EconomyApply(&e);
+            if (e.body.h.kind == ECONOMY_REQUEST) {
+                int granted = EconomyRequestGranted(e.body.h.unit, e.body.resources);
+                int outcome = EconomyApply(&e.body.h, e.size);
                 Check(outcome == granted, "RequestGranted says what the REQUEST then returns");
                 run->granted += outcome;
                 continue;
             }
-            EconomyApply(&e);
+            EconomyApply(&e.body.h, e.size);
         }
         EconomyUpdatePlayer(0);
         EconomyUpdatePlayer(1);
@@ -349,9 +361,9 @@ int main()
     Check(HashWritten() == first, "WriteState writes the same state twice");
     Check(s_lines > 4 * 2, "WriteState writes the accounts of the live units");
 
-    EconomyEvent e = Event(ECONOMY_INCOME, 0, 1, ECON_METAL, 0.0f, 1.0f);
+    ScriptedEvent e = Event(ECONOMY_INCOME, 0, 1, ECON_METAL, 0.0f, 1.0f);
     unsigned long long before = HashWritten();
-    EconomyApply(&e);
+    EconomyApply(&e.body.h, e.size);
     Check(HashWritten() != before, "an event to a unit's account changes the written state");
 
     CheckRefusedSpend();

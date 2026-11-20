@@ -1011,7 +1011,7 @@ def statics_run(path=None, report=None):
     def random_int(count):
         return rand32() % count if count > 0 else 0
 
-    def emit(_effect):
+    def emit(_effect, _size):
         state["spawns"] += 1
 
     def fatal_error(_message):
@@ -1057,7 +1057,7 @@ def statics_run(path=None, report=None):
     params = scratch
     kinds = dict(re.findall(r"(WIND_METEORS_\w+) = (\d+)", open(os.path.join(ROOT, "interfaces", "wind_meteors.h")).read()))
     enable, parameters = int(kinds["WIND_METEORS_ENABLE"]), int(kinds["WIND_METEORS_PARAMS"])
-    enable_event = struct.pack("<i", enable) + bytes(48)
+    enable_event = struct.pack("<i", enable)
     params_event = struct.pack("<i", parameters) + b"Meteor\0".ljust(32, b"\0") + (50).to_bytes(4, "little") + struct.pack("<fff", 0.5, 2.0, 3.0)
 
     budget = entry["fuel_budget"]
@@ -1070,9 +1070,9 @@ def statics_run(path=None, report=None):
 
     call("InitMeteors")
     memory.write(store, enable_event, params)
-    call("Apply", params)
+    call("Apply", params, len(enable_event))
     memory.write(store, params_event, params)
-    call("Apply", params)
+    call("Apply", params, len(params_event))
     if get(sim_at + off[("SimGlobals", "g_meteorsEnabled")]) != 1:
         sys.exit("an ENABLE event did not set g_meteorsEnabled in the block")
     setup = digest()

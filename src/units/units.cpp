@@ -540,9 +540,9 @@ Unit* __stdcall CreateUnitFromPacket(unsigned char player, UnitSpawnPacket* spaw
 }
 
 
-static FeaturesEvent CorpseEvent(void* target, unsigned short id, GroundHeightPos* pos, Unit* unit)
+static FeaturesPlace CorpseEvent(void* target, unsigned short id, GroundHeightPos* pos, Unit* unit)
 {
-    FeaturesEvent place = FeaturesEventOf(FEATURES_PLACE, (Cell*)target - g_game->cells, g_game->width);
+    FeaturesPlace place = FeaturesPlaceOf((Cell*)target - g_game->cells, g_game->width);
     place.flags = FEATURES_HAS_POS | FEATURES_HAS_ROT;
     place.feature = id;
     place.owner = unit->playerIndex;
@@ -570,13 +570,13 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         if (target != 0) {
             GroundHeightPos* pos = (GroundHeightPos*)&unit->pos;
             if (g_seams.map->GetGroundHeight((Vec3*)pos) <= g_game->seaLevel) {
-                FeaturesEvent place = CorpseEvent(target, id, pos, unit);
+                FeaturesPlace place = CorpseEvent(target, id, pos, unit);
                 if (!(unit->def->flags1 & 0x1000000))
                     place.flags |= FEATURES_SINK;
                 if (ScheduleFeaturesPlace(&place) != 0)
                     flag = 0;
             } else {
-                FeaturesEvent place = CorpseEvent(target, id, pos, unit);
+                FeaturesPlace place = CorpseEvent(target, id, pos, unit);
                 SchedPublish(SCHED_UNITS, &place, sizeof(place));
             }
             if (flag) {

@@ -142,18 +142,40 @@ static inline void AddIncomeW(float* dst, int handicap, double v)
 
 #undef WIND_ADD
 
-static void EmitEffect(int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal, int value)
+static EconomyEventHeader EffectHeader(int kind, int player, EconUnit unit)
 {
-    EconomyEvent effect;
-    memset(&effect, 0, sizeof(effect));
-    effect.kind = kind;
-    effect.player = player;
-    effect.unit = unit;
+    EconomyEventHeader header;
+    header.kind = kind;
+    header.player = player;
+    header.unit = unit;
+    return header;
+}
+
+static void EmitCloak(int player, EconUnit unit, int keep)
+{
+    EconomyCloak effect;
+    effect.h = EffectHeader(ECONOMY_EFFECT_CLOAK, player, unit);
+    effect.keep = keep;
+    s_world->Emit(&effect.h, sizeof(effect));
+}
+
+static void EmitExtractor(int player, EconUnit unit, int metal)
+{
+    EconomyExtractor effect;
+    effect.h = EffectHeader(ECONOMY_EFFECT_EXTRACTOR, player, unit);
+    effect.metal = metal;
+    s_world->Emit(&effect.h, sizeof(effect));
+}
+
+static void EmitShare(int player, unsigned int resources, float energy, float metal, int to)
+{
+    EconomyShare effect;
+    effect.h = EffectHeader(ECONOMY_EFFECT_SHARE, player, 0);
     effect.resources = resources;
     effect.energy = energy;
     effect.metal = metal;
-    effect.value = value;
-    s_world->Emit(&effect);
+    effect.to = to;
+    s_world->Emit(&effect.h, sizeof(effect));
 }
 
 unsigned int __stdcall EconomyRegionSize(const EconMapInfo* map)
@@ -274,33 +296,46 @@ static int SpendOn(EconAccount* a, Player* pl, unsigned int resources, float ene
     return SpendMetalOn(a, pl, metal);
 }
 
-int __stdcall EconomyApply(const EconomyEvent* event)
+int __stdcall EconomyApply(const EconomyEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(EconomyEventHeader))
+        return 0;
     switch (event->kind) {
     case ECONOMY_RESET:
         ResetAccount(event->player, event->unit);
         return 1;
-    case ECONOMY_LOAD:
-        *UnitAccountOf(event->unit) = event->account;
+    case ECONOMY_LOAD: {
+        if (size < sizeof(EconomyLoad))
+            return 0;
+        const EconomyLoad* load = reinterpret_cast<const EconomyLoad*>(event);
+        *UnitAccountOf(event->unit) = load->account;
         return 1;
-    case ECONOMY_REQUEST:
-        return RequestOn(AccountOf(event->player, event->unit), event->resources, event->energy, event->metal);
+    }
+    case ECONOMY_REQUEST: {
+        if (size < sizeof(EconomyRequest))
+            return 0;
+        const EconomyRequest* request = reinterpret_cast<const EconomyRequest*>(event);
+        return RequestOn(AccountOf(event->player, event->unit), request->resources, request->energy, request->metal);
+    }
     case ECONOMY_INCOME: {
+        if (size < sizeof(EconomyIncome))
+            return 0;
+        const EconomyIncome* income = reinterpret_cast<const EconomyIncome*>(event);
         EconAccount* a = AccountOf(event->player, event->unit);
         int handicap = HandicapOf(event->player);
-        if (event->resources & ECON_ENERGY)
-            AddIncome(&a->energy.make, handicap, event->energy);
-        if (event->resources & ECON_METAL)
-            AddIncome(&a->metal.make, handicap, event->metal);
+        if (income->resources & ECON_ENERGY)
+            AddIncome(&a->energy.make, handicap, income->energy);
+        if (income->resources & ECON_METAL)
+            AddIncome(&a->metal.make, handicap, income->metal);
         return 1;
     }
     }
     return 0;
 }
 
-int __stdcall EconomySpend(const EconomyEvent* spend)
+int __stdcall EconomySpend(const struct EconomySpend* spend)
 {
-    return SpendOn(AccountOf(spend->player, spend->unit), &g_game->players[spend->player], spend->resources, spend->energy, spend->metal);
+    return SpendOn(AccountOf(spend->h.player, spend->h.unit), &g_game->players[spend->h.player], spend->resources, spend->energy, spend->metal);
 }
 
 int __stdcall EconomyRequestGranted(EconUnit unit, unsigned int resources)
@@ -429,14 +464,14 @@ void __stdcall EconomyUpdatePlayer(int player)
                         acct->energy.use += (float)cost;
                         paid = 1;
                     }
-                    EmitEffect(ECONOMY_EFFECT_CLOAK, ui.player, u, 0, 0, 0, paid);
+                    EmitCloak(ui.player, u, paid);
 #else
-                    EmitEffect(ECONOMY_EFFECT_CLOAK, ui.player, u, 0, 0, 0, SpendOn(acct, owner, ECON_ENERGY, (float)cost, 0));
+                    EmitCloak(ui.player, u, SpendOn(acct, owner, ECON_ENERGY, (float)cost, 0));
 #endif
                 } else
-                    EmitEffect(ECONOMY_EFFECT_CLOAK, ui.player, u, 0, 0, 0, 0);
+                    EmitCloak(ui.player, u, 0);
             } else
-                EmitEffect(ECONOMY_EFFECT_CLOAK, ui.player, u, 0, 0, 0, 0);
+                EmitCloak(ui.player, u, 0);
         }
         producedA[0] += acct->energy.make;
         usedA[0] += acct->energy.use;
@@ -621,7 +656,7 @@ void __stdcall EconomyUpdateMetalExtraction(EconUnit unit)
         }
         *(float*)&UnitOfHandle(unit)->extraction = ti.extractsMetal * 1.52587890625e-05 * (float)total.value;
         if (ui.hasScript)
-            EmitEffect(ECONOMY_EFFECT_EXTRACTOR, ui.player, unit, 0, 0, 0, total.parts.whole);
+            EmitExtractor(ui.player, unit, total.parts.whole);
     }
 }
 
@@ -665,7 +700,7 @@ void __stdcall EconomyUpdateResourceSharing(int player)
         if (found != player && self->metal > self->shareMetal) {
             Player* other = &g_game->players[found];
             float amount = ShareMetalAmount(self->metal, self->shareMetal, other->metalCapacity, other->metal);
-            EmitEffect(ECONOMY_EFFECT_SHARE, me.index, 0, ECON_METAL, 0, amount, foundIndex);
+            EmitShare(me.index, ECON_METAL, 0, amount, foundIndex);
         }
 
         found = player;
@@ -686,7 +721,7 @@ void __stdcall EconomyUpdateResourceSharing(int player)
         if (found != player && self->energy > self->shareEnergy) {
             Player* other = &g_game->players[found];
             float amount = ShareEnergyAmount(self->energy, self->shareEnergy, other->energyCapacity, other->energy);
-            EmitEffect(ECONOMY_EFFECT_SHARE, me.index, 0, ECON_ENERGY, amount, 0, foundIndex);
+            EmitShare(me.index, ECON_ENERGY, amount, 0, foundIndex);
         }
     }
 

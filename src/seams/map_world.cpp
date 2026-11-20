@@ -16,23 +16,25 @@
 #include "../../link/globals.h"
 #include "map_world.h"
 
-void MapInbox(const void* event)
+void MapInbox(const void* event, unsigned int size)
 {
-    const MapEvent* e = static_cast<const MapEvent*>(event);
-    HarnessMapEvent(e, g_seams.map->Apply(e));
+    const MapEventHeader* e = static_cast<const MapEventHeader*>(event);
+    HarnessMapEvent(e, size, g_seams.map->Apply(e, size));
 }
 
-void MapOnFeaturesPassMaps(const void* event)
+void MapOnFeaturesPassMaps(const void* event, unsigned int size)
 {
-    const FeaturesEvent* effect = static_cast<const FeaturesEvent*>(event);
+    if (size < sizeof(FeaturesPassMaps))
+        return;
+    const FeaturesPassMaps* effect = static_cast<const FeaturesPassMaps*>(event);
     Point16 at;
     at.x = (short)effect->x;
     at.y = (short)effect->z;
     Point16 footprint;
     footprint.x = (short)effect->width;
     footprint.y = (short)effect->height;
-    MapEvent passMaps = MapRectEventOf(MAP_PASS_MAPS, 0, at, footprint);
-    MapInbox(&passMaps);
+    MapPassMaps passMaps = MapPassMapsOf(at, footprint);
+    MapInbox(&passMaps, sizeof(passMaps));
 }
 
 void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor)

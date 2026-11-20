@@ -99,6 +99,7 @@ void FreeWeaponArray(void)
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/weapons.h"
 
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(UnitWeaponSlot* unit, Unit* source,
@@ -137,7 +138,7 @@ void __stdcall RockUnit(RockUnitView* obj, UnitWeaponSlot* src)
     short angle = src->fireHeading - obj->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    WeaponsPublishStartScriptWithArgs(obj, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(obj, WEAPONS_SCRIPT_ROCK_UNIT, 0, 0, 2, b, a, 0, 0);
 }
 
 
@@ -909,11 +910,11 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     proj->targetUnitPtr = (Unit*)param_5;
 
     proj->active = fire->weapon->burst;
-    WeaponsPublishStartScript(unit, g_fireScriptNames[(fire->flags >> 2) & 3], 0, 0);
+    WeaponsPublishStartScript(unit, WeaponsFireScript((fire->flags >> 2) & 3), 0, 0);
     short angle = unit->weapons[(fire->flags >> 2) & 3].fireHeading - unit->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_ROCK_UNIT, 0, 0, 2, b, a, 0, 0);
 
     if (fire->weapon->flags.b.startSmoke)
         RecordWeaponSmoke(*p3, 9);
@@ -960,11 +961,11 @@ int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
     proj->targetUnitPtr = (Unit*)param_5;
     proj->interceptedProjectile = (Projectile*)param_6;
     proj->active = shot->weapon->burst;
-    WeaponsPublishStartScript(unit, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+    WeaponsPublishStartScript(unit, WeaponsFireScript((shot->flags >> 2) & 3), 0, 0);
     short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
     int a = -ScaledSin((short)angle, 800);
     int b = -ScaledCos((short)angle, 800);
-    WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_ROCK_UNIT, 0, 0, 2, b, a, 0, 0);
     if (shot->weapon->flags.b.startSmoke)
         RecordWeaponSmoke(*pos, 9);
     return 1;
@@ -1003,11 +1004,11 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         }
         proj->active = shot->weapon->burst;
         proj->targetUnitPtr = (Unit*)param_5;
-        WeaponsPublishStartScript(unit, g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
+        WeaponsPublishStartScript(unit, WeaponsFireScript((shot->flags >> 2) & 3), 0, 0);
         short angle = unit->weapons[(shot->flags >> 2) & 3].fireHeading - unit->heading;
         int a = -ScaledSin((short)angle, 800);
         int b = -ScaledCos((short)angle, 800);
-        WeaponsPublishStartScriptWithArgs(unit, "RockUnit", 0, 0, 2, b, a, 0, 0);
+        WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_ROCK_UNIT, 0, 0, 2, b, a, 0, 0);
         if (shot->weapon->flags.b.startSmoke)
             RecordWeaponSmoke(*pos, 9);
         return 1;
@@ -1253,7 +1254,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
         }
         if (!ok) {
             unit->flags &= 0xfe;
-            WeaponsPublishNotice(fire, 0x1000);
+            WeaponsPublishNotice(fire, WEAPONS_EFFECT_OUT_OF_REACH);
             return 0;
         }
         if (!AimWithinTolerance(fire, unit, heading, pitch)) {
@@ -1504,7 +1505,7 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
         if (s->weapon->reloadTime > frame.maxTime)
             frame.maxTime = s->weapon->reloadTime;
     }
-    WeaponsPublishStartScriptWithArgs(unit, "SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
+    WeaponsPublishStartScriptWithArgs(unit, WEAPONS_SCRIPT_SET_MAX_RELOAD_TIME, 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }
 
 void __stdcall SubtractVec3(Vec3* a, Vec3* b, int* dx, int* dy, int* dz);
@@ -1563,7 +1564,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->firePitch = angle;
                     e->fireHeading = heading;
                     e->aimCob.nAimCobDone = 0;
-                    WeaponsPublishStartScriptWithArgs(unit, g_aimScriptNames[(e->flags >> 2) & 3], Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2,
+                    WeaponsPublishStartScriptWithArgs(unit, WeaponsAimScript((e->flags >> 2) & 3), Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2,
                                                heading, angle, 0, 0);
                     g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
@@ -1573,7 +1574,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             bool armed = attached->flags.b.vLaunch;
             if (armed && (!attached->flags.b.stockpile || e->stockpile) && !(e->flags & 1)) {
                 e->aimCob.nAimCobDone = 0;
-                WeaponsPublishStartScriptWithArgs(unit, g_aimScriptNames[(e->flags >> 2) & 3], Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2, 0, 0,
+                WeaponsPublishStartScriptWithArgs(unit, WeaponsAimScript((e->flags >> 2) & 3), Ref<WeaponAimCobCb>(&e->aimCob).offset, 0, 2, 0, 0,
                                            0, 0);
                 g_seams.network->SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;
@@ -1607,12 +1608,11 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 int pct = 100 - n * 6;
                 e->reloadTimer = (short)((BT_REPLAY_INJECT_RELOAD_BASE - q) * (pct * attached->reloadTime / 100) / 100);
             }
-            int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
-            WeaponsPublishNotice(unit, m);
+            WeaponsPublishNotice(unit, attached->flags.b.commandFire ? WEAPONS_EFFECT_COMMAND_SHOT_FIRED : WEAPONS_EFFECT_SHOT_FIRED);
             if (!attached->flags.b.stockpile)
                 EconSpend(unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
         } else {
-            WeaponsPublishNotice(unit, 0x1000);
+            WeaponsPublishNotice(unit, WEAPONS_EFFECT_OUT_OF_REACH);
         }
     }
 }
@@ -2118,11 +2118,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 continue;
             if (!hits.AddFeature(origin))
                 continue;
-            {
-                FeaturesEvent damage = FeaturesEventAt(FEATURES_DAMAGE, fx, fz);
-                damage.value = (int)((WeaponDef*)weapon->type.get() - g_game->weapons);
-                SchedPublish(SCHED_WEAPONS, &damage, sizeof(damage));
-            }
+            FeaturesPublishDamage(SCHED_WEAPONS, fx, fz, (int)((WeaponDef*)weapon->type.get() - g_game->weapons));
         }
     }
 

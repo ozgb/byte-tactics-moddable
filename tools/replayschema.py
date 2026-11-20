@@ -119,9 +119,101 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
+EVENTS = {
+    "wind_meteors": {"header": "WindMeteorsEventHeader", "kinds": {
+        64: None, 65: None, 66: "WindMeteorsParams", 67: None, 80: "WindMeteorsSpawn"}},
+    "targeting": {"header": "TargetingEventHeader", "kinds": {
+        96: "TargetingSetUnit", 97: "TargetingSetPos", 98: None, 99: None, 100: "TargetingLoad", 112: None}},
+    "los_radar": {"header": "LosRadarEventHeader", "kinds": {
+        128: "LosRadarUnit", 129: "LosRadarUnit", 130: "LosRadarUnit", 131: "LosRadarAddEyeball", 132: "LosRadarCellHeights",
+        133: "LosRadarRecalculate", 134: "LosRadarSharePlayer", 135: "LosRadarSharePlayer", 136: "LosRadarShareMap",
+        137: "LosRadarUnit", 138: "LosRadarSightLoad"}},
+    "map": {"header": "MapEventHeader", "kinds": {
+        160: None, 161: None, 162: None, 163: None, 164: "MapSetYard", 165: None, 166: None, 168: "MapPassMaps", 176: "MapCellsChanged"}},
+}
+EVENT_UNIT_FIELDS = {"unit", "target"}
+EVENT_SCALARS = {"int": "i32", "unsigned int": "u32", "unsigned": "u32", "float": "f32"}
+
+
+def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | None]]]:
+    """Every struct of interfaces/<subsystem>.h that is plain data: its members as (type, name, array length or None)."""
+    text = (INTERFACES / (subsystem + ".h")).read_text()
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    text = re.sub(r"//[^\n]*", "", text)
+    out = {}
+    for m in re.finditer(r"\bstruct (\w+) \{(.*?)\n\};", text, re.S):
+        members = []
+        for d in re.finditer(r"^\s*([A-Za-z_][\w ]*?)\s+(\w+)(?:\[(\d+)\])?;\s*$", m.group(2), re.M):
+            members.append((d.group(1).strip(), d.group(2), int(d.group(3)) if d.group(3) else None))
+        out[m.group(1)] = members
+    return out
+
+
+def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]:
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset named unit or target as a ref to Unit."""
+    fields = []
+    for ctype, member, length in structs[name]:
+        if ctype in structs:
+            fields += flatten_event_fields(structs, ctype, path + member + ".")
+            continue
+        if ctype == "char" and length:
+            field = {"name": member, "kind": "string", "size": length}
+            if path:
+                field["member"] = path + member
+            fields.append(field)
+            continue
+        for i in range(length or 1):
+            field = {"name": member if length is None else "%s%d" % (member, i)}
+            if ctype == "unsigned int" and member in EVENT_UNIT_FIELDS:
+                field.update({"kind": "ref", "target": "Unit"})
+            elif ctype in EVENT_SCALARS:
+                field["kind"] = EVENT_SCALARS[ctype]
+            else:
+                raise Error("%s::%s has the type %s, which an event does not use" % (name, member, ctype))
+            where = path + member if length is None else "%s%s[%d]" % (path, member, i)
+            if where != field["name"]:
+                field["member"] = where
+            fields.append(field)
+    return fields
+
+
+def check_event_kinds(subsystem: str, kinds: dict) -> None:
+    """The kinds of the table are the enumerators of the header's kind enums, no more and no fewer."""
+    text = re.sub(r"//[^\n]*", "", (INTERFACES / (subsystem + ".h")).read_text())
+    declared = set()
+    for m in re.finditer(r"\benum \w*Kind\s*\{(.*?)\}", text, re.S):
+        declared |= {int(v) for v in re.findall(r"=\s*(\d+)", m.group(1))}
+    if declared != set(kinds):
+        raise Error("the event kinds of %s are %s in its header, and %s in EVENTS" % (subsystem, sorted(declared), sorted(kinds)))
+
+
+def with_events(ann: dict) -> dict:
+    """The annotations with the event structs of EVENTS added as value kinds (marked `generated`) and the tables `events`; once."""
+    if "events" in ann:
+        return ann
+    ann = copy.deepcopy(ann)
+    ann["events"] = {}
+    for sub, spec in EVENTS.items():
+        check_event_kinds(sub, spec["kinds"])
+        structs = interface_structs(sub)
+        for name in dict.fromkeys([spec["header"]] + [x for x in spec["kinds"].values() if x]):
+            if name not in structs:
+                raise Error("interfaces/%s.h has no struct %s" % (sub, name))
+            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name)}
+        ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())}}
+    return ann
+
+
+def without_events(ann: dict) -> dict:
+    """The annotations as data/replay_schema.json keeps them: what with_events added left out."""
+    ann = {k: v for k, v in ann.items() if k != "events"}
+    ann["objects"] = {k: v for k, v in ann["objects"].items() if v.get("generated") != "event"}
+    return ann
+
+
 def load_annotations(fixtures: bool = False) -> dict:
-    """The annotations of data/replay_schema.json; with `fixtures`, those of the schema that only the tests load as well."""
-    ann = json.loads(JSON_OUT.read_text())["annotations"]
+    """The annotations of data/replay_schema.json with the event kinds; with `fixtures`, those of the schema that only the tests load as well."""
+    ann = with_events(json.loads(JSON_OUT.read_text())["annotations"])
     return merge_fixtures(ann, json.loads(FIXTURES_JSON.read_text())) if fixtures else ann
 
 
@@ -1001,7 +1093,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "pending"}
 STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 
@@ -1123,6 +1215,15 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s has the direction %s, and a struct is in, out or inout" % (where, label, a["dir"]))
             elif a.get("nullable") and a.get("dir", "in") == "out":
                 errors.append("%s: %s is an out struct, and only a struct in or inout can be nullable" % (where, label))
+        elif a["mode"] == "event":
+            table = ann.get("events", {}).get(a.get("events"))
+            size = a.get("size")
+            if table is None:
+                errors.append("%s: %s needs `events` that names a table of EVENTS" % (where, label))
+            elif arg_type(a) != table["header"] + "*":
+                errors.append("%s: %s is %s, and the events of %s start with %s*" % (where, label, arg_type(a), a["events"], table["header"]))
+            if size not in names or size == a["name"] or args[names.index(size)]["type"] not in INTEGER_ARGS:
+                errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
         elif a["mode"] == "vector":
             check_vector_arg(where, a, label, kinds, errors)
         elif a["mode"] == "units-buffer":
@@ -1848,6 +1949,19 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             if site.get("capped"):
                 L += factor_asserts(site["room"], container, "%s table" % o["name"])
             sites.append('    { %s, %s, offsetof(%s, %s), "%s", %s, %d, %d%s },' % (kind_id[o["name"]], kind_id[site["container"]], container, site["offset"], site["member"], stride, site["count"], int(bool(site.get("ref"))), room))
+    events = ann.get("events", {})
+    L += ["enum ReplayEventTableId {"] + ["    RET_%s," % upper(e) for e in events] + ["    RET_COUNT", "};", ""]
+    kinds_list: list[str] = []
+    tables_list: list[str] = []
+    for e, spec in events.items():
+        tables_list.append("    { %s, %d, %d }," % (kind_id[spec["header"]], len(kinds_list), len(spec["kinds"])))
+        kinds_list += ["    { %s, %s }," % (k, kind_id[v]) for k, v in spec["kinds"].items()]
+    L += ["static const ReplayEventKind kReplayEventKinds[] = {"] + (kinds_list or ["    { 0, 0 },"]) + ["};",
+          "static const ReplayEventTable kReplayEventTables[] = {"] + (tables_list or ["    { 0, 0, 0 },"]) + ["};"]
+    for spec in events.values():
+        for name in dict.fromkeys(spec["kinds"].values()):
+            L.append('static_assert(sizeof(%s) <= REPLAY_EVENT_MAX, "%s fits the event buffer");' % (types[name], name))
+    L.append("")
     L += ["static const ReplayInsideSite kReplayInsideSites[] = {"] + (sites or ['    { 0, 0, 0, "" },']) + ["};", "static const unsigned kReplayInsideSiteCount = %d;" % len(sites), "", "static const ReplayObjectKind kReplayObjectKinds[] = {"]
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
@@ -2102,6 +2216,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             a["lengthIndex"] = names.index(a["length"])
         if a.get("count") in names:
             a["countIndex"] = names.index(a["count"])
+        if a.get("size") in names:
+            a["sizeIndex"] = names.index(a["size"])
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
@@ -2111,6 +2227,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("    roots.Add(ROK_WEAPONDEF, a%d);" % i)
         elif a["mode"] == "struct" and a.get("dir") != "out":
             L += struct_roots(a, i, objects, object_fields)
+        elif a["mode"] == "event":
+            L.append("    EventRoots(roots, RET_%s, a%d, a%d);" % (upper(a["events"]), i, a["sizeIndex"]))
     L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     held_args = [] if is_import else callback_args
@@ -2249,6 +2367,9 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if a.get("dir") == "out" and phase == "o":
             guard = "if (result != 0) " if a.get("when") else ""
             return ['%sArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (guard, line, upper(a["kind"]), var)]
+    elif mode == "event":
+        if phase == "a":
+            return ['ArgEvent(s_call, "%s", RET_%s, a%d, a%d);' % (line, upper(a["events"]), i, a["sizeIndex"])]
     elif mode == "structs":
         if phase == "a":
             return ['ArgStructs(s_call, "%s", ROK_%s, %s, (int)a%d);' % (line, upper(a["kind"]), var, a.get("countIndex", 0))]
@@ -2606,6 +2727,10 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
                 guard = "if (%s != 0) " % ("g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
                 after.append('    %sCompareStruct("%s", ROK_%s, &%s);' % (guard, line, upper(a["kind"]), g))
                 call.append("&" + g)
+        elif m == "event":
+            L.append("    unsigned char %s[REPLAY_EVENT_MAX];\n    memset(%s, 0, sizeof %s);" % (v, v, v))
+            L.append('    ParseEvent("%s", RET_%s, %s);' % (line, upper(a["events"]), v))
+            call.append("(%s)%s" % (arg_type(a), v))
         elif m == "structs":
             counted = s["args"][a.get("countIndex", 0)]
             L.append("    StructsHolder %s;\n    %s.Parse(\"%s\", ROK_%s, ArgScalar<int>(\"%s\"));" % (v, v, line, upper(a["kind"]), counted["line"]))
@@ -2833,6 +2958,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s needs a `kind` of file, rec or bank" % (where, a["param"]))
             elif m == "value" and (a.get("kind") not in kinds or kinds[a["kind"]]["scope"] != "value"):
                 errors.append("%s: the argument %s needs a `kind` that is a value kind of the schema" % (where, a["param"]))
+            elif m == "value" and "size" in a and params.get(a["size"], {}).get("mode") != "int":
+                errors.append("%s: the argument %s has a `size` that names no int argument" % (where, a["param"]))
             if "reach" in a:
                 if m != "object":
                     errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
@@ -2922,6 +3049,8 @@ def service_input_lines(s: dict, ctx: str) -> list[str]:
             L.append("ReplayAddTextN(t, %s, (int)%s);" % (v, service_param_expr(s, a["length"], ctx)))
         elif m == "commandargs":
             L.append("ReplayAddArgs(t, (const CommandArgs*)%s);" % v)
+        elif m == "value" and "size" in a:
+            L.append("ReplayAddValueSized(t, ROK_%s, %s, %s, g_objects);" % (upper(a["kind"]), v, service_param_expr(s, a["size"], ctx)))
         elif m == "value":
             L.append("ReplayAddValueOrNull(t, ROK_%s, %s, g_objects);" % (upper(a["kind"]), v))
     return L
@@ -2963,6 +3092,8 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddTextN(t, (const char*)a[%d].v.p, a[%d].v.i);" % (i, index[a["length"]]))
             elif m == "commandargs":
                 L.append("        ReplayAddArgs(t, (const CommandArgs*)a[%d].v.p);" % i)
+            elif m == "value" and "size" in a:
+                L.append("        ReplayAddValueSized(t, ROK_%s, a[%d].v.p, (unsigned)a[%d].v.i, Table());" % (upper(a["kind"]), i, index[a["size"]]))
             elif m == "value":
                 L.append("        ReplayAddValueOrNull(t, ROK_%s, a[%d].v.p, Table());" % (upper(a["kind"]), i))
         res = s.get("result")
@@ -3350,7 +3481,7 @@ def render_fixture_hooks(ann: dict, model: dict) -> str:
 
 
 def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: dict | None = None, fixtures: dict | None = None):
-    ann = ann or load_annotations()
+    ann = with_events(ann or load_annotations())
     assignment = assignment or read_assignment()
     model, errors = build(ann, rows, assignment)
     fixture_ann = merge_fixtures(ann, fixtures if fixtures is not None else json.loads(FIXTURES_JSON.read_text()))
@@ -3382,7 +3513,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         CALLBACKS_SLOTS: render_callback_players(model),
         SHAPES_SLOTS: render_shapes(fixture_ann),
         FIXTURE_HOOKS_INC: render_fixture_hooks(fixture_ann, fixture_model),
-        JSON_OUT: json_text(ann, model),
+        JSON_OUT: json_text(without_events(ann), model),
     }
     return files, errors, model
 

@@ -3,7 +3,7 @@
 
 #include "../../interfaces/rand_stream.h"
 
-typedef void (*SchedHandler)(const void* event);
+typedef void (*SchedHandler)(const void* event, unsigned int size);
 
 struct SchedRoute {
     int outbox;

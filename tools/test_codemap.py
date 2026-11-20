@@ -87,7 +87,7 @@ class ModelTest(unittest.TestCase):
         edge = inbox.out[apply.id]
         self.assertIn("seam", edge.kinds)
         self.assertEqual(edge.via, "WeaponsSeam::Apply")
-        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["e"])
+        self.assertEqual([a["value"] for a in edge.sites[0]["args"]], ["e", "size"])
         self.assertEqual(edge.sites[0]["args"][0]["param"], "event")
 
     def test_forwarding_wrappers_are_drawn_through(self):

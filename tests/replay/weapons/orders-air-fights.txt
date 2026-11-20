@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 2.0
+subsystem weapons 3.0
 call 100 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 0
@@ -8932,7 +8932,7 @@ call 101 UpdateUnitWeapons
   o z 24532383
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 19006 5007 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9298,7 +9298,7 @@ call 107 UpdateUnitWeapons
   o z 25055918
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 19785 5546 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9673,7 +9673,7 @@ call 113 UpdateUnitWeapons
   o z 25550972
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 20578 6009 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -9712,13 +9712,13 @@ call 114 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#2 0 = (799385,-82097,-1143869)
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(40187277,3718991,18528182) = 3
   i services.RecordSimEvent 30 0 [46,40187277,3718991,18528182,3] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
   i services.RecordSimEvent 9 0 [40187277,3718991,18528182,9] 4
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
   w Unit#2.weapon0ReloadTimer 90
@@ -10158,7 +10158,7 @@ call 119 UpdateUnitWeapons
   o z 26020046
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 21389 6069 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -10298,13 +10298,13 @@ call 121 UpdateUnitWeapons
   i scripts.GetPieceOffset Unit#3 0 = (800707,-53014,-1144661)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
   o p2 (0)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(42802113,3748074,18513840) = 3
   i services.RecordSimEvent 30 0 [46,42802113,3748074,18513840,3] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
   i services.RecordSimEvent 9 0 [42802113,3748074,18513840,9] 4
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 2
   w Unit#3.weapon0ReloadTimer 90
@@ -10723,7 +10723,7 @@ call 125 UpdateUnitWeapons
   o z 26463558
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 22219 5759 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11186,7 +11186,7 @@ call 131 UpdateUnitWeapons
   o z 26862367
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 23067 5911 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11593,7 +11593,7 @@ call 137 UpdateUnitWeapons
   o z 27220589
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 23936 6043 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -11997,7 +11997,7 @@ call 143 UpdateUnitWeapons
   o z 27547800
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 24831 6133 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -12398,7 +12398,7 @@ call 149 UpdateUnitWeapons
   o z 27854594
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 25754 6226 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -12802,7 +12802,7 @@ call 155 UpdateUnitWeapons
   o z 28150124
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 26703 6273 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -13256,7 +13256,7 @@ call 161 UpdateUnitWeapons
   o z 28417395
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 27674 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -13671,7 +13671,7 @@ call 167 UpdateUnitWeapons
   o z 28667764
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 28654 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14061,7 +14061,7 @@ call 173 UpdateUnitWeapons
   o z 28914862
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 29631 6321 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14461,7 +14461,7 @@ call 179 UpdateUnitWeapons
   o z 29168765
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 30586 6226 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -14858,7 +14858,7 @@ call 185 UpdateUnitWeapons
   o z 29430019
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 31492 6133 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -15249,7 +15249,7 @@ call 191 UpdateUnitWeapons
   o z 29592774
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32220 5974 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -15648,7 +15648,7 @@ call 197 UpdateUnitWeapons
   o z 29643422
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32752 5861 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -15980,7 +15980,7 @@ call 202 UpdateUnitWeapons
   o z 29605448
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33069 5905 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -16283,7 +16283,7 @@ call 207 UpdateUnitWeapons
   o x 50457410
   o y 735324
   o z 21918821
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 207 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
@@ -16328,7 +16328,7 @@ call 207 UpdateUnitWeapons
   o z 29498953
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33281 5949 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -16355,7 +16355,7 @@ call 208 UpdateUnitWeapons
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 208 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
@@ -16419,7 +16419,7 @@ call 209 UpdateUnitWeapons
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 209 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
@@ -16483,7 +16483,7 @@ call 210 UpdateUnitWeapons
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 210 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
@@ -16553,14 +16553,14 @@ call 211 UpdateUnitWeapons
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 211 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
   w Unit#3.weapon0ReloadTimer 0
 call 211 UpdateUnitWeapons
   r Unit#3.posX 83267814
@@ -16607,12 +16607,12 @@ call 211 UpdateUnitWeapons
   i services.RandomInt 681 = 246
   i scripts.QueryScript CobScript#7 "QueryPrimary" (0) null null null = 1
   o p2 (3)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(49961472,1440891,23505142) = 3
   i services.RecordSimEvent 30 0 [57,49961472,1440891,23505142,3] 5
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 44
+  i services.SchedPublish 6 8
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 1
   w rng.seed 0x36f30390
@@ -16675,14 +16675,14 @@ call 212 UpdateUnitWeapons
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 212 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451710
   o y 735324
   o z 21919295
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 212 UpdateUnitWeapons
   r Unit#3.posX 83870075
   r Unit#3.posY 15316300
@@ -16721,7 +16721,7 @@ call 212 UpdateUnitWeapons
   o z 29327799
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 33394 6086 0 0 = 0
   w Unit#252.weapon0Flags 3
   w Unit#252.weapon0ReloadTimer 25
@@ -16758,14 +16758,14 @@ call 213 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 213 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 213 UpdateUnitWeapons
   r Unit#3.posX 84473110
   r Unit#3.posY 15479408
@@ -16828,14 +16828,14 @@ call 214 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 214 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 214 UpdateUnitWeapons
   r Unit#3.posX 85076894
   r Unit#3.posY 15642726
@@ -16893,14 +16893,14 @@ call 215 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 215 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 215 UpdateUnitWeapons
   r Unit#3.posX 85681394
   r Unit#3.posY 15806248
@@ -16959,14 +16959,14 @@ call 216 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 216 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 216 UpdateUnitWeapons
   r Unit#3.posX 86286586
   r Unit#3.posY 15969964
@@ -17024,14 +17024,14 @@ call 217 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 217 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 217 UpdateUnitWeapons
   r Unit#3.posX 86892447
   r Unit#3.posY 16133868
@@ -17090,14 +17090,14 @@ call 218 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 218 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 218 UpdateUnitWeapons
   r Unit#3.posX 87498957
   r Unit#3.posY 16297954
@@ -17155,14 +17155,14 @@ call 219 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 219 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 219 UpdateUnitWeapons
   r Unit#3.posX 88106094
   r Unit#3.posY 16462216
@@ -17220,14 +17220,14 @@ call 220 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 220 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 220 UpdateUnitWeapons
   r Unit#3.posX 88713839
   r Unit#3.posY 16626648
@@ -17285,14 +17285,14 @@ call 221 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 221 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 221 UpdateUnitWeapons
   r Unit#3.posX 89322170
   r Unit#3.posY 16791245
@@ -17350,14 +17350,14 @@ call 222 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 222 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 222 UpdateUnitWeapons
   r Unit#3.posX 89931062
   r Unit#3.posY 16956001
@@ -17419,14 +17419,14 @@ call 223 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 223 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 223 UpdateUnitWeapons
   r Unit#3.posX 90540498
   r Unit#3.posY 17120910
@@ -17484,14 +17484,14 @@ call 224 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 224 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 224 UpdateUnitWeapons
   r Unit#3.posX 91150454
   r Unit#3.posY 17285967
@@ -17549,14 +17549,14 @@ call 225 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 225 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 225 UpdateUnitWeapons
   r Unit#3.posX 91760918
   r Unit#3.posY 17451165
@@ -17614,14 +17614,14 @@ call 226 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 226 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 226 UpdateUnitWeapons
   r Unit#3.posX 92371868
   r Unit#3.posY 17616501
@@ -17679,14 +17679,14 @@ call 227 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 227 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 227 UpdateUnitWeapons
   r Unit#3.posX 92983289
   r Unit#3.posY 17781969
@@ -17744,14 +17744,14 @@ call 228 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 228 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 228 UpdateUnitWeapons
   r Unit#3.posX 93595167
   r Unit#3.posY 17947565
@@ -17810,14 +17810,14 @@ call 229 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 229 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 229 UpdateUnitWeapons
   r Unit#3.posX 94207486
   r Unit#3.posY 18113285
@@ -17875,14 +17875,14 @@ call 230 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 230 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 230 UpdateUnitWeapons
   r Unit#3.posX 94820229
   r Unit#3.posY 18279125
@@ -17940,14 +17940,14 @@ call 231 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 231 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 231 UpdateUnitWeapons
   r Unit#3.posX 95433382
   r Unit#3.posY 18445080
@@ -18005,14 +18005,14 @@ call 232 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 232 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 232 UpdateUnitWeapons
   r Unit#3.posX 96046927
   r Unit#3.posY 18611146
@@ -18070,14 +18070,14 @@ call 233 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 233 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 233 UpdateUnitWeapons
   r Unit#3.posX 96660847
   r Unit#3.posY 18777319
@@ -18135,14 +18135,14 @@ call 234 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 234 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 234 UpdateUnitWeapons
   r Unit#3.posX 97275131
   r Unit#3.posY 18943594
@@ -18201,14 +18201,14 @@ call 235 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 235 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 235 UpdateUnitWeapons
   r Unit#3.posX 97889773
   r Unit#3.posY 19109967
@@ -18266,14 +18266,14 @@ call 236 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 236 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 236 UpdateUnitWeapons
   r Unit#3.posX 98504752
   r Unit#3.posY 19276438
@@ -18331,14 +18331,14 @@ call 237 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 237 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 237 UpdateUnitWeapons
   r Unit#3.posX 99120063
   r Unit#3.posY 19443000
@@ -18400,14 +18400,14 @@ call 238 UpdateUnitWeapons
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 238 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50451943
   o y 735324
   o z 21919564
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 238 UpdateUnitWeapons
   r Unit#3.posX 99735687
   r Unit#3.posY 19609652
@@ -18447,7 +18447,7 @@ call 238 UpdateUnitWeapons
   o z 27541088
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 32090 9126 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -18474,14 +18474,14 @@ call 239 UpdateUnitWeapons
   o x 50463355
   o y 735324
   o z 21918369
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 239 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50463355
   o y 735324
   o z 21918369
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 239 UpdateUnitWeapons
   r Unit#3.posX 100351615
   r Unit#3.posY 19776390
@@ -18538,14 +18538,14 @@ call 240 UpdateUnitWeapons
   o x 50477805
   o y 735324
   o z 21919062
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 240 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50477805
   o y 735324
   o z 21919062
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 240 UpdateUnitWeapons
   r Unit#3.posX 100967839
   r Unit#3.posY 19943210
@@ -18605,14 +18605,14 @@ call 241 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 241 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 241 UpdateUnitWeapons
   r Unit#3.posX 101584348
   r Unit#3.posY 20110110
@@ -18669,14 +18669,14 @@ call 242 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 242 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 242 UpdateUnitWeapons
   r Unit#3.posX 102201134
   r Unit#3.posY 20277088
@@ -18733,14 +18733,14 @@ call 243 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 243 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 243 UpdateUnitWeapons
   r Unit#3.posX 102818182
   r Unit#3.posY 20444141
@@ -18797,14 +18797,14 @@ call 244 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 244 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 244 UpdateUnitWeapons
   r Unit#3.posX 103435488
   r Unit#3.posY 20611265
@@ -18861,14 +18861,14 @@ call 245 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 245 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 245 UpdateUnitWeapons
   r Unit#3.posX 104053045
   r Unit#3.posY 20774912
@@ -18925,14 +18925,14 @@ call 246 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 246 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 246 UpdateUnitWeapons
   r Unit#3.posX 104670842
   r Unit#3.posZ 39429936
@@ -18988,14 +18988,14 @@ call 247 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 247 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 247 UpdateUnitWeapons
   r Unit#3.posX 105288871
   r Unit#3.posZ 39625793
@@ -19051,14 +19051,14 @@ call 248 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 248 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 248 UpdateUnitWeapons
   r Unit#3.posX 105907120
   r Unit#3.posZ 39821720
@@ -19114,14 +19114,14 @@ call 249 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 249 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 249 UpdateUnitWeapons
   r Unit#3.posX 106525586
   r Unit#3.posZ 40017717
@@ -19177,14 +19177,14 @@ call 250 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 250 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 250 UpdateUnitWeapons
   r Unit#3.posX 107144256
   r Unit#3.posZ 40213781
@@ -19244,14 +19244,14 @@ call 251 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 251 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 251 UpdateUnitWeapons
   r Unit#3.posX 107763120
   r Unit#3.posZ 40409908
@@ -19308,14 +19308,14 @@ call 252 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 252 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 252 UpdateUnitWeapons
   r Unit#3.posX 108382179
   r Unit#3.posZ 40606098
@@ -19375,14 +19375,14 @@ call 253 UpdateUnitWeapons
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 253 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50475782
   o y 735324
   o z 21919511
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 253 UpdateUnitWeapons
   r Unit#3.posX 109001428
   r Unit#3.posZ 40802349
@@ -19420,7 +19420,7 @@ call 253 UpdateUnitWeapons
   o z 26129954
   i scripts.GetAimFromPosition Unit#252 0
   o out (50462720,994508,22547660)
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#252 "AimPrimary" 2 30101 9825 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
   w Unit#252.weapon0Flags 3
@@ -19446,14 +19446,14 @@ call 254 UpdateUnitWeapons
   o x 50470549
   o y 735324
   o z 21920853
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 254 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50470549
   o y 735324
   o z 21920853
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 254 UpdateUnitWeapons
   r Unit#3.posX 109620856
   r Unit#3.posZ 40998658
@@ -19509,14 +19509,14 @@ call 255 UpdateUnitWeapons
   o x 50465295
   o y 735324
   o z 21922457
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 255 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50465295
   o y 735324
   o z 21922457
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 255 UpdateUnitWeapons
   r Unit#3.posX 110240456
   r Unit#3.posZ 41195023
@@ -19572,14 +19572,14 @@ call 256 UpdateUnitWeapons
   o x 50460034
   o y 735324
   o z 21924320
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 256 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50460034
   o y 735324
   o z 21924320
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 256 UpdateUnitWeapons
   r Unit#3.posX 110860227
   r Unit#3.posZ 41391444
@@ -19636,14 +19636,14 @@ call 257 UpdateUnitWeapons
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 257 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 257 UpdateUnitWeapons
   r Unit#3.posX 111480156
   r Unit#3.posZ 41587917
@@ -19699,14 +19699,14 @@ call 258 UpdateUnitWeapons
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 258 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 258 UpdateUnitWeapons
   r Unit#3.posX 112100242
   r Unit#3.posZ 41784440
@@ -19762,14 +19762,14 @@ call 259 UpdateUnitWeapons
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 259 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 259 UpdateUnitWeapons
   r Unit#3.posX 112720475
   r Unit#3.posZ 41981011
@@ -19826,14 +19826,14 @@ call 260 UpdateUnitWeapons
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 260 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 50456655
   o y 735324
   o z 21925652
-  i services.SchedPublish 6 112
+  i services.SchedPublish 6 8
 call 260 UpdateUnitWeapons
   r Unit#3.posX 113340856
   r Unit#3.posZ 42177631

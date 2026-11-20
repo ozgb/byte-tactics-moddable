@@ -5,66 +5,156 @@ struct Player;
 struct StateWriter;
 
 // Major version of the ai interface, changed when a slot is removed or its signature changes.
-#define AI_VERSION_MAJOR 5
+#define AI_VERSION_MAJOR 6
 // Minor version of the ai interface, changed when a slot is added.
 #define AI_VERSION_MINOR 0
 
-// The kinds of event other modules publish to ai's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: REACT_TO_ATTACK or SET_SQUAD names a null unit; SET_SQUAD names a squad outside -1 to 9, or a unit whose player has no squads; PLAN names a bit above 3; the kind is unknown.
+// The fields every ai event and effect starts with.
+struct AiEventHeader {
+    // An AiEventKind or an AiEffectKind.
+    int kind;
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none: PLAN, WEIGHT and LIMIT name none), as economy's events give a unit.
+    unsigned int unit;
+};
+
+// The kinds of event other modules publish to ai's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; REACT_TO_ATTACK or SET_SQUAD names a null unit; SET_SQUAD names a squad outside -1 to 9, or a unit whose player has no squads; PLAN names a bit above 3; the kind is unknown.
 enum AiEventKind {
-    // unit was attacked by target (0 when no unit attacked it, or the attacker is dead) for value damage; when unit's player is an active computer player, its AI may react with orders for unit; outcome 1.
+    // unit was attacked (AiReactToAttack); when unit's player is an active computer player, its AI may react with orders for unit; outcome 1.
     AI_REACT_TO_ATTACK = 224,
-    // unit joins squad value (0 to 9) of its player and leaves the squad it was in, or only leaves it when value is -1; outcome 1.
+    // unit joins a squad of its player and leaves the squad it was in, or only leaves it (AiSetSquad); outcome 1.
     AI_SET_SQUAD = 226,
-    // Switches the AI commands (WEIGHT and LIMIT) on when value names the match's difficulty (bit 0 easy, bit 1 medium, bit 2 hard) or has bit 3 (any difficulty), and off otherwise; outcome 1.
+    // Switches the AI commands (WEIGHT and LIMIT) on when the plan names the match's difficulty, and off otherwise (AiPlan); outcome 1.
     AI_PLAN = 227,
-    // When the AI commands are on, scales by scale the build weight (0 to 100) of each unit type in types for every player with a squad manager, unless a WEIGHT with extra 1 fixed it; extra 1 fixes it; outcome 1, or 0 when the commands are off.
+    // When the AI commands are on, scales the build weight (0 to 100) of each unit type of a set for every player with a squad manager, unless a fixing WEIGHT fixed it (AiWeight); outcome 1, or 0 when the commands are off.
     AI_WEIGHT = 228,
-    // When the AI commands are on, sets value as the build limit of each unit type in types for every active computer player, unless a LIMIT with extra 1 fixed it; extra 1 fixes it; outcome 1, or 0 when the commands are off.
+    // When the AI commands are on, sets the build limit of each unit type of a set for every active computer player, unless a fixing LIMIT fixed it (AiLimit); outcome 1, or 0 when the commands are off.
     AI_LIMIT = 229
 };
 
 // The kinds of effect ai publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
 enum AiEffectKind {
-    // unit gets an order of type value (the kind orders' GetOrderType returned) against target or the position pos when hasPos is 1, with the order's two arguments params; when extra is 0 it replaces the unit's orders that are not marked to stay, when 1 it is queued behind them.
+    // unit gets an order (AiAddOrder).
     AI_EFFECT_ADD_ORDER = 240,
-    // The factory unit queues extra more of the unit type value to build.
+    // The factory unit queues more of a unit type to build (AiQueueBuild).
     AI_EFFECT_QUEUE_BUILD = 241,
-    // unit's orders are deleted: every order when value is 1, the ones not marked to stay when 0.
+    // unit's orders are deleted (AiStop).
     AI_EFFECT_STOP = 243,
-    // unit's state bits in value are set when extra is 1 and cleared when 0 (bit 0: the unit is switched on).
+    // Some of unit's state bits are set or cleared (AiActivate).
     AI_EFFECT_ACTIVATE = 245,
-    // unit takes the movement state value (0 hold position, 1 manoeuvre, 2 roam) and the firing state extra (0 hold fire, 1 return fire, 2 fire at will).
+    // unit takes a movement state and a firing state (AiSetStates).
     AI_EFFECT_SET_STATES = 246
 };
 
-// An event (AiEventKind) or an effect (AiEffectKind), as plain data with no pointers; fields a kind does not use are 0.
-struct AiEvent {
-    // An AiEventKind or an AiEffectKind.
-    int kind;
-    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none), as economy's events give a unit.
-    unsigned int unit;
-    // The other unit, as its block offset: the attacker of REACT_TO_ATTACK, the target of an order.
-    unsigned int target;
-    // The argument of the kind, as the kind says.
-    int value;
-    // The second argument of the kind, as the kind says.
-    int extra;
-    // The two arguments of an order (ADD_ORDER).
-    int params[2];
-    // 1 when pos holds a position.
-    int hasPos;
-    // A position in world coordinates with 16 fractional bits: x, y and z.
-    int pos[3];
-    // The factor of WEIGHT.
+// The payload of REACT_TO_ATTACK.
+struct AiReactToAttack {
+    // The kind and the unit attacked.
+    AiEventHeader h;
+    // The attacker, as its block offset (0 when no unit attacked, or the attacker is dead).
+    unsigned int attacker;
+    // The damage dealt.
+    int damage;
+};
+
+// The payload of SET_SQUAD.
+struct AiSetSquad {
+    // The kind and the unit.
+    AiEventHeader h;
+    // The squad it joins, 0 to 9, or -1 to only leave its squad.
+    int squad;
+};
+
+// The payload of PLAN.
+struct AiPlan {
+    // The kind; the unit is 0.
+    AiEventHeader h;
+    // The difficulties the commands are for: bit 0 easy, bit 1 medium, bit 2 hard, bit 3 any.
+    unsigned int difficulties;
+};
+
+// The payload of WEIGHT.
+struct AiWeight {
+    // The kind; the unit is 0.
+    AiEventHeader h;
+    // The factor the weights are scaled by.
     float scale;
-    // The unit types of WEIGHT and LIMIT, as a set of bits: type n is bit n % 32 of word n / 32.
+    // 1 to fix the weights so that later WEIGHT events leave them, 0 not to.
+    int fix;
+    // The unit types, as a set of bits: type n is bit n % 32 of word n / 32.
     unsigned int types[16];
+};
+
+// The payload of LIMIT.
+struct AiLimit {
+    // The kind; the unit is 0.
+    AiEventHeader h;
+    // The build limit.
+    int limit;
+    // 1 to fix the limits so that later LIMIT events leave them, 0 not to.
+    int fix;
+    // The unit types, as a set of bits: type n is bit n % 32 of word n / 32.
+    unsigned int types[16];
+};
+
+// The payload of ADD_ORDER.
+struct AiAddOrder {
+    // The kind and the unit ordered.
+    AiEventHeader h;
+    // The order's type, the kind orders' GetOrderType returned.
+    int type;
+    // 0 to replace the unit's orders that are not marked to stay, 1 to queue it behind them.
+    int queue;
+    // The target unit, as its block offset (0 for none).
+    unsigned int target;
+    // 1 when pos holds the order's position.
+    int hasPos;
+    // The order's position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The order's two arguments.
+    int params[2];
+};
+
+// The payload of QUEUE_BUILD.
+struct AiQueueBuild {
+    // The kind and the factory unit.
+    AiEventHeader h;
+    // The unit type to build.
+    int type;
+    // How many more to queue.
+    int count;
+};
+
+// The payload of STOP.
+struct AiStop {
+    // The kind and the unit.
+    AiEventHeader h;
+    // 1 to delete every order, 0 only the ones not marked to stay.
+    int all;
+};
+
+// The payload of ACTIVATE.
+struct AiActivate {
+    // The kind and the unit.
+    AiEventHeader h;
+    // The state bits (bit 0: the unit is switched on).
+    unsigned int bits;
+    // 1 to set them, 0 to clear them.
+    int on;
+};
+
+// The payload of SET_STATES.
+struct AiSetStates {
+    // The kind and the unit.
+    AiEventHeader h;
+    // The movement state: 0 hold position, 1 manoeuvre, 2 roam.
+    int movement;
+    // The firing state: 0 hold fire, 1 return fire, 2 fire at will.
+    int firing;
 };
 
 // Computer player decisions: what each computer player's AI wants, and the orders and targets it gives its units; other modules call no slot of it but through the engine. The engine delivers ai's pending inbox, through Apply, before each run (UpdateSquads, UpdatePlayerAI), and at each phase boundary.
 struct AiSeam {
-    // Consumes one queued event of the inbox and returns its outcome, which the engine records in the trace's dump and returns to no one.
-    int (__stdcall* Apply)(const AiEvent* event);
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const AiEventHeader* event, unsigned int size);
     // Writes a report on the AI of a player to a file. Hooks: none.
     void (__stdcall* DumpPlayerAI)(int player, void* file);
     // Resets the unit tables of the computer players and loads the default AI script again. Hooks: none.

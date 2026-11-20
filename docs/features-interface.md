@@ -1,6 +1,6 @@
 # The features interface
 
-Features sits behind `interfaces/features.h` (version 3.1), the second module on the scheduler after economy
+Features sits behind `interfaces/features.h` (version 4.0), the second module on the scheduler after economy
 (`docs/economy-interface.md`), and the first with random draws to keep in order (#954). 3.1c's feature code is its
 default implementation. This page is the inventory the interface was cut from:
 - what other subsystems did to features' state in 3.1c, and what each became;
@@ -96,6 +96,19 @@ economy's inbox, reached through `economy.Apply` from the reclaim's INCOME. They
 adapters onto units', map's and weapons' seam slots that `src/game/routes.cpp` registers. Features' code calls no other
 subsystem outside an interface. A reclaim in a multiplayer game still sends its packet through
 `network.SendFeatureReclaimed`, a seam slot, as 3.1c did; network is outside the model (section 8).
+
+**Payloads.** Every event and effect starts with `FeaturesEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/features.h` (version 4.0) that starts with it; a publisher passes the payload's size, `Apply(event, size)` refuses an event smaller than its kind's payload with outcome 0 and no change, and `Place(const FeaturesPlace*)` takes the PLACE payload.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| PLACE 32 | `FeaturesPlace` | `x`, `z` (the cell), `feature` (the feature type), `flags` (`FEATURES_HAS_POS` 1, `FEATURES_HAS_ROT` 2, `FEATURES_SINK` 4), `owner` (10 for none), `pos[3]` (world coordinates, 16 fractional bits, with HAS_POS), `rot[3]` (16-bit angles, with HAS_ROT) |
+| REMOVE 33 | `FeaturesRemove` | `x`, `z`, `force` (1 to remove even a feature that refuses removal) |
+| DAMAGE 34 | `FeaturesDamage` | `x`, `z` (the cell the feature's footprint starts at), `weapon` |
+| RECLAIM 35 | `FeaturesReclaim` | `unit` (the reclaiming unit, a block offset), `pos[3]` (the feature's position) |
+| FREE_STATE 48 | `FeaturesFreeState` | `state`: the piece state to free, a block offset |
+| INIT_STATE 49 | `FeaturesInitState` | `state` (the piece state, a block offset), `feature` (the type whose model it is built for) |
+| PASS_MAPS 50 | `FeaturesPassMaps` | `x`, `z` (the footprint's first cell), `width`, `height` |
+| AREA_DAMAGE 51 | `FeaturesAreaDamage` | `weapon`, `pos[3]` (the centre of the damage) |
 
 ## 4. Views
 

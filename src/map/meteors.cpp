@@ -136,17 +136,17 @@ void UpdateMeteors()
             pos.x += g_meteorOrigin.x << 20;
             pos.y = -vel.y * 90;
             pos.z += g_meteorOrigin.y << 20;
-            WindMeteorsEffect effect;
-            effect.kind = WIND_METEORS_EFFECT_SPAWN;
+            WindMeteorsSpawn effect;
+            effect.h.kind = WIND_METEORS_EFFECT_SPAWN;
             effect.weapon = g_meteorWeapon.get() == nullptr ? -1 : (int)(g_meteorWeapon.get() - g_game->weapons);
-            effect.x = pos.x;
-            effect.y = pos.y;
-            effect.z = pos.z;
-            effect.vx = vel.x;
-            effect.vy = vel.y;
-            effect.vz = vel.z;
+            effect.pos[0] = pos.x;
+            effect.pos[1] = pos.y;
+            effect.pos[2] = pos.z;
+            effect.vel[0] = vel.x;
+            effect.vel[1] = vel.y;
+            effect.vel[2] = vel.z;
             effect.announce = 1;
-            WindMeteorsEmit(&effect);
+            WindMeteorsEmit(&effect.h, sizeof(effect));
         }
         if (g_meteorStrikeEndTime <= (unsigned int)g_game->ticks)
             g_meteorActive = 0;
@@ -219,8 +219,10 @@ void __stdcall LoadMeteorDefaults(MeteorShowerParams* params)
     }
 }
 
-void __stdcall WindMeteorsApply(const WindMeteorsEvent* event)
+void __stdcall WindMeteorsApply(const WindMeteorsEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(WindMeteorsEventHeader))
+        return;
     switch (event->kind) {
     case WIND_METEORS_ENABLE:
         EnableMeteors();
@@ -229,7 +231,8 @@ void __stdcall WindMeteorsApply(const WindMeteorsEvent* event)
         DisableMeteors();
         break;
     case WIND_METEORS_PARAMS:
-        SetMeteorParams(&event->params);
+        if (size >= sizeof(WindMeteorsParams))
+            SetMeteorParams(&reinterpret_cast<const WindMeteorsParams*>(event)->params);
         break;
     case WIND_METEORS_START:
         StartMeteorShower();

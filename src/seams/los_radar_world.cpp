@@ -3,8 +3,8 @@
 #include "../../interfaces/services.h"
 #include "los_radar_world.h"
 
-void LosRadarInbox(const void* event)
+void LosRadarInbox(const void* event, unsigned int size)
 {
-    const LosRadarEvent* e = static_cast<const LosRadarEvent*>(event);
-    HarnessLosRadarEvent(e, g_seams.los_radar->Apply(e));
+    const LosRadarEventHeader* e = static_cast<const LosRadarEventHeader*>(event);
+    HarnessLosRadarEvent(e, size, g_seams.los_radar->Apply(e, size));
 }

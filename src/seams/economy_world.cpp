@@ -14,6 +14,7 @@
 #include "../harness/replay_services.h"
 #include "../harness/harness.h"
 #include "../game/scheduler.h"
+#include "../game/economy_events.h"
 #include "economy_world.h"
 
 #include "../../link/globals.h"
@@ -133,10 +134,10 @@ static int __stdcall WorldCellMetal(int x, int y)
     return c != nullptr ? c->metal : -1;
 }
 
-static void __stdcall WorldEmit(const EconomyEvent* effect)
+static void __stdcall WorldEmit(const EconomyEventHeader* effect, unsigned int size)
 {
-    HarnessEconomyEvent(effect, 1);
-    SchedPublish(SCHED_ECONOMY, effect, sizeof(*effect));
+    HarnessEconomyEvent(effect, size, 1);
+    SchedPublish(SCHED_ECONOMY, effect, size);
 }
 
 static EconomyWorldView s_world = {
@@ -150,19 +151,19 @@ const EconomyWorldView* __stdcall NativeEconomyWorld()
     return &s_world;
 }
 
-void EconomyInbox(const void* event)
+void EconomyInbox(const void* event, unsigned int size)
 {
-    const EconomyEvent* e = static_cast<const EconomyEvent*>(event);
-    HarnessEconomyEvent(e, g_seams.economy->Apply(e));
+    const EconomyEventHeader* e = static_cast<const EconomyEventHeader*>(event);
+    HarnessEconomyEvent(e, size, g_seams.economy->Apply(e, size));
 }
 
-int __stdcall ScheduleEconomySpend(const EconomyEvent* spend)
+int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend)
 {
     ReplayImport call(RI_SCHEDULE_ECONOMY_SPEND);
     call.Ptr(spend);
     SchedDeliver(SCHED_ECONOMY);
     int outcome = g_seams.economy->Spend(spend);
-    HarnessEconomyEvent(spend, outcome);
+    HarnessEconomyEvent(&spend->h, sizeof(*spend), outcome);
     return call.Result(outcome);
 }
 

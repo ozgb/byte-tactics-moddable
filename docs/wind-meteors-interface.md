@@ -1,6 +1,6 @@
 # The wind_meteors interface
 
-Wind and meteors sit behind `interfaces/wind_meteors.h` (version 2.0), the second module on the scheduler after
+Wind and meteors sit behind `interfaces/wind_meteors.h` (version 3.0), the second module on the scheduler after
 economy (`docs/economy-interface.md`). 3.1c's code is the default implementation: the wind pass in
 `src/game/game_state.cpp` (`UpdateWindOnStream`) and the meteor schedule in `src/map/meteors.cpp`. This page is the
 inventory the interface was cut from (#964):
@@ -67,6 +67,14 @@ packets come out as in 3.1c. Section 8 has the gate's verdict.
 
 `weapons.FindWeaponByName`, wind_meteors' one query of another subsystem, stays a direct query, made by `InitMeteors`
 at match start.
+
+**Payloads.** Every event and effect starts with `WindMeteorsEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/wind_meteors.h` (version 3.0) that starts with it, or is the header alone. `Apply(event, size)` takes the payload's size and ignores an event smaller than its kind's payload (it returns nothing); `WindMeteorsEmit(effect, size)` publishes an effect and records it.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| ENABLE 64, DISABLE 65, START 67 | the header alone | none |
+| PARAMS 66 | `WindMeteorsParams` | `params`: the `MeteorShowerParams` the event sets |
+| SPAWN 80 | `WindMeteorsSpawn` | `weapon` (the meteor weapon's slot), `pos[3]` (the start, world units), `vel[3]` (per tick, world units), `announce` (1 when announced to the other players of a network game) |
 
 ## 4. Views and queries
 

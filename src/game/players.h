@@ -8,7 +8,7 @@ struct Player;
 struct Unit;
 
 struct Gui;
-struct PlayersEvent;
+struct PlayersEventHeader;
 struct PlayersMapInfo;
 struct StateWriter;
 
@@ -30,7 +30,7 @@ void __stdcall UpdatePlayersFinish();
 void __stdcall InitPlayerResources();
 void __stdcall LoadPlayerControllers(HapiBank* file);
 void __stdcall UpdateBlink();
-int __stdcall PlayersApply(const PlayersEvent* event);
+int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size);
 unsigned int __stdcall PlayersRegionSize(const PlayersMapInfo* info);
 void __stdcall PlayersInit(const PlayersMapInfo* info, void* region, unsigned int size);
 void* __stdcall PlayersShutdown();

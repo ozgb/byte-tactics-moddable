@@ -80,8 +80,8 @@ int TdfRecord::GetFieldInt(const char*, int fallback)
 }
 void __stdcall SchedPublish(int, const void*, unsigned int) {}
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall HarnessMapEvent(const MapEvent*, int) {}
-void __stdcall HarnessPlayersEvent(const PlayersEvent*, int) {}
+void __stdcall HarnessMapEvent(const MapEventHeader*, unsigned int, int) {}
+void __stdcall HarnessPlayersEvent(const PlayersEventHeader*, unsigned int, int) {}
 
 enum {
     kMapCells = 32,
@@ -120,7 +120,7 @@ static unsigned long long Fnv(unsigned long long h, const void* p, unsigned int 
 
 static const unsigned long long kFnvBasis = 0xcbf29ce484222325ull;
 
-static int __stdcall TamperedApply(const MapEvent* e)
+static int __stdcall TamperedApply(const MapEventHeader* e, unsigned int size)
 {
     if (e->kind == MAP_REMOVE_UNIT) {
         s_removals++;
@@ -129,7 +129,15 @@ static int __stdcall TamperedApply(const MapEvent* e)
             return 0;
         }
     }
-    return ApplyMapEvent(e);
+    return ApplyMapEvent(e, size);
+}
+
+static MapEventHeader UnitEvent(int kind, Unit* unit)
+{
+    MapEventHeader event;
+    event.kind = kind;
+    event.unit = unit ? Ref<Unit>(unit).offset : 0;
+    return event;
 }
 
 static int Triangle(int t, int period, int span)
@@ -305,12 +313,12 @@ static void Play(Run* run, bool tamper)
     for (s_tick = 0; s_tick < kTicks; s_tick++) {
         for (int i = 1; i < kUnits; i++) {
             if (s_tick > 0) {
-                MapEvent remove = MapEventOf(MAP_REMOVE_UNIT, &s_units[i]);
-                g_seams.map->Apply(&remove);
+                MapEventHeader remove = UnitEvent(MAP_REMOVE_UNIT, &s_units[i]);
+                g_seams.map->Apply(&remove, sizeof remove);
             }
             Move(s_tick, i);
-            MapEvent add = MapEventOf(MAP_ADD_UNIT, &s_units[i]);
-            Check(g_seams.map->Apply(&add) == 1, "ADD_UNIT of a unit has outcome 1");
+            MapEventHeader add = UnitEvent(MAP_ADD_UNIT, &s_units[i]);
+            Check(g_seams.map->Apply(&add, sizeof add) == 1, "ADD_UNIT of a unit has outcome 1");
         }
         run->cells[s_tick] = HashCells();
         run->buckets[s_tick] = HashBuckets();
@@ -340,33 +348,43 @@ static void CheckRejected()
     unsigned long long before = HashState();
     std::vector<char> units((char*)s_units, (char*)(s_units + kUnits));
     std::vector<char> cells((char*)g_game->cells.get(), (char*)(g_game->cells.get() + kMapCells * kMapCells));
-    MapEvent noUnit[7];
+    MapSetYard noUnit[7];
+    for (int k = 0; k < 7; k++) {
+        memset(&noUnit[k], 0, sizeof noUnit[k]);
+        noUnit[k].h.kind = MAP_ADD_UNIT + k;
+    }
+    MapSetYard retired;
+    memset(&retired, 0, sizeof retired);
+    retired.h.kind = 167;
+    retired.open = 1;
+    MapEventHeader badKind = UnitEvent(127, &s_units[kRunner]);
     for (int k = 0; k < 7; k++)
-        noUnit[k] = MapEventOf(MAP_ADD_UNIT + k);
-    MapEvent retired = MapEventOf(167);
-    retired.value = 1;
-    MapEvent badKind = MapEventOf(127);
-    badKind.unit = Ref<Unit>(&s_units[kRunner]).offset;
-    for (int k = 0; k < 7; k++)
-        Check(g_seams.map->Apply(&noUnit[k]) == 0, "an event of a unit kind with a null unit has outcome 0");
-    Check(g_seams.map->Apply(&retired) == 0, "an event of kind 167, which map 5.0 no longer has, has outcome 0");
-    Check(g_seams.map->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
+        Check(g_seams.map->Apply(&noUnit[k].h, MapEventSize(MAP_ADD_UNIT + k)) == 0, "an event of a unit kind with a null unit has outcome 0");
+    Check(g_seams.map->Apply(&retired.h, sizeof(MapEventHeader)) == 0, "an event of kind 167, which map 5.0 no longer has, has outcome 0");
+    Check(g_seams.map->Apply(&badKind, sizeof badKind) == 0, "an event of an unknown kind has outcome 0");
+    MapSetYard shortYard;
+    memset(&shortYard, 0, sizeof shortYard);
+    shortYard.h = UnitEvent(MAP_SET_YARD, &s_units[kRunner]);
+    Check(g_seams.map->Apply(&shortYard.h, sizeof(MapEventHeader)) == 0, "a SET_YARD smaller than its payload has outcome 0");
     Unit* loose = &s_units[0];
     Check(!loose->spatialBucket && s_units[kRunner].spatialBucket, "the unit outside the run has no bucket, and the runner has one");
-    MapEvent unlinkNoBucket = MapEventOf(MAP_BUCKET_UNLINK, loose);
-    MapEvent prependNoBucket = MapEventOf(MAP_BUCKET_PREPEND, loose);
-    MapEvent prependAgain = MapEventOf(MAP_BUCKET_PREPEND, &s_units[kRunner]);
-    MapEvent unlinkStray = MapEventOf(MAP_BUCKET_UNLINK, loose);
-    MapEvent negativePassMaps = MapEventOf(MAP_PASS_MAPS);
+    MapEventHeader unlinkNoBucket = UnitEvent(MAP_BUCKET_UNLINK, loose);
+    MapEventHeader prependNoBucket = UnitEvent(MAP_BUCKET_PREPEND, loose);
+    MapEventHeader prependAgain = UnitEvent(MAP_BUCKET_PREPEND, &s_units[kRunner]);
+    MapEventHeader unlinkStray = UnitEvent(MAP_BUCKET_UNLINK, loose);
+    MapPassMaps negativePassMaps;
+    memset(&negativePassMaps, 0, sizeof negativePassMaps);
+    negativePassMaps.h.kind = MAP_PASS_MAPS;
     negativePassMaps.size[0] = -1;
     negativePassMaps.size[1] = 2;
-    Check(g_seams.map->Apply(&unlinkNoBucket) == 0, "a bucket unlink of a unit with no bucket has outcome 0");
-    Check(g_seams.map->Apply(&prependNoBucket) == 0, "a bucket prepend of a unit with no bucket has outcome 0");
-    Check(g_seams.map->Apply(&prependAgain) == 0, "a bucket prepend of a unit already in its bucket has outcome 0");
+    Check(g_seams.map->Apply(&negativePassMaps.h, sizeof negativePassMaps - 1) == 0, "a PASS_MAPS smaller than its payload has outcome 0");
+    Check(g_seams.map->Apply(&unlinkNoBucket, sizeof unlinkNoBucket) == 0, "a bucket unlink of a unit with no bucket has outcome 0");
+    Check(g_seams.map->Apply(&prependNoBucket, sizeof prependNoBucket) == 0, "a bucket prepend of a unit with no bucket has outcome 0");
+    Check(g_seams.map->Apply(&prependAgain, sizeof prependAgain) == 0, "a bucket prepend of a unit already in its bucket has outcome 0");
     loose->spatialBucket = s_units[kRunner].spatialBucket;
-    Check(g_seams.map->Apply(&unlinkStray) == 0, "a bucket unlink of a unit not in its bucket's chain has outcome 0");
+    Check(g_seams.map->Apply(&unlinkStray, sizeof unlinkStray) == 0, "a bucket unlink of a unit not in its bucket's chain has outcome 0");
     loose->spatialBucket = 0;
-    Check(g_seams.map->Apply(&negativePassMaps) == 0, "a PASS_MAPS of negative size has outcome 0");
+    Check(g_seams.map->Apply(&negativePassMaps.h, sizeof negativePassMaps) == 0, "a PASS_MAPS of negative size has outcome 0");
     Check(HashState() == before, "a rejected event changes no hashed state");
     Check(memcmp(&units[0], s_units, units.size()) == 0, "a rejected event changes no unit");
     Check(memcmp(&cells[0], g_game->cells.get(), cells.size()) == 0, "a rejected event changes no cell");

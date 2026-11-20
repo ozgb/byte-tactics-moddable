@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem map 5.0
+subsystem map 6.0
 call 1020 GetGroundHeight
   r Game.width 224
   r Game.height 102
@@ -244810,34 +244810,25 @@ call 1024 Apply
   r Cell#22847.flags 80
   a event.kind 164
   a event.unit Unit#2
-  a event.value 1
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a event.open 1
+  a size 12
   i los_radar.GetMapCell 40 16 = Cell#3624
   o Cell#3624.metal 3
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
-  i services.SchedPublish 7 52
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
   w Unit#2.flags 0x3ce42321
   w Unit#2.cobStateFlags 4
   w MovementClass#0.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff
@@ -267840,17 +267831,7 @@ call 1025 Apply
   r UnitMotion#3.pathLockStamp 0
   a event.kind 160
   a event.unit Unit#3
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#3.cargoNext Unit#2
   w Unit#3.spatialBucket SpatialBucket#61
   w UnitMotion#3.pathLockStamp 1025
@@ -267868,17 +267849,7 @@ call 1025 Apply
 call 1025 Apply
   a event.kind 165
   a event.unit Unit#3
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#3.cargoNext null
   w SpatialBucket#61.head Unit#2
   o result 1
@@ -269493,18 +269464,8 @@ call 1045 Apply
   r MovementClass#2.lastTick 1000
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
-  i services.SchedPublish 7 52
+  a size 8
+  i services.SchedPublish 7 32
   w MovementClass#2.cells 258:ffffffffffffffffffffffffffffffff
   w UnitMotion#1.pathLockStamp 1045
   w Cell#4292.unit 0
@@ -269518,17 +269479,7 @@ call 1045 Apply
   r Unit#1.posZ 21269737
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4293.unit 1
   w Cell#4294.unit 1
   w Cell#4517.unit 1
@@ -270513,17 +270464,7 @@ call 1059 Apply
   r Unit#3.flags 0x10242321
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1059
   w Cell#4293.unit 0
   w Cell#4294.unit 0
@@ -270536,17 +270477,7 @@ call 1059 Apply
   r Unit#1.posZ 21265856
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4294.unit 1
   w Cell#4295.unit 1
   w Cell#4518.unit 1
@@ -294238,18 +294169,8 @@ call 1366 Apply
   r MovementClass#2.lastTick 1321
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
-  i services.SchedPublish 7 52
+  a size 8
+  i services.SchedPublish 7 32
   w MovementClass#2.cells 1306:f4ffff01f4ffff01f57f5501ff7f0000ff7f0000
   w UnitMotion#2.pathLockStamp 1366
   w Cell#19676.unit 0
@@ -294263,17 +294184,7 @@ call 1366 Apply
   r Unit#251.posZ 92534636
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#251.spatialBucket SpatialBucket#331
   w SpatialBucket#303.head null
   w SpatialBucket#331.head Unit#251
@@ -295605,17 +295516,7 @@ call 1385 Apply
   r Unit#251.posZ 91919393
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1385
   w Cell#19675.unit 0
   w Cell#19676.unit 0
@@ -295628,17 +295529,7 @@ call 1385 Apply
   r Unit#251.posZ 91862564
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#251.spatialBucket SpatialBucket#303
   w SpatialBucket#303.head Unit#251
   w SpatialBucket#331.head null
@@ -295796,17 +295687,7 @@ call 1387 Apply
   r Unit#251.posZ 91805735
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1387
   w Cell#19674.unit 0
   w Cell#19675.unit 0
@@ -295819,17 +295700,7 @@ call 1387 Apply
   r Unit#251.posZ 91748906
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#19450.unit 251
   w Cell#19451.unit 251
   w Cell#19674.unit 251
@@ -297158,17 +297029,7 @@ call 1406 Apply
   r Unit#251.posZ 90739301
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1406
   w Cell#19450.unit 0
   w Cell#19451.unit 0
@@ -297181,17 +297042,7 @@ call 1406 Apply
   r Unit#251.posZ 90684021
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#19226.unit 251
   w Cell#19227.unit 251
   w Cell#19450.unit 251
@@ -297484,17 +297335,7 @@ call 1410 Apply
   r Unit#251.posZ 90518181
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1410
   w Cell#19226.unit 0
   w Cell#19227.unit 0
@@ -297507,17 +297348,7 @@ call 1410 Apply
   r Unit#251.posZ 90462901
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#19225.unit 251
   w Cell#19226.unit 251
   w Cell#19449.unit 251
@@ -298570,17 +298401,7 @@ call 1425 Apply
   r Unit#251.posZ 89695884
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1425
   w Cell#19225.unit 0
   w Cell#19226.unit 0
@@ -298593,17 +298414,7 @@ call 1425 Apply
   r Unit#251.posZ 89641135
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#19001.unit 251
   w Cell#19002.unit 251
   w Cell#19225.unit 251
@@ -299243,17 +299054,7 @@ call 1434 Apply
   r Unit#251.posZ 89205299
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1434
   w Cell#19001.unit 0
   w Cell#19002.unit 0
@@ -299266,17 +299067,7 @@ call 1434 Apply
   r Unit#251.posZ 89151089
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#19000.unit 251
   w Cell#19001.unit 251
   w Cell#19224.unit 251
@@ -300053,17 +299844,7 @@ call 1445 Apply
   r Unit#251.posZ 88607372
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1445
   w Cell#19000.unit 0
   w Cell#19001.unit 0
@@ -300076,17 +299857,7 @@ call 1445 Apply
   r Unit#251.posZ 88553162
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#18776.unit 251
   w Cell#18777.unit 251
   w Cell#19000.unit 251
@@ -300931,17 +300702,7 @@ call 1457 Apply
   r Unit#251.posZ 87955235
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1457
   w Cell#18776.unit 0
   w Cell#18777.unit 0
@@ -300954,17 +300715,7 @@ call 1457 Apply
   r Unit#251.posZ 87901025
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#18775.unit 251
   w Cell#18776.unit 251
   w Cell#18999.unit 251
@@ -301464,17 +301215,7 @@ call 1464 Apply
   r Unit#251.posZ 87575226
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1464
   w Cell#18775.unit 0
   w Cell#18776.unit 0
@@ -301487,17 +301228,7 @@ call 1464 Apply
   r Unit#251.posZ 87520477
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#18551.unit 251
   w Cell#18552.unit 251
   w Cell#18775.unit 251
@@ -302688,17 +302419,7 @@ call 1481 Apply
   r Unit#251.posZ 86650961
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1481
   w Cell#18551.unit 0
   w Cell#18552.unit 0
@@ -302711,17 +302432,7 @@ call 1481 Apply
   r Unit#251.posZ 86596751
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#251.spatialBucket SpatialBucket#302
   w SpatialBucket#302.head Unit#251
   w SpatialBucket#303.head null
@@ -302879,17 +302590,7 @@ call 1483 Apply
   r Unit#251.posZ 86542541
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1483
   w Cell#18550.unit 0
   w Cell#18551.unit 0
@@ -302902,17 +302603,7 @@ call 1483 Apply
   r Unit#251.posZ 86488331
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#18326.unit 251
   w Cell#18327.unit 251
   w Cell#18550.unit 251
@@ -304033,17 +303724,7 @@ call 1499 Apply
   r Unit#251.posZ 85528088
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1499
   w Cell#18326.unit 0
   w Cell#18327.unit 0
@@ -304056,17 +303737,7 @@ call 1499 Apply
   r Unit#251.posZ 85457974
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#18102.unit 251
   w Cell#18103.unit 251
   w Cell#18326.unit 251
@@ -304218,17 +303889,7 @@ call 1501 Apply
   r Unit#251.posZ 85387860
   a event.kind 166
   a event.unit Unit#3
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#3.cargoNext Unit#2
   w SpatialBucket#61.head Unit#3
   o result 1
@@ -304263,18 +303924,8 @@ call 1501 Apply
   r Unit#3.flags 0x10252321
   a event.kind 161
   a event.unit Unit#3
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
-  i services.SchedPublish 7 52
+  a size 8
+  i services.SchedPublish 7 32
   w MovementClass#2.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff
   w UnitMotion#3.pathLockStamp 1501
   w Cell#4298.unit 0
@@ -304292,17 +303943,7 @@ call 1501 Apply
   r Unit#3.posY 146357
   a event.kind 160
   a event.unit Unit#3
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4298.unit2 3
   w Cell#4299.unit2 3
   w Cell#4300.unit2 3
@@ -305441,17 +305082,7 @@ call 1514 Apply
   r MovementClass#2.lastTick 1472
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1514
   w Cell#18102.unit 0
   w Cell#18103.unit 0
@@ -305464,17 +305095,7 @@ call 1514 Apply
   r Unit#251.posZ 84406264
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#17878.unit 251
   w Cell#17879.unit 251
   w Cell#18102.unit 251
@@ -305560,18 +305181,8 @@ call 1515 Apply
   r Unit#251.flags 0x90e40025
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
-  i services.SchedPublish 7 52
+  a size 8
+  i services.SchedPublish 7 32
   w MovementClass#2.cells 260:ffffffffffffffff55d5ffff
   w UnitMotion#1.pathLockStamp 1515
   w Cell#4294.unit 0
@@ -305585,17 +305196,7 @@ call 1515 Apply
   r Unit#1.posZ 20435995
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4070.unit 1
   w Cell#4071.unit 1
   w Cell#4294.unit 1
@@ -305700,17 +305301,7 @@ call 1516 Apply
   r UnitMotion#4.pathLockStamp 0
   a event.kind 160
   a event.unit Unit#4
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#4.cargoNext Unit#3
   w Unit#4.spatialBucket SpatialBucket#61
   w UnitMotion#4.pathLockStamp 1516
@@ -305723,17 +305314,7 @@ call 1516 Apply
 call 1516 Apply
   a event.kind 165
   a event.unit Unit#4
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#4.cargoNext null
   w SpatialBucket#61.head Unit#3
   o result 1
@@ -306041,17 +305622,7 @@ call 1520 Apply
   r Unit#251.posZ 84055694
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1520
   w Cell#4070.unit 0
   w Cell#4071.unit 0
@@ -306064,17 +305635,7 @@ call 1520 Apply
   r Unit#1.posZ 20128047
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4069.unit 1
   w Cell#4070.unit 1
   w Cell#4293.unit 1
@@ -306747,17 +306308,7 @@ call 1529 Apply
   r Unit#3.posY 1981365
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1529
   w Cell#17878.unit 0
   w Cell#17879.unit 0
@@ -306770,17 +306321,7 @@ call 1529 Apply
   r Unit#251.posZ 83354554
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Unit#251.spatialBucket SpatialBucket#274
   w SpatialBucket#274.head Unit#251
   w SpatialBucket#302.head null
@@ -308989,17 +308530,7 @@ call 1536 Apply
   r MovementClass#2.lastTick 1502
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1536
   w Cell#4069.unit 0
   w Cell#4070.unit 0
@@ -309012,17 +308543,7 @@ call 1536 Apply
   r Unit#1.posZ 19394986
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#3845.unit 1
   w Cell#3846.unit 1
   w Cell#4069.unit 1
@@ -309112,17 +308633,7 @@ call 1537 Apply
   r Unit#251.posZ 82863756
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1537
   w Cell#3845.unit 0
   w Cell#3846.unit 0
@@ -309135,17 +308646,7 @@ call 1537 Apply
   r Unit#1.posZ 19373079
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#3844.unit 1
   w Cell#3845.unit 1
   w Cell#4068.unit 1
@@ -309597,17 +309098,7 @@ call 1543 Apply
   r Unit#251.posZ 82443072
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1543
   w Cell#3844.unit 0
   w Cell#3845.unit 0
@@ -309620,17 +309111,7 @@ call 1543 Apply
   r Unit#1.posZ 19407303
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4068.unit 1
   w Cell#4069.unit 1
   w Cell#4292.unit 1
@@ -309727,17 +309208,7 @@ call 1544 Apply
   r Unit#3.posY 2964405
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1544
   w Cell#17654.unit 0
   w Cell#17655.unit 0
@@ -309750,17 +309221,7 @@ call 1544 Apply
   r Unit#251.posZ 82302844
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#17430.unit 251
   w Cell#17431.unit 251
   w Cell#17654.unit 251
@@ -310861,17 +310322,7 @@ call 1559 Apply
   r Unit#251.posZ 81321203
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1559
   w Cell#4068.unit 0
   w Cell#4069.unit 0
@@ -310884,17 +310335,7 @@ call 1559 Apply
   r Unit#1.posZ 20450206
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4292.unit 1
   w Cell#4293.unit 1
   w Cell#4516.unit 1
@@ -310916,17 +310357,7 @@ call 1559 Apply
   r Unit#3.posZ 21266998
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1559
   w Cell#17430.unit 0
   w Cell#17431.unit 0
@@ -310938,17 +310369,7 @@ call 1559 Apply
   r Unit#251.posZ 81251080
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#17206.unit 251
   w Cell#17207.unit 251
   w Cell#17430.unit 251
@@ -311975,17 +311396,7 @@ call 1573 Apply
   r Unit#251.posZ 80339481
   a event.kind 161
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#1.pathLockStamp 1573
   w Cell#4292.unit 0
   w Cell#4293.unit 0
@@ -311998,17 +311409,7 @@ call 1573 Apply
   r Unit#1.posZ 21503762
   a event.kind 160
   a event.unit Unit#1
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#4516.unit 1
   w Cell#4517.unit 1
   w Cell#4740.unit 1
@@ -312104,17 +311505,7 @@ call 1574 Apply
   r Unit#3.posZ 21448696
   a event.kind 161
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w UnitMotion#2.pathLockStamp 1574
   w Cell#17206.unit 0
   w Cell#17207.unit 0
@@ -312126,17 +311517,7 @@ call 1574 Apply
   r Unit#251.posZ 80199235
   a event.kind 160
   a event.unit Unit#251
-  a event.value 0
-  a event.cellX 0
-  a event.cellY 0
-  a event.sizeX 0
-  a event.sizeY 0
-  a event.left 0
-  a event.top 0
-  a event.right 0
-  a event.bottom 0
-  a event.classes 0
-  a event.cause 0
+  a size 8
   w Cell#16982.unit 251
   w Cell#16983.unit 251
   w Cell#17206.unit 251

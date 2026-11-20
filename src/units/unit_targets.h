@@ -2,7 +2,7 @@
 #define UNIT_TARGETS_H
 struct Unit;
 struct Vec3;
-struct TargetingEvent;
+struct TargetingEventHeader;
 
 struct Unit;
 class UnitDef;
@@ -12,7 +12,7 @@ struct Unit;
 int __stdcall UnitCanBuild(Unit* unit, short id);
 void __stdcall NotifyUnitRefs(Unit* obj, int event);
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
-int __stdcall ApplyTargetingEvent(const TargetingEvent* e);
+int __stdcall ApplyTargetingEvent(const TargetingEventHeader* e, unsigned int size);
 int __stdcall IsTargetingUnit(Unit* list, Unit* obj);
 void __stdcall AlignUnitToGround(Unit* u);
 

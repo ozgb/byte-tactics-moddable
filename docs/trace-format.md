@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 6`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 7`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 6
+bt-trace 7
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -121,23 +121,31 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 6. |
+| `trace_format` | The format number, 7. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
 | `wind` | Fields of the game record hashed in the wind section, in hash order. |
 | `globals` | Named simulation globals: `meteors`, `game` and `pathfinder`, each a list in hash order. |
 | `results` | The path results section (section 8.21), which is dumped and not hashed: its `section` number, the most waypoints of an event it dumps (`points`), and the `fields` of an event in dump order. |
-| `economy` | The economy events section (section 8.22), which is dumped and not hashed: its `section` number, the `fields` of an event in dump order, and the `account` that a LOAD event adds (the `kind` of the event it follows and its `size` in bytes). |
 | `packets` | The share packets section (section 8.23), which is dumped and not hashed: its `section` number and the `fields` of a packet in dump order. |
-| `windMeteors` | The wind_meteors events section (section 8.24), which is dumped and not hashed: its `section` number and the `fields` of a record in dump order. |
-| `features` | The features events section (section 8.25), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
-| `targeting` | The targeting events section (section 8.26), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
-| `los_radar` | The los_radar events section (section 8.27), which is dumped and not hashed: its `section` number and the `fields` of an event in dump order. |
-| `map` | The map events section (section 8.28), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
-| `playersEvents` | The players events section (section 8.29), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
-| `aiEvents` | The ai events section (section 8.30), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
-| `weaponsEvents` | The weapons events section (section 8.31), which is dumped and not hashed: its `section` number and the `fields` of an event or effect in dump order. |
+| `economy` | The economy events section (section 8.22), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `windMeteors` | The wind_meteors events section (section 8.24), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `features` | The features events section (section 8.25), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `targeting` | The targeting events section (section 8.26), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `los_radar` | The los_radar events section (section 8.27), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `map` | The map events section (section 8.28), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `playersEvents` | The players events section (section 8.29), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `aiEvents` | The ai events section (section 8.30), which is dumped and not hashed: its `section` number and its `kinds`. |
+| `weaponsEvents` | The weapons events section (section 8.31), which is dumped and not hashed: its `section` number and its `kinds`. |
+
+The event sections (the last nine rows above) are not lists of fields but of kinds. `kinds` maps each kind value
+(the first int of a record, as a decimal string) to an object with the kind's enum `name`, the `size` in bytes of its
+payload (without the `outcome`) and its own `fields`: the fields the kind has, in dump order, each with `name`,
+`size`, `kind` and `target` as below but with no `offset`. A field of the kind `handle` is a 4-byte block offset that the dump
+writes as `null` when 0 and `heap` otherwise. A nested record is flattened into dotted names (`record.hitPoints`), or
+is one `bytes` field. Every list starts with `kind` and ends with `outcome`, except those of `windMeteors`, which have
+no `outcome`. A reader must read the kind before the fields.
 
 A **table** has `size` (the byte size of the record it describes), `fields`, `plan`, and for most
 tables `excluded`. A table with `split_of` is a part of another table: it holds fields of that
@@ -1028,37 +1036,42 @@ the synchronous `Spend` answers, with its answer; an effect is recorded when eco
 outbox, with outcome 1. So the records are in economy's order of consumption and publication, and the
 events that an effect causes (a share's SPEND and INCOME) follow it. The host empties
 the record after the world row of the tick, so the lines a dump writes after an earlier phase hold the
-records made so far. The fields are `economy.fields` of the schema, in this order.
+records made so far. Each record has the fields of its kind, the `fields` of its entry in `economy.kinds` of the schema, in the order of that list.
+An event shorter than its kind's payload is recorded zero-filled past its size and dumped with every field of its kind, so
+it reads as a full event whose missing fields are 0, with outcome 0; the dump does not write its size. The same holds for
+the event sections 8.24 to 8.31.
 
 ```
 economy.count                                  # n
-for k in 0 .. n-1, in application order:
+for k in 0 .. n-1, in application order, by the kind of the record:
     economy[k].kind
-    economy[k].player
-    economy[k].unit                            # the record's unit, a pointer ID with target unit (is_ref=true)
-    economy[k].resources
-    economy[k].energy                          # its 4 bytes as a u32
-    economy[k].metal                           # its 4 bytes as a u32
-    economy[k].value
-    economy[k].outcome
-    if kind == 1:
-        economy[k].account                     # hex: the 48 bytes
+    economy[k].<each field of that kind, in the order of its row below>
 ```
 
-`economy.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`economy.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is an event: 0 RESET, 1 LOAD, 2 REQUEST, 3 SPEND, 4 INCOME; or an effect: 16 CLOAK,
-  17 EXTRACTOR, 18 SHARE.
-- `player` is the player index of the account's player (a unit's owner, or the player for unit 0), or
-  the giver of a SHARE. The unit is a pointer ID with target `unit` (section 5), null for a player's own
-  account and for the kinds that name no unit.
-- `resources` holds the bits of the resources the record is about: 1 energy, 2 metal. An INCOME carries
-  exactly one bit. `energy` and `metal` are the amounts as IEEE 754 single bits, `value` the argument of
-  an effect (CLOAK: 1 to keep the unit cloaked and 0 to uncloak it; EXTRACTOR: the metal under the
-  footprint; SHARE: the amount given). Fields a kind does not use are 0.
-- `outcome` is the result of `Apply`: 1, or 0 for a SPEND whose store was short.
-- A LOAD adds the account it sets, the 12 float words of a unit's resource account in the order a saved
-  game stores it, copied when the event is recorded.
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 0 | ECONOMY_RESET | `player`, `unit` (unit), `outcome` |
+| 1 | ECONOMY_LOAD | `player`, `unit` (unit), `account` (48 bytes), `outcome` |
+| 2 | ECONOMY_REQUEST | `player`, `unit` (unit), `resources`, `energy`, `metal`, `outcome` |
+| 3 | ECONOMY_SPEND | `player`, `unit` (unit), `resources`, `energy`, `metal`, `outcome` |
+| 4 | ECONOMY_INCOME | `player`, `unit` (unit), `resources`, `energy`, `metal`, `outcome` |
+| 16 | ECONOMY_EFFECT_CLOAK | `player`, `unit` (unit), `keep`, `outcome` |
+| 17 | ECONOMY_EFFECT_EXTRACTOR | `player`, `unit` (unit), `metal`, `outcome` |
+| 18 | ECONOMY_EFFECT_SHARE | `player`, `unit` (unit), `resources`, `energy`, `metal`, `to`, `outcome` |
+
+- `kind` is an event: 0 RESET, 1 LOAD, 2 REQUEST, 3 SPEND, 4 INCOME; or an effect: 16 EFFECT_CLOAK,
+  17 EFFECT_EXTRACTOR, 18 EFFECT_SHARE. `player` is the player index of the account's player (a unit's owner, or
+  the player for unit 0), or the giver of a share. `unit` is null for a player's own account and for the kinds that
+  name no unit.
+- `resources` holds the bits of the resources the record is about: 1 energy, 2 metal. An INCOME carries exactly
+  one bit. `energy` and `metal` are the amounts as IEEE 754 single bits. The `metal` of EFFECT_EXTRACTOR is the
+  metal under the footprint (an integer); `keep` of EFFECT_CLOAK is 1 to keep the unit cloaked and 0 to uncloak it;
+  `to` of EFFECT_SHARE is the player that receives the share.
+- `account` of a LOAD is the 12 float words of a unit's resource account (the energy ledger, then the metal ledger,
+  six floats each), in the order a saved game stores it, copied when the event is recorded.
+- `outcome` is the result of `Apply`: 1, or 0 for a SPEND whose store was short; it is 1 for an effect.
 - The resource accounts of units are private to economy and are not hashed (the Unit table leaves out
   bytes 0xbc to 0xeb, section 4); the player accounts of section 27 and the players' resource fields
   still are. What economy's `WriteState` reports (its record, numbered 34) is dumped between sections 15 and
@@ -1104,25 +1117,31 @@ build does not record them, so its dumps have no `windMeteors.*` lines. An event
 wind_meteors consumes it from its inbox, right after `Apply` returns; an effect is recorded when
 wind_meteors publishes it to its outbox. So the records are in wind_meteors' order of consumption and
 publication. The host empties the record after the world row of the tick, so the lines a dump writes
-after an earlier phase hold the records made so far. The fields are `windMeteors.fields` of the
-schema, in this order.
+after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `windMeteors.kinds` of the schema, in the order of that list.
 
 ```
-windMeteors.count                              # n
+windMeteors.count                                  # n
 for k in 0 .. n-1, in order of consumption and publication:
     windMeteors[k].kind
-    windMeteors[k].data                        # hex: the record's bytes after its first int
+    windMeteors[k].<each field of that kind, in the order of its row below>
 ```
 
-`windMeteors.count` and `kind` are written as `0x` and 8 hex digits.
+`windMeteors.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is an event: 64 ENABLE, 65 DISABLE, 66 PARAMS, 67 START; or an effect: 80 SPAWN.
-- `data` of an event is the 48 bytes after its `kind`: the meteor shower parameters of a PARAMS event
-  (the weapon name in 32 bytes, then the radius, the density, the duration and the interval, 4 bytes
-  each, the last three as IEEE 754 single bits where they are floats), and 0 for the other kinds.
-- `data` of an effect is the 32 bytes after its `kind`: for SPAWN the meteor weapon's slot in the match's
-  table of weapons, the position and the velocity (3 ints each) and whether the spawn is announced to the
-  other players.
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 64 | WIND_METEORS_ENABLE | none |
+| 65 | WIND_METEORS_DISABLE | none |
+| 66 | WIND_METEORS_PARAMS | `params` (48 bytes) |
+| 67 | WIND_METEORS_START | none |
+| 80 | WIND_METEORS_EFFECT_SPAWN | `weapon`, `pos` (12 bytes), `vel` (12 bytes), `announce` |
+
+- `kind` is an event: 64 ENABLE, 65 DISABLE, 66 PARAMS, 67 START; or an effect: 80 EFFECT_SPAWN. ENABLE, DISABLE and
+  START have no fields but `kind`. The section has no `outcome`.
+- `params` of a PARAMS event is the meteor shower parameters: the weapon name in 32 bytes, then the radius, the
+  density, the duration and the interval, 4 bytes each, the last three as IEEE 754 single bits.
+- A SPAWN effect has `weapon` (the meteor weapon's slot in the match's table of weapons), `pos` and `vel` (the
+  position and the velocity, 3 ints each) and `announce` (whether the spawn is announced to the other players).
 - The meteor schedule and the 13 meteor globals are private to wind_meteors and are still hashed (section
   7.7); the wind fields of the game record are hashed in section 7.6.
 
@@ -1136,42 +1155,39 @@ the synchronous `Place` answers, with its answer; an effect is recorded when fea
 outbox, with outcome 1. So the records are in features' order of consumption and publication, and the
 effects an event causes come before the event: a DAMAGE that kills a feature dumps its FREE_STATE and PASS_MAPS first. The host
 empties the record after the world row of the tick, so the lines a dump writes after an earlier phase
-hold the records made so far. The fields are `features.fields` of the schema, in this order.
+hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `features.kinds` of the schema, in the order of that list.
 
 ```
-features.count                                 # n
-for k in 0 .. n-1, in application order:
+features.count                                  # n
+for k in 0 .. n-1, in application order, by the kind of the record:
     features[k].kind
-    features[k].flags
-    features[k].x
-    features[k].z
-    features[k].feature
-    features[k].owner
-    features[k].unit                           # the record's unit, a pointer ID with target unit (is_ref=true)
-    features[k].value
-    features[k].state                          # null when 0, heap otherwise: never the number
-    features[k].width
-    features[k].height
-    features[k].pos                            # hex: the 12 bytes, three little-endian i32
-    features[k].rot                            # hex: the 12 bytes, three little-endian i32
-    features[k].outcome
+    features[k].<each field of that kind, in the order of its row below>
 ```
 
-`features.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`features.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is an event: 32 PLACE, 33 REMOVE, 34 DAMAGE, 35 RECLAIM; or an effect: 48 FREE_STATE,
-  49 INIT_STATE, 50 PASS_MAPS, 51 AREA_DAMAGE.
-- `flags` holds the bits of a PLACE: 1 pos is given, 2 rot is given, 4 the placed feature starts to sink.
-- `x` and `z` are the cell the record acts on, or the first cell of a footprint; `width` and `height`
-  the size of a footprint in cells. `feature` is the feature type by its number, `owner` the player that
-  owns a placed feature (10 for none).
-- `unit` is the unit that reclaims, a pointer ID with target `unit` (section 5), null for the kinds that
-  name none. `value` is the argument of the kind (REMOVE: 1 to remove even a feature that refuses
-  removal; DAMAGE and AREA_DAMAGE: the number of the weapon's definition).
-- `state` is the block offset of a piece state: `null` for 0, `heap` for any other value, because the offset
-  depends on the allocator and is not behaviour.
-- `pos` is a position in world coordinates with 16 fractional bits and `rot` a rotation in 16-bit angles,
-  x, y and z. Fields a kind does not use are 0.
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 32 | FEATURES_PLACE | `x`, `z`, `feature`, `flags`, `owner`, `pos` (12 bytes), `rot` (12 bytes), `outcome` |
+| 33 | FEATURES_REMOVE | `x`, `z`, `force`, `outcome` |
+| 34 | FEATURES_DAMAGE | `x`, `z`, `weapon`, `outcome` |
+| 35 | FEATURES_RECLAIM | `unit` (unit), `pos` (12 bytes), `outcome` |
+| 48 | FEATURES_EFFECT_FREE_STATE | `state` (handle), `outcome` |
+| 49 | FEATURES_EFFECT_INIT_STATE | `state` (handle), `feature`, `outcome` |
+| 50 | FEATURES_EFFECT_PASS_MAPS | `x`, `z`, `width`, `height`, `outcome` |
+| 51 | FEATURES_EFFECT_AREA_DAMAGE | `weapon`, `pos` (12 bytes), `outcome` |
+
+- `kind` is an event: 32 PLACE, 33 REMOVE, 34 DAMAGE, 35 RECLAIM; or an effect: 48 EFFECT_FREE_STATE,
+  49 EFFECT_INIT_STATE, 50 EFFECT_PASS_MAPS, 51 EFFECT_AREA_DAMAGE.
+- `flags` of a PLACE holds the bits: 1 `pos` is given, 2 `rot` is given, 4 the placed feature starts to sink.
+- `x` and `z` are the cell the record acts on, or the first cell of a footprint; `width` and `height` the size of a
+  footprint in cells. `feature` is the feature type by its number, `owner` the player that owns a placed feature
+  (10 for none). `force` of a REMOVE is 1 to remove even a feature that refuses removal; `weapon` of a DAMAGE or an
+  EFFECT_AREA_DAMAGE is the number of the weapon's definition.
+- `unit` of a RECLAIM is the unit that reclaims, a pointer ID with target `unit` (section 5).
+- `state` is the block offset of a piece state: `null` for 0, `heap` for any other value, because the offset depends
+  on the allocator and is not behaviour.
+- `pos` is a position in world coordinates with 16 fractional bits and `rot` a rotation in 16-bit angles, x, y and z.
 - `outcome` is the result of `Apply` or of `Place`, or 1 for an effect.
 
 ### 8.26 targeting events (section 38, dumped only)
@@ -1182,29 +1198,33 @@ build does not record them, so its dumps have no `targeting.*` lines. An event i
 consumes it from its inbox, right after `Apply` returns, with the outcome `Apply` gave; an effect is recorded
 when targeting publishes it to its outbox, with outcome 1. So the records are in targeting's order of
 consumption and publication. The host empties the record after the world row of the tick, so the lines a
-dump writes after an earlier phase hold the records made so far. The fields are `targeting.fields` of the
-schema, in this order.
+dump writes after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `targeting.kinds` of the schema, in the order of that list.
 
 ```
-targeting.count                                # n
-for k in 0 .. n-1, in application order:
+targeting.count                                  # n
+for k in 0 .. n-1, in application order, by the kind of the record:
     targeting[k].kind
-    targeting[k].unit                          # a pointer ID with target unit (is_ref=true)
-    targeting[k].weapon
-    targeting[k].target                        # a pointer ID with target unit (is_ref=true)
-    targeting[k].pos                           # hex: the 12 bytes, three little-endian i32
-    targeting[k].outcome
+    targeting[k].<each field of that kind, in the order of its row below>
 ```
 
-`targeting.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`targeting.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is an event: 96 SET_UNIT, 97 SET_POS, 98 CLEAR, 99 RESET, 100 LOAD; or an effect: 112 CLEARED.
-- `unit` is the unit whose weapon aims, a pointer ID with target `unit` (section 5): `units:N`, `null`, or
-  `heap` for a pointer that is not in the unit table.
-- `weapon` is the weapon of the unit, 0 to 2. `target` is the unit aimed at, resolved as `unit` is, null for
-  the kinds that name none.
-- `pos` is the position aimed at in world coordinates with 16 fractional bits, x, y and z; for LOAD, `pos[0]` and
-  `pos[2]` are the two halves of the saved target pair. Fields a kind does not use are 0.
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 96 | TARGETING_SET_UNIT | `unit` (unit), `weapon`, `target` (unit), `outcome` |
+| 97 | TARGETING_SET_POS | `unit` (unit), `weapon`, `pos` (12 bytes), `outcome` |
+| 98 | TARGETING_CLEAR | `unit` (unit), `weapon`, `outcome` |
+| 99 | TARGETING_RESET | `unit` (unit), `weapon`, `outcome` |
+| 100 | TARGETING_LOAD | `unit` (unit), `weapon`, `xOrUnit`, `zOrSentinel`, `outcome` |
+| 112 | TARGETING_EFFECT_CLEARED | `unit` (unit), `weapon`, `outcome` |
+
+- `kind` is an event: 96 SET_UNIT, 97 SET_POS, 98 CLEAR, 99 RESET, 100 LOAD; or an effect: 112 EFFECT_CLEARED.
+  CLEAR, RESET and EFFECT_CLEARED have only the header fields (`kind`, `unit`, `weapon`) and `outcome`.
+- `unit` is the unit whose weapon aims, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for
+  a pointer that is not in the unit table. `weapon` is the weapon of the unit, 0 to 2. `target` of a SET_UNIT is the
+  unit aimed at, resolved as `unit` is.
+- `pos` of a SET_POS is the position aimed at in world coordinates with 16 fractional bits, x, y and z. `xOrUnit` and
+  `zOrSentinel` of a LOAD are the two halves of the saved target pair.
 - `outcome` is the result of `Apply` (1 for SET_UNIT, SET_POS and LOAD; for CLEAR and RESET 1 when the weapon had a
   target and 0 when not), or 1 for an effect.
 
@@ -1216,48 +1236,47 @@ its dumps have no `los_radar.*` lines. An event is recorded when los_radar consu
 after `Apply` returns, with the outcome `Apply` gave; los_radar publishes no effects. So the records are in
 los_radar's order of consumption. The host empties the record after the world row of the tick, so the lines
 a dump writes after an earlier phase hold the records made so far. The record has no fixed capacity, as a tick
-may hold an event for each unit that moved; a run that cannot hold it stops with an error. The fields are
-`los_radar.fields` of the schema, in this order.
+may hold an event for each unit that moved; a run that cannot hold it stops with an error. Each record has the fields of its kind, the `fields` of its entry in `los_radar.kinds` of the schema, in the order of that list.
 
 ```
-los_radar.count                                # n
-for k in 0 .. n-1, in application order:
+los_radar.count                                  # n
+for k in 0 .. n-1, in application order, by the kind of the record:
     los_radar[k].kind
-    los_radar[k].unit                          # a pointer ID with target unit (is_ref=true)
-    los_radar[k].player
-    los_radar[k].value
-    los_radar[k].pos                           # hex: the 12 bytes, three little-endian i32
-    los_radar[k].sightDistance
-    los_radar[k].eyeHeight
-    los_radar[k].lifetime
-    los_radar[k].cell                          # hex: the 8 bytes, two little-endian i32
-    los_radar[k].size                          # hex: the 8 bytes, two little-endian i32
-    los_radar[k].sightCell
-    los_radar[k].sightFrameIdx
-    los_radar[k].outcome
+    los_radar[k].<each field of that kind, in the order of its row below>
 ```
 
-`los_radar.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`los_radar.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
+
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 128 | LOS_RADAR_UPDATE_UNIT | `unit` (unit), `outcome` |
+| 129 | LOS_RADAR_REMOVE_UNIT | `unit` (unit), `outcome` |
+| 130 | LOS_RADAR_REVEAL_UNIT | `unit` (unit), `outcome` |
+| 131 | LOS_RADAR_ADD_EYEBALL | `pos` (12 bytes), `sightDistance`, `eyeHeight`, `lifetime`, `outcome` |
+| 132 | LOS_RADAR_CELL_HEIGHTS | `cell` (8 bytes), `size` (8 bytes), `outcome` |
+| 133 | LOS_RADAR_RECALCULATE | `reset`, `outcome` |
+| 134 | LOS_RADAR_SHARE_MAPPING | `player`, `outcome` |
+| 135 | LOS_RADAR_SHARE_RADAR | `player`, `outcome` |
+| 136 | LOS_RADAR_SHARE_MAP | `from`, `to`, `outcome` |
+| 137 | LOS_RADAR_SIGHT_RESET | `unit` (unit), `outcome` |
+| 138 | LOS_RADAR_SIGHT_LOAD | `unit` (unit), `cell`, `frameIdx`, `outcome` |
 
 - `kind` is an event: 128 UPDATE_UNIT, 129 REMOVE_UNIT, 130 REVEAL_UNIT, 131 ADD_EYEBALL, 132 CELL_HEIGHTS,
   133 RECALCULATE, 134 SHARE_MAPPING, 135 SHARE_RADAR, 136 SHARE_MAP, 137 SIGHT_RESET, 138 SIGHT_LOAD.
-- `unit` is the unit whose line of sight changes, a pointer ID with target `unit` (section 5): `units:N`,
-  `null`, or `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
-- `player` is the player of SHARE_MAPPING and SHARE_RADAR and the player whose map SHARE_MAP shares, 0 to 9;
-  `value` is the argument of RECALCULATE, 1 when each cell is first reset (to show nothing to every player when
-  mapping is on, to show every cell to every player when it is off), and
-  for SHARE_MAP the player it shows the map to, 0 to 9. Fields a kind does not use are 0.
-- `pos`, `sightDistance`, `eyeHeight` and `lifetime` are those of an ADD_EYEBALL: the position in world
-  coordinates with 16 fractional bits, x, y and z, the sight distance and the height of the eye above the
-  position, in world units, and the lifetime in ticks.
-- `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a
-  CELL_HEIGHTS.
-- `sightCell` and `sightFrameIdx` are the sight cache a SIGHT_LOAD sets for the unit: the cell of the last sight
-  circle (x in the low 16 bits, z in the high 16) and the table frame index. They are 0 for every other kind,
-  SIGHT_RESET included.
-- `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
-  null; for ADD_EYEBALL 0 when line of sight is off or no eyeball is free; for SHARE_MAPPING and
-  SHARE_RADAR 0 outside a network game.
+- `unit` of UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT, SIGHT_RESET and SIGHT_LOAD is the unit whose line of sight changes,
+  a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer that is not in the unit table.
+- `player` of SHARE_MAPPING and SHARE_RADAR is the player that shares, 0 to 9. `from` and `to` of SHARE_MAP are the
+  player whose map is shared and the player it is shown to, 0 to 9. `reset` of RECALCULATE is 1 when each cell is
+  first reset (to show nothing to every player when mapping is on, to show every cell to every player when it is off).
+- `pos`, `sightDistance`, `eyeHeight` and `lifetime` of an ADD_EYEBALL are the position in world coordinates with 16
+  fractional bits, x, y and z, the sight distance and the height of the eye above the position, in world units, and
+  the lifetime in ticks.
+- `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a CELL_HEIGHTS.
+- `cell` and `frameIdx` of a SIGHT_LOAD are the sight cache it sets for the unit: the cell of the last sight circle
+  (x in the low 16 bits, z in the high 16) and the table frame index.
+- `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is null; for
+  ADD_EYEBALL 0 when line of sight is off or no eyeball is free; for SHARE_MAPPING and SHARE_RADAR 0 outside a
+  network game.
 
 ### 8.28 map events (section 40, dumped only)
 
@@ -1271,39 +1290,42 @@ which is recorded only once `Apply` has returned its outcome. A reader at a dive
 effects as their cause. The host empties the record after the world
 row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. The record has
 no fixed capacity, as a tick may hold an event for each unit that moved; a run that cannot hold it stops with
-an error. The fields are `map.fields` of the schema, in this order.
+an error. Each record has the fields of its kind, the `fields` of its entry in `map.kinds` of the schema, in the order of that list.
 
 ```
-map.count                                      # n
-for k in 0 .. n-1, in order:
+map.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
     map[k].kind
-    map[k].unit                                # a pointer ID with target unit (is_ref=true)
-    map[k].value
-    map[k].cell                                # hex: the 8 bytes, two little-endian i32
-    map[k].size                                # hex: the 8 bytes, two little-endian i32
-    map[k].rect                                # hex: the 16 bytes, four little-endian i32
-    map[k].classes
-    map[k].cause
-    map[k].outcome
+    map[k].<each field of that kind, in the order of its row below>
 ```
 
-`map.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`map.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is an event or an effect: 160 ADD_UNIT, 161 REMOVE_UNIT, 162 CLEAR_UNIT, 163 RECLAIM_FOOTPRINT,
-  164 SET_YARD, 165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 168 PASS_MAPS, and the effect 176 CELLS_CHANGED. 167 was
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 160 | MAP_ADD_UNIT | `unit` (unit), `outcome` |
+| 161 | MAP_REMOVE_UNIT | `unit` (unit), `outcome` |
+| 162 | MAP_CLEAR_UNIT | `unit` (unit), `outcome` |
+| 163 | MAP_RECLAIM_FOOTPRINT | `unit` (unit), `outcome` |
+| 164 | MAP_SET_YARD | `unit` (unit), `open`, `outcome` |
+| 165 | MAP_BUCKET_UNLINK | `unit` (unit), `outcome` |
+| 166 | MAP_BUCKET_PREPEND | `unit` (unit), `outcome` |
+| 168 | MAP_PASS_MAPS | `unit` (unit), `cell` (8 bytes), `size` (8 bytes), `outcome` |
+| 176 | MAP_EFFECT_CELLS_CHANGED | `unit` (unit), `rect` (16 bytes), `classes`, `cause`, `outcome` |
+
+- `kind` is an event or an effect: 160 ADD_UNIT, 161 REMOVE_UNIT, 162 CLEAR_UNIT, 163 RECLAIM_FOOTPRINT, 164 SET_YARD,
+  165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 168 PASS_MAPS, and the effect 176 EFFECT_CELLS_CHANGED. 167 was
   REFRESH_PASS_MAP, which map 5.0 (#983) removed: the refreshes of the pass maps around a search are map's own slots,
-  and each pass map they compute again is a CELLS_CHANGED record.
-- `unit` is the unit the event names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or
-  `heap` for a pointer that is not in the unit table. It is null for the kinds that name no unit.
-- `value` is the argument of the kind: for SET_YARD 1 to open the yard and 0 to close it. Fields a kind does
-  not use are 0.
-- `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a
-  PASS_MAPS.
-- `rect` is the rectangle of a CELLS_CHANGED, left, top, right and bottom, in cells, `classes` the movement
+  and each pass map they compute again is a CELLS_CHANGED record. Every kind but SET_YARD, PASS_MAPS and
+  EFFECT_CELLS_CHANGED has only `kind`, `unit` and `outcome`.
+- `unit` is the unit the event names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a
+  pointer that is not in the unit table.
+- `open` of SET_YARD is 1 to open the yard and 0 to close it.
+- `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a PASS_MAPS.
+- `rect` of EFFECT_CELLS_CHANGED is the rectangle, left, top, right and bottom, in cells, `classes` the movement
   classes whose pass maps changed, a bit for each class index, and `cause` the reason for the change.
-- `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is
-  null; for SET_YARD 0 when the footprint was not clear. It is
-  1 for an effect.
+- `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is null; for
+  SET_YARD 0 when the footprint was not clear. It is 1 for an effect.
 
 Map's own report (record 45, written through the `StateWriter` of the seam's `WriteState`) is dumped and never hashed, with the
 prefix `mapState.`, after the `aiState.*` lines:
@@ -1327,45 +1349,44 @@ after `Apply` returns, with the outcome `Apply` gave; an effect is recorded when
 its subscriber, with outcome 1. So the records are in the order players consumed and the scheduler delivered
 them. The host empties the record after the world row of the tick, so the lines a dump writes after an earlier
 phase hold the records made so far. The record has no fixed capacity; a run that cannot hold it stops with an
-error. The fields are `playersEvents.fields` of the schema, in this order. The section is dumped, never hashed.
+error. Each record has the fields of its kind, the `fields` of its entry in `playersEvents.kinds` of the schema, in the order of that list. The section is dumped, never hashed.
 
 ```
-playersEvents.count                            # n
-for k in 0 .. n-1, in order:
+playersEvents.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
     playersEvents[k].kind
-    playersEvents[k].unit                      # a pointer ID with target unit (is_ref=true)
-    playersEvents[k].player
-    playersEvents[k].from
-    playersEvents[k].value
-    playersEvents[k].amount                    # the bits of a float
-    playersEvents[k].announce
-    playersEvents[k].record
-    playersEvents[k].hitPoints
-    playersEvents[k].buildPercent
-    playersEvents[k].angles                    # hex: the 6 bytes, three little-endian i16
-    playersEvents[k].stockpiles                # hex: the 3 bytes
-    playersEvents[k].outcome
+    playersEvents[k].<each field of that kind, in the order of its row below>
 ```
 
-`playersEvents.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`playersEvents.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
+
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 192 | PLAYERS_GIVE_UNIT | `unit` (unit), `player`, `record.present`, `record.hitPoints`, `record.buildPercent`, `record.angles` (12 bytes), `record.stockpiles` (12 bytes), `outcome` |
+| 193 | PLAYERS_KILL_UNITS | `unit` (unit), `player`, `outcome` |
+| 194 | PLAYERS_UNIT_CREATED | `unit` (unit), `outcome` |
+| 195 | PLAYERS_UNIT_DIED | `unit` (unit), `outcome` |
+| 196 | PLAYERS_TRANSFER | `unit` (unit), `from`, `to`, `resource`, `amount`, `announce`, `outcome` |
+| 208 | PLAYERS_EFFECT_KILL_UNIT | `unit` (unit), `selfDestruct`, `outcome` |
+| 209 | PLAYERS_EFFECT_SEND_UNIT | `unit` (unit), `player`, `outcome` |
+| 210 | PLAYERS_EFFECT_CAPTURE_UNIT | `unit` (unit), `player`, `record.present`, `record.hitPoints`, `record.buildPercent`, `record.angles` (12 bytes), `record.stockpiles` (12 bytes), `outcome` |
 
 - `kind` is an event into players' inbox: 192 GIVE_UNIT, 193 KILL_UNITS, 194 UNIT_CREATED, 195 UNIT_DIED,
-  196 TRANSFER; or an effect players publishes to units: 208 KILL_UNIT, 209 SEND_UNIT, 210 CAPTURE_UNIT.
-- `unit` is the unit the kind names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap`
-  for a pointer that is not in the unit table. It is null for the kinds that name no unit.
-- `player` is the player the kind is about, 0 to 9, or 10 for none: the receiver of a unit or a transfer, or
-  the player whose units are killed. `from` is the giver of a transfer.
-- `value` is the argument of the kind: for KILL_UNIT 0 when the unit dies by 30000 damage it deals itself and
-  1 when it self-destructs. `amount` is the amount of a transfer, the bits of a float, and `announce` is 1
-  when a transfer is announced (clamped, spent and sent to the other machines) and 0 when it only credits the
-  receiver.
-- `record` is 1 when `hitPoints`, `buildPercent`, `angles` (bank, heading and pitch) and `stockpiles` (of the
-  unit's three weapons) come from an ownership record received from another machine. Fields a kind does not
-  use are 0.
-- `outcome` is the result of `Apply`: for GIVE_UNIT 1 when the unit changed hands and 0 when it was already
-  the player's, dead, dying or the player could not take it; for TRANSFER 1, or 0 when either player is 10 or
-  the amount is 0; 0 for any event that names a null unit or a player above 10; 1 for the other kinds. It is 1
-  for an effect.
+  196 TRANSFER; or an effect players publishes to units: 208 EFFECT_KILL_UNIT, 209 EFFECT_SEND_UNIT,
+  210 EFFECT_CAPTURE_UNIT. UNIT_CREATED and UNIT_DIED have only `kind`, `unit` and `outcome`.
+- `unit` is the unit the kind names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a
+  pointer that is not in the unit table.
+- `player` is the player the kind is about, 0 to 9, or 10 for none: the receiver of a unit, or the player whose units
+  are killed. `from` and `to` of a TRANSFER are the giver and the receiver; `resource` is the resource moved, `amount`
+  the amount, the bits of a float, and `announce` is 1 when a transfer is announced (clamped, spent and sent to the
+  other machines) and 0 when it only credits the receiver. `selfDestruct` of EFFECT_KILL_UNIT is 0 when the unit dies
+  by 30000 damage it deals itself and 1 when it self-destructs.
+- `record.present` is 1 when the other `record` fields come from an ownership record received from another machine:
+  `record.hitPoints`, `record.buildPercent`, `record.angles` (bank, heading and pitch, three little-endian i32) and
+  `record.stockpiles` (of the unit's three weapons, three little-endian i32).
+- `outcome` is the result of `Apply`: for GIVE_UNIT 1 when the unit changed hands and 0 when it was already the
+  player's, dead, dying or the player could not take it; for TRANSFER 1, or 0 when either player is 10 or the amount is
+  0; 0 for any event that names a null unit or a player above 10; 1 for the other kinds. It is 1 for an effect.
 
 ### 8.30 ai events (section 42, dumped only) and ai's report (record 43)
 
@@ -1374,39 +1395,43 @@ their lines, after those of section 41, as a diagnostic. The reference build doe
 dumps have no `aiEvents.*` lines. An event is recorded when ai consumes it from its inbox, right after `Apply`
 returns, with the outcome `Apply` gave; an effect is recorded when ai publishes it, with outcome 1. So the
 records are in the order ai consumed and published them. The host empties the record after the world row of
-the tick, so the lines a dump writes after an earlier phase hold the records made so far. The fields are
-`aiEvents.fields` of the schema, in this order. The section is dumped, never hashed.
+the tick, so the lines a dump writes after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `aiEvents.kinds` of the schema, in the order of that list. The section is dumped, never hashed.
 
 ```
-aiEvents.count                                 # n
-for k in 0 .. n-1, in order:
+aiEvents.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
     aiEvents[k].kind
-    aiEvents[k].unit                           # a pointer ID with target unit (is_ref=true)
-    aiEvents[k].target                         # a pointer ID with target unit (is_ref=true)
-    aiEvents[k].value
-    aiEvents[k].extra
-    aiEvents[k].params                         # hex: the 8 bytes, two little-endian i32
-    aiEvents[k].hasPos
-    aiEvents[k].pos                            # hex: the 12 bytes, three little-endian i32
-    aiEvents[k].scale                          # the bits of a float
-    aiEvents[k].types                          # hex: the 64 bytes, a set of bits
-    aiEvents[k].outcome
+    aiEvents[k].<each field of that kind, in the order of its row below>
 ```
 
-`aiEvents.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`aiEvents.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
+
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 224 | AI_REACT_TO_ATTACK | `unit` (unit), `attacker` (unit), `damage`, `outcome` |
+| 226 | AI_SET_SQUAD | `unit` (unit), `squad`, `outcome` |
+| 227 | AI_PLAN | `unit` (unit), `difficulties`, `outcome` |
+| 228 | AI_WEIGHT | `unit` (unit), `scale`, `fix`, `types` (64 bytes), `outcome` |
+| 229 | AI_LIMIT | `unit` (unit), `limit`, `fix`, `types` (64 bytes), `outcome` |
+| 240 | AI_EFFECT_ADD_ORDER | `unit` (unit), `type`, `queue`, `target` (unit), `hasPos`, `pos` (12 bytes), `params` (8 bytes), `outcome` |
+| 241 | AI_EFFECT_QUEUE_BUILD | `unit` (unit), `type`, `count`, `outcome` |
+| 243 | AI_EFFECT_STOP | `unit` (unit), `all`, `outcome` |
+| 245 | AI_EFFECT_ACTIVATE | `unit` (unit), `bits`, `on`, `outcome` |
+| 246 | AI_EFFECT_SET_STATES | `unit` (unit), `movement`, `firing`, `outcome` |
 
 - `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 226 SET_SQUAD, 227 PLAN, 228 WEIGHT, 229 LIMIT; or an
-  effect ai publishes: 240 ADD_ORDER, 241 QUEUE_BUILD, 243 STOP, 245 ACTIVATE, 246 SET_STATES. In ai 5.0 the
-  kinds 225 (DAMAGE_SPLIT), 242 (ATTACK), 244 (NOTIFY_REFS) and 247 (HIT) are gone and not reused.
-- `unit` is the unit the kind is about and `target` the other unit (the attacker of REACT_TO_ATTACK, the target
-  of an order), each a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer
-  that is not in the unit table. Each is null for a kind that names no such unit.
-- `value` and `extra` are the arguments of the kind, `params` the two arguments of an order, `hasPos` is 1 when
-  `pos` holds a position (x, y and z with 16 fractional bits), `scale` is the factor of WEIGHT (the bits of a
-  float) and `types` the unit types of WEIGHT and LIMIT as a set of bits: type n is bit n % 32 of word n / 32.
-  Fields a kind does not use are 0.
-- `outcome` is the result of `Apply` for an event: 1, or 0 for a WEIGHT or LIMIT while the AI commands are off.
-  It is 1 for an effect.
+  effect ai publishes: 240 EFFECT_ADD_ORDER, 241 EFFECT_QUEUE_BUILD, 243 EFFECT_STOP, 245 EFFECT_ACTIVATE,
+  246 EFFECT_SET_STATES. In ai 5.0 the kinds 225 (DAMAGE_SPLIT), 242 (ATTACK), 244 (NOTIFY_REFS) and 247 (HIT) are
+  gone and not reused.
+- `unit` is the unit the kind is about, `attacker` the unit that attacks in a REACT_TO_ATTACK and `target` the unit an
+  order is aimed at, each a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer that
+  is not in the unit table.
+- `damage`, `squad`, `difficulties`, `limit`, `fix`, `type`, `queue`, `count`, `all`, `bits`, `on`, `movement` and
+  `firing` are the arguments of their kinds; `params` the two arguments of an ADD_ORDER, `hasPos` is 1 when `pos` holds
+  a position (x, y and z with 16 fractional bits), `scale` is the factor of WEIGHT (the bits of a float) and `types`
+  the unit types of WEIGHT and LIMIT as a set of bits: type n is bit n % 32 of word n / 32.
+- `outcome` is the result of `Apply` for an event: 1, or 0 for a WEIGHT or LIMIT while the AI commands are off. It is
+  1 for an effect.
 
 ai's own report (record 43, written through the `StateWriter` of the seam's `WriteState`) is dumped and never
 hashed, after the `economyState.*` lines that follow the pathfinder's, with the prefix `aiState.`:
@@ -1446,40 +1471,67 @@ holds their lines, after those of section 42, as a diagnostic. The reference bui
 dumps have no `weaponsEvents.*` lines. An event is recorded when weapons consumes it from its inbox, right after
 `Apply` returns, with the outcome `Apply` gave; an effect is recorded when weapons publishes it, with outcome 1.
 So the records are in the order weapons consumed and published them. The host empties the record after the world
-row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. The fields are
-`weaponsEvents.fields` of the schema, in this order. The section is dumped, never hashed.
+row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `weaponsEvents.kinds` of the schema, in the order of that list. The section is dumped, never hashed.
 
 ```
-weaponsEvents.count                            # n
-for k in 0 .. n-1, in order:
+weaponsEvents.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
     weaponsEvents[k].kind
-    weaponsEvents[k].unit                      # a pointer ID with target unit (is_ref=true)
-    weaponsEvents[k].target                    # a pointer ID with target unit (is_ref=true)
-    weaponsEvents[k].value
-    weaponsEvents[k].extra
-    weaponsEvents[k].callback                  # a block offset, printed as hex digits like any scalar
-    weaponsEvents[k].pos                       # hex: the 12 bytes, three little-endian i32
-    weaponsEvents[k].vel                       # hex: the 12 bytes, three little-endian i32
-    weaponsEvents[k].args                      # hex: the 32 bytes, eight little-endian i32
-    weaponsEvents[k].name                      # hex: the 32 bytes, a script name ended by a 0
-    weaponsEvents[k].outcome
+    weaponsEvents[k].<each field of that kind, in the order of its row below>
 ```
 
-`weaponsEvents.count` and the numbers of a record are written as `0x` and 8 hex digits.
+`weaponsEvents.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. Fields in the table below are of the type shown: a plain field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
 
-- `kind` is a damage event into weapons' inbox: 256 DAMAGE, 257 REMOTE_DAMAGE; another event: 258 DETONATE,
-  259 RELEASE, 260 CLAIM, 261 INIT_SLOTS, 262 REMOVE_PROJECTILES, 263 AIM_DONE, 264 EXPLODE_PIECE,
-  265 AREA_DAMAGE, 266 SPAWN, 267 SET_STOCKPILES, 268 LOAD_SLOT, 269 ADD_STOCKPILE; a damage effect weapons publishes: 272 ATTACKED,
-  274 MARK_DAMAGED, 275 DAMAGE_RECORD, 276 HEALTH, 277 PARALYZE; or another effect: 273 HIT, 278 START_SCRIPT,
-  279 DETACH_PIECE, 280 NOTICE, 281 BUSY.
-- `unit` is the unit the kind is about and `target` the other unit (the source of DAMAGE, the attacker of
-  ATTACKED and DAMAGE_RECORD), each a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a
-  pointer that is not in the unit table. Each is null for a kind that names no such unit.
-- `value` and `extra` are the arguments of the kind, as the kind says. `callback` is the aim callback of a weapon,
-  as its block offset (0 for none): the one a START_SCRIPT effect passes and an AIM_DONE event names.
-- `pos` is a position in world coordinates with 16 fractional bits (x, y and z), `vel` a velocity in world units
-  per tick with 16 fractional bits (x, y and z), `args` the further arguments of the kind and `name` the name of a
-  script. Fields a kind does not use are 0.
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 256 | WEAPONS_DAMAGE | `unit` (unit), `source` (unit), `amount`, `damageKind`, `direction`, `outcome` |
+| 257 | WEAPONS_REMOTE_DAMAGE | `unit` (unit), `source` (unit), `amount`, `damageKind`, `direction`, `outcome` |
+| 258 | WEAPONS_DETONATE | `unit` (unit), `selfDestruct`, `outcome` |
+| 259 | WEAPONS_RELEASE | `unit` (unit), `weapon`, `outcome` |
+| 260 | WEAPONS_CLAIM | `unit` (unit), `weapon`, `outcome` |
+| 261 | WEAPONS_INIT_SLOTS | `unit` (unit), `outcome` |
+| 262 | WEAPONS_REMOVE_PROJECTILES | `unit` (unit), `outcome` |
+| 263 | WEAPONS_AIM_DONE | `unit` (unit), `callback`, `result`, `outcome` |
+| 264 | WEAPONS_EXPLODE_PIECE | `unit` (unit), `piece`, `flags`, `outcome` |
+| 265 | WEAPONS_AREA_DAMAGE | `unit` (unit), `weapon`, `pos` (12 bytes), `outcome` |
+| 266 | WEAPONS_SPAWN | `unit` (unit), `weapon`, `pos` (12 bytes), `vel` (12 bytes), `announce`, `outcome` |
+| 267 | WEAPONS_SET_STOCKPILES | `unit` (unit), `stockpiles` (12 bytes), `outcome` |
+| 269 | WEAPONS_ADD_STOCKPILE | `unit` (unit), `weapon`, `outcome` |
+| 272 | WEAPONS_EFFECT_ATTACKED | `unit` (unit), `attacker` (unit), `amount`, `outcome` |
+| 273 | WEAPONS_EFFECT_HIT | `unit` (unit), `enemyDamage`, `friendlyDamage`, `outcome` |
+| 274 | WEAPONS_EFFECT_MARK_DAMAGED | `unit` (unit), `outcome` |
+| 275 | WEAPONS_EFFECT_DAMAGE_RECORD | `unit` (unit), `damageKind`, `attacker` (unit), `outcome` |
+| 276 | WEAPONS_EFFECT_HEALTH | `unit` (unit), `health`, `dying`, `outcome` |
+| 277 | WEAPONS_EFFECT_PARALYZE | `unit` (unit), `ticks`, `outcome` |
+| 278 | WEAPONS_EFFECT_START_SCRIPT | `unit` (unit), `script`, `callback`, `update`, `withArgs`, `count`, `args` (16 bytes), `outcome` |
+| 279 | WEAPONS_EFFECT_DETACH_PIECE | `unit` (unit), `piece`, `pose`, `outcome` |
+| 280 | WEAPONS_EFFECT_SHOT_FIRED | `unit` (unit), `outcome` |
+| 281 | WEAPONS_EFFECT_BUSY | `unit` (unit), `until`, `outcome` |
+| 282 | WEAPONS_EFFECT_COMMAND_SHOT_FIRED | `unit` (unit), `outcome` |
+| 283 | WEAPONS_EFFECT_OUT_OF_REACH | `unit` (unit), `outcome` |
+
+- `kind` is a damage event into weapons' inbox: 256 DAMAGE, 257 REMOTE_DAMAGE; another event: 258 DETONATE, 259 RELEASE,
+  260 CLAIM, 261 INIT_SLOTS, 262 REMOVE_PROJECTILES, 263 AIM_DONE, 264 EXPLODE_PIECE, 265 AREA_DAMAGE, 266 SPAWN,
+  267 SET_STOCKPILES, 269 ADD_STOCKPILE (268 LOAD_SLOT is gone: the seam's `LoadState` is called directly); a damage
+  effect weapons publishes: 272 EFFECT_ATTACKED, 274 EFFECT_MARK_DAMAGED, 275 EFFECT_DAMAGE_RECORD, 276 EFFECT_HEALTH,
+  277 EFFECT_PARALYZE; or another effect: 273 EFFECT_HIT, 278 EFFECT_START_SCRIPT, 279 EFFECT_DETACH_PIECE,
+  280 EFFECT_SHOT_FIRED, 281 EFFECT_BUSY, 282 EFFECT_COMMAND_SHOT_FIRED, 283 EFFECT_OUT_OF_REACH. INIT_SLOTS,
+  REMOVE_PROJECTILES, EFFECT_MARK_DAMAGED, EFFECT_SHOT_FIRED, EFFECT_COMMAND_SHOT_FIRED and EFFECT_OUT_OF_REACH have
+  only `kind`, `unit` and `outcome`. The three shot kinds are what the earlier NOTICE effect carried in its bits
+  0x400, 0x800 and 0x1000.
+- `unit` is the unit the kind is about, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a
+  pointer that is not in the unit table. `source` of a DAMAGE or REMOTE_DAMAGE and `attacker` of an EFFECT_ATTACKED or
+  EFFECT_DAMAGE_RECORD are the other unit, resolved the same way.
+- `callback` of an AIM_DONE or EFFECT_START_SCRIPT is the aim callback of a weapon, as its block offset (0 for none).
+  `script` of EFFECT_START_SCRIPT is the script to start: 0 none, 1 to 3 the fire scripts of the three weapons, 4 to 6
+  their aim scripts, 7 rock unit, 8 set max reload time, 9 hit by weapon, 10 take damage; `update`, `withArgs`,
+  `count` and `args` (four i32) are how it starts.
+- `pos` is a position in world coordinates with 16 fractional bits (x, y and z), `vel` a velocity in world units per
+  tick with 16 fractional bits (x, y and z). `weapon` is a weapon definition's number for AREA_DAMAGE and SPAWN, the unit's weapon slot (0 to 2, or 3 for all
+  three) for RELEASE and CLAIM, and the slot (0 to 2) for ADD_STOCKPILE; `stockpiles` the three weapon
+  stockpiles of SET_STOCKPILES, and `amount`, `damageKind`, `direction`, `enemyDamage`, `friendlyDamage`, `health`,
+  `dying`, `ticks`, `until`, `piece`, `flags`, `pose`, `selfDestruct`, `announce` and `result` the arguments of their
+  kinds, as the kind says.
 - `outcome` is the result of `Apply` for an event, and 1 for an effect.
 
 weapons' own report (record 48, written through the `StateWriter` of the seam's `WriteState`) is dumped and never
@@ -1510,8 +1562,8 @@ It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the st
 The digest file is:
 
 ```
-bt-digest 5
-trace_format bt-trace 6
+bt-digest 7
+trace_format bt-trace 7
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1526,7 +1578,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35, 36 to 42 and 47. The first line is `bt-dump 5`; every
+of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35, 36 to 42 and 47. The first line is `bt-dump N`, N the format number (section 12); every
 other line is
 
 ```
@@ -1639,7 +1691,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 6.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 7.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
@@ -1661,6 +1713,15 @@ hashes `b` only; the sight cache of a unit (`Unit::unusedLosCache`, `unusedLosSi
 `unusedWinLoseTime`) and the end-game countdown (a game scalar) left the tables. What left is dumped, never hashed, in the
 records 43 (ai, extended), 44 (los_radar), 45 (map) and 46 (players), with the prefixes `aiState.`, `losRadarState.`, `mapState.` and `playersState.`. A reader of
 format 5 must read the new world row; a reader of the dump must skip the four prefixes. The digests of the stored scenarios change, and so does the tag.
+
+Format 7 gave each kind of the event sections its own field list (sections 8.22 and 8.24 to 8.31; the schema's
+`economy`, `features`, `windMeteors`, `targeting`, `los_radar`, `map`, `playersEvents`, `aiEvents` and `weaponsEvents`
+entries hold `kinds` instead of one `fields` list, and economy's separate `account` is a field of the LOAD kind). A
+record of a section prints the fields of its kind only, and a reader must read the kind before the fields. The
+payloads are the structs of the interface headers, so a kind's fields are the header's, then the payload's, then
+`outcome`; the `unit`, `target`, `source` and `attacker` fields that name a unit are pointer IDs as before. No row
+and no digest changes, and the line syntax is the same: a reader that skips the event prefixes changes only its
+number.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

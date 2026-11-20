@@ -440,6 +440,7 @@ WeaponsSeam g_native_weapons = {
     FreeWeaponTypes,
     InitExplosions,
     FreeExplosions,
+    LoadWeaponsStateSlot,
     WriteWeaponsStateSlot,
 };
 
@@ -494,11 +495,12 @@ void Run_wind_meteors_UpdateMeteors()
 
 void Run_wind_meteors_Apply()
 {
-    WindMeteorsEvent p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("event", ROK_WINDMETEORSEVENT, &p0);
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_WIND_METEORS, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
-    g_seams.wind_meteors->Apply(&p0);
+    g_seams.wind_meteors->Apply((WindMeteorsEventHeader*)p0, p1);
 }
 
 void Run_wind_meteors_InitMeteors()
@@ -619,11 +621,12 @@ int g_result_targeting_Apply;
 
 void Run_targeting_Apply()
 {
-    TargetingEvent p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("event", ROK_TARGETINGEVENT, &p0);
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_TARGETING, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
     SetClosing("result");
-    g_result_targeting_Apply = g_seams.targeting->Apply(&p0);
+    g_result_targeting_Apply = g_seams.targeting->Apply((TargetingEventHeader*)p0, p1);
 }
 
 void After_targeting_Apply()
@@ -712,11 +715,12 @@ int g_result_map_Apply;
 
 void Run_map_Apply()
 {
-    MapEvent p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("event", ROK_MAPEVENT, &p0);
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_MAP, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
     SetClosing("result");
-    g_result_map_Apply = g_seams.map->Apply(&p0);
+    g_result_map_Apply = g_seams.map->Apply((MapEventHeader*)p0, p1);
 }
 
 void After_map_Apply()

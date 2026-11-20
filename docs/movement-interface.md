@@ -1,6 +1,6 @@
 # The movement interface
 
-Movement sits behind `interfaces/movement.h` (version 1.0), the seam over a unit's motion, the goals it steers to and
+Movement sits behind `interfaces/movement.h` (version 2.0), the seam over a unit's motion, the goals it steers to and
 the targets orders hand those goals (#993). 3.1c's code is its default implementation. It is cut from orders (which held
 `UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference), and the
 cut left orders at 4.0 and units at 2.0. This page is the inventory the interface was cut from, written from the code
@@ -28,7 +28,7 @@ need a scheduler:
   an order attaches to a goal (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`, all
   `OrderFx`). It steers a unit one tick at a time, takes the results of path searches, and builds, loads, saves and
   frees those objects.
-- **Versions.** Movement 1.0 (33 slots), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
+- **Versions.** Movement 2.0 (33 slots; 2.0 since `ApplyPathEvent` takes a pathfinding event header and its size, #1009), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
   state slots left for scripts, #993; it gained `UnitRefInit` and `UnitRefSetUnit`, section 3).
 - **What it calls out.** Movement calls other subsystems only through their seams: pathfinding (`Submit`, `Cancel`),
   scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`SetStateBits`,
@@ -46,7 +46,7 @@ Every slot has the harness replay hook as a caller of the inner seam in test mod
 | Slot | What it does | Callers | In the tick | Came from |
 |---|---|---|---|---|
 | `UpdateMotion` | Steers a unit, moves it and updates its move rate for one tick | units (`unit_position.cpp`: `UpdateUnitBody`, `ReceiveUnitStates`) | yes | `OrdersSeam::UpdateMotion` |
-| `ApplyPathEvent` | Applies a path search event to its requester | game (`scheduler.cpp`: `SchedPlayersPhase`, for each event pathfinding polls) | yes | `OrdersSeam::ApplyPathEvent` |
+| `ApplyPathEvent` | Applies a path search event, its payload of the given size, to its requester, with the waypoints polled for it; an event smaller than its kind's payload changes nothing | game (`scheduler.cpp`: `SchedPlayersPhase`, for each event pathfinding polls) | yes | `OrdersSeam::ApplyPathEvent` |
 | `NewUnitMotion` | Allocates and builds a unit's motion | units (`units.cpp`: `CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`) | both: the creation code runs in the tick and outside it when a game is set up | `OrdersSeam::NewUnitMotion` |
 | `LoadMotion` | Reads a unit's motion from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no: load | `OrdersSeam::LoadMotion` |
 | `SaveMotion` | Writes a unit's motion to a saved game | units (`unit_save.cpp`: `SaveUnits`) | no: save | `OrdersSeam::SaveMotion` |
@@ -206,7 +206,7 @@ This issue closes the cut and leaves these to #984, #985 and #986:
 - **The steering slots** (`SetFlightMode`, `PathOrderSetAltitude`, `PathOrderSetApproachRadius`, `PathOrderSetHeading`,
   `AirManeuverOrderSetAltitude`) and the construction slots are called by orders' state machines, which use no answer
   but the target a `New*` slot returns; #985 decides which of them become events and which stay synchronous.
-- **`ApplyPathEvent`** is called from the players phase at the end of pathfinding's poll; its place in the order of
+- **`ApplyPathEvent`** takes the polled event's header, its size and the waypoints (`PathfindingEventHeader`, `docs/pathfinding-interface.md`, section 3), and is called from the players phase at the end of pathfinding's poll; its place in the order of
   phases is the model pathfinding (`docs/pathfinding-interface.md`) and #985 settle.
 - **The load, save and network slots** (`LoadMotion`, `SaveMotion`, the `Load*` and `OrderFx*` slots, `GoalHasNetUnitState`,
   `GoalSerializeNetUnitState`) run outside the tick or on the network's side; nothing here makes them events.

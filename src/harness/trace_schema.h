@@ -2,9 +2,20 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 6
+#define TRACE_FORMAT 7
 
-enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF };
+#include <stddef.h>
+#include "../../interfaces/economy.h"
+#include "../../interfaces/features.h"
+#include "../../interfaces/wind_meteors.h"
+#include "../../interfaces/targeting.h"
+#include "../../interfaces/los_radar.h"
+#include "../../interfaces/map.h"
+#include "../../interfaces/players.h"
+#include "../../interfaces/ai.h"
+#include "../../interfaces/weapons.h"
+
+enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF, TF_HANDLE };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
                    TT_FEATURE, TT_PIECE, TT_REC, TT_NODE, TT_MOVECLASS, TT_ORDER, TT_ORDERFX, TT_LINK };
 
@@ -24,6 +35,21 @@ struct TraceGlobal {
     unsigned char kind;
     unsigned char target;
     unsigned char relative;
+};
+
+struct TraceEventKind {
+    int kind;
+    const char* name;
+    unsigned payloadSize;
+    const TraceField* fields;
+    unsigned fieldCount;
+};
+
+struct TraceEventModule {
+    const char* prefix;
+    unsigned section;
+    const TraceEventKind* kinds;
+    unsigned kindCount;
 };
 
 struct TraceTable {
@@ -1341,6 +1367,818 @@ static const TraceTable kMissionDataTable = { kMissionDataFields, 16, kMissionDa
 static const TraceTable kMissionStartRestTable = { kMissionStartRestFields, 2, kMissionStartRestPlan, 2, 0xec4 };
 static const TraceTable kWeaponDefDataTable = { kWeaponDefDataFields, 29, kWeaponDefDataPlan, 7, 0x115 };
 static const TraceTable kUnitDefDataTable = { kUnitDefDataFields, 75, kUnitDefDataPlan, 16, 0x249 };
+
+#define TRACE_EVENT_OUTCOME 0xffffffffu
+#define TRACE_EVENT_MAX_BYTES 80
+#define TRACE_EVENT_MAX_REFS 2
+
+static_assert(sizeof(EconomyEventHeader) == 12, "EconomyEventHeader");
+static const TraceField kEventEconomyReset[] = {
+    { "kind", offsetof(EconomyEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyEventHeader, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyLoad) == 60, "EconomyLoad");
+static const TraceField kEventEconomyLoad[] = {
+    { "kind", offsetof(EconomyLoad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyLoad, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyLoad, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "account", offsetof(EconomyLoad, account), 48, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyRequest) == 24, "EconomyRequest");
+static const TraceField kEventEconomyRequest[] = {
+    { "kind", offsetof(EconomyRequest, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyRequest, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyRequest, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "resources", offsetof(EconomyRequest, resources), 4, TF_SCALAR, TT_NONE, 0 },
+    { "energy", offsetof(EconomyRequest, energy), 4, TF_SCALAR, TT_NONE, 0 },
+    { "metal", offsetof(EconomyRequest, metal), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomySpend) == 24, "EconomySpend");
+static const TraceField kEventEconomySpend[] = {
+    { "kind", offsetof(EconomySpend, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomySpend, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomySpend, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "resources", offsetof(EconomySpend, resources), 4, TF_SCALAR, TT_NONE, 0 },
+    { "energy", offsetof(EconomySpend, energy), 4, TF_SCALAR, TT_NONE, 0 },
+    { "metal", offsetof(EconomySpend, metal), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyIncome) == 24, "EconomyIncome");
+static const TraceField kEventEconomyIncome[] = {
+    { "kind", offsetof(EconomyIncome, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyIncome, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyIncome, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "resources", offsetof(EconomyIncome, resources), 4, TF_SCALAR, TT_NONE, 0 },
+    { "energy", offsetof(EconomyIncome, energy), 4, TF_SCALAR, TT_NONE, 0 },
+    { "metal", offsetof(EconomyIncome, metal), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyCloak) == 16, "EconomyCloak");
+static const TraceField kEventEconomyEffectCloak[] = {
+    { "kind", offsetof(EconomyCloak, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyCloak, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyCloak, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "keep", offsetof(EconomyCloak, keep), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyExtractor) == 16, "EconomyExtractor");
+static const TraceField kEventEconomyEffectExtractor[] = {
+    { "kind", offsetof(EconomyExtractor, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyExtractor, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyExtractor, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "metal", offsetof(EconomyExtractor, metal), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(EconomyShare) == 28, "EconomyShare");
+static const TraceField kEventEconomyEffectShare[] = {
+    { "kind", offsetof(EconomyShare, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(EconomyShare, h.player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(EconomyShare, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "resources", offsetof(EconomyShare, resources), 4, TF_SCALAR, TT_NONE, 0 },
+    { "energy", offsetof(EconomyShare, energy), 4, TF_SCALAR, TT_NONE, 0 },
+    { "metal", offsetof(EconomyShare, metal), 4, TF_SCALAR, TT_NONE, 0 },
+    { "to", offsetof(EconomyShare, to), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kEconomyKinds[] = {
+    { 0, "ECONOMY_RESET", sizeof(EconomyEventHeader), kEventEconomyReset, 4 },
+    { 1, "ECONOMY_LOAD", sizeof(EconomyLoad), kEventEconomyLoad, 5 },
+    { 2, "ECONOMY_REQUEST", sizeof(EconomyRequest), kEventEconomyRequest, 7 },
+    { 3, "ECONOMY_SPEND", sizeof(EconomySpend), kEventEconomySpend, 7 },
+    { 4, "ECONOMY_INCOME", sizeof(EconomyIncome), kEventEconomyIncome, 7 },
+    { 16, "ECONOMY_EFFECT_CLOAK", sizeof(EconomyCloak), kEventEconomyEffectCloak, 5 },
+    { 17, "ECONOMY_EFFECT_EXTRACTOR", sizeof(EconomyExtractor), kEventEconomyEffectExtractor, 5 },
+    { 18, "ECONOMY_EFFECT_SHARE", sizeof(EconomyShare), kEventEconomyEffectShare, 8 },
+};
+static const TraceEventModule kEconomyEvents = { "economy", 33, kEconomyKinds, 8 };
+
+static_assert(sizeof(FeaturesPlace) == 48, "FeaturesPlace");
+static const TraceField kEventFeaturesPlace[] = {
+    { "kind", offsetof(FeaturesPlace, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "x", offsetof(FeaturesPlace, x), 4, TF_SCALAR, TT_NONE, 0 },
+    { "z", offsetof(FeaturesPlace, z), 4, TF_SCALAR, TT_NONE, 0 },
+    { "feature", offsetof(FeaturesPlace, feature), 4, TF_SCALAR, TT_NONE, 0 },
+    { "flags", offsetof(FeaturesPlace, flags), 4, TF_SCALAR, TT_NONE, 0 },
+    { "owner", offsetof(FeaturesPlace, owner), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(FeaturesPlace, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "rot", offsetof(FeaturesPlace, rot), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesRemove) == 16, "FeaturesRemove");
+static const TraceField kEventFeaturesRemove[] = {
+    { "kind", offsetof(FeaturesRemove, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "x", offsetof(FeaturesRemove, x), 4, TF_SCALAR, TT_NONE, 0 },
+    { "z", offsetof(FeaturesRemove, z), 4, TF_SCALAR, TT_NONE, 0 },
+    { "force", offsetof(FeaturesRemove, force), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesDamage) == 16, "FeaturesDamage");
+static const TraceField kEventFeaturesDamage[] = {
+    { "kind", offsetof(FeaturesDamage, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "x", offsetof(FeaturesDamage, x), 4, TF_SCALAR, TT_NONE, 0 },
+    { "z", offsetof(FeaturesDamage, z), 4, TF_SCALAR, TT_NONE, 0 },
+    { "weapon", offsetof(FeaturesDamage, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesReclaim) == 20, "FeaturesReclaim");
+static const TraceField kEventFeaturesReclaim[] = {
+    { "kind", offsetof(FeaturesReclaim, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(FeaturesReclaim, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(FeaturesReclaim, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesFreeState) == 8, "FeaturesFreeState");
+static const TraceField kEventFeaturesEffectFreeState[] = {
+    { "kind", offsetof(FeaturesFreeState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "state", offsetof(FeaturesFreeState, state), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesInitState) == 12, "FeaturesInitState");
+static const TraceField kEventFeaturesEffectInitState[] = {
+    { "kind", offsetof(FeaturesInitState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "state", offsetof(FeaturesInitState, state), 4, TF_HANDLE, TT_NONE, 0 },
+    { "feature", offsetof(FeaturesInitState, feature), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesPassMaps) == 20, "FeaturesPassMaps");
+static const TraceField kEventFeaturesEffectPassMaps[] = {
+    { "kind", offsetof(FeaturesPassMaps, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "x", offsetof(FeaturesPassMaps, x), 4, TF_SCALAR, TT_NONE, 0 },
+    { "z", offsetof(FeaturesPassMaps, z), 4, TF_SCALAR, TT_NONE, 0 },
+    { "width", offsetof(FeaturesPassMaps, width), 4, TF_SCALAR, TT_NONE, 0 },
+    { "height", offsetof(FeaturesPassMaps, height), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(FeaturesAreaDamage) == 20, "FeaturesAreaDamage");
+static const TraceField kEventFeaturesEffectAreaDamage[] = {
+    { "kind", offsetof(FeaturesAreaDamage, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "weapon", offsetof(FeaturesAreaDamage, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(FeaturesAreaDamage, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kFeaturesKinds[] = {
+    { 32, "FEATURES_PLACE", sizeof(FeaturesPlace), kEventFeaturesPlace, 9 },
+    { 33, "FEATURES_REMOVE", sizeof(FeaturesRemove), kEventFeaturesRemove, 5 },
+    { 34, "FEATURES_DAMAGE", sizeof(FeaturesDamage), kEventFeaturesDamage, 5 },
+    { 35, "FEATURES_RECLAIM", sizeof(FeaturesReclaim), kEventFeaturesReclaim, 4 },
+    { 48, "FEATURES_EFFECT_FREE_STATE", sizeof(FeaturesFreeState), kEventFeaturesEffectFreeState, 3 },
+    { 49, "FEATURES_EFFECT_INIT_STATE", sizeof(FeaturesInitState), kEventFeaturesEffectInitState, 4 },
+    { 50, "FEATURES_EFFECT_PASS_MAPS", sizeof(FeaturesPassMaps), kEventFeaturesEffectPassMaps, 6 },
+    { 51, "FEATURES_EFFECT_AREA_DAMAGE", sizeof(FeaturesAreaDamage), kEventFeaturesEffectAreaDamage, 4 },
+};
+static const TraceEventModule kFeaturesEvents = { "features", 36, kFeaturesKinds, 8 };
+
+static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
+static const TraceField kEventWindMeteorsEnable[] = {
+    { "kind", offsetof(WindMeteorsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
+static const TraceField kEventWindMeteorsDisable[] = {
+    { "kind", offsetof(WindMeteorsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WindMeteorsParams) == 52, "WindMeteorsParams");
+static const TraceField kEventWindMeteorsParams[] = {
+    { "kind", offsetof(WindMeteorsParams, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "params", offsetof(WindMeteorsParams, params), 48, TF_BYTES, TT_NONE, 0 },
+};
+static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
+static const TraceField kEventWindMeteorsStart[] = {
+    { "kind", offsetof(WindMeteorsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WindMeteorsSpawn) == 36, "WindMeteorsSpawn");
+static const TraceField kEventWindMeteorsEffectSpawn[] = {
+    { "kind", offsetof(WindMeteorsSpawn, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "weapon", offsetof(WindMeteorsSpawn, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(WindMeteorsSpawn, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "vel", offsetof(WindMeteorsSpawn, vel), 12, TF_BYTES, TT_NONE, 0 },
+    { "announce", offsetof(WindMeteorsSpawn, announce), 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kWindMeteorsKinds[] = {
+    { 64, "WIND_METEORS_ENABLE", sizeof(WindMeteorsEventHeader), kEventWindMeteorsEnable, 1 },
+    { 65, "WIND_METEORS_DISABLE", sizeof(WindMeteorsEventHeader), kEventWindMeteorsDisable, 1 },
+    { 66, "WIND_METEORS_PARAMS", sizeof(WindMeteorsParams), kEventWindMeteorsParams, 2 },
+    { 67, "WIND_METEORS_START", sizeof(WindMeteorsEventHeader), kEventWindMeteorsStart, 1 },
+    { 80, "WIND_METEORS_EFFECT_SPAWN", sizeof(WindMeteorsSpawn), kEventWindMeteorsEffectSpawn, 5 },
+};
+static const TraceEventModule kWindMeteorsEvents = { "windMeteors", 37, kWindMeteorsKinds, 5 };
+
+static_assert(sizeof(TargetingSetUnit) == 16, "TargetingSetUnit");
+static const TraceField kEventTargetingSetUnit[] = {
+    { "kind", offsetof(TargetingSetUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingSetUnit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingSetUnit, h.weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "target", offsetof(TargetingSetUnit, target), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(TargetingSetPos) == 24, "TargetingSetPos");
+static const TraceField kEventTargetingSetPos[] = {
+    { "kind", offsetof(TargetingSetPos, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingSetPos, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingSetPos, h.weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(TargetingSetPos, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(TargetingEventHeader) == 12, "TargetingEventHeader");
+static const TraceField kEventTargetingClear[] = {
+    { "kind", offsetof(TargetingEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingEventHeader, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(TargetingEventHeader) == 12, "TargetingEventHeader");
+static const TraceField kEventTargetingReset[] = {
+    { "kind", offsetof(TargetingEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingEventHeader, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(TargetingLoad) == 20, "TargetingLoad");
+static const TraceField kEventTargetingLoad[] = {
+    { "kind", offsetof(TargetingLoad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingLoad, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingLoad, h.weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "xOrUnit", offsetof(TargetingLoad, xOrUnit), 4, TF_SCALAR, TT_NONE, 0 },
+    { "zOrSentinel", offsetof(TargetingLoad, zOrSentinel), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(TargetingEventHeader) == 12, "TargetingEventHeader");
+static const TraceField kEventTargetingEffectCleared[] = {
+    { "kind", offsetof(TargetingEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(TargetingEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(TargetingEventHeader, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kTargetingKinds[] = {
+    { 96, "TARGETING_SET_UNIT", sizeof(TargetingSetUnit), kEventTargetingSetUnit, 5 },
+    { 97, "TARGETING_SET_POS", sizeof(TargetingSetPos), kEventTargetingSetPos, 5 },
+    { 98, "TARGETING_CLEAR", sizeof(TargetingEventHeader), kEventTargetingClear, 4 },
+    { 99, "TARGETING_RESET", sizeof(TargetingEventHeader), kEventTargetingReset, 4 },
+    { 100, "TARGETING_LOAD", sizeof(TargetingLoad), kEventTargetingLoad, 6 },
+    { 112, "TARGETING_EFFECT_CLEARED", sizeof(TargetingEventHeader), kEventTargetingEffectCleared, 4 },
+};
+static const TraceEventModule kTargetingEvents = { "targeting", 38, kTargetingKinds, 6 };
+
+static_assert(sizeof(LosRadarUnit) == 8, "LosRadarUnit");
+static const TraceField kEventLosRadarUpdateUnit[] = {
+    { "kind", offsetof(LosRadarUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(LosRadarUnit, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarUnit) == 8, "LosRadarUnit");
+static const TraceField kEventLosRadarRemoveUnit[] = {
+    { "kind", offsetof(LosRadarUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(LosRadarUnit, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarUnit) == 8, "LosRadarUnit");
+static const TraceField kEventLosRadarRevealUnit[] = {
+    { "kind", offsetof(LosRadarUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(LosRadarUnit, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarAddEyeball) == 28, "LosRadarAddEyeball");
+static const TraceField kEventLosRadarAddEyeball[] = {
+    { "kind", offsetof(LosRadarAddEyeball, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(LosRadarAddEyeball, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "sightDistance", offsetof(LosRadarAddEyeball, sightDistance), 4, TF_SCALAR, TT_NONE, 0 },
+    { "eyeHeight", offsetof(LosRadarAddEyeball, eyeHeight), 4, TF_SCALAR, TT_NONE, 0 },
+    { "lifetime", offsetof(LosRadarAddEyeball, lifetime), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarCellHeights) == 20, "LosRadarCellHeights");
+static const TraceField kEventLosRadarCellHeights[] = {
+    { "kind", offsetof(LosRadarCellHeights, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "cell", offsetof(LosRadarCellHeights, cell), 8, TF_BYTES, TT_NONE, 0 },
+    { "size", offsetof(LosRadarCellHeights, size), 8, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarRecalculate) == 8, "LosRadarRecalculate");
+static const TraceField kEventLosRadarRecalculate[] = {
+    { "kind", offsetof(LosRadarRecalculate, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "reset", offsetof(LosRadarRecalculate, reset), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarSharePlayer) == 8, "LosRadarSharePlayer");
+static const TraceField kEventLosRadarShareMapping[] = {
+    { "kind", offsetof(LosRadarSharePlayer, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(LosRadarSharePlayer, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarSharePlayer) == 8, "LosRadarSharePlayer");
+static const TraceField kEventLosRadarShareRadar[] = {
+    { "kind", offsetof(LosRadarSharePlayer, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "player", offsetof(LosRadarSharePlayer, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarShareMap) == 12, "LosRadarShareMap");
+static const TraceField kEventLosRadarShareMap[] = {
+    { "kind", offsetof(LosRadarShareMap, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "from", offsetof(LosRadarShareMap, from), 4, TF_SCALAR, TT_NONE, 0 },
+    { "to", offsetof(LosRadarShareMap, to), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarUnit) == 8, "LosRadarUnit");
+static const TraceField kEventLosRadarSightReset[] = {
+    { "kind", offsetof(LosRadarUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(LosRadarUnit, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(LosRadarSightLoad) == 16, "LosRadarSightLoad");
+static const TraceField kEventLosRadarSightLoad[] = {
+    { "kind", offsetof(LosRadarSightLoad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(LosRadarSightLoad, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "cell", offsetof(LosRadarSightLoad, cell), 4, TF_SCALAR, TT_NONE, 0 },
+    { "frameIdx", offsetof(LosRadarSightLoad, frameIdx), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kLosRadarKinds[] = {
+    { 128, "LOS_RADAR_UPDATE_UNIT", sizeof(LosRadarUnit), kEventLosRadarUpdateUnit, 3 },
+    { 129, "LOS_RADAR_REMOVE_UNIT", sizeof(LosRadarUnit), kEventLosRadarRemoveUnit, 3 },
+    { 130, "LOS_RADAR_REVEAL_UNIT", sizeof(LosRadarUnit), kEventLosRadarRevealUnit, 3 },
+    { 131, "LOS_RADAR_ADD_EYEBALL", sizeof(LosRadarAddEyeball), kEventLosRadarAddEyeball, 6 },
+    { 132, "LOS_RADAR_CELL_HEIGHTS", sizeof(LosRadarCellHeights), kEventLosRadarCellHeights, 4 },
+    { 133, "LOS_RADAR_RECALCULATE", sizeof(LosRadarRecalculate), kEventLosRadarRecalculate, 3 },
+    { 134, "LOS_RADAR_SHARE_MAPPING", sizeof(LosRadarSharePlayer), kEventLosRadarShareMapping, 3 },
+    { 135, "LOS_RADAR_SHARE_RADAR", sizeof(LosRadarSharePlayer), kEventLosRadarShareRadar, 3 },
+    { 136, "LOS_RADAR_SHARE_MAP", sizeof(LosRadarShareMap), kEventLosRadarShareMap, 4 },
+    { 137, "LOS_RADAR_SIGHT_RESET", sizeof(LosRadarUnit), kEventLosRadarSightReset, 3 },
+    { 138, "LOS_RADAR_SIGHT_LOAD", sizeof(LosRadarSightLoad), kEventLosRadarSightLoad, 5 },
+};
+static const TraceEventModule kLosRadarEvents = { "los_radar", 39, kLosRadarKinds, 11 };
+
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapAddUnit[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapRemoveUnit[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapClearUnit[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapReclaimFootprint[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapSetYard) == 12, "MapSetYard");
+static const TraceField kEventMapSetYard[] = {
+    { "kind", offsetof(MapSetYard, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapSetYard, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "open", offsetof(MapSetYard, open), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapBucketUnlink[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapEventHeader) == 8, "MapEventHeader");
+static const TraceField kEventMapBucketPrepend[] = {
+    { "kind", offsetof(MapEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapPassMaps) == 24, "MapPassMaps");
+static const TraceField kEventMapPassMaps[] = {
+    { "kind", offsetof(MapPassMaps, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapPassMaps, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "cell", offsetof(MapPassMaps, cell), 8, TF_BYTES, TT_NONE, 0 },
+    { "size", offsetof(MapPassMaps, size), 8, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MapCellsChanged) == 32, "MapCellsChanged");
+static const TraceField kEventMapEffectCellsChanged[] = {
+    { "kind", offsetof(MapCellsChanged, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapCellsChanged, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "rect", offsetof(MapCellsChanged, rect), 16, TF_BYTES, TT_NONE, 0 },
+    { "classes", offsetof(MapCellsChanged, classes), 4, TF_SCALAR, TT_NONE, 0 },
+    { "cause", offsetof(MapCellsChanged, cause), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kMapKinds[] = {
+    { 160, "MAP_ADD_UNIT", sizeof(MapEventHeader), kEventMapAddUnit, 3 },
+    { 161, "MAP_REMOVE_UNIT", sizeof(MapEventHeader), kEventMapRemoveUnit, 3 },
+    { 162, "MAP_CLEAR_UNIT", sizeof(MapEventHeader), kEventMapClearUnit, 3 },
+    { 163, "MAP_RECLAIM_FOOTPRINT", sizeof(MapEventHeader), kEventMapReclaimFootprint, 3 },
+    { 164, "MAP_SET_YARD", sizeof(MapSetYard), kEventMapSetYard, 4 },
+    { 165, "MAP_BUCKET_UNLINK", sizeof(MapEventHeader), kEventMapBucketUnlink, 3 },
+    { 166, "MAP_BUCKET_PREPEND", sizeof(MapEventHeader), kEventMapBucketPrepend, 3 },
+    { 168, "MAP_PASS_MAPS", sizeof(MapPassMaps), kEventMapPassMaps, 5 },
+    { 176, "MAP_EFFECT_CELLS_CHANGED", sizeof(MapCellsChanged), kEventMapEffectCellsChanged, 6 },
+};
+static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 9 };
+
+static_assert(sizeof(PlayersGiveUnit) == 48, "PlayersGiveUnit");
+static const TraceField kEventPlayersGiveUnit[] = {
+    { "kind", offsetof(PlayersGiveUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersGiveUnit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersGiveUnit, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.present", offsetof(PlayersGiveUnit, record.present), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.hitPoints", offsetof(PlayersGiveUnit, record.hitPoints), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.buildPercent", offsetof(PlayersGiveUnit, record.buildPercent), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.angles", offsetof(PlayersGiveUnit, record.angles), 12, TF_BYTES, TT_NONE, 0 },
+    { "record.stockpiles", offsetof(PlayersGiveUnit, record.stockpiles), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersKillUnits) == 12, "PlayersKillUnits");
+static const TraceField kEventPlayersKillUnits[] = {
+    { "kind", offsetof(PlayersKillUnits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersKillUnits, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersKillUnits, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersEventHeader) == 8, "PlayersEventHeader");
+static const TraceField kEventPlayersUnitCreated[] = {
+    { "kind", offsetof(PlayersEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersEventHeader) == 8, "PlayersEventHeader");
+static const TraceField kEventPlayersUnitDied[] = {
+    { "kind", offsetof(PlayersEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersTransfer) == 28, "PlayersTransfer");
+static const TraceField kEventPlayersTransfer[] = {
+    { "kind", offsetof(PlayersTransfer, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersTransfer, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "from", offsetof(PlayersTransfer, from), 4, TF_SCALAR, TT_NONE, 0 },
+    { "to", offsetof(PlayersTransfer, to), 4, TF_SCALAR, TT_NONE, 0 },
+    { "resource", offsetof(PlayersTransfer, resource), 4, TF_SCALAR, TT_NONE, 0 },
+    { "amount", offsetof(PlayersTransfer, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "announce", offsetof(PlayersTransfer, announce), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersKillUnit) == 12, "PlayersKillUnit");
+static const TraceField kEventPlayersEffectKillUnit[] = {
+    { "kind", offsetof(PlayersKillUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersKillUnit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "selfDestruct", offsetof(PlayersKillUnit, selfDestruct), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersSendUnit) == 12, "PlayersSendUnit");
+static const TraceField kEventPlayersEffectSendUnit[] = {
+    { "kind", offsetof(PlayersSendUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersSendUnit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersSendUnit, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersCaptureUnit) == 48, "PlayersCaptureUnit");
+static const TraceField kEventPlayersEffectCaptureUnit[] = {
+    { "kind", offsetof(PlayersCaptureUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersCaptureUnit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersCaptureUnit, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.present", offsetof(PlayersCaptureUnit, record.present), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.hitPoints", offsetof(PlayersCaptureUnit, record.hitPoints), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.buildPercent", offsetof(PlayersCaptureUnit, record.buildPercent), 4, TF_SCALAR, TT_NONE, 0 },
+    { "record.angles", offsetof(PlayersCaptureUnit, record.angles), 12, TF_BYTES, TT_NONE, 0 },
+    { "record.stockpiles", offsetof(PlayersCaptureUnit, record.stockpiles), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kPlayersKinds[] = {
+    { 192, "PLAYERS_GIVE_UNIT", sizeof(PlayersGiveUnit), kEventPlayersGiveUnit, 9 },
+    { 193, "PLAYERS_KILL_UNITS", sizeof(PlayersKillUnits), kEventPlayersKillUnits, 4 },
+    { 194, "PLAYERS_UNIT_CREATED", sizeof(PlayersEventHeader), kEventPlayersUnitCreated, 3 },
+    { 195, "PLAYERS_UNIT_DIED", sizeof(PlayersEventHeader), kEventPlayersUnitDied, 3 },
+    { 196, "PLAYERS_TRANSFER", sizeof(PlayersTransfer), kEventPlayersTransfer, 8 },
+    { 208, "PLAYERS_EFFECT_KILL_UNIT", sizeof(PlayersKillUnit), kEventPlayersEffectKillUnit, 4 },
+    { 209, "PLAYERS_EFFECT_SEND_UNIT", sizeof(PlayersSendUnit), kEventPlayersEffectSendUnit, 4 },
+    { 210, "PLAYERS_EFFECT_CAPTURE_UNIT", sizeof(PlayersCaptureUnit), kEventPlayersEffectCaptureUnit, 9 },
+};
+static const TraceEventModule kPlayersEvents = { "playersEvents", 41, kPlayersKinds, 8 };
+
+static_assert(sizeof(AiReactToAttack) == 16, "AiReactToAttack");
+static const TraceField kEventAiReactToAttack[] = {
+    { "kind", offsetof(AiReactToAttack, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiReactToAttack, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "attacker", offsetof(AiReactToAttack, attacker), 4, TF_REF, TT_UNIT, 0 },
+    { "damage", offsetof(AiReactToAttack, damage), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiSetSquad) == 12, "AiSetSquad");
+static const TraceField kEventAiSetSquad[] = {
+    { "kind", offsetof(AiSetSquad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiSetSquad, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "squad", offsetof(AiSetSquad, squad), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiPlan) == 12, "AiPlan");
+static const TraceField kEventAiPlan[] = {
+    { "kind", offsetof(AiPlan, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiPlan, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "difficulties", offsetof(AiPlan, difficulties), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiWeight) == 80, "AiWeight");
+static const TraceField kEventAiWeight[] = {
+    { "kind", offsetof(AiWeight, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiWeight, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "scale", offsetof(AiWeight, scale), 4, TF_SCALAR, TT_NONE, 0 },
+    { "fix", offsetof(AiWeight, fix), 4, TF_SCALAR, TT_NONE, 0 },
+    { "types", offsetof(AiWeight, types), 64, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiLimit) == 80, "AiLimit");
+static const TraceField kEventAiLimit[] = {
+    { "kind", offsetof(AiLimit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiLimit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "limit", offsetof(AiLimit, limit), 4, TF_SCALAR, TT_NONE, 0 },
+    { "fix", offsetof(AiLimit, fix), 4, TF_SCALAR, TT_NONE, 0 },
+    { "types", offsetof(AiLimit, types), 64, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiAddOrder) == 44, "AiAddOrder");
+static const TraceField kEventAiEffectAddOrder[] = {
+    { "kind", offsetof(AiAddOrder, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiAddOrder, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "type", offsetof(AiAddOrder, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "queue", offsetof(AiAddOrder, queue), 4, TF_SCALAR, TT_NONE, 0 },
+    { "target", offsetof(AiAddOrder, target), 4, TF_REF, TT_UNIT, 0 },
+    { "hasPos", offsetof(AiAddOrder, hasPos), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(AiAddOrder, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "params", offsetof(AiAddOrder, params), 8, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiQueueBuild) == 16, "AiQueueBuild");
+static const TraceField kEventAiEffectQueueBuild[] = {
+    { "kind", offsetof(AiQueueBuild, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiQueueBuild, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "type", offsetof(AiQueueBuild, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "count", offsetof(AiQueueBuild, count), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiStop) == 12, "AiStop");
+static const TraceField kEventAiEffectStop[] = {
+    { "kind", offsetof(AiStop, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiStop, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "all", offsetof(AiStop, all), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiActivate) == 16, "AiActivate");
+static const TraceField kEventAiEffectActivate[] = {
+    { "kind", offsetof(AiActivate, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiActivate, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "bits", offsetof(AiActivate, bits), 4, TF_SCALAR, TT_NONE, 0 },
+    { "on", offsetof(AiActivate, on), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(AiSetStates) == 16, "AiSetStates");
+static const TraceField kEventAiEffectSetStates[] = {
+    { "kind", offsetof(AiSetStates, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiSetStates, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "movement", offsetof(AiSetStates, movement), 4, TF_SCALAR, TT_NONE, 0 },
+    { "firing", offsetof(AiSetStates, firing), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kAiKinds[] = {
+    { 224, "AI_REACT_TO_ATTACK", sizeof(AiReactToAttack), kEventAiReactToAttack, 5 },
+    { 226, "AI_SET_SQUAD", sizeof(AiSetSquad), kEventAiSetSquad, 4 },
+    { 227, "AI_PLAN", sizeof(AiPlan), kEventAiPlan, 4 },
+    { 228, "AI_WEIGHT", sizeof(AiWeight), kEventAiWeight, 6 },
+    { 229, "AI_LIMIT", sizeof(AiLimit), kEventAiLimit, 6 },
+    { 240, "AI_EFFECT_ADD_ORDER", sizeof(AiAddOrder), kEventAiEffectAddOrder, 9 },
+    { 241, "AI_EFFECT_QUEUE_BUILD", sizeof(AiQueueBuild), kEventAiEffectQueueBuild, 5 },
+    { 243, "AI_EFFECT_STOP", sizeof(AiStop), kEventAiEffectStop, 4 },
+    { 245, "AI_EFFECT_ACTIVATE", sizeof(AiActivate), kEventAiEffectActivate, 5 },
+    { 246, "AI_EFFECT_SET_STATES", sizeof(AiSetStates), kEventAiEffectSetStates, 5 },
+};
+static const TraceEventModule kAiEvents = { "aiEvents", 42, kAiKinds, 10 };
+
+static_assert(sizeof(WeaponsDamage) == 24, "WeaponsDamage");
+static const TraceField kEventWeaponsDamage[] = {
+    { "kind", offsetof(WeaponsDamage, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsDamage, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "source", offsetof(WeaponsDamage, source), 4, TF_REF, TT_UNIT, 0 },
+    { "amount", offsetof(WeaponsDamage, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "damageKind", offsetof(WeaponsDamage, damageKind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "direction", offsetof(WeaponsDamage, direction), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsDamage) == 24, "WeaponsDamage");
+static const TraceField kEventWeaponsRemoteDamage[] = {
+    { "kind", offsetof(WeaponsDamage, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsDamage, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "source", offsetof(WeaponsDamage, source), 4, TF_REF, TT_UNIT, 0 },
+    { "amount", offsetof(WeaponsDamage, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "damageKind", offsetof(WeaponsDamage, damageKind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "direction", offsetof(WeaponsDamage, direction), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsDetonate) == 12, "WeaponsDetonate");
+static const TraceField kEventWeaponsDetonate[] = {
+    { "kind", offsetof(WeaponsDetonate, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsDetonate, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "selfDestruct", offsetof(WeaponsDetonate, selfDestruct), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsRelease) == 12, "WeaponsRelease");
+static const TraceField kEventWeaponsRelease[] = {
+    { "kind", offsetof(WeaponsRelease, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsRelease, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(WeaponsRelease, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsClaim) == 12, "WeaponsClaim");
+static const TraceField kEventWeaponsClaim[] = {
+    { "kind", offsetof(WeaponsClaim, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsClaim, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(WeaponsClaim, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsInitSlots[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsRemoveProjectiles[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsAimDone) == 16, "WeaponsAimDone");
+static const TraceField kEventWeaponsAimDone[] = {
+    { "kind", offsetof(WeaponsAimDone, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsAimDone, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "callback", offsetof(WeaponsAimDone, callback), 4, TF_SCALAR, TT_NONE, 0 },
+    { "result", offsetof(WeaponsAimDone, result), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsExplodePiece) == 16, "WeaponsExplodePiece");
+static const TraceField kEventWeaponsExplodePiece[] = {
+    { "kind", offsetof(WeaponsExplodePiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsExplodePiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(WeaponsExplodePiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "flags", offsetof(WeaponsExplodePiece, flags), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsAreaDamage) == 24, "WeaponsAreaDamage");
+static const TraceField kEventWeaponsAreaDamage[] = {
+    { "kind", offsetof(WeaponsAreaDamage, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsAreaDamage, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(WeaponsAreaDamage, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(WeaponsAreaDamage, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsSpawn) == 40, "WeaponsSpawn");
+static const TraceField kEventWeaponsSpawn[] = {
+    { "kind", offsetof(WeaponsSpawn, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsSpawn, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(WeaponsSpawn, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(WeaponsSpawn, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "vel", offsetof(WeaponsSpawn, vel), 12, TF_BYTES, TT_NONE, 0 },
+    { "announce", offsetof(WeaponsSpawn, announce), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsSetStockpiles) == 20, "WeaponsSetStockpiles");
+static const TraceField kEventWeaponsSetStockpiles[] = {
+    { "kind", offsetof(WeaponsSetStockpiles, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsSetStockpiles, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "stockpiles", offsetof(WeaponsSetStockpiles, stockpiles), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsAddStockpile) == 12, "WeaponsAddStockpile");
+static const TraceField kEventWeaponsAddStockpile[] = {
+    { "kind", offsetof(WeaponsAddStockpile, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsAddStockpile, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "weapon", offsetof(WeaponsAddStockpile, weapon), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsAttacked) == 16, "WeaponsAttacked");
+static const TraceField kEventWeaponsEffectAttacked[] = {
+    { "kind", offsetof(WeaponsAttacked, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsAttacked, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "attacker", offsetof(WeaponsAttacked, attacker), 4, TF_REF, TT_UNIT, 0 },
+    { "amount", offsetof(WeaponsAttacked, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsHit) == 16, "WeaponsHit");
+static const TraceField kEventWeaponsEffectHit[] = {
+    { "kind", offsetof(WeaponsHit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsHit, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "enemyDamage", offsetof(WeaponsHit, enemyDamage), 4, TF_SCALAR, TT_NONE, 0 },
+    { "friendlyDamage", offsetof(WeaponsHit, friendlyDamage), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsEffectMarkDamaged[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsDamageRecord) == 16, "WeaponsDamageRecord");
+static const TraceField kEventWeaponsEffectDamageRecord[] = {
+    { "kind", offsetof(WeaponsDamageRecord, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsDamageRecord, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "damageKind", offsetof(WeaponsDamageRecord, damageKind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "attacker", offsetof(WeaponsDamageRecord, attacker), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsHealth) == 16, "WeaponsHealth");
+static const TraceField kEventWeaponsEffectHealth[] = {
+    { "kind", offsetof(WeaponsHealth, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsHealth, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "health", offsetof(WeaponsHealth, health), 4, TF_SCALAR, TT_NONE, 0 },
+    { "dying", offsetof(WeaponsHealth, dying), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsParalyze) == 12, "WeaponsParalyze");
+static const TraceField kEventWeaponsEffectParalyze[] = {
+    { "kind", offsetof(WeaponsParalyze, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsParalyze, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ticks", offsetof(WeaponsParalyze, ticks), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsStartScript) == 44, "WeaponsStartScript");
+static const TraceField kEventWeaponsEffectStartScript[] = {
+    { "kind", offsetof(WeaponsStartScript, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsStartScript, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "script", offsetof(WeaponsStartScript, script), 4, TF_SCALAR, TT_NONE, 0 },
+    { "callback", offsetof(WeaponsStartScript, callback), 4, TF_SCALAR, TT_NONE, 0 },
+    { "update", offsetof(WeaponsStartScript, update), 4, TF_SCALAR, TT_NONE, 0 },
+    { "withArgs", offsetof(WeaponsStartScript, withArgs), 4, TF_SCALAR, TT_NONE, 0 },
+    { "count", offsetof(WeaponsStartScript, count), 4, TF_SCALAR, TT_NONE, 0 },
+    { "args", offsetof(WeaponsStartScript, args), 16, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsDetachPiece) == 16, "WeaponsDetachPiece");
+static const TraceField kEventWeaponsEffectDetachPiece[] = {
+    { "kind", offsetof(WeaponsDetachPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsDetachPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(WeaponsDetachPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pose", offsetof(WeaponsDetachPiece, pose), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsEffectShotFired[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsBusy) == 12, "WeaponsBusy");
+static const TraceField kEventWeaponsEffectBusy[] = {
+    { "kind", offsetof(WeaponsBusy, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsBusy, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "until", offsetof(WeaponsBusy, until), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsEffectCommandShotFired[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WeaponsEventHeader) == 8, "WeaponsEventHeader");
+static const TraceField kEventWeaponsEffectOutOfReach[] = {
+    { "kind", offsetof(WeaponsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kWeaponsKinds[] = {
+    { 256, "WEAPONS_DAMAGE", sizeof(WeaponsDamage), kEventWeaponsDamage, 7 },
+    { 257, "WEAPONS_REMOTE_DAMAGE", sizeof(WeaponsDamage), kEventWeaponsRemoteDamage, 7 },
+    { 258, "WEAPONS_DETONATE", sizeof(WeaponsDetonate), kEventWeaponsDetonate, 4 },
+    { 259, "WEAPONS_RELEASE", sizeof(WeaponsRelease), kEventWeaponsRelease, 4 },
+    { 260, "WEAPONS_CLAIM", sizeof(WeaponsClaim), kEventWeaponsClaim, 4 },
+    { 261, "WEAPONS_INIT_SLOTS", sizeof(WeaponsEventHeader), kEventWeaponsInitSlots, 3 },
+    { 262, "WEAPONS_REMOVE_PROJECTILES", sizeof(WeaponsEventHeader), kEventWeaponsRemoveProjectiles, 3 },
+    { 263, "WEAPONS_AIM_DONE", sizeof(WeaponsAimDone), kEventWeaponsAimDone, 5 },
+    { 264, "WEAPONS_EXPLODE_PIECE", sizeof(WeaponsExplodePiece), kEventWeaponsExplodePiece, 5 },
+    { 265, "WEAPONS_AREA_DAMAGE", sizeof(WeaponsAreaDamage), kEventWeaponsAreaDamage, 5 },
+    { 266, "WEAPONS_SPAWN", sizeof(WeaponsSpawn), kEventWeaponsSpawn, 7 },
+    { 267, "WEAPONS_SET_STOCKPILES", sizeof(WeaponsSetStockpiles), kEventWeaponsSetStockpiles, 4 },
+    { 269, "WEAPONS_ADD_STOCKPILE", sizeof(WeaponsAddStockpile), kEventWeaponsAddStockpile, 4 },
+    { 272, "WEAPONS_EFFECT_ATTACKED", sizeof(WeaponsAttacked), kEventWeaponsEffectAttacked, 5 },
+    { 273, "WEAPONS_EFFECT_HIT", sizeof(WeaponsHit), kEventWeaponsEffectHit, 5 },
+    { 274, "WEAPONS_EFFECT_MARK_DAMAGED", sizeof(WeaponsEventHeader), kEventWeaponsEffectMarkDamaged, 3 },
+    { 275, "WEAPONS_EFFECT_DAMAGE_RECORD", sizeof(WeaponsDamageRecord), kEventWeaponsEffectDamageRecord, 5 },
+    { 276, "WEAPONS_EFFECT_HEALTH", sizeof(WeaponsHealth), kEventWeaponsEffectHealth, 5 },
+    { 277, "WEAPONS_EFFECT_PARALYZE", sizeof(WeaponsParalyze), kEventWeaponsEffectParalyze, 4 },
+    { 278, "WEAPONS_EFFECT_START_SCRIPT", sizeof(WeaponsStartScript), kEventWeaponsEffectStartScript, 9 },
+    { 279, "WEAPONS_EFFECT_DETACH_PIECE", sizeof(WeaponsDetachPiece), kEventWeaponsEffectDetachPiece, 5 },
+    { 280, "WEAPONS_EFFECT_SHOT_FIRED", sizeof(WeaponsEventHeader), kEventWeaponsEffectShotFired, 3 },
+    { 281, "WEAPONS_EFFECT_BUSY", sizeof(WeaponsBusy), kEventWeaponsEffectBusy, 4 },
+    { 282, "WEAPONS_EFFECT_COMMAND_SHOT_FIRED", sizeof(WeaponsEventHeader), kEventWeaponsEffectCommandShotFired, 3 },
+    { 283, "WEAPONS_EFFECT_OUT_OF_REACH", sizeof(WeaponsEventHeader), kEventWeaponsEffectOutOfReach, 3 },
+};
+static const TraceEventModule kWeaponsEvents = { "weaponsEvents", 47, kWeaponsKinds, 25 };
 
 static const TraceField kWindFields[] = {
     { "windCounter", 0x37ec4, 4, TF_SCALAR, TT_NONE, 0x0 },

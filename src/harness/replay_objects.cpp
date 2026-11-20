@@ -2514,6 +2514,28 @@ void ReplayAddStruct(ReplayText& t, const char* tag, const char* name, unsigned 
     value.Free();
 }
 
+unsigned ReplayEventObject(unsigned table, int kind)
+{
+    const ReplayEventTable& t = kReplayEventTables[table];
+    for (unsigned i = 0; i < t.count; i++) {
+        if (kReplayEventKinds[t.first + i].kind == kind)
+            return kReplayEventKinds[t.first + i].object;
+    }
+    return t.header;
+}
+
+void ReplayAddEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size, ReplayObjectTable& objects)
+{
+    unsigned char copy[REPLAY_EVENT_MAX];
+    memset(copy, 0, sizeof copy);
+    if (p == nullptr) {
+        ReplayAddStruct(t, "a", name, kReplayEventTables[table].header, nullptr, objects);
+        return;
+    }
+    memcpy(copy, p, size < sizeof copy ? size : sizeof copy);
+    ReplayAddStruct(t, "a", name, ReplayEventObject(table, *(int*)copy), copy, objects);
+}
+
 void ReplayAddStructs(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p, int count, ReplayObjectTable& table)
 {
     if (p == nullptr || count <= 0) {
@@ -2556,6 +2578,19 @@ void ReplayAddValueOrNull(ReplayText& t, unsigned kind, const void* p, ReplayObj
         t.Add("null");
     else
         ReplayAddValue(t, kind, p, table);
+}
+
+void ReplayAddValueSized(ReplayText& t, unsigned kind, const void* p, unsigned size, ReplayObjectTable& table)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    unsigned char copy[REPLAY_EVENT_MAX];
+    memset(copy, 0, sizeof copy);
+    unsigned limit = kReplayObjectKinds[kind].size < sizeof copy ? kReplayObjectKinds[kind].size : (unsigned)sizeof copy;
+    memcpy(copy, p, size < limit ? size : limit);
+    ReplayAddValue(t, kind, copy, table);
 }
 
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table)

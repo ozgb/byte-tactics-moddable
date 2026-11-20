@@ -371,9 +371,9 @@ class ModuleManifestTest(unittest.TestCase):
         for entry in document["modules"]:
             self.assertFalse(set(oraclekit.MODULE_SOURCE_FIELDS) & set(entry), entry["name"])
         meteors = next(e for e in document["modules"] if e["name"] == "wind_meteors")
-        self.assertEqual(meteors["imports"]["services"]["WindMeteorsEmit"], [["linear"], "void"])
+        self.assertEqual(meteors["imports"]["services"]["WindMeteorsEmit"], [["linear", "int"], "void"])
         self.assertEqual(meteors["exports"][:2], ["UpdateWind", "UpdateMeteors"])
-        self.assertEqual(document["majors"]["services"], 1)
+        self.assertEqual(document["majors"]["services"], 2)
 
     def test_the_name_check_finds_paths_and_files(self):
         for text in ("src/a", "x lib/b", "a.cpp", "m.h ", "orig/TotalA.exe", "build/tools"):

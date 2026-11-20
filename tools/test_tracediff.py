@@ -171,6 +171,19 @@ class DiffDumpsTest(unittest.TestCase):
         self.assertEqual(out, {"mystery[0].x": "0x1", "units[3].weapon": "heap"})
 
 
+class EventKindsTest(unittest.TestCase):
+    def test_events_of_different_kinds_are_compared_field_by_field(self):
+        a = ("100 units targeting.count 0x00000002\n100 units targeting[0].kind 0x00000060\n"
+             "100 units targeting[0].target unit:4\n100 units targeting[1].kind 0x00000062\n"
+             "100 units targeting[1].outcome 0x00000001\n")
+        b = a.replace("unit:4", "null").replace("targeting[1].kind 0x00000062", "targeting[1].kind 0x00000063")
+        with tempfile.TemporaryDirectory() as d:
+            one, two = write_dump(Path(d), "a.txt", a), write_dump(Path(d), "b.txt", b)
+            found = td.diff_dumps(one, two, 100, "units")
+        self.assertEqual(found, [("targeting[0].target", "unit:4", "null"),
+                                 ("targeting[1].kind", "0x00000062", "0x00000063")])
+
+
 class CommandLineTest(unittest.TestCase):
     def run_main(self, *argv):
         out, err = io.StringIO(), io.StringIO()

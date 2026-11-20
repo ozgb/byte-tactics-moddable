@@ -1,6 +1,6 @@
 # The weapons interface
 
-Weapons sits behind `interfaces/weapons.h` (version 2.0), the eighth module on the scheduler after economy
+Weapons sits behind `interfaces/weapons.h` (version 3.0), the eighth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`), players (`docs/players-interface.md`) and ai
 (`docs/ai-interface.md`) (#984). It is the weapons, projectiles and explosions of the simulation, and the damage rules
@@ -22,7 +22,7 @@ run and drained at each phase boundary, synchronous slots that deliver the modul
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
 to 67 and 80, targeting 96 to 100 and 112, los_radar 128 to 136, map 160 to 168 and 176, players 192 to 196 and 208 to
-210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246, weapons 256 to 269 and 272 to 281 (its range is 256 to 287).
+210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246, weapons 256 to 267, 269 and 272 to 283 (its range is 256 to 287).
 
 The human ruled on 2026-11-17 that **weapons owns the damage rules and units owns the record**: weapons computes the
 damage (the armour, the kill count, the network packet, the effects that tell ai, orders and units) and publishes the
@@ -30,16 +30,16 @@ writes to the unit record as effects (section 3).
 
 Weapons' place in it:
 - **Events into weapons:** DAMAGE, REMOTE_DAMAGE, DETONATE, RELEASE, CLAIM, INIT_SLOTS, REMOVE_PROJECTILES,
-  AIM_DONE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN, SET_STOCKPILES, LOAD_SLOT and ADD_STOCKPILE, published by units, orders, scripts,
+  AIM_DONE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN, SET_STOCKPILES and ADD_STOCKPILE, published by units, orders, scripts,
   features, wind_meteors and the engine (the network). Weapons' handler (`WeaponsInbox`,
   `src/seams/weapons_world.cpp`) passes each to `Apply`, and records it with its outcome in the trace's dump
   (section 5). Features' AREA_DAMAGE and wind_meteors' SPAWN reach it through `WeaponsOnFeaturesAreaDamage` and
   `WeaponsOnMeteorSpawn`, which build the event and hand it to the same handler; their routes in `src/game/routes.cpp`
   are as they were (AREA_DAMAGE synchronous, SPAWN queued).
-- **Routes:** of the sixteen routes into weapons, fourteen are synchronous (seven because the gate diverged with them
-  queued, six by #952's rule, and features' AREA_DAMAGE as it was). LOAD_SLOT and wind_meteors' SPAWN stay queued. Of weapons' effects, START_SCRIPT,
+- **Routes:** of the fifteen routes into weapons, fourteen are synchronous (seven because the gate diverged with them
+  queued, six by #952's rule, and features' AREA_DAMAGE as it was). Only wind_meteors' SPAWN stays queued (the saved game's slots no longer go through an event: the slot `LoadState`, below). Of weapons' effects, START_SCRIPT,
   DETACH_PIECE and HEALTH are synchronous because the gate diverged with them queued, and MARK_DAMAGED,
-  DAMAGE_RECORD, PARALYZE, NOTICE and BUSY by #952's rule; ATTACKED (four routes), HIT, DAMAGE to features and CLEAR to
+  DAMAGE_RECORD, PARALYZE, SHOT_FIRED, COMMAND_SHOT_FIRED, OUT_OF_REACH and BUSY by #952's rule; ATTACKED (four routes), HIT, DAMAGE to features and CLEAR to
   targeting are as they were (sections 4 and 8).
 - **Runs:** `UpdateProjectiles`, `UpdateExplosions` and `UpdateUnitWeapons`. The scheduler calls the first two as the
   projectiles and explosions phases (`SchedProjectilesPhase`, `SchedExplosionsPhase`, `src/game/scheduler.cpp`) and
@@ -52,7 +52,7 @@ Weapons' place in it:
 - **Queries:** `FindWeaponByName`, `WeaponCanReachUnit`, `FindTargetableProjectile` and `WeaponCanReachPos`, as of
   weapons' last apply, and the view read `GetWeaponRange`.
 - **Effects out of weapons:** the damage effects ATTACKED, MARK_DAMAGED, DAMAGE_RECORD, HEALTH and PARALYZE, and the
-  effects HIT, START_SCRIPT, DETACH_PIECE, NOTICE and BUSY, to units, orders, ai and scripts, besides DAMAGE to
+  effects HIT, START_SCRIPT, DETACH_PIECE, SHOT_FIRED, COMMAND_SHOT_FIRED, OUT_OF_REACH and BUSY, to units, orders, ai and scripts, besides DAMAGE to
   features and CLEAR to targeting. Units and scripts are not on the model yet, so their handlers
   (`src/units/weapons_effects.cpp`, `src/scripts/weapons_effects.cpp`) are adapters that hold 3.1c's writes.
 - **Module ids:** weapons keeps `SCHED_WEAPONS = 6`, which its outbox already used.
@@ -74,22 +74,22 @@ group keeps a later split of the projectiles from the damage rules cheap:
 | the network: a damage packet arrives (`HandleNetPackets`, `net_game.cpp`) | `ApplyUnitDamage` | REMOTE_DAMAGE from the engine |
 | a damaged unit (`ApplyUnitDamage`) | the writes to the unit record, `ai.ReactToAttack`, the script starts | the effects MARK_DAMAGED, ATTACKED, DAMAGE_RECORD, HEALTH, PARALYZE and START_SCRIPT (section 3) |
 
-DAMAGE carries the amount in `value`, the kind in `extra` (1 a weapon, 2 a paralyser, 10 a repair that heals, 11 the
-water, others the cause of a death), the source in `target` and the direction in `args[0]`. REMOTE_DAMAGE carries what
+DAMAGE carries a `WeaponsDamage`: the `source` (a block offset, 0 for none), the `amount`, the `damageKind` (1 a weapon, 2
+a paralyser, 10 a repair that heals, 11 the water, others the cause of a death) and the `direction` (a 16-bit heading). REMOTE_DAMAGE carries what
 another machine already computed and announced, and skips the armour and the network announcement.
 
 **The other events:**
 
 | 3.1c site | 3.1c call | Event |
 |---|---|---|
-| units: `KillUnit` with a self-destruct, a player's kill (`UnitsOnPlayersKillUnit`) | `DetonateUnitWeapon` | DETONATE from units, `value` 1 for the self-destruct weapon |
-| orders: the order's start and end (`unit_orders.cpp`, `vtol_orders.cpp`, `order_queue.cpp`) | `Unit::ClaimWeapons` | CLAIM from orders, `value` the weapon (0 to 2) or 3 for all |
+| units: `KillUnit` with a self-destruct, a player's kill (`UnitsOnPlayersKillUnit`) | `DetonateUnitWeapon` | DETONATE from units, with `WeaponsDetonate::selfDestruct` 1 for the self-destruct weapon |
+| orders: the order's start and end (`unit_orders.cpp`, `vtol_orders.cpp`, `order_queue.cpp`) | `Unit::ClaimWeapons` | CLAIM from orders, with `WeaponsClaim::weapon` the weapon (0 to 2) or 3 for all |
 | orders and units: the order's end, a unit's creation (`InitUnitFromType`) | `Unit::ReleaseWeapons` | RELEASE from orders and from units |
 | units: a unit is built or created from a packet (`units.cpp`) | `InitUnitWeaponSlots` | INIT_SLOTS from units |
 | units: a unit dies (`ApplyUnitDeath`) | `RemoveUnitProjectiles` | REMOVE_PROJECTILES from units |
 | units: a unit captured by another player (`UnitsOnPlayersCaptureUnit`) | the stockpiles copied into the new unit's slots | SET_STOCKPILES from units |
-| units: a saved game loads (`unit_save.cpp`) | the slot's fields restored, but its target pair | LOAD_SLOT from units, outside the tick; the target pair is targeting's, restored by targeting's LOAD (`docs/targeting-interface.md`, section 2) |
-| orders: a stockpile weapon's build order finishes a round (`BuildWeaponOrder`, `unit_orders.cpp`) | the slot's `stockpile` raised by one | ADD_STOCKPILE from orders, `value` the weapon (0 to 2) |
+| units: a saved game loads (`unit_save.cpp`) | the slot's fields restored, but its target pair | the slot `LoadState(unit, slot, state)`, called by units for each slot while a saved game loads, outside the tick, with a `WeaponsSlotState`; the target pair is targeting's, restored by targeting's LOAD (`docs/targeting-interface.md`, section 2) |
+| orders: a stockpile weapon's build order finishes a round (`BuildWeaponOrder`, `unit_orders.cpp`) | the slot's `stockpile` raised by one | ADD_STOCKPILE from orders, with `WeaponsAddStockpile::weapon` the weapon (0 to 2) |
 | scripts: an aim thread ends, or the aim script is missing (`cob.cpp`) | `WeaponAimCobComplete` | AIM_DONE from scripts |
 | scripts: the explode opcode (`script_explode.cpp`) | `CobScriptExplodePiece` | EXPLODE_PIECE from scripts |
 | features: a burning feature (`SpreadFire`), by features' effect AREA_DAMAGE | `ApplyAreaDamageAt` | AREA_DAMAGE, through `WeaponsOnFeaturesAreaDamage` |
@@ -120,7 +120,7 @@ every same-statement order is a route's (section 4).
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 47) and returned to no
 one: 1 for every kind, and 0 for SPAWN when the table of projectiles is full. `Apply` first rejects, with outcome 0
 and no change, an event naming a null unit (all but SPAWN, AREA_DAMAGE and AIM_DONE), a RELEASE or CLAIM outside
-weapon 0 to 3, a LOAD_SLOT or ADD_STOCKPILE outside 0 to 2, an AIM_DONE with no callback, a SPAWN or AREA_DAMAGE
+weapon 0 to 3, an ADD_STOCKPILE outside 0 to 2, an AIM_DONE with no callback, a SPAWN or AREA_DAMAGE
 naming a weapon outside the table (SPAWN may name -1), and an unknown kind.
 
 **Calls outside the interface.** `docs/schedule.md` listed, on the damage path of `DamageUnit`, `DetonateUnitWeapon`,
@@ -138,14 +138,14 @@ interface after `map.Apply` were the AREA_DAMAGE adapter, which now builds an ev
 |---|---|---|
 | `units.MarkRecentlyDamaged` in `ApplyUnitDamage` | MARK_DAMAGED | `UnitsOnWeaponsMarkDamaged`: `units.MarkRecentlyDamaged` |
 | `ai.ReactToAttack` and the notices, return fire and speech | ATTACKED | four routes in 3.1c's order: `UnitsOnWeaponsAttacked`, `AiOnWeaponsAttacked`, `OrdersOnWeaponsAttacked`, `UnitsOnWeaponsAttackedSpeech` (as #991 left them) |
-| the writes of the last attacker and damage kind | DAMAGE_RECORD | `UnitsOnWeaponsDamageRecord`: `lastDamageType`, and when `target` is not 0, `lastAttackerSlot` and `attacker` |
-| the write of `health` and the dying flag | HEALTH | `UnitsOnWeaponsHealth`: `health`, and flag 0x4000 when `extra` is 1 |
-| the paralysis order (`orders.MissionTypeFromName`, `NewOrder`, `AppendOrder`, the first order's `ticks`) | PARALYZE | `OrdersOnWeaponsParalyze`: adds `value` ticks to a first order that is a paralysis, else appends one |
+| the writes of the last attacker and damage kind | DAMAGE_RECORD | `UnitsOnWeaponsDamageRecord`: `lastDamageType`, and when `WeaponsDamageRecord::attacker` is not 0, `lastAttackerSlot` and `attacker` |
+| the write of `health` and the dying flag | HEALTH | `UnitsOnWeaponsHealth`: `health`, and flag 0x4000 when `WeaponsHealth::dying` is 1 |
+| the paralysis order (`orders.MissionTypeFromName`, `NewOrder`, `AppendOrder`, the first order's `ticks`) | PARALYZE | `OrdersOnWeaponsParalyze`: adds `WeaponsParalyze::ticks` ticks to a first order that is a paralysis, else appends one |
 | a shot hits (`ApplyWeaponHit`, `DetonateProjectile`, `ApplyAreaDamage`) | HIT | `OrdersOnWeaponsHit`: the `netDirtyFlags` split (as #991 left it) |
-| `scripts.StartScript`, `StartScriptWithArgs` (fire, aim, rock, hit-by-weapon and take-damage scripts) | START_SCRIPT | `ScriptsOnWeaponsStartScript`: the script's start, with the arguments when `extra` is 1 |
+| `scripts.StartScript`, `StartScriptWithArgs` (fire, aim, rock, hit-by-weapon and take-damage scripts) | START_SCRIPT | `ScriptsOnWeaponsStartScript`: the script's start, with the arguments when `WeaponsStartScript::withArgs` is 1; the `WeaponsScript` the payload names becomes the script's name |
 | `scripts.PoseUnitModel`, the piece's hide (`DetachPiece` of an exploded piece) | DETACH_PIECE | `ScriptsOnWeaponsDetachPiece` |
-| the notice bits written on a unit (`netDirtyFlags`) | NOTICE | `UnitsOnWeaponsNotice`: ORs `value` into `netDirtyFlags` |
-| the unit's `workTime` set for the idle animation | BUSY | `UnitsOnWeaponsBusy`: `workTime` becomes `value` |
+| the notice bits written on a unit (`netDirtyFlags`) | SHOT_FIRED, COMMAND_SHOT_FIRED, OUT_OF_REACH | `UnitsOnWeaponsNotice`: ORs bit 0x400 (SHOT_FIRED), 0x800 (COMMAND_SHOT_FIRED) or 0x1000 (OUT_OF_REACH) into `netDirtyFlags`; each kind is the header alone |
+| the unit's `workTime` set for the idle animation | BUSY | `UnitsOnWeaponsBusy`: `workTime` becomes `WeaponsBusy::until` |
 | `features.DamageFeature` | DAMAGE (features') | features' `Apply`, as before |
 | `targeting.ClearWeaponTarget` | CLEAR (targeting's) | targeting's `Apply`, as before |
 
@@ -157,12 +157,12 @@ the rules, units owns the record.
 
 | Field of `Unit` | Whose | Written how |
 |---|---|---|
-| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`) but the target pair: `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, LOAD_SLOT, ADD_STOCKPILE, AIM_DONE) and runs (`UpdateUnitWeapons`) |
+| the three weapon slots, `Unit::weapons[0]` to `[2]` (`UnitWeaponSlot`, `src/weapons/unit_weapon_slot.h`) but the target pair: `aimCob` (`ppVtbl`, `nAimCobDone`), `weapon`, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading`, `firePitch`, `stockpile`, `flags`; also read by their union names `weapon` (slot 0's weapon), `f_1f` (slot 0's flags), `f2c` and `f_3b` (slot 1's weapon and flags), `f48` and `f_57` (slot 2's weapon and flags) | weapons' view state, as map's bucket fields are in the same record (`docs/map-interface.md`, section 3) | by weapons' own events (INIT_SLOTS, RELEASE, CLAIM, SET_STOCKPILES, ADD_STOCKPILE, AIM_DONE), the slot `LoadState` and runs (`UpdateUnitWeapons`) |
 | the target pair of each slot, `aimTargetXOrUnitId` and `aimTargetZOrUnitSentinel`, the slot's first four bytes | targeting's (`docs/targeting-interface.md`, section 5) | by targeting's events (SET_UNIT, SET_POS, CLEAR, RESET, LOAD) and its slot `GetWeaponTargetPos`; a saved game's pair by LOAD, which units publishes as the save loads |
 | `health`, `flags` (0x4000 dying), `attacker`, `lastAttackerSlot`, `lastDamageType` | units' record | by the effects HEALTH and DAMAGE_RECORD, units' handlers; `health` has other writers (self-repair, build progress, orders) |
 | `recentlyDamagedTimer` | units' record | by MARK_DAMAGED |
 | `workTime` | units' record | by BUSY (orders write it too) |
-| the notice bits of `netDirtyFlags` (bits 10 to 14, mask 0x7c00) | units' record | by NOTICE; targeting's SET_UNIT and SET_POS clear them, and HIT sets bits 13 and 14 for orders |
+| the notice bits of `netDirtyFlags` (bits 10 to 14, mask 0x7c00) | units' record | by SHOT_FIRED, COMMAND_SHOT_FIRED and OUT_OF_REACH; targeting's SET_UNIT and SET_POS clear them, and HIT sets bits 13 and 14 for orders |
 | the first order's `ticks`, and the paralysis order | orders' record | by PARALYZE |
 
 **`scripts.QueryScript` and `scripts.GetAimFromPosition` stay synchronous slots of scripts (#986).** They are mixed:
@@ -174,6 +174,38 @@ issue.
 rules run in `src/weapons/damage.cpp` (`DamageUnit`, `ApplyUnitDamage`, `ParalyzeUnit`), and what they decide goes out
 as the effects above. It writes its own state: the projectile table, the explosions, the debris and the exploded pieces
 (section 5).
+
+**Payloads.** Every event and effect starts with `WeaponsEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for SPAWN, AREA_DAMAGE and AIM_DONE, which name none). Each kind has the payload of `interfaces/weapons.h` (version 3.0) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| DAMAGE 256, REMOTE_DAMAGE 257 | `WeaponsDamage` | `source` (the unit that dealt it, a block offset, 0 for none), `amount`, `damageKind` (1 a weapon, 2 a paralyser, 10 a repair that heals, 11 the water, others the cause of a death), `direction` (a 16-bit heading) |
+| DETONATE 258 | `WeaponsDetonate` | `selfDestruct`: 1 for the unit's self-destruct weapon, 0 for the weapon it explodes as |
+| RELEASE 259 | `WeaponsRelease` | `weapon`: 0 to 2, or 3 for all three |
+| CLAIM 260 | `WeaponsClaim` | `weapon`: 0 to 2, or 3 for all three |
+| INIT_SLOTS 261, REMOVE_PROJECTILES 262 | the header alone | none |
+| AIM_DONE 263 | `WeaponsAimDone` | `callback` (the aim callback START_SCRIPT passed, a block offset), `result` (what the aim script returned) |
+| EXPLODE_PIECE 264 | `WeaponsExplodePiece` | `piece`, `flags` (the explode flags of the script's opcode) |
+| AREA_DAMAGE 265 | `WeaponsAreaDamage` | `weapon` (its index in the table of weapons), `pos[3]` (the centre, world coordinates with 16 fractional bits) |
+| SPAWN 266 | `WeaponsSpawn` | `weapon` (-1 for none), `pos[3]`, `vel[3]` (per tick, 16 fractional bits), `announce` (1 when announced to the other machines) |
+| SET_STOCKPILES 267 | `WeaponsSetStockpiles` | `stockpiles[3]`: the stockpile of each of the unit's three weapons |
+| ADD_STOCKPILE 269 | `WeaponsAddStockpile` | `weapon`: 0 to 2 |
+| ATTACKED 272 | `WeaponsAttacked` | `attacker` (a block offset, 0 when no unit did), `amount` |
+| HIT 273 | `WeaponsHit` | `enemyDamage` (dealt to units of other players), `friendlyDamage` (dealt to units of the unit's own player) |
+| MARK_DAMAGED 274 | the header alone | none |
+| DAMAGE_RECORD 275 | `WeaponsDamageRecord` | `damageKind`, `attacker` (when not 0, it and its player become the unit's last attacker) |
+| HEALTH 276 | `WeaponsHealth` | `health` (the new health), `dying` (1 when the unit is marked to die) |
+| PARALYZE 277 | `WeaponsParalyze` | `ticks`: the ticks of paralysis to add |
+| START_SCRIPT 278 | `WeaponsStartScript` | `script` (a `WeaponsScript`), `callback` (the aim callback it returns to, a block offset, 0 for none), `update` (the script's flag update), `withArgs`, `count`, `args[4]` |
+| DETACH_PIECE 279 | `WeaponsDetachPiece` | `piece`, `pose` (1 when the model is first posed from its angles and animation) |
+| SHOT_FIRED 280, COMMAND_SHOT_FIRED 282, OUT_OF_REACH 283 | the header alone | none: these three are the notices its orders wait on, 0x400, 0x800 and 0x1000 of the unit's `netDirtyFlags` |
+| BUSY 281 | `WeaponsBusy` | `until`: the tick the unit is busy until |
+
+**`WeaponsScript`.** START_SCRIPT names the script by an enum, not by a name: NONE 0 (a script of an empty name, as a fire script's index 3 does), FIRE_PRIMARY 1, FIRE_SECONDARY 2, FIRE_TERTIARY 3 (the first, second and third weapon fires), AIM_PRIMARY 4, AIM_SECONDARY 5, AIM_TERTIARY 6, ROCK_UNIT 7, SET_MAX_RELOAD_TIME 8 (the longest reload of the unit's weapons, in milliseconds), HIT_BY_WEAPON 9 (the direction a hit came from) and TAKE_DAMAGE 10 (the share of its health a hit took). The scripts side maps each back to the name of the unit script it starts.
+
+**`LoadState`.** `LoadState(unit, slot, state)` replaces the LOAD_SLOT event of weapons 2.0. Units calls it for each of a unit's slots while a saved game loads, outside the tick, with a `WeaponsSlotState`: `aimDone`, `typeByte` (a byte of the weapon's type that the save keeps), `aimOffset`, `reload`, `heading`, `pitch`, `stockpile` and `flags` (the slot's flag bits 0, 1, 2 to 3 and 4). It sets the slot's fields as the save held them and writes nothing else; the slot's target pair is restored by targeting's LOAD.
+
+**NOTICE.** Weapons 2.0 had one NOTICE effect whose value held the bits to set in a unit's `netDirtyFlags`. The three bits are now kinds of their own, SHOT_FIRED (0x400), COMMAND_SHOT_FIRED (0x800) and OUT_OF_REACH (0x1000), each the header alone, and the units side ORs the bit of the kind it receives.
 
 ## 4. Views and routes
 
@@ -189,8 +221,8 @@ each module's last run.
 - **Queries:** `FindWeaponByName`, `WeaponCanReachUnit`, `FindTargetableProjectile` and `WeaponCanReachPos`.
 
 **As of weapons' last run.** By #952's rule a query needs a delivery first only when an event that can be pending
-writes what it reads. Weapons' queries read the weapon slots, the projectile table and the definitions. The only routes
-into weapons that are queued are LOAD_SLOT (published only while a save loads, outside the tick) and SPAWN (wind_meteors'
+writes what it reads. Weapons' queries read the weapon slots, the projectile table and the definitions. The only route
+into weapons that is queued is SPAWN (wind_meteors'
 effect), which writes the projectile table, and nothing queries that table's new entry before the phase boundary
 delivers it.
 
@@ -208,7 +240,7 @@ delivers it.
 | units INIT_SLOTS | synchronous | The gate (section 8). |
 | units REMOVE_PROJECTILES | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit dies in the units phase (`ApplyUnitDeath`), and later units' `UpdateUnitWeapons` read the projectile table (`FindTargetableProjectile`, an anti-missile weapon's target) before the phase boundary. |
 | units SET_STOCKPILES | synchronous | #952's rule. Queued it stayed equal on the tier, but the captured unit's (or copy's) stockpiles are read by its own `UpdateUnitWeapons` (a stockpile weapon fires only with stock) and by the network's unit-state packet, later in the same phase. |
-| units LOAD_SLOT | queued | Equal on the tier, and #952's rule does not need it: it is published only while a save loads (`unit_save.cpp`), outside the tick, where #970's rule delivers it at once. |
+| units `LoadState` | slot | Called directly, not an event: it replaces LOAD_SLOT, which was queued and equal. Units calls it for each slot while a saved game loads (`unit_save.cpp`), outside the tick. |
 | engine REMOTE_DAMAGE | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: the net phase (`HandleNetPackets`) applies packets in order, and the packets after it in the same phase read the damaged unit (a unit's state packet, a kill packet). The same argument as the engine's KILL_UNITS and GIVE_UNIT rows of `docs/players-interface.md`. |
 | scripts AIM_DONE | synchronous | #952's rule. Queued it stayed equal on the tier, but a missing aim script answers at once, inside weapons' own START_SCRIPT in `UpdateUnitWeapons` (`StartScriptWithArgsByIndex`, `cob.cpp`), and the same update then reads `aimCob.nAimCobDone` in the fire step before the phase ends. |
 | scripts EXPLODE_PIECE | synchronous | The gate (section 8). |
@@ -220,7 +252,7 @@ delivers it.
 | weapons PARALYZE, to orders | synchronous | #952's rule. Queued it stayed equal on the tier, but the paralysis order is read by the unit's own `RunOrders` later in the same units phase (weapons run before orders in a unit's update). |
 | weapons START_SCRIPT, to scripts | synchronous | The gate (section 8). |
 | weapons DETACH_PIECE, to scripts | synchronous | The gate (section 8). |
-| weapons NOTICE, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but the notice bits (`netDirtyFlags` 10 to 14) are written on a target in `UpdateUnitWeapons` and read by the target's targeting and orders and by the network's state packet later in the same phase. |
+| weapons SHOT_FIRED, COMMAND_SHOT_FIRED and OUT_OF_REACH, to units | synchronous | #952's rule, as NOTICE had it. Queued it stayed equal on the tier, but the notice bits (`netDirtyFlags` 10 to 14) are written on a target in `UpdateUnitWeapons` and read by the target's targeting and orders and by the network's state packet later in the same phase. |
 | weapons BUSY, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but it writes `workTime`, which the unit's orders read (nine reads in `unit_orders.cpp`) later in the same unit update. |
 | weapons ATTACKED (four routes), HIT | synchronous | As #991 left them (`docs/ai-interface.md`, section 8). |
 | weapons DAMAGE to features | synchronous | As before (the gate, `docs/features-interface.md`, section 8). |
@@ -284,7 +316,7 @@ hashes none of them. Each record is an event with the outcome `Apply` gave, or a
 Weapons draws from the game logic stream (`RandomInt`) when a shot spreads or a projectile explodes, in the fire step of
 `UpdateUnitWeapons` (units phase), in the projectile pass and in an explosion's debris. It records sim events (an
 explosion's sound and smoke, a unit's speech) where 3.1c did. Every route around these draws is synchronous (section
-4) but LOAD_SLOT (outside the tick) and SPAWN (a meteor's projectile, which draws nothing in its own event), so the
+4) but SPAWN (a meteor's projectile, which draws nothing in its own event), so the
 order in which events are published is the order of the calls in 3.1c, and each draw and record is made at the
 statement that makes it. The scheduler keeps the order of runs in a unit's update: units' head, weapons' step, units'
 body.
@@ -373,10 +405,10 @@ section 4).
 | weapons ATTACKED, HIT | unchanged | synchronous as #991 left them (`docs/ai-interface.md`, section 8) |
 | weapons DAMAGE to features, CLEAR to targeting | unchanged | synchronous as before (`docs/features-interface.md` and `docs/targeting-interface.md`, section 8) |
 
-**Inbox depths.** Every route into weapons but two is synchronous, so its inbox holds an event only while wind_meteors'
+**Inbox depths.** Every route into weapons but one is synchronous, so its inbox holds an event only while wind_meteors'
 SPAWN waits for the phase boundary: it was never deeper than 1, in any scenario (the SPAWNs of meteors-hailstorm and
 hailstorm-los-off, 150 each, and of console-features and meteors-earthquake, each delivered before the next was
-published). LOAD_SLOT is published only while a save loads, outside the tick, and is delivered at once. The most
+published). The slot `LoadState` is called only while a save loads, outside the tick. The most
 events delivered to weapons inside one tick was 541, in edges-economy-targeting at tick 245. A synchronous delivery
 into weapons ran inside another one 7 times, all orders' RELEASE: a DAMAGE (or features' AREA_DAMAGE) publishes
 ATTACKED, ai's handler reacts to the attack with an order that releases the unit's weapons, and that RELEASE runs

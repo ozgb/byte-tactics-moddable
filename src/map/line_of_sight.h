@@ -4,7 +4,7 @@ struct Cell;
 
 struct Cell;
 struct Eye;
-struct LosRadarEvent;
+struct LosRadarEventHeader;
 struct LosRadarMapInfo;
 struct LosSightCache;
 struct StateWriter;
@@ -27,7 +27,7 @@ void __stdcall FreeLosTables();
 Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
 unsigned int __stdcall SoundHeardMask(const Vec3* at);
 Cell* __stdcall GetOriginCellAtPosition(Vec3* pos);
-int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e);
+int __stdcall ApplyLosRadarEvent(const LosRadarEventHeader* event, unsigned int size);
 unsigned int __stdcall LosRadarRegionSize(const LosRadarMapInfo* map);
 void __stdcall LosRadarInit(const LosRadarMapInfo* map, void* region, unsigned int size);
 void* __stdcall LosRadarShutdown();

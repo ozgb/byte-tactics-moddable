@@ -8,20 +8,22 @@
 #include "../../interfaces/services.h"
 #include "ai_world.h"
 
-void AiInbox(const void* event)
+void AiInbox(const void* event, unsigned int size)
 {
-    const AiEvent* e = static_cast<const AiEvent*>(event);
-    HarnessAiEvent(e, g_seams.ai->Apply(e));
+    const AiEventHeader* e = static_cast<const AiEventHeader*>(event);
+    HarnessAiEvent(e, size, g_seams.ai->Apply(e, size));
 }
 
-void AiOnWeaponsAttacked(const void* event)
+void AiOnWeaponsAttacked(const void* event, unsigned int size)
 {
-    const WeaponsEvent* effect = static_cast<const WeaponsEvent*>(event);
-    AiEvent e;
+    if (size < sizeof(WeaponsAttacked))
+        return;
+    const WeaponsAttacked* effect = static_cast<const WeaponsAttacked*>(event);
+    AiReactToAttack e;
     memset(&e, 0, sizeof(e));
-    e.kind = AI_REACT_TO_ATTACK;
-    e.unit = effect->unit;
-    e.target = effect->target;
-    e.value = effect->value;
-    AiInbox(&e);
+    e.h.kind = AI_REACT_TO_ATTACK;
+    e.h.unit = effect->h.unit;
+    e.attacker = effect->attacker;
+    e.damage = effect->amount;
+    AiInbox(&e, sizeof(e));
 }

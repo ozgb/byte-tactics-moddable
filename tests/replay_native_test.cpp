@@ -97,6 +97,14 @@ void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int)
 {
 }
 
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int)
+{
+}
+
+void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];

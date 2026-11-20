@@ -1505,24 +1505,17 @@ enum ReplaySlotId {
     RSL_LOS_RADAR_SHUTDOWN,
     RSL_LOS_RADAR_SIGHTCACHE,
     RSL_LOS_RADAR_WRITESTATE,
-    RSL_ORDERS_APPENDORDER,
-    RSL_ORDERS_ADDORDER,
-    RSL_ORDERS_DELETEORDERS,
-    RSL_ORDERS_GETORDERFLAGS,
-    RSL_ORDERS_GETORDERTYPE,
-    RSL_ORDERS_ISSUEATTACKORDER,
-    RSL_ORDERS_REATTACHFXTOUNIT,
-    RSL_ORDERS_SERIALIZEORDERTOSAVE,
-    RSL_ORDERS_ADDBECARRIEDORDER,
+    RSL_ORDERS_APPLY,
     RSL_ORDERS_RUNORDERS,
     RSL_ORDERS_RUNSECONDARYORDERS,
+    RSL_ORDERS_GETORDERFLAGS,
+    RSL_ORDERS_GETORDERTYPE,
+    RSL_ORDERS_MISSIONTYPEFROMNAME,
     RSL_ORDERS_REGISTERALLORDERTYPES,
     RSL_ORDERS_CLEARORDERTYPETABLE,
-    RSL_ORDERS_LOADORDER,
-    RSL_ORDERS_MISSIONTYPEFROMNAME,
-    RSL_ORDERS_NEWORDER,
-    RSL_ORDERS_QUEUEBUILDORDER,
-    RSL_ORDERS_ORDERORSTATUSFLAGS,
+    RSL_ORDERS_LOADORDERS,
+    RSL_ORDERS_SAVEORDERS,
+    RSL_ORDERS_WRITESTATE,
     RSL_UNITS_UPDATEALLUNITS,
     RSL_UNITS_SETSTATEBITS,
     RSL_UNITS_MARKRECENTLYDAMAGED,
@@ -1563,12 +1556,15 @@ enum ReplaySlotId {
     RSL_UNITS_UPDATESFXOCCUPY,
     RSL_UNITS_UPDATEUNITHEAD,
     RSL_UNITS_UPDATEUNITBODY,
+    RSL_UNITS_UPDATEUNITTAIL,
     RSL_UNITS_GETFACTORIESINRADIUS,
     RSL_UNITS_CREATEFACTORYINDEX,
     RSL_UNITS_FREEFACTORYINDEX,
     RSL_UNITS_REFRESHFACTORYINDEX,
     RSL_UNITS_UNITREFINIT,
     RSL_UNITS_UNITREFSETUNIT,
+    RSL_UNITS_UNITREFGET,
+    RSL_UNITS_UNITREFSETVALUE,
     RSL_UNITS_WRITESTATE,
     RSL_PLAYERS_APPLY,
     RSL_PLAYERS_UPDATEPLAYERS,
@@ -1634,18 +1630,13 @@ enum ReplaySlotId {
     RSL_SCRIPTS_LOADSCRIPTSTATE,
     RSL_SCRIPTS_DELETESCRIPT,
     RSL_SCRIPTS_INITOBJECTSTATE,
+    RSL_MOVEMENT_APPLY,
     RSL_MOVEMENT_UPDATEMOTION,
     RSL_MOVEMENT_APPLYPATHEVENT,
-    RSL_MOVEMENT_NEWUNITMOTION,
-    RSL_MOVEMENT_LOADMOTION,
-    RSL_MOVEMENT_SAVEMOTION,
-    RSL_MOVEMENT_DESTROYMOTIONOBJECT,
-    RSL_MOVEMENT_UNITMOTIONREADNETSTATE,
-    RSL_MOVEMENT_SETFLIGHTMODE,
-    RSL_MOVEMENT_PATHORDERSETALTITUDE,
-    RSL_MOVEMENT_PATHORDERSETAPPROACHRADIUS,
-    RSL_MOVEMENT_PATHORDERSETHEADING,
-    RSL_MOVEMENT_AIRMANEUVERORDERSETALTITUDE,
+    RSL_MOVEMENT_GETMOTIONSTATE,
+    RSL_MOVEMENT_READNETSTATE,
+    RSL_MOVEMENT_HASNETSTATE,
+    RSL_MOVEMENT_WRITENETSTATE,
     RSL_MOVEMENT_NEWPATHORDERAT,
     RSL_MOVEMENT_NEWPATHORDERTOUNIT,
     RSL_MOVEMENT_NEWPATHORDERTOUNITAT,
@@ -1654,19 +1645,11 @@ enum ReplaySlotId {
     RSL_MOVEMENT_NEWAPPROACHRADIUS,
     RSL_MOVEMENT_NEWRINGAPPROACH,
     RSL_MOVEMENT_NEWPOINTMARKER,
-    RSL_MOVEMENT_LOADPATHORDER,
-    RSL_MOVEMENT_LOADAIRMANEUVERORDER,
-    RSL_MOVEMENT_LOADAPPROACHRADIUS,
-    RSL_MOVEMENT_LOADRINGAPPROACH,
-    RSL_MOVEMENT_LOADPOINTMARKER,
-    RSL_MOVEMENT_MOTIONGOAL,
-    RSL_MOVEMENT_GOALTARGET,
-    RSL_MOVEMENT_GOALSETPATHORDER,
-    RSL_MOVEMENT_ORDERFXDESTROY,
-    RSL_MOVEMENT_ORDERFXGETTYPE,
-    RSL_MOVEMENT_ORDERFXSERIALIZETOSAVE,
-    RSL_MOVEMENT_GOALHASNETUNITSTATE,
-    RSL_MOVEMENT_GOALSERIALIZENETUNITSTATE,
+    RSL_MOVEMENT_LOADTARGET,
+    RSL_MOVEMENT_SAVETARGET,
+    RSL_MOVEMENT_TARGETTYPE,
+    RSL_MOVEMENT_UNITTARGET,
+    RSL_MOVEMENT_WRITESTATE,
     RSL_FILES_OPENREAD,
     RSL_FILES_OPENAPPEND,
     RSL_FILES_CREATE,
@@ -1864,17 +1847,6 @@ static const unsigned short kReplayLosRadarIsPointVisibleObjReads[] = { 31, 32 }
 static const unsigned char kReplayLosRadarRefreshUnitIndexAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayLosRadarRefreshUnitIndexReads[] = { 0 };
 static const unsigned short kReplayLosRadarRefreshUnitIndexObjReads[] = { 25, 28, 34, 35, 37, 38, 108 };
-static const unsigned short kReplayOrdersAppendOrderObjReads[] = { 80 };
-static const unsigned short kReplayOrdersAppendOrderObjWrites[] = { 237 };
-static const unsigned short kReplayOrdersAddOrderObjReads[] = { 80 };
-static const unsigned short kReplayOrdersAddOrderObjWrites[] = { 80 };
-static const unsigned short kReplayOrdersDeleteOrdersObjReads[] = { 80, 237 };
-static const unsigned short kReplayOrdersGetOrderFlagsObjReads[] = { 80 };
-static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 17, 29 };
-static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 25, 28 };
-static const unsigned short kReplayOrdersIssueAttackOrderObjReads[] = { 35, 37, 51, 52, 53, 80 };
-static const unsigned short kReplayOrdersReattachFxToUnitObjReads[] = { 50, 236 };
-static const unsigned short kReplayOrdersAddBeCarriedOrderObjReads[] = { 72, 80, 237 };
 static const unsigned char kReplayOrdersRunOrdersReads[] = { 0 };
 static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 24, 35, 36, 48, 80, 235, 237, 240 };
 static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 48, 235 };
@@ -1882,7 +1854,9 @@ static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 46, 47,
 static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 46, 47, 48 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 235, 237, 240 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 235 };
-static const unsigned short kReplayOrdersQueueBuildOrderObjReads[] = { 50 };
+static const unsigned short kReplayOrdersGetOrderFlagsObjReads[] = { 80 };
+static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 17, 29 };
+static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 25, 28 };
 static const unsigned short kReplayUnitsSetStateBitsObjReads[] = { 0, 24, 36, 43 };
 static const unsigned short kReplayUnitsSetStateBitsObjWrites[] = { 38 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
@@ -1998,10 +1972,6 @@ static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 194, 195 
 static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 194, 195 };
 static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 43 };
 static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 35 };
-static const unsigned short kReplayMovementLoadMotionObjReads[] = { 44 };
-static const unsigned short kReplayMovementLoadMotionObjWrites[] = { 170, 171 };
-static const unsigned short kReplayMovementSaveMotionObjReads[] = { 44, 170, 171 };
-static const unsigned short kReplayMovementSetFlightModeObjWrites[] = { 171 };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoReads[] = { 16 };
 static const unsigned short kReplayNetworkBroadcastPlayerInfoObjReads[] = { 1, 22 };
@@ -2120,24 +2090,17 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "Shutdown", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SightCache", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "AppendOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersAppendOrderObjReads, 1, kReplayOrdersAppendOrderObjWrites, 1, nullptr, 0 },
-    { "AddOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersAddOrderObjReads, 1, kReplayOrdersAddOrderObjWrites, 1, nullptr, 0 },
-    { "DeleteOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersDeleteOrdersObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "GetOrderFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersGetOrderFlagsObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "GetOrderType", SUB_ORDERS, kReplayOrdersGetOrderTypeReads, 2, nullptr, 0, kReplayOrdersGetOrderTypeObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "IssueAttackOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersIssueAttackOrderObjReads, 6, nullptr, 0, nullptr, 0 },
-    { "ReattachFxToUnit", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersReattachFxToUnitObjReads, 2, nullptr, 0, nullptr, 0 },
-    { "SerializeOrderToSave", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "AddBeCarriedOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersAddBeCarriedOrderObjReads, 3, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RunOrders", SUB_ORDERS, kReplayOrdersRunOrdersReads, 1, nullptr, 0, kReplayOrdersRunOrdersObjReads, 9, kReplayOrdersRunOrdersObjWrites, 2, nullptr, 0 },
     { "RunSecondaryOrders", SUB_ORDERS, kReplayOrdersRunSecondaryOrdersReads, 4, kReplayOrdersRunSecondaryOrdersWrites, 3, kReplayOrdersRunSecondaryOrdersObjReads, 3, kReplayOrdersRunSecondaryOrdersObjWrites, 1, nullptr, 0 },
+    { "GetOrderFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersGetOrderFlagsObjReads, 1, nullptr, 0, nullptr, 0 },
+    { "GetOrderType", SUB_ORDERS, kReplayOrdersGetOrderTypeReads, 2, nullptr, 0, kReplayOrdersGetOrderTypeObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "MissionTypeFromName", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RegisterAllOrderTypes", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "ClearOrderTypeTable", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "MissionTypeFromName", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "NewOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "QueueBuildOrder", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersQueueBuildOrderObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "OrderOrStatusFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "LoadOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SaveOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteState", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateAllUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
     { "MarkRecentlyDamaged", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2178,12 +2141,15 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdateSfxOccupy", SUB_UNITS, kReplayUnitsUpdateSfxOccupyReads, 1, nullptr, 0, kReplayUnitsUpdateSfxOccupyObjReads, 6, nullptr, 0, nullptr, 0 },
     { "UpdateUnitHead", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 12, nullptr, 0, nullptr, 0 },
+    { "UpdateUnitTail", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetFactoriesInRadius", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsGetFactoriesInRadiusObjReads, 3, nullptr, 0, nullptr, 0 },
     { "CreateFactoryIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeFactoryIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "RefreshFactoryIndex", SUB_UNITS, kReplayUnitsRefreshFactoryIndexReads, 1, nullptr, 0, kReplayUnitsRefreshFactoryIndexObjReads, 6, nullptr, 0, kReplayUnitsRefreshFactoryIndexAllOf, 1 },
     { "UnitRefInit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitRefSetUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UnitRefGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UnitRefSetValue", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayers", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2249,18 +2215,13 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "LoadScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "InitObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementUpdateMotionObjReads, 1, nullptr, 0, nullptr, 0 },
     { "ApplyPathEvent", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "NewUnitMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementLoadMotionObjReads, 1, kReplayMovementLoadMotionObjWrites, 2, nullptr, 0 },
-    { "SaveMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementSaveMotionObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "DestroyMotionObject", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitMotionReadNetState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "SetFlightMode", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, kReplayMovementSetFlightModeObjWrites, 1, nullptr, 0 },
-    { "PathOrderSetAltitude", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "PathOrderSetApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "PathOrderSetHeading", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "AirManeuverOrderSetAltitude", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetMotionState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "ReadNetState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "HasNetState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteNetState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewPathOrderAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewPathOrderToUnit", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewPathOrderToUnitAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2269,19 +2230,11 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "NewApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewRingApproach", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NewPointMarker", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadPathOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadAirManeuverOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadRingApproach", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadPointMarker", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "MotionGoal", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GoalTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GoalSetPathOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "OrderFxDestroy", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "OrderFxGetType", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "OrderFxSerializeToSave", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GoalHasNetUnitState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GoalSerializeNetUnitState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "LoadTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SaveTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "TargetType", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UnitTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OpenRead", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OpenAppend", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Create", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -2375,15 +2328,15 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "weapons", 3, 0, 1, 66, 5 },
     { "targeting", 3, 0, 1, 71, 6 },
     { "los_radar", 4, 0, 0, 77, 28 },
-    { "orders", 4, 0, 0, 105, 18 },
-    { "units", 4, 0, 0, 123, 47 },
-    { "players", 4, 0, 0, 170, 28 },
-    { "map", 6, 0, 1, 198, 11 },
-    { "scripts", 1, 0, 0, 209, 25 },
-    { "movement", 2, 0, 0, 234, 33 },
-    { "mission", 1, 1, 0, 267, 0 },
-    { "files", 2, 0, 0, 267, 58 },
-    { "network", 1, 0, 0, 325, 22 },
+    { "orders", 5, 0, 0, 105, 11 },
+    { "units", 5, 0, 0, 116, 50 },
+    { "players", 4, 0, 0, 166, 28 },
+    { "map", 6, 0, 1, 194, 11 },
+    { "scripts", 1, 0, 0, 205, 25 },
+    { "movement", 3, 0, 0, 230, 20 },
+    { "mission", 1, 1, 0, 250, 0 },
+    { "files", 2, 0, 0, 250, 58 },
+    { "network", 1, 0, 0, 308, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

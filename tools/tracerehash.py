@@ -7,7 +7,7 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. Sections 24 and 25 are the records los_radar and units write through the state writer (`losRadarIndex[i].*`, `unitsFactories[i].*`). The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
 shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), weapons' report (`weaponsState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results (section 32), the economy events
-(section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40), players' events (section 41), ai's events (section 42) and weapons' events (section 47) are dumped only, and skipped.
+(section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40), players' events (section 41), ai's events (section 42), weapons' events (section 47), orders' events (section 48) and movement's events (section 49) are dumped only, and skipped.
 """
 
 import argparse
@@ -25,7 +25,8 @@ PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "w
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
 DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[",
                "windMeteors.", "windMeteors[", "targeting.", "targeting[", "los_radar.", "los_radar[", "map.", "map[",
-               "playersEvents.", "playersEvents[", "aiEvents.", "aiEvents[", "weaponsEvents.", "weaponsEvents[")
+               "playersEvents.", "playersEvents[", "aiEvents.", "aiEvents[", "weaponsEvents.", "weaponsEvents[",
+               "ordersEvents.", "ordersEvents[", "movementEvents.", "movementEvents[")
 
 
 class Error(Exception):

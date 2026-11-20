@@ -258,7 +258,8 @@ class SchemaJsonTest(unittest.TestCase):
     def test_every_event_section_has_one_field_list_per_kind(self):
         sections = {m.key: m.section for m in ts.EVENT_MODULES}
         self.assertEqual(sections, {"economy": 33, "features": 36, "windMeteors": 37, "targeting": 38, "los_radar": 39,
-                                    "map": 40, "playersEvents": 41, "aiEvents": 42, "weaponsEvents": 47})
+                                    "map": 40, "playersEvents": 41, "aiEvents": 42, "weaponsEvents": 47,
+                                    "ordersEvents": 48, "movementEvents": 49})
         targets = {t["name"] for t in self.model["targets"]}
         for module in ts.EVENT_MODULES:
             section = self.model[module.key]

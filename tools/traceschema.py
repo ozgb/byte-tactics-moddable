@@ -8,7 +8,7 @@ per table the fields in hash order and the plan the hash walks, the masks with t
 and the fields left out of the hash with their reasons. Its "results" entry is the record a dump
 holds for each path event the host delivers (section 32), in dump order; its "packets" entry
 is the record for each resource share packet the step sends (section 35). The event sections (economy 33,
-features 36, windMeteors 37, targeting 38, los_radar 39, map 40, playersEvents 41, aiEvents 42, weaponsEvents 47)
+features 36, windMeteors 37, targeting 38, los_radar 39, map 40, playersEvents 41, aiEvents 42, weaponsEvents 47, ordersEvents 48, movementEvents 49)
 each have "kinds": per kind value its enum name, the size of its payload and its own field list (the header's
 fields, then the payload's, then the outcome, which windMeteors has not), generated from the structs and enums
 of interfaces/ with the table EVENT_MODULES. The generated header holds the same lists with each field's offset
@@ -920,8 +920,8 @@ PACKET_FIELDS: list[tuple[str, int, str, str | None]] = [
     ("amount", 4, "scalar", None),
 ]
 INTERFACES = ROOT / "interfaces"
-EVENT_REF_NAMES = ("unit", "target", "source", "attacker")
-EVENT_HANDLE_NAMES = ("state",)
+EVENT_REF_NAMES = ("unit", "target", "source", "attacker", "builder")
+EVENT_HANDLE_NAMES = ("state", "order", "ref")
 EVENT_FLATTENED = ("PlayersOwnershipRecord",)
 EVENT_OUTCOME_OFFSET = "TRACE_EVENT_OUTCOME"
 SCALAR_TYPES = {"int": 4, "unsigned int": 4, "unsigned": 4, "float": 4, "EconUnit": 4, "EconType": 4,
@@ -932,8 +932,9 @@ UNIT_TYPES = ("unsigned int", "EconUnit", "PathUnit")
 class EventModule:
     """One event section: where it is dumped, which header and enums name its kinds, and each kind's payload."""
 
-    def __init__(self, key, section, c_name, header_file, header, enums, payloads, outcome=True):
+    def __init__(self, key, section, c_name, header_file, header, enums, payloads, outcome=True, handles=()):
         self.key, self.section, self.c_name = key, section, c_name
+        self.handles = handles
         self.header_file, self.header, self.enums = header_file, header, enums
         self.payloads, self.outcome = payloads, outcome
 
@@ -997,6 +998,37 @@ EVENT_MODULES = [
                  "WEAPONS_EFFECT_START_SCRIPT": "WeaponsStartScript", "WEAPONS_EFFECT_DETACH_PIECE": "WeaponsDetachPiece",
                  "WEAPONS_EFFECT_SHOT_FIRED": None, "WEAPONS_EFFECT_BUSY": "WeaponsBusy",
                  "WEAPONS_EFFECT_COMMAND_SHOT_FIRED": None, "WEAPONS_EFFECT_OUT_OF_REACH": None}),
+    EventModule("ordersEvents", 48, "Orders", "orders.h", "OrdersEventHeader",
+                ["OrdersEventKind", "OrdersEffectKind"],
+                {"ORDERS_ADD": "OrdersAdd", "ORDERS_QUEUE_BUILD": "OrdersQueueBuild", "ORDERS_STOP": "OrdersStop",
+                 "ORDERS_BE_CARRIED": "OrdersAttachToPiece", "ORDERS_STATUS_FLAGS": "OrdersStatusFlags",
+                 "ORDERS_ATTACKED": "OrdersAttacked", "ORDERS_PARALYZE": "OrdersParalyze",
+                 "ORDERS_COMMAND": "OrdersAdd",
+                 "ORDERS_EFFECT_SET_STATE_BITS": "OrdersSetStateBits", "ORDERS_EFFECT_SET_POSITION": "OrdersSetPosition",
+                 "ORDERS_EFFECT_ATTACH_TO_PIECE": "OrdersAttachToPiece",
+                 "ORDERS_EFFECT_FINISH_CONSTRUCTION": "OrdersFinishConstruction",
+                 "ORDERS_EFFECT_BUILD_DECAY": "OrdersBuildDecay", "ORDERS_EFFECT_REPAIR": "OrdersRepair",
+                 "ORDERS_EFFECT_UNLINK": "OrdersUnlink", "ORDERS_EFFECT_START_SCRIPT": "OrdersStartScript",
+                 "ORDERS_EFFECT_BUSY": "OrdersBusy", "ORDERS_EFFECT_SET_FLAGS": "OrdersSetFlags",
+                 "ORDERS_EFFECT_CLEAR_NET_DIRTY": "OrdersClearNetDirty", "ORDERS_EFFECT_SET_STANCE": "OrdersSetStance",
+                 "ORDERS_EFFECT_SET_ANGLES": "OrdersSetAngles",
+                 "ORDERS_EFFECT_SET_BUILD_STATE": "OrdersSetBuildState"}),
+    EventModule("movementEvents", 49, "Movement", "movement.h", "MovementEventHeader",
+                ["MovementEventKind", "MovementEffectKind"],
+                {"MOVEMENT_NEW": None, "MOVEMENT_DESTROY": None, "MOVEMENT_LOAD": "MovementLoad",
+                 "MOVEMENT_SET_MODE": "MovementSetMode", "MOVEMENT_SET_SPEED": "MovementSetSpeed",
+                 "MOVEMENT_PLACED": None, "MOVEMENT_SET_TARGET": "MovementTarget",
+                 "MOVEMENT_DESTROY_TARGET": "MovementTarget", "MOVEMENT_SET_FLIGHT_MODE": "MovementSetMode",
+                 "MOVEMENT_SET_ALTITUDE": "MovementTargetValue", "MOVEMENT_SET_APPROACH_RADIUS": "MovementTargetValue",
+                 "MOVEMENT_SET_HEADING": "MovementTargetValue",
+                 "MOVEMENT_EFFECT_ORDER_FLAGS": "MovementOrderFlags", "MOVEMENT_EFFECT_TURN": "MovementTurn",
+                 "MOVEMENT_EFFECT_TILT": "MovementTilt", "MOVEMENT_EFFECT_ANGLES": "MovementAngles",
+                 "MOVEMENT_EFFECT_MOVE": "MovementMove", "MOVEMENT_EFFECT_MOVED": "MovementMoved",
+                 "MOVEMENT_EFFECT_CHANGE_CELL": "MovementChangeCell", "MOVEMENT_EFFECT_MOVE_RATE": "MovementMoveRate",
+                 "MOVEMENT_EFFECT_SET_POSITION": "MovementSetPosition",
+                 "MOVEMENT_EFFECT_SET_STATE_BITS": "MovementSetStateBits",
+                 "MOVEMENT_EFFECT_SFX_OCCUPY": None, "MOVEMENT_EFFECT_START_SCRIPT": "MovementStartScript"},
+                handles=("target",)),
 ]
 
 
@@ -1040,10 +1072,10 @@ def event_fields(module, text, struct, prefix="", cprefix="", first=True):
             out += event_fields(module, text, ctype, prefix + name + ".", cprefix + name + ".", False)
         elif ctype in SCALAR_TYPES and not count:
             kind, target = "scalar", None
-            if name in EVENT_REF_NAMES and ctype in UNIT_TYPES:
-                kind, target = "ref", "unit"
-            elif name in EVENT_HANDLE_NAMES:
+            if name in module.handles or name in EVENT_HANDLE_NAMES:
                 kind = "handle"
+            elif name in EVENT_REF_NAMES and ctype in UNIT_TYPES:
+                kind, target = "ref", "unit"
             out.append((prefix + name, SCALAR_TYPES[ctype], kind, target, cprefix + name))
         else:
             each = SCALAR_TYPES[ctype] if ctype in SCALAR_TYPES else struct_size(text, ctype)

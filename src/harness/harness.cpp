@@ -2909,6 +2909,8 @@ static void VisitModuleState()
     g_seams.economy->WriteState(&s_stateWriter);
     g_seams.ai->WriteState(&s_stateWriter);
     g_seams.weapons->WriteState(&s_stateWriter);
+    g_seams.orders->WriteState(&s_stateWriter);
+    g_seams.movement->WriteState(&s_stateWriter);
     g_seams.map->WriteState(&s_stateWriter);
     g_seams.players->WriteState(&s_stateWriter);
     WriterEndRecord();
@@ -2978,11 +2980,12 @@ struct EventSection {
     bool lost;
 };
 
-enum { ES_ECONOMY, ES_WIND_METEORS, ES_FEATURES, ES_TARGETING, ES_LOS_RADAR, ES_MAP, ES_PLAYERS, ES_AI, ES_WEAPONS, ES_COUNT };
+enum { ES_ECONOMY, ES_WIND_METEORS, ES_FEATURES, ES_TARGETING, ES_LOS_RADAR, ES_MAP, ES_PLAYERS, ES_AI, ES_WEAPONS, ES_ORDERS, ES_MOVEMENT, ES_COUNT };
 
 static EventSection s_eventSections[ES_COUNT] = {
     { &kEconomyEvents },  { &kWindMeteorsEvents }, { &kFeaturesEvents }, { &kTargetingEvents }, { &kLosRadarEvents },
     { &kMapEvents },      { &kPlayersEvents },     { &kAiEvents },       { &kWeaponsEvents },
+    { &kOrdersEvents },   { &kMovementEvents },
 };
 
 static const TraceEventKind* FindEventKind(const TraceEventModule* module, int kind)
@@ -3050,6 +3053,16 @@ void __stdcall HarnessAiEvent(const AiEventHeader* event, unsigned int size, int
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader* event, unsigned int size, int outcome)
 {
     RecordEvent(ES_WEAPONS, event, size, outcome);
+}
+
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_ORDERS, event, size, outcome);
+}
+
+void __stdcall HarnessMovementEvent(const MovementEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_MOVEMENT, event, size, outcome);
 }
 
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)

@@ -14,6 +14,8 @@
 #include "../../interfaces/players.h"
 #include "../../interfaces/ai.h"
 #include "../../interfaces/weapons.h"
+#include "../../interfaces/orders.h"
+#include "../../interfaces/movement.h"
 
 enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF, TF_HANDLE };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
@@ -2179,6 +2181,421 @@ static const TraceEventKind kWeaponsKinds[] = {
     { 283, "WEAPONS_EFFECT_OUT_OF_REACH", sizeof(WeaponsEventHeader), kEventWeaponsEffectOutOfReach, 3 },
 };
 static const TraceEventModule kWeaponsEvents = { "weaponsEvents", 47, kWeaponsKinds, 25 };
+
+static_assert(sizeof(OrdersAdd) == 44, "OrdersAdd");
+static const TraceField kEventOrdersAdd[] = {
+    { "kind", offsetof(OrdersAdd, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersAdd, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "type", offsetof(OrdersAdd, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "queue", offsetof(OrdersAdd, queue), 4, TF_SCALAR, TT_NONE, 0 },
+    { "target", offsetof(OrdersAdd, target), 4, TF_REF, TT_UNIT, 0 },
+    { "hasPos", offsetof(OrdersAdd, hasPos), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(OrdersAdd, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "params", offsetof(OrdersAdd, params), 8, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersQueueBuild) == 44, "OrdersQueueBuild");
+static const TraceField kEventOrdersQueueBuild[] = {
+    { "kind", offsetof(OrdersQueueBuild, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersQueueBuild, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "count", offsetof(OrdersQueueBuild, count), 4, TF_SCALAR, TT_NONE, 0 },
+    { "name", offsetof(OrdersQueueBuild, name), 32, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersStop) == 12, "OrdersStop");
+static const TraceField kEventOrdersStop[] = {
+    { "kind", offsetof(OrdersStop, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersStop, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "all", offsetof(OrdersStop, all), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersAttachToPiece) == 20, "OrdersAttachToPiece");
+static const TraceField kEventOrdersBeCarried[] = {
+    { "kind", offsetof(OrdersAttachToPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersAttachToPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(OrdersAttachToPiece, target), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(OrdersAttachToPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "mode", offsetof(OrdersAttachToPiece, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersStatusFlags) == 16, "OrdersStatusFlags");
+static const TraceField kEventOrdersStatusFlags[] = {
+    { "kind", offsetof(OrdersStatusFlags, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersStatusFlags, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "order", offsetof(OrdersStatusFlags, order), 4, TF_HANDLE, TT_NONE, 0 },
+    { "flags", offsetof(OrdersStatusFlags, flags), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersAttacked) == 12, "OrdersAttacked");
+static const TraceField kEventOrdersAttacked[] = {
+    { "kind", offsetof(OrdersAttacked, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersAttacked, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "attacker", offsetof(OrdersAttacked, attacker), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersParalyze) == 12, "OrdersParalyze");
+static const TraceField kEventOrdersParalyze[] = {
+    { "kind", offsetof(OrdersParalyze, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersParalyze, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ticks", offsetof(OrdersParalyze, ticks), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersAdd) == 44, "OrdersAdd");
+static const TraceField kEventOrdersCommand[] = {
+    { "kind", offsetof(OrdersAdd, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersAdd, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "type", offsetof(OrdersAdd, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "queue", offsetof(OrdersAdd, queue), 4, TF_SCALAR, TT_NONE, 0 },
+    { "target", offsetof(OrdersAdd, target), 4, TF_REF, TT_UNIT, 0 },
+    { "hasPos", offsetof(OrdersAdd, hasPos), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(OrdersAdd, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "params", offsetof(OrdersAdd, params), 8, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetStateBits) == 16, "OrdersSetStateBits");
+static const TraceField kEventOrdersEffectSetStateBits[] = {
+    { "kind", offsetof(OrdersSetStateBits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetStateBits, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mask", offsetof(OrdersSetStateBits, mask), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(OrdersSetStateBits, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetPosition) == 24, "OrdersSetPosition");
+static const TraceField kEventOrdersEffectSetPosition[] = {
+    { "kind", offsetof(OrdersSetPosition, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetPosition, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(OrdersSetPosition, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "mode", offsetof(OrdersSetPosition, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersAttachToPiece) == 20, "OrdersAttachToPiece");
+static const TraceField kEventOrdersEffectAttachToPiece[] = {
+    { "kind", offsetof(OrdersAttachToPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersAttachToPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(OrdersAttachToPiece, target), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(OrdersAttachToPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "mode", offsetof(OrdersAttachToPiece, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersFinishConstruction) == 12, "OrdersFinishConstruction");
+static const TraceField kEventOrdersEffectFinishConstruction[] = {
+    { "kind", offsetof(OrdersFinishConstruction, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersFinishConstruction, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "builder", offsetof(OrdersFinishConstruction, builder), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersBuildDecay) == 12, "OrdersBuildDecay");
+static const TraceField kEventOrdersEffectBuildDecay[] = {
+    { "kind", offsetof(OrdersBuildDecay, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersBuildDecay, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ticks", offsetof(OrdersBuildDecay, ticks), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersRepair) == 16, "OrdersRepair");
+static const TraceField kEventOrdersEffectRepair[] = {
+    { "kind", offsetof(OrdersRepair, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersRepair, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "builder", offsetof(OrdersRepair, builder), 4, TF_REF, TT_UNIT, 0 },
+    { "amount", offsetof(OrdersRepair, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersUnlink) == 12, "OrdersUnlink");
+static const TraceField kEventOrdersEffectUnlink[] = {
+    { "kind", offsetof(OrdersUnlink, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersUnlink, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ref", offsetof(OrdersUnlink, ref), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersStartScript) == 76, "OrdersStartScript");
+static const TraceField kEventOrdersEffectStartScript[] = {
+    { "kind", offsetof(OrdersStartScript, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersStartScript, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "form", offsetof(OrdersStartScript, form), 4, TF_SCALAR, TT_NONE, 0 },
+    { "index", offsetof(OrdersStartScript, index), 4, TF_SCALAR, TT_NONE, 0 },
+    { "name", offsetof(OrdersStartScript, name), 32, TF_BYTES, TT_NONE, 0 },
+    { "callback", offsetof(OrdersStartScript, callback), 4, TF_SCALAR, TT_NONE, 0 },
+    { "update", offsetof(OrdersStartScript, update), 4, TF_SCALAR, TT_NONE, 0 },
+    { "count", offsetof(OrdersStartScript, count), 4, TF_SCALAR, TT_NONE, 0 },
+    { "args", offsetof(OrdersStartScript, args), 16, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersBusy) == 12, "OrdersBusy");
+static const TraceField kEventOrdersEffectBusy[] = {
+    { "kind", offsetof(OrdersBusy, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersBusy, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "until", offsetof(OrdersBusy, until), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetFlags) == 16, "OrdersSetFlags");
+static const TraceField kEventOrdersEffectSetFlags[] = {
+    { "kind", offsetof(OrdersSetFlags, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetFlags, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "clear", offsetof(OrdersSetFlags, clear), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(OrdersSetFlags, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersClearNetDirty) == 12, "OrdersClearNetDirty");
+static const TraceField kEventOrdersEffectClearNetDirty[] = {
+    { "kind", offsetof(OrdersClearNetDirty, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersClearNetDirty, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mask", offsetof(OrdersClearNetDirty, mask), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetStance) == 24, "OrdersSetStance");
+static const TraceField kEventOrdersEffectSetStance[] = {
+    { "kind", offsetof(OrdersSetStance, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetStance, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "fields", offsetof(OrdersSetStance, fields), 4, TF_SCALAR, TT_NONE, 0 },
+    { "moveOrder", offsetof(OrdersSetStance, moveOrder), 4, TF_SCALAR, TT_NONE, 0 },
+    { "fireOrder", offsetof(OrdersSetStance, fireOrder), 4, TF_SCALAR, TT_NONE, 0 },
+    { "group", offsetof(OrdersSetStance, group), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetAngles) == 20, "OrdersSetAngles");
+static const TraceField kEventOrdersEffectSetAngles[] = {
+    { "kind", offsetof(OrdersSetAngles, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetAngles, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "bank", offsetof(OrdersSetAngles, bank), 4, TF_SCALAR, TT_NONE, 0 },
+    { "heading", offsetof(OrdersSetAngles, heading), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pitch", offsetof(OrdersSetAngles, pitch), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(OrdersSetBuildState) == 16, "OrdersSetBuildState");
+static const TraceField kEventOrdersEffectSetBuildState[] = {
+    { "kind", offsetof(OrdersSetBuildState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersSetBuildState, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "buildLeft", offsetof(OrdersSetBuildState, buildLeft), 4, TF_SCALAR, TT_NONE, 0 },
+    { "health", offsetof(OrdersSetBuildState, health), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kOrdersKinds[] = {
+    { 288, "ORDERS_ADD", sizeof(OrdersAdd), kEventOrdersAdd, 9 },
+    { 289, "ORDERS_QUEUE_BUILD", sizeof(OrdersQueueBuild), kEventOrdersQueueBuild, 5 },
+    { 290, "ORDERS_STOP", sizeof(OrdersStop), kEventOrdersStop, 4 },
+    { 291, "ORDERS_BE_CARRIED", sizeof(OrdersAttachToPiece), kEventOrdersBeCarried, 6 },
+    { 292, "ORDERS_STATUS_FLAGS", sizeof(OrdersStatusFlags), kEventOrdersStatusFlags, 5 },
+    { 293, "ORDERS_ATTACKED", sizeof(OrdersAttacked), kEventOrdersAttacked, 4 },
+    { 294, "ORDERS_PARALYZE", sizeof(OrdersParalyze), kEventOrdersParalyze, 4 },
+    { 295, "ORDERS_COMMAND", sizeof(OrdersAdd), kEventOrdersCommand, 9 },
+    { 304, "ORDERS_EFFECT_SET_STATE_BITS", sizeof(OrdersSetStateBits), kEventOrdersEffectSetStateBits, 5 },
+    { 305, "ORDERS_EFFECT_SET_POSITION", sizeof(OrdersSetPosition), kEventOrdersEffectSetPosition, 5 },
+    { 306, "ORDERS_EFFECT_ATTACH_TO_PIECE", sizeof(OrdersAttachToPiece), kEventOrdersEffectAttachToPiece, 6 },
+    { 307, "ORDERS_EFFECT_FINISH_CONSTRUCTION", sizeof(OrdersFinishConstruction), kEventOrdersEffectFinishConstruction, 4 },
+    { 308, "ORDERS_EFFECT_BUILD_DECAY", sizeof(OrdersBuildDecay), kEventOrdersEffectBuildDecay, 4 },
+    { 309, "ORDERS_EFFECT_REPAIR", sizeof(OrdersRepair), kEventOrdersEffectRepair, 5 },
+    { 310, "ORDERS_EFFECT_UNLINK", sizeof(OrdersUnlink), kEventOrdersEffectUnlink, 4 },
+    { 311, "ORDERS_EFFECT_START_SCRIPT", sizeof(OrdersStartScript), kEventOrdersEffectStartScript, 10 },
+    { 312, "ORDERS_EFFECT_BUSY", sizeof(OrdersBusy), kEventOrdersEffectBusy, 4 },
+    { 313, "ORDERS_EFFECT_SET_FLAGS", sizeof(OrdersSetFlags), kEventOrdersEffectSetFlags, 5 },
+    { 314, "ORDERS_EFFECT_CLEAR_NET_DIRTY", sizeof(OrdersClearNetDirty), kEventOrdersEffectClearNetDirty, 4 },
+    { 315, "ORDERS_EFFECT_SET_STANCE", sizeof(OrdersSetStance), kEventOrdersEffectSetStance, 7 },
+    { 316, "ORDERS_EFFECT_SET_ANGLES", sizeof(OrdersSetAngles), kEventOrdersEffectSetAngles, 6 },
+    { 317, "ORDERS_EFFECT_SET_BUILD_STATE", sizeof(OrdersSetBuildState), kEventOrdersEffectSetBuildState, 5 },
+};
+static const TraceEventModule kOrdersEvents = { "ordersEvents", 48, kOrdersKinds, 22 };
+
+static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
+static const TraceField kEventMovementNew[] = {
+    { "kind", offsetof(MovementEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
+static const TraceField kEventMovementDestroy[] = {
+    { "kind", offsetof(MovementEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementLoad) == 52, "MovementLoad");
+static const TraceField kEventMovementLoad[] = {
+    { "kind", offsetof(MovementLoad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementLoad, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "state", offsetof(MovementLoad, state), 44, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementSetMode) == 12, "MovementSetMode");
+static const TraceField kEventMovementSetMode[] = {
+    { "kind", offsetof(MovementSetMode, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementSetMode, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mode", offsetof(MovementSetMode, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementSetSpeed) == 12, "MovementSetSpeed");
+static const TraceField kEventMovementSetSpeed[] = {
+    { "kind", offsetof(MovementSetSpeed, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementSetSpeed, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "speed", offsetof(MovementSetSpeed, speed), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
+static const TraceField kEventMovementPlaced[] = {
+    { "kind", offsetof(MovementEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTarget) == 12, "MovementTarget");
+static const TraceField kEventMovementSetTarget[] = {
+    { "kind", offsetof(MovementTarget, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTarget, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(MovementTarget, target), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTarget) == 12, "MovementTarget");
+static const TraceField kEventMovementDestroyTarget[] = {
+    { "kind", offsetof(MovementTarget, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTarget, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(MovementTarget, target), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementSetMode) == 12, "MovementSetMode");
+static const TraceField kEventMovementSetFlightMode[] = {
+    { "kind", offsetof(MovementSetMode, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementSetMode, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mode", offsetof(MovementSetMode, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTargetValue) == 16, "MovementTargetValue");
+static const TraceField kEventMovementSetAltitude[] = {
+    { "kind", offsetof(MovementTargetValue, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTargetValue, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(MovementTargetValue, target), 4, TF_HANDLE, TT_NONE, 0 },
+    { "value", offsetof(MovementTargetValue, value), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTargetValue) == 16, "MovementTargetValue");
+static const TraceField kEventMovementSetApproachRadius[] = {
+    { "kind", offsetof(MovementTargetValue, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTargetValue, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(MovementTargetValue, target), 4, TF_HANDLE, TT_NONE, 0 },
+    { "value", offsetof(MovementTargetValue, value), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTargetValue) == 16, "MovementTargetValue");
+static const TraceField kEventMovementSetHeading[] = {
+    { "kind", offsetof(MovementTargetValue, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTargetValue, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(MovementTargetValue, target), 4, TF_HANDLE, TT_NONE, 0 },
+    { "value", offsetof(MovementTargetValue, value), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementOrderFlags) == 16, "MovementOrderFlags");
+static const TraceField kEventMovementEffectOrderFlags[] = {
+    { "kind", offsetof(MovementOrderFlags, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementOrderFlags, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "order", offsetof(MovementOrderFlags, order), 4, TF_HANDLE, TT_NONE, 0 },
+    { "flags", offsetof(MovementOrderFlags, flags), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTurn) == 12, "MovementTurn");
+static const TraceField kEventMovementEffectTurn[] = {
+    { "kind", offsetof(MovementTurn, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTurn, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "delta", offsetof(MovementTurn, delta), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementTilt) == 16, "MovementTilt");
+static const TraceField kEventMovementEffectTilt[] = {
+    { "kind", offsetof(MovementTilt, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementTilt, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "bank", offsetof(MovementTilt, bank), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pitch", offsetof(MovementTilt, pitch), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementAngles) == 20, "MovementAngles");
+static const TraceField kEventMovementEffectAngles[] = {
+    { "kind", offsetof(MovementAngles, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementAngles, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "bank", offsetof(MovementAngles, bank), 4, TF_SCALAR, TT_NONE, 0 },
+    { "heading", offsetof(MovementAngles, heading), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pitch", offsetof(MovementAngles, pitch), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementMove) == 20, "MovementMove");
+static const TraceField kEventMovementEffectMove[] = {
+    { "kind", offsetof(MovementMove, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementMove, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(MovementMove, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementMoved) == 12, "MovementMoved");
+static const TraceField kEventMovementEffectMoved[] = {
+    { "kind", offsetof(MovementMoved, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementMoved, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "moved", offsetof(MovementMoved, moved), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementChangeCell) == 32, "MovementChangeCell");
+static const TraceField kEventMovementEffectChangeCell[] = {
+    { "kind", offsetof(MovementChangeCell, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementChangeCell, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(MovementChangeCell, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "cell", offsetof(MovementChangeCell, cell), 8, TF_BYTES, TT_NONE, 0 },
+    { "mode", offsetof(MovementChangeCell, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementMoveRate) == 12, "MovementMoveRate");
+static const TraceField kEventMovementEffectMoveRate[] = {
+    { "kind", offsetof(MovementMoveRate, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementMoveRate, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "rate", offsetof(MovementMoveRate, rate), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementSetPosition) == 24, "MovementSetPosition");
+static const TraceField kEventMovementEffectSetPosition[] = {
+    { "kind", offsetof(MovementSetPosition, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementSetPosition, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(MovementSetPosition, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "mode", offsetof(MovementSetPosition, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementSetStateBits) == 16, "MovementSetStateBits");
+static const TraceField kEventMovementEffectSetStateBits[] = {
+    { "kind", offsetof(MovementSetStateBits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementSetStateBits, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mask", offsetof(MovementSetStateBits, mask), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(MovementSetStateBits, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
+static const TraceField kEventMovementEffectSfxOccupy[] = {
+    { "kind", offsetof(MovementEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(MovementStartScript) == 12, "MovementStartScript");
+static const TraceField kEventMovementEffectStartScript[] = {
+    { "kind", offsetof(MovementStartScript, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementStartScript, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "script", offsetof(MovementStartScript, script), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kMovementKinds[] = {
+    { 320, "MOVEMENT_NEW", sizeof(MovementEventHeader), kEventMovementNew, 3 },
+    { 321, "MOVEMENT_DESTROY", sizeof(MovementEventHeader), kEventMovementDestroy, 3 },
+    { 322, "MOVEMENT_LOAD", sizeof(MovementLoad), kEventMovementLoad, 4 },
+    { 323, "MOVEMENT_SET_MODE", sizeof(MovementSetMode), kEventMovementSetMode, 4 },
+    { 324, "MOVEMENT_SET_SPEED", sizeof(MovementSetSpeed), kEventMovementSetSpeed, 4 },
+    { 325, "MOVEMENT_PLACED", sizeof(MovementEventHeader), kEventMovementPlaced, 3 },
+    { 326, "MOVEMENT_SET_TARGET", sizeof(MovementTarget), kEventMovementSetTarget, 4 },
+    { 327, "MOVEMENT_DESTROY_TARGET", sizeof(MovementTarget), kEventMovementDestroyTarget, 4 },
+    { 328, "MOVEMENT_SET_FLIGHT_MODE", sizeof(MovementSetMode), kEventMovementSetFlightMode, 4 },
+    { 329, "MOVEMENT_SET_ALTITUDE", sizeof(MovementTargetValue), kEventMovementSetAltitude, 5 },
+    { 330, "MOVEMENT_SET_APPROACH_RADIUS", sizeof(MovementTargetValue), kEventMovementSetApproachRadius, 5 },
+    { 331, "MOVEMENT_SET_HEADING", sizeof(MovementTargetValue), kEventMovementSetHeading, 5 },
+    { 336, "MOVEMENT_EFFECT_ORDER_FLAGS", sizeof(MovementOrderFlags), kEventMovementEffectOrderFlags, 5 },
+    { 337, "MOVEMENT_EFFECT_TURN", sizeof(MovementTurn), kEventMovementEffectTurn, 4 },
+    { 338, "MOVEMENT_EFFECT_TILT", sizeof(MovementTilt), kEventMovementEffectTilt, 5 },
+    { 339, "MOVEMENT_EFFECT_ANGLES", sizeof(MovementAngles), kEventMovementEffectAngles, 6 },
+    { 340, "MOVEMENT_EFFECT_MOVE", sizeof(MovementMove), kEventMovementEffectMove, 4 },
+    { 341, "MOVEMENT_EFFECT_MOVED", sizeof(MovementMoved), kEventMovementEffectMoved, 4 },
+    { 342, "MOVEMENT_EFFECT_CHANGE_CELL", sizeof(MovementChangeCell), kEventMovementEffectChangeCell, 6 },
+    { 343, "MOVEMENT_EFFECT_MOVE_RATE", sizeof(MovementMoveRate), kEventMovementEffectMoveRate, 4 },
+    { 344, "MOVEMENT_EFFECT_SET_POSITION", sizeof(MovementSetPosition), kEventMovementEffectSetPosition, 5 },
+    { 345, "MOVEMENT_EFFECT_SET_STATE_BITS", sizeof(MovementSetStateBits), kEventMovementEffectSetStateBits, 5 },
+    { 346, "MOVEMENT_EFFECT_SFX_OCCUPY", sizeof(MovementEventHeader), kEventMovementEffectSfxOccupy, 3 },
+    { 347, "MOVEMENT_EFFECT_START_SCRIPT", sizeof(MovementStartScript), kEventMovementEffectStartScript, 4 },
+};
+static const TraceEventModule kMovementEvents = { "movementEvents", 49, kMovementKinds, 24 };
 
 static const TraceField kWindFields[] = {
     { "windCounter", 0x37ec4, 4, TF_SCALAR, TT_NONE, 0x0 },

@@ -279,7 +279,8 @@ bool ReplayKindFits(unsigned declared, unsigned actual)
 unsigned ReplayConcreteKind(unsigned kind, const void* p)
 {
     const ReplayObjectKind& base = kReplayObjectKinds[kind];
-    if (p != nullptr && base.polyCount == 0 && ReplayVtable(kind) != nullptr && *(const void* const*)p != ReplayVtable(kind)) {
+    const void* word = p != nullptr ? *(const void* const*)p : nullptr;
+    if (word != nullptr && base.polyCount == 0 && ReplayVtable(kind) != nullptr && word != ReplayVtable(kind)) {
         char message[200];
         sprintf(message, "a %s has a vptr that is not %s", base.name, ReplayVtableName(kind));
         ReplayFail(message);

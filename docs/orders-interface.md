@@ -452,10 +452,14 @@ outside the tick; with them and map's PLACED queued together, the tier was equal
 | weapons ATTACKED, PARALYZE, HIT | unchanged | synchronous as before (`docs/ai-interface.md`, section 8, and `docs/weapons-interface.md`, section 8) |
 | orders to movement (six routes) | | in `docs/movement-interface.md`, section 8 |
 
-**Inbox depths.** Every route into orders that is published inside the tick is synchronous, and the three queued routes
-(the engine's COMMAND and QUEUE_BUILD, and movement's LOAD) are published only outside it, where each event is delivered
-at once (#970). So orders' inbox never holds an event inside the tick, `SchedEndTick` never finds one, and its depth is 0.
-No scenario counted it. A synchronous delivery into movement runs inside one into orders: `Apply` of STOP calls
-`DeleteOrders`, and `Order::~Order` publishes movement's SET_TARGET and DESTROY_TARGET (`order_queue.cpp`) through
-`SchedPublish`. A delivery into orders also runs inside orders' own run: `SelfDestructOrder` (in `RunOrders`) publishes
-weapons' DAMAGE, which publishes ATTACKED, whose route reaches orders' `Apply`.
+**Inbox depths.** A build that counted every publish and delivery played all 89 scenarios (87 wrote their counts;
+console-ilose and console-iwin exit before the dump), with native modules, and every scenario stayed equal. No route
+into orders is queued inside the tick: the three queued routes (the engine's COMMAND and QUEUE_BUILD, and movement's
+LOAD) are published only outside it, where each event is delivered at once (#970). So orders' inbox never held an event
+inside the tick, and its depth is 0. Orders' six queued effects go to units' inbox, which also takes other modules'
+events; its deepest was 5 events (orders-air-repair, tick 757), and BUSY, the busiest, was queued 1,282,535 times.
+Orders took at most 199 deliveries in one tick (edges-economy-targeting, tick 245), and deliveries nested at most 6
+deep, counting every module (console-units, tick 150). A synchronous delivery into movement runs inside one into orders:
+`Apply` of STOP calls `DeleteOrders`, and `Order::~Order` publishes movement's SET_TARGET and DESTROY_TARGET
+(`order_queue.cpp`) through `SchedPublish`. A delivery into orders also runs inside orders' own run: `SelfDestructOrder`
+(in `RunOrders`) publishes weapons' DAMAGE, which publishes ATTACKED, whose route reaches orders' `Apply`.

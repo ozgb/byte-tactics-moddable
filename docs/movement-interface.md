@@ -511,10 +511,14 @@ the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 
 | movement START_SCRIPT | diverged | mission-capture, tick 181, world phase: stored ea630c9c9a33e44c, got e83cde9c9860c414. |
 | movement ADD_UNIT, REMOVE_UNIT to map; UPDATE_UNIT to los_radar | unchanged | synchronous as before (`docs/map-interface.md` and `docs/los-radar-interface.md`, section 8); published from `SCHED_MOVEMENT` now |
 
-**Inbox depths.** Every route into movement that is published inside the tick is synchronous, and the one queued route
-(units' LOAD) is published only while a saved game loads, outside the tick, where each event is delivered at once (#970).
-So movement's inbox never holds an event inside the tick, `SchedEndTick` never finds one, and its depth is 0. No scenario
-counted it. A synchronous delivery into movement runs inside another delivery in two places the code shows: `Apply` of
-orders' STOP calls `DeleteOrders`, and `Order::~Order` publishes SET_TARGET and DESTROY_TARGET (`order_queue.cpp`), so
-movement's `Apply` runs inside orders' `Apply`; and `ApplyAttachUnit`, the handler of orders' ATTACH_TO_PIECE, publishes
-SET_MODE. The network's `ReceiveUnitStates` calls `UpdateMotion` directly, without a delivery (`TODO(#948)`).
+**Inbox depths.** A build that counted every publish and delivery played all 89 scenarios (87 wrote their counts;
+console-ilose and console-iwin exit before the dump), with native modules, and every scenario stayed equal. Four routes
+into movement are queued inside the tick: map's PLACED and orders' SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING.
+Movement's inbox held at most 3 events (long-greenhaven-8p, tick 48130), and `SchedEndTick` never found one. Units' LOAD
+is published only while a saved game loads, outside the tick, where each event is delivered at once (#970). Movement's
+five queued effects go to units' inbox, whose deepest was 5 events; SFX_OCCUPY, the busiest, was queued 7,268,389 times.
+Movement took at most 147 deliveries in one tick (edges-economy-targeting, tick 245). A synchronous delivery into
+movement runs inside another delivery in two places the code shows: `Apply` of orders' STOP calls `DeleteOrders`, and
+`Order::~Order` publishes SET_TARGET and DESTROY_TARGET (`order_queue.cpp`), so movement's `Apply` runs inside orders'
+`Apply`; and `ApplyAttachUnit`, the handler of orders' ATTACH_TO_PIECE, publishes SET_MODE. The network's
+`ReceiveUnitStates` calls `UpdateMotion` directly, without a delivery (`TODO(#948)`).

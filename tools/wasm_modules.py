@@ -1011,7 +1011,7 @@ def statics_run(path=None, report=None):
     def random_int(count):
         return rand32() % count if count > 0 else 0
 
-    def emit(_effect):
+    def emit(_effect, _size):
         state["spawns"] += 1
 
     def fatal_error(_message):

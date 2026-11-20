@@ -325,7 +325,7 @@ class MajorsTests(unittest.TestCase):
 
     def test_header_majors_read_every_interface(self):
         majors = wm.header_majors()
-        self.assertEqual(majors["wind_meteors"], 2)
+        self.assertEqual(majors["wind_meteors"], 3)
         self.assertIn("weapons", majors)
         self.assertIn("services", majors)
 

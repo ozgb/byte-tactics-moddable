@@ -10,7 +10,7 @@ from pathlib import Path
 import coupling
 import replay
 
-GOOD = "bt-replay 2\nsubsystem wind_meteors 2.0\ncall 1 UpdateWind\ncall 2 UpdateMeteors\n  r Game.width 1024\n  i services.GameRand main = 5\n  w rng.main 0x00000001\n"
+GOOD = "bt-replay 2\nsubsystem wind_meteors 3.0\ncall 1 UpdateWind\ncall 2 UpdateMeteors\n  r Game.width 1024\n  i services.GameRand main = 5\n  w rng.main 0x00000001\n"
 
 
 class Scenario(unittest.TestCase):
@@ -74,7 +74,7 @@ class Subsystems(unittest.TestCase):
     def test_every_simulation_subsystem_is_known(self):
         versions = replay.schema_versions()
         self.assertEqual(set(versions), set(coupling.SIM_SUBSYSTEMS) | {"files", "network"})
-        self.assertEqual(versions["wind_meteors"], "2.0")
+        self.assertEqual(versions["wind_meteors"], "3.0")
 
     def test_the_default_is_the_subsystems_with_recordings(self):
         self.assertEqual(replay.default_subsystems(), ["wind_meteors", "weapons", "targeting", "map"])

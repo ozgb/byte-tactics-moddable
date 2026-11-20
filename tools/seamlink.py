@@ -108,8 +108,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 ReparseAiWeightScriptsIfLimitNotSticky, CreateSquads, FreeSquads, CreateSquadManager and FreeSquadManager, run outside the tick, from the console and
                 players' set-up; their callers are CmdPrintWeights and CmdReloadAIProfiles (src/game/console_commands.cpp) and FreePlayers, InitPlayerSlot,
                 LoadDefaultAIScript and RebuildAIFeatureCells (src/game/players.cpp).
-                Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions and FreeExplosions, run outside the tick;
-                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp).
+                Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions, FreeExplosions and LoadState, run outside the tick;
+                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and LoadUnit (src/units/unit_save.cpp, the saved game).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
                 FirstFeatureSpot, FindFeatureAtPos; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
@@ -362,8 +362,9 @@ WEAPONS = Pilot(
     info_types=("Fixed", "MovableVec3", "ReachPosVec3", "ReachUnitVec3", "WakeVector"),
     rowless_calls=("_strcmpi", "strcmp", "operator Projectile *", "operator WeaponDef *", "operator bool", "bx_acos", "bx_hypot", "bx_sqrt"),
     frame_writers=(("WriteState", "CountExplosionTables"),),
-    setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions"),
-    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")))
+    setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions", "LoadState"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
+                   ("LoadUnit", "src/units/unit_save.cpp")))
 PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS)
 
 

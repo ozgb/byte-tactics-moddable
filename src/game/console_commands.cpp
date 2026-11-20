@@ -154,7 +154,7 @@ void* __stdcall PlaceFeature(void* target, unsigned short id, void* pos, void* a
 void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
 #include "../../interfaces/wind_meteors.h"
-#include "../seams/wind_meteors_world.h"
+#include "wind_meteors_events.h"
 #include "../../interfaces/services.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"

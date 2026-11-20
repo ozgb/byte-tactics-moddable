@@ -22,8 +22,10 @@ static Unit* UnitOfEvent(const PlayersEventHeader* h)
     return ref.get();
 }
 
-void UnitsOnPlayersKillUnit(const void* event)
+void UnitsOnPlayersKillUnit(const void* event, unsigned int size)
 {
+    if (size < sizeof(PlayersKillUnit))
+        return;
     const PlayersKillUnit* e = static_cast<const PlayersKillUnit*>(event);
     Unit* u = UnitOfEvent(&e->h);
     if (e->selfDestruct == 0) {
@@ -35,8 +37,10 @@ void UnitsOnPlayersKillUnit(const void* event)
     }
 }
 
-void UnitsOnPlayersSendUnit(const void* event)
+void UnitsOnPlayersSendUnit(const void* event, unsigned int size)
 {
+    if (size < sizeof(PlayersSendUnit))
+        return;
     const PlayersSendUnit* e = static_cast<const PlayersSendUnit*>(event);
     Unit* unit = UnitOfEvent(&e->h);
     Player* other = &g_game->players[e->player];
@@ -46,8 +50,10 @@ void UnitsOnPlayersSendUnit(const void* event)
     WeaponsPublishDamage(SCHED_UNITS, 0, unit, 30000, 4, 0);
 }
 
-void UnitsOnPlayersCaptureUnit(const void* event)
+void UnitsOnPlayersCaptureUnit(const void* event, unsigned int size)
 {
+    if (size < sizeof(PlayersCaptureUnit))
+        return;
     const PlayersCaptureUnit* e = static_cast<const PlayersCaptureUnit*>(event);
     Unit* unit = UnitOfEvent(&e->h);
     Player* other = &g_game->players[e->player];

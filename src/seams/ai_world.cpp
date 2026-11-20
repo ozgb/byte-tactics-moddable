@@ -6,18 +6,18 @@
 #include "../../interfaces/ai.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/services.h"
-#include "../game/ai_events.h"
 #include "ai_world.h"
 
-void AiInbox(const void* event)
+void AiInbox(const void* event, unsigned int size)
 {
     const AiEventHeader* e = static_cast<const AiEventHeader*>(event);
-    unsigned int size = AiEventSize(e->kind);
     HarnessAiEvent(e, size, g_seams.ai->Apply(e, size));
 }
 
-void AiOnWeaponsAttacked(const void* event)
+void AiOnWeaponsAttacked(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsAttacked))
+        return;
     const WeaponsAttacked* effect = static_cast<const WeaponsAttacked*>(event);
     AiReactToAttack e;
     memset(&e, 0, sizeof(e));
@@ -25,5 +25,5 @@ void AiOnWeaponsAttacked(const void* event)
     e.h.unit = effect->h.unit;
     e.attacker = effect->attacker;
     e.damage = effect->amount;
-    AiInbox(&e);
+    AiInbox(&e, sizeof(e));
 }

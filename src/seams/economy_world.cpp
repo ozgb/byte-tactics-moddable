@@ -151,10 +151,9 @@ const EconomyWorldView* __stdcall NativeEconomyWorld()
     return &s_world;
 }
 
-void EconomyInbox(const void* event)
+void EconomyInbox(const void* event, unsigned int size)
 {
     const EconomyEventHeader* e = static_cast<const EconomyEventHeader*>(event);
-    unsigned int size = EconomyEventSize(e->kind);
     HarnessEconomyEvent(e, size, g_seams.economy->Apply(e, size));
 }
 

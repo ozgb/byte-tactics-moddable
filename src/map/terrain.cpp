@@ -1464,6 +1464,8 @@ static bool BucketHolds(SpatialBucket* bucket, Unit* unit)
 
 int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(MapEventHeader))
+        return 0;
     if (size < MapEventSize(event->kind))
         return 0;
     switch (event->kind) {

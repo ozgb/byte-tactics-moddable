@@ -79,6 +79,8 @@ int __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount,
 
 int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(PlayersEventHeader))
+        return 0;
     if (size < PlayersEventSize(event->kind))
         return 0;
     Ref<Unit> ref;

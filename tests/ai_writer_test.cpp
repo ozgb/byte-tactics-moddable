@@ -145,7 +145,7 @@ void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
     if (outbox != SCHED_AI)
         return;
     if (event.h.kind == AI_EFFECT_STOP)
-        OrdersOnAiStop(&event);
+        OrdersOnAiStop(&event, sizeof(event));
 }
 
 static int IndexOf(Unit* unit)

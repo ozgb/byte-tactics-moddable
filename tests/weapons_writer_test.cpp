@@ -104,7 +104,7 @@ static bool IsHandled(SchedHandler handler)
         || handler == UnitsOnWeaponsHealth;
 }
 
-void __stdcall SchedPublish(int outbox, const void* data, unsigned int)
+void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
     int kind = *(const int*)data;
     int count = 0;
@@ -112,7 +112,7 @@ void __stdcall SchedPublish(int outbox, const void* data, unsigned int)
     for (int i = 0; i < count; i++)
         if (routes[i].outbox == outbox && routes[i].kind == kind && routes[i].synchronous && IsHandled(routes[i].handler)) {
             s_effects++;
-            routes[i].handler(data);
+            routes[i].handler(data, size);
         }
 }
 

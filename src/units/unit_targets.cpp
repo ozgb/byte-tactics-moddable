@@ -332,6 +332,8 @@ static int ResetWeaponTarget(Unit* obj, int index)
 
 int __stdcall ApplyTargetingEvent(const TargetingEventHeader* e, unsigned int size)
 {
+    if (size < sizeof(TargetingEventHeader))
+        return 0;
     Unit* unit = UnitOfHandle(e->unit);
     if (!unit || e->weapon < 0 || e->weapon > 2) {
         return 0;

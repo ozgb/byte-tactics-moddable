@@ -273,15 +273,10 @@ inline void WeaponsPublishDetachPiece(U* unit, int piece, int pose)
 }
 
 template <class U>
-inline void WeaponsPublishNotice(U* unit, int bits)
+inline void WeaponsPublishNotice(U* unit, int kind)
 {
-    static const int kinds[3] = {WEAPONS_EFFECT_SHOT_FIRED, WEAPONS_EFFECT_COMMAND_SHOT_FIRED, WEAPONS_EFFECT_OUT_OF_REACH};
-    for (int i = 0; i < 3; i++) {
-        if (bits & 0x400 << i) {
-            WeaponsEventHeader effect = WeaponsHeaderOf(kinds[i], unit);
-            WeaponsPublishEffect(&effect, sizeof(effect));
-        }
-    }
+    WeaponsEventHeader effect = WeaponsHeaderOf(kind, unit);
+    WeaponsPublishEffect(&effect, sizeof(effect));
 }
 
 template <class U>

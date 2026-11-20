@@ -109,7 +109,7 @@ buffer holds (orders pass 64).
 Partial results over several ticks don't happen in 3.1c (a search reports once, at its end). The
 interface has `PATH_EVENT_PROGRESS` for implementations that do.
 
-**Payloads.** Every event starts with `PathfindingEventHeader`: `kind`, `unit`, `requester`, `target` and `tick` (the tick of the step). Each kind has the payload of `interfaces/pathfinding.h` (version 4.0) that starts with it. `Poll(out, size, points, capacity)` copies the next payload to `out`, at most `size` bytes of it, and the first min(count, capacity) waypoints to `points`; it returns the payload's size, or 0 when no event is left.
+**Payloads.** Every event starts with `PathfindingEventHeader`: `kind`, `unit`, `requester`, `target` and `tick` (the tick of the step). Each kind has the payload of `interfaces/pathfinding.h` (version 4.0) that starts with it. `Poll(out, size, points, capacity)` copies the next payload to `out`, at most `size` bytes of it, and the first min(count, capacity) waypoints to `points`; it returns the payload's size, or 0 when no event is left. The engine zeroes `out` before each `Poll` and stops polling for the step at a return smaller than the header (0, a negative number, or the 1 of an older module).
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

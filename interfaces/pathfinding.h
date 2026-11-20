@@ -225,7 +225,7 @@ struct PathfindingSeam {
     void (__stdcall* CellsChanged)(int left, int top, int right, int bottom, unsigned int classes, int cause);
     // Does this tick's search work, as much as the implementation chooses; called once per tick, in the players phase.
     void (__stdcall* Step)(void);
-    // Takes the next event of the last step, in the order they happened, copies its payload to out, at most size bytes of it, and the first min(count, capacity) waypoints of its route to points; returns the payload's size, or 0 when none is left. Called after Step, in the same phase.
+    // Takes the next event of the last step, in the order they happened, copies its payload to out, at most size bytes of it, and the first min(count, capacity) waypoints of its route to points; returns the payload's size, or 0 when none is left; the engine stops polling at a return smaller than the header. Called after Step, in the same phase.
     int (__stdcall* Poll)(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);

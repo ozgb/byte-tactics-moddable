@@ -27,6 +27,7 @@ const unsigned int kInboxCapacity = 1024;
 
 struct InboxEntry {
     SchedHandler handler;
+    unsigned int size;
     unsigned int words[kEventWords];
 };
 
@@ -47,7 +48,7 @@ void __stdcall SchedDeliver(int module)
     while (inbox->head != inbox->tail) {
         InboxEntry entry = inbox->entries[inbox->head % kInboxCapacity];
         inbox->head++;
-        entry.handler(entry.words);
+        entry.handler(entry.words, entry.size);
     }
 }
 
@@ -59,6 +60,8 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     call.Int((int)size);
     if (size > sizeof(InboxEntry::words))
         FatalError((char*)"an event is larger than an inbox entry");
+    if (size < sizeof(int))
+        FatalError((char*)"an event is smaller than its kind");
     int kind = *static_cast<const int*>(event);
     int count;
     const SchedRoute* routes = SchedRoutes(&count);
@@ -68,7 +71,7 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
             continue;
         if (route->synchronous || !s_inTick) {
             SchedDeliver(route->subscriber);
-            route->handler(event);
+            route->handler(event, size);
             continue;
         }
         Inbox* inbox = &s_inboxes[route->subscriber];
@@ -76,6 +79,7 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
             SchedDeliver(route->subscriber);
         InboxEntry* entry = &inbox->entries[inbox->tail % kInboxCapacity];
         entry->handler = route->handler;
+        entry->size = size;
         memset(entry->words, 0, sizeof(entry->words));
         memcpy(entry->words, event, size);
         inbox->tail++;
@@ -225,8 +229,11 @@ void SchedPlayersPhase(RandStream stream)
     g_seams.pathfinding->Step();
     PathfindingFinished event;
     PathPoint waypoints[64];
-    int size;
-    while ((size = g_seams.pathfinding->Poll(&event.h, sizeof event, waypoints, 64)) != 0) {
+    for (;;) {
+        memset(&event, 0, sizeof event);
+        int size = g_seams.pathfinding->Poll(&event.h, sizeof event, waypoints, 64);
+        if (size < (int)sizeof(PathfindingEventHeader))
+            break;
         unsigned int got = (unsigned int)size < sizeof event ? (unsigned int)size : sizeof event;
         HarnessPathEvent(&event.h, got, waypoints, 64);
         g_seams.movement->ApplyPathEvent(&event.h, got, waypoints);

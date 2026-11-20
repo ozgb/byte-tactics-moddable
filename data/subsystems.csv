@@ -3277,7 +3277,6 @@ EconPublish,src/game/economy_events.h,game,file:src/game/economy,game
 EconPublishLoad,src/game/economy_events.h,game,file:src/game/economy,game
 EconSpend,src/game/economy_events.h,game,file:src/game/economy,game
 EconomyApply,src/game/economy.cpp,economy,file:src/game/economy,
-EconomyEventSize,src/game/economy_events.h,game,file:src/game/economy,game
 EconomyInbox,src/seams/economy_world.cpp,seams,folder:src/seams/,
 EconomyInit,src/game/economy.cpp,economy,file:src/game/economy,
 EconomyRegionSize,src/game/economy.cpp,economy,file:src/game/economy,
@@ -3342,7 +3341,6 @@ Fatal,src/state/block.cpp,game,default,
 FatalErrorImport,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 FeatureTypeCount,src/map/features.cpp,features,file:src/map/features,
 FeatureVec3,src/map/features.cpp,features,file:src/map/features,
-FeaturesEventSize,src/game/features_events.h,game,name:Feature,game
 FeaturesHeaderOf,src/game/features_events.h,game,name:Feature,game
 FeaturesInbox,src/seams/features_world.cpp,seams,folder:src/seams/,
 FeaturesPlaceOf,src/game/features_events.h,game,name:Feature,game
@@ -4336,8 +4334,7 @@ PruneLoose,src/orders/order_list.cpp,orders,file:src/orders/,
 PruneUsed,src/orders/order_list.cpp,orders,file:src/orders/,
 PublishCleared,src/units/unit_targets.cpp,targeting,default:src/units/,targeting
 PublishEffect,src/map/features.cpp,features,file:src/map/features,
-PublishMeteorSetUp,src/mission/map_list.cpp,mission,file:src/mission/,
-PublishWindMeteors,src/seams/wind_meteors_world.cpp,seams,folder:src/seams/,
+PublishWindMeteors,src/game/wind_meteors_events.h,game,name:Wind,game
 PumpNetPackets,src/network/net_game.cpp,network,file:src/network/,
 PurgeEvents,src/ai/pathfind_hpa.cpp,pathfinding,file:src/ai/pathfind,
 Push,src/host/win32/window.cpp,platform,folder:src/host/,
@@ -4818,6 +4815,7 @@ ReplayAddTextN,src/harness/replay_values.h,harness,folder:src/harness/,
 ReplayAddValue,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayAddValueList,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayAddValueOrNull,src/harness/replay_objects.cpp,harness,folder:src/harness/,
+ReplayAddValueSized,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayAddWeapon,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 ReplayAddWords,src/harness/replay_values.h,harness,folder:src/harness/,
 ReplayAnswerBusy,src/harness/replay.h,harness,folder:src/harness/,
@@ -5205,7 +5203,6 @@ TableRoom,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 TableSpan,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 TakeFrame,src/network/packets.cpp,network,file:src/network/,
 TakeVec3,src/ingame/sim_event_drain.cpp,presentation,presentation,
-TargetingEventSize,src/game/targeting_events.h,game,name:Target,game
 TargetingInbox,src/seams/targeting_world.cpp,seams,folder:src/seams/,
 TdfFieldVector::DestroyAll,src/util/tdf.cpp,platform,folder:src/util/,
 TdfFile::GetDouble,interfaces/services.h,platform,folder:interfaces/services.h,
@@ -5485,7 +5482,6 @@ WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsEmit,src/seams/wind_meteors_world.cpp,seams,folder:src/seams/,
 WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
-WindMeteorsEventSize,src/game/wind_meteors_events.h,game,name:Wind,game
 WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsInbox,src/seams/wind_meteors_world.cpp,seams,folder:src/seams/,

@@ -14,14 +14,18 @@ static Unit* UnitOfHandle(EconUnit handle)
     return ref.get();
 }
 
-void UnitsOnEconomyCloak(const void* event)
+void UnitsOnEconomyCloak(const void* event, unsigned int size)
 {
+    if (size < sizeof(EconomyCloak))
+        return;
     const EconomyCloak* effect = static_cast<const EconomyCloak*>(event);
     g_seams.units->SetStateBits(UnitOfHandle(effect->h.unit), 4, effect->keep);
 }
 
-void UnitsOnEconomyExtractor(const void* event)
+void UnitsOnEconomyExtractor(const void* event, unsigned int size)
 {
+    if (size < sizeof(EconomyExtractor))
+        return;
     const EconomyExtractor* effect = static_cast<const EconomyExtractor*>(event);
     Unit* unit = UnitOfHandle(effect->h.unit);
     if (unit->script != nullptr)

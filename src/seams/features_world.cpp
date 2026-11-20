@@ -6,13 +6,11 @@
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"
-#include "../game/features_events.h"
 #include "features_world.h"
 
-void FeaturesInbox(const void* event)
+void FeaturesInbox(const void* event, unsigned int size)
 {
     const FeaturesEventHeader* e = static_cast<const FeaturesEventHeader*>(event);
-    unsigned int size = FeaturesEventSize(e->kind);
     HarnessFeaturesEvent(e, size, g_seams.features->Apply(e, size));
 }
 

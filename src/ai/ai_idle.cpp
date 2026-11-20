@@ -12,6 +12,8 @@ const AiSeam* s_standard = nullptr;
 
 int __stdcall ApplyIdle(const AiEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(AiEventHeader))
+        return 0;
     if (event->kind == AI_REACT_TO_ATTACK) {
         Ref<Unit> ref;
         ref.offset = event->unit;

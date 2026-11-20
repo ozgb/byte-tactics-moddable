@@ -103,7 +103,7 @@ enum SchedModule {
     // The number of modules.
     SCHED_MODULE_COUNT = 15
 };
-// Publishes an event, plain data whose first int is its kind, to a module's outbox; the router copies it to the inbox of each subscriber of that kind, which consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
+// Publishes an event, plain data whose first int is its kind, of size bytes (at least 4, or a fatal error), to a module's outbox; the router copies it to the inbox of each subscriber of that kind, with its size, which the subscriber receives as the event's size, and the subscriber consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
 struct EconomySpend;
 // Calls economy's synchronous Spend slot for a spend after delivering economy's pending inbox, records it, and returns its outcome, visible at once.

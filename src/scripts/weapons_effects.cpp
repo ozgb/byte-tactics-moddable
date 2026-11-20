@@ -52,8 +52,10 @@ static const char* ScriptName(int script)
     return "";
 }
 
-void ScriptsOnWeaponsStartScript(const void* event)
+void ScriptsOnWeaponsStartScript(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsStartScript))
+        return;
     const WeaponsStartScript* e = static_cast<const WeaponsStartScript*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -71,8 +73,10 @@ void ScriptsOnWeaponsStartScript(const void* event)
         script->StartScript(name, callback, e->update);
 }
 
-void ScriptsOnWeaponsDetachPiece(const void* event)
+void ScriptsOnWeaponsDetachPiece(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsDetachPiece))
+        return;
     const WeaponsDetachPiece* e = static_cast<const WeaponsDetachPiece*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)

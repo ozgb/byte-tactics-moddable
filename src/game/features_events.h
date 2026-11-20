@@ -17,29 +17,6 @@ inline FeaturesEventHeader FeaturesHeaderOf(int kind)
     return header;
 }
 
-inline unsigned int FeaturesEventSize(int kind)
-{
-    switch (kind) {
-    case FEATURES_PLACE:
-        return sizeof(FeaturesPlace);
-    case FEATURES_REMOVE:
-        return sizeof(FeaturesRemove);
-    case FEATURES_DAMAGE:
-        return sizeof(FeaturesDamage);
-    case FEATURES_RECLAIM:
-        return sizeof(FeaturesReclaim);
-    case FEATURES_EFFECT_FREE_STATE:
-        return sizeof(FeaturesFreeState);
-    case FEATURES_EFFECT_INIT_STATE:
-        return sizeof(FeaturesInitState);
-    case FEATURES_EFFECT_PASS_MAPS:
-        return sizeof(FeaturesPassMaps);
-    case FEATURES_EFFECT_AREA_DAMAGE:
-        return sizeof(FeaturesAreaDamage);
-    }
-    return sizeof(FeaturesEventHeader);
-}
-
 inline FeaturesPlace FeaturesPlaceOf(int cellIndex, int width)
 {
     FeaturesPlace event;

@@ -1,10 +1,7 @@
 #ifndef WIND_METEORS_WORLD_H
 #define WIND_METEORS_WORLD_H
 
-struct MeteorShowerParams;
-
-void PublishWindMeteors(int kind, const MeteorShowerParams* params);
-void WindMeteorsInbox(const void* event);
-void WeaponsOnMeteorSpawn(const void* event);
+void WindMeteorsInbox(const void* event, unsigned int size);
+void WeaponsOnMeteorSpawn(const void* event, unsigned int size);
 
 #endif

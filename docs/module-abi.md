@@ -375,13 +375,15 @@ the fields of that kind, or has no payload struct, in which case the event is th
 header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
 offset. Two kinds share one payload struct only when their fields mean the same.
 
-The publisher passes the payload's size with it: `SchedPublish(outbox, &payload, sizeof payload)`. The scheduler copies
-`size` bytes into a 128-byte inbox entry as before and hands the module the event as a pointer to the header. A slot that
-consumes an event takes the header and the size, `Apply(header, size)`: it switches on `kind`, checks that `size` is at
-least the size of that kind's payload, and refuses a smaller one with outcome 0 and no change (a `void` `Apply`, as
-wind_meteors', just ignores it); only then does it read the payload's fields. The module's interface header says which
-struct belongs to which kind. An effect is routed by its kind, so its subscriber reads the payload of the kind it
-subscribed to.
+The publisher passes the payload's size with it: `SchedPublish(outbox, &payload, sizeof payload)`. An event of fewer
+than 4 bytes has no kind to route by, and is a fatal error. The scheduler copies `size` bytes into a 128-byte inbox entry,
+keeps the size with it, and hands the subscriber the event as a pointer to the header together with the size the publisher
+gave, whether it delivers the event at once or from the inbox. A slot that consumes an event takes the header and that
+size, `Apply(header, size)`: it first refuses a size smaller than the header with outcome 0, before it reads `kind`; then
+it switches on `kind`, checks that `size` is at least the size of that kind's payload, and refuses a smaller one with
+outcome 0 and no change (a `void` `Apply`, as wind_meteors', just ignores it); only then does it read the payload's fields.
+The module's interface header says which struct belongs to which kind. An effect is routed by its kind, so its subscriber
+reads the payload of the kind it subscribed to, and does nothing with an effect smaller than that payload.
 
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
@@ -558,11 +560,11 @@ signatures are below; those the manifest's modules import are also `signatures.s
 | `TdfRecord_GetFieldString` | `[handle, linear, linear, int, linear] -> int` | copies a field's text into a buffer (arguments: record, destination, key, size, default) |
 | `CommandArgs_GetIntArg` | `[scratch, int, int] -> int` | reads argument *index* of a console command as an integer, or the default |
 | `CommandArgs_Count` | `[scratch] -> int` | the number of arguments of a console command, its name included (`meteor 1` has 2); the recordings carry it as the `a args.count` line |
-| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
+| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the host refuses, as an import error, any kind but SPAWN, a size other than SPAWN's payload, and a weapon slot outside the table of weapons; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
-| `SchedPublish` | `[int, linear, int] -> void` | publishes the event or effect at the second argument (a payload, 6.1: plain data that starts with its kind, as many bytes as the third argument says) to the outbox the first argument names (a `SchedModule`); the scheduler's router copies it to the inbox of each module that subscribes to its kind |
+| `SchedPublish` | `[int, linear, int] -> void` | publishes the event or effect at the second argument (a payload, 6.1: plain data that starts with its kind, as many bytes as the third argument says) to the outbox the first argument names (a `SchedModule`); the scheduler's router copies it to the inbox of each module that subscribes to its kind, with its size, which the subscriber's `Apply` receives; fewer than 4 bytes is a fatal error |
 | `HarnessEconomyEvent` | `[linear, int, int] -> void` | in test mode, records an economy event or effect, its payload of the size in bytes that the second argument gives, with its outcome (third argument) for the dump's economy events; outside test mode it does nothing |
 | `HarnessFeaturesEvent` | `[linear, int, int] -> void` | the same for a features event or effect and the dump's features events |
 | `HarnessTargetingEvent` | `[linear, int, int] -> void` | the same for a targeting event or effect and the dump's targeting events |

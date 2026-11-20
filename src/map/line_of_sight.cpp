@@ -1701,6 +1701,8 @@ static Unit* LosUnitOfHandle(unsigned int handle)
 
 int __stdcall ApplyLosRadarEvent(const LosRadarEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(LosRadarEventHeader))
+        return 0;
     if (size < LosRadarEventSize(event->kind))
         return 0;
     switch (event->kind) {

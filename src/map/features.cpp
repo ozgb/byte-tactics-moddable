@@ -1126,6 +1126,8 @@ int __stdcall PlaceEvent(const FeaturesPlace* e)
 
 int __stdcall ApplyEvent(const FeaturesEventHeader* e, unsigned int size)
 {
+    if (size < sizeof(FeaturesEventHeader))
+        return 0;
     switch (e->kind) {
     case FEATURES_PLACE:
         if (size < sizeof(FeaturesPlace))

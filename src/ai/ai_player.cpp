@@ -345,6 +345,8 @@ static void ReactToAttack(Unit* unit)
 
 int __stdcall AiApply(const AiEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(AiEventHeader))
+        return 0;
     if (size < AiEventSize(event->kind))
         return 0;
     Unit* unit = AiUnitOf(event->unit);

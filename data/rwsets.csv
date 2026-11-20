@@ -10557,7 +10557,7 @@ address,function,file,kind,target
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,Mission::LoadBriefing
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,Mission::LoadMissionData
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,Mission::SelectSchema
-0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,PublishMeteorSetUp
+0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,PublishWindMeteors
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,TdfFile::LoadFile
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,TdfFile::ResetCurrentRecord
 0x435da0,Mission::LoadMission,src/mission/map_list.cpp,call,TdfFile::SelectRecord
@@ -42706,9 +42706,7 @@ address,function,file,kind,target
 ,AiIdleSeam,src/ai/ai_idle.cpp,global_escape,s_idle
 ,AiIdleSeam,src/ai/ai_idle.cpp,global_write,s_idle
 ,AiIdleSeam,src/ai/ai_idle.cpp,global_write,s_standard
-,AiInbox,src/seams/ai_world.cpp,call,AiEventSize
 ,AiInbox,src/seams/ai_world.cpp,call,HarnessAiEvent
-,AiInbox,src/seams/ai_world.cpp,field_read,AiEventHeader::kind
 ,AiInbox,src/seams/ai_world.cpp,field_read,AiSeam::Apply
 ,AiInbox,src/seams/ai_world.cpp,field_read,Seams::ai
 ,AiInbox,src/seams/ai_world.cpp,function,
@@ -44995,10 +44993,7 @@ address,function,file,kind,target
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyRequest::metal
 ,EconomyApply,src/game/economy.cpp,field_read,EconomyRequest::resources
 ,EconomyApply,src/game/economy.cpp,function,
-,EconomyEventSize,src/game/economy_events.h,function,
-,EconomyInbox,src/seams/economy_world.cpp,call,EconomyEventSize
 ,EconomyInbox,src/seams/economy_world.cpp,call,HarnessEconomyEvent
-,EconomyInbox,src/seams/economy_world.cpp,field_read,EconomyEventHeader::kind
 ,EconomyInbox,src/seams/economy_world.cpp,field_read,EconomySeam::Apply
 ,EconomyInbox,src/seams/economy_world.cpp,field_read,Seams::economy
 ,EconomyInbox,src/seams/economy_world.cpp,function,
@@ -45487,12 +45482,9 @@ address,function,file,kind,target
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::y
 ,FeatureVec3,src/map/features.cpp,field_write,Vec3::z
 ,FeatureVec3,src/map/features.cpp,function,
-,FeaturesEventSize,src/game/features_events.h,function,
 ,FeaturesHeaderOf,src/game/features_events.h,field_write,FeaturesEventHeader::kind
 ,FeaturesHeaderOf,src/game/features_events.h,function,
-,FeaturesInbox,src/seams/features_world.cpp,call,FeaturesEventSize
 ,FeaturesInbox,src/seams/features_world.cpp,call,HarnessFeaturesEvent
-,FeaturesInbox,src/seams/features_world.cpp,field_read,FeaturesEventHeader::kind
 ,FeaturesInbox,src/seams/features_world.cpp,field_read,FeaturesSeam::Apply
 ,FeaturesInbox,src/seams/features_world.cpp,field_read,Seams::features
 ,FeaturesInbox,src/seams/features_world.cpp,function,
@@ -50870,8 +50862,6 @@ address,function,file,kind,target
 ,Lookup,src/state/block.cpp,global_read,kFreeBit
 ,LosRadarEventSize,src/game/los_radar_events.h,function,
 ,LosRadarInbox,src/seams/los_radar_world.cpp,call,HarnessLosRadarEvent
-,LosRadarInbox,src/seams/los_radar_world.cpp,call,LosRadarEventSize
-,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,LosRadarEventHeader::kind
 ,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,LosRadarSeam::Apply
 ,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,Seams::los_radar
 ,LosRadarInbox,src/seams/los_radar_world.cpp,function,
@@ -51095,8 +51085,6 @@ address,function,file,kind,target
 ,MapFreeBuckets,src/map/terrain.cpp,function,
 ,MapFreeBuckets,src/map/terrain.cpp,global_read,g_game
 ,MapInbox,src/seams/map_world.cpp,call,HarnessMapEvent
-,MapInbox,src/seams/map_world.cpp,call,MapEventSize
-,MapInbox,src/seams/map_world.cpp,field_read,MapEventHeader::kind
 ,MapInbox,src/seams/map_world.cpp,field_read,MapSeam::Apply
 ,MapInbox,src/seams/map_world.cpp,field_read,Seams::map
 ,MapInbox,src/seams/map_world.cpp,function,
@@ -53102,8 +53090,6 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,global_read,g_game
 ,PlayersEventSize,src/game/players_events.h,function,
 ,PlayersInbox,src/seams/players_world.cpp,call,HarnessPlayersEvent
-,PlayersInbox,src/seams/players_world.cpp,call,PlayersEventSize
-,PlayersInbox,src/seams/players_world.cpp,field_read,PlayersEventHeader::kind
 ,PlayersInbox,src/seams/players_world.cpp,field_read,PlayersSeam::Apply
 ,PlayersInbox,src/seams/players_world.cpp,field_read,Seams::players
 ,PlayersInbox,src/seams/players_world.cpp,function,
@@ -53398,20 +53384,13 @@ address,function,file,kind,target
 ,PublishEffect,src/map/features.cpp,call,HarnessFeaturesEvent
 ,PublishEffect,src/map/features.cpp,call,SchedPublish
 ,PublishEffect,src/map/features.cpp,function,
-,PublishMeteorSetUp,src/mission/map_list.cpp,call,SchedPublish
-,PublishMeteorSetUp,src/mission/map_list.cpp,call,memset
-,PublishMeteorSetUp,src/mission/map_list.cpp,call,operator=
-,PublishMeteorSetUp,src/mission/map_list.cpp,deref_read,*MeteorShowerParams
-,PublishMeteorSetUp,src/mission/map_list.cpp,field_write,WindMeteorsEventHeader::kind
-,PublishMeteorSetUp,src/mission/map_list.cpp,field_write,WindMeteorsParams::params
-,PublishMeteorSetUp,src/mission/map_list.cpp,function,
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,SchedPublish
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,memset
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,call,operator=
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,deref_read,*MeteorShowerParams
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsEventHeader::kind
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,field_write,WindMeteorsParams::params
-,PublishWindMeteors,src/seams/wind_meteors_world.cpp,function,
+,PublishWindMeteors,src/game/wind_meteors_events.h,call,SchedPublish
+,PublishWindMeteors,src/game/wind_meteors_events.h,call,memset
+,PublishWindMeteors,src/game/wind_meteors_events.h,call,operator=
+,PublishWindMeteors,src/game/wind_meteors_events.h,deref_read,*MeteorShowerParams
+,PublishWindMeteors,src/game/wind_meteors_events.h,field_write,WindMeteorsEventHeader::kind
+,PublishWindMeteors,src/game/wind_meteors_events.h,field_write,WindMeteorsParams::params
+,PublishWindMeteors,src/game/wind_meteors_events.h,function,
 ,PumpNetPackets,src/network/net_game.cpp,call,HandleNetPackets
 ,PumpNetPackets,src/network/net_game.cpp,call,PacketManager::SendAllQueued
 ,PumpNetPackets,src/network/net_game.cpp,function,
@@ -57763,6 +57742,13 @@ address,function,file,kind,target
 ,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayAddValue
 ,ReplayAddValueOrNull,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayAddValueOrNull,src/harness/replay_objects.cpp,function,
+,ReplayAddValueSized,src/harness/replay_objects.cpp,call,ReplayAddValue
+,ReplayAddValueSized,src/harness/replay_objects.cpp,call,ReplayText::Add
+,ReplayAddValueSized,src/harness/replay_objects.cpp,call,memcpy
+,ReplayAddValueSized,src/harness/replay_objects.cpp,call,memset
+,ReplayAddValueSized,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::size
+,ReplayAddValueSized,src/harness/replay_objects.cpp,function,
+,ReplayAddValueSized,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,call,ReplayText::AddUnsigned
 ,ReplayAddWeapon,src/harness/replay_objects.cpp,field_escape,Game::weapons
@@ -58327,7 +58313,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddArgs
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddObjectName
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddTextN
-,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddValueOrNull
+,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddValueSized
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddWords
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayBytes
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayCalls
@@ -59384,11 +59370,12 @@ address,function,file,kind,target
 ,SchedDeliver,src/game/scheduler.cpp,field_read,Inbox::head
 ,SchedDeliver,src/game/scheduler.cpp,field_read,Inbox::tail
 ,SchedDeliver,src/game/scheduler.cpp,field_read,InboxEntry::handler
+,SchedDeliver,src/game/scheduler.cpp,field_read,InboxEntry::size
 ,SchedDeliver,src/game/scheduler.cpp,field_write,Inbox::head
 ,SchedDeliver,src/game/scheduler.cpp,function,
 ,SchedDeliver,src/game/scheduler.cpp,global_escape,s_inboxes
 ,SchedDeliver,src/game/scheduler.cpp,global_read,kInboxCapacity
-,SchedDeliver,src/game/scheduler.cpp,indirect_call,indirect via void (*)(const void *) __attribute__((stdcall)) [InboxEntry::handler]
+,SchedDeliver,src/game/scheduler.cpp,indirect_call,"indirect via void (*)(const void *, unsigned int) __attribute__((stdcall)) [InboxEntry::handler]"
 ,SchedEndTick,src/game/scheduler.cpp,call,FatalError
 ,SchedEndTick,src/game/scheduler.cpp,call,SchedPending
 ,SchedEndTick,src/game/scheduler.cpp,call,SchedPhaseBoundary
@@ -59435,6 +59422,7 @@ address,function,file,kind,target
 ,SchedPhaseBoundary,src/game/scheduler.cpp,function,
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,HarnessPathEvent
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,SchedDeliver
+,SchedPlayersPhase,src/game/scheduler.cpp,call,memset
 ,SchedPlayersPhase,src/game/scheduler.cpp,call,operator Unit *
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_escape,Game::players
 ,SchedPlayersPhase,src/game/scheduler.cpp,field_maybe_written,PathfindingFinished::h
@@ -59512,11 +59500,12 @@ address,function,file,kind,target
 ,SchedPublish,src/game/scheduler.cpp,field_read,SchedRoute::synchronous
 ,SchedPublish,src/game/scheduler.cpp,field_write,Inbox::tail
 ,SchedPublish,src/game/scheduler.cpp,field_write,InboxEntry::handler
+,SchedPublish,src/game/scheduler.cpp,field_write,InboxEntry::size
 ,SchedPublish,src/game/scheduler.cpp,function,
 ,SchedPublish,src/game/scheduler.cpp,global_escape,s_inboxes
 ,SchedPublish,src/game/scheduler.cpp,global_read,kInboxCapacity
 ,SchedPublish,src/game/scheduler.cpp,global_read,s_inTick
-,SchedPublish,src/game/scheduler.cpp,indirect_call,indirect via void (*const)(const void *) __attribute__((stdcall)) [SchedRoute::handler]
+,SchedPublish,src/game/scheduler.cpp,indirect_call,"indirect via void (*const)(const void *, unsigned int) __attribute__((stdcall)) [SchedRoute::handler]"
 ,SchedRoutes,src/game/routes.cpp,deref_write,*int
 ,SchedRoutes,src/game/routes.cpp,function,
 ,SchedRoutes,src/game/routes.cpp,global_escape,s_routes@src/game/routes.cpp
@@ -61010,11 +60999,8 @@ address,function,file,kind,target
 ,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::y
 ,TakeVec3,src/ingame/sim_event_drain.cpp,field_write,Vec3::z
 ,TakeVec3,src/ingame/sim_event_drain.cpp,function,
-,TargetingEventSize,src/game/targeting_events.h,function,
 ,TargetingInbox,src/seams/targeting_world.cpp,call,HarnessTargetingEvent
-,TargetingInbox,src/seams/targeting_world.cpp,call,TargetingEventSize
 ,TargetingInbox,src/seams/targeting_world.cpp,field_read,Seams::targeting
-,TargetingInbox,src/seams/targeting_world.cpp,field_read,TargetingEventHeader::kind
 ,TargetingInbox,src/seams/targeting_world.cpp,field_read,TargetingSeam::Apply
 ,TargetingInbox,src/seams/targeting_world.cpp,function,
 ,TargetingInbox,src/seams/targeting_world.cpp,global_read,g_seams
@@ -62974,9 +62960,7 @@ address,function,file,kind,target
 ,WeaponsHeaderOf,src/game/weapons_events.h,field_write,WeaponsEventHeader::unit
 ,WeaponsHeaderOf,src/game/weapons_events.h,function,
 ,WeaponsInbox,src/seams/weapons_world.cpp,call,HarnessWeaponsEvent
-,WeaponsInbox,src/seams/weapons_world.cpp,call,WeaponsEventSize
 ,WeaponsInbox,src/seams/weapons_world.cpp,field_read,Seams::weapons
-,WeaponsInbox,src/seams/weapons_world.cpp,field_read,WeaponsEventHeader::kind
 ,WeaponsInbox,src/seams/weapons_world.cpp,field_read,WeaponsSeam::Apply
 ,WeaponsInbox,src/seams/weapons_world.cpp,function,
 ,WeaponsInbox,src/seams/weapons_world.cpp,global_read,g_seams
@@ -63206,7 +63190,6 @@ address,function,file,kind,target
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,WindMeteorsSpawn::weapon
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,WindMeteorsEmitImport,src/wasm/wind_meteors_glue.cpp,function,
-,WindMeteorsEventSize,src/game/wind_meteors_events.h,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,global_read,s_fatalPending
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,call,FuelLeft
@@ -63216,9 +63199,7 @@ address,function,file,kind,target
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_read,s_fuelOpen
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,global_write,s_fuelOpen
 ,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,call,HarnessWindMeteorsEvent
-,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,call,WindMeteorsEventSize
 ,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,field_read,Seams::wind_meteors
-,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsEventHeader::kind
 ,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,field_read,WindMeteorsSeam::Apply
 ,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,function,
 ,WindMeteorsInbox,src/seams/wind_meteors_world.cpp,global_read,g_seams

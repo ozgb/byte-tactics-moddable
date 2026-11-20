@@ -143,7 +143,7 @@ static bool IsHandled(SchedHandler handler)
         || handler == UnitsOnWeaponsAttackedSpeech || handler == OrdersOnWeaponsHit || handler == OrdersOnAiStop;
 }
 
-void __stdcall SchedPublish(int outbox, const void* data, unsigned int)
+void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
     int kind = *(const int*)data;
     if (outbox == SCHED_ORDERS && kind == TARGETING_SET_UNIT)
@@ -152,7 +152,7 @@ void __stdcall SchedPublish(int outbox, const void* data, unsigned int)
     const SchedRoute* routes = SchedRoutes(&count);
     for (int i = 0; i < count; i++)
         if (routes[i].outbox == outbox && routes[i].kind == kind && routes[i].synchronous && IsHandled(routes[i].handler))
-            routes[i].handler(data);
+            routes[i].handler(data, size);
 }
 
 static int IndexOf(Unit* unit)
@@ -649,7 +649,7 @@ static int ReturnFire(int unit, int attacker)
     e.h = WeaponsHeaderOf(WEAPONS_EFFECT_ATTACKED, &s_units[unit]);
     e.attacker = attacker == 0 ? 0 : Ref<Unit>(&s_units[attacker]).offset;
     e.amount = 10;
-    OrdersOnWeaponsAttacked(&e);
+    OrdersOnWeaponsAttacked(&e, sizeof(e));
     int attacks = 0;
     for (size_t i = 0; i < s_log.size(); i++)
         if (s_log[i] == TAG_ATTACK)

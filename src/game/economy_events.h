@@ -23,26 +23,6 @@ inline EconomyEventHeader EconHeader(int kind, int player, EconUnit unit)
     return header;
 }
 
-inline unsigned int EconomyEventSize(int kind)
-{
-    switch (kind) {
-    case ECONOMY_LOAD:
-        return sizeof(EconomyLoad);
-    case ECONOMY_REQUEST:
-        return sizeof(EconomyRequest);
-    case ECONOMY_SPEND:
-        return sizeof(EconomySpend);
-    case ECONOMY_INCOME:
-        return sizeof(EconomyIncome);
-    case ECONOMY_EFFECT_CLOAK:
-        return sizeof(EconomyCloak);
-    case ECONOMY_EFFECT_EXTRACTOR:
-        return sizeof(EconomyExtractor);
-    case ECONOMY_EFFECT_SHARE:
-        return sizeof(EconomyShare);
-    }
-    return sizeof(EconomyEventHeader);
-}
 
 inline void EconPublish(int outbox, int kind, int player, EconUnit unit, unsigned int resources, float energy, float metal)
 {
@@ -81,7 +61,12 @@ template <class U>
 inline int EconRequest(int outbox, U* unit, unsigned int resources, float energy, float metal)
 {
     int granted = ScheduleEconomyRequestGranted(EconHandleOf(unit), resources);
-    EconPublish(outbox, ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit), resources, energy, metal);
+    EconomyRequest event;
+    event.h = EconHeader(ECONOMY_REQUEST, unit->playerIndex, EconHandleOf(unit));
+    event.resources = resources;
+    event.energy = energy;
+    event.metal = metal;
+    SchedPublish(outbox, &event, sizeof(event));
     return granted;
 }
 

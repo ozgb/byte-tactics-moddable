@@ -221,6 +221,8 @@ void __stdcall LoadMeteorDefaults(MeteorShowerParams* params)
 
 void __stdcall WindMeteorsApply(const WindMeteorsEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(WindMeteorsEventHeader))
+        return;
     switch (event->kind) {
     case WIND_METEORS_ENABLE:
         EnableMeteors();

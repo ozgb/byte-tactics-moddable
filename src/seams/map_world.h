@@ -5,7 +5,7 @@
 
 struct Vec3;
 
-void MapInbox(const void* event);
-void MapOnFeaturesPassMaps(const void* event);
+void MapInbox(const void* event, unsigned int size);
+void MapOnFeaturesPassMaps(const void* event, unsigned int size);
 
 #endif

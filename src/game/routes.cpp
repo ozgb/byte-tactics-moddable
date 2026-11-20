@@ -31,8 +31,10 @@
 #include "players.h"
 #include "scheduler.h"
 
-static void PathfindingOnMapCellsChanged(const void* event)
+static void PathfindingOnMapCellsChanged(const void* event, unsigned int size)
 {
+    if (size < sizeof(MapCellsChanged))
+        return;
     const MapCellsChanged* e = static_cast<const MapCellsChanged*>(event);
     g_seams.pathfinding->CellsChanged(e->rect[0], e->rect[1], e->rect[2], e->rect[3], e->classes, e->cause);
 }

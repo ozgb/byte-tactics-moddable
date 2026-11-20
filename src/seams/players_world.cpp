@@ -8,15 +8,16 @@
 #include "../game/players_events.h"
 #include "players_world.h"
 
-void PlayersInbox(const void* event)
+void PlayersInbox(const void* event, unsigned int size)
 {
     const PlayersEventHeader* e = static_cast<const PlayersEventHeader*>(event);
-    unsigned int size = PlayersEventSize(e->kind);
     HarnessPlayersEvent(e, size, g_seams.players->Apply(e, size));
 }
 
-void PlayersOnEconomyShare(const void* event)
+void PlayersOnEconomyShare(const void* event, unsigned int size)
 {
+    if (size < sizeof(EconomyShare))
+        return;
     const EconomyShare* effect = static_cast<const EconomyShare*>(event);
     PlayersTransfer transfer;
     memset(&transfer, 0, sizeof(transfer));
@@ -31,5 +32,5 @@ void PlayersOnEconomyShare(const void* event)
         transfer.resource = 0;
         transfer.amount = effect->energy;
     }
-    PlayersInbox(&transfer);
+    PlayersInbox(&transfer, sizeof(transfer));
 }

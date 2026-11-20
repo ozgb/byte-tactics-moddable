@@ -7,8 +7,10 @@
 #include "unit.h"
 #include "targeting_effects.h"
 
-void UnitsOnTargetingCleared(const void* event)
+void UnitsOnTargetingCleared(const void* event, unsigned int size)
 {
+    if (size < sizeof(TargetingEventHeader))
+        return;
     const TargetingEventHeader* effect = static_cast<const TargetingEventHeader*>(event);
     Ref<Unit> ref;
     ref.offset = effect->unit;

@@ -28,8 +28,10 @@ static int NoticeBit(int kind)
     return 0x1000;
 }
 
-void UnitsOnWeaponsAttacked(const void* event)
+void UnitsOnWeaponsAttacked(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsAttacked))
+        return;
     const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -37,8 +39,10 @@ void UnitsOnWeaponsAttacked(const void* event)
     g_seams.units->NotifyUnitRefs(unit, 16);
 }
 
-void UnitsOnWeaponsAttackedSpeech(const void* event)
+void UnitsOnWeaponsAttackedSpeech(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsAttacked))
+        return;
     const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -48,8 +52,10 @@ void UnitsOnWeaponsAttackedSpeech(const void* event)
         RecordUnitSpeech(unit, 2, SIM_SPEECH_KIND_TEXT, SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
 }
 
-void UnitsOnWeaponsMarkDamaged(const void* event)
+void UnitsOnWeaponsMarkDamaged(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsEventHeader))
+        return;
     const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
@@ -57,8 +63,10 @@ void UnitsOnWeaponsMarkDamaged(const void* event)
     g_seams.units->MarkRecentlyDamaged(unit);
 }
 
-void UnitsOnWeaponsDamageRecord(const void* event)
+void UnitsOnWeaponsDamageRecord(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsDamageRecord))
+        return;
     const WeaponsDamageRecord* e = static_cast<const WeaponsDamageRecord*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -71,8 +79,10 @@ void UnitsOnWeaponsDamageRecord(const void* event)
     }
 }
 
-void UnitsOnWeaponsHealth(const void* event)
+void UnitsOnWeaponsHealth(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsHealth))
+        return;
     const WeaponsHealth* e = static_cast<const WeaponsHealth*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -82,8 +92,10 @@ void UnitsOnWeaponsHealth(const void* event)
         unit->flags |= 0x4000;
 }
 
-void UnitsOnWeaponsNotice(const void* event)
+void UnitsOnWeaponsNotice(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsEventHeader))
+        return;
     const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
@@ -91,8 +103,10 @@ void UnitsOnWeaponsNotice(const void* event)
     unit->netDirtyFlags |= (unsigned short)NoticeBit(e->kind);
 }
 
-void UnitsOnWeaponsBusy(const void* event)
+void UnitsOnWeaponsBusy(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsBusy))
+        return;
     const WeaponsBusy* e = static_cast<const WeaponsBusy*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)

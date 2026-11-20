@@ -1254,7 +1254,7 @@ int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit,
         }
         if (!ok) {
             unit->flags &= 0xfe;
-            WeaponsPublishNotice(fire, 0x1000);
+            WeaponsPublishNotice(fire, WEAPONS_EFFECT_OUT_OF_REACH);
             return 0;
         }
         if (!AimWithinTolerance(fire, unit, heading, pitch)) {
@@ -1608,12 +1608,11 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                 int pct = 100 - n * 6;
                 e->reloadTimer = (short)((BT_REPLAY_INJECT_RELOAD_BASE - q) * (pct * attached->reloadTime / 100) / 100);
             }
-            int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
-            WeaponsPublishNotice(unit, m);
+            WeaponsPublishNotice(unit, attached->flags.b.commandFire ? WEAPONS_EFFECT_COMMAND_SHOT_FIRED : WEAPONS_EFFECT_SHOT_FIRED);
             if (!attached->flags.b.stockpile)
                 EconSpend(unit->playerIndex, EconHandleOf(unit), ECON_ENERGY | ECON_METAL, attached->energyPerShot, attached->metalPerShot);
         } else {
-            WeaponsPublishNotice(unit, 0x1000);
+            WeaponsPublishNotice(unit, WEAPONS_EFFECT_OUT_OF_REACH);
         }
     }
 }

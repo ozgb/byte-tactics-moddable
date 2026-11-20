@@ -298,6 +298,8 @@ static int SpendOn(EconAccount* a, Player* pl, unsigned int resources, float ene
 
 int __stdcall EconomyApply(const EconomyEventHeader* event, unsigned int size)
 {
+    if (size < sizeof(EconomyEventHeader))
+        return 0;
     switch (event->kind) {
     case ECONOMY_RESET:
         ResetAccount(event->player, event->unit);

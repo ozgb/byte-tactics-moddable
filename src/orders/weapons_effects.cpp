@@ -30,8 +30,10 @@ static Unit* UnitOfOffset(unsigned int offset)
     return ref.get();
 }
 
-void OrdersOnWeaponsAttacked(const void* event)
+void OrdersOnWeaponsAttacked(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsAttacked))
+        return;
     const WeaponsAttacked* e = static_cast<const WeaponsAttacked*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -59,8 +61,10 @@ void OrdersOnWeaponsAttacked(const void* event)
     }
 }
 
-void OrdersOnWeaponsHit(const void* event)
+void OrdersOnWeaponsHit(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsHit))
+        return;
     const WeaponsHit* e = static_cast<const WeaponsHit*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)
@@ -68,8 +72,10 @@ void OrdersOnWeaponsHit(const void* event)
     unit->netDirtyFlags |= (e->enemyDamage > e->friendlyDamage * 2) ? 0x4000 : 0x2000;
 }
 
-void OrdersOnWeaponsParalyze(const void* event)
+void OrdersOnWeaponsParalyze(const void* event, unsigned int size)
 {
+    if (size < sizeof(WeaponsParalyze))
+        return;
     const WeaponsParalyze* e = static_cast<const WeaponsParalyze*>(event);
     Unit* unit = UnitOfOffset(e->h.unit);
     if (unit == nullptr)

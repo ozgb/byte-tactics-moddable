@@ -9,19 +9,20 @@
 #include "weapons_world.h"
 
 
-void WeaponsInbox(const void* event)
+void WeaponsInbox(const void* event, unsigned int size)
 {
     const WeaponsEventHeader* e = static_cast<const WeaponsEventHeader*>(event);
-    unsigned int size = WeaponsEventSize(e->kind);
     HarnessWeaponsEvent(e, size, g_seams.weapons->Apply(e, size));
 }
 
-void WeaponsOnFeaturesAreaDamage(const void* event)
+void WeaponsOnFeaturesAreaDamage(const void* event, unsigned int size)
 {
+    if (size < sizeof(FeaturesAreaDamage))
+        return;
     const FeaturesAreaDamage* effect = static_cast<const FeaturesAreaDamage*>(event);
     WeaponsAreaDamage e;
     e.h = WeaponsHeaderOf(WEAPONS_AREA_DAMAGE);
     e.weapon = effect->weapon;
     memcpy(e.pos, effect->pos, sizeof(e.pos));
-    WeaponsInbox(&e);
+    WeaponsInbox(&e, sizeof(e));
 }

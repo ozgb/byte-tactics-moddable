@@ -20,19 +20,6 @@ inline TargetingEventHeader TargetingHeaderOf(int kind, U* unit, int weapon)
     return header;
 }
 
-inline unsigned int TargetingEventSize(int kind)
-{
-    switch (kind) {
-    case TARGETING_SET_UNIT:
-        return sizeof(TargetingSetUnit);
-    case TARGETING_SET_POS:
-        return sizeof(TargetingSetPos);
-    case TARGETING_LOAD:
-        return sizeof(TargetingLoad);
-    }
-    return sizeof(TargetingEventHeader);
-}
-
 template <class U, class T>
 inline void TargetingPublishSetUnit(int outbox, U* unit, T* target, int weapon)
 {

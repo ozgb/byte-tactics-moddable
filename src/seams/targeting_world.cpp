@@ -10,10 +10,9 @@
 #include "../game/targeting_events.h"
 #include "targeting_world.h"
 
-void TargetingInbox(const void* event)
+void TargetingInbox(const void* event, unsigned int size)
 {
     const TargetingEventHeader* e = static_cast<const TargetingEventHeader*>(event);
-    unsigned int size = TargetingEventSize(e->kind);
     HarnessTargetingEvent(e, size, g_seams.targeting->Apply(e, size));
 }
 

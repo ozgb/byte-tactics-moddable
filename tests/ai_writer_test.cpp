@@ -8,6 +8,7 @@
 #include "../interfaces/seams.h"
 #include "../interfaces/services.h"
 #include "../interfaces/ai.h"
+#include "../interfaces/orders.h"
 #include "../src/state/sim_globals.h"
 #include "../src/units/unit_def.h"
 #include "../src/units/unit_type_set.h"
@@ -23,7 +24,9 @@
 #include "../src/ai/squad_manager.h"
 #pragma pack(pop)
 #include "../src/ai/ai_player.h"
-#include "../src/orders/ai_effects.h"
+#include "../src/orders/order_list.h"
+#include "../src/orders/orders_seam.h"
+#include "../src/seams/orders_world.h"
 #include "../src/ai/ai_idle.h"
 #include "../src/game/ai_events.h"
 
@@ -78,6 +81,7 @@ int __stdcall RandomInt(int n)
 }
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
 void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int) {}
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
     return 0;
@@ -153,7 +157,7 @@ static int IndexOf(Unit* unit)
     return (int)(unit - s_units);
 }
 
-static void __stdcall FakeDeleteOrders(Unit* unit, int)
+void __stdcall DeleteOrders(Unit* unit, int)
 {
     s_records[IndexOf(unit)].stops++;
 }
@@ -201,7 +205,7 @@ static void Setup()
 
     static OrdersSeam orders;
     memset(&orders, 0, sizeof orders);
-    orders.DeleteOrders = FakeDeleteOrders;
+    orders.Apply = OrdersApply;
     g_seams.orders = &orders;
 }
 

@@ -35,8 +35,9 @@
 #include "../src/game/scheduler.h"
 #include "../src/game/weapons_events.h"
 #include "../src/seams/ai_world.h"
-#include "../src/orders/ai_effects.h"
-#include "../src/orders/weapons_effects.h"
+#include "../src/orders/order_list.h"
+#include "../src/orders/orders_seam.h"
+#include "../src/seams/orders_world.h"
 #include "../src/units/weapons_effects.h"
 #include "../src/units/factory_index.h"
 #include "../src/map/line_of_sight_index.h"
@@ -126,6 +127,8 @@ void __stdcall RecordSimEvent(SimEventKind kind, unsigned int, const unsigned in
 
 void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int) {}
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
+void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, int) {}
 
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
@@ -140,7 +143,7 @@ int __stdcall IsUnitVisibleToPlayer(Player*, Unit*)
 static bool IsHandled(SchedHandler handler)
 {
     return handler == UnitsOnWeaponsAttacked || handler == AiOnWeaponsAttacked || handler == OrdersOnWeaponsAttacked
-        || handler == UnitsOnWeaponsAttackedSpeech || handler == OrdersOnWeaponsHit || handler == OrdersOnAiStop;
+        || handler == UnitsOnWeaponsAttackedSpeech || handler == UnitsOnWeaponsHit || handler == OrdersOnAiStop;
 }
 
 void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
@@ -166,13 +169,13 @@ static void __stdcall FakeNotifyUnitRefs(Unit*, int event)
         s_log.push_back(TAG_NOTICE);
 }
 
-static int __stdcall FakeIssueAttackOrder(Unit*, Unit*, int)
+int __stdcall IssueAttackOrder(Unit*, Unit*, int)
 {
     s_log.push_back(TAG_ATTACK);
     return s_attackResult;
 }
 
-static void __stdcall FakeDeleteOrders(Unit*, int)
+void __stdcall DeleteOrders(Unit*, int)
 {
     s_log.push_back(TAG_STOP);
 }
@@ -302,8 +305,7 @@ static void Setup()
 
     static OrdersSeam orders;
     memset(&orders, 0, sizeof orders);
-    orders.IssueAttackOrder = FakeIssueAttackOrder;
-    orders.DeleteOrders = FakeDeleteOrders;
+    orders.Apply = OrdersApply;
     orders.GetOrderFlags = FakeGetOrderFlags;
     g_seams.orders = &orders;
     static UnitsSeam units;
@@ -588,9 +590,9 @@ static void CheckRouteOrder()
           "ATTACKED is routed to the notice, ai, the return fire and the speech, in that order");
     int hit = 0;
     for (int i = 0; i < count; i++)
-        if (routes[i].outbox == SCHED_WEAPONS && routes[i].kind == WEAPONS_EFFECT_HIT && routes[i].handler == OrdersOnWeaponsHit && routes[i].synchronous)
+        if (routes[i].outbox == SCHED_WEAPONS && routes[i].kind == WEAPONS_EFFECT_HIT && routes[i].handler == UnitsOnWeaponsHit && routes[i].synchronous)
             hit++;
-    Check(hit == 1, "HIT is routed synchronously to the orders hit handler");
+    Check(hit == 1, "HIT is routed synchronously to the units hit handler");
 }
 
 static void CheckSplitAttack()

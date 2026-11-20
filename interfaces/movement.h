@@ -20,7 +20,7 @@ struct Point16;
 struct Vec3;
 
 // Major version of the movement interface, changed when a slot is removed or its signature changes.
-#define MOVEMENT_VERSION_MAJOR 1
+#define MOVEMENT_VERSION_MAJOR 2
 // Minor version of the movement interface, changed when a slot is added.
 #define MOVEMENT_VERSION_MINOR 0
 

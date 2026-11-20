@@ -339,6 +339,7 @@ static void LoadUnitMotion(Unit* unit, HapiBank* file)
     MovementPublishLoad(SCHED_UNITS, unit, &state);
 }
 
+// FUNCTION: 0x43dd70
 static void SaveUnitMotion(Unit* unit, HapiBank* file)
 {
     char name[32];

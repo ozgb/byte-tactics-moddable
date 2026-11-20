@@ -147,7 +147,6 @@ void __stdcall MovementUpdateMotion(Unit* unit)
     unit->motion->UpdateMotion(unit);
 }
 
-// FUNCTION: 0x43dd70
 void __stdcall MovementGetMotionState(Unit* unit, MovementMotionState* out)
 {
     UnitMotion* motion = unit->motion;

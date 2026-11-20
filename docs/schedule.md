@@ -955,6 +955,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `orders.LoadOrder`: mixed
 1. `orders.ReattachFxToUnit`: intent
 1. `scripts.LoadScriptState`: intent
+1. `weapons.LoadState`: intent
 
 ### `units.SetStateBits`
 
@@ -1280,6 +1281,7 @@ is not listed.
 | units | `scripts.StartScriptWithArgs` | intent |
 | units | `targeting.Apply` | mixed |
 | units | `weapons.Apply` | mixed |
+| units | `weapons.LoadState` | intent |
 | units | `weapons.UpdateUnitWeapons` | intent |
 | weapons | `ai.Apply` | mixed |
 | weapons | `economy.Spend` | mixed |
@@ -1485,11 +1487,11 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | features | 1 / 0 | 5 / 5 | 0 / 0 | 3 / 5 | 15 | 3 | 18 |
 | ai | 0 / 0 | 2 / 0 | 0 / 2 | 3 / 2 | 0 | 18 | 18 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 1 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 3 | 0 / 1 | 8 / 5 | 19 | 55 | 74 |
+| weapons | 0 / 2 | 10 / 3 | 0 / 2 | 8 / 5 | 19 | 55 | 74 |
 | targeting | 1 / 0 | 3 / 4 | 0 / 0 | 1 / 8 | 4 | 31 | 35 |
 | los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 6 | 11 | 26 | 36 |
 | orders | 3 / 0 | 21 / 1 | 17 / 6 | 32 / 1 | 24 | 56 | 80 |
-| units | 3 / 0 | 4 / 6 | 23 / 12 | 14 / 10 | 136 | 39 | 175 |
+| units | 3 / 0 | 4 / 6 | 24 / 12 | 14 / 10 | 136 | 39 | 175 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 7 / 4 | 1 | 12 | 11 |
 | map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 16 | 32 | 48 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 15 | 0 / 8 | 20 | 25 | 45 |

@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 333 immediate, 13 deferrable, 1160 read-only, 1551 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 333 immediate, 13 deferrable, 1160 read-only, 1560 unobserved.
 
 ## Cutting rule
 
@@ -24,21 +24,21 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 
 | subsystem | ordered | immediate | deferrable | read-only | unobserved | can be cut from |
 |---|---|---|---|---|---|---|
-| wind_meteors | 0 | 0 | 0 | 18 | 125 | 14 of 14 |
-| economy | 0 | 42 | 0 | 4 | 86 | 5 of 14 |
-| features | 15 | 18 | 2 | 79 | 210 | 8 of 14 |
+| wind_meteors | 0 | 0 | 0 | 18 | 126 | 14 of 14 |
+| economy | 0 | 42 | 0 | 4 | 87 | 5 of 14 |
+| features | 15 | 18 | 2 | 79 | 207 | 8 of 14 |
 | ai | 11 | 18 | 2 | 104 | 236 | 6 of 14 |
 | pathfinding | 0 | 0 | 0 | 66 | 57 | 14 of 14 |
-| weapons | 30 | 74 | 2 | 237 | 220 | 4 of 14 |
+| weapons | 30 | 74 | 2 | 237 | 226 | 4 of 14 |
 | targeting | 11 | 35 | 1 | 40 | 113 | 5 of 14 |
-| los_radar | 6 | 37 | 2 | 140 | 260 | 4 of 14 |
+| los_radar | 6 | 37 | 2 | 140 | 262 | 4 of 14 |
 | orders | 18 | 80 | 9 | 127 | 315 | 4 of 14 |
-| units | 28 | 175 | 5 | 104 | 470 | 3 of 14 |
+| units | 28 | 175 | 5 | 104 | 480 | 3 of 14 |
 | players | 4 | 13 | 1 | 75 | 303 | 11 of 14 |
 | map | 9 | 48 | 0 | 95 | 233 | 4 of 14 |
 | scripts | 16 | 45 | 0 | 23 | 150 | 8 of 14 |
 | movement | 0 | 81 | 2 | 48 | 218 | 6 of 14 |
-| mission | 0 | 0 | 0 | 0 | 106 | 14 of 14 |
+| mission | 0 | 0 | 0 | 0 | 107 | 14 of 14 |
 
 ## Tightly coupled groups
 
@@ -217,7 +217,7 @@ Gaps in what the data say:
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 18 |
-| unobserved | 64 | 61 |
+| unobserved | 65 | 61 |
 
 **Ordered** (0).
 
@@ -245,7 +245,7 @@ None.
 | features | 7 | 5 |
 | los_radar | 5 | 5 |
 | map | 5 | 5 |
-| mission | 7 | 10 |
+| mission | 8 | 10 |
 | movement | 5 | 5 |
 | orders | 5 | 5 |
 | pathfinding | 2 | 2 |
@@ -296,7 +296,7 @@ It has no deferrable edge.
 | immediate | 39 | 3 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 4 |
-| unobserved | 46 | 40 |
+| unobserved | 47 | 40 |
 
 **Ordered** (0).
 
@@ -372,7 +372,7 @@ None.
 | players | 19 | 25 |
 | scripts | 1 | 1 |
 | targeting | 1 | 1 |
-| units | 3 | 4 |
+| units | 4 | 4 |
 | weapons | 3 | 1 |
 
 ### Cut from
@@ -446,7 +446,7 @@ It has no deferrable edge.
 | immediate | 15 | 3 |
 | deferrable | 2 | 0 |
 | read-only | 0 | 79 |
-| unobserved | 111 | 99 |
+| unobserved | 109 | 98 |
 
 **Ordered** (15).
 
@@ -519,8 +519,8 @@ It has no deferrable edge.
 | players | 6 | 9 |
 | scripts | 5 | 4 |
 | targeting | 4 | 4 |
-| units | 12 | 13 |
-| weapons | 14 | 10 |
+| units | 11 | 13 |
+| weapons | 13 | 9 |
 | wind_meteors | 5 | 7 |
 
 ### Cut from
@@ -848,7 +848,7 @@ It has no deferrable edge.
 | immediate | 19 | 55 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 237 |
-| unobserved | 110 | 110 |
+| unobserved | 109 | 117 |
 
 **Ordered** (30).
 
@@ -951,7 +951,7 @@ The 40 rows with the most runs are shown; the other 34 are in data/dependencies.
 |---|---|---|
 | ai | 8 | 5 |
 | economy | 1 | 3 |
-| features | 10 | 14 |
+| features | 9 | 13 |
 | los_radar | 18 | 13 |
 | map | 6 | 8 |
 | mission | 3 | 5 |
@@ -960,7 +960,7 @@ The 40 rows with the most runs are shown; the other 34 are in data/dependencies.
 | players | 4 | 11 |
 | scripts | 9 | 6 |
 | targeting | 6 | 5 |
-| units | 18 | 24 |
+| units | 18 | 32 |
 | wind_meteors | 3 | 4 |
 
 ### Cut from
@@ -1226,7 +1226,7 @@ The 15 groups with the most rows are shown.
 | immediate | 11 | 26 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 140 |
-| unobserved | 113 | 147 |
+| unobserved | 115 | 147 |
 
 **Ordered** (6).
 
@@ -1309,7 +1309,7 @@ The 15 groups with the most rows are shown.
 | players | 7 | 24 |
 | scripts | 5 | 5 |
 | targeting | 4 | 5 |
-| units | 7 | 28 |
+| units | 9 | 28 |
 | weapons | 13 | 18 |
 | wind_meteors | 5 | 5 |
 
@@ -1631,7 +1631,7 @@ The 15 groups with the most rows are shown.
 | immediate | 136 | 39 |
 | deferrable | 4 | 1 |
 | read-only | 0 | 104 |
-| unobserved | 303 | 167 |
+| unobserved | 311 | 169 |
 
 **Ordered** (28).
 
@@ -1734,9 +1734,9 @@ The 40 rows with the most runs are shown; the other 135 are in data/dependencies
 | other | units is writer | units is reader |
 |---|---|---|
 | ai | 44 | 7 |
-| economy | 4 | 3 |
-| features | 13 | 12 |
-| los_radar | 28 | 7 |
+| economy | 4 | 4 |
+| features | 13 | 11 |
+| los_radar | 28 | 9 |
 | map | 36 | 12 |
 | mission | 3 | 7 |
 | movement | 24 | 16 |
@@ -1745,7 +1745,7 @@ The 40 rows with the most runs are shown; the other 135 are in data/dependencies
 | players | 23 | 32 |
 | scripts | 23 | 10 |
 | targeting | 13 | 6 |
-| weapons | 24 | 18 |
+| weapons | 32 | 18 |
 | wind_meteors | 5 | 8 |
 
 ### Cut from
@@ -2486,7 +2486,7 @@ The 15 groups with the most rows are shown.
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 0 |
-| unobserved | 66 | 40 |
+| unobserved | 66 | 41 |
 
 **Ordered** (0).
 
@@ -2519,7 +2519,7 @@ None.
 | targeting | 3 | 3 |
 | units | 7 | 3 |
 | weapons | 5 | 3 |
-| wind_meteors | 10 | 7 |
+| wind_meteors | 10 | 8 |
 
 ### Cut from
 

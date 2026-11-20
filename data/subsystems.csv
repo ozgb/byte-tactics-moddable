@@ -2946,7 +2946,7 @@ AddStream,src/harness/replay.cpp,harness,folder:src/harness/,
 AddVec3,src/harness/replay.cpp,harness,folder:src/harness/,
 AdvanceMissionNative,src/seams/native.cpp,seams,folder:src/seams/,
 AiApply,src/ai/ai_player.cpp,ai,file:src/ai/,
-AiEventSize,src/game/ai_events.h,game,default:src/game/,
+AiEventSize,src/game/ai_event_size.h,game,default:src/game/,
 AiIdleSeam,src/ai/ai_idle.cpp,ai,file:src/ai/,
 AiInbox,src/seams/ai_world.cpp,seams,folder:src/seams/,
 AiOnWeaponsAttacked,src/seams/ai_world.cpp,seams,folder:src/seams/,
@@ -3967,7 +3967,7 @@ LodRaw,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,
 LogStateChange,src/frontend/frontend.cpp,presentation,presentation,
 Lookup,src/orders/order_dispatch.cpp,orders,file:src/orders/,
 Lookup,src/state/block.cpp,game,default,
-LosRadarEventSize,src/game/los_radar_events.h,game,name:Radar,game
+LosRadarEventSize,src/game/los_radar_event_size.h,game,name:Radar,game
 LosRadarInbox,src/seams/los_radar_world.cpp,seams,folder:src/seams/,
 LosRadarInit,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,
 LosRadarPublishRecalculate,src/game/los_radar_events.h,game,phase:UpdatePlayers,game
@@ -4006,7 +4006,7 @@ MapCacheEntry::MapCacheEntry,src/mission/map_cache_entry.h,mission,file:src/miss
 MapCacheEntry::SetChecksum,src/mission/map_list.cpp,mission,file:src/mission/,
 MapCellCount,src/harness/harness.cpp,harness,folder:src/harness/,
 MapContains,src/sound/sound.cpp,presentation,presentation,
-MapEventSize,src/game/map_events.h,game,default:src/game/,
+MapEventSize,src/game/map_event_size.h,game,default:src/game/,
 MapFind,src/harness/harness.cpp,harness,folder:src/harness/,
 MapFreeBuckets,src/map/terrain.cpp,map,file:src/map/terrain,
 MapInbox,src/seams/map_world.cpp,seams,folder:src/seams/,
@@ -4287,7 +4287,7 @@ PlayerRecordAt,src/game/game_load.cpp,players,name:Player,
 PlayerSlotOf,src/game/players.cpp,players,file:src/game/players,
 Player_Get,src/map/radar_capture.cpp,los_radar,file:src/map/radar,
 PlayersApply,src/game/players_events.cpp,players,file:src/game/players,
-PlayersEventSize,src/game/players_events.h,game,file:src/game/players,game
+PlayersEventSize,src/game/players_event_size.h,game,file:src/game/players,game
 PlayersInbox,src/seams/players_world.cpp,seams,folder:src/seams/,
 PlayersInit,src/game/players.cpp,players,file:src/game/players,
 PlayersOnEconomyShare,src/seams/players_world.cpp,seams,folder:src/seams/,
@@ -5449,7 +5449,7 @@ WalkFields,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 Walkable,src/harness/replay_objects.cpp,harness,folder:src/harness/,
 WeaponsAimScript,src/game/weapons_events.h,game,phase:UpdateAllUnits,game
 WeaponsApply,src/weapons/weapons_apply.cpp,weapons,file:src/weapons/,
-WeaponsEventSize,src/game/weapons_events.h,game,name:Weapon,game
+WeaponsEventSize,src/game/weapons_event_size.h,game,name:Weapon,game
 WeaponsFireScript,src/game/weapons_events.h,game,phase:UpdateAllUnits,game
 WeaponsHeaderOf,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsInbox,src/seams/weapons_world.cpp,seams,folder:src/seams/,

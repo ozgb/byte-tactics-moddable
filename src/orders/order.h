@@ -109,7 +109,7 @@ struct Order : public OrderBase {
     void ReattachFxToUnit();
     void MergeFlagsFromTable(int k);
     virtual void OrStatusFlags(unsigned int flags);
-    void SetAttachedFx(OrderFx* obj);
+    void SetAttachedFx(unsigned int obj);
     void AttachApproachRadiusGoal(Vec3* pos, int n);
     void AttachRingApproachGoal(Vec3* pos, int radius1, int radius2);
     void AttachBuildFootprintMarker(Point16 cell, Point16 size);

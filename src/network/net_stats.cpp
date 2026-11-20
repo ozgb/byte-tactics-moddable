@@ -12,20 +12,12 @@
 #include "../../interfaces/services.h"
 
 
-void __stdcall RegisterOrderTypes(void* table, int id);
 void __stdcall StepGafSequence(void* item);
 
 unsigned int __cdecl GetTicks();
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern char g_vtolOrders[];
-
-// FUNCTION: 0x415b20
-void RegisterVtolOrders()
-{
-    RegisterOrderTypes(g_vtolOrders, 0x16);
-}
 
 // FUNCTION: 0x415b30
 void StepAllGafSequences(void)

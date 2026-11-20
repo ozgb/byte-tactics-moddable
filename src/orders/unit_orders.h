@@ -30,6 +30,7 @@ int __stdcall StandbyMineOrder(Unit* unit, Order* order, int unused);
 int __stdcall ParkOrder(Unit* unit, Order* order, int flags);
 int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags);
 void __stdcall RegisterGroundOrders();
+void __stdcall RegisterVtolOrders();
 int __stdcall AttackUTypeOrder(Unit* unit, Order* order, int unused);
 int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags);
 

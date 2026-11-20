@@ -57,6 +57,18 @@ inline unsigned int OrdersEventSize(int kind)
         return sizeof(OrdersUnlink);
     case ORDERS_EFFECT_START_SCRIPT:
         return sizeof(OrdersStartScript);
+    case ORDERS_EFFECT_BUSY:
+        return sizeof(OrdersBusy);
+    case ORDERS_EFFECT_SET_FLAGS:
+        return sizeof(OrdersSetFlags);
+    case ORDERS_EFFECT_CLEAR_NET_DIRTY:
+        return sizeof(OrdersClearNetDirty);
+    case ORDERS_EFFECT_SET_STANCE:
+        return sizeof(OrdersSetStance);
+    case ORDERS_EFFECT_SET_ANGLES:
+        return sizeof(OrdersSetAngles);
+    case ORDERS_EFFECT_SET_BUILD_STATE:
+        return sizeof(OrdersSetBuildState);
     }
     return sizeof(OrdersEventHeader);
 }
@@ -116,6 +128,146 @@ inline void OrdersPublishStatusFlags(int outbox, Unit* unit, O* order, unsigned 
     event.order = Ref<O>(order).offset;
     event.flags = flags;
     SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void OrdersPublishSetStateBits(Unit* unit, int mask, int set)
+{
+    OrdersSetStateBits effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_STATE_BITS, unit);
+    effect.mask = mask;
+    effect.set = set;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishAttachToPiece(Unit* unit, Unit* target, int piece, int mode)
+{
+    OrdersAttachToPiece effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_ATTACH_TO_PIECE, unit);
+    effect.target = Ref<Unit>(target).offset;
+    effect.piece = piece;
+    effect.mode = mode;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishFinishConstruction(Unit* builder, Unit* unit)
+{
+    OrdersFinishConstruction effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_FINISH_CONSTRUCTION, unit);
+    effect.builder = Ref<Unit>(builder).offset;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishBuildDecay(Unit* unit, int ticks)
+{
+    OrdersBuildDecay effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_BUILD_DECAY, unit);
+    effect.ticks = ticks;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+template <class V>
+inline void OrdersPublishSetPosition(Unit* unit, const V& pos, int mode)
+{
+    OrdersSetPosition effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_POSITION, unit);
+    effect.pos[0] = pos.x;
+    effect.pos[1] = pos.y;
+    effect.pos[2] = pos.z;
+    effect.mode = mode;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishRepair(Unit* unit, Unit* builder, float amount)
+{
+    OrdersRepair effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_REPAIR, unit);
+    effect.builder = Ref<Unit>(builder).offset;
+    effect.amount = amount;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishBusy(Unit* unit, int until)
+{
+    OrdersBusy effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_BUSY, unit);
+    effect.until = until;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishSetFlags(Unit* unit, unsigned int clear, unsigned int set)
+{
+    OrdersSetFlags effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_FLAGS, unit);
+    effect.clear = clear;
+    effect.set = set;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishClearNetDirty(Unit* unit, unsigned int mask)
+{
+    OrdersClearNetDirty effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_CLEAR_NET_DIRTY, unit);
+    effect.mask = mask;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishSetStance(Unit* unit, int fields, int moveOrder, int fireOrder, int group)
+{
+    OrdersSetStance effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_STANCE, unit);
+    effect.fields = fields;
+    effect.moveOrder = moveOrder;
+    effect.fireOrder = fireOrder;
+    effect.group = group;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+template <class A>
+inline void OrdersPublishSetAngles(Unit* unit, const A& angles)
+{
+    OrdersSetAngles effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_ANGLES, unit);
+    effect.bank = angles.bank;
+    effect.heading = angles.heading;
+    effect.pitch = angles.pitch;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishSetBuildState(Unit* unit, float buildLeft, int health)
+{
+    OrdersSetBuildState effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_SET_BUILD_STATE, unit);
+    effect.buildLeft = buildLeft;
+    effect.health = health;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+template <class O>
+inline void OrdersPublishUnlink(Unit* unit, O* ref)
+{
+    OrdersUnlink effect;
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_UNLINK, unit);
+    effect.ref = Ref<O>(ref).offset;
+    OrdersPublishEffect(&effect, sizeof(effect));
+}
+
+inline void OrdersPublishStartScript(Unit* unit, int form, int index, const char* name, unsigned int callback, int update, int count, int a, int b, int c, int d)
+{
+    OrdersStartScript effect;
+    memset(&effect, 0, sizeof(effect));
+    effect.h = OrdersHeaderOf(ORDERS_EFFECT_START_SCRIPT, unit);
+    effect.form = form;
+    effect.index = index;
+    if (name)
+        strncpy(effect.name, name, sizeof(effect.name) - 1);
+    effect.callback = callback;
+    effect.update = update;
+    effect.count = count;
+    effect.args[0] = a;
+    effect.args[1] = b;
+    effect.args[2] = c;
+    effect.args[3] = d;
+    OrdersPublishEffect(&effect, sizeof(effect));
 }
 
 #endif

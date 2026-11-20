@@ -70,7 +70,19 @@ enum OrdersEffectKind {
     // A reference an order holds to a unit is unlinked from that unit (OrdersUnlink).
     ORDERS_EFFECT_UNLINK = 310,
     // A script of unit starts (OrdersStartScript).
-    ORDERS_EFFECT_START_SCRIPT = 311
+    ORDERS_EFFECT_START_SCRIPT = 311,
+    // unit is busy until a tick (OrdersBusy).
+    ORDERS_EFFECT_BUSY = 312,
+    // unit's flag word changes under two masks (OrdersSetFlags).
+    ORDERS_EFFECT_SET_FLAGS = 313,
+    // Network dirty flags of unit are cleared (OrdersClearNetDirty).
+    ORDERS_EFFECT_CLEAR_NET_DIRTY = 314,
+    // unit takes its movement stance, its fire stance or its group (OrdersSetStance).
+    ORDERS_EFFECT_SET_STANCE = 315,
+    // unit's angles are set (OrdersSetAngles).
+    ORDERS_EFFECT_SET_ANGLES = 316,
+    // unit's build progress and health are set (OrdersSetBuildState).
+    ORDERS_EFFECT_SET_BUILD_STATE = 317
 };
 
 // The payload of ADD and COMMAND.
@@ -199,6 +211,78 @@ struct OrdersUnlink {
     OrdersEventHeader h;
     // The reference, as its block offset.
     unsigned int ref;
+};
+
+// The payload of BUSY.
+struct OrdersBusy {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The tick until which the unit is busy.
+    int until;
+};
+
+// The payload of SET_FLAGS.
+struct OrdersSetFlags {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The flag bits cleared first.
+    unsigned int clear;
+    // The flag bits set after.
+    unsigned int set;
+};
+
+// The payload of CLEAR_NET_DIRTY.
+struct OrdersClearNetDirty {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The dirty bits cleared.
+    unsigned int mask;
+};
+
+// The fields of a SET_STANCE effect.
+enum OrdersStanceField {
+    // The movement stance.
+    ORDERS_STANCE_MOVE = 1,
+    // The fire stance.
+    ORDERS_STANCE_FIRE = 2,
+    // The group.
+    ORDERS_STANCE_GROUP = 4
+};
+
+// The payload of SET_STANCE.
+struct OrdersSetStance {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The fields set (OrdersStanceField bits).
+    int fields;
+    // The movement stance.
+    int moveOrder;
+    // The fire stance.
+    int fireOrder;
+    // The group.
+    int group;
+};
+
+// The payload of SET_ANGLES.
+struct OrdersSetAngles {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The bank.
+    int bank;
+    // The heading.
+    int heading;
+    // The pitch.
+    int pitch;
+};
+
+// The payload of SET_BUILD_STATE.
+struct OrdersSetBuildState {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The part of the unit still to build, 0 when finished.
+    float buildLeft;
+    // The health.
+    int health;
 };
 
 // The forms of a START_SCRIPT effect.

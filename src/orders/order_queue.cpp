@@ -71,6 +71,9 @@ OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTab
 
 #include "order.h"
 #include "../game/weapons_events.h"
+#include "../game/movement_events.h"
+#include "../game/orders_events.h"
+#include "../../interfaces/movement.h"
 extern int __cdecl _strcmpi(const char*, const char*);
 
 static inline void InsertBefore(Unit* p, Order* child, Order* before)
@@ -115,7 +118,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
 void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short param_3)
 {
     int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StartBuilding");
-    g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 1, param_3, 0, 0, 0);
+    OrdersPublishStartScript(obj, ORDERS_SCRIPT_BY_INDEX_WITH_ARGS, index, 0, 0, 0, 1, param_3, 0, 0, 0);
     g_seams.network->SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
     target->flags_42 |= 0x400000;
 }
@@ -125,7 +128,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
 {
     if (target->flags_42 & 0x400000) {
         int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StopBuilding");
-        g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
+        OrdersPublishStartScript(obj, ORDERS_SCRIPT_BY_INDEX_WITH_ARGS, index, 0, 0, 0, 0, 0, 0, 0, 0);
         g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         target->flags_42 &= ~0x400000;
     }
@@ -228,23 +231,23 @@ void Order::AnnounceStatusIfFlagged(SimSpeechText text)
 void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
-        g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), (OrderFx*)attached);
+        MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, attached.offset);
     }
 }
 
 // FUNCTION: 0x4388d0
-void Order::SetAttachedFx(OrderFx* obj)
+void Order::SetAttachedFx(unsigned int obj)
 {
     if (unit->motion.get()) {
         if (attached) {
-            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+            MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+            MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
             attached = 0;
         }
         if (obj) {
             subFlags &= ~0x3e0;
-            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
-            attached = obj;
+            MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, obj);
+            attached.offset = obj;
         }
     }
 }
@@ -253,23 +256,23 @@ void Order::SetAttachedFx(OrderFx* obj)
 void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 {
     if ((unit->def->flags1 & 0x800) == 0) {
-        ApproachRadius* obj = g_seams.movement->NewApproachRadius(this, p->x, p->z, n);
+        unsigned int obj = g_seams.movement->NewApproachRadius(Ref<Order>(this).offset, p->x, p->z, n);
         if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
-                attached = obj;
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, obj);
+                attached.offset = obj;
             }
         }
     } else {
         if (unit->motion.get() && attached) {
-            g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-            g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+            MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+            MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
             attached = 0;
         }
     }
@@ -279,24 +282,24 @@ void Order::AttachApproachRadiusGoal(Vec3* p, int n)
 void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        RingApproach* obj = g_seams.movement->NewRingApproach(this, pos->x, pos->z, radius1, radius2);
+        unsigned int obj = g_seams.movement->NewRingApproach(Ref<Order>(this).offset, pos->x, pos->z, radius1, radius2);
         if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
-                attached = obj;
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, obj);
+                attached.offset = obj;
             }
         }
     } else {
         if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
         }
@@ -307,24 +310,24 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        PointMarker* obj = g_seams.movement->NewPointMarker(this, cell, size);
+        unsigned int obj = g_seams.movement->NewPointMarker(Ref<Order>(this).offset, cell, size);
         if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
             if (obj) {
                 subFlags &= ~0x3e0;
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), obj);
-                attached = obj;
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, obj);
+                attached.offset = obj;
             }
         }
     } else {
         if (unit->motion.get()) {
             if (attached) {
-                g_seams.movement->GoalSetPathOrder(g_seams.movement->MotionGoal(unit->motion.get()), 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
         }
@@ -357,22 +360,21 @@ Order::~Order()
     if (flags_42 & 0x400000) {
         Unit* obj = unit;
         int index = g_seams.scripts->FindScript((CobScript*)obj->script.get(), "StopBuilding");
-        g_seams.scripts->StartScriptWithArgsByIndex((CobScript*)obj->script.get(), index, 0, 0, 0, 0, 0, 0, 0);
+        OrdersPublishStartScript(obj, ORDERS_SCRIPT_BY_INDEX_WITH_ARGS, index, 0, 0, 0, 0, 0, 0, 0, 0);
         g_seams.network->SendScriptCall(obj, index, 0, 0, 0, 0, 0);
         flags_42 &= ~0x400000;
     }
     if (unit->motion.get() != 0) {
-        PathGoal* goal = g_seams.movement->MotionGoal(unit->motion.get());
-        OrderFx* current = g_seams.movement->GoalTarget(goal);
-        if (current != 0 && current == attached.get()) {
+        unsigned int current = g_seams.movement->UnitTarget(unit);
+        if (current != 0 && current == attached.offset) {
             if (attached != 0) {
-                g_seams.movement->GoalSetPathOrder(goal, 0);
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
                 attached = 0;
             }
         } else {
             if (attached) {
-                g_seams.movement->OrderFxDestroy((OrderFx*)attached);
+                MovementPublishTarget(SCHED_ORDERS, MOVEMENT_DESTROY_TARGET, unit, attached.offset);
             }
             attached = 0;
         }
@@ -380,7 +382,7 @@ Order::~Order()
     if (!(flags_42 & 0x10000)) {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
     }
-    g_seams.units->UnitRefUnlink((UnitRef*)&link);
+    OrdersPublishUnlink(link.owner.get(), &link);
 }
 
 short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
@@ -428,7 +430,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     : link()
 {
     g_seams.units->UnitRefInit((UnitRef*)&link, nullptr, nullptr);
-    link.SetValue(this);
+    g_seams.units->UnitRefSetValue((UnitRef*)&link, this);
     g_seams.units->UnitRefSetUnit((UnitRef*)&link, 0);
     next = 0;
     attached = 0;
@@ -492,21 +494,11 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     sprintf(buf3, "%s%s", name, "g");
     switch (desc.field_4) {
     case 2:
-        attached = g_seams.movement->LoadPathOrder(this, file, buf3);
-        return;
-    case 3: {
-        AirManeuverOrder* maneuver = g_seams.movement->LoadAirManeuverOrder(this, file, buf3);
-        attached = maneuver;
-        return;
-    }
+    case 3:
     case 4:
-        attached = g_seams.movement->LoadApproachRadius(this, file, buf3);
-        return;
     case 5:
-        attached = g_seams.movement->LoadRingApproach(this, file, buf3);
-        return;
     case 6:
-        attached = g_seams.movement->LoadPointMarker(this, file, buf3);
+        attached.offset = g_seams.movement->LoadTarget(desc.field_4, Ref<Order>(this).offset, file, buf3);
         return;
     case 0:
         attached = 0;
@@ -536,7 +528,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         desc.unitType = u->id;
     Unit* o = link.owner;
     desc.ownerType = (o != 0 && (link.owner->flags & 0x10000000) != 0 && link.owner != 0) ? o->id : 0;
-    desc.field_4 = attached ? g_seams.movement->OrderFxGetType((OrderFx*)attached) : 0;
+    desc.field_4 = attached ? g_seams.movement->TargetType(attached.offset) : 0;
     desc.kind = kind.index;
     desc.flag5 = state;
     desc.flags6 = flags;
@@ -571,7 +563,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     if (desc.field_4 != 0) {
         char buf3[0x20];
         sprintf(buf3, "%s%s", name, "g");
-        g_seams.movement->OrderFxSerializeToSave((OrderFx*)attached, this, file, buf3);
+        g_seams.movement->SaveTarget(attached.offset, Ref<Order>(this).offset, file, buf3);
     }
     return 1;
 }

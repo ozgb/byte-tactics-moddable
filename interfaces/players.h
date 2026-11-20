@@ -119,6 +119,12 @@ struct PlayersCaptureUnit {
     PlayersOwnershipRecord record;
 };
 
+// The match players sets its private state up for.
+struct PlayersMapInfo {
+    // The number of players.
+    int playerCount;
+};
+
 // Per-player state: the players, their mission conditions and the end of the game. The engine delivers players' pending inbox, through Apply, before each run (UpdatePlayerHead, UpdatePlayerBody, UpdatePlayerTail, UpdatePlayersFinish), and at each phase boundary.
 struct PlayersSeam {
     // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.

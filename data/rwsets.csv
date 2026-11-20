@@ -42503,7 +42503,7 @@ address,function,file,kind,target
 ,AiApply,src/ai/ai_player.cpp,field_read,Unit::player
 ,AiApply,src/ai/ai_player.cpp,function,
 ,AiApply,src/ai/ai_player.cpp,global_read,g_aiCommandsEnabled
-,AiEventSize,src/game/ai_events.h,function,
+,AiEventSize,src/game/ai_event_size.h,function,
 ,AiIdleSeam,src/ai/ai_idle.cpp,call,operator=
 ,AiIdleSeam,src/ai/ai_idle.cpp,deref_read,*AiSeam
 ,AiIdleSeam,src/ai/ai_idle.cpp,field_write,AiSeam::Apply
@@ -48031,6 +48031,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitHead
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitTail
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::WriteState
+,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::GetWeaponRange
@@ -48362,6 +48363,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitHead
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitTail
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsWriteState
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsGetWeaponRange
@@ -50608,7 +50610,7 @@ address,function,file,kind,target
 ,Lookup,src/state/block.cpp,global_read,kChunkHeader
 ,Lookup,src/state/block.cpp,global_read,kFirstChunk
 ,Lookup,src/state/block.cpp,global_read,kFreeBit
-,LosRadarEventSize,src/game/los_radar_events.h,function,
+,LosRadarEventSize,src/game/los_radar_event_size.h,function,
 ,LosRadarInbox,src/seams/los_radar_world.cpp,call,HarnessLosRadarEvent
 ,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,LosRadarSeam::Apply
 ,LosRadarInbox,src/seams/los_radar_world.cpp,field_read,Seams::los_radar
@@ -50813,7 +50815,7 @@ address,function,file,kind,target
 ,MapCellCount,src/harness/harness.cpp,call,GameU32
 ,MapCellCount,src/harness/harness.cpp,function,
 ,MapContains,src/sound/sound.cpp,function,
-,MapEventSize,src/game/map_events.h,function,
+,MapEventSize,src/game/map_event_size.h,function,
 ,MapFind,src/harness/harness.cpp,call,MapSlot
 ,MapFind,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapFind,src/harness/harness.cpp,deref_write,*unsigned int
@@ -53170,7 +53172,7 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,field_write,Ref<Unit>::offset
 ,PlayersApply,src/game/players_events.cpp,function,
 ,PlayersApply,src/game/players_events.cpp,global_read,g_game
-,PlayersEventSize,src/game/players_events.h,function,
+,PlayersEventSize,src/game/players_event_size.h,function,
 ,PlayersInbox,src/seams/players_world.cpp,call,HarnessPlayersEvent
 ,PlayersInbox,src/seams/players_world.cpp,field_read,PlayersSeam::Apply
 ,PlayersInbox,src/seams/players_world.cpp,field_read,Seams::players
@@ -56982,6 +56984,18 @@ address,function,file,kind,target
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [UnitsSeam::WriteState]
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgEvent
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,EventRoots
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWeaponsApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWeaponsApply,src/harness/replay_hooks.inc,field_read,WeaponsEventHeader::kind
+,RecWeaponsApply,src/harness/replay_hooks.inc,field_read,WeaponsSeam::Apply
+,RecWeaponsApply,src/harness/replay_hooks.inc,function,
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_call
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_inner_weapons
+,RecWeaponsApply,src/harness/replay_hooks.inc,global_read,s_tail
+,RecWeaponsApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const WeaponsEventHeader *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::Apply]"
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgValue
@@ -57986,6 +58000,7 @@ address,function,file,kind,target
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::name
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
+,ReplayConcreteKind,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::vptrUnset
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,function,
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
@@ -63108,7 +63123,7 @@ address,function,file,kind,target
 ,WeaponsApply,src/weapons/weapons_apply.cpp,function,
 ,WeaponsApply,src/weapons/weapons_apply.cpp,global_escape,g_weaponAimCobVtable
 ,WeaponsApply,src/weapons/weapons_apply.cpp,global_read,g_game
-,WeaponsEventSize,src/game/weapons_events.h,function,
+,WeaponsEventSize,src/game/weapons_event_size.h,function,
 ,WeaponsFireScript,src/game/weapons_events.h,function,
 ,WeaponsHeaderOf,src/game/weapons_events.h,field_write,WeaponsEventHeader::kind
 ,WeaponsHeaderOf,src/game/weapons_events.h,field_write,WeaponsEventHeader::unit

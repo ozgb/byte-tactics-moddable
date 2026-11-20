@@ -1,7 +1,7 @@
 """Generate src/harness/trace_schema.h and data/trace_schema.json, the field tables the test harness hashes and dumps.
 
-    uv run tools/traceschema.py          # rewrite both files; a second run leaves them unchanged
-    uv run tools/traceschema.py --check  # exit 1 when either committed file is out of date
+    uv run tools/traceschema.py          # rewrite the files; a second run leaves them unchanged
+    uv run tools/traceschema.py --check  # exit 1 when a committed file is out of date
 
 The JSON is the same tables as data, for a re-implementation that has no use for the header:
 per table the fields in hash order and the plan the hash walks, the masks with their reasons,
@@ -13,6 +13,11 @@ each have "kinds": per kind value its enum name, the size of its payload and its
 fields, then the payload's, then the outcome, which windMeteors has not), generated from the structs and enums
 of interfaces/ with the table EVENT_MODULES. The generated header holds the same lists with each field's offset
 from offsetof. No row hashes any of them.
+
+EVENT_MODULES is the one table of each kind's payload: the size function of a module whose Apply checks a payload's
+size (src/game/<module>_event_size.h, `<Module>EventSize`) and the replay schema's table of event kinds
+(tools/replayschema.py) are made from it, and EVENT_REF_NAMES is the one list of the payload fields that hold a unit,
+which both schemas record as a ref.
 
 Layouts are read from the headers under src/ (packed, so a struct's fields follow each other
 with no padding), checked against the "+0x" offsets and the "0x.. bytes" size in its
@@ -932,11 +937,11 @@ UNIT_TYPES = ("unsigned int", "EconUnit", "PathUnit")
 class EventModule:
     """One event section: where it is dumped, which header and enums name its kinds, and each kind's payload."""
 
-    def __init__(self, key, section, c_name, header_file, header, enums, payloads, outcome=True, handles=()):
+    def __init__(self, key, section, c_name, header_file, header, enums, payloads, outcome=True, handles=(), size_header=None):
         self.key, self.section, self.c_name = key, section, c_name
         self.handles = handles
         self.header_file, self.header, self.enums = header_file, header, enums
-        self.payloads, self.outcome = payloads, outcome
+        self.payloads, self.outcome, self.size_header = payloads, outcome, size_header
 
 
 EVENT_MODULES = [
@@ -968,22 +973,22 @@ EVENT_MODULES = [
                  "LOS_RADAR_CELL_HEIGHTS": "LosRadarCellHeights", "LOS_RADAR_RECALCULATE": "LosRadarRecalculate",
                  "LOS_RADAR_SHARE_MAPPING": "LosRadarSharePlayer", "LOS_RADAR_SHARE_RADAR": "LosRadarSharePlayer",
                  "LOS_RADAR_SHARE_MAP": "LosRadarShareMap", "LOS_RADAR_SIGHT_RESET": "LosRadarUnit",
-                 "LOS_RADAR_SIGHT_LOAD": "LosRadarSightLoad"}),
+                 "LOS_RADAR_SIGHT_LOAD": "LosRadarSightLoad"}, size_header="los_radar_event_size.h"),
     EventModule("map", 40, "Map", "map.h", "MapEventHeader", ["MapEventKind", "MapEffectKind"],
                 {"MAP_ADD_UNIT": None, "MAP_REMOVE_UNIT": None, "MAP_CLEAR_UNIT": None, "MAP_RECLAIM_FOOTPRINT": None,
                  "MAP_SET_YARD": "MapSetYard", "MAP_BUCKET_UNLINK": None, "MAP_BUCKET_PREPEND": None,
-                 "MAP_PASS_MAPS": "MapPassMaps", "MAP_EFFECT_CELLS_CHANGED": "MapCellsChanged"}),
+                 "MAP_PASS_MAPS": "MapPassMaps", "MAP_EFFECT_CELLS_CHANGED": "MapCellsChanged"}, size_header="map_event_size.h"),
     EventModule("playersEvents", 41, "Players", "players.h", "PlayersEventHeader",
                 ["PlayersEventKind", "PlayersEffectKind"],
                 {"PLAYERS_GIVE_UNIT": "PlayersGiveUnit", "PLAYERS_KILL_UNITS": "PlayersKillUnits",
                  "PLAYERS_UNIT_CREATED": None, "PLAYERS_UNIT_DIED": None, "PLAYERS_TRANSFER": "PlayersTransfer",
                  "PLAYERS_EFFECT_KILL_UNIT": "PlayersKillUnit", "PLAYERS_EFFECT_SEND_UNIT": "PlayersSendUnit",
-                 "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}),
+                 "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}, size_header="players_event_size.h"),
     EventModule("aiEvents", 42, "Ai", "ai.h", "AiEventHeader", ["AiEventKind", "AiEffectKind"],
                 {"AI_REACT_TO_ATTACK": "AiReactToAttack", "AI_SET_SQUAD": "AiSetSquad", "AI_PLAN": "AiPlan",
                  "AI_WEIGHT": "AiWeight", "AI_LIMIT": "AiLimit", "AI_EFFECT_ADD_ORDER": "AiAddOrder",
                  "AI_EFFECT_QUEUE_BUILD": "AiQueueBuild", "AI_EFFECT_STOP": "AiStop",
-                 "AI_EFFECT_ACTIVATE": "AiActivate", "AI_EFFECT_SET_STATES": "AiSetStates"}),
+                 "AI_EFFECT_ACTIVATE": "AiActivate", "AI_EFFECT_SET_STATES": "AiSetStates"}, size_header="ai_event_size.h"),
     EventModule("weaponsEvents", 47, "Weapons", "weapons.h", "WeaponsEventHeader",
                 ["WeaponsDamageEventKind", "WeaponsDamageEffectKind", "WeaponsEventKind", "WeaponsEffectKind"],
                 {"WEAPONS_DAMAGE": "WeaponsDamage", "WEAPONS_REMOTE_DAMAGE": "WeaponsDamage",
@@ -997,7 +1002,8 @@ EVENT_MODULES = [
                  "WEAPONS_EFFECT_HEALTH": "WeaponsHealth", "WEAPONS_EFFECT_PARALYZE": "WeaponsParalyze",
                  "WEAPONS_EFFECT_START_SCRIPT": "WeaponsStartScript", "WEAPONS_EFFECT_DETACH_PIECE": "WeaponsDetachPiece",
                  "WEAPONS_EFFECT_SHOT_FIRED": None, "WEAPONS_EFFECT_BUSY": "WeaponsBusy",
-                 "WEAPONS_EFFECT_COMMAND_SHOT_FIRED": None, "WEAPONS_EFFECT_OUT_OF_REACH": None}),
+                 "WEAPONS_EFFECT_COMMAND_SHOT_FIRED": None, "WEAPONS_EFFECT_OUT_OF_REACH": None},
+                size_header="weapons_event_size.h"),
     EventModule("ordersEvents", 48, "Orders", "orders.h", "OrdersEventHeader",
                 ["OrdersEventKind", "OrdersEffectKind"],
                 {"ORDERS_ADD": "OrdersAdd", "ORDERS_QUEUE_BUILD": "OrdersQueueBuild", "ORDERS_STOP": "OrdersStop",
@@ -1012,7 +1018,8 @@ EVENT_MODULES = [
                  "ORDERS_EFFECT_BUSY": "OrdersBusy", "ORDERS_EFFECT_SET_FLAGS": "OrdersSetFlags",
                  "ORDERS_EFFECT_CLEAR_NET_DIRTY": "OrdersClearNetDirty", "ORDERS_EFFECT_SET_STANCE": "OrdersSetStance",
                  "ORDERS_EFFECT_SET_ANGLES": "OrdersSetAngles",
-                 "ORDERS_EFFECT_SET_BUILD_STATE": "OrdersSetBuildState"}),
+                 "ORDERS_EFFECT_SET_BUILD_STATE": "OrdersSetBuildState"},
+                size_header="orders_event_size.h"),
     EventModule("movementEvents", 49, "Movement", "movement.h", "MovementEventHeader",
                 ["MovementEventKind", "MovementEffectKind"],
                 {"MOVEMENT_NEW": None, "MOVEMENT_DESTROY": None, "MOVEMENT_LOAD": "MovementLoad",
@@ -1028,8 +1035,21 @@ EVENT_MODULES = [
                  "MOVEMENT_EFFECT_SET_POSITION": "MovementSetPosition",
                  "MOVEMENT_EFFECT_SET_STATE_BITS": "MovementSetStateBits",
                  "MOVEMENT_EFFECT_SFX_OCCUPY": None, "MOVEMENT_EFFECT_START_SCRIPT": "MovementStartScript"},
-                handles=("target",)),
+                handles=("target",), size_header="movement_event_size.h"),
 ]
+
+
+def is_unit_ref(ctype, name):
+    """Whether a payload field holds a unit as its block offset, by the one list both schemas read."""
+    return name in EVENT_REF_NAMES and ctype in UNIT_TYPES
+
+
+def module_of_header(header_file):
+    """The event module whose kinds interfaces/<header_file> declares."""
+    for module in EVENT_MODULES:
+        if module.header_file == header_file:
+            return module
+    raise ValueError("no event module declares its kinds in %s" % header_file)
 
 
 def interface_text(module):
@@ -1072,10 +1092,12 @@ def event_fields(module, text, struct, prefix="", cprefix="", first=True):
             out += event_fields(module, text, ctype, prefix + name + ".", cprefix + name + ".", False)
         elif ctype in SCALAR_TYPES and not count:
             kind, target = "scalar", None
-            if name in module.handles or name in EVENT_HANDLE_NAMES:
+            if name in module.handles:
                 kind = "handle"
-            elif name in EVENT_REF_NAMES and ctype in UNIT_TYPES:
+            elif is_unit_ref(ctype, name):
                 kind, target = "ref", "unit"
+            elif name in EVENT_HANDLE_NAMES:
+                kind = "handle"
             out.append((prefix + name, SCALAR_TYPES[ctype], kind, target, cprefix + name))
         else:
             each = SCALAR_TYPES[ctype] if ctype in SCALAR_TYPES else struct_size(text, ctype)
@@ -1745,6 +1767,36 @@ def generate():
     return "\n".join(lines) + "\n", schema.errors, render_json(model)
 
 
+def event_size_header(module, kinds):
+    """src/game/<module>_event_size.h: the payload size of each kind, the header's for a kind with no payload or an unknown one."""
+    groups = {}
+    for name, struct, _, _ in kinds.values():
+        if struct != module.header:
+            groups.setdefault(struct, []).append(name)
+    guard = "GAME_%s_H" % Path(module.size_header).stem.upper()
+    lines = [
+        "// Generated by tools/traceschema.py from interfaces/%s. Do not edit." % module.header_file,
+        "#ifndef " + guard,
+        "#define " + guard,
+        "",
+        '#include "../../interfaces/%s"' % module.header_file,
+        "",
+        "inline unsigned int %sEventSize(int kind)" % module.c_name,
+        "{",
+        "    switch (kind) {",
+    ]
+    for struct, names in groups.items():
+        lines += ["    case %s:" % name for name in names]
+        lines.append("        return sizeof(%s);" % struct)
+    lines += ["    default:", "        return sizeof(%s);" % module.header, "    }", "}", "", "#endif"]
+    return "\n".join(lines) + "\n"
+
+
+def event_size_files():
+    """(path, text) of each module's generated size function."""
+    return [(ROOT / "src/game" / m.size_header, event_size_header(m, event_kinds(m))) for m in EVENT_MODULES if m.size_header]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--check", action="store_true")
@@ -1752,7 +1804,7 @@ def main():
     text, errors, schema_json = generate()
     for e in errors:
         print("layout: " + e, file=sys.stderr)
-    files = [(OUT, text), (JSON_OUT, schema_json)]
+    files = [(OUT, text), (JSON_OUT, schema_json)] + event_size_files()
     if args.check:
         stale = [path for path, want in files if not path.exists() or path.read_text() != want]
         for path in stale:

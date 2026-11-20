@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "../../interfaces/orders.h"
+#include "orders_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
@@ -23,54 +24,6 @@ inline OrdersEventHeader OrdersHeaderOf(int kind, U* unit)
     OrdersEventHeader header = OrdersHeaderOf(kind);
     header.unit = Ref<U>(unit).offset;
     return header;
-}
-
-inline unsigned int OrdersEventSize(int kind)
-{
-    switch (kind) {
-    case ORDERS_ADD:
-    case ORDERS_COMMAND:
-        return sizeof(OrdersAdd);
-    case ORDERS_QUEUE_BUILD:
-        return sizeof(OrdersQueueBuild);
-    case ORDERS_STOP:
-        return sizeof(OrdersStop);
-    case ORDERS_STATUS_FLAGS:
-        return sizeof(OrdersStatusFlags);
-    case ORDERS_ATTACKED:
-        return sizeof(OrdersAttacked);
-    case ORDERS_PARALYZE:
-        return sizeof(OrdersParalyze);
-    case ORDERS_EFFECT_SET_STATE_BITS:
-        return sizeof(OrdersSetStateBits);
-    case ORDERS_EFFECT_SET_POSITION:
-        return sizeof(OrdersSetPosition);
-    case ORDERS_EFFECT_ATTACH_TO_PIECE:
-        return sizeof(OrdersAttachToPiece);
-    case ORDERS_EFFECT_FINISH_CONSTRUCTION:
-        return sizeof(OrdersFinishConstruction);
-    case ORDERS_EFFECT_BUILD_DECAY:
-        return sizeof(OrdersBuildDecay);
-    case ORDERS_EFFECT_REPAIR:
-        return sizeof(OrdersRepair);
-    case ORDERS_EFFECT_UNLINK:
-        return sizeof(OrdersUnlink);
-    case ORDERS_EFFECT_START_SCRIPT:
-        return sizeof(OrdersStartScript);
-    case ORDERS_EFFECT_BUSY:
-        return sizeof(OrdersBusy);
-    case ORDERS_EFFECT_SET_FLAGS:
-        return sizeof(OrdersSetFlags);
-    case ORDERS_EFFECT_CLEAR_NET_DIRTY:
-        return sizeof(OrdersClearNetDirty);
-    case ORDERS_EFFECT_SET_STANCE:
-        return sizeof(OrdersSetStance);
-    case ORDERS_EFFECT_SET_ANGLES:
-        return sizeof(OrdersSetAngles);
-    case ORDERS_EFFECT_SET_BUILD_STATE:
-        return sizeof(OrdersSetBuildState);
-    }
-    return sizeof(OrdersEventHeader);
 }
 
 inline void OrdersPublishEffect(const void* effect, unsigned int size)

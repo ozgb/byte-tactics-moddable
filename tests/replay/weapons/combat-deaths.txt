@@ -8924,6 +8924,40 @@ call 857 UpdateUnitWeapons
   o z 0
 call 857 UpdateUnitWeapons
   a unit Unit#2
+call 857 Apply
+  r Game.localPlayer 0
+  r Unit#2.health 70
+  r Unit#2.player Player#0
+  r Unit#2.activateFlags 0
+  r UnitDef#112.flags1 0x0084008a
+  r UnitDef#112.damagemodifier 21845
+  r UnitDef#112.weapons0 weapondef#0
+  r UnitDef#112.weapons1 weapondef#0
+  r UnitDef#112.weapons2 weapondef#0
+  r Player#0.active 1
+  r Player#0.type 1
+  r weapondef#0.index 0
+  a event.kind 256
+  a event.unit Unit#2
+  a event.source Unit#2
+  a event.amount 30000
+  a event.damageKind 3
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 8
+  i services.SchedPublish 6 16
+  i services.SchedPublish 6 16
+  i services.RecordSimEvent 12 0 [1,0,0] 3
+  i services.SchedPublish 6 16
+  o result 1
+call 857 Apply
+  r Unit#2.health -29930
+  r Unit#2.flags 0x30286321
+  a event.kind 259
+  a event.unit Unit#2
+  a event.weapon 3
+  a size 12
+  o result 1
 call 857 UpdateUnitWeapons
   r rng.seed 0x39d15801
   r Unit#3.health 630
@@ -10213,6 +10247,23 @@ call 900 UpdateUnitWeapons
   o z 0
 call 900 UpdateUnitWeapons
   a unit Unit#252
+call 900 Apply
+  r Unit#251.player Player#1
+  r Unit#251.activateFlags 1
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.damagemodifier 65536
+  r UnitDef#167.weapons0 weapondef#21
+  r UnitDef#167.weapons1 weapondef#0
+  r UnitDef#167.weapons2 weapondef#23
+  r Player#1.active 1
+  r Player#1.type 2
+  r weapondef#21.index 21
+  r weapondef#23.index 23
+  a event.kind 259
+  a event.unit Unit#251
+  a event.weapon 3
+  a size 12
+  o result 1
 call 901 UpdateUnitWeapons
   r rng.seed 0x37063248
   r Player#0.energy f32:0x45245424
@@ -11270,12 +11321,47 @@ call 933 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 933 Apply
+  r Unit#1.player Player#0
+  r Unit#1.activateFlags 1
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.damagemodifier 65536
+  r UnitDef#34.weapons0 weapondef#20
+  r UnitDef#34.weapons1 weapondef#0
+  r UnitDef#34.weapons2 weapondef#22
+  r weapondef#20.index 20
+  r weapondef#22.index 22
+  a event.kind 259
+  a event.unit Unit#1
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  i services.SchedPublish 6 12
+  w Unit#1.weapon0Flags 18
+  w Unit#1.weapon2Flags 26
+  o result 1
 call 933 UpdateUnitWeapons
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
+call 933 Apply
+  r Unit#3.player Player#0
+  r Unit#3.activateFlags 0
+  r UnitDef#71.flags1 0x0081808a
+  r UnitDef#71.damagemodifier 65536
+  r UnitDef#71.weapons0 weapondef#80
+  r UnitDef#71.weapons1 weapondef#0
+  r UnitDef#71.weapons2 weapondef#0
+  r weapondef#80.index 80
+  a event.kind 259
+  a event.unit Unit#3
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  w Unit#3.weapon0Flags 18
+  o result 1
 call 933 UpdateUnitWeapons
   r Unit#251.posX 199509163
   r Unit#251.posZ 84722156
@@ -11291,8 +11377,6 @@ call 933 UpdateUnitWeapons
 call 933 UpdateUnitWeapons
   a unit Unit#252
 call 934 UpdateUnitWeapons
-  r Unit#1.weapon0Flags 18
-  r Unit#1.weapon2Flags 26
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11302,13 +11386,24 @@ call 934 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 934 Apply
+  a event.kind 259
+  a event.unit Unit#1
+  a event.weapon 3
+  a size 12
+  o result 1
 call 934 UpdateUnitWeapons
-  r Unit#3.weapon0Flags 18
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
+call 934 Apply
+  a event.kind 259
+  a event.unit Unit#3
+  a event.weapon 3
+  a size 12
+  o result 1
 call 934 UpdateUnitWeapons
   r Unit#251.posX 199558751
   r Unit#251.posZ 84672568
@@ -12251,6 +12346,28 @@ call 964 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 964 Apply
+  a event.kind 256
+  a event.unit Unit#3
+  a event.source Unit#3
+  a event.amount 30000
+  a event.damageKind 3
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 8
+  i services.SchedPublish 6 16
+  i services.SchedPublish 6 16
+  i services.RecordSimEvent 12 0 [1,0,0] 3
+  i services.SchedPublish 6 16
+  o result 1
+call 964 Apply
+  r Unit#3.health -29250
+  r Unit#3.flags 0xb0286321
+  a event.kind 259
+  a event.unit Unit#3
+  a event.weapon 3
+  a size 12
+  o result 1
 call 964 UpdateUnitWeapons
   r rng.seed 0x28887861
   r Unit#251.posX 201034668
@@ -12353,6 +12470,16 @@ call 968 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 968 Apply
+  a event.kind 256
+  a event.unit Unit#1
+  a event.source Unit#1
+  a event.amount 1
+  a event.damageKind 10
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 16
+  o result 1
 call 968 UpdateUnitWeapons
   r Unit#251.posX 201231169
   r Unit#251.posZ 82973398
@@ -12568,6 +12695,16 @@ call 976 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 976 Apply
+  a event.kind 256
+  a event.unit Unit#1
+  a event.source Unit#1
+  a event.amount 1
+  a event.damageKind 10
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 16
+  o result 1
 call 976 UpdateUnitWeapons
   r Unit#251.posX 201624171
   r Unit#251.posZ 82573100
@@ -12769,6 +12906,16 @@ call 984 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 984 Apply
+  a event.kind 256
+  a event.unit Unit#1
+  a event.source Unit#1
+  a event.amount 1
+  a event.damageKind 10
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 16
+  o result 1
 call 984 UpdateUnitWeapons
   r Unit#251.posX 202017173
   r Unit#251.posZ 82172802
@@ -12977,6 +13124,16 @@ call 992 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 992 Apply
+  a event.kind 256
+  a event.unit Unit#1
+  a event.source Unit#1
+  a event.amount 1
+  a event.damageKind 10
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 16
+  o result 1
 call 992 UpdateUnitWeapons
   r Unit#251.posX 202410175
   r Unit#251.posZ 81772504
@@ -13179,6 +13336,16 @@ call 1000 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1000 Apply
+  a event.kind 256
+  a event.unit Unit#1
+  a event.source Unit#1
+  a event.amount 1
+  a event.damageKind 10
+  a event.direction 0
+  a size 24
+  i services.SchedPublish 6 16
+  o result 1
 call 1000 UpdateUnitWeapons
   r Unit#251.posX 202803177
   r Unit#251.posZ 81372206

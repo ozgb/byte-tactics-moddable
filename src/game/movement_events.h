@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "../../interfaces/movement.h"
+#include "movement_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
@@ -23,49 +24,6 @@ inline MovementEventHeader MovementHeaderOf(int kind, U* unit)
     MovementEventHeader header = MovementHeaderOf(kind);
     header.unit = Ref<U>(unit).offset;
     return header;
-}
-
-inline unsigned int MovementEventSize(int kind)
-{
-    switch (kind) {
-    case MOVEMENT_LOAD:
-        return sizeof(MovementLoad);
-    case MOVEMENT_SET_MODE:
-    case MOVEMENT_SET_FLIGHT_MODE:
-        return sizeof(MovementSetMode);
-    case MOVEMENT_SET_SPEED:
-        return sizeof(MovementSetSpeed);
-    case MOVEMENT_SET_TARGET:
-    case MOVEMENT_DESTROY_TARGET:
-        return sizeof(MovementTarget);
-    case MOVEMENT_SET_ALTITUDE:
-    case MOVEMENT_SET_APPROACH_RADIUS:
-    case MOVEMENT_SET_HEADING:
-        return sizeof(MovementTargetValue);
-    case MOVEMENT_EFFECT_ORDER_FLAGS:
-        return sizeof(MovementOrderFlags);
-    case MOVEMENT_EFFECT_TURN:
-        return sizeof(MovementTurn);
-    case MOVEMENT_EFFECT_TILT:
-        return sizeof(MovementTilt);
-    case MOVEMENT_EFFECT_ANGLES:
-        return sizeof(MovementAngles);
-    case MOVEMENT_EFFECT_MOVE:
-        return sizeof(MovementMove);
-    case MOVEMENT_EFFECT_MOVED:
-        return sizeof(MovementMoved);
-    case MOVEMENT_EFFECT_CHANGE_CELL:
-        return sizeof(MovementChangeCell);
-    case MOVEMENT_EFFECT_MOVE_RATE:
-        return sizeof(MovementMoveRate);
-    case MOVEMENT_EFFECT_SET_POSITION:
-        return sizeof(MovementSetPosition);
-    case MOVEMENT_EFFECT_SET_STATE_BITS:
-        return sizeof(MovementSetStateBits);
-    case MOVEMENT_EFFECT_START_SCRIPT:
-        return sizeof(MovementStartScript);
-    }
-    return sizeof(MovementEventHeader);
 }
 
 inline void MovementPublishEffect(const void* effect, unsigned int size)

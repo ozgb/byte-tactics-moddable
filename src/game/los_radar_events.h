@@ -5,34 +5,9 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/los_radar.h"
+#include "los_radar_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
-
-inline unsigned int LosRadarEventSize(int kind)
-{
-    switch (kind) {
-    case LOS_RADAR_UPDATE_UNIT:
-    case LOS_RADAR_REMOVE_UNIT:
-    case LOS_RADAR_REVEAL_UNIT:
-    case LOS_RADAR_SIGHT_RESET:
-        return sizeof(LosRadarUnit);
-    case LOS_RADAR_ADD_EYEBALL:
-        return sizeof(LosRadarAddEyeball);
-    case LOS_RADAR_CELL_HEIGHTS:
-        return sizeof(LosRadarCellHeights);
-    case LOS_RADAR_RECALCULATE:
-        return sizeof(LosRadarRecalculate);
-    case LOS_RADAR_SHARE_MAPPING:
-    case LOS_RADAR_SHARE_RADAR:
-        return sizeof(LosRadarSharePlayer);
-    case LOS_RADAR_SHARE_MAP:
-        return sizeof(LosRadarShareMap);
-    case LOS_RADAR_SIGHT_LOAD:
-        return sizeof(LosRadarSightLoad);
-    default:
-        return sizeof(LosRadarEventHeader);
-    }
-}
 
 template <class U>
 inline LosRadarUnit LosRadarUnitEventOf(int kind, U* unit)

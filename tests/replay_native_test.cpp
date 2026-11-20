@@ -5265,6 +5265,19 @@ void ElementSiteSelfTest()
     printf("a vptr that is not the global: %s\n", ReplayFailure() == nullptr ? "(none)" : ReplayFailure());
     Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "FixtureCb has a vptr that is not g_fixtureCbVtable") != nullptr, "a word that is not the global's address is a failure that names the global");
     ReplayClearFailure();
+
+    rebuilt->slots[1].cb.ppVtbl = nullptr;
+    Recorder unset;
+    unset.Record(kinds, (void* const*)&rebuilt, 1, sets);
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "FixtureCb has a vptr that is not g_fixtureCbVtable") != nullptr, "a word of 0 is a failure for a kind without vptr_unset");
+    ReplayClearFailure();
+    WeaponAimCobCb notYetSet;
+    memset(&notYetSet, 0, sizeof notYetSet);
+    Check(ReplayConcreteKind(ROK_WEAPONAIMCOBCB, &notYetSet) == ROK_WEAPONAIMCOBCB && ReplayFailure() == nullptr, "and an object not set up yet for a kind with vptr_unset");
+    static void* other[2];
+    notYetSet.ppVtbl = (void**)other;
+    Check(ReplayConcreteKind(ROK_WEAPONAIMCOBCB, &notYetSet) == kReplayObjectKindCount && ReplayFailure() != nullptr, "whose other wrong words still fail");
+    ReplayClearFailure();
     free(text);
 }
 

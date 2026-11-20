@@ -2807,6 +2807,31 @@ class EventForms(unittest.TestCase):
             rs.check_event_kinds(sub, spec["kinds"])
             self.assertEqual(set(ann["events"][sub]["kinds"]), {str(k) for k in spec["kinds"]})
 
+    def test_the_table_of_kinds_is_the_trace_schemas(self):
+        for sub in rs.EVENT_SUBSYSTEMS:
+            module = rs.traceschema.module_of_header(sub + ".h")
+            kinds = rs.traceschema.event_kinds(module)
+            self.assertEqual(rs.EVENTS[sub]["header"], module.header)
+            self.assertEqual(set(rs.EVENTS[sub]["kinds"]), set(kinds))
+            for value, (_, struct, _, _) in kinds.items():
+                self.assertEqual(rs.EVENTS[sub]["kinds"][value] or module.header, struct, (sub, value))
+
+    def test_both_schemas_record_the_same_payload_fields_as_unit_refs(self):
+        for sub in rs.EVENT_SUBSYSTEMS + ("weapons",):
+            module = rs.traceschema.module_of_header(sub + ".h")
+            structs = rs.interface_structs(sub)
+            for value, (_, struct, _, fields) in rs.traceschema.event_kinds(module).items():
+                trace = {name for name, _, kind, _, _ in fields if kind == "ref"}
+                replay = {f["name"] for f in rs.flatten_event_fields(structs, struct) if f["kind"] == "ref"}
+                self.assertEqual(replay, trace, (sub, value))
+
+    def test_every_weapons_field_that_holds_a_unit_is_a_ref(self):
+        structs = rs.interface_structs("weapons")
+        refs = lambda name: {f["name"]: f.get("target") for f in rs.flatten_event_fields(structs, name) if f["kind"] == "ref"}
+        self.assertEqual(refs("WeaponsDamage"), {"unit": "Unit", "source": "Unit"})
+        self.assertEqual(refs("WeaponsAttacked"), {"unit": "Unit", "attacker": "Unit"})
+        self.assertEqual(refs("WeaponsDamageRecord"), {"unit": "Unit", "attacker": "Unit"})
+
     def test_a_kind_missing_from_the_table_is_an_error(self):
         kinds = dict(rs.EVENTS["targeting"]["kinds"])
         del kinds[100]

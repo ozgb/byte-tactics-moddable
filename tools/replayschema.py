@@ -119,19 +119,17 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENTS = {
-    "wind_meteors": {"header": "WindMeteorsEventHeader", "kinds": {
-        64: None, 65: None, 66: "WindMeteorsParams", 67: None, 80: "WindMeteorsSpawn"}},
-    "targeting": {"header": "TargetingEventHeader", "kinds": {
-        96: "TargetingSetUnit", 97: "TargetingSetPos", 98: None, 99: None, 100: "TargetingLoad", 112: None}},
-    "los_radar": {"header": "LosRadarEventHeader", "kinds": {
-        128: "LosRadarUnit", 129: "LosRadarUnit", 130: "LosRadarUnit", 131: "LosRadarAddEyeball", 132: "LosRadarCellHeights",
-        133: "LosRadarRecalculate", 134: "LosRadarSharePlayer", 135: "LosRadarSharePlayer", 136: "LosRadarShareMap",
-        137: "LosRadarUnit", 138: "LosRadarSightLoad"}},
-    "map": {"header": "MapEventHeader", "kinds": {
-        160: None, 161: None, 162: None, 163: None, 164: "MapSetYard", 165: None, 166: None, 168: "MapPassMaps", 176: "MapCellsChanged"}},
-}
-EVENT_UNIT_FIELDS = {"unit", "target"}
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map")
+
+
+def event_table(subsystem: str) -> dict:
+    """The header struct of a subsystem's events and each kind's payload struct (None for the header alone), from traceschema's EVENT_MODULES."""
+    module = traceschema.module_of_header(subsystem + ".h")
+    kinds = traceschema.event_kinds(module)
+    return {"header": module.header, "kinds": {value: None if struct == module.header else struct for value, (_, struct, _, _) in kinds.items()}}
+
+
+EVENTS = {sub: event_table(sub) for sub in EVENT_SUBSYSTEMS}
 EVENT_SCALARS = {"int": "i32", "unsigned int": "u32", "unsigned": "u32", "float": "f32"}
 
 
@@ -150,7 +148,7 @@ def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | No
 
 
 def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]:
-    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset named unit or target as a ref to Unit."""
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit."""
     fields = []
     for ctype, member, length in structs[name]:
         if ctype in structs:
@@ -164,7 +162,7 @@ def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]
             continue
         for i in range(length or 1):
             field = {"name": member if length is None else "%s%d" % (member, i)}
-            if ctype == "unsigned int" and member in EVENT_UNIT_FIELDS:
+            if traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]

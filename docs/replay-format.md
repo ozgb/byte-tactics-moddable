@@ -514,12 +514,13 @@ header every event of the module starts with (its `kind`, and the fields all kin
 event, payload included. Each kind has its own payload struct, which starts with the header (`TargetingSetPos` is a
 `TargetingEventHeader h` and `int pos[3]`), or is the header alone (`TARGETING_CLEAR`). The annotation is
 `{"mode": "event", "events": "targeting", "size": "size"}`; the table of kinds is the one the interface header declares: each
-kind of its kind enums and the payload struct it carries, with the header struct for a kind that has no payload.
+kind of its kind enums and the payload struct it carries, with the header struct for a kind that has no payload. It is the trace
+schema's table of kinds, the one the trace dump and each `Apply`'s size check use too.
 
 The argument is recorded as the lines of the payload struct of the event's `kind`, header fields first (`a event.kind 97`,
 `a event.unit Unit#1`, `a event.weapon 2`, `a event.pos0 10`, `a event.pos1 -20`, `a event.pos2 30`), and then `a size 24` as the
-scalar it is. The elements of an array member are `name0`, `name1` and so on; a block offset named `unit` or `target` is a ref
-to a unit, recorded as an object name, so that the slot's reads of that unit are recorded as an object argument's are. A kind
+scalar it is. The elements of an array member are `name0`, `name1` and so on; a block offset named `unit`, `target`, `source` or
+`attacker` is a ref to a unit (the list the trace dump reads too, `docs/trace-format.md`), recorded as an object name, so that the slot's reads of that unit are recorded as an object argument's are. A kind
 the table does not list is recorded as the header. Exactly `size` bytes of the event are copied before the lines are made, so
 a payload field beyond `size` reads as 0 (an event shorter than its payload is recorded, and the slot answers it with outcome 0);
 the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.

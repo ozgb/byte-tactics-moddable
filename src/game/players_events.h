@@ -5,6 +5,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/players.h"
+#include "players_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../units/unit_commands.h"
@@ -14,26 +15,6 @@ struct Unit;
 
 void __stdcall KillPlayerUnits(unsigned char player);
 int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersGiveUnit* event);
-
-inline unsigned int PlayersEventSize(int kind)
-{
-    switch (kind) {
-    case PLAYERS_GIVE_UNIT:
-        return sizeof(PlayersGiveUnit);
-    case PLAYERS_KILL_UNITS:
-        return sizeof(PlayersKillUnits);
-    case PLAYERS_TRANSFER:
-        return sizeof(PlayersTransfer);
-    case PLAYERS_EFFECT_KILL_UNIT:
-        return sizeof(PlayersKillUnit);
-    case PLAYERS_EFFECT_SEND_UNIT:
-        return sizeof(PlayersSendUnit);
-    case PLAYERS_EFFECT_CAPTURE_UNIT:
-        return sizeof(PlayersCaptureUnit);
-    default:
-        return sizeof(PlayersEventHeader);
-    }
-}
 
 template <class E, class U>
 inline void PlayersFillHeader(E* event, int kind, U* unit)

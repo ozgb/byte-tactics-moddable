@@ -4,38 +4,11 @@
 #include <string.h>
 
 #include "../../interfaces/ai.h"
+#include "ai_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
 struct Unit;
-
-inline unsigned int AiEventSize(int kind)
-{
-    switch (kind) {
-    case AI_REACT_TO_ATTACK:
-        return sizeof(AiReactToAttack);
-    case AI_SET_SQUAD:
-        return sizeof(AiSetSquad);
-    case AI_PLAN:
-        return sizeof(AiPlan);
-    case AI_WEIGHT:
-        return sizeof(AiWeight);
-    case AI_LIMIT:
-        return sizeof(AiLimit);
-    case AI_EFFECT_ADD_ORDER:
-        return sizeof(AiAddOrder);
-    case AI_EFFECT_QUEUE_BUILD:
-        return sizeof(AiQueueBuild);
-    case AI_EFFECT_STOP:
-        return sizeof(AiStop);
-    case AI_EFFECT_ACTIVATE:
-        return sizeof(AiActivate);
-    case AI_EFFECT_SET_STATES:
-        return sizeof(AiSetStates);
-    default:
-        return sizeof(AiEventHeader);
-    }
-}
 
 template <class E>
 inline void AiFillHeader(E* event, int kind)

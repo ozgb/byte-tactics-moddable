@@ -9175,6 +9175,15 @@ call 105 UpdateUnitWeapons
   o y 5397417
   o z 24884647
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 105 Apply
+  r Game.localPlayer 1
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 106 UpdateUnitWeapons
   r Unit#1.posX 42041529
   r Unit#1.posZ 16918614
@@ -9228,7 +9237,6 @@ call 106 UpdateUnitWeapons
   o y 0
   o z 0
 call 106 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#252
   i services.ScheduleTargetingTargetPos Unit#252 0 = 1
   o x 42989076
@@ -9541,6 +9549,14 @@ call 111 UpdateUnitWeapons
   o y 5823175
   o z 25388992
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 111 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 111 GetWeaponRange
   a unit Unit#251
   a weapon 0
@@ -9566,6 +9582,25 @@ call 112 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 112 Apply
+  r Unit#2.player Player#0
+  r Unit#2.activateFlags 1
+  r UnitDef#51.flags1 0x00818889
+  r UnitDef#51.damagemodifier 65536
+  r UnitDef#51.weapons0 weapondef#108
+  r UnitDef#51.weapons1 weapondef#0
+  r UnitDef#51.weapons2 weapondef#0
+  r Player#0.active 1
+  r Player#0.type 1
+  r weapondef#108.index 108
+  r weapondef#0.index 0
+  a event.kind 259
+  a event.unit Unit#2
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  w Unit#2.weapon0Flags 18
+  o result 1
 call 112 UpdateUnitWeapons
   r rng.seed 0x5378e70f
   r Unit#3.posY 3211264
@@ -9599,7 +9634,6 @@ call 112 UpdateUnitWeapons
   o y 0
   o z 0
 call 112 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#252
   i services.ScheduleTargetingTargetPos Unit#252 0 = 1
   o x 43337790
@@ -9626,7 +9660,6 @@ call 113 UpdateUnitWeapons
   r Unit#2.posX 39344493
   r Unit#2.posY 3735552
   r Unit#2.posZ 19662205
-  r Unit#2.weapon0Flags 18
   r Unit#2.heading -27648
   r UnitMotion#2.speed 69433
   a unit Unit#2
@@ -9634,6 +9667,14 @@ call 113 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 113 Apply
+  a event.kind 260
+  a event.unit Unit#2
+  a event.weapon 0
+  a size 12
+  i services.SchedPublish 6 12
+  w Unit#2.weapon0Flags 2
+  o result 1
 call 113 UpdateUnitWeapons
   r Unit#3.posY 3276800
   r Unit#3.heading -25088
@@ -9698,7 +9739,6 @@ call 114 UpdateUnitWeapons
   r Unit#2.posY 3801088
   r Unit#2.posZ 19672051
   r Unit#2.weapon0TargetX 252
-  r Unit#2.weapon0Flags 2
   r Unit#2.heading -27136
   r UnitMotion#2.speed 79217
   a unit Unit#2
@@ -10007,6 +10047,14 @@ call 117 UpdateUnitWeapons
   o y 5986037
   o z 25866327
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 117 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 118 UpdateUnitWeapons
   r Unit#1.posX 42982914
   r Unit#1.posZ 16852056
@@ -10020,7 +10068,6 @@ call 118 UpdateUnitWeapons
   r Projectile#0.directionZ 317601
   r Projectile#0.anglesHeading 45517
   r Projectile#0.anglesPitch -3356
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -10126,6 +10173,16 @@ call 119 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 119 Apply
+  r Unit#3.player Player#0
+  r Unit#3.activateFlags 1
+  a event.kind 259
+  a event.unit Unit#3
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  w Unit#3.weapon0Flags 18
+  o result 1
 call 119 UpdateUnitWeapons
   r rng.seed 0x1aafbc93
   a unit Unit#4
@@ -10198,7 +10255,6 @@ call 120 UpdateUnitWeapons
   r Unit#3.posX 41964121
   r Unit#3.posY 3735552
   r Unit#3.posZ 19651762
-  r Unit#3.weapon0Flags 18
   r Unit#3.heading -27648
   r UnitMotion#3.speed 69433
   r Unit#2.posX 40234987
@@ -10211,6 +10267,14 @@ call 120 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 120 Apply
+  a event.kind 260
+  a event.unit Unit#3
+  a event.weapon 0
+  a size 12
+  i services.SchedPublish 6 12
+  w Unit#3.weapon0Flags 2
+  o result 1
 call 120 UpdateUnitWeapons
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10278,7 +10342,6 @@ call 121 UpdateUnitWeapons
   r Unit#3.posY 3801088
   r Unit#3.posZ 19658501
   r Unit#3.weapon0TargetX 252
-  r Unit#3.weapon0Flags 2
   r Unit#3.heading -27136
   r UnitMotion#3.speed 75700
   r Unit#2.flags 0x98240126
@@ -10540,6 +10603,14 @@ call 123 UpdateUnitWeapons
   o y 5620465
   o z 26320357
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 123 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 124 UpdateUnitWeapons
   r Unit#1.posX 43453640
   r Unit#1.posZ 16819262
@@ -10562,7 +10633,6 @@ call 124 UpdateUnitWeapons
   r Projectile#1.directionZ 380670
   r Projectile#1.anglesHeading 44392
   r Projectile#1.anglesPitch -4259
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11036,6 +11106,14 @@ call 129 UpdateUnitWeapons
   o y 5513673
   o z 26734313
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 129 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 130 UpdateUnitWeapons
   r Game.projectileCount 0
   r Unit#1.posX 43923943
@@ -11052,7 +11130,6 @@ call 130 UpdateUnitWeapons
   r Projectile#0.anglesPitch -4223
   r Projectile#0.flags 2
   r Unit#252.health 177
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11457,11 +11534,18 @@ call 135 UpdateUnitWeapons
   o y 5538083
   o z 27105146
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 135 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 136 UpdateUnitWeapons
   r Unit#1.posX 44335706
   r Unit#1.posZ 17026314
   r Unit#1.heading -24004
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -11861,10 +11945,17 @@ call 141 UpdateUnitWeapons
   o y 5556302
   o z 27441528
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 141 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 142 UpdateUnitWeapons
   r Unit#1.posX 44665232
   r Unit#1.posZ 17364024
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -12264,10 +12355,17 @@ call 147 UpdateUnitWeapons
   o y 5551911
   o z 27753937
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 147 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 148 UpdateUnitWeapons
   r Unit#1.posX 44994758
   r Unit#1.posZ 17701734
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -12667,11 +12765,18 @@ call 153 UpdateUnitWeapons
   o y 5549598
   o z 28053014
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 153 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 154 UpdateUnitWeapons
   r Unit#1.posX 45324284
   r Unit#1.posZ 18039444
   r Unit#1.heading -24714
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13070,11 +13175,18 @@ call 159 UpdateUnitWeapons
   o y 5543142
   o z 28331053
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 159 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 160 UpdateUnitWeapons
   r Unit#1.posX 45653810
   r Unit#1.posZ 18377154
   r Unit#1.heading -24720
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13152,6 +13264,120 @@ call 161 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 161 Apply
+  r Unit#1.player Player#0
+  r Unit#1.activateFlags 1
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.damagemodifier 65536
+  r UnitDef#34.weapons0 weapondef#20
+  r UnitDef#34.weapons1 weapondef#0
+  r UnitDef#34.weapons2 weapondef#22
+  r weapondef#20.index 20
+  r weapondef#22.index 22
+  a event.kind 260
+  a event.unit Unit#1
+  a event.weapon 3
+  a size 12
+  i services.SchedPublish 6 12
+  i services.SchedPublish 6 12
+  w Unit#1.weapon0Flags 2
+  w Unit#1.weapon2Flags 10
+  o result 1
+call 161 Apply
+  r Unit#6.health 0
+  r Unit#6.def UnitDef#112
+  r Unit#6.player Player#0
+  r Unit#6.flags 0x30010021
+  r Unit#6.activateFlags 0
+  r Unit#6.script null
+  r Unit#6.id 6
+  r Unit#6.killCount 0
+  r Unit#6.playerIndex 0
+  r Unit#6.posX 45613056
+  r Unit#6.posY 65536
+  r Unit#6.posZ 22544384
+  r Unit#6.weapon0TargetX 0
+  r Unit#6.weapon0TargetZ 0
+  r Unit#6.weapon0Def null
+  r Unit#6.weapon0Flags 0
+  r Unit#6.weapon1TargetX 0
+  r Unit#6.weapon1TargetZ 0
+  r Unit#6.weapon1Def null
+  r Unit#6.weapon1Flags 0
+  r Unit#6.weapon2TargetX 0
+  r Unit#6.weapon2TargetZ 0
+  r Unit#6.weapon2Def null
+  r Unit#6.weapon2Flags 0
+  r Unit#6.weapon0ReloadTimer 0
+  r Unit#6.weapon0FireHeading 0
+  r Unit#6.weapon0FirePitch 0
+  r Unit#6.weapon0Stockpile 0
+  r Unit#6.weapon0MuzzleDelta 0
+  r Unit#6.weapon1ReloadTimer 0
+  r Unit#6.weapon1FireHeading 0
+  r Unit#6.weapon1FirePitch 0
+  r Unit#6.weapon1Stockpile 0
+  r Unit#6.weapon1MuzzleDelta 0
+  r Unit#6.weapon2ReloadTimer 0
+  r Unit#6.weapon2FireHeading 0
+  r Unit#6.weapon2FirePitch 0
+  r Unit#6.weapon2Stockpile 0
+  r Unit#6.weapon2MuzzleDelta 0
+  r UnitDef#112.flags1 0x0084008a
+  r UnitDef#112.damagemodifier 21845
+  r UnitDef#112.maxHealth 326
+  r UnitDef#112.weapons0 weapondef#0
+  r UnitDef#112.weapons1 weapondef#0
+  r UnitDef#112.weapons2 weapondef#0
+  r Unit#6.weapons[0].aimCob.nAimCobDone 0
+  r Unit#6.weapons[1].aimCob.nAimCobDone 0
+  r Unit#6.weapons[2].aimCob.nAimCobDone 0
+  a event.kind 259
+  a event.unit Unit#6
+  a event.weapon 0
+  a size 12
+  o result 1
+call 161 Apply
+  a event.kind 259
+  a event.unit Unit#6
+  a event.weapon 1
+  a size 12
+  o result 1
+call 161 Apply
+  a event.kind 259
+  a event.unit Unit#6
+  a event.weapon 2
+  a size 12
+  o result 1
+call 161 Apply
+  r Unit#6.flags 0x30290021
+  r Unit#6.script CobScript#8
+  a event.kind 261
+  a event.unit Unit#6
+  a size 8
+  i scripts.QueryScript CobScript#8 "QueryPrimary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 0
+  o out (45613056,65536,22544384)
+  i scripts.QueryScript CobScript#8 "QuerySecondary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 1
+  o out (45613056,65536,22544384)
+  i scripts.QueryScript CobScript#8 "QueryTertiary" (0) null null null = 0
+  o p2 (0)
+  i scripts.GetPieceOffset Unit#6 0 = (0,0,0)
+  i scripts.GetAimFromPosition Unit#6 2
+  o out (45613056,65536,22544384)
+  i services.SchedPublish 6 44
+  w Unit#6.weapon0Def weapondef#0
+  w Unit#6.weapon0Flags 16
+  w Unit#6.weapon1Def weapondef#0
+  w Unit#6.weapon1Flags 20
+  w Unit#6.weapon2Def weapondef#0
+  w Unit#6.weapon2Flags 24
+  o result 1
 call 161 UpdateUnitWeapons
   r rng.seed 0x122d3b7d
   r Unit#2.flags 0x9824012a
@@ -13191,53 +13417,22 @@ call 161 UpdateUnitWeapons
   r UnitMotion#5.speed 103882
   a unit Unit#5
 call 161 UpdateUnitWeapons
-  r Unit#6.health 0
-  r Unit#6.def UnitDef#112
   r Unit#6.flags 0x30280021
-  r Unit#6.script CobScript#8
-  r Unit#6.id 6
-  r Unit#6.killCount 0
-  r Unit#6.playerIndex 0
   r Unit#6.owner Player#0
   r Unit#6.motion null
-  r Unit#6.posX 45613056
-  r Unit#6.posY 65536
-  r Unit#6.posZ 22544384
-  r Unit#6.weapon0TargetX 0
   r Unit#6.weapon0TargetZ -32768
-  r Unit#6.weapon0Def weapondef#0
-  r Unit#6.weapon0Flags 16
-  r Unit#6.weapon1TargetX 0
   r Unit#6.weapon1TargetZ -32768
-  r Unit#6.weapon1Def weapondef#0
-  r Unit#6.weapon1Flags 20
-  r Unit#6.weapon2TargetX 0
   r Unit#6.weapon2TargetZ -32768
-  r Unit#6.weapon2Def weapondef#0
-  r Unit#6.weapon2Flags 24
   r Unit#6.heading 32663
   r Unit#6.pitch 0
-  r Unit#6.weapon0ReloadTimer 0
-  r Unit#6.weapon0FireHeading 0
-  r Unit#6.weapon0FirePitch 0
-  r Unit#6.weapon0Stockpile 0
-  r Unit#6.weapon0MuzzleDelta 0
-  r Unit#6.weapon1ReloadTimer 0
-  r Unit#6.weapon1FireHeading 0
-  r Unit#6.weapon1FirePitch 0
-  r Unit#6.weapon1Stockpile 0
-  r Unit#6.weapon1MuzzleDelta 0
-  r Unit#6.weapon2ReloadTimer 0
-  r Unit#6.weapon2FireHeading 0
-  r Unit#6.weapon2FirePitch 0
-  r Unit#6.weapon2Stockpile 0
-  r Unit#6.weapon2MuzzleDelta 0
-  r UnitDef#112.maxHealth 326
   r UnitDef#112.modelMaxYHigh 38
-  r Unit#6.weapons[0].aimCob.nAimCobDone 0
-  r Unit#6.weapons[1].aimCob.nAimCobDone 0
-  r Unit#6.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#6
+call 161 Apply
+  a event.kind 260
+  a event.unit Unit#6
+  a event.weapon 3
+  a size 12
+  o result 1
 call 161 UpdateUnitWeapons
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -13266,8 +13461,6 @@ call 161 UpdateUnitWeapons
 call 162 UpdateUnitWeapons
   r Unit#1.posX 45722464
   r Unit#1.posZ 18447511
-  r Unit#1.weapon0Flags 2
-  r Unit#1.weapon2Flags 10
   r UnitMotion#1.speed 39323
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
@@ -13533,8 +13726,15 @@ call 165 UpdateUnitWeapons
   o y 5541303
   o z 28585212
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 165 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 166 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13929,8 +14129,15 @@ call 171 UpdateUnitWeapons
   o y 5543777
   o z 28832198
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 171 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 172 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -14326,8 +14533,15 @@ call 177 UpdateUnitWeapons
   o y 5548912
   o z 29082825
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 177 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 178 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -14726,8 +14940,15 @@ call 183 UpdateUnitWeapons
   o y 5555161
   o z 29345866
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 183 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 184 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -14837,6 +15058,19 @@ call 185 UpdateUnitWeapons
   r Unit#5.heading -13950
   r UnitMotion#5.speed 103675
   a unit Unit#5
+call 185 Apply
+  r Unit#5.player Player#0
+  r Unit#5.activateFlags 1
+  r UnitDef#29.flags1 0x008088c9
+  r UnitDef#29.damagemodifier 65536
+  r UnitDef#29.weapons0 weapondef#0
+  r UnitDef#29.weapons1 weapondef#0
+  r UnitDef#29.weapons2 weapondef#0
+  a event.kind 260
+  a event.unit Unit#5
+  a event.weapon 3
+  a size 12
+  o result 1
 call 185 UpdateUnitWeapons
   r rng.seed 0x4ce7c9db
   a unit Unit#6
@@ -15117,8 +15351,15 @@ call 189 UpdateUnitWeapons
   o y 5500017
   o z 29551370
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 189 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 190 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -15514,8 +15755,15 @@ call 195 UpdateUnitWeapons
   o y 5450164
   o z 29638517
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 195 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 196 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -15847,8 +16095,15 @@ call 200 UpdateUnitWeapons
   o y 5418519
   o z 29629083
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 200 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 201 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -16190,8 +16445,15 @@ call 205 UpdateUnitWeapons
   o y 5395179
   o z 29549522
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 205 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 206 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -16527,12 +16789,19 @@ call 210 UpdateUnitWeapons
   o y 5378772
   o z 29403778
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 210 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 211 UpdateUnitWeapons
   r rng.seed 0x749a3077
   r Player#0.energy f32:0x476a8643
   r Player#0.metal f32:0x46ea5e31
   r Unit#3.flags 0x9024002a
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -16733,10 +17002,30 @@ call 212 GetWeaponRange
   o result 180
 call 212 WeaponCanReachUnit
   r UnitDef#144.flags1 0x00918089
-  r UnitDef#29.flags1 0x008088c9
   a shooter Unit#252
   a target Unit#5
   a weapon 0
+  o result 1
+call 212 Apply
+  r Unit#252.player Player#1
+  r Unit#252.activateFlags 0
+  r UnitDef#144.damagemodifier 65536
+  r UnitDef#144.weapons0 weapondef#88
+  r UnitDef#144.weapons1 weapondef#0
+  r UnitDef#144.weapons2 weapondef#0
+  r Player#1.active 1
+  r Player#1.type 1
+  r weapondef#88.index 88
+  a event.kind 260
+  a event.unit Unit#252
+  a event.weapon 0
+  a size 12
+  o result 1
+call 212 Apply
+  a event.kind 260
+  a event.unit Unit#252
+  a event.weapon 2
+  a size 12
   o result 1
 call 213 UpdateUnitWeapons
   a unit Unit#1
@@ -16807,6 +17096,18 @@ call 213 WeaponCanReachUnit
   a shooter Unit#252
   a target Unit#5
   a weapon 0
+  o result 1
+call 213 Apply
+  a event.kind 260
+  a event.unit Unit#252
+  a event.weapon 0
+  a size 12
+  o result 1
+call 213 Apply
+  a event.kind 260
+  a event.unit Unit#252
+  a event.weapon 2
+  a size 12
   o result 1
 call 214 UpdateUnitWeapons
   a unit Unit#1
@@ -16938,8 +17239,15 @@ call 215 UpdateUnitWeapons
   o y 5629992
   o z 29195621
   w Unit#252.weapon0ReloadTimer 22
+call 215 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 216 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -19288,8 +19596,15 @@ call 251 UpdateUnitWeapons
   o y 6144688
   o z 26320564
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 251 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 252 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -19806,8 +20121,15 @@ call 259 UpdateUnitWeapons
   o y 5645258
   o z 25560838
   i services.ScheduleTargetingTargetUnit Unit#252 0 = Unit#5
+call 259 Apply
+  a event.kind 263
+  a event.unit null
+  a event.callback Unit#252.weapons[0].aimCob
+  a event.result 1
+  a size 16
+  w Unit#252.weapons[0].aimCob.nAimCobDone 1
+  o result 1
 call 260 UpdateUnitWeapons
-  r Unit#252.weapons[0].aimCob.nAimCobDone 1
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0

@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "../../interfaces/weapons.h"
+#include "weapons_event_size.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
@@ -23,50 +24,6 @@ inline WeaponsEventHeader WeaponsHeaderOf(int kind, U* unit)
     WeaponsEventHeader header = WeaponsHeaderOf(kind);
     header.unit = Ref<U>(unit).offset;
     return header;
-}
-
-inline unsigned int WeaponsEventSize(int kind)
-{
-    switch (kind) {
-    case WEAPONS_DAMAGE:
-    case WEAPONS_REMOTE_DAMAGE:
-        return sizeof(WeaponsDamage);
-    case WEAPONS_DETONATE:
-        return sizeof(WeaponsDetonate);
-    case WEAPONS_RELEASE:
-        return sizeof(WeaponsRelease);
-    case WEAPONS_CLAIM:
-        return sizeof(WeaponsClaim);
-    case WEAPONS_AIM_DONE:
-        return sizeof(WeaponsAimDone);
-    case WEAPONS_EXPLODE_PIECE:
-        return sizeof(WeaponsExplodePiece);
-    case WEAPONS_AREA_DAMAGE:
-        return sizeof(WeaponsAreaDamage);
-    case WEAPONS_SPAWN:
-        return sizeof(WeaponsSpawn);
-    case WEAPONS_SET_STOCKPILES:
-        return sizeof(WeaponsSetStockpiles);
-    case WEAPONS_ADD_STOCKPILE:
-        return sizeof(WeaponsAddStockpile);
-    case WEAPONS_EFFECT_ATTACKED:
-        return sizeof(WeaponsAttacked);
-    case WEAPONS_EFFECT_HIT:
-        return sizeof(WeaponsHit);
-    case WEAPONS_EFFECT_DAMAGE_RECORD:
-        return sizeof(WeaponsDamageRecord);
-    case WEAPONS_EFFECT_HEALTH:
-        return sizeof(WeaponsHealth);
-    case WEAPONS_EFFECT_PARALYZE:
-        return sizeof(WeaponsParalyze);
-    case WEAPONS_EFFECT_START_SCRIPT:
-        return sizeof(WeaponsStartScript);
-    case WEAPONS_EFFECT_DETACH_PIECE:
-        return sizeof(WeaponsDetachPiece);
-    case WEAPONS_EFFECT_BUSY:
-        return sizeof(WeaponsBusy);
-    }
-    return sizeof(WeaponsEventHeader);
 }
 
 inline void WeaponsPublishEffect(const void* effect, unsigned int size)

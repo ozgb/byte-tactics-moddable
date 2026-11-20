@@ -228,6 +228,25 @@ enum ReplayObjectKindId {
     ROK_MAPSETYARD,
     ROK_MAPPASSMAPS,
     ROK_MAPCELLSCHANGED,
+    ROK_WEAPONSEVENTHEADER,
+    ROK_WEAPONSDAMAGE,
+    ROK_WEAPONSDETONATE,
+    ROK_WEAPONSRELEASE,
+    ROK_WEAPONSCLAIM,
+    ROK_WEAPONSAIMDONE,
+    ROK_WEAPONSEXPLODEPIECE,
+    ROK_WEAPONSAREADAMAGE,
+    ROK_WEAPONSSPAWN,
+    ROK_WEAPONSSETSTOCKPILES,
+    ROK_WEAPONSADDSTOCKPILE,
+    ROK_WEAPONSATTACKED,
+    ROK_WEAPONSHIT,
+    ROK_WEAPONSDAMAGERECORD,
+    ROK_WEAPONSHEALTH,
+    ROK_WEAPONSPARALYZE,
+    ROK_WEAPONSSTARTSCRIPT,
+    ROK_WEAPONSDETACHPIECE,
+    ROK_WEAPONSBUSY,
     ROK_COUNT
 };
 
@@ -422,6 +441,7 @@ enum ReplayEventTableId {
     RET_TARGETING,
     RET_LOS_RADAR,
     RET_MAP,
+    RET_WEAPONS,
     RET_COUNT
 };
 
@@ -457,12 +477,38 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 166, ROK_MAPEVENTHEADER },
     { 168, ROK_MAPPASSMAPS },
     { 176, ROK_MAPCELLSCHANGED },
+    { 256, ROK_WEAPONSDAMAGE },
+    { 257, ROK_WEAPONSDAMAGE },
+    { 258, ROK_WEAPONSDETONATE },
+    { 259, ROK_WEAPONSRELEASE },
+    { 260, ROK_WEAPONSCLAIM },
+    { 261, ROK_WEAPONSEVENTHEADER },
+    { 262, ROK_WEAPONSEVENTHEADER },
+    { 263, ROK_WEAPONSAIMDONE },
+    { 264, ROK_WEAPONSEXPLODEPIECE },
+    { 265, ROK_WEAPONSAREADAMAGE },
+    { 266, ROK_WEAPONSSPAWN },
+    { 267, ROK_WEAPONSSETSTOCKPILES },
+    { 269, ROK_WEAPONSADDSTOCKPILE },
+    { 272, ROK_WEAPONSATTACKED },
+    { 273, ROK_WEAPONSHIT },
+    { 274, ROK_WEAPONSEVENTHEADER },
+    { 275, ROK_WEAPONSDAMAGERECORD },
+    { 276, ROK_WEAPONSHEALTH },
+    { 277, ROK_WEAPONSPARALYZE },
+    { 278, ROK_WEAPONSSTARTSCRIPT },
+    { 279, ROK_WEAPONSDETACHPIECE },
+    { 280, ROK_WEAPONSEVENTHEADER },
+    { 281, ROK_WEAPONSBUSY },
+    { 282, ROK_WEAPONSEVENTHEADER },
+    { 283, ROK_WEAPONSEVENTHEADER },
 };
 static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 5 },
     { ROK_TARGETINGEVENTHEADER, 5, 6 },
     { ROK_LOSRADAREVENTHEADER, 11, 11 },
     { ROK_MAPEVENTHEADER, 22, 9 },
+    { ROK_WEAPONSEVENTHEADER, 31, 25 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -482,6 +528,25 @@ static_assert(sizeof(MapEventHeader) <= REPLAY_EVENT_MAX, "MapEventHeader fits t
 static_assert(sizeof(MapSetYard) <= REPLAY_EVENT_MAX, "MapSetYard fits the event buffer");
 static_assert(sizeof(MapPassMaps) <= REPLAY_EVENT_MAX, "MapPassMaps fits the event buffer");
 static_assert(sizeof(MapCellsChanged) <= REPLAY_EVENT_MAX, "MapCellsChanged fits the event buffer");
+static_assert(sizeof(WeaponsDamage) <= REPLAY_EVENT_MAX, "WeaponsDamage fits the event buffer");
+static_assert(sizeof(WeaponsDetonate) <= REPLAY_EVENT_MAX, "WeaponsDetonate fits the event buffer");
+static_assert(sizeof(WeaponsRelease) <= REPLAY_EVENT_MAX, "WeaponsRelease fits the event buffer");
+static_assert(sizeof(WeaponsClaim) <= REPLAY_EVENT_MAX, "WeaponsClaim fits the event buffer");
+static_assert(sizeof(WeaponsEventHeader) <= REPLAY_EVENT_MAX, "WeaponsEventHeader fits the event buffer");
+static_assert(sizeof(WeaponsAimDone) <= REPLAY_EVENT_MAX, "WeaponsAimDone fits the event buffer");
+static_assert(sizeof(WeaponsExplodePiece) <= REPLAY_EVENT_MAX, "WeaponsExplodePiece fits the event buffer");
+static_assert(sizeof(WeaponsAreaDamage) <= REPLAY_EVENT_MAX, "WeaponsAreaDamage fits the event buffer");
+static_assert(sizeof(WeaponsSpawn) <= REPLAY_EVENT_MAX, "WeaponsSpawn fits the event buffer");
+static_assert(sizeof(WeaponsSetStockpiles) <= REPLAY_EVENT_MAX, "WeaponsSetStockpiles fits the event buffer");
+static_assert(sizeof(WeaponsAddStockpile) <= REPLAY_EVENT_MAX, "WeaponsAddStockpile fits the event buffer");
+static_assert(sizeof(WeaponsAttacked) <= REPLAY_EVENT_MAX, "WeaponsAttacked fits the event buffer");
+static_assert(sizeof(WeaponsHit) <= REPLAY_EVENT_MAX, "WeaponsHit fits the event buffer");
+static_assert(sizeof(WeaponsDamageRecord) <= REPLAY_EVENT_MAX, "WeaponsDamageRecord fits the event buffer");
+static_assert(sizeof(WeaponsHealth) <= REPLAY_EVENT_MAX, "WeaponsHealth fits the event buffer");
+static_assert(sizeof(WeaponsParalyze) <= REPLAY_EVENT_MAX, "WeaponsParalyze fits the event buffer");
+static_assert(sizeof(WeaponsStartScript) <= REPLAY_EVENT_MAX, "WeaponsStartScript fits the event buffer");
+static_assert(sizeof(WeaponsDetachPiece) <= REPLAY_EVENT_MAX, "WeaponsDetachPiece fits the event buffer");
+static_assert(sizeof(WeaponsBusy) <= REPLAY_EVENT_MAX, "WeaponsBusy fits the event buffer");
 
 static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },
@@ -493,66 +558,85 @@ static const ReplayInsideSite kReplayInsideSites[] = {
 static const unsigned kReplayInsideSiteCount = 5;
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
-    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0 },
-    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, 0, 0 },
-    { "UnitDef", sizeof(UnitDef), RS_STATE, 3, 0, 0, 0, 0, 0 },
-    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MeteorShowerParams", sizeof(MeteorShowerParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "SpatialBucket", sizeof(SpatialBucket), RS_STATE, 4, 0, 0, 0, 0, 1 },
-    { "OverflowBucket", sizeof(SpatialBucket), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Cell", sizeof(Cell), RS_STATE, 5, 0, 0, 0, 0, 1 },
-    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "UnitTypeSet", sizeof(UnitTypeSet), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Projectile", sizeof(Projectile), RS_STATE, 6, 0, 0, 0, 0, 0 },
-    { "MovementClass", sizeof(MovementClass), RS_STATE, 7, 0, 0, 0, 0, 0 },
-    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "OrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, 3, 0 },
-    { "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "RingApproach", sizeof(RingApproach), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "KeyedCell", sizeof(KeyedCell), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "PlayerAI", sizeof(PlayerAI), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "alloc", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Gaf", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "FrameTable", sizeof(FrameTable), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "GafFrame", sizeof(GafFrame), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Object3do", sizeof(Object3do), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 4, 0, 0, 0 },
-    { "Feature", sizeof(Feature), RS_STATE, 8, 0, 0, 0, 0, 0 },
-    { "Spot", sizeof(Spot), RS_STATE, 9, 0, 0, 0, 0, 0 },
-    { "Pool", sizeof(Pool), RS_STATE, 10, 0, 0, 0, 0, 0 },
-    { "ModelState", sizeof(ModelState), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "Mission", sizeof(Mission), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "WeaponAimCobCb", sizeof(WeaponAimCobCb), RS_STATE, RT_ORDER, 4, 1, 0, 0, 0 },
-    { "WeaponFire", sizeof(WeaponDef), RS_STATE, 11, 0, 0, 0, 0, 0 },
-    { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "WindMeteorsSpawn", sizeof(WindMeteorsSpawn), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "TargetingEventHeader", sizeof(TargetingEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "TargetingSetUnit", sizeof(TargetingSetUnit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "TargetingSetPos", sizeof(TargetingSetPos), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "TargetingLoad", sizeof(TargetingLoad), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarEventHeader", sizeof(LosRadarEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarUnit", sizeof(LosRadarUnit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarAddEyeball", sizeof(LosRadarAddEyeball), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarCellHeights", sizeof(LosRadarCellHeights), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarRecalculate", sizeof(LosRadarRecalculate), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarSharePlayer", sizeof(LosRadarSharePlayer), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarShareMap", sizeof(LosRadarShareMap), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "LosRadarSightLoad", sizeof(LosRadarSightLoad), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MapEventHeader", sizeof(MapEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MapSetYard", sizeof(MapSetYard), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
-    { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0 },
+    { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0, 0 },
+    { "Unit", sizeof(Unit), RS_STATE, 2, 0, 0, 0, 0, 0, 0 },
+    { "UnitDef", sizeof(UnitDef), RS_STATE, 3, 0, 0, 0, 0, 0, 0 },
+    { "weapondef", sizeof(WeaponDef), RS_INDEX, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MeteorShowerParams", sizeof(MeteorShowerParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "PlayerInfo", sizeof(PlayerInfo), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "SpatialBucket", sizeof(SpatialBucket), RS_STATE, 4, 0, 0, 0, 0, 1, 0 },
+    { "OverflowBucket", sizeof(SpatialBucket), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Cell", sizeof(Cell), RS_STATE, 5, 0, 0, 0, 0, 1, 0 },
+    { "CobScript", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitMotion", sizeof(UnitMotion), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Vec3", sizeof(Vec3), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitTypeSet", sizeof(UnitTypeSet), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Projectile", sizeof(Projectile), RS_STATE, 6, 0, 0, 0, 0, 0, 0 },
+    { "MovementClass", sizeof(MovementClass), RS_STATE, 7, 0, 0, 0, 0, 0, 0 },
+    { "Point16", sizeof(Point16), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MissionType", sizeof(MissionType), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Angles16", sizeof(Angles16), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "OrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, 3, 0, 0 },
+    { "ApproachRadius", sizeof(ApproachRadius), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "RingApproach", sizeof(RingApproach), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "PathOrder", sizeof(PathOrder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Order", sizeof(Order), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "OrderTableEntry", sizeof(OrderTableEntry), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "KeyedCell", sizeof(KeyedCell), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "PlayerAI", sizeof(PlayerAI), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "alloc", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Gaf", sizeof(char), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FrameTable", sizeof(FrameTable), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "GafFrame", sizeof(GafFrame), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Object3do", sizeof(Object3do), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 4, 0, 0, 0, 0 },
+    { "Feature", sizeof(Feature), RS_STATE, 8, 0, 0, 0, 0, 0, 0 },
+    { "Spot", sizeof(Spot), RS_STATE, 9, 0, 0, 0, 0, 0, 0 },
+    { "Pool", sizeof(Pool), RS_STATE, 10, 0, 0, 0, 0, 0, 0 },
+    { "ModelState", sizeof(ModelState), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Mission", sizeof(Mission), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponAimCobCb", sizeof(WeaponAimCobCb), RS_STATE, RT_ORDER, 4, 1, 0, 0, 0, 1 },
+    { "WeaponFire", sizeof(WeaponDef), RS_STATE, 11, 0, 0, 0, 0, 0, 0 },
+    { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WindMeteorsSpawn", sizeof(WindMeteorsSpawn), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "TargetingEventHeader", sizeof(TargetingEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "TargetingSetUnit", sizeof(TargetingSetUnit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "TargetingSetPos", sizeof(TargetingSetPos), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "TargetingLoad", sizeof(TargetingLoad), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarEventHeader", sizeof(LosRadarEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarUnit", sizeof(LosRadarUnit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarAddEyeball", sizeof(LosRadarAddEyeball), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarCellHeights", sizeof(LosRadarCellHeights), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarRecalculate", sizeof(LosRadarRecalculate), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarSharePlayer", sizeof(LosRadarSharePlayer), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarShareMap", sizeof(LosRadarShareMap), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "LosRadarSightLoad", sizeof(LosRadarSightLoad), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapEventHeader", sizeof(MapEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapSetYard", sizeof(MapSetYard), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsEventHeader", sizeof(WeaponsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsDamage", sizeof(WeaponsDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsDetonate", sizeof(WeaponsDetonate), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsRelease", sizeof(WeaponsRelease), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsClaim", sizeof(WeaponsClaim), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsAimDone", sizeof(WeaponsAimDone), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsExplodePiece", sizeof(WeaponsExplodePiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsAreaDamage", sizeof(WeaponsAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsSpawn", sizeof(WeaponsSpawn), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsSetStockpiles", sizeof(WeaponsSetStockpiles), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsAddStockpile", sizeof(WeaponsAddStockpile), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsAttacked", sizeof(WeaponsAttacked), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsHit", sizeof(WeaponsHit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsDamageRecord", sizeof(WeaponsDamageRecord), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsHealth", sizeof(WeaponsHealth), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsParalyze", sizeof(WeaponsParalyze), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsStartScript", sizeof(WeaponsStartScript), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsDetachPiece", sizeof(WeaponsDetachPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WeaponsBusy", sizeof(WeaponsBusy), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 58;
+static const unsigned kReplayObjectKindCount = 77;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -975,9 +1059,95 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "rect3", offsetof(MapCellsChanged, rect[3]), sizeof(((MapCellsChanged*)nullptr)->rect[3]), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "classes", offsetof(MapCellsChanged, classes), sizeof(((MapCellsChanged*)nullptr)->classes), ROK_MAPCELLSCHANGED, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "cause", offsetof(MapCellsChanged, cause), sizeof(((MapCellsChanged*)nullptr)->cause), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsEventHeader, kind), sizeof(((WeaponsEventHeader*)nullptr)->kind), ROK_WEAPONSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsEventHeader, unit), sizeof(((WeaponsEventHeader*)nullptr)->unit), ROK_WEAPONSEVENTHEADER, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsDamage, h.kind), sizeof(((WeaponsDamage*)nullptr)->h.kind), ROK_WEAPONSDAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsDamage, h.unit), sizeof(((WeaponsDamage*)nullptr)->h.unit), ROK_WEAPONSDAMAGE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "source", offsetof(WeaponsDamage, source), sizeof(((WeaponsDamage*)nullptr)->source), ROK_WEAPONSDAMAGE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "amount", offsetof(WeaponsDamage, amount), sizeof(((WeaponsDamage*)nullptr)->amount), ROK_WEAPONSDAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "damageKind", offsetof(WeaponsDamage, damageKind), sizeof(((WeaponsDamage*)nullptr)->damageKind), ROK_WEAPONSDAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "direction", offsetof(WeaponsDamage, direction), sizeof(((WeaponsDamage*)nullptr)->direction), ROK_WEAPONSDAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsDetonate, h.kind), sizeof(((WeaponsDetonate*)nullptr)->h.kind), ROK_WEAPONSDETONATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsDetonate, h.unit), sizeof(((WeaponsDetonate*)nullptr)->h.unit), ROK_WEAPONSDETONATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "selfDestruct", offsetof(WeaponsDetonate, selfDestruct), sizeof(((WeaponsDetonate*)nullptr)->selfDestruct), ROK_WEAPONSDETONATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsRelease, h.kind), sizeof(((WeaponsRelease*)nullptr)->h.kind), ROK_WEAPONSRELEASE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsRelease, h.unit), sizeof(((WeaponsRelease*)nullptr)->h.unit), ROK_WEAPONSRELEASE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "weapon", offsetof(WeaponsRelease, weapon), sizeof(((WeaponsRelease*)nullptr)->weapon), ROK_WEAPONSRELEASE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsClaim, h.kind), sizeof(((WeaponsClaim*)nullptr)->h.kind), ROK_WEAPONSCLAIM, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsClaim, h.unit), sizeof(((WeaponsClaim*)nullptr)->h.unit), ROK_WEAPONSCLAIM, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "weapon", offsetof(WeaponsClaim, weapon), sizeof(((WeaponsClaim*)nullptr)->weapon), ROK_WEAPONSCLAIM, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsAimDone, h.kind), sizeof(((WeaponsAimDone*)nullptr)->h.kind), ROK_WEAPONSAIMDONE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsAimDone, h.unit), sizeof(((WeaponsAimDone*)nullptr)->h.unit), ROK_WEAPONSAIMDONE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "callback", offsetof(WeaponsAimDone, callback), sizeof(((WeaponsAimDone*)nullptr)->callback), ROK_WEAPONSAIMDONE, RK_REF, ROK_WEAPONAIMCOBCB, 0, 0, {}, 0, 0 },
+    { "result", offsetof(WeaponsAimDone, result), sizeof(((WeaponsAimDone*)nullptr)->result), ROK_WEAPONSAIMDONE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsExplodePiece, h.kind), sizeof(((WeaponsExplodePiece*)nullptr)->h.kind), ROK_WEAPONSEXPLODEPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsExplodePiece, h.unit), sizeof(((WeaponsExplodePiece*)nullptr)->h.unit), ROK_WEAPONSEXPLODEPIECE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "piece", offsetof(WeaponsExplodePiece, piece), sizeof(((WeaponsExplodePiece*)nullptr)->piece), ROK_WEAPONSEXPLODEPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "flags", offsetof(WeaponsExplodePiece, flags), sizeof(((WeaponsExplodePiece*)nullptr)->flags), ROK_WEAPONSEXPLODEPIECE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsAreaDamage, h.kind), sizeof(((WeaponsAreaDamage*)nullptr)->h.kind), ROK_WEAPONSAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsAreaDamage, h.unit), sizeof(((WeaponsAreaDamage*)nullptr)->h.unit), ROK_WEAPONSAREADAMAGE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "weapon", offsetof(WeaponsAreaDamage, weapon), sizeof(((WeaponsAreaDamage*)nullptr)->weapon), ROK_WEAPONSAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(WeaponsAreaDamage, pos[0]), sizeof(((WeaponsAreaDamage*)nullptr)->pos[0]), ROK_WEAPONSAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(WeaponsAreaDamage, pos[1]), sizeof(((WeaponsAreaDamage*)nullptr)->pos[1]), ROK_WEAPONSAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(WeaponsAreaDamage, pos[2]), sizeof(((WeaponsAreaDamage*)nullptr)->pos[2]), ROK_WEAPONSAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsSpawn, h.kind), sizeof(((WeaponsSpawn*)nullptr)->h.kind), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsSpawn, h.unit), sizeof(((WeaponsSpawn*)nullptr)->h.unit), ROK_WEAPONSSPAWN, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "weapon", offsetof(WeaponsSpawn, weapon), sizeof(((WeaponsSpawn*)nullptr)->weapon), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(WeaponsSpawn, pos[0]), sizeof(((WeaponsSpawn*)nullptr)->pos[0]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(WeaponsSpawn, pos[1]), sizeof(((WeaponsSpawn*)nullptr)->pos[1]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(WeaponsSpawn, pos[2]), sizeof(((WeaponsSpawn*)nullptr)->pos[2]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "vel0", offsetof(WeaponsSpawn, vel[0]), sizeof(((WeaponsSpawn*)nullptr)->vel[0]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "vel1", offsetof(WeaponsSpawn, vel[1]), sizeof(((WeaponsSpawn*)nullptr)->vel[1]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "vel2", offsetof(WeaponsSpawn, vel[2]), sizeof(((WeaponsSpawn*)nullptr)->vel[2]), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "announce", offsetof(WeaponsSpawn, announce), sizeof(((WeaponsSpawn*)nullptr)->announce), ROK_WEAPONSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsSetStockpiles, h.kind), sizeof(((WeaponsSetStockpiles*)nullptr)->h.kind), ROK_WEAPONSSETSTOCKPILES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsSetStockpiles, h.unit), sizeof(((WeaponsSetStockpiles*)nullptr)->h.unit), ROK_WEAPONSSETSTOCKPILES, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "stockpiles0", offsetof(WeaponsSetStockpiles, stockpiles[0]), sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[0]), ROK_WEAPONSSETSTOCKPILES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "stockpiles1", offsetof(WeaponsSetStockpiles, stockpiles[1]), sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[1]), ROK_WEAPONSSETSTOCKPILES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "stockpiles2", offsetof(WeaponsSetStockpiles, stockpiles[2]), sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[2]), ROK_WEAPONSSETSTOCKPILES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsAddStockpile, h.kind), sizeof(((WeaponsAddStockpile*)nullptr)->h.kind), ROK_WEAPONSADDSTOCKPILE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsAddStockpile, h.unit), sizeof(((WeaponsAddStockpile*)nullptr)->h.unit), ROK_WEAPONSADDSTOCKPILE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "weapon", offsetof(WeaponsAddStockpile, weapon), sizeof(((WeaponsAddStockpile*)nullptr)->weapon), ROK_WEAPONSADDSTOCKPILE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsAttacked, h.kind), sizeof(((WeaponsAttacked*)nullptr)->h.kind), ROK_WEAPONSATTACKED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsAttacked, h.unit), sizeof(((WeaponsAttacked*)nullptr)->h.unit), ROK_WEAPONSATTACKED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "attacker", offsetof(WeaponsAttacked, attacker), sizeof(((WeaponsAttacked*)nullptr)->attacker), ROK_WEAPONSATTACKED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "amount", offsetof(WeaponsAttacked, amount), sizeof(((WeaponsAttacked*)nullptr)->amount), ROK_WEAPONSATTACKED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsHit, h.kind), sizeof(((WeaponsHit*)nullptr)->h.kind), ROK_WEAPONSHIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsHit, h.unit), sizeof(((WeaponsHit*)nullptr)->h.unit), ROK_WEAPONSHIT, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "enemyDamage", offsetof(WeaponsHit, enemyDamage), sizeof(((WeaponsHit*)nullptr)->enemyDamage), ROK_WEAPONSHIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "friendlyDamage", offsetof(WeaponsHit, friendlyDamage), sizeof(((WeaponsHit*)nullptr)->friendlyDamage), ROK_WEAPONSHIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsDamageRecord, h.kind), sizeof(((WeaponsDamageRecord*)nullptr)->h.kind), ROK_WEAPONSDAMAGERECORD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsDamageRecord, h.unit), sizeof(((WeaponsDamageRecord*)nullptr)->h.unit), ROK_WEAPONSDAMAGERECORD, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "damageKind", offsetof(WeaponsDamageRecord, damageKind), sizeof(((WeaponsDamageRecord*)nullptr)->damageKind), ROK_WEAPONSDAMAGERECORD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "attacker", offsetof(WeaponsDamageRecord, attacker), sizeof(((WeaponsDamageRecord*)nullptr)->attacker), ROK_WEAPONSDAMAGERECORD, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsHealth, h.kind), sizeof(((WeaponsHealth*)nullptr)->h.kind), ROK_WEAPONSHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsHealth, h.unit), sizeof(((WeaponsHealth*)nullptr)->h.unit), ROK_WEAPONSHEALTH, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "health", offsetof(WeaponsHealth, health), sizeof(((WeaponsHealth*)nullptr)->health), ROK_WEAPONSHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "dying", offsetof(WeaponsHealth, dying), sizeof(((WeaponsHealth*)nullptr)->dying), ROK_WEAPONSHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsParalyze, h.kind), sizeof(((WeaponsParalyze*)nullptr)->h.kind), ROK_WEAPONSPARALYZE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsParalyze, h.unit), sizeof(((WeaponsParalyze*)nullptr)->h.unit), ROK_WEAPONSPARALYZE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "ticks", offsetof(WeaponsParalyze, ticks), sizeof(((WeaponsParalyze*)nullptr)->ticks), ROK_WEAPONSPARALYZE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsStartScript, h.kind), sizeof(((WeaponsStartScript*)nullptr)->h.kind), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsStartScript, h.unit), sizeof(((WeaponsStartScript*)nullptr)->h.unit), ROK_WEAPONSSTARTSCRIPT, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "script", offsetof(WeaponsStartScript, script), sizeof(((WeaponsStartScript*)nullptr)->script), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "callback", offsetof(WeaponsStartScript, callback), sizeof(((WeaponsStartScript*)nullptr)->callback), ROK_WEAPONSSTARTSCRIPT, RK_REF, ROK_WEAPONAIMCOBCB, 0, 0, {}, 0, 0 },
+    { "update", offsetof(WeaponsStartScript, update), sizeof(((WeaponsStartScript*)nullptr)->update), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "withArgs", offsetof(WeaponsStartScript, withArgs), sizeof(((WeaponsStartScript*)nullptr)->withArgs), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "count", offsetof(WeaponsStartScript, count), sizeof(((WeaponsStartScript*)nullptr)->count), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args0", offsetof(WeaponsStartScript, args[0]), sizeof(((WeaponsStartScript*)nullptr)->args[0]), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args1", offsetof(WeaponsStartScript, args[1]), sizeof(((WeaponsStartScript*)nullptr)->args[1]), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args2", offsetof(WeaponsStartScript, args[2]), sizeof(((WeaponsStartScript*)nullptr)->args[2]), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args3", offsetof(WeaponsStartScript, args[3]), sizeof(((WeaponsStartScript*)nullptr)->args[3]), ROK_WEAPONSSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsDetachPiece, h.kind), sizeof(((WeaponsDetachPiece*)nullptr)->h.kind), ROK_WEAPONSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsDetachPiece, h.unit), sizeof(((WeaponsDetachPiece*)nullptr)->h.unit), ROK_WEAPONSDETACHPIECE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "piece", offsetof(WeaponsDetachPiece, piece), sizeof(((WeaponsDetachPiece*)nullptr)->piece), ROK_WEAPONSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pose", offsetof(WeaponsDetachPiece, pose), sizeof(((WeaponsDetachPiece*)nullptr)->pose), ROK_WEAPONSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WeaponsBusy, h.kind), sizeof(((WeaponsBusy*)nullptr)->h.kind), ROK_WEAPONSBUSY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(WeaponsBusy, h.unit), sizeof(((WeaponsBusy*)nullptr)->h.unit), ROK_WEAPONSBUSY, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "until", offsetof(WeaponsBusy, until), sizeof(((WeaponsBusy*)nullptr)->until), ROK_WEAPONSBUSY, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 394;
-static const unsigned kReplayWalkableFieldCount = 60;
+static const unsigned kReplayObjectFieldCount = 480;
+static const unsigned kReplayWalkableFieldCount = 84;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 37, 35, 38, 45, 51, 53, 108 };
 
@@ -1370,6 +1540,92 @@ static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[2]) == 4, "MapCellsChange
 static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[3]) == 4, "MapCellsChanged::rect3 has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->classes) == 4, "MapCellsChanged::classes has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->cause) == 4, "MapCellsChanged::cause has the size the schema says");
+static_assert(sizeof(((WeaponsEventHeader*)nullptr)->kind) == 4, "WeaponsEventHeader::kind has the size the schema says");
+static_assert(sizeof(((WeaponsEventHeader*)nullptr)->unit) == 4, "WeaponsEventHeader::unit has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->h.kind) == 4, "WeaponsDamage::kind has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->h.unit) == 4, "WeaponsDamage::unit has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->source) == 4, "WeaponsDamage::source has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->amount) == 4, "WeaponsDamage::amount has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->damageKind) == 4, "WeaponsDamage::damageKind has the size the schema says");
+static_assert(sizeof(((WeaponsDamage*)nullptr)->direction) == 4, "WeaponsDamage::direction has the size the schema says");
+static_assert(sizeof(((WeaponsDetonate*)nullptr)->h.kind) == 4, "WeaponsDetonate::kind has the size the schema says");
+static_assert(sizeof(((WeaponsDetonate*)nullptr)->h.unit) == 4, "WeaponsDetonate::unit has the size the schema says");
+static_assert(sizeof(((WeaponsDetonate*)nullptr)->selfDestruct) == 4, "WeaponsDetonate::selfDestruct has the size the schema says");
+static_assert(sizeof(((WeaponsRelease*)nullptr)->h.kind) == 4, "WeaponsRelease::kind has the size the schema says");
+static_assert(sizeof(((WeaponsRelease*)nullptr)->h.unit) == 4, "WeaponsRelease::unit has the size the schema says");
+static_assert(sizeof(((WeaponsRelease*)nullptr)->weapon) == 4, "WeaponsRelease::weapon has the size the schema says");
+static_assert(sizeof(((WeaponsClaim*)nullptr)->h.kind) == 4, "WeaponsClaim::kind has the size the schema says");
+static_assert(sizeof(((WeaponsClaim*)nullptr)->h.unit) == 4, "WeaponsClaim::unit has the size the schema says");
+static_assert(sizeof(((WeaponsClaim*)nullptr)->weapon) == 4, "WeaponsClaim::weapon has the size the schema says");
+static_assert(sizeof(((WeaponsAimDone*)nullptr)->h.kind) == 4, "WeaponsAimDone::kind has the size the schema says");
+static_assert(sizeof(((WeaponsAimDone*)nullptr)->h.unit) == 4, "WeaponsAimDone::unit has the size the schema says");
+static_assert(sizeof(((WeaponsAimDone*)nullptr)->callback) == 4, "WeaponsAimDone::callback has the size the schema says");
+static_assert(sizeof(((WeaponsAimDone*)nullptr)->result) == 4, "WeaponsAimDone::result has the size the schema says");
+static_assert(sizeof(((WeaponsExplodePiece*)nullptr)->h.kind) == 4, "WeaponsExplodePiece::kind has the size the schema says");
+static_assert(sizeof(((WeaponsExplodePiece*)nullptr)->h.unit) == 4, "WeaponsExplodePiece::unit has the size the schema says");
+static_assert(sizeof(((WeaponsExplodePiece*)nullptr)->piece) == 4, "WeaponsExplodePiece::piece has the size the schema says");
+static_assert(sizeof(((WeaponsExplodePiece*)nullptr)->flags) == 4, "WeaponsExplodePiece::flags has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->h.kind) == 4, "WeaponsAreaDamage::kind has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->h.unit) == 4, "WeaponsAreaDamage::unit has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->weapon) == 4, "WeaponsAreaDamage::weapon has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->pos[0]) == 4, "WeaponsAreaDamage::pos0 has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->pos[1]) == 4, "WeaponsAreaDamage::pos1 has the size the schema says");
+static_assert(sizeof(((WeaponsAreaDamage*)nullptr)->pos[2]) == 4, "WeaponsAreaDamage::pos2 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->h.kind) == 4, "WeaponsSpawn::kind has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->h.unit) == 4, "WeaponsSpawn::unit has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->weapon) == 4, "WeaponsSpawn::weapon has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->pos[0]) == 4, "WeaponsSpawn::pos0 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->pos[1]) == 4, "WeaponsSpawn::pos1 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->pos[2]) == 4, "WeaponsSpawn::pos2 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->vel[0]) == 4, "WeaponsSpawn::vel0 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->vel[1]) == 4, "WeaponsSpawn::vel1 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->vel[2]) == 4, "WeaponsSpawn::vel2 has the size the schema says");
+static_assert(sizeof(((WeaponsSpawn*)nullptr)->announce) == 4, "WeaponsSpawn::announce has the size the schema says");
+static_assert(sizeof(((WeaponsSetStockpiles*)nullptr)->h.kind) == 4, "WeaponsSetStockpiles::kind has the size the schema says");
+static_assert(sizeof(((WeaponsSetStockpiles*)nullptr)->h.unit) == 4, "WeaponsSetStockpiles::unit has the size the schema says");
+static_assert(sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[0]) == 4, "WeaponsSetStockpiles::stockpiles0 has the size the schema says");
+static_assert(sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[1]) == 4, "WeaponsSetStockpiles::stockpiles1 has the size the schema says");
+static_assert(sizeof(((WeaponsSetStockpiles*)nullptr)->stockpiles[2]) == 4, "WeaponsSetStockpiles::stockpiles2 has the size the schema says");
+static_assert(sizeof(((WeaponsAddStockpile*)nullptr)->h.kind) == 4, "WeaponsAddStockpile::kind has the size the schema says");
+static_assert(sizeof(((WeaponsAddStockpile*)nullptr)->h.unit) == 4, "WeaponsAddStockpile::unit has the size the schema says");
+static_assert(sizeof(((WeaponsAddStockpile*)nullptr)->weapon) == 4, "WeaponsAddStockpile::weapon has the size the schema says");
+static_assert(sizeof(((WeaponsAttacked*)nullptr)->h.kind) == 4, "WeaponsAttacked::kind has the size the schema says");
+static_assert(sizeof(((WeaponsAttacked*)nullptr)->h.unit) == 4, "WeaponsAttacked::unit has the size the schema says");
+static_assert(sizeof(((WeaponsAttacked*)nullptr)->attacker) == 4, "WeaponsAttacked::attacker has the size the schema says");
+static_assert(sizeof(((WeaponsAttacked*)nullptr)->amount) == 4, "WeaponsAttacked::amount has the size the schema says");
+static_assert(sizeof(((WeaponsHit*)nullptr)->h.kind) == 4, "WeaponsHit::kind has the size the schema says");
+static_assert(sizeof(((WeaponsHit*)nullptr)->h.unit) == 4, "WeaponsHit::unit has the size the schema says");
+static_assert(sizeof(((WeaponsHit*)nullptr)->enemyDamage) == 4, "WeaponsHit::enemyDamage has the size the schema says");
+static_assert(sizeof(((WeaponsHit*)nullptr)->friendlyDamage) == 4, "WeaponsHit::friendlyDamage has the size the schema says");
+static_assert(sizeof(((WeaponsDamageRecord*)nullptr)->h.kind) == 4, "WeaponsDamageRecord::kind has the size the schema says");
+static_assert(sizeof(((WeaponsDamageRecord*)nullptr)->h.unit) == 4, "WeaponsDamageRecord::unit has the size the schema says");
+static_assert(sizeof(((WeaponsDamageRecord*)nullptr)->damageKind) == 4, "WeaponsDamageRecord::damageKind has the size the schema says");
+static_assert(sizeof(((WeaponsDamageRecord*)nullptr)->attacker) == 4, "WeaponsDamageRecord::attacker has the size the schema says");
+static_assert(sizeof(((WeaponsHealth*)nullptr)->h.kind) == 4, "WeaponsHealth::kind has the size the schema says");
+static_assert(sizeof(((WeaponsHealth*)nullptr)->h.unit) == 4, "WeaponsHealth::unit has the size the schema says");
+static_assert(sizeof(((WeaponsHealth*)nullptr)->health) == 4, "WeaponsHealth::health has the size the schema says");
+static_assert(sizeof(((WeaponsHealth*)nullptr)->dying) == 4, "WeaponsHealth::dying has the size the schema says");
+static_assert(sizeof(((WeaponsParalyze*)nullptr)->h.kind) == 4, "WeaponsParalyze::kind has the size the schema says");
+static_assert(sizeof(((WeaponsParalyze*)nullptr)->h.unit) == 4, "WeaponsParalyze::unit has the size the schema says");
+static_assert(sizeof(((WeaponsParalyze*)nullptr)->ticks) == 4, "WeaponsParalyze::ticks has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->h.kind) == 4, "WeaponsStartScript::kind has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->h.unit) == 4, "WeaponsStartScript::unit has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->script) == 4, "WeaponsStartScript::script has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->callback) == 4, "WeaponsStartScript::callback has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->update) == 4, "WeaponsStartScript::update has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->withArgs) == 4, "WeaponsStartScript::withArgs has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->count) == 4, "WeaponsStartScript::count has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->args[0]) == 4, "WeaponsStartScript::args0 has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->args[1]) == 4, "WeaponsStartScript::args1 has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->args[2]) == 4, "WeaponsStartScript::args2 has the size the schema says");
+static_assert(sizeof(((WeaponsStartScript*)nullptr)->args[3]) == 4, "WeaponsStartScript::args3 has the size the schema says");
+static_assert(sizeof(((WeaponsDetachPiece*)nullptr)->h.kind) == 4, "WeaponsDetachPiece::kind has the size the schema says");
+static_assert(sizeof(((WeaponsDetachPiece*)nullptr)->h.unit) == 4, "WeaponsDetachPiece::unit has the size the schema says");
+static_assert(sizeof(((WeaponsDetachPiece*)nullptr)->piece) == 4, "WeaponsDetachPiece::piece has the size the schema says");
+static_assert(sizeof(((WeaponsDetachPiece*)nullptr)->pose) == 4, "WeaponsDetachPiece::pose has the size the schema says");
+static_assert(sizeof(((WeaponsBusy*)nullptr)->h.kind) == 4, "WeaponsBusy::kind has the size the schema says");
+static_assert(sizeof(((WeaponsBusy*)nullptr)->h.unit) == 4, "WeaponsBusy::unit has the size the schema says");
+static_assert(sizeof(((WeaponsBusy*)nullptr)->until) == 4, "WeaponsBusy::until has the size the schema says");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
@@ -1466,6 +1722,7 @@ enum ReplaySlotId {
     RSL_PATHFINDING_STEP,
     RSL_PATHFINDING_POLL,
     RSL_PATHFINDING_WRITESTATE,
+    RSL_WEAPONS_APPLY,
     RSL_WEAPONS_UPDATEUNITWEAPONS,
     RSL_WEAPONS_GETWEAPONRANGE,
     RSL_WEAPONS_WEAPONCANREACHUNIT,
@@ -1802,6 +2059,9 @@ static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 46, 47, 48 };
 static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 46, 47, 48 };
 static const unsigned char kReplayAiParseDownloadableAiWeightScriptsAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf[] = { ROK_UNITDEF };
+static const unsigned char kReplayWeaponsApplyReads[] = { 29 };
+static const unsigned short kReplayWeaponsApplyObjReads[] = { 0, 24, 33, 35, 36, 37, 38, 43, 44, 46, 47, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 108, 123, 124, 126, 127, 128, 138, 142, 313 };
+static const unsigned short kReplayWeaponsApplyObjWrites[] = { 56, 57, 61, 62, 66, 67, 81, 84, 85, 86, 89, 90, 91, 94, 95, 313 };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsAllOf[] = { ROK_PROJECTILE, ROK_WEAPONFIRE };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17, 28, 30, 46, 47, 48 };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 46, 47, 48 };
@@ -2081,6 +2341,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "Step", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Poll", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_WEAPONS, kReplayWeaponsApplyReads, 1, nullptr, 0, kReplayWeaponsApplyObjReads, 51, kReplayWeaponsApplyObjWrites, 16, nullptr, 0 },
     { "UpdateUnitWeapons", SUB_WEAPONS, kReplayWeaponsUpdateUnitWeaponsReads, 8, kReplayWeaponsUpdateUnitWeaponsWrites, 4, kReplayWeaponsUpdateUnitWeaponsObjReads, 92, kReplayWeaponsUpdateUnitWeaponsObjWrites, 43, kReplayWeaponsUpdateUnitWeaponsAllOf, 2 },
     { "GetWeaponRange", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsGetWeaponRangeObjReads, 4, nullptr, 0, nullptr, 0 },
     { "WeaponCanReachUnit", SUB_WEAPONS, kReplayWeaponsWeaponCanReachUnitReads, 2, nullptr, 0, kReplayWeaponsWeaponCanReachUnitObjReads, 14, nullptr, 0, nullptr, 0 },
@@ -2372,18 +2633,18 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "features", 4, 0, 0, 20, 22 },
     { "ai", 6, 0, 0, 42, 15 },
     { "pathfinding", 4, 0, 0, 57, 9 },
-    { "weapons", 3, 0, 1, 66, 5 },
-    { "targeting", 3, 0, 1, 71, 6 },
-    { "los_radar", 4, 0, 0, 77, 28 },
-    { "orders", 4, 0, 0, 105, 18 },
-    { "units", 4, 0, 0, 123, 47 },
-    { "players", 4, 0, 0, 170, 28 },
-    { "map", 6, 0, 1, 198, 11 },
-    { "scripts", 1, 0, 0, 209, 25 },
-    { "movement", 2, 0, 0, 234, 33 },
-    { "mission", 1, 1, 0, 267, 0 },
-    { "files", 2, 0, 0, 267, 58 },
-    { "network", 1, 0, 0, 325, 22 },
+    { "weapons", 3, 0, 1, 66, 6 },
+    { "targeting", 3, 0, 1, 72, 6 },
+    { "los_radar", 4, 0, 0, 78, 28 },
+    { "orders", 4, 0, 0, 106, 18 },
+    { "units", 4, 0, 0, 124, 47 },
+    { "players", 4, 0, 0, 171, 28 },
+    { "map", 6, 0, 1, 199, 11 },
+    { "scripts", 1, 0, 0, 210, 25 },
+    { "movement", 2, 0, 0, 235, 33 },
+    { "mission", 1, 1, 0, 268, 0 },
+    { "files", 2, 0, 0, 268, 58 },
+    { "network", 1, 0, 0, 326, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

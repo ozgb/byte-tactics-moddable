@@ -88,6 +88,7 @@ struct ReplayObjectKind {
     unsigned char polyFirst;
     unsigned char polyCount;
     unsigned char delta;
+    unsigned char vptrUnset;
 };
 
 #define REPLAY_EVENT_MAX 256

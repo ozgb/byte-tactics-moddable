@@ -119,19 +119,18 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENTS = {
-    "wind_meteors": {"header": "WindMeteorsEventHeader", "kinds": {
-        64: None, 65: None, 66: "WindMeteorsParams", 67: None, 80: "WindMeteorsSpawn"}},
-    "targeting": {"header": "TargetingEventHeader", "kinds": {
-        96: "TargetingSetUnit", 97: "TargetingSetPos", 98: None, 99: None, 100: "TargetingLoad", 112: None}},
-    "los_radar": {"header": "LosRadarEventHeader", "kinds": {
-        128: "LosRadarUnit", 129: "LosRadarUnit", 130: "LosRadarUnit", 131: "LosRadarAddEyeball", 132: "LosRadarCellHeights",
-        133: "LosRadarRecalculate", 134: "LosRadarSharePlayer", 135: "LosRadarSharePlayer", 136: "LosRadarShareMap",
-        137: "LosRadarUnit", 138: "LosRadarSightLoad"}},
-    "map": {"header": "MapEventHeader", "kinds": {
-        160: None, 161: None, 162: None, 163: None, 164: "MapSetYard", 165: None, 166: None, 168: "MapPassMaps", 176: "MapCellsChanged"}},
-}
-EVENT_UNIT_FIELDS = {"unit", "target"}
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons")
+
+
+def event_table(subsystem: str) -> dict:
+    """The header struct of a subsystem's events, each kind's payload struct (None for the header alone) and each kind's value by its enum name, from traceschema's EVENT_MODULES."""
+    module = traceschema.module_of_header(subsystem + ".h")
+    kinds = traceschema.event_kinds(module)
+    return {"header": module.header, "kinds": {value: None if struct == module.header else struct for value, (_, struct, _, _) in kinds.items()},
+            "names": {name: value for value, (name, _, _, _) in kinds.items()}}
+
+
+EVENTS = {sub: event_table(sub) for sub in EVENT_SUBSYSTEMS}
 EVENT_SCALARS = {"int": "i32", "unsigned int": "u32", "unsigned": "u32", "float": "f32"}
 
 
@@ -149,12 +148,13 @@ def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | No
     return out
 
 
-def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]:
-    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset named unit or target as a ref to Unit."""
+def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | None = None) -> list[dict]:
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit, and a block offset that `refs` names (`Struct.member` to kind) as a ref to that kind."""
     fields = []
+    refs = refs or {}
     for ctype, member, length in structs[name]:
         if ctype in structs:
-            fields += flatten_event_fields(structs, ctype, path + member + ".")
+            fields += flatten_event_fields(structs, ctype, path + member + ".", refs)
             continue
         if ctype == "char" and length:
             field = {"name": member, "kind": "string", "size": length}
@@ -164,8 +164,10 @@ def flatten_event_fields(structs: dict, name: str, path: str = "") -> list[dict]
             continue
         for i in range(length or 1):
             field = {"name": member if length is None else "%s%d" % (member, i)}
-            if ctype == "unsigned int" and member in EVENT_UNIT_FIELDS:
+            if traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
+            elif "%s.%s" % (name, member) in refs and ctype == "unsigned int" and length is None:
+                field.update({"kind": "ref", "target": refs["%s.%s" % (name, member)]})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]
             else:
@@ -193,15 +195,28 @@ def with_events(ann: dict) -> dict:
         return ann
     ann = copy.deepcopy(ann)
     ann["events"] = {}
+    refs = event_refs(ann)
     for sub, spec in EVENTS.items():
         check_event_kinds(sub, spec["kinds"])
         structs = interface_structs(sub)
         for name in dict.fromkeys([spec["header"]] + [x for x in spec["kinds"].values() if x]):
             if name not in structs:
                 raise Error("interfaces/%s.h has no struct %s" % (sub, name))
-            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name)}
-        ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())}}
+            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name, refs=refs.get(sub))}
+        ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())},
+                              "names": dict(spec["names"])}
     return ann
+
+
+def event_refs(ann: dict) -> dict:
+    """Per table of events, the payload members (`Struct.member`) that the `refs` of its event arguments record as refs, and the kind each leads to."""
+    out: dict = {}
+    for spec in ann.get("subsystems", {}).values():
+        for note in spec.get("slots", {}).values():
+            for arg in note.get("args", {}).values():
+                if arg.get("mode") == "event" and isinstance(arg.get("refs"), dict):
+                    out.setdefault(arg.get("events"), {}).update(arg["refs"])
+    return out
 
 
 def without_events(ann: dict) -> dict:
@@ -730,6 +745,8 @@ def check_vptr(ann: dict) -> list[str]:
     errors = []
     taken = {spec["vtable"]: name for name, spec in ann["objects"].items() if isinstance(spec.get("vtable"), str)}
     for name, spec in ann["objects"].items():
+        if "vptr_unset" in spec and ("vptr" not in spec or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
+            errors.append("%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % name)
         if "vptr" not in spec:
             continue
         if not isinstance(spec["vptr"], str) or not VTABLE_NAME.match(spec["vptr"]):
@@ -1173,6 +1190,35 @@ def check_length(where: str, a: dict, label: str, args: list[dict], errors: list
         errors.append("%s: the `elem` of %s is one of %s" % (where, label, ", ".join(sorted(SIZES))))
 
 
+def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict) -> list[str]:
+    """Errors for the `unrecorded` kinds (an enum name of the table, each with a reason) and the `refs` (`Struct.member`, an unsigned int member of a struct of the module's interface that is no unit ref, leading to a state kind) of an event argument."""
+    errors = []
+    unrecorded = a.get("unrecorded", {})
+    if not isinstance(unrecorded, dict):
+        errors.append("%s: `unrecorded` of %s maps the name of a kind to the reason it is not recorded" % (where, label))
+        unrecorded = {}
+    for name, reason in unrecorded.items():
+        if name not in table["names"]:
+            errors.append("%s: %s leaves %s unrecorded, which is no kind of the events of %s" % (where, label, name, a["events"]))
+        elif not isinstance(reason, str) or not reason:
+            errors.append("%s: %s leaves %s unrecorded with no reason" % (where, label, name))
+    refs = a.get("refs", {})
+    if not isinstance(refs, dict):
+        errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
+        refs = {}
+    structs = interface_structs(a["events"])
+    for key, kind in refs.items():
+        struct, _, member = key.partition(".")
+        ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
+        if kinds.get(kind, {}).get("scope") != "state":
+            errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, key, kind))
+        elif ctype != "unsigned int":
+            errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
+        elif traceschema.is_unit_ref(ctype, member):
+            errors.append("%s: `refs` of %s names %s, which is a unit ref already" % (where, label, key))
+    return errors
+
+
 def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) -> list[str]:
     """Errors for the struct forms of a slot: the kind must be a value kind of the argument's type, a count must name an integer argument."""
     errors = []
@@ -1224,6 +1270,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s is %s, and the events of %s start with %s*" % (where, label, arg_type(a), a["events"], table["header"]))
             if size not in names or size == a["name"] or args[names.index(size)]["type"] not in INTEGER_ARGS:
                 errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
+            if table is not None:
+                errors += check_event_extras(where, label, a, table, kinds)
         elif a["mode"] == "vector":
             check_vector_arg(where, a, label, kinds, errors)
         elif a["mode"] == "units-buffer":
@@ -1402,7 +1450,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vptr", "kinds", "delta"):
+        for key in ("vtable", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         objects.append(entry)
@@ -1573,7 +1621,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                             if "w" in OBJECT_KINDS[kind]:
                                 obj_writes.add(i)
                         owner_type = target.split("::")[0]
-                        if not hits and owner_type in state_types and (kind, target) not in rules_of:
+                        if not hits and owner_type in state_types and (kind, target) not in rules_of and target not in ann["exempt"]:
                             pending["untracked"].add(target)
                         elif (not hits and "::" in target and owner_type not in kind_types and owner_type not in exempt_types
                               and owner_type not in seam_types and not any(n == owner_type or n.startswith(owner_type + "_") for n in spec.get("services", []))
@@ -1966,7 +2014,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
         inside_first, inside_count = site_at[o["name"]]
-        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True)))
+        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -2219,6 +2267,11 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         if a.get("size") in names:
             a["sizeIndex"] = names.index(a["size"])
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "event" and a.get("unrecorded"):
+            kinds = " || ".join("a%d->kind == %s" % (i, name) for name in a["unrecorded"])
+            L.append("    if (a%d != nullptr && a%d >= sizeof(*a%d) && (%s))" % (i, a["sizeIndex"], i, kinds))
+            L.append("        return s_inner_%s->%s(%s);" % (sub, slot, call_args))
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
         if a["mode"] == "object":

@@ -663,6 +663,7 @@ game,harness,shared_write,Point16::y,1
 game,harness,shared_write,Vec3::x,2
 game,harness,shared_write,Vec3::y,1
 game,harness,shared_write,Vec3::z,2
+game,harness,shared_write,WeaponsEventHeader::kind,1
 game,los_radar,indirect,ExpireEyeballs,1
 game,los_radar,indirect,FreeMapResources,1
 game,los_radar,indirect,GetMapCellAtPosition,1
@@ -2087,6 +2088,7 @@ harness,seams,shared_write,UnitsSeam::UpdateAllUnits,1
 harness,seams,shared_write,UnitsSeam::UpdateSfxOccupy,1
 harness,seams,shared_write,UnitsSeam::UpdateUnitBody,1
 harness,seams,shared_write,UnitsSeam::UpdateUnitHead,1
+harness,seams,shared_write,WeaponsSeam::Apply,2
 harness,seams,shared_write,WeaponsSeam::FindTargetableProjectile,1
 harness,seams,shared_write,WeaponsSeam::GetWeaponRange,1
 harness,seams,shared_write,WeaponsSeam::UpdateUnitWeapons,1
@@ -5512,6 +5514,7 @@ seams,harness,shared_write,UnitsSeam::UpdateUnitHead,2
 seams,harness,shared_write,Vec3::x,2
 seams,harness,shared_write,Vec3::y,1
 seams,harness,shared_write,Vec3::z,2
+seams,harness,shared_write,WeaponsSeam::Apply,2
 seams,harness,shared_write,WeaponsSeam::FindTargetableProjectile,2
 seams,harness,shared_write,WeaponsSeam::GetWeaponRange,2
 seams,harness,shared_write,WeaponsSeam::UpdateUnitWeapons,2

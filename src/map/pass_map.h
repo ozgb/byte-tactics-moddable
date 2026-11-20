@@ -24,7 +24,6 @@ public:
     Ref<unsigned int> cells;
     unsigned int lastTick;
 
-    ~PassMap();
     void Resize(unsigned int w, unsigned int h);
     void SetCell(int x, int y, int value);
     void Build();

@@ -58,11 +58,6 @@ struct UnitPassMapRecordView {
 
 #include "../../link/globals.h"
 
-PassMap::~PassMap()
-{
-    operator delete(cells);
-}
-
 // FUNCTION: 0x440470
 void PassMap::Resize(unsigned int w, unsigned int h)
 {

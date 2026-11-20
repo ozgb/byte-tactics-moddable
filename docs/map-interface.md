@@ -445,3 +445,8 @@ update (`UpdateUnit`) was 4, in mission-timer at tick 186 (unit 361).
 tier was equal (38 of 38 scenarios); the fallback (only the two reads move, the refresh stays a synchronous slot of
 units) was not needed. The CELLS_CHANGED effects of the refreshes reach pathfinding through the synchronous route at
 the statements units' direct calls stood at, so no draw or write moved.
+
+**Map 7.0 (#1002).** The pass maps left units' `MovementClass` for map's own `PassMap` table, and map's slots take the
+class index. The trace format and every stored trace are unchanged (section 5), and the tier was equal in both modes
+(76 of 76 games, 38 scenarios). The sim globals grew by 512 bytes, so the smoke, full, music and mp play-tests were
+run too, and passed.

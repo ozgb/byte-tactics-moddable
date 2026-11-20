@@ -604,12 +604,12 @@ address,function,file,line,kind,target,verdict,note,phase
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,514,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]",false_positive,"targets: CanRepairNative, the function the slot holds (filled by InstallNativeSeams, src/seams/native.cpp; followed via data/hazard_edges.csv). The table is set once at start, so the target does not depend on an address.",tick
 0x43f0e0,GetOrderType,src/orders/order_dispatch.cpp,532,indirect_call,"indirect via int (*)(Unit *, int, Unit *) __attribute__((fastcall)) [UnitsSeam::CanRepair]",false_positive,"targets: CanRepairNative, the function the slot holds (filled by InstallNativeSeams, src/seams/native.cpp; followed via data/hazard_edges.csv). The table is set once at start, so the target does not depend on an address.",tick
 0x440420,FindMovementClass,src/units/movement_class.cpp,87,thread_global,g_movementClasses <- LoadThreadMain,,,tick
-0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,302,ptr_compare,- PassMap*,,,tick
-0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,294,thread_global,g_passMaps <- LoadThreadMain,,,tick
-0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,324,ptr_compare,- PassMap*,,,tick
-0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,332,ptr_compare,- PassMap*,,,tick
-0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,327,ptr_compare,<= UnitPassMapRecordView*,,,tick
-0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,345,ptr_compare,- PassMap*,,,tick
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,297,ptr_compare,- PassMap*,,,tick
+0x440a70,RefreshPassMapsForUnit,src/map/pass_map.cpp,289,thread_global,g_passMaps <- LoadThreadMain,,,tick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,319,ptr_compare,- PassMap*,,,tick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,327,ptr_compare,- PassMap*,,,tick
+0x440af0,PassMap::RefreshMovedUnits,src/map/pass_map.cpp,322,ptr_compare,<= UnitPassMapRecordView*,,,tick
+0x440be0,PassMap::RefreshUnitIfStale,src/map/pass_map.cpp,340,ptr_compare,- PassMap*,,,tick
 0x441460,ConnectToGame,src/frontend/multi.cpp,254,ptr_to_int,void * -> int,false_positive,"GUI handle or surface/buffer address passed as an int to frontend or presentation code (menus, dialogs, gadget callbacks); presentation only, not read by the simulation.",tick
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,796,ptr_to_int,void * -> int,false_positive,"Address of a GlobalAlloc block handed to DirectPlay lobby code as an opaque address (BuildCompoundAddress in multi.cpp); round trip, lobby only.",tick
 0x441c30,BuildCompoundAddress,src/frontend/multi.cpp,713,thread_global,g_modemInfo <- LoadThreadMain,false_positive,"Presentation/menu state: the load thread reaches the writer HandleModemDialogClick only through LoadMatch -> UpdatePlayers (game_load.cpp) -> OpenMessageBox -> UpdateMenu -> GUI handler, a by-name closure (the box opens only when a player is out, players.cpp), and the load thread ends before tick 1 (LoadMatch in game_load.cpp, main thread waits at LoadMatch); later writers run on the main thread, and the tick never reads this back.",tick
@@ -1834,7 +1834,7 @@ address,function,file,line,kind,target,verdict,note,phase
 ,RecordSoundAt,src/state/sim_effects.h,239,indirect_call,indirect via unsigned int (*)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask],false_positive,"targets: SoundHeardMask, the function the slot holds (filled by InstallNativeSeams, src/seams/native.cpp; followed via data/hazard_edges.csv). The table is set once at start, so the target does not depend on an address.",tick
 ,RecordSoundAtName,src/state/sim_effects.h,247,indirect_call,indirect via unsigned int (*)(const Vec3 *) __attribute__((stdcall)) [LosRadarSeam::SoundHeardMask],false_positive,"targets: SoundHeardMask, the function the slot holds (filled by InstallNativeSeams, src/seams/native.cpp; followed via data/hazard_edges.csv). The table is set once at start, so the target does not depend on an address.",tick
 ,RefAbs,src/harness/harness.cpp,2108,ptr_to_int,void * -> unsigned int,false_positive,Test harness helper: turns a block-relative offset into an address to read the trace's own fields; the address is never stored in game state or ordered.,tick
-,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,277,ptr_compare,- PassMap*,,,tick
+,RefreshAndReportAllPassMaps,src/map/pass_map.cpp,272,ptr_compare,- PassMap*,,,tick
 ,RefreshFactoryIndex,src/units/factory_index.cpp,89,ptr_compare,<= Unit*,false_positive,"Both pointers are in one array (a player's slice of g_game->units, as CreateUnit units.cpp relies on), so the order is index order and layout-independent.",tick
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,113,ptr_compare,<= Unit*,false_positive,"Both pointers are in one array (a player's slice of g_game->units, as CreateUnit units.cpp relies on), so the order is index order and layout-independent.",tick
 ,Release,src/weapons/debris_cache.cpp,45,ptr_to_int,char * -> int,false_positive,Equality test of the address a cache chunk's owner holds with the chunk's own address (Release in debris_cache.cpp); no ordering or numeric use.,tick

@@ -2493,7 +2493,7 @@ map,pathfinding,shared_write,MapCellsChanged::rect,1
 map,pathfinding,shared_write,Point16::x,9
 map,pathfinding,shared_write,Point16::y,9
 map,platform,call,RandomInt,1
-map,platform,call,operator delete,12
+map,platform,call,operator delete,11
 map,platform,call,operator new,6
 map,platform,call,operator==,5
 map,platform,shared_write,Fixed::value,2

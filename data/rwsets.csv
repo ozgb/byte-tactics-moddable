@@ -52504,10 +52504,6 @@ address,function,file,kind,target
 ,PassMap::InBounds,src/map/pass_map.h,field_read,PassMap::height
 ,PassMap::InBounds,src/map/pass_map.h,field_read,PassMap::width
 ,PassMap::InBounds,src/map/pass_map.h,function,
-,PassMap::~PassMap,src/map/pass_map.cpp,call,operator delete
-,PassMap::~PassMap,src/map/pass_map.cpp,call,operator unsigned int *
-,PassMap::~PassMap,src/map/pass_map.cpp,field_read,PassMap::cells
-,PassMap::~PassMap,src/map/pass_map.cpp,function,
 ,PassMapGetNative,src/seams/native.cpp,call,PassMap::Get
 ,PassMapGetNative,src/seams/native.cpp,field_read,PassMapTable::entries
 ,PassMapGetNative,src/seams/native.cpp,function,

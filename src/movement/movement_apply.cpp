@@ -16,6 +16,7 @@
 #include "air_maneuver_order.h"
 #include "unit_motion.h"
 #include "../game/movement_events.h"
+#include "../game/movement_event_size.h"
 #include "../../interfaces/movement.h"
 #include "../../link/globals.h"
 #include "movement_seam.h"

@@ -20,6 +20,7 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../game/orders_events.h"
+#include "../game/orders_event_size.h"
 #include "../game/targeting_events.h"
 #include "mission_type.h"
 #include "order_list.h"

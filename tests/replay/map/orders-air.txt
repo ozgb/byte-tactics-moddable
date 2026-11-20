@@ -267832,9 +267832,9 @@ call 1025 Apply
   a event.kind 160
   a event.unit Unit#3
   a size 8
+  i services.SchedPublish 7 8
   w Unit#3.cargoNext Unit#2
   w Unit#3.spatialBucket SpatialBucket#61
-  w UnitMotion#3.pathLockStamp 1025
   w SpatialBucket#61.head Unit#3
   w Cell#4298.unit 3
   w Cell#4299.unit 3
@@ -269462,6 +269462,7 @@ call 1045 Apply
   r Unit#3.carrier Unit#2
   r MovementClass#2.cells 258:57f5ffff07f4ffff07f4ffff07f4ffff
   r MovementClass#2.lastTick 1000
+  r UnitMotion#3.pathLockStamp 1025
   a event.kind 161
   a event.unit Unit#1
   a size 8
@@ -269480,6 +269481,7 @@ call 1045 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4293.unit 1
   w Cell#4294.unit 1
   w Cell#4517.unit 1
@@ -270478,6 +270480,7 @@ call 1059 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4294.unit 1
   w Cell#4295.unit 1
   w Cell#4518.unit 1
@@ -294185,6 +294188,7 @@ call 1366 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Unit#251.spatialBucket SpatialBucket#331
   w SpatialBucket#303.head null
   w SpatialBucket#331.head Unit#251
@@ -295530,6 +295534,7 @@ call 1385 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Unit#251.spatialBucket SpatialBucket#303
   w SpatialBucket#303.head Unit#251
   w SpatialBucket#331.head null
@@ -295701,6 +295706,7 @@ call 1387 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#19450.unit 251
   w Cell#19451.unit 251
   w Cell#19674.unit 251
@@ -297043,6 +297049,7 @@ call 1406 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#19226.unit 251
   w Cell#19227.unit 251
   w Cell#19450.unit 251
@@ -297349,6 +297356,7 @@ call 1410 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#19225.unit 251
   w Cell#19226.unit 251
   w Cell#19449.unit 251
@@ -298415,6 +298423,7 @@ call 1425 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#19001.unit 251
   w Cell#19002.unit 251
   w Cell#19225.unit 251
@@ -299068,6 +299077,7 @@ call 1434 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#19000.unit 251
   w Cell#19001.unit 251
   w Cell#19224.unit 251
@@ -299858,6 +299868,7 @@ call 1445 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#18776.unit 251
   w Cell#18777.unit 251
   w Cell#19000.unit 251
@@ -300716,6 +300727,7 @@ call 1457 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#18775.unit 251
   w Cell#18776.unit 251
   w Cell#18999.unit 251
@@ -301229,6 +301241,7 @@ call 1464 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#18551.unit 251
   w Cell#18552.unit 251
   w Cell#18775.unit 251
@@ -302433,6 +302446,7 @@ call 1481 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Unit#251.spatialBucket SpatialBucket#302
   w SpatialBucket#302.head Unit#251
   w SpatialBucket#303.head null
@@ -302604,6 +302618,7 @@ call 1483 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#18326.unit 251
   w Cell#18327.unit 251
   w Cell#18550.unit 251
@@ -303738,6 +303753,7 @@ call 1499 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#18102.unit 251
   w Cell#18103.unit 251
   w Cell#18326.unit 251
@@ -303944,6 +303960,7 @@ call 1501 Apply
   a event.kind 160
   a event.unit Unit#3
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4298.unit2 3
   w Cell#4299.unit2 3
   w Cell#4300.unit2 3
@@ -305096,6 +305113,7 @@ call 1514 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#17878.unit 251
   w Cell#17879.unit 251
   w Cell#18102.unit 251
@@ -305197,6 +305215,7 @@ call 1515 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4070.unit 1
   w Cell#4071.unit 1
   w Cell#4294.unit 1
@@ -305302,9 +305321,9 @@ call 1516 Apply
   a event.kind 160
   a event.unit Unit#4
   a size 8
+  i services.SchedPublish 7 8
   w Unit#4.cargoNext Unit#3
   w Unit#4.spatialBucket SpatialBucket#61
-  w UnitMotion#4.pathLockStamp 1516
   w SpatialBucket#61.head Unit#4
   w Cell#4299.unit 4
   w Cell#4300.unit 4
@@ -305620,6 +305639,7 @@ call 1520 Apply
   r Unit#4.carrier Unit#2
   r Unit#251.posX 191966475
   r Unit#251.posZ 84055694
+  r UnitMotion#4.pathLockStamp 1516
   a event.kind 161
   a event.unit Unit#1
   a size 8
@@ -305636,6 +305656,7 @@ call 1520 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4069.unit 1
   w Cell#4070.unit 1
   w Cell#4293.unit 1
@@ -306322,6 +306343,7 @@ call 1529 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Unit#251.spatialBucket SpatialBucket#274
   w SpatialBucket#274.head Unit#251
   w SpatialBucket#302.head null
@@ -308544,6 +308566,7 @@ call 1536 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#3845.unit 1
   w Cell#3846.unit 1
   w Cell#4069.unit 1
@@ -308647,6 +308670,7 @@ call 1537 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#3844.unit 1
   w Cell#3845.unit 1
   w Cell#4068.unit 1
@@ -309112,6 +309136,7 @@ call 1543 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4068.unit 1
   w Cell#4069.unit 1
   w Cell#4292.unit 1
@@ -309222,6 +309247,7 @@ call 1544 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#17430.unit 251
   w Cell#17431.unit 251
   w Cell#17654.unit 251
@@ -310336,6 +310362,7 @@ call 1559 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4292.unit 1
   w Cell#4293.unit 1
   w Cell#4516.unit 1
@@ -310370,6 +310397,7 @@ call 1559 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#17206.unit 251
   w Cell#17207.unit 251
   w Cell#17430.unit 251
@@ -311410,6 +311438,7 @@ call 1573 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4516.unit 1
   w Cell#4517.unit 1
   w Cell#4740.unit 1
@@ -311518,6 +311547,7 @@ call 1574 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
+  i services.SchedPublish 7 8
   w Cell#16982.unit 251
   w Cell#16983.unit 251
   w Cell#17206.unit 251

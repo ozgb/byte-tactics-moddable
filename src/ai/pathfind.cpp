@@ -670,7 +670,7 @@ PathEventRecord* Pathfinder::AddEvent(int kind, int status)
     if (extra->eventCount >= extra->eventCapacity)
         return 0;
     PathEventRecord* record = (PathEventRecord*)((char*)this + extra->eventsOffset) + extra->eventCount++;
-    PathEvent* event = &record->event;
+    PathEventData* event = &record->event;
     event->kind = kind;
     event->status = status;
     event->unit = object;
@@ -681,16 +681,45 @@ PathEventRecord* Pathfinder::AddEvent(int kind, int status)
     return record;
 }
 
-int Pathfinder::Poll(PathEvent* out, PathPoint* points, int capacity)
+static unsigned int PathEventPayload(const PathEventData& e, PathfindingEventHeader* out, unsigned int size)
+{
+    PathfindingFinished payload;
+    memset(&payload, 0, sizeof(payload));
+    payload.h.kind = e.kind;
+    payload.h.unit = e.unit;
+    payload.h.requester = e.requester;
+    payload.h.target = e.target;
+    payload.h.tick = e.tick;
+    unsigned int total = sizeof(PathfindingEventHeader);
+    switch (e.kind) {
+    case PATH_EVENT_STARTED:
+        reinterpret_cast<PathfindingStarted*>(&payload)->start = e.status;
+        total = sizeof(PathfindingStarted);
+        break;
+    case PATH_EVENT_PROGRESS:
+        reinterpret_cast<PathfindingProgress*>(&payload)->count = e.count;
+        total = sizeof(PathfindingProgress);
+        break;
+    case PATH_EVENT_FINISHED:
+        payload.status = e.status;
+        payload.count = e.count;
+        total = sizeof(PathfindingFinished);
+        break;
+    }
+    memcpy(out, &payload, size < total ? size : total);
+    return total;
+}
+
+int Pathfinder::Poll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
 {
     PathExtra* extra = Extra();
     if (extra->eventNext >= extra->eventCount)
         return 0;
     PathEventRecord* record = (PathEventRecord*)((char*)this + extra->eventsOffset) + extra->eventNext++;
-    *out = record->event;
+    unsigned int total = PathEventPayload(record->event, out, size);
     for (int i = 0; i < record->event.count && i < capacity; i++)
         points[i] = record->points[i];
-    return 1;
+    return (int)total;
 }
 
 // FUNCTION: 0x40eb70
@@ -970,12 +999,12 @@ void __stdcall PathfindingStep()
         pf->RunSearches();
 }
 
-int __stdcall PathfindingPoll(PathEvent* out, PathPoint* points, int capacity)
+int __stdcall PathfindingPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
 {
     Pathfinder* pf = GetPathfinder();
     if (pf == nullptr)
         return 0;
-    return pf->Poll(out, points, capacity);
+    return pf->Poll(out, size, points, capacity);
 }
 
 namespace {

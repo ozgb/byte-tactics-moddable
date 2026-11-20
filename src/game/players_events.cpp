@@ -77,21 +77,27 @@ int __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount,
     return 1;
 }
 
-int __stdcall PlayersApply(const PlayersEvent* e)
+int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
 {
+    if (size < PlayersEventSize(event->kind))
+        return 0;
     Ref<Unit> ref;
-    ref.offset = e->unit;
+    ref.offset = event->unit;
     Unit* unit = ref.get();
-    switch (e->kind) {
-    case PLAYERS_GIVE_UNIT:
+    switch (event->kind) {
+    case PLAYERS_GIVE_UNIT: {
+        const PlayersGiveUnit* e = reinterpret_cast<const PlayersGiveUnit*>(event);
         if (unit == nullptr || (unsigned)e->player > 9 || g_game->list_391ed == nullptr)
             return 0;
         return GiveUnitToPlayer(unit, &g_game->players[e->player], e);
-    case PLAYERS_KILL_UNITS:
+    }
+    case PLAYERS_KILL_UNITS: {
+        const PlayersKillUnits* e = reinterpret_cast<const PlayersKillUnits*>(event);
         if ((unsigned)e->player > 10)
             return 0;
         KillPlayerUnits((unsigned char)e->player);
         return 1;
+    }
     case PLAYERS_UNIT_CREATED:
         if (unit == nullptr || g_game->list_391ed == nullptr)
             return 0;
@@ -102,14 +108,16 @@ int __stdcall PlayersApply(const PlayersEvent* e)
             return 0;
         g_game->list_391ed->NotifyUnitDied(unit);
         return 1;
-    case PLAYERS_TRANSFER:
-        if ((unsigned)e->from > 10 || (unsigned)e->player > 10)
+    case PLAYERS_TRANSFER: {
+        const PlayersTransfer* e = reinterpret_cast<const PlayersTransfer*>(event);
+        if ((unsigned)e->from > 10 || (unsigned)e->to > 10)
             return 0;
-        if (e->value == 0)
-            return TransferMetal((unsigned char)e->from, (unsigned char)e->player, e->amount, e->announce);
-        if (e->value == 1)
-            return TransferEnergy((unsigned char)e->from, (unsigned char)e->player, e->amount, e->announce);
+        if (e->resource == 0)
+            return TransferMetal((unsigned char)e->from, (unsigned char)e->to, e->amount, e->announce);
+        if (e->resource == 1)
+            return TransferEnergy((unsigned char)e->from, (unsigned char)e->to, e->amount, e->announce);
         return 0;
+    }
     }
     return 0;
 }
@@ -143,7 +151,7 @@ void __stdcall KillPlayerUnits(unsigned char player)
 }
 
 // FUNCTION: 0x488570
-int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event)
+int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersGiveUnit* event)
 {
     if (unit->player == other)
         return 0;

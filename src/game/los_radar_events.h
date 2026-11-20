@@ -8,18 +8,38 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
-inline LosRadarEvent LosRadarEventOf(int kind)
+inline unsigned int LosRadarEventSize(int kind)
 {
-    LosRadarEvent event;
-    memset(&event, 0, sizeof(event));
-    event.kind = kind;
-    return event;
+    switch (kind) {
+    case LOS_RADAR_UPDATE_UNIT:
+    case LOS_RADAR_REMOVE_UNIT:
+    case LOS_RADAR_REVEAL_UNIT:
+    case LOS_RADAR_SIGHT_RESET:
+        return sizeof(LosRadarUnit);
+    case LOS_RADAR_ADD_EYEBALL:
+        return sizeof(LosRadarAddEyeball);
+    case LOS_RADAR_CELL_HEIGHTS:
+        return sizeof(LosRadarCellHeights);
+    case LOS_RADAR_RECALCULATE:
+        return sizeof(LosRadarRecalculate);
+    case LOS_RADAR_SHARE_MAPPING:
+    case LOS_RADAR_SHARE_RADAR:
+        return sizeof(LosRadarSharePlayer);
+    case LOS_RADAR_SHARE_MAP:
+        return sizeof(LosRadarShareMap);
+    case LOS_RADAR_SIGHT_LOAD:
+        return sizeof(LosRadarSightLoad);
+    default:
+        return sizeof(LosRadarEventHeader);
+    }
 }
 
 template <class U>
-inline LosRadarEvent LosRadarEventOf(int kind, U* unit)
+inline LosRadarUnit LosRadarUnitEventOf(int kind, U* unit)
 {
-    LosRadarEvent event = LosRadarEventOf(kind);
+    LosRadarUnit event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = kind;
     event.unit = Ref<U>(unit).offset;
     return event;
 }
@@ -27,44 +47,49 @@ inline LosRadarEvent LosRadarEventOf(int kind, U* unit)
 template <class U>
 inline void LosRadarPublishUpdateUnit(int outbox, U* unit)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_UPDATE_UNIT, unit);
+    LosRadarUnit event = LosRadarUnitEventOf(LOS_RADAR_UPDATE_UNIT, unit);
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U>
 inline void LosRadarPublishRemoveUnit(int outbox, U* unit)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_REMOVE_UNIT, unit);
+    LosRadarUnit event = LosRadarUnitEventOf(LOS_RADAR_REMOVE_UNIT, unit);
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U>
 inline void LosRadarPublishRevealUnit(int outbox, U* unit)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_REVEAL_UNIT, unit);
+    LosRadarUnit event = LosRadarUnitEventOf(LOS_RADAR_REVEAL_UNIT, unit);
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U>
 inline void LosRadarPublishSightReset(int outbox, U* unit)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SIGHT_RESET, unit);
+    LosRadarUnit event = LosRadarUnitEventOf(LOS_RADAR_SIGHT_RESET, unit);
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U>
 inline void LosRadarPublishSightLoad(int outbox, U* unit, int cell, unsigned char frameIdx)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SIGHT_LOAD, unit);
-    event.sight.cell = cell;
-    event.sight.frameIdx = frameIdx;
+    LosRadarSightLoad event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_SIGHT_LOAD;
+    event.unit = Ref<U>(unit).offset;
+    event.cell = cell;
+    event.frameIdx = frameIdx;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class P>
 inline void LosRadarPublishAddEyeball(int outbox, const P* pos, int sightDistance, int eyeHeight, int lifetime)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_ADD_EYEBALL);
+    LosRadarAddEyeball event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_ADD_EYEBALL;
     event.pos[0] = pos->x;
     event.pos[1] = pos->y;
     event.pos[2] = pos->z;
@@ -77,7 +102,9 @@ inline void LosRadarPublishAddEyeball(int outbox, const P* pos, int sightDistanc
 template <class C, class S>
 inline void LosRadarPublishCellHeights(int outbox, C cell, S size)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_CELL_HEIGHTS);
+    LosRadarCellHeights event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_CELL_HEIGHTS;
     event.cell[0] = cell.x;
     event.cell[1] = cell.y;
     event.size[0] = size.x;
@@ -87,30 +114,38 @@ inline void LosRadarPublishCellHeights(int outbox, C cell, S size)
 
 inline void LosRadarPublishRecalculate(int outbox, int value)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_RECALCULATE);
-    event.value = value;
+    LosRadarRecalculate event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_RECALCULATE;
+    event.reset = value;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void LosRadarPublishShareMapping(int outbox, int player)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SHARE_MAPPING);
+    LosRadarSharePlayer event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_SHARE_MAPPING;
     event.player = player;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void LosRadarPublishShareRadar(int outbox, int player)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SHARE_RADAR);
+    LosRadarSharePlayer event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_SHARE_RADAR;
     event.player = player;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void LosRadarPublishShareMap(int outbox, int from, int to)
 {
-    LosRadarEvent event = LosRadarEventOf(LOS_RADAR_SHARE_MAP);
-    event.player = from;
-    event.value = to;
+    LosRadarShareMap event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_SHARE_MAP;
+    event.from = from;
+    event.to = to;
     SchedPublish(outbox, &event, sizeof(event));
 }
 

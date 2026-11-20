@@ -203,9 +203,9 @@ static void Tick()
 {
     s_tick++;
     PathfindingStep();
-    PathEvent e;
+    PathfindingFinished e;
     PathPoint points[64];
-    while (PathfindingPoll(&e, points, 64))
+    while (PathfindingPoll(&e.h, sizeof e, points, 64))
         ;
 }
 
@@ -253,14 +253,16 @@ static void ConsumerReset()
         s_goals[u].flags = 8;
 }
 
-static void ConsumerApply(const PathEvent* e, const PathPoint* points)
+static void ConsumerApply(const PathfindingEventHeader* h, const PathPoint* points)
 {
-    ConsumerGoal* goal = &s_goals[e->requester / 16];
-    unsigned int* subFlags = &s_orderSubFlags[e->target];
-    if (e->kind == PATH_EVENT_STARTED) {
-        goal->repathClaimTick = e->tick;
-        *subFlags |= e->status == PATH_START_DIRECT ? 0x100 : 0x200;
-    } else if (e->kind == PATH_EVENT_FINISHED) {
+    ConsumerGoal* goal = &s_goals[h->requester / 16];
+    unsigned int* subFlags = &s_orderSubFlags[h->target];
+    if (h->kind == PATH_EVENT_STARTED) {
+        const PathfindingStarted* e = reinterpret_cast<const PathfindingStarted*>(h);
+        goal->repathClaimTick = h->tick;
+        *subFlags |= e->start == PATH_START_DIRECT ? 0x100 : 0x200;
+    } else if (h->kind == PATH_EVENT_FINISHED) {
+        const PathfindingFinished* e = reinterpret_cast<const PathfindingFinished*>(h);
         if (e->count == 0) {
             *subFlags |= 0x40;
             goal->flags &= ~1;
@@ -320,10 +322,10 @@ static void PlayResults(ResultRun* run, Tamper tamper)
     for (int t = 0; t < kResultTicks; t++) {
         s_tick++;
         PathfindingStep();
-        PathEvent e;
+        PathfindingFinished e;
         PathPoint points[kEventPoints];
-        while (PathfindingPoll(&e, points, kEventPoints)) {
-            if (e.kind == PATH_EVENT_FINISHED && e.status == PATH_FOUND && e.count > 0) {
+        while (PathfindingPoll(&e.h, sizeof e, points, kEventPoints)) {
+            if (e.h.kind == PATH_EVENT_FINISHED && e.status == PATH_FOUND && e.count > 0) {
                 run->finished++;
                 if (tamper != TAMPER_NONE && run->tampered < 0) {
                     if (tamper == TAMPER_WAYPOINT) {
@@ -335,7 +337,7 @@ static void PlayResults(ResultRun* run, Tamper tamper)
                     run->tampered = t;
                 }
             }
-            ConsumerApply(&e, points);
+            ConsumerApply(&e.h, points);
         }
         run->consumer[t] = ConsumerHash();
         run->written[t] = HashWritten();

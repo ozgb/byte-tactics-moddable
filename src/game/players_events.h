@@ -13,34 +13,51 @@ struct Player;
 struct Unit;
 
 void __stdcall KillPlayerUnits(unsigned char player);
-int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersEvent* event);
+int __stdcall GiveUnitToPlayer(Unit* unit, Player* other, const PlayersGiveUnit* event);
 
-inline PlayersEvent PlayersEventOf(int kind)
+inline unsigned int PlayersEventSize(int kind)
 {
-    PlayersEvent event;
-    memset(&event, 0, sizeof(event));
-    event.kind = kind;
-    return event;
+    switch (kind) {
+    case PLAYERS_GIVE_UNIT:
+        return sizeof(PlayersGiveUnit);
+    case PLAYERS_KILL_UNITS:
+        return sizeof(PlayersKillUnits);
+    case PLAYERS_TRANSFER:
+        return sizeof(PlayersTransfer);
+    case PLAYERS_EFFECT_KILL_UNIT:
+        return sizeof(PlayersKillUnit);
+    case PLAYERS_EFFECT_SEND_UNIT:
+        return sizeof(PlayersSendUnit);
+    case PLAYERS_EFFECT_CAPTURE_UNIT:
+        return sizeof(PlayersCaptureUnit);
+    default:
+        return sizeof(PlayersEventHeader);
+    }
 }
 
-template <class U>
-inline PlayersEvent PlayersEventOf(int kind, U* unit)
+template <class E, class U>
+inline void PlayersFillHeader(E* event, int kind, U* unit)
 {
-    PlayersEvent event = PlayersEventOf(kind);
-    event.unit = Ref<U>(unit).offset;
-    return event;
+    memset(event, 0, sizeof(*event));
+    event->h.kind = kind;
+    event->h.unit = Ref<U>(unit).offset;
 }
 
 template <class U>
 inline void PlayersPublishUnit(int outbox, int kind, U* unit)
 {
-    PlayersEvent event = PlayersEventOf(kind, unit);
+    PlayersEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = kind;
+    event.unit = Ref<U>(unit).offset;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void PlayersPublishKillUnits(int outbox, int player)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_KILL_UNITS);
+    PlayersKillUnits event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_KILL_UNITS;
     event.player = player;
     SchedPublish(outbox, &event, sizeof(event));
 }
@@ -48,28 +65,31 @@ inline void PlayersPublishKillUnits(int outbox, int player)
 template <class U>
 inline void PlayersPublishGiveUnit(int outbox, U* unit, int player, const OwnershipTransferPacket* record)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_GIVE_UNIT, unit);
+    PlayersGiveUnit event;
+    PlayersFillHeader(&event, PLAYERS_GIVE_UNIT, unit);
     event.player = player;
     if (record != nullptr) {
-        event.record = 1;
-        event.hitPoints = record->hitPoints;
-        event.buildPercent = record->buildPercent;
-        event.angles[0] = record->angles.bank;
-        event.angles[1] = (short)record->angles.heading;
-        event.angles[2] = record->angles.pitch;
-        event.stockpiles[0] = record->stockpile0;
-        event.stockpiles[1] = record->stockpile1;
-        event.stockpiles[2] = record->stockpile2;
+        event.record.present = 1;
+        event.record.hitPoints = record->hitPoints;
+        event.record.buildPercent = record->buildPercent;
+        event.record.angles[0] = record->angles.bank;
+        event.record.angles[1] = (short)record->angles.heading;
+        event.record.angles[2] = record->angles.pitch;
+        event.record.stockpiles[0] = record->stockpile0;
+        event.record.stockpiles[1] = record->stockpile1;
+        event.record.stockpiles[2] = record->stockpile2;
     }
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void PlayersPublishTransfer(int outbox, int from, int to, int resource, float amount, int announce)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_TRANSFER);
+    PlayersTransfer event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_TRANSFER;
     event.from = from;
-    event.player = to;
-    event.value = resource;
+    event.to = to;
+    event.resource = resource;
     event.amount = amount;
     event.announce = announce;
     SchedPublish(outbox, &event, sizeof(event));
@@ -78,32 +98,31 @@ inline void PlayersPublishTransfer(int outbox, int from, int to, int resource, f
 template <class U>
 inline void PlayersPublishKillUnit(U* unit, int how)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_EFFECT_KILL_UNIT, unit);
-    event.value = how;
-    HarnessPlayersEvent(&event, 1);
+    PlayersKillUnit event;
+    PlayersFillHeader(&event, PLAYERS_EFFECT_KILL_UNIT, unit);
+    event.selfDestruct = how;
+    HarnessPlayersEvent(&event.h, sizeof(event), 1);
     SchedPublish(SCHED_PLAYERS, &event, sizeof(event));
 }
 
 template <class U>
 inline void PlayersPublishSendUnit(U* unit, int player)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_EFFECT_SEND_UNIT, unit);
+    PlayersSendUnit event;
+    PlayersFillHeader(&event, PLAYERS_EFFECT_SEND_UNIT, unit);
     event.player = player;
-    HarnessPlayersEvent(&event, 1);
+    HarnessPlayersEvent(&event.h, sizeof(event), 1);
     SchedPublish(SCHED_PLAYERS, &event, sizeof(event));
 }
 
 template <class U>
-inline void PlayersPublishCaptureUnit(U* unit, int player, const PlayersEvent* record)
+inline void PlayersPublishCaptureUnit(U* unit, int player, const PlayersGiveUnit* give)
 {
-    PlayersEvent event = PlayersEventOf(PLAYERS_EFFECT_CAPTURE_UNIT, unit);
+    PlayersCaptureUnit event;
+    PlayersFillHeader(&event, PLAYERS_EFFECT_CAPTURE_UNIT, unit);
     event.player = player;
-    event.record = record->record;
-    event.hitPoints = record->hitPoints;
-    event.buildPercent = record->buildPercent;
-    memcpy(event.angles, record->angles, sizeof(event.angles));
-    memcpy(event.stockpiles, record->stockpiles, sizeof(event.stockpiles));
-    HarnessPlayersEvent(&event, 1);
+    event.record = give->record;
+    HarnessPlayersEvent(&event.h, sizeof(event), 1);
     SchedPublish(SCHED_PLAYERS, &event, sizeof(event));
 }
 

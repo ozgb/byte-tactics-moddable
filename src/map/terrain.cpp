@@ -68,6 +68,7 @@ public:
 extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../../interfaces/seams.h"
 #include "../game/los_radar_events.h"
+#include "../game/map_events.h"
 #include "../../interfaces/map.h"
 #include "spatial_bucket.h"
 #include "../../interfaces/services.h"
@@ -1461,19 +1462,23 @@ static bool BucketHolds(SpatialBucket* bucket, Unit* unit)
     return false;
 }
 
-int __stdcall ApplyMapEvent(const MapEvent* e)
+int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size)
 {
-    switch (e->kind) {
-    case MAP_PASS_MAPS:
+    if (size < MapEventSize(event->kind))
+        return 0;
+    switch (event->kind) {
+    case MAP_PASS_MAPS: {
+        const MapPassMaps* e = reinterpret_cast<const MapPassMaps*>(event);
         if (e->size[0] < 0 || e->size[1] < 0)
             return 0;
         RefreshAllPassMaps(MapPoint(e->cell), MapPoint(e->size));
         return 1;
     }
-    Unit* unit = MapUnitOfHandle(e->unit);
+    }
+    Unit* unit = MapUnitOfHandle(event->unit);
     if (!unit)
         return 0;
-    switch (e->kind) {
+    switch (event->kind) {
     case MAP_ADD_UNIT:
         AddUnitToMap(unit);
         return 1;
@@ -1487,7 +1492,7 @@ int __stdcall ApplyMapEvent(const MapEvent* e)
         ForceNeighborFootprintReclaim(unit);
         return 1;
     case MAP_SET_YARD:
-        return SetYardOpen(unit, e->value);
+        return SetYardOpen(unit, reinterpret_cast<const MapSetYard*>(event)->open);
     case MAP_BUCKET_UNLINK:
         if (!unit->spatialBucket || !BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
             return 0;

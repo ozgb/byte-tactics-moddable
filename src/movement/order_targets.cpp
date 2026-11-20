@@ -1519,21 +1519,29 @@ void PatrolGoal::FillWaypointWorldPos(Vec3* out, int unused, int n)
     }
 }
 
-void __stdcall ApplyPathEvent(const PathEvent* event, const PathPoint* waypoints)
+void __stdcall ApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
 {
+    if (size < sizeof(PathfindingEventHeader))
+        return;
     Ref<AiSearchGoal> goal;
     goal.offset = event->requester;
     if (event->kind == PATH_EVENT_STARTED) {
+        if (size < sizeof(PathfindingStarted))
+            return;
+        const PathfindingStarted* started = reinterpret_cast<const PathfindingStarted*>(event);
         goal->repathClaimTick = event->tick;
         Ref<OrderFx> fx;
         fx.offset = event->target;
-        fx->AddFlags(event->status == PATH_START_DIRECT ? 0x100 : 0x200);
+        fx->AddFlags(started->start == PATH_START_DIRECT ? 0x100 : 0x200);
     } else if (event->kind == PATH_EVENT_FINISHED) {
-        if (event->count == 0) {
+        if (size < sizeof(PathfindingFinished))
+            return;
+        const PathfindingFinished* finished = reinterpret_cast<const PathfindingFinished*>(event);
+        if (finished->count == 0) {
             goal->SetWaypoints(0, 0);
         } else {
             Point16 points[PATH_WAYPOINT_CAPACITY];
-            int count = event->count < PATH_WAYPOINT_CAPACITY ? event->count : PATH_WAYPOINT_CAPACITY;
+            int count = finished->count < PATH_WAYPOINT_CAPACITY ? finished->count : PATH_WAYPOINT_CAPACITY;
             for (int i = 0; i < count; i++) {
                 points[i].x = waypoints[i].x;
                 points[i].y = waypoints[i].y;

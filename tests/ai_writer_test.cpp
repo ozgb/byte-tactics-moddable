@@ -25,6 +25,7 @@
 #include "../src/ai/ai_player.h"
 #include "../src/orders/ai_effects.h"
 #include "../src/ai/ai_idle.h"
+#include "../src/game/ai_events.h"
 
 Game* g_game;
 Seams g_seams;
@@ -76,7 +77,7 @@ int __stdcall RandomInt(int n)
     return n > 0 ? n - 1 : 0;
 }
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall HarnessAiEvent(const AiEvent*, int) {}
+void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int) {}
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
     return 0;
@@ -131,18 +132,19 @@ static int OtherAi(unsigned int offset)
 
 void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
-    AiEvent event;
+    AiStop event;
+    memset(&event, 0, sizeof event);
     memcpy(&event, data, size < sizeof event ? size : sizeof event);
-    if (outbox == SCHED_AI && event.kind == AI_EFFECT_STOP && s_tick == s_redirectTick && s_redirected < 0) {
+    if (outbox == SCHED_AI && event.h.kind == AI_EFFECT_STOP && s_tick == s_redirectTick && s_redirected < 0) {
         s_redirected = s_tick;
-        event.unit = Ref<Unit>(&s_units[OtherAi(event.unit)]).offset;
+        event.h.unit = Ref<Unit>(&s_units[OtherAi(event.h.unit)]).offset;
     }
     s_effects = Fnv(s_effects, &outbox, sizeof outbox);
     s_effects = Fnv(s_effects, &event, sizeof event);
     s_effectCount++;
     if (outbox != SCHED_AI)
         return;
-    if (event.kind == AI_EFFECT_STOP)
+    if (event.h.kind == AI_EFFECT_STOP)
         OrdersOnAiStop(&event);
 }
 
@@ -215,14 +217,14 @@ static void Restart()
     g_game->ticks = 0;
 }
 
-static int __stdcall TamperedApply(const AiEvent* e)
+static int __stdcall TamperedApply(const AiEventHeader* e, unsigned int size)
 {
     s_applied++;
     if (s_dropKind != 0 && s_tick == s_dropTick && e->kind == s_dropKind && s_dropped < 0) {
         s_dropped = s_tick;
         return 0;
     }
-    return AiApply(e);
+    return AiApply(e, size);
 }
 
 struct Run {
@@ -250,26 +252,36 @@ static unsigned long long HashState()
     return Fnv(kFnvBasis, parts, sizeof parts);
 }
 
-static AiEvent Event(int kind, int unit)
+struct TestEvent {
+    union {
+        AiEventHeader h;
+        AiReactToAttack react;
+        AiSetSquad squad;
+        AiPlan plan;
+    };
+};
+
+static TestEvent Event(int kind, int unit)
 {
-    AiEvent e;
+    TestEvent e;
     memset(&e, 0, sizeof e);
-    e.kind = kind;
-    e.unit = Ref<Unit>(&s_units[unit]).offset;
+    e.h.kind = kind;
+    e.h.unit = Ref<Unit>(&s_units[unit]).offset;
     return e;
 }
 
-static AiEvent Attacked(int unit, int attacker)
+static TestEvent Attacked(int unit, int attacker)
 {
-    AiEvent e = Event(AI_REACT_TO_ATTACK, unit);
-    e.target = Ref<Unit>(&s_units[attacker]).offset;
-    e.value = 10;
+    TestEvent e = Event(AI_REACT_TO_ATTACK, unit);
+    e.react.attacker = Ref<Unit>(&s_units[attacker]).offset;
+    e.react.damage = 10;
     return e;
 }
 
-static int Offer(const AiEvent& e, bool direct)
+static int Offer(const TestEvent& e, bool direct)
 {
-    return direct ? AiApply(&e) : g_seams.ai->Apply(&e);
+    unsigned int size = AiEventSize(e.h.kind);
+    return direct ? AiApply(&e.h, size) : g_seams.ai->Apply(&e.h, size);
 }
 
 static void Play(Run* run, int dropKind, int dropTick, int redirectTick, bool direct)
@@ -287,9 +299,9 @@ static void Play(Run* run, int dropKind, int dropTick, int redirectTick, bool di
     for (s_tick = 0; s_tick < kTicks; s_tick++) {
         g_game->ticks = s_tick;
         if (s_tick == 0) {
-            AiEvent plan = Event(AI_PLAN, kAi0);
-            plan.unit = 0;
-            plan.value = 8;
+            TestEvent plan = Event(AI_PLAN, kAi0);
+            plan.h.unit = 0;
+            plan.plan.difficulties = 8;
             Check(Offer(plan, direct) == 1, "a plan for any difficulty has outcome 1");
         }
         int victim = s_tick % 2 == 0 ? kAi0 : kAi1;
@@ -326,23 +338,25 @@ static void CheckRejected()
 {
     unsigned long long before = HashState();
     int effects = s_effectCount;
-    AiEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
-    noUnit.unit = 0;
-    AiEvent badSquad = Event(AI_SET_SQUAD, kAi0);
-    badSquad.value = 10;
-    AiEvent badPlan = Event(AI_PLAN, kAi0);
-    badPlan.value = 16;
-    AiEvent badKind = Event(255, kAi0);
-    AiEvent squadBelow = Event(AI_SET_SQUAD, kAi0);
-    squadBelow.value = -2;
-    AiEvent noSquads = Event(AI_SET_SQUAD, kAi0);
-    noSquads.value = 0;
-    Check(g_seams.ai->Apply(&noUnit) == 0, "a reaction with a null unit has outcome 0");
-    Check(g_seams.ai->Apply(&badSquad) == 0, "a squad above 9 has outcome 0");
-    Check(g_seams.ai->Apply(&badPlan) == 0, "a plan with a bit above 3 has outcome 0");
-    Check(g_seams.ai->Apply(&badKind) == 0, "an event of an unknown kind has outcome 0");
-    Check(g_seams.ai->Apply(&squadBelow) == 0, "a squad below -1 has outcome 0");
-    Check(g_seams.ai->Apply(&noSquads) == 0, "a squad for a unit whose player has no squads has outcome 0");
+    TestEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
+    noUnit.h.unit = 0;
+    TestEvent badSquad = Event(AI_SET_SQUAD, kAi0);
+    badSquad.squad.squad = 10;
+    TestEvent badPlan = Event(AI_PLAN, kAi0);
+    badPlan.plan.difficulties = 16;
+    TestEvent badKind = Event(255, kAi0);
+    TestEvent squadBelow = Event(AI_SET_SQUAD, kAi0);
+    squadBelow.squad.squad = -2;
+    TestEvent noSquads = Event(AI_SET_SQUAD, kAi0);
+    noSquads.squad.squad = 0;
+    TestEvent shortReact = Attacked(kAi0, kEnemy0);
+    Check(Offer(noUnit, false) == 0, "a reaction with a null unit has outcome 0");
+    Check(Offer(badSquad, false) == 0, "a squad above 9 has outcome 0");
+    Check(Offer(badPlan, false) == 0, "a plan with a bit above 3 has outcome 0");
+    Check(Offer(badKind, false) == 0, "an event of an unknown kind has outcome 0");
+    Check(Offer(squadBelow, false) == 0, "a squad below -1 has outcome 0");
+    Check(Offer(noSquads, false) == 0, "a squad for a unit whose player has no squads has outcome 0");
+    Check(g_seams.ai->Apply(&shortReact.h, sizeof(AiReactToAttack) - 1) == 0, "an event smaller than its payload has outcome 0");
     Check(HashState() == before, "a rejected event changes no hashed state");
     Check(s_effectCount == effects, "a rejected event publishes no effect");
 }
@@ -351,7 +365,7 @@ static int s_standardApplies;
 static int s_listRefreshes;
 static int s_squadRuns;
 
-static int __stdcall CountApply(const AiEvent*)
+static int __stdcall CountApply(const AiEventHeader*, unsigned int)
 {
     s_standardApplies++;
     return 1;
@@ -382,16 +396,16 @@ static void CheckIdleSeam()
     Check(s_listRefreshes == 0, "the idle module's UpdatePlayerAI runs nothing");
     Check(s_squadRuns == 0, "the idle module runs no squads");
 
-    AiEvent computer = Attacked(kAi0, kEnemy0);
-    Check(idle->Apply(&computer) == 0 && s_standardApplies == 0, "the idle module rejects a reaction of a computer player's unit");
+    TestEvent computer = Attacked(kAi0, kEnemy0);
+    Check(idle->Apply(&computer.h, AiEventSize(computer.h.kind)) == 0 && s_standardApplies == 0, "the idle module rejects a reaction of a computer player's unit");
     g_game->players[0].type = 1;
-    Check(idle->Apply(&computer) == 1 && s_standardApplies == 1, "the idle module passes a reaction of a human player's unit on");
+    Check(idle->Apply(&computer.h, AiEventSize(computer.h.kind)) == 1 && s_standardApplies == 1, "the idle module passes a reaction of a human player's unit on");
     g_game->players[0].type = 2;
-    AiEvent plan = Event(AI_PLAN, kAi0);
-    Check(idle->Apply(&plan) == 1 && s_standardApplies == 2, "the idle module passes other events on");
-    AiEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
-    noUnit.unit = 0;
-    Check(idle->Apply(&noUnit) == 1 && s_standardApplies == 3, "the idle module passes a reaction with no unit on");
+    TestEvent plan = Event(AI_PLAN, kAi0);
+    Check(idle->Apply(&plan.h, AiEventSize(plan.h.kind)) == 1 && s_standardApplies == 2, "the idle module passes other events on");
+    TestEvent noUnit = Event(AI_REACT_TO_ATTACK, kAi0);
+    noUnit.h.unit = 0;
+    Check(idle->Apply(&noUnit.h, AiEventSize(noUnit.h.kind)) == 1 && s_standardApplies == 3, "the idle module passes a reaction with no unit on");
 }
 
 int main()

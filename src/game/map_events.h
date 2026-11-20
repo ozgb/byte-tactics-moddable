@@ -8,42 +8,47 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 
-inline MapEvent MapEventOf(int kind)
+inline unsigned int MapEventSize(int kind)
 {
-    MapEvent event;
-    memset(&event, 0, sizeof(event));
-    event.kind = kind;
-    return event;
-}
-
-template <class U>
-inline MapEvent MapEventOf(int kind, U* unit)
-{
-    MapEvent event = MapEventOf(kind);
-    event.unit = Ref<U>(unit).offset;
-    return event;
+    switch (kind) {
+    case MAP_SET_YARD:
+        return sizeof(MapSetYard);
+    case MAP_PASS_MAPS:
+        return sizeof(MapPassMaps);
+    case MAP_EFFECT_CELLS_CHANGED:
+        return sizeof(MapCellsChanged);
+    default:
+        return sizeof(MapEventHeader);
+    }
 }
 
 template <class U>
 inline void MapPublishUnit(int outbox, int kind, U* unit)
 {
-    MapEvent event = MapEventOf(kind, unit);
+    MapEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = kind;
+    event.unit = Ref<U>(unit).offset;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class U>
 inline void MapPublishSetYard(int outbox, U* unit, int open)
 {
-    MapEvent event = MapEventOf(MAP_SET_YARD, unit);
-    event.value = open;
+    MapSetYard event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_SET_YARD;
+    event.h.unit = Ref<U>(unit).offset;
+    event.open = open;
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 template <class C, class S>
-inline MapEvent MapRectEventOf(int kind, int value, C cell, S size)
+inline MapPassMaps MapPassMapsOf(C cell, S size)
 {
-    MapEvent event = MapEventOf(kind);
-    event.value = value;
+    MapPassMaps event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_PASS_MAPS;
     event.cell[0] = cell.x;
     event.cell[1] = cell.y;
     event.size[0] = size.x;
@@ -54,20 +59,22 @@ inline MapEvent MapRectEventOf(int kind, int value, C cell, S size)
 template <class C, class S>
 inline void MapPublishPassMaps(int outbox, C cell, S size)
 {
-    MapEvent event = MapRectEventOf(MAP_PASS_MAPS, 0, cell, size);
+    MapPassMaps event = MapPassMapsOf(cell, size);
     SchedPublish(outbox, &event, sizeof(event));
 }
 
 inline void MapPublishCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
 {
-    MapEvent event = MapEventOf(MAP_EFFECT_CELLS_CHANGED);
+    MapCellsChanged event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_EFFECT_CELLS_CHANGED;
     event.rect[0] = left;
     event.rect[1] = top;
     event.rect[2] = right;
     event.rect[3] = bottom;
     event.classes = classes;
     event.cause = cause;
-    HarnessMapEvent(&event, 1);
+    HarnessMapEvent(&event.h, sizeof(event), 1);
     SchedPublish(SCHED_MAP, &event, sizeof(event));
 }
 

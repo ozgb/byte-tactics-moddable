@@ -35,12 +35,12 @@ unsigned int __stdcall GetTerrainPassValue(MovementClass* obj, int x, int y);
 int __stdcall IsPadSlotFree(Unit* pad, int id);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
 int __stdcall UnitsInRange(const Vec3* at, int range, int skip, unsigned short* ids, int capacity);
-struct MapEvent;
+struct MapEventHeader;
 struct StateWriter;
 void __stdcall MapAllocateBuckets();
 void __stdcall MapFreeBuckets();
 void __stdcall MapWriteState(const StateWriter* w);
-int __stdcall ApplyMapEvent(const MapEvent* e);
+int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size);
 
 int __stdcall GetPassMapCellValue(MovementClass* obj, Cell* cell);
 void __stdcall AddUnitToMap(Unit* obj);

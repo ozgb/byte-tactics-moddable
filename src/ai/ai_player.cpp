@@ -296,28 +296,28 @@ void EnableAICommands()
 #pragma auto_inline(on)
 
 // FUNCTION: 0x406db0
-static void ScaleWeights(const AiEvent* e)
+static void ScaleWeights(const AiWeight* e)
 {
     if (g_aiCommandsEnabled != 0) {
         UnitTypeSet set;
         memcpy(&set, e->types, sizeof(set));
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].ai != 0) {
-                ScaleUnitWeights(i, &set, e->scale, e->extra);
+                ScaleUnitWeights(i, &set, e->scale, e->fix);
             }
         }
     }
 }
 
 // FUNCTION: 0x406e40
-static void SetLimits(const AiEvent* e)
+static void SetLimits(const AiLimit* e)
 {
     if (g_aiCommandsEnabled != 0) {
         UnitTypeSet set;
         memcpy(&set, e->types, sizeof(set));
         for (char i = 0; i < 10; i++) {
             if (g_game->players[i].active != 0 && g_game->players[i].type == 2) {
-                SetUnitLimits(i, &set, e->value, e->extra);
+                SetUnitLimits(i, &set, e->limit, e->fix);
             }
         }
     }
@@ -343,34 +343,40 @@ static void ReactToAttack(Unit* unit)
     }
 }
 
-int __stdcall AiApply(const AiEvent* e)
+int __stdcall AiApply(const AiEventHeader* event, unsigned int size)
 {
-    Unit* unit = AiUnitOf(e->unit);
-    switch (e->kind) {
+    if (size < AiEventSize(event->kind))
+        return 0;
+    Unit* unit = AiUnitOf(event->unit);
+    switch (event->kind) {
     case AI_REACT_TO_ATTACK:
         if (unit == nullptr)
             return 0;
         ReactToAttack(unit);
         return 1;
-    case AI_SET_SQUAD:
-        if (unit == nullptr || e->value < -1 || e->value > 9 || !unit->player || !unit->player->groups)
+    case AI_SET_SQUAD: {
+        int squad = reinterpret_cast<const AiSetSquad*>(event)->squad;
+        if (unit == nullptr || squad < -1 || squad > 9 || !unit->player || !unit->player->groups)
             return 0;
-        SetUnitSquad(unit, e->value);
+        SetUnitSquad(unit, squad);
         return 1;
-    case AI_PLAN:
-        if ((unsigned int)e->value > 15)
+    }
+    case AI_PLAN: {
+        unsigned int plan = reinterpret_cast<const AiPlan*>(event)->difficulties;
+        if (plan > 15)
             return 0;
-        SetAiCommandsEnabled(e->value);
+        SetAiCommandsEnabled(plan);
         return 1;
+    }
     case AI_WEIGHT:
         if (g_aiCommandsEnabled == 0)
             return 0;
-        ScaleWeights(e);
+        ScaleWeights(reinterpret_cast<const AiWeight*>(event));
         return 1;
     case AI_LIMIT:
         if (g_aiCommandsEnabled == 0)
             return 0;
-        SetLimits(e);
+        SetLimits(reinterpret_cast<const AiLimit*>(event));
         return 1;
     }
     return 0;

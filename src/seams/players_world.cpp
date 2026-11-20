@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/economy.h"
@@ -9,22 +10,25 @@
 
 void PlayersInbox(const void* event)
 {
-    const PlayersEvent* e = static_cast<const PlayersEvent*>(event);
-    HarnessPlayersEvent(e, g_seams.players->Apply(e));
+    const PlayersEventHeader* e = static_cast<const PlayersEventHeader*>(event);
+    unsigned int size = PlayersEventSize(e->kind);
+    HarnessPlayersEvent(e, size, g_seams.players->Apply(e, size));
 }
 
 void PlayersOnEconomyShare(const void* event)
 {
-    const EconomyEvent* effect = static_cast<const EconomyEvent*>(event);
-    PlayersEvent transfer = PlayersEventOf(PLAYERS_TRANSFER);
-    transfer.from = effect->player;
-    transfer.player = effect->value;
+    const EconomyShare* effect = static_cast<const EconomyShare*>(event);
+    PlayersTransfer transfer;
+    memset(&transfer, 0, sizeof(transfer));
+    transfer.h.kind = PLAYERS_TRANSFER;
+    transfer.from = effect->h.player;
+    transfer.to = effect->to;
     transfer.announce = 1;
     if (effect->resources & ECON_METAL) {
-        transfer.value = 1;
+        transfer.resource = 1;
         transfer.amount = effect->metal;
     } else {
-        transfer.value = 0;
+        transfer.resource = 0;
         transfer.amount = effect->energy;
     }
     PlayersInbox(&transfer);

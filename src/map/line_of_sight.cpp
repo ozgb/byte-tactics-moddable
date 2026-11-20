@@ -100,6 +100,7 @@ struct GraphicsOptionFlagsView {
 
 #include "../game/game.h"
 #include "../game/features_events.h"
+#include "../game/los_radar_events.h"
 
 #pragma pack(pop)
 
@@ -1698,31 +1699,34 @@ static Unit* LosUnitOfHandle(unsigned int handle)
     return ref.get();
 }
 
-int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e)
+int __stdcall ApplyLosRadarEvent(const LosRadarEventHeader* event, unsigned int size)
 {
-    switch (e->kind) {
+    if (size < LosRadarEventSize(event->kind))
+        return 0;
+    switch (event->kind) {
     case LOS_RADAR_UPDATE_UNIT: {
-        Unit* unit = LosUnitOfHandle(e->unit);
+        Unit* unit = LosUnitOfHandle(reinterpret_cast<const LosRadarUnit*>(event)->unit);
         if (!unit)
             return 0;
         UpdateUnitLineOfSight(unit);
         return 1;
     }
     case LOS_RADAR_REMOVE_UNIT: {
-        Unit* unit = LosUnitOfHandle(e->unit);
+        Unit* unit = LosUnitOfHandle(reinterpret_cast<const LosRadarUnit*>(event)->unit);
         if (!unit)
             return 0;
         RemoveUnitLineOfSight(unit);
         return 1;
     }
     case LOS_RADAR_REVEAL_UNIT: {
-        Unit* unit = LosUnitOfHandle(e->unit);
+        Unit* unit = LosUnitOfHandle(reinterpret_cast<const LosRadarUnit*>(event)->unit);
         if (!unit)
             return 0;
         RevealNewUnit(unit);
         return 1;
     }
     case LOS_RADAR_ADD_EYEBALL: {
+        const LosRadarAddEyeball* e = reinterpret_cast<const LosRadarAddEyeball*>(event);
         Vec3 pos;
         pos.x = e->pos[0];
         pos.y = e->pos[1];
@@ -1730,43 +1734,55 @@ int __stdcall ApplyLosRadarEvent(const LosRadarEvent* e)
         return AddEyeball(&pos, e->sightDistance, e->eyeHeight, e->lifetime);
     }
     case LOS_RADAR_CELL_HEIGHTS: {
+        const LosRadarCellHeights* e = reinterpret_cast<const LosRadarCellHeights*>(event);
         Point16 cell;
         cell.x = (short)e->cell[0];
         cell.y = (short)e->cell[1];
-        Point16 size;
-        size.x = (short)e->size[0];
-        size.y = (short)e->size[1];
-        UpdateCellHeightRange(cell, size);
+        Point16 extent;
+        extent.x = (short)e->size[0];
+        extent.y = (short)e->size[1];
+        UpdateCellHeightRange(cell, extent);
         return 1;
     }
     case LOS_RADAR_RECALCULATE:
-        RecalculateLineOfSight(e->value);
+        RecalculateLineOfSight(reinterpret_cast<const LosRadarRecalculate*>(event)->reset);
         return 1;
-    case LOS_RADAR_SHARE_MAPPING:
-        if (e->player < 0 || e->player > 9)
+    case LOS_RADAR_SHARE_MAPPING: {
+        int player = reinterpret_cast<const LosRadarSharePlayer*>(event)->player;
+        if (player < 0 || player > 9)
             return 0;
-        return CmdShareMapping(e->player);
-    case LOS_RADAR_SHARE_RADAR:
-        if (e->player < 0 || e->player > 9)
+        return CmdShareMapping(player);
+    }
+    case LOS_RADAR_SHARE_RADAR: {
+        int player = reinterpret_cast<const LosRadarSharePlayer*>(event)->player;
+        if (player < 0 || player > 9)
             return 0;
-        return CmdShareRadar(e->player);
-    case LOS_RADAR_SHARE_MAP:
-        if (e->player < 0 || e->player > 9 || e->value < 0 || e->value > 9)
+        return CmdShareRadar(player);
+    }
+    case LOS_RADAR_SHARE_MAP: {
+        const LosRadarShareMap* e = reinterpret_cast<const LosRadarShareMap*>(event);
+        if (e->from < 0 || e->from > 9 || e->to < 0 || e->to > 9)
             return 0;
-        ShareMapInfo((unsigned char)e->player, (unsigned char)e->value);
+        ShareMapInfo((unsigned char)e->from, (unsigned char)e->to);
         return 1;
+    }
     case LOS_RADAR_SIGHT_RESET: {
-        Unit* unit = LosUnitOfHandle(e->unit);
+        Unit* unit = LosUnitOfHandle(reinterpret_cast<const LosRadarUnit*>(event)->unit);
         if (!unit)
             return 0;
         memset(SightOf(unit), 0, sizeof(LosSightCache));
         return 1;
     }
     case LOS_RADAR_SIGHT_LOAD: {
+        const LosRadarSightLoad* e = reinterpret_cast<const LosRadarSightLoad*>(event);
         Unit* unit = LosUnitOfHandle(e->unit);
         if (!unit)
             return 0;
-        *SightOf(unit) = e->sight;
+        LosSightCache sight;
+        memset(&sight, 0, sizeof(sight));
+        sight.cell = e->cell;
+        sight.frameIdx = (unsigned char)e->frameIdx;
+        *SightOf(unit) = sight;
         return 1;
     }
     }

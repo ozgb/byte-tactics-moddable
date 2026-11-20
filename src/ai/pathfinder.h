@@ -265,8 +265,18 @@ struct PathPending {
     int nextUnit;
 };
 
+struct PathEventData {
+    int kind;
+    int status;
+    PathUnit unit;
+    PathHandle requester;
+    PathHandle target;
+    unsigned int tick;
+    int count;
+};
+
 struct PathEventRecord {
-    PathEvent event;
+    PathEventData event;
     PathPoint points[64];
 };
 
@@ -462,7 +472,7 @@ public:
     PathEventRecord* AddEvent(int kind, int status);
     void Submit(const PathRequest* request);
     void Cancel(PathHandle requester);
-    int Poll(PathEvent* out, PathPoint* points, int capacity);
+    int Poll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity);
     void Step();
 };
 #pragma pack(pop)
@@ -475,7 +485,7 @@ void __stdcall PathfindingSubmit(const PathRequest* request);
 void __stdcall PathfindingCancel(PathHandle requester);
 void __stdcall PathfindingCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause);
 void __stdcall PathfindingStep();
-int __stdcall PathfindingPoll(PathEvent* out, PathPoint* points, int capacity);
+int __stdcall PathfindingPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity);
 void __stdcall PathfindingWriteState(const StateWriter* writer);
 void __stdcall PathfindingSetBaseScale(int scale);
 void __stdcall PathfindingDebugCell(int x, int y, int* flags, int* dir);

@@ -118,7 +118,7 @@ The other slots were checked against the same rule:
   nothing.
 - The slots that load or replace the mission (`SetMissionType`, `LoadCampaign`, `LoadMissionByName`, `SelectMission`,
   `AdvanceMission`, `RefreshMapList`) allocate and free only the mission's own memory.
-- So do map 5.0's new slots (`GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds`, `RefreshMovedUnits`,
+- So do map 5.0's new slots (`GetGroundHeight`, `MovementClassGet`, `MovementClassInBounds` (renamed `PassMapGet` and `PassMapInBounds` in 7.0), `RefreshMovedUnits`,
   `RefreshUnitIfStale`).
 - The slots of 1.1 hand plain data. `GetMissionParams`, `GetMissionUnit` and `GetMissionFeature` write to a struct the
   caller owns (`MissionParams`, `MissionUnitInfo`, `MissionFeatureInfo`); the names in the last two point into the

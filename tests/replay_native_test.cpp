@@ -23,6 +23,7 @@
 #include "../src/map/plot_map.h"
 #include "../src/mission/map_list.h"
 #include "../src/units/movement_class.h"
+#include "../src/map/pass_map.h"
 #include "../src/weapons/weapon_aim_cob_cb.h"
 #include "../src/scripts/cob_script.h"
 #include "../src/weapons/weapons.h"
@@ -418,6 +419,16 @@ MovementClass* MovementEntries()
 }
 
 #pragma pop_macro("g_movementClasses")
+
+#pragma push_macro("g_passMaps")
+#undef g_passMaps
+
+PassMap* PassMapEntries()
+{
+    return g_simGlobals->g_passMaps.entries;
+}
+
+#pragma pop_macro("g_passMaps")
 
 unsigned char* BlockBase(const ReplayField& f)
 {
@@ -1696,29 +1707,24 @@ void __fastcall SpatialBucketUnlinkUnitSlot(SpatialBucket* self, int unusedEdx, 
     self->UnlinkUnit(unit);
 }
 
-void __fastcall RefreshPassMapSlot(MovementClass* self, int unusedEdx, Point16 a, Point16 b)
+int __stdcall PassMapGetSlot(int moveClass, int x, int y)
 {
-    self->RefreshPassMap(a, b);
+    return PassMapEntries()[moveClass].Get(x, y);
 }
 
-int __stdcall MovementClassGetSlot(MovementClass* self, int x, int y)
+int __stdcall PassMapInBoundsSlot(int moveClass, unsigned int x, unsigned int y)
 {
-    return self->Get(x, y);
+    return PassMapEntries()[moveClass].InBounds(x, y);
 }
 
-int __stdcall MovementClassInBoundsSlot(MovementClass* self, unsigned int x, unsigned int y)
+void __stdcall RefreshMovedUnitsSlot(int moveClass, Unit* unit)
 {
-    return self->InBounds(x, y);
+    PassMapEntries()[moveClass].RefreshMovedUnits((UnitPassMapView*)unit);
 }
 
-void __stdcall RefreshMovedUnitsSlot(MovementClass* self, Unit* unit)
+void __stdcall RefreshUnitIfStaleSlot(int moveClass, Unit* unit)
 {
-    self->RefreshMovedUnits((UnitPassMapView*)unit);
-}
-
-void __stdcall RefreshUnitIfStaleSlot(MovementClass* self, Unit* unit)
-{
-    self->RefreshUnitIfStale((UnitPassMapView*)unit);
+    PassMapEntries()[moveClass].RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
 int __fastcall AdvanceMissionSlot(Mission* self)
@@ -2735,14 +2741,14 @@ void ArraySelfTest()
     for (int i = 0; i < 1500; i++)
         explored[i] = (unsigned char)(i * 7 + 1);
     player->explored = explored;
-    MovementClass* movement = &MovementEntries()[2];
+    PassMap* movement = &PassMapEntries()[2];
     movement->width = 4;
     movement->height = 32;
     unsigned* cells = (unsigned*)SimAlloc(8 * 4);
     for (int i = 0; i < 8; i++)
         cells[i] = 0x01020304u * (unsigned)(i + 1);
     movement->cells = cells;
-    unsigned char kinds[2] = { ROK_PLAYER, ROK_MOVEMENTCLASS };
+    unsigned char kinds[2] = { ROK_PLAYER, ROK_PASSMAP };
     void* roots[2] = { player, movement };
 
     Recorder recorder;
@@ -2754,7 +2760,7 @@ void ArraySelfTest()
     Check(CountLines(first, "  r Player#3.explored ") == 3, "a long array is chunked into lines");
     Check(strstr(first, "  r Player#3.explored 512:") != nullptr && strstr(first, "  r Player#3.explored 1024:") != nullptr, "each chunk says where it starts");
     Check(LongestLine(first) < 1100, "the lines are bounded");
-    Check(strstr(first, "  r MovementClass#2.cells [8] 0:04030201") != nullptr, "the elements are written as the bytes of memory");
+    Check(strstr(first, "  r PassMap#2.cells [8] 0:04030201") != nullptr, "the elements are written as the bytes of memory");
 
     explored[5] = 0xaa;
     explored[6] = 0xbb;
@@ -2764,7 +2770,7 @@ void ArraySelfTest()
     calls.AddText(recorder.text);
     const char* second = recorder.text.Data();
     Check(strstr(second, "  r Player#3.explored 5:aabb 1000:cc\n") != nullptr, "a later call writes the changed runs only");
-    Check(strstr(second, "  r MovementClass#2.cells 3:efbeadde\n") != nullptr, "a changed element of a wider array is one run");
+    Check(strstr(second, "  r PassMap#2.cells 3:efbeadde\n") != nullptr, "a changed element of a wider array is one run");
     Check(CountLines(second, "  r ") == 2, "and nothing else");
 
     explored[1] = 0;
@@ -2787,7 +2793,7 @@ void ArraySelfTest()
     int lines = RestoreText(calls.Data(), sets);
     Check(lines > 8, "the lines of every call restore");
     Player* rebuilt = (Player*)ReplayResolveObject("Player#3", nullptr, g_objects, AllocObject);
-    MovementClass* rebuiltClass = (MovementClass*)ReplayResolveObject("MovementClass#2", nullptr, g_objects, AllocObject);
+    PassMap* rebuiltClass = (PassMap*)ReplayResolveObject("PassMap#2", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && rebuilt->exploredSize == 40 && rebuilt->explored.get() != nullptr && rebuilt->explored.get()[39] == 9 && rebuilt->explored.get()[40 - 1] == 9, "the last whole write wins");
     Check(rebuiltClass != nullptr && rebuiltClass->cells.get() != nullptr && rebuiltClass->cells.get()[3] == 0xdeadbeefu && rebuiltClass->cells.get()[2] == 0x01020304u * 3, "the delta is applied to the array the replayer kept");
 
@@ -2799,7 +2805,7 @@ void ArraySelfTest()
 
     g_rootKinds[0] = ROK_PLAYER;
     g_rootObjects[0] = rebuilt;
-    g_rootKinds[1] = ROK_MOVEMENTCLASS;
+    g_rootKinds[1] = ROK_PASSMAP;
     g_rootObjects[1] = rebuiltClass;
     g_rootCount = 2;
     BeginCompare();
@@ -2809,30 +2815,30 @@ void ArraySelfTest()
     BeginCompare();
     CompareObjects(&sets);
     printf("a changed element: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "MovementClass#2.cells") == 0, "a changed element is reported at its array");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PassMap#2.cells") == 0, "a changed element is reported at its array");
     Check(strstr(g_detail.Data(), "byte 25 of 32") != nullptr, "and at its byte");
     rebuiltClass->cells.get()[6] ^= 0x100u;
 
     printf("a pass map whose height is not a multiple of 16\n");
     ResetBlock();
-    MovementClass* partial = &MovementEntries()[3];
+    PassMap* partial = &PassMapEntries()[3];
     partial->width = 4;
     partial->height = 20;
     unsigned* rows = (unsigned*)SimAlloc(8 * 4);
     for (int i = 0; i < 8; i++)
         rows[i] = 0x01010101u * (unsigned)(i + 1);
     partial->cells = rows;
-    unsigned char partialKind = ROK_MOVEMENTCLASS;
+    unsigned char partialKind = ROK_PASSMAP;
     void* partialRoot = partial;
     Recorder partialRecorder;
     partialRecorder.Record(&partialKind, &partialRoot, 1, sets);
     ReplayText partialCalls;
     partialCalls.AddText(partialRecorder.text);
-    Check(strstr(partialRecorder.text.Data(), "  r MovementClass#3.cells [8] 0:01010101") != nullptr, "the whole allocation is recorded, the last row included");
+    Check(strstr(partialRecorder.text.Data(), "  r PassMap#3.cells [8] 0:01010101") != nullptr, "the whole allocation is recorded, the last row included");
     ResetBlock();
     RestoreText(partialCalls.Data(), sets);
-    MovementClass* partialRebuilt = (MovementClass*)ReplayResolveObject("MovementClass#3", nullptr, g_objects, AllocObject);
-    g_rootKinds[0] = ROK_MOVEMENTCLASS;
+    PassMap* partialRebuilt = (PassMap*)ReplayResolveObject("PassMap#3", nullptr, g_objects, AllocObject);
+    g_rootKinds[0] = ROK_PASSMAP;
     g_rootObjects[0] = partialRebuilt;
     g_rootCount = 1;
     BeginCompare();
@@ -2841,7 +2847,7 @@ void ArraySelfTest()
     partialRebuilt->cells.get()[7] ^= 1u;
     BeginCompare();
     CompareObjects(&sets);
-    Check(g_diffs == 1 && strcmp(g_firstKey, "MovementClass#3.cells") == 0, "a one-word change in the last row is reported");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "PassMap#3.cells") == 0, "a one-word change in the last row is reported");
     Check(strstr(g_detail.Data(), "byte 28 of 32") != nullptr, "at its byte");
 
     printf("long deltas\n");

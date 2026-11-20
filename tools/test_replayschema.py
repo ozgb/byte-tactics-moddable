@@ -759,8 +759,8 @@ class Arrays(unittest.TestCase):
     def test_the_length_is_read_from_the_object_it_belongs_to(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
-        self.assertIn("{ 4, 1, 0, { { offsetof(MovementClass, width), (unsigned char)sizeof(((MovementClass*)nullptr)->width), 0 }, "
-                      "{ offsetof(MovementClass, height), (unsigned char)sizeof(((MovementClass*)nullptr)->height), 4, 15u } } }", text)
+        self.assertIn("{ 4, 1, 0, { { offsetof(PassMap, width), (unsigned char)sizeof(((PassMap*)nullptr)->width), 0 }, "
+                      "{ offsetof(PassMap, height), (unsigned char)sizeof(((PassMap*)nullptr)->height), 4, 15u } } }", text)
         self.assertIn("{ 2, 1, 0, { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 1 }, "
                       "{ offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 1 } } }", text)
 

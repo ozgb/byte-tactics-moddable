@@ -41,9 +41,9 @@ FeaturePseudoUnit::def,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::flags_110,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::flags_114,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unitDefIndex,presentation,every-frame,,per-player-filter,7
+FeaturePseudoUnit::unknown_0,map,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_0,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_0,scripts,every-frame,,per-player-filter,7
-FeaturePseudoUnit::unknown_0,units,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_96,presentation,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_96,scripts,every-frame,,per-player-filter,7
 FeaturePseudoUnit::unknown_a8,presentation,every-frame,,per-player-filter,7
@@ -62,16 +62,15 @@ LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,map,unknown,,all-players,1
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,orders,ui-action,,all-players,4
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,presentation,unknown,,all-players,5
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,every-frame,,all-players,89
-LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,unknown,,all-players,1
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,every-frame,,all-players,89
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,orders,ui-action,,all-players,4
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,every-frame,,all-players,89
-LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,every-frame,,all-players,89
 LoadUnitFbi: GameAllocIgnoreTag BUILDING YARD,map,unknown,,all-players,1
 MapViewFlags::bit0,presentation,ui-action,,all-players,0
 MapViewFlags::bit1,presentation,ui-action,,all-players,0
 MapViewFlags::bit2,presentation,ui-action,,all-players,0
 MapViewFlags::raw,presentation,ui-action,,all-players,0
-Mission::type,map,every-frame,,all-players,89
+Mission::type,mission,every-frame,,all-players,89
 ModelState::animDirty,platform,every-frame,,per-player-filter,85
 ModelState::animDirty,scripts,every-frame,,per-player-filter,88
 ModelState::bitmap,platform,every-frame,,per-player-filter,85
@@ -250,6 +249,7 @@ Unit::player,units,unknown,,per-player-filter,1
 Unit::playerIndex,orders,unknown,,per-player-filter,5
 Unit::playerIndex,presentation,every-frame,SIM_EVENT_SELECTION_ORDERS_DIRTY,per-player-filter,89
 Unit::pos,los_radar,every-frame,,per-player-filter,26
+Unit::pos,map,every-frame,,per-player-filter,88
 Unit::pos,presentation,every-frame,,per-player-filter,88
 Unit::postTransferHoldoff,orders,unknown,,per-player-filter,3
 Unit::postTransferHoldoff,presentation,ui-action,,per-player-filter,8
@@ -270,16 +270,15 @@ Unit::unknown_4c,presentation,ui-action,,per-player-filter,5
 Unit::weapon,orders,ui-action,,per-player-filter,3
 Unit::weapon,presentation,ui-action,,per-player-filter,8
 Unit::xWhole,presentation,every-frame,,per-player-filter,89
-Unit::xWhole,units,every-frame,,per-player-filter,88
 Unit::yFraction,los_radar,ui-action,,per-player-filter,12
 Unit::yFraction,presentation,every-frame,,per-player-filter,88
 Unit::yWhole,orders,ui-action,,per-player-filter,1
 Unit::yWhole,presentation,every-frame,,per-player-filter,89
 Unit::zBufferFlag,presentation,every-frame,,per-player-filter,88
 Unit::zFraction,los_radar,every-frame,,per-player-filter,26
+Unit::zFraction,map,every-frame,,per-player-filter,88
 Unit::zFraction,presentation,every-frame,,per-player-filter,88
 Unit::zWhole,presentation,every-frame,,per-player-filter,89
-Unit::zWhole,units,every-frame,,per-player-filter,88
 UnitDef::attackrunlength,presentation,ui-action,,all-players,0
 UnitDef::buildMenuPageCount,presentation,ui-action,,all-players,7
 UnitDef::buildRange,presentation,ui-action,,all-players,0
@@ -370,9 +369,8 @@ bits_37f2f,presentation,every-frame,,all-players,89
 bits_38a51,game,every-frame,,all-players,89
 bits_38a51,presentation,every-frame,,all-players,89
 cells,los_radar,every-frame,,all-players,89
-cells,map,unknown,,all-players,1
+cells,map,every-frame,,all-players,89
 cells,presentation,every-frame,,all-players,89
-cells,units,every-frame,,all-players,89
 commanderDeath,presentation,ui-action,,all-players,0
 count_1491b,presentation,every-frame,,all-players,89
 defs,harness,ui-action,,all-players,1
@@ -396,9 +394,8 @@ g_missionOrderTableVec@src/orders/order_list.cpp,presentation,ui-action,,all-pla
 g_quirks,presentation,unknown,,all-players,0
 gravity,presentation,unknown,,all-players,0
 height,los_radar,every-frame,,all-players,89
-height,map,unknown,,all-players,1
+height,map,every-frame,,all-players,89
 height,presentation,every-frame,,all-players,89
-height,units,every-frame,,all-players,89
 loaded,presentation,unknown,,all-players,0
 localPlayer,harness,ui-action,,own,1
 localPlayer,orders,unknown,,own,5
@@ -409,7 +406,7 @@ mapHeight,presentation,ui-action,SIM_EVENT_FOCUS_COMMANDER,all-players,2
 mapWidth,game,every-frame,,all-players,16
 mapWidth,presentation,ui-action,SIM_EVENT_FOCUS_COMMANDER,all-players,2
 maxUnitsSetting,presentation,ui-action,,all-players,0
-net,presentation,every-frame,,all-players,89
+net,seams,every-frame,,all-players,89
 netGameFlags,presentation,ui-action,,all-players,0
 numPlayers,presentation,ui-action,,own,0
 otherFlags,presentation,ui-action,,all-players,0
@@ -469,8 +466,7 @@ vertices,platform,ui-action,,per-player-filter,8
 visibilityMask,presentation,ui-action,,own,0
 width,features,unknown,,all-players,1
 width,los_radar,every-frame,,all-players,89
-width,map,unknown,,all-players,1
+width,map,every-frame,,all-players,89
 width,presentation,every-frame,,all-players,89
-width,units,every-frame,,all-players,89
 windX,presentation,unknown,,all-players,0
 windZ,presentation,unknown,,all-players,0

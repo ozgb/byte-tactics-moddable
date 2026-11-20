@@ -13,10 +13,10 @@ InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlo
 InitPlayerSlot: operator new unsigned char,presentation,NanoParticle::DrawParticle,InitPlayerSlot: operator new unsigned char,0,
 LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,-
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
-LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,units,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
-Mission::type,map,Mission::GetGameType,SetMissionType: new Mission,1,
+Mission::type,mission,Mission::GetGameType,SetMissionType: new Mission,1,
 ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::animDirty,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::animDirty,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
@@ -136,6 +136,7 @@ Unit::pitch,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNI
 Unit::playerIndex,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::playerIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::playerIndex,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::pos,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::pos,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::script,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::speed,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -147,15 +148,14 @@ Unit::state,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNI
 Unit::unitDefIndex,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unitDefIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::xWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::yFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::yWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zBufferFlag,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zBufferFlag,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::zFraction,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::zWhole,units,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 UnitDef::flags1,presentation,CMemoryCache::DrawObjectPicture,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::flags1,presentation,UnitTable::DrawLitPieces,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitDef::flags1,presentation,UnitTable::DrawPieces,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
@@ -180,8 +180,8 @@ bits_37f2f,presentation,DrawBattleFrame,bits_37f2f,1,
 bits_38a51,game,MainLoopTick,bits_38a51,1,
 bits_38a51,presentation,DrawBattleFrame,bits_38a51,1,
 cells,los_radar,FreeLosTables,cells,1,
+cells,map,GetGroundHeight,cells,1,
 cells,presentation,DrawBattleFrame,cells,1,
-cells,units,GetGroundHeight,cells,1,
 count_1491b,presentation,DrawExplosions,count_1491b,1,
 features,presentation,BlitFeatureGaf,features,1,
 features,presentation,DrawBattleFrame,features,1,
@@ -190,10 +190,10 @@ flags_38d75,presentation,UpdateCdCategoryByActivity,flags_38d75,1,
 g_explodedPieces,presentation,DrawExplosions,g_explodedPieces,1,
 height,los_radar,BuildFogTiles,height,0,-
 height,los_radar,FreeLosTables,height,1,
+height,map,GetGroundHeight,height,1,
 height,presentation,DrawBattleFrame,height,1,
-height,units,GetGroundHeight,height,1,
 localPlayer,presentation,DrawBattleFrame,localPlayer,1,
-net,presentation,DrawBattleFrame,net,1,
+net,seams,GetGameTypeNative,net,1,
 p1b8a,presentation,DrawBattleFrame,p1b8a,1,
 p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,-
 p1b8a,presentation,UnitTable::DrawLitPieces,p1b8a,0,-
@@ -219,7 +219,7 @@ unknown_1b8e,presentation,DrawBattleFrame,unknown_1b8e,1,
 unknown_1b8e,presentation,NanoParticle::DrawParticle,unknown_1b8e,0,
 width,los_radar,BuildFogTiles,width,0,-
 width,los_radar,FreeLosTables,width,1,
+width,map,GetGroundHeight,width,1,
 width,presentation,BlitFeatureGaf,width,1,
 width,presentation,DrawBattleFrame,width,1,
 width,presentation,DrawMapTiles,width,1,
-width,units,GetGroundHeight,width,1,

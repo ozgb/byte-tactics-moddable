@@ -15,6 +15,7 @@
 #include "../files/files_bank.h"
 #include "../game/unit_resources.h"
 #include "../units/movement_class.h"
+#include "../map/pass_map.h"
 #include "../scripts/cob_script.h"
 #include "../scripts/cob_types.h"
 #include "../scripts/unit_script.h"
@@ -111,6 +112,7 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../orders/orders_seam.h"
 #include "../movement/movement_seam.h"
 #include "../../interfaces/rand_stream.h"
+#include "../state/sim_globals.h"
 
 
 
@@ -493,24 +495,24 @@ static void __fastcall UpdateSfxOccupyNative(UnitMotion* self, int unusedEdx, Un
     ((SfxOccupyTracker*)self)->UpdateSfxOccupy(unit);
 }
 
-static int __stdcall MovementClassGetNative(MovementClass* self, int x, int y)
+static int __stdcall PassMapGetNative(int moveClass, int x, int y)
 {
-    return self->Get(x, y);
+    return g_passMaps.entries[moveClass].Get(x, y);
 }
 
-static int __stdcall MovementClassInBoundsNative(MovementClass* self, unsigned int x, unsigned int y)
+static int __stdcall PassMapInBoundsNative(int moveClass, unsigned int x, unsigned int y)
 {
-    return self->InBounds(x, y);
+    return g_passMaps.entries[moveClass].InBounds(x, y);
 }
 
-static void __stdcall RefreshMovedUnitsNative(MovementClass* self, Unit* unit)
+static void __stdcall RefreshMovedUnitsNative(int moveClass, Unit* unit)
 {
-    self->RefreshMovedUnits((UnitPassMapView*)unit);
+    g_passMaps.entries[moveClass].RefreshMovedUnits((UnitPassMapView*)unit);
 }
 
-static void __stdcall RefreshUnitIfStaleNative(MovementClass* self, Unit* unit)
+static void __stdcall RefreshUnitIfStaleNative(int moveClass, Unit* unit)
 {
-    self->RefreshUnitIfStale((UnitPassMapView*)unit);
+    g_passMaps.entries[moveClass].RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
 static void __stdcall UnitRefInitNative(UnitRef* ref, Unit* unit, OrderBase* value)
@@ -748,8 +750,8 @@ void InstallNativeSeams()
     s_pathfinding.WriteState = PathfindingWriteState;
     s_pathfinding.SetSearchScale = PathfindingSetBaseScale;
     s_pathfinding.DebugCell = PathfindingDebugCell;
-    s_map.MovementClassGet = MovementClassGetNative;
-    s_map.MovementClassInBounds = MovementClassInBoundsNative;
+    s_map.PassMapGet = PassMapGetNative;
+    s_map.PassMapInBounds = PassMapInBoundsNative;
     s_map.RefreshMovedUnits = RefreshMovedUnitsNative;
     s_map.RefreshUnitIfStale = RefreshUnitIfStaleNative;
     s_los_radar.HasReadyUnitInRange = HasReadyUnitInRange;
@@ -855,6 +857,7 @@ void InstallNativeSeams()
     s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
     s_units.MarkRecentlyDamaged = (void (__stdcall *)(Unit *))MarkRecentlyDamaged;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
+    s_map.FreePassMaps = FreePassMaps;
     s_map.LoadMappingData = LoadMappingData;
     s_map.LoadMetalPlotmap = LoadMetalPlotmap;
     s_map.LoadPlayerFeaturesPlotmap = LoadPlayerFeaturesPlotmap;
@@ -926,6 +929,7 @@ void InstallNativeSeams()
     s_units.UnitRefUnlink = UnitRefUnlinkNative;
     s_units.UnitRefInit = UnitRefInitNative;
     s_units.UnitRefSetUnit = UnitRefSetUnitNative;
+    s_units.GetMovementLimits = GetMovementLimits;
     s_scripts.StartScriptWithArgsByIndex = StartScriptWithArgsByIndexNative;
     s_units.UpdateSfxOccupy = UpdateSfxOccupyNative;
     s_scripts.PoseUnitModel = PoseUnitModel;

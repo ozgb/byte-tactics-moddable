@@ -211,11 +211,11 @@ Every slot reads only, apart from `BeginSearch` and `EndSearch`.
 | `UnitsPerPlayer`, `FirstUnit`, `LastUnit`, `NextUnit` | each player's unit slots, as handles | the players' unit arrays, walked by the cursors |
 | `UnitState` | a unit's player, cell, heading, movement class and its class's footprint | the unit and its `UnitMotion` |
 | `MoveClass` | the movement classes by number | `g_movementClasses` |
-| `InBounds`, `Pass` | a class's pass map, through map's queries `MovementClassInBounds` and `MovementClassGet` (map 5.0) | `MovementClassInBounds`, `MovementClassGet` |
+| `InBounds`, `Pass` | a class's pass map, through map's queries `PassMapInBounds` and `PassMapGet` (map 5.0 as `MovementClassInBounds` and `MovementClassGet`, which took the class; the class index since map 7.0) | `PassMapInBounds`, `PassMapGet` |
 | `SeenSize`, `Seen` | a player's visibility grid, 2 by 2 cells a square | `visibilityMask` |
 | `LineOfSight` | a straight walk over a class's pass map | not in 3.1c; for any-angle implementations |
 | `TerrainPass` | the pass state from terrain and features alone, without the stamps of units | `GetPassMapFootprintValueWithEdgeStrips` with the unit test left out |
-| `BeginSearch`, `EndSearch` | bring the pass map up to date around a search for a unit: map's inbox is delivered, then map's synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` run (map 5.0) | `RefreshMovedUnits`, `RefreshUnitIfStale` |
+| `BeginSearch`, `EndSearch` | bring the pass map up to date around a search for a unit: map's inbox is delivered, then map's synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` run (map 5.0, with the class index since map 7.0) | `RefreshMovedUnits`, `RefreshUnitIfStale` |
 
 Units and classes are handles, and the view gives no pointer into the engine, so an implementation in
 a WASM module can use the same table through imports.
@@ -224,7 +224,7 @@ The pass maps are map's since map 5.0 (#983, `docs/map-interface.md`, section 3)
 and the lazy refresh of `BeginSearch` and `EndSearch` is map's own work, which reports what it rewrote through its
 CELLS_CHANGED effect like map's other pass-map writes. Units kept the movement class definition (the classes read from
 `MOVEINFO.TDF`, `FindMovementClass` and the class fields a unit's motion reads); no slot of units is left in the world
-view.
+view. The world view turns the `PathClass` pathfinding gives it (the offset of the class's record in units' block) into the class index, 0 to 31, before it calls map's `PassMapGet`, `PassMapInBounds`, `RefreshMovedUnits`, `RefreshUnitIfStale` and `GetTerrainPassValue`; the pathfinding interface is unchanged.
 
 `CellsChanged` is the other way in. It names a rectangle of cells, the movement classes (a mask of `MoveClass`
 indexes) and the cause. Map's CELLS_CHANGED calls it once per class with the rectangle that class's pass map was rewritten in:
@@ -234,7 +234,7 @@ clipped to the map.
   `PlaceFeature` or `RemoveFeature` changes the cells), so `TerrainPass` may differ;
 - `PATH_CHANGE_UNITS`: the stamps of units on the pass maps were refreshed (building footprints in
   `src/map/terrain.cpp`, and `RefreshPassMapsForUnit`, `RefreshMovedUnits` and `RefreshUnitIfStale`, map's functions
-  in `src/units/movement_class.cpp`). `TerrainPass` did not change.
+  in `src/map/pass_map.cpp`). `TerrainPass` did not change.
 
 Every call comes from map's CELLS_CHANGED effect, whose route is synchronous (`docs/map-interface.md`, section 4), so
 it arrives at the statement that rewrote the pass map, in 3.1c's order. Before map 5.0 the refreshes of

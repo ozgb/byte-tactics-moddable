@@ -8,6 +8,7 @@ template<class T> class allocator;
 template<class T, class A> class vector;
 }
 
+struct MapMoveLimits;
 struct Unit;
 struct UnitDef;
 struct Vec3;
@@ -124,6 +125,8 @@ struct UnitsSeam {
     void (__stdcall* UnitRefSetValue)(UnitRef* ref, OrderBase* value);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Writes to out the footprint and limits of each movement class the game data defines, in index order, at most capacity of them, and returns how many it wrote; a query, outside the tick. Hooks: none.
+    int (__stdcall* GetMovementLimits)(MapMoveLimits* out, int capacity);
 };
 
 #endif

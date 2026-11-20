@@ -46,9 +46,11 @@ TYPE_OVERRIDES = {
     "g_missionOrderTableBegin": "char*",
     "g_playerAI": "PlayerAI*[10]",
     "g_quirks": "Quirks",
+    "g_passMaps": "PassMapTable",
 }
 REF_FIELDS = {"g_explodedPieces", "g_meteorWeapon", "g_playerAI"}
 STATIC_FILES = {"g_movementClasses": "src/units/movement_class.cpp"}
+SIZE_OVERRIDES = {"g_movementClasses": 512}
 ELEMENT_SIZES = {"char": 1, "unsigned char": 1, "signed char": 1, "short": 2, "unsigned short": 2, "int": 4,
                  "unsigned int": 4, "float": 4}
 
@@ -65,6 +67,7 @@ HEADER_INCLUDES = [
     '"../network/packet_manager.h"',
     '"../quirks/quirks.h"',
     '"../units/movement_class.h"',
+    '"../map/pass_map.h"',
     '"../util/vec3.h"',
 ]
 FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct PlayerAI;", "struct WeaponDef;"]
@@ -143,10 +146,18 @@ def load_rows() -> list[Row]:
         if m:
             row.container = m.group(1).split("::")[-1]
             row.offset = int(m.group(2), 16)
-        row.size = int(row.csv["size"])
+        row.size = SIZE_OVERRIDES.get(row.leaf, int(row.csv["size"]))
         row.type = row.csv["type"]
         row.init = row.csv["init"]
-    return [r for r in rows if not in_vector(r, rows)]
+    return [r for r in rows if not in_vector(r, rows) and not outgrows(r, rows)]
+
+
+def outgrows(row: Row, rows: list[Row]) -> bool:
+    """Whether the row is a raw view that no longer fits in its container, which SIZE_OVERRIDES shrank."""
+    if not row.interior:
+        return False
+    box = next((r for r in rows if r.leaf == row.container and not r.interior), None)
+    return box is not None and box.leaf in SIZE_OVERRIDES and row.offset + (row.size or 0) > box.size
 
 
 def in_vector(row: Row, rows: list[Row]) -> bool:
@@ -239,9 +250,10 @@ def header_text(rows: list[Row]) -> str:
             "inline SimGlobals& Sim()", "{", "    return g_simGlobals != 0 ? *g_simGlobals : SimCreate();", "}", ""]
     out += ['#pragma clang diagnostic push', '#pragma clang diagnostic ignored "-Winvalid-offsetof"']
     for a, b in zip(fields, fields[1:]):
-        if a.address is not None and b.address is not None and a.address + a.size == b.address:
+        size = int(a.csv["size"]) if a.leaf in SIZE_OVERRIDES else a.size
+        if a.address is not None and b.address is not None and a.address + size == b.address:
             out.append(f"static_assert(__builtin_offsetof(SimGlobals, {b.leaf}) - __builtin_offsetof(SimGlobals, {a.leaf}) "
-                       f"== {b.address - a.address}, \"{a.leaf} is followed by {b.leaf}\");")
+                       f"== {a.size}, \"{a.leaf} is followed by {b.leaf}\");")
     for row in fields:
         if row.csv is not None and row.csv["size_from"] == "definition" and row.size:
             out.append(f"static_assert(sizeof(((SimGlobals*)0)->{row.leaf}) == {row.size}, \"{row.leaf} size\");")

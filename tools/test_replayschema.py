@@ -873,11 +873,11 @@ class StructForms(unittest.TestCase):
 
     def test_a_struct_by_value_is_written_as_its_fields_in_one_line(self):
         ann = annotations()
-        orders = ann["subsystems"]["orders"].setdefault("slots", {})
-        orders.setdefault("AddOrder", {}).setdefault("args", {})["kind"] = {"mode": "value", "kind": "MissionType"}
+        movement = ann["subsystems"]["movement"].setdefault("slots", {})
+        movement.setdefault("NewPointMarker", {}).setdefault("args", {})["pos"] = {"mode": "value", "kind": "Point16"}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
-        self.assertIn('ArgValueStruct(s_call, "a", "kind", ROK_MISSIONTYPE, &a0);', files[rs.HOOKS_H])
+        self.assertIn('ArgValueStruct(s_call, "a", "pos", ROK_POINT16, &a1);', files[rs.HOOKS_H])
 
     def test_a_result_by_value_is_recorded_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
@@ -935,22 +935,22 @@ class Polymorphic(unittest.TestCase):
 
     def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
         ann = annotations()
-        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}}}}
+        ann["subsystems"]["units"]["slots"] = {"UnitRefSetValue": {"args": {"value": {"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}}}}
         files, errors, model = self.generated(ann)
         self.assertEqual(errors, [])
-        arg = model["subsystems"]["orders"]["slots"]["AppendOrder"]["args"][1]
+        arg = model["subsystems"]["units"]["slots"]["UnitRefSetValue"]["args"][1]
         self.assertEqual((arg["mode"], arg["kind"], arg["poly"]), ("object", "OrderFx", "OrderFx"))
         self.assertIn("roots.Add(ROK_ORDERFX, a1);", files[rs.HOOKS_H])
 
     def test_an_argument_note_of_the_base_needs_poly(self):
         ann = annotations()
-        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "OrderFx"}}}}
-        self.assertTrue(any("the argument node points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
+        ann["subsystems"]["units"]["slots"] = {"UnitRefSetValue": {"args": {"value": {"mode": "object", "kind": "OrderFx"}}}}
+        self.assertTrue(any("the argument value points at the base kind OrderFx and needs" in e for e in self.errors(ann)))
 
     def test_poly_of_a_kind_that_is_no_base_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["orders"]["slots"] = {"AppendOrder": {"args": {"node": {"mode": "object", "kind": "Order", "poly": "Order"}}}}
-        self.assertTrue(any("`poly` of the argument node names the base kind" in e for e in self.errors(ann)))
+        ann["subsystems"]["units"]["slots"] = {"UnitRefSetValue": {"args": {"value": {"mode": "object", "kind": "Order", "poly": "Order"}}}}
+        self.assertTrue(any("`poly` of the argument value names the base kind" in e for e in self.errors(ann)))
 
     def test_a_ref_to_a_base_needs_poly(self):
         ann = annotations()

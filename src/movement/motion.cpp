@@ -74,6 +74,7 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
+#include "../game/movement_events.h"
 
 #include "../network/player.h"
 
@@ -145,16 +146,6 @@ void RegisterUnitOrders();
 
 
 #pragma pack(push, 1)
-struct UnitMotionSaveRecord {
-    Vec3 velocity;
-    Vec3 p2;
-    int speed;
-    short turn;
-    int pathLockStamp;
-    unsigned char mode : 2;
-    unsigned char flag : 1;
-};
-
 class PathGoalVtableView {
 public:
     virtual void v0(int);
@@ -183,8 +174,7 @@ void UnitMotion::ApplyClampedTurnDelta(Unit* unit, short amount)
             turn = -max;
         else
             turn = amount;
-        unit->angles.heading += turn;
-        unit->moved = 1;
+        MovementPublishTurn(unit, turn);
     } else {
         turn = 0;
     }
@@ -306,8 +296,7 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
             turn = -max;
         else
             turn = diff;
-        unit->angles.heading += turn;
-        unit->moved = 1;
+        MovementPublishTurn(unit, turn);
     } else {
         turn = 0;
     }
@@ -338,8 +327,9 @@ void UnitMotion::ApplyBankAndPitch(Unit* owner, Vec3* v)
     xz[1] = p2.z;
     RotatePoint2D(owner->angles.heading, xz);
     int n = (int)(((__int64)g_game->gravity << 16) / 0xccd);
-    owner->angles.bank = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
-    owner->angles.pitch = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
+    short bank = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->bankscale * -xz[0]) >> 16), n);
+    short pitch = (short)AngleOfVector((int)(((__int64)((UnitDefMoveView*)owner->def.get())->pitchscale * -xz[0]) >> 16), n);
+    MovementPublishTilt(owner, bank, pitch);
 }
 #pragma auto_inline(on)
 
@@ -352,9 +342,9 @@ void UnitMotion::SetFlightMode(Unit* owner, int newState)
             Vec3 zero = OrderVec3(0, 0, 0);
             velocity = zero;
             ApplyBankAndPitch(owner, &zero);
-            g_seams.units->SetStateBits(owner, 1, 0);
+            MovementPublishSetStateBits(owner, 1, 0);
         } else {
-            g_seams.units->SetStateBits(owner, 1, 1);
+            MovementPublishSetStateBits(owner, 1, 1);
         }
         mode = newState;
     }
@@ -424,8 +414,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
             turn = (short)-max;
         else
             turn = d;
-        unit->angles.heading = (short)(unit->angles.heading + turn);
-        unit->moved = 1;
+        MovementPublishTurn(unit, turn);
     } else {
         turn = 0;
     }
@@ -480,9 +469,9 @@ void UnitMotion::UpdatePosition(Unit* u)
         if (((UnitDefMoveView*)u->def.get())->b19) {
             v.y = ORDER_MAX(v.y, MakeFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel).value);
         }
-        g_seams.units->SetUnitPosition(u, v, mode);
+        MovementPublishSetPosition(u, v.x, v.y, v.z, mode);
         Angles16 o = g_seams.scripts->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
-        u->angles = o;
+        MovementPublishAngles(u, o.bank, o.heading, o.pitch);
         if (((CarrierMotionView*)u->carrier.get())->motion != 0) {
             speed = ((CarrierMotionView*)u->carrier.get())->motion->speed;
             velocity = ((CarrierMotionView*)u->carrier.get())->motion->velocity;
@@ -491,7 +480,7 @@ void UnitMotion::UpdatePosition(Unit* u)
             Vec3 zero = OrderVec3(0, 0, 0);
             velocity = zero;
         }
-        u->moved = 0;
+        MovementPublishMoved(u, 0);
         return;
     }
 
@@ -507,8 +496,7 @@ void UnitMotion::UpdatePosition(Unit* u)
     cell.x = (pos.x - draft.x * 0x80000 + 0x80000) >> 20;
     cell.y = (pos.z - draft.y * 0x80000 + 0x80000) >> 20;
     if (cell.x == u->cell.x && cell.y == u->cell.y && m == u->mode) {
-        u->pos = pos;
-        u->moved = 1;
+        MovementPublishMove(u, pos.x, pos.y, pos.z);
         return;
     }
 
@@ -531,21 +519,15 @@ void UnitMotion::UpdatePosition(Unit* u)
             vec.z = z;
             velocity = vec;
         }
-        u->pos = pos;
-        u->moved = 1;
+        MovementPublishMove(u, pos.x, pos.y, pos.z);
         return;
     }
 
-    // TODO(#985): publish from SCHED_MOVEMENT
-    MapPublishUnit(SCHED_ORDERS, MAP_REMOVE_UNIT, u);
-    u->pos = pos;
-    *(Point16*)&u->cell = cell;
-    u->mode = (short)m;
-    // TODO(#985): publish from SCHED_MOVEMENT
-    MapPublishUnit(SCHED_ORDERS, MAP_ADD_UNIT, u);
-    u->moved = 1;
-    // TODO(#985): publish from SCHED_MOVEMENT
-    LosRadarPublishUpdateUnit(SCHED_ORDERS, u);
+    MapPublishUnit(SCHED_MOVEMENT, MAP_REMOVE_UNIT, u);
+    MovementPublishChangeCell(u, pos.x, pos.y, pos.z, cell.x, cell.y, m);
+    MapPublishUnit(SCHED_MOVEMENT, MAP_ADD_UNIT, u);
+    MovementPublishMoved(u, 1);
+    LosRadarPublishUpdateUnit(SCHED_MOVEMENT, u);
 }
 
 // FUNCTION: 0x43da70
@@ -565,22 +547,22 @@ void UnitMotion::UpdateMoveRate(Unit* unit)
     if (rate == (int)((unit->flags >> 2) & 3))
         return;
     if (rate == 0) {
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StopMoving", nullptr, 1);
+        MovementPublishStartScript(unit, MOVEMENT_SCRIPT_STOP_MOVING);
     } else if ((unit->flags & 0xc) == 0) {
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "StartMoving", nullptr, 1);
+        MovementPublishStartScript(unit, MOVEMENT_SCRIPT_START_MOVING);
     }
     switch (rate) {
     case 1:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate1", nullptr, 1);
+        MovementPublishStartScript(unit, MOVEMENT_SCRIPT_MOVE_RATE_1);
         break;
     case 2:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate2", nullptr, 1);
+        MovementPublishStartScript(unit, MOVEMENT_SCRIPT_MOVE_RATE_2);
         break;
     case 3:
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "MoveRate3", nullptr, 1);
+        MovementPublishStartScript(unit, MOVEMENT_SCRIPT_MOVE_RATE_3);
         break;
     }
-    unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);
+    MovementPublishMoveRate(unit, rate);
 }
 
 // FUNCTION: 0x43dc00
@@ -635,41 +617,5 @@ void UnitMotion::UpdateMotion(Unit* u)
         SteerGroundUnit(u);
     UpdatePosition(u);
     UpdateMoveRate(u);
-    g_seams.units->UpdateSfxOccupy((UnitMotion*)this, 0, u);
-}
-
-// FUNCTION: 0x43dd70
-void UnitMotion::SaveMotion(Unit* info, HapiBank* file)
-{
-    char name[32];
-    UnitMotionSaveRecord hdr;
-    hdr.velocity = velocity;
-    hdr.p2 = p2;
-    hdr.speed = speed;
-    hdr.turn = turn;
-    hdr.pathLockStamp = pathLockStamp;
-    hdr.mode = mode;
-    hdr.flag = flag;
-    sprintf(name, "u%04xmob", info->id);
-    file->OpenNamedBox(name);
-    file->SeekBox(0);
-    file->WriteBox(&hdr, 0x23);
-}
-
-// FUNCTION: 0x43de30
-void UnitMotion::LoadMotion(Unit* unit, HapiBank* file)
-{
-    char name[32];
-    UnitMotionSaveRecord rec;
-    sprintf(name, "u%04xmob", unit->id);
-    file->OpenNamedBox(name);
-    file->SeekBox(0);
-    file->ReadBox(&rec, 0x23);
-    velocity = rec.velocity;
-    p2 = rec.p2;
-    speed = rec.speed;
-    turn = rec.turn;
-    pathLockStamp = rec.pathLockStamp;
-    mode = rec.mode;
-    flag = rec.flag;
+    MovementPublishSfxOccupy(u);
 }

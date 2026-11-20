@@ -45,6 +45,8 @@ typedef std::vector<Point16> PointMarkerCellVector;
 #pragma pack(push, 2)
 
 #include "../../interfaces/services.h"
+#include "../game/movement_events.h"
+#include "movement_seam.h"
 
 class BitReader;
 struct Order;
@@ -264,7 +266,7 @@ void OrderFx::AddFlags(int param_1)
 {
     Order* val = source;
     if (val != 0) {
-        val->subFlags |= param_1;
+        MovementPublishOrderFlags(source.offset, val->unit.offset, (unsigned int)param_1);
     }
 }
 #pragma auto_inline(on)
@@ -1519,7 +1521,7 @@ void PatrolGoal::FillWaypointWorldPos(Vec3* out, int unused, int n)
     }
 }
 
-void __stdcall ApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
+void __stdcall MovementApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
 {
     if (size < sizeof(PathfindingEventHeader))
         return;

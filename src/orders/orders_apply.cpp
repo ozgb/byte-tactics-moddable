@@ -6,6 +6,7 @@
 #include "../weapons/weapon_def.h"
 #include "../weapons/unit_weapon_slot.h"
 #include "order.h"
+#include "order_base.h"
 #include "../units/unit_def.h"
 #include "../network/player.h"
 #include "../units/unit.h"
@@ -113,7 +114,7 @@ int __stdcall OrdersApply(const OrdersEventHeader* e, unsigned int size)
         pos[0] = p->pos[0];
         pos[1] = p->pos[1];
         pos[2] = p->pos[2];
-        IssueOrCancelOrder((unsigned char)p->type, p->queue, unit, (int)UnitOfOffset(p->target), p->hasPos ? pos : 0, p->params[0], p->params[1]);
+        IssueOrCancelOrder((unsigned char)p->type, p->queue, unit, (int)UnitOfOffset(p->target), p->hasPos ? pos : nullptr, p->params[0], p->params[1]);
         break;
     }
     case ORDERS_QUEUE_BUILD: {

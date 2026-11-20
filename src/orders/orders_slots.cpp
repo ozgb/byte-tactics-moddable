@@ -2,9 +2,6 @@
 #include <stddef.h>
 
 #pragma pack(push, 1)
-#include "../units/unit_type_set.h"
-#include "../weapons/weapon_def.h"
-#include "../weapons/unit_weapon_slot.h"
 #include "order.h"
 #include "../units/unit_def.h"
 #include "../network/player.h"
@@ -13,7 +10,6 @@
 
 #include "../util/vec3.h"
 #include "../state/block.h"
-#include "../files/files_api.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/state_writer.h"
 #include "mission_type.h"

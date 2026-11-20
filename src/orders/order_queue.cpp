@@ -23,7 +23,7 @@ class CobScript;
 struct OrderSaveRecord {
     unsigned short unitType;
     unsigned short ownerType;
-    int field_4;
+    int targetType;
     unsigned char kind;
     unsigned char flag5;
     unsigned int flags6;
@@ -492,13 +492,13 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
 
     char buf3[0x20];
     sprintf(buf3, "%s%s", name, "g");
-    switch (desc.field_4) {
+    switch (desc.targetType) {
     case 2:
     case 3:
     case 4:
     case 5:
     case 6:
-        attached.offset = g_seams.movement->LoadTarget(desc.field_4, Ref<Order>(this).offset, file, buf3);
+        attached.offset = g_seams.movement->LoadTarget(desc.targetType, Ref<Order>(this).offset, file, buf3);
         return;
     case 0:
         attached = 0;
@@ -528,7 +528,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         desc.unitType = u->id;
     Unit* o = link.owner;
     desc.ownerType = (o != 0 && (link.owner->flags & 0x10000000) != 0 && link.owner != 0) ? o->id : 0;
-    desc.field_4 = attached ? g_seams.movement->TargetType(attached.offset) : 0;
+    desc.targetType = attached ? g_seams.movement->TargetType(attached.offset) : 0;
     desc.kind = kind.index;
     desc.flag5 = state;
     desc.flags6 = flags;
@@ -560,7 +560,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
             file->SetStringItem(buf2, g_game->defs.get()[id].unitname);
     }
 
-    if (desc.field_4 != 0) {
+    if (desc.targetType != 0) {
         char buf3[0x20];
         sprintf(buf3, "%s%s", name, "g");
         g_seams.movement->SaveTarget(attached.offset, Ref<Order>(this).offset, file, buf3);

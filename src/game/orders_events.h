@@ -87,7 +87,7 @@ inline void OrdersPublishAdd(int outbox, int kind, Unit* unit, int type, int que
     event.type = type;
     event.queue = queue;
     event.target = Ref<Unit>(target).offset;
-    event.hasPos = pos != 0;
+    event.hasPos = pos != nullptr;
     event.pos[0] = pos ? pos->x : 0;
     event.pos[1] = pos ? pos->y : 0;
     event.pos[2] = pos ? pos->z : 0;

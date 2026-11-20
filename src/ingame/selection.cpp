@@ -1,4 +1,5 @@
 #include "../game/orders_events.h"
+#include "../../interfaces/orders.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

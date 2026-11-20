@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include <stddef.h>
 
 #include "../../interfaces/seams.h"

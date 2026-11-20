@@ -75,6 +75,7 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 
 #include "../network/player.h"
 

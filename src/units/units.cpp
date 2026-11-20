@@ -1,5 +1,6 @@
 #include "../game/orders_events.h"
 #include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include <stdio.h>
 #include "unit_def.h"
 #include "../state/block.h"

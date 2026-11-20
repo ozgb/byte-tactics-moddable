@@ -1,4 +1,5 @@
 #include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include "win_types.h"
 #include "../state/block.h"
 #include <stdlib.h>

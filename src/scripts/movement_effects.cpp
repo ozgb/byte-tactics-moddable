@@ -7,7 +7,6 @@
 #include "../../interfaces/movement.h"
 #include "../../interfaces/ref.h"
 #include "cob_script.h"
-#include "cob_types.h"
 #include "unit_script.h"
 #include "movement_effects.h"
 

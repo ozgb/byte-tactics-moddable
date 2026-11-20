@@ -15,6 +15,7 @@ struct Player;
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 #include "../game/orders_events.h"
+#include "../../interfaces/orders.h"
 
 struct UnitDefMaxHealthView {
     char unknown_0[0x1fa];

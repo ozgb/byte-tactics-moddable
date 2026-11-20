@@ -40,6 +40,7 @@ struct Pair16 { short lo, hi; };
 #include "box.h"
 
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include "../scripts/cob_script.h"
 
 #include "../files/files_api.h"

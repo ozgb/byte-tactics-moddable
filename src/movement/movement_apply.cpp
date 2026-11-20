@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -8,7 +7,6 @@
 #include "../state/block.h"
 #include "../network/player.h"
 #include "../game/game.h"
-#include "../files/files_bank.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
 #include "../orders/order.h"
@@ -16,9 +14,9 @@
 #include "order_fx.h"
 #include "path_order.h"
 #include "air_maneuver_order.h"
-#include "approach_areas.h"
 #include "unit_motion.h"
 #include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include "../../link/globals.h"
 #include "movement_seam.h"
 

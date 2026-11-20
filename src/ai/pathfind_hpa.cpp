@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/pathfinding.h"

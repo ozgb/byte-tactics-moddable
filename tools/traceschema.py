@@ -1494,6 +1494,11 @@ def render_json(model):
     return "\n".join(out) + "\n"
 
 
+def event_fields_name(kind):
+    """The C name of a kind's field table: WEAPONS_CLAIM gives kEventWeaponsClaim."""
+    return "kEvent" + "".join(part.capitalize() for part in kind.split("_"))
+
+
 def event_tables(event_models, schema):
     """The C tables of the event sections: per kind its fields with offsets from offsetof, per module its kinds."""
     biggest = max(size for _, kinds in event_models for _, _, size, _ in kinds.values())
@@ -1504,7 +1509,7 @@ def event_tables(event_models, schema):
     for module, kinds in event_models:
         for value, (name, struct, size, fields) in kinds.items():
             lines.append("static_assert(sizeof(%s) == %d, \"%s\");" % (struct, size, struct))
-            lines.append("static const TraceField kEvent_%s[] = {" % name)
+            lines.append("static const TraceField %s[] = {" % event_fields_name(name))
             for fname, fsize, kind, target, expr in fields:
                 offset = expr if expr == EVENT_OUTCOME_OFFSET else "offsetof(%s, %s)" % (struct, expr)
                 lines.append("    { %s, %s, %d, %s, %s, 0 }," % (
@@ -1512,7 +1517,8 @@ def event_tables(event_models, schema):
             lines.append("};")
         lines.append("static const TraceEventKind k%sKinds[] = {" % module.c_name)
         for value, (name, struct, size, fields) in kinds.items():
-            lines.append("    { %d, %s, sizeof(%s), kEvent_%s, %d }," % (value, c_string(name), struct, name, len(fields)))
+            lines.append("    { %d, %s, sizeof(%s), %s, %d }," % (value, c_string(name), struct, event_fields_name(name),
+                                                               len(fields)))
         lines.append("};")
         lines.append("static const TraceEventModule k%sEvents = { %s, %d, k%sKinds, %d };" % (
             module.c_name, c_string(module.key), module.section, module.c_name, len(kinds)))

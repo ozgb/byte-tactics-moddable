@@ -13,6 +13,7 @@
 #include "../../interfaces/network.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
+#include "../../interfaces/weapons.h"
 #include "../game/weapons_events.h"
 #include "../state/sim_effects.h"
 #include "../util/math.h"

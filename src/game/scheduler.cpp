@@ -6,6 +6,7 @@
 #include "../network/player.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
+#include "../../interfaces/pathfinding.h"
 #include "../../interfaces/rand_stream.h"
 #include "../units/unit.h"
 #include "game.h"

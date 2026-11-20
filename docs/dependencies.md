@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 333 immediate, 13 deferrable, 1160 read-only, 1560 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 333 immediate, 13 deferrable, 1160 read-only, 1557 unobserved.
 
 ## Cutting rule
 
@@ -24,7 +24,7 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 
 | subsystem | ordered | immediate | deferrable | read-only | unobserved | can be cut from |
 |---|---|---|---|---|---|---|
-| wind_meteors | 0 | 0 | 0 | 18 | 126 | 14 of 14 |
+| wind_meteors | 0 | 0 | 0 | 18 | 123 | 14 of 14 |
 | economy | 0 | 42 | 0 | 4 | 87 | 5 of 14 |
 | features | 15 | 18 | 2 | 79 | 207 | 8 of 14 |
 | ai | 11 | 18 | 2 | 104 | 236 | 6 of 14 |
@@ -38,7 +38,7 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | map | 9 | 48 | 0 | 95 | 233 | 4 of 14 |
 | scripts | 16 | 45 | 0 | 23 | 150 | 8 of 14 |
 | movement | 0 | 81 | 2 | 48 | 218 | 6 of 14 |
-| mission | 0 | 0 | 0 | 0 | 107 | 14 of 14 |
+| mission | 0 | 0 | 0 | 0 | 104 | 14 of 14 |
 
 ## Tightly coupled groups
 
@@ -217,7 +217,7 @@ Gaps in what the data say:
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 18 |
-| unobserved | 65 | 61 |
+| unobserved | 64 | 59 |
 
 **Ordered** (0).
 
@@ -245,7 +245,7 @@ None.
 | features | 7 | 5 |
 | los_radar | 5 | 5 |
 | map | 5 | 5 |
-| mission | 8 | 10 |
+| mission | 7 | 8 |
 | movement | 5 | 5 |
 | orders | 5 | 5 |
 | pathfinding | 2 | 2 |
@@ -2486,7 +2486,7 @@ The 15 groups with the most rows are shown.
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 0 |
-| unobserved | 66 | 41 |
+| unobserved | 64 | 40 |
 
 **Ordered** (0).
 
@@ -2519,7 +2519,7 @@ None.
 | targeting | 3 | 3 |
 | units | 7 | 3 |
 | weapons | 5 | 3 |
-| wind_meteors | 10 | 8 |
+| wind_meteors | 8 | 7 |
 
 ### Cut from
 

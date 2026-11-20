@@ -149,7 +149,15 @@ def load_rows() -> list[Row]:
         row.size = SIZE_OVERRIDES.get(row.leaf, int(row.csv["size"]))
         row.type = row.csv["type"]
         row.init = row.csv["init"]
-    return [r for r in rows if not in_vector(r, rows)]
+    return [r for r in rows if not in_vector(r, rows) and not outgrows(r, rows)]
+
+
+def outgrows(row: Row, rows: list[Row]) -> bool:
+    """Whether the row is a raw view that no longer fits in its container, which SIZE_OVERRIDES shrank."""
+    if not row.interior:
+        return False
+    box = next((r for r in rows if r.leaf == row.container and not r.interior), None)
+    return box is not None and box.leaf in SIZE_OVERRIDES and row.offset + (row.size or 0) > box.size
 
 
 def in_vector(row: Row, rows: list[Row]) -> bool:
@@ -242,9 +250,10 @@ def header_text(rows: list[Row]) -> str:
             "inline SimGlobals& Sim()", "{", "    return g_simGlobals != 0 ? *g_simGlobals : SimCreate();", "}", ""]
     out += ['#pragma clang diagnostic push', '#pragma clang diagnostic ignored "-Winvalid-offsetof"']
     for a, b in zip(fields, fields[1:]):
-        if a.address is not None and b.address is not None and a.address + a.size == b.address:
+        size = int(a.csv["size"]) if a.leaf in SIZE_OVERRIDES else a.size
+        if a.address is not None and b.address is not None and a.address + size == b.address:
             out.append(f"static_assert(__builtin_offsetof(SimGlobals, {b.leaf}) - __builtin_offsetof(SimGlobals, {a.leaf}) "
-                       f"== {b.address - a.address}, \"{a.leaf} is followed by {b.leaf}\");")
+                       f"== {a.size}, \"{a.leaf} is followed by {b.leaf}\");")
     for row in fields:
         if row.csv is not None and row.csv["size_from"] == "definition" and row.size:
             out.append(f"static_assert(sizeof(((SimGlobals*)0)->{row.leaf}) == {row.size}, \"{row.leaf} size\");")

@@ -99,6 +99,7 @@ static_assert(__builtin_offsetof(SimGlobals, pad_28c) - __builtin_offsetof(SimGl
 static_assert(__builtin_offsetof(SimGlobals, g_missionOrderTableVec) - __builtin_offsetof(SimGlobals, pad_28c) == 4, "pad_28c is followed by g_missionOrderTableVec");
 static_assert(__builtin_offsetof(SimGlobals, pad_2a0) - __builtin_offsetof(SimGlobals, g_missionOrderTableVec) == 16, "g_missionOrderTableVec is followed by pad_2a0");
 static_assert(__builtin_offsetof(SimGlobals, g_movementClasses) - __builtin_offsetof(SimGlobals, pad_2a0) == 8, "pad_2a0 is followed by g_movementClasses");
+static_assert(__builtin_offsetof(SimGlobals, pad_6a8) - __builtin_offsetof(SimGlobals, g_movementClasses) == 512, "g_movementClasses is followed by pad_6a8");
 static_assert(__builtin_offsetof(SimGlobals, pad_764) - __builtin_offsetof(SimGlobals, g_packetHandlers) == 180, "g_packetHandlers is followed by pad_764");
 static_assert(__builtin_offsetof(SimGlobals, g_packetSizes) - __builtin_offsetof(SimGlobals, pad_764) == 4, "pad_764 is followed by g_packetSizes");
 static_assert(__builtin_offsetof(SimGlobals, pad_81c) - __builtin_offsetof(SimGlobals, g_packetSizes) == 180, "g_packetSizes is followed by pad_81c");
@@ -158,8 +159,6 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define g_quirks (Sim().g_quirks)
 typedef unsigned char SimType_g_meteorWeaponNameTail[28];
 #define g_meteorWeaponNameTail (*reinterpret_cast<SimType_g_meteorWeaponNameTail*>(reinterpret_cast<char*>(&g_meteorWeaponName) + 0x4))
-typedef char SimType_g_movementClassEntries[];
-#define g_movementClassEntries (*reinterpret_cast<SimType_g_movementClassEntries*>(reinterpret_cast<char*>(&g_movementClasses) + 0x18))
 typedef int (__stdcall* SimType_g_packetHandlerType2)(int);
 #define g_packetHandlerType2 (*reinterpret_cast<SimType_g_packetHandlerType2*>(reinterpret_cast<char*>(&g_packetHandlers) + 0x8))
 typedef PacketChannel SimType_g_packetChannels[];

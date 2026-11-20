@@ -1,91 +1,395 @@
 # The movement interface
 
-Movement sits behind `interfaces/movement.h` (version 2.0), the seam over a unit's motion, the goals it steers to and
-the targets orders hand those goals (#993). 3.1c's code is its default implementation. It is cut from orders (which held
-`UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference), and the
-cut left orders at 4.0 and units at 2.0. This page is the inventory the interface was cut from, written from the code
-as it now is:
+Movement sits behind `interfaces/movement.h` (version 3.0), the seam over a unit's motion, the goals it steers to and
+the targets orders hand those goals (#993), and since #985 the tenth module on the scheduler, with orders
+(`docs/orders-interface.md`). 3.1c's code is its default implementation. It was cut from orders (which held
+`UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference) by #993, and
+put on the scheduler by #985. This page is the inventory the interface was cut from, written from the code as it now is:
 - where movement sits, and what it is not;
-- each slot, its callers, and whether they run in the tick;
-- which files and functions moved, and which stayed;
-- the rules of `data/subsystems.csv`;
-- the state, and the hashed state only movement reads;
-- what the next issues decide.
+- what other subsystems did to movement's state in 3.1c, and what each became;
+- what movement did to others (the unit record), and what each became;
+- what movement reads, and what others read of it;
+- how the order of random draws and sim events is kept;
+- what stays inside the default, which files moved and the rules of `data/subsystems.csv`;
+- the state, and what the trace hashes and what it only dumps.
 
 ## 1. The model
 
-Movement is a seam over native code and nothing else, like the other simulation subsystems whose code is 3.1c's. It is
-cut from the same scheme as `docs/targeting-interface.md` and `docs/map-interface.md`, with none of their parts that
-need a scheduler:
-- **No scheduler.** Movement has no inbox, no events, no pass and no `SCHED_*` run. `SCHED_MOVEMENT` (14) exists in
-  `interfaces/services.h` (services 1.19) as an id and nothing more, as `SCHED_SCRIPTS` (13) does for scripts. Callers
-  call the slots directly and synchronously, as they called orders' and units' slots before (section 2).
+The model is the human's of 2026-11-12, as `docs/economy-interface.md`, section 1, gives it: reads as of each module's
+last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's order, inboxes consumed before each
+run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
+outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event kinds
+are unique across interfaces: weapons uses 256 to 267, 269 and 272 to 283, orders 288 to 295 and 304 to 317 (its range
+is 288 to 319) and movement 320 to 331 and 336 to 347 (its range is 320 to 351); the others are listed in
+`docs/weapons-interface.md`, section 1.
+
+Two rulings of the human shape this change:
+- **Movement owns the unit record's motion fields** (2026-11-18): the position, the angles, the cell, the mode and the
+  moved mark that movement steers are movement's to write, and the motion record's fields are movement's alone.
+  Units' and map's writes to `UnitMotion` belong to this change (section 2).
+- **No slot passes memory ownership across a seam, and major bumps are cheap** (2026-11-19). A target (a `PathOrder`,
+  an `ApproachRadius`, a `RingApproach`, a `PointMarker` or an `AirManeuverOrder`, all `OrderFx`) is named by its block
+  offset everywhere outside `src/movement/`, and an event carries it as that offset.
+
+Movement's place in it:
+- **Events into movement:** NEW, DESTROY, LOAD, SET_MODE, SET_SPEED, PLACED, SET_TARGET, DESTROY_TARGET,
+  SET_FLIGHT_MODE, SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING, published by units, map and orders. Movement's
+  handler (`MovementInbox`, `src/seams/movement_world.cpp`) passes each to `Apply` and records it with its outcome in
+  the trace's dump (section 5).
+- **Routes:** each route's reason is in section 4.
+- **Runs:** `UpdateMotion`, called by the scheduler as a step of the units pass, for a unit with a motion, after
+  `RunSecondaryOrders` and with movement's inbox delivered first (section 6). The network's `ReceiveUnitStates` calls it
+  too, directly (section 2).
+- **The engine's delivery:** `ApplyPathEvent` is pathfinding's result, delivered by the engine as before: the players
+  phase (`SchedPlayersPhase`, `scheduler.cpp`) polls pathfinding and calls the slot for each event, with the waypoints
+  `Poll` copied. It is not a route, and movement's inbox is not delivered for it.
+- **Synchronous slots:** the `New*` slots build a target and return it, so the answer is the new target (section 2).
+- **Queries:** `GetMotionState`, `HasNetState`, `TargetType` and `UnitTarget`, as of movement's last apply, and the view
+  read `WriteNetState`.
+- **Effects out of movement:** ORDER_FLAGS to orders; TURN, TILT, ANGLES, MOVE, MOVED, CHANGE_CELL, MOVE_RATE,
+  SET_POSITION, SET_STATE_BITS and SFX_OCCUPY to units; START_SCRIPT to scripts; and the map's ADD_UNIT and REMOVE_UNIT
+  and los_radar's UPDATE_UNIT, which `UnitMotion::UpdatePosition` publishes from `SCHED_MOVEMENT` (they were
+  `TODO(#985)` markers published from `SCHED_ORDERS`; the routes of `src/game/routes.cpp` are keyed by the publisher).
+  Units and scripts are not on the model yet (#986), so their handlers (`src/units/movement_effects.cpp`,
+  `src/scripts/movement_effects.cpp`) are adapters that hold 3.1c's writes and calls.
+- **Module ids:** movement keeps `SCHED_MOVEMENT = 14` from #993.
 - **No WASM module** (the maintainer, 2026-11-19, on #993). The slots are native: `src/seams/native.cpp` fills them
   (`<Slot>Native`), and the harness records each call through a replay hook (`RecMovement<Slot>`,
   `src/harness/replay_hooks.inc`).
 - **What it is.** A unit's motion record (`UnitMotion`: its velocity, turn, speed, move mode and the goal it steers
   to), the goals (`PathGoal`, `LiteGoal`, `PatrolGoal`, `PackedGoal`, `PackedPosGoal`, `AiSearchGoal`) and the targets
-  an order attaches to a goal (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`, all
-  `OrderFx`). It steers a unit one tick at a time, takes the results of path searches, and builds, loads, saves and
-  frees those objects.
-- **Versions.** Movement 2.0 (33 slots; 2.0 since `ApplyPathEvent` takes a pathfinding event header and its size, #1009), orders 4.0 (its motion slots left), units 2.0 (its script, piece and model
-  state slots left for scripts, #993; it gained `UnitRefInit` and `UnitRefSetUnit`, section 3).
-- **What it calls out.** Movement calls other subsystems only through their seams: pathfinding (`Submit`, `Cancel`),
-  scripts (`GetPiecePosition`, `GetPieceAngles`, `StartScript`), units (`SetStateBits`,
-  `SetUnitPosition`, `UpdateSfxOccupy`, `UnitRefSetUnit`, `UnitRefUnlink`, `LoadUnit`) and map
-  (`GetGroundHeight`, units' until map 5.0, and `ScheduleMapCanPlaceUnitFootprint`). Its three publishes of other modules' events are section 6.
-- **Who takes it on.** Orders (#985) puts movement on the scheduler with itself, as both run in the units phase;
-  scripts go with units (#986); weapons (#984) addresses scripts' slots. None of the three changes what this page lists.
+  an order attaches to a goal. It steers a unit one tick at a time, takes the results of path searches, and builds,
+  loads, saves and frees those objects.
+- **Versions.** Movement 3.0 (20 slots; 2.0 had 33), orders 5.0, units 5.0 (`UpdateUnitBody` returns an int, and
+  `UpdateUnitTail`, `UnitRefGet` and `UnitRefSetValue` are new, section 2).
+- **What it calls out.** Movement calls other subsystems through their seams: pathfinding (`Submit`, `Cancel`), scripts
+  (`GetPiecePosition`, `GetPieceAngles`), units (`LoadUnit`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefUnlink`) and map
+  (`GetGroundHeight`, and the service `ScheduleMapCanPlaceUnitFootprint`). Its writes to the unit record, the order and
+  scripts are effects (section 3).
 
-## 2. The slots
+## 2. Events into movement
 
-Callers are named by subsystem and file. "In the tick" says whether the caller runs inside a tick (`UpdateUnits` and the
-phases around it, `RunOrders`, `HandleNetPackets`, unit creation and death) or outside it (load, save, presentation).
-Every slot has the harness replay hook as a caller of the inner seam in test mode; it is not repeated in the table.
+**Every slot of 2.0.** The 33 slots of movement 2.0, and what each became in 3.0:
 
-| Slot | What it does | Callers | In the tick | Came from |
+| 2.0 slot | 3.0 |
+|---|---|
+| `NewUnitMotion` | event: NEW, from units (`units.cpp`: `CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`), the header alone |
+| `DestroyMotionObject` | event: DESTROY, from units (`units.cpp`: `ApplyUnitDeath`), the header alone (below) |
+| `LoadMotion` | event: LOAD, from units (`unit_save.cpp`: `LoadUnit`), with a `MovementMotionState` |
+| `SaveMotion` | query: `GetMotionState`, which fills the state a saved game keeps, called by units (`unit_save.cpp`: `SaveUnits`) |
+| `UpdateMotion` | run, called by the scheduler, and by the network's `ReceiveUnitStates` (below) |
+| `ApplyPathEvent` | the engine's delivery, unchanged (section 1) |
+| `UnitMotionReadNetState` | slot `ReadNetState`, taking the unit, called by units (`ReceiveUnitStates`) |
+| `GoalHasNetUnitState`, `GoalSerializeNetUnitState` | slots `HasNetState` (a query) and `WriteNetState` (a view read), taking the unit, called by the network (`NetSendUnitStates`) |
+| `SetFlightMode` | event: SET_FLIGHT_MODE, from orders (the VTOL orders, `PrepVtolClimb`) |
+| `PathOrderSetAltitude`, `AirManeuverOrderSetAltitude` | event: SET_ALTITUDE, from orders (`vtol_orders.cpp`); a move target and an air maneuver target take it, a target of another kind refuses |
+| `PathOrderSetApproachRadius` | event: SET_APPROACH_RADIUS, from orders |
+| `PathOrderSetHeading` | event: SET_HEADING, from orders (`VtolMobileBuildOrder`, `VtolHelpBuildOrder`) |
+| `GoalSetPathOrder` | event: SET_TARGET, from orders (`Order::SetAttachedFx`, the attach functions of `order_queue.cpp`, `Order::ReattachFxToUnit`), with the target or 0 for none |
+| `OrderFxDestroy` | event: DESTROY_TARGET, from orders (`Order::~Order` and the same functions), with the target |
+| `NewPathOrderAt`, `NewPathOrderToUnit`, `NewPathOrderToUnitAt`, `NewPathOrderToUnitAtAngle`, `NewAirManeuverOrder`, `NewApproachRadius`, `NewRingApproach`, `NewPointMarker` | synchronous slots, unchanged but for the types: the order and the answer are block offsets |
+| `LoadPathOrder`, `LoadAirManeuverOrder`, `LoadApproachRadius`, `LoadRingApproach`, `LoadPointMarker` | one slot, `LoadTarget(type, order, file, name)`, outside the tick |
+| `OrderFxSerializeToSave` | slot `SaveTarget`, outside the tick |
+| `OrderFxGetType` | query: `TargetType` |
+| `MotionGoal`, `GoalTarget` | query: `UnitTarget(unit)`, which answers the target the goal of the unit's motion steers to, or 0 |
+| (not slots: units' and map's writes to `UnitMotion`) | events: SET_MODE, SET_SPEED, PLACED (below) |
+
+`Apply` and `WriteState` are new. The 33 slots of 2.0 became 20 in 3.0.
+
+**The writers, one by one.** Units' and map's writes to the motion record became events (the ruling of 2026-11-18):
+
+| 3.1c site | 3.1c write | Event |
+|---|---|---|
+| units: a unit gets its motion (`CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`) | `new UnitMotion(unit)` | NEW from units |
+| units: a unit dies (`ApplyUnitDeath`) | `DestroyMotionObject`, then the motion freed | DESTROY from units |
+| units: a saved game loads (`unit_save.cpp`) | `LoadMotion`: the record's fields read | LOAD from units |
+| units: a unit carried or set down (`UpdateUnitBody`, `unit_position.cpp`) | `UnitMotion::mode` written | SET_MODE from units |
+| units: a unit state arrives from the network (`ReadUnitState`) | `UnitMotion::speed` written | SET_SPEED from units |
+| map: a unit is placed on the map (`AddUnitToMap`, `terrain.cpp`) | `UnitMotion::pathLockStamp` written with the tick | PLACED from map |
+| orders: an order attaches a goal's target (`order_queue.cpp`) | `PathGoal::SetPathOrder` | SET_TARGET from orders |
+| orders: an order is deleted or replaced (`order_queue.cpp`) | `delete` of the target | DESTROY_TARGET from orders |
+| orders: a VTOL order (`vtol_orders.cpp`) | `UnitMotion::SetFlightMode` | SET_FLIGHT_MODE from orders |
+| orders: a VTOL order | `PathOrder::SetAltitude`, `AirManeuverOrder::SetAltitude` | SET_ALTITUDE from orders |
+| orders: a VTOL order | `PathOrder::SetApproachRadius` | SET_APPROACH_RADIUS from orders |
+| orders: a VTOL order | `PathOrder::SetHeading` | SET_HEADING from orders |
+
+`PathOrderAttach` stays units'. Its inline `Get` and `SetValue` became units' slots `UnitRefGet` (a view read) and
+`UnitRefSetValue` (units 5.0), so that orders' and movement's calls to them go through `units.*`.
+
+**Orders to movement, which become events and which stay synchronous slots.** #993 left all of them synchronous slots.
+The calls whose caller uses no answer, and writes only, are the events above (SET_TARGET, DESTROY_TARGET,
+SET_FLIGHT_MODE, SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING). The `New*` calls stay synchronous slots, because
+the state machine takes the target's block offset the slot returns and uses it in the next statement (attaches it to the
+order, hands it to a `Set*` event): the same-statement answer is the new target. The queries `UnitTarget` and
+`TargetType` answer as of movement's last apply, and read the motion from the view.
+
+**Calls of units to movement outside the tick.** `LoadMotion` and `SaveMotion` ran when a saved game loads and saves
+(`LoadUnit`, `SaveUnits`): LOAD is published outside the tick and delivered at once (#970), and `GetMotionState` is a
+query that writes nothing. `NewUnitMotion` is both: unit creation runs in the tick (a build, a spawn) and outside it when
+a game is set up.
+
+**The network's writers** wait for #948 (parked), as #954's did. `ReceiveUnitStates` (`unit_position.cpp`, called from
+`HandleNetPackets`, phase 0) calls `ReadNetState` and `UpdateMotion` directly: `TODO(#948)` marks the `UpdateMotion`
+call. `NetSendUnitStates` calls `HasNetState` and `WriteNetState`, which read.
+
+**`UpdateMotion` and the scheduler.** The scheduler's units step is:
+
+```
+if (UpdateUnitBody(u)) { deliver orders; RunOrders(u); deliver orders; RunSecondaryOrders(u);
+                         if (u->motion) { deliver movement; UpdateMotion(u); moved = 1 } }
+deliver units; UpdateUnitTail(u, moved)
+```
+
+3.1c called these from inside `UpdateUnit`; the split keeps 3.1c's order. `UpdateUnitBody` returns 1 when the unit's player
+is active and of type 1 or 2, and `UpdateUnitTail(u, moved)` runs the unit's height when `moved` is 1, then a pending kill.
+
+**`ApplyPathEvent` stays the engine's delivery** (the issue allowed a route): it is pathfinding's result, delivered by the
+engine as before from the players phase, with the waypoints `Poll` copied, so there is no event to route and the order
+is the poll's. A started search sets the claim tick of the goal and a status flag on the order, and a finished one gives
+the goal its waypoints.
+
+**`DestroyMotionObject`'s virtual, resolved.** `docs/schedule.md` could not resolve the virtual call it makes. The
+DESTROY event frees the motion, and the goal is freed through its virtual destructor, `obj->v0(1)`; each goal class's
+destructor writes:
+
+| Goal class | Destructor | What it writes |
+|---|---|---|
+| `PathGoal` | 0x44ef60 | nothing |
+| `AiSearchGoal` | 0x44f450 | calls pathfinding's `Cancel(goalOffset)` |
+| `LiteGoal` | 0x490840 | compiler-generated, nothing |
+| `PackedGoal` | 0x490630 | compiler-generated, nothing |
+| `PackedPosGoal` | 0x4909e0 | deletes its target (a `PathOrder`, whose `Destroy` unlinks its unit reference, or an `AirManeuverOrder`) and sets target to 0 |
+| `PatrolGoal` | 0x44f590 | trivial |
+
+Each frees the goal with `operator delete` (the sim block). The motion is freed by `operator delete` after.
+
+**Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 49) and returned to no
+one: 1 for every kind, and 0 for the events it refuses. `Apply` refuses, with outcome 0 and no change, an event smaller
+than its kind's payload, an unknown kind, an event naming a null unit (but DESTROY_TARGET, SET_ALTITUDE,
+SET_APPROACH_RADIUS and SET_HEADING, which name a target instead), an event that needs a motion (all but NEW) naming a
+unit with none, a DESTROY_TARGET, SET_ALTITUDE, SET_APPROACH_RADIUS or SET_HEADING naming no target, and a
+SET_ALTITUDE for a target that is neither a move target nor an air maneuver (SET_APPROACH_RADIUS and SET_HEADING need a
+move target).
+
+**Payloads.** Every event and effect starts with `MovementEventHeader`: `kind` and `unit` (the unit it is about, a block
+offset; 0 for the kinds about a target). Each kind has the payload of `interfaces/movement.h` (version 3.0) that starts
+with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload.
+
+| Kind | Payload | Fields after the header |
+|---|---|---|
+| NEW 320, DESTROY 321, PLACED 325 | the header alone | none |
+| LOAD 322 | `MovementLoad` | `state` (`MovementMotionState`: `velocity[3]`, `p2[3]`, `speed`, `turn`, `pathLockStamp`, `mode`, `flag`) |
+| SET_MODE 323, SET_FLIGHT_MODE 328 | `MovementSetMode` | `mode`, 0 to 3 |
+| SET_SPEED 324 | `MovementSetSpeed` | `speed` |
+| SET_TARGET 326, DESTROY_TARGET 327 | `MovementTarget` | `target` (a block offset, 0 for none) |
+| SET_ALTITUDE 329, SET_APPROACH_RADIUS 330, SET_HEADING 331 | `MovementTargetValue` | `target`, `value` (the altitude, the radius or the heading) |
+
+SET_MODE puts the motion in a flight mode and nothing else, as a carrier's cargo is set down or picked up;
+SET_FLIGHT_MODE is `UnitMotion::SetFlightMode`, which grounds or lifts an aircraft with the mode's other changes.
+
+## 3. Effects out of movement
+
+Movement writes the unit record where 3.1c's motion code did: `UnitMotion::UpdatePosition`, the steering and
+`UpdateMoveRate` (`src/movement/motion.cpp`). Each write became an effect that units' adapter applies (`src/units/
+movement_effects.cpp`), or stayed movement's own state.
+
+| 3.1c write or call | Effect | Subscriber's handler |
+|---|---|---|
+| a target reports progress (`order_targets.cpp`): `OrderOrStatusFlags` on the order | ORDER_FLAGS | `OrdersOnMovementOrderFlags`: STATUS_FLAGS to orders' inbox |
+| the heading turns and `moved` is set (`SteerGroundUnit`, `SteerAircraft`) | TURN | `UnitsOnMovementTurn`: `angles.heading` plus `delta`, and `moved` 1 |
+| the bank and the pitch (`ApplyBankAndPitch`) | TILT | `UnitsOnMovementTilt` |
+| the angles of a carried unit (`UpdatePosition`) | ANGLES | `UnitsOnMovementAngles` |
+| a step inside the cell (`UpdatePosition`) | MOVE | `UnitsOnMovementMove`: `pos` and `moved` 1 |
+| `moved` marked or cleared (`UpdatePosition`) | MOVED | `UnitsOnMovementMoved` |
+| a step into another cell or flight mode (`UpdatePosition`) | CHANGE_CELL | `UnitsOnMovementChangeCell`: `pos`, `cell` and `mode` |
+| the move rate (`UpdateMoveRate`) | MOVE_RATE | `UnitsOnMovementMoveRate`: bits 2 and 3 of `flags` |
+| a carried unit follows its carrier's piece (`UpdatePosition`): `units.SetUnitPosition` | SET_POSITION | `UnitsOnMovementSetPosition`: `units.SetUnitPosition(pos, mode)` |
+| `units.SetStateBits` (`motion.cpp`) | SET_STATE_BITS | `UnitsOnMovementSetStateBits`: `units.SetStateBits` |
+| `units.UpdateSfxOccupy` (the unit's script is told whether it is in the water, on the ground or in the air) | SFX_OCCUPY | `UnitsOnMovementSfxOccupy`: `units.UpdateSfxOccupy`, the header alone |
+| `scripts.StartScript` (StartMoving, StopMoving, MoveRate1 to 3) | START_SCRIPT | `ScriptsOnMovementStartScript`: starts the script `MovementStartScript::script` names, with no callback |
+| `MapPublishUnit` (REMOVE_UNIT, ADD_UNIT) and `LosRadarPublishUpdateUnit` (`UpdatePosition`) | map's REMOVE_UNIT and ADD_UNIT, los_radar's UPDATE_UNIT | map's and los_radar's `Apply`, as before, published from `SCHED_MOVEMENT` |
+
+The handlers are the adapters of units and scripts, which hold 3.1c's writes until #986 puts units and scripts on the
+scheduler.
+
+**Which `Unit` fields movement writes, and whether each is an effect or movement's view state.** The rule of the issue:
+a field with another writer can't be movement's view state, as map's bucket fields are in the same record
+(`docs/map-interface.md`, section 3). Units writes `pos`, the angles, `mode`, `moved` and `flags` too (in
+`SetUnitPosition`, `ReadUnitState`, `CreateUnit` and a transport's `ApplyAttachUnit`: `src/units/units.cpp` writes
+`mode` and `moved`, `unit_position.cpp` writes `pos`, `cell`, `mode`, `moved` and the angles, and `SetUnitPosition`
+writes `pos` and `cell`):
+
+| Field of `Unit` | Whose | Written how |
+|---|---|---|
+| `pos`, `yFraction`, `zFraction` (the position words) | units' record | by the effects MOVE, CHANGE_CELL and SET_POSITION; units writes it too |
+| `angles` (`heading`, `pitch`, bank) | units' record | by TURN, TILT and ANGLES, and by orders' SET_ANGLES; units writes it too |
+| `cell` | units' record | by CHANGE_CELL; units' `SetUnitPosition` and `CreateUnit` write it too |
+| `mode` | units' record | by CHANGE_CELL; units writes it too |
+| `moved` | units' record | by TURN, MOVE and MOVED; units writes it too |
+| `flags` (the move rate, bits 2 and 3; the state bits) | units' record | by MOVE_RATE and SET_STATE_BITS; units writes it too |
+
+None is movement's view state, so each is an effect, and the routes are the ones of section 4. The motion record
+(`UnitMotion`) is movement's, and every write to it, units' and map's included, is movement's event now.
+
+**Writes movement keeps.** Movement writes `UnitMotion` (its velocity, turn, speed, mode, flag, `lastMoveTick`,
+`pathLockStamp` and goal) and the goals and targets (section 5), in its own events and runs, and the claim tick of the
+goal in `ApplyPathEvent`.
+
+## 4. Views and routes
+
+**What movement reads:** a unit's position, cell, heading, flags, type, carrier, footprint and owner (units' record,
+and its own writes through units' handlers); the unit definition's movement fields (`UnitDefMoveView`); the carrier's
+motion (`CarrierMotionView`); the player's type and activity (`PlayerTypeView`); `Game::ticks`, `gravity` and `seaLevel`;
+the cells' heights and whether a footprint can be placed (map's `GetGroundHeight` and the service
+`ScheduleMapCanPlaceUnitFootprint`); and a piece's position and angles (scripts' `GetPiecePosition` and
+`GetPieceAngles`), as of each module's last run.
+
+**What others read of movement:**
+- **Views, in the state block, hashed:** the motion record and the goals (section 5), read by weapons (`UnitMotion::speed`,
+  `velocity`), orders (`UnitMotion::flags`, `velocity`, in the VTOL orders), targeting (`velocity`), units (`speed`,
+  `flags`, `lastMoveTick`, `PathOrder::pos`) and pathfinding (the goal's areas, by offset).
+- **Queries:** `UnitTarget` and `TargetType` (orders), `GetMotionState` (units, a save) and `HasNetState` (the network).
+
+**As of movement's last run.** By #952's rule a query needs a delivery first only when an event that can be pending
+writes what it reads. TBD(the argument for each query, once the routes into movement are decided: section 8).
+
+**The routes.** Every route, with its reason. The routes new in this change are filled in at section 8.
+
+| Route | Now | Why |
+|---|---|---|
+| units NEW, to movement | TBD | TBD |
+| units DESTROY, to movement | TBD | TBD |
+| units LOAD, to movement | TBD | TBD |
+| units SET_MODE, to movement | TBD | TBD |
+| units SET_SPEED, to movement | TBD | TBD |
+| map PLACED, to movement | TBD | TBD |
+| orders SET_TARGET, to movement | TBD | TBD |
+| orders DESTROY_TARGET, to movement | TBD | TBD |
+| orders SET_FLIGHT_MODE, to movement | TBD | TBD |
+| orders SET_ALTITUDE, to movement | TBD | TBD |
+| orders SET_APPROACH_RADIUS, to movement | TBD | TBD |
+| orders SET_HEADING, to movement | TBD | TBD |
+| movement ORDER_FLAGS, to orders (`OrdersOnMovementOrderFlags`) | TBD | TBD |
+| movement TURN, to units | TBD | TBD |
+| movement TILT, to units | TBD | TBD |
+| movement ANGLES, to units | TBD | TBD |
+| movement MOVE, to units | TBD | TBD |
+| movement MOVED, to units | TBD | TBD |
+| movement CHANGE_CELL, to units | TBD | TBD |
+| movement MOVE_RATE, to units | TBD | TBD |
+| movement SET_POSITION, to units | TBD | TBD |
+| movement SET_STATE_BITS, to units | TBD | TBD |
+| movement SFX_OCCUPY, to units | TBD | TBD |
+| movement START_SCRIPT, to scripts | TBD | TBD |
+| movement ADD_UNIT, to map | synchronous | As before (the gate, `docs/map-interface.md`, section 8); published from `SCHED_MOVEMENT` now, `SCHED_ORDERS` before. |
+| movement REMOVE_UNIT, to map | synchronous | As before (`docs/map-interface.md`, section 8); published from `SCHED_MOVEMENT` now. |
+| movement UPDATE_UNIT, to los_radar | synchronous | As before (`docs/los-radar-interface.md`, section 8); published from `SCHED_MOVEMENT` now. |
+
+**The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 64 rows of class `immediate` with movement as
+writer or reader and the other side not orders (the rows between the two are in `docs/orders-interface.md`, section 4,
+as are the rows of orders with the other modules). The writes of units' adapters of movement's effects (position, angles,
+cell, mode, moved, flags) are units' in them. Each pair is served as follows:
+
+| Writer to reader | Rows | Items | Phase | How it is served |
 |---|---|---|---|---|
-| `UpdateMotion` | Steers a unit, moves it and updates its move rate for one tick | units (`unit_position.cpp`: `UpdateUnitBody`, `ReceiveUnitStates`) | yes | `OrdersSeam::UpdateMotion` |
-| `ApplyPathEvent` | Applies a path search event, its payload of the given size, to its requester, with the waypoints polled for it; an event smaller than its kind's payload changes nothing | game (`scheduler.cpp`: `SchedPlayersPhase`, for each event pathfinding polls) | yes | `OrdersSeam::ApplyPathEvent` |
-| `NewUnitMotion` | Allocates and builds a unit's motion | units (`units.cpp`: `CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`) | both: the creation code runs in the tick and outside it when a game is set up | `OrdersSeam::NewUnitMotion` |
-| `LoadMotion` | Reads a unit's motion from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no: load | `OrdersSeam::LoadMotion` |
-| `SaveMotion` | Writes a unit's motion to a saved game | units (`unit_save.cpp`: `SaveUnits`) | no: save | `OrdersSeam::SaveMotion` |
-| `DestroyMotionObject` | Frees what a unit's motion holds | units (`units.cpp`: `ApplyUnitDeath`) | yes | `OrdersSeam::DestroyMotionObject` |
-| `UnitMotionReadNetState` | Reads a unit's motion from a packet, through its goal | units (`unit_position.cpp`: `ReceiveUnitStates`) | yes (`HandleNetPackets` is phase 0) | `OrdersSeam::UnitMotionReadNetState` |
-| `SetFlightMode` | Grounds or lifts an aircraft | orders (`vtol_orders.cpp`: the VTOL orders, `PrepVtolClimb`) | yes | new: was a direct call of `UnitMotion::SetFlightMode` from `vtol_orders.cpp` |
-| `PathOrderSetAltitude` | Sets the altitude of a move target | orders (`vtol_orders.cpp`) | yes | new: was a direct call of `PathOrder::SetAltitude` from `vtol_orders.cpp` |
-| `PathOrderSetApproachRadius` | Sets how near a move target a unit has to come | orders (`vtol_orders.cpp`) | yes | new: was a direct call of `PathOrder::SetApproachRadius` from `vtol_orders.cpp` |
-| `PathOrderSetHeading` | Sets the heading a unit takes on arrival | orders (`vtol_orders.cpp`: `VtolMobileBuildOrder`, `VtolHelpBuildOrder`) | yes | new: was a direct call of `PathOrder::SetHeading` from `vtol_orders.cpp` |
-| `AirManeuverOrderSetAltitude` | Sets the altitude of an air maneuver target | orders (`vtol_orders.cpp`: `AirToAirOrder`) | yes | new: was a direct call of `AirManeuverOrder::SetAltitude` from `vtol_orders.cpp` |
-| `NewPathOrderAt` | Builds a move target at a position | orders (`vtol_orders.cpp`: the VTOL orders and their helpers) | yes | new: was `new (kSim) PathOrder(order, pos)` in `vtol_orders.cpp` |
-| `NewPathOrderToUnit` | Builds a move target that follows a unit | orders (`vtol_orders.cpp`: `VtolPickupOrder`, `AirStrikeOrder`) | yes | new: was `new (kSim) PathOrder(order, unit)` in `vtol_orders.cpp` |
-| `NewPathOrderToUnitAt` | Builds a move target at a position near a unit | orders (`vtol_orders.cpp`: `AirToGroundHoverOrder`) | yes | new: was `new (kSim) PathOrder(order, unit, pos)` in `vtol_orders.cpp` |
-| `NewPathOrderToUnitAtAngle` | Builds a move target that follows a unit at an angle | orders (`vtol_orders.cpp`: `VtolPickupOrder`, `VtolLandingOrder`) | yes | new: was `new (kSim) PathOrder(order, unit, angle)` in `vtol_orders.cpp` |
-| `NewAirManeuverOrder` | Builds an air maneuver target from two positions | orders (`vtol_orders.cpp`: `AirToAirOrder`) | yes | new: was `new (kSim) AirManeuverOrder(order, from, to)` in `vtol_orders.cpp` |
-| `NewApproachRadius` | Builds a disc target | orders (`order_queue.cpp`: `Order::AttachApproachRadiusGoal`, called from `unit_orders.cpp`) | yes | new: was `new (kSim) ApproachRadius(...)` in `order_queue.cpp` |
-| `NewRingApproach` | Builds a ring target | orders (`order_queue.cpp`: `Order::AttachRingApproachGoal`, called from `unit_orders.cpp`) | yes | new: was `new (kSim) RingApproach(...)` in `order_queue.cpp` |
-| `NewPointMarker` | Builds a footprint marker target | orders (`order_queue.cpp`: `Order::AttachBuildFootprintMarker`, called from `unit_orders.cpp`) | yes | new: was `new (kSim) PointMarker(...)` in `order_queue.cpp` |
-| `LoadPathOrder` | Builds a move target from a saved game | orders (`order_queue.cpp`: `Order::Order`, the load constructor) | no: load | new: was `new (kSim) PathOrder(order, file, name)` in `order_queue.cpp` |
-| `LoadAirManeuverOrder` | Builds an air maneuver target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) AirManeuverOrder(order, file, name)` in `order_queue.cpp` |
-| `LoadApproachRadius` | Builds a disc target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) ApproachRadius(order, file, name)` in `order_queue.cpp` |
-| `LoadRingApproach` | Builds a ring target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) RingApproach(order, file, name)` in `order_queue.cpp` |
-| `LoadPointMarker` | Builds a footprint marker target from a saved game | orders (`order_queue.cpp`: `Order::Order`) | no: load | new: was `new (kSim) PointMarker(order, file, name)` in `order_queue.cpp` |
-| `MotionGoal` | Returns the goal that steers a unit's movement, a query | orders (`order_queue.cpp`: the same functions as `GoalSetPathOrder`) | both: as `GoalSetPathOrder` | new: was a read of `UnitMotion::obj` through orders' own view (`UnitMotionSlotView`) in `order_queue.cpp` |
-| `GoalTarget` | Returns the target a goal steers to, or null, a query | orders (`order_queue.cpp`: `Order::~Order`) | yes | new: was a read of `PathGoal::target` through orders' own view (`OrderFxSlot::current`) in `order_queue.cpp` |
-| `GoalSetPathOrder` | Hands a goal the target it steers to, or null | orders (`order_queue.cpp`: `Order::SetAttachedFx`, `Order::AttachApproachRadiusGoal`, `AttachRingApproachGoal`, `AttachBuildFootprintMarker`, `Order::~Order`, and `Order::ReattachFxToUnit`, which `LoadUnit` calls) | both: orders run in the tick; `ReattachFxToUnit` runs on load | new: was the virtual `SetPathOrder` (called through its vtable slot or as `slot->Attach`) from `order_queue.cpp` |
-| `OrderFxDestroy` | Destroys a target and frees it; the target is never null (orders checks first, where 3.1c's `delete` did nothing on null) | orders (`order_queue.cpp`: the same functions) | both: as `GoalSetPathOrder`, and `Order::~Order` also runs when units are freed | new: was `delete (OrderFx*)attached` in `order_queue.cpp` |
-| `OrderFxGetType` | Returns the kind of a target | orders (`order_queue.cpp`: `Order::SerializeToSave`) | no: save | new: was the virtual `GetType` from `order_queue.cpp` |
-| `OrderFxSerializeToSave` | Writes a target to a saved game | orders (`order_queue.cpp`: `Order::SerializeToSave`) | no: save | new: was the virtual `SerializeToSave` from `order_queue.cpp` |
-| `GoalHasNetUnitState` | Says whether a goal has network state to send | network (`net_game.cpp`: `NetSendUnitStates`) | yes | new: was the virtual `HasNetUnitState` (`v7`) from `net_game.cpp` |
-| `GoalSerializeNetUnitState` | Writes a goal's network state to a packet | network (`net_game.cpp`: `NetSendUnitStates`) | yes | new: was the virtual `WriteTo` from `net_game.cpp` |
+| economy to movement | 3 | `unknown_1b8e`, `unknown_1cd9`, `pad_1df4` (the `Player` records' resources) | units | A view: economy's view state, as of its last apply, read directly (`docs/economy-interface.md`, section 4); the access log attributes the read to movement's call chain in the unit's update. |
+| map to movement | 2 | `Unit::flags`, `Unit::spatialBucket` | units | A view: map's bucket fields and the unit's flags, written by map's own code, as of the writer's last run. |
+| movement to los_radar | 4 | `Unit::flags`, `pos`, `yFraction`, `zFraction` | units | UPDATE_UNIT, a synchronous route (above), published after the unit's position effect, so los_radar reads the position the effect wrote, at movement's statement. |
+| movement to map | 4 | `Unit::cell`, `flags`, `pos`, `zFraction` | units | REMOVE_UNIT and ADD_UNIT, synchronous routes, published around CHANGE_CELL at the statement 3.1c made them. |
+| movement to scripts | 7 | `Unit::field_64`, `flags`, `heading`, `pitch`, `pos`, `yFraction`, `zFraction` | units | A view of the unit record, written by movement's effects through units' handlers in the unit's update; scripts run in units' body, before orders and movement in the unit's update (3.1c's order), so scripts read the previous tick's. |
+| movement to targeting | 4 | `Unit::flags`, `pos`, `zFraction`, `UnitMotion::velocity` | units | A view, read by targeting's slots called from the unit's update, as of movement's last run. |
+| movement to units | 12 | `PathOrder::pos`, `Unit::cell`, `field_64`, `flags`, `heading`, `pitch`, `pos`, `yFraction`, `zFraction`, `UnitMotion::flags`, `lastMoveTick`, `speed` | units | Units' handlers of movement's effects write the unit record, and units' own code (`UpdateUnitTail`: `UpdateUnitHeight`, the network's state) reads it after movement's run in the unit's update; the motion's `speed` and `lastMoveTick` are a view of movement's record. |
+| movement to weapons | 8 | `Unit::flags`, `heading`, `pitch`, `pos`, `yFraction`, `zFraction`, `UnitMotion::speed`, `velocity` | units | A view: the unit's motion, written by `UpdateMotion` and read by `UpdateUnitWeapons` in the unit's update, in 3.1c's order (head, weapons, body, orders, movement, tail), so weapons reads the previous tick's (`docs/weapons-interface.md`, section 4). |
+| scripts to movement | 1 | `Unit::script` | units | A view of the unit's script, read by movement's script queries, as of scripts' last run. |
+| units to movement | 19 | `PathOrder::ref`, `Unit::carrier`, `cell`, `def`, `flags`, `footprint`, `heading`, `motion`, `pitch`, `pos`, `script`, `transportPiece`, `yFraction`, `yWhole`, `zFraction`, `UnitMotion::flags`, and the `Player` records' resources | units | A view of the unit record, written by units' own code and its adapters, read by movement in `UpdateMotion` in the unit's update, as of the writer's last statement; units' writes to the motion record itself are movement's events (section 2). |
 
-`NetSendUnitStates` is called from the units phase of the scheduler (`scheduler.cpp`, `SendUnitStates`). Orders'
-`Order::~Order` runs when orders are deleted in the tick (`DeleteOrders`) and when a unit is freed.
+How a pair is served, in the three ways of the table: **a view** is read directly from the state block as of the writer's
+last run; **in 3.1c's order within a unit's update** means the scheduler's order is the order of 3.1c's `UpdateUnit`; **a
+synchronous route** is the route above that is made synchronous because a later read needs its write. Which of the
+effect routes are synchronous is section 8's (TBD).
 
-No slot has a caller in presentation. Every caller of a slot is a subsystem that called the same code directly in 3.1c,
-so no call moved in time: the cut changed how the call is made, not when.
+## 5. State and the trace
 
-## 3. What moved
+Movement keeps no private region, and its `WriteState` writes no record: its state is sim state in the shared block,
+hashed where it was. It stays where it is and stays hashed in this change (the human, 2026-11-16 and 2026-11-17, on #978
+and #984, for weapons, orders and units); nothing leaves the hash in this change. The heap rows of
+`data/state_classes.csv` (`UnitMotion::UnitMotion: new ...`, the goals, and the `New*Native` and `Load*Native` rows) name
+movement as the class's owner, and the format bump of weapons, orders and units takes out of the hash what only its
+owner reads. The trace hashes the motions and goals in section 21 and the order effects in section 22
+(`docs/trace-format.md`, sections 8.10 and 8.11); this change edits neither.
+
+| Movement's state | Where | Read by | Only movement reads it |
+|---|---|---|---|
+| The motion record (`UnitMotion`: `velocity`, `p2`, `turn`, `lastMoveTick`) | the unit's heap object, hashed (section 21) | movement | yes |
+| `UnitMotion::speed` | the same | movement, units (`ReadUnitState`, `WriteUnitState`), weapons (by view) | no: units reads it in the unit's network state, and writes it by SET_SPEED |
+| `UnitMotion::mode`, `flag` | the same | movement; units (`ApplyAttachUnit`, by SET_MODE) | no |
+| `UnitMotion::flags`, `velocity`, `field_22` | the same | movement, orders (the VTOL orders: `PrepVtolClimb`, `VtolFollowOrder`, `VtolHelpBuildOrder`, `VtolMobileBuildOrder`, `VtolSeekAttackOrder`, `AirToAirOrder`, `AirStrikeOrder`) | no |
+| `UnitMotion::pathLockStamp` | the same | movement; map's `AddUnitToMap` sets it with PLACED (the tick the unit was placed) | no: it is map's bookkeeping in the motion record, written by movement's own event, and read by units' saved game (`GetMotionState`) |
+| `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (`src/seams/pathfinding_world.cpp`, by offset) | no |
+| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes the unit to the slots), orders (through `UnitTarget`), pathfinding (by offset) | no: it is the object the slots take |
+| The target a goal steers to (`PathGoal::target`) | the goal, hashed | movement, orders (through `UnitTarget`) | no: orders reads it through the slot |
+| The goals' fields (`PatrolGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `AiSearchGoal`) | the goal's heap object, hashed (section 21) | movement; presentation (`AiSearchGoal::DrawOnSurface` reads `active`, `count` and `owner`, console debug overlay) | yes, in the simulation |
+| The goal areas (`PathGoalArea`) | filled by the goals | movement; pathfinding, through `PathGoalCells`, `PathGoalContains` and `PathGoalDistance` | no |
+| The targets' fields (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) | the order effect, hashed (section 22) | movement; `OrderFx::source` is the order | yes: orders reaches them only through the slots and events |
+| The unit reference of a move target (`PathOrder::ref`, a `PathOrderAttach`) | the target, hashed | movement, units (the list, `UnitRefGet`, `UnitRefSetValue`), orders (`Order::link`, `Matches`) | no: it is units' (section 7) |
+
+What movement writes of others' state, from `uv run tools/coupling.py --summary movement`: the unit record (`pos`,
+`angles`, `flags`, `mode`, `moved`, units') by effects, `Order::subFlags` (orders') by ORDER_FLAGS, `PathRequest`
+fields (pathfinding's) and the `AiSearchGoal` repath claim. It reads `Game::ticks`, `Game::gravity`, `Game::seaLevel`,
+`Game::overflowBucket`, `Unit::motion`, `Unit::def` and `Unit::cell` among others, and the fields of the unit
+definition, as of the last write of the owner.
+
+**The hashed state only movement reads**, for the later format bump:
+- the motion record's `velocity` is read by orders and its `p2`, `turn` and `lastMoveTick` by movement alone (units reads
+  `lastMoveTick` by view in the access log), so the bump can drop `p2` and `turn` and keep the fields others read;
+- every field of the goals (`PatrolGoal` points and count, `AiSearchGoal` points, flags and repath claim,
+  `PackedGoal` pose, `LiteGoal` mode, dirty flags and state), but for what the debug overlay of presentation reads;
+- every field of the targets of section 22 (`PathOrder` altitude, approach radius, heading, piece, position and follow
+  offset, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), the order effect class and its
+  numbering, and not the unit reference of a move target (section 7).
+
+**Reads through views.** Other subsystems read motion records by offset through views the access log names by their own
+type, so `UnitMotion::...` does not show them: weapons reads the word at `+0x20` (`UnitMotion::speed`) as a range, a
+parameter and an id (`MotionRangeView`, `DroppedMotionParamView`, `DroppedMotionIdView` in `weapons.cpp`) and
+`explosions.cpp` reads `+8` as a size (`Size`); pathfinding's `UnitMotionPlannerView` reads the first two fields. A bump
+that moves `speed`, `velocity`, `movementClass` or the goal pointer out of the unit's record has to give these readers a
+slot or keep the offsets. `AddUnitToMap`'s write of `pathLockStamp` (`+0x26`) is the event PLACED now, so no subsystem
+writes the motion record by offset.
+
+**The trace dumps movement's events** in section 49 (`docs/trace-format.md`, section 8.33), after orders' section 48
+(`docs/orders-interface.md`, section 5), and hashes none of them. Each record is an event with the outcome `Apply`
+gave, or an effect movement published (outcome 1), in movement's order. Sections 50 and 51 are reserved for units and
+scripts (#986). The section is new, so the trace format's schema changes. Neither module's `WriteState` writes a
+record.
+
+`privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes movement's
+state or calls its entry points, and no query slot writes state.
+
+## 6. Random draws and sim events
+
+Movement's own code (`src/movement/`) makes no draw from the game logic stream and records no sim event: a draw or a
+record falls in what its effects and publishes start (a script's start, map's and los_radar's updates). The class `ordered` of `data/dependencies.csv` has no row with movement as
+writer or reader, because the access logs predate movement's module (the rows of the units pass are attributed to
+orders and units): the draws that fall inside a unit's update around movement's step are the ordered rows of
+`docs/orders-interface.md`, section 6.
+
+The scheduler keeps the order of runs in a unit's update: units' head, weapons' step, units' body, orders' two runs, then
+`UpdateMotion`, then units' tail. A route that carries a script's start (START_SCRIPT, whose script can draw and record)
+or map's and los_radar's updates (which record sim events) is made synchronous when queueing moves them: TBD(each route's
+mode: section 8). The three publishes in `UpdatePosition` keep 3.1c's order: map's REMOVE_UNIT, the position effect
+(CHANGE_CELL), map's ADD_UNIT, the MOVED effect, los_radar's UPDATE_UNIT.
+
+## 7. What stays inside the default
+
+3.1c's types and limits are the default's, not the interface's: the goal classes and their virtual calls, the layout of
+`UnitMotion`, the unit definition's movement fields, the saved game's motion and target records, and the network's goal
+state. An event carries a unit and a target as their block offsets, and the motion's state as a plain
+`MovementMotionState`: no pointers, no `Unit*`, `UnitMotion*` or `PathOrder*` in an event. The `New*` and `Load*` slots
+build objects in the sim block (`new (kSim)`) and give the caller their block offset, a handle the caller keeps and
+never reads through; the goal's virtual destructor frees its goal (section 2). `ApplyPathEvent` is the engine's
+delivery (section 2).
+
+### What moved
 
 **Files moved** (`git diff -M`, bc4825ffd), `src/orders/` to `src/movement/`: `air_maneuver_order.h`, `approach_areas.h`,
 `order_fx.h`, `order_goals.h`, `order_target_types.h`, `order_targets.cpp`, `order_targets.h`, `path_order.h`,
@@ -108,20 +412,23 @@ that movement reads, as a view.
 - **`PathOrderAttach`** (`src/units/path_order_attach.h`; `PathOrderAttach::PathOrderAttach` and `SetUnit` in
   `src/units/unit_targets.cpp`). #993 lists them as movement's. They stay units': `PathOrderAttach` is the unit
   reference (`UnitRef`) that orders (`Order::link`) and movement (`PathOrder::ref`) both embed, and its link and unlink
-  are units' unit-list code (`Unit::head`, `UnitRef::Unlink`). Movement and orders reach it through units' new slots
-  `UnitRefInit` and `UnitRefSetUnit`, and through the existing `UnitRefUnlink` (units 2.0); all three take a `UnitRef*`. Where the caller built the
+  are units' unit-list code (`Unit::head`, `UnitRef::Unlink`). Movement and orders reach it through units' slots
+  `UnitRefInit`, `UnitRefSetUnit`, `UnitRefGet` and `UnitRefSetValue` (units 5.0: the inline `Get` and `SetValue` became slots, so
+  that orders' calls pass `coupling --seams`), and through the existing `UnitRefUnlink`; all take a `UnitRef*`. Where the caller built the
   reference in place (`link(o, 0)`), the constructor now runs empty and `UnitRefInit` fills it; its destructor body
   moved into `UnitRef::Unlink`. The header moved from `src/orders/` to `src/units/`.
 - **`MovementClass`** (`src/units/movement_class.cpp`): the pass map and the movement class table are units' and map's
   (`docs/map-interface.md`), not the motion's. `UnitMotion::movementClass` only points at one.
 - **Pathfinding.** `src/ai/pathfind*.cpp` stays pathfinding's. It reads a goal's areas through `PathGoalCells`,
   `PathGoalContains` and `PathGoalDistance` in `src/util/path_goal.cpp` (platform), not through a slot.
-- **`UpdateUnitHeight`** and the unit's position code stay units'. Movement writes `Unit::pos` and `Unit::angles` through
-  `UnitMotion::UpdatePosition` and its steering, and reaches units' `SetUnitPosition` through its slot.
+- **`UpdateUnitHeight`** and the unit's position code stay units'. Movement writes `Unit::pos` and `Unit::angles`
+  through `UnitMotion::UpdatePosition` and its steering as effects (section 3), and `SetUnitPosition` is the adapter's call.
 - **Orders' reads of motion fields.** Orders still reads `UnitMotion::flags`, `velocity` and `field_22` in the VTOL
   orders, as it did (section 5).
+- **`RegisterVtolOrders`** is orders', not movement's: it moved from `src/network/net_stats.cpp` to
+  `src/orders/unit_orders.cpp` (`docs/orders-interface.md`, section 3).
 
-## 4. The rules of `data/subsystems.csv`
+### The rules of `data/subsystems.csv`
 
 `tools/coupling.py` gives each function a subsystem by a rule, `file:` (`FILES`), `name:` (`NAMES`) or `default:`
 (`FOLDER_DEFAULT`), and an override column that wins (`data/subsystems.csv`, the `override` column). #993's change to
@@ -138,7 +445,7 @@ Rows that stay elsewhere, by override:
 
 | Function | File | Subsystem | Why |
 |---|---|---|---|
-| `PathOrderAttach::PathOrderAttach` | `src/units/unit_targets.cpp` | units (`name:Order`, override `units`) | The unit reference stays units' (section 3) |
+| `PathOrderAttach::PathOrderAttach` | `src/units/unit_targets.cpp` | units (`name:Order`, override `units`) | The unit reference stays units' (section 7) |
 | `PathOrderAttach::SetUnit` | `src/units/unit_targets.cpp` | units (`name:Order`, override `units`) | The same |
 | `MakeVec3` | `src/movement/packed_goal.cpp` | platform (`file:src/movement/`, override `platform`) | A vector helper, as in every other subsystem |
 
@@ -147,70 +454,18 @@ The rows that moved with the files carry the same rule under their new file: the
 `file:src/orders/` to `movement`, `file:src/movement/`; the rows of `PackedGoal`, `LiteGoal` and `PackedPosGoal` went
 from the players' `victory.cpp` rule to `file:src/movement/`. No `name:` rule is new for movement.
 
-## 5. State and the trace
+### What is left
 
-Movement keeps no private region, and so it has no `WriteState` report: its state is sim state in the shared block, hashed where it was. It
-stays where it is and stays hashed in this change (the human, 2026-11-16 and 2026-11-17, on #978 and #984); the heap
-rows of `data/state_classes.csv` (`UnitMotion::UnitMotion: new ...`, the goals, and the `New*Native` and `Load*Native`
-rows) name movement as the class's owner, and the format bump of weapons, orders and units takes out of the hash what
-only its owner reads. The trace hashes the motions and goals in section 21 and the order effects in section 22
-(`docs/trace-format.md`, sections 8.10 and 8.11); this change edits neither.
+After this change:
+- **Units and scripts (#986)** take the adapters (`src/units/movement_effects.cpp`, `src/scripts/movement_effects.cpp`)
+  into their inboxes. Until then the adapters apply movement's effects by 3.1c's calls and writes. Units' slots
+  `SetUnitPosition`, `SetStateBits` and `UpdateSfxOccupy` and scripts' `StartScript` stay as the adapters' calls.
+- **The network's writers (#948):** `ReceiveUnitStates` calls `ReadNetState` and `UpdateMotion` directly (`TODO(#948)`),
+  and `NetSendUnitStates` calls the net-state slots.
+- **The state** stays hashed where it is until the format bump of section 5 (weapons, orders and units).
+- **The steering reads of orders** (the VTOL orders read `UnitMotion::flags`, `velocity`, `field_22` by view) stay views
+  until that bump.
 
-| Movement's state | Where | Read by | Only movement reads it |
-|---|---|---|---|
-| The motion record (`UnitMotion`: `velocity`, `p2`, `turn`, `lastMoveTick`) | the unit's heap object, hashed (section 21) | movement | yes |
-| `UnitMotion::speed` | the same | movement, units (`ReadUnitState`, `WriteUnitState`) | no: units reads and writes it in the unit's network state |
-| `UnitMotion::mode`, `flag` | the same | movement; units (`ApplyAttachUnit` writes `mode`) | no |
-| `UnitMotion::flags`, `velocity`, `field_22` | the same | movement, orders (the VTOL orders: `PrepVtolClimb`, `VtolFollowOrder`, `VtolHelpBuildOrder`, `VtolMobileBuildOrder`, `VtolSeekAttackOrder`, `AirToAirOrder`, `AirStrikeOrder`) | no |
-| `UnitMotion::pathLockStamp` | the same | movement; map writes it by offset (`AddUnitToMap`, `+0x26`) | no |
-| `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (`src/seams/pathfinding_world.cpp`, by offset) | no |
-| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes it to the slots), orders (through `MotionGoal`), pathfinding (by offset) | no: it is the object the slots take |
-| The target a goal steers to (`PathGoal::target`) | the goal, hashed | movement, orders (through `GoalTarget`) | no: orders reads it through the slot |
-| The goals' fields (`PatrolGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `AiSearchGoal`) | the goal's heap object, hashed (section 21) | movement; presentation (`AiSearchGoal::DrawOnSurface` reads `active`, `count` and `owner`, console debug overlay) | yes, in the simulation |
-| The goal areas (`PathGoalArea`) | filled by the goals | movement; pathfinding, through `PathGoalCells`, `PathGoalContains` and `PathGoalDistance` | no |
-| The targets' fields (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) | the order effect, hashed (section 22) | movement; `OrderFx::source` is the order | yes: orders reaches them only through the slots |
-| The unit reference of a move target (`PathOrder::ref`, a `PathOrderAttach`) | the target, hashed | movement, units (the list), orders (`Order::link`, `Order::SerializeToSave`, `Matches`) | no: it is units' (section 3) |
+## 8. What the gate decided
 
-What movement writes of others' state, from `uv run tools/coupling.py --summary movement`: `Unit::pos`, `Unit::angles`,
-`Unit::flags`, `Unit::mode` and `Unit::moved` (units'), `Order::subFlags` (orders'), `PathRequest` fields
-(pathfinding's) and the `AiSearchGoal` repath claim. It reads `Game::ticks`, `Game::gravity`, `Game::seaLevel`,
-`Game::overflowBucket`, `Unit::motion`, `Unit::def` and `Unit::cell` among others, and the fields of the unit
-definition, as of the last write of the owner.
-
-**The hashed state only movement reads**, for the later format bump:
-- the motion record's `velocity` is read by orders and its `p2`, `turn` and `lastMoveTick` by movement alone, so the
-  bump can drop `p2`, `turn` and `lastMoveTick` and keep the fields others read;
-- every field of the goals (`PatrolGoal` points and count, `AiSearchGoal` points, flags and repath claim,
-  `PackedGoal` pose, `LiteGoal` mode, dirty flags and state), but for what the debug overlay of presentation reads;
-- every field of the targets of section 22 (`PathOrder` altitude, approach radius, heading, piece, position and follow
-  offset, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), the order effect class and its
-  numbering, and not the unit reference of a move target (section 3).
-
-**Reads through views.** Other subsystems read motion records by offset through views the access log names by their own
-type, so `UnitMotion::...` does not show them: weapons reads the word at `+0x20` (`UnitMotion::speed`) as a range, a
-parameter and an id (`MotionRangeView`, `DroppedMotionParamView`, `DroppedMotionIdView` in `weapons.cpp`) and
-`explosions.cpp` reads `+8` as a size (`Size`); pathfinding's `UnitMotionPlannerView` reads the first two fields;
-`AddUnitToMap` in `terrain.cpp` writes `pathLockStamp` (`+0x26`). A bump that moves `speed`, `velocity`,
-`movementClass` or the goal pointer out of the unit's record has to give these readers a slot or keep the offsets.
-
-## 6. What the next issues decide
-
-This issue closes the cut and leaves these to #984, #985 and #986:
-- **#985 puts movement on the scheduler with orders.** It decides which slots become events, and whether movement has a
-  pass or runs as part of orders' unit update. `UpdateMotion` is called from units' `UpdateUnitBody` after `RunOrders` and
-  `RunSecondaryOrders`, so the order of the two runs is the order the scheduler has to keep.
-- **The three publishes in `UnitMotion::UpdatePosition`** (`src/movement/motion.cpp`) carry `TODO(#985)` markers: map's
-  `MAP_REMOVE_UNIT` and `MAP_ADD_UNIT` and los_radar's update of the unit, all published from `SCHED_ORDERS`. They move
-  to `SCHED_MOVEMENT` when movement has its own outbox, as the routes of `src/game/routes.cpp` are keyed by the
-  publisher.
-- **The steering slots** (`SetFlightMode`, `PathOrderSetAltitude`, `PathOrderSetApproachRadius`, `PathOrderSetHeading`,
-  `AirManeuverOrderSetAltitude`) and the construction slots are called by orders' state machines, which use no answer
-  but the target a `New*` slot returns; #985 decides which of them become events and which stay synchronous.
-- **`ApplyPathEvent`** takes the polled event's header, its size and the waypoints (`PathfindingEventHeader`, `docs/pathfinding-interface.md`, section 3), and is called from the players phase at the end of pathfinding's poll; its place in the order of
-  phases is the model pathfinding (`docs/pathfinding-interface.md`) and #985 settle.
-- **The load, save and network slots** (`LoadMotion`, `SaveMotion`, the `Load*` and `OrderFx*` slots, `GoalHasNetUnitState`,
-  `GoalSerializeNetUnitState`) run outside the tick or on the network's side; nothing here makes them events.
-- **The state** stays hashed where it is until the format bump of section 5 (weapons, orders and units), which #984,
-  #985 and #986 take with their own sections of the hash.
-- **Weapons (#984)** reads motion fields by view (section 5) and calls scripts' slots, not movement's, so it adds no
-  caller to this page.
+TBD

@@ -435,7 +435,8 @@ UNITS = Pilot(
                    ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp")),
     slot_callers=UNITS_SLOT_CALLERS)
 SCRIPTS_SLOT_CALLERS = (("QueryScript", "orders"), ("QueryScript", "weapons"), ("GetNanoPiecePosition", "orders"),
-                        ("GetAimFromPosition", "weapons"), ("StartScriptWithArgsByIndex", "network"), ("UpdateObjectState", "presentation"))
+                        ("GetAimFromPosition", "weapons"), ("GetSweetSpot", "targeting"),
+                        ("StartScriptWithArgsByIndex", "network"), ("UpdateObjectState", "presentation"))
 SCRIPTS = Pilot(
     owner="scripts", header="interfaces/scripts.h", seam="ScriptsSeam",
     writing=("Apply", "RunScripts", "StartScriptWithArgsByIndex", "QueryScript", "GetNanoPiecePosition", "GetAimFromPosition", "GetSweetSpot",

@@ -1724,7 +1724,7 @@ ScriptsFindScript,src/scripts/cob.cpp,scripts,x,
         self.assertEqual(seamlink.PILOTS[-1].owner, "scripts")
         self.assertIn(seamlink.SCRIPTS_GLUE_FILE, seamlink.SCRIPTS.engine_files)
         self.assertIn("RunScripts", seamlink.SCRIPTS.writing)
-        self.assertNotIn(("GetSweetSpot", "targeting"), seamlink.SCRIPTS.slot_callers)
+        self.assertIn(("GetSweetSpot", "targeting"), seamlink.SCRIPTS.slot_callers)
         header = seamlink.ROOT / "interfaces/scripts.h"
         if header.exists():
             pilot = seamlink.SCRIPTS

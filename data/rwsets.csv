@@ -42949,6 +42949,12 @@ address,function,file,kind,target
 ,ArgValueStruct,src/harness/replay.cpp,function,
 ,ArgVec3,src/harness/replay.cpp,call,ArgValue
 ,ArgVec3,src/harness/replay.cpp,function,
+,ArgVec3Xz,src/harness/replay.cpp,call,ReplayText::Add
+,ArgVec3Xz,src/harness/replay.cpp,call,ReplayText::AddChar
+,ArgVec3Xz,src/harness/replay.cpp,call,ReplayText::AddInt
+,ArgVec3Xz,src/harness/replay.cpp,field_read,Vec3::x
+,ArgVec3Xz,src/harness/replay.cpp,field_read,Vec3::z
+,ArgVec3Xz,src/harness/replay.cpp,function,
 ,ArgWeapon,src/harness/replay.cpp,call,ReplayAddWeapon
 ,ArgWeapon,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgWeapon,src/harness/replay.cpp,call,ReplayText::AddChar
@@ -55324,7 +55330,7 @@ address,function,file,kind,target
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetCellMeanHeight]
 ,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,ArgValue
-,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,ArgVec3
+,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,ArgVec3Xz
 ,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,FinishImport
 ,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,ImportResult
 ,RecMapGetGroundHeight,src/harness/replay_hooks.inc,call,ImportVec3Xz

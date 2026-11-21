@@ -20,7 +20,7 @@
     "los_radar": 4,
     "map": 7,
     "mission": 1,
-    "movement": 3,
+    "movement": 4,
     "network": 1,
     "orders": 5,
     "pathfinding": 4,

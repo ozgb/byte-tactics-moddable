@@ -66,8 +66,9 @@ and the unit index, each player's lists of the enemy units it sees and knows and
 The cells of the map (the allocation "PLOT MEMORY", which presentation, map and features write too) and the line of sight setting bits of the map flags are not listed. Any writer but los_radar fails, which is what makes every move, removal, reveal and
 recalculation of line of sight reach these items through the scheduler's events.
 
-Map's state is written by map alone. The members of the bucket types (`UnitBucket::first` and `SpatialBucket::head`) are private for reads and writes: only map reads them, and `mapState` reports them. Read elsewhere, so private for writes only: the spatial bucket index of a unit (`Unit::spatialBucket`, which orders reads: order_targets.cpp), the pass maps of the movement classes (the allocation of BuildAllPassMaps, `BuildAllPassMaps: operator new unsigned int`) and the two results of
-the last placement test, `g_lastPlaceHeight` and `g_lastPlaceMetalSum`. The bucket array (`cells_1429f`) and the overflow bucket (`overflowBucket`) are not listed: they are allocated and freed outside the tick, and the item that names their allocation is listed once map owns it. The cells of the map (the allocation "PLOT MEMORY", which
+Map's state is written by map alone. The members of the bucket types (`UnitBucket::first` and `SpatialBucket::head`) are private for reads and writes: only map reads them, and `mapState` reports them. Read elsewhere, so private for writes only: the spatial bucket index of a unit (`Unit::spatialBucket`, which orders reads: order_targets.cpp), the pass maps of the movement classes (the allocation of BuildAllPassMaps, `BuildAllPassMaps: operator new unsigned int`), the two results of
+the last placement test, `g_lastPlaceHeight` and `g_lastPlaceMetalSum`, and the path lock stamp of a unit's motion (`UnitMotion::pathLockStamp`), map's bookkeeping in movement's record, which
+AddUnitToMap and the pass map refreshes write and a saved game reads and restores through map's PathLockStamp and LOAD_PATH_LOCK_STAMP. The bucket array (`cells_1429f`) and the overflow bucket (`overflowBucket`) are not listed: they are allocated and freed outside the tick, and the item that names their allocation is listed once map owns it. The cells of the map (the allocation "PLOT MEMORY", which
 presentation, features and los_radar write too) are not listed either, nor are `Unit::cargoNext` (units write it), `Unit::flags`, `Unit::bit2` and `Unit::cobStateFlags`. Any writer but
 map fails, which is what makes every placement, move and removal reach these items through the scheduler's events.
 
@@ -81,7 +82,7 @@ Weapons' state is written by weapons alone and read by others: the projectile ta
 
 Orders' state is the orders of a unit, written by orders alone and read by others: the members of `Order` (the order objects; ai, features, map, movement and presentation read them) and the head of the unit's first order list (`Unit::list`, read by ai, movement and presentation) are private for writes only, and the head of its second list (`Unit::list2`, which only orders reads) for reads and writes. `Unit::netDirtyFlags` is not listed: orders, scripts, targeting and units write it. The unit record's position, heading, cell and flags stay units': orders publishes effects that units' handlers apply. An order's link (`PathOrderAttach`, the words `Order::unknown_12`, `Order::target` and `Order::unknown_1a`) is an entry of the list of references to its target unit, which units keeps (UnitRefSetUnit, UnitRefSetValue and the link's constructor and destructor), so units may write those three items too (ALSO_WRITTEN_BY). Any other writer but orders fails, which is what makes every command, stop, queue, attack and paralysis reach the orders through the scheduler's events.
 
-Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. Map may write the path lock stamp (`UnitMotion::pathLockStamp`) too: its pass maps stamp a unit's motion with the tick as they refresh for it (RefreshPassMapsForUnit, PassMap::RefreshMovedUnits), while the stamp of a unit placed on the map is movement's PLACED event. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
+Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. The path lock stamp (`UnitMotion::pathLockStamp`) is not movement's but map's (above): movement neither writes it nor carries it in its events. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
 
 Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it.
 
@@ -132,7 +133,7 @@ LOS_RADAR_TYPES = ("Eye",)
 
 LOS_RADAR_WRITE_TYPES = ("LosUnitIndex", "LosUnitIndexEntry")
 
-MAP_WRITE_ITEMS = ("Unit::spatialBucket", "BuildAllPassMaps: operator new unsigned int", "g_lastPlaceHeight", "g_lastPlaceMetalSum")
+MAP_WRITE_ITEMS = ("Unit::spatialBucket", "BuildAllPassMaps: operator new unsigned int", "g_lastPlaceHeight", "g_lastPlaceMetalSum", "UnitMotion::pathLockStamp")
 
 MAP_TYPES = ("UnitBucket", "SpatialBucket")
 
@@ -156,7 +157,7 @@ WEAPONS_WRITE_TYPES = ("Projectile", "Explosion", "ExplodedPiece")
 WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris", "g_explodedPieces", "DebrisPiece::state", "DebrisCache::cur",
                        "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
                        "Unit::field_8", "Unit::type", "Unit::weapon", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b",
-                       "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::unknown_24", "Unit::lastTick", "Unit::unknown_2a", "Unit::f2c", "Unit::unknown_30",
+                       "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::unknown_24", "Unit::unknown_2a", "Unit::f2c", "Unit::unknown_30",
                        "Unit::b3a", "Unit::f_3b", "Unit::weapon2AimCob", "Unit::f48", "Unit::unknown_4c", "Unit::b56", "Unit::f_57")
 
 
@@ -171,10 +172,12 @@ MOVEMENT_WRITE_TYPES = ("UnitMotion", "PathGoal", "AiSearchGoal", "PackedGoal", 
 
 MOVEMENT_WRITE_ITEMS = ("Unit::motion",)
 
+MOVEMENT_EXCEPT = ("UnitMotion::pathLockStamp",)
+
 
 ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "units"), ("Order::unknown_1a", "units"))
 
-MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"), ("UnitMotion::pathLockStamp", "map"))
+MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"),)
 
 
 UNITS_WRITE_TYPES = ("Unit",)
@@ -221,7 +224,7 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS),
           Owner("weapons", "", (), NO_ALLOCATION, WEAPONS_WRITE_TYPES, write_items=WEAPONS_WRITE_ITEMS),
           Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS, also_written_by=ORDERS_ALSO_WRITTEN_BY),
-          Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS,
+          Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS, except_items=MOVEMENT_EXCEPT,
                 also_written_by=MOVEMENT_ALSO_WRITTEN_BY),
           Owner("scripts", "", (), NO_ALLOCATION, SCRIPTS_WRITE_TYPES, write_items=SCRIPTS_WRITE_ITEMS, also_written_by=SCRIPTS_ALSO_WRITTEN_BY),
           Owner("units", "", (), NO_ALLOCATION, UNITS_WRITE_TYPES, also_written_by=UNITS_ALSO_WRITTEN_BY))

@@ -11,6 +11,8 @@ inline unsigned int MapEventSize(int kind)
         return sizeof(MapSetYard);
     case MAP_PASS_MAPS:
         return sizeof(MapPassMaps);
+    case MAP_LOAD_PATH_LOCK_STAMP:
+        return sizeof(MapPathLockStamp);
     case MAP_EFFECT_CELLS_CHANGED:
         return sizeof(MapCellsChanged);
     default:

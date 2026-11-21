@@ -38,9 +38,9 @@ inline void MovementPublishUnit(int outbox, int kind, Unit* unit)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
-inline void MovementPublishLoad(int outbox, Unit* unit, const MovementMotionState* state)
+inline void MovementPublishLoad(int outbox, Unit* unit, const MovementSavedState* state)
 {
-    MovementLoad event;
+    MovementLoadState event;
     event.h = MovementHeaderOf(MOVEMENT_LOAD, unit);
     event.state = *state;
     SchedPublish(outbox, &event, sizeof(event));

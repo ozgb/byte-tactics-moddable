@@ -7,7 +7,7 @@
 int __stdcall MovementApply(const MovementEventHeader* event, unsigned int size);
 void __stdcall MovementUpdateMotion(Unit* unit);
 void __stdcall MovementApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints);
-void __stdcall MovementGetMotionState(Unit* unit, MovementMotionState* out);
+void __stdcall MovementGetMotionState(Unit* unit, MovementSavedState* out);
 void __stdcall MovementReadNetState(Unit* unit, BitReader* reader);
 int __stdcall MovementHasNetState(Unit* unit);
 void __stdcall MovementWriteNetState(Unit* unit, BitWriter* stream);

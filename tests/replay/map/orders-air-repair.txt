@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem map 7.0
+subsystem map 7.1
 call 380 GetGroundHeight
   r Game.width 224
   r Game.height 102
@@ -22851,136 +22851,136 @@ call 380 GetGroundHeight
   r Cell#22845.height 1
   r Cell#22846.height 1
   r Cell#22847.height 1
-  a pos (199229440,79691776)
+  a pos (199229440,0,79691776)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,79691776)
+  a pos (199229440,0,79691776)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,65536,78643200)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,65536,78643200)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 380 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,79691776)
+  a pos (199229440,0,79691776)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,79691776)
+  a pos (199229440,0,79691776)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,65536,78643200)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,65536,78643200)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 381 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 382 Apply
   r Game.seaLevel 0
@@ -244719,40 +244719,40 @@ call 382 Apply
   w Cell#5639.flags 80
   o result 1
 call 382 GetGroundHeight
-  a pos (45613056,15204352)
+  a pos (45613056,5941448,15204352)
   o result 1
 call 382 GetGroundHeight
-  a pos (49807360,19398656)
+  a pos (49807360,65536,19398656)
   o result 1
 call 382 GetGroundHeight
-  a pos (36175872,21495808)
+  a pos (36175872,65536,21495808)
   o result 1
 call 382 GetGroundHeight
-  a pos (37224448,21495808)
+  a pos (37224448,33,21495808)
   o result 1
 call 382 GetGroundHeight
-  a pos (38273024,21495808)
+  a pos (38273024,65536,21495808)
   o result 1
 call 382 GetGroundHeight
-  a pos (36175872,22544384)
+  a pos (36175872,65536,22544384)
   o result 1
 call 382 GetGroundHeight
-  a pos (37224448,22544384)
+  a pos (37224448,65536,22544384)
   o result 1
 call 382 GetGroundHeight
-  a pos (38273024,22544384)
+  a pos (38273024,65536,22544384)
   o result 1
 call 382 GetGroundHeight
-  a pos (36175872,23592960)
+  a pos (36175872,65536,23592960)
   o result 1
 call 382 GetGroundHeight
-  a pos (37224448,23592960)
+  a pos (37224448,65536,23592960)
   o result 1
 call 382 GetGroundHeight
-  a pos (38273024,23592960)
+  a pos (38273024,65536,23592960)
   o result 1
 call 382 GetGroundHeight
-  a pos (49807360,24641536)
+  a pos (49807360,65536,24641536)
   o result 1
 call 382 IsPadSlotFree
   r Unit#2.transportPiece 255
@@ -267675,7 +267675,6 @@ call 382 Apply
   a event.kind 160
   a event.unit Unit#4
   a size 8
-  i services.SchedPublish 7 8
   w Cell#4310.unit2 4
   w Cell#4311.unit2 4
   w Cell#4534.unit2 4
@@ -267904,70 +267903,70 @@ call 382 GetCellMeanHeight
   a pos.z 28686667
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,0,78643200)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,0,78643200)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,70254592)
+  a pos (199229440,65536,70254592)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,70254592)
+  a pos (199229440,65536,70254592)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71172096)
+  a pos (199229440,65536,71172096)
   o result 1
 call 382 GetGroundHeight
-  a pos (199229440,71172096)
+  a pos (199229440,65536,71172096)
   o result 1
 call 383 GetCellMeanHeight
   a pos.x 40676935
@@ -268140,70 +268139,70 @@ call 383 GetCellMeanHeight
   a pos.z 28694267
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,0,78643200)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,78643200)
+  a pos (199229440,0,78643200)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,77594624)
+  a pos (199229440,65536,77594624)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,76546048)
+  a pos (199229440,65536,76546048)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,75497472)
+  a pos (199229440,65536,75497472)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,74448896)
+  a pos (199229440,65536,74448896)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,73400320)
+  a pos (199229440,65536,73400320)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,72351744)
+  a pos (199229440,65536,72351744)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,70254592)
+  a pos (199229440,65536,70254592)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,70254592)
+  a pos (199229440,65536,70254592)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71303168)
+  a pos (199229440,65536,71303168)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71106560)
+  a pos (199229440,65536,71106560)
   o result 1
 call 383 GetGroundHeight
-  a pos (199229440,71106560)
+  a pos (199229440,65536,71106560)
   o result 1
 call 384 GetCellMeanHeight
   a pos.x 40726087
@@ -268376,70 +268375,70 @@ call 384 GetCellMeanHeight
   a pos.z 28701867
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,78643200)
+  a pos (199098368,0,78643200)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,78643200)
+  a pos (199098368,0,78643200)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,77594624)
+  a pos (199098368,65536,77594624)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,77594624)
+  a pos (199098368,65536,77594624)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,76546048)
+  a pos (199098368,65536,76546048)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,76546048)
+  a pos (199098368,65536,76546048)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,75497472)
+  a pos (199098368,65536,75497472)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,75497472)
+  a pos (199098368,65536,75497472)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,74448896)
+  a pos (199098368,65536,74448896)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,74448896)
+  a pos (199098368,65536,74448896)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,73400320)
+  a pos (199098368,65536,73400320)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,73400320)
+  a pos (199098368,65536,73400320)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,72351744)
+  a pos (199098368,65536,72351744)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,72351744)
+  a pos (199098368,65536,72351744)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,70254592)
+  a pos (199098368,65536,70254592)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,70254592)
+  a pos (199098368,65536,70254592)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71172096)
+  a pos (199098368,65536,71172096)
   o result 1
 call 384 GetGroundHeight
-  a pos (199098368,71172096)
+  a pos (199098368,65536,71172096)
   o result 1
 call 385 GetCellMeanHeight
   a pos.x 40775239
@@ -268612,68 +268611,68 @@ call 385 GetCellMeanHeight
   a pos.z 28709467
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,78643200)
+  a pos (199098368,0,78643200)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,78643200)
+  a pos (199098368,0,78643200)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,77594624)
+  a pos (199098368,65536,77594624)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,77594624)
+  a pos (199098368,65536,77594624)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,76546048)
+  a pos (199098368,65536,76546048)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,76546048)
+  a pos (199098368,65536,76546048)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,75497472)
+  a pos (199098368,65536,75497472)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,75497472)
+  a pos (199098368,65536,75497472)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,74448896)
+  a pos (199098368,65536,74448896)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,74448896)
+  a pos (199098368,65536,74448896)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,73400320)
+  a pos (199098368,65536,73400320)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,73400320)
+  a pos (199098368,65536,73400320)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,72351744)
+  a pos (199098368,65536,72351744)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,72351744)
+  a pos (199098368,65536,72351744)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,70254592)
+  a pos (199098368,65536,70254592)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,70254592)
+  a pos (199098368,65536,70254592)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71303168)
+  a pos (199098368,65536,71303168)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71172096)
+  a pos (199098368,65536,71172096)
   o result 1
 call 385 GetGroundHeight
-  a pos (199098368,71172096)
+  a pos (199098368,65536,71172096)
   o result 1

@@ -817,6 +817,7 @@ void InstallNativeSeams()
     s_map.AllocateBuckets = MapAllocateBuckets;
     s_map.FreeBuckets = MapFreeBuckets;
     s_map.WriteState = MapWriteState;
+    s_map.PathLockStamp = PathLockStamp;
     s_map.UnitsInRange = UnitsInRange;
     s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;

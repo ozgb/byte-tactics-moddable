@@ -232,6 +232,7 @@ enum ReplayObjectKindId {
     ROK_MAPEVENTHEADER,
     ROK_MAPSETYARD,
     ROK_MAPPASSMAPS,
+    ROK_MAPPATHLOCKSTAMP,
     ROK_MAPCELLSCHANGED,
     ROK_WEAPONSEVENTHEADER,
     ROK_WEAPONSDAMAGE,
@@ -274,7 +275,7 @@ enum ReplayObjectKindId {
     ROK_ORDERSSETANGLES,
     ROK_ORDERSSETBUILDSTATE,
     ROK_MOVEMENTEVENTHEADER,
-    ROK_MOVEMENTLOAD,
+    ROK_MOVEMENTLOADSTATE,
     ROK_MOVEMENTSETMODE,
     ROK_MOVEMENTSETSPEED,
     ROK_MOVEMENTTARGET,
@@ -555,6 +556,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 165, ROK_MAPEVENTHEADER },
     { 166, ROK_MAPEVENTHEADER },
     { 168, ROK_MAPPASSMAPS },
+    { 169, ROK_MAPPATHLOCKSTAMP },
     { 176, ROK_MAPCELLSCHANGED },
     { 256, ROK_WEAPONSDAMAGE },
     { 257, ROK_WEAPONSDAMAGE },
@@ -605,10 +607,9 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 317, ROK_ORDERSSETBUILDSTATE },
     { 320, ROK_MOVEMENTEVENTHEADER },
     { 321, ROK_MOVEMENTEVENTHEADER },
-    { 322, ROK_MOVEMENTLOAD },
+    { 322, ROK_MOVEMENTLOADSTATE },
     { 323, ROK_MOVEMENTSETMODE },
     { 324, ROK_MOVEMENTSETSPEED },
-    { 325, ROK_MOVEMENTEVENTHEADER },
     { 326, ROK_MOVEMENTTARGET },
     { 327, ROK_MOVEMENTTARGET },
     { 328, ROK_MOVEMENTSETMODE },
@@ -663,10 +664,10 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 5 },
     { ROK_TARGETINGEVENTHEADER, 5, 6 },
     { ROK_LOSRADAREVENTHEADER, 11, 11 },
-    { ROK_MAPEVENTHEADER, 22, 9 },
-    { ROK_WEAPONSEVENTHEADER, 31, 25 },
-    { ROK_ORDERSEVENTHEADER, 56, 22 },
-    { ROK_MOVEMENTEVENTHEADER, 78, 24 },
+    { ROK_MAPEVENTHEADER, 22, 10 },
+    { ROK_WEAPONSEVENTHEADER, 32, 25 },
+    { ROK_ORDERSEVENTHEADER, 57, 22 },
+    { ROK_MOVEMENTEVENTHEADER, 79, 23 },
     { ROK_UNITSEVENTHEADER, 102, 27 },
     { ROK_SCRIPTSEVENTHEADER, 129, 4 },
 };
@@ -687,6 +688,7 @@ static_assert(sizeof(LosRadarSightLoad) <= REPLAY_EVENT_MAX, "LosRadarSightLoad 
 static_assert(sizeof(MapEventHeader) <= REPLAY_EVENT_MAX, "MapEventHeader fits the event buffer");
 static_assert(sizeof(MapSetYard) <= REPLAY_EVENT_MAX, "MapSetYard fits the event buffer");
 static_assert(sizeof(MapPassMaps) <= REPLAY_EVENT_MAX, "MapPassMaps fits the event buffer");
+static_assert(sizeof(MapPathLockStamp) <= REPLAY_EVENT_MAX, "MapPathLockStamp fits the event buffer");
 static_assert(sizeof(MapCellsChanged) <= REPLAY_EVENT_MAX, "MapCellsChanged fits the event buffer");
 static_assert(sizeof(WeaponsDamage) <= REPLAY_EVENT_MAX, "WeaponsDamage fits the event buffer");
 static_assert(sizeof(WeaponsDetonate) <= REPLAY_EVENT_MAX, "WeaponsDetonate fits the event buffer");
@@ -729,7 +731,7 @@ static_assert(sizeof(OrdersSetStance) <= REPLAY_EVENT_MAX, "OrdersSetStance fits
 static_assert(sizeof(OrdersSetAngles) <= REPLAY_EVENT_MAX, "OrdersSetAngles fits the event buffer");
 static_assert(sizeof(OrdersSetBuildState) <= REPLAY_EVENT_MAX, "OrdersSetBuildState fits the event buffer");
 static_assert(sizeof(MovementEventHeader) <= REPLAY_EVENT_MAX, "MovementEventHeader fits the event buffer");
-static_assert(sizeof(MovementLoad) <= REPLAY_EVENT_MAX, "MovementLoad fits the event buffer");
+static_assert(sizeof(MovementLoadState) <= REPLAY_EVENT_MAX, "MovementLoadState fits the event buffer");
 static_assert(sizeof(MovementSetMode) <= REPLAY_EVENT_MAX, "MovementSetMode fits the event buffer");
 static_assert(sizeof(MovementSetSpeed) <= REPLAY_EVENT_MAX, "MovementSetSpeed fits the event buffer");
 static_assert(sizeof(MovementTarget) <= REPLAY_EVENT_MAX, "MovementTarget fits the event buffer");
@@ -843,6 +845,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MapEventHeader", sizeof(MapEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapSetYard", sizeof(MapSetYard), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapPathLockStamp", sizeof(MapPathLockStamp), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsEventHeader", sizeof(WeaponsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsDamage", sizeof(WeaponsDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -885,7 +888,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "OrdersSetAngles", sizeof(OrdersSetAngles), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersSetBuildState", sizeof(OrdersSetBuildState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementEventHeader", sizeof(MovementEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
-    { "MovementLoad", sizeof(MovementLoad), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MovementLoadState", sizeof(MovementLoadState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementSetMode", sizeof(MovementSetMode), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementSetSpeed", sizeof(MovementSetSpeed), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementTarget", sizeof(MovementTarget), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -931,7 +934,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "ScriptsDetachPiece", sizeof(ScriptsDetachPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsState", sizeof(ScriptsState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 146;
+static const unsigned kReplayObjectKindCount = 147;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -1364,6 +1367,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "cell1", offsetof(MapPassMaps, cell[1]), sizeof(((MapPassMaps*)nullptr)->cell[1]), ROK_MAPPASSMAPS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "size0", offsetof(MapPassMaps, size[0]), sizeof(((MapPassMaps*)nullptr)->size[0]), ROK_MAPPASSMAPS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "size1", offsetof(MapPassMaps, size[1]), sizeof(((MapPassMaps*)nullptr)->size[1]), ROK_MAPPASSMAPS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(MapPathLockStamp, h.kind), sizeof(((MapPathLockStamp*)nullptr)->h.kind), ROK_MAPPATHLOCKSTAMP, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(MapPathLockStamp, h.unit), sizeof(((MapPathLockStamp*)nullptr)->h.unit), ROK_MAPPATHLOCKSTAMP, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "stamp", offsetof(MapPathLockStamp, stamp), sizeof(((MapPathLockStamp*)nullptr)->stamp), ROK_MAPPATHLOCKSTAMP, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MapCellsChanged, h.kind), sizeof(((MapCellsChanged*)nullptr)->h.kind), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapCellsChanged, h.unit), sizeof(((MapCellsChanged*)nullptr)->h.unit), ROK_MAPCELLSCHANGED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "rect0", offsetof(MapCellsChanged, rect[0]), sizeof(((MapCellsChanged*)nullptr)->rect[0]), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1555,19 +1561,18 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "health", offsetof(OrdersSetBuildState, health), sizeof(((OrdersSetBuildState*)nullptr)->health), ROK_ORDERSSETBUILDSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MovementEventHeader, kind), sizeof(((MovementEventHeader*)nullptr)->kind), ROK_MOVEMENTEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementEventHeader, unit), sizeof(((MovementEventHeader*)nullptr)->unit), ROK_MOVEMENTEVENTHEADER, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "kind", offsetof(MovementLoad, h.kind), sizeof(((MovementLoad*)nullptr)->h.kind), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "unit", offsetof(MovementLoad, h.unit), sizeof(((MovementLoad*)nullptr)->h.unit), ROK_MOVEMENTLOAD, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "velocity0", offsetof(MovementLoad, state.velocity[0]), sizeof(((MovementLoad*)nullptr)->state.velocity[0]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "velocity1", offsetof(MovementLoad, state.velocity[1]), sizeof(((MovementLoad*)nullptr)->state.velocity[1]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "velocity2", offsetof(MovementLoad, state.velocity[2]), sizeof(((MovementLoad*)nullptr)->state.velocity[2]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p20", offsetof(MovementLoad, state.p2[0]), sizeof(((MovementLoad*)nullptr)->state.p2[0]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p21", offsetof(MovementLoad, state.p2[1]), sizeof(((MovementLoad*)nullptr)->state.p2[1]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p22", offsetof(MovementLoad, state.p2[2]), sizeof(((MovementLoad*)nullptr)->state.p2[2]), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "speed", offsetof(MovementLoad, state.speed), sizeof(((MovementLoad*)nullptr)->state.speed), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "turn", offsetof(MovementLoad, state.turn), sizeof(((MovementLoad*)nullptr)->state.turn), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "pathLockStamp", offsetof(MovementLoad, state.pathLockStamp), sizeof(((MovementLoad*)nullptr)->state.pathLockStamp), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "mode", offsetof(MovementLoad, state.mode), sizeof(((MovementLoad*)nullptr)->state.mode), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "flag", offsetof(MovementLoad, state.flag), sizeof(((MovementLoad*)nullptr)->state.flag), ROK_MOVEMENTLOAD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(MovementLoadState, h.kind), sizeof(((MovementLoadState*)nullptr)->h.kind), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(MovementLoadState, h.unit), sizeof(((MovementLoadState*)nullptr)->h.unit), ROK_MOVEMENTLOADSTATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "velocity0", offsetof(MovementLoadState, state.velocity[0]), sizeof(((MovementLoadState*)nullptr)->state.velocity[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "velocity1", offsetof(MovementLoadState, state.velocity[1]), sizeof(((MovementLoadState*)nullptr)->state.velocity[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "velocity2", offsetof(MovementLoadState, state.velocity[2]), sizeof(((MovementLoadState*)nullptr)->state.velocity[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "p20", offsetof(MovementLoadState, state.p2[0]), sizeof(((MovementLoadState*)nullptr)->state.p2[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "p21", offsetof(MovementLoadState, state.p2[1]), sizeof(((MovementLoadState*)nullptr)->state.p2[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "p22", offsetof(MovementLoadState, state.p2[2]), sizeof(((MovementLoadState*)nullptr)->state.p2[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "speed", offsetof(MovementLoadState, state.speed), sizeof(((MovementLoadState*)nullptr)->state.speed), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "turn", offsetof(MovementLoadState, state.turn), sizeof(((MovementLoadState*)nullptr)->state.turn), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(MovementLoadState, state.mode), sizeof(((MovementLoadState*)nullptr)->state.mode), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "flag", offsetof(MovementLoadState, state.flag), sizeof(((MovementLoadState*)nullptr)->state.flag), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MovementSetMode, h.kind), sizeof(((MovementSetMode*)nullptr)->h.kind), ROK_MOVEMENTSETMODE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementSetMode, h.unit), sizeof(((MovementSetMode*)nullptr)->h.unit), ROK_MOVEMENTSETMODE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "mode", offsetof(MovementSetMode, mode), sizeof(((MovementSetMode*)nullptr)->mode), ROK_MOVEMENTSETMODE, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1761,8 +1766,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "state", offsetof(ScriptsState, state), sizeof(((ScriptsState*)nullptr)->state), ROK_SCRIPTSSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "feature", offsetof(ScriptsState, feature), sizeof(((ScriptsState*)nullptr)->feature), ROK_SCRIPTSSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 800;
-static const unsigned kReplayWalkableFieldCount = 160;
+static const unsigned kReplayObjectFieldCount = 802;
+static const unsigned kReplayWalkableFieldCount = 161;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 37, 35, 38, 45, 51, 53, 108 };
 
@@ -2165,6 +2170,9 @@ static_assert(sizeof(((MapPassMaps*)nullptr)->cell[0]) == 4, "MapPassMaps::cell0
 static_assert(sizeof(((MapPassMaps*)nullptr)->cell[1]) == 4, "MapPassMaps::cell1 has the size the schema says");
 static_assert(sizeof(((MapPassMaps*)nullptr)->size[0]) == 4, "MapPassMaps::size0 has the size the schema says");
 static_assert(sizeof(((MapPassMaps*)nullptr)->size[1]) == 4, "MapPassMaps::size1 has the size the schema says");
+static_assert(sizeof(((MapPathLockStamp*)nullptr)->h.kind) == 4, "MapPathLockStamp::kind has the size the schema says");
+static_assert(sizeof(((MapPathLockStamp*)nullptr)->h.unit) == 4, "MapPathLockStamp::unit has the size the schema says");
+static_assert(sizeof(((MapPathLockStamp*)nullptr)->stamp) == 4, "MapPathLockStamp::stamp has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.kind) == 4, "MapCellsChanged::kind has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.unit) == 4, "MapCellsChanged::unit has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[0]) == 4, "MapCellsChanged::rect0 has the size the schema says");
@@ -2354,19 +2362,18 @@ static_assert(sizeof(((OrdersSetBuildState*)nullptr)->buildLeft) == 4, "OrdersSe
 static_assert(sizeof(((OrdersSetBuildState*)nullptr)->health) == 4, "OrdersSetBuildState::health has the size the schema says");
 static_assert(sizeof(((MovementEventHeader*)nullptr)->kind) == 4, "MovementEventHeader::kind has the size the schema says");
 static_assert(sizeof(((MovementEventHeader*)nullptr)->unit) == 4, "MovementEventHeader::unit has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->h.kind) == 4, "MovementLoad::kind has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->h.unit) == 4, "MovementLoad::unit has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.velocity[0]) == 4, "MovementLoad::velocity0 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.velocity[1]) == 4, "MovementLoad::velocity1 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.velocity[2]) == 4, "MovementLoad::velocity2 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.p2[0]) == 4, "MovementLoad::p20 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.p2[1]) == 4, "MovementLoad::p21 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.p2[2]) == 4, "MovementLoad::p22 has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.speed) == 4, "MovementLoad::speed has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.turn) == 4, "MovementLoad::turn has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.pathLockStamp) == 4, "MovementLoad::pathLockStamp has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.mode) == 4, "MovementLoad::mode has the size the schema says");
-static_assert(sizeof(((MovementLoad*)nullptr)->state.flag) == 4, "MovementLoad::flag has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->h.kind) == 4, "MovementLoadState::kind has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->h.unit) == 4, "MovementLoadState::unit has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[0]) == 4, "MovementLoadState::velocity0 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[1]) == 4, "MovementLoadState::velocity1 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[2]) == 4, "MovementLoadState::velocity2 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[0]) == 4, "MovementLoadState::p20 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[1]) == 4, "MovementLoadState::p21 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[2]) == 4, "MovementLoadState::p22 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.speed) == 4, "MovementLoadState::speed has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.turn) == 4, "MovementLoadState::turn has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.mode) == 4, "MovementLoadState::mode has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.flag) == 4, "MovementLoadState::flag has the size the schema says");
 static_assert(sizeof(((MovementSetMode*)nullptr)->h.kind) == 4, "MovementSetMode::kind has the size the schema says");
 static_assert(sizeof(((MovementSetMode*)nullptr)->h.unit) == 4, "MovementSetMode::unit has the size the schema says");
 static_assert(sizeof(((MovementSetMode*)nullptr)->mode) == 4, "MovementSetMode::mode has the size the schema says");
@@ -3504,9 +3511,9 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "orders", 5, 0, 0, 106, 11 },
     { "units", 6, 0, 0, 117, 44 },
     { "players", 4, 0, 0, 161, 28 },
-    { "map", 7, 0, 1, 189, 11 },
+    { "map", 7, 1, 1, 189, 11 },
     { "scripts", 2, 0, 0, 200, 23 },
-    { "movement", 3, 0, 0, 223, 20 },
+    { "movement", 4, 0, 0, 223, 20 },
     { "mission", 1, 1, 0, 243, 0 },
     { "files", 2, 0, 0, 243, 58 },
     { "network", 1, 0, 0, 301, 22 },

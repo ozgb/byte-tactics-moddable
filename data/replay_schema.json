@@ -3029,36 +3029,6 @@
     "note": "the chain is walked and relinked through a pointer to the cargoNext of a unit"
    },
    {
-    "kind": "field_escape",
-    "target": "Unit::motion",
-    "rule": "fields",
-    "functions": [
-     "FootprintValue",
-     "GetPassMapCellValue",
-     "GetPassMapFootprintValue"
-    ],
-    "reads": [
-     "Unit.motion",
-     "UnitMotion.pathLockStamp"
-    ],
-    "note": "the motion pointer of a unit slot is read as a unit view whose lastTick is the pathLockStamp of the motion"
-   },
-   {
-    "kind": "field_read",
-    "target": "Unit::lastTick",
-    "rule": "fields",
-    "functions": [
-     "FootprintValue",
-     "GetPassMapCellValue",
-     "GetPassMapFootprintValue"
-    ],
-    "reads": [
-     "Unit.motion",
-     "UnitMotion.pathLockStamp"
-    ],
-    "note": "lastTick of the unit view is the pathLockStamp of the motion it points at"
-   },
-   {
     "kind": "field_read",
     "target": "Unit::pos",
     "rule": "fields",
@@ -4469,6 +4439,11 @@
       "record": false,
       "reason": "#660 part 3",
       "native": "RefreshUnitIfStaleSlot"
+     },
+     "PathLockStamp": {
+      "record": false,
+      "reason": "a query of a saved game, outside the tick, as SaveMappingData",
+      "native": "PathLockStamp"
      }
     },
     "imports": [
@@ -6130,6 +6105,7 @@
   {"name": "MapEventHeader", "type": "MapEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
   {"name": "MapSetYard", "type": "MapSetYard", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "open", "kind": "i32"}]},
   {"name": "MapPassMaps", "type": "MapPassMaps", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "cell0", "kind": "i32", "member": "cell[0]"}, {"name": "cell1", "kind": "i32", "member": "cell[1]"}, {"name": "size0", "kind": "i32", "member": "size[0]"}, {"name": "size1", "kind": "i32", "member": "size[1]"}]},
+  {"name": "MapPathLockStamp", "type": "MapPathLockStamp", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "stamp", "kind": "i32"}]},
   {"name": "MapCellsChanged", "type": "MapCellsChanged", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "rect0", "kind": "i32", "member": "rect[0]"}, {"name": "rect1", "kind": "i32", "member": "rect[1]"}, {"name": "rect2", "kind": "i32", "member": "rect[2]"}, {"name": "rect3", "kind": "i32", "member": "rect[3]"}, {"name": "classes", "kind": "u32"}, {"name": "cause", "kind": "i32"}]},
   {"name": "WeaponsEventHeader", "type": "WeaponsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
   {"name": "WeaponsDamage", "type": "WeaponsDamage", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "source", "kind": "ref", "target": "Unit"}, {"name": "amount", "kind": "i32"}, {"name": "damageKind", "kind": "i32"}, {"name": "direction", "kind": "i32"}]},
@@ -6172,7 +6148,7 @@
   {"name": "OrdersSetAngles", "type": "OrdersSetAngles", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "bank", "kind": "i32"}, {"name": "heading", "kind": "i32"}, {"name": "pitch", "kind": "i32"}]},
   {"name": "OrdersSetBuildState", "type": "OrdersSetBuildState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "buildLeft", "kind": "f32"}, {"name": "health", "kind": "i32"}]},
   {"name": "MovementEventHeader", "type": "MovementEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
-  {"name": "MovementLoad", "type": "MovementLoad", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "velocity0", "kind": "i32", "member": "state.velocity[0]"}, {"name": "velocity1", "kind": "i32", "member": "state.velocity[1]"}, {"name": "velocity2", "kind": "i32", "member": "state.velocity[2]"}, {"name": "p20", "kind": "i32", "member": "state.p2[0]"}, {"name": "p21", "kind": "i32", "member": "state.p2[1]"}, {"name": "p22", "kind": "i32", "member": "state.p2[2]"}, {"name": "speed", "kind": "i32", "member": "state.speed"}, {"name": "turn", "kind": "i32", "member": "state.turn"}, {"name": "pathLockStamp", "kind": "i32", "member": "state.pathLockStamp"}, {"name": "mode", "kind": "i32", "member": "state.mode"}, {"name": "flag", "kind": "i32", "member": "state.flag"}]},
+  {"name": "MovementLoadState", "type": "MovementLoadState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "velocity0", "kind": "i32", "member": "state.velocity[0]"}, {"name": "velocity1", "kind": "i32", "member": "state.velocity[1]"}, {"name": "velocity2", "kind": "i32", "member": "state.velocity[2]"}, {"name": "p20", "kind": "i32", "member": "state.p2[0]"}, {"name": "p21", "kind": "i32", "member": "state.p2[1]"}, {"name": "p22", "kind": "i32", "member": "state.p2[2]"}, {"name": "speed", "kind": "i32", "member": "state.speed"}, {"name": "turn", "kind": "i32", "member": "state.turn"}, {"name": "mode", "kind": "i32", "member": "state.mode"}, {"name": "flag", "kind": "i32", "member": "state.flag"}]},
   {"name": "MovementSetMode", "type": "MovementSetMode", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "mode", "kind": "i32"}]},
   {"name": "MovementSetSpeed", "type": "MovementSetSpeed", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "speed", "kind": "i32"}]},
   {"name": "MovementTarget", "type": "MovementTarget", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "target", "kind": "u32"}]},
@@ -6464,7 +6440,7 @@
    }
   },
   "map": {
-   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [7, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}}},
+   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [7, 1], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick, as SaveMappingData", "native": "PathLockStamp"}}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "PassMap::Refresh", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells", "PassMap.lastTick", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cobStateFlags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "PassMap.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "PassMap", "Feature"], "args": [{"name": "event", "type": "MapEventHeader*", "line": "event", "mode": "event", "events": "map", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
@@ -6508,12 +6484,12 @@
    }
   },
   "movement": {
-   "header": {"interface": "interfaces/movement.h", "struct": "MovementSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 1, "ruleless": 0, "unresolvedSlots": ["Apply", "ApplyPathEvent", "GetMotionState", "HasNetState", "WriteNetState", "NewPathOrderAt", "NewPathOrderToUnit", "NewPathOrderToUnitAt", "NewPathOrderToUnitAtAngle", "NewAirManeuverOrder", "NewApproachRadius", "NewRingApproach", "NewPointMarker", "LoadTarget", "SaveTarget", "TargetType", "UnitTarget", "WriteState"], "unannotatedArgs": ["Apply(event)", "ApplyPathEvent(event)", "ApplyPathEvent(waypoints)", "GetMotionState(out)", "ReadNetState(reader)", "WriteNetState(stream)", "NewPathOrderAt(pos)", "NewPathOrderToUnitAt(pos)", "NewAirManeuverOrder(from)", "NewAirManeuverOrder(to)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/movement.h", "struct": "MovementSeam", "version": [4, 0], "status": "pending", "imports": [], "pending": {"untracked": 1, "ruleless": 0, "unresolvedSlots": ["Apply", "ApplyPathEvent", "GetMotionState", "HasNetState", "WriteNetState", "NewPathOrderAt", "NewPathOrderToUnit", "NewPathOrderToUnitAt", "NewPathOrderToUnitAtAngle", "NewAirManeuverOrder", "NewApproachRadius", "NewRingApproach", "NewPointMarker", "LoadTarget", "SaveTarget", "TargetType", "UnitTarget", "WriteState"], "unannotatedArgs": ["Apply(event)", "ApplyPathEvent(event)", "ApplyPathEvent(waypoints)", "GetMotionState(out)", "ReadNetState(reader)", "WriteNetState(stream)", "NewPathOrderAt(pos)", "NewPathOrderToUnitAt(pos)", "NewAirManeuverOrder(from)", "NewAirManeuverOrder(to)", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "MovementEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "UpdateMotion": {"conv": "__stdcall", "ret": "void", "functions": ["UnitMotion::UpdateMotion"], "reads": [], "writes": [], "objectReads": ["Unit.def"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateMotion"},
     "ApplyPathEvent": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "PathfindingEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}, {"name": "waypoints", "type": "PathPoint*", "line": "waypoints", "mode": "pending"}], "result": null, "native": "ApplyPathEvent"},
-    "GetMotionState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "out", "type": "MovementMotionState*", "line": "out", "mode": "pending"}], "result": null, "native": "GetMotionState"},
+    "GetMotionState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "out", "type": "MovementSavedState*", "line": "out", "mode": "pending"}], "result": null, "native": "GetMotionState"},
     "ReadNetState": {"conv": "__stdcall", "ret": "void", "functions": ["UnitMotion::ReadNetState"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "reader", "type": "BitReader*", "line": "reader", "mode": "pending"}], "result": null, "native": "ReadNetState"},
     "HasNetState": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "HasNetState"},
     "WriteNetState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "stream", "type": "BitWriter*", "line": "stream", "mode": "pending"}], "result": null, "native": "WriteNetState"},

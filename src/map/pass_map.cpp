@@ -6,23 +6,9 @@
 #include "../../interfaces/seams.h"
 #include "../util/vec3.h"
 
+#include "pass_map.h"
+
 void __cdecl operator delete(void* p);
-
-#pragma pack(push, 2)
-struct MotionTickView {
-    char unknown_0[0x26];
-    unsigned int lastTick;
-};
-
-struct UnitPassMapView {
-    Ref<MotionTickView> unit;
-    char unknown_4[0x76 - 0x4];
-    Point16 a;
-    char unknown_7a[0x7e - 0x7a];
-    Point16 b;
-};
-
-#pragma pack(pop)
 
 #pragma pack(push, 1)
 struct UnitPassMapRecordView {
@@ -39,7 +25,6 @@ struct UnitPassMapRecordView {
 #include "cell.h"
 #pragma pack(pop)
 
-#include "pass_map.h"
 #include "terrain.h"
 #include "../network/player.h"
 #include "../game/map_events.h"
@@ -323,6 +308,19 @@ void PassMap::RefreshMovedUnits(UnitPassMapView* p)
         }
     }
     p->unit->lastTick = prev;
+}
+
+int __stdcall PathLockStamp(Unit* unit)
+{
+    UnitPassMapView* p = (UnitPassMapView*)unit;
+    if (!p->unit)
+        return 0;
+    return (int)p->unit->lastTick;
+}
+
+void __stdcall LoadPathLockStamp(Unit* unit, int stamp)
+{
+    ((UnitPassMapView*)unit)->unit->lastTick = (unsigned int)stamp;
 }
 
 // FUNCTION: 0x440be0

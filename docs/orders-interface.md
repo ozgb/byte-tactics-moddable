@@ -54,9 +54,9 @@ Orders' place in it:
 - **Effects out of orders:** thirteen effects to units (SET_STATE_BITS, SET_POSITION, ATTACH_TO_PIECE,
   FINISH_CONSTRUCTION, BUILD_DECAY, REPAIR, UNLINK, BUSY, SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and
   SET_BUILD_STATE) and one to scripts (START_SCRIPT, in three forms), besides the events to movement, weapons,
-  targeting, features, economy and players that orders published before. Units and scripts are not on the model yet
-  (#986), so their handlers (`src/units/orders_effects.cpp`, `src/scripts/orders_effects.cpp`) are adapters that hold
-  3.1c's calls and writes.
+  targeting, features, economy and players that orders published before. Their handlers are
+  adapters in `src/seams/units_world.cpp` and `src/seams/scripts_world.cpp` (now, since #986, handlers of units' and
+  scripts' inboxes: `UnitsApply` and `ScriptsApply` hold 3.1c's calls and writes).
 - **Module ids:** orders keeps `SCHED_ORDERS = 3`, which its outbox already used; movement keeps `SCHED_MOVEMENT = 14`.
 - **Versions:** orders 5.0 (11 slots; 4.0 had 18), movement 3.0, units 5.0 (`UpdateUnitBody` returns an int,
   `UpdateUnitTail`, `UnitRefGet` and `UnitRefSetValue` are new), services 2.1 (`HarnessOrdersEvent` and
@@ -155,8 +155,9 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | the write of `buildLeft` and `health` | SET_BUILD_STATE | `UnitsOnOrdersSetBuildState` |
 | `scripts.StartScript`, `StartScriptWithArgs`, `StartScriptWithArgsByIndex` | START_SCRIPT | `ScriptsOnOrdersStartScript`: the script's start, by `OrdersStartScript::form` (by name, by name with arguments, by index with arguments); the three starts are one effect |
 
-The handlers are the adapters of units and scripts, which hold 3.1c's writes until #986 puts units and scripts on the
-scheduler. The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
+The handlers are the adapters of units and scripts (`src/seams/units_world.cpp`, `src/seams/scripts_world.cpp`); since
+#986 they publish units' and scripts' events, and the slots the third column names left the seams (`UnitsApply` and
+`ScriptsApply` call the code). The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
 SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and SET_BUILD_STATE are the six that go beyond the issue's list of
 intents, for writes of the unit record that orders made directly.
 

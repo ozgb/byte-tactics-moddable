@@ -1,34 +1,39 @@
 # The scripts interface
 
-Scripts sit behind `interfaces/scripts.h` (version 1.0), the first of two simulation subsystems cut out of units and
+Scripts sit behind `interfaces/scripts.h` (version 2.0), the first of two simulation subsystems cut out of units and
 orders in #993 (the other is movement, `docs/movement-interface.md`). Scripts are a unit's COB scripts as the
 simulation sees them: the interpreter and its threads, the piece state a script poses, and the piece queries (where a
 piece is, what angles it has, where a weapon aims from). 3.1c's code is its default implementation. This page is the
 inventory the interface was cut from:
-- the slots, who calls each, and whether it runs inside the tick;
+- the slots, the events, who calls and publishes each, and whether it runs inside the tick;
 - what moved, and what stayed where it was;
 - the rules of `data/subsystems.csv` for the new directory;
+- the routes into and out of scripts, each with its reason;
 - the hashed state, and the part of it only scripts reads.
 
 ## 1. The model
 
-Scripts are not on the scheduler. They have no inbox, no events, no pass and no `SCHED_*` run. `SCHED_SCRIPTS = 13`
-exists in `interfaces/services.h` (services 1.19) as an id only, as `SCHED_MOVEMENT = 14` does for movement, so
-`SCHED_MODULE_COUNT` is 15. Callers call the seam slots directly and synchronously, as they called units' slots before
-the cut: a slot answers at the statement that called it, and a script's thread runs when `RunScripts` is called
-(section 2).
+Scripts are on the scheduler since #986, with units. They have an inbox (`ScriptsInbox`, `src/seams/scripts_world.cpp`)
+that passes each event to `Apply` (`ScriptsApply`, `src/scripts/scripts_apply.cpp`) and records it with its outcome in
+the trace's dump (section 6). They have four events (section 2) and no pass of their own: `RunScripts` is a step of the
+scheduler's unit loop (`SchedUnitsPhase`, `src/game/scheduler.cpp`), between `UpdateUnitWeapons` and `UpdateUnitBody`,
+with scripts' inbox and then units' delivered before it and after it. Scripts' inbox is delivered before every delivery
+of units' inbox. `SCHED_SCRIPTS = 13` is the module's id and `SCHED_MODULE_COUNT` is 15. The synchronous slots answer
+at the statement that called them, as in 1.0, and deliver scripts' inbox first.
 
 There is no WASM module (the maintainer, 2026-11-19, on #993, option 1). The seam is over native code, like the other
 simulation subsystems: the fillers are in `src/seams/native.cpp` (`<Slot>Native`), and `g_seams.scripts` is set there.
 
-Versions: scripts 1.0. Units went to 2.0: the 16 slots that moved here left `UnitsSeam`, and the minor restarted at 0.
-Orders went to 4.0 for movement's slots (`docs/movement-interface.md`). Units gained `UnitRefInit` and `UnitRefSetUnit`
-for movement, not for scripts.
+Versions: scripts 2.0 (`StartScript`, `StartScriptWithArgs` and `InitObjectState` left the seam and `Apply` is new),
+units 6.0 (`docs/units-interface.md`) and services 2.2 (`HarnessUnitsEvent` and `HarnessScriptsEvent`). Before #986
+scripts were 1.0: units went to 2.0 when the 16 slots that moved here left `UnitsSeam`, and orders to 4.0 for
+movement's slots (`docs/movement-interface.md`).
 
 What scripts call out to. A thread runs a unit's COB code, and some of its operations reach other subsystems. They
 are scripts' imports, all through seams or services (`uv run tools/coupling.py --summary scripts`):
-- **units**, through `UnitsSeam`: `AttachUnitToPiece` (the ATTACH and DROP operations), `SetStateBits` (the unit values
-  that set the unit's flags); map, through `MapSeam`: `GetGroundHeight` (a unit value; units' until map 5.0);
+- **units**, through units' events: UNITS_ATTACH_TO_PIECE (the ATTACH and DROP operations) and UNITS_SCRIPT_VALUE (the
+  unit values that set the unit's flags), published from `SCHED_SCRIPTS`; **map**: MAP_SET_YARD (the YARD_OPEN value,
+  published as units does) and, through `MapSeam`, `GetGroundHeight` (a unit value; units' until map 5.0);
 - **weapons**, through `WeaponsSeam`: `WeaponAimCobComplete` (a thread that ends or returns to a weapon's aim callback,
   `cob.cpp`) and `CobScriptExplodePiece` (the EXPLODE operation);
 - **los_radar**, through `LosRadarSeam`: `IsUnitVisibleToPlayer` (the effects that only the local player sees);
@@ -41,27 +46,31 @@ Scripts draw from the game logic random stream: the RANDOM operation of the inte
 The draw is made inside a script's thread, so its place in the order of draws is the order in which `RunScripts` runs
 the unit's threads, which is 3.1c's.
 
-The next issues take scripts on: #986 puts them on the scheduler with units, and #984 (weapons) addresses scripts'
-slots (section 6).
+Scripts' effects on units and map are events now, and every other module's start of a script is the event START
+(section 2); section 7 lists what is left.
 
 ## 2. The slots
 
-The first 16 slots came from `UnitsSeam` with the same signatures. The last 9 are new: each was a direct call of the
-script code from units' files (or a `delete`), and each is now a slot, so no subsystem calls into `src/scripts/`
-except through `g_seams.scripts`. Every slot has a harness replay hook (`RecScripts<Slot>`,
-`src/harness/replay_hooks.inc`), which the callers below do not list again.
+Of the slots of 1.0, `StartScript`, `StartScriptWithArgs` and `InitObjectState` are gone: every caller publishes the
+event START (for the first two) or INIT_STATE (for the third), which scripts' `Apply` consumes. The other 22 are
+synchronous slots. No subsystem calls into `src/scripts/` except through `g_seams.scripts`. Every slot has a harness
+replay hook (`RecScripts<Slot>`, `src/harness/replay_hooks.inc`), which the callers below do not list again.
 
 "In the tick" is yes when the callers run under a phase (`UpdateAllUnits`, `RunOrders`, `UpdateProjectiles`, phase 0's
 `HandleNetPackets`) and no for load, save and drawing; both when the slot has callers of each kind. A caller named
 by its function is in the file given.
 
+The slots that run a script or read its pose and answer in the caller's statement are the mixed ones: `QueryScript`,
+`GetNanoPiecePosition`, `GetAimFromPosition` and `GetSweetSpot` (and `FindScript`, the piece getters and
+`ObjectStateSize`, which only read). They stay synchronous slots: a query's script runs at once, may draw from the
+random stream and write the unit, and the caller uses the result in the same statement, so it cannot wait for a
+delivery.
+
 | Slot | What it does | Callers | In the tick | From |
 |---|---|---|---|---|
-| `StartScript` | starts a named script with a callback | movement (`motion.cpp`: `UnitMotion::UpdateMoveRate`); orders (`vtol_orders.cpp`: `VtolLandIfCanOrder`, `VtolLandingOrder`, `VtolPickupOrder`, `VtolUnloadOrder`); units (`unit.cpp`: `Unit::SetStateBits`; `units.cpp`: `InitUnitScript`); weapons (`weapons.cpp`: `FireBallisticProjectile`, `FireLineOfSightProjectile`, `FireVLaunchProjectile`) | yes | `UnitsSeam::StartScript` |
-| `StartScriptWithArgs` | starts a named script with up to four arguments | orders (`unit_orders.cpp`: `GroundPickupOrder`, `GroundUnloadOrder`; `vtol_orders.cpp`: `VtolPickupOrder`); units (`economy_effects.cpp`, `targeting_effects.cpp`, `sfx_occupy.cpp`, `unit_motion.cpp`: `UpdateWindGenerator`, `unit_targets.cpp`: `ApplyUnitDamage`, `units.cpp`: `ApplyUnitDeath`); weapons (`weapons.cpp`: the three `Fire*Projectile`, `RockUnit`, `InitUnitWeaponSlots`, `UpdateUnitWeapons`) | yes | `UnitsSeam::StartScriptWithArgs` |
 | `StartScriptWithArgsByIndex` | starts a script by the index of its name | network (`net_game.cpp`: `HandleNetPackets`, a script call from a packet); orders (`order_queue.cpp`: `StartBuildingScript`, `StopBuildingScript`, `Order::~Order`) | yes | `UnitsSeam::StartScriptWithArgsByIndex` |
 | `QueryScript` | runs a query script and returns its result | orders (`unit_orders.cpp`: `BuildingBuildOrder`; `vtol_orders.cpp`: `FindLandingPad`, `VtolPickupOrder`); units (`units.cpp`: `KillUnit`); weapons (`weapon_pieces.cpp`: `QueryWeaponPiece`) | yes | `UnitsSeam::QueryScript` |
-| `FindScript` | the index of a named script | network (`net_game.cpp`: `SendScriptCallByName`, `SendScriptCallNoArgsByName`, which orders reach through `g_seams.network`); orders (`order_queue.cpp`); units (`targeting_effects.cpp`: `UnitsOnTargetingCleared`) | yes | `UnitsSeam::FindScript` |
+| `FindScript` | the index of a named script | network (`net_game.cpp`: `SendScriptCallByName`, `SendScriptCallNoArgsByName`, which orders reach through `g_seams.network`); orders (`order_queue.cpp`); units (`ScriptsOnTargetingCleared` in `src/seams/scripts_world.cpp`) | yes | `UnitsSeam::FindScript` |
 | `GetPieceOffset` | offset of a piece from the unit | orders (`vtol_orders.cpp`: `VtolPickupOrder`); weapons (`weapon_pieces.cpp`: `GetWeaponPiecePosition`) | yes | `UnitsSeam::GetPieceOffset` |
 | `GetPiecePosition` | world position of a piece | movement (`motion.cpp`: `UnitMotion::UpdatePosition`; `order_targets.cpp`: `PathOrder::FillWorldPos`); orders (`unit_orders.cpp`: `BuildingBuildOrder`); weapons (`script_explode.cpp`: `UnitScript::ExplodePiece`) | yes | `UnitsSeam::GetPiecePosition` |
 | `GetPieceAngles` | angles of a piece | movement (`motion.cpp`: `UnitMotion::UpdatePosition`, a unit carried on a piece) | yes | `UnitsSeam::GetPieceAngles` |
@@ -70,27 +79,29 @@ by its function is in the file given.
 | `GetSweetSpot` | the point weapons aim at | units (`unit_targets.cpp`: `GetWeaponTargetPos`) | yes | `UnitsSeam::GetSweetSpot` |
 | `PoseUnitModel` | poses a unit's model from its angles and animation | weapons (`explosions.cpp`: `StartExplodePiece`) | yes | `UnitsSeam::PoseUnitModel` |
 | `CreateObjectState` | builds the piece state of a model (a feature, or a unit with no script) | units (`units.cpp`: `InitUnitScript`) | both | `UnitsSeam::CreateObjectState` |
-| `FreeObjectState` | frees a piece state and its cached pictures | units (`units.cpp`: `ApplyUnitDeath`; `features_effects.cpp`: `UnitsOnFeaturesFreeState`) | yes | `UnitsSeam::FreeObjectState` |
+| `FreeObjectState` | frees a piece state and its cached pictures | units (`units.cpp`: `ApplyUnitDeath`; `ScriptsOnFeaturesFreeState` in `src/seams/scripts_world.cpp`) | yes | `UnitsSeam::FreeObjectState` |
 | `UpdateObjectState` | poses a model from its current angles when they changed | presentation (`model_render.cpp`: `DrawUnit`) | no | `UnitsSeam::UpdateObjectState` |
 | `ObjectStateSize` | bytes of a model's piece state, a query | features (`features.cpp`: `PlaceFeature`) | both | `UnitsSeam::ObjectStateSize` |
 | `NewUnitScript` | allocates a unit's script and stores it in the unit | units (`units.cpp`: `InitUnitScript`) | both | new: was a direct call of `NewUnitScript` from `units.cpp` |
 | `SetCob` | gives a script its unit type's compiled data | units (`units.cpp`: `InitUnitScript`) | both | new: was `CobScript::SetCob` from `units.cpp` |
 | `CreatePlayerObjectState` | builds a scripted unit's piece state | units (`units.cpp`: `InitUnitScript`) | both | new: was a direct call of `CreatePlayerObjectState` from `units.cpp` |
 | `SetObjectState` | gives a unit script its piece state | units (`units.cpp`: `InitUnitScript`) | both | new: was `UnitScript::SetObjectState` from `units.cpp` |
-| `RunScripts` | runs a script's threads for the elapsed ticks | units (`unit_position.cpp`: `UpdateUnitBody`) | yes | new: was `CobScript::RunScripts` from `unit_position.cpp` |
+| `RunScripts` | runs a script's threads for the elapsed ticks | the scheduler (`SchedUnitsPhase`) | yes | new: was `CobScript::RunScripts` from `unit_position.cpp`, called by `UpdateUnitBody` |
 | `SaveScriptState` | writes a script's threads to a saved game | units (`unit_save.cpp`: `SaveUnits`) | no | new: was `CobScript::SaveScriptState` from `unit_save.cpp` |
 | `LoadScriptState` | reads a script's threads from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no | new: was `CobScript::LoadScriptState` from `unit_save.cpp` |
 | `DeleteScript` | destroys a unit script (the virtual deleting destructor) | units (`units.cpp`: `ApplyUnitDeath`) | yes | new: was a `delete` of the `CobScript` from `units.cpp` |
-| `InitObjectState` | fills a model's piece state the caller allocated | units (`features_effects.cpp`: `UnitsOnFeaturesInitState`) | yes | new: was a direct call of `InitObjectState` from `features_effects.cpp` |
 
 Notes on the table:
-- **`InitUnitScript` stays in units** (`units.cpp`, `FUNCTION: 0x485d40`): it is the unit's creation, and it now
-  makes six calls through the seam where it made direct ones. Creation runs in the tick (a unit built or spawned,
-  or made from a packet) and when a game starts, so the five slots only it calls are marked both.
+- **`InitUnitScript` stays in units** (`units.cpp`, `FUNCTION: 0x485d40`): it is the unit's creation, and it makes
+  five calls through the seam where it made direct ones, and publishes START for the script's Create. Creation runs in the tick (a unit built or spawned,
+  or made from a packet) and when a game starts, so the slots only it calls are marked both.
 - **`ObjectStateSize` and the two feature slots.** A feature's piece state is made by `PlaceFeature` (in the tick for
   a feature placed by an event, outside it at load and by the console) and freed and filled by the effects
-  FREE_STATE and INIT_STATE (`docs/features-interface.md`), which units applies through `FreeObjectState` and
-  `InitObjectState`.
+  FREE_STATE and INIT_STATE (`docs/features-interface.md`), which scripts' handlers (`ScriptsOnFeaturesFreeState` and
+  `ScriptsOnFeaturesInitState`) turn into scripts' events of the same names. `FreeObjectState` stays a slot for a unit's
+  death; INIT_STATE has no slot.
+- **`RunScripts` is the scheduler's step,** between `UpdateUnitWeapons` and `UpdateUnitBody` for each unit with a
+  script, in 3.1c's order, so scripts' draws of `RandomInt` sit where they did.
 - **`UpdateObjectState` is a drawing call.** `DrawUnit` calls it in the draw pass, which poses the model for
   display. Presentation does not read a unit's pose through any other slot. `PoseUnitModel` is the simulation's
   version for a unit whose pose the simulation reads (a piece blown off, `StartExplodePiece`).
@@ -98,6 +109,21 @@ Notes on the table:
 - **Slots whose callers all sit in one subsystem** (`GetSweetSpot` in units, `GetAimFromPosition` in weapons,
   the save and load pair in units) are still slots: the interface is the set of what other code calls, whoever
   that is today.
+
+**The events.** Four kinds, each a plain-data payload (`interfaces/scripts.h`, `src/game/scripts_events.h` builds
+and publishes them). `Apply` rejects an event smaller than its payload, naming no unit (but FREE_STATE and INIT_STATE,
+which name a piece state) or of an unknown kind: it changes nothing and has outcome 0.
+
+| Kind | Payload | Fields | Outcome | Published by |
+|---|---|---|---|---|
+| START (416) | `ScriptsStart` | the unit; the form (by name, by name with arguments, by index with arguments); the index; the name (32 bytes); the callback, as its block offset; the update argument; the argument count; four arguments | 1, or 0 when the unit has no script | units (`SCHED_UNITS`: its own starts, section 3 of `docs/units-interface.md`); weapons (START_SCRIPT, `ScriptsOnWeaponsStartScript`); orders (`ScriptsOnOrdersStartScript`); movement (`ScriptsOnMovementStartScript`); economy (EXTRACTOR, `ScriptsOnEconomyExtractor`); targeting (CLEARED, `ScriptsOnTargetingCleared`) |
+| DETACH_PIECE (417) | `ScriptsDetachPiece` | the unit; the piece; whether the model is posed first | 1 | weapons (`ScriptsOnWeaponsDetachPiece`) |
+| FREE_STATE (418) | `ScriptsState` | the piece state, as its block offset | 1 | features (`ScriptsOnFeaturesFreeState`) |
+| INIT_STATE (419) | `ScriptsState` | the piece state, as its block offset; the feature type | 1 | features (`ScriptsOnFeaturesInitState`) |
+
+The adapters onto scripts' code are handlers of scripts' inbox in `src/seams/scripts_world.cpp`: each translates the
+foreign payload into one of these events and calls `ScriptsInbox`. The files `src/scripts/{weapons,orders,movement}_effects.cpp`
+and the `src/units/*_effects.cpp` that were the adapters are gone.
 
 ## 3. What moved
 
@@ -146,13 +172,36 @@ piece into debris, so scripts reach it through `WeaponsSeam::CobScriptExplodePie
   orders'.
 
 **The callers moved to the seam.** Every direct call of `CobScript` or `UnitScript` from outside `src/scripts/`, and
-every `g_seams.units->` call of the 16 slots, is now `g_seams.scripts->`: the files are in `src/orders/`
+every `g_seams.units->` call of the 16 slots, was made `g_seams.scripts->`: the files were in `src/orders/`
 (`order_list.cpp`, `order_queue.cpp`, `order_targets.cpp`, `unit_orders.cpp`, `vtol_orders.cpp`), `src/units/`
-(`economy_effects.cpp`, `features_effects.cpp`, `targeting_effects.cpp`, `unit.cpp`, `unit_motion.cpp`,
-`unit_position.cpp`, `unit_save.cpp`, `unit_targets.cpp`, `units.cpp`), `src/weapons/`, `src/network/net_game.cpp`,
+(`unit.cpp`, `unit_motion.cpp`, `unit_position.cpp`, `unit_save.cpp`, `unit_targets.cpp`, `units.cpp`, and the
+`*_effects.cpp` adapters that #986 later replaced), `src/weapons/`, `src/network/net_game.cpp`,
 `src/map/features.cpp` and `src/graphics/model_render.cpp`.
 
-## 4. The rules of `data/subsystems.csv`
+## 4. The routes
+
+Every route into and out of scripts, with its mode. Synchronous means the handler runs inside `SchedPublish`, at the
+statement of the publisher. The first rows are new in #986 and rest on the gate; the table of units' routes with the
+same reasons is in `docs/units-interface.md`, section 4.
+
+| Route | Mode | Why |
+|---|---|---|
+| units START, to scripts (`ScriptsInbox`) | synchronous | Queued, scenario `orders-air-fights` diverged at tick 497, world phase, `units[6].script.activeCount` 4 against 3: a started script runs its first slice at once. |
+| scripts SCRIPT_VALUE, to units (UNITS_SCRIPT_VALUE) | synchronous | Queued, scenario `orders-tier2-core` diverged at tick 43, units phase, `units[2].activateFlags` 0x02 against 0x00: the thread reads the value back. |
+| scripts SET_YARD, to map (MAP_SET_YARD, the YARD_OPEN value) | synchronous | Queued, scenario `orders-air` diverged at tick 1024, units phase, `units[2].bit0` 0x04 against 0x0c. |
+| scripts ATTACH_TO_PIECE, to units (UNITS_ATTACH_TO_PIECE) | synchronous | #952's rule: queued it stayed equal, but the handler reads the passenger's `cargo` and the carrier's `carrier`, which the previous attach or drop of the same script run writes, and sends the attach to the network in the publisher's order. Orders' ATTACH_TO_PIECE is synchronous for the same handler. |
+| weapons START_SCRIPT, DETACH_PIECE, to scripts | synchronous | As before (`docs/weapons-interface.md`, sections 4 and 8). |
+| orders START_SCRIPT, to scripts | synchronous | As before (`docs/orders-interface.md`, section 4). |
+| movement START_SCRIPT, to scripts | synchronous | As before (`docs/movement-interface.md`, section 4). |
+| economy EXTRACTOR, to scripts | queued | As before (`docs/economy-interface.md`, section 4). Scripts' inbox is delivered before each delivery of units' inbox, so the start runs where it ran. |
+| features FREE_STATE, INIT_STATE, to scripts | synchronous | As before (`docs/features-interface.md`, sections 4 and 8). |
+| targeting CLEARED, to scripts | synchronous | As before (`docs/targeting-interface.md`, section 8). |
+| scripts AIM_DONE, EXPLODE_PIECE, to weapons | synchronous | As before (`docs/weapons-interface.md`, section 4). |
+
+All of them are in `src/game/routes.cpp`. The routes to scripts' handlers that were units' (EXTRACTOR, FREE_STATE,
+INIT_STATE and CLEARED) keep their modes.
+
+## 5. The rules of `data/subsystems.csv`
 
 - **One `file:` rule for the new directory.** `tools/coupling.py` lists `("src/scripts/", "scripts")` first in
   `FILES`, and `"src/scripts/": "scripts"` in `FOLDER_DEFAULT`, and adds `scripts` to `SIM_SUBSYSTEMS`. Every function
@@ -171,8 +220,9 @@ every `g_seams.units->` call of the 16 slots, is now `g_seams.scripts->`: the fi
 - **The moved rows** keep their function names and change the file column. The regenerated `data/subsystems.csv`,
   `data/coupling.csv`, `data/rwsets.csv`, `data/crt_calls.csv` and `data/state_classes.csv` carry the move.
 
-## 5. State and the trace
+## 6. State and the trace
 
+Scripts' events are dumped in section 51 of the trace (units' in section 50), never hashed (`docs/trace-format.md`).
 Scripts keep no private region, so they have no `WriteState` report: their state is the script object of each unit
 and its piece state, hashed where they are (the human, 2026-11-16 and 2026-11-17, on #978 and #984). It stays hashed
 in this change as section 23 of `docs/trace-format.md` (8.12, "scripts"), and the units' section hashes the unit's
@@ -195,9 +245,8 @@ the last list below is what scripts adds to that bump.
 | The unit's bit0, bit1 and bit3 (`UnitScript::SetUnitValue`, `GetUnitValue`) | the unit record, hashed with the unit | scripts write them directly; the word they sit in is read as `Unit::flags` by units, orders and map | no |
 | The feature's model state (`PlaceFeature`, `FREE_STATE`, `INIT_STATE`) | the feature, hashed as a pointer marker | features, presentation; scripts builds and fills it | no |
 
-Scripts are not among the owners of `privatestate.py` yet (#986 adds them with units). With them, `--check` would fail
-when another subsystem writes any of the items scripts alone writes: the
-channels, the statics, the piece records and the transforms. By the access log (`uv run tools/coupling.py --summary
+This change adds scripts to the owners of `privatestate.py`. With them, `--check` fails when another subsystem writes
+any of the items scripts alone writes: the channels, the statics, the piece records and the transforms. By the access log (`uv run tools/coupling.py --summary
 scripts`), the sim items scripts writes are those and the unit's `script` pointer and bits above; presentation writes
 `ModelState::cacheDrawCount` and `ObjectState::unit` (drawing), and units writes the model state's `unit` pointer.
 Scripts read, and write nothing of, the unit's position, heading, angles, flags, health, `cargo`, `cargoNext`,
@@ -215,22 +264,19 @@ Scripts read, and write nothing of, the unit's position, heading, angles, flags,
 Nothing else in the hash is scripts'. The unit's `script`, `state` and bits stay in the unit's section with the
 unit.
 
-## 6. What the next issues decide
+## 7. What is left
 
-This issue leaves the following to the issues that put the module on the model, and opens none of them:
-- **#986 (units, with scripts on the scheduler).** Which of the slots become events. The candidates are the ones whose
-  callers use no answer: `StartScript`, `StartScriptWithArgs` and `StartScriptWithArgsByIndex` (their results are
-  mostly dropped, but not in `StartScript` of `InitUnitScript`'s "Create", nor in the `FindScript`/index pairs of
-  `order_queue.cpp`, which use the index), `SetCob`, `SetObjectState`, `SaveScriptState` and `DeleteScript`. The
-  queries (`QueryScript`, the piece getters, `ObjectStateSize`) and `FindScript` answer in the caller's statement.
-  Whether `RunScripts`, called from `UpdateUnitBody` for each unit in 3.1c's order, becomes a pass of scripts, and where
-  scripts' draws of `RandomInt` sit in it.
+The following is left, and no issue is opened for it here:
+- **#986, done.** Units and scripts are on the scheduler. Every start of a script is the event START and the filling
+  of a feature's piece state is INIT_STATE (section 2); scripts' effects on units and map are events published from
+  `SCHED_SCRIPTS` (section 4); `RunScripts` is a step of the unit loop. The queries, the life cycle of a unit's script
+  and the save and load pair stay synchronous slots, as section 2 says.
 - **#984 (weapons), done (`docs/weapons-interface.md`).** Weapons publishes its script starts as the effect
-  START_SCRIPT (its `WeaponsScript` names the script, which scripts maps back to the unit script's name) and a piece's detaching as DETACH_PIECE, both to scripts; scripts publishes a weapon's aim callback
-  (`WeaponAimCobComplete`) as weapons' event AIM_DONE and the explode opcode (`CobScriptExplodePiece`) as
-  EXPLODE_PIECE. `QueryScript` and `GetAimFromPosition` stay synchronous slots of scripts (mixed: they run a unit's
-  script, and weapons uses the answer in the same statement), for #986.
-- **The format bump for weapons, orders and units.** Moving the state section 5 lists out of the hash, as #979 does
+  START_SCRIPT and a piece's detaching as DETACH_PIECE, both to scripts, whose handlers turn them into START and
+  DETACH_PIECE; scripts publishes a weapon's aim callback (`WeaponAimCobComplete`) as weapons' event AIM_DONE and the
+  explode opcode (`CobScriptExplodePiece`) as EXPLODE_PIECE. `QueryScript` and `GetAimFromPosition` stay synchronous
+  slots of scripts (mixed: they run a unit's script, and weapons uses the answer in the same statement).
+- **The format bump for weapons, orders and units.** Moving the state section 6 lists out of the hash, as #979 does
   for los_radar, players, ai and map.
 - **The piece queries stay scripts'.** They read the piece state, and their callers (weapons, orders, movement) reach
   them through this seam like any other slot.

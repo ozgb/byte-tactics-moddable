@@ -48,9 +48,9 @@ Players' place in it:
   last apply.
 - **Views:** the `Player` records (`Game::players`), which players, economy, units and the network write
   (section 4), and the conditions' objects, which only players reads.
-- **Effects out of players:** KILL_UNIT, SEND_UNIT and CAPTURE_UNIT, to units. Units is not on the model yet, so its
-  handlers (`src/units/players_effects.cpp`) are adapters that hold 3.1c's writes into the unit and its calls into
-  weapons, network and units. Players records each effect in the trace's dump before it publishes it, as
+- **Effects out of players:** KILL_UNIT, SEND_UNIT and CAPTURE_UNIT, to units. Units' handlers
+  (`src/seams/units_world.cpp`) are adapters that turn each into a units event for `UnitsApply`
+  (`src/units/units_apply.cpp`), which holds 3.1c's writes into the unit and its calls into weapons, network and units. Players records each effect in the trace's dump before it publishes it, as
   `docs/module-abi.md`, 9.3, asks of a module's effects.
 - **Module ids:** players keeps `SCHED_PLAYERS = 4`, which economy's routes already used as an outbox.
 
@@ -144,8 +144,8 @@ seam.
   the unit takes 30000 damage; the copy takes the unit's state bits (`units.SetStateBits`).
 
 The handlers (`UnitsOnPlayersKillUnit`, `UnitsOnPlayersSendUnit`, `UnitsOnPlayersCaptureUnit`,
-`src/units/players_effects.cpp`) are units' adapters, as economy's CLOAK and EXTRACTOR are
-(`src/units/economy_effects.cpp`): units owns the writes, and the effects carry a unit as its block offset and a
+`src/seams/units_world.cpp`) are units' adapters, as economy's CLOAK and EXTRACTOR are
+(`src/seams/units_world.cpp` and `src/seams/scripts_world.cpp`): units owns the writes, and the effects carry a unit as its block offset and a
 player as its index, so they are plain data. The three routes are synchronous (section 4), so
 each write lands at the publisher's statement, as 3.1c's did: inside units' or orders' update that published the
 GIVE_UNIT or KILL_UNITS, or inside the network packet that did.

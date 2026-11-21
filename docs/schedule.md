@@ -89,6 +89,7 @@ Each entity:
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
@@ -96,7 +97,6 @@ Each entity:
 1. `weapons.UpdateUnitWeapons`: intent
 1. `scripts.RunScripts`: intent
 1. `mission.GetMissionParams`: mixed
-1. `map.Apply`: mixed
 1. `orders.RunOrders`: intent
 1. `orders.RunSecondaryOrders`: intent
 1. `movement.UpdateMotion`: intent
@@ -265,12 +265,12 @@ Each entity:
 1. `economy.Apply`: mixed
 1. the delivery of a queued effect to a handler of units
 1. `weapons.Apply`: mixed
+1. `map.Apply`: mixed
 1. `map.GetCellMeanHeight`: query
 1. `map.GetGroundHeight`: query
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
 1. a sim event is recorded
 1. `los_radar.GetMapCell`: query
-1. `map.Apply`: mixed
 1. `scripts.ObjectStateSize`: query
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.SoundHeardMask`: query
@@ -288,6 +288,7 @@ Before the loops:
 1. `economy.Apply`: mixed
 1. the delivery of a queued effect to a handler of units
 1. `weapons.Apply`: mixed
+1. `map.Apply`: mixed
 
 Each entity of loop 1:
 
@@ -302,9 +303,9 @@ Each entity of loop 2:
 1. `economy.Apply`: mixed
 1. the delivery of a queued effect to a handler of units
 1. `weapons.Apply`: mixed
+1. `map.Apply`: mixed
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.GetMapCell`: query
-1. `map.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -437,9 +438,9 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `economy.Apply`: mixed
 1. the delivery of a queued effect to a handler of units
 1. `weapons.Apply`: mixed
+1. `map.Apply`: mixed
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.GetMapCell`: query
-1. `map.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
@@ -466,7 +467,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `map.Apply`
 
 1. `los_radar.Apply`: mixed
-1. `movement.Apply`: mixed
 1. the delivery of a queued effect to a handler of pathfinding
 1. `los_radar.GetMapCell`: query
 
@@ -479,13 +479,11 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `map.RefreshMovedUnits`
 
 1. `los_radar.Apply`: mixed
-1. `movement.Apply`: mixed
 1. the delivery of a queued effect to a handler of pathfinding
 
 ### `map.RefreshUnitIfStale`
 
 1. `los_radar.Apply`: mixed
-1. `movement.Apply`: mixed
 1. the delivery of a queued effect to a handler of pathfinding
 
 ### `movement.Apply`
@@ -493,8 +491,8 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `pathfinding.Cancel`: intent
 1. the delivery of a queued effect to a handler of units
 1. `los_radar.Apply`: mixed
-1. `orders.Apply`: mixed
 1. `map.Apply`: mixed
+1. `orders.Apply`: mixed
 1. the delivery of a queued effect to a handler of scripts
 1. `scripts.GetPiecePosition`: query
 1. `pathfinding.Submit`: intent
@@ -504,8 +502,8 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. the delivery of a queued effect to a handler of units
 1. `los_radar.Apply`: mixed
-1. `orders.Apply`: mixed
 1. `map.Apply`: mixed
+1. `orders.Apply`: mixed
 1. the delivery of a queued effect to a handler of scripts
 
 ### `movement.LoadTarget`
@@ -553,6 +551,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `scripts.GetPieceAngles`: query
 1. the delivery of a queued effect to a handler of units
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `orders.Apply`: mixed
 1. `map.CanPlaceUnitFootprint`: mixed
 
@@ -827,10 +826,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
-1. `map.Apply`: mixed
 1. a sim event is recorded
 1. `scripts.StartScript`: intent
 
@@ -842,10 +841,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
-1. `map.Apply`: mixed
 
 ### `units.CreateUnit`
 
@@ -856,10 +855,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
-1. `map.Apply`: mixed
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
@@ -879,10 +878,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
-1. `map.Apply`: mixed
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
@@ -905,6 +904,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
 1. `ai.Apply`: mixed
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
@@ -912,7 +912,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `weapons.UpdateUnitWeapons`: intent
 1. `scripts.RunScripts`: intent
 1. `mission.GetMissionParams`: mixed
-1. `map.Apply`: mixed
 1. `orders.RunOrders`: intent
 1. `orders.RunSecondaryOrders`: intent
 1. `movement.UpdateMotion`: intent
@@ -1043,7 +1042,6 @@ is not listed.
 | map | `los_radar.Apply` | mixed |
 | map | `los_radar.GetMapCell` | query |
 | map | `los_radar.GetMapCellAtPosition` | query |
-| map | `movement.Apply` | mixed |
 | movement | `los_radar.Apply` | mixed |
 | movement | `map.Apply` | mixed |
 | movement | `map.CanPlaceUnitFootprint` | mixed |
@@ -1250,7 +1248,7 @@ the split lies in.
 | movement | orders | units, each entity | split | `players.Apply` (step 2) | `orders.RunOrders` (step 15) |  | by item | 1 | 1 |
 | movement | players | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 1 |
 | movement | targeting | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 1 |
-| movement | targeting | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 11) |  | by item | 1 | 1 |
+| movement | targeting | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 12) |  | by item | 1 | 1 |
 | movement | units | units, each entity | apply before continuing | `players.Apply` (step 2) | the caller |  | by subsystem | 2 | 1 |
 | movement | units | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
 | movement | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
@@ -1264,7 +1262,7 @@ the split lies in.
 | scripts | units | units, each entity | apply before continuing | `players.Apply` (step 2) | the caller |  | by subsystem | 2 | 2 |
 | scripts | units | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
 | scripts | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 10 | 3 |
-| scripts | weapons | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 11) |  | by item | 1 | 1 |
+| scripts | weapons | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 12) |  | by item | 1 | 1 |
 | targeting | orders | units, each entity | split | `players.Apply` (step 2) | `orders.RunOrders` (step 15) |  | by item | 1 | 1 |
 | targeting | scripts | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 1 |
 | targeting | units | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
@@ -1288,10 +1286,10 @@ the split lies in.
 | units | targeting | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 2) |  | by subsystem | 5 | 5 |
 | units | targeting | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 0 |
 | units | targeting | units, each entity | split | `players.Apply` (step 2) | `orders.RunOrders` (step 15) |  | by item | 3 | 3 |
-| units | targeting | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 11) |  | by item | 2 | 2 |
+| units | targeting | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 12) |  | by item | 2 | 2 |
 | units | weapons | units, each entity | write before calling | the caller, before the first step | `players.Apply` (step 2) |  | by subsystem | 7 | 7 |
 | units | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 8 | 8 |
-| units | weapons | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 11) |  | by item | 2 | 2 |
+| units | weapons | units, each entity | split | `players.Apply` (step 2) | `weapons.UpdateUnitWeapons` (step 12) |  | by item | 2 | 2 |
 | weapons | orders | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 4 | 4 |
 | weapons | targeting | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 6 | 6 |
 | weapons | units | units, each entity | apply before continuing | `players.Apply` (step 2) | the caller |  | by subsystem | 3 | 0 |
@@ -1376,9 +1374,9 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | orders | 3 / 0 | 21 / 1 | 1 / 3 | 28 / 4 | 8 | 49 | 57 |
 | units | 1 / 1 | 5 / 6 | 18 / 3 | 16 / 11 | 131 | 23 | 154 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 7 / 3 | 1 | 12 | 11 |
-| map | 0 / 1 | 3 / 15 | 0 / 2 | 2 / 7 | 15 | 27 | 42 |
+| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 15 | 27 | 42 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 11 | 0 / 8 | 19 | 17 | 36 |
-| movement | 0 / 0 | 3 / 1 | 3 / 2 | 7 / 13 | 15 | 26 | 41 |
+| movement | 0 / 0 | 3 / 1 | 3 / 2 | 7 / 12 | 15 | 26 | 41 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |
 
 ## Limits

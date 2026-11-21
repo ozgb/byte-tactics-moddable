@@ -313,7 +313,7 @@ void PassMap::RefreshMovedUnits(UnitPassMapView* p)
 int __stdcall PathLockStamp(Unit* unit)
 {
     UnitPassMapView* p = (UnitPassMapView*)unit;
-    if (p->unit == 0)
+    if (!p->unit)
         return 0;
     return (int)p->unit->lastTick;
 }

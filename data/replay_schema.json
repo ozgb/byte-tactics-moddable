@@ -3029,36 +3029,6 @@
     "note": "the chain is walked and relinked through a pointer to the cargoNext of a unit"
    },
    {
-    "kind": "field_escape",
-    "target": "Unit::motion",
-    "rule": "fields",
-    "functions": [
-     "FootprintValue",
-     "GetPassMapCellValue",
-     "GetPassMapFootprintValue"
-    ],
-    "reads": [
-     "Unit.motion",
-     "UnitMotion.pathLockStamp"
-    ],
-    "note": "the motion pointer of a unit slot is read as a unit view whose lastTick is the pathLockStamp of the motion"
-   },
-   {
-    "kind": "field_read",
-    "target": "Unit::lastTick",
-    "rule": "fields",
-    "functions": [
-     "FootprintValue",
-     "GetPassMapCellValue",
-     "GetPassMapFootprintValue"
-    ],
-    "reads": [
-     "Unit.motion",
-     "UnitMotion.pathLockStamp"
-    ],
-    "note": "lastTick of the unit view is the pathLockStamp of the motion it points at"
-   },
-   {
     "kind": "field_read",
     "target": "Unit::pos",
     "rule": "fields",

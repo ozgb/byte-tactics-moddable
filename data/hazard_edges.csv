@@ -1652,6 +1652,7 @@ RepairUnitNoMoveOrder,UnitRefGet,"seam slot filled by InstallNativeSeams, UnitsS
 RunInitialMission,OrdersGetOrderType,"seam slot filled by InstallNativeSeams, OrdersSeam::GetOrderType, RunInitialMission (src/units/unit_commands.cpp), src/seams/native.cpp"
 RunInitialMission,OrdersMissionTypeFromName,"seam slot filled by InstallNativeSeams, OrdersSeam::MissionTypeFromName, RunInitialMission (src/units/unit_commands.cpp), src/seams/native.cpp"
 SaveUnitMotion,MovementGetMotionState,"seam slot filled by InstallNativeSeams, MovementSeam::GetMotionState, SaveUnitMotion (src/units/unit_save.cpp), src/seams/native.cpp"
+SaveUnitMotion,PathLockStamp,"seam slot filled by InstallNativeSeams, MapSeam::PathLockStamp, SaveUnitMotion (src/units/unit_save.cpp), src/seams/native.cpp"
 SaveUnits,OrdersSaveOrders,"seam slot filled by InstallNativeSeams, OrdersSeam::SaveOrders, SaveUnits (src/units/unit_save.cpp), src/seams/native.cpp"
 SchedPlayersPhase,MovementApplyPathEvent,"seam slot filled by InstallNativeSeams, MovementSeam::ApplyPathEvent, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
 SchedUnitsPhase,MovementUpdateMotion,"seam slot filled by InstallNativeSeams, MovementSeam::UpdateMotion, SchedUnitsPhase (src/game/scheduler.cpp), src/seams/native.cpp"

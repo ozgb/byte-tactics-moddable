@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 275 immediate, 13 deferrable, 1223 read-only, 1532 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 275 immediate, 13 deferrable, 1223 read-only, 1530 unobserved.
 
 ## Cutting rule
 
@@ -33,11 +33,11 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | targeting | 11 | 32 | 1 | 40 | 111 | 5 of 14 |
 | los_radar | 6 | 33 | 2 | 140 | 260 | 5 of 14 |
 | orders | 18 | 57 | 8 | 138 | 297 | 4 of 14 |
-| units | 28 | 154 | 6 | 85 | 459 | 3 of 14 |
+| units | 28 | 154 | 6 | 85 | 457 | 3 of 14 |
 | players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
 | map | 9 | 42 | 1 | 98 | 225 | 4 of 14 |
 | scripts | 16 | 36 | 0 | 28 | 142 | 9 of 14 |
-| movement | 0 | 41 | 2 | 69 | 235 | 7 of 14 |
+| movement | 0 | 41 | 2 | 69 | 233 | 7 of 14 |
 | mission | 0 | 0 | 0 | 55 | 104 | 14 of 14 |
 
 ## Tightly coupled groups
@@ -1618,7 +1618,7 @@ The 15 groups with the most rows are shown.
 | immediate | 131 | 23 |
 | deferrable | 6 | 0 |
 | read-only | 0 | 85 |
-| unobserved | 306 | 153 |
+| unobserved | 305 | 152 |
 
 **Ordered** (28).
 
@@ -1727,7 +1727,7 @@ The 40 rows with the most runs are shown; the other 114 are in data/dependencies
 | los_radar | 28 | 9 |
 | map | 32 | 8 |
 | mission | 3 | 7 |
-| movement | 30 | 16 |
+| movement | 29 | 15 |
 | orders | 57 | 16 |
 | pathfinding | 2 | 2 |
 | players | 23 | 32 |
@@ -2308,7 +2308,7 @@ It has no deferrable edge.
 | immediate | 15 | 26 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 69 |
-| unobserved | 91 | 144 |
+| unobserved | 90 | 143 |
 
 **Ordered** (0).
 
@@ -2389,7 +2389,7 @@ The 40 rows with the most runs are shown; the other 1 are in data/dependencies.c
 | players | 6 | 6 |
 | scripts | 6 | 7 |
 | targeting | 4 | 4 |
-| units | 16 | 30 |
+| units | 15 | 29 |
 | weapons | 4 | 10 |
 | wind_meteors | 5 | 5 |
 

@@ -12143,7 +12143,6 @@ address,function,file,kind,target
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::movementClass
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::obj
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::p2
-0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::pathLockStamp
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::speed
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::turn
 0x43dc00,UnitMotion::UnitMotion,src/movement/motion.cpp,field_write,UnitMotion::velocity
@@ -12171,14 +12170,15 @@ address,function,file,kind,target
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,call,HapiBank::WriteBox
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,call,memset
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,call,sprintf
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::flag
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::mode
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::p2
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::pathLockStamp
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::speed
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::turn
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementMotionState::velocity
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MapSeam::PathLockStamp
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::flag
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::mode
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::p2
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::speed
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::turn
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSavedState::velocity
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,MovementSeam::GetMotionState
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,Seams::map
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,Seams::movement
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_read,Unit::id
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_write,UnitMotionSaveRecord::flag
@@ -12190,17 +12190,16 @@ address,function,file,kind,target
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,field_write,UnitMotionSaveRecord::velocity
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,function,
 0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,global_read,g_seams
-0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, MovementMotionState *) __attribute__((stdcall)) [MovementSeam::GetMotionState]"
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::flag
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::mode
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::p2
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::pathLockStamp
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::speed
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::turn
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementMotionState::velocity
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,indirect_call,indirect via int (*)(Unit *) __attribute__((stdcall)) [MapSeam::PathLockStamp]
+0x43dd70,SaveUnitMotion,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, MovementSavedState *) __attribute__((stdcall)) [MovementSeam::GetMotionState]"
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::flag
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::mode
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::p2
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::speed
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::turn
+0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_read,MovementSavedState::velocity
 0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,UnitMotion::flag
 0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,UnitMotion::mode
-0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,UnitMotion::pathLockStamp
 0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,UnitMotion::speed
 0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,UnitMotion::turn
 0x43de30,LoadMotionState,src/movement/movement_apply.cpp,field_write,Vec3::x
@@ -24436,12 +24435,12 @@ address,function,file,kind,target
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,field_write,Unit::spatialBucket
 0x47cbd0,ClearFootprintAndUnlink,src/map/terrain.cpp,function,
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,LosRadarPublishCellHeights
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,MovementPublishUnit
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,RefreshAllPassMapsForUnits
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,SetOwner
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,get
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator Cell *
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator Unit *
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator!=
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator->
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,deref_escape,*Cell
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,deref_escape,*Unit
@@ -24454,6 +24453,7 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::cells_1429f
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::height
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::overflowBucket
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::ticks
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::units
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Game::width_142a3
@@ -24467,15 +24467,16 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::flags
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::footprint
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::id
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::motion
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::player
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Unit::pos
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,UnitDef::yardmap
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,UnitPassMapView::unit
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Vec3::x
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_read,Vec3::z
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Cell::flags
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Cell::unit
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Cell::unit2
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,MotionTickView::lastTick
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Point16::x
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Point16::y
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,field_write,Unit::flags
@@ -24650,10 +24651,9 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator Unit *
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator bool
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,call,operator->
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,deref_read,*Ref<Unit>
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,deref_escape,*Unit
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,deref_read,*int
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_escape,Game::width
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_escape,Unit::motion
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Cell::feature
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Cell::high
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Cell::low
@@ -24665,6 +24665,7 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::features
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::seaLevel
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Game::units
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,MotionTickView::lastTick
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::badSlope
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::badWaterSlope
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::lastTick
@@ -24672,7 +24673,7 @@ address,function,file,kind,target
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::maxWaterDepth
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::maxWaterSlope
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,PassMap::minWaterDepth
-0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,Unit::lastTick
+0x47de60,GetPassMapCellValue,src/map/terrain.cpp,field_read,UnitPassMapView::unit
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,function,
 0x47de60,GetPassMapCellValue,src/map/terrain.cpp,global_read,g_game
 0x47dfc0,GetPassMapFootprintValue,src/map/terrain.cpp,call,FootprintValue
@@ -42828,6 +42829,7 @@ address,function,file,kind,target
 ,ApplyMapEvent,src/map/terrain.cpp,call,BucketHolds
 ,ApplyMapEvent,src/map/terrain.cpp,call,ClearFootprintAndUnlink
 ,ApplyMapEvent,src/map/terrain.cpp,call,ForceNeighborFootprintReclaim
+,ApplyMapEvent,src/map/terrain.cpp,call,LoadPathLockStamp
 ,ApplyMapEvent,src/map/terrain.cpp,call,MapEventSize
 ,ApplyMapEvent,src/map/terrain.cpp,call,MapPoint
 ,ApplyMapEvent,src/map/terrain.cpp,call,MapUnitOfHandle
@@ -42842,7 +42844,9 @@ address,function,file,kind,target
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEventHeader::unit
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPassMaps::cell
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPassMaps::size
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPathLockStamp::stamp
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapSetYard::open
+,ApplyMapEvent,src/map/terrain.cpp,field_read,Unit::motion
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,Unit::spatialBucket
 ,ApplyMapEvent,src/map/terrain.cpp,function,
 ,ApplyMissionOptionFlags,src/game/game_load.cpp,field_read,MissionOptionFlags::flag_4
@@ -45815,8 +45819,7 @@ address,function,file,kind,target
 ,FootprintValue,src/map/terrain.cpp,call,operator bool
 ,FootprintValue,src/map/terrain.cpp,call,operator->
 ,FootprintValue,src/map/terrain.cpp,deref_escape,*Cell
-,FootprintValue,src/map/terrain.cpp,deref_read,*Ref<Unit>
-,FootprintValue,src/map/terrain.cpp,field_escape,Unit::motion
+,FootprintValue,src/map/terrain.cpp,deref_escape,*Unit
 ,FootprintValue,src/map/terrain.cpp,field_read,Cell::feature
 ,FootprintValue,src/map/terrain.cpp,field_read,Cell::high
 ,FootprintValue,src/map/terrain.cpp,field_read,Cell::low
@@ -45831,6 +45834,7 @@ address,function,file,kind,target
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::seaLevel
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::units
 ,FootprintValue,src/map/terrain.cpp,field_read,Game::width
+,FootprintValue,src/map/terrain.cpp,field_read,MotionTickView::lastTick
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::badSlope
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::badWaterSlope
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::lastTick
@@ -45838,7 +45842,7 @@ address,function,file,kind,target
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::maxWaterDepth
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::maxWaterSlope
 ,FootprintValue,src/map/terrain.cpp,field_read,PassMap::minWaterDepth
-,FootprintValue,src/map/terrain.cpp,field_read,Unit::lastTick
+,FootprintValue,src/map/terrain.cpp,field_read,UnitPassMapView::unit
 ,FootprintValue,src/map/terrain.cpp,function,
 ,FootprintValue,src/map/terrain.cpp,global_read,g_game
 ,FootprintValueWithEdgeStrips,src/map/terrain.cpp,call,FootprintValue
@@ -49174,6 +49178,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadPlayerFeaturesPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PassMapGet
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PassMapInBounds
+,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PathLockStamp
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshMovedUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshUnitIfStale
@@ -49720,6 +49725,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PassMapGetNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PassMapInBoundsNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathLockStamp
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingCancel
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingCellsChanged
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,PathfindingDebugCell
@@ -50263,6 +50269,7 @@ address,function,file,kind,target
 ,KnownCopy,src/harness/replay_text.cpp,function,
 ,KnownHash,src/harness/replay_text.cpp,deref_read,*unsigned char
 ,KnownHash,src/harness/replay_text.cpp,function,
+,KnownKind,src/movement/movement_apply.cpp,function,
 ,KnownKind,src/orders/orders_apply.cpp,function,
 ,KnownKind,src/weapons/weapons_apply.cpp,function,
 ,LIndex,src/ai/pathfind_hpa.cpp,field_read,Hdr::shift
@@ -50514,6 +50521,10 @@ address,function,file,kind,target
 ,LoadOnline,src/host/win32/net.cpp,global_read,g_onlineDllPath@src/host/win32/net.cpp
 ,LoadOnline,src/host/win32/net.cpp,global_write,g_onlineDll@src/host/win32/net.cpp
 ,LoadOnline,src/host/win32/net.cpp,global_write,g_onlineDllPath@src/host/win32/net.cpp
+,LoadPathLockStamp,src/map/pass_map.cpp,call,operator->
+,LoadPathLockStamp,src/map/pass_map.cpp,field_read,UnitPassMapView::unit
+,LoadPathLockStamp,src/map/pass_map.cpp,field_write,MotionTickView::lastTick
+,LoadPathLockStamp,src/map/pass_map.cpp,function,
 ,LoadScriptStateNative,src/seams/native.cpp,call,CobScript::LoadScriptState
 ,LoadScriptStateNative,src/seams/native.cpp,function,
 ,LoadSideRect,src/game/side_data.cpp,call,FatalError
@@ -50528,6 +50539,7 @@ address,function,file,kind,target
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::OpenNamedBox
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::ReadBox
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::SeekBox
+,LoadUnitMotion,src/units/unit_save.cpp,call,MapPublishPathLockStamp
 ,LoadUnitMotion,src/units/unit_save.cpp,call,MovementPublishLoad
 ,LoadUnitMotion,src/units/unit_save.cpp,call,sprintf
 ,LoadUnitMotion,src/units/unit_save.cpp,field_read,Unit::id
@@ -50538,13 +50550,12 @@ address,function,file,kind,target
 ,LoadUnitMotion,src/units/unit_save.cpp,field_read,UnitMotionSaveRecord::speed
 ,LoadUnitMotion,src/units/unit_save.cpp,field_read,UnitMotionSaveRecord::turn
 ,LoadUnitMotion,src/units/unit_save.cpp,field_read,UnitMotionSaveRecord::velocity
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::flag
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::mode
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::p2
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::pathLockStamp
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::speed
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::turn
-,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementMotionState::velocity
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::flag
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::mode
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::p2
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::speed
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::turn
+,LoadUnitMotion,src/units/unit_save.cpp,field_write,MovementSavedState::velocity
 ,LoadUnitMotion,src/units/unit_save.cpp,function,
 ,LoadWeaponTDFs,src/units/unit_types.cpp,call,BuildDataPath
 ,LoadWeaponTDFs,src/units/unit_types.cpp,call,ListDirectory
@@ -51297,10 +51308,9 @@ address,function,file,kind,target
 ,MovementApply,src/movement/movement_apply.cpp,call,operator new
 ,MovementApply,src/movement/movement_apply.cpp,call,operator->
 ,MovementApply,src/movement/movement_apply.cpp,call,operator=
-,MovementApply,src/movement/movement_apply.cpp,field_read,Game::ticks
 ,MovementApply,src/movement/movement_apply.cpp,field_read,MovementEventHeader::kind
 ,MovementApply,src/movement/movement_apply.cpp,field_read,MovementEventHeader::unit
-,MovementApply,src/movement/movement_apply.cpp,field_read,MovementLoad::state
+,MovementApply,src/movement/movement_apply.cpp,field_read,MovementLoadState::state
 ,MovementApply,src/movement/movement_apply.cpp,field_read,MovementSetMode::mode
 ,MovementApply,src/movement/movement_apply.cpp,field_read,MovementSetSpeed::speed
 ,MovementApply,src/movement/movement_apply.cpp,field_read,MovementTarget::target
@@ -51309,10 +51319,8 @@ address,function,file,kind,target
 ,MovementApply,src/movement/movement_apply.cpp,field_read,UnitMotion::obj
 ,MovementApply,src/movement/movement_apply.cpp,field_write,Unit::motion
 ,MovementApply,src/movement/movement_apply.cpp,field_write,UnitMotion::mode
-,MovementApply,src/movement/movement_apply.cpp,field_write,UnitMotion::pathLockStamp
 ,MovementApply,src/movement/movement_apply.cpp,field_write,UnitMotion::speed
 ,MovementApply,src/movement/movement_apply.cpp,function,
-,MovementApply,src/movement/movement_apply.cpp,global_read,g_game
 ,MovementApply,src/movement/movement_apply.cpp,global_read,kSim
 ,MovementApply,src/movement/movement_apply.cpp,indirect_call,virtual OrderFx::GetType
 ,MovementApply,src/movement/movement_apply.cpp,indirect_call,virtual OrderFx::~OrderFx
@@ -51335,6 +51343,7 @@ address,function,file,kind,target
 ,MovementApplyPathEvent,src/movement/order_targets.cpp,field_write,Ref<OrderFx>::offset
 ,MovementApplyPathEvent,src/movement/order_targets.cpp,function,
 ,MovementEventSize,src/game/movement_event_size.h,function,
+,MovementEventValid,src/movement/movement_apply.cpp,call,KnownKind
 ,MovementEventValid,src/movement/movement_apply.cpp,call,TargetKind
 ,MovementEventValid,src/movement/movement_apply.cpp,call,operator==
 ,MovementEventValid,src/movement/movement_apply.cpp,field_read,MovementEventHeader::kind
@@ -51345,19 +51354,17 @@ address,function,file,kind,target
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,Unit::motion
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,UnitMotion::flag
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,UnitMotion::mode
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,UnitMotion::pathLockStamp
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,UnitMotion::speed
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,UnitMotion::turn
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,Vec3::x
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,Vec3::y
 ,MovementGetMotionState,src/movement/movement_apply.cpp,field_read,Vec3::z
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::flag
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::mode
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::p2
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::pathLockStamp
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::speed
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::turn
-,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementMotionState::velocity
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::flag
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::mode
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::p2
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::speed
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::turn
+,MovementGetMotionState,src/movement/movement_apply.cpp,field_write,MovementSavedState::velocity
 ,MovementGetMotionState,src/movement/movement_apply.cpp,function,
 ,MovementHasNetState,src/movement/movement_apply.cpp,call,get
 ,MovementHasNetState,src/movement/movement_apply.cpp,call,operator->
@@ -51429,9 +51436,9 @@ address,function,file,kind,target
 ,MovementPublishLoad,src/game/movement_events.h,call,MovementHeaderOf
 ,MovementPublishLoad,src/game/movement_events.h,call,SchedPublish
 ,MovementPublishLoad,src/game/movement_events.h,call,operator=
-,MovementPublishLoad,src/game/movement_events.h,deref_read,*MovementMotionState
-,MovementPublishLoad,src/game/movement_events.h,field_write,MovementLoad::h
-,MovementPublishLoad,src/game/movement_events.h,field_write,MovementLoad::state
+,MovementPublishLoad,src/game/movement_events.h,deref_read,*MovementSavedState
+,MovementPublishLoad,src/game/movement_events.h,field_write,MovementLoadState::h
+,MovementPublishLoad,src/game/movement_events.h,field_write,MovementLoadState::state
 ,MovementPublishLoad,src/game/movement_events.h,function,
 ,MovementPublishOrderFlags,src/game/movement_events.h,call,MovementHeaderOf
 ,MovementPublishOrderFlags,src/game/movement_events.h,call,MovementPublishEffect
@@ -52725,6 +52732,11 @@ address,function,file,kind,target
 ,PathGrid::Set,src/ai/pathfinder.h,field_read,PathGrid::width
 ,PathGrid::Set,src/ai/pathfinder.h,field_write,PathCell::flags
 ,PathGrid::Set,src/ai/pathfinder.h,function,
+,PathLockStamp,src/map/pass_map.cpp,call,operator bool
+,PathLockStamp,src/map/pass_map.cpp,call,operator->
+,PathLockStamp,src/map/pass_map.cpp,field_read,MotionTickView::lastTick
+,PathLockStamp,src/map/pass_map.cpp,field_read,UnitPassMapView::unit
+,PathLockStamp,src/map/pass_map.cpp,function,
 ,PathOrderAttach::PathOrderAttach,src/units/path_order_attach.h,function,
 ,PathOrderAttach::~PathOrderAttach,src/units/path_order_attach.h,function,
 ,PathResultsAdd,src/harness/path_results.cpp,call,memcpy
@@ -55466,7 +55478,7 @@ address,function,file,kind,target
 ,RecMovementGetMotionState,src/harness/replay_hooks.inc,function,
 ,RecMovementGetMotionState,src/harness/replay_hooks.inc,global_read,s_call
 ,RecMovementGetMotionState,src/harness/replay_hooks.inc,global_read,s_inner_movement
-,RecMovementGetMotionState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, MovementMotionState *) __attribute__((stdcall)) [MovementSeam::GetMotionState]"
+,RecMovementGetMotionState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, MovementSavedState *) __attribute__((stdcall)) [MovementSeam::GetMotionState]"
 ,RecMovementHasNetState,src/harness/replay_hooks.inc,call,Add
 ,RecMovementHasNetState,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementHasNetState,src/harness/replay_hooks.inc,call,ArgValue

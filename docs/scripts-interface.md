@@ -246,7 +246,10 @@ the last list below is what scripts adds to that bump.
 | The feature's model state (`PlaceFeature`, `FREE_STATE`, `INIT_STATE`) | the feature, hashed as a pointer marker | features, presentation; scripts builds and fills it | no |
 
 This change adds scripts to the owners of `privatestate.py`. With them, `--check` fails when another subsystem writes
-any of the items scripts alone writes: the channels, the statics, the piece records and the transforms. By the access log (`uv run tools/coupling.py --summary
+any of the items scripts alone writes: the script objects (`CobScript`, `UnitScript`, the channels), the statics and
+the piece records, and the unit's `script` pointer, which units also writes when it creates and frees the script
+(`InitUnitScript`, `ApplyUnitDeath`). The model state is not claimed: presentation (`cacheDrawCount`, `shadow`) and
+units (`bitmap`) write parts of it. By the access log (`uv run tools/coupling.py --summary
 scripts`), the sim items scripts writes are those and the unit's `script` pointer and bits above; presentation writes
 `ModelState::cacheDrawCount` and `ObjectState::unit` (drawing), and units writes the model state's `unit` pointer.
 Scripts read, and write nothing of, the unit's position, heading, angles, flags, health, `cargo`, `cargoNext`,

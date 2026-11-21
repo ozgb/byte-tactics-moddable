@@ -276,12 +276,12 @@ outside the tick, after LOAD has been delivered, and `HasNetState` reads the goa
 | movement ORDER_FLAGS, to orders (`OrdersOnMovementOrderFlags`) | synchronous | The gate (section 8). |
 | movement TURN, to units | synchronous | The gate (section 8). |
 | movement TILT, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `SetFlightMode` publishes it from SET_FLIGHT_MODE's handler, inside `RunOrders`, and the orders that follow in the same call read the unit's pieces through scripts' piece queries (`GetNanoPiecePosition`), which read the bank and pitch it writes, before units' delivery after `UpdateMotion`. |
-| movement ANGLES, to units | queued | #952's rule finds no read: it is published in the carried branch of `UpdatePosition`, after SET_POSITION, and the statement after it is MOVED; any later synchronous publish to units delivers units' inbox first, and no statement between it and that delivery reads the angles. |
+| movement ANGLES, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code: it is published in the carried branch of `UpdatePosition`, after SET_POSITION, and the statement after it is MOVED; any later synchronous publish to units delivers units' inbox first, and no statement between it and that delivery reads the angles. |
 | movement MOVE, to units | synchronous | The gate (section 8): the traces were equal, the sim event digest diverged. |
 | movement MOVED, to units | queued | #952's rule finds no read: it writes `Unit::moved`, which no function of `src/` reads (it is written at five sites, and the scheduler hands `UpdateUnitTail` its own `moved`). |
 | movement CHANGE_CELL, to units | synchronous | The gate (section 8). |
 | movement MOVE_RATE, to units | queued | #952's rule finds no read: it writes bits 2 and 3 of `Unit::flags`, which `UpdateMoveRate` reads before it publishes, and economy and the UI read later (the players phase, after a phase boundary). |
-| movement SET_POSITION, to units | queued | #952's rule finds no read: it is published in the carried branch of `UpdatePosition`, whose next statements read the carrier's piece angles and motion, not the unit's position; any later synchronous publish to units delivers units' inbox first, and SFX_OCCUPY's handler reads `yWhole` after that delivery. |
+| movement SET_POSITION, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code: it is published in the carried branch of `UpdatePosition`, whose next statements read the carrier's piece angles and motion, not the unit's position; any later synchronous publish to units delivers units' inbox first, and SFX_OCCUPY's handler reads `yWhole` after that delivery. |
 | movement SET_STATE_BITS, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `SetFlightMode` publishes it from SET_FLIGHT_MODE's handler, inside `RunOrders`, and the build orders that can follow in the same call read `activateFlags & 1` (`unit_orders.cpp`), which it writes, before units' delivery after `UpdateMotion`. |
 | movement SFX_OCCUPY, to units | queued | #952's rule finds no read: it is the last publish of `UpdateMotion`, and its handler (`UpdateSfxOccupy`) reads `yWhole` and `flags & 3` and starts `setSFXoccupy` only when the state changed; nothing between it and units' delivery before the tail reads what it writes. |
 | movement START_SCRIPT, to scripts | synchronous | The gate (section 8). |
@@ -362,8 +362,8 @@ writes the motion record by offset.
 
 **The trace dumps movement's events** in section 49 (`docs/trace-format.md`, section 8.33), after orders' section 48
 (`docs/orders-interface.md`, section 5), and hashes none of them. Each record is an event with the outcome `Apply`
-gave, or an effect movement published (outcome 1), in movement's order. Sections 50 and 51 are reserved for units and
-scripts (#986). The section is new, so the trace format's schema changes. Neither module's `WriteState` writes a
+gave, or an effect movement published (outcome 1), in movement's order. Sections 50 and 51 are units' and
+scripts' events (`docs/trace-format.md`, sections 8.34 and 8.35). The section is new, so the trace format's schema changes. Neither module's `WriteState` writes a
 record.
 
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes movement's
@@ -500,12 +500,12 @@ the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 
 | movement ORDER_FLAGS | diverged | orders-air, tick 940, world phase: stored 394b77cd380e1e61, got a3baa9ecf36255af. |
 | movement TURN | diverged | mission-radius, tick 1, units phase (`UpdateAllUnits`, 0x48ad30): `units[9].pos.x` (reference 0x070000a1, queued 0x07000081). |
 | movement TILT | equal | none (synchronous by #952's rule, section 4) |
-| movement ANGLES | equal | none (queued, section 4: #952's rule finds no read) |
+| movement ANGLES | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
 | movement MOVE | traces equal, events diverged | mission-capture, tick 1, units phase: the sim event digest (`1 units 36`, stored fb5750c1bbf846e8, got 555fb8667eecd559); also mission-passes-x, tick 5, and mission-radius, tick 1. |
 | movement MOVED | equal | none (queued, section 4: #952's rule finds no read) |
 | movement CHANGE_CELL | diverged | mission-radius, tick 20, world phase: `cells[3408]` (reference first byte 0x00, queued 0x09), 328 fields in all: the cell records of a unit's old and new footprint (map's ADD_UNIT and REMOVE_UNIT, synchronous, read the unit's cell, which CHANGE_CELL writes). |
 | movement MOVE_RATE | equal | none (queued, section 4: #952's rule finds no read) |
-| movement SET_POSITION | equal | none (queued, section 4: #952's rule finds no read) |
+| movement SET_POSITION | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
 | movement SET_STATE_BITS | equal | none (synchronous by #952's rule, section 4) |
 | movement SFX_OCCUPY | equal | none (queued, section 4: #952's rule finds no read) |
 | movement START_SCRIPT | diverged | mission-capture, tick 181, world phase: stored ea630c9c9a33e44c, got e83cde9c9860c414. |

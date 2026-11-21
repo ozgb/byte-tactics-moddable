@@ -17,9 +17,11 @@ Scripts are on the scheduler since #986, with units. They have an inbox (`Script
 that passes each event to `Apply` (`ScriptsApply`, `src/scripts/scripts_apply.cpp`) and records it with its outcome in
 the trace's dump (section 6). They have four events (section 2) and no pass of their own: `RunScripts` is a step of the
 scheduler's unit loop (`SchedUnitsPhase`, `src/game/scheduler.cpp`), between `UpdateUnitWeapons` and `UpdateUnitBody`,
-with scripts' inbox and then units' delivered before it and after it. Scripts' inbox is delivered before every delivery
-of units' inbox. `SCHED_SCRIPTS = 13` is the module's id and `SCHED_MODULE_COUNT` is 15. The synchronous slots answer
-at the statement that called them, as in 1.0, and deliver scripts' inbox first.
+with scripts' inbox delivered before it and units' before and after it. No route into scripts is queued (section 4),
+so scripts' inbox is empty in the tick. `SCHED_SCRIPTS = 13` is the module's id and `SCHED_MODULE_COUNT` is 15. The
+synchronous slots, which `src/seams/native.cpp` installs directly, answer at the statement that called them, as in 1.0;
+with nothing pending in scripts' inbox, they deliver nothing first. They read units' record as it is when they are
+called; every route into units that writes what a script reads is synchronous (`docs/units-interface.md`, section 4).
 
 There is no WASM module (the maintainer, 2026-11-19, on #993, option 1). The seam is over native code, like the other
 simulation subsystems: the fillers are in `src/seams/native.cpp` (`<Slot>Native`), and `g_seams.scripts` is set there.
@@ -70,16 +72,16 @@ delivery.
 |---|---|---|---|---|
 | `StartScriptWithArgsByIndex` | starts a script by the index of its name | network (`net_game.cpp`: `HandleNetPackets`, a script call from a packet); orders (`order_queue.cpp`: `StartBuildingScript`, `StopBuildingScript`, `Order::~Order`) | yes | `UnitsSeam::StartScriptWithArgsByIndex` |
 | `QueryScript` | runs a query script and returns its result | orders (`unit_orders.cpp`: `BuildingBuildOrder`; `vtol_orders.cpp`: `FindLandingPad`, `VtolPickupOrder`); units (`units.cpp`: `KillUnit`); weapons (`weapon_pieces.cpp`: `QueryWeaponPiece`) | yes | `UnitsSeam::QueryScript` |
-| `FindScript` | the index of a named script | network (`net_game.cpp`: `SendScriptCallByName`, `SendScriptCallNoArgsByName`, which orders reach through `g_seams.network`); orders (`order_queue.cpp`); units (`ScriptsOnTargetingCleared` in `src/seams/scripts_world.cpp`) | yes | `UnitsSeam::FindScript` |
+| `FindScript` | the index of a named script | network (`net_game.cpp`: `SendScriptCallByName`, `SendScriptCallNoArgsByName`, which orders reach through `g_seams.network`); orders (`order_queue.cpp`) | yes | `UnitsSeam::FindScript` |
 | `GetPieceOffset` | offset of a piece from the unit | orders (`vtol_orders.cpp`: `VtolPickupOrder`); weapons (`weapon_pieces.cpp`: `GetWeaponPiecePosition`) | yes | `UnitsSeam::GetPieceOffset` |
 | `GetPiecePosition` | world position of a piece | movement (`motion.cpp`: `UnitMotion::UpdatePosition`; `order_targets.cpp`: `PathOrder::FillWorldPos`); orders (`unit_orders.cpp`: `BuildingBuildOrder`); weapons (`script_explode.cpp`: `UnitScript::ExplodePiece`) | yes | `UnitsSeam::GetPiecePosition` |
 | `GetPieceAngles` | angles of a piece | movement (`motion.cpp`: `UnitMotion::UpdatePosition`, a unit carried on a piece) | yes | `UnitsSeam::GetPieceAngles` |
 | `GetNanoPiecePosition` | world position of the nano piece | orders (`unit_orders.cpp`: ten build, repair, reclaim, capture and resurrect orders; `vtol_orders.cpp`: five VTOL ones) | yes | `UnitsSeam::GetNanoPiecePosition` |
 | `GetAimFromPosition` | the position a weapon aims from | weapons (`weapons.cpp`: `CalcAimAngles`, `FireTurretWeapon`, `InitUnitWeaponSlots`, `UpdateUnitWeapons`) | yes | `UnitsSeam::GetAimFromPosition` |
-| `GetSweetSpot` | the point weapons aim at | units (`unit_targets.cpp`: `GetWeaponTargetPos`) | yes | `UnitsSeam::GetSweetSpot` |
+| `GetSweetSpot` | the point weapons aim at | targeting (`unit_targets.cpp`: `GetWeaponTargetPos`) | yes | `UnitsSeam::GetSweetSpot` |
 | `PoseUnitModel` | poses a unit's model from its angles and animation | weapons (`explosions.cpp`: `StartExplodePiece`) | yes | `UnitsSeam::PoseUnitModel` |
 | `CreateObjectState` | builds the piece state of a model (a feature, or a unit with no script) | units (`units.cpp`: `InitUnitScript`) | both | `UnitsSeam::CreateObjectState` |
-| `FreeObjectState` | frees a piece state and its cached pictures | units (`units.cpp`: `ApplyUnitDeath`; `ScriptsOnFeaturesFreeState` in `src/seams/scripts_world.cpp`) | yes | `UnitsSeam::FreeObjectState` |
+| `FreeObjectState` | frees a piece state and its cached pictures | units (`units.cpp`: `ApplyUnitDeath`); features' FREE_STATE reaches the same code through scripts' `Apply`, not this slot | yes | `UnitsSeam::FreeObjectState` |
 | `UpdateObjectState` | poses a model from its current angles when they changed | presentation (`model_render.cpp`: `DrawUnit`) | no | `UnitsSeam::UpdateObjectState` |
 | `ObjectStateSize` | bytes of a model's piece state, a query | features (`features.cpp`: `PlaceFeature`) | both | `UnitsSeam::ObjectStateSize` |
 | `NewUnitScript` | allocates a unit's script and stores it in the unit | units (`units.cpp`: `InitUnitScript`) | both | new: was a direct call of `NewUnitScript` from `units.cpp` |
@@ -193,13 +195,13 @@ same reasons is in `docs/units-interface.md`, section 4.
 | weapons START_SCRIPT, DETACH_PIECE, to scripts | synchronous | As before (`docs/weapons-interface.md`, sections 4 and 8). |
 | orders START_SCRIPT, to scripts | synchronous | As before (`docs/orders-interface.md`, section 4). |
 | movement START_SCRIPT, to scripts | synchronous | As before (`docs/movement-interface.md`, section 4). |
-| economy EXTRACTOR, to scripts | queued | As before (`docs/economy-interface.md`, section 4). Scripts' inbox is delivered before each delivery of units' inbox, so the start runs where it ran. |
+| economy EXTRACTOR, to scripts | synchronous | #952's rule: the start takes a thread channel, which a later start on the unit in the same phase could take first while it waited (`docs/units-interface.md`, section 4). It was queued before. |
 | features FREE_STATE, INIT_STATE, to scripts | synchronous | As before (`docs/features-interface.md`, sections 4 and 8). |
 | targeting CLEARED, to scripts | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | scripts AIM_DONE, EXPLODE_PIECE, to weapons | synchronous | As before (`docs/weapons-interface.md`, section 4). |
 
-All of them are in `src/game/routes.cpp`. The routes to scripts' handlers that were units' (EXTRACTOR, FREE_STATE,
-INIT_STATE and CLEARED) keep their modes.
+All of them are in `src/game/routes.cpp`. Of the routes to scripts' handlers that were units', FREE_STATE,
+INIT_STATE and CLEARED keep their modes, and EXTRACTOR becomes synchronous.
 
 ## 5. The rules of `data/subsystems.csv`
 
@@ -226,7 +228,7 @@ Scripts' events are dumped in section 51 of the trace (units' in section 50), ne
 Scripts keep no private region, so they have no `WriteState` report: their state is the script object of each unit
 and its piece state, hashed where they are (the human, 2026-11-16 and 2026-11-17, on #978 and #984). It stays hashed
 in this change as section 23 of `docs/trace-format.md` (8.12, "scripts"), and the units' section hashes the unit's
-`script` and `state` pointers as before. `docs/trace-format.md` is not edited here (#979 works there). The scripts'
+`script` and `state` pointers as before. Sections 50 and 51 are in `docs/trace-format.md` as 8.34 and 8.35. The scripts'
 class rows in `data/state_classes.csv` name `src/scripts/` as the owner (`NewUnitScript: new UnitScript`,
 `CreateObjectState` and `CreatePlayerObjectState: GameAllocIgnoreTag ModelState`). A later format bump, for weapons,
 orders and units, moves out of the hash what only its owner reads (as #979 does for los_radar, players, ai and map);

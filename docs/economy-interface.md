@@ -39,9 +39,11 @@ Economy's place in it:
 - **A query as of the last run:** `RequestGranted`, called through the service `ScheduleEconomyRequestGranted`, which
   does not deliver economy's inbox first (sections 4 and 8).
 - **Effects out of economy:** CLOAK, EXTRACTOR and SHARE, published to economy's outbox through the world view's
-  `Emit`. Units subscribes to CLOAK and EXTRACTOR, players to SHARE; their handlers are adapters onto their own seam
-  slots (`src/seams/units_world.cpp` and `src/seams/scripts_world.cpp` for CLOAK and EXTRACTOR, `PlayersOnEconomyShare` in `src/game/players.cpp`). EXTRACTOR and SHARE
-  are queued; CLOAK's route is synchronous, because the gate diverged with it queued (section 8).
+  `Emit`. Units subscribe to CLOAK, scripts to EXTRACTOR and players to SHARE. Their handlers turn each into their own
+  module's event: `UnitsOnEconomyCloak` (`src/seams/units_world.cpp`), `ScriptsOnEconomyExtractor`
+  (`src/seams/scripts_world.cpp`) and `PlayersOnEconomyShare` (`src/game/players.cpp`). SHARE is queued. CLOAK's route
+  is synchronous, because the gate diverged with it queued (section 8). EXTRACTOR's is synchronous since #986, by
+  #952's rule (`docs/units-interface.md`, section 4).
 - **Runs:** `UpdatePlayerEconomy` (the players phase), `UpdateMetalExtraction` (above) and `UpdateResourceSharing`
   (the tail of a network game), called by the engine only.
 
@@ -106,8 +108,8 @@ its records go with the next tick's, and the shares of a scenario's last tick ar
 
 | 3.1c call | Effect | Subscriber's handler |
 |---|---|---|
-| `SetStateBits(unit, 4, paid)` in `UpdatePlayerEconomy`, for a cloaked unit's upkeep | CLOAK (synchronous) | `units.SetStateBits` |
-| the `SetSpeed` script call in `UpdateMetalExtraction` | EXTRACTOR | `scripts.StartScriptWithArgs` when the unit has a script |
+| `SetStateBits(unit, 4, paid)` in `UpdatePlayerEconomy`, for a cloaked unit's upkeep | CLOAK (synchronous) | `UnitsOnEconomyCloak`: units' SET_STATE_BITS, mask 4 |
+| the `SetSpeed` script call in `UpdateMetalExtraction` | EXTRACTOR (synchronous since #986) | `ScriptsOnEconomyExtractor`: scripts' START of `SetSpeed`, with the metal as its argument, when the unit has a script |
 | `TransferEnergy`/`TransferMetal` in `UpdateResourceSharing` | SHARE | `players.TransferEnergy` or `TransferMetal`, whose own SPEND and INCOME follow it |
 
 `los_radar.GetMapCell`, economy's one query of another subsystem, became the world view's `CellMetal`. The share of
@@ -249,7 +251,8 @@ delivery of los_radar's own reaches it. Serving the read from los_radar would me
 state, kept by an effect from units in the same phase, which needs the same delivery before the pass, and adds a
 hashed field (a trace format change). The synchronous route is that delivery, so CLOAK stays synchronous.
 
-**Queued, and equal:** RESET, LOAD, REQUEST, INCOME and EXTRACTOR, in every scenario in both modes.
+**Queued, and equal:** RESET, LOAD, REQUEST, INCOME and EXTRACTOR, in every scenario in both modes. #986 made EXTRACTOR
+synchronous by #952's rule, since a script start takes a channel (`docs/units-interface.md`, section 4).
 
 **SHARE is queued, and equal.** The three `share-` scenarios (#953) give metal, energy, and both with the share of
 maps on, to an allied remote slot every 60 ticks; `share-all` runs past tick 900, where a share and a share of maps fall

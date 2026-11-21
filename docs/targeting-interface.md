@@ -32,9 +32,8 @@ Targeting's place in it:
 - **Queries:** `GetWeaponTargetUnit`, called through `ScheduleTargetingTargetUnit`, which delivers targeting's inbox
   first, and `ChooseWeapon`, which reads only the weapon slots' flags and is called directly (section 4).
 - **Effects out of targeting:** CLEARED, published to targeting's outbox (`SCHED_TARGETING`) when a weapon that had a
-  target loses it. Units subscribes to it; its handler, `ScriptsOnTargetingCleared` (`src/seams/scripts_world.cpp`,
-  was units' `UnitsOnTargetingCleared`), keeps the `FindScript` slot and publishes scripts' event START, as 3.1c
-  started the script.
+  target loses it. Scripts subscribe to it; their handler, `ScriptsOnTargetingCleared` (`src/seams/scripts_world.cpp`,
+  was units' `UnitsOnTargetingCleared`), publishes scripts' event START by name, as 3.1c started the script.
 - **Runs:** none. Targeting has no phase of its own and no loop the scheduler holds: it runs only when an event is
   applied or a slot is called, inside the runs of orders, ai, weapons and units.
 - **A new outbox:** ai had none. Its SET_UNIT, SET_POS and CLEAR are published from `SCHED_AI`, which services 1.14 adds
@@ -78,10 +77,10 @@ callers passed pointers and could publish none of these, so no trace moves; a mo
 
 | 3.1c call | Effect | Subscriber's handler |
 |---|---|---|
-| `scripts.FindScript(script, "StartBuilding")`, then `scripts.StartScriptWithArgs(script, "TargetCleared", ..., weapon)`, when a weapon that had a target loses it (`ClearWeaponTarget`, the dead target of `GetWeaponTargetPos`) | CLEARED, with the unit and the weapon | `ScriptsOnTargetingCleared`: the same lookup, then the event START (was `StartScriptWithArgs`) |
+| `scripts.FindScript(script, "StartBuilding")`, then `scripts.StartScriptWithArgs(script, "TargetCleared", ..., weapon)`, when a weapon that had a target loses it (`ClearWeaponTarget`, the dead target of `GetWeaponTargetPos`) | CLEARED, with the unit and the weapon | `ScriptsOnTargetingCleared`: the event START by name, with the weapon as its argument (was `StartScriptWithArgs`) |
 
-The `FindScript` call looks up a function whose answer 3.1c threw away; the adapter keeps it, since the lookup is
-scripts' code and its cost is not targeting's to judge.
+The `FindScript` call looks up a function whose answer 3.1c threw away, and it writes nothing. Since #986 the handler is
+scripts' own, and it drops the lookup.
 
 **Payloads.** Every event and effect starts with `TargetingEventHeader`: `kind`, `unit` (the unit whose weapon aims, a block offset) and `weapon` (0 to 2). Each kind has the payload of `interfaces/targeting.h` (version 3.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, with a null unit or a weapon outside 0 to 2, and a SET_UNIT with a null `target`.
 

@@ -1770,7 +1770,7 @@ dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller stat
 then sections 1 to 9), then the lines of the world sections (10 to 14, 18 to 25 and 27, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
 lines of section 27), then the lines of sections 32, 33, 37, 36, 38 to 42 and 47 to 51, in that order, which end the block and are
-not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29, 8.30, 8.31, 8.32 and 8.33). The `meteors` block ends with the lines of section 35 after them
+not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29, 8.30, 8.31, 8.32, 8.33, 8.34 and 8.35). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*` and `weaponsState.*` lines of economy's, ai's, map's, players' and weapons' own reports that follow them, sit between those of
 sections 14 and 18 but are not hash input (sections 8.7, 8.22, 8.30, 8.28, 8.17 and 8.31), and the `losRadarState.*` lines sit before those of section 24 (section 8.6). Every

@@ -72,7 +72,8 @@ Units' place in it:
 
 **The writers, one by one.** Every adapter onto units' code is a handler of units' inbox, in
 `src/seams/units_world.cpp`: it turns the foreign payload into a units event and passes it to `UnitsInbox`, refusing a
-payload smaller than its struct as before. The adapters' names and routes are unchanged (section 4).
+payload smaller than its struct as before. The adapters' names are unchanged; each route's mode is in section 4, where
+six of the routes into units that were queued become synchronous.
 
 | Publisher's effect | Handler | Units event |
 |---|---|---|
@@ -91,7 +92,8 @@ payload smaller than its struct as before. The adapters' names and routes are un
 
 Economy's EXTRACTOR, features' FREE_STATE and INIT_STATE and targeting's CLEARED, which #966 to #971 routed to units'
 adapters, only ever reached scripts' code (a script start, or a feature's model state): they are handlers of scripts'
-inbox now (`docs/scripts-interface.md`, section 6), with their routes' modes unchanged.
+inbox now (`docs/scripts-interface.md`, section 6): FREE_STATE, INIT_STATE and CLEARED with their modes unchanged, and
+EXTRACTOR, queued before, synchronous (section 4).
 
 **The mixed slots.** Each writes and returns an answer the caller reads in the same statement, so each stays a
 synchronous slot, marked so in `interfaces/units.h` and `interfaces/scripts.h`; none is split, because the answer is the
@@ -184,15 +186,50 @@ answers (scripts' queries), as of each module's last run.
 queries of section 1. Section 5 says which fields are another module's view state.
 
 **As of units' last run.** By #952's rule a query needs a delivery first only when an event that can be pending writes
-what it reads. `FindUnitType`, `FindUnitTypeId`, `FindMissionUnit` and `GetMovementLimits` read the unit types, which no
-event writes. `CanLoad`, `CanReclaim` and `CanRepair` read the two units' types, flags and owners; `UnitRefGet` a
-reference's unit; `GetFactoriesInRadius` the factory index, which only `RefreshFactoryIndex` writes. The queued routes
-into units (below) write `workTime`, the flags under 0x20, 0x800, 0x8000 and 0xc, the stance, the angles, the build
-state, the moved mark and the SFX state: none of them is read by a query.
+what it reads. Five routes into units stay queued (the table below): orders' BUSY and SET_FLAGS and movement's MOVED,
+MOVE_RATE and SFX_OCCUPY. They write `workTime`, the flag bits 0x20, 0x800, 0x8000 and 0xc, the moved mark and the SFX
+tracker's state. Each query's reads, against those writes:
+- `FindUnitType`, `FindUnitTypeId`, `FindMissionUnit` and `GetMovementLimits` read the unit types, which no event writes.
+- `CanRepair` (`src/units/unit.cpp`) reads the builder's type and the other unit's `health`, type, `flags & 3` and
+  `yWhole`. `CanLoad` reads both types, the carrier's cargo list and the other unit's `motion`, `flags & 3`, `pos.y` and
+  `buildLeft`. `CanReclaim` reads both types and the other unit's `flags & 3`. No queued route writes any of these:
+  `health` and `buildLeft` are written by orders' SET_BUILD_STATE and BUILD_DECAY, and `pos` by movement's and orders'
+  SET_POSITION, all synchronous since this change (below). So the queries read them at the publisher's statement, as
+  in 3.1c, wherever orders calls them.
+- `UnitRefGet` reads a reference's unit, written by units' own code and by UNLINK (synchronous). `GetFactoriesInRadius`
+  reads the factory index, which only `RefreshFactoryIndex` writes.
+
+**Scripts' reads of the record.** A script reads the unit record through `UnitScript::GetUnitValue`
+(`src/scripts/unit_script.cpp`), which reads:
+- `health` (4) and `buildLeft` (17);
+- the movement and fire stances, flag bits 18 to 21 (2 and 3);
+- the piece positions, from `pos` and the angles (7 and 8);
+- another unit's `pos`, behind its bit 0x10000000 (9 and 10);
+- `heading` (12);
+- and the bits that SCRIPT_VALUE writes (synchronous).
+
+Which of these a script reads is in its COB code, which is data, so no argument from the publishers' code can show that
+a pending write goes unread. A script runs at once:
+- when a synchronous START reaches it, from units, weapons, orders, movement, targeting or economy;
+- from the slots that take a channel (`StartScriptWithArgsByIndex`, `QueryScript`, `GetNanoPiecePosition`,
+  `GetAimFromPosition`, `GetSweetSpot`).
+
+Before this change, two queued writes met such a read:
+- For a carried unit, `UnitMotion::UpdatePosition` publishes SET_POSITION and ANGLES. `UpdateMoveRate` then starts
+  StopMoving with update 1, whose first slice could read 7, 8 or 12 before units' inbox was delivered.
+- `StandingFireOrder` publishes SET_STANCE and then targeting's CLEAR, whose CLEARED starts TargetCleared at once, which
+  could read 3.
+
+So every route into units that writes a field in that list is synchronous: orders' SET_STANCE, SET_ANGLES,
+SET_BUILD_STATE and BUILD_DECAY, and movement's ANGLES and SET_POSITION. Each lands its write at the publisher's
+statement, as 3.1c did, and the tier stayed equal (section 8). The five routes still queued write nothing a script
+reads: `GetUnitValue` reads `flags` only at bits 18 to 21 and 0x10000000, and no opcode reads `workTime`, the moved
+mark or the SFX tracker.
 
 **The routes.** Every route into or out of units and scripts, with its reason. The routes below that units published
-or received before this change are final and cite the document that decided them; the routes new in this change cite
-the gate (section 8) or #952's rule.
+or received before this change cite the document that decided them, except the seven this change makes synchronous
+(EXTRACTOR, four of orders' and two of movement's), which cite the reads above; the routes new in this change cite the
+gate (section 8) or #952's rule.
 
 | Route | Now | Why |
 |---|---|---|
@@ -201,15 +238,15 @@ the gate (section 8) or #952's rule.
 | scripts ATTACH_TO_PIECE, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but the handler (`AttachUnitToPiece`) reads the passenger's `cargo` and the carrier's `carrier`, which the previous attach or drop of the same script run writes (COB's attach and drop opcodes run in one thread slice, as a transport's TransportPickup and TransportDrop do), and it sends the attach to the network in the publisher's order; orders' ATTACH_TO_PIECE is synchronous for the same handler (`docs/orders-interface.md`, section 4). |
 | scripts SET_YARD, to map | synchronous | The gate (section 8): queued, scenario `orders-air` diverged. Units' own SET_YARD is synchronous by the gate too (`docs/map-interface.md`, sections 4 and 8). |
 | engine ATTACH_TO_PIECE, to units | queued | Published only by `RunInitialMission` while a mission loads, before the first tick, so it is delivered at once (#970) whichever its mode, as orders' ADD from the same function (`docs/orders-interface.md`, section 4). |
-| economy EXTRACTOR, to scripts (`ScriptsOnEconomyExtractor`; was units') | queued | As before (`docs/economy-interface.md`, section 4). Scripts' inbox is delivered before each delivery of units' in the unit loop and the players phase, so the start runs where it ran. |
+| economy EXTRACTOR, to scripts (`ScriptsOnEconomyExtractor`; was units') | synchronous | #952's rule. The start takes one of the script's thread channels, and channels are hashed (section 23 of `docs/trace-format.md`). Queued, the start waited in scripts' inbox. A synchronous route into units, the phase boundary (which delivers units before scripts) and scripts' slots that take a channel do not deliver that inbox, so a later start on the unit in the same phase could take the channel first. For example, a packet's `StartScriptWithArgsByIndex` could follow the `CreateUnitFromPacket` that made the extractor. Synchronous, the start runs at `UpdateMetalExtraction`'s statement, where 3.1c called it. EXTRACTOR was scripts' only queued route, so scripts' inbox is empty in the tick. |
 | features FREE_STATE, INIT_STATE, to scripts (was units') | synchronous | As before (`docs/features-interface.md`, sections 4 and 8). |
 | targeting CLEARED, to scripts (was units') | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | economy CLOAK, to units | synchronous | As before (`docs/economy-interface.md`, section 4). |
 | ai ACTIVATE, SET_STATES, to units | synchronous | As before (`docs/ai-interface.md`, section 8). |
 | players KILL_UNIT, SEND_UNIT, CAPTURE_UNIT, to units | synchronous | As before (`docs/players-interface.md`, section 8). |
 | weapons' 10 routes to units | synchronous | As before (`docs/weapons-interface.md`, sections 4 and 8; `docs/ai-interface.md`, section 4, for HIT). |
-| orders' 13 routes to units | 7 synchronous, BUILD_DECAY, BUSY, SET_FLAGS, SET_STANCE, SET_ANGLES and SET_BUILD_STATE queued | As before (`docs/orders-interface.md`, section 4). The queued six rest on CLEAR_NET_DIRTY staying synchronous and unconditional, which it does: units' handler of it is a units event like the others. |
-| movement's 10 routes to units | 5 synchronous, ANGLES, MOVED, MOVE_RATE, SET_POSITION and SFX_OCCUPY queued | As before (`docs/movement-interface.md`, section 4). |
+| orders' 13 routes to units | 11 synchronous, BUSY and SET_FLAGS queued | BUILD_DECAY, SET_STANCE, SET_ANGLES and SET_BUILD_STATE are synchronous since this change, because queries and scripts read what they write (above). The rest are as before (`docs/orders-interface.md`, section 4). The queued two rest on CLEAR_NET_DIRTY staying synchronous and unconditional, which it does: units' handler of it is a units event like the others. |
+| movement's 10 routes to units | 7 synchronous, MOVED, MOVE_RATE and SFX_OCCUPY queued | ANGLES and SET_POSITION are synchronous since this change, because queries and scripts read what they write (above). The rest are as before (`docs/movement-interface.md`, section 4). |
 | units' routes to economy, players, weapons, ai, features, targeting, los_radar, map, orders and movement | as they were | Each with its reason in its subscriber's document, unchanged. |
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 166 rows of class `immediate` with units or
@@ -303,19 +340,19 @@ draw is in the same function, and only the way to that function changed.
 slots, and 3.1c's `UpdateUnit` is split around the other modules' steps, in its order:
 
 ```
-deliver scripts; deliver units; UpdateUnitHead(u);
+deliver units; UpdateUnitHead(u);
 if (the player is human or AI) { deliver weapons; UpdateUnitWeapons(u); }
-deliver scripts; deliver units;
+deliver units;
 if (u->script) { deliver scripts; RunScripts(u->script, 1); }
-deliver scripts; deliver units;
+deliver units;
 if (UpdateUnitBody(u)) { deliver orders; RunOrders(u); deliver orders; RunSecondaryOrders(u);
                          if (u->motion) { deliver movement; UpdateMotion(u); moved = 1 } }
-deliver scripts; deliver units; UpdateUnitTail(u, moved)
+deliver units; UpdateUnitTail(u, moved)
 ```
 
 after which, for a network game, each player's `SendUnitStates` runs where 3.1c ran it, after that player's units.
-Scripts' inbox is delivered before each delivery of units', so a script start a queued route asked for runs before the
-unit's next step, where 3.1c ran it. The three parts of units' update call no other module's intent: the head counts
+No route into scripts is queued (section 4), so every script start runs at its publisher's statement, as in 3.1c, and
+scripts' inbox is delivered only before `RunScripts`, as each step's module is. The three parts of units' update call no other module's intent: the head counts
 the unit and tells a wind generator's script the wind (scripts' START, synchronous, for `SetDirection` and
 `SetSpeed`); the body counts the unit's timers down, recomputes its
 health percentage, applies water damage by publishing weapons' DAMAGE (synchronous, so weapons' damage rules run at
@@ -377,6 +414,11 @@ the comparison, the row gives the first field of the unit or script that differs
 units' adapters to scripts' handlers kept their modes, and so did every route the issues before this one decided. The
 engine's ATTACH_TO_PIECE is published only outside the tick (section 4).
 
+The review of this change made seven queued routes synchronous by #952's rule (section 4): economy's EXTRACTOR to
+scripts, orders' BUILD_DECAY, SET_STANCE, SET_ANGLES and SET_BUILD_STATE, and movement's ANGLES and SET_POSITION. Queued,
+they were equal on the full suite, as their own issues found. Synchronous, the tier in both modes gave "gate tier passed:
+38 scenarios equal at c9bc6e64164d", where the line names the commit the build's working tree was on.
+
 | Route queued | Tier | First divergence |
 |---|---|---|
 | units START, to scripts | diverged | orders-air-fights, tick 497, world phase (the once-per-tick tables, hashed after `UpdateMeteors`): `units[6].script.activeCount` (reference 4, queued 3), and the script's `channels[2].pc` (0x83, 0x114) and statics. |
@@ -393,8 +435,10 @@ pull request.
 inbox held at most 5 events (orders-air-repair, tick 757), from the queued routes of orders and movement; SFX_OCCUPY,
 the busiest, was queued 7,268,389 times, and orders' CLEAR_NET_DIRTY, synchronous, was delivered 5,442,764 times.
 Units took at most 958 deliveries in one tick (long-greenhaven-8p, tick 52800). Scripts' inbox held at most 1 event
-(units-transport-ship, tick 133): economy's EXTRACTOR, its only queued route, queued 597 times in the tick; scripts took
+(units-transport-ship, tick 133): economy's EXTRACTOR, then its only queued route, queued 597 times in the tick; scripts took
 at most 422 deliveries in one tick (edges-economy-targeting, tick 245), and units' START was published 21,305 times
 in the tick and 1,883 outside it. ATTACH_TO_PIECE, from the engine and from scripts, was published 5 times in the tick
 (synchronous) and 23 times outside it. Deliveries nested at most 6 deep, counting every module (console-units, tick
-150), as before this change.
+150), as before this change. The counts were taken before the review made EXTRACTOR and six routes into units synchronous (above);
+since then scripts' inbox holds nothing in the tick, and units' inbox holds only BUSY, SET_FLAGS, MOVED, MOVE_RATE and
+SFX_OCCUPY.

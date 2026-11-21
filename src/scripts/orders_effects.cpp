@@ -5,7 +5,6 @@
 #include "../units/unit.h"
 #pragma pack(pop)
 
-#include "../../interfaces/seams.h"
 #include "../../interfaces/scripts.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/ref.h"
@@ -36,13 +35,13 @@ void ScriptsOnOrdersStartScript(const void* event, unsigned int size)
     CobScript* script = (CobScript*)unit->script.get();
     switch (e->form) {
     case ORDERS_SCRIPT_BY_NAME:
-        g_seams.scripts->StartScript(script, name, callback, e->update);
+        script->StartScript(name, callback, e->update);
         break;
     case ORDERS_SCRIPT_BY_NAME_WITH_ARGS:
-        g_seams.scripts->StartScriptWithArgs(script, name, callback, e->update, e->count, e->args[0], e->args[1], e->args[2], e->args[3]);
+        script->StartScriptWithArgs(name, callback, e->update, e->count, e->args[0], e->args[1], e->args[2], e->args[3]);
         break;
     case ORDERS_SCRIPT_BY_INDEX_WITH_ARGS:
-        g_seams.scripts->StartScriptWithArgsByIndex(script, e->index, callback, e->update, e->count, e->args[0], e->args[1], e->args[2], e->args[3]);
+        script->StartScriptWithArgsByIndex(e->index, callback, e->update, e->count, e->args[0], e->args[1], e->args[2], e->args[3]);
         break;
     }
 }

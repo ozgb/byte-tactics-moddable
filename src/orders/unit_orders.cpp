@@ -951,14 +951,14 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
             return 8;
         }
         order->AnnounceStatusIfFlagged(SIM_SPEECH_CAPTURING);
-        order->duration = (int)(g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->EnergyCost() / 2000 + g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->MetalCost() / 140 + 150);
+        order->duration = (int)(target->def->EnergyCost() / 2000 + target->def->MetalCost() / 140 + 150);
         order->duration = order->duration < 1800 ? order->duration : 1800;
-        order->duration = (g_seams.units->UnitRefGet((UnitRef*)&order->link)->health + g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->MaxHealth()) * order->duration / (g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->maxHealth * 2);
+        order->duration = (target->health + target->def->MaxHealth()) * order->duration / (target->def->maxHealth * 2);
         int experience = 0;
-        experience = g_seams.units->UnitRefGet((UnitRef*)&order->link)->killCount;
+        experience = target->killCount;
         order->duration = ((experience / 5 + 10) * order->duration * 10) / 100;
         WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-        order->AttachBuildFootprintMarker(g_seams.units->UnitRefGet((UnitRef*)&order->link)->cell, g_seams.units->UnitRefGet((UnitRef*)&order->link)->footprint);
+        order->AttachBuildFootprintMarker(target->cell, target->footprint);
         order->flags = 0x100e8;
         return 1;
     }
@@ -968,11 +968,11 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         Fixed distance;
         distance.value = (int)_hypot(unit->pos.x - target->pos.x, unit->pos.z - target->pos.z);
         int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-        gap += (int)(_hypot(g_seams.units->UnitRefGet((UnitRef*)&order->link)->footprint.x, g_seams.units->UnitRefGet((UnitRef*)&order->link)->footprint.y) * -8.0);
+        gap += (int)(_hypot(target->footprint.x, target->footprint.y) * -8.0);
         unsigned int range = 0;
         range = unit->def->buildRange;
         if (gap > (int)range) return 0;
-        StartBuildingScript(unit, order, GetHeadingBetween(position, &g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos) - unit->angles.heading);
+        StartBuildingScript(unit, order, GetHeadingBetween(position, &target->pos) - unit->angles.heading);
         return 1;
     }
     case 2:
@@ -990,13 +990,13 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         Vec3 start;
         g_seams.scripts->GetNanoPiecePosition(order->source, &start);
         Vec3 bounds[2];
-        bounds[1] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-        bounds[0] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-        bounds[0].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinX;
-        bounds[0].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinZ;
-        bounds[1].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxX;
-        bounds[1].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxZ;
-        bounds[1].y += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxY;
+        bounds[1] = target->pos;
+        bounds[0] = target->pos;
+        bounds[0].x += target->def->modelMinX;
+        bounds[0].z += target->def->modelMinZ;
+        bounds[1].x += target->def->modelMaxX;
+        bounds[1].z += target->def->modelMaxZ;
+        bounds[1].y += target->def->modelMaxY;
         RecordReverseNanoParticles(bounds, start, 6);
         OrdersPublishBusy(unit, g_game->ticks + 900);
         order->elapsed += 2;
@@ -1051,7 +1051,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         order->AttachBuildFootprintMarker(target->cell, target->footprint);
         order->flags |= 0x100e8;
         order->SetDeadlineTicks(15);
-        order->elapsed = ComputeReclaimDamagePulse(unit, g_seams.units->UnitRefGet((UnitRef*)&order->link), 15);
+        order->elapsed = ComputeReclaimDamagePulse(unit, target, 15);
         order->duration = 0;
         return 2;
     case 2:
@@ -1069,22 +1069,23 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         range = unit->def->buildRange;
         range += target->def->radius184;
         int square = SquaredDistance(delta.x, delta.z);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, g_seams.units->UnitRefGet((UnitRef*)&order->link))) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, target)) {
             if (order->duration >= 15) {
-                WeaponsPublishDamage(SCHED_ORDERS, unit, g_seams.units->UnitRefGet((UnitRef*)&order->link), order->elapsed, 5, 0);
+                WeaponsPublishDamage(SCHED_ORDERS, unit, target, order->elapsed, 5, 0);
                 order->duration = 0;
             }
             OrdersPublishBusy(unit, g_game->ticks + 900);
             Vec3 start;
             g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
-            bounds[1] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-            bounds[0] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-            bounds[0].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinX;
-            bounds[0].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinZ;
-            bounds[1].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxX;
-            bounds[1].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxZ;
-            bounds[1].y += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxY;
+            Unit* reclaimed = g_seams.units->UnitRefGet((UnitRef*)&order->link);
+            bounds[1] = reclaimed->pos;
+            bounds[0] = reclaimed->pos;
+            bounds[0].x += reclaimed->def->modelMinX;
+            bounds[0].z += reclaimed->def->modelMinZ;
+            bounds[1].x += reclaimed->def->modelMaxX;
+            bounds[1].z += reclaimed->def->modelMaxZ;
+            bounds[1].y += reclaimed->def->modelMaxY;
             RecordReverseNanoParticles(bounds, start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
@@ -1199,17 +1200,18 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
         int rate = 0;
         rate = unit->def->buildRate;
         // TODO(#986): the answer of AddRepairProgress is read here
-        if (g_seams.units->AddRepairProgress(unit, g_seams.units->UnitRefGet((UnitRef*)&order->link), (float)(rate / 30))) {
+        if (g_seams.units->AddRepairProgress(unit, target, (float)(rate / 30))) {
             Vec3 start;
             g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
-            bounds[1] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-            bounds[0] = g_seams.units->UnitRefGet((UnitRef*)&order->link)->pos;
-            bounds[0].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinX;
-            bounds[0].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMinZ;
-            bounds[1].x += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxX;
-            bounds[1].z += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxZ;
-            bounds[1].y += g_seams.units->UnitRefGet((UnitRef*)&order->link)->def->modelMaxY;
+            Unit* repaired = g_seams.units->UnitRefGet((UnitRef*)&order->link);
+            bounds[1] = repaired->pos;
+            bounds[0] = repaired->pos;
+            bounds[0].x += repaired->def->modelMinX;
+            bounds[0].z += repaired->def->modelMinZ;
+            bounds[1].x += repaired->def->modelMaxX;
+            bounds[1].z += repaired->def->modelMaxZ;
+            bounds[1].y += repaired->def->modelMaxY;
             RecordNanoParticles(start, bounds, 6);
         }
         order->SetDeadlineTicks(1);

@@ -479,6 +479,7 @@ MapSeam g_native_map = {
     RefreshMovedUnitsSlot,
     RefreshUnitIfStaleSlot,
     WriteStateSlot,
+    PathLockStamp,
 };
 
 void Run_wind_meteors_UpdateWind()

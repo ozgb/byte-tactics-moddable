@@ -118,7 +118,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
                 GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
-                SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
+                SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds, PathLockStamp; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
@@ -324,13 +324,13 @@ MAP = Pilot(
     owner="map", header="interfaces/map.h", seam="MapSeam",
     writing=("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius", "RefreshMovedUnits", "RefreshUnitIfStale"),
     query=("UnitsInRange", "GetCellMeanHeight", "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "GetGroundHeight",
-           "PassMapGet", "PassMapInBounds", "WriteState"),
+           "PassMapGet", "PassMapInBounds", "WriteState", "PathLockStamp"),
     engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, PATHFINDING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
     setup=("BuildAllPassMaps", "FreePassMaps", "LoadMappingData", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap", "SaveMappingData",
            "SaveMetalPlotmap", "SavePlayerFeaturesPlotmap", "AllocateBuckets", "FreeBuckets"),
     allowed_indirect=("LosRadarSeam::GetMapCell", "FeaturesSeam::GetCellFeature"),
     filler_locals=(("SnapWorldPosToFootprint", "Point16"),),
-    rowless_calls=("operator unsigned int *",),
+    rowless_calls=("operator unsigned int *", "operator bool"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                    ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
                    ("SaveGameFile", "src/game/settings_campaign.cpp"), ("BuildDerivedLayers", "src/map/line_of_sight.cpp"),

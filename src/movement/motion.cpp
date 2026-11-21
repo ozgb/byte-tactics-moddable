@@ -572,7 +572,6 @@ UnitMotion::UnitMotion(Unit* unit)
     velocity = OrderVec3(0, 0, 0);
     speed = 0;
     turn = 0;
-    pathLockStamp = 0;
     p2 = OrderVec3(0, 0, 0);
     mode = 1;
     flag = 0;

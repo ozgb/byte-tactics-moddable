@@ -648,7 +648,7 @@ game,harness,call,ReplayImport::AnsweredPointer,3
 game,harness,call,ReplayImport::Int,6
 game,harness,call,ReplayImport::Ptr,6
 game,harness,call,ReplayImport::Result,2
-game,harness,call,ReplayImport::~ReplayImport,8
+game,harness,call,ReplayImport::~ReplayImport,9
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,2
 game,harness,shared_write,Game::endGameVictory,2
@@ -1938,12 +1938,8 @@ harness,presentation,shared_write,g_quirks,1
 harness,scripts,shared_write,Game::playerIndex,1
 harness,scripts,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 harness,scripts,shared_write,MapSeam::GetGroundHeight,1
-harness,scripts,shared_write,ScriptsSeam::StartScript,1
-harness,scripts,shared_write,ScriptsSeam::StartScriptWithArgs,1
-harness,scripts,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,scripts,shared_write,Seams::los_radar,1
 harness,scripts,shared_write,Seams::map,1
-harness,scripts,shared_write,Seams::scripts,1
 harness,scripts,shared_write,Seams::units,3
 harness,scripts,shared_write,UnitsSeam::AttachUnitToPiece,2
 harness,scripts,shared_write,UnitsSeam::SetStateBits,1
@@ -5799,12 +5795,8 @@ seams,scripts,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 seams,scripts,shared_write,MapSeam::GetGroundHeight,1
 seams,scripts,shared_write,OrdersEventHeader::unit,1
 seams,scripts,shared_write,Ref<Unit>::offset,3
-seams,scripts,shared_write,ScriptsSeam::StartScript,1
-seams,scripts,shared_write,ScriptsSeam::StartScriptWithArgs,1
-seams,scripts,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 seams,scripts,shared_write,Seams::los_radar,1
 seams,scripts,shared_write,Seams::map,1
-seams,scripts,shared_write,Seams::scripts,1
 seams,scripts,shared_write,Seams::units,3
 seams,scripts,shared_write,UnitsSeam::AttachUnitToPiece,2
 seams,scripts,shared_write,UnitsSeam::SetStateBits,1
@@ -6118,6 +6110,7 @@ units,game,call,RecordSmoke,1
 units,game,call,RecordUnitSpeech,2
 units,game,call,SchedPublish,1
 units,game,call,SchedUnitsPhase,1
+units,game,call,ScheduleUnitsDeliver,1
 units,game,call,SimAllocTagged,6
 units,game,call,SimBlockTrack,1
 units,game,call,SimFree,1

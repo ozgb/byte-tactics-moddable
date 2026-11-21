@@ -27830,6 +27830,7 @@ address,function,file,kind,target
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,BitReader::ReadBits
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,CreateUnitFromPacket
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,ReadUnitState
+0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,ScheduleUnitsDeliver
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,UpdateUnitHeight
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator Unit *
 0x48b920,ReceiveUnitStates,src/units/unit_position.cpp,call,operator bool
@@ -59664,6 +59665,9 @@ address,function,file,kind,target
 ,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,function,
 ,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,global_read,g_seams
 ,ScheduleTargetingTargetUnit,src/seams/targeting_world.cpp,indirect_call,"indirect via Unit *(*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
+,ScheduleUnitsDeliver,src/game/scheduler.cpp,call,ReplayImport::~ReplayImport
+,ScheduleUnitsDeliver,src/game/scheduler.cpp,call,SchedDeliver
+,ScheduleUnitsDeliver,src/game/scheduler.cpp,function,
 ,ScreenX,src/ingame/markers.cpp,field_read,View::scroll_x
 ,ScreenX,src/ingame/markers.cpp,function,
 ,ScreenY,src/ingame/markers.cpp,field_read,View::scroll_y
@@ -59682,6 +59686,9 @@ address,function,file,kind,target
 ,ScriptsOnMovementStartScript,src/scripts/movement_effects.cpp,field_read,MovementStartScript::script
 ,ScriptsOnMovementStartScript,src/scripts/movement_effects.cpp,field_read,Unit::script
 ,ScriptsOnMovementStartScript,src/scripts/movement_effects.cpp,function,
+,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,CobScript::StartScript
+,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,CobScript::StartScriptWithArgs
+,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,CobScript::StartScriptWithArgsByIndex
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,UnitOfOffset
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,get
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,call,memset
@@ -59694,17 +59701,9 @@ address,function,file,kind,target
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,OrdersStartScript::index
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,OrdersStartScript::name
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,OrdersStartScript::update
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,ScriptsSeam::StartScript
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,ScriptsSeam::StartScriptWithArgs
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,ScriptsSeam::StartScriptWithArgsByIndex
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,Seams::scripts
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_read,Unit::script
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,field_write,Ref<Callback>::offset
 ,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,function,
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,global_read,g_seams
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, char *, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [ScriptsSeam::StartScriptWithArgs]"
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *, Callback *, int) __attribute__((stdcall)) [ScriptsSeam::StartScript]"
-,ScriptsOnOrdersStartScript,src/scripts/orders_effects.cpp,indirect_call,"indirect via int (*)(CobScript *, int, Callback *, int, int, int, int, int, int) __attribute__((stdcall)) [ScriptsSeam::StartScriptWithArgsByIndex]"
 ,ScriptsOnWeaponsDetachPiece,src/scripts/weapons_effects.cpp,call,PoseUnitModel
 ,ScriptsOnWeaponsDetachPiece,src/scripts/weapons_effects.cpp,call,UnitOfOffset
 ,ScriptsOnWeaponsDetachPiece,src/scripts/weapons_effects.cpp,call,get

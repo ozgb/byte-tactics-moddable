@@ -120,13 +120,13 @@ inline void MovementPublishAngles(U* unit, int bank, int heading, int pitch)
 }
 
 template <class U>
-inline void MovementPublishMove(U* unit, int x, int y, int z)
+inline void MovementPublishMove(U* unit, const Vec3& to)
 {
     MovementMove effect;
     effect.h = MovementHeaderOf(MOVEMENT_EFFECT_MOVE, unit);
-    effect.pos[0] = x;
-    effect.pos[1] = y;
-    effect.pos[2] = z;
+    effect.pos[0] = to.x;
+    effect.pos[1] = to.y;
+    effect.pos[2] = to.z;
     MovementPublishEffect(&effect, sizeof(effect));
 }
 

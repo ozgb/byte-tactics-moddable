@@ -497,7 +497,7 @@ void UnitMotion::UpdatePosition(Unit* u)
     cell.x = (pos.x - draft.x * 0x80000 + 0x80000) >> 20;
     cell.y = (pos.z - draft.y * 0x80000 + 0x80000) >> 20;
     if (cell.x == u->cell.x && cell.y == u->cell.y && m == u->mode) {
-        MovementPublishMove(u, pos.x, pos.y, pos.z);
+        MovementPublishMove(u, pos);
         return;
     }
 
@@ -520,7 +520,7 @@ void UnitMotion::UpdatePosition(Unit* u)
             vec.z = z;
             velocity = vec;
         }
-        MovementPublishMove(u, pos.x, pos.y, pos.z);
+        MovementPublishMove(u, pos);
         return;
     }
 

@@ -1,3 +1,4 @@
+#include "../game/scripts_events.h"
 #include "win_types.h"
 #include <string.h>
 #include "../state/block.h"
@@ -40,8 +41,8 @@ struct UnitDefMetalWindView {
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
     if (((UnitDefMetalWindView*)unit->def.get())->windGenerator > 0.0f && g_game->windEnabled) {
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
+        ScriptsPublishStartWithArgs(SCHED_UNITS, unit, "SetDirection", 0, 1, g_game->windDirection, 0, 0, 0);
+        ScriptsPublishStartWithArgs(SCHED_UNITS, unit, "SetSpeed", 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
 }
 

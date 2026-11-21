@@ -572,7 +572,6 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// TODO(#986): the answers of QueryScript are read here
 // FUNCTION: 0x411840
 int __stdcall FindLandingPad(Unit* unit, int pad)
 {
@@ -602,7 +601,6 @@ static inline int IsAhead(Unit* unit, Order* order)
     return (short)(((Vec3Words*)&toward)->xWhole * ((Vec3Words*)&facing)->xWhole + ((Vec3Words*)&toward)->zWhole * ((Vec3Words*)&facing)->zWhole) > 0;
 }
 
-// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x413d80
 int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -704,7 +702,6 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 #pragma auto_inline(on)
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414e70
 int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -958,7 +955,6 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// TODO(#986): the answers of QueryScript are read here
 // FUNCTION: 0x4111b0
 int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
 {
@@ -1629,7 +1625,6 @@ struct Unit;
 static inline UnitDef* Definitions() { return g_game->defs; }
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 struct Feature;
-// TODO(#986): the answers of AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x414380
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -1715,7 +1710,6 @@ struct Unit;
 
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414770
 int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
 {
@@ -1795,7 +1789,6 @@ struct Unit;
 
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414a80
 int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 {

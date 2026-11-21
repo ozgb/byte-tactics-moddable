@@ -169,6 +169,9 @@ int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend)
 
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
 {
+    const unsigned int unitWord = offsetof(EconomyEventHeader, unit) / sizeof(unsigned int);
+    if (HarnessTestMode() && (SchedInboxHolds(SCHED_ECONOMY, ECONOMY_RESET, unitWord, unit) || SchedInboxHolds(SCHED_ECONOMY, ECONOMY_LOAD, unitWord, unit)))
+        FatalError((char*)"RequestGranted: a RESET or LOAD of the asking unit is pending in economy's inbox");
     ReplayImport call(RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
     call.Int((int)unit);
     call.Int((int)resources);

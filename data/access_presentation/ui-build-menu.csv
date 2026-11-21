@@ -257,7 +257,7 @@ Unit::pos,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnore
 Unit::postTransferHoldoff,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::postTransferHoldoff,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::script,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::script,units,Unit::SetStateBits,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::script,scripts,ScriptsApplyStart,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::speed,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,

@@ -40,7 +40,7 @@ Economy's place in it:
   does not deliver economy's inbox first (sections 4 and 8).
 - **Effects out of economy:** CLOAK, EXTRACTOR and SHARE, published to economy's outbox through the world view's
   `Emit`. Units subscribes to CLOAK and EXTRACTOR, players to SHARE; their handlers are adapters onto their own seam
-  slots (`src/units/economy_effects.cpp`, `PlayersOnEconomyShare` in `src/game/players.cpp`). EXTRACTOR and SHARE
+  slots (`src/seams/units_world.cpp` and `src/seams/scripts_world.cpp` for CLOAK and EXTRACTOR, `PlayersOnEconomyShare` in `src/game/players.cpp`). EXTRACTOR and SHARE
   are queued; CLOAK's route is synchronous, because the gate diverged with it queued (section 8).
 - **Runs:** `UpdatePlayerEconomy` (the players phase), `UpdateMetalExtraction` (above) and `UpdateResourceSharing`
   (the tail of a network game), called by the engine only.

@@ -48,9 +48,9 @@ computer player.
 - **Views:** the units' fields ai reads (position, flags, orders, health, type, owner), the `Player` records with
   economy's incomes and usages, map's metal sums and the line of sight tables (section 4). Ai's own state is read by no
   other simulation module.
-- **Effects out of ai:** ADD_ORDER, QUEUE_BUILD and STOP, to orders; ACTIVATE and SET_STATES, to units. Neither is on
-  the model yet, so their handlers (`src/orders/ai_effects.cpp`, `src/units/ai_effects.cpp`) are adapters that call
-  today's seam slots or make 3.1c's write. Ai records each effect in the trace's dump before it publishes it, as
+- **Effects out of ai:** ADD_ORDER, QUEUE_BUILD and STOP, to orders; ACTIVATE and SET_STATES, to units. Their
+  handlers are adapters in `src/seams/orders_world.cpp` and `src/seams/units_world.cpp` (units' hand the effect to
+  `UnitsApply`, `src/units/units_apply.cpp`). Ai records each effect in the trace's dump before it publishes it, as
   `docs/module-abi.md`, 9.3, asks of a module's effects. Its targets already were effects: SET_UNIT and CLEAR to
   targeting, synchronous, and SET_POS, queued (#955, #975; `docs/targeting-interface.md`, section 4). They are
   unchanged.
@@ -139,7 +139,7 @@ Every write ai makes into another subsystem's state is an effect, delivered to a
 **ATTACK, NOTIFY_REFS and HIT left ai (#991); their numbers 242, 244 and 247 are not reused.** They served every
 player, not only the computer players, so they are weapons' routes now (section 2): the notice is units'
 (`UnitsOnWeaponsAttacked`, NotifyUnitRefs 16), the return fire is orders' (`OrdersOnWeaponsAttacked`, in
-`src/orders/weapons_effects.cpp`), and the wake bits of HIT, which orders' `RunOrders` consumes as order events (units
+`src/seams/orders_world.cpp`), and the wake bits of HIT, which orders' `RunOrders` consumes as order events (units
 clears them when a unit is made), are written by `OrdersOnWeaponsHit`.
 
 **Return fire is an orders effect.** 3.1c's `ReactToAttack` used the answer of `IssueAttackOrder` in the same

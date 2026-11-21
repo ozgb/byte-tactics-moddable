@@ -53,8 +53,8 @@ Weapons' place in it:
   weapons' last apply, and the view read `GetWeaponRange`.
 - **Effects out of weapons:** the damage effects ATTACKED, MARK_DAMAGED, DAMAGE_RECORD, HEALTH and PARALYZE, and the
   effects HIT, START_SCRIPT, DETACH_PIECE, SHOT_FIRED, COMMAND_SHOT_FIRED, OUT_OF_REACH and BUSY, to units, orders, ai and scripts, besides DAMAGE to
-  features and CLEAR to targeting. Units and scripts are not on the model yet, so their handlers
-  (`src/units/weapons_effects.cpp`, `src/scripts/weapons_effects.cpp`) are adapters that hold 3.1c's writes.
+  features and CLEAR to targeting. Their handlers are adapters in `src/seams/units_world.cpp` and
+  `src/seams/scripts_world.cpp` (since #986 handlers of units' and scripts' inboxes, consumed by `UnitsApply` and `ScriptsApply`).
 - **Module ids:** weapons keeps `SCHED_WEAPONS = 6`, which its outbox already used.
 
 ## 2. Events into weapons
@@ -68,7 +68,7 @@ group keeps a later split of the projectiles from the damage rules cheap:
 | a weapon's hit, a projectile's or an explosion's (`weapons.cpp`) | `DamageUnit` (kind 1, paralyser 2) | weapons' own code, in the same pass: `DamageUnit` and its effects, called directly |
 | self-destruct and order damage (`unit_orders.cpp`, `vtol_orders.cpp`) | `DamageUnit` | DAMAGE from orders |
 | water damage (`UpdateUnitBody`, `unit_position.cpp`) | `DamageUnit` (kind 11) | DAMAGE from units |
-| the console's kills and a unit's death by a player's kill (`unit_commands.cpp`, `players_effects.cpp`) | `DamageUnit` | DAMAGE from units |
+| the console's kills and a unit's death by a player's kill (`unit_commands.cpp`, `UnitsOnPlayersKillUnit` in `units_world.cpp`) | `DamageUnit` | DAMAGE from units |
 | a dying transport's cargo (`ApplyUnitDeath`, `units.cpp`) | `DamageUnit` | DAMAGE from units |
 | build progress and repair (`AddBuildProgress`, `AddRepairProgress`, `control_panel.cpp`) | `DamageUnit` | DAMAGE from units (kinds 9 and 10) |
 | the network: a damage packet arrives (`HandleNetPackets`, `net_game.cpp`) | `ApplyUnitDamage` | REMOTE_DAMAGE from the engine |
@@ -128,7 +128,7 @@ naming a weapon outside the table (SPAWN may name -1), and an unknown kind.
 `orders.MissionTypeFromName`), and in `UpdateUnitWeapons` a call into units outside its interface (after
 `scripts.GetAimFromPosition`). The first was the paralysis branch, which compared the first order's kind
 (`MissionType::operator==`, `src/orders/mission_type.h`) and appended the order: it is now PARALYZE, the order's own
-code in its handler (`OrdersOnWeaponsParalyze`, `src/orders/weapons_effects.cpp`). The second was the write to the unit
+code in its handler (`OrdersOnWeaponsParalyze`, `src/seams/orders_world.cpp`). The second was the write to the unit
 record (`MarkRecentlyDamaged` and the fields of section 3), now units' effects. The calls into weapons outside its
 interface after `map.Apply` were the AREA_DAMAGE adapter, which now builds an event for `Apply`.
 
@@ -149,8 +149,8 @@ interface after `map.Apply` were the AREA_DAMAGE adapter, which now builds an ev
 | `features.DamageFeature` | DAMAGE (features') | features' `Apply`, as before |
 | `targeting.ClearWeaponTarget` | CLEAR (targeting's) | targeting's `Apply`, as before |
 
-The handlers are the adapters of units, orders and scripts, which hold 3.1c's writes until #986 puts units and scripts
-on the scheduler.
+The handlers are the adapters of units, orders and scripts (`src/seams/*_world.cpp`); since #986 the units' and
+scripts' publish their events, and the slots the third column names left the seams.
 
 **Which unit-record fields are weapons' and which are units'.** The rule is the human's of 2026-11-17: weapons owns
 the rules, units owns the record.

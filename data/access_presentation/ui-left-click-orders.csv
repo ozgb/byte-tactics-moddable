@@ -91,7 +91,6 @@ ModelState::shadow,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAll
 ModelState::shadow,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 MovementNewApproachRadius: new ApproachRadius,movement,AiSearchGoal::SetPathOrder,MovementNewApproachRadius: new ApproachRadius,0,-
 MovementNewApproachRadius: new ApproachRadius,movement,MovementApply,MovementNewApproachRadius: new ApproachRadius,0,-
-NewUnitScript: new UnitScript,scripts,CobScript::FUN_004b07b0,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::StartScriptByIndex,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::StartScriptWithArgsByIndex,NewUnitScript: new UnitScript,0,-
 Order::attached,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,
@@ -199,7 +198,7 @@ Unit::pos,presentation,IssueOrderToSelection,AllocateUnitMemory: GameAllocIgnore
 Unit::postTransferHoldoff,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::postTransferHoldoff,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::script,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::script,units,UnitsOnTargetingCleared,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::script,scripts,ScriptsApplyStart,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::speed,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-

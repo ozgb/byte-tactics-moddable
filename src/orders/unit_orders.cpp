@@ -307,7 +307,6 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
 }
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x402430
 int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
 {
@@ -328,7 +327,6 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
         if ((unsigned int)unit->health >= unit->def->maxHealth)
             return 1;
         OrdersPublishBusy(unit, g_game->ticks + 0x96);
-        // TODO(#986): the answer of AddRepairProgress is read here
         if (g_seams.units->AddRepairProgress(order->target, unit, (float)(order->target->def->buildRate / 30))) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(order->target, &nano);
@@ -362,7 +360,6 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
 }
 
 
-// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition, QueryScript are read here
 // FUNCTION: 0x402640
 int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -927,7 +924,6 @@ int __stdcall ClassifyEighths(double x)
     return 5;
 }
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404270
 int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -1024,7 +1020,6 @@ float HalfNegated(float x)
 }
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404730
 int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -1099,7 +1094,6 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     return 7;
 }
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x405300
 int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -1150,7 +1144,6 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
             return 0;
         }
         OrdersPublishBusy(unit, g_game->ticks + 150);
-        // TODO(#986): the answer of AddRepairProgress is read here
         if (g_seams.units->AddRepairProgress(unit, order->target, (float)(unit->def->buildRate / 30))) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(order->source, &nano);
@@ -1174,7 +1167,6 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x405740
 int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
 {
@@ -1199,7 +1191,6 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
         OrdersPublishBusy(unit, g_game->ticks + 150);
         int rate = 0;
         rate = unit->def->buildRate;
-        // TODO(#986): the answer of AddRepairProgress is read here
         if (g_seams.units->AddRepairProgress(unit, target, (float)(rate / 30))) {
             Vec3 start;
             g_seams.scripts->GetNanoPiecePosition(order->source, &start);
@@ -1454,7 +1445,6 @@ struct Vec3Sum : Vec3 {
     }
 };
 
-// TODO(#986): the answers of AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x403f70
 int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -1635,7 +1625,6 @@ static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
     return c;
 }
 struct Feature;
-// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x403a20
 int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -1735,7 +1724,6 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 
 
 
-// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404ad0
 int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
 {
@@ -1981,7 +1969,6 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src)
     }
 }
 
-// TODO(#986): the answers of CreateUnit, GetNanoPiecePosition are read here
 // FUNCTION: 0x404db0
 int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
 {

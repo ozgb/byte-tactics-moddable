@@ -2984,12 +2984,12 @@ struct EventSection {
     bool lost;
 };
 
-enum { ES_ECONOMY, ES_WIND_METEORS, ES_FEATURES, ES_TARGETING, ES_LOS_RADAR, ES_MAP, ES_PLAYERS, ES_AI, ES_WEAPONS, ES_ORDERS, ES_MOVEMENT, ES_COUNT };
+enum { ES_ECONOMY, ES_WIND_METEORS, ES_FEATURES, ES_TARGETING, ES_LOS_RADAR, ES_MAP, ES_PLAYERS, ES_AI, ES_WEAPONS, ES_ORDERS, ES_MOVEMENT, ES_UNITS, ES_SCRIPTS, ES_COUNT };
 
 static EventSection s_eventSections[ES_COUNT] = {
     { &kEconomyEvents },  { &kWindMeteorsEvents }, { &kFeaturesEvents }, { &kTargetingEvents }, { &kLosRadarEvents },
     { &kMapEvents },      { &kPlayersEvents },     { &kAiEvents },       { &kWeaponsEvents },
-    { &kOrdersEvents },   { &kMovementEvents },
+    { &kOrdersEvents },   { &kMovementEvents },   { &kUnitsEvents },    { &kScriptsEvents },
 };
 
 static const TraceEventKind* FindEventKind(const TraceEventModule* module, int kind)
@@ -3067,6 +3067,16 @@ void __stdcall HarnessOrdersEvent(const OrdersEventHeader* event, unsigned int s
 void __stdcall HarnessMovementEvent(const MovementEventHeader* event, unsigned int size, int outcome)
 {
     RecordEvent(ES_MOVEMENT, event, size, outcome);
+}
+
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_UNITS, event, size, outcome);
+}
+
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader* event, unsigned int size, int outcome)
+{
+    RecordEvent(ES_SCRIPTS, event, size, outcome);
 }
 
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size)

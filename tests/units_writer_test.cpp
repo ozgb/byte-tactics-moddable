@@ -38,7 +38,8 @@
 #include "../src/orders/order_list.h"
 #include "../src/orders/orders_seam.h"
 #include "../src/seams/orders_world.h"
-#include "../src/units/weapons_effects.h"
+#include "../src/seams/units_world.h"
+#include "../src/units/units_seam.h"
 #include "../src/units/factory_index.h"
 #include "../src/map/line_of_sight_index.h"
 
@@ -129,6 +130,8 @@ void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int) {}
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
 void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, int) {}
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader*, unsigned int, int) {}
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader*, unsigned int, int) {}
 
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit*, int)
 {
@@ -163,7 +166,7 @@ static int IndexOf(Unit* unit)
     return (int)(unit - s_units);
 }
 
-static void __stdcall FakeNotifyUnitRefs(Unit*, int event)
+void __stdcall NotifyUnitRefs(Unit*, int event)
 {
     if (event == 16)
         s_log.push_back(TAG_NOTICE);
@@ -310,7 +313,7 @@ static void Setup()
     g_seams.orders = &orders;
     static UnitsSeam units;
     memset(&units, 0, sizeof units);
-    units.NotifyUnitRefs = FakeNotifyUnitRefs;
+    units.Apply = UnitsApply;
     units.CreateFactoryIndex = CreateFactoryIndex;
     units.FreeFactoryIndex = FreeFactoryIndex;
     units.RefreshFactoryIndex = RefreshFactoryIndex;

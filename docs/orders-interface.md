@@ -54,9 +54,9 @@ Orders' place in it:
 - **Effects out of orders:** thirteen effects to units (SET_STATE_BITS, SET_POSITION, ATTACH_TO_PIECE,
   FINISH_CONSTRUCTION, BUILD_DECAY, REPAIR, UNLINK, BUSY, SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and
   SET_BUILD_STATE) and one to scripts (START_SCRIPT, in three forms), besides the events to movement, weapons,
-  targeting, features, economy and players that orders published before. Units and scripts are not on the model yet
-  (#986), so their handlers (`src/units/orders_effects.cpp`, `src/scripts/orders_effects.cpp`) are adapters that hold
-  3.1c's calls and writes.
+  targeting, features, economy and players that orders published before. Their handlers are
+  adapters in `src/seams/units_world.cpp` and `src/seams/scripts_world.cpp` (now, since #986, handlers of units' and
+  scripts' inboxes: `UnitsApply` and `ScriptsApply` hold 3.1c's calls and writes).
 - **Module ids:** orders keeps `SCHED_ORDERS = 3`, which its outbox already used; movement keeps `SCHED_MOVEMENT = 14`.
 - **Versions:** orders 5.0 (11 slots; 4.0 had 18), movement 3.0, units 5.0 (`UpdateUnitBody` returns an int,
   `UpdateUnitTail`, `UnitRefGet` and `UnitRefSetValue` are new), services 2.1 (`HarnessOrdersEvent` and
@@ -155,8 +155,9 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | the write of `buildLeft` and `health` | SET_BUILD_STATE | `UnitsOnOrdersSetBuildState` |
 | `scripts.StartScript`, `StartScriptWithArgs`, `StartScriptWithArgsByIndex` | START_SCRIPT | `ScriptsOnOrdersStartScript`: the script's start, by `OrdersStartScript::form` (by name, by name with arguments, by index with arguments); the three starts are one effect |
 
-The handlers are the adapters of units and scripts, which hold 3.1c's writes until #986 puts units and scripts on the
-scheduler. The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
+The handlers are the adapters of units and scripts (`src/seams/units_world.cpp`, `src/seams/scripts_world.cpp`); since
+#986 they publish units' and scripts' events, and the slots the third column names left the seams (`UnitsApply` and
+`ScriptsApply` call the code). The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
 SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and SET_BUILD_STATE are the six that go beyond the issue's list of
 intents, for writes of the unit record that orders made directly.
 
@@ -280,7 +281,7 @@ cite the document that decided them; the routes new in this change cite the gate
 | orders BUSY, to units | queued | #952's rule finds no read: `Unit::workTime` is read by economy's cloak upkeep (`economy.cpp`, through `WorldUnitInfo`) in the players phase, after a phase boundary has delivered it, and by the info panel, outside the tick; nothing in `src/orders/` reads it. |
 | orders SET_FLAGS, to units | queued | #952's rule finds no read: it sets and clears bits 0x20, 0x800 and 0x8000 of `Unit::flags` (`MakeSelectableOrder`, `CloakOnOrder`, `CloakOffOrder`), whose readers are economy's and victory's in the players phase and the UI. |
 | orders CLEAR_NET_DIRTY, to units | synchronous | The gate (section 8). |
-| orders SET_STANCE, to units | queued | #952's rule finds no read: the stance is read back only at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, and by the orders panel, outside the tick. |
+| orders SET_STANCE, to units | queued | #952's rule finds no read before units' next delivery. The stance is read back at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, by the orders panel, outside the tick, and by targeting's `FindBestTargetIfFireAtWill` (`unit_targets.cpp`, through `ScheduleTargetingFireAtWill`), which reads `Unit::fireOrder` and which the patrol, guard and VTOL orders call from `RunOrders`. That read is safe: `RunOrders` publishes CLEAR_NET_DIRTY, synchronous, at the top of every turn of its loop before the order runs, and a synchronous route delivers its subscriber's inbox first, so units' inbox is empty when the next order runs; and no order of the second list (`RunSecondaryOrders`) calls the search. |
 | orders SET_ANGLES, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head. |
 | orders SET_BUILD_STATE, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` run in later states of the order or in the unit's own update. |
 | orders START_SCRIPT, to scripts | synchronous | The gate (section 8). |
@@ -297,6 +298,13 @@ cite the document that decided them; the routes new in this change cite the gate
 | orders SET_POS, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders CLEAR, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders to movement (six routes) | synchronous | Each with its reason in `docs/movement-interface.md`, section 4. |
+
+**The queued routes to units rest on CLEAR_NET_DIRTY.** BUSY, SET_FLAGS, SET_STANCE, SET_ANGLES, SET_BUILD_STATE and
+BUILD_DECAY reach units queued because CLEAR_NET_DIRTY is published unconditionally before each order of the first list
+runs and is synchronous, so its delivery empties units' inbox between two orders of one unit. If CLEAR_NET_DIRTY became
+queued, or were published only when a dirty bit is pending, each of these routes would need #952's rule again. Since
+#986 the handlers are units' inbox handlers (`docs/units-interface.md`), and CLEAR_NET_DIRTY stays a synchronous route
+to units, so this still holds.
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 80 rows of class `immediate` with orders as
 writer or reader and the other side not movement alone (the rows between orders and movement are in the table too; the

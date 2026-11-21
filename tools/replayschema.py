@@ -119,7 +119,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts")
 
 
 def event_table(subsystem: str) -> dict:
@@ -2451,7 +2451,7 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if a.get("dir") == "out":
             return []
         if phase == "a":
-            return ['ArgVec3(s_call, "%s", %s);' % (line, var)]
+            return ['ArgVec3%s(s_call, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", line, var)]
         if phase == "i":
             return ['ImportVec3%s(line, "%s", %s);' % ("Xz" if a.get("axes") == "xz" else "", a.get("label", line), var)]
     elif mode in ("units", "units-buffer", "vector"):

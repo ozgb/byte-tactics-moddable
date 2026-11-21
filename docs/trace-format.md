@@ -306,7 +306,7 @@ the row since format 6, and sections 24 and 25 hold other content (sections 8.13
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) ai's events (section 42, section 8.30) weapons' events (section 47, section 8.31), orders' events (section 48, section 8.32) and movement's events (section 49, section 8.33) are in a dump and in no row, as diagnostics, and so are the records 43 to 46 and 48 (ai's, los_radar's, map's, players' and weapons' reports, sections 8.30, 8.6, 8.28, 8.17 and 8.31). Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) ai's events (section 42, section 8.30) weapons' events (section 47, section 8.31), orders' events (section 48, section 8.32) movement's events (section 49, section 8.33), units' events (section 50, section 8.34) and scripts' events (section 51, section 8.35) are in a dump and in no row, as diagnostics, and so are the records 43 to 46 and 48 (ai's, los_radar's, map's, players' and weapons' reports, sections 8.30, 8.6, 8.28, 8.17 and 8.31). Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
@@ -1644,6 +1644,83 @@ for k in 0 .. n-1, in order, by the kind of the record:
 - `state` of LOAD is the unit's motion state, 11 words (44 bytes), `pos` a position in world coordinates with 16 fractional bits (x, y and z), and `cell` a cell (x and y). `mode`, `speed`, `value`, `flags`, `delta`, `bank`, `pitch`, `heading`, `moved`, `rate`, `mask`, `set` and `script` are the arguments of their kinds, as the kind says. 320 to 331 are events into movement's inbox and 336 and up are effects movement publishes.
 - `outcome` is the result of `Apply` for an event, and 1 for an effect.
 
+### 8.34 units events (section 50, dumped only)
+
+The events of units in this tick (`interfaces/units.h`). No row hashes them (section 6): a dump
+holds their lines, after those of section 49, as a diagnostic. The reference build does not record them, so its
+dumps have no `unitsEvents.*` lines. An event is recorded when units consumes it from its inbox, right after
+`Apply` returns, with the outcome `Apply` gave. So the records are in the order units consumed them. The host empties the record after the world
+row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `unitsEvents.kinds` of the schema, in the order of that list. The section is dumped, never hashed.
+
+```
+unitsEvents.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
+    unitsEvents[k].kind
+    unitsEvents[k].<each field of that kind, in the order of its row below>
+```
+
+`unitsEvents.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. A field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
+
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 352 | UNITS_SET_STATE_BITS | `unit` (unit), `mask`, `set`, `outcome` |
+| 353 | UNITS_SET_FLAGS | `unit` (unit), `clear`, `set`, `outcome` |
+| 354 | UNITS_SET_NET_DIRTY | `unit` (unit), `clear`, `set`, `outcome` |
+| 355 | UNITS_SET_WORK_TIME | `unit` (unit), `until`, `outcome` |
+| 356 | UNITS_SET_POSITION | `unit` (unit), `pos` (12 bytes), `mode`, `outcome` |
+| 357 | UNITS_ATTACH_TO_PIECE | `unit` (unit), `target` (unit), `piece`, `mode`, `outcome` |
+| 358 | UNITS_FINISH_CONSTRUCTION | `unit` (unit), `builder` (unit), `outcome` |
+| 359 | UNITS_BUILD_DECAY | `unit` (unit), `ticks`, `outcome` |
+| 360 | UNITS_REPAIR | `unit` (unit), `builder` (unit), `amount`, `outcome` |
+| 361 | UNITS_UNLINK | `unit` (unit), `ref` (handle), `outcome` |
+| 362 | UNITS_SET_STANCE | `unit` (unit), `fields`, `moveOrder`, `fireOrder`, `group`, `outcome` |
+| 363 | UNITS_SET_ANGLES | `unit` (unit), `fields`, `bank`, `heading`, `pitch`, `outcome` |
+| 364 | UNITS_SET_BUILD_STATE | `unit` (unit), `buildLeft`, `health`, `outcome` |
+| 365 | UNITS_TURN | `unit` (unit), `delta`, `outcome` |
+| 366 | UNITS_MOVE | `unit` (unit), `pos` (12 bytes), `outcome` |
+| 367 | UNITS_CHANGE_CELL | `unit` (unit), `pos` (12 bytes), `cell` (8 bytes), `mode`, `outcome` |
+| 384 | UNITS_SET_MOVED | `unit` (unit), `moved`, `outcome` |
+| 385 | UNITS_SFX_OCCUPY | `unit` (unit), `outcome` |
+| 386 | UNITS_SCRIPT_VALUE | `unit` (unit), `which`, `value`, `outcome` |
+| 387 | UNITS_NOTIFY_REFS | `unit` (unit), `event`, `outcome` |
+| 388 | UNITS_ATTACKED_SPEECH | `unit` (unit), `outcome` |
+| 389 | UNITS_MARK_DAMAGED | `unit` (unit), `outcome` |
+| 390 | UNITS_DAMAGE_RECORD | `unit` (unit), `damageKind`, `attacker` (unit), `outcome` |
+| 391 | UNITS_SET_HEALTH | `unit` (unit), `health`, `dying`, `outcome` |
+| 392 | UNITS_KILL | `unit` (unit), `selfDestruct`, `outcome` |
+| 393 | UNITS_SEND | `unit` (unit), `player`, `outcome` |
+| 394 | UNITS_CAPTURE | `unit` (unit), `player`, `present`, `hitPoints`, `buildPercent`, `angles` (12 bytes), `stockpiles` (12 bytes), `outcome` |
+
+- `unit` is the unit the kind is about, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer that is not in the unit table; `target`, `builder` and `attacker` are other units in the same form. `ref` is a unit reference as a block offset (handle). `pos` is a position in world coordinates with 16 fractional bits (x, y and z), `cell` a cell (x and y), `angles` and `stockpiles` are 3 words each. The other fields are the arguments of their kinds, as the kind says. 352 to 367 and 384 to 394 are the events units consumes.
+- `outcome` is the result of `Apply`.
+
+### 8.35 scripts events (section 51, dumped only)
+
+The events of scripts in this tick (`interfaces/scripts.h`). No row hashes them (section 6): a dump
+holds their lines, after those of section 50, as a diagnostic. The reference build does not record them, so its
+dumps have no `scriptsEvents.*` lines. An event is recorded when scripts consumes it from its inbox, right after
+`Apply` returns, with the outcome `Apply` gave. So the records are in the order scripts consumed them. The host empties the record after the world
+row of the tick, so the lines a dump writes after an earlier phase hold the records made so far. Each record has the fields of its kind, the `fields` of its entry in `scriptsEvents.kinds` of the schema, in the order of that list. The section is dumped, never hashed.
+
+```
+scriptsEvents.count                                  # n
+for k in 0 .. n-1, in order, by the kind of the record:
+    scriptsEvents[k].kind
+    scriptsEvents[k].<each field of that kind, in the order of its row below>
+```
+
+`scriptsEvents.count` and the numbers of a record are written as `0x` and 8 hex digits. A reader reads `kind` first, then the fields of that kind and no others: the fields differ from kind to kind, and a kind has no line for a field of another kind's payload. A field is a number (a float is its 4 bytes as a u32), `(unit)` a pointer ID with target `unit` (is_ref=true, section 5), `(handle)` a block offset written `null` when 0 and `heap` otherwise, never the number, and `(N bytes)` the hex: of the N bytes.
+
+| Kind | Name | Fields after `kind`, in dump order |
+| --- | --- | --- |
+| 416 | SCRIPTS_START | `unit` (unit), `form`, `index`, `name` (32 bytes), `callback` (handle), `update`, `count`, `args` (16 bytes), `outcome` |
+| 417 | SCRIPTS_DETACH_PIECE | `unit` (unit), `piece`, `pose`, `outcome` |
+| 418 | SCRIPTS_FREE_STATE | `unit` (unit), `state` (handle), `feature`, `outcome` |
+| 419 | SCRIPTS_INIT_STATE | `unit` (unit), `state` (handle), `feature`, `outcome` |
+
+- `unit` is the unit the kind is about, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer that is not in the unit table. `callback` and `state` are a callback and a piece state, as block offsets (handles). The other fields are the arguments of their kinds, as the kind says. 416 to 419 are the events scripts consumes.
+- `outcome` is the result of `Apply`.
+
 
 ## 9. The per-tick digest
 
@@ -1678,7 +1755,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35, 36 to 42 and 47 to 49. The first line is `bt-dump N`, N the format number (section 12); every
+of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35, 36 to 42 and 47 to 51. The first line is `bt-dump N`, N the format number (section 12); every
 other line is
 
 ```
@@ -1692,7 +1769,7 @@ with single spaces between the first three fields and the value, which runs to t
 dump has, in order: the lines of the phase row (`gameTick`, the Park-Miller state of `rng`, `rng.crtHoldrand`,
 then sections 1 to 9), then the lines of the world sections (10 to 14, 18 to 25 and 27, and 29 to 31 when the
 tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that tick, after the
-lines of section 27), then the lines of sections 32, 33, 37, 36, 38 to 42 and 47 to 49, in that order, which end the block and are
+lines of section 27), then the lines of sections 32, 33, 37, 36, 38 to 42 and 47 to 51, in that order, which end the block and are
 not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29, 8.30, 8.31, 8.32 and 8.33). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
 sections 16 and 17, and the `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*` and `weaponsState.*` lines of economy's, ai's, map's, players' and weapons' own reports that follow them, sit between those of
@@ -1804,7 +1881,7 @@ Section 36 (the features events, section 8.25) was added in format 5 in the same
 and a reader must skip `features.*` too. Section 38 (targeting's events, section 8.26) was added the
 same way, after section 36's lines: a reader must also skip `targeting.*`. Section 39 (los_radar's events, section 8.27) was added
 the same way, after section 38's lines: a reader must also skip `los_radar.*`. Section 40 (map's events, section 8.28) was added the same way, after
-section 39's lines: a reader must also skip `map.*`. Section 41 (players' events, section 8.29) was added the same way, after section 40's lines: a reader must also skip `playersEvents.*`. Section 42 (ai's events, section 8.30) and record 43 (ai's report, `aiState.*`) were added the same way: a reader must also skip `aiEvents.*` and `aiState.*`. Section 47 (weapons' events, section 8.31) and record 48 (weapons' report, `weaponsState.*`) were added the same way, and a reader must also skip `weaponsEvents.*` and `weaponsState.*`. Sections 48 and 49 (orders' and movement's events, sections 8.32 and 8.33) were added the same way, and a reader must also skip `ordersEvents.*` and `movementEvents.*`. Sections 42, 47, 48 and 49 are new in the trace format.
+section 39's lines: a reader must also skip `map.*`. Section 41 (players' events, section 8.29) was added the same way, after section 40's lines: a reader must also skip `playersEvents.*`. Section 42 (ai's events, section 8.30) and record 43 (ai's report, `aiState.*`) were added the same way: a reader must also skip `aiEvents.*` and `aiState.*`. Section 47 (weapons' events, section 8.31) and record 48 (weapons' report, `weaponsState.*`) were added the same way, and a reader must also skip `weaponsEvents.*` and `weaponsState.*`. Sections 48 and 49 (orders' and movement's events, sections 8.32 and 8.33) were added the same way, and a reader must also skip `ordersEvents.*` and `movementEvents.*`. Sections 50 and 51 (units' and scripts' events, sections 8.34 and 8.35) were added the same way, and a reader must also skip `unitsEvents.*` and `scriptsEvents.*`. Sections 42, 47, 48, 49, 50 and 51 are new in the trace format.
 
 Format 6 took the state that only its owner reads out of the hash (#979). Sections 15 (the eyes), 26 (the squads) and 28 (the mission conditions)
 left the world row, and section 25 (the squad managers) and section 24 (the player AI) were replaced by the records that units and los_radar write

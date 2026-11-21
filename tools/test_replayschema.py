@@ -370,6 +370,13 @@ class TargetingForms(unittest.TestCase):
         self.assertIn('ImportVec3Xz(line, "pos", a0);', body[:body.index("\n}\n")])
         self.assertIn("AddVec3Xz(t, a0);", files[rs.SLOTS_H])
 
+    def test_a_slot_records_only_the_axes_it_reads_of_its_own_argument(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecMapGetGroundHeight"):]
+        self.assertIn('ArgVec3Xz(s_call, "pos", a0);', body[:body.index("\n}\n")])
+        self.assertNotIn('ArgVec3(s_call, "pos", a0);', body[:body.index("\n}\n")])
+
     def test_a_vec3_out_of_an_import_is_recorded_after_the_call_and_applied_by_the_stub(self):
         files, _, _ = self.generated()
         self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])

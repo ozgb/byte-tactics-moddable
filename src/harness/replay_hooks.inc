@@ -2767,7 +2767,7 @@ int __stdcall RecMapGetGroundHeight(Vec3* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETGROUNDHEIGHT, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgVec3(s_call, "pos", a0);
+        ArgVec3Xz(s_call, "pos", a0);
     }
     ReplayText line;
     if (scope.Import()) {

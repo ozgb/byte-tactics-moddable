@@ -643,7 +643,7 @@ and one for the replayer. A `callback` argument is allowed on a slot that a subs
 The recorder hooks the object's methods for the duration of the import: it points the object's vptr at a class of its own that
 derives from the interface, so each call is recorded and then made on the object's own method, and it puts the vptr back when the
 import returns. The object keeps its address and its identity, so a callback the callee keeps for later (the `Callback` of
-`StartScriptWithArgs`) is the module's own object after the import, and a call it makes later is not part of any import. Two limits end the
+`StartScriptWithArgsByIndex`) is the module's own object after the import, and a call it makes later is not part of any import. Two limits end the
 run, naming the call: a callback made inside another callback, and an import made inside a callback, are not recorded, because their
 lines could not be in call order. A callback that frees its own object is put back only when the vptr word still holds the recorder's.
 
@@ -654,7 +654,7 @@ object's at the same place.
 
 ### A callback held in state
 
-A callback object can also be state the module keeps: the argument of a slot (`StartScript` takes a `Callback*` and the channel it starts calls back when the
+A callback object can also be state the module keeps: the argument of a slot (`StartScriptWithArgsByIndex` takes a `Callback*` and the channel it starts calls back when the
 script ends), or a pointer in an object (`Weapon.callbacks`). Two forms name one.
 
 A slot argument of mode `callback` (the same note as an import's, `{"mode": "callback", "callback": "Callback"}`) is `a <name> <handle>#<n>`, or `a <name> null`.
@@ -970,7 +970,7 @@ from the layout), and the export refuses a copy that names any other source name
   the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, `CommandArgs`). A type with no
   reason is an error. A pending subsystem is not asked.
 - `indirect_call` rows of a complete subsystem. Every `indirect_call` row of a function behind a recorded slot, and of every function
-  `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam.SetStateBits]`)
+  `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam.CanLoad]`)
   to a slot the subsystem lists in `imports`, or to a slot of its own seam whose functions are all behind the slot being checked; a
   `virtual Class.Method` dispatch where `Class` is a kind with `kinds` (`poly`) or a kind with a `vtable`, and the `Method` of each concrete kind's type is
   among the functions (a concrete type that defines no `Method` of its own is not asked, and the base's own `Method` is asked only when some concrete
@@ -999,7 +999,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
-| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for an import that reads only those (`GetGroundHeight`); with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
+| `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
 | `vector` (`dir: out`) | a vector of `Point16` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |

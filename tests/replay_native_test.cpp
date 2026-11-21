@@ -754,7 +754,13 @@ void ParseScalar(const char* v, Point16& out)
     out.x = (short)x;
     out.y = (short)y;
 }
-void ParseScalar(const char* v, Vec3& out) { sscanf(v, "(%d,%d,%d)", &out.x, &out.y, &out.z); }
+void ParseScalar(const char* v, Vec3& out)
+{
+    if (sscanf(v, "(%d,%d,%d)", &out.x, &out.y, &out.z) == 2) {
+        out.z = out.y;
+        out.y = 0;
+    }
+}
 
 template <class T> T ArgScalar(const char* name)
 {

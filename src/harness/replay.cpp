@@ -412,6 +412,17 @@ void ArgVec3(ReplayText& t, const char* name, const Vec3* v)
     ArgValue(t, name, v);
 }
 
+void ArgVec3Xz(ReplayText& t, const char* name, const Vec3* v)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.Add(" (");
+    t.AddInt(v->x);
+    t.AddChar(',');
+    t.AddInt(v->z);
+    t.Add(")\n");
+}
+
 void ArgPending(ReplayText& t, const char* name)
 {
     t.Add("  a ");

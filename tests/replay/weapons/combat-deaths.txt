@@ -8926,7 +8926,6 @@ call 857 UpdateUnitWeapons
   a unit Unit#2
 call 857 Apply
   r Game.localPlayer 0
-  r Unit#2.health 70
   r Unit#2.player Player#0
   r Unit#2.activateFlags 0
   r UnitDef#112.flags1 0x0084008a

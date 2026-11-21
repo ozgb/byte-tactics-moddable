@@ -291,6 +291,35 @@ enum ReplayObjectKindId {
     ROK_MOVEMENTSETPOSITION,
     ROK_MOVEMENTSETSTATEBITS,
     ROK_MOVEMENTSTARTSCRIPT,
+    ROK_UNITSEVENTHEADER,
+    ROK_UNITSSETSTATEBITS,
+    ROK_UNITSSETFLAGS,
+    ROK_UNITSSETNETDIRTY,
+    ROK_UNITSSETWORKTIME,
+    ROK_UNITSSETPOSITION,
+    ROK_UNITSATTACHTOPIECE,
+    ROK_UNITSFINISHCONSTRUCTION,
+    ROK_UNITSBUILDDECAY,
+    ROK_UNITSREPAIR,
+    ROK_UNITSUNLINK,
+    ROK_UNITSSETSTANCE,
+    ROK_UNITSSETANGLES,
+    ROK_UNITSSETBUILDSTATE,
+    ROK_UNITSTURN,
+    ROK_UNITSMOVE,
+    ROK_UNITSCHANGECELL,
+    ROK_UNITSSETMOVED,
+    ROK_UNITSSCRIPTVALUE,
+    ROK_UNITSNOTIFYREFS,
+    ROK_UNITSDAMAGERECORD,
+    ROK_UNITSSETHEALTH,
+    ROK_UNITSKILL,
+    ROK_UNITSSEND,
+    ROK_UNITSCAPTURE,
+    ROK_SCRIPTSEVENTHEADER,
+    ROK_SCRIPTSSTART,
+    ROK_SCRIPTSDETACHPIECE,
+    ROK_SCRIPTSSTATE,
     ROK_FIXTUREVIEW,
     ROK_FIXTURESLAVE,
     ROK_FIXTUREHOLDER,
@@ -586,6 +615,8 @@ enum ReplayEventTableId {
     RET_WEAPONS,
     RET_ORDERS,
     RET_MOVEMENT,
+    RET_UNITS,
+    RET_SCRIPTS,
     RET_COUNT
 };
 
@@ -692,6 +723,37 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 345, ROK_MOVEMENTSETSTATEBITS },
     { 346, ROK_MOVEMENTEVENTHEADER },
     { 347, ROK_MOVEMENTSTARTSCRIPT },
+    { 352, ROK_UNITSSETSTATEBITS },
+    { 353, ROK_UNITSSETFLAGS },
+    { 354, ROK_UNITSSETNETDIRTY },
+    { 355, ROK_UNITSSETWORKTIME },
+    { 356, ROK_UNITSSETPOSITION },
+    { 357, ROK_UNITSATTACHTOPIECE },
+    { 358, ROK_UNITSFINISHCONSTRUCTION },
+    { 359, ROK_UNITSBUILDDECAY },
+    { 360, ROK_UNITSREPAIR },
+    { 361, ROK_UNITSUNLINK },
+    { 362, ROK_UNITSSETSTANCE },
+    { 363, ROK_UNITSSETANGLES },
+    { 364, ROK_UNITSSETBUILDSTATE },
+    { 365, ROK_UNITSTURN },
+    { 366, ROK_UNITSMOVE },
+    { 367, ROK_UNITSCHANGECELL },
+    { 384, ROK_UNITSSETMOVED },
+    { 385, ROK_UNITSEVENTHEADER },
+    { 386, ROK_UNITSSCRIPTVALUE },
+    { 387, ROK_UNITSNOTIFYREFS },
+    { 388, ROK_UNITSEVENTHEADER },
+    { 389, ROK_UNITSEVENTHEADER },
+    { 390, ROK_UNITSDAMAGERECORD },
+    { 391, ROK_UNITSSETHEALTH },
+    { 392, ROK_UNITSKILL },
+    { 393, ROK_UNITSSEND },
+    { 394, ROK_UNITSCAPTURE },
+    { 416, ROK_SCRIPTSSTART },
+    { 417, ROK_SCRIPTSDETACHPIECE },
+    { 418, ROK_SCRIPTSSTATE },
+    { 419, ROK_SCRIPTSSTATE },
 };
 static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 5 },
@@ -701,6 +763,8 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WEAPONSEVENTHEADER, 31, 25 },
     { ROK_ORDERSEVENTHEADER, 56, 22 },
     { ROK_MOVEMENTEVENTHEADER, 78, 24 },
+    { ROK_UNITSEVENTHEADER, 102, 27 },
+    { ROK_SCRIPTSEVENTHEADER, 129, 4 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -777,6 +841,34 @@ static_assert(sizeof(MovementMoveRate) <= REPLAY_EVENT_MAX, "MovementMoveRate fi
 static_assert(sizeof(MovementSetPosition) <= REPLAY_EVENT_MAX, "MovementSetPosition fits the event buffer");
 static_assert(sizeof(MovementSetStateBits) <= REPLAY_EVENT_MAX, "MovementSetStateBits fits the event buffer");
 static_assert(sizeof(MovementStartScript) <= REPLAY_EVENT_MAX, "MovementStartScript fits the event buffer");
+static_assert(sizeof(UnitsSetStateBits) <= REPLAY_EVENT_MAX, "UnitsSetStateBits fits the event buffer");
+static_assert(sizeof(UnitsSetFlags) <= REPLAY_EVENT_MAX, "UnitsSetFlags fits the event buffer");
+static_assert(sizeof(UnitsSetNetDirty) <= REPLAY_EVENT_MAX, "UnitsSetNetDirty fits the event buffer");
+static_assert(sizeof(UnitsSetWorkTime) <= REPLAY_EVENT_MAX, "UnitsSetWorkTime fits the event buffer");
+static_assert(sizeof(UnitsSetPosition) <= REPLAY_EVENT_MAX, "UnitsSetPosition fits the event buffer");
+static_assert(sizeof(UnitsAttachToPiece) <= REPLAY_EVENT_MAX, "UnitsAttachToPiece fits the event buffer");
+static_assert(sizeof(UnitsFinishConstruction) <= REPLAY_EVENT_MAX, "UnitsFinishConstruction fits the event buffer");
+static_assert(sizeof(UnitsBuildDecay) <= REPLAY_EVENT_MAX, "UnitsBuildDecay fits the event buffer");
+static_assert(sizeof(UnitsRepair) <= REPLAY_EVENT_MAX, "UnitsRepair fits the event buffer");
+static_assert(sizeof(UnitsUnlink) <= REPLAY_EVENT_MAX, "UnitsUnlink fits the event buffer");
+static_assert(sizeof(UnitsSetStance) <= REPLAY_EVENT_MAX, "UnitsSetStance fits the event buffer");
+static_assert(sizeof(UnitsSetAngles) <= REPLAY_EVENT_MAX, "UnitsSetAngles fits the event buffer");
+static_assert(sizeof(UnitsSetBuildState) <= REPLAY_EVENT_MAX, "UnitsSetBuildState fits the event buffer");
+static_assert(sizeof(UnitsTurn) <= REPLAY_EVENT_MAX, "UnitsTurn fits the event buffer");
+static_assert(sizeof(UnitsMove) <= REPLAY_EVENT_MAX, "UnitsMove fits the event buffer");
+static_assert(sizeof(UnitsChangeCell) <= REPLAY_EVENT_MAX, "UnitsChangeCell fits the event buffer");
+static_assert(sizeof(UnitsSetMoved) <= REPLAY_EVENT_MAX, "UnitsSetMoved fits the event buffer");
+static_assert(sizeof(UnitsEventHeader) <= REPLAY_EVENT_MAX, "UnitsEventHeader fits the event buffer");
+static_assert(sizeof(UnitsScriptValue) <= REPLAY_EVENT_MAX, "UnitsScriptValue fits the event buffer");
+static_assert(sizeof(UnitsNotifyRefs) <= REPLAY_EVENT_MAX, "UnitsNotifyRefs fits the event buffer");
+static_assert(sizeof(UnitsDamageRecord) <= REPLAY_EVENT_MAX, "UnitsDamageRecord fits the event buffer");
+static_assert(sizeof(UnitsSetHealth) <= REPLAY_EVENT_MAX, "UnitsSetHealth fits the event buffer");
+static_assert(sizeof(UnitsKill) <= REPLAY_EVENT_MAX, "UnitsKill fits the event buffer");
+static_assert(sizeof(UnitsSend) <= REPLAY_EVENT_MAX, "UnitsSend fits the event buffer");
+static_assert(sizeof(UnitsCapture) <= REPLAY_EVENT_MAX, "UnitsCapture fits the event buffer");
+static_assert(sizeof(ScriptsStart) <= REPLAY_EVENT_MAX, "ScriptsStart fits the event buffer");
+static_assert(sizeof(ScriptsDetachPiece) <= REPLAY_EVENT_MAX, "ScriptsDetachPiece fits the event buffer");
+static_assert(sizeof(ScriptsState) <= REPLAY_EVENT_MAX, "ScriptsState fits the event buffer");
 
 static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, anim), "anim", 0, 1, 0 },
@@ -912,6 +1004,35 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MovementSetPosition", sizeof(MovementSetPosition), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementSetStateBits", sizeof(MovementSetStateBits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MovementStartScript", sizeof(MovementStartScript), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsEventHeader", sizeof(UnitsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetStateBits", sizeof(UnitsSetStateBits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetFlags", sizeof(UnitsSetFlags), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetNetDirty", sizeof(UnitsSetNetDirty), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetWorkTime", sizeof(UnitsSetWorkTime), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetPosition", sizeof(UnitsSetPosition), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsAttachToPiece", sizeof(UnitsAttachToPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsFinishConstruction", sizeof(UnitsFinishConstruction), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsBuildDecay", sizeof(UnitsBuildDecay), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsRepair", sizeof(UnitsRepair), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsUnlink", sizeof(UnitsUnlink), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetStance", sizeof(UnitsSetStance), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetAngles", sizeof(UnitsSetAngles), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetBuildState", sizeof(UnitsSetBuildState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsTurn", sizeof(UnitsTurn), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsMove", sizeof(UnitsMove), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsChangeCell", sizeof(UnitsChangeCell), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetMoved", sizeof(UnitsSetMoved), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsScriptValue", sizeof(UnitsScriptValue), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsNotifyRefs", sizeof(UnitsNotifyRefs), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsDamageRecord", sizeof(UnitsDamageRecord), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSetHealth", sizeof(UnitsSetHealth), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsKill", sizeof(UnitsKill), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsSend", sizeof(UnitsSend), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsCapture", sizeof(UnitsCapture), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "ScriptsEventHeader", sizeof(ScriptsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "ScriptsStart", sizeof(ScriptsStart), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "ScriptsDetachPiece", sizeof(ScriptsDetachPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "ScriptsState", sizeof(ScriptsState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureView", sizeof(FixtureView), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureSlave", sizeof(FixtureSlave), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureHolder", sizeof(FixtureHolder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -949,7 +1070,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureLosStep", sizeof(LosStep), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureOrderEntry", sizeof(OrderTableEntry), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 153;
+static const unsigned kReplayObjectKindCount = 182;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
 
@@ -1647,18 +1768,149 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(MovementStartScript, h.kind), sizeof(((MovementStartScript*)nullptr)->h.kind), ROK_MOVEMENTSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementStartScript, h.unit), sizeof(((MovementStartScript*)nullptr)->h.unit), ROK_MOVEMENTSTARTSCRIPT, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "script", offsetof(MovementStartScript, script), sizeof(((MovementStartScript*)nullptr)->script), ROK_MOVEMENTSTARTSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsEventHeader, kind), sizeof(((UnitsEventHeader*)nullptr)->kind), ROK_UNITSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsEventHeader, unit), sizeof(((UnitsEventHeader*)nullptr)->unit), ROK_UNITSEVENTHEADER, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetStateBits, h.kind), sizeof(((UnitsSetStateBits*)nullptr)->h.kind), ROK_UNITSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetStateBits, h.unit), sizeof(((UnitsSetStateBits*)nullptr)->h.unit), ROK_UNITSSETSTATEBITS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "mask", offsetof(UnitsSetStateBits, mask), sizeof(((UnitsSetStateBits*)nullptr)->mask), ROK_UNITSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "set", offsetof(UnitsSetStateBits, set), sizeof(((UnitsSetStateBits*)nullptr)->set), ROK_UNITSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetFlags, h.kind), sizeof(((UnitsSetFlags*)nullptr)->h.kind), ROK_UNITSSETFLAGS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetFlags, h.unit), sizeof(((UnitsSetFlags*)nullptr)->h.unit), ROK_UNITSSETFLAGS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "clear", offsetof(UnitsSetFlags, clear), sizeof(((UnitsSetFlags*)nullptr)->clear), ROK_UNITSSETFLAGS, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "set", offsetof(UnitsSetFlags, set), sizeof(((UnitsSetFlags*)nullptr)->set), ROK_UNITSSETFLAGS, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetNetDirty, h.kind), sizeof(((UnitsSetNetDirty*)nullptr)->h.kind), ROK_UNITSSETNETDIRTY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetNetDirty, h.unit), sizeof(((UnitsSetNetDirty*)nullptr)->h.unit), ROK_UNITSSETNETDIRTY, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "clear", offsetof(UnitsSetNetDirty, clear), sizeof(((UnitsSetNetDirty*)nullptr)->clear), ROK_UNITSSETNETDIRTY, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "set", offsetof(UnitsSetNetDirty, set), sizeof(((UnitsSetNetDirty*)nullptr)->set), ROK_UNITSSETNETDIRTY, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetWorkTime, h.kind), sizeof(((UnitsSetWorkTime*)nullptr)->h.kind), ROK_UNITSSETWORKTIME, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetWorkTime, h.unit), sizeof(((UnitsSetWorkTime*)nullptr)->h.unit), ROK_UNITSSETWORKTIME, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "until", offsetof(UnitsSetWorkTime, until), sizeof(((UnitsSetWorkTime*)nullptr)->until), ROK_UNITSSETWORKTIME, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetPosition, h.kind), sizeof(((UnitsSetPosition*)nullptr)->h.kind), ROK_UNITSSETPOSITION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetPosition, h.unit), sizeof(((UnitsSetPosition*)nullptr)->h.unit), ROK_UNITSSETPOSITION, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(UnitsSetPosition, pos[0]), sizeof(((UnitsSetPosition*)nullptr)->pos[0]), ROK_UNITSSETPOSITION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(UnitsSetPosition, pos[1]), sizeof(((UnitsSetPosition*)nullptr)->pos[1]), ROK_UNITSSETPOSITION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(UnitsSetPosition, pos[2]), sizeof(((UnitsSetPosition*)nullptr)->pos[2]), ROK_UNITSSETPOSITION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(UnitsSetPosition, mode), sizeof(((UnitsSetPosition*)nullptr)->mode), ROK_UNITSSETPOSITION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsAttachToPiece, h.kind), sizeof(((UnitsAttachToPiece*)nullptr)->h.kind), ROK_UNITSATTACHTOPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsAttachToPiece, h.unit), sizeof(((UnitsAttachToPiece*)nullptr)->h.unit), ROK_UNITSATTACHTOPIECE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "target", offsetof(UnitsAttachToPiece, target), sizeof(((UnitsAttachToPiece*)nullptr)->target), ROK_UNITSATTACHTOPIECE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "piece", offsetof(UnitsAttachToPiece, piece), sizeof(((UnitsAttachToPiece*)nullptr)->piece), ROK_UNITSATTACHTOPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(UnitsAttachToPiece, mode), sizeof(((UnitsAttachToPiece*)nullptr)->mode), ROK_UNITSATTACHTOPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsFinishConstruction, h.kind), sizeof(((UnitsFinishConstruction*)nullptr)->h.kind), ROK_UNITSFINISHCONSTRUCTION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsFinishConstruction, h.unit), sizeof(((UnitsFinishConstruction*)nullptr)->h.unit), ROK_UNITSFINISHCONSTRUCTION, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "builder", offsetof(UnitsFinishConstruction, builder), sizeof(((UnitsFinishConstruction*)nullptr)->builder), ROK_UNITSFINISHCONSTRUCTION, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsBuildDecay, h.kind), sizeof(((UnitsBuildDecay*)nullptr)->h.kind), ROK_UNITSBUILDDECAY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsBuildDecay, h.unit), sizeof(((UnitsBuildDecay*)nullptr)->h.unit), ROK_UNITSBUILDDECAY, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "ticks", offsetof(UnitsBuildDecay, ticks), sizeof(((UnitsBuildDecay*)nullptr)->ticks), ROK_UNITSBUILDDECAY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsRepair, h.kind), sizeof(((UnitsRepair*)nullptr)->h.kind), ROK_UNITSREPAIR, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsRepair, h.unit), sizeof(((UnitsRepair*)nullptr)->h.unit), ROK_UNITSREPAIR, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "builder", offsetof(UnitsRepair, builder), sizeof(((UnitsRepair*)nullptr)->builder), ROK_UNITSREPAIR, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "amount", offsetof(UnitsRepair, amount), sizeof(((UnitsRepair*)nullptr)->amount), ROK_UNITSREPAIR, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsUnlink, h.kind), sizeof(((UnitsUnlink*)nullptr)->h.kind), ROK_UNITSUNLINK, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsUnlink, h.unit), sizeof(((UnitsUnlink*)nullptr)->h.unit), ROK_UNITSUNLINK, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "ref", offsetof(UnitsUnlink, ref), sizeof(((UnitsUnlink*)nullptr)->ref), ROK_UNITSUNLINK, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetStance, h.kind), sizeof(((UnitsSetStance*)nullptr)->h.kind), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetStance, h.unit), sizeof(((UnitsSetStance*)nullptr)->h.unit), ROK_UNITSSETSTANCE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "fields", offsetof(UnitsSetStance, fields), sizeof(((UnitsSetStance*)nullptr)->fields), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "moveOrder", offsetof(UnitsSetStance, moveOrder), sizeof(((UnitsSetStance*)nullptr)->moveOrder), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "fireOrder", offsetof(UnitsSetStance, fireOrder), sizeof(((UnitsSetStance*)nullptr)->fireOrder), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "group", offsetof(UnitsSetStance, group), sizeof(((UnitsSetStance*)nullptr)->group), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetAngles, h.kind), sizeof(((UnitsSetAngles*)nullptr)->h.kind), ROK_UNITSSETANGLES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetAngles, h.unit), sizeof(((UnitsSetAngles*)nullptr)->h.unit), ROK_UNITSSETANGLES, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "fields", offsetof(UnitsSetAngles, fields), sizeof(((UnitsSetAngles*)nullptr)->fields), ROK_UNITSSETANGLES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "bank", offsetof(UnitsSetAngles, bank), sizeof(((UnitsSetAngles*)nullptr)->bank), ROK_UNITSSETANGLES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "heading", offsetof(UnitsSetAngles, heading), sizeof(((UnitsSetAngles*)nullptr)->heading), ROK_UNITSSETANGLES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pitch", offsetof(UnitsSetAngles, pitch), sizeof(((UnitsSetAngles*)nullptr)->pitch), ROK_UNITSSETANGLES, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetBuildState, h.kind), sizeof(((UnitsSetBuildState*)nullptr)->h.kind), ROK_UNITSSETBUILDSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetBuildState, h.unit), sizeof(((UnitsSetBuildState*)nullptr)->h.unit), ROK_UNITSSETBUILDSTATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "buildLeft", offsetof(UnitsSetBuildState, buildLeft), sizeof(((UnitsSetBuildState*)nullptr)->buildLeft), ROK_UNITSSETBUILDSTATE, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "health", offsetof(UnitsSetBuildState, health), sizeof(((UnitsSetBuildState*)nullptr)->health), ROK_UNITSSETBUILDSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsTurn, h.kind), sizeof(((UnitsTurn*)nullptr)->h.kind), ROK_UNITSTURN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsTurn, h.unit), sizeof(((UnitsTurn*)nullptr)->h.unit), ROK_UNITSTURN, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "delta", offsetof(UnitsTurn, delta), sizeof(((UnitsTurn*)nullptr)->delta), ROK_UNITSTURN, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsMove, h.kind), sizeof(((UnitsMove*)nullptr)->h.kind), ROK_UNITSMOVE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsMove, h.unit), sizeof(((UnitsMove*)nullptr)->h.unit), ROK_UNITSMOVE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(UnitsMove, pos[0]), sizeof(((UnitsMove*)nullptr)->pos[0]), ROK_UNITSMOVE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(UnitsMove, pos[1]), sizeof(((UnitsMove*)nullptr)->pos[1]), ROK_UNITSMOVE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(UnitsMove, pos[2]), sizeof(((UnitsMove*)nullptr)->pos[2]), ROK_UNITSMOVE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsChangeCell, h.kind), sizeof(((UnitsChangeCell*)nullptr)->h.kind), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsChangeCell, h.unit), sizeof(((UnitsChangeCell*)nullptr)->h.unit), ROK_UNITSCHANGECELL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(UnitsChangeCell, pos[0]), sizeof(((UnitsChangeCell*)nullptr)->pos[0]), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(UnitsChangeCell, pos[1]), sizeof(((UnitsChangeCell*)nullptr)->pos[1]), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(UnitsChangeCell, pos[2]), sizeof(((UnitsChangeCell*)nullptr)->pos[2]), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "cell0", offsetof(UnitsChangeCell, cell[0]), sizeof(((UnitsChangeCell*)nullptr)->cell[0]), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "cell1", offsetof(UnitsChangeCell, cell[1]), sizeof(((UnitsChangeCell*)nullptr)->cell[1]), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(UnitsChangeCell, mode), sizeof(((UnitsChangeCell*)nullptr)->mode), ROK_UNITSCHANGECELL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetMoved, h.kind), sizeof(((UnitsSetMoved*)nullptr)->h.kind), ROK_UNITSSETMOVED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetMoved, h.unit), sizeof(((UnitsSetMoved*)nullptr)->h.unit), ROK_UNITSSETMOVED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "moved", offsetof(UnitsSetMoved, moved), sizeof(((UnitsSetMoved*)nullptr)->moved), ROK_UNITSSETMOVED, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsScriptValue, h.kind), sizeof(((UnitsScriptValue*)nullptr)->h.kind), ROK_UNITSSCRIPTVALUE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsScriptValue, h.unit), sizeof(((UnitsScriptValue*)nullptr)->h.unit), ROK_UNITSSCRIPTVALUE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "which", offsetof(UnitsScriptValue, which), sizeof(((UnitsScriptValue*)nullptr)->which), ROK_UNITSSCRIPTVALUE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "value", offsetof(UnitsScriptValue, value), sizeof(((UnitsScriptValue*)nullptr)->value), ROK_UNITSSCRIPTVALUE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsNotifyRefs, h.kind), sizeof(((UnitsNotifyRefs*)nullptr)->h.kind), ROK_UNITSNOTIFYREFS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsNotifyRefs, h.unit), sizeof(((UnitsNotifyRefs*)nullptr)->h.unit), ROK_UNITSNOTIFYREFS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "event", offsetof(UnitsNotifyRefs, event), sizeof(((UnitsNotifyRefs*)nullptr)->event), ROK_UNITSNOTIFYREFS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsDamageRecord, h.kind), sizeof(((UnitsDamageRecord*)nullptr)->h.kind), ROK_UNITSDAMAGERECORD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsDamageRecord, h.unit), sizeof(((UnitsDamageRecord*)nullptr)->h.unit), ROK_UNITSDAMAGERECORD, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "damageKind", offsetof(UnitsDamageRecord, damageKind), sizeof(((UnitsDamageRecord*)nullptr)->damageKind), ROK_UNITSDAMAGERECORD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "attacker", offsetof(UnitsDamageRecord, attacker), sizeof(((UnitsDamageRecord*)nullptr)->attacker), ROK_UNITSDAMAGERECORD, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSetHealth, h.kind), sizeof(((UnitsSetHealth*)nullptr)->h.kind), ROK_UNITSSETHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSetHealth, h.unit), sizeof(((UnitsSetHealth*)nullptr)->h.unit), ROK_UNITSSETHEALTH, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "health", offsetof(UnitsSetHealth, health), sizeof(((UnitsSetHealth*)nullptr)->health), ROK_UNITSSETHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "dying", offsetof(UnitsSetHealth, dying), sizeof(((UnitsSetHealth*)nullptr)->dying), ROK_UNITSSETHEALTH, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsKill, h.kind), sizeof(((UnitsKill*)nullptr)->h.kind), ROK_UNITSKILL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsKill, h.unit), sizeof(((UnitsKill*)nullptr)->h.unit), ROK_UNITSKILL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "selfDestruct", offsetof(UnitsKill, selfDestruct), sizeof(((UnitsKill*)nullptr)->selfDestruct), ROK_UNITSKILL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsSend, h.kind), sizeof(((UnitsSend*)nullptr)->h.kind), ROK_UNITSSEND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsSend, h.unit), sizeof(((UnitsSend*)nullptr)->h.unit), ROK_UNITSSEND, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "player", offsetof(UnitsSend, player), sizeof(((UnitsSend*)nullptr)->player), ROK_UNITSSEND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsCapture, h.kind), sizeof(((UnitsCapture*)nullptr)->h.kind), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsCapture, h.unit), sizeof(((UnitsCapture*)nullptr)->h.unit), ROK_UNITSCAPTURE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "player", offsetof(UnitsCapture, player), sizeof(((UnitsCapture*)nullptr)->player), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "present", offsetof(UnitsCapture, present), sizeof(((UnitsCapture*)nullptr)->present), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "hitPoints", offsetof(UnitsCapture, hitPoints), sizeof(((UnitsCapture*)nullptr)->hitPoints), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "buildPercent", offsetof(UnitsCapture, buildPercent), sizeof(((UnitsCapture*)nullptr)->buildPercent), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "angles0", offsetof(UnitsCapture, angles[0]), sizeof(((UnitsCapture*)nullptr)->angles[0]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "angles1", offsetof(UnitsCapture, angles[1]), sizeof(((UnitsCapture*)nullptr)->angles[1]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "angles2", offsetof(UnitsCapture, angles[2]), sizeof(((UnitsCapture*)nullptr)->angles[2]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "stockpiles0", offsetof(UnitsCapture, stockpiles[0]), sizeof(((UnitsCapture*)nullptr)->stockpiles[0]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "stockpiles1", offsetof(UnitsCapture, stockpiles[1]), sizeof(((UnitsCapture*)nullptr)->stockpiles[1]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "stockpiles2", offsetof(UnitsCapture, stockpiles[2]), sizeof(((UnitsCapture*)nullptr)->stockpiles[2]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(ScriptsEventHeader, kind), sizeof(((ScriptsEventHeader*)nullptr)->kind), ROK_SCRIPTSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(ScriptsEventHeader, unit), sizeof(((ScriptsEventHeader*)nullptr)->unit), ROK_SCRIPTSEVENTHEADER, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(ScriptsStart, h.kind), sizeof(((ScriptsStart*)nullptr)->h.kind), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(ScriptsStart, h.unit), sizeof(((ScriptsStart*)nullptr)->h.unit), ROK_SCRIPTSSTART, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "form", offsetof(ScriptsStart, form), sizeof(((ScriptsStart*)nullptr)->form), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "index", offsetof(ScriptsStart, index), sizeof(((ScriptsStart*)nullptr)->index), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(ScriptsStart, name), 32, ROK_SCRIPTSSTART, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "callback", offsetof(ScriptsStart, callback), sizeof(((ScriptsStart*)nullptr)->callback), ROK_SCRIPTSSTART, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "update", offsetof(ScriptsStart, update), sizeof(((ScriptsStart*)nullptr)->update), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "count", offsetof(ScriptsStart, count), sizeof(((ScriptsStart*)nullptr)->count), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args0", offsetof(ScriptsStart, args[0]), sizeof(((ScriptsStart*)nullptr)->args[0]), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args1", offsetof(ScriptsStart, args[1]), sizeof(((ScriptsStart*)nullptr)->args[1]), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args2", offsetof(ScriptsStart, args[2]), sizeof(((ScriptsStart*)nullptr)->args[2]), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "args3", offsetof(ScriptsStart, args[3]), sizeof(((ScriptsStart*)nullptr)->args[3]), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(ScriptsDetachPiece, h.kind), sizeof(((ScriptsDetachPiece*)nullptr)->h.kind), ROK_SCRIPTSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(ScriptsDetachPiece, h.unit), sizeof(((ScriptsDetachPiece*)nullptr)->h.unit), ROK_SCRIPTSDETACHPIECE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "piece", offsetof(ScriptsDetachPiece, piece), sizeof(((ScriptsDetachPiece*)nullptr)->piece), ROK_SCRIPTSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pose", offsetof(ScriptsDetachPiece, pose), sizeof(((ScriptsDetachPiece*)nullptr)->pose), ROK_SCRIPTSDETACHPIECE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(ScriptsState, h.kind), sizeof(((ScriptsState*)nullptr)->h.kind), ROK_SCRIPTSSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(ScriptsState, h.unit), sizeof(((ScriptsState*)nullptr)->h.unit), ROK_SCRIPTSSTATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "state", offsetof(ScriptsState, state), sizeof(((ScriptsState*)nullptr)->state), ROK_SCRIPTSSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "feature", offsetof(ScriptsState, feature), sizeof(((ScriptsState*)nullptr)->feature), ROK_SCRIPTSSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(FixtureView, flags), sizeof(((FixtureView*)nullptr)->flags), ROK_FIXTUREVIEW, RK_U16, 0, 0, 0, {}, 0, 0 },
-    { "count", offsetof(FixtureView, plain.count), sizeof(((FixtureView*)nullptr)->plain.count), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 670, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
-    { "total", offsetof(FixtureView, plain.total), sizeof(((FixtureView*)nullptr)->plain.total), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 670, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
-    { "scale", offsetof(FixtureView, linked.scale), sizeof(((FixtureView*)nullptr)->linked.scale), ROK_FIXTUREVIEW, RK_F32, 0, 0, 0, { 670, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
-    { "table", offsetof(FixtureView, linked.table), sizeof(void*), ROK_FIXTUREVIEW, RK_PTR, ROK_FRAMETABLE, 0, 0, { 670, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
-    { "def", offsetof(FixtureView, linked.def), sizeof(((FixtureView*)nullptr)->linked.def), ROK_FIXTUREVIEW, RK_REF, ROK_UNITDEF, 0, 0, { 670, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "count", offsetof(FixtureView, plain.count), sizeof(((FixtureView*)nullptr)->plain.count), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 801, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
+    { "total", offsetof(FixtureView, plain.total), sizeof(((FixtureView*)nullptr)->plain.total), ROK_FIXTUREVIEW, RK_I32, 0, 0, 0, { 801, 0, ROK_FIXTUREVIEW, 1u, 0 }, 0, 0 },
+    { "scale", offsetof(FixtureView, linked.scale), sizeof(((FixtureView*)nullptr)->linked.scale), ROK_FIXTUREVIEW, RK_F32, 0, 0, 0, { 801, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "table", offsetof(FixtureView, linked.table), sizeof(void*), ROK_FIXTUREVIEW, RK_PTR, ROK_FRAMETABLE, 0, 0, { 801, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
+    { "def", offsetof(FixtureView, linked.def), sizeof(((FixtureView*)nullptr)->linked.def), ROK_FIXTUREVIEW, RK_REF, ROK_UNITDEF, 0, 0, { 801, 0, ROK_FIXTUREVIEW, 1u, 1 }, 0, 0 },
     { "player", offsetof(FixtureSlave, player), sizeof(((FixtureSlave*)nullptr)->player), ROK_FIXTURESLAVE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "master", offsetof(FixtureSlave, master), sizeof(((FixtureSlave*)nullptr)->master), ROK_FIXTURESLAVE, RK_REF, ROK_FIXTUREVIEW, 0, 0, {}, 0, 0 },
-    { "moved", offsetof(FixtureSlave, ground.moved), sizeof(((FixtureSlave*)nullptr)->ground.moved), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 24, 676, ROK_PLAYER, 4u, 4 }, 0, 0 },
-    { "speed", offsetof(FixtureSlave, air.speed), sizeof(((FixtureSlave*)nullptr)->air.speed), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 24, 676, ROK_PLAYER, 4u, 0 }, 0, 0 },
-    { "low", offsetof(FixtureSlave, narrow.low), sizeof(((FixtureSlave*)nullptr)->narrow.low), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 670, 677, ROK_FIXTUREVIEW, 2u, 0 }, 0, 0 },
-    { "high", offsetof(FixtureSlave, wide.high), sizeof(((FixtureSlave*)nullptr)->wide.high), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 670, 677, ROK_FIXTUREVIEW, 2u, 2 }, 0, 0 },
+    { "moved", offsetof(FixtureSlave, ground.moved), sizeof(((FixtureSlave*)nullptr)->ground.moved), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 24, 807, ROK_PLAYER, 4u, 4 }, 0, 0 },
+    { "speed", offsetof(FixtureSlave, air.speed), sizeof(((FixtureSlave*)nullptr)->air.speed), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 24, 807, ROK_PLAYER, 4u, 0 }, 0, 0 },
+    { "low", offsetof(FixtureSlave, narrow.low), sizeof(((FixtureSlave*)nullptr)->narrow.low), ROK_FIXTURESLAVE, RK_I32, 0, 0, 0, { 801, 808, ROK_FIXTUREVIEW, 2u, 0 }, 0, 0 },
+    { "high", offsetof(FixtureSlave, wide.high), sizeof(((FixtureSlave*)nullptr)->wide.high), ROK_FIXTURESLAVE, RK_F32, 0, 0, 0, { 801, 808, ROK_FIXTUREVIEW, 2u, 2 }, 0, 0 },
     { "id", offsetof(FixtureHolder, id), sizeof(((FixtureHolder*)nullptr)->id), ROK_FIXTUREHOLDER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "anim", offsetof(FixtureHolder, anim), sizeof(((FixtureHolder*)nullptr)->anim), ROK_FIXTUREHOLDER, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
     { "shadow", offsetof(FixtureHolder, shadow), sizeof(((FixtureHolder*)nullptr)->shadow), ROK_FIXTUREHOLDER, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
@@ -1756,10 +2008,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "drawMask", offsetof(OrderTableEntry, drawMask), sizeof(((OrderTableEntry*)nullptr)->drawMask), ROK_FIXTUREORDERENTRY, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_FIXTUREORDERENTRY, RK_U32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 777;
-static const unsigned kReplayWalkableFieldCount = 146;
+static const unsigned kReplayObjectFieldCount = 908;
+static const unsigned kReplayWalkableFieldCount = 179;
 
-static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 33, 689, 37, 35, 38, 45, 51, 53, 108 };
+static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 33, 820, 37, 35, 38, 45, 51, 53, 108 };
 
 static_assert(sizeof(((Player*)nullptr)->active) == 4, "Player::active has the size the schema says");
 static_assert(sizeof(((Player*)nullptr)->id) == 4, "Player::id has the size the schema says");
@@ -2423,6 +2675,136 @@ static_assert(sizeof(((MovementSetStateBits*)nullptr)->set) == 4, "MovementSetSt
 static_assert(sizeof(((MovementStartScript*)nullptr)->h.kind) == 4, "MovementStartScript::kind has the size the schema says");
 static_assert(sizeof(((MovementStartScript*)nullptr)->h.unit) == 4, "MovementStartScript::unit has the size the schema says");
 static_assert(sizeof(((MovementStartScript*)nullptr)->script) == 4, "MovementStartScript::script has the size the schema says");
+static_assert(sizeof(((UnitsEventHeader*)nullptr)->kind) == 4, "UnitsEventHeader::kind has the size the schema says");
+static_assert(sizeof(((UnitsEventHeader*)nullptr)->unit) == 4, "UnitsEventHeader::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetStateBits*)nullptr)->h.kind) == 4, "UnitsSetStateBits::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetStateBits*)nullptr)->h.unit) == 4, "UnitsSetStateBits::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetStateBits*)nullptr)->mask) == 4, "UnitsSetStateBits::mask has the size the schema says");
+static_assert(sizeof(((UnitsSetStateBits*)nullptr)->set) == 4, "UnitsSetStateBits::set has the size the schema says");
+static_assert(sizeof(((UnitsSetFlags*)nullptr)->h.kind) == 4, "UnitsSetFlags::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetFlags*)nullptr)->h.unit) == 4, "UnitsSetFlags::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetFlags*)nullptr)->clear) == 4, "UnitsSetFlags::clear has the size the schema says");
+static_assert(sizeof(((UnitsSetFlags*)nullptr)->set) == 4, "UnitsSetFlags::set has the size the schema says");
+static_assert(sizeof(((UnitsSetNetDirty*)nullptr)->h.kind) == 4, "UnitsSetNetDirty::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetNetDirty*)nullptr)->h.unit) == 4, "UnitsSetNetDirty::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetNetDirty*)nullptr)->clear) == 4, "UnitsSetNetDirty::clear has the size the schema says");
+static_assert(sizeof(((UnitsSetNetDirty*)nullptr)->set) == 4, "UnitsSetNetDirty::set has the size the schema says");
+static_assert(sizeof(((UnitsSetWorkTime*)nullptr)->h.kind) == 4, "UnitsSetWorkTime::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetWorkTime*)nullptr)->h.unit) == 4, "UnitsSetWorkTime::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetWorkTime*)nullptr)->until) == 4, "UnitsSetWorkTime::until has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->h.kind) == 4, "UnitsSetPosition::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->h.unit) == 4, "UnitsSetPosition::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->pos[0]) == 4, "UnitsSetPosition::pos0 has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->pos[1]) == 4, "UnitsSetPosition::pos1 has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->pos[2]) == 4, "UnitsSetPosition::pos2 has the size the schema says");
+static_assert(sizeof(((UnitsSetPosition*)nullptr)->mode) == 4, "UnitsSetPosition::mode has the size the schema says");
+static_assert(sizeof(((UnitsAttachToPiece*)nullptr)->h.kind) == 4, "UnitsAttachToPiece::kind has the size the schema says");
+static_assert(sizeof(((UnitsAttachToPiece*)nullptr)->h.unit) == 4, "UnitsAttachToPiece::unit has the size the schema says");
+static_assert(sizeof(((UnitsAttachToPiece*)nullptr)->target) == 4, "UnitsAttachToPiece::target has the size the schema says");
+static_assert(sizeof(((UnitsAttachToPiece*)nullptr)->piece) == 4, "UnitsAttachToPiece::piece has the size the schema says");
+static_assert(sizeof(((UnitsAttachToPiece*)nullptr)->mode) == 4, "UnitsAttachToPiece::mode has the size the schema says");
+static_assert(sizeof(((UnitsFinishConstruction*)nullptr)->h.kind) == 4, "UnitsFinishConstruction::kind has the size the schema says");
+static_assert(sizeof(((UnitsFinishConstruction*)nullptr)->h.unit) == 4, "UnitsFinishConstruction::unit has the size the schema says");
+static_assert(sizeof(((UnitsFinishConstruction*)nullptr)->builder) == 4, "UnitsFinishConstruction::builder has the size the schema says");
+static_assert(sizeof(((UnitsBuildDecay*)nullptr)->h.kind) == 4, "UnitsBuildDecay::kind has the size the schema says");
+static_assert(sizeof(((UnitsBuildDecay*)nullptr)->h.unit) == 4, "UnitsBuildDecay::unit has the size the schema says");
+static_assert(sizeof(((UnitsBuildDecay*)nullptr)->ticks) == 4, "UnitsBuildDecay::ticks has the size the schema says");
+static_assert(sizeof(((UnitsRepair*)nullptr)->h.kind) == 4, "UnitsRepair::kind has the size the schema says");
+static_assert(sizeof(((UnitsRepair*)nullptr)->h.unit) == 4, "UnitsRepair::unit has the size the schema says");
+static_assert(sizeof(((UnitsRepair*)nullptr)->builder) == 4, "UnitsRepair::builder has the size the schema says");
+static_assert(sizeof(((UnitsRepair*)nullptr)->amount) == 4, "UnitsRepair::amount has the size the schema says");
+static_assert(sizeof(((UnitsUnlink*)nullptr)->h.kind) == 4, "UnitsUnlink::kind has the size the schema says");
+static_assert(sizeof(((UnitsUnlink*)nullptr)->h.unit) == 4, "UnitsUnlink::unit has the size the schema says");
+static_assert(sizeof(((UnitsUnlink*)nullptr)->ref) == 4, "UnitsUnlink::ref has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->h.kind) == 4, "UnitsSetStance::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->h.unit) == 4, "UnitsSetStance::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->fields) == 4, "UnitsSetStance::fields has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->moveOrder) == 4, "UnitsSetStance::moveOrder has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->fireOrder) == 4, "UnitsSetStance::fireOrder has the size the schema says");
+static_assert(sizeof(((UnitsSetStance*)nullptr)->group) == 4, "UnitsSetStance::group has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->h.kind) == 4, "UnitsSetAngles::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->h.unit) == 4, "UnitsSetAngles::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->fields) == 4, "UnitsSetAngles::fields has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->bank) == 4, "UnitsSetAngles::bank has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->heading) == 4, "UnitsSetAngles::heading has the size the schema says");
+static_assert(sizeof(((UnitsSetAngles*)nullptr)->pitch) == 4, "UnitsSetAngles::pitch has the size the schema says");
+static_assert(sizeof(((UnitsSetBuildState*)nullptr)->h.kind) == 4, "UnitsSetBuildState::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetBuildState*)nullptr)->h.unit) == 4, "UnitsSetBuildState::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetBuildState*)nullptr)->buildLeft) == 4, "UnitsSetBuildState::buildLeft has the size the schema says");
+static_assert(sizeof(((UnitsSetBuildState*)nullptr)->health) == 4, "UnitsSetBuildState::health has the size the schema says");
+static_assert(sizeof(((UnitsTurn*)nullptr)->h.kind) == 4, "UnitsTurn::kind has the size the schema says");
+static_assert(sizeof(((UnitsTurn*)nullptr)->h.unit) == 4, "UnitsTurn::unit has the size the schema says");
+static_assert(sizeof(((UnitsTurn*)nullptr)->delta) == 4, "UnitsTurn::delta has the size the schema says");
+static_assert(sizeof(((UnitsMove*)nullptr)->h.kind) == 4, "UnitsMove::kind has the size the schema says");
+static_assert(sizeof(((UnitsMove*)nullptr)->h.unit) == 4, "UnitsMove::unit has the size the schema says");
+static_assert(sizeof(((UnitsMove*)nullptr)->pos[0]) == 4, "UnitsMove::pos0 has the size the schema says");
+static_assert(sizeof(((UnitsMove*)nullptr)->pos[1]) == 4, "UnitsMove::pos1 has the size the schema says");
+static_assert(sizeof(((UnitsMove*)nullptr)->pos[2]) == 4, "UnitsMove::pos2 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->h.kind) == 4, "UnitsChangeCell::kind has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->h.unit) == 4, "UnitsChangeCell::unit has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->pos[0]) == 4, "UnitsChangeCell::pos0 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->pos[1]) == 4, "UnitsChangeCell::pos1 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->pos[2]) == 4, "UnitsChangeCell::pos2 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->cell[0]) == 4, "UnitsChangeCell::cell0 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->cell[1]) == 4, "UnitsChangeCell::cell1 has the size the schema says");
+static_assert(sizeof(((UnitsChangeCell*)nullptr)->mode) == 4, "UnitsChangeCell::mode has the size the schema says");
+static_assert(sizeof(((UnitsSetMoved*)nullptr)->h.kind) == 4, "UnitsSetMoved::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetMoved*)nullptr)->h.unit) == 4, "UnitsSetMoved::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetMoved*)nullptr)->moved) == 4, "UnitsSetMoved::moved has the size the schema says");
+static_assert(sizeof(((UnitsScriptValue*)nullptr)->h.kind) == 4, "UnitsScriptValue::kind has the size the schema says");
+static_assert(sizeof(((UnitsScriptValue*)nullptr)->h.unit) == 4, "UnitsScriptValue::unit has the size the schema says");
+static_assert(sizeof(((UnitsScriptValue*)nullptr)->which) == 4, "UnitsScriptValue::which has the size the schema says");
+static_assert(sizeof(((UnitsScriptValue*)nullptr)->value) == 4, "UnitsScriptValue::value has the size the schema says");
+static_assert(sizeof(((UnitsNotifyRefs*)nullptr)->h.kind) == 4, "UnitsNotifyRefs::kind has the size the schema says");
+static_assert(sizeof(((UnitsNotifyRefs*)nullptr)->h.unit) == 4, "UnitsNotifyRefs::unit has the size the schema says");
+static_assert(sizeof(((UnitsNotifyRefs*)nullptr)->event) == 4, "UnitsNotifyRefs::event has the size the schema says");
+static_assert(sizeof(((UnitsDamageRecord*)nullptr)->h.kind) == 4, "UnitsDamageRecord::kind has the size the schema says");
+static_assert(sizeof(((UnitsDamageRecord*)nullptr)->h.unit) == 4, "UnitsDamageRecord::unit has the size the schema says");
+static_assert(sizeof(((UnitsDamageRecord*)nullptr)->damageKind) == 4, "UnitsDamageRecord::damageKind has the size the schema says");
+static_assert(sizeof(((UnitsDamageRecord*)nullptr)->attacker) == 4, "UnitsDamageRecord::attacker has the size the schema says");
+static_assert(sizeof(((UnitsSetHealth*)nullptr)->h.kind) == 4, "UnitsSetHealth::kind has the size the schema says");
+static_assert(sizeof(((UnitsSetHealth*)nullptr)->h.unit) == 4, "UnitsSetHealth::unit has the size the schema says");
+static_assert(sizeof(((UnitsSetHealth*)nullptr)->health) == 4, "UnitsSetHealth::health has the size the schema says");
+static_assert(sizeof(((UnitsSetHealth*)nullptr)->dying) == 4, "UnitsSetHealth::dying has the size the schema says");
+static_assert(sizeof(((UnitsKill*)nullptr)->h.kind) == 4, "UnitsKill::kind has the size the schema says");
+static_assert(sizeof(((UnitsKill*)nullptr)->h.unit) == 4, "UnitsKill::unit has the size the schema says");
+static_assert(sizeof(((UnitsKill*)nullptr)->selfDestruct) == 4, "UnitsKill::selfDestruct has the size the schema says");
+static_assert(sizeof(((UnitsSend*)nullptr)->h.kind) == 4, "UnitsSend::kind has the size the schema says");
+static_assert(sizeof(((UnitsSend*)nullptr)->h.unit) == 4, "UnitsSend::unit has the size the schema says");
+static_assert(sizeof(((UnitsSend*)nullptr)->player) == 4, "UnitsSend::player has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->h.kind) == 4, "UnitsCapture::kind has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->h.unit) == 4, "UnitsCapture::unit has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->player) == 4, "UnitsCapture::player has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->present) == 4, "UnitsCapture::present has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->hitPoints) == 4, "UnitsCapture::hitPoints has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->buildPercent) == 4, "UnitsCapture::buildPercent has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->angles[0]) == 4, "UnitsCapture::angles0 has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->angles[1]) == 4, "UnitsCapture::angles1 has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->angles[2]) == 4, "UnitsCapture::angles2 has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[0]) == 4, "UnitsCapture::stockpiles0 has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[1]) == 4, "UnitsCapture::stockpiles1 has the size the schema says");
+static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[2]) == 4, "UnitsCapture::stockpiles2 has the size the schema says");
+static_assert(sizeof(((ScriptsEventHeader*)nullptr)->kind) == 4, "ScriptsEventHeader::kind has the size the schema says");
+static_assert(sizeof(((ScriptsEventHeader*)nullptr)->unit) == 4, "ScriptsEventHeader::unit has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->h.kind) == 4, "ScriptsStart::kind has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->h.unit) == 4, "ScriptsStart::unit has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->form) == 4, "ScriptsStart::form has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->index) == 4, "ScriptsStart::index has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->callback) == 4, "ScriptsStart::callback has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->update) == 4, "ScriptsStart::update has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->count) == 4, "ScriptsStart::count has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->args[0]) == 4, "ScriptsStart::args0 has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->args[1]) == 4, "ScriptsStart::args1 has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->args[2]) == 4, "ScriptsStart::args2 has the size the schema says");
+static_assert(sizeof(((ScriptsStart*)nullptr)->args[3]) == 4, "ScriptsStart::args3 has the size the schema says");
+static_assert(sizeof(((ScriptsDetachPiece*)nullptr)->h.kind) == 4, "ScriptsDetachPiece::kind has the size the schema says");
+static_assert(sizeof(((ScriptsDetachPiece*)nullptr)->h.unit) == 4, "ScriptsDetachPiece::unit has the size the schema says");
+static_assert(sizeof(((ScriptsDetachPiece*)nullptr)->piece) == 4, "ScriptsDetachPiece::piece has the size the schema says");
+static_assert(sizeof(((ScriptsDetachPiece*)nullptr)->pose) == 4, "ScriptsDetachPiece::pose has the size the schema says");
+static_assert(sizeof(((ScriptsState*)nullptr)->h.kind) == 4, "ScriptsState::kind has the size the schema says");
+static_assert(sizeof(((ScriptsState*)nullptr)->h.unit) == 4, "ScriptsState::unit has the size the schema says");
+static_assert(sizeof(((ScriptsState*)nullptr)->state) == 4, "ScriptsState::state has the size the schema says");
+static_assert(sizeof(((ScriptsState*)nullptr)->feature) == 4, "ScriptsState::feature has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->flags) == 2, "FixtureView::flags has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->plain.count) == 4, "FixtureView::count has the size the schema says");
 static_assert(sizeof(((FixtureView*)nullptr)->plain.total) == 4, "FixtureView::total has the size the schema says");
@@ -2697,10 +3079,8 @@ enum ReplaySlotId {
     RSL_ORDERS_LOADORDERS,
     RSL_ORDERS_SAVEORDERS,
     RSL_ORDERS_WRITESTATE,
+    RSL_UNITS_APPLY,
     RSL_UNITS_UPDATEALLUNITS,
-    RSL_UNITS_SETSTATEBITS,
-    RSL_UNITS_MARKRECENTLYDAMAGED,
-    RSL_UNITS_NOTIFYUNITREFS,
     RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY,
     RSL_UNITS_ALLOCATEUNITMEMORY,
     RSL_UNITS_FREEUNITMEMORY,
@@ -2724,17 +3104,12 @@ enum ReplaySlotId {
     RSL_UNITS_FINDUNITTYPE,
     RSL_UNITS_FINDUNITTYPEID,
     RSL_UNITS_FINDMISSIONUNIT,
-    RSL_UNITS_ATTACHUNITTOPIECE,
     RSL_UNITS_ADDBUILDPROGRESS,
     RSL_UNITS_ADDREPAIRPROGRESS,
-    RSL_UNITS_APPLYUNFINISHEDBUILDDECAY,
-    RSL_UNITS_FINISHCONSTRUCTION,
-    RSL_UNITS_SETUNITPOSITION,
     RSL_UNITS_CANLOAD,
     RSL_UNITS_CANRECLAIM,
     RSL_UNITS_CANREPAIR,
     RSL_UNITS_UNITREFUNLINK,
-    RSL_UNITS_UPDATESFXOCCUPY,
     RSL_UNITS_UPDATEUNITHEAD,
     RSL_UNITS_UPDATEUNITBODY,
     RSL_UNITS_UPDATEUNITTAIL,
@@ -2787,8 +3162,7 @@ enum ReplaySlotId {
     RSL_MAP_GETGROUNDHEIGHT,
     RSL_MAP_PASSMAPGET,
     RSL_MAP_PASSMAPINBOUNDS,
-    RSL_SCRIPTS_STARTSCRIPT,
-    RSL_SCRIPTS_STARTSCRIPTWITHARGS,
+    RSL_SCRIPTS_APPLY,
     RSL_SCRIPTS_STARTSCRIPTWITHARGSBYINDEX,
     RSL_SCRIPTS_QUERYSCRIPT,
     RSL_SCRIPTS_FINDSCRIPT,
@@ -2811,7 +3185,6 @@ enum ReplaySlotId {
     RSL_SCRIPTS_SAVESCRIPTSTATE,
     RSL_SCRIPTS_LOADSCRIPTSTATE,
     RSL_SCRIPTS_DELETESCRIPT,
-    RSL_SCRIPTS_INITOBJECTSTATE,
     RSL_MOVEMENT_APPLY,
     RSL_MOVEMENT_UPDATEMOTION,
     RSL_MOVEMENT_APPLYPATHEVENT,
@@ -3042,8 +3415,6 @@ static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 253 }
 static const unsigned short kReplayOrdersGetOrderFlagsObjReads[] = { 80 };
 static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 17, 29 };
 static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 25, 28 };
-static const unsigned short kReplayUnitsSetStateBitsObjReads[] = { 0, 24, 36, 43 };
-static const unsigned short kReplayUnitsSetStateBitsObjWrites[] = { 38 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayUnitsAllocateUnitMemoryReads[] = { 26 };
 static const unsigned char kReplayUnitsAllocateUnitMemoryWrites[] = { 26 };
@@ -3071,22 +3442,14 @@ static const unsigned short kReplayUnitsCreateUnitObjReads[] = { 4, 5, 26, 27, 3
 static const unsigned short kReplayUnitsCreateUnitObjWrites[] = { 26, 27, 79 };
 static const unsigned char kReplayUnitsFindUnitTypeAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayUnitsFindUnitTypeIdAllOf[] = { ROK_UNITDEF };
-static const unsigned short kReplayUnitsAttachUnitToPieceObjReads[] = { 37, 44, 70, 72 };
 static const unsigned short kReplayUnitsAddBuildProgressObjReads[] = { 33, 34, 35, 37, 47, 124 };
 static const unsigned short kReplayUnitsAddBuildProgressObjWrites[] = { 33, 34, 37 };
 static const unsigned short kReplayUnitsAddRepairProgressObjReads[] = { 33, 35, 124 };
-static const unsigned short kReplayUnitsApplyUnfinishedBuildDecayObjReads[] = { 35 };
-static const unsigned short kReplayUnitsFinishConstructionObjReads[] = { 0, 24, 35, 36, 37, 72, 79 };
-static const unsigned short kReplayUnitsFinishConstructionObjWrites[] = { 34, 37, 79 };
-static const unsigned short kReplayUnitsSetUnitPositionObjReads[] = { 37, 41, 42 };
-static const unsigned short kReplayUnitsSetUnitPositionObjWrites[] = { 37, 41 };
 static const unsigned char kReplayUnitsCanLoadReads[] = { 17 };
 static const unsigned short kReplayUnitsCanLoadObjReads[] = { 34, 35, 37, 50, 108, 114, 121 };
 static const unsigned short kReplayUnitsCanReclaimObjReads[] = { 35 };
 static const unsigned char kReplayUnitsCanRepairReads[] = { 17 };
 static const unsigned short kReplayUnitsCanRepairObjReads[] = { 33, 35, 37, 52, 108, 120, 124, 125 };
-static const unsigned char kReplayUnitsUpdateSfxOccupyReads[] = { 17 };
-static const unsigned short kReplayUnitsUpdateSfxOccupyObjReads[] = { 35, 37, 43, 52, 117, 125 };
 static const unsigned char kReplayUnitsUpdateUnitBodyReads[] = { 0, 17 };
 static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 24, 33, 34, 35, 36, 43, 52, 72, 124 };
 static const unsigned short kReplayUnitsUpdateUnitTailObjReads[] = { 79 };
@@ -3293,10 +3656,8 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "LoadOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SaveOrders", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateAllUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "SetStateBits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetStateBitsObjReads, 4, kReplayUnitsSetStateBitsObjWrites, 1, nullptr, 0 },
-    { "MarkRecentlyDamaged", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "NotifyUnitRefs", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitTypeSetAddTypeOrCategory", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AllocateUnitMemory", SUB_UNITS, kReplayUnitsAllocateUnitMemoryReads, 1, kReplayUnitsAllocateUnitMemoryWrites, 1, kReplayUnitsAllocateUnitMemoryObjReads, 2, kReplayUnitsAllocateUnitMemoryObjWrites, 3, kReplayUnitsAllocateUnitMemoryAllOf, 1 },
     { "FreeUnitMemory", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3320,17 +3681,12 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FindUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeAllOf, 1 },
     { "FindUnitTypeId", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeIdAllOf, 1 },
     { "FindMissionUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "AttachUnitToPiece", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAttachUnitToPieceObjReads, 4, nullptr, 0, nullptr, 0 },
     { "AddBuildProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddBuildProgressObjReads, 6, kReplayUnitsAddBuildProgressObjWrites, 3, nullptr, 0 },
     { "AddRepairProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddRepairProgressObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "ApplyUnfinishedBuildDecay", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsApplyUnfinishedBuildDecayObjReads, 1, nullptr, 0, nullptr, 0 },
-    { "FinishConstruction", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsFinishConstructionObjReads, 7, kReplayUnitsFinishConstructionObjWrites, 3, nullptr, 0 },
-    { "SetUnitPosition", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSetUnitPositionObjReads, 3, kReplayUnitsSetUnitPositionObjWrites, 2, nullptr, 0 },
     { "CanLoad", SUB_UNITS, kReplayUnitsCanLoadReads, 1, nullptr, 0, kReplayUnitsCanLoadObjReads, 7, nullptr, 0, nullptr, 0 },
     { "CanReclaim", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCanReclaimObjReads, 1, nullptr, 0, nullptr, 0 },
     { "CanRepair", SUB_UNITS, kReplayUnitsCanRepairReads, 1, nullptr, 0, kReplayUnitsCanRepairObjReads, 8, nullptr, 0, nullptr, 0 },
     { "UnitRefUnlink", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UpdateSfxOccupy", SUB_UNITS, kReplayUnitsUpdateSfxOccupyReads, 1, nullptr, 0, kReplayUnitsUpdateSfxOccupyObjReads, 6, nullptr, 0, nullptr, 0 },
     { "UpdateUnitHead", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 10, nullptr, 0, nullptr, 0 },
     { "UpdateUnitTail", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUpdateUnitTailObjReads, 1, nullptr, 0, nullptr, 0 },
@@ -3383,8 +3739,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "GetGroundHeight", SUB_MAP, kReplayMapGetGroundHeightReads, 2, nullptr, 0, kReplayMapGetGroundHeightObjReads, 1, nullptr, 0, kReplayMapGetGroundHeightAllOf, 1 },
     { "PassMapGet", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapGetObjReads, 2, nullptr, 0, kReplayMapPassMapGetAllOf, 1 },
     { "PassMapInBounds", SUB_MAP, nullptr, 0, nullptr, 0, kReplayMapPassMapInBoundsObjReads, 2, nullptr, 0, kReplayMapPassMapInBoundsAllOf, 1 },
-    { "StartScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "StartScriptWithArgs", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Apply", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "StartScriptWithArgsByIndex", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "QueryScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FindScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3407,7 +3762,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SaveScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "InitObjectState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementUpdateMotionObjReads, 1, nullptr, 0, nullptr, 0 },
     { "ApplyPathEvent", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3522,14 +3876,14 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "targeting", 3, 0, 1, 72, 6 },
     { "los_radar", 4, 0, 0, 78, 28 },
     { "orders", 5, 0, 0, 106, 11 },
-    { "units", 5, 0, 0, 117, 51 },
-    { "players", 4, 0, 0, 168, 28 },
-    { "map", 7, 0, 1, 196, 11 },
-    { "scripts", 1, 0, 0, 207, 25 },
-    { "movement", 3, 0, 0, 232, 20 },
-    { "mission", 1, 1, 0, 252, 0 },
-    { "files", 2, 0, 0, 252, 58 },
-    { "network", 1, 0, 0, 310, 22 },
+    { "units", 6, 0, 0, 117, 44 },
+    { "players", 4, 0, 0, 161, 28 },
+    { "map", 7, 0, 1, 189, 11 },
+    { "scripts", 2, 0, 0, 200, 23 },
+    { "movement", 3, 0, 0, 223, 20 },
+    { "mission", 1, 1, 0, 243, 0 },
+    { "files", 2, 0, 0, 243, 58 },
+    { "network", 1, 0, 0, 301, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

@@ -26,7 +26,7 @@
 #include "../src/game/scheduler.h"
 #include "../src/game/weapons_events.h"
 #include "../src/seams/weapons_world.h"
-#include "../src/units/weapons_effects.h"
+#include "../src/seams/units_world.h"
 #include "../src/weapons/damage.h"
 #include "../src/weapons/weapons_apply.h"
 
@@ -99,6 +99,8 @@ void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, u
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
 void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, int) {}
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader*, unsigned int, int) {}
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader*, unsigned int, int) {}
 
 static bool IsHandled(SchedHandler handler)
 {
@@ -118,9 +120,41 @@ void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
         }
 }
 
-static void __stdcall FakeMarkRecentlyDamaged(Unit*)
+static Unit* UnitOfOffset(unsigned int offset)
 {
-    s_marked++;
+    Ref<Unit> ref;
+    ref.offset = offset;
+    return ref.get();
+}
+
+static int __stdcall FakeUnitsApply(const UnitsEventHeader* e, unsigned int)
+{
+    Unit* unit = UnitOfOffset(e->unit);
+    if (unit == nullptr)
+        return 0;
+    switch (e->kind) {
+    case UNITS_MARK_DAMAGED:
+        s_marked++;
+        break;
+    case UNITS_DAMAGE_RECORD: {
+        const UnitsDamageRecord* p = reinterpret_cast<const UnitsDamageRecord*>(e);
+        unit->lastDamageType = (unsigned char)p->damageKind;
+        Unit* attacker = UnitOfOffset(p->attacker);
+        if (attacker) {
+            unit->lastAttackerSlot = attacker->playerIndex;
+            unit->attacker = attacker;
+        }
+        break;
+    }
+    case UNITS_SET_HEALTH: {
+        const UnitsSetHealth* p = reinterpret_cast<const UnitsSetHealth*>(e);
+        unit->health = (short)p->health;
+        if (p->dying == 1)
+            unit->flags |= 0x4000;
+        break;
+    }
+    }
+    return 1;
 }
 
 static int s_tamperAt = -1;
@@ -175,7 +209,7 @@ static void Setup()
 
     static UnitsSeam units;
     memset(&units, 0, sizeof units);
-    units.MarkRecentlyDamaged = FakeMarkRecentlyDamaged;
+    units.Apply = FakeUnitsApply;
     g_seams.units = &units;
 }
 

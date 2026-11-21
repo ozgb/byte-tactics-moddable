@@ -106,6 +106,14 @@ void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, in
 {
 }
 
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader*, unsigned int, int)
+{
+}
+
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader*, unsigned int, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];

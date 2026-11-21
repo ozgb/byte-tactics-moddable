@@ -119,7 +119,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts")
 
 
 def event_table(subsystem: str) -> dict:

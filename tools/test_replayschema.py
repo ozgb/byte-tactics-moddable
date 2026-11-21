@@ -443,7 +443,7 @@ class TargetingForms(unittest.TestCase):
 
     def test_two_subsystems_importing_one_slot_get_one_stub(self):
         files, _, _ = self.generated()
-        self.assertEqual(files[rs.SLOTS_H].count("int __stdcall Imp_scripts_StartScriptWithArgs("), 1)
+        self.assertEqual(files[rs.SLOTS_H].count("int __stdcall Imp_map_GetGroundHeight("), 1)
 
     def test_an_object_result_is_compared_by_name(self):
         files, _, _ = self.generated()
@@ -1034,7 +1034,7 @@ class Callbacks(unittest.TestCase):
     def generated(self, ann=None):
         return rs.generate(rs.read_rows(), ann or annotations())
 
-    def with_import(self, mutate=None, slot="StartScript", importer="wind_meteors"):
+    def with_import(self, mutate=None, slot="StartScriptWithArgsByIndex", importer="wind_meteors"):
         ann = annotations()
         modes = {"script": {"mode": "object", "kind": "CobScript"}, "name": {"mode": "text"}, "callback": {"mode": "callback", "callback": "Callback", "line": "callback"}}
         params = [x for x in rs.parse_interface("scripts", "ScriptsSeam")["slots"] if x["name"] == slot][0]["params"]
@@ -1080,34 +1080,33 @@ class Callbacks(unittest.TestCase):
         files, errors, _ = self.generated(self.with_import())
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecScriptsStartScript("):]
+        body = hooks[hooks.index("RecScriptsStartScriptWithArgsByIndex("):]
         body = body[:body.index("\n}\n")]
         self.assertIn("ReplayCallbackScope cb2;", body)
         self.assertIn("ImportCallback(line, cb2, RCB_CALLBACK, a2);", body)
-        self.assertLess(body.index("s_inner_scripts->StartScript"), body.index("cb2.Stop();"))
+        self.assertLess(body.index("s_inner_scripts->StartScriptWithArgsByIndex"), body.index("cb2.Stop();"))
         self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
         self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
 
     def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
         files, _, _ = self.generated(self.with_import())
         slots = files[rs.SLOTS_H]
-        body = slots[slots.index("Imp_scripts_StartScript("):]
+        body = slots[slots.index("Imp_scripts_StartScriptWithArgsByIndex("):]
         body = body[:body.index("\n}\n")]
         self.assertIn("AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a2);", body)
-        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_Callback(a2, OBJ_CALLBACK + RCB_CALLBACK, "scripts.StartScript");'))
+        self.assertLess(body.index("Enter(t)"), body.index('PlayCallbacks_Callback(a2, OBJ_CALLBACK + RCB_CALLBACK, "scripts.StartScriptWithArgsByIndex");'))
 
     def test_a_callback_argument_of_a_slot_no_subsystem_imports_is_recorded_as_an_a_line(self):
         def only_note(ann):
-            ann["subsystems"]["wind_meteors"]["imports"].remove("scripts.StartScript")
-            ann["subsystems"]["weapons"]["imports"].remove("scripts.StartScript")
+            ann["subsystems"]["wind_meteors"]["imports"].remove("scripts.StartScriptWithArgsByIndex")
         files, errors, _ = self.generated(self.with_import(only_note))
         self.assertFalse([e for e in errors if "callback argument" in e])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecScriptsStartScript("):]
+        body = hooks[hooks.index("RecScriptsStartScriptWithArgsByIndex("):]
         body = body[:body.index("\n}\n")]
         self.assertIn("ReplayCallbackScope held2;", body)
         self.assertIn('ArgCallback(s_call, "callback", held2, RCB_CALLBACK, a2);', body)
-        self.assertLess(body.index("s_inner_scripts->StartScript"), body.index("held2.Stop();"))
+        self.assertLess(body.index("s_inner_scripts->StartScriptWithArgsByIndex"), body.index("held2.Stop();"))
         self.assertLess(body.index("held2.Stop();"), body.index("ArgCallbackExit(s_tail, held2);"))
         self.assertNotIn("ImportCallback", body)
 
@@ -1191,11 +1190,11 @@ class Callbacks(unittest.TestCase):
 
     def test_the_callback_names_an_entry_and_its_type(self):
         def unknown(ann):
-            ann["subsystems"]["scripts"]["slots"]["StartScript"]["args"]["callback"]["callback"] = "Nowhere"
+            ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgsByIndex"]["args"]["callback"]["callback"] = "Nowhere"
         self.assertTrue(any("needs a `callback` that is an entry of `callbacks`" in e for e in self.errors(self.with_import(unknown))))
 
         def wrong(ann):
-            ann["subsystems"]["scripts"]["slots"]["StartScript"]["args"]["callback"]["callback"] = "UnitScanVisitor"
+            ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgsByIndex"]["args"]["callback"]["callback"] = "UnitScanVisitor"
         self.assertTrue(any("the callback UnitScanVisitor is UnitScanVisitor*" in e for e in self.errors(self.with_import(wrong))))
 
     def test_the_methods_are_the_virtuals_of_the_class_in_order(self):
@@ -2307,12 +2306,12 @@ class ElementForms(unittest.TestCase):
 
     def test_an_import_takes_the_same_object_argument(self):
         ann = annotations()
-        slot = ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgs"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
-        ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["scripts.StartScriptWithArgs"]
+        slot = ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgsByIndex"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
+        ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["scripts.StartScriptWithArgsByIndex"]
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecScriptsStartScriptWithArgs"):]
+        body = hooks[hooks.index("RecScriptsStartScriptWithArgsByIndex"):]
         body = body[:body.index("\n}\n")]
         self.assertIn("ImportObject(line, ROK_FIXTURECB, a2);", body)
         del slot

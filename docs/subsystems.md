@@ -547,15 +547,14 @@ Coverage: 95.9% of functions (234 of 244), 85.9% of lines, 65.7% of branches; 10
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (151 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (9). It is called most by game (26 distinct functions) and seams (8). It imports 138 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 89.6% of functions (146 of 163), 86.4% of lines, 67.3% of branches; 17 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 17 is under **units, functions no scenario enters** below.
+**units** (151 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (9). It is called most by game (26 distinct functions) and seams (8). It imports 138 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.2% of functions (109 of 125), 85.9% of lines, 70.9% of branches; 16 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 16 is under **units, functions no scenario enters** below.
 
-**units, functions no scenario enters** (17 of 163 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 146 are entered, 89.6%), by reason:
+**units, functions no scenario enters** (16 of 125 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 109 are entered, 87.2%), by reason:
 
 - Load only (1): `IdAt` (a sort helper of the load). `save-midgame` (#422) enters the save side (`SaveUnits`, `CobScript::SaveScriptState` and the `UnitScript::IsPiece` slots it calls), and `load-midgame` (#442) enters `LoadUnits`, `LoadUnit` and `CobScript::LoadScriptState`.
 - Network only (4): `WriteUnitState`, `ReceiveUnitStates`, `ReadUnitState` and `CreateUnitFromPacket`.
 - No caller in the game (1): `PathOrderAttach::~PathOrderAttach`. It is the virtual destructor of the unit reference that an order and a move target embed: they are freed by their own `Destroy`, which unlinks the reference through units' `UnitRefUnlink`, and since #993 the unlink is `UnitRef::Unlink`'s own body rather than an inline call of the destructor.
-- Needs a case no scenario sets up yet (1): `UnitsOnOrdersSetPosition`, the handler of orders' SET_POSITION, which only a teleport publishes (see orders).
-- Network game only (1): `UnitsOnPlayersSendUnit`. It applies players' SEND_UNIT effect, which `GiveUnitToPlayer` publishes only when the unit goes to a remote human (player type 3).
+- Network game only (1): `UnitsApplySend`. It applies the SEND event, which players' SEND_UNIT effect publishes through `UnitsOnPlayersSendUnit` and `GiveUnitToPlayer` publishes only when the unit goes to a remote human (player type 3).
 - Shutdown only (7): `FreeUnitMemory`, `FreeUnitTypes`, `FreeUnitInfo`, `FreeUnitCategories`, `FreeDownloadMenus`, `FreeMovementClasses` and `FreeFactoryIndex` (from `FreePlayers`).
 - Entered by the console: `KillAllUnits`, `KillUnitsOfType` and `ReloadUnitType`, by `console-units` (#445). `Selectable` is entered too since the coverage of #652, by a path not yet traced.
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
@@ -591,9 +590,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Multiplayer lobby and menus only (7): `Mission::GetTerrainSizeTier` (the lobby colour), `Mission::GetDescription`, `Mission::GetPlanet`, `Mission::GetTranslatedName` and `Mission::HasMissionName` (the map list and mission menus), and `Mission::GetMemory` and `Mission::GetNumPlayers` (the lobby's map size line). Test mode calls only `LoadMissionByName`.
 - Campaign menu, end screen and restart only (5): `Mission::GetBriefing`, `Mission::SelectMission`, `Mission::MissionExists`, `Mission::AdvanceMission` and `Mission::GetMissionIndex`.
 
-**scripts** (89 functions). No phase root: the scheduler's unit loop runs each unit's script through the `RunScripts` slot, between the unit's weapons and its body (#986). The COB interpreter, the unit scripts and the piece state (`src/scripts`, `interfaces/scripts.h`, #993). 19 functions are called from outside, by seams (13), orders (3), movement (2), weapons (2), units (1), features (1) and presentation (1); the busiest are `GetNanoPiecePosition` (15) and `GetPiecePosition` (4). It imports 22 functions: game 8, platform 6, files 4, seams 1, los_radar 1, presentation 1. Its effects on weapons (AIM_DONE, EXPLODE_PIECE), units (SCRIPT_VALUE, ATTACH_TO_PIECE) and map (SET_YARD) are events through the route table, and it reads the ground height through map's seam (`GetGroundHeight`). The inventory is `docs/scripts-interface.md`. Coverage: 78.2% of functions (68 of 87), 90.1% of lines, 84.1% of branches; 19 live functions no scenario enters, and 6 more are dead (data/coverage.csv). The list of those 19 is under **scripts, functions no scenario enters** below.
+**scripts** (89 functions). No phase root: the scheduler's unit loop runs each unit's script through the `RunScripts` slot, between the unit's weapons and its body (#986). The COB interpreter, the unit scripts and the piece state (`src/scripts`, `interfaces/scripts.h`, #993). 19 functions are called from outside, by seams (13), orders (3), movement (2), weapons (2), units (1), features (1) and presentation (1); the busiest are `GetNanoPiecePosition` (15) and `GetPiecePosition` (4). It imports 22 functions: game 8, platform 6, files 4, seams 1, los_radar 1, presentation 1. Its effects on weapons (AIM_DONE, EXPLODE_PIECE), units (SCRIPT_VALUE, ATTACH_TO_PIECE) and map (SET_YARD) are events through the route table, and it reads the ground height through map's seam (`GetGroundHeight`). The inventory is `docs/scripts-interface.md`. Coverage: 77.1% of functions (64 of 83), 89.6% of lines, 83.9% of branches; 19 live functions no scenario enters, and 6 more are dead (data/coverage.csv). The list of those 19 is under **scripts, functions no scenario enters** below.
 
-**scripts, functions no scenario enters** (19 of 87 after the scenarios of `reference/scenarios/`; 68 are entered, 78.2%), by reason:
+**scripts, functions no scenario enters** (19 of 83 after the scenarios of `reference/scenarios/`; 64 are entered, 77.1%), by reason:
 
 - Base-class slots of `CobScript` that `UnitScript` overrides (13): `CobScript::AttachUnit`, `CobScript::DropUnit`, `CobScript::EmitSfx`, `CobScript::ExplodeLegacy`, `CobScript::ExplodePiece`, `CobScript::GetTransporterId`, `CobScript::GetUnitValue`, `CobScript::IsCarryingUnit`, `CobScript::IsPieceCached`, `CobScript::IsPieceShaded`, `CobScript::IsPieceVisible`, `CobScript::PlaySoundNoop`, `CobScript::SetUnitValue`. Every unit's script is a `UnitScript`, so the base bodies are never called.
 - COB opcodes that no script of the game data uses (4): `UnitScript::IsCarryingUnit`, `UnitScript::GetTransporterId`, `UnitScript::PlaySoundNoop`, `Channel::XorOp`. No unit can reach them.
@@ -624,7 +623,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (372 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 236 functions are called from outside, by platform (84 distinct functions) and presentation (33); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 622 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 26.
 
-**game, functions no scenario enters** (85 of 373 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 288 are entered, 77.2%), by reason:
+**game, functions no scenario enters** (85 of 385 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 300 are entered, 77.9%), by reason:
 
 - Network only (6): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes), `ScheduleUnitsDeliver` (units' inbox, delivered by `ReceiveUnitStates` after each unit's `UpdateMotion`). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
@@ -776,18 +775,18 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **targeting** | 20 of 20 | 100.0% | 96.1% | 79.6% | 0 | 1 |
 | **los_radar** | 87 of 96 | 90.6% | 87.6% | 74.4% | 9 | 22 |
 | **orders** | 234 of 244 | 95.9% | 85.9% | 65.7% | 10 | 17 |
-| **units** | 146 of 163 | 89.6% | 86.4% | 67.3% | 17 | 28 |
+| **units** | 109 of 125 | 87.2% | 85.9% | 70.9% | 16 | 28 |
 | **players** | 103 of 156 | 66.0% | 67.7% | 61.0% | 53 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.4% | 5 | 9 |
 | **mission** | 28 of 47 | 59.6% | 74.9% | 62.7% | 19 | 1 |
-| **scripts** | 68 of 87 | 78.2% | 90.1% | 84.1% | 19 | 6 |
+| **scripts** | 64 of 83 | 77.1% | 89.6% | 83.9% | 19 | 6 |
 | **movement** | 117 of 173 | 67.6% | 71.6% | 65.1% | 56 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 288 of 373 | 77.2% | 61.2% | 40.5% | 85 | 23 |
+| game | 300 of 385 | 77.9% | 62.1% | 42.0% | 85 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 400 of 748 | 53.5% | 41.0% | 28.0% | 348 | 86 |
 | presentation | 565 of 1150 | 49.1% | 36.2% | 29.6% | 585 | 295 |
-| seams | 156 of 176 | 88.6% | 92.0% | 49.1% | 20 | 0 |
+| seams | 200 of 222 | 90.1% | 93.1% | 57.8% | 22 | 0 |
 | state | 485 of 552 | 87.9% | 70.3% | 49.1% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

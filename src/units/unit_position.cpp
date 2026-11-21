@@ -487,6 +487,7 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
         if ((u->flags & 0x10000000) && u->motion) {
             // TODO(#948): the network's writers go on the scheduler
             g_seams.movement->UpdateMotion(u);
+            ScheduleUnitsDeliver();
             UpdateUnitHeight(u);
         }
     }

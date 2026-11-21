@@ -52,6 +52,12 @@ void __stdcall SchedDeliver(int module)
     }
 }
 
+void __stdcall ScheduleUnitsDeliver()
+{
+    ReplayImport call(RI_SCHEDULE_UNITS_DELIVER);
+    SchedDeliver(SCHED_UNITS);
+}
+
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
 {
     ReplayImport call(RI_SCHED_PUBLISH);

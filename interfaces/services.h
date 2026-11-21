@@ -118,6 +118,8 @@ int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an EconUnit, its block offset) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
+// Delivers units' pending inbox at once, as the units pass does before a unit's tail; units calls it where the network has run movement's UpdateMotion for a unit outside that pass, before it reads what the queued effects write.
+void __stdcall ScheduleUnitsDeliver();
 struct WindMeteorsEventHeader;
 // Publishes an effect of wind_meteors (interfaces/wind_meteors.h), its payload of size bytes, to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
 void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);

@@ -456,6 +456,14 @@ void __stdcall ScheduleMetalExtraction(unsigned int unit)
     (void)r;
 }
 
+void __stdcall ScheduleUnitsDeliver()
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_UNITS_DELIVER);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
 {
     ReplayText t;

@@ -5404,6 +5404,12 @@
     ]
    },
    {
+    "name": "ScheduleUnitsDeliver",
+    "id": "RI_SCHEDULE_UNITS_DELIVER",
+    "declaration": "void __stdcall ScheduleUnitsDeliver();",
+    "args": []
+   },
+   {
     "name": "WindMeteorsEmit",
     "id": "RI_WIND_METEORS_EMIT",
     "declaration": "void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);",

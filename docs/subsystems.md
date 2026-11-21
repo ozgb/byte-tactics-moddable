@@ -547,9 +547,9 @@ Coverage: 95.9% of functions (234 of 244), 85.9% of lines, 65.7% of branches; 10
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (192 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 94 functions are called from outside; the busiest are `FindUnitTypeId` (18), `AttachUnitToPiece` (1), `CreateUnit` (9). It is called most by game (68 distinct functions) and seams (9). It imports 144 functions, mostly platform (47), presentation (7), seams (14) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts`. It is the other side of most of orders' writes. Coverage: 89.6% of functions (147 of 164), 86.4% of lines, 67.3% of branches; 17 live functions no scenario enters, and 27 more are dead (data/coverage.csv). The list of those 17 is under **units, functions no scenario enters** below.
+**units** (192 functions). Phase root `UpdateAllUnits`, which calls `RunOrders` (orders) and `UpdateUnitWeapons` (weapons). 94 functions are called from outside; the busiest are `FindUnitTypeId` (18), `AttachUnitToPiece` (1), `CreateUnit` (9). It is called most by game (68 distinct functions) and seams (9). It imports 144 functions, mostly platform (47), presentation (7), seams (14) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts`. It is the other side of most of orders' writes. Coverage: 89.6% of functions (146 of 163), 86.4% of lines, 67.3% of branches; 17 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 17 is under **units, functions no scenario enters** below.
 
-**units, functions no scenario enters** (17 of 164 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 147 are entered, 89.6%), by reason:
+**units, functions no scenario enters** (17 of 163 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 146 are entered, 89.6%), by reason:
 
 - Load only (1): `IdAt` (a sort helper of the load). `save-midgame` (#422) enters the save side (`SaveUnits`, `CobScript::SaveScriptState` and the `UnitScript::IsPiece` slots it calls), and `load-midgame` (#442) enters `LoadUnits`, `LoadUnit` and `CobScript::LoadScriptState`.
 - Network only (4): `WriteUnitState`, `ReceiveUnitStates`, `ReadUnitState` and `CreateUnitFromPacket`.
@@ -776,7 +776,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **targeting** | 20 of 20 | 100.0% | 96.1% | 79.6% | 0 | 1 |
 | **los_radar** | 87 of 96 | 90.6% | 87.6% | 74.4% | 9 | 22 |
 | **orders** | 234 of 244 | 95.9% | 85.9% | 65.7% | 10 | 17 |
-| **units** | 147 of 164 | 89.6% | 86.4% | 67.3% | 17 | 27 |
+| **units** | 146 of 163 | 89.6% | 86.4% | 67.3% | 17 | 28 |
 | **players** | 103 of 156 | 66.0% | 67.7% | 61.0% | 53 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.4% | 5 | 9 |
 | **mission** | 28 of 47 | 59.6% | 74.9% | 62.7% | 19 | 1 |

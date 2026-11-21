@@ -695,7 +695,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,244,234,5091,4373,2866,1882,,17,
+orders,*,,244,234,5090,4372,2866,1882,,17,
 orders,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,src/game/orders_events.h,1,0,0,0,0,0,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,0,unset-case
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
@@ -2365,7 +2365,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,20,20,228,219,108,86,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,164,147,3215,2779,1310,882,,27,
+units,*,,163,146,3214,2778,1310,882,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
 units,CheckDownloadableFlags,src/units/unit_types.cpp,0,0,0,0,0,0,?CheckDownloadableFlags@@YGXXZ,1,
 units,ClampPointToSegment,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ClampPointToSegment@@YGXPAUPoint16@@U1@1@Z,1,
@@ -2392,6 +2392,7 @@ units,IsUnitCommander,src/units/units.cpp,0,0,0,0,0,0,?IsUnitCommander@@YGHPAUUn
 units,MakePropList,src/units/unit_targets.cpp,1,0,0,0,0,0,?MakePropList@@YGPADPAVUnitDef@@@Z,0,unit-info
 units,OctantBetween,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?OctantBetween@@YGDUPoint16@@0@Z,1,
 units,Partition,src/units/unit_commands.cpp,0,0,0,0,0,0,?Partition@@YGPAPAUPlayer@@PAPAU1@0PAU1@P6GH11@Z@Z,1,
+units,PathOrderAttach::PathOrderAttach,src/units/path_order_attach.h,0,0,0,0,0,0,??0PathOrderAttach@@QAE@XZ,1,
 units,PathOrderAttach::~PathOrderAttach,src/units/path_order_attach.h,1,0,0,0,0,0,??1PathOrderAttach@@UAE@XZ,0,no-caller
 units,PointerSpanBytes,src/units/unit_commands.cpp,0,0,0,0,0,0,?PointerSpanBytes@@YGHPAPAUPlayer@@0@Z,1,
 units,QuickSort,src/units/unit_commands.cpp,0,0,0,0,0,0,?QuickSort@@YGXPAPAUPlayer@@0P6GHPAU1@1@ZH@Z,1,

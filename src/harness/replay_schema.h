@@ -3077,7 +3077,7 @@ static const unsigned short kReplayUnitsCanReclaimObjReads[] = { 35 };
 static const unsigned char kReplayUnitsCanRepairReads[] = { 17 };
 static const unsigned short kReplayUnitsCanRepairObjReads[] = { 33, 35, 37, 52, 108, 120, 124, 125 };
 static const unsigned char kReplayUnitsUpdateUnitBodyReads[] = { 0, 17 };
-static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 24, 33, 34, 35, 36, 43, 52, 72, 124 };
+static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 24, 33, 34, 35, 36, 52, 72, 124 };
 static const unsigned short kReplayUnitsUpdateUnitTailObjReads[] = { 79 };
 static const unsigned short kReplayUnitsGetFactoriesInRadiusObjReads[] = { 35, 38, 108 };
 static const unsigned char kReplayUnitsRefreshFactoryIndexAllOf[] = { ROK_PLAYER };
@@ -3314,7 +3314,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CanRepair", SUB_UNITS, kReplayUnitsCanRepairReads, 1, nullptr, 0, kReplayUnitsCanRepairObjReads, 8, nullptr, 0, nullptr, 0 },
     { "UnitRefUnlink", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateUnitHead", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 10, nullptr, 0, nullptr, 0 },
+    { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 9, nullptr, 0, nullptr, 0 },
     { "UpdateUnitTail", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUpdateUnitTailObjReads, 1, nullptr, 0, nullptr, 0 },
     { "GetFactoriesInRadius", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsGetFactoriesInRadiusObjReads, 3, nullptr, 0, nullptr, 0 },
     { "CreateFactoryIndex", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },

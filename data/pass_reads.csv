@@ -1127,8 +1127,7 @@ units,Unit::flags,los_radar,IsUnitVisibleToPlayer,same-record,2,ten-ring-atoll@2
 units,Unit::flags,map,RemoveUnitFromMap,other-record,30,mission-build-unit@1
 units,Unit::flags,map,RemoveUnitFromMap,same-record,2,orders-guard-reclaim@350
 units,Unit::flags,map,SetYardOpen,other-record,18,mission-timer@50
-units,Unit::flags,movement,UnitMotion::UpdateMoveRate,other-record,38,mission-build-unit@1
-units,Unit::flags,movement,UnitMotion::UpdateMoveRate,same-record,20,ui-build-menu@87
+units,Unit::flags,movement,UnitMotion::UpdateMoveRate,other-record,36,mission-build-unit@1
 units,Unit::flags,movement,UnitMotion::UpdatePosition,other-record,38,mission-build-unit@1
 units,Unit::flags,orders,AttackChaseOrder,other-record,8,mission-build-unit@36
 units,Unit::flags,orders,AttackKamikazeOrder,other-record,1,edges-economy-targeting@244
@@ -1195,7 +1194,7 @@ units,Unit::flags,units,UpdateUnitBody,same-record,47,conditions-shore-to-shore@
 units,Unit::flags,units,UpdateUnitTail,other-record,70,mission-build-unit@1
 units,Unit::flags,units,UpdateUnitTail,same-record,46,conditions-shore-to-shore@6
 units,Unit::flags,weapons,AllocProjectile,other-record,13,edges-economy-targeting@36
-units,Unit::flags,weapons,ApplyUnitDamage,other-record,13,mission-kill-mobile@180
+units,Unit::flags,weapons,ApplyUnitDamage,other-record,12,mission-kill-mobile@180
 units,Unit::flags,weapons,ApplyUnitDamage,same-record,3,edges-targeting-lead@261
 units,Unit::flags,weapons,FireTurretWeapon,other-record,7,mission-build-unit@39
 units,Unit::footprint,map,AddUnitToMap,other-record,7,orders-air-fights@161
@@ -1474,8 +1473,8 @@ units,Unit::script,orders,FindLandingPad,other-record,1,orders-air-repair@382
 units,Unit::script,scripts,GetAimFromPosition,other-record,5,mission-build-unit@91
 units,Unit::script,scripts,GetNanoPiecePosition,other-record,17,mission-kill-of-type@99
 units,Unit::script,scripts,GetSweetSpot,other-record,9,mission-build-unit@71
-units,Unit::script,scripts,ScriptsApplyStart,other-record,17,mission-build-unit@1
-units,Unit::script,scripts,ScriptsApplyStart,same-record,23,mission-timer@51
+units,Unit::script,scripts,ScriptsApply,other-record,17,mission-build-unit@1
+units,Unit::script,scripts,ScriptsApply,same-record,23,mission-timer@51
 units,Unit::script,units,ApplyUnitDeath,other-record,15,mission-build-unit@1
 units,Unit::script,units,KillUnit,other-record,13,mission-build-unit@71
 units,Unit::script,weapons,GetWeaponPiecePosition,other-record,3,mission-radius@1535
@@ -2763,7 +2762,7 @@ units.players,Unit::script,orders,StartBuildingScript,other-record,2,skirmish4-l
 units.players,Unit::script,scripts,GetAimFromPosition,other-record,7,mission-build-unit@94
 units.players,Unit::script,scripts,GetNanoPiecePosition,other-record,28,ten-lava-run@164
 units.players,Unit::script,scripts,GetSweetSpot,other-record,10,mission-build-unit@75
-units.players,Unit::script,scripts,ScriptsApplyStart,other-record,19,mission-build-unit@1
+units.players,Unit::script,scripts,ScriptsApply,other-record,19,mission-build-unit@1
 units.players,Unit::script,units,ApplyUnitDeath,other-record,11,mission-build-unit@1
 units.players,Unit::script,units,KillUnit,other-record,6,edges-economy-targeting@245
 units.players,Unit::script,weapons,GetWeaponPiecePosition,other-record,4,eight-full-moon@8021

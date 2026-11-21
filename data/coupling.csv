@@ -5837,7 +5837,7 @@ seams,units,shared_write,UnitsAttachToPiece::target,1
 seams,units,shared_write,UnitsBuildDecay::ticks,1
 seams,units,shared_write,UnitsCapture::buildPercent,1
 seams,units,shared_write,UnitsCapture::hitPoints,1
-seams,units,shared_write,UnitsCapture::player,1
+seams,units,shared_write,UnitsCapture::player,2
 seams,units,shared_write,UnitsCapture::present,1
 seams,units,shared_write,UnitsChangeCell::mode,1
 seams,units,shared_write,UnitsDamageRecord::attacker,1

@@ -1555,7 +1555,7 @@ FreePlayers,FreeFactoryIndex,"seam slot filled by InstallNativeSeams, UnitsSeam:
 SchedPlayersPhase,RefreshUnitIndex,"seam slot filled by InstallNativeSeams, LosRadarSeam::RefreshUnitIndex, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
 SchedPlayersPhase,RefreshFactoryIndex,"seam slot filled by InstallNativeSeams, UnitsSeam::RefreshFactoryIndex, SchedPlayersPhase (src/game/scheduler.cpp), src/seams/native.cpp"
 SchedPlayersPhase,UpdatePlayerAIIdle,"seam slot filled by AiIdleSeam, AiSeam::UpdatePlayerAI, SchedPlayersPhase (src/game/scheduler.cpp), src/ai/ai_idle.cpp"
-OrdersOnWeaponsAttacked,WeaponCanReachUnit,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponCanReachUnit, OrdersOnWeaponsAttacked (src/orders/weapons_effects.cpp), src/seams/native.cpp"
+OrdersOnWeaponsAttacked,WeaponCanReachUnit,"seam slot filled by InstallNativeSeams, WeaponsSeam::WeaponCanReachUnit, OrdersOnWeaponsAttacked (src/seams/orders_world.cpp), src/seams/native.cpp"
 SchedPublish,UnitsOnWeaponsAttacked,"route table entry, s_routes (src/game/routes.cpp) read through SchedRoutes, SchedRoute::handler called by SchedPublish (src/game/scheduler.cpp)"
 SchedDeliver,UnitsOnWeaponsAttacked,"route table entry, s_routes (src/game/routes.cpp) read through SchedRoutes, SchedRoute::handler called by SchedDeliver (src/game/scheduler.cpp)"
 SchedPublish,AiOnWeaponsAttacked,"route table entry, s_routes (src/game/routes.cpp) read through SchedRoutes, SchedRoute::handler called by SchedPublish (src/game/scheduler.cpp)"

@@ -61461,6 +61461,7 @@ address,function,file,kind,target
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsAttachToPiece::piece
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsAttachToPiece::target
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsBuildDecay::ticks
+,UnitsApply,src/units/units_apply.cpp,field_read,UnitsCapture::player
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsChangeCell::cell
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsChangeCell::mode
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsChangeCell::pos

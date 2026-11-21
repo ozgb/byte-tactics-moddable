@@ -1242,7 +1242,7 @@ the split lies in.
 | map | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
 | map | weapons | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 1 |
 | movement | map | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
-| movement | map | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 2 | 1 |
+| movement | map | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 0 |
 | movement | orders | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by item | 1 | 1 |
 | movement | orders | units, each entity | split | `players.Apply` (step 2) | `features.Apply` (step 3) |  | by subsystem | 1 | 1 |
 | movement | orders | units, each entity | split | `players.Apply` (step 2) | `orders.RunOrders` (step 15) |  | by item | 1 | 1 |
@@ -1374,9 +1374,9 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | orders | 3 / 0 | 21 / 1 | 1 / 3 | 28 / 4 | 8 | 49 | 57 |
 | units | 1 / 1 | 5 / 6 | 18 / 3 | 16 / 11 | 131 | 23 | 154 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 7 / 3 | 1 | 12 | 11 |
-| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 15 | 27 | 42 |
+| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 15 | 26 | 41 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 11 | 0 / 8 | 19 | 17 | 36 |
-| movement | 0 / 0 | 3 / 1 | 3 / 2 | 7 / 12 | 15 | 26 | 41 |
+| movement | 0 / 0 | 3 / 1 | 3 / 2 | 7 / 12 | 14 | 26 | 40 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |
 
 ## Limits

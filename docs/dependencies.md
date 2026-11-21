@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 275 immediate, 13 deferrable, 1223 read-only, 1531 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 274 immediate, 13 deferrable, 1221 read-only, 1531 unobserved.
 
 ## Cutting rule
 
@@ -35,9 +35,9 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | orders | 18 | 57 | 8 | 138 | 297 | 4 of 14 |
 | units | 28 | 154 | 6 | 85 | 458 | 3 of 14 |
 | players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
-| map | 9 | 42 | 1 | 98 | 226 | 4 of 14 |
-| scripts | 16 | 36 | 0 | 28 | 142 | 9 of 14 |
-| movement | 0 | 41 | 2 | 69 | 233 | 7 of 14 |
+| map | 9 | 41 | 1 | 98 | 226 | 4 of 14 |
+| scripts | 16 | 36 | 0 | 26 | 142 | 9 of 14 |
+| movement | 0 | 40 | 2 | 69 | 233 | 7 of 14 |
 | mission | 0 | 0 | 0 | 55 | 104 | 14 of 14 |
 
 ## Tightly coupled groups
@@ -83,10 +83,10 @@ From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans 
 | boundary | needed | edges | direct | carried | mergeable | example |
 |---|---|---|---|---|---|---|
 | 0\|1 | absent | 0 | 0 | 0 | absent | - |
-| 1\|2 | yes | 214 | 71 | 88 | no | mission-build-unit@1 |
-| 2\|3 | yes | 165 | 1 | 94 | no | mission-build-unit@1 |
-| 3\|4 | yes | 162 | 0 | 94 | no | mission-build-unit@1 |
-| 4\|5 | yes | 48 | 11 | 28 | no | mission-defeat-passes-x@5 |
+| 1\|2 | yes | 211 | 70 | 88 | no | mission-build-unit@1 |
+| 2\|3 | yes | 163 | 1 | 94 | no | mission-build-unit@1 |
+| 3\|4 | yes | 160 | 0 | 94 | no | mission-build-unit@1 |
+| 4\|5 | yes | 47 | 11 | 28 | no | mission-defeat-passes-x@5 |
 | 5\|6 | yes | 10 | 0 | 20 | no | mission-build-unit@16 |
 | 6\|7 | yes | 10 | 0 | 16 | no | mission-build-unit@16 |
 | 7\|tail | yes | 8 | 0 | 14 | no | mission-build-unit@16 |
@@ -1960,7 +1960,7 @@ The 15 groups with the most rows are shown.
 | class | as writer | as reader |
 |---|---|---|
 | ordered | 5 | 4 |
-| immediate | 15 | 27 |
+| immediate | 15 | 26 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 98 |
 | unobserved | 94 | 132 |
@@ -1979,7 +1979,7 @@ The 15 groups with the most rows are shown.
 | writes to units | `rng.parkMiller` | units | 1 | long-greenhaven-8p@25525 |
 | reads from targeting | `rng.parkMiller` | units | 1 | long-greenhaven-8p@48406 |
 
-**Immediate** (42).
+**Immediate** (41).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
@@ -1994,7 +1994,6 @@ The 15 groups with the most rows are shown.
 | reads from units | `Unit::def` | units | 56 | mission-build-unit@1 |
 | reads from units | `Unit::footprint` | units | 53 | conditions-shore-to-shore@6 |
 | reads from units | `Unit::cobStateFlags` | units | 49 | conditions-shore-to-shore@6 |
-| reads from movement | `UnitMotion::pathLockStamp` | units | 45 | mission-build-unit@1 |
 | reads from movement | `Unit::motion` | units | 30 | mission-timer@51 |
 | reads from features | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | units | 28 | mission-build-unit@1 |
 | writes to movement | `Unit::flags` | units | 26 | edges-targeting-lead@11 |
@@ -2023,8 +2022,9 @@ The 15 groups with the most rows are shown.
 | writes to los_radar | `Unit::flags` | units | 2 | ten-ring-atoll@8741 |
 | reads from units | `pad_1df4` | units | 2 | edges-economy-targeting@117 |
 | reads from units | `unknown_1cd9` | units | 2 | edges-economy-targeting@245 |
+| reads from los_radar | `LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY` | units | 1 | long-greenhaven-8p@25957 |
 
-The 40 rows with the most runs are shown; the other 2 are in data/dependencies.csv.
+The 40 rows with the most runs are shown; the other 1 are in data/dependencies.csv.
 
 **Deferrable** (1).
 
@@ -2074,7 +2074,7 @@ Cannot be cut from, with the edge of the most runs:
 | orders | immediate | map -> orders | `Unit::spatialBucket` | units | 5 | orders-air-fights@185 |
 | units | immediate | map -> units | `Unit::flags` | units | 84 | mission-build-unit@1 |
 | scripts | immediate | map -> scripts | `Unit::cobStateFlags` | units | 23 | mission-timer@50 |
-| movement | immediate | movement -> map | `UnitMotion::pathLockStamp` | units | 45 | mission-build-unit@1 |
+| movement | immediate | movement -> map | `Unit::motion` | units | 30 | mission-timer@51 |
 
 ### Phase boundaries
 
@@ -2087,12 +2087,12 @@ Cannot be cut from, with the edge of the most runs:
 | projectiles -> players | 0 | 2 | 0 | 0 |
 | projectiles -> units | 0 | 0 | 0 | 1 |
 | units -> explosions | 0 | 2 | 0 | 0 |
-| units -> features | 2 | 4 | 0 | 0 |
-| units -> players | 3 | 10 | 0 | 0 |
+| units -> features | 2 | 3 | 0 | 0 |
+| units -> players | 3 | 9 | 0 | 0 |
 | units -> presentation | 0 | 2 | 0 | 0 |
-| units -> projectiles | 3 | 4 | 0 | 0 |
+| units -> projectiles | 3 | 3 | 0 | 0 |
 | units -> tail | 0 | 2 | 0 | 0 |
-| units -> units | 0 | 0 | 7 | 19 |
+| units -> units | 0 | 0 | 7 | 18 |
 
 The rows themselves are in data/phase_dependencies.csv.
 
@@ -2117,11 +2117,11 @@ The rows themselves are in data/phase_dependencies.csv.
 | units.players | `RemoveUnitFromMap` | 7 | 2 | `Unit::flags` | 50 |
 | units | `AddUnitToMap` | 6 | 4 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 11 |
 | units | `ClearFootprintAndUnlink` | 6 | 2 | `Rec::field_6` | 16 |
-| units | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 23 |
+| units | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 27 |
 | units | `SetOwner` | 6 | 2 | `Unit::spatialBucket` | 20 |
 | units.players | `CanPlaceFootprintAt` | 6 | 2 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 3 |
 | units.players | `ClearFootprintAndUnlink` | 6 | 2 | `Unit::cargoNext` | 12 |
-| units.players | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 27 |
+| units.players | `RefreshPassMapsForUnit` | 6 | 1 | `UnitMotion::pathLockStamp` | 39 |
 | units.players | `UnitsInRange` | 6 | 2 | `Unit::pos` | 4 |
 
 The 15 groups with the most rows are shown.
@@ -2141,7 +2141,7 @@ The 15 groups with the most rows are shown.
 | ordered | 8 | 8 |
 | immediate | 19 | 17 |
 | deferrable | 0 | 0 |
-| read-only | 0 | 28 |
+| read-only | 0 | 26 |
 | unobserved | 61 | 81 |
 
 **Ordered** (16).
@@ -2214,7 +2214,7 @@ None.
 
 | other | scripts is writer | scripts is reader |
 |---|---|---|
-| (no writer) | 0 | 28 |
+| (no writer) | 0 | 26 |
 
 **Unobserved**, by the other subsystem.
 
@@ -2305,7 +2305,7 @@ It has no deferrable edge.
 | class | as writer | as reader |
 |---|---|---|
 | ordered | 0 | 0 |
-| immediate | 15 | 26 |
+| immediate | 14 | 26 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 69 |
 | unobserved | 90 | 143 |
@@ -2314,7 +2314,7 @@ It has no deferrable edge.
 
 None.
 
-**Immediate** (41).
+**Immediate** (40).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
@@ -2327,7 +2327,6 @@ None.
 | reads from units | `Unit::cell` | units | 63 | mission-capture@1 |
 | reads from units | `Unit::pitch` | units | 61 | mission-build-unit@1 |
 | reads from units | `Unit::footprint` | units | 51 | conditions-dark-side@19 |
-| writes to map | `UnitMotion::pathLockStamp` | units | 45 | mission-build-unit@1 |
 | reads from orders | `Order::flags_42` | units | 39 | mission-build-unit@1 |
 | writes to units | `Unit::motion` | units | 37 | console-ilose@30 |
 | reads from orders | `Order::unit` | units | 31 | mission-build-unit@1 |
@@ -2358,8 +2357,7 @@ None.
 | writes to units | `UnitMotion::speed` | units | 4 | units-transport@2115 |
 | writes to orders | `UnitMotion::velocity` | units | 1 | long-greenhaven-8p@33263 |
 | writes to players | `Unit::motion` | units | 1 | mission-kill-mobile@180 |
-
-The 40 rows with the most runs are shown; the other 1 are in data/dependencies.csv.
+| writes to weapons | `UnitMotion::speed` | units | 1 | long-greenhaven-8p@30518 |
 
 **Deferrable** (2).
 
@@ -2407,7 +2405,7 @@ Cannot be cut from, with the edge of the most runs:
 | orders | immediate | orders -> movement | `Order::flags_42` | units | 39 | mission-build-unit@1 |
 | units | immediate | units -> movement | `Unit::flags` | units | 83 | load-midgame@1 |
 | players | immediate | movement -> players | `Unit::motion` | units | 1 | mission-kill-mobile@180 |
-| map | immediate | movement -> map | `UnitMotion::pathLockStamp` | units | 45 | mission-build-unit@1 |
+| map | immediate | movement -> map | `Unit::motion` | units | 30 | mission-timer@51 |
 
 ### Phase boundaries
 
@@ -2419,10 +2417,10 @@ Cannot be cut from, with the edge of the most runs:
 | presentation -> units | 0 | 0 | 0 | 3 |
 | projectiles -> players | 0 | 1 | 0 | 0 |
 | projectiles -> units | 0 | 0 | 0 | 4 |
-| units -> features | 2 | 0 | 0 | 0 |
-| units -> players | 3 | 2 | 0 | 0 |
-| units -> projectiles | 3 | 1 | 0 | 0 |
-| units -> units | 0 | 0 | 9 | 25 |
+| units -> features | 1 | 0 | 0 | 0 |
+| units -> players | 2 | 2 | 0 | 0 |
+| units -> projectiles | 2 | 1 | 0 | 0 |
+| units -> units | 0 | 0 | 8 | 25 |
 
 The rows themselves are in data/phase_dependencies.csv.
 

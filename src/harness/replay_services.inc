@@ -359,6 +359,10 @@ void ReplayImportEnd(ReplayImport& c)
         t.AddInt(a[0].v.i);
         break;
     }
+    case RI_SCHEDULE_UNITS_DELIVER:
+    {
+        break;
+    }
     case RI_WIND_METEORS_EMIT:
     {
         AddSpace(t);

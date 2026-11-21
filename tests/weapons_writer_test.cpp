@@ -97,6 +97,8 @@ int __stdcall RandomInt(int n)
 
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int) {}
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
+void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, int) {}
 
 static bool IsHandled(SchedHandler handler)
 {

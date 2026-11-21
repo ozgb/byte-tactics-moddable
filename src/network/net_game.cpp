@@ -3113,11 +3113,11 @@ void __stdcall NetSendUnitStates(Player* owner)
             continue;
         if (!u->motion)
             continue;
-        if (!g_seams.movement->GoalHasNetUnitState((PathGoal*)u->motion->player.get()))
+        if (!g_seams.movement->HasNetState(u))
             continue;
         stream.WriteBits(u->id - u->player->firstIndex, 0x10);
         stream.WriteBits(u->unitDefIndex, g_game->unitDefCountBits);
-        g_seams.movement->GoalSerializeNetUnitState((PathGoal*)u->motion->player.get(), &stream);
+        g_seams.movement->WriteNetState(u, &stream);
         if (((stream.bit + 7) >> 3) + stream.index * 4 >= 0x200)
             break;
     }

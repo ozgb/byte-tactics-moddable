@@ -40,6 +40,7 @@ struct Pair16 { short lo, hi; };
 #include "box.h"
 
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include "../scripts/cob_script.h"
 
 #include "../files/files_api.h"
@@ -140,6 +141,9 @@ struct FixedPosView;
 #include "../../interfaces/seams.h"
 #include "../map/unit_visitor.h"
 #include "../../interfaces/orders.h"
+#include "../game/orders_events.h"
+#include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include "order_queue.h"
 #include "order_queue.h"
 #include "../graphics/particles.h"
@@ -232,8 +236,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
             Vec3 pos;
         if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<16));
         else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<16));
-            PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-            g_seams.movement->PathOrderSetApproachRadius(move, 128);
+            unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
             order->SetAttachedFx(move);
             order->flags=0x100e8;
             return 1;
@@ -243,8 +247,8 @@ int __stdcall VtolEvadeOrder(Unit* unit,Order* order,int flags)
         Vec3 pos;
         if (order->side) pos=AddVec3(unit->pos,Offset(unit->heading-0x4000,range<<17));
         else pos=AddVec3(unit->pos,Offset(unit->heading+0x4000,range<<17));
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, 128);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
         order->SetAttachedFx(move);
         order->flags=0x100e8;
         return 1;
@@ -261,12 +265,12 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
 {
     WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
     if (unit->carrier)
-        g_seams.units->AttachUnitToPiece(unit, 0, -1, 2);
-    g_seams.units->SetStateBits(unit, 1, 1);
+        OrdersPublishAttachToPiece(unit, 0, -1, 2);
+    OrdersPublishSetStateBits(unit, 1, 1);
     if ((unit->motion->flags & 3) == 1) {
-        g_seams.movement->SetFlightMode(unit->motion.get(), unit, 2);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &unit->pos);
-        g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude / 2);
+        MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 2);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude / 2);
         order->SetAttachedFx(obj);
         order->flags |= flags | 0xe0;
     }
@@ -285,8 +289,8 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
         return 2;
@@ -307,13 +311,13 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         if (g_seams.map->CanPlaceFootprintAt(unit, &unit->pos)) {
-            g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &unit->pos);
+            OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME, 0, "EndTransport", 0, 1, 0, 0, 0, 0, 0);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
             int h = max(g_seams.map->GetGroundHeight(&unit->pos), g_game->seaLevel);
-            g_seams.movement->PathOrderSetAltitude(obj, h <= g_game->seaLevel ? g_seams.map->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, h <= g_game->seaLevel ? g_seams.map->GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
             order->SetAttachedFx(obj);
             order->flags = 0xe0;
-            g_seams.units->SetStateBits(unit, 1, 0);
+            OrdersPublishSetStateBits(unit, 1, 0);
             return 1;
         }
         for (int r = 0x40; r < 0x100; r += 0x10) {
@@ -324,7 +328,7 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
             Point16 cell = WorldToCellMul(p, fp);
             CellToWorld(fp, cell, &p);
             if (g_seams.map->CanPlaceFootprintAt(unit, &p)) {
-                order->SetAttachedFx(g_seams.movement->NewPathOrderAt(order, &p));
+                order->SetAttachedFx(g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p));
                 order->flags = 0xe0;
                 return 2;
             }
@@ -337,15 +341,15 @@ int __stdcall VtolLandIfCanOrder(Unit* unit, Order* order, int flags)
         sum.y = order->pos.y + off.y;
         sum.z = order->pos.z + off.z;
         Vec3 dest = sum;
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x40);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x40));
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         return 2;
     }
     case 2:
         if (flags & 0x20) {
-            g_seams.movement->SetFlightMode(unit->motion.get(), unit, 1);
+            MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 1);
             return 5;
         }
         return 8;
@@ -391,8 +395,8 @@ int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
                 p.z = order->z << 16;
                 int distance = (RandomInt(0x20) + 8) << 16;
                 p += Offset(angle, distance);
-                PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-                g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+                unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+                MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
                 order->SetAttachedFx(obj);
                 order->SetDeadlineTicks(RandomInt(0xf) + 0x1e);
                 order->state = 1;
@@ -425,7 +429,7 @@ int __stdcall VtolMoveOrder(Unit* unit, Order* order, int flags)
         order->AnnounceStatusIfFlagged(SIM_SPEECH_KIND_TEXT);
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         Snap(&order->pos, *(Point16*)&unit->footprint);
-        order->SetAttachedFx(g_seams.movement->NewPathOrderAt(order, &order->pos));
+        order->SetAttachedFx(g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos));
         order->flags = 0xe0;
         return 1;
     case 2:
@@ -498,8 +502,8 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     }
     if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x4000;
     Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
-    PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-    g_seams.movement->PathOrderSetApproachRadius(move, 128);
+    unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+    MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
     order->SetAttachedFx(move);
     order->SetDeadlineTicks(30);
     order->flags|=0xf8;
@@ -524,9 +528,9 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         if (unit->motion && (unit->def->flags1 & 0x800)) {
             order->AnnounceStatusIfFlagged(SIM_SPEECH_UNLOADING);
             g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, unit->cargo);
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
-            g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
-            g_seams.movement->PathOrderSetApproachRadius(obj, 0x140);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x140));
             order->SetAttachedFx(obj);
             order->flags = 0xe8;
             return 1;
@@ -535,9 +539,9 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
     case 1: {
         Unit* cargo = order->target;
         if (ScheduleMapCanPlaceUnitFootprint(cargo->def, 0, WorldToCell16(order->pos, *(Point16*)&cargo->footprint), 1)) {
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
             int h = unit->cargo->def->modelMaxYHigh;
-            g_seams.movement->PathOrderSetAltitude(obj, h);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, h);
             order->SetAttachedFx(obj);
             order->flags = 0xe8;
             return 1;
@@ -553,10 +557,10 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_UNLOAD_UNIT);
             return 9;
         }
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
-        g_seams.units->AttachUnitToPiece(unit->cargo, 0, -1, 1);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &unit->pos);
-        g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+        OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME, 0, "EndTransport", 0, 0, 0, 0, 0, 0, 0);
+        OrdersPublishAttachToPiece(unit->cargo, 0, -1, 1);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0xe0;
         return 1;
@@ -568,6 +572,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
+// TODO(#986): the answers of QueryScript are read here
 // FUNCTION: 0x411840
 int __stdcall FindLandingPad(Unit* unit, int pad)
 {
@@ -597,6 +602,7 @@ static inline int IsAhead(Unit* unit, Order* order)
     return (short)(((Vec3Words*)&toward)->xWhole * ((Vec3Words*)&facing)->xWhole + ((Vec3Words*)&toward)->zWhole * ((Vec3Words*)&facing)->zWhole) > 0;
 }
 
+// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x413d80
 int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -608,12 +614,12 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         if (unit->motion && (unit->def->flags1&0x800)) {
             order->AnnounceStatusIfFlagged(SIM_SPEECH_BUILDING);
             WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-            if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
-            g_seams.units->SetStateBits(unit, 1,1);
+            if (unit->carrier) OrdersPublishAttachToPiece(unit,0,-1,2);
+            OrdersPublishSetStateBits(unit, 1,1);
             if ((unit->motion->flags&3)==1) {
-                g_seams.movement->SetFlightMode(unit->motion.get(), unit, 2);
-                PathOrder* move=g_seams.movement->NewPathOrderAt(order, &unit->pos);
-                g_seams.movement->PathOrderSetAltitude(move, unit->def->altitude/2);
+                MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 2);
+                unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+                MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, move, unit->def->altitude/2);
                 order->SetAttachedFx(move);
                 order->flags|=0xe0;
             }
@@ -626,8 +632,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         Point16 origin=*(Point16*)&def->footprintx;
         Point16 cell=WorldToCell(order->pos,origin);
         CellToWorldPos(cell,&order->pos,origin);
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &order->pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, unit->def->buildRange);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(unit->def->buildRange));
         order->SetAttachedFx(move);
         order->flags=0xe0;
         return 1;
@@ -642,7 +648,9 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             order->SetDeadlineTicks(30);
             return 2;
         }
-        g_seams.map->SnapWorldPosToFootprint(def,&order->pos);
+        Vec3 snapped = order->pos;
+        g_seams.map->SnapWorldPosToFootprint(def, &snapped);
+        order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,order->pos,0,1,0));
         if (!order->target) { RecordUnitSpeech(unit,7,SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS); return 8; }
         RecordUnitSpeech(unit,9,SIM_SPEECH_STARTING_CONSTRUCTION);
@@ -659,8 +667,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
             int range=unit->def->buildRange<<16;
             angle+=0xdb6e;
             Vec3 pos=PosMinus(order->target->pos,Offset(angle,range));
-            PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-            g_seams.movement->PathOrderSetHeading(move, (unsigned short)angle);
+            unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_HEADING, unit, move, (short)((unsigned short)angle));
             order->SetAttachedFx(move);
         }
         int rate=0; rate=unit->def->buildRate;
@@ -696,6 +704,7 @@ void __stdcall CellToWorldPos(Point16 a, Vec3* out, Point16 b)
 #pragma auto_inline(on)
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414e70
 int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -724,8 +733,8 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
-        g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -742,7 +751,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         if ((unsigned int)order->target->health >= order->target->def->maxHealth)
             return 1;
         {
-            g_seams.units->AddRepairProgress(unit, order->target, (float)(unit->def->buildRate / 30));
+            OrdersPublishRepair(order->target, unit, (float)(unit->def->buildRate / 30));
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(order->source, &nano);
             Box box;
@@ -860,8 +869,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
         return 2;
@@ -887,8 +896,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         int angle = GetHeadingBetween(&unit->pos, &order->target->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = Sum(unit->pos, off);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -896,8 +905,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     case 2: {
         WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 0);
         TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->target->pos);
-        g_seams.movement->PathOrderSetApproachRadius(obj, range);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->target->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(range));
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         order->side = 0;
@@ -911,8 +920,8 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
             order->misses = 0;
             Vec3 off = Offset(RandomInt(0x10000), range << 16);
             Vec3 p = AddVec3(order->target->pos, off);
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-            g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
             order->flags |= 0x110e8;
             return 2;
         }
@@ -927,9 +936,9 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 off = Offset(angle, range * 2 / 3 << 16);
         Vec3 p = Diff(order->target->pos, off);
-        PathOrder* obj = g_seams.movement->NewPathOrderToUnitAt(order, order->target, &p);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x10);
-        g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+        unsigned int obj = g_seams.movement->NewPathOrderToUnitAt(Ref<Order>(order).offset, order->target, &p);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x10));
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
@@ -949,6 +958,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
+// TODO(#986): the answers of QueryScript are read here
 // FUNCTION: 0x4111b0
 int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
 {
@@ -973,9 +983,9 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             }
             break;
         case 1: {
-            PathOrder* obj = g_seams.movement->NewPathOrderToUnit(order, order->target);
-            g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
-            g_seams.movement->PathOrderSetApproachRadius(obj, 0x30);
+            unsigned int obj = g_seams.movement->NewPathOrderToUnit(Ref<Order>(order).offset, order->target);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x30));
             order->SetAttachedFx(obj);
             order->flags = 0x100e8;
             return 1;
@@ -988,24 +998,24 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             return 1;
         case 3: {
             int height = target->def->modelMaxY;
-            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "BeginTransport", 0, 1, 1, height, 0, 0, 0);
+            OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME_WITH_ARGS, 0, "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             g_seams.network->SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = g_seams.scripts->GetPieceOffset(unit, order->piece);
-            PathOrder* obj = g_seams.movement->NewPathOrderToUnitAtAngle(order, order->target, -1);
-            g_seams.movement->PathOrderSetAltitude(obj, -((Vec3Words*)&offset)->yWhole);
+            unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, -1);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, -((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
             order->flags = 0x100ea;
             return 1;
         }
         case 4: {
             if (flags & 0x42) {
-                g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
+                OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME, 0, "EndTransport", 0, 0, 0, 0, 0, 0, 0);
                 return 8;
             }
-            g_seams.units->AttachUnitToPiece(target, unit, order->piece, 0);
+            OrdersPublishAttachToPiece(target, unit, order->piece, 0);
             RecordUnitSpeech(unit, 12, SIM_SPEECH_KIND_TEXT);
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &unit->pos);
-            g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
             order->flags |= 0xe0;
             return 1;
         }
@@ -1034,8 +1044,8 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             center.z=(g_game->mapHeight/2)<<16;
             short angle=GetHeadingBetween(&unit->pos,&center);
             Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
-            PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-            g_seams.movement->PathOrderSetApproachRadius(move, 128);
+            unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
             order->flags|=0xe0;
             order->SetAttachedFx(move);
             return 2;
@@ -1047,12 +1057,12 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             if (unit->motion && (unit->def->flags1&0x800)) {
                 order->AnnounceStatusIfFlagged(SIM_SPEECH_GUARDING);
                 WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-                if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
-                g_seams.units->SetStateBits(unit, 1,1);
+                if (unit->carrier) OrdersPublishAttachToPiece(unit,0,-1,2);
+                OrdersPublishSetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
-                    g_seams.movement->SetFlightMode(unit->motion.get(), unit, 2);
-                    PathOrder* move=g_seams.movement->NewPathOrderAt(order, &unit->pos);
-                    g_seams.movement->PathOrderSetAltitude(move, unit->def->altitude/2);
+                    MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 2);
+                    unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+                    MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, move, unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
                 }
@@ -1125,8 +1135,8 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             if ((unsigned char)(unit->flags>>31)&1)
                 pos=AddVec3(order->target->pos,Offset(angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
             else pos=AddVec3(order->target->pos,Offset(angle,0x1400000));
-            PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-            g_seams.movement->PathOrderSetApproachRadius(move, 128);
+            unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
             order->SetAttachedFx(move);
             order->SetDeadlineTicks(30);
             order->flags|=0xf8;
@@ -1175,8 +1185,8 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
             return 6;
         short angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(order->pos, Offset(angle, 0x1400000));
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x150);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x150));
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
@@ -1269,16 +1279,16 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 dest = AddVec3(order->target->pos, Offset(order->angle, radius << 16));
         order->angle += 0x4000;
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         order->state = 1;
         return 2;
     }
     case 2: {
-        PathOrder* obj = g_seams.movement->NewPathOrderToUnitAtAngle(order, order->target, -1);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0xa0);
+        unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, -1);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0xa0));
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -1290,8 +1300,8 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             RecordUnitSpeech(unit, 7, SIM_SPEECH_LANDING_FAILED);
             return 0;
         }
-        PathOrder* obj = g_seams.movement->NewPathOrderToUnitAtAngle(order, order->target, order->angle);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x30);
+        unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, order->angle);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x30));
         order->SetAttachedFx(obj);
         order->flags = 0xe8;
         return 1;
@@ -1307,12 +1317,12 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             RecordUnitSpeech(unit, 7, SIM_SPEECH_LANDING_ABORTED_ALL_PADS_ARE_OCCUPIED);
             return 0;
         }
-        PathOrder* obj = g_seams.movement->NewPathOrderToUnitAtAngle(order, order->target, order->angle);
+        unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, order->angle);
         if (unit->cargo)
-            g_seams.movement->PathOrderSetAltitude(obj, unit->cargo->def->modelMaxYHigh);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->cargo->def->modelMaxYHigh);
         else
-            g_seams.movement->PathOrderSetAltitude(obj, 0);
-        g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 1);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, 0);
+        OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME, 0, "EndTransport", 0, 1, 0, 0, 0, 0, 0);
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(0xf);
         order->state = 5;
@@ -1328,11 +1338,11 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             return 0;
         }
         if (unit->cargo) {
-            g_seams.scripts->StartScript((CobScript*)unit->script.get(), "EndTransport", 0, 0);
-            g_seams.units->AttachUnitToPiece(unit->cargo, order->target, order->angle, 0);
+            OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME, 0, "EndTransport", 0, 0, 0, 0, 0, 0, 0);
+            OrdersPublishAttachToPiece(unit->cargo, order->target, order->angle, 0);
             dropped = 1;
         } else {
-            g_seams.units->AttachUnitToPiece(unit, order->target, order->angle, 0);
+            OrdersPublishAttachToPiece(unit, order->target, order->angle, 0);
         }
         if (!dropped && unit->health < unit->def->maxHealth
             && (order->target->def->flags1 & 0x200)
@@ -1432,12 +1442,12 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
         int time = (int)(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
-        PathOrder* obj;
+        unsigned int obj;
         if (order->target)
-            obj = g_seams.movement->NewPathOrderToUnit(order, order->target);
+            obj = g_seams.movement->NewPathOrderToUnit(Ref<Order>(order).offset, order->target);
         else
-            obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
-        g_seams.movement->PathOrderSetApproachRadius(obj, time);
+            obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(time));
         order->SetAttachedFx(obj);
         order->SetDeadlineTicks(1);
         order->flags |= 0x100e8;
@@ -1478,8 +1488,8 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
 
 static inline void AttachMove(Order* order, const Vec3& dest, short radius)
 {
-    PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-    g_seams.movement->PathOrderSetApproachRadius(obj, radius);
+    unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+    MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, order->unit, obj, (short)(radius));
     order->SetAttachedFx(obj);
 }
 
@@ -1542,8 +1552,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = AddVec3(unit->pos, off);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -1554,8 +1564,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
         else
             TargetingPublishSetPos(SCHED_ORDERS, unit, &order->pos, 0);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
-        g_seams.movement->PathOrderSetApproachRadius(obj, speed);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(speed));
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         return 1;
@@ -1564,8 +1574,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         short angle = AngleOfVector(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
         Vec3 off = Offset(angle, speed * 0x30000);
         Vec3 p = AddVec3(order->pos, off);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-        g_seams.movement->PathOrderSetApproachRadius(obj, RandomInt(0x80) + 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(RandomInt(0x80) + 0x80));
         order->SetAttachedFx(obj);
         order->flags = 0x100ea;
         return 1;
@@ -1589,8 +1599,8 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         sum.y = unit->pos.y + off.y;
         sum.z = unit->pos.z + off.z;
         Vec3 p = sum;
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &p);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &p);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->SetAttachedFx(obj);
         order->flags = 0x100ea;
         Dummy();
@@ -1619,6 +1629,7 @@ struct Unit;
 static inline UnitDef* Definitions() { return g_game->defs; }
 static inline short Angle(Vec3* a,Vec3* b) { return AngleOfVector(a->x-b->x,a->z-b->z); }
 struct Feature;
+// TODO(#986): the answers of AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x414380
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
 {
@@ -1632,12 +1643,12 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
                 if (!unit->def->ids) return 7;
                 order->AnnounceStatusIfFlagged(SIM_SPEECH_BUILDING);
                 WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-                if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
-                g_seams.units->SetStateBits(unit, 1,1);
+                if (unit->carrier) OrdersPublishAttachToPiece(unit,0,-1,2);
+                OrdersPublishSetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
-                    g_seams.movement->SetFlightMode(unit->motion.get(), unit, 2);
-                    PathOrder* move=g_seams.movement->NewPathOrderAt(order, &unit->pos);
-                    g_seams.movement->PathOrderSetAltitude(move, unit->def->altitude/2);
+                    MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 2);
+                    unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+                    MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, move, unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
                 }
@@ -1647,8 +1658,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
         break;
     case 1: {
         order->retries=0;
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &order->target->pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, unit->def->buildRange);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->target->pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(unit->def->buildRange));
         order->SetAttachedFx(move);
         order->flags=0xe0;
         return 1;
@@ -1666,8 +1677,8 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             angle+=0xdb6e;
             Vec3* base=&order->target->pos;
             Vec3 pos=PosMinus(*base,Offset(angle,range));
-            PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-            g_seams.movement->PathOrderSetHeading(move, (unsigned short)angle);
+            unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_HEADING, unit, move, (short)((unsigned short)angle));
             order->SetAttachedFx(move);
         }
         int rate=0; rate=unit->def->buildRate;
@@ -1704,6 +1715,7 @@ struct Unit;
 
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414770
 int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
 {
@@ -1726,7 +1738,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
         order->SetAttachedFx(obj);
         order->flags = 0xe0;
         return 1;
@@ -1742,7 +1754,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         order->time -= 2;
         if (order->time <= 0)
             return 1;
-        unit->workTime = g_game->ticks + 300;
+        OrdersPublishBusy(unit, g_game->ticks + 300);
         if (order->time > 30) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(unit, &nano);
@@ -1783,6 +1795,7 @@ struct Unit;
 
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x414a80
 int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 {
@@ -1811,7 +1824,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         Point16 origin = *(Point16*)&unit->footprint;
         Point16 cell = WorldToCell(order->pos, origin);
         CellToWorldPos(cell, &order->pos, origin);
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->target->pos);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->target->pos);
         order->SetAttachedFx(obj);
         order->flags |= 0x100e8;
         RecordUnitSpeech(unit, 11, SIM_SPEECH_KIND_TEXT);
@@ -1862,8 +1875,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         center.z=(g_game->mapHeight/2)<<16;
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Offset(angle,0x3200000));
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, 128);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
         order->flags|=0xe0;
         order->SetAttachedFx(move);
         return 2;
@@ -1879,12 +1892,12 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 order->angle=RandomInt(0x10000);
                 order->parity=order->angle&1;
                 WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-                if (unit->carrier) g_seams.units->AttachUnitToPiece(unit,0,-1,2);
-                g_seams.units->SetStateBits(unit, 1,1);
+                if (unit->carrier) OrdersPublishAttachToPiece(unit,0,-1,2);
+                OrdersPublishSetStateBits(unit, 1,1);
                 if ((unit->motion->flags&3)==1) {
-                    g_seams.movement->SetFlightMode(unit->motion.get(), unit, 2);
-                    PathOrder* move=g_seams.movement->NewPathOrderAt(order, &unit->pos);
-                    g_seams.movement->PathOrderSetAltitude(move, unit->def->altitude/2);
+                    MovementPublishSetMode(SCHED_ORDERS, MOVEMENT_SET_FLIGHT_MODE, unit, 2);
+                    unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &unit->pos);
+                    MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, move, unit->def->altitude/2);
                     order->SetAttachedFx(move);
                     order->flags|=0xe0;
                 }
@@ -1909,8 +1922,8 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         if (target && IssueAttackOrder(unit,target,0)) return 5;
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
         Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(((WeaponDef*)unit->weapons[0].weapon)->range+160)<<16));
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, 128);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
         order->SetAttachedFx(move);
         order->SetDeadlineTicks(RandomInt(30)+30);
         order->flags|=0xe0;
@@ -1930,8 +1943,8 @@ int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
         center.z=(g_game->mapHeight/2)<<16;
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
-        PathOrder* move=g_seams.movement->NewPathOrderAt(order, &pos);
-        g_seams.movement->PathOrderSetApproachRadius(move, 128);
+        unsigned int move = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &pos);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, move, (short)(128));
         order->flags|=0xe0;
         order->SetAttachedFx(move);
         return 2;
@@ -1972,8 +1985,8 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->mapHeight / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &dest);
-        g_seams.movement->PathOrderSetApproachRadius(obj, 0x80);
+        unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &dest);
+        MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_APPROACH_RADIUS, unit, obj, (short)(0x80));
         order->flags |= 0xe0;
         order->SetAttachedFx(obj);
         return 2;
@@ -1998,8 +2011,8 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             if (IsAhead(unit, order)) {
                 Vec3 from = AddVec3(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));
                 Vec3 to = Offset(unit->heading, unit->def->maxvelocity);
-                AirManeuverOrder* obj = g_seams.movement->NewAirManeuverOrder(order, &from, &to);
-                g_seams.movement->AirManeuverOrderSetAltitude(obj, unit->def->altitude);
+                unsigned int obj = g_seams.movement->NewAirManeuverOrder(Ref<Order>(order).offset, &from, &to);
+                MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
                 order->SetAttachedFx(obj);
                 order->SetDeadlineTicks(RandomInt(0x1e) + 0x3c);
                 order->ticks = 0;
@@ -2018,7 +2031,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
                 p.x += ((UnitMotion*)order->target->motion)->velocity.x * 45;
                 p.z += ((UnitMotion*)order->target->motion)->velocity.z * 45;
                 Vec3 other = Sum(((UnitMotion*)order->target->motion)->velocity, Offset(order->target->heading, order->target->def->maxvelocity / 2));
-                order->SetAttachedFx(g_seams.movement->NewAirManeuverOrder(order, &p, &other));
+                order->SetAttachedFx(g_seams.movement->NewAirManeuverOrder(Ref<Order>(order).offset, &p, &other));
             }
             order->SetDeadlineTicks(0x2d);
             order->flags |= 0x100e8;
@@ -2055,8 +2068,8 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
         case 1: {
             if (flags & 0xe0)
                 return 6;
-            PathOrder* obj = g_seams.movement->NewPathOrderAt(order, &order->pos);
-            g_seams.movement->PathOrderSetAltitude(obj, unit->def->altitude);
+            unsigned int obj = g_seams.movement->NewPathOrderAt(Ref<Order>(order).offset, &order->pos);
+            MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, unit->def->altitude);
             order->SetAttachedFx(obj);
             order->SetDeadlineTicks(0x2d);
             order->flags |= 0xe0;

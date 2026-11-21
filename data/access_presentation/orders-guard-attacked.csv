@@ -149,7 +149,7 @@ UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 WeaponDef::colour,presentation,DrawProjectiles,weapons,0,
 WeaponDef::colour2,presentation,DrawProjectiles,weapons,0,
 WeaponDef::flags,presentation,DrawProjectiles,weapons,0,

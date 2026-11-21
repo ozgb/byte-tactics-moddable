@@ -485,7 +485,7 @@ add_custom_command(
   DEPENDS players_writer_test_objects $<TARGET_OBJECTS:players_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(players_writer_test DEPENDS "${CMAKE_BINARY_DIR}/players_writer_test.exe")
-add_library(ai_writer_test_objects OBJECT src/ai/ai_player.cpp src/ai/ai_idle.cpp src/orders/ai_effects.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ai_writer_test.cpp)
+add_library(ai_writer_test_objects OBJECT src/ai/ai_player.cpp src/ai/ai_idle.cpp src/seams/orders_world.cpp src/orders/orders_apply.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ai_writer_test.cpp)
 target_include_directories(ai_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(ai_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(ai_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
@@ -496,7 +496,7 @@ add_custom_command(
   DEPENDS ai_writer_test_objects $<TARGET_OBJECTS:ai_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(ai_writer_test DEPENDS "${CMAKE_BINARY_DIR}/ai_writer_test.exe")
-add_library(units_writer_test_objects OBJECT src/game/routes.cpp src/units/weapons_effects.cpp src/units/factory_index.cpp src/map/line_of_sight_index.cpp src/orders/weapons_effects.cpp src/orders/ai_effects.cpp src/seams/ai_world.cpp src/seams/weapons_world.cpp src/scripts/weapons_effects.cpp src/ai/ai_player.cpp src/ai/ai_idle.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/units_writer_test.cpp)
+add_library(units_writer_test_objects OBJECT src/game/routes.cpp src/units/weapons_effects.cpp src/units/factory_index.cpp src/map/line_of_sight_index.cpp src/seams/orders_world.cpp src/orders/orders_apply.cpp src/seams/ai_world.cpp src/seams/weapons_world.cpp src/scripts/weapons_effects.cpp src/ai/ai_player.cpp src/ai/ai_idle.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/units_writer_test.cpp)
 target_include_directories(units_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(units_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(units_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
@@ -519,6 +519,18 @@ add_custom_command(
   DEPENDS weapons_writer_test_objects $<TARGET_OBJECTS:weapons_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(weapons_writer_test DEPENDS "${CMAKE_BINARY_DIR}/weapons_writer_test.exe")
+
+add_library(orders_writer_test_objects OBJECT src/game/routes.cpp src/seams/orders_world.cpp src/orders/orders_apply.cpp src/orders/order_list.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/orders_writer_test.cpp)
+target_include_directories(orders_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(orders_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(orders_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/orders_writer_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/orders_writer_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /force:unresolved
+          $<TARGET_OBJECTS:orders_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS orders_writer_test_objects $<TARGET_OBJECTS:orders_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(orders_writer_test DEPENDS "${CMAKE_BINARY_DIR}/orders_writer_test.exe")
 
 add_custom_target(wasm_modules
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build

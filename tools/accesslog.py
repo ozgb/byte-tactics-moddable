@@ -251,11 +251,18 @@ def read_subsystems(path: Path = SUBSYSTEMS) -> Subsystems:
     return out
 
 
+DELETING_DESTRUCTOR = re.compile(r"\?\?_[GE](.+?)@@")
+
+
 def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
-    """The subsystem of a function: the row of its name and source file, else its only subsystem, else the only
-    subsystem of its source file (a template instance, a constructor or a function the csv leaves out), else unknown."""
+    """The subsystem of a function: the row of its name and source file, else its only subsystem, else (for a scalar or
+    vector deleting destructor) the row of its class's destructor or the only subsystem of its class's members, else the only subsystem of its source file (a template
+    instance, a constructor or a function the csv leaves out), else unknown."""
     source = object_source(obj)
-    for candidate in dict.fromkeys([name, blockpointers.demangle(name), sources.base_name(name)]):
+    deleting = DELETING_DESTRUCTOR.match(name)
+    owner = "::".join(reversed(deleting.group(1).split("@"))) if deleting else ""
+    destructor = [owner + "::~" + owner.rsplit("::", 1)[-1]] if deleting else []
+    for candidate in dict.fromkeys([name, blockpointers.demangle(name), sources.base_name(name)] + destructor):
         found = rows.get(candidate)
         if not found:
             continue
@@ -265,6 +272,10 @@ def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
         every = {s for _, s in found}
         if len(every) == 1:
             return next(iter(every))
+    if deleting:
+        members = {s for key, found in rows.items() if key.startswith(owner + "::") for _, s in found}
+        if len(members) == 1:
+            return next(iter(members))
     in_file = rows.files.get(source, ())
     return next(iter(in_file)) if len(in_file) == 1 else UNKNOWN
 

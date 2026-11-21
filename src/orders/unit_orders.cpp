@@ -118,6 +118,9 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos,
 #include "../game/economy_events.h"
 #include "../game/features_events.h"
 #include "../game/targeting_events.h"
+#include "../game/orders_events.h"
+#include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include "../game/weapons_events.h"
 #include "../../interfaces/economy.h"
 char* __stdcall lstrcpynA(char* dest, const char* src, int count);
@@ -148,7 +151,7 @@ int __stdcall StopOrder(Unit* unit, Order* order, int unused)
 // FUNCTION: 0x401cc0
 int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int unused)
 {
-    unit->flags = (unit->flags & ~0x8000) | 0x20;
+    OrdersPublishSetFlags(unit, 0x8000, 0x20);
     return 5;
 }
 
@@ -304,6 +307,7 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
 }
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x402430
 int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
 {
@@ -323,7 +327,8 @@ int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
     case 1:
         if ((unsigned int)unit->health >= unit->def->maxHealth)
             return 1;
-        unit->workTime = g_game->ticks + 0x96;
+        OrdersPublishBusy(unit, g_game->ticks + 0x96);
+        // TODO(#986): the answer of AddRepairProgress is read here
         if (g_seams.units->AddRepairProgress(order->target, unit, (float)(order->target->def->buildRate / 30))) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(order->target, &nano);
@@ -357,6 +362,7 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
 }
 
 
+// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition, QueryScript are read here
 // FUNCTION: 0x402640
 int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -364,10 +370,10 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         if (order->target != 0) {
             float refund = (unsigned int)((1.0f - order->target->buildLeft) * order->target->def->metalCost);
             EconPublish(SCHED_ORDERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
-            g_seams.units->FinishConstruction(unit, order->target);
+            OrdersPublishFinishConstruction(unit, order->target);
             WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, 30000, 9, 0);
         }
-        g_seams.units->SetStateBits(unit, 9, 0);
+        OrdersPublishSetStateBits(unit, 9, 0);
         RecordBuildMenuUpdate(unit);
         return 5;
     }
@@ -382,10 +388,10 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, 0);
         if (unit->flags & 0x20000000) {
             if (order->count <= 0) {
-                g_seams.units->SetStateBits(unit, 1, 0);
+                OrdersPublishSetStateBits(unit, 1, 0);
                 return 5;
             }
-            g_seams.units->SetStateBits(unit, 1, 1);
+            OrdersPublishSetStateBits(unit, 1, 1);
             return 1;
         }
         break;
@@ -410,11 +416,10 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             return 2;
         }
         RecordUnitSpeech(unit, 9, SIM_SPEECH_STARTING_CONSTRUCTION);
-        g_seams.units->AttachUnitToPiece(order->target, unit, piece, 1);
-        order->target->moveOrder = unit->moveOrder;
-        order->target->fireOrder = unit->fireOrder;
+        OrdersPublishAttachToPiece(order->target, unit, piece, 1);
+        OrdersPublishSetStance((Unit*)order->target, ORDERS_STANCE_MOVE | ORDERS_STANCE_FIRE, unit->moveOrder, unit->fireOrder, 0);
         AddOrder("getbuilt", 1, order->target, unit, 0, 0, 0);
-        g_seams.units->SetStateBits(unit, 8, 1);
+        OrdersPublishSetStateBits(unit, 8, 1);
         RecordBuildMenuUpdate(unit);
         return 1;
     }
@@ -443,8 +448,8 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         break;
     case 4:
         RecordUnitSpeech(unit, 8, SIM_SPEECH_KIND_TEXT);
-        g_seams.units->SetStateBits(unit, 8, 0);
-        g_seams.units->FinishConstruction(unit, order->target);
+        OrdersPublishSetStateBits(unit, 8, 0);
+        OrdersPublishFinishConstruction(unit, order->target);
         g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, 0);
         order->count--;
         RecordBuildMenuUpdate(unit);
@@ -502,7 +507,7 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
 int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
 {
     if (order->ticks == 0) {
-        g_seams.units->SetStateBits(unit, 0x10, 0);
+        OrdersPublishSetStateBits(unit, 0x10, 0);
         return 5;
     }
     if (order->ticks > 0x708)
@@ -513,7 +518,7 @@ int __stdcall ParalyzeOrder(Unit* unit, Order* order, int unused)
     order->SetAttachedFx(0);
     order->SetDeadlineTicks(order->ticks);
     order->ticks = 0;
-    g_seams.units->SetStateBits(unit, 0x10, 1);
+    OrdersPublishSetStateBits(unit, 0x10, 1);
     return 1;
 }
 
@@ -539,10 +544,9 @@ int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
                     }
                 }
                 if (unit->Ready() && order->Target()->Ready()) {
-                    unit->moveOrder = order->Target()->moveOrder;
-                    unit->fireOrder = order->Target()->fireOrder;
+                    OrdersPublishSetStance(unit, ORDERS_STANCE_MOVE | ORDERS_STANCE_FIRE, order->Target()->moveOrder, order->Target()->fireOrder, 0);
                     if (unit->player->active && unit->player->type == 1)
-                        unit->group = order->Target()->group;
+                        OrdersPublishSetStance(unit, ORDERS_STANCE_GROUP, 0, 0, order->Target()->group);
                 }
             }
             if (!queued)
@@ -567,7 +571,7 @@ int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
             order->SetDeadlineTicks(30);
         } else if (flags & 1) {
             order->SetDeadlineTicks(11);
-            g_seams.units->ApplyUnfinishedBuildDecay(unit, 11);
+            OrdersPublishBuildDecay(unit, 11);
         }
         order->Wait();
         return 2;
@@ -598,7 +602,7 @@ int __stdcall BeCarriedOrder(Unit* unit, Order* order, int unused)
 int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 {
     if (((UnitDefActivateFlagView*)unit->def.get())->flag) {
-        g_seams.units->SetStateBits(unit, 1, 1);
+        OrdersPublishSetStateBits(unit, 1, 1);
     }
     return 5;
 }
@@ -607,7 +611,7 @@ int __stdcall ActivateOrder(Unit* unit, int unused1, int unused2)
 int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2)
 {
     if (((UnitDefActivateFlagView*)unit->def.get())->flag) {
-        g_seams.units->SetStateBits(unit, 1, 0);
+        OrdersPublishSetStateBits(unit, 1, 0);
     }
     return 5;
 }
@@ -617,7 +621,7 @@ int __stdcall CloakOnOrder(char* param1, int unused1, int unused2)
 {
     CloakDefView* p = (CloakDefView*)((Unit*)param1)->def.get();
     if (p->flag) {
-        *(unsigned int*)(param1 + 0x110) |= 0x800;
+        OrdersPublishSetFlags((Unit*)param1, 0, 0x800);
     }
     return 5;
 }
@@ -627,7 +631,7 @@ int __stdcall CloakOffOrder(char* unit, int unused1, int unused2)
 {
     CloakDefView* p = (CloakDefView*)((Unit*)unit)->def.get();
     if (p->flag) {
-        *(unsigned int*)(unit + 0x110) &= ~0x800;
+        OrdersPublishSetFlags((Unit*)unit, 0x800, 0);
     }
     return 5;
 }
@@ -635,14 +639,14 @@ int __stdcall CloakOffOrder(char* unit, int unused1, int unused2)
 // FUNCTION: 0x4030d0
 int __stdcall StandingMoveOrder(Unit* unit, Order* order, int unused)
 {
-    unit->moveOrder = order->mode;
+    OrdersPublishSetStance(unit, ORDERS_STANCE_MOVE, order->mode, 0, 0);
     return 5;
 }
 
 // FUNCTION: 0x403100
 int __stdcall StandingFireOrder(Unit* unit, Order* order, int unused)
 {
-    unit->fireOrder = order->mode;
+    OrdersPublishSetStance(unit, ORDERS_STANCE_FIRE, 0, order->mode, 0);
     if (order->mode == 0 || order->mode == 1) {
         for (char i = 0; i < 3; i++) {
             if (unit->weapons[i].flags & 0x10) {
@@ -923,10 +927,11 @@ int __stdcall ClassifyEighths(double x)
     return 5;
 }
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404270
 int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
 {
-    Unit* target = order->link.Get();
+    Unit* target = g_seams.units->UnitRefGet((UnitRef*)&order->link);
     if (!target || (flags & 0x10008)) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_CAPTURE_FAILED);
         return 8;
@@ -946,14 +951,14 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
             return 8;
         }
         order->AnnounceStatusIfFlagged(SIM_SPEECH_CAPTURING);
-        order->duration = (int)(order->link.Get()->def->EnergyCost() / 2000 + order->link.Get()->def->MetalCost() / 140 + 150);
+        order->duration = (int)(target->def->EnergyCost() / 2000 + target->def->MetalCost() / 140 + 150);
         order->duration = order->duration < 1800 ? order->duration : 1800;
-        order->duration = (order->link.Get()->health + order->link.Get()->def->MaxHealth()) * order->duration / (order->link.Get()->def->maxHealth * 2);
+        order->duration = (target->health + target->def->MaxHealth()) * order->duration / (target->def->maxHealth * 2);
         int experience = 0;
-        experience = order->link.Get()->killCount;
+        experience = target->killCount;
         order->duration = ((experience / 5 + 10) * order->duration * 10) / 100;
         WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-        order->AttachBuildFootprintMarker(order->link.Get()->cell, order->link.Get()->footprint);
+        order->AttachBuildFootprintMarker(target->cell, target->footprint);
         order->flags = 0x100e8;
         return 1;
     }
@@ -963,11 +968,11 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         Fixed distance;
         distance.value = (int)_hypot(unit->pos.x - target->pos.x, unit->pos.z - target->pos.z);
         int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-        gap += (int)(_hypot(order->link.Get()->footprint.x, order->link.Get()->footprint.y) * -8.0);
+        gap += (int)(_hypot(target->footprint.x, target->footprint.y) * -8.0);
         unsigned int range = 0;
         range = unit->def->buildRange;
         if (gap > (int)range) return 0;
-        StartBuildingScript(unit, order, GetHeadingBetween(position, &order->link.Get()->pos) - unit->angles.heading);
+        StartBuildingScript(unit, order, GetHeadingBetween(position, &target->pos) - unit->angles.heading);
         return 1;
     }
     case 2:
@@ -985,15 +990,15 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         Vec3 start;
         g_seams.scripts->GetNanoPiecePosition(order->source, &start);
         Vec3 bounds[2];
-        bounds[1] = order->link.Get()->pos;
-        bounds[0] = order->link.Get()->pos;
-        bounds[0].x += order->link.Get()->def->modelMinX;
-        bounds[0].z += order->link.Get()->def->modelMinZ;
-        bounds[1].x += order->link.Get()->def->modelMaxX;
-        bounds[1].z += order->link.Get()->def->modelMaxZ;
-        bounds[1].y += order->link.Get()->def->modelMaxY;
+        bounds[1] = target->pos;
+        bounds[0] = target->pos;
+        bounds[0].x += target->def->modelMinX;
+        bounds[0].z += target->def->modelMinZ;
+        bounds[1].x += target->def->modelMaxX;
+        bounds[1].z += target->def->modelMaxZ;
+        bounds[1].y += target->def->modelMaxY;
         RecordReverseNanoParticles(bounds, start, 6);
-        unit->workTime = g_game->ticks + 900;
+        OrdersPublishBusy(unit, g_game->ticks + 900);
         order->elapsed += 2;
         order->SetDeadlineTicks(2);
         return 2;
@@ -1019,10 +1024,11 @@ float HalfNegated(float x)
 }
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404730
 int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 {
-    Unit* target = order->link.Get();
+    Unit* target = g_seams.units->UnitRefGet((UnitRef*)&order->link);
     if (!target || (flags & 0x10008)) return 5;
     unsigned int state = 0;
     state = order->state;
@@ -1045,7 +1051,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         order->AttachBuildFootprintMarker(target->cell, target->footprint);
         order->flags |= 0x100e8;
         order->SetDeadlineTicks(15);
-        order->elapsed = ComputeReclaimDamagePulse(unit, order->link.Get(), 15);
+        order->elapsed = ComputeReclaimDamagePulse(unit, target, 15);
         order->duration = 0;
         return 2;
     case 2:
@@ -1063,22 +1069,23 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         range = unit->def->buildRange;
         range += target->def->radius184;
         int square = SquaredDistance(delta.x, delta.z);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, order->link.Get())) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, target)) {
             if (order->duration >= 15) {
-                WeaponsPublishDamage(SCHED_ORDERS, unit, order->link.Get(), order->elapsed, 5, 0);
+                WeaponsPublishDamage(SCHED_ORDERS, unit, target, order->elapsed, 5, 0);
                 order->duration = 0;
             }
-            unit->workTime = g_game->ticks + 900;
+            OrdersPublishBusy(unit, g_game->ticks + 900);
             Vec3 start;
             g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
-            bounds[1] = order->link.Get()->pos;
-            bounds[0] = order->link.Get()->pos;
-            bounds[0].x += order->link.Get()->def->modelMinX;
-            bounds[0].z += order->link.Get()->def->modelMinZ;
-            bounds[1].x += order->link.Get()->def->modelMaxX;
-            bounds[1].z += order->link.Get()->def->modelMaxZ;
-            bounds[1].y += order->link.Get()->def->modelMaxY;
+            Unit* reclaimed = g_seams.units->UnitRefGet((UnitRef*)&order->link);
+            bounds[1] = reclaimed->pos;
+            bounds[0] = reclaimed->pos;
+            bounds[0].x += reclaimed->def->modelMinX;
+            bounds[0].z += reclaimed->def->modelMinZ;
+            bounds[1].x += reclaimed->def->modelMaxX;
+            bounds[1].z += reclaimed->def->modelMaxZ;
+            bounds[1].y += reclaimed->def->modelMaxY;
             RecordReverseNanoParticles(bounds, start, 6);
             order->SetDeadlineTicks(2);
             order->duration += 2;
@@ -1092,6 +1099,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     return 7;
 }
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x405300
 int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
 {
@@ -1141,7 +1149,8 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
             order->SetDeadlineTicks(15);
             return 0;
         }
-        unit->workTime = g_game->ticks + 150;
+        OrdersPublishBusy(unit, g_game->ticks + 150);
+        // TODO(#986): the answer of AddRepairProgress is read here
         if (g_seams.units->AddRepairProgress(unit, order->target, (float)(unit->def->buildRate / 30))) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(order->source, &nano);
@@ -1165,10 +1174,11 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
     return 7;
 }
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x405740
 int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
 {
-    Unit* target = order->link.Get();
+    Unit* target = g_seams.units->UnitRefGet((UnitRef*)&order->link);
     if (!target) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIRS_UNSUCCESSFUL);
         return 5;
@@ -1186,20 +1196,22 @@ int __stdcall RepairUnitNoMoveOrder(Unit* unit, Order* order, int unused)
     case 1: {
         if ((unsigned int)target->health >= target->def->maxHealth) return 1;
         if (target->flags & 0xc) return 1;
-        unit->workTime = g_game->ticks + 150;
+        OrdersPublishBusy(unit, g_game->ticks + 150);
         int rate = 0;
         rate = unit->def->buildRate;
-        if (g_seams.units->AddRepairProgress(unit, order->link.Get(), (float)(rate / 30))) {
+        // TODO(#986): the answer of AddRepairProgress is read here
+        if (g_seams.units->AddRepairProgress(unit, target, (float)(rate / 30))) {
             Vec3 start;
             g_seams.scripts->GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
-            bounds[1] = order->link.Get()->pos;
-            bounds[0] = order->link.Get()->pos;
-            bounds[0].x += order->link.Get()->def->modelMinX;
-            bounds[0].z += order->link.Get()->def->modelMinZ;
-            bounds[1].x += order->link.Get()->def->modelMaxX;
-            bounds[1].z += order->link.Get()->def->modelMaxZ;
-            bounds[1].y += order->link.Get()->def->modelMaxY;
+            Unit* repaired = g_seams.units->UnitRefGet((UnitRef*)&order->link);
+            bounds[1] = repaired->pos;
+            bounds[0] = repaired->pos;
+            bounds[0].x += repaired->def->modelMinX;
+            bounds[0].z += repaired->def->modelMinZ;
+            bounds[1].x += repaired->def->modelMaxX;
+            bounds[1].z += repaired->def->modelMaxZ;
+            bounds[1].y += repaired->def->modelMaxY;
             RecordNanoParticles(start, bounds, 6);
         }
         order->SetDeadlineTicks(1);
@@ -1324,7 +1336,7 @@ int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags)
         case 2:
             {
             int id = target->id;
-            g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportPickup", 0, 1, 1, id, 0, 0, 0);
+            OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME_WITH_ARGS, 0, "TransportPickup", 0, 1, 1, id, 0, 0, 0);
             RecordUnitSpeech(unit, 12, SIM_SPEECH_KIND_TEXT);
             ++order->attempts;
             order->SetDeadlineTicks(15); return 1;
@@ -1357,8 +1369,8 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, unit->cargo);
         if (!order->target) return 5;
         order->AnnounceStatusIfFlagged(SIM_SPEECH_UNLOADING);
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "TransportDrop",0,1,1,order->target->id,
-            (order->pos.x&0xffff0000)+(order->pos.z>>16),0,0);
+        OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME_WITH_ARGS, 0, "TransportDrop", 0, 1, 1, order->target->id,
+            (order->pos.x&0xffff0000)+(order->pos.z>>16), 0, 0);
         ++order->attempts;
         order->SetDeadlineTicks(15);
         return 1;
@@ -1442,6 +1454,7 @@ struct Vec3Sum : Vec3 {
     }
 };
 
+// TODO(#986): the answers of AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x403f70
 int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -1488,7 +1501,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
             bounds[1] = (Vec3Sum&)order->target->pos + *(Vec3*)&order->target->def->modelMaxX;
             RecordNanoParticles(start, bounds, 6);
         }
-        unit->workTime = g_game->ticks + 300;
+        OrdersPublishBusy(unit, g_game->ticks + 300);
         if (order->target->buildLeft != 0.0f) {
             order->SetDeadlineTicks(1);
             order->flags |= 0xa;
@@ -1587,6 +1600,12 @@ extern const OrderTableEntry g_vtolOrders[22] = {
 };
 static_assert(sizeof(g_vtolOrders) == 22 * sizeof(OrderTableEntry), "");
 
+// FUNCTION: 0x415b20
+void __stdcall RegisterVtolOrders()
+{
+    RegisterOrderTypes((void*)g_vtolOrders, 0x16);
+}
+
 // GLOBAL: 0x4fd288
 extern const OrderTableEntry g_readyOrder[1] = {
     {"Ready", (int (__stdcall *)(Unit *, Order *, int))ReadyOrder, 0, 0, 0xf, 0x0, ""},
@@ -1616,6 +1635,7 @@ static inline Point16 WorldToCell16(Vec3 v, Point16 origin)
     return c;
 }
 struct Feature;
+// TODO(#986): the answers of CreateUnit, AddBuildProgress, GetNanoPiecePosition are read here
 // FUNCTION: 0x403a20
 int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -1666,7 +1686,9 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             return 2;
         }
         WeaponsPublishClaim(SCHED_ORDERS, (Unit*)unit, 3);
-        g_seams.map->SnapWorldPosToFootprint(def, &order->pos);
+        Vec3 snapped = order->pos;
+        g_seams.map->SnapWorldPosToFootprint(def, &snapped);
+        order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)((char*)order + 0x12),
             g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
         if (!order->target) {
@@ -1693,7 +1715,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             bounds[1] = PosPlus(order->target->pos, *(Vec3*)&order->target->def->modelMaxX);
             RecordNanoParticles(start, bounds, 6);
         }
-        unit->workTime = g_game->ticks + 300;
+        OrdersPublishBusy(unit, g_game->ticks + 300);
         if (order->target->buildLeft != 0.0f) {
             order->SetDeadlineTicks(1);
             order->flags |= 0xa;
@@ -1713,6 +1735,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 
 
 
+// TODO(#986): the answers of GetNanoPiecePosition are read here
 // FUNCTION: 0x404ad0
 int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
 {
@@ -1754,7 +1777,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
         order->time -= 2;
         if (order->time <= 0)
             return 1;
-        unit->workTime = g_game->ticks + 300;
+        OrdersPublishBusy(unit, g_game->ticks + 300);
         if (order->time > 15) {
             Vec3 nano;
             g_seams.scripts->GetNanoPiecePosition(unit, &nano);
@@ -1944,7 +1967,7 @@ int __stdcall TeleportOrder(Unit* unit,Order* order,int unused)
         if(p->pos.x >= low.x && p->pos.x <= high.x && p->pos.z >= low.z && p->pos.z <= high.z && p->pos.y >= low.y && p->pos.y <= high.y && unit != p) {
             Vec dest = Sub(Add(*(Vec*)&order->pos,*(Vec*)&p->pos),*(Vec*)&unit->pos);
             RecordTeleportParticles(p->pos,*(Vec3*)&dest,30,5);
-            g_seams.units->SetUnitPosition(p,*(Vec3*)&dest,1);
+            OrdersPublishSetPosition(p, *(Vec3*)&dest, 1);
         }
     }
     return 5;
@@ -1958,6 +1981,7 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src)
     }
 }
 
+// TODO(#986): the answers of CreateUnit, GetNanoPiecePosition are read here
 // FUNCTION: 0x404db0
 int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
 {
@@ -2032,7 +2056,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             box.hi.z += f->footprintZ << 20;
             box.hi.y += f->height << 16;
             RecordNanoParticles(nano, box, 6);
-            unit->workTime = g_game->ticks + 300;
+            OrdersPublishBusy(unit, g_game->ticks + 300);
             order->SetDeadlineTicks(1);
             return 2;
         }
@@ -2049,7 +2073,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             return 8;
         FeatureSpot* spot = &g_game->spots[c->offsetY | (c->offsetX << 8)];
         if (spot)
-            order->target->angles = spot->rot;
+            OrdersPublishSetAngles((Unit*)order->target, spot->rot);
         FeaturesPublishRemove(SCHED_ORDERS, g_seams.los_radar->GetMapCellAtPosition(&order->pos) - g_game->cells, g_game->width);
         if (g_seams.mission->GetGameType() == 3) {
             int n = c - g_game->cells;
@@ -2059,8 +2083,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             xz.y = n / w;
             g_seams.network->SendFeatureReclaimed(unit, xz.x, xz.y);
         }
-        order->target->buildLeft = 0;
-        order->target->health = 1;
+        OrdersPublishSetBuildState((Unit*)order->target, 0, 1);
         RecordSelectionOrdersDirty(unit);
         break;
     }

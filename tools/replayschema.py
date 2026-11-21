@@ -119,7 +119,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement")
 
 
 def event_table(subsystem: str) -> dict:
@@ -148,13 +148,13 @@ def interface_structs(subsystem: str) -> dict[str, list[tuple[str, str, int | No
     return out
 
 
-def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | None = None) -> list[dict]:
-    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit, and a block offset that `refs` names (`Struct.member` to kind) as a ref to that kind."""
+def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | None = None, handles: tuple = ()) -> list[dict]:
+    """The fields of an event struct as value-kind fields: the members of a nested struct in place (`member` is the path), an array as one field per element, a block offset that traceschema.is_unit_ref names as a ref to Unit unless the module lists it in `handles`, and a block offset that `refs` names (`Struct.member` to kind) as a ref to that kind."""
     fields = []
     refs = refs or {}
     for ctype, member, length in structs[name]:
         if ctype in structs:
-            fields += flatten_event_fields(structs, ctype, path + member + ".", refs)
+            fields += flatten_event_fields(structs, ctype, path + member + ".", refs, handles)
             continue
         if ctype == "char" and length:
             field = {"name": member, "kind": "string", "size": length}
@@ -164,7 +164,7 @@ def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | 
             continue
         for i in range(length or 1):
             field = {"name": member if length is None else "%s%d" % (member, i)}
-            if traceschema.is_unit_ref(ctype, member):
+            if member not in handles and traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
             elif "%s.%s" % (name, member) in refs and ctype == "unsigned int" and length is None:
                 field.update({"kind": "ref", "target": refs["%s.%s" % (name, member)]})
@@ -202,7 +202,7 @@ def with_events(ann: dict) -> dict:
         for name in dict.fromkeys([spec["header"]] + [x for x in spec["kinds"].values() if x]):
             if name not in structs:
                 raise Error("interfaces/%s.h has no struct %s" % (sub, name))
-            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name, refs=refs.get(sub))}
+            ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name, refs=refs.get(sub), handles=traceschema.module_of_header(sub + ".h").handles)}
         ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())},
                               "names": dict(spec["names"])}
     return ann

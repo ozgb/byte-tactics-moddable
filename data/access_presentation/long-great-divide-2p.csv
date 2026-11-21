@@ -223,7 +223,7 @@ UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,0,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,0,
 WeaponDef::colour,presentation,DrawProjectiles,weapons,0,
 WeaponDef::colour2,presentation,DrawProjectiles,weapons,0,
 WeaponDef::flags,presentation,DrawProjectiles,weapons,0,
@@ -261,7 +261,7 @@ height,los_radar,GetMapCellAtPosition,height,0,
 height,map,GetGroundHeight,height,1,
 height,presentation,DrawBattleFrame,height,1,
 localPlayer,presentation,DrawBattleFrame,localPlayer,1,
-localPlayer,presentation,UpdateCdCategoryByActivity,localPlayer,0,3
+localPlayer,presentation,UpdateCdCategoryByActivity,localPlayer,0,3|28
 net,seams,GetGameTypeNative,net,1,
 p1b8a,presentation,DrawBattleFrame,p1b8a,1,
 p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,
@@ -303,7 +303,7 @@ unknown_1b8e,presentation,DrawProjectiles,unknown_1b8e,0,
 unknown_1b8e,presentation,NanoParticle::DrawParticle,unknown_1b8e,0,
 unknown_1b8e,presentation,SmokeParticles::Render,unknown_1b8e,0,
 unknown_1b8e,presentation,ThrustParticle::DrawParticle,unknown_1b8e,0,
-unknown_1b8e,presentation,UpdateCdCategoryByActivity,unknown_1b8e,0,3
+unknown_1b8e,presentation,UpdateCdCategoryByActivity,unknown_1b8e,0,3|28
 width,los_radar,BuildFogTiles,width,0,
 width,los_radar,FreeLosTables,width,1,
 width,los_radar,GetMapCellAtPosition,width,0,

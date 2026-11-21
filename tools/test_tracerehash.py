@@ -273,6 +273,11 @@ class DumpedOnlyTest(unittest.TestCase):
         w.skip_dumped(tr.DUMPED_ONLY)
         self.assertEqual(w.pos, 1)
 
+    def test_an_empty_orders_and_movement_events_record_is_skipped(self):
+        w = tr.Walker(RESULTS, [("ordersEvents.count", "0x00000000"), ("movementEvents.count", "0x00000000")])
+        w.skip_dumped(tr.DUMPED_ONLY)
+        self.assertEqual(w.pos, 2)
+
     def test_an_empty_map_record_is_skipped(self):
         w = tr.Walker(RESULTS, [("map.count", "0x00000000")])
         w.skip_dumped(tr.DUMPED_ONLY)

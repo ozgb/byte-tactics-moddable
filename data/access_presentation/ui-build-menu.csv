@@ -142,6 +142,7 @@ Order::next,orders,SumQueuedBuildCount,AddOrder: new Order,0,
 Order::next,presentation,DrawOrderOverlays,AddOrder: new Order,0,
 Order::radius,orders,AdjustBuildCount,AddOrder: new Order,0,
 Order::radius,orders,SumQueuedBuildCount,AddOrder: new Order,0,
+Order::target,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,-
 Order::target,orders,BuildingBuildOrder,AddOrder: new Order,0,-
 Order::target,orders,GetOrderTarget,AddOrder: new Order,0,
 Order::target,units,PathOrderAttach::SetUnit,AddOrder: new Order,0,-
@@ -321,7 +322,7 @@ UnitDef::modelSizeX,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgno
 UnitDef::modelSizeY,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,
 baseX,los_radar,ClampWorldPosToTerrain,baseX,1,
 baseY,los_radar,ClampWorldPosToTerrain,baseY,1,

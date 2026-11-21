@@ -1,3 +1,6 @@
+#include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
+#include "../game/orders_events.h"
 #include <stdio.h>
 #include "unit_def.h"
 
@@ -239,12 +242,12 @@ void __stdcall ApplyAttachUnit(OrderView* order)
                             u->carrier = 0;
                             MapPublishUnit(SCHED_UNITS, MAP_BUCKET_PREPEND, u);
                         }
-                        u->motion->mode = order->param2;
+                        MovementPublishSetMode(SCHED_UNITS, MOVEMENT_SET_MODE, u, order->param2);
                         if (u->player->active) {
                             unsigned char k = u->player->type;
                             if (k == 1 || k == 2) {
                                 if (t && !(((TerrainFlags*)&t->def->flags1)->bits.low & 0x200))
-                                    g_seams.orders->AddBeCarriedOrder(u);
+                                    OrdersPublishBeCarried(SCHED_UNITS, u);
                             }
                         }
                         RecordDeselectIfIneligible(u);
@@ -262,8 +265,9 @@ void __stdcall UpdateUnitHead(Unit* u)
     UpdateWindGenerator(u);
 }
 
-void __stdcall UpdateUnitBody(Unit* u)
+int __stdcall UpdateUnitBody(Unit* u)
 {
+    int runOrders = 0;
     if (u->script != 0) {
         g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
     }
@@ -307,13 +311,16 @@ void __stdcall UpdateUnitBody(Unit* u)
                 int n = u->def->healtimeUnsigned * 8;
                 AddRepairProgress(u, u, (float)(n / 30));
             }
-            g_seams.orders->RunOrders(u);
-            g_seams.orders->RunSecondaryOrders(u);
-            if (u->motion != 0) {
-                g_seams.movement->UpdateMotion(u->motion, 0, u);
-                UpdateUnitHeight(u);
-            }
+            runOrders = 1;
         }
+    }
+    return runOrders;
+}
+
+void __stdcall UpdateUnitTail(Unit* u, int moved)
+{
+    if (moved) {
+        UpdateUnitHeight(u);
     }
     if (u->killPending) {
         KillUnit(u, u->lastDamageType);
@@ -439,7 +446,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     u->moved = 1;
     u->angles = tail;
     if (u->motion)
-        u->motion->speed = reader->ReadBits(0x20);
+        MovementPublishSetSpeed(SCHED_UNITS, u, reader->ReadBits(0x20));
 }
 
 // FUNCTION: 0x48b920
@@ -471,14 +478,16 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.tail.dword = *(Tail32*)&unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
-        g_seams.movement->UnitMotionReadNetState(unit->motion, &reader);
+        g_seams.movement->ReadNetState(unit, &reader);
         index = (short)reader.ReadBits(0x10);
     }
 
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            g_seams.movement->UpdateMotion(u->motion, 0, u);
+            // TODO(#948): the network's writers go on the scheduler
+            g_seams.movement->UpdateMotion(u);
+            ScheduleUnitsDeliver();
             UpdateUnitHeight(u);
         }
     }

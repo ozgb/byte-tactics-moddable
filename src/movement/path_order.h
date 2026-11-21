@@ -33,7 +33,9 @@ public:
     short heading;
     short piece;
     Ref<Unit> unit;
-    PathOrderAttach ref;
+    union {
+        PathOrderAttach ref;
+    };
     union {
         Vec3 pos;
         struct {
@@ -50,6 +52,7 @@ public:
     PathOrder(Order* source, Unit* unit, short value);
     PathOrder(Order* source, const Vec3& p);
     PathOrder(Order* source, Unit* unit, const Vec3& p);
+    ~PathOrder() override;
     void SetAltitude(int param_1);
     void SetHeading(short v);
     void SetApproachRadius(short v);

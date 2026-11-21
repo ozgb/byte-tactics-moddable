@@ -1,3 +1,5 @@
+#include "../game/orders_events.h"
+#include "../../interfaces/orders.h"
 #include "win_types.h"
 #include "../../interfaces/host.h"
 #include <stdio.h>
@@ -81,8 +83,6 @@ void ShowSoftwareCursor();
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
 #include "../game/console_commands.h"
 
-void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
-                            int id, Vec3* pos, int typeId, int amount);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, Player* player);
 #include "../graphics/movies.h"
 #include "../map/terrain.h"
@@ -174,12 +174,12 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
             if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
-                HarnessUiOrder(MissionType("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
-                IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
+                HarnessUiOrder(g_seams.orders->MissionTypeFromName("MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
+                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("MOBILEBUILD").index, remove, nullptr, &pos, index, 0);
             } else {
                 if (((UnitDef*)u->def.get())->flying) {
-                    HarnessUiOrder(MissionType("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
-                    IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
+                    HarnessUiOrder(g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD").index, remove, u, nullptr, (int*)&pos, index, 0);
+                    OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD").index, remove, nullptr, &pos, index, 0);
                 }
             }
         }
@@ -269,7 +269,7 @@ void __stdcall QueueBuildOrderWithSound(char* name, Unit* unit, int count)
         else
             PlaySoundByName("subbuild", 0);
     }
-    g_seams.orders->QueueBuildOrder(name, unit, count);
+    OrdersPublishQueueBuild(SCHED_ENGINE, unit, name, count);
 }
 
 // FUNCTION: 0x419bc0

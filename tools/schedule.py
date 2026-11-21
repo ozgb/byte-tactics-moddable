@@ -73,6 +73,7 @@ TRANSPARENT = {None, "seams", "platform", "game"}
 OUTSIDE = "a call into %s outside its interface"
 DELIVERY = "the delivery of a queued effect to a handler of %s"
 ROUTE_REASON = "route table entry"
+VISITOR_REASON = "visitor passed at "
 ROUTE_ROW = re.compile(r"\{SCHED_(\w+), \w+, SCHED_(\w+), (\w+), ([01])\}")
 ROUTES = "src/game/routes.cpp"
 OUTBOX_ARG = re.compile(r"Publish\w*\(\s*SCHED_(\w+)")
@@ -497,8 +498,12 @@ class Program:
         self.handlers = {r["target"] for r in edges if r["reason"].startswith(ROUTE_REASON)}
         self.routes = [(p.lower(), s.lower(), h, sync == "1") for p, s, h, sync in ROUTE_ROW.findall(sources.get(ROUTES, ""))]
         self.outboxes = outboxes(self.fns, sources)
+        self.passers: dict[tuple[str, str], set[str]] = defaultdict(set)
+        self.visitor_hits = 0
         for r in edges:
             m = SLOT_REASON.match(r["reason"])
+            if r["reason"].startswith(VISITOR_REASON):
+                self.passers[(r["caller"], r["target"])].add(r["reason"][len(VISITOR_REASON):].rsplit(" (", 1)[0])
             if m:
                 self.slots["%s::%s" % m.groups()].add(r["target"])
             else:
@@ -644,6 +649,7 @@ class Program:
         """The steps, and the functions on the stack whose calls were left out to break a cycle: a result cut by an
         ancestor is not kept, since the same function reached another way runs those calls."""
         key = (fn.name, fn.file, fn.start, sub)
+        hits = self.visitor_hits
         if lines is None and key in self.memo:
             if own is not None:
                 own |= self.memo_own[key]
@@ -685,6 +691,8 @@ class Program:
             for name in names:
                 if not self.routes_to(sub, fn.name, name):
                     continue
+                if not self.visitor_followed(fn, name, stack):
+                    continue
                 if name in self.phase_slot and fn.name not in self.slots[self.phase_slot[name]]:
                     slot = self.phase_slot[name]
                     callee = self.seam_owner[slot.split("::")[0]]
@@ -704,12 +712,24 @@ class Program:
                     else:
                         inline(g)
         cut.discard(key)
-        if lines is None and not cut:
+        if lines is None and not cut and self.visitor_hits == hits:
             self.memo[key] = out
             self.memo_own[key] = mine
         if own is not None:
             own |= mine
         return out, cut
+
+    def visitor_followed(self, fn: Fn, target: str, stack: tuple) -> bool:
+        """Whether a call of `fn` reaches the visitor method `target`: one that a walker calls for whatever visitor it is
+        given runs only from the code that passes the visitor, so the passer must be on the stack. A result that
+        depends on this is not memoised, since it depends on the stack."""
+        passers = self.passers.get((fn.name, target))
+        if not passers:
+            return True
+        self.visitor_hits += 1
+        names = {k[0] for k in stack}
+        owner = target.rpartition("::")[0]
+        return any(p == target or (owner and p.rpartition("::")[0] == owner) or p in names for p in passers)
 
     def routes_to(self, sub: str, fn: str, handler: str) -> bool:
         """Whether code of `sub` can run the route table handler from `fn`: SchedPublish runs the handlers of the
@@ -1260,11 +1280,6 @@ LOOPS = {
     ("meteors", 1): "the meteor shower once per tick: the pass has one entity.",
 }
 SILENT_INTENTS = {
-    "movement.AirManeuverOrderSetAltitude": "the reference's does nothing: an air maneuver target keeps no altitude.",
-    "movement.DestroyMotionObject": "it writes through a virtual call whose targets are not resolved.",
-    "movement.GoalSetPathOrder": "it writes through a virtual call whose targets are not resolved.",
-    "orders.ReattachFxToUnit": "it writes through movement's GoalSetPathOrder, a virtual call whose targets are not "
-                               "resolved.",
     "scripts.FindScript": "a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and "
                           "drops the index, as 3.1c does.",
 }
@@ -1279,6 +1294,8 @@ The orders are read from the program, not from a run. That decides what they cla
 - **Nested calls** are followed through everything the subsystem runs itself, through the virtual calls and function
   pointers whose targets are known, and through the engine's shared helpers. A call is followed into every function
   of its name, overloads included, so a list can hold steps (and a class count writes) that one call does not run.
+  A visitor passed to a shared walker is followed only from the code that passes it: the walker's virtual call
+  reaches that visitor when the passer is among the functions being followed, and no other.
   Calls into presentation, network and file code are left out of the lists, and so is the test harness.
 - **Values.** The caller uses a call's value when it uses the value returned, or when it hands the call the address
   of an object, an array or a pointer to a plain value (never a string) that the call fills in: what it runs writes

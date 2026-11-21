@@ -91,10 +91,10 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(edge.sites[0]["args"][0]["param"], "event")
 
     def test_forwarding_wrappers_are_drawn_through(self):
-        activate = self.function("ActivateOrder")
-        callees = {self.model.functions[i].name for i, e in activate.out.items() if "seam" in e.kinds}
-        self.assertIn("Unit::SetStateBits", callees)
-        self.assertNotIn("SetStateBitsNative", callees)
+        reclaim = self.function("ReclaimUnitOrder")
+        callees = {self.model.functions[i].name for i, e in reclaim.out.items() if "seam" in e.kinds}
+        self.assertIn("Unit::CanReclaim", callees)
+        self.assertNotIn("CanReclaimNative", callees)
 
     def test_a_wrapper_with_its_own_work_stays_visible(self):
         busy = []

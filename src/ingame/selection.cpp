@@ -1,3 +1,5 @@
+#include "../game/orders_events.h"
+#include "../../interfaces/orders.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -549,8 +551,6 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 struct UnitOrderTypeView;
 struct FixedPosView;
 #include "../orders/order_dispatch.h"
-void __stdcall IssueOrCancelOrder(MissionType kind, int flag, Unit* unit,
-                            Unit* target, int* pos, int typeId, int amount);
 
 static inline MissionType Order(const char* name) { return MissionType(name); }
 
@@ -612,12 +612,12 @@ void __stdcall IssueOrderToSelection(MouseEvent* mouse, unsigned char mode,
                         here[1] = pos[1];
                         here[2] = pos[2] + u->pos.z - avg[2];
                         HarnessUiOrder(kind.index, flag_a, u, except, here, typeId, amount);
-                        IssueOrCancelOrder(kind, flag_a, u, except, here, typeId, amount);
+                        OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, kind.index, flag_a, except, (Vec3*)here, typeId, amount);
                         continue;
                     }
                 }
                 HarnessUiOrder(kind.index, flag_a, u, except, pos, typeId, amount);
-                IssueOrCancelOrder(kind, flag_a, u, except, pos, typeId, amount);
+                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, kind.index, flag_a, except, (Vec3*)pos, typeId, amount);
             }
         }
     }

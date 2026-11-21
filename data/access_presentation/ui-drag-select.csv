@@ -195,7 +195,7 @@ UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelSizeX,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitDef::modelSizeY,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,-
 baseX,los_radar,ClampWorldPosToTerrain,baseX,1,
 baseY,los_radar,ClampWorldPosToTerrain,baseY,1,

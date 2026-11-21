@@ -200,7 +200,7 @@ UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,1
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 baseX,los_radar,ClampWorldPosToTerrain,baseX,1,
 baseY,los_radar,ClampWorldPosToTerrain,baseY,1,
 bits,game,BattleFrame,bits,0,

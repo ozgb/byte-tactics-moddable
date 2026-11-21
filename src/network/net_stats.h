@@ -6,7 +6,6 @@ struct MessageByteCounter {
     int b;
 };
 
-void __stdcall RegisterVtolOrders();
 void __stdcall StepAllGafSequences(void);
 void __stdcall ResetNetStats();
 void __stdcall CountMessage(unsigned char kind, int amount, int player);

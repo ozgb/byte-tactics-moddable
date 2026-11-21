@@ -49,7 +49,7 @@ MissionRule), by a function that data/subsystems.csv does not give to the subsys
 src/seams/native.cpp (each `s_mission.<slot> = <function>;` of the table, and TheMission, which they share) are the default's own
 and may. Every other caller reads the mission through MissionSeam, so a mission module with its own layout can serve it.
 --pilot-seams judges the seam of each pilot (PILOTS: economy, interfaces/economy.h; wind_meteors, interfaces/wind_meteors.h;
-features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h; ai, interfaces/ai.h; weapons, interfaces/weapons.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
+features, interfaces/features.h; targeting, interfaces/targeting.h; los_radar, interfaces/los_radar.h; map, interfaces/map.h; players, interfaces/players.h; ai, interfaces/ai.h; weapons, interfaces/weapons.h; orders, interfaces/orders.h; movement, interfaces/movement.h), which is applied by the engine and written by nothing else, from data/rwsets.csv, the header and
 src/seams/native.cpp. A slot may have any calling convention (UpdateWind is __cdecl). The PILOTS table holds each one's lists of
 slots, engine and allowed indirect calls. It fails, for each pilot, on:
 
@@ -59,7 +59,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 copy of the slot needs), by any function but the pilot's own (data/subsystems.csv) and the engine's. The
                 engine's are the files of the scheduler (src/game/scheduler.cpp, which routes the events and runs the
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
-                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp and for map src/seams/pathfinding_world.cpp, src/seams/players_world.cpp, src/seams/ai_world.cpp, src/seams/weapons_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
+                src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp and for map src/seams/pathfinding_world.cpp, src/seams/players_world.cpp, src/seams/ai_world.cpp, src/seams/weapons_world.cpp, src/seams/orders_world.cpp and src/seams/movement_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
                 (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
@@ -76,6 +76,9 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   players       RunGameSteps (src/ingame/game_dialogs.cpp), which runs UpdateBlink, and LoadMatch (src/game/game_load.cpp), which runs
                                 UpdatePlayersOnStream on the load stream
                   ai            none
+                  orders        none
+                  movement      ReceiveUnitStates (src/units/unit_position.cpp), which runs UpdateMotion and ReadNetState on the unit states a
+                                packet carries (the network, #948 moves the call)
                 Features' writing slots are UpdateFeatures (the phase slot), Apply, Place, AnimateFeatureType,
                 ScanFeatureCell and UpdateFeatureSpot; targeting's are Apply, GetWeaponTargetPos, FindWeaponTarget and
                 FindBestTargetIfFireAtWill; los_radar's are Apply and the passes the scheduler runs, UpdateUnitLineOfSight, RecordRadarUnits,
@@ -83,7 +86,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 PickRandomReclaimableResourcesInRadius, which the services ScheduleMapCanBuildAt, ScheduleMapCanPlaceUnitFootprint and ScheduleMapPickReclaimable
                 (src/seams/map_world.cpp) reach for the other subsystems, and RefreshMovedUnits and RefreshUnitIfStale, the lazy refresh of the pass maps that
                 pathfinding's world (src/seams/pathfinding_world.cpp) runs at the start and end of a search; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
-                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none). A presentation or unowned function fails like any other.
+                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none); orders' are Apply, RunOrders and RunSecondaryOrders, which the scheduler runs (engine functions: none); movement's are Apply, UpdateMotion and ApplyPathEvent, which the scheduler runs, ReadNetState, which ReceiveUnitStates runs (#948), and the synchronous New* slots (NewPathOrderAt, NewPathOrderToUnit, NewPathOrderToUnitAt, NewPathOrderToUnitAtAngle, NewAirManeuverOrder, NewApproachRadius, NewRingApproach, NewPointMarker), which build a target in the block and which the functions of orders call (the slot_callers of the pilot: the orders that hold the target). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -112,7 +115,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and LoadUnit (src/units/unit_save.cpp, the saved game).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
-                FirstFeatureSpot, FindFeatureAtPos; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
+                FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
                 GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
                 SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
@@ -136,6 +139,10 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   BlockVector::Begin, BlockVector::End, empty, size and push_back, the vectors its queries read and fill; map's: operator unsigned int *,
                   the conversion of a pass map's Ref that PassMapGet reads);
                   or has inline assembly.
+                Orders' GetOrderType reaches UnitsSeam::CanLoad and CanRepair and LosRadarSeam::GetMapCellAtPosition, read-only queries (its allowed_indirect), and Fatal, the bounds
+                error of the block's Ref (a service: it ends the run), and copies a unit's flags into a stack union (UnitOrderTypeFlags, its walk_locals).
+                Movement's queries call the virtual PathGoal::HasNetUnitState, PathGoal::SerializeNetUnitState and OrderFx::GetType of its own goals and targets,
+                which read them (allowed_indirect), and build a Ref<OrderFx> on the stack in TargetOfOffset (walk_locals).
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
                 TdfRecord::GetFieldDouble, GetFieldInt, GetFieldString) and ends in FatalError when the file is bogus. They
@@ -219,6 +226,8 @@ PATHFINDING_GLUE_FILE = "src/seams/pathfinding_world.cpp"
 PLAYERS_GLUE_FILE = "src/seams/players_world.cpp"
 AI_GLUE_FILE = "src/seams/ai_world.cpp"
 WEAPONS_GLUE_FILE = "src/seams/weapons_world.cpp"
+ORDERS_GLUE_FILE = "src/seams/orders_world.cpp"
+MOVEMENT_GLUE_FILE = "src/seams/movement_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -249,6 +258,8 @@ class Pilot:
     filler_locals: tuple = ()
     rowless_calls: tuple = ()
     frame_writers: tuple = ()
+    slot_callers: tuple = ()
+    walk_locals: tuple = ()
     by_params: bool = True
 
 
@@ -366,7 +377,34 @@ WEAPONS = Pilot(
     setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions", "LoadState"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                    ("LoadUnit", "src/units/unit_save.cpp")))
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS)
+ORDERS = Pilot(
+    owner="orders", header="interfaces/orders.h", seam="OrdersSeam",
+    writing=("Apply", "RunOrders", "RunSecondaryOrders"),
+    query=("GetOrderFlags", "GetOrderType", "MissionTypeFromName", "WriteState"),
+    engine_files=(SCHEDULER_FILE, ORDERS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(),
+    services=("Fatal",),
+    allowed_indirect=("UnitsSeam::CanLoad", "UnitsSeam::CanRepair", "LosRadarSeam::GetMapCellAtPosition"),
+    walk_locals=(("GetOrderType", "GetOrderType", "UnitOrderTypeFlags"),),
+    rowless_calls=("operator Player *", "operator UnitDefOrderTypeView *", "operator WeaponDefOrderTypeView *", "operator bool"),
+    setup=("RegisterAllOrderTypes", "ClearOrderTypeTable", "LoadOrders", "SaveOrders"),
+    setup_callers=(("InitGame", "src/game/game_state.cpp"), ("ShutdownGame", "src/game/game_state.cpp"),
+                   ("LoadUnit", "src/units/unit_save.cpp"), ("SaveUnits", "src/units/unit_save.cpp")))
+MOVEMENT_NEW_SLOTS = ("NewPathOrderAt", "NewPathOrderToUnit", "NewPathOrderToUnitAt", "NewPathOrderToUnitAtAngle", "NewAirManeuverOrder",
+                      "NewApproachRadius", "NewRingApproach", "NewPointMarker")
+MOVEMENT = Pilot(
+    owner="movement", header="interfaces/movement.h", seam="MovementSeam",
+    writing=("Apply", "UpdateMotion", "ApplyPathEvent", "ReadNetState") + MOVEMENT_NEW_SLOTS,
+    query=("GetMotionState", "HasNetState", "WriteNetState", "TargetType", "UnitTarget", "WriteState"),
+    engine_files=(SCHEDULER_FILE, MOVEMENT_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(("ReceiveUnitStates", "src/units/unit_position.cpp"),),
+    allowed_indirect=("virtual PathGoal::HasNetUnitState", "virtual PathGoal::SerializeNetUnitState", "virtual OrderFx::GetType"),
+    walk_locals=(("TargetType", "TargetOfOffset", "Ref<OrderFx>"),),
+    rowless_calls=("memset", "operator UnitMotion *", "strcmp"),
+    setup=("LoadTarget", "SaveTarget"),
+    setup_callers=(("Order::Order", "src/orders/order_queue.cpp"), ("Order::SerializeToSave", "src/orders/order_queue.cpp")),
+    slot_callers=tuple((slot, "orders") for slot in MOVEMENT_NEW_SLOTS))
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS, ORDERS, MOVEMENT)
 
 
 @dataclass
@@ -922,6 +960,8 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
                     todo.append(target)
             elif kind == "indirect_call":
                 via = re.findall(r"\[(\w+)::(\w+)\]", target)
+                if target in pilot.allowed_indirect:
+                    continue
                 if not via or not all((t == pilot.world and s in pilot.world_reads) or f"{t}::{s}" in pilot.allowed_indirect
                                       or (t != pilot.world and t in callable_types) for t, s in via):
                     found.add(("query", owner, fn, f"{what} calls {target}"))
@@ -929,7 +969,7 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
                 found.add(("query", owner, fn, f"{what} has inline assembly"))
             elif kind in QUERY_WRITE_KINDS:
                 written = written_type(target)
-                if written in pilot.info_types or (fn == filler and (slot, written) in pilot.filler_locals) or (fn == filler and kind in OUT_KINDS and written in out_types | {result}):
+                if written in pilot.info_types or (slot, fn, written) in pilot.walk_locals or (fn == filler and (slot, written) in pilot.filler_locals) or (fn == filler and kind in OUT_KINDS and written in out_types | {result}):
                     continue
                 if pilot.services and fn == filler and kind in OUT_SERVICE_KINDS and written in out_types:
                     continue
@@ -979,7 +1019,7 @@ def pilot_seams(root: Path, pilot: Pilot = ECONOMY) -> list:
         owner = owners.get(key, "unowned")
         engine = r["file"] in pilot.engine_files or key in pilot.engine_functions or key in phase_fillers
         for slot in used:
-            if slot in writing and owner != pilot.owner and not engine:
+            if slot in writing and owner != pilot.owner and not engine and (slot.split("::")[1], owner) not in pilot.slot_callers:
                 found.add(("call", owner, r["function"], slot))
             elif slot in setup and owner != pilot.owner and key not in pilot.setup_callers and r["file"] != REPLAY_HOOKS_FILE:
                 found.add(("setup", owner, r["function"], slot))

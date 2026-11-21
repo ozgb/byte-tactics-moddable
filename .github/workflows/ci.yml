@@ -307,9 +307,9 @@ jobs:
           uv run tools/test_tidy.py
           uv run tools/tidy.py "origin/$BASE_REF...HEAD"
 
-      - name: Compile the game, data, bitexact, block_test, ref_test, pathfinding_writer_test, economy_writer_test, features_writer_test, targeting_writer_test, los_radar_writer_test, map_writer_test, players_writer_test, ai_writer_test, units_writer_test, weapons_writer_test, replay_test and replay_native_test
+      - name: Compile the game, data, bitexact, block_test, ref_test, pathfinding_writer_test, economy_writer_test, features_writer_test, targeting_writer_test, los_radar_writer_test, map_writer_test, players_writer_test, ai_writer_test, units_writer_test, weapons_writer_test, orders_writer_test, replay_test and replay_native_test
         if: steps.changed.outputs.run == 'true'
-        run: cmake --build build/modern --target game data bitexact block_test ref_test pathfinding_writer_test economy_writer_test features_writer_test targeting_writer_test los_radar_writer_test map_writer_test players_writer_test ai_writer_test units_writer_test weapons_writer_test replay_test replay_native_test
+        run: cmake --build build/modern --target game data bitexact block_test ref_test pathfinding_writer_test economy_writer_test features_writer_test targeting_writer_test los_radar_writer_test map_writer_test players_writer_test ai_writer_test units_writer_test weapons_writer_test orders_writer_test replay_test replay_native_test
 
       - name: Compile the game and data with the access log
         if: steps.changed.outputs.run == 'true'
@@ -378,7 +378,7 @@ jobs:
           cmake --build build/modern --target wasm_runtime wasm_runtime_inject
           df -h /
 
-      - name: Run block_test, ref_test, pathfinding_writer_test, economy_writer_test, features_writer_test, targeting_writer_test, los_radar_writer_test, map_writer_test, players_writer_test, ai_writer_test, units_writer_test, weapons_writer_test, replay_test and the native and WASM replays under Wine
+      - name: Run block_test, ref_test, pathfinding_writer_test, economy_writer_test, features_writer_test, targeting_writer_test, los_radar_writer_test, map_writer_test, players_writer_test, ai_writer_test, units_writer_test, weapons_writer_test, orders_writer_test, replay_test and the native and WASM replays under Wine
         if: steps.changed.outputs.run == 'true'
         env:
           WINEDEBUG: -all
@@ -409,6 +409,7 @@ jobs:
             build/modern/ai_writer_test.exe
             build/modern/units_writer_test.exe
             build/modern/weapons_writer_test.exe
+            build/modern/orders_writer_test.exe
             build/modern/replay_test.exe
             build/modern/replay_native_test.exe
             build/modern/replay_inject_test.exe

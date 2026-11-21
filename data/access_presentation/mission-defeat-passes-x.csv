@@ -219,7 +219,7 @@ UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitDef::modelMinZ,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 WeaponDef::colour,presentation,DrawProjectiles,weapons,0,
 WeaponDef::colour2,presentation,DrawProjectiles,weapons,0,
 WeaponDef::shotKind,presentation,DrawProjectiles,weapons,0,

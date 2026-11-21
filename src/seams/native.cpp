@@ -26,18 +26,11 @@
 #include "../scripts/object_state.h"
 #include "../units/unit.h"
 #include "../ai/pathfinder.h"
-#include "../movement/ai_search_goal.h"
-#include "../movement/order_fx.h"
-#include "../movement/path_order.h"
-#include "../movement/approach_areas.h"
-#include "../movement/air_maneuver_order.h"
 #include "../ai/squad_manager.h"
 #include "../units/unit_type_set.h"
 #include "../units/unit_ref.h"
 #include "../units/sfx_occupy.h"
-#include "../movement/unit_motion.h"
 #include "../orders/order.h"
-#include "../orders/order_base.h"
 #include "../util/angles.h"
 
 struct Player;
@@ -71,13 +64,8 @@ class MissionType;
 #include "../units/squads.h"
 int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Player* los);
 int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
-#include "../orders/order_list.h"
-#include "../orders/order_list.h"
-#include "../orders/order_queue.h"
 struct UnitOrderTypeView;
 struct FixedPosView;
-#include "../orders/order_dispatch.h"
-#include "../movement/order_targets.h"
 #include "../game/players.h"
 #include "../units/unit_targets.h"
 
@@ -91,7 +79,6 @@ struct ModelBuildList;
 #include "../ingame/info_panel.h"
 
 #include "../units/unit_commands.h"
-#include "../units/unit_motion.h"
 
 #include "../map/line_of_sight.h"
 #include "../game/share_commands.h"
@@ -122,8 +109,9 @@ Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../scripts/piece_queries.h"
 #include "../units/unit_position.h"
 #include "../game/scheduler.h"
+#include "../orders/orders_seam.h"
+#include "../movement/movement_seam.h"
 #include "../../interfaces/rand_stream.h"
-#include "../orders/order_queue.h"
 #include "../state/sim_globals.h"
 
 
@@ -507,31 +495,6 @@ static void __fastcall UpdateSfxOccupyNative(UnitMotion* self, int unusedEdx, Un
     ((SfxOccupyTracker*)self)->UpdateSfxOccupy(unit);
 }
 
-static void __fastcall ReattachFxToUnitNative(Order* self)
-{
-    self->ReattachFxToUnit();
-}
-
-static int __fastcall SerializeOrderToSaveNative(Order* self, int unusedEdx, Unit* unit, HapiBank* file, char* name)
-{
-    return self->SerializeToSave(unit, file, name);
-}
-
-static Order* __stdcall LoadOrderNative(Unit* unit, HapiBank* file, char* name)
-{
-    return new (kSim) Order(unit, file, name);
-}
-
-static Order* __stdcall NewOrderNative(MissionType kind, Unit* target, void* pos, int a, int b, int c)
-{
-    return new (kSim) Order(kind, target, pos, a, b, c);
-}
-
-static MissionType __stdcall MissionTypeFromNameNative(const char* name)
-{
-    return MissionType(name);
-}
-
 static int __stdcall PassMapGetNative(int moveClass, int x, int y)
 {
     return g_passMaps.entries[moveClass].Get(x, y);
@@ -550,184 +513,6 @@ static void __stdcall RefreshMovedUnitsNative(int moveClass, Unit* unit)
 static void __stdcall RefreshUnitIfStaleNative(int moveClass, Unit* unit)
 {
     g_passMaps.entries[moveClass].RefreshUnitIfStale((UnitPassMapView*)unit);
-}
-
-static void __stdcall OrderOrStatusFlagsNative(OrderBase* order, unsigned int flags)
-{
-    order->OrStatusFlags(flags);
-}
-
-static void __fastcall DestroyMotionObjectNative(UnitMotion* self)
-{
-    self->DestroyObject();
-}
-
-static void __stdcall NewUnitMotionNative(Unit* unit)
-{
-    unit->motion = new (kSim) UnitMotion(unit);
-}
-
-static void __fastcall LoadMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
-{
-    self->LoadMotion(unit, file);
-}
-
-static void __fastcall SaveMotionNative(UnitMotion* self, int unusedEdx, Unit* unit, HapiBank* file)
-{
-    self->SaveMotion(unit, file);
-}
-
-static void __fastcall UpdateMotionNative(UnitMotion* self, int unusedEdx, Unit* unit)
-{
-    self->UpdateMotion(unit);
-}
-
-static void __stdcall UnitMotionReadNetStateNative(UnitMotion* motion, BitReader* reader)
-{
-    motion->ReadNetState(reader);
-}
-
-static void __stdcall SetFlightModeNative(UnitMotion* self, Unit* unit, int state)
-{
-    self->SetFlightMode(unit, state);
-}
-
-static void __stdcall PathOrderSetAltitudeNative(PathOrder* self, int altitude)
-{
-    self->SetAltitude(altitude);
-}
-
-static void __stdcall PathOrderSetApproachRadiusNative(PathOrder* self, short radius)
-{
-    self->SetApproachRadius(radius);
-}
-
-static void __stdcall PathOrderSetHeadingNative(PathOrder* self, short heading)
-{
-    self->SetHeading(heading);
-}
-
-static void __stdcall AirManeuverOrderSetAltitudeNative(AirManeuverOrder* self, int altitude)
-{
-    self->SetAltitude(altitude);
-}
-
-static PathOrder* __stdcall NewPathOrderAtNative(Order* source, const Vec3* pos)
-{
-    PathOrder* target = new (kSim) PathOrder(source, *pos);
-    return target;
-}
-
-static PathOrder* __stdcall NewPathOrderToUnitNative(Order* source, Unit* unit)
-{
-    PathOrder* target = new (kSim) PathOrder(source, unit);
-    return target;
-}
-
-static PathOrder* __stdcall NewPathOrderToUnitAtNative(Order* source, Unit* unit, const Vec3* pos)
-{
-    PathOrder* target = new (kSim) PathOrder(source, unit, *pos);
-    return target;
-}
-
-static PathOrder* __stdcall NewPathOrderToUnitAtAngleNative(Order* source, Unit* unit, short angle)
-{
-    PathOrder* target = new (kSim) PathOrder(source, unit, angle);
-    return target;
-}
-
-static AirManeuverOrder* __stdcall NewAirManeuverOrderNative(Order* source, const Vec3* from, const Vec3* to)
-{
-    AirManeuverOrder* target = new (kSim) AirManeuverOrder(source, *from, *to);
-    return target;
-}
-
-static ApproachRadius* __stdcall NewApproachRadiusNative(Order* source, int x, int y, int radius)
-{
-    ApproachRadius* target = new (kSim) ApproachRadius(source, x, y, radius);
-    return target;
-}
-
-static RingApproach* __stdcall NewRingApproachNative(Order* source, int x, int y, int inner, int outer)
-{
-    RingApproach* target = new (kSim) RingApproach(source, x, y, inner, outer);
-    return target;
-}
-
-static PointMarker* __stdcall NewPointMarkerNative(Order* source, Point16 pos, Point16 size)
-{
-    PointMarker* target = new (kSim) PointMarker(source, pos, size);
-    return target;
-}
-
-static PathOrder* __stdcall LoadPathOrderNative(Order* source, HapiBank* file, char* name)
-{
-    PathOrder* target = new (kSim) PathOrder((int)source, file, name);
-    return target;
-}
-
-static AirManeuverOrder* __stdcall LoadAirManeuverOrderNative(Order* source, HapiBank* file, char* name)
-{
-    AirManeuverOrder* target = new (kSim) AirManeuverOrder((int)source, file, name);
-    return target;
-}
-
-static ApproachRadius* __stdcall LoadApproachRadiusNative(Order* source, HapiBank* file, char* name)
-{
-    ApproachRadius* target = new (kSim) ApproachRadius((int)source, file, name);
-    return target;
-}
-
-static RingApproach* __stdcall LoadRingApproachNative(Order* source, HapiBank* file, char* name)
-{
-    RingApproach* target = new (kSim) RingApproach((int)source, file, name);
-    return target;
-}
-
-static PointMarker* __stdcall LoadPointMarkerNative(Order* source, HapiBank* file, char* name)
-{
-    PointMarker* target = new (kSim) PointMarker((int)source, file, name);
-    return target;
-}
-
-static PathGoal* __stdcall MotionGoalNative(UnitMotion* motion)
-{
-    return (PathGoal*)motion->obj.get();
-}
-
-static OrderFx* __stdcall GoalTargetNative(PathGoal* goal)
-{
-    return goal->target.get();
-}
-
-static void __stdcall GoalSetPathOrderNative(PathGoal* goal, void* target)
-{
-    goal->SetPathOrder(target);
-}
-
-static void __stdcall OrderFxDestroyNative(OrderFx* target)
-{
-    delete target;
-}
-
-static int __stdcall OrderFxGetTypeNative(OrderFx* target)
-{
-    return target->GetType();
-}
-
-static int __stdcall OrderFxSerializeToSaveNative(OrderFx* target, Order* order, HapiBank* file, char* name)
-{
-    return target->SerializeToSave(order, file, name);
-}
-
-static int __stdcall GoalHasNetUnitStateNative(PathGoal* goal)
-{
-    return goal->HasNetUnitState();
-}
-
-static void __stdcall GoalSerializeNetUnitStateNative(PathGoal* goal, BitWriter* stream)
-{
-    goal->SerializeNetUnitState(stream);
 }
 
 static void __stdcall UnitRefInitNative(UnitRef* ref, Unit* unit, OrderBase* value)
@@ -965,9 +750,6 @@ void InstallNativeSeams()
     s_pathfinding.WriteState = PathfindingWriteState;
     s_pathfinding.SetSearchScale = PathfindingSetBaseScale;
     s_pathfinding.DebugCell = PathfindingDebugCell;
-    s_movement.ApplyPathEvent = ApplyPathEvent;
-    s_orders.OrderOrStatusFlags = OrderOrStatusFlagsNative;
-    s_movement.UnitMotionReadNetState = UnitMotionReadNetStateNative;
     s_map.PassMapGet = PassMapGetNative;
     s_map.PassMapInBounds = PassMapInBoundsNative;
     s_map.RefreshMovedUnits = RefreshMovedUnitsNative;
@@ -1010,7 +792,6 @@ void InstallNativeSeams()
     s_weapons.UpdateUnitWeapons = UpdateUnitWeapons;
     s_ai.Apply = AiApply;
     s_ai.WriteState = AiWriteState;
-    s_orders.AppendOrder = AppendOrder;
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
     s_ai.CreatePlayerAI = CreatePlayerAI;
@@ -1065,13 +846,6 @@ void InstallNativeSeams()
     s_map.UnitsInRange = UnitsInRange;
     s_map.CanBuildAt = CanBuildAt;
     s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
-    s_orders.AddOrder = AddOrder;
-    s_orders.DeleteOrders = DeleteOrders;
-    s_orders.GetOrderFlags = (int (__stdcall *)(Unit *))GetOrderFlags;
-    s_orders.GetOrderType = GetOrderType;
-    s_orders.IssueAttackOrder = IssueAttackOrder;
-    s_orders.RegisterAllOrderTypes = RegisterAllOrderTypes;
-    s_orders.ClearOrderTypeTable = ClearOrderTypeTable;
     s_players.Apply = PlayersApply;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.NotifyUnitRefs = NotifyUnitRefs;
@@ -1153,32 +927,6 @@ void InstallNativeSeams()
     s_units.CanReclaim = CanReclaimNative;
     s_units.CanRepair = CanRepairNative;
     s_units.UnitRefUnlink = UnitRefUnlinkNative;
-    s_movement.SetFlightMode = SetFlightModeNative;
-    s_movement.PathOrderSetAltitude = PathOrderSetAltitudeNative;
-    s_movement.PathOrderSetApproachRadius = PathOrderSetApproachRadiusNative;
-    s_movement.PathOrderSetHeading = PathOrderSetHeadingNative;
-    s_movement.AirManeuverOrderSetAltitude = AirManeuverOrderSetAltitudeNative;
-    s_movement.NewPathOrderAt = NewPathOrderAtNative;
-    s_movement.NewPathOrderToUnit = NewPathOrderToUnitNative;
-    s_movement.NewPathOrderToUnitAt = NewPathOrderToUnitAtNative;
-    s_movement.NewPathOrderToUnitAtAngle = NewPathOrderToUnitAtAngleNative;
-    s_movement.NewAirManeuverOrder = NewAirManeuverOrderNative;
-    s_movement.NewApproachRadius = NewApproachRadiusNative;
-    s_movement.NewRingApproach = NewRingApproachNative;
-    s_movement.NewPointMarker = NewPointMarkerNative;
-    s_movement.LoadPathOrder = LoadPathOrderNative;
-    s_movement.LoadAirManeuverOrder = LoadAirManeuverOrderNative;
-    s_movement.LoadApproachRadius = LoadApproachRadiusNative;
-    s_movement.LoadRingApproach = LoadRingApproachNative;
-    s_movement.LoadPointMarker = LoadPointMarkerNative;
-    s_movement.MotionGoal = MotionGoalNative;
-    s_movement.GoalTarget = GoalTargetNative;
-    s_movement.GoalSetPathOrder = GoalSetPathOrderNative;
-    s_movement.OrderFxDestroy = OrderFxDestroyNative;
-    s_movement.OrderFxGetType = OrderFxGetTypeNative;
-    s_movement.OrderFxSerializeToSave = OrderFxSerializeToSaveNative;
-    s_movement.GoalHasNetUnitState = GoalHasNetUnitStateNative;
-    s_movement.GoalSerializeNetUnitState = GoalSerializeNetUnitStateNative;
     s_units.UnitRefInit = UnitRefInitNative;
     s_units.UnitRefSetUnit = UnitRefSetUnitNative;
     s_units.GetMovementLimits = GetMovementLimits;
@@ -1188,8 +936,42 @@ void InstallNativeSeams()
     s_scripts.CreateObjectState = CreateObjectState;
     s_scripts.FreeObjectState = FreeObjectState;
     s_scripts.UpdateObjectState = UpdateObjectState;
+    s_orders.Apply = OrdersApply;
+    s_orders.RunOrders = OrdersRunOrders;
+    s_orders.RunSecondaryOrders = OrdersRunSecondaryOrders;
+    s_orders.GetOrderFlags = OrdersGetOrderFlags;
+    s_orders.GetOrderType = OrdersGetOrderType;
+    s_orders.MissionTypeFromName = OrdersMissionTypeFromName;
+    s_orders.RegisterAllOrderTypes = OrdersRegisterAllOrderTypes;
+    s_orders.ClearOrderTypeTable = OrdersClearOrderTypeTable;
+    s_orders.LoadOrders = OrdersLoadOrders;
+    s_orders.SaveOrders = OrdersSaveOrders;
+    s_orders.WriteState = OrdersWriteState;
+    s_movement.Apply = MovementApply;
+    s_movement.UpdateMotion = MovementUpdateMotion;
+    s_movement.ApplyPathEvent = MovementApplyPathEvent;
+    s_movement.GetMotionState = MovementGetMotionState;
+    s_movement.ReadNetState = MovementReadNetState;
+    s_movement.HasNetState = MovementHasNetState;
+    s_movement.WriteNetState = MovementWriteNetState;
+    s_movement.NewPathOrderAt = MovementNewPathOrderAt;
+    s_movement.NewPathOrderToUnit = MovementNewPathOrderToUnit;
+    s_movement.NewPathOrderToUnitAt = MovementNewPathOrderToUnitAt;
+    s_movement.NewPathOrderToUnitAtAngle = MovementNewPathOrderToUnitAtAngle;
+    s_movement.NewAirManeuverOrder = MovementNewAirManeuverOrder;
+    s_movement.NewApproachRadius = MovementNewApproachRadius;
+    s_movement.NewRingApproach = MovementNewRingApproach;
+    s_movement.NewPointMarker = MovementNewPointMarker;
+    s_movement.LoadTarget = MovementLoadTarget;
+    s_movement.SaveTarget = MovementSaveTarget;
+    s_movement.TargetType = MovementTargetType;
+    s_movement.UnitTarget = MovementUnitTarget;
+    s_movement.WriteState = MovementWriteState;
     s_units.UpdateUnitHead = UpdateUnitHead;
     s_units.UpdateUnitBody = UpdateUnitBody;
+    s_units.UpdateUnitTail = UpdateUnitTail;
+    s_units.UnitRefGet = UnitRefGet;
+    s_units.UnitRefSetValue = UnitRefSetValue;
     s_scripts.ObjectStateSize = ObjectStateSize;
     s_scripts.NewUnitScript = NewUnitScriptNative;
     s_scripts.SetCob = SetCobNative;
@@ -1200,20 +982,6 @@ void InstallNativeSeams()
     s_scripts.LoadScriptState = LoadScriptStateNative;
     s_scripts.DeleteScript = DeleteScriptNative;
     s_scripts.InitObjectState = InitObjectStateNative;
-    s_orders.ReattachFxToUnit = ReattachFxToUnitNative;
-    s_orders.SerializeOrderToSave = SerializeOrderToSaveNative;
-    s_orders.AddBeCarriedOrder = AddBeCarriedOrder;
-    s_orders.RunOrders = RunOrders;
-    s_orders.RunSecondaryOrders = RunSecondaryOrders;
-    s_movement.DestroyMotionObject = DestroyMotionObjectNative;
-    s_movement.NewUnitMotion = NewUnitMotionNative;
-    s_orders.LoadOrder = LoadOrderNative;
-    s_orders.MissionTypeFromName = MissionTypeFromNameNative;
-    s_orders.NewOrder = NewOrderNative;
-    s_orders.QueueBuildOrder = QueueBuildOrder;
-    s_movement.LoadMotion = LoadMotionNative;
-    s_movement.SaveMotion = SaveMotionNative;
-    s_movement.UpdateMotion = UpdateMotionNative;
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.Apply = WeaponsApply;

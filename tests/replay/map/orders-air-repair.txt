@@ -244719,7 +244719,7 @@ call 382 Apply
   w Cell#5639.flags 80
   o result 1
 call 382 GetGroundHeight
-  a pos (45613056,5918624,15204352)
+  a pos (45613056,5941268,15204352)
   o result 1
 call 382 GetGroundHeight
   a pos (49807360,65536,19398656)
@@ -267675,6 +267675,7 @@ call 382 Apply
   a event.kind 160
   a event.unit Unit#4
   a size 8
+  i services.SchedPublish 7 8
   w Cell#4310.unit2 4
   w Cell#4311.unit2 4
   w Cell#4534.unit2 4

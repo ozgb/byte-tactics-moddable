@@ -1,3 +1,5 @@
+#include "../game/movement_events.h"
+#include "../../interfaces/movement.h"
 #include "win_types.h"
 #include "../state/block.h"
 #include <stdlib.h>
@@ -375,7 +377,7 @@ void __stdcall AddUnitToMap(Unit* obj)
 {
     Point16 size = obj->footprint;
     if (obj->motion.get() != nullptr)
-        *(int*)((unsigned char*)obj->motion.get() + 0x26) = g_game->ticks;
+        MovementPublishUnit(SCHED_MAP, MOVEMENT_PLACED, obj);
     {
         short px = obj->cell.x;
         if (px < 0)

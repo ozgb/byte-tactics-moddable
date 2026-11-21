@@ -9,6 +9,10 @@ class UnitDef;
 
 struct Unit;
 
+class UnitRef;
+class OrderBase;
+Unit* __stdcall UnitRefGet(UnitRef* ref);
+void __stdcall UnitRefSetValue(UnitRef* ref, OrderBase* value);
 int __stdcall UnitCanBuild(Unit* unit, short id);
 void __stdcall NotifyUnitRefs(Unit* obj, int event);
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);

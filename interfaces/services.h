@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 2
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 0
+#define SERVICES_VERSION_MINOR 1
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -68,6 +68,12 @@ void __stdcall HarnessAiEvent(const AiEventHeader* event, unsigned int size, int
 struct WeaponsEventHeader;
 // In test mode, records a weapons event as weapons consumes it, or an effect as weapons publishes it, its payload of size bytes, with its outcome, for the dump's weapons events.
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader* event, unsigned int size, int outcome);
+struct OrdersEventHeader;
+// In test mode, records an orders event as orders consumes it, or an effect as orders publishes it, its payload of size bytes, with its outcome, for the dump's orders events.
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader* event, unsigned int size, int outcome);
+struct MovementEventHeader;
+// In test mode, records a movement event as movement consumes it, or an effect as movement publishes it, its payload of size bytes, with its outcome, for the dump's movement events.
+void __stdcall HarnessMovementEvent(const MovementEventHeader* event, unsigned int size, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.
@@ -112,6 +118,8 @@ int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 // Runs economy's UpdateMetalExtraction for a unit (an EconUnit, its block offset) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
+// Delivers units' pending inbox at once, as the units pass does before a unit's tail; units calls it where the network has run movement's UpdateMotion for a unit outside that pass, before it reads what the queued effects write.
+void __stdcall ScheduleUnitsDeliver();
 struct WindMeteorsEventHeader;
 // Publishes an effect of wind_meteors (interfaces/wind_meteors.h), its payload of size bytes, to its outbox, as SchedPublish does, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
 void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);

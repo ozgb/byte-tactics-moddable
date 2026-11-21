@@ -4,94 +4,302 @@
 class BitReader;
 class BitWriter;
 class HapiBank;
-class OrderFx;
-class UnitMotion;
-class PathGoal;
-class PathOrder;
-class ApproachRadius;
-class RingApproach;
-class PointMarker;
-class AirManeuverOrder;
 struct Unit;
-struct Order;
 struct PathfindingEventHeader;
 struct PathPoint;
 struct Point16;
 struct Vec3;
+struct StateWriter;
 
 // Major version of the movement interface, changed when a slot is removed or its signature changes.
-#define MOVEMENT_VERSION_MAJOR 2
+#define MOVEMENT_VERSION_MAJOR 3
 // Minor version of the movement interface, changed when a slot is added.
 #define MOVEMENT_VERSION_MINOR 0
 
-// Unit motion, its goals and the targets the goals steer to.
+// The fields every movement event and effect starts with.
+struct MovementEventHeader {
+    // A kind of event or of effect.
+    int kind;
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none).
+    unsigned int unit;
+};
+
+// The kinds of event other modules publish to movement's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, or its kind is unknown, or: for the kinds about a target (DESTROY_TARGET, SET_ALTITUDE, SET_APPROACH_RADIUS, SET_HEADING), it names no target, and their unit is not checked; for the other kinds, it names a null unit, or a unit with no movement (all of them but NEW). The kinds about a target then depend on the target's kind, as TargetType gives it.
+enum MovementEventKind {
+    // unit gets its movement, steered by a goal that suits its player and its unit type; the header alone; outcome 1.
+    MOVEMENT_NEW = 320,
+    // unit's movement and its goal are freed, and unit has no movement; the header alone; outcome 1.
+    MOVEMENT_DESTROY = 321,
+    // unit's movement takes the state a saved game keeps (MovementLoad); outcome 1.
+    MOVEMENT_LOAD = 322,
+    // unit's movement is put in a flight mode without the flight mode's other changes, as a carrier sets down or picks up its cargo (MovementSetMode); outcome 1.
+    MOVEMENT_SET_MODE = 323,
+    // unit's movement takes a speed, as another machine sent it (MovementSetSpeed); outcome 1.
+    MOVEMENT_SET_SPEED = 324,
+    // unit was placed on the map at this tick, which its movement's path lock stamp keeps; the header alone; outcome 1.
+    MOVEMENT_PLACED = 325,
+    // unit's goal steers to a target, or to none (MovementTarget); outcome 1.
+    MOVEMENT_SET_TARGET = 326,
+    // A target is destroyed and its memory freed (MovementTarget); outcome 1.
+    MOVEMENT_DESTROY_TARGET = 327,
+    // unit's movement switches its flight mode, which grounds or lifts an aircraft (MovementSetMode); outcome 1.
+    MOVEMENT_SET_FLIGHT_MODE = 328,
+    // A move target (kind 2) or an air maneuver target (kind 3) holds its unit at an altitude, outcome 1; a target of another kind (1, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
+    MOVEMENT_SET_ALTITUDE = 329,
+    // A move target (kind 2) sets how near its unit has to come, outcome 1; a target of another kind (1, 3, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
+    MOVEMENT_SET_APPROACH_RADIUS = 330,
+    // A move target (kind 2) sets the heading its unit takes when it arrives, outcome 1; a target of another kind (1, 3, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
+    MOVEMENT_SET_HEADING = 331
+};
+
+// The kinds of effect movement publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
+enum MovementEffectKind {
+    // A target reports the progress of the order it moves a unit for: status flags are set on the order (MovementOrderFlags).
+    MOVEMENT_EFFECT_ORDER_FLAGS = 336,
+    // unit's heading turns and unit has moved (MovementTurn).
+    MOVEMENT_EFFECT_TURN = 337,
+    // unit's bank and pitch change (MovementTilt).
+    MOVEMENT_EFFECT_TILT = 338,
+    // unit's bank, heading and pitch change (MovementAngles).
+    MOVEMENT_EFFECT_ANGLES = 339,
+    // unit moves to a position in its cell and has moved (MovementMove).
+    MOVEMENT_EFFECT_MOVE = 340,
+    // unit is marked as moved or not moved (MovementMoved).
+    MOVEMENT_EFFECT_MOVED = 341,
+    // unit moves to a position in another cell, or in another flight mode (MovementChangeCell).
+    MOVEMENT_EFFECT_CHANGE_CELL = 342,
+    // unit's move rate changes (MovementMoveRate).
+    MOVEMENT_EFFECT_MOVE_RATE = 343,
+    // unit is placed at a position, as a carried unit follows its carrier's piece (MovementSetPosition).
+    MOVEMENT_EFFECT_SET_POSITION = 344,
+    // unit's state bits change (MovementSetStateBits).
+    MOVEMENT_EFFECT_SET_STATE_BITS = 345,
+    // unit's script is told whether the unit is in the water, on the ground or in the air, when that changed; the header alone.
+    MOVEMENT_EFFECT_SFX_OCCUPY = 346,
+    // A script of unit starts (MovementStartScript).
+    MOVEMENT_EFFECT_START_SCRIPT = 347
+};
+
+// The state of a unit's movement that a saved game keeps.
+struct MovementMotionState {
+    // The velocity, in world units with 16 fractional bits: x, y and z.
+    int velocity[3];
+    // The smoothed acceleration that banks and pitches an aircraft: x, y and z.
+    int p2[3];
+    // The speed.
+    int speed;
+    // The turn of the last tick.
+    int turn;
+    // The tick the unit was last placed on the map.
+    int pathLockStamp;
+    // The flight mode, 0 to 3.
+    int mode;
+    // The movement's flag, 0 or 1.
+    int flag;
+};
+
+// The payload of LOAD.
+struct MovementLoad {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The state.
+    MovementMotionState state;
+};
+
+// The payload of SET_MODE and SET_FLIGHT_MODE.
+struct MovementSetMode {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The flight mode, 0 to 3.
+    int mode;
+};
+
+// The payload of SET_SPEED.
+struct MovementSetSpeed {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The speed.
+    int speed;
+};
+
+// The payload of SET_TARGET and DESTROY_TARGET.
+struct MovementTarget {
+    // The kind and the unit the target moves, or 0.
+    MovementEventHeader h;
+    // The target, as its block offset (0 for none).
+    unsigned int target;
+};
+
+// The payload of SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING.
+struct MovementTargetValue {
+    // The kind and the unit the target moves, or 0.
+    MovementEventHeader h;
+    // The target, as its block offset.
+    unsigned int target;
+    // The altitude, the radius or the heading.
+    int value;
+};
+
+// The payload of ORDER_FLAGS.
+struct MovementOrderFlags {
+    // The kind and the unit moved.
+    MovementEventHeader h;
+    // The order, as its block offset.
+    unsigned int order;
+    // The flags to set.
+    unsigned int flags;
+};
+
+// The payload of TURN.
+struct MovementTurn {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The change of heading.
+    int delta;
+};
+
+// The payload of TILT.
+struct MovementTilt {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The bank.
+    int bank;
+    // The pitch.
+    int pitch;
+};
+
+// The payload of ANGLES.
+struct MovementAngles {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The bank.
+    int bank;
+    // The heading.
+    int heading;
+    // The pitch.
+    int pitch;
+};
+
+// The payload of MOVE.
+struct MovementMove {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+};
+
+// The payload of MOVED.
+struct MovementMoved {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // 1 when the unit has moved, 0 when not.
+    int moved;
+};
+
+// The payload of CHANGE_CELL.
+struct MovementChangeCell {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The cell: x and y.
+    int cell[2];
+    // The flight mode.
+    int mode;
+};
+
+// The payload of MOVE_RATE.
+struct MovementMoveRate {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The move rate, 0 (still) to 3.
+    int rate;
+};
+
+// The payload of SET_POSITION.
+struct MovementSetPosition {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+    // The flight mode the unit is placed in.
+    int mode;
+};
+
+// The payload of SET_STATE_BITS.
+struct MovementSetStateBits {
+    // The kind and the unit.
+    MovementEventHeader h;
+    // The state bits to change.
+    int mask;
+    // 1 to set them, 0 to clear them.
+    int set;
+};
+
+// The scripts a START_SCRIPT effect starts.
+enum MovementScript {
+    // StartMoving.
+    MOVEMENT_SCRIPT_START_MOVING = 0,
+    // StopMoving.
+    MOVEMENT_SCRIPT_STOP_MOVING = 1,
+    // MoveRate1.
+    MOVEMENT_SCRIPT_MOVE_RATE_1 = 2,
+    // MoveRate2.
+    MOVEMENT_SCRIPT_MOVE_RATE_2 = 3,
+    // MoveRate3.
+    MOVEMENT_SCRIPT_MOVE_RATE_3 = 4
+};
+
+// The payload of START_SCRIPT.
+struct MovementStartScript {
+    // The kind and the unit whose script starts.
+    MovementEventHeader h;
+    // The script (MovementScript).
+    int script;
+};
+
+// Unit motion, its goals and the targets the goals steer to. A target is named by its block offset, a handle the caller keeps and never reads through.
 struct MovementSeam {
-    // Steers a unit, moves it and updates its move rate for one tick (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* UpdateMotion)(UnitMotion* motion, int unusedEdx, Unit* unit);
-    // Applies an event of a path search, its payload of size bytes, to its requester, with the waypoints Poll copied for it; an event smaller than its payload changes nothing: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    int (__stdcall* Apply)(const MovementEventHeader* event, unsigned int size);
+    // Steers a unit, moves it and updates its move rate for one tick, in the unit's update; the engine calls it for a unit with a movement after its orders. Hooks: none.
+    void (__stdcall* UpdateMotion)(Unit* unit);
+    // Applies an event of a path search, its payload of size bytes, to its requester, with the waypoints Poll copied for it; the engine's delivery of pathfinding's results; an event smaller than its payload changes nothing: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
     void (__stdcall* ApplyPathEvent)(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints);
-    // Allocates the movement of a unit from the sim block, builds it and stores it in the unit. Hooks: none.
-    void (__stdcall* NewUnitMotion)(Unit* unit);
-    // Reads the movement of a unit from a saved game bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* LoadMotion)(UnitMotion* motion, int unusedEdx, Unit* unit, HapiBank* file);
-    // Writes the movement of a unit to a saved game bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* SaveMotion)(UnitMotion* motion, int unusedEdx, Unit* unit, HapiBank* file);
-    // Frees what the movement of a unit holds (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* DestroyMotionObject)(UnitMotion* motion);
+    // Fills the state of a unit's movement that a saved game keeps, outside the tick; a query. Hooks: none.
+    void (__stdcall* GetMotionState)(Unit* unit, MovementMotionState* out);
     // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
-    void (__stdcall* UnitMotionReadNetState)(UnitMotion* motion, BitReader* reader);
-    // Switches the flight mode of a unit's movement, which grounds or lifts an aircraft (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* SetFlightMode)(UnitMotion* motion, Unit* unit, int state);
-    // Sets the altitude an order that moves a unit holds it at (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* PathOrderSetAltitude)(PathOrder* order, int altitude);
-    // Sets how near a move target a unit has to come (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* PathOrderSetApproachRadius)(PathOrder* order, short radius);
-    // Sets the heading a unit takes when it arrives (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* PathOrderSetHeading)(PathOrder* order, short heading);
-    // Sets the altitude of an air maneuver target (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* AirManeuverOrderSetAltitude)(AirManeuverOrder* order, int altitude);
-    // Allocates a move target at a position from the sim block, builds it for an order and returns it. Hooks: none.
-    PathOrder* (__stdcall* NewPathOrderAt)(Order* source, const Vec3* pos);
-    // Allocates a move target that follows a unit from the sim block, builds it for an order and returns it. Hooks: none.
-    PathOrder* (__stdcall* NewPathOrderToUnit)(Order* source, Unit* unit);
-    // Allocates a move target at a position near a unit from the sim block, builds it for an order and returns it. Hooks: none.
-    PathOrder* (__stdcall* NewPathOrderToUnitAt)(Order* source, Unit* unit, const Vec3* pos);
-    // Allocates a move target that follows a unit at an angle from the sim block, builds it for an order and returns it. Hooks: none.
-    PathOrder* (__stdcall* NewPathOrderToUnitAtAngle)(Order* source, Unit* unit, short angle);
-    // Allocates an air maneuver target from the sim block, builds it for an order from two positions and returns it. Hooks: none.
-    AirManeuverOrder* (__stdcall* NewAirManeuverOrder)(Order* source, const Vec3* from, const Vec3* to);
-    // Allocates a disc target from the sim block, builds it for an order and returns it. Hooks: none.
-    ApproachRadius* (__stdcall* NewApproachRadius)(Order* source, int x, int y, int radius);
-    // Allocates a ring target from the sim block, builds it for an order and returns it. Hooks: none.
-    RingApproach* (__stdcall* NewRingApproach)(Order* source, int x, int y, int inner, int outer);
-    // Allocates a footprint marker target from the sim block, builds it for an order and returns it. Hooks: none.
-    PointMarker* (__stdcall* NewPointMarker)(Order* source, Point16 pos, Point16 size);
-    // Allocates a move target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    PathOrder* (__stdcall* LoadPathOrder)(Order* source, HapiBank* file, char* name);
-    // Allocates an air maneuver target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    AirManeuverOrder* (__stdcall* LoadAirManeuverOrder)(Order* source, HapiBank* file, char* name);
-    // Allocates a disc target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    ApproachRadius* (__stdcall* LoadApproachRadius)(Order* source, HapiBank* file, char* name);
-    // Allocates a ring target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    RingApproach* (__stdcall* LoadRingApproach)(Order* source, HapiBank* file, char* name);
-    // Allocates a footprint marker target from the sim block, reads it from a saved game bank under a name and returns it. Hooks: none.
-    PointMarker* (__stdcall* LoadPointMarker)(Order* source, HapiBank* file, char* name);
-    // Returns the goal that steers a unit's movement. Hooks: none.
-    PathGoal* (__stdcall* MotionGoal)(UnitMotion* motion);
-    // Returns the target a goal steers to, or null. Hooks: none.
-    OrderFx* (__stdcall* GoalTarget)(PathGoal* goal);
-    // Hands a goal the target it steers to, or null (the virtual SetPathOrder). Hooks: none.
-    void (__stdcall* GoalSetPathOrder)(PathGoal* goal, void* target);
-    // Destroys a target and frees its memory (the virtual deleting destructor); the target is never null. Hooks: none.
-    void (__stdcall* OrderFxDestroy)(OrderFx* target);
-    // Returns the kind of a target, 0 for none (the virtual GetType). Hooks: none.
-    int (__stdcall* OrderFxGetType)(OrderFx* target);
-    // Writes a target to a bank of a saved game under a name and returns 1 when it was written (the virtual SerializeToSave). Hooks: none.
-    int (__stdcall* OrderFxSerializeToSave)(OrderFx* target, Order* order, HapiBank* file, char* name);
-    // Returns nonzero when a goal has network state to send (the virtual HasNetUnitState). Hooks: none.
-    int (__stdcall* GoalHasNetUnitState)(PathGoal* goal);
-    // Writes the network state of a goal to a packet (the virtual SerializeNetUnitState). Hooks: none.
-    void (__stdcall* GoalSerializeNetUnitState)(PathGoal* goal, BitWriter* stream);
+    void (__stdcall* ReadNetState)(Unit* unit, BitReader* reader);
+    // Returns nonzero when the goal of a unit's movement has network state to send; a query. Hooks: none.
+    int (__stdcall* HasNetState)(Unit* unit);
+    // Writes the network state of the goal of a unit's movement to a packet; a view read. Hooks: none.
+    void (__stdcall* WriteNetState)(Unit* unit, BitWriter* stream);
+    // Builds a move target at a position for an order (its block offset) and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewPathOrderAt)(unsigned int order, const Vec3* pos);
+    // Builds a move target that follows a unit for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewPathOrderToUnit)(unsigned int order, Unit* unit);
+    // Builds a move target at a position near a unit for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewPathOrderToUnitAt)(unsigned int order, Unit* unit, const Vec3* pos);
+    // Builds a move target that follows a unit at an angle for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewPathOrderToUnitAtAngle)(unsigned int order, Unit* unit, short angle);
+    // Builds an air maneuver target from two positions for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewAirManeuverOrder)(unsigned int order, const Vec3* from, const Vec3* to);
+    // Builds a disc target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewApproachRadius)(unsigned int order, int x, int y, int radius);
+    // Builds a ring target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewRingApproach)(unsigned int order, int x, int y, int inner, int outer);
+    // Builds a footprint marker target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
+    unsigned int (__stdcall* NewPointMarker)(unsigned int order, Point16 pos, Point16 size);
+    // Reads a target of a kind (as TargetType returns it, 2 to 6) for an order from a saved game bank under a name and returns it, or 0 for another kind, outside the tick. Hooks: none.
+    unsigned int (__stdcall* LoadTarget)(int type, unsigned int order, HapiBank* file, const char* name);
+    // Writes a target for an order to a saved game bank under a name, outside the tick. Hooks: none.
+    void (__stdcall* SaveTarget)(unsigned int target, unsigned int order, HapiBank* file, const char* name);
+    // Returns the kind of a target, 0 for none: 1 a plain target, 2 a move target, 3 an air maneuver target, 4 a disc, 5 a ring, 6 a footprint marker; a query. Hooks: none.
+    int (__stdcall* TargetType)(unsigned int target);
+    // Returns the target the goal of a unit's movement steers to, or 0, also for a unit with no movement; a query. Hooks: none.
+    unsigned int (__stdcall* UnitTarget)(Unit* unit);
+    // Writes movement's state as records of the trace, which the engine dumps and does not hash.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

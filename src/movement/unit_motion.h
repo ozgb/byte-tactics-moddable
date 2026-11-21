@@ -78,8 +78,6 @@ public:
     void ReadNetState(BitReader* reader);
     void UpdateMotion(Unit* u);
     void ApplyClampedTurnDelta(Unit* unit, short amount);
-    void SaveMotion(Unit* unit, HapiBank* file);
-    void LoadMotion(Unit* unit, HapiBank* file);
 };
 
 #pragma pack(pop)

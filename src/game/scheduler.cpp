@@ -52,6 +52,12 @@ void __stdcall SchedDeliver(int module)
     }
 }
 
+void __stdcall ScheduleUnitsDeliver()
+{
+    ReplayImport call(RI_SCHEDULE_UNITS_DELIVER);
+    SchedDeliver(SCHED_UNITS);
+}
+
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
 {
     ReplayImport call(RI_SCHED_PUBLISH);
@@ -154,7 +160,20 @@ void SchedUnitsPhase()
                             }
                         }
                         SchedDeliver(SCHED_UNITS);
-                        g_seams.units->UpdateUnitBody(u);
+                        int moved = 0;
+                        if (g_seams.units->UpdateUnitBody(u)) {
+                            SchedDeliver(SCHED_ORDERS);
+                            g_seams.orders->RunOrders(u);
+                            SchedDeliver(SCHED_ORDERS);
+                            g_seams.orders->RunSecondaryOrders(u);
+                            if (u->motion != 0) {
+                                SchedDeliver(SCHED_MOVEMENT);
+                                g_seams.movement->UpdateMotion(u);
+                                moved = 1;
+                            }
+                        }
+                        SchedDeliver(SCHED_UNITS);
+                        g_seams.units->UpdateUnitTail(u, moved);
                     }
                     u = (Unit*)((char*)u + 0x118);
                 }

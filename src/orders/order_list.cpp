@@ -33,6 +33,7 @@ struct Point16FromShorts : Point16 {
 #include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
+#include "../game/orders_events.h"
 
 #include "../network/player.h"
 
@@ -319,11 +320,11 @@ static inline MissionType MissionTypeOf(unsigned char k)
 
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
-    : kind(MissionTypeOf(k)), link(), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
+    : kind(MissionTypeOf(k)), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
       id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
 {
     g_seams.units->UnitRefInit((UnitRef*)&link, o, nullptr);
-    link.SetValue(this);
+    g_seams.units->UnitRefSetValue((UnitRef*)&link, this);
     state = 0;
     flags = 0;
     subFlags = 0;
@@ -785,7 +786,7 @@ void __stdcall RunOrders(Unit* unit)
         unsigned int pending = (node->subFlags | (unsigned short)unit->netDirtyFlags) & node->flags;
         if (node->flags != 0 && pending == 0)
             return;
-        unit->netDirtyFlags &= ~pending;
+        OrdersPublishClearNetDirty(unit, pending);
         node->subFlags &= ~pending;
         node->flags = 0;
         if (pending & 0x10000)

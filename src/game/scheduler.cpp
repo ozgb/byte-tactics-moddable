@@ -52,12 +52,12 @@ void __stdcall SchedDeliver(int module)
     }
 }
 
-int __stdcall SchedInboxHolds(int module, int kind, unsigned int unit)
+int __stdcall SchedInboxHolds(int module, int kind, unsigned int word, unsigned int value)
 {
     Inbox* inbox = &s_inboxes[module];
     for (unsigned int i = inbox->head; i != inbox->tail; i++) {
         const InboxEntry* entry = &inbox->entries[i % kInboxCapacity];
-        if (entry->words[0] == (unsigned int)kind && entry->words[1] == unit)
+        if (entry->words[0] == (unsigned int)kind && entry->words[word] == value)
             return 1;
     }
     return 0;

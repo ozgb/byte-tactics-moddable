@@ -45,14 +45,14 @@ static int KnownKind(int kind)
     return (kind >= UNITS_SET_STATE_BITS && kind <= UNITS_CHANGE_CELL) || (kind >= UNITS_SET_MOVED && kind <= UNITS_CAPTURE);
 }
 
-static void AttackedSpeech(Unit* unit)
+static void UnitsApplyAttackedSpeech(Unit* unit)
 {
     if (!(g_seams.orders->GetOrderFlags(unit) & ORDER_FLAG_NO_UNDERATTACK_LINE) &&
         (unit->lastAttackerSlot != unit->playerIndex || unit->lastDamageType == 1))
         RecordUnitSpeech(unit, 2, SIM_SPEECH_KIND_TEXT, SIM_EVENT_SPEECH_IF_NOT_VISIBLE);
 }
 
-static void ScriptValue(Unit* unit, int which, int value)
+static void UnitsApplyScriptValue(Unit* unit, int which, int value)
 {
     switch (which) {
     case 1:
@@ -74,7 +74,7 @@ static void ScriptValue(Unit* unit, int which, int value)
     unit->dirty = true;
 }
 
-static void Kill(Unit* u, int selfDestruct)
+static void UnitsApplyKill(Unit* u, int selfDestruct)
 {
     if (selfDestruct == 0) {
         WeaponsPublishDamage(SCHED_UNITS, u, u, 0x7530, 3, 0);
@@ -85,7 +85,7 @@ static void Kill(Unit* u, int selfDestruct)
     }
 }
 
-static void Send(Unit* unit, int player)
+static void UnitsApplySend(Unit* unit, int player)
 {
     Player* other = &g_game->players[player];
     unit->flags &= ~0x10;
@@ -94,7 +94,7 @@ static void Send(Unit* unit, int player)
     WeaponsPublishDamage(SCHED_UNITS, 0, unit, 30000, 4, 0);
 }
 
-static int Capture(Unit* unit, const UnitsCapture* e)
+static int UnitsApplyCapture(Unit* unit, const UnitsCapture* e)
 {
     Player* other = &g_game->players[e->player];
     Unit* n = CreateUnit(other->index, unit->unitDefIndex, *(Vec3*)&unit->pos, 1, unit->flags & 3, 0);
@@ -241,14 +241,14 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
         break;
     case UNITS_SCRIPT_VALUE: {
         const UnitsScriptValue* p = reinterpret_cast<const UnitsScriptValue*>(e);
-        ScriptValue(unit, p->which, p->value);
+        UnitsApplyScriptValue(unit, p->which, p->value);
         break;
     }
     case UNITS_NOTIFY_REFS:
         NotifyUnitRefs(unit, reinterpret_cast<const UnitsNotifyRefs*>(e)->event);
         break;
     case UNITS_ATTACKED_SPEECH:
-        AttackedSpeech(unit);
+        UnitsApplyAttackedSpeech(unit);
         break;
     case UNITS_MARK_DAMAGED:
         MarkRecentlyDamaged(unit);
@@ -271,13 +271,13 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
         break;
     }
     case UNITS_KILL:
-        Kill(unit, reinterpret_cast<const UnitsKill*>(e)->selfDestruct);
+        UnitsApplyKill(unit, reinterpret_cast<const UnitsKill*>(e)->selfDestruct);
         break;
     case UNITS_SEND:
-        Send(unit, reinterpret_cast<const UnitsSend*>(e)->player);
+        UnitsApplySend(unit, reinterpret_cast<const UnitsSend*>(e)->player);
         break;
     case UNITS_CAPTURE:
-        return Capture(unit, reinterpret_cast<const UnitsCapture*>(e));
+        return UnitsApplyCapture(unit, reinterpret_cast<const UnitsCapture*>(e));
     }
     return 1;
 }

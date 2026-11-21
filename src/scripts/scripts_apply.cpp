@@ -42,7 +42,7 @@ static int KnownKind(int kind)
     return kind >= SCRIPTS_START && kind <= SCRIPTS_INIT_STATE;
 }
 
-static int Start(Unit* unit, const ScriptsStart* p)
+static int ScriptsApplyStart(Unit* unit, const ScriptsStart* p)
 {
     CobScript* script = (CobScript*)unit->script.get();
     if (script == nullptr)
@@ -69,7 +69,7 @@ static int Start(Unit* unit, const ScriptsStart* p)
     return 1;
 }
 
-static ModelState* StateOfOffset(unsigned int offset)
+static ModelState* ScriptsStateOfOffset(unsigned int offset)
 {
     Ref<ModelState> ref;
     ref.offset = offset;
@@ -85,19 +85,19 @@ int __stdcall ScriptsApply(const ScriptsEventHeader* e, unsigned int size)
     if (size < ScriptsEventSize(e->kind))
         return 0;
     if (e->kind == SCRIPTS_FREE_STATE) {
-        FreeObjectState(StateOfOffset(reinterpret_cast<const ScriptsState*>(e)->state));
+        FreeObjectState(ScriptsStateOfOffset(reinterpret_cast<const ScriptsState*>(e)->state));
         return 1;
     }
     if (e->kind == SCRIPTS_INIT_STATE) {
         const ScriptsState* p = reinterpret_cast<const ScriptsState*>(e);
-        InitObjectState(StateOfOffset(p->state), (Object3do*)g_game->features[p->feature].object);
+        InitObjectState(ScriptsStateOfOffset(p->state), (Object3do*)g_game->features[p->feature].object);
         return 1;
     }
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)
         return 0;
     if (e->kind == SCRIPTS_START)
-        return Start(unit, reinterpret_cast<const ScriptsStart*>(e));
+        return ScriptsApplyStart(unit, reinterpret_cast<const ScriptsStart*>(e));
     const ScriptsDetachPiece* p = reinterpret_cast<const ScriptsDetachPiece*>(e);
     if (p->pose == 1)
         PoseUnitModel(unit);

@@ -66,7 +66,7 @@ static const char* MovementScriptName(int script)
     return nullptr;
 }
 
-static void StartOf(unsigned int unit, int form, const char* name, int index, unsigned int callback, int update, int count, const int* args)
+static void ScriptsWorldStartOf(unsigned int unit, int form, const char* name, int index, unsigned int callback, int update, int count, const int* args)
 {
     ScriptsStart e = ScriptsStartOf<Unit>(nullptr, form, name, index, callback, update, count, args[0], args[1], args[2], args[3]);
     e.h.unit = unit;
@@ -78,7 +78,7 @@ void ScriptsOnWeaponsStartScript(const void* event, unsigned int size)
     if (size < sizeof(WeaponsStartScript))
         return;
     const WeaponsStartScript* effect = static_cast<const WeaponsStartScript*>(event);
-    StartOf(effect->h.unit, effect->withArgs == 1 ? SCRIPTS_START_BY_NAME_WITH_ARGS : SCRIPTS_START_BY_NAME, WeaponsScriptName(effect->script), 0, effect->callback, effect->update, effect->count, effect->args);
+    ScriptsWorldStartOf(effect->h.unit, effect->withArgs == 1 ? SCRIPTS_START_BY_NAME_WITH_ARGS : SCRIPTS_START_BY_NAME, WeaponsScriptName(effect->script), 0, effect->callback, effect->update, effect->count, effect->args);
 }
 
 void ScriptsOnWeaponsDetachPiece(const void* event, unsigned int size)
@@ -104,7 +104,7 @@ void ScriptsOnOrdersStartScript(const void* event, unsigned int size)
         form = SCRIPTS_START_BY_NAME_WITH_ARGS;
     else if (effect->form == ORDERS_SCRIPT_BY_INDEX_WITH_ARGS)
         form = SCRIPTS_START_BY_INDEX_WITH_ARGS;
-    StartOf(effect->h.unit, form, effect->name, effect->index, effect->callback, effect->update, effect->count, effect->args);
+    ScriptsWorldStartOf(effect->h.unit, form, effect->name, effect->index, effect->callback, effect->update, effect->count, effect->args);
 }
 
 void ScriptsOnMovementStartScript(const void* event, unsigned int size)
@@ -116,7 +116,7 @@ void ScriptsOnMovementStartScript(const void* event, unsigned int size)
     if (name == nullptr)
         return;
     static const int kNoArgs[4] = {0, 0, 0, 0};
-    StartOf(effect->h.unit, SCRIPTS_START_BY_NAME, name, 0, 0, 1, 0, kNoArgs);
+    ScriptsWorldStartOf(effect->h.unit, SCRIPTS_START_BY_NAME, name, 0, 0, 1, 0, kNoArgs);
 }
 
 void ScriptsOnEconomyExtractor(const void* event, unsigned int size)
@@ -129,7 +129,7 @@ void ScriptsOnEconomyExtractor(const void* event, unsigned int size)
     Unit* unit = ref.get();
     if (unit->script != nullptr) {
         const int args[4] = {effect->metal, 0, 0, 0};
-        StartOf(effect->h.unit, SCRIPTS_START_BY_NAME_WITH_ARGS, "SetSpeed", 0, 0, 0, 1, args);
+        ScriptsWorldStartOf(effect->h.unit, SCRIPTS_START_BY_NAME_WITH_ARGS, "SetSpeed", 0, 0, 0, 1, args);
     }
 }
 
@@ -163,5 +163,5 @@ void ScriptsOnTargetingCleared(const void* event, unsigned int size)
         return;
     const TargetingEventHeader* effect = static_cast<const TargetingEventHeader*>(event);
     const int args[4] = {effect->weapon, 0, 0, 0};
-    StartOf(effect->unit, SCRIPTS_START_BY_NAME_WITH_ARGS, "TargetCleared", 0, 0, 0, 1, args);
+    ScriptsWorldStartOf(effect->unit, SCRIPTS_START_BY_NAME_WITH_ARGS, "TargetCleared", 0, 0, 0, 1, args);
 }

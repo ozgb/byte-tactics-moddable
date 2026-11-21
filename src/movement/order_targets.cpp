@@ -714,7 +714,7 @@ void PathOrder::SerializeToBits(BitWriter* stream)
 
 // FUNCTION: 0x44de80 ??0PathOrder@@QAE@HPAVHapiBank@@PAD@Z
 PathOrder::PathOrder(int owner, HapiBank* file, char* name)
-    : OrderFx((Order*)owner), ref()
+    : OrderFx((Order*)owner)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
@@ -783,7 +783,7 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
 
 // FUNCTION: 0x44e080 ??0PathOrder@@QAE@PAUUnit@@PAVBitReader@@@Z
 PathOrder::PathOrder(Unit* owner_, BitReader* reader)
-    : OrderFx(nullptr), unit(owner_), ref()
+    : OrderFx(nullptr), unit(owner_)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
@@ -814,7 +814,7 @@ PathOrder::PathOrder(Unit* owner_, BitReader* reader)
 
 // FUNCTION: 0x44e190 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z
 PathOrder::PathOrder(Order* order, Unit* unit)
-    : OrderFx(order), ref()
+    : OrderFx(order)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
@@ -837,7 +837,7 @@ PathOrder::PathOrder(Order* order, Unit* unit)
 
 // FUNCTION: 0x44e250 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@F@Z
 PathOrder::PathOrder(Order* source, Unit* unit, short value)
-    : OrderFx(source), piece(value), ref()
+    : OrderFx(source), piece(value)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);
@@ -850,7 +850,7 @@ PathOrder::PathOrder(Order* source, Unit* unit, short value)
 
 // FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
 PathOrder::PathOrder(Order* source, const Vec3& p)
-    : OrderFx(source), ref(), pos(p)
+    : OrderFx(source), pos(p)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, nullptr, nullptr);
     SetVtable(g_pathOrderVtable);
@@ -863,7 +863,7 @@ PathOrder::PathOrder(Order* source, const Vec3& p)
 
 // FUNCTION: 0x44e330 ??0PathOrder@@QAE@PAUOrder@@PAUUnit@@ABUVec3@@@Z
 PathOrder::PathOrder(Order* source, Unit* unit, const Vec3& p)
-    : OrderFx(source), ref()
+    : OrderFx(source)
 {
     g_seams.units->UnitRefInit((UnitRef*)&ref, unit, nullptr);
     SetVtable(g_pathOrderVtable);

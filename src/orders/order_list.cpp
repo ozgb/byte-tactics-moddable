@@ -320,7 +320,7 @@ static inline MissionType MissionTypeOf(unsigned char k)
 
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
-    : kind(MissionTypeOf(k)), link(), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
+    : kind(MissionTypeOf(k)), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
       id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
 {
     g_seams.units->UnitRefInit((UnitRef*)&link, o, nullptr);

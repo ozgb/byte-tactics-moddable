@@ -427,7 +427,6 @@ static unsigned char OrderKindFromSavedIndex(unsigned char want)
 
 // FUNCTION: 0x43a420
 Order::Order(Unit* punit, HapiBank* file, char* name)
-    : link()
 {
     g_seams.units->UnitRefInit((UnitRef*)&link, nullptr, nullptr);
     g_seams.units->UnitRefSetValue((UnitRef*)&link, this);

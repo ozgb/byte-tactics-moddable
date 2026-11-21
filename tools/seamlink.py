@@ -86,7 +86,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 PickRandomReclaimableResourcesInRadius, which the services ScheduleMapCanBuildAt, ScheduleMapCanPlaceUnitFootprint and ScheduleMapPickReclaimable
                 (src/seams/map_world.cpp) reach for the other subsystems, and RefreshMovedUnits and RefreshUnitIfStale, the lazy refresh of the pass maps that
                 pathfinding's world (src/seams/pathfinding_world.cpp) runs at the start and end of a search; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
-                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none); orders' are Apply, RunOrders and RunSecondaryOrders, which the scheduler runs (engine functions: none); movement's are Apply, UpdateMotion and ApplyPathEvent, which the scheduler runs, ReadNetState, which ReceiveUnitStates runs (#948), and the synchronous New* slots (NewPathOrderAt, NewPathOrderToUnit, NewPathOrderToUnitAt, NewPathOrderToUnitAtAngle, NewAirManeuverOrder, NewApproachRadius, NewRingApproach, NewPointMarker), which build a target in the block and which the functions of orders call (the slot_callers of the pilot: the orders that hold the target). A presentation or unowned function fails like any other.
+                UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none); orders' are Apply, RunOrders and RunSecondaryOrders, which the scheduler runs (engine functions: none); movement's are Apply, UpdateMotion and ApplyPathEvent, which the scheduler runs, ReadNetState, which ReceiveUnitStates runs (#948), and the synchronous New* slots (NewPathOrderAt, NewPathOrderToUnit, NewPathOrderToUnitAt, NewPathOrderToUnitAtAngle, NewAirManeuverOrder, NewApproachRadius, NewRingApproach, NewPointMarker), which build a target in the block and which the functions of orders call (the slot_callers of the pilot: the orders that hold the target). units' writing slots are Apply, UpdateUnitHead, UpdateUnitBody, UpdateUnitTail, RefreshFactoryIndex and UpdateAllUnits, which the scheduler runs, and the synchronous CreateUnit, LoadUnit, AddBuildProgress, AddRepairProgress, UnitRefInit, UnitRefSetUnit, UnitRefSetValue and UnitRefUnlink, which orders, movement and players call (UNITS_SLOT_CALLERS), with the game functions that spawn units listed as its engine functions; scripts' are Apply and RunScripts, which the scheduler runs, and the synchronous slots that orders, weapons, units and the network call (SCRIPTS_SLOT_CALLERS). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
                 recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
@@ -228,6 +228,8 @@ AI_GLUE_FILE = "src/seams/ai_world.cpp"
 WEAPONS_GLUE_FILE = "src/seams/weapons_world.cpp"
 ORDERS_GLUE_FILE = "src/seams/orders_world.cpp"
 MOVEMENT_GLUE_FILE = "src/seams/movement_world.cpp"
+UNITS_GLUE_FILE = "src/seams/units_world.cpp"
+SCRIPTS_GLUE_FILE = "src/seams/scripts_world.cpp"
 QUERY_WRITE_KINDS = ("field_write", "field_maybe_written", "global_write", "global_maybe_written", "deref_write", "deref_maybe_written")
 OUT_KINDS = ("field_write", "deref_write")
 OUT_SERVICE_KINDS = ("field_maybe_written", "deref_maybe_written")
@@ -404,7 +406,52 @@ MOVEMENT = Pilot(
     setup=("LoadTarget", "SaveTarget"),
     setup_callers=(("Order::Order", "src/orders/order_queue.cpp"), ("Order::SerializeToSave", "src/orders/order_queue.cpp")),
     slot_callers=tuple((slot, "orders") for slot in MOVEMENT_NEW_SLOTS))
-PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS, ORDERS, MOVEMENT)
+UNITS_SLOT_CALLERS = (("CreateUnit", "orders"), ("CreateUnit", "players"), ("LoadUnit", "movement"), ("LoadUnit", "orders"),
+                      ("AddBuildProgress", "orders"), ("AddRepairProgress", "orders"), ("UnitRefInit", "orders"), ("UnitRefInit", "movement"),
+                      ("UnitRefSetUnit", "orders"), ("UnitRefSetUnit", "movement"), ("UnitRefSetValue", "orders"),
+                      ("UnitRefUnlink", "movement"))
+UNITS = Pilot(
+    owner="units", header="interfaces/units.h", seam="UnitsSeam",
+    writing=("Apply", "UpdateUnitHead", "UpdateUnitBody", "UpdateUnitTail", "RefreshFactoryIndex", "UpdateAllUnits", "CreateUnit", "LoadUnit",
+             "AddBuildProgress", "AddRepairProgress", "UnitRefInit", "UnitRefSetUnit", "UnitRefSetValue", "UnitRefUnlink"),
+    query=("FindUnitType", "FindUnitTypeId", "FindMissionUnit", "CanLoad", "CanReclaim", "CanRepair", "GetFactoriesInRadius", "UnitRefGet",
+           "GetMovementLimits", "WriteState"),
+    engine_files=(SCHEDULER_FILE, UNITS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"), ("CreateMissionUnits", "src/units/unit_commands.cpp"),
+                      ("DefaultCommandHandler", "src/game/console_commands.cpp"), ("LoadMatch", "src/game/game_load.cpp"),
+                      ("SpawnCommanderAtStartPos", "src/game/main_loop.cpp"), ("IssueScriptedSpawn", "src/harness/harness.cpp")),
+    allowed_indirect=("MissionSeam::CountMissionUnits", "MissionSeam::GetMissionUnit"),
+    walk_locals=(("WriteState", "UnitsWriteState", "FactoryIndexEntry"),),
+    rowless_calls=("BlockVector::Begin", "BlockVector::End", "BlockVector::Size", "_strcmpi", "strcmp", "operator CargoLinkView *", "operator bool",
+                   "push_back", "sprintf"),
+    setup=("UnitTypeSetAddTypeOrCategory", "AllocateUnitMemory", "FreeUnitMemory", "FreeUnitInfo", "RefreshUnitInfo", "LoadUnitTypes",
+           "FreeUnitTypes", "LoadDownloadMenus", "FreeDownloadMenus", "FreeMovementClasses", "InitUnitCategories", "FreeUnitCategories",
+           "KillAllUnits", "KillUnitsOfType", "ReloadUnitType", "KillUnit", "LoadUnits", "SaveUnits", "CreateFactoryIndex", "FreeFactoryIndex"),
+    setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
+                   ("ShutdownGame", "src/game/game_state.cpp"), ("CmdKill", "src/game/console_commands.cpp"),
+                   ("CmdLimitSlot", "src/game/console_commands.cpp"), ("CmdReload", "src/game/console_commands.cpp"),
+                   ("CmdWeightSlot", "src/game/console_commands.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
+                   ("SaveGameFile", "src/game/settings_campaign.cpp"), ("MenuFrame", "src/game/main_loop.cpp"),
+                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp")),
+    slot_callers=UNITS_SLOT_CALLERS)
+SCRIPTS_SLOT_CALLERS = (("QueryScript", "orders"), ("QueryScript", "weapons"), ("GetNanoPiecePosition", "orders"),
+                        ("GetAimFromPosition", "weapons"), ("StartScriptWithArgsByIndex", "network"), ("UpdateObjectState", "presentation"))
+SCRIPTS = Pilot(
+    owner="scripts", header="interfaces/scripts.h", seam="ScriptsSeam",
+    writing=("Apply", "RunScripts", "StartScriptWithArgsByIndex", "QueryScript", "GetNanoPiecePosition", "GetAimFromPosition", "GetSweetSpot",
+             "UpdateObjectState", "PoseUnitModel", "NewUnitScript", "SetCob", "CreatePlayerObjectState", "SetObjectState", "CreateObjectState",
+             "DeleteScript", "FreeObjectState", "LoadScriptState", "SaveScriptState"),
+    query=("FindScript", "GetPieceOffset", "GetPiecePosition", "GetPieceAngles", "ObjectStateSize"),
+    engine_files=(SCHEDULER_FILE, SCRIPTS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_functions=(),
+    walk_locals=(("GetPieceOffset", "RotateByAngles", "Vec3"), ("GetPiecePosition", "RotateByAngles", "Vec3"),
+                 ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord")),
+    rowless_calls=("RotatePoint2D", "operator PieceAngleRecord *", "operator PieceRecord *", "operator PieceTable *", "operator+", "strcmp"),
+    slot_callers=SCRIPTS_SLOT_CALLERS + tuple((slot, "units") for slot in ("NewUnitScript", "SetCob", "CreatePlayerObjectState", "SetObjectState",
+                                                                             "CreateObjectState", "DeleteScript", "FreeObjectState",
+                                                                             "LoadScriptState", "SaveScriptState", "QueryScript", "GetSweetSpot",
+                                                                             "PoseUnitModel")))
+PILOTS = (ECONOMY, WIND_METEORS, FEATURES, TARGETING, LOS_RADAR, MAP, PLAYERS, AI, WEAPONS, ORDERS, MOVEMENT, UNITS, SCRIPTS)
 
 
 @dataclass

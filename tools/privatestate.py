@@ -83,6 +83,10 @@ Orders' state is the orders of a unit, written by orders alone and read by other
 
 Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. Map may write the path lock stamp (`UnitMotion::pathLockStamp`) too: its pass maps stamp a unit's motion with the tick as they refresh for it (RefreshPassMapsForUnit, PassMap::RefreshMovedUnits), while the stamp of a unit placed on the map is movement's PLACED event. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
 
+Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it.
+
+Units' state is the unit record, written by units alone but for the items of the owners above it in the table (targeting, weapons, orders, movement, map and scripts) and for the views of the record that other subsystems keep: map's `Unit::cargoNext` (the bucket link: SpatialBucket::UnlinkUnit, SpatialBucket::PrependUnit, SetOwner, ClearFootprintAndUnlink) and `Unit::cobStateFlags` (SetYardOpen), los_radar's and map's and presentation's bits of `Unit::flags` (UpdateSensorRadarAndCloak and the jam visitors; ClaimFootprintCells, AddUnitToMap, RemoveUnitFromMap, SetYardOpen, ForceNeighborFootprintReclaim; the selection functions), los_radar's `Unit::workTime` (charged by the log), economy's `Unit::extraction` (EconomyUpdateMetalExtraction), ai's `Unit::group` (SetUnitSquad) and targeting's `Unit::netDirtyFlags` (SetWeaponTargetUnit, SetWeaponTargetPos): the `also_written_by` of the owner.
+
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
 """
@@ -173,6 +177,19 @@ ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "uni
 MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"), ("UnitMotion::pathLockStamp", "map"))
 
 
+UNITS_WRITE_TYPES = ("Unit",)
+
+UNITS_ALSO_WRITTEN_BY = (("Unit::cargoNext", "map"), ("Unit::cobStateFlags", "map"), ("Unit::flags", "los_radar"), ("Unit::flags", "map"),
+                         ("Unit::flags", "presentation"), ("Unit::workTime", "los_radar"), ("Unit::extraction", "economy"),
+                         ("Unit::group", "ai"), ("Unit::netDirtyFlags", "targeting"))
+
+SCRIPTS_WRITE_TYPES = ("CobScript", "UnitScript", "Channel", "Piece", "ModelPiece")
+
+SCRIPTS_WRITE_ITEMS = ("NewUnitScript: new UnitScript", "CobScript::SetCob: realloc int", "Unit::script")
+
+SCRIPTS_ALSO_WRITTEN_BY = (("Unit::script", "units"),)
+
+
 @dataclass(frozen=True)
 class Owner:
     """A subsystem with private state: the items of its types, its region root and its allocation (an item named `<function>: <allocator> <tag>` of a region it allocates), the types of items private for writes only, and the named items private for reads and writes (items) or for writes only (write_items)."""
@@ -205,7 +222,9 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("weapons", "", (), NO_ALLOCATION, WEAPONS_WRITE_TYPES, write_items=WEAPONS_WRITE_ITEMS),
           Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS, also_written_by=ORDERS_ALSO_WRITTEN_BY),
           Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS,
-                also_written_by=MOVEMENT_ALSO_WRITTEN_BY))
+                also_written_by=MOVEMENT_ALSO_WRITTEN_BY),
+          Owner("scripts", "", (), NO_ALLOCATION, SCRIPTS_WRITE_TYPES, write_items=SCRIPTS_WRITE_ITEMS, also_written_by=SCRIPTS_ALSO_WRITTEN_BY),
+          Owner("units", "", (), NO_ALLOCATION, UNITS_WRITE_TYPES, also_written_by=UNITS_ALSO_WRITTEN_BY))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",

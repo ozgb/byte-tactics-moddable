@@ -756,7 +756,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_economy_wind_meteors_features_targeting_and_los_radar(self):
-        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons", "orders", "movement"])
+        self.assertEqual([p.owner for p in seamlink.PILOTS], ["economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons", "orders", "movement", "units", "scripts"])
         self.assertEqual(set(seamlink.FEATURES.writing + seamlink.FEATURES.setup + seamlink.FEATURES.query),
                          set(seamlink.slot_parameters((seamlink.ROOT / "interfaces/features.h").read_text(), "FeaturesSeam"))
                          if (seamlink.ROOT / "interfaces/features.h").exists() else set())
@@ -882,7 +882,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
-        self.assertEqual(seamlink.PILOTS[-8].owner, "targeting")
+        self.assertEqual(seamlink.PILOTS[-10].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
         self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
@@ -994,7 +994,7 @@ LrList,src/map/line_of_sight_index.cpp,los_radar,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_los_radar_before_map(self):
-        self.assertEqual(seamlink.PILOTS[-7].owner, "los_radar")
+        self.assertEqual(seamlink.PILOTS[-9].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex", "Init", "Shutdown"))
         self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"))
@@ -1121,7 +1121,7 @@ MpHelp,src/map/terrain.cpp,map,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_map_before_players(self):
-        self.assertEqual(seamlink.PILOTS[-6].owner, "map")
+        self.assertEqual(seamlink.PILOTS[-8].owner, "map")
         self.assertEqual(seamlink.MAP.writing, ("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius",
                                                 "RefreshMovedUnits", "RefreshUnitIfStale"))
         header = seamlink.ROOT / "interfaces/map.h"
@@ -1228,7 +1228,7 @@ PlBlink,src/game/players.cpp,players,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_players_before_ai(self):
-        self.assertEqual(seamlink.PILOTS[-5].owner, "players")
+        self.assertEqual(seamlink.PILOTS[-7].owner, "players")
         self.assertEqual(seamlink.PLAYERS.writing, ("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
                                                     "UpdatePlayerTail", "UpdatePlayersFinish", "UpdateBlink", "Init", "Shutdown"))
         self.assertEqual(seamlink.PLAYERS.query, ("RegionSize", "WriteState"))
@@ -1310,7 +1310,7 @@ UpdateSquadsNative,src/seams/native.cpp,seams,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_ai_before_weapons(self):
-        self.assertEqual(seamlink.PILOTS[-4].owner, "ai")
+        self.assertEqual(seamlink.PILOTS[-6].owner, "ai")
         self.assertEqual(seamlink.AI.writing, ("Apply", "UpdateSquads", "UpdatePlayerAI"))
         self.assertEqual(seamlink.AI.engine_functions, ())
         header = seamlink.ROOT / "interfaces/ai.h"
@@ -1385,7 +1385,7 @@ CountExplosionTables,src/weapons/explosions.cpp,weapons,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_weapons_before_orders_and_movement(self):
-        self.assertEqual(seamlink.PILOTS[-3].owner, "weapons")
+        self.assertEqual(seamlink.PILOTS[-5].owner, "weapons")
         self.assertEqual(seamlink.WEAPONS.writing, ("Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons"))
         header = seamlink.ROOT / "interfaces/weapons.h"
         if header.exists():
@@ -1462,7 +1462,7 @@ GetOrderType,src/orders/order_dispatch.cpp,orders,x,
         self.assertEqual(self.check([]), [])
 
     def test_the_pilots_table_lists_orders_before_movement(self):
-        self.assertEqual(seamlink.PILOTS[-2].owner, "orders")
+        self.assertEqual(seamlink.PILOTS[-4].owner, "orders")
         self.assertEqual(seamlink.ORDERS.writing, ("Apply", "RunOrders", "RunSecondaryOrders"))
         self.assertEqual(seamlink.ORDERS.engine_functions, ())
         self.assertIn(seamlink.ORDERS_GLUE_FILE, seamlink.ORDERS.engine_files)
@@ -1550,8 +1550,8 @@ TargetOfOffset,src/movement/movement_targets.cpp,movement,x,
     def test_the_tree_as_given_passes(self):
         self.assertEqual(self.check([]), [])
 
-    def test_the_pilots_table_lists_movement_last(self):
-        self.assertEqual(seamlink.PILOTS[-1].owner, "movement")
+    def test_the_pilots_table_lists_movement_before_units(self):
+        self.assertEqual(seamlink.PILOTS[-3].owner, "movement")
         self.assertEqual(seamlink.MOVEMENT.writing[:4], ("Apply", "UpdateMotion", "ApplyPathEvent", "ReadNetState"))
         self.assertEqual(seamlink.MOVEMENT.engine_functions, (("ReceiveUnitStates", "src/units/unit_position.cpp"),))
         self.assertEqual(set(slot for slot, _ in seamlink.MOVEMENT.slot_callers), set(seamlink.MOVEMENT_NEW_SLOTS))
@@ -1585,6 +1585,167 @@ TargetOfOffset,src/movement/movement_targets.cpp,movement,x,
         rows = [("MovementTargetType", "src/movement/movement_targets.cpp", "indirect_call", "virtual OrderFx::Destroy"),
                 ("TargetOfOffset", "src/movement/movement_targets.cpp", "field_write", "UnitMotion::speed")]
         self.assertEqual([f[:3] for f in self.check(rows)], [("query", "movement", "MovementTargetType"), ("query", "movement", "TargetOfOffset")])
+
+
+UNITS_HEADER = """struct UnitsSeam {
+    int (__stdcall* Apply)(const UnitsEventHeader* event, unsigned int size);
+    void (__stdcall* UpdateUnitHead)(Unit* unit);
+    Unit* (__stdcall* CreateUnit)(unsigned char player, unsigned short typeId);
+    unsigned short (__stdcall* FindUnitTypeId)(const char* name);
+    void (__stdcall* LoadUnits)(HapiBank* file);
+};
+"""
+UNITS_NATIVE = """static UnitsSeam s_units;
+s_units.Apply = UnitsApply;
+s_units.UpdateUnitHead = UnitsUpdateUnitHead;
+s_units.CreateUnit = UnitsCreateUnit;
+s_units.FindUnitTypeId = UnitsFindUnitTypeId;
+s_units.LoadUnits = UnitsLoadUnits;
+"""
+UNITS_PILOT = dataclasses.replace(
+    seamlink.UNITS, writing=("Apply", "UpdateUnitHead", "CreateUnit"), query=("FindUnitTypeId",), setup=("LoadUnits",),
+    setup_callers=(("LoadSavedGameState", "src/game/settings_campaign.cpp"),), slot_callers=(("CreateUnit", "orders"),),
+    engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),), allowed_indirect=(), walk_locals=(), rowless_calls=())
+
+
+class UnitsPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+SchedUnitsPhase,src/game/scheduler.cpp,game,x,
+RunGameSteps,src/ingame/game_dialogs.cpp,game,x,
+LoadSavedGameState,src/game/settings_campaign.cpp,game,x,
+BuildOrder,src/orders/unit_orders.cpp,orders,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
+Other,src/game/console_commands.cpp,game,x,
+UnitsFindUnitTypeId,src/units/unit_types.cpp,units,x,
+"""
+
+    def check(self, rows, native=UNITS_NATIVE):
+        rows = [("UnitsFindUnitTypeId", "src/units/unit_types.cpp", "function", "")] + rows
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(native)
+            (root / "interfaces/units.h").write_text(UNITS_HEADER)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, UNITS_PILOT)
+
+    def slot(self, name):
+        return f"indirect via void (*)(Unit *) __attribute__((stdcall)) [UnitsSeam::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_units_before_scripts(self):
+        self.assertEqual(seamlink.PILOTS[-2].owner, "units")
+        self.assertEqual(seamlink.UNITS.writing[:6], ("Apply", "UpdateUnitHead", "UpdateUnitBody", "UpdateUnitTail", "RefreshFactoryIndex", "UpdateAllUnits"))
+        self.assertIn(seamlink.UNITS_GLUE_FILE, seamlink.UNITS.engine_files)
+        self.assertEqual({o for s, o in seamlink.UNITS.slot_callers if s == "CreateUnit"}, {"orders", "players"})
+        header = seamlink.ROOT / "interfaces/units.h"
+        if header.exists():
+            pilot = seamlink.UNITS
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "UnitsSeam")))
+
+    def test_only_the_engine_the_named_callers_and_units_call_a_writing_slot(self):
+        rows = [("SchedUnitsPhase", "src/game/scheduler.cpp", "indirect_call", self.slot("UpdateUnitHead")),
+                ("RunGameSteps", "src/ingame/game_dialogs.cpp", "indirect_call", self.slot("UpdateUnitHead")),
+                ("BuildOrder", "src/orders/unit_orders.cpp", "indirect_call", self.slot("CreateUnit")),
+                ("BuildOrder", "src/orders/unit_orders.cpp", "indirect_call", self.slot("UpdateUnitHead")),
+                ("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("CreateUnit")),
+                ("Other", "src/game/console_commands.cpp", "field_read", "UnitsSeam::Apply")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)),
+                         [("call", "game", "Other"), ("call", "orders", "BuildOrder"), ("call", "weapons", "Fire")])
+
+    def test_a_set_up_slot_is_called_by_its_callers_only(self):
+        rows = [("LoadSavedGameState", "src/game/settings_campaign.cpp", "indirect_call", self.slot("LoadUnits")),
+                ("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("LoadUnits"))]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)), [("setup", "weapons", "Fire")])
+
+    def test_a_query_writes_no_state(self):
+        rows = [("UnitsFindUnitTypeId", "src/units/unit_types.cpp", "field_write", "Unit::health")]
+        self.assertEqual([f[:3] for f in self.check(rows)], [("query", "units", "UnitsFindUnitTypeId")])
+
+    def test_a_slot_that_is_not_filled_fails(self):
+        found = self.check([], native=UNITS_NATIVE.replace("s_units.CreateUnit = UnitsCreateUnit;\n", ""))
+        self.assertEqual([f[:3] for f in found], [("slot", "units", "CreateUnit")])
+
+
+SCRIPTS_HEADER = """struct ScriptsSeam {
+    int (__stdcall* Apply)(const ScriptsEventHeader* event, unsigned int size);
+    int (__stdcall* QueryScript)(CobScript* script, char* name);
+    void (__stdcall* RunScripts)(CobScript* script, int elapsed);
+    int (__stdcall* FindScript)(CobScript* script, const char* name);
+};
+"""
+SCRIPTS_NATIVE = """static ScriptsSeam s_scripts;
+s_scripts.Apply = ScriptsApply;
+s_scripts.QueryScript = ScriptsQueryScript;
+s_scripts.RunScripts = ScriptsRunScripts;
+s_scripts.FindScript = ScriptsFindScript;
+"""
+SCRIPTS_PILOT = dataclasses.replace(
+    seamlink.SCRIPTS, writing=("Apply", "QueryScript", "RunScripts"), query=("FindScript",), setup=(),
+    slot_callers=(("QueryScript", "orders"),), walk_locals=(), rowless_calls=())
+
+
+class ScriptsPilotTest(unittest.TestCase):
+    SUBS = """function,file,subsystem,rule,override
+SchedUnitsPhase,src/game/scheduler.cpp,game,x,
+BuildOrder,src/orders/unit_orders.cpp,orders,x,
+Fire,src/weapons/weapons.cpp,weapons,x,
+Aim,src/units/unit_targets.cpp,targeting,x,
+ScriptsFindScript,src/scripts/cob.cpp,scripts,x,
+"""
+
+    def check(self, rows, native=SCRIPTS_NATIVE):
+        rows = [("ScriptsFindScript", "src/scripts/cob.cpp", "function", "")] + rows
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "data").mkdir()
+            (root / "src/seams").mkdir(parents=True)
+            (root / "interfaces").mkdir()
+            (root / seamlink.NATIVE_TABLE).write_text(native)
+            (root / "interfaces/scripts.h").write_text(SCRIPTS_HEADER)
+            (root / seamlink.SUBSYSTEMS).write_text(self.SUBS)
+            (root / seamlink.RWSETS).write_text("address,function,file,kind,target\n"
+                                                + "".join(f'0x1,{f},{p},{k},"{t}"\n' for f, p, k, t in rows))
+            return seamlink.pilot_seams(root, SCRIPTS_PILOT)
+
+    def slot(self, name):
+        return f"indirect via void (*)(CobScript *) __attribute__((stdcall)) [ScriptsSeam::{name}]"
+
+    def test_the_tree_as_given_passes(self):
+        self.assertEqual(self.check([]), [])
+
+    def test_the_pilots_table_lists_scripts_last(self):
+        self.assertEqual(seamlink.PILOTS[-1].owner, "scripts")
+        self.assertIn(seamlink.SCRIPTS_GLUE_FILE, seamlink.SCRIPTS.engine_files)
+        self.assertIn("RunScripts", seamlink.SCRIPTS.writing)
+        self.assertNotIn(("GetSweetSpot", "targeting"), seamlink.SCRIPTS.slot_callers)
+        header = seamlink.ROOT / "interfaces/scripts.h"
+        if header.exists():
+            pilot = seamlink.SCRIPTS
+            self.assertEqual(set(pilot.writing + pilot.setup + pilot.query), set(seamlink.slot_parameters(header.read_text(), "ScriptsSeam")))
+
+    def test_only_the_engine_the_named_callers_and_scripts_call_a_writing_slot(self):
+        rows = [("SchedUnitsPhase", "src/game/scheduler.cpp", "indirect_call", self.slot("RunScripts")),
+                ("BuildOrder", "src/orders/unit_orders.cpp", "indirect_call", self.slot("QueryScript")),
+                ("BuildOrder", "src/orders/unit_orders.cpp", "indirect_call", self.slot("RunScripts")),
+                ("Fire", "src/weapons/weapons.cpp", "indirect_call", self.slot("QueryScript")),
+                ("Aim", "src/units/unit_targets.cpp", "field_read", "ScriptsSeam::Apply")]
+        self.assertEqual(sorted(f[:3] for f in self.check(rows)),
+                         [("call", "orders", "BuildOrder"), ("call", "targeting", "Aim"), ("call", "weapons", "Fire")])
+
+    def test_a_query_writes_no_state(self):
+        rows = [("ScriptsFindScript", "src/scripts/cob.cpp", "field_write", "Channel::state")]
+        self.assertEqual([f[:3] for f in self.check(rows)], [("query", "scripts", "ScriptsFindScript")])
+
+    def test_a_slot_that_is_not_filled_fails(self):
+        found = self.check([], native=SCRIPTS_NATIVE.replace("s_scripts.RunScripts = ScriptsRunScripts;\n", ""))
+        self.assertEqual([f[:3] for f in found], [("slot", "scripts", "RunScripts")])
 
 
 if __name__ == "__main__":

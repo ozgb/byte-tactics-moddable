@@ -44,7 +44,7 @@ struct Unit {
             unsigned char f_1f;
             int field_20;
             char unknown_24[2];
-            int lastTick;
+            char unknown_26[4];
             char unknown_2a[2];
             Ref<WeaponDef> f2c;
             char unknown_30[10];

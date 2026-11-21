@@ -3442,7 +3442,7 @@ void __stdcall RecMovementApplyPathEvent(const PathfindingEventHeader* a0, unsig
     }
 }
 
-void __stdcall RecMovementGetMotionState(Unit* a0, MovementMotionState* a1)
+void __stdcall RecMovementGetMotionState(Unit* a0, MovementSavedState* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);

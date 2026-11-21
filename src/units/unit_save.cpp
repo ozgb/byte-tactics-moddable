@@ -325,7 +325,7 @@ static void LoadUnitMotion(Unit* unit, HapiBank* file)
     file->OpenNamedBox(name);
     file->SeekBox(0);
     file->ReadBox(&rec, 0x23);
-    MovementMotionState state;
+    MovementSavedState state;
     state.velocity[0] = rec.velocity[0];
     state.velocity[1] = rec.velocity[1];
     state.velocity[2] = rec.velocity[2];
@@ -334,17 +334,17 @@ static void LoadUnitMotion(Unit* unit, HapiBank* file)
     state.p2[2] = rec.p2[2];
     state.speed = rec.speed;
     state.turn = rec.turn;
-    state.pathLockStamp = rec.pathLockStamp;
     state.mode = rec.mode;
     state.flag = rec.flag;
     MovementPublishLoad(SCHED_UNITS, unit, &state);
+    MapPublishPathLockStamp(SCHED_UNITS, unit, rec.pathLockStamp);
 }
 
 // FUNCTION: 0x43dd70
 static void SaveUnitMotion(Unit* unit, HapiBank* file)
 {
     char name[32];
-    MovementMotionState state;
+    MovementSavedState state;
     g_seams.movement->GetMotionState(unit, &state);
     UnitMotionSaveRecord hdr;
     memset(&hdr, 0, sizeof(hdr));
@@ -356,7 +356,7 @@ static void SaveUnitMotion(Unit* unit, HapiBank* file)
     hdr.p2[2] = state.p2[2];
     hdr.speed = state.speed;
     hdr.turn = (short)state.turn;
-    hdr.pathLockStamp = state.pathLockStamp;
+    hdr.pathLockStamp = g_seams.map->PathLockStamp(unit);
     hdr.mode = state.mode;
     hdr.flag = state.flag;
     sprintf(name, "u%04xmob", unit->id);

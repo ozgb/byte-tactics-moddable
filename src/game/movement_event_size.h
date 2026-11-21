@@ -8,7 +8,7 @@ inline unsigned int MovementEventSize(int kind)
 {
     switch (kind) {
     case MOVEMENT_LOAD:
-        return sizeof(MovementLoad);
+        return sizeof(MovementLoadState);
     case MOVEMENT_SET_MODE:
     case MOVEMENT_SET_FLIGHT_MODE:
         return sizeof(MovementSetMode);

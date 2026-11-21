@@ -2332,7 +2332,7 @@ static_assert(offsetof(Unit, field_1e) == 30, "");
 static_assert(offsetof(Unit, f_1f) == 31, "");
 static_assert(offsetof(Unit, field_20) == 32, "");
 static_assert(offsetof(Unit, unknown_24) == 36, "");
-static_assert(offsetof(Unit, lastTick) == 38, "");
+static_assert(offsetof(Unit, unknown_26) == 38, "");
 static_assert(offsetof(Unit, unknown_2a) == 42, "");
 static_assert(offsetof(Unit, f2c) == 44, "");
 static_assert(offsetof(Unit, unknown_30) == 48, "");

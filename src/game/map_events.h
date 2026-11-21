@@ -30,6 +30,17 @@ inline void MapPublishSetYard(int outbox, U* unit, int open)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+template <class U>
+inline void MapPublishPathLockStamp(int outbox, U* unit, int stamp)
+{
+    MapPathLockStamp event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_LOAD_PATH_LOCK_STAMP;
+    event.h.unit = Ref<U>(unit).offset;
+    event.stamp = stamp;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class C, class S>
 inline MapPassMaps MapPassMapsOf(C cell, S size)
 {

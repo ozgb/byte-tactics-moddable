@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <string.h>
 
 #pragma pack(push, 1)
 #include "../units/unit.h"

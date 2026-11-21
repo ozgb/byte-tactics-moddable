@@ -1,16 +1,13 @@
 #include <stddef.h>
 
 #pragma pack(push, 1)
-#include "unit_type_set.h"
 #include "../weapons/unit_weapon_slot.h"
 #include "../network/player.h"
-#include "unit_def.h"
 #include "unit.h"
 #pragma pack(pop)
 
 #include "../util/vec3.h"
 #include "../util/angles.h"
-#include "../state/block.h"
 #include "../state/sim_speech.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/units.h"
@@ -31,7 +28,7 @@
 
 #include "../../link/globals.h"
 
-Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int finished, int mode, int id);
 
 static Unit* UnitOfOffset(unsigned int offset)
 {

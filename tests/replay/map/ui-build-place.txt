@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem map 7.0
+subsystem map 7.1
 call 0 Apply
   r Game.width 224
   r Game.height 102
@@ -297536,7 +297536,6 @@ call 0 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Unit#1.spatialBucket SpatialBucket#32
   w SpatialBucket#32.head Unit#1
   w Cell#3170.unit 1
@@ -297561,7 +297560,6 @@ call 0 Apply
   a event.kind 160
   a event.unit Unit#251
   a size 8
-  i services.SchedPublish 7 8
   w Unit#251.spatialBucket SpatialBucket#334
   w SpatialBucket#334.head Unit#251
   w Cell#19698.unit 251
@@ -323430,7 +323428,6 @@ call 45 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#3171.unit 1
   w Cell#3172.unit 1
   w Cell#3395.unit 1
@@ -324876,7 +324873,6 @@ call 64 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#3172.unit 1
   w Cell#3173.unit 1
   w Cell#3396.unit 1
@@ -325114,7 +325110,6 @@ call 67 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#3396.unit 1
   w Cell#3397.unit 1
   w Cell#3620.unit 1
@@ -326042,7 +326037,6 @@ call 80 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Unit#1.spatialBucket SpatialBucket#60
   w SpatialBucket#32.head null
   w SpatialBucket#60.head Unit#1
@@ -327076,7 +327070,6 @@ call 94 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#3844.unit 1
   w Cell#3845.unit 1
   w Cell#4068.unit 1
@@ -328074,7 +328067,6 @@ call 108 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#4068.unit 1
   w Cell#4069.unit 1
   w Cell#4292.unit 1
@@ -328381,7 +328373,6 @@ call 112 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#4069.unit 1
   w Cell#4070.unit 1
   w Cell#4293.unit 1
@@ -329245,7 +329236,6 @@ call 122 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#4293.unit 1
   w Cell#4294.unit 1
   w Cell#4517.unit 1
@@ -330242,7 +330232,6 @@ call 136 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  i services.SchedPublish 7 8
   w Cell#4517.unit 1
   w Cell#4518.unit 1
   w Cell#4741.unit 1

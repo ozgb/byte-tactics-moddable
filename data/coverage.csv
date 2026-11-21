@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,372,288,5918,3622,2202,892,,23,
+game,*,,373,288,5922,3622,2202,892,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -224,6 +224,7 @@ game,SaveCdLists,src/game/game_state.cpp,1,0,0,0,0,0,?SaveCdLists@@YGXXZ,0,input
 game,SaveGameScreenHandler,src/game/savegame.cpp,1,0,0,0,0,0,?SaveGameScreenHandler@@YGXPAUGui@@@Z,0,save-load
 game,SaveTrackSettings,src/game/settings.cpp,0,0,0,0,0,0,?SaveTrackSettings@@YGXPAE@Z,1,
 game,SavedGameSelectHandler,src/game/savegame.cpp,1,0,0,0,0,0,?SavedGameSelectHandler@@YGXHH@Z,0,save-load
+game,ScheduleUnitsDeliver,src/game/scheduler.cpp,1,0,0,0,0,0,?ScheduleUnitsDeliver@@YGXXZ,0,network
 game,SetGameMode,src/game/game_state.cpp,1,0,0,0,0,0,?SetGameMode@@YGXH@Z,0,menu
 game,SetGameSpeed,src/game/game_state.cpp,1,0,0,0,0,0,?SetGameSpeed@@YGXHH@Z,0,input
 game,ShowInvalidSavegameDialog,src/game/savegame.cpp,0,0,0,0,0,0,?ShowInvalidSavegameDialog@@YGXPAX@Z,1,
@@ -695,7 +696,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,244,234,5090,4372,2866,1882,,17,
+orders,*,,244,234,5092,4373,2866,1882,,17,
 orders,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,src/game/orders_events.h,1,0,0,0,0,0,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,0,unset-case
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
@@ -2216,7 +2217,7 @@ scripts,UnitScript::ExplodeLegacy,src/scripts/unit_script.cpp,1,0,0,0,0,0,?Explo
 scripts,UnitScript::GetTransporterId,src/scripts/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0,unused-opcode
 scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0,unused-opcode
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
-seams,*,,176,157,1244,1147,116,57,,0,
+seams,*,,176,156,1244,1144,116,57,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YGHXZ,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YGHXZ,0,
 seams,CountMissionsNative,src/seams/native.cpp,1,0,0,0,0,0,?CountMissionsNative@@YGHXZ,0,
@@ -2234,6 +2235,7 @@ seams,GetTranslatedNameNative,src/seams/native.cpp,1,0,0,0,0,0,?GetTranslatedNam
 seams,HasMissionNameNative,src/seams/native.cpp,1,0,0,0,0,0,?HasMissionNameNative@@YGHXZ,0,
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YGHH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YGHH@Z,0,
+seams,StartScriptWithArgsByIndexNative,src/seams/native.cpp,1,0,0,0,0,0,?StartScriptWithArgsByIndexNative@@YGHPAVCobScript@@HPAUCallback@@HHHHHH@Z,0,
 seams,WorldLineOfSight,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldLineOfSight@@YGHIHHHH@Z,0,
 seams,WorldTerrainPass,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldTerrainPass@@YGHIHH@Z,0,
 state,*,,552,485,1713,1204,1176,578,,59,
@@ -2365,7 +2367,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,20,20,228,219,108,86,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,163,146,3214,2778,1310,882,,28,
+units,*,,163,146,3215,2778,1310,882,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
 units,CheckDownloadableFlags,src/units/unit_types.cpp,0,0,0,0,0,0,?CheckDownloadableFlags@@YGXXZ,1,
 units,ClampPointToSegment,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ClampPointToSegment@@YGXPAUPoint16@@U1@1@Z,1,

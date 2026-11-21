@@ -624,9 +624,9 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (367 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 231 functions are called from outside, by platform (84 distinct functions) and presentation (33); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 620 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 68.
 
-**game, functions no scenario enters** (84 of 372 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 288 are entered, 77.4%), by reason:
+**game, functions no scenario enters** (85 of 373 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 288 are entered, 77.2%), by reason:
 
-- Network only (5): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
+- Network only (6): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes), `ScheduleUnitsDeliver` (units' inbox, delivered by `ReceiveUnitStates` after each unit's `UpdateMotion`). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
 - Menu or front end only (4): `Force640x480Surfaces`, `ReturnToMainMenuFrame`, `SaveAllMissionsSetting`, `SetGameMode`. The lobby, menus and dialogs, which test mode skips. Covered by #398's UI log.
 - Save and load only (8): `DeleteHapiBank`, `ListSavedGames`, `LoadGameScreenHandler`, `SaveGameScreenHandler`, `SavedGameSelectHandler`, `ShowLoadGameScreen`, `ShowSaveGameScreen`, `ShowSavedGameInfo`. Test mode saves (the `save` key, `save-midgame`) and loads that save (the `load` key, `load-midgame`, #442), which enters `FreeSummaryBank`, `LoadSavedGameState`, `OpenHapiBank` and `OpenSummaryBank`. The screens and handlers of the save and load menus are never entered.
@@ -783,11 +783,11 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **scripts** | 68 of 87 | 78.2% | 90.1% | 84.1% | 19 | 6 |
 | **movement** | 117 of 173 | 67.6% | 71.6% | 65.1% | 56 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
-| game | 288 of 372 | 77.4% | 61.2% | 40.5% | 84 | 23 |
+| game | 288 of 373 | 77.2% | 61.2% | 40.5% | 85 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 400 of 748 | 53.5% | 41.0% | 28.0% | 348 | 86 |
 | presentation | 565 of 1150 | 49.1% | 36.2% | 29.6% | 585 | 295 |
-| seams | 157 of 176 | 89.2% | 92.2% | 49.1% | 19 | 0 |
+| seams | 156 of 176 | 88.6% | 92.0% | 49.1% | 20 | 0 |
 | state | 485 of 552 | 87.9% | 70.3% | 49.1% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

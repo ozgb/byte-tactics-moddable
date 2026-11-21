@@ -13,6 +13,7 @@ movement,units,PathOrder::pos_z,units,g9,89,equal,88,0,0
 orders,ai,Unit::group,units,g3,89,equal,88,0,1688
 orders,features,Unit::metal,units,g1,88,equal,87,0,0
 orders,los_radar,Order::pos,units,g1,89,equal,88,0,0
+orders,movement,Order::unit,projectiles,g11,89,equal,88,0,0
 orders,players,Unit::pos,units,g1,89,equal,88,0,0
 orders,players,Unit::zFraction,units,g1,89,equal,88,0,0
 orders,units,Order::pos,projectiles,g6,89,equal,88,0,0
@@ -23,10 +24,12 @@ orders,weapons,Order::kind,projectiles,g4,89,equal,88,0,0
 orders,weapons,Unit::field_1e,units,g8,89,equal,88,0,0
 targeting,weapons,Unit::current,players,g1,89,equal,88,0,0
 units,ai,Unit::activateFlags,units,g1,89,equal,88,0,0
+units,ai,Unit::group,units,g11,89,equal,88,0,0
 units,features,FeatureAnimEntry::bytes_10,units,g1,89,equal,88,0,0
 units,orders,AirManeuverOrder::target,units,g6,89,equal,88,0,0
 units,orders,PathOrder::unit,units,g6,89,equal,88,0,0
 units,orders,Unit::activateFlags,units,g3,89,equal,88,0,1688
+units,orders,Unit::group,units,g12,89,equal,88,0,0
 units,orders,Unit::killCount,units,g3,89,equal,88,0,1688
 units,orders,Unit::lastDamageType,units,g10,89,equal,88,0,0
 units,orders,Unit::metal,units,g3,88,equal,87,0,1688

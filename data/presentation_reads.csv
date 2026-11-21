@@ -1,4 +1,5 @@
 item,reader,pattern,covered_by_event,visibility,runs
+AddOrder: new Order,orders,unknown,,all-players,4
 AiSearchGoal::active,presentation,unknown,,all-players,0
 AiSearchGoal::count,presentation,unknown,,all-players,0
 BroadcastToggleFlags::b0,presentation,ui-action,,all-players,0
@@ -99,10 +100,8 @@ ModelState::shadow,platform,every-frame,,per-player-filter,88
 ModelState::shadow,presentation,every-frame,,per-player-filter,63
 ModelState::shadow,scripts,every-frame,,per-player-filter,88
 ModelState::shadow,unknown,unknown,,per-player-filter,48
-NewApproachRadiusNative: new ApproachRadius,movement,unknown,,all-players,3
-NewApproachRadiusNative: new ApproachRadius,seams,unknown,,all-players,3
-NewPointMarkerNative: new PointMarker,movement,unknown,,all-players,1
-NewPointMarkerNative: new PointMarker,seams,unknown,,all-players,1
+MovementNewApproachRadius: new ApproachRadius,movement,unknown,,all-players,3
+MovementNewPointMarker: new PointMarker,movement,unknown,,all-players,1
 NewUnitScript: new UnitScript,scripts,unknown,,all-players,3
 Order::attached,orders,ui-action,,per-player-filter,4
 Order::created,presentation,ui-action,,per-player-filter,2
@@ -112,15 +111,16 @@ Order::kind,orders,ui-action,,per-player-filter,5
 Order::kind,presentation,ui-action,,per-player-filter,3
 Order::next,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,5
 Order::next,presentation,ui-action,,per-player-filter,3
-Order::pos,orders,ui-action,,per-player-filter,1
+Order::pos,orders,unknown,,per-player-filter,1
 Order::pos,presentation,ui-action,,per-player-filter,2
 Order::radius,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,2
-Order::subFlags,movement,unknown,,per-player-filter,4
-Order::target,orders,ui-action,,per-player-filter,3
+Order::subFlags,orders,unknown,,per-player-filter,4
+Order::target,orders,ui-action,,per-player-filter,6
 Order::target,presentation,ui-action,,per-player-filter,2
 Order::target,units,unknown,,per-player-filter,6
 Order::type,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,2
 Order::type,presentation,ui-action,,per-player-filter,1
+Order::unit,movement,unknown,,per-player-filter,4
 Order::unit,orders,ui-action,,per-player-filter,5
 Order::unit,presentation,ui-action,,per-player-filter,2
 PieceFrame::always0,presentation,unknown,,per-player-filter,0
@@ -234,6 +234,7 @@ Unit::list,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,8
 Unit::list,presentation,ui-action,,per-player-filter,5
 Unit::list2,orders,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,8
 Unit::mode,presentation,ui-action,,per-player-filter,0
+Unit::motion,movement,unknown,,per-player-filter,5
 Unit::motion,orders,ui-action,,per-player-filter,6
 Unit::motion,presentation,every-frame,,per-player-filter,87
 Unit::moveOrder,presentation,unknown,,per-player-filter,0
@@ -337,9 +338,8 @@ UnitDef::sonardistance,presentation,ui-action,,all-players,0
 UnitDef::sonardistancejam,presentation,ui-action,,all-players,0
 UnitDef::soundcategory,presentation,ui-action,SIM_EVENT_UNIT_SPEECH,all-players,66
 UnitDef::weapons,orders,unknown,,all-players,2
-UnitMotion::UnitMotion: new PackedPosGoal,movement,unknown,,per-player-filter,4
-UnitMotion::UnitMotion: new PackedPosGoal,seams,unknown,,per-player-filter,5
-UnitMotion::obj,seams,unknown,,per-player-filter,5
+UnitMotion::UnitMotion: new PackedPosGoal,movement,unknown,,per-player-filter,5
+UnitMotion::obj,movement,unknown,,per-player-filter,5
 UnitMotion::speed,presentation,every-frame,,per-player-filter,87
 UnitTypeSet::bits,presentation,ui-action,,all-players,1
 WeaponDef::areaOfEffect,presentation,ui-action,,all-players,0

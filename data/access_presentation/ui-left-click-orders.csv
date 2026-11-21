@@ -1,4 +1,5 @@
 item,reader,function,container,every,after
+AddOrder: new Order,orders,OrdersApply,AddOrder: new Order,0,-
 BuildMenuPage::count,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
 BuildMenuPage::entries,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
 Feature::animTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
@@ -88,8 +89,8 @@ ModelState::shadow,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgn
 ModelState::shadow,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::shadow,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::shadow,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
-NewApproachRadiusNative: new ApproachRadius,movement,AiSearchGoal::SetPathOrder,NewApproachRadiusNative: new ApproachRadius,0,-
-NewApproachRadiusNative: new ApproachRadius,seams,OrderFxDestroyNative,NewApproachRadiusNative: new ApproachRadius,0,-
+MovementNewApproachRadius: new ApproachRadius,movement,AiSearchGoal::SetPathOrder,MovementNewApproachRadius: new ApproachRadius,0,-
+MovementNewApproachRadius: new ApproachRadius,movement,MovementApply,MovementNewApproachRadius: new ApproachRadius,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::FUN_004b07b0,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::StartScriptByIndex,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::StartScriptWithArgsByIndex,NewUnitScript: new UnitScript,0,-
@@ -105,10 +106,13 @@ Order::flags_42,orders,AddOrder,EnsurePatrolReturnOrder: new Order,0,-
 Order::flags_42,orders,InsertOrderAfterMarked,AddOrder: new Order,0,
 Order::next,orders,AddOrder,AddOrder: new Order,0,
 Order::next,orders,AddOrder,EnsurePatrolReturnOrder: new Order,0,-
-Order::subFlags,movement,AiSearchGoal::SetPathOrder,AddOrder: new Order,0,-
+Order::subFlags,orders,GetTableEntryByTypeByte,AddOrder: new Order,0,-
+Order::target,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,
+Order::target,orders,??1Order@@QAE@XZ,EnsurePatrolReturnOrder: new Order,0,-
 Order::target,units,PathOrderAttach::SetUnit,AddOrder: new Order,0,
 Order::target,units,UnitRef::Unlink,AddOrder: new Order,0,
 Order::target,units,UnitRef::Unlink,EnsurePatrolReturnOrder: new Order,0,-
+Order::unit,movement,AiSearchGoal::SetPathOrder,AddOrder: new Order,0,-
 Order::unit,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,
 Order::unit,orders,??1Order@@QAE@XZ,EnsurePatrolReturnOrder: new Order,0,-
 Unit::activateFlags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -169,6 +173,8 @@ Unit::list,orders,InsertOrderAfterMarked,AllocateUnitMemory: GameAllocIgnoreTag 
 Unit::list,orders,SumQueuedBuildCount,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::list2,orders,GetBuildWeaponPercent,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::list2,orders,SumQueuedBuildCount,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::motion,movement,MovementApply,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::motion,movement,MovementUnitTarget,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::motion,orders,??1Order@@QAE@XZ,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::motion,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::motion,orders,GetOrderType,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -252,10 +258,11 @@ UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgno
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::weapons,orders,GetOrderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
 UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::SetPathOrder,UnitMotion::UnitMotion: new PackedPosGoal,0,-
-UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalSetPathOrderNative,UnitMotion::UnitMotion: new PackedPosGoal,0,-
-UnitMotion::UnitMotion: new PackedPosGoal,seams,GoalTargetNative,UnitMotion::UnitMotion: new PackedPosGoal,0,
-UnitMotion::obj,seams,MotionGoalNative,NewUnitMotionNative: new UnitMotion,0,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,0,
+UnitMotion::UnitMotion: new PackedPosGoal,movement,MovementApply,UnitMotion::UnitMotion: new PackedPosGoal,0,-
+UnitMotion::UnitMotion: new PackedPosGoal,movement,MovementUnitTarget,UnitMotion::UnitMotion: new PackedPosGoal,0,
+UnitMotion::obj,movement,MovementApply,MovementApply: new UnitMotion,0,-
+UnitMotion::obj,movement,MovementUnitTarget,MovementApply: new UnitMotion,0,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,0,
 WeaponDef::flags,orders,GetOrderCursor,weapons,0,-
 WeaponDef::flags,orders,GetOrderType,weapons,0,-
 WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,

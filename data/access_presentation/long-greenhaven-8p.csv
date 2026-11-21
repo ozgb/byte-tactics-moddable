@@ -242,7 +242,7 @@ UnitDef::modelSizeX,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnor
 UnitDef::modelSizeY,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,3
 UnitDef::modelSizeZ,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,3
 UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,3
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,0,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,0,
 WeaponDef::colour,presentation,DrawProjectiles,weapons,0,3
 WeaponDef::colour2,presentation,DrawProjectiles,weapons,0,3
 WeaponDef::flags,presentation,DrawProjectiles,weapons,0,3

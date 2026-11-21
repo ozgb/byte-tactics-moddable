@@ -146,7 +146,7 @@ UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgn
 UnitDef::modelSizeX,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::modelSizeY,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
 UnitDef::modelSizeZ,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
-UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,NewUnitMotionNative: new UnitMotion,0,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,0,
 baseX,los_radar,ClampWorldPosToTerrain,baseX,1,
 baseY,los_radar,ClampWorldPosToTerrain,baseY,1,
 bits,game,BattleFrame,bits,0,

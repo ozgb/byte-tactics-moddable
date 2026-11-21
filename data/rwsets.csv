@@ -27007,8 +27007,8 @@ address,function,file,kind,target
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,global_read,g_seams
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissionUnits]
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(int, MissionUnitInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionUnit]"
-0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,AttachUnitToPiece
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,OrdersPublishAdd
+0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,UnitsPublishAttachToPiece
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,bx_sscanf
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,isspace
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,operator!=

@@ -1475,7 +1475,6 @@ game,targeting,shared_write,UnitDef::flags1,1
 game,targeting,shared_write,Vec3::x,3
 game,targeting,shared_write,Vec3::y,2
 game,targeting,shared_write,Vec3::z,3
-game,units,call,AttachUnitToPiece,1
 game,units,indirect,AllocateUnitMemory,1
 game,units,indirect,CreateUnit,4
 game,units,indirect,FindMissionUnit,1
@@ -5757,7 +5756,7 @@ seams,scripts,call,CreatePlayerObjectState,1
 seams,scripts,call,GetSweetSpot,1
 seams,scripts,call,NewUnitScript,1
 seams,scripts,call,UnitScript::SetObjectState,1
-seams,scripts,indirect,ScriptsApply,2
+seams,scripts,indirect,ScriptsApply,1
 seams,scripts,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 seams,scripts,shared_write,MapSeam::GetGroundHeight,1
 seams,scripts,shared_write,Ref<Unit>::offset,1
@@ -5797,7 +5796,7 @@ seams,units,call,Unit::CanReclaim,1
 seams,units,call,Unit::CanRepair,1
 seams,units,call,UnitRef::Unlink,1
 seams,units,call,UnitTypeSet::AddTypeOrCategory,1
-seams,units,indirect,UnitsApply,2
+seams,units,indirect,UnitsApply,1
 seams,units,shared_write,LosRadarSeam::GetMapCell,1
 seams,units,shared_write,MapSeam::GetGroundHeight,3
 seams,units,shared_write,MissionSeam::GetGameType,1

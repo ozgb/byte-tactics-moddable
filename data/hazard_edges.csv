@@ -1623,8 +1623,6 @@ OrderSquad,OrdersGetOrderType,"seam slot filled by InstallNativeSeams, OrdersSea
 OrdersInbox,OrdersApply,"seam slot filled by InstallNativeSeams, OrdersSeam::Apply, OrdersInbox (src/seams/orders_world.cpp), src/seams/native.cpp"
 UnitsInbox,UnitsApply,"seam slot filled by InstallNativeSeams, UnitsSeam::Apply, UnitsInbox (src/seams/units_world.cpp), src/seams/native.cpp"
 ScriptsInbox,ScriptsApply,"seam slot filled by InstallNativeSeams, ScriptsSeam::Apply, ScriptsInbox (src/seams/scripts_world.cpp), src/seams/native.cpp"
-UnitsInbox,UnitsApply,"seam slot filled by InstallNativeSeams, UnitsSeam::Apply, UnitsInbox (src/seams/units_world.cpp), src/seams/native.cpp"
-ScriptsInbox,ScriptsApply,"seam slot filled by InstallNativeSeams, ScriptsSeam::Apply, ScriptsInbox (src/seams/scripts_world.cpp), src/seams/native.cpp"
 Patrol,MovementNewPathOrderAt,"seam slot filled by InstallNativeSeams, MovementSeam::NewPathOrderAt, Patrol (src/orders/vtol_orders.cpp), src/seams/native.cpp"
 PrepVtolClimb,MovementNewPathOrderAt,"seam slot filled by InstallNativeSeams, MovementSeam::NewPathOrderAt, PrepVtolClimb (src/orders/vtol_orders.cpp), src/seams/native.cpp"
 ReceiveUnitStates,MovementReadNetState,"seam slot filled by InstallNativeSeams, MovementSeam::ReadNetState, ReceiveUnitStates (src/units/unit_position.cpp), src/seams/native.cpp"

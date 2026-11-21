@@ -1577,6 +1577,7 @@ units,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,1,skirmish4-
 units,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,10,edges-economy-targeting@36
 units,Unit::unknown_1c,weapons,FireBallisticProjectile,other-record,4,mission-radius@1301
 units,Unit::unknown_1c,weapons,FireTurretWeapon,other-record,10,edges-economy-targeting@39
+units,Unit::unknown_24,weapons,FireTurretWeapon,other-record,2,mission-radius@1310
 units,Unit::unknown_30,weapons,FireTurretWeapon,other-record,1,mission-radius@1309
 units,Unit::unknown_30,weapons,UpdateUnitWeapons,other-record,8,mission-timer@51
 units,Unit::unknown_30,weapons,UpdateUnitWeapons,same-record,5,mission-timer@51
@@ -1592,7 +1593,6 @@ units,Unit::weapon,weapons,UpdateUnitWeapons,other-record,41,mission-timer@51
 units,Unit::weapon,weapons,UpdateUnitWeapons,same-record,51,conditions-shore-to-shore@6
 units,Unit::weapon,weapons,WeaponCanReachPos,other-record,3,skirmish4-long@20780
 units,Unit::weapon,weapons,WeaponCanReachUnit,other-record,3,skirmish4-long@19381
-units,Unit::weapon1AimCob,weapons,FireTurretWeapon,other-record,2,mission-radius@1310
 units,Unit::weapon2Target,targeting,ApplyTargetingEvent,other-record,4,mission-kill-of-type@99
 units,Unit::yFraction,los_radar,IsUnitVisibleToPlayer,other-record,11,mission-capture@5
 units,Unit::yFraction,movement,PathOrder::IsComplete,other-record,12,mission-capture@1
@@ -2864,6 +2864,7 @@ units.players,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,2,lo
 units.players,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,12,mission-build-unit@54
 units.players,Unit::unknown_1c,weapons,FireBallisticProjectile,other-record,2,skirmish4-long@22010
 units.players,Unit::unknown_1c,weapons,FireTurretWeapon,other-record,11,mission-build-unit@54
+units.players,Unit::unknown_24,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::unknown_30,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::unknown_30,weapons,UpdateUnitWeapons,other-record,4,mission-capture@499
 units.players,Unit::unknown_4c,weapons,FireTurretWeapon,other-record,1,eight-full-moon@8001
@@ -2884,7 +2885,6 @@ units.players,Unit::weapon,weapons,GetWeaponRange,other-record,3,long-greenhaven
 units.players,Unit::weapon,weapons,UpdateUnitWeapons,other-record,42,conditions-shore-to-shore@6
 units.players,Unit::weapon,weapons,WeaponCanReachPos,other-record,4,orders-air-fights@161
 units.players,Unit::weapon,weapons,WeaponCanReachUnit,other-record,3,skirmish4-long@15961
-units.players,Unit::weapon1AimCob,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::weapon2AimCob,weapons,FireTurretWeapon,other-record,1,eight-full-moon@8001
 units.players,Unit::weapon2Target,targeting,ApplyTargetingEvent,other-record,10,edges-economy-targeting@82
 units.players,Unit::weapon2Target,targeting,GetWeaponTargetPos,other-record,29,edges-economy-targeting@10

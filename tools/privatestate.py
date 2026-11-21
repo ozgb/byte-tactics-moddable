@@ -52,7 +52,7 @@ damage and reclaim reach them through the scheduler's events.
 Targeting's state stays in the Unit record, hashed and read by others, and is written by targeting alone: the weapon target pair of each of the three
 weapon slots of a unit (`UnitWeaponSlot::aimTargetXOrUnitId` and `aimTargetZOrUnitSentinel`), which the log names by the first member of the union of
 `Unit` that starts each slot's words: `Unit::current` (slot 0), `Unit::field_20` (slot 1) and `Unit::weapon2Target` (slot 2), each the pair's four bytes.
-The other members of a slot (`Unit::field_8`, `Unit::weapon1AimCob`, `Unit::weapon2AimCob`) are not the pair and are shared with the unit's own set-up and
+The other members of a slot (`Unit::field_8`, `Unit::unknown_24`, `Unit::weapon2AimCob`) are not the pair and are shared with the unit's own set-up and
 weapons, so they are not listed. `Unit::netDirtyFlags` is not listed either: targeting clears bits of it, but weapons and orders write it too. Any
 writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events.
 Like every check here it sees the windows of a tick only, and a saved game loads outside them: no stored summary covers LoadUnit, whose restore
@@ -153,7 +153,7 @@ WEAPONS_WRITE_TYPES = ("Projectile", "Explosion", "ExplodedPiece")
 WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris", "g_explodedPieces", "DebrisPiece::state", "DebrisCache::cur",
                        "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
                        "Unit::field_8", "Unit::type", "Unit::weapon", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b",
-                       "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::weapon1AimCob", "Unit::f2c", "Unit::unknown_30",
+                       "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::unknown_24", "Unit::unknown_2a", "Unit::f2c", "Unit::unknown_30",
                        "Unit::b3a", "Unit::f_3b", "Unit::weapon2AimCob", "Unit::f48", "Unit::unknown_4c", "Unit::b56", "Unit::f_57")
 
 

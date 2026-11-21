@@ -1,3 +1,4 @@
+#include "../game/scripts_events.h"
 #include "../game/orders_events.h"
 #include "win_types.h"
 #include "../../interfaces/ref.h"
@@ -166,17 +167,17 @@ void Unit::SetStateBits(int mask, int set)
             gained = ~old & now;
             lost = (unsigned char)newLost;
             if (gained & 1) {
-                g_seams.scripts->StartScript((CobScript*)script.get(), "Activate", 0, 0);
+                ScriptsPublishStart(SCHED_UNITS, this, "Activate", 0);
                 RecordUnitSpeech(this, 3, SIM_SPEECH_KIND_TEXT);
             }
             if (lost & 1) {
-                g_seams.scripts->StartScript((CobScript*)script.get(), "Deactivate", 0, 0);
+                ScriptsPublishStart(SCHED_UNITS, this, "Deactivate", 0);
                 RecordUnitSpeech(this, 4, SIM_SPEECH_KIND_TEXT);
             }
             if (gained & 8)
-                g_seams.scripts->StartScript((CobScript*)script.get(), "StartBuilding", 0, 0);
+                ScriptsPublishStart(SCHED_UNITS, this, "StartBuilding", 0);
             if (lost & 8)
-                g_seams.scripts->StartScript((CobScript*)script.get(), "StopBuilding", 0, 0);
+                ScriptsPublishStart(SCHED_UNITS, this, "StopBuilding", 0);
             if (gained & 4) {
                 RecordUnitSpeech(this, 0xe, SIM_SPEECH_KIND_TEXT);
                 for (link = head; link; link = link->next) {

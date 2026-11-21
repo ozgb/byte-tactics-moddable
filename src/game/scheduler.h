@@ -16,6 +16,7 @@ struct SchedRoute {
 const SchedRoute* SchedRoutes(int* count);
 
 void __stdcall SchedDeliver(int module);
+int __stdcall SchedInboxHolds(int module, int kind, unsigned int unit);
 void SchedBeginTick();
 void SchedPhaseBoundary();
 void SchedEndTick();

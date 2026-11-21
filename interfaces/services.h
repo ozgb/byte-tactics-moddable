@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 2
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 1
+#define SERVICES_VERSION_MINOR 2
 
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
@@ -74,6 +74,12 @@ void __stdcall HarnessOrdersEvent(const OrdersEventHeader* event, unsigned int s
 struct MovementEventHeader;
 // In test mode, records a movement event as movement consumes it, or an effect as movement publishes it, its payload of size bytes, with its outcome, for the dump's movement events.
 void __stdcall HarnessMovementEvent(const MovementEventHeader* event, unsigned int size, int outcome);
+struct UnitsEventHeader;
+// In test mode, records a units event as units consumes it, its payload of size bytes, with its outcome, for the dump's units events.
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader* event, unsigned int size, int outcome);
+struct ScriptsEventHeader;
+// In test mode, records a scripts event as scripts consumes it, its payload of size bytes, with its outcome, for the dump's scripts events.
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader* event, unsigned int size, int outcome);
 // The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
     // The engine itself, outside any module.

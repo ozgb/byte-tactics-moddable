@@ -23,6 +23,7 @@ struct UnitDefMaxHealthView {
 };
 
 #include "unit.h"
+#include "units_seam.h"
 
 struct UnitPtrVectorView {
     char allocator_byte;
@@ -203,7 +204,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
             int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
             if (target != 0)
-                g_seams.units->AttachUnitToPiece(unit, (Unit*)target, -1, 0);
+                AttachUnitToPiece(unit, (Unit*)target, -1, 0);
             break;
         }
         }

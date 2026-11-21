@@ -12,7 +12,7 @@ struct Vec3;
 struct StateWriter;
 
 // Major version of the movement interface, changed when a slot is removed or its signature changes.
-#define MOVEMENT_VERSION_MAJOR 3
+#define MOVEMENT_VERSION_MAJOR 4
 // Minor version of the movement interface, changed when a slot is added.
 #define MOVEMENT_VERSION_MINOR 0
 
@@ -24,20 +24,18 @@ struct MovementEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to movement's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, or its kind is unknown, or: for the kinds about a target (DESTROY_TARGET, SET_ALTITUDE, SET_APPROACH_RADIUS, SET_HEADING), it names no target, and their unit is not checked; for the other kinds, it names a null unit, or a unit with no movement (all of them but NEW). The kinds about a target then depend on the target's kind, as TargetType gives it.
+// The kinds of event other modules publish to movement's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, or its kind is unknown (325 is none since 4.0), or: for the kinds about a target (DESTROY_TARGET, SET_ALTITUDE, SET_APPROACH_RADIUS, SET_HEADING), it names no target, and their unit is not checked; for the other kinds, it names a null unit, or a unit with no movement (all of them but NEW). The kinds about a target then depend on the target's kind, as TargetType gives it.
 enum MovementEventKind {
     // unit gets its movement, steered by a goal that suits its player and its unit type; the header alone; outcome 1.
     MOVEMENT_NEW = 320,
     // unit's movement and its goal are freed, and unit has no movement; the header alone; outcome 1.
     MOVEMENT_DESTROY = 321,
-    // unit's movement takes the state a saved game keeps (MovementLoad); outcome 1.
+    // unit's movement takes the state a saved game keeps (MovementLoadState); outcome 1.
     MOVEMENT_LOAD = 322,
     // unit's movement is put in a flight mode without the flight mode's other changes, as a carrier sets down or picks up its cargo (MovementSetMode); outcome 1.
     MOVEMENT_SET_MODE = 323,
     // unit's movement takes a speed, as another machine sent it (MovementSetSpeed); outcome 1.
     MOVEMENT_SET_SPEED = 324,
-    // unit was placed on the map at this tick, which its movement's path lock stamp keeps; the header alone; outcome 1.
-    MOVEMENT_PLACED = 325,
     // unit's goal steers to a target, or to none (MovementTarget); outcome 1.
     MOVEMENT_SET_TARGET = 326,
     // A target is destroyed and its memory freed (MovementTarget); outcome 1.
@@ -80,8 +78,8 @@ enum MovementEffectKind {
     MOVEMENT_EFFECT_START_SCRIPT = 347
 };
 
-// The state of a unit's movement that a saved game keeps.
-struct MovementMotionState {
+// The state of a unit's movement that a saved game keeps, but for the path lock stamp, which is map's.
+struct MovementSavedState {
     // The velocity, in world units with 16 fractional bits: x, y and z.
     int velocity[3];
     // The smoothed acceleration that banks and pitches an aircraft: x, y and z.
@@ -90,8 +88,6 @@ struct MovementMotionState {
     int speed;
     // The turn of the last tick.
     int turn;
-    // The tick the unit was last placed on the map.
-    int pathLockStamp;
     // The flight mode, 0 to 3.
     int mode;
     // The movement's flag, 0 or 1.
@@ -99,11 +95,11 @@ struct MovementMotionState {
 };
 
 // The payload of LOAD.
-struct MovementLoad {
+struct MovementLoadState {
     // The kind and the unit.
     MovementEventHeader h;
     // The state.
-    MovementMotionState state;
+    MovementSavedState state;
 };
 
 // The payload of SET_MODE and SET_FLIGHT_MODE.
@@ -267,7 +263,7 @@ struct MovementSeam {
     // Applies an event of a path search, its payload of size bytes, to its requester, with the waypoints Poll copied for it; the engine's delivery of pathfinding's results; an event smaller than its payload changes nothing: a started search sets the claim tick of the goal and a status flag on the order, a finished one gives the goal its waypoints. Hooks: none.
     void (__stdcall* ApplyPathEvent)(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints);
     // Fills the state of a unit's movement that a saved game keeps, outside the tick; a query. Hooks: none.
-    void (__stdcall* GetMotionState)(Unit* unit, MovementMotionState* out);
+    void (__stdcall* GetMotionState)(Unit* unit, MovementSavedState* out);
     // Reads the network state of a unit's movement from a packet, through the goal that moves it. Hooks: none.
     void (__stdcall* ReadNetState)(Unit* unit, BitReader* reader);
     // Returns nonzero when the goal of a unit's movement has network state to send; a query. Hooks: none.

@@ -1,5 +1,3 @@
-#include "../game/movement_events.h"
-#include "../../interfaces/movement.h"
 #include "win_types.h"
 #include "../state/block.h"
 #include <stdlib.h>
@@ -376,8 +374,9 @@ void __stdcall ClearFootprintAndUnlink(Unit* unit)
 void __stdcall AddUnitToMap(Unit* obj)
 {
     Point16 size = obj->footprint;
-    if (obj->motion.get() != nullptr)
-        MovementPublishUnit(SCHED_MAP, MOVEMENT_PLACED, obj);
+    UnitPassMapView* placed = (UnitPassMapView*)obj;
+    if (placed->unit)
+        placed->unit->lastTick = (unsigned int)g_game->ticks;
     {
         short px = obj->cell.x;
         if (px < 0)
@@ -920,8 +919,8 @@ int __stdcall GetPassMapCellValue(PassMap* obj, Cell* cell)
     if (blocked)
         return 0;
     if (cell->unit != 0) {
-        Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
-        if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
+        UnitPassMapView* unit = (UnitPassMapView*)&g_game->units[cell->unit];
+        if (!unit->unit || unit->unit->lastTick < obj->lastTick)
             return 0;
     }
     int minHeight = g_game->seaLevel - obj->maxWaterDepth;
@@ -982,8 +981,8 @@ static int FootprintValue(PassMap* obj, int x, int y, int w, int h, int stampUni
             if (blocked)
                 return 0;
             if (stampUnits && cell->unit != 0) {
-                Ref<Unit>& unit = (*(Ref<Unit>*)&g_game->units[cell->unit].motion);
-                if (!unit || ((unsigned int)unit->lastTick) < obj->lastTick)
+                UnitPassMapView* unit = (UnitPassMapView*)&g_game->units[cell->unit];
+                if (!unit->unit || unit->unit->lastTick < obj->lastTick)
                     return 0;
             }
             if ((int)cell->low < minHeight)
@@ -1504,6 +1503,11 @@ int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size)
         if (!unit->spatialBucket || BucketHolds((SpatialBucket*)unit->spatialBucket.get(), unit))
             return 0;
         ((SpatialBucket*)unit->spatialBucket.get())->PrependUnit(unit);
+        return 1;
+    case MAP_LOAD_PATH_LOCK_STAMP:
+        if (!unit->motion)
+            return 0;
+        LoadPathLockStamp(unit, reinterpret_cast<const MapPathLockStamp*>(event)->stamp);
         return 1;
     }
     return 0;

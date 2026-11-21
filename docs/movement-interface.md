@@ -1,6 +1,6 @@
 # The movement interface
 
-Movement sits behind `interfaces/movement.h` (version 3.0), the seam over a unit's motion, the goals it steers to and
+Movement sits behind `interfaces/movement.h` (version 4.0), the seam over a unit's motion, the goals it steers to and
 the targets orders hand those goals (#993), and since #985 the tenth module on the scheduler, with orders
 (`docs/orders-interface.md`). 3.1c's code is its default implementation. It was cut from orders (which held
 `UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference) by #993, and
@@ -20,20 +20,21 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event kinds
 are unique across interfaces: weapons uses 256 to 267, 269 and 272 to 283, orders 288 to 295 and 304 to 317 (its range
-is 288 to 319) and movement 320 to 331 and 336 to 347 (its range is 320 to 351); the others are listed in
+is 288 to 319) and movement 320 to 324, 326 to 331 and 336 to 347 (325, PLACED until 4.0, stays free; its range is 320 to 351); the others are listed in
 `docs/weapons-interface.md`, section 1.
 
 Two rulings of the human shape this change:
 - **Movement owns the unit record's motion fields** (2026-11-18): the position, the angles, the cell, the mode and the
-  moved mark that movement steers are movement's to write, and the motion record's fields are movement's alone.
+  moved mark that movement steers are movement's to write, and the motion record's fields are movement's alone, but
+  for the path lock stamp, which is map's since 4.0 (the ruling of #1019, section 2).
   Units' and map's writes to `UnitMotion` belong to this change (section 2).
 - **No slot passes memory ownership across a seam, and major bumps are cheap** (2026-11-19). A target (a `PathOrder`,
   an `ApproachRadius`, a `RingApproach`, a `PointMarker` or an `AirManeuverOrder`, all `OrderFx`) is named by its block
   offset everywhere outside `src/movement/`, and an event carries it as that offset.
 
 Movement's place in it:
-- **Events into movement:** NEW, DESTROY, LOAD, SET_MODE, SET_SPEED, PLACED, SET_TARGET, DESTROY_TARGET,
-  SET_FLIGHT_MODE, SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING, published by units, map and orders. Movement's
+- **Events into movement:** NEW, DESTROY, LOAD, SET_MODE, SET_SPEED, SET_TARGET, DESTROY_TARGET,
+  SET_FLIGHT_MODE, SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING, published by units and orders (PLACED, published by map, was removed in 4.0). Movement's
   handler (`MovementInbox`, `src/seams/movement_world.cpp`) passes each to `Apply` and records it with its outcome in
   the trace's dump (section 5).
 - **Routes:** each route's reason is in section 4.
@@ -60,7 +61,7 @@ Movement's place in it:
   to), the goals (`PathGoal`, `LiteGoal`, `PatrolGoal`, `PackedGoal`, `PackedPosGoal`, `AiSearchGoal`) and the targets
   an order attaches to a goal. It steers a unit one tick at a time, takes the results of path searches, and builds,
   loads, saves and frees those objects.
-- **Versions.** Movement 3.0 (20 slots; 2.0 had 33), orders 5.0, units 5.0 (`UpdateUnitBody` returns an int, and
+- **Versions.** Movement 4.0 (20 slots; 3.0 had 20 and 2.0 had 33), orders 5.0, units 5.0 (`UpdateUnitBody` returns an int, and
   `UpdateUnitTail`, `UnitRefGet` and `UnitRefSetValue` are new, section 2).
 - **What it calls out.** Movement calls other subsystems through their seams: pathfinding (`Submit`, `Cancel`), scripts
   (`GetPiecePosition`, `GetPieceAngles`), units (`LoadUnit`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefUnlink`) and map
@@ -75,7 +76,7 @@ Movement's place in it:
 |---|---|
 | `NewUnitMotion` | event: NEW, from units (`units.cpp`: `CreateUnitMotion`, `InitUnit`, `InitSpawnedUnit`), the header alone |
 | `DestroyMotionObject` | event: DESTROY, from units (`units.cpp`: `ApplyUnitDeath`), the header alone (below) |
-| `LoadMotion` | event: LOAD, from units (`unit_save.cpp`: `LoadUnit`), with a `MovementMotionState` |
+| `LoadMotion` | event: LOAD, from units (`unit_save.cpp`: `LoadUnit`), with a `MovementMotionState` (a `MovementSavedState` since 4.0) |
 | `SaveMotion` | query: `GetMotionState`, which fills the state a saved game keeps, called by units (`unit_save.cpp`: `SaveUnits`) |
 | `UpdateMotion` | run, called by the scheduler, and by the network's `ReceiveUnitStates` (below) |
 | `ApplyPathEvent` | the engine's delivery, unchanged (section 1) |
@@ -92,9 +93,11 @@ Movement's place in it:
 | `OrderFxSerializeToSave` | slot `SaveTarget`, outside the tick |
 | `OrderFxGetType` | query: `TargetType` |
 | `MotionGoal`, `GoalTarget` | query: `UnitTarget(unit)`, which answers the target the goal of the unit's motion steers to, or 0 |
-| (not slots: units' and map's writes to `UnitMotion`) | events: SET_MODE, SET_SPEED, PLACED (below) |
+| (not slots: units' and map's writes to `UnitMotion`) | events: SET_MODE, SET_SPEED, PLACED (removed in 4.0, below) |
 
 `Apply` and `WriteState` are new. The 33 slots of 2.0 became 20 in 3.0.
+
+**Movement 4.0 (#1019): the path lock stamp is map's.** The maintainer ruled that map owns `UnitMotion::pathLockStamp` in place, as it owns the bucket fields and claim bits it keeps in units' record (`docs/map-interface.md`, section 3). The record's layout and the trace are unchanged. The kind PLACED 325 is removed and the number stays free: `Apply` rejects 325 as an unknown kind. `MovementMotionState` is replaced by `MovementSavedState`, the same fields without `pathLockStamp`, and the LOAD payload `MovementLoad` by `MovementLoadState`, under new names because a field removed in place is not allowed by any version bump. `GetMotionState` fills a `MovementSavedState`. Movement neither writes nor reports the stamp: the saved game sets it through map's LOAD_PATH_LOCK_STAMP and reads it through map's `PathLockStamp`, and `AddUnitToMap` writes it itself. The motion's constructor (NEW) no longer zeroes it: the record is allocated zeroed, so the stamp is 0 from NEW until map first stamps it, as before.
 
 **The writers, one by one.** Units' and map's writes to the motion record became events (the ruling of 2026-11-18):
 
@@ -105,7 +108,7 @@ Movement's place in it:
 | units: a saved game loads (`unit_save.cpp`) | `LoadMotion`: the record's fields read | LOAD from units |
 | units: a unit carried or set down (`UpdateUnitBody`, `unit_position.cpp`) | `UnitMotion::mode` written | SET_MODE from units |
 | units: a unit state arrives from the network (`ReadUnitState`) | `UnitMotion::speed` written | SET_SPEED from units |
-| map: a unit is placed on the map (`AddUnitToMap`, `terrain.cpp`) | `UnitMotion::pathLockStamp` written with the tick | PLACED from map |
+| map: a unit is placed on the map (`AddUnitToMap`, `terrain.cpp`) | `UnitMotion::pathLockStamp` written with the tick | PLACED from map in 3.0; none in 4.0 (below) |
 | orders: an order attaches a goal's target (`order_queue.cpp`) | `PathGoal::SetPathOrder` | SET_TARGET from orders |
 | orders: an order is deleted or replaced (`order_queue.cpp`) | `delete` of the target | DESTROY_TARGET from orders |
 | orders: a VTOL order (`vtol_orders.cpp`) | `UnitMotion::SetFlightMode` | SET_FLIGHT_MODE from orders |
@@ -172,13 +175,13 @@ SET_ALTITUDE for a target that is neither a move target nor an air maneuver (SET
 move target).
 
 **Payloads.** Every event and effect starts with `MovementEventHeader`: `kind` and `unit` (the unit it is about, a block
-offset; 0 for the kinds about a target). Each kind has the payload of `interfaces/movement.h` (version 3.0) that starts
+offset; 0 for the kinds about a target). Each kind has the payload of `interfaces/movement.h` (version 4.0) that starts
 with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
-| NEW 320, DESTROY 321, PLACED 325 | the header alone | none |
-| LOAD 322 | `MovementLoad` | `state` (`MovementMotionState`: `velocity[3]`, `p2[3]`, `speed`, `turn`, `pathLockStamp`, `mode`, `flag`) |
+| NEW 320, DESTROY 321 | the header alone | none |
+| LOAD 322 | `MovementLoadState` | `state` (`MovementSavedState`: `velocity[3]`, `p2[3]`, `speed`, `turn`, `mode`, `flag`) |
 | SET_MODE 323, SET_FLIGHT_MODE 328 | `MovementSetMode` | `mode`, 0 to 3 |
 | SET_SPEED 324 | `MovementSetSpeed` | `speed` |
 | SET_TARGET 326, DESTROY_TARGET 327 | `MovementTarget` | `target` (a block offset, 0 for none) |
@@ -229,10 +232,10 @@ writes `pos` and `cell`):
 | `flags` (the move rate, bits 2 and 3; the state bits) | units' record | by MOVE_RATE and SET_STATE_BITS; units writes it too |
 
 None is movement's view state, so each is an effect, and the routes are the ones of section 4. The motion record
-(`UnitMotion`) is movement's, and every write to it, units' and map's included, is movement's event now.
+(`UnitMotion`) is movement's, and every write to it, units' and map's included, is movement's event now, but for the path lock stamp, which map writes itself (section 2).
 
-**Writes movement keeps.** Movement writes `UnitMotion` (its velocity, turn, speed, mode, flag, `lastMoveTick`,
-`pathLockStamp` and goal) and the goals and targets (section 5), in its own events and runs, and the claim tick of the
+**Writes movement keeps.** Movement writes `UnitMotion` (its velocity, turn, speed, mode, flag, `lastMoveTick`
+and goal; not `pathLockStamp`, which is map's) and the goals and targets (section 5), in its own events and runs, and the claim tick of the
 goal in `ApplyPathEvent`.
 
 ## 4. Views and routes
@@ -263,10 +266,10 @@ outside the tick, after LOAD has been delivered, and `HasNetState` reads the goa
 |---|---|---|
 | units NEW, to movement | synchronous | The gate (section 8). |
 | units DESTROY, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit can be killed inside its own update (`SelfDestructOrder` publishes a DAMAGE of 30000 on itself in `RunOrders`, and `ApplyUnitDeath` publishes DESTROY), and `SchedUnitsPhase` then tests `u->motion != 0`, delivers movement's inbox and calls `UpdateMotion(u)`, which would take the pointer the delivered DESTROY has just cleared. |
-| units LOAD, to movement | queued | Published only by `LoadUnitMotion` (`unit_save.cpp`), which `LoadUnit` calls from `LoadUnits` (`settings_campaign.cpp`) while a saved game loads, outside the tick, where `SchedPublish` delivers at once (#970). Queued, with COMMAND, QUEUE_BUILD and PLACED, it stayed equal (section 8). |
+| units LOAD, to movement | queued | Published only by `LoadUnitMotion` (`unit_save.cpp`), which `LoadUnit` calls from `LoadUnits` (`settings_campaign.cpp`) while a saved game loads, outside the tick, where `SchedPublish` delivers at once (#970). Queued, with COMMAND, QUEUE_BUILD and (in 3.0) PLACED, it stayed equal (section 8). |
 | units SET_MODE, to movement | synchronous | #952's rule. Queued it stayed equal on the tier (which has no transport), but `ApplyAttachUnit` publishes it when a unit is attached or detached, and `PrepVtolClimb` and the VTOL orders that follow it read `unit->motion->flags & 3`, the mode bits, in the statements after their ATTACH_TO_PIECE, before movement's inbox is delivered ahead of `UpdateMotion` (`vtol_orders.cpp`: `PrepVtolClimb` and the cases of lines 618, 1059, 1645 and 1894). |
 | units SET_SPEED, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: `ReadUnitState` publishes it in the net phase, and the next `ReceiveUnitStates` of the same phase calls `UpdateMotion` directly for every unit of its player (`TODO(#948)`), without a delivery, and `UpdateMotion` reads the speed. The same argument as the engine's REMOTE_DAMAGE row of `docs/weapons-interface.md`. |
-| map PLACED, to movement | queued | #952's rule finds no read: it writes `UnitMotion::pathLockStamp` (the tick), which only `GetMotionState` (the saved game, outside the tick) and the trace's hash, taken after a phase boundary, read; map's `AddUnitToMap`, its refresh and `spatialBucket` code do not read it. |
+| map PLACED, to movement | removed in 4.0 | Queued in 3.0: #952's rule found no read, as it wrote `UnitMotion::pathLockStamp` (the tick), which only `GetMotionState` (the saved game, outside the tick) and the trace's hash, taken after a phase boundary, read; map's `AddUnitToMap`, its refresh and `spatialBucket` code did not read it. Since 4.0 map writes the stamp itself (`docs/map-interface.md`, section 3), so there is no event. |
 | orders SET_TARGET, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but an order can set its target and be deleted in the same `RunOrders` (or `AddOrder`'s pruning), and `Order::~Order` reads `UnitTarget` (`order_queue.cpp`) to decide whether the goal still steers to its own target: a pending SET_TARGET leaves the old target and the wrong branch. |
 | orders DESTROY_TARGET, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but it frees the target's block in the sim heap, and the orders that run after it in the same `RunOrders` loop and in `RunSecondaryOrders` build new targets through the `New*` slots, whose allocations read the heap's free list: queued, they would get other offsets, which the hashed orders keep. |
 | orders SET_FLIGHT_MODE, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but its handler (`SetFlightMode`) zeroes the motion's speed and velocity and publishes TILT and SET_STATE_BITS, and `RunOrders` goes on, in the same call, to the unit's next order, which reads `activateFlags` (`unit_orders.cpp`, the build orders) and the unit's pieces through scripts before movement's delivery. |
@@ -328,7 +331,7 @@ owner reads. The trace hashes the motions and goals in section 21 and the order 
 | `UnitMotion::speed` | the same | movement, units (`ReadUnitState`, `WriteUnitState`), weapons (by view) | no: units reads it in the unit's network state, and writes it by SET_SPEED |
 | `UnitMotion::mode`, `flag` | the same | movement; units (`ApplyAttachUnit`, by SET_MODE) | no |
 | `UnitMotion::flags`, `velocity`, `field_22` | the same | movement, orders (the VTOL orders: `PrepVtolClimb`, `VtolFollowOrder`, `VtolHelpBuildOrder`, `VtolMobileBuildOrder`, `VtolSeekAttackOrder`, `AirToAirOrder`, `AirStrikeOrder`) | no |
-| `UnitMotion::pathLockStamp` | the same | movement; map's `AddUnitToMap` sets it with PLACED (the tick the unit was placed) | no: it is map's bookkeeping in the motion record, written by movement's own event, and read by units' saved game (`GetMotionState`) |
+| `UnitMotion::pathLockStamp` | the same | map (the issue #1019 decision): `AddUnitToMap` sets it to the tick the unit was placed, its pass map refreshes stamp it again, and LOAD_PATH_LOCK_STAMP sets it from a saved game; movement does not write it | no: it is map's field, kept in movement's motion record, as map keeps its bucket fields in units' record; units' saved game reads it through map's `PathLockStamp`, not through `GetMotionState` |
 | `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (`src/seams/pathfinding_world.cpp`, by offset) | no |
 | The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes the unit to the slots), orders (through `UnitTarget`), pathfinding (by offset) | no: it is the object the slots take |
 | The target a goal steers to (`PathGoal::target`) | the goal, hashed | movement, orders (through `UnitTarget`) | no: orders reads it through the slot |
@@ -357,7 +360,7 @@ type, so `UnitMotion::...` does not show them: weapons reads the word at `+0x20`
 parameter and an id (`MotionRangeView`, `DroppedMotionParamView`, `DroppedMotionIdView` in `weapons.cpp`) and
 `explosions.cpp` reads `+8` as a size (`Size`); pathfinding's `UnitMotionPlannerView` reads the first two fields. A bump
 that moves `speed`, `velocity`, `movementClass` or the goal pointer out of the unit's record has to give these readers a
-slot or keep the offsets. `AddUnitToMap`'s write of `pathLockStamp` (`+0x26`) is the event PLACED now, so no subsystem
+slot or keep the offsets. `AddUnitToMap`'s write of `pathLockStamp` (`+0x26`) was the event PLACED in 3.0; since 4.0 it is map's own write of its field, so no other subsystem
 writes the motion record by offset.
 
 **The trace dumps movement's events** in section 49 (`docs/trace-format.md`, section 8.33), after orders' section 48
@@ -388,7 +391,7 @@ diverged queued, and map's and los_radar's routes are as before (section 8). The
 3.1c's types and limits are the default's, not the interface's: the goal classes and their virtual calls, the layout of
 `UnitMotion`, the unit definition's movement fields, the saved game's motion and target records, and the network's goal
 state. An event carries a unit and a target as their block offsets, and the motion's state as a plain
-`MovementMotionState`: no pointers, no `Unit*`, `UnitMotion*` or `PathOrder*` in an event. The `New*` and `Load*` slots
+`MovementSavedState`: no pointers, no `Unit*`, `UnitMotion*` or `PathOrder*` in an event. The `New*` and `Load*` slots
 build objects in the sim block (`new (kSim)`) and give the caller their block offset, a handle the caller keeps and
 never reads through; the goal's virtual destructor frees its goal (section 2). `ApplyPathEvent` is the engine's
 delivery (section 2).
@@ -480,7 +483,7 @@ divergences are against the reference, with the first tick, phase and field of t
 first field is an `aiState` squad record that one side lacks, that is an artifact of the comparison, and the row gives the
 tick and phase and the scenario's first `DIFF` line instead. A route that stayed equal is still synchronous when it can be
 pending while a later read in the same phase needs what it writes (#952's rule, section 4); the routes it
-finds no such read for are queued together (section 4), and the gate of this change ran with them queued. Movement's LOAD stays queued, since it is published only while a saved game loads; with map's PLACED and
+finds no such read for are queued together (section 4), and the gate of this change ran with them queued. Movement's LOAD stays queued, since it is published only while a saved game loads; with map's PLACED (removed in 4.0) and
 the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 38 scenarios at fdfcd3cae033).
 
 | Route queued | Tier | First divergence |
@@ -490,7 +493,7 @@ the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 
 | units LOAD | equal | none (queued, section 4) |
 | units SET_MODE | equal | none (synchronous by #952's rule, section 4) |
 | units SET_SPEED | equal | none (synchronous by #952's rule, section 4; the tier has no network path) |
-| map PLACED | equal | none (queued, section 4: #952's rule finds no read) |
+| map PLACED (removed in 4.0) | equal | none (queued in 3.0, section 4: #952's rule found no read) |
 | orders SET_TARGET | equal | none (synchronous by #952's rule, section 4) |
 | orders DESTROY_TARGET | equal | none (synchronous by #952's rule, section 4) |
 | orders SET_FLIGHT_MODE | equal | none (synchronous by #952's rule, section 4) |
@@ -513,7 +516,7 @@ the engine's COMMAND and QUEUE_BUILD queued together, the tier was equal (38 of 
 
 **Inbox depths.** A build that counted every publish and delivery played all 89 scenarios (87 wrote their counts;
 console-ilose and console-iwin exit before the dump), with native modules, and every scenario stayed equal. Four routes
-into movement are queued inside the tick: map's PLACED and orders' SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING.
+into movement were queued inside the tick in 3.0: map's PLACED (removed in 4.0) and orders' SET_ALTITUDE, SET_APPROACH_RADIUS and SET_HEADING.
 Movement's inbox held at most 3 events (long-greenhaven-8p, tick 48130), and `SchedEndTick` never found one. Units' LOAD
 is published only while a saved game loads, outside the tick, where each event is delivered at once (#970). Movement's
 five queued effects go to units' inbox, whose deepest was 5 events; SFX_OCCUPY, the busiest, was queued 7,268,389 times.

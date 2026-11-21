@@ -1763,6 +1763,13 @@ static const TraceField kEventMapPassMaps[] = {
     { "size", offsetof(MapPassMaps, size), 8, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(MapPathLockStamp) == 12, "MapPathLockStamp");
+static const TraceField kEventMapLoadPathLockStamp[] = {
+    { "kind", offsetof(MapPathLockStamp, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapPathLockStamp, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "stamp", offsetof(MapPathLockStamp, stamp), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(MapCellsChanged) == 32, "MapCellsChanged");
 static const TraceField kEventMapEffectCellsChanged[] = {
     { "kind", offsetof(MapCellsChanged, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1781,9 +1788,10 @@ static const TraceEventKind kMapKinds[] = {
     { 165, "MAP_BUCKET_UNLINK", sizeof(MapEventHeader), kEventMapBucketUnlink, 3 },
     { 166, "MAP_BUCKET_PREPEND", sizeof(MapEventHeader), kEventMapBucketPrepend, 3 },
     { 168, "MAP_PASS_MAPS", sizeof(MapPassMaps), kEventMapPassMaps, 5 },
+    { 169, "MAP_LOAD_PATH_LOCK_STAMP", sizeof(MapPathLockStamp), kEventMapLoadPathLockStamp, 4 },
     { 176, "MAP_EFFECT_CELLS_CHANGED", sizeof(MapCellsChanged), kEventMapEffectCellsChanged, 6 },
 };
-static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 9 };
+static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 10 };
 
 static_assert(sizeof(PlayersGiveUnit) == 48, "PlayersGiveUnit");
 static const TraceField kEventPlayersGiveUnit[] = {
@@ -2403,11 +2411,11 @@ static const TraceField kEventMovementDestroy[] = {
     { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
-static_assert(sizeof(MovementLoad) == 52, "MovementLoad");
+static_assert(sizeof(MovementLoadState) == 48, "MovementLoadState");
 static const TraceField kEventMovementLoad[] = {
-    { "kind", offsetof(MovementLoad, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
-    { "unit", offsetof(MovementLoad, h.unit), 4, TF_REF, TT_UNIT, 0 },
-    { "state", offsetof(MovementLoad, state), 44, TF_BYTES, TT_NONE, 0 },
+    { "kind", offsetof(MovementLoadState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MovementLoadState, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "state", offsetof(MovementLoadState, state), 40, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
 static_assert(sizeof(MovementSetMode) == 12, "MovementSetMode");
@@ -2422,12 +2430,6 @@ static const TraceField kEventMovementSetSpeed[] = {
     { "kind", offsetof(MovementSetSpeed, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
     { "unit", offsetof(MovementSetSpeed, h.unit), 4, TF_REF, TT_UNIT, 0 },
     { "speed", offsetof(MovementSetSpeed, speed), 4, TF_SCALAR, TT_NONE, 0 },
-    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
-};
-static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
-static const TraceField kEventMovementPlaced[] = {
-    { "kind", offsetof(MovementEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
-    { "unit", offsetof(MovementEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
 static_assert(sizeof(MovementTarget) == 12, "MovementTarget");
@@ -2569,10 +2571,9 @@ static const TraceField kEventMovementEffectStartScript[] = {
 static const TraceEventKind kMovementKinds[] = {
     { 320, "MOVEMENT_NEW", sizeof(MovementEventHeader), kEventMovementNew, 3 },
     { 321, "MOVEMENT_DESTROY", sizeof(MovementEventHeader), kEventMovementDestroy, 3 },
-    { 322, "MOVEMENT_LOAD", sizeof(MovementLoad), kEventMovementLoad, 4 },
+    { 322, "MOVEMENT_LOAD", sizeof(MovementLoadState), kEventMovementLoad, 4 },
     { 323, "MOVEMENT_SET_MODE", sizeof(MovementSetMode), kEventMovementSetMode, 4 },
     { 324, "MOVEMENT_SET_SPEED", sizeof(MovementSetSpeed), kEventMovementSetSpeed, 4 },
-    { 325, "MOVEMENT_PLACED", sizeof(MovementEventHeader), kEventMovementPlaced, 3 },
     { 326, "MOVEMENT_SET_TARGET", sizeof(MovementTarget), kEventMovementSetTarget, 4 },
     { 327, "MOVEMENT_DESTROY_TARGET", sizeof(MovementTarget), kEventMovementDestroyTarget, 4 },
     { 328, "MOVEMENT_SET_FLIGHT_MODE", sizeof(MovementSetMode), kEventMovementSetFlightMode, 4 },
@@ -2592,7 +2593,7 @@ static const TraceEventKind kMovementKinds[] = {
     { 346, "MOVEMENT_EFFECT_SFX_OCCUPY", sizeof(MovementEventHeader), kEventMovementEffectSfxOccupy, 3 },
     { 347, "MOVEMENT_EFFECT_START_SCRIPT", sizeof(MovementStartScript), kEventMovementEffectStartScript, 4 },
 };
-static const TraceEventModule kMovementEvents = { "movementEvents", 49, kMovementKinds, 24 };
+static const TraceEventModule kMovementEvents = { "movementEvents", 49, kMovementKinds, 23 };
 
 static const TraceField kWindFields[] = {
     { "windCounter", 0x37ec4, 4, TF_SCALAR, TT_NONE, 0x0 },

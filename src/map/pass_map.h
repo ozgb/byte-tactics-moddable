@@ -2,10 +2,26 @@
 #define MAP_PASS_MAP_H
 
 #include "../../interfaces/ref.h"
+#include "../util/vec3.h"
 
 struct MapMoveLimits;
 struct Point16;
-struct UnitPassMapView;
+struct Unit;
+
+#pragma pack(push, 2)
+struct MotionTickView {
+    char unknown_0[0x26];
+    unsigned int lastTick;
+};
+
+struct UnitPassMapView {
+    Ref<MotionTickView> unit;
+    char unknown_4[0x76 - 0x4];
+    Point16 a;
+    char unknown_7a[0x7e - 0x7a];
+    Point16 b;
+};
+#pragma pack(pop)
 
 class PassMap {
 public:
@@ -48,5 +64,7 @@ void __stdcall FreePassMaps(void);
 void __stdcall RefreshAllPassMaps(Point16 a, Point16 b);
 void __stdcall RefreshAllPassMapsForUnits(Point16 a, Point16 b);
 void __stdcall RefreshPassMapsForUnit(UnitPassMapView* p);
+int __stdcall PathLockStamp(Unit* unit);
+void __stdcall LoadPathLockStamp(Unit* unit, int stamp);
 
 #endif

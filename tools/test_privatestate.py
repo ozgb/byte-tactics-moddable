@@ -335,11 +335,16 @@ class MovementOwnerTest(unittest.TestCase):
                      "RingApproach::inner", "PointMarker::size"):
             self.assertEqual(ps.private_to(item), ("movement", ("writer",)), item)
 
-    def test_the_path_lock_stamp_is_movements_and_maps(self):
-        self.assertEqual(ps.private_to("UnitMotion::pathLockStamp"), ("movement", ("writer",)))
-        rows = {"edges": [("movement", "-", "UnitMotion::pathLockStamp"), ("map", "map", "UnitMotion::pathLockStamp"),
-                          ("units", "-", "UnitMotion::pathLockStamp")]}
-        self.assertEqual(ps.violations(rows), ["edges: writer units on UnitMotion::pathLockStamp, which is written only by movement"])
+    def test_the_path_lock_stamp_is_maps_alone(self):
+        self.assertEqual(ps.private_to("UnitMotion::pathLockStamp"), ("map", ("writer",)))
+        rows = {"edges": [("map", "map", "UnitMotion::pathLockStamp"), ("map", "-", "UnitMotion::pathLockStamp")],
+                "reads": [("-", "units", "UnitMotion::pathLockStamp")]}
+        self.assertEqual(ps.violations(rows), [])
+        rows = {"edges": [("movement", "-", "UnitMotion::pathLockStamp"), ("units", "map", "UnitMotion::pathLockStamp")],
+                "cross": [("orders", "map", "UnitMotion::pathLockStamp")]}
+        self.assertEqual(ps.violations(rows), ["cross: writer orders on UnitMotion::pathLockStamp, which is written only by map",
+                                               "edges: writer movement on UnitMotion::pathLockStamp, which is written only by map",
+                                               "edges: writer units on UnitMotion::pathLockStamp, which is written only by map"])
 
     def test_a_movement_write_passes_and_a_read_by_anyone_passes(self):
         rows = {"edges": [("movement", "units", "UnitMotion::speed"), ("movement", "-", "Unit::motion")],

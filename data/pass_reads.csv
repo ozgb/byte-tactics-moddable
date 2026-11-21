@@ -1319,7 +1319,6 @@ units,Unit::lastAttackerSlot,units,KillUnit,same-record,4,orders-guard-reclaim@3
 units,Unit::lastAttackerSlot,units,UnitsOnWeaponsAttackedSpeech,other-record,5,mission-kill-mobile@180
 units,Unit::lastDamageType,units,UpdateUnitTail,other-record,9,edges-economy-targeting@117
 units,Unit::lastDamageType,units,UpdateUnitTail,same-record,4,orders-guard-reclaim@350
-units,Unit::lastTick,weapons,FireTurretWeapon,other-record,1,mission-radius@1310
 units,Unit::list,movement,AiSearchGoal::SetPathOrder,other-record,11,mission-build-unit@1
 units,Unit::list,orders,AddBeCarriedOrder,other-record,6,mission-kill-of-type@99
 units,Unit::list,orders,AddOrder,other-record,15,mission-kill-of-type@183
@@ -1354,7 +1353,7 @@ units,Unit::motion,map,RefreshPassMapsForUnit,other-record,14,edges-economy-targ
 units,Unit::motion,movement,AiSearchGoal::TickTowardGoal,other-record,19,mission-build-unit@75
 units,Unit::motion,movement,LiteGoal::TickTowardGoal,other-record,7,mission-timer@51
 units,Unit::motion,movement,LiteGoal::TickTowardGoal,same-record,12,mission-timer@51
-units,Unit::motion,movement,MovementApply,other-record,15,edges-economy-targeting@117
+units,Unit::motion,movement,MovementApply,other-record,13,edges-economy-targeting@117
 units,Unit::motion,movement,MovementUnitTarget,other-record,12,edges-economy-targeting@117
 units,Unit::motion,movement,MovementUpdateMotion,other-record,25,mission-timer@51
 units,Unit::motion,movement,MovementUpdateMotion,same-record,22,mission-timer@51
@@ -1578,6 +1577,7 @@ units,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,1,skirmish4-
 units,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,10,edges-economy-targeting@36
 units,Unit::unknown_1c,weapons,FireBallisticProjectile,other-record,4,mission-radius@1301
 units,Unit::unknown_1c,weapons,FireTurretWeapon,other-record,10,edges-economy-targeting@39
+units,Unit::unknown_24,weapons,FireTurretWeapon,other-record,2,mission-radius@1310
 units,Unit::unknown_30,weapons,FireTurretWeapon,other-record,1,mission-radius@1309
 units,Unit::unknown_30,weapons,UpdateUnitWeapons,other-record,8,mission-timer@51
 units,Unit::unknown_30,weapons,UpdateUnitWeapons,same-record,5,mission-timer@51
@@ -1743,7 +1743,7 @@ units,UnitMotion::obj,movement,UnitMotion::UpdateMotion,same-record,22,mission-t
 units,UnitMotion::p2,movement,UnitMotion::ApplyBankAndPitch,other-record,9,mission-capture@1
 units,UnitMotion::pathLockStamp,map,FootprintValue,other-record,10,mission-build-unit@1
 units,UnitMotion::pathLockStamp,map,FootprintValue,same-record,4,units-transport@2114
-units,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,23,mission-capture@1
+units,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,27,mission-capture@1
 units,UnitMotion::speed,movement,UnitMotion::ApplyClampedTurnDelta,other-record,48,mission-build-unit@1
 units,UnitMotion::speed,movement,UnitMotion::ApplyClampedTurnDelta,same-record,19,ui-build-menu@87
 units,UnitMotion::speed,movement,UnitMotion::SteerAircraft,other-record,14,mission-capture@1
@@ -2654,7 +2654,6 @@ units.players,Unit::lastAttackerSlot,network,NetSendUnitKilled,other-record,11,m
 units.players,Unit::lastAttackerSlot,units,KillUnit,other-record,11,mission-build-unit@1
 units.players,Unit::lastDamageType,units,UpdateUnitTail,other-record,3,edges-economy-targeting@245
 units.players,Unit::lastDamageType,units,UpdateUnitTail,same-record,6,orders-air-repair@382
-units.players,Unit::lastTick,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::list,movement,AiSearchGoal::SetPathOrder,other-record,14,mission-defeat-all-units@1
 units.players,Unit::list,orders,AddBeCarriedOrder,other-record,1,long-greenhaven-8p@13126
 units.players,Unit::list,orders,AddOrder,other-record,8,eight-pincushion-teams@944
@@ -2679,7 +2678,7 @@ units.players,Unit::motion,map,FootprintValue,other-record,3,skirmish4-long@1783
 units.players,Unit::motion,map,RefreshPassMapsForUnit,other-record,10,mission-defeat-all-units@185
 units.players,Unit::motion,movement,AiSearchGoal::TickTowardGoal,other-record,16,mission-build-unit@75
 units.players,Unit::motion,movement,LiteGoal::TickTowardGoal,other-record,8,quad-king-of-the-hill@6425
-units.players,Unit::motion,movement,MovementApply,other-record,10,mission-defeat-all-units@181
+units.players,Unit::motion,movement,MovementApply,other-record,7,mission-defeat-all-units@181
 units.players,Unit::motion,movement,MovementUnitTarget,other-record,6,mission-defeat-passes-x@195
 units.players,Unit::motion,movement,MovementUpdateMotion,other-record,29,console-ilose@30
 units.players,Unit::motion,movement,UnitMotion::UpdatePosition,other-record,12,ten-ring-atoll@3952
@@ -2865,6 +2864,7 @@ units.players,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,2,lo
 units.players,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,12,mission-build-unit@54
 units.players,Unit::unknown_1c,weapons,FireBallisticProjectile,other-record,2,skirmish4-long@22010
 units.players,Unit::unknown_1c,weapons,FireTurretWeapon,other-record,11,mission-build-unit@54
+units.players,Unit::unknown_24,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::unknown_30,weapons,FireTurretWeapon,other-record,1,mission-radius@1301
 units.players,Unit::unknown_30,weapons,UpdateUnitWeapons,other-record,4,mission-capture@499
 units.players,Unit::unknown_4c,weapons,FireTurretWeapon,other-record,1,eight-full-moon@8001
@@ -3009,7 +3009,7 @@ units.players,UnitMotion::obj,movement,UnitMotion::SteerGroundUnit,other-record,
 units.players,UnitMotion::obj,movement,UnitMotion::UpdateMotion,other-record,19,ui-build-menu@87
 units.players,UnitMotion::p2,movement,UnitMotion::ApplyBankAndPitch,other-record,4,long-greenhaven-8p@10385
 units.players,UnitMotion::pathLockStamp,map,FootprintValue,other-record,18,mission-build-unit@71
-units.players,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,27,mission-capture@17
+units.players,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,39,mission-capture@17
 units.players,UnitMotion::speed,movement,UnitMotion::ApplyClampedTurnDelta,other-record,85,ai-antinuke-intercept@1
 units.players,UnitMotion::speed,movement,UnitMotion::SteerGroundUnit,other-record,61,load-midgame@1
 units.players,UnitMotion::velocity,targeting,GetWeaponTargetPos,other-record,1,long-greenhaven-8p@35889

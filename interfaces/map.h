@@ -13,7 +13,7 @@ class HapiBank;
 // Major version of the map interface, changed when a slot is removed or its signature changes.
 #define MAP_VERSION_MAJOR 7
 // Minor version of the map interface, changed when a slot is added.
-#define MAP_VERSION_MINOR 0
+#define MAP_VERSION_MINOR 1
 
 // A movement class's footprint and limits, as units reads them from the game data; map copies them when it builds the pass maps.
 struct MapMoveLimits {
@@ -62,7 +62,9 @@ enum MapEventKind {
     // Puts unit at the front of its spatial grid bucket, as it leaves a carrier; the header alone; outcome 1, or 0 when unit has no bucket or is already in its bucket's chain.
     MAP_BUCKET_PREPEND = 166,
     // Computes again the pass maps of every movement class over a rectangle, after the terrain or the features on it changed (MapPassMaps); outcome 1, or 0 when either size is negative.
-    MAP_PASS_MAPS = 168
+    MAP_PASS_MAPS = 168,
+    // unit's movement takes the path lock stamp a saved game keeps (MapPathLockStamp); outcome 1, or 0 when unit has no movement.
+    MAP_LOAD_PATH_LOCK_STAMP = 169
 };
 
 // The kinds of effect map publishes to its outbox, for the modules that subscribe to them.
@@ -87,6 +89,14 @@ struct MapPassMaps {
     int cell[2];
     // The width and height of the rectangle, in cells.
     int size[2];
+};
+
+// The payload of LOAD_PATH_LOCK_STAMP.
+struct MapPathLockStamp {
+    // The kind and the unit.
+    MapEventHeader h;
+    // The tick map last stamped the unit's movement with, as the saved game keeps it.
+    int stamp;
 };
 
 // The payload of CELLS_CHANGED.
@@ -153,6 +163,8 @@ struct MapSeam {
     void (__stdcall* RefreshUnitIfStale)(int moveClass, Unit* unit);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Returns the path lock stamp of a unit's movement, the tick map last stamped it with when it placed the unit or computed a pass map again for it, or 0 for a unit with no movement; a query, which a saved game reads outside the tick. Hooks: none.
+    int (__stdcall* PathLockStamp)(Unit* unit);
 };
 
 #endif

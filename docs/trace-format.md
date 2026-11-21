@@ -1313,21 +1313,25 @@ for k in 0 .. n-1, in order, by the kind of the record:
 | 165 | MAP_BUCKET_UNLINK | `unit` (unit), `outcome` |
 | 166 | MAP_BUCKET_PREPEND | `unit` (unit), `outcome` |
 | 168 | MAP_PASS_MAPS | `unit` (unit), `cell` (8 bytes), `size` (8 bytes), `outcome` |
+| 169 | MAP_LOAD_PATH_LOCK_STAMP | `unit` (unit), `stamp`, `outcome` |
 | 176 | MAP_EFFECT_CELLS_CHANGED | `unit` (unit), `rect` (16 bytes), `classes`, `cause`, `outcome` |
 
 - `kind` is an event or an effect: 160 ADD_UNIT, 161 REMOVE_UNIT, 162 CLEAR_UNIT, 163 RECLAIM_FOOTPRINT, 164 SET_YARD,
-  165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 168 PASS_MAPS, and the effect 176 EFFECT_CELLS_CHANGED. 167 was
+  165 BUCKET_UNLINK, 166 BUCKET_PREPEND, 168 PASS_MAPS, 169 LOAD_PATH_LOCK_STAMP (map 7.1), and the effect 176
+  EFFECT_CELLS_CHANGED. 167 was
   REFRESH_PASS_MAP, which map 5.0 (#983) removed: the refreshes of the pass maps around a search are map's own slots,
-  and each pass map they compute again is a CELLS_CHANGED record. Every kind but SET_YARD, PASS_MAPS and
-  EFFECT_CELLS_CHANGED has only `kind`, `unit` and `outcome`.
+  and each pass map they compute again is a CELLS_CHANGED record. Every kind but SET_YARD, PASS_MAPS,
+  LOAD_PATH_LOCK_STAMP and EFFECT_CELLS_CHANGED has only `kind`, `unit` and `outcome`.
 - `unit` is the unit the event names, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a
   pointer that is not in the unit table.
 - `open` of SET_YARD is 1 to open the yard and 0 to close it.
+- `stamp` of LOAD_PATH_LOCK_STAMP is the path lock stamp, a tick, that the saved game keeps for the unit's movement.
 - `cell` is the first cell, x and y, and `size` the width and height, in cells, of the rectangle of a PASS_MAPS.
 - `rect` of EFFECT_CELLS_CHANGED is the rectangle, left, top, right and bottom, in cells, `classes` the movement
   classes whose pass maps changed, a bit for each class index, and `cause` the reason for the change.
 - `outcome` is the result of `Apply`: 1 for every kind but these: 0 when the kind names a unit and `unit` is null; for
-  SET_YARD 0 when the footprint was not clear. It is 1 for an effect.
+  SET_YARD 0 when the footprint was not clear; for LOAD_PATH_LOCK_STAMP 0 when the unit has no movement. It is 1 for an
+  effect.
 
 Map's own report (record 45, written through the `StateWriter` of the seam's `WriteState`) is dumped and never hashed, with the
 prefix `mapState.`, after the `aiState.*` lines:
@@ -1617,10 +1621,9 @@ for k in 0 .. n-1, in order, by the kind of the record:
 | --- | --- | --- |
 | 320 | MOVEMENT_NEW | `unit` (unit), `outcome` |
 | 321 | MOVEMENT_DESTROY | `unit` (unit), `outcome` |
-| 322 | MOVEMENT_LOAD | `unit` (unit), `state` (44 bytes), `outcome` |
+| 322 | MOVEMENT_LOAD | `unit` (unit), `state` (40 bytes), `outcome` |
 | 323 | MOVEMENT_SET_MODE | `unit` (unit), `mode`, `outcome` |
 | 324 | MOVEMENT_SET_SPEED | `unit` (unit), `speed`, `outcome` |
-| 325 | MOVEMENT_PLACED | `unit` (unit), `outcome` |
 | 326 | MOVEMENT_SET_TARGET | `unit` (unit), `target` (handle), `outcome` |
 | 327 | MOVEMENT_DESTROY_TARGET | `unit` (unit), `target` (handle), `outcome` |
 | 328 | MOVEMENT_SET_FLIGHT_MODE | `unit` (unit), `mode`, `outcome` |
@@ -1641,7 +1644,7 @@ for k in 0 .. n-1, in order, by the kind of the record:
 | 347 | MOVEMENT_EFFECT_START_SCRIPT | `unit` (unit), `script`, `outcome` |
 
 - `unit` is the unit the kind is about, a pointer ID with target `unit` (section 5): `units:N`, `null`, or `heap` for a pointer that is not in the unit table. `target` and `order` are a movement target and an order, as block offsets (handles).
-- `state` of LOAD is the unit's motion state, 11 words (44 bytes), `pos` a position in world coordinates with 16 fractional bits (x, y and z), and `cell` a cell (x and y). `mode`, `speed`, `value`, `flags`, `delta`, `bank`, `pitch`, `heading`, `moved`, `rate`, `mask`, `set` and `script` are the arguments of their kinds, as the kind says. 320 to 331 are events into movement's inbox and 336 and up are effects movement publishes.
+- `state` of LOAD is the unit's motion state, 10 words (40 bytes), `pos` a position in world coordinates with 16 fractional bits (x, y and z), and `cell` a cell (x and y). `mode`, `speed`, `value`, `flags`, `delta`, `bank`, `pitch`, `heading`, `moved`, `rate`, `mask`, `set` and `script` are the arguments of their kinds, as the kind says. 320 to 331 but 325, which movement 4.0 removed (PLACED), are events into movement's inbox and 336 and up are effects movement publishes.
 - `outcome` is the result of `Apply` for an event, and 1 for an effect.
 
 

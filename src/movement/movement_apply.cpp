@@ -21,8 +21,6 @@
 #include "../../link/globals.h"
 #include "movement_seam.h"
 
-static_assert(offsetof(UnitMotion, pathLockStamp) == 0x26, "pathLockStamp");
-
 static Unit* UnitOfOffset(unsigned int offset)
 {
     Ref<Unit> ref;
@@ -43,9 +41,28 @@ static int TargetKind(int kind)
            kind == MOVEMENT_SET_HEADING;
 }
 
+static int KnownKind(int kind)
+{
+    switch (kind) {
+    case MOVEMENT_NEW:
+    case MOVEMENT_DESTROY:
+    case MOVEMENT_LOAD:
+    case MOVEMENT_SET_MODE:
+    case MOVEMENT_SET_SPEED:
+    case MOVEMENT_SET_TARGET:
+    case MOVEMENT_DESTROY_TARGET:
+    case MOVEMENT_SET_FLIGHT_MODE:
+    case MOVEMENT_SET_ALTITUDE:
+    case MOVEMENT_SET_APPROACH_RADIUS:
+    case MOVEMENT_SET_HEADING:
+        return 1;
+    }
+    return 0;
+}
+
 static int MovementEventValid(const MovementEventHeader* e, Unit* unit, OrderFx* target)
 {
-    if (e->kind < MOVEMENT_NEW || e->kind > MOVEMENT_SET_HEADING)
+    if (!KnownKind(e->kind))
         return 0;
     if (TargetKind(e->kind))
         return target != nullptr;
@@ -57,7 +74,7 @@ static int MovementEventValid(const MovementEventHeader* e, Unit* unit, OrderFx*
 }
 
 // FUNCTION: 0x43de30
-static void LoadMotionState(UnitMotion* motion, const MovementMotionState* state)
+static void LoadMotionState(UnitMotion* motion, const MovementSavedState* state)
 {
     motion->velocity.x = state->velocity[0];
     motion->velocity.y = state->velocity[1];
@@ -67,7 +84,6 @@ static void LoadMotionState(UnitMotion* motion, const MovementMotionState* state
     motion->p2.z = state->p2[2];
     motion->speed = state->speed;
     motion->turn = (short)state->turn;
-    motion->pathLockStamp = state->pathLockStamp;
     motion->mode = state->mode;
     motion->flag = state->flag;
 }
@@ -96,16 +112,13 @@ int __stdcall MovementApply(const MovementEventHeader* e, unsigned int size)
         break;
     }
     case MOVEMENT_LOAD:
-        LoadMotionState(unit->motion, &reinterpret_cast<const MovementLoad*>(e)->state);
+        LoadMotionState(unit->motion, &reinterpret_cast<const MovementLoadState*>(e)->state);
         break;
     case MOVEMENT_SET_MODE:
         unit->motion->mode = reinterpret_cast<const MovementSetMode*>(e)->mode;
         break;
     case MOVEMENT_SET_SPEED:
         unit->motion->speed = reinterpret_cast<const MovementSetSpeed*>(e)->speed;
-        break;
-    case MOVEMENT_PLACED:
-        unit->motion->pathLockStamp = g_game->ticks;
         break;
     case MOVEMENT_SET_TARGET:
         ((PathGoal*)unit->motion->obj.get())->SetPathOrder(target);
@@ -146,7 +159,7 @@ void __stdcall MovementUpdateMotion(Unit* unit)
     unit->motion->UpdateMotion(unit);
 }
 
-void __stdcall MovementGetMotionState(Unit* unit, MovementMotionState* out)
+void __stdcall MovementGetMotionState(Unit* unit, MovementSavedState* out)
 {
     UnitMotion* motion = unit->motion;
     if (motion == nullptr) {
@@ -161,7 +174,6 @@ void __stdcall MovementGetMotionState(Unit* unit, MovementMotionState* out)
     out->p2[2] = motion->p2.z;
     out->speed = motion->speed;
     out->turn = motion->turn;
-    out->pathLockStamp = motion->pathLockStamp;
     out->mode = motion->mode;
     out->flag = motion->flag;
 }

@@ -531,6 +531,28 @@ add_custom_command(
   DEPENDS orders_writer_test_objects $<TARGET_OBJECTS:orders_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(orders_writer_test DEPENDS "${CMAKE_BINARY_DIR}/orders_writer_test.exe")
+add_library(units_hash_test_objects OBJECT src/seams/units_world.cpp src/units/units_apply.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/units_hash_test.cpp)
+target_include_directories(units_hash_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(units_hash_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(units_hash_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/units_hash_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/units_hash_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /force:unresolved
+          $<TARGET_OBJECTS:units_hash_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS units_hash_test_objects $<TARGET_OBJECTS:units_hash_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(units_hash_test DEPENDS "${CMAKE_BINARY_DIR}/units_hash_test.exe")
+add_library(request_guard_test_objects OBJECT src/game/scheduler.cpp src/game/routes.cpp src/seams/economy_world.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/request_guard_test.cpp)
+target_include_directories(request_guard_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(request_guard_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(request_guard_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/request_guard_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/request_guard_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /force:unresolved
+          $<TARGET_OBJECTS:request_guard_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS request_guard_test_objects $<TARGET_OBJECTS:request_guard_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(request_guard_test DEPENDS "${CMAKE_BINARY_DIR}/request_guard_test.exe")
 
 add_custom_target(wasm_modules
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build

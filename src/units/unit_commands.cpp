@@ -15,6 +15,7 @@ struct Player;
 #include "../util/vec3.h"
 #include "../../interfaces/seams.h"
 #include "../game/orders_events.h"
+#include "../game/units_events.h"
 #include "../../interfaces/orders.h"
 
 struct UnitDefMaxHealthView {
@@ -204,7 +205,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
             int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
             if (target != 0)
-                AttachUnitToPiece(unit, (Unit*)target, -1, 0);
+                UnitsPublishAttachToPiece(SCHED_ENGINE, unit, (Unit*)target, -1, 0);
             break;
         }
         }

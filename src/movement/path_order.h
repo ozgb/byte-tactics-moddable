@@ -52,7 +52,7 @@ public:
     PathOrder(Order* source, Unit* unit, short value);
     PathOrder(Order* source, const Vec3& p);
     PathOrder(Order* source, Unit* unit, const Vec3& p);
-    ~PathOrder();
+    ~PathOrder() override;
     void SetAltitude(int param_1);
     void SetHeading(short v);
     void SetApproachRadius(short v);

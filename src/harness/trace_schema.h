@@ -78,8 +78,7 @@ static const TraceField kUnitFields[] = {
     { "f_1f", 0x1f, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "field_20", 0x20, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "", 0x24, 4, TF_POINTER, TT_HEAP, 0x0 },
-    { "", 0x28, 2, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x2a, 2, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x28, 4, TF_BYTES, TT_NONE, 0x0 },
     { "f2c", 0x2c, 4, TF_REF, TT_HEAP, 0x0 },
     { "", 0x30, 10, TF_BYTES, TT_NONE, 0x0 },
     { "b3a", 0x3a, 1, TF_SCALAR, TT_NONE, 0x0 },
@@ -1313,7 +1312,7 @@ static const TraceField kUnitDefDataPlan[] = {
     { "", 0x241, 8, TF_BYTES, TT_NONE, 0x0 },
 };
 
-static const TraceTable kUnitTable = { kUnitFields, 76, kUnitPlan, 32, 0x118 };
+static const TraceTable kUnitTable = { kUnitFields, 75, kUnitPlan, 32, 0x118 };
 static const TraceTable kProjectileTable = { kProjectileFields, 33, kProjectilePlan, 6, 0x6b };
 static const TraceTable kPlayerTable = { kPlayerFields, 64, kPlayerPlan, 12, 0x14b };
 static const TraceTable kDebrisTable = { kDebrisFields, 27, kDebrisPlan, 6, 0x54 };

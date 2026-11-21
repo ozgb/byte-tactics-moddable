@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 275 immediate, 13 deferrable, 1223 read-only, 1530 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 275 immediate, 13 deferrable, 1223 read-only, 1531 unobserved.
 
 ## Cutting rule
 
@@ -33,9 +33,9 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | targeting | 11 | 32 | 1 | 40 | 111 | 5 of 14 |
 | los_radar | 6 | 33 | 2 | 140 | 260 | 5 of 14 |
 | orders | 18 | 57 | 8 | 138 | 297 | 4 of 14 |
-| units | 28 | 154 | 6 | 85 | 457 | 3 of 14 |
+| units | 28 | 154 | 6 | 85 | 458 | 3 of 14 |
 | players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
-| map | 9 | 42 | 1 | 98 | 225 | 4 of 14 |
+| map | 9 | 42 | 1 | 98 | 226 | 4 of 14 |
 | scripts | 16 | 36 | 0 | 28 | 142 | 9 of 14 |
 | movement | 0 | 41 | 2 | 69 | 233 | 7 of 14 |
 | mission | 0 | 0 | 0 | 55 | 104 | 14 of 14 |
@@ -1618,7 +1618,7 @@ The 15 groups with the most rows are shown.
 | immediate | 131 | 23 |
 | deferrable | 6 | 0 |
 | read-only | 0 | 85 |
-| unobserved | 305 | 152 |
+| unobserved | 306 | 152 |
 
 **Ordered** (28).
 
@@ -1725,7 +1725,7 @@ The 40 rows with the most runs are shown; the other 114 are in data/dependencies
 | economy | 4 | 4 |
 | features | 13 | 11 |
 | los_radar | 28 | 9 |
-| map | 32 | 8 |
+| map | 33 | 8 |
 | mission | 3 | 7 |
 | movement | 29 | 15 |
 | orders | 57 | 16 |
@@ -1963,7 +1963,7 @@ The 15 groups with the most rows are shown.
 | immediate | 15 | 27 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 98 |
-| unobserved | 94 | 131 |
+| unobserved | 94 | 132 |
 
 **Ordered** (9).
 
@@ -2053,7 +2053,7 @@ The 40 rows with the most runs are shown; the other 2 are in data/dependencies.c
 | players | 7 | 13 |
 | scripts | 7 | 5 |
 | targeting | 4 | 5 |
-| units | 8 | 32 |
+| units | 8 | 33 |
 | weapons | 8 | 6 |
 | wind_meteors | 5 | 5 |
 

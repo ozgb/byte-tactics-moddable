@@ -375,7 +375,7 @@ void __stdcall AddUnitToMap(Unit* obj)
 {
     Point16 size = obj->footprint;
     UnitPassMapView* placed = (UnitPassMapView*)obj;
-    if (placed->unit != 0)
+    if (placed->unit)
         placed->unit->lastTick = (unsigned int)g_game->ticks;
     {
         short px = obj->cell.x;

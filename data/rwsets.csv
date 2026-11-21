@@ -24440,7 +24440,7 @@ address,function,file,kind,target
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,get
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator Cell *
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator Unit *
-0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator!=
+0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator bool
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,call,operator->
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,deref_escape,*Cell
 0x47cc30,AddUnitToMap,src/map/terrain.cpp,deref_escape,*Unit

@@ -2577,6 +2577,7 @@ units,map,MapMoveLimits::maxSlope,-,unobserved,0,,
 units,map,MapMoveLimits::maxWaterDepth,-,unobserved,0,,
 units,map,MapMoveLimits::maxWaterSlope,-,unobserved,0,,
 units,map,MapMoveLimits::minWaterDepth,-,unobserved,0,,
+units,map,PathLockStamp,-,unobserved,0,,indirect
 units,map,Point16::x,-,unobserved,0,,
 units,map,Point16::y,-,unobserved,0,,
 units,map,Ref<Unit>::offset,-,unobserved,0,,

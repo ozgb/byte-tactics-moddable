@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 7.0), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 7.1), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -22,19 +22,20 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 166, 168 and 176 (167 was
+to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 166, 168, 169 and 176 (167 was
 REFRESH_PASS_MAP, which map 5.0 removed).
 
 Map's place in it:
 - **Events into map:** ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT, RECLAIM_FOOTPRINT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND
-  and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name.
+  and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name; and since 7.1
+  LOAD_PATH_LOCK_STAMP, published by units while a saved game loads.
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
   `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
   it moved from map's files into the same glue, as it is the engine's adapter.
-- **Routes:** all ten routes into map are synchronous: six because the gate diverged with them queued, units'
+- **Routes:** ten of the eleven routes into map are synchronous: six because the gate diverged with them queued, units'
   ADD_UNIT and BUCKET_PREPEND by #952's rule, features' PASS_MAPS as #971 left it, and RECLAIM_FOOTPRINT because no
   scenario reaches it (sections 4 and 8). Of map's two effects, CELLS_CHANGED is synchronous by #952's rule and
-  CELL_HEIGHTS stays queued.
+  CELL_HEIGHTS stays queued, and so does the route of LOAD_PATH_LOCK_STAMP, the eleventh (section 4).
 - **Runs:** none. Map has no pass of its own: every write it makes inside the tick is on behalf of a caller, and the
   scheduler gains no pass for it. Map's inbox is delivered at each phase boundary and before each synchronous slot.
 - **Synchronous slots:** `CanBuildAt`, `CanPlaceUnitFootprint` and `PickRandomReclaimableResourcesInRadius`, called
@@ -44,7 +45,7 @@ Map's place in it:
   world view at the start and end of a search (`WorldBeginSearch`, `WorldEndSearch`, `src/seams/pathfinding_world.cpp`),
   which deliver map's inbox first too.
 - **Queries:** `UnitsInRange`, `GetCellMeanHeight`, `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`,
-  `IsPadSlotFree`, and since 5.0 `GetGroundHeight`, `PassMapGet` and `PassMapInBounds` (`MovementClassGet` and
+  `IsPadSlotFree`, since 7.1 `PathLockStamp`, and since 5.0 `GetGroundHeight`, `PassMapGet` and `PassMapInBounds` (`MovementClassGet` and
   `MovementClassInBounds` before 7.0), called directly, as
   of map's last apply.
 - **Views:** the footprint fields of the cell records, through los_radar's cell view (section 4); a unit's bucket
@@ -134,6 +135,8 @@ can.
 | units' `FreeMovementClasses`, which also freed the pass maps | map's `FreePassMaps`, a shutdown slot the engine calls after units' `FreeMovementClasses`, which now frees only the names |
 | every other slot | unchanged |
 
+**Map 7.1 (#1019).** The path lock stamp (`UnitMotion::pathLockStamp`) became map's: the field stays in movement's motion record, as the bucket fields and claim bits stay in units' record, and map keeps it. The kind LOAD_PATH_LOCK_STAMP 169 (payload `MapPathLockStamp`) is the saved game's way to set it, and the query `PathLockStamp(unit)`, the last slot of the seam, is the way to read it for the save, outside the tick: it returns the stamp, or 0 for a unit with no movement. The slot is appended, so the version is 7.1. The stamp was movement's event PLACED until movement 4.0 (`docs/movement-interface.md`).
+
 **`VisitObjectsInRange` became a query.** 3.1c's took a `UnitVisitor` and called its `Visit` for each unit within
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
 inside map's. Map 4.0's `UnitsInRange` writes the ids of the units in range to a buffer the caller gives, in the
@@ -194,22 +197,27 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
   every reader of any bit.
 - **`Unit::bit2`:** the yard state that SET_YARD writes, which the yard map's test reads back (`ClaimFootprintCells`,
   `AddUnitToMap`). The access log names it as `Unit::cobStateFlags`, the union over it.
-- **`UnitMotion::pathLockStamp`:** ADD_UNIT stamps a mobile unit's motion with the tick it was placed; map's pass map
-  refreshes (`RefreshPassMapsForUnit` under REMOVE_UNIT, and the slots `RefreshMovedUnits` and `RefreshUnitIfStale`)
-  compare it with the movement class's tick and stamp it again.
+- **`UnitMotion::pathLockStamp`:** map's field in movement's motion record, which map owns in place as it owns the bucket
+  fields and claim bits above; movement neither writes nor carries it (before 7.1, movement 3.0 carried it: an event
+  PLACED from map, and a field of its saved state). ADD_UNIT stamps a mobile unit's motion with the tick it was placed,
+  in `AddUnitToMap` itself, at its first statement as 3.1c did; map's pass map refreshes (`RefreshPassMapsForUnit`
+  under REMOVE_UNIT, and the slots `RefreshMovedUnits` and `RefreshUnitIfStale`) compare it with the movement class's
+  tick and stamp it again; and LOAD_PATH_LOCK_STAMP sets it from a saved game. The query `PathLockStamp` reads it for
+  the save. Until map first stamps it, it is 0, as the motion record is allocated zeroed.
 - **`Order::pos`:** written by `SnapWorldPosToFootprint`, a query that writes only the position it is given; the
   caller passes its order's position. It is the caller's own write through a query, not map's.
 
 An effect for any of these would need a synchronous route, because units and orders read each of them back in the
 same update (the `immediate` rows of section 4), and would only move the write.
 
-**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 7.0, unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size.
+**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 7.1; 7.1 added LOAD_PATH_LOCK_STAMP, and the other payloads are unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size. LOAD_PATH_LOCK_STAMP has outcome 1, or 0 when the unit has no movement.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
 | ADD_UNIT 160, REMOVE_UNIT 161, CLEAR_UNIT 162, RECLAIM_FOOTPRINT 163, BUCKET_UNLINK 165, BUCKET_PREPEND 166 | the header alone | none |
 | SET_YARD 164 | `MapSetYard` | `open`: 1 to open the yard, 0 to close it |
 | PASS_MAPS 168 | `MapPassMaps` | `cell[2]` (the rectangle's first cell), `size[2]` (width and height in cells) |
+| LOAD_PATH_LOCK_STAMP 169 | `MapPathLockStamp` | `stamp`: the path lock stamp (a tick) a saved game keeps |
 | CELLS_CHANGED 176 | `MapCellsChanged` | `rect[4]` (left, top, right, bottom), `classes` (a bit for each movement class whose pass maps changed), `cause` (a `PathChange`) |
 
 ## 4. Views
@@ -266,6 +274,7 @@ one only when an event that can be pending writes what it reads. No route into m
 | units BUCKET_UNLINK | synchronous | The gate (section 8). |
 | units BUCKET_PREPEND | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit that leaves a carrier in the units phase is missing from its bucket until the phase boundary, and orders' patrol and repair orders and the victory conditions walk the buckets (`UnitsInRange`) later in the same phase. BUCKET_UNLINK, its pair, diverged queued (section 8). |
 | units REFRESH_PASS_MAP | removed in 5.0 | Map's own synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` instead, called at the search's statement after map's inbox is delivered (section 8). Queued in 4.0, the event diverged. |
+| units LOAD_PATH_LOCK_STAMP | queued | #952's rule finds no read that a pending event would change. It is published only by `LoadUnitMotion` (`unit_save.cpp`) while a saved game loads, outside the tick, where #970's rule delivers it at once anyway. Only map reads the stamp, and map applies its inbox in order before any of its synchronous slots and at each phase boundary, so every read of the stamp (the pass map refresh, and the trace's hash after a phase boundary) sees it. The same as movement's LOAD. |
 | units RECLAIM_FOOTPRINT | synchronous | No scenario reaches it (section 8): `LoadUnit` publishes it only for a saved unit whose yard is open, and the one saved game of the suite has none. It is published only as a saved game is read, outside the tick, where #970's rule delivers it at once anyway, so the policy changes no order. |
 | features PASS_MAPS | synchronous | #971 made it synchronous by #952's rule (`docs/features-interface.md`, section 4); unchanged. |
 | map CELLS_CHANGED, to pathfinding | synchronous | #952's rule. Queued it stayed equal on the tier, which says little: the default pathfinding marks the stale clusters of its hierarchy from it, and the scenarios' paths came out the same. It can be pending while a later read in the same phase needs it: a path submitted later in the units phase (orders' `Submit`) reads the stale marks, and in 4.x units' own `CellsChanged` reports, direct calls into pathfinding, interleaved with map's in that phase (queued, map's would land after all of units', in another order than 3.1c's). Since 5.0 those reports are map's CELLS_CHANGED too, so the route carries them all at their statements. |
@@ -286,7 +295,7 @@ item is every field of every cell, so a row with it is any field. Each is served
 | map → ai | `g_lastPlaceMetalSum` | players | Written by the synchronous `CanBuildAt` and `CanPlaceUnitFootprint`, read by the same caller right after. |
 | units, orders, weapons → map | `Unit::cell`, `pos`, `zFraction`, `flags`, `footprint`, `def`, `motion`, `carrier`, `cargo`, `cargoNext`, `cobStateFlags` | units | Map reads them inside its synchronous events and slots, at the publisher's statement: REMOVE_UNIT before the publisher writes the new cell, ADD_UNIT after it, as 3.1c's calls did. |
 | orders → map | `Order::pos` | units | Read by the synchronous `CanPlaceUnitFootprint` and the queries at the caller's statement. |
-| units → map | `UnitMotion::pathLockStamp`, the pass maps | players | In 4.x read by the synchronous REFRESH_PASS_MAP, which units published from pathfinding's world view in the players phase. Since 5.0 the refresh that writes them is map's synchronous `RefreshMovedUnits` and `RefreshUnitIfStale`, run at the search's statement, so the writer is map itself, and since 7.0 the pass maps are map's `g_passMaps`; the access data re-recorded for 7.0 (#1002) has no units → map row for them. |
+| map → map | `UnitMotion::pathLockStamp`, the pass maps | players | In 4.x read by the synchronous REFRESH_PASS_MAP, which units published from pathfinding's world view in the players phase. Since 5.0 the refresh that writes them is map's synchronous `RefreshMovedUnits` and `RefreshUnitIfStale`, run at the search's statement, so the writer is map itself, and since 7.0 the pass maps are map's `g_passMaps`; the access data re-recorded for 7.0 (#1002) has no units → map row for them. Since 7.1 the stamp is map's field in movement's record, which only map writes. |
 | economy, units → map | `pad_1df4`, `unknown_1b8e`, `unknown_1cd9` | units | The players' alliance words, read by `CanBuildAt` and the claim at the caller's statement. |
 | features, los_radar → map | `PLOT MEMORY`, `MAPPED MEMORY`, `FeatureAnimEntry::bytes_8`, `bytes_10` | units, features, projectiles | Features' and los_radar's fields of the cells and the spots, written by their own synchronous routes and runs; map reads them in its synchronous events and slots, after those writes, as in 3.1c. |
 | weapons → map | `Debris::pos` | explosions | Read by `GetCellMeanHeight`, a query, at the caller's statement. |

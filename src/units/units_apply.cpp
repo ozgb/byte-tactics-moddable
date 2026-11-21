@@ -271,9 +271,13 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
         UnitsApplyKill(unit, reinterpret_cast<const UnitsKill*>(e)->selfDestruct);
         break;
     case UNITS_SEND:
+        if ((unsigned int)reinterpret_cast<const UnitsSend*>(e)->player >= 10)
+            return 0;
         UnitsApplySend(unit, reinterpret_cast<const UnitsSend*>(e)->player);
         break;
     case UNITS_CAPTURE:
+        if ((unsigned int)reinterpret_cast<const UnitsCapture*>(e)->player >= 10)
+            return 0;
         return UnitsApplyCapture(unit, reinterpret_cast<const UnitsCapture*>(e));
     }
     return 1;

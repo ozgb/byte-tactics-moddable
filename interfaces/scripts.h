@@ -26,7 +26,7 @@ struct ScriptsEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to scripts' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but FREE_STATE and INIT_STATE, which name a piece state), or its kind is unknown.
+// The kinds of event other modules publish to scripts' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but FREE_STATE and INIT_STATE, which name a piece state), names a null piece state (FREE_STATE, INIT_STATE), or its kind is unknown.
 enum ScriptsEventKind {
     // A script of unit starts, and runs until it waits or ends (ScriptsStart); outcome 1, or 0 when unit has no script.
     SCRIPTS_START = 416,
@@ -128,7 +128,7 @@ struct ScriptsSeam {
     ModelState* (__stdcall* CreatePlayerObjectState)(Object3do* model, ScriptTable* data, Unit* owner);
     // Gives a unit script the piece state of its unit (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* SetObjectState)(UnitScript* script, ModelState* state);
-    // Runs the threads of a script for a number of elapsed ticks; the engine calls it for each unit with a script, before the unit's UpdateUnitBody (thiscall in 3.1c, this first). Hooks: none.
+    // Runs the threads of a script for a number of elapsed ticks (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* RunScripts)(CobScript* script, int elapsed);
     // Writes the threads of a script to a bank of a saved game (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* SaveScriptState)(CobScript* script, HapiBank* file);

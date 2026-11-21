@@ -84,13 +84,16 @@ int __stdcall ScriptsApply(const ScriptsEventHeader* e, unsigned int size)
         return 0;
     if (size < ScriptsEventSize(e->kind))
         return 0;
-    if (e->kind == SCRIPTS_FREE_STATE) {
-        FreeObjectState(ScriptsStateOfOffset(reinterpret_cast<const ScriptsState*>(e)->state));
-        return 1;
-    }
-    if (e->kind == SCRIPTS_INIT_STATE) {
+    if (e->kind == SCRIPTS_FREE_STATE || e->kind == SCRIPTS_INIT_STATE) {
         const ScriptsState* p = reinterpret_cast<const ScriptsState*>(e);
-        InitObjectState(ScriptsStateOfOffset(p->state), (Object3do*)g_game->features[p->feature].object);
+        ModelState* state = ScriptsStateOfOffset(p->state);
+        if (state == nullptr)
+            return 0;
+        if (e->kind == SCRIPTS_FREE_STATE) {
+            FreeObjectState(state);
+            return 1;
+        }
+        InitObjectState(state, (Object3do*)g_game->features[p->feature].object);
         return 1;
     }
     Unit* unit = UnitOfOffset(e->unit);

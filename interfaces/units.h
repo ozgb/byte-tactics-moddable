@@ -30,7 +30,7 @@ struct UnitsEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 394); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference), or its kind is unknown.
+// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 394); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference), names a player outside 0 to 9 (SEND, CAPTURE), or its kind is unknown.
 enum UnitsEventKind {
     // unit's state bits under a mask are set or cleared, which starts the scripts that announce the change (UnitsSetStateBits); outcome 1.
     UNITS_SET_STATE_BITS = 352,
@@ -50,7 +50,7 @@ enum UnitsEventKind {
     UNITS_BUILD_DECAY = 359,
     // unit is repaired by a builder (UnitsRepair); outcome 1.
     UNITS_REPAIR = 360,
-    // A reference an order holds to a unit is unlinked from that unit (UnitsUnlink); the header's unit is 0; outcome 1, or 0 for no reference.
+    // A reference an order holds to a unit is unlinked from that unit (UnitsUnlink); the header's unit is the unit the reference points at, which Apply does not read; outcome 1, or 0 for no reference.
     UNITS_UNLINK = 361,
     // unit takes its movement stance, its fire stance or its group (UnitsSetStance); outcome 1.
     UNITS_SET_STANCE = 362,
@@ -176,7 +176,7 @@ struct UnitsRepair {
 
 // The payload of UNLINK.
 struct UnitsUnlink {
-    // The kind; the unit is 0.
+    // The kind and the unit the reference points at.
     UnitsEventHeader h;
     // The reference, as its block offset.
     unsigned int ref;

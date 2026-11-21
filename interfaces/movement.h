@@ -24,7 +24,7 @@ struct MovementEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to movement's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but the kinds about a target, which name a target instead), names no target where it needs one, names a unit with no movement where it needs one (all but NEW), or its kind is unknown.
+// The kinds of event other modules publish to movement's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, or its kind is unknown, or: for the kinds about a target (DESTROY_TARGET, SET_ALTITUDE, SET_APPROACH_RADIUS, SET_HEADING), it names no target, and their unit is not checked; for the other kinds, it names a null unit, or a unit with no movement (all of them but NEW). The kinds about a target then depend on the target's kind, as TargetType gives it.
 enum MovementEventKind {
     // unit gets its movement, steered by a goal that suits its player and its unit type; the header alone; outcome 1.
     MOVEMENT_NEW = 320,
@@ -44,11 +44,11 @@ enum MovementEventKind {
     MOVEMENT_DESTROY_TARGET = 327,
     // unit's movement switches its flight mode, which grounds or lifts an aircraft (MovementSetMode); outcome 1.
     MOVEMENT_SET_FLIGHT_MODE = 328,
-    // A move target holds its unit at an altitude; a target of another kind keeps none (MovementTargetValue); outcome 1.
+    // A move target (kind 2) or an air maneuver target (kind 3) holds its unit at an altitude, outcome 1; a target of another kind (1, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
     MOVEMENT_SET_ALTITUDE = 329,
-    // A move target sets how near its unit has to come (MovementTargetValue); outcome 1.
+    // A move target (kind 2) sets how near its unit has to come, outcome 1; a target of another kind (1, 3, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
     MOVEMENT_SET_APPROACH_RADIUS = 330,
-    // A move target sets the heading its unit takes when it arrives (MovementTargetValue); outcome 1.
+    // A move target (kind 2) sets the heading its unit takes when it arrives, outcome 1; a target of another kind (1, 3, 4, 5 or 6) is left as it was, outcome 0 (MovementTargetValue).
     MOVEMENT_SET_HEADING = 331
 };
 
@@ -294,7 +294,7 @@ struct MovementSeam {
     unsigned int (__stdcall* LoadTarget)(int type, unsigned int order, HapiBank* file, const char* name);
     // Writes a target for an order to a saved game bank under a name, outside the tick. Hooks: none.
     void (__stdcall* SaveTarget)(unsigned int target, unsigned int order, HapiBank* file, const char* name);
-    // Returns the kind of a target, 0 for none; a query. Hooks: none.
+    // Returns the kind of a target, 0 for none: 1 a plain target, 2 a move target, 3 an air maneuver target, 4 a disc, 5 a ring, 6 a footprint marker; a query. Hooks: none.
     int (__stdcall* TargetType)(unsigned int target);
     // Returns the target the goal of a unit's movement steers to, or 0, also for a unit with no movement; a query. Hooks: none.
     unsigned int (__stdcall* UnitTarget)(Unit* unit);

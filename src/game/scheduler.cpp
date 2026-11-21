@@ -66,7 +66,6 @@ int __stdcall SchedInboxHolds(int module, int kind, unsigned int word, unsigned 
 void __stdcall ScheduleUnitsDeliver()
 {
     ReplayImport call(RI_SCHEDULE_UNITS_DELIVER);
-    SchedDeliver(SCHED_SCRIPTS);
     SchedDeliver(SCHED_UNITS);
 }
 
@@ -162,7 +161,6 @@ void SchedUnitsPhase()
 #if BT_ACCESS_LOG
                         AccessLogEntity();
 #endif
-                        SchedDeliver(SCHED_SCRIPTS);
                         SchedDeliver(SCHED_UNITS);
                         g_seams.units->UpdateUnitHead(u);
                         if (u->player->active != 0) {
@@ -172,13 +170,11 @@ void SchedUnitsPhase()
                                 g_seams.weapons->UpdateUnitWeapons(u);
                             }
                         }
-                        SchedDeliver(SCHED_SCRIPTS);
                         SchedDeliver(SCHED_UNITS);
                         if (u->script != 0) {
                             SchedDeliver(SCHED_SCRIPTS);
                             g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
                         }
-                        SchedDeliver(SCHED_SCRIPTS);
                         SchedDeliver(SCHED_UNITS);
                         int moved = 0;
                         if (g_seams.units->UpdateUnitBody(u)) {
@@ -192,7 +188,6 @@ void SchedUnitsPhase()
                                 moved = 1;
                             }
                         }
-                        SchedDeliver(SCHED_SCRIPTS);
                         SchedDeliver(SCHED_UNITS);
                         g_seams.units->UpdateUnitTail(u, moved);
                     }
@@ -286,7 +281,6 @@ void SchedPlayersPhase(RandStream stream)
         g_seams.ai->UpdateSquads(player);
         SchedDeliver(SCHED_LOS_RADAR);
         g_seams.los_radar->RefreshUnitIndex(player);
-        SchedDeliver(SCHED_SCRIPTS);
         SchedDeliver(SCHED_UNITS);
         g_seams.units->RefreshFactoryIndex(player);
         SchedDeliver(SCHED_AI);

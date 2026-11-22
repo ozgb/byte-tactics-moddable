@@ -404,14 +404,14 @@ struct UnitsSeam {
     int (__stdcall* AddBuildProgress)(Unit* builder, Unit* unit, float amount);
     // Adds repair progress to a unit and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: none.
     int (__stdcall* AddRepairProgress)(Unit* builder, Unit* unit, float amount);
-    // Returns 1 when a unit can load a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanLoad)(Unit* unit, int unusedEdx, Unit* target);
-    // Returns 1 when a unit can reclaim a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanReclaim)(Unit* unit, int unusedEdx, Unit* target);
-    // Returns 1 when a unit can repair a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanRepair)(Unit* unit, int unusedEdx, Unit* target);
-    // Unlinks a reference from the list of the unit it points at (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* UnitRefUnlink)(UnitRef* ref);
+    // Returns 1 when a unit can load a target. Hooks: none.
+    int (__stdcall* CanLoad)(Unit* unit, Unit* target);
+    // Returns 1 when a unit can reclaim a target. Hooks: none.
+    int (__stdcall* CanReclaim)(Unit* unit, Unit* target);
+    // Returns 1 when a unit can repair a target. Hooks: none.
+    int (__stdcall* CanRepair)(Unit* unit, Unit* target);
+    // Unlinks a reference from the list of the unit it points at. Hooks: none.
+    void (__stdcall* UnitRefUnlink)(UnitRef* ref);
     // Starts one unit's update for one tick, before its weapons: the count of units updated and its wind generator; UpdateAllUnits calls it for each unit of each player. Hooks: none.
     void (__stdcall* UpdateUnitHead)(Unit* unit);
     // Continues one unit's update for one tick, after its weapons and its scripts: its timers, health percentage, water damage and self-repair; returns 1 when the unit's player is active and of type 1 or 2, so that its orders and its movement run next. Hooks: none.

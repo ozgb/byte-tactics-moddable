@@ -176,7 +176,7 @@ static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char
     self->AddTypeOrCategory(text, out);
 }
 
-static unsigned char __fastcall ChooseWeaponNative(Unit* self)
+static unsigned char __stdcall ChooseWeaponNative(Unit* self)
 {
     return self->ChooseWeapon();
 }
@@ -371,27 +371,27 @@ static char* __stdcall GetNumPlayersNative()
     return TheMission()->GetNumPlayers();
 }
 
-static void __fastcall DeactivateConditionsNative(MissionConditions* self)
+static void __stdcall DeactivateConditionsNative(MissionConditions* self)
 {
     self->Deactivate();
 }
 
-static void __fastcall LoadConditionsNative(MissionConditions* self, int unusedEdx, HapiBank* file)
+static void __stdcall LoadConditionsNative(MissionConditions* self, HapiBank* file)
 {
     self->LoadConditions(file);
 }
 
-static void __fastcall SaveConditionsNative(MissionConditions* self, int unusedEdx, HapiBank* file)
+static void __stdcall SaveConditionsNative(MissionConditions* self, HapiBank* file)
 {
     self->SaveConditions(file);
 }
 
-static void __fastcall RegisterConditionsNative(MissionConditions* self, int unusedEdx, TdfFile* mission)
+static void __stdcall RegisterConditionsNative(MissionConditions* self, TdfFile* mission)
 {
     self->RegisterConditions((ConditionParams*)mission);
 }
 
-static void __fastcall FreeConditionsNative(MissionConditions* self)
+static void __stdcall FreeConditionsNative(MissionConditions* self)
 {
     self->FreeConditions();
 }
@@ -406,22 +406,22 @@ static MissionConditions* __stdcall NewConditionsNative(void)
     return new (kSim) MissionConditions;
 }
 
-static int __fastcall CanLoadNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanLoadNative(Unit* self, Unit* target)
 {
     return self->CanLoad(target);
 }
 
-static int __fastcall CanReclaimNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanReclaimNative(Unit* self, Unit* target)
 {
     return self->CanReclaim(target);
 }
 
-static int __fastcall CanRepairNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanRepairNative(Unit* self, Unit* target)
 {
     return self->CanRepair(target);
 }
 
-static void __fastcall UnitRefUnlinkNative(UnitRef* self)
+static void __stdcall UnitRefUnlinkNative(UnitRef* self)
 {
     self->Unlink();
 }

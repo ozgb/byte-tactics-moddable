@@ -1030,7 +1030,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     switch (state) {
     case 0:
         if (unit->motion && (unit->def->flags2 & 0x400)) {
-            if (!g_seams.units->CanReclaim(unit, 0, target)) {
+            if (!g_seams.units->CanReclaim(unit, target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_THAT_UNIT_CANNOT_BE_RECLAIMED);
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
                 return 8;
@@ -1064,7 +1064,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         range = unit->def->buildRange;
         range += target->def->radius184;
         int square = SquaredDistance(delta.x, delta.z);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, target)) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, target)) {
             if (order->duration >= 15) {
                 WeaponsPublishDamage(SCHED_ORDERS, unit, target, order->elapsed, 5, 0);
                 order->duration = 0;

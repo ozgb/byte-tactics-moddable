@@ -77,8 +77,8 @@ struct TargetingSeam {
     Unit* (__stdcall* FindWeaponTarget)(Unit* unit, unsigned char weapon, int useRange);
     // Synchronous: picks the best enemy for a unit that fires at will, as FindWeaponTarget does for its first weapon, or returns null. Hooks: FilterTargets.
     Unit* (__stdcall* FindBestTargetIfFireAtWill)(Unit* unit);
-    // Returns the weapon a unit fires first at its target; a query (thiscall in 3.1c, this first). Hooks: none.
-    unsigned char (__fastcall* ChooseWeapon)(Unit* unit);
+    // Returns the weapon a unit fires first at its target; a query. Hooks: none.
+    unsigned char (__stdcall* ChooseWeapon)(Unit* unit);
     // Returns the target pair of a weapon of a unit as a saved game keeps it, the two 16-bit halves TARGETING_LOAD sets, the first in the low half; a query, which a saved game reads outside the tick. Hooks: none.
     int (__stdcall* SavedTargetPair)(Unit* unit, int weapon);
 };

@@ -106,7 +106,7 @@ int __stdcall LoadSavedGameState(HapiBank* file)
     g_seams.los_radar->LoadMappingData(file);
     g_seams.units->LoadUnits(file);
     g_seams.wind_meteors->LoadMeteors(file);
-    g_seams.players->LoadConditions(g_game->list_391ed, 0, file);
+    g_seams.players->LoadConditions(g_game->list_391ed, file);
     g_game->bits_37ebe_2.loaded = 1;
     return 1;
 }
@@ -172,7 +172,7 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
         g_seams.map->SavePlayerFeaturesPlotmap(&file);
         g_seams.map->SaveMetalPlotmap(&file);
         g_seams.wind_meteors->SaveMeteors(&file);
-        g_seams.players->SaveConditions(g_game->list_391ed, 0, &file);
+        g_seams.players->SaveConditions(g_game->list_391ed, &file);
     }
     int result = file.SaveBank(path, g_saveBankName, 1, 0);
     (&file)->CloseBank();

@@ -1587,7 +1587,7 @@ int EnterList(ReplayText& t, Ref<Unit>* out, int capacity)
     return count;
 }
 
-unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
+unsigned char __stdcall ChooseWeaponSlot(Unit* unit)
 {
     return unit->ChooseWeapon();
 }

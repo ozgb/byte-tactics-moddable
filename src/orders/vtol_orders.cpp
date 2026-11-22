@@ -720,7 +720,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
     switch (order->state) {
     case 0:
         if (unit->motion && (unit->def->flags1 & 0x800)) {
-            if (!g_seams.units->CanRepair(unit, 0, order->target)) {
+            if (!g_seams.units->CanRepair(unit, order->target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIR_MISSION_FAILED);
                 return 8;
             }
@@ -1093,7 +1093,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                     }
                 }
             }
-            if (g_seams.units->CanRepair(unit, 0, order->target)) {
+            if (g_seams.units->CanRepair(unit, order->target)) {
                 MissionType kind=GetOrderType(8, unit, (Unit*)order->target, nullptr);
                 if (kind.index) {
                     order->SetAttachedFx(0);
@@ -1102,7 +1102,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 }
             }
             if (order->target->list && order->target->list->kind.index && (unit->def->flags1&0x40) &&
-                g_seams.units->CanRepair(unit, 0, order->target->list->target) &&
+                g_seams.units->CanRepair(unit, order->target->list->target) &&
                 (order->target->def->flags1&0x40) && order->target->list &&
                 (order->target->list->flags_42&0x100000) && unit!=order->target->list->target) {
                 int building = order->target->list->kind=="MobileBuild" || order->target->list->kind=="BuildingBuild" || order->target->list->kind=="VTOL_MobileBuild";
@@ -1802,7 +1802,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
                 return 7;
             }
-            if (!g_seams.units->CanReclaim(unit, 0, target)) {
+            if (!g_seams.units->CanReclaim(unit, target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_THAT_UNIT_CANNOT_BE_RECLAIMED);
                 return 8;
             }
@@ -1831,7 +1831,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         int range = 0;
         range = unit->def->buildRange;
         int square = Square(delta);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, order->target)) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, order->target)) {
             if (order->duration >= 15) {
                 WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, order->elapsed, 5, 0);
                 order->duration = 0;
@@ -2075,12 +2075,12 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
                 VisitUnitsInRange(&unit->pos, range, (UnitVisitor*)&collector);
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
-                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft == 0.0f) {
+                    if (g_seams.units->CanRepair(unit, target) && target->buildLeft == 0.0f) {
                         if (IssueRepairOrder(unit, target, 0))
                             return 6;
                         return 3;
                     }
-                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft != 0.0f) {
+                    if (g_seams.units->CanRepair(unit, target) && target->buildLeft != 0.0f) {
                         order->SetAttachedFx(0);
                         AppendOrder(unit, new (kSim) Order("VTOL_HELPBUILD", target, 0, 0, 0, 0));
                         order->flags = 0;

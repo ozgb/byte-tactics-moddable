@@ -652,7 +652,7 @@ int Mission::LoadMission(char* map)
     noSeaLevelTrigger = parser.current->GetFieldInt("nosealeveltrigger", 0);
     waterDoesDamage = parser.current->GetFieldInt("waterdoesdamage", 0);
     waterDamage = parser.current->GetFieldInt("waterdamage", 0);
-    g_seams.players->RegisterConditions(g_game->list_391ed, 0, &parser);
+    g_seams.players->RegisterConditions(g_game->list_391ed, &parser);
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!SelectSchema(type, &parser, schema)) {

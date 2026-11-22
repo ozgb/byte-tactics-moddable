@@ -151,16 +151,16 @@ struct PlayersSeam {
     void (__stdcall* SetupPlayerSlot)(int player, char type);
     // Steps the blinking of the player markers. Hooks: none.
     void (__stdcall* UpdateBlink)(void);
-    // Stops the victory and defeat conditions of the mission from being checked (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* DeactivateConditions)(MissionConditions* conditions);
-    // Reads the conditions state of a saved game from a bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* LoadConditions)(MissionConditions* conditions, int unusedEdx, HapiBank* file);
-    // Writes the conditions state of a saved game to a bank (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* SaveConditions)(MissionConditions* conditions, int unusedEdx, HapiBank* file);
-    // Reads the victory and defeat conditions from a mission file (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* RegisterConditions)(MissionConditions* conditions, int unusedEdx, TdfFile* mission);
-    // Frees the condition objects (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* FreeConditions)(MissionConditions* conditions);
+    // Stops the victory and defeat conditions of the mission from being checked. Hooks: none.
+    void (__stdcall* DeactivateConditions)(MissionConditions* conditions);
+    // Reads the conditions state of a saved game from a bank. Hooks: none.
+    void (__stdcall* LoadConditions)(MissionConditions* conditions, HapiBank* file);
+    // Writes the conditions state of a saved game to a bank. Hooks: none.
+    void (__stdcall* SaveConditions)(MissionConditions* conditions, HapiBank* file);
+    // Reads the victory and defeat conditions from a mission file. Hooks: none.
+    void (__stdcall* RegisterConditions)(MissionConditions* conditions, TdfFile* mission);
+    // Frees the condition objects. Hooks: none.
+    void (__stdcall* FreeConditions)(MissionConditions* conditions);
     // Frees the condition objects and then the conditions object itself. Hooks: none.
     void (__stdcall* DeleteConditions)(MissionConditions* conditions);
     // Advances every player's state for one tick like UpdatePlayers, but draws from the given stream; UpdatePlayers draws from the main stream.

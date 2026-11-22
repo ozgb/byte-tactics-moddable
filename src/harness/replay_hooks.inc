@@ -1100,7 +1100,7 @@ Unit* __stdcall RecTargetingFindBestTargetIfFireAtWill(Unit* a0)
     return result;
 }
 
-unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
+unsigned char __stdcall RecTargetingChooseWeapon(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2038,61 +2038,58 @@ int __stdcall RecUnitsAddRepairProgress(Unit* a0, Unit* a1, float a2)
     return result;
 }
 
-int __fastcall RecUnitsCanLoad(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanLoad(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANLOAD, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanLoad(a0, a1, a2);
+    int result = s_inner_units->CanLoad(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __fastcall RecUnitsCanReclaim(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanReclaim(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANRECLAIM, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanReclaim(a0, a1, a2);
+    int result = s_inner_units->CanReclaim(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __fastcall RecUnitsCanRepair(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanRepair(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANREPAIR, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanRepair(a0, a1, a2);
+    int result = s_inner_units->CanRepair(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-void __fastcall RecUnitsUnitRefUnlink(UnitRef* a0)
+void __stdcall RecUnitsUnitRefUnlink(UnitRef* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITREFUNLINK, SUB_UNITS, roots);
@@ -2421,7 +2418,7 @@ void __stdcall RecPlayersUpdateBlink()
     }
 }
 
-void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
+void __stdcall RecPlayersDeactivateConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_DEACTIVATECONDITIONS, SUB_PLAYERS, roots);
@@ -2433,49 +2430,46 @@ void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
     }
 }
 
-void __fastcall RecPlayersLoadConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __stdcall RecPlayersLoadConditions(MissionConditions* a0, HapiBank* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADCONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
     }
-    s_inner_players->LoadConditions(a0, a1, a2);
+    s_inner_players->LoadConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersSaveConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __stdcall RecPlayersSaveConditions(MissionConditions* a0, HapiBank* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_SAVECONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
     }
-    s_inner_players->SaveConditions(a0, a1, a2);
+    s_inner_players->SaveConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersRegisterConditions(MissionConditions* a0, int a1, TdfFile* a2)
+void __stdcall RecPlayersRegisterConditions(MissionConditions* a0, TdfFile* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_REGISTERCONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
         ArgPending(s_call, "mission");
     }
-    s_inner_players->RegisterConditions(a0, a1, a2);
+    s_inner_players->RegisterConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersFreeConditions(MissionConditions* a0)
+void __stdcall RecPlayersFreeConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_FREECONDITIONS, SUB_PLAYERS, roots);

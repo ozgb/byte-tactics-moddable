@@ -364,16 +364,31 @@ def compare_entries(old: dict, new: dict) -> list[Change]:
     return out
 
 
+SAME_WIDTH = re.compile(r"\blong(?! long)\b(?<!long long)")
+
+
+def member_shape(member: tuple) -> tuple:
+    """A layout member without its name, with long spelled int (the same width on every target): (offset, depth, type)."""
+    offset, depth, text = member
+    return offset, depth, SAME_WIDTH.sub("int", text.rsplit(" ", 1)[0])
+
+
 def compare_layout(record: str, old: tuple, new: tuple) -> list[Change]:
     if old is None or new is None:
         return [Change("layout", "no layout from clang for %s" % record)] if old != new else []
     old_members, old_size, _ = old
     new_members, new_size, _ = new
-    if new_members[:len(old_members)] != old_members or new_size < old_size:
+    old_shapes, new_shapes = [member_shape(m) for m in old_members], [member_shape(m) for m in new_members]
+    old_names = {(m[1], m[2].rsplit(" ", 1)[-1]): m[0] for m in old_members}
+    moved = any(old_names.get((m[1], m[2].rsplit(" ", 1)[-1]), m[0]) != m[0] for m in new_members)
+    if new_shapes[:len(old_shapes)] != old_shapes or new_size < old_size or moved:
         return [Change("layout", "field moved or changed size in %s" % record)]
-    if new_members != old_members:
-        return [Change("additive", "field appended to %s" % record)]
-    return []
+    changes = []
+    if new_members[:len(old_members)] != old_members:
+        changes.append(Change("breaking", "field renamed or retyped at the same offset and width in %s" % record))
+    if len(new_members) > len(old_members):
+        changes.append(Change("additive", "field appended to %s" % record))
+    return changes
 
 
 def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Change]:

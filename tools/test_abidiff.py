@@ -106,6 +106,22 @@ class MajorBumpTest(unittest.TestCase):
         self.assertFalse(result.ok, result)
         self.assertIn("moved or changed size", result.summary)
 
+    def test_a_renamed_field_is_breaking(self):
+        renamed = header([SLOT_A], data="int a; int c;")
+        self.assertFalse(verdict(self.old, renamed, modules=manifest(built=None)).ok)
+        result = verdict(self.old, header([SLOT_A], major=2, data="int a; int c;"), modules=manifest(built=None))
+        self.assertTrue(result.ok, result)
+        self.assertIn("field renamed or retyped at the same offset and width in Data", result.details)
+
+    def test_long_to_int_is_a_retype_not_a_move(self):
+        old = header([SLOT_A], data="unsigned long a; long b;")
+        result = verdict(old, header([SLOT_A], major=2, data="unsigned a; int b;"), modules=manifest(built=None))
+        self.assertTrue(result.ok, result)
+
+    def test_a_field_that_changes_width_fails(self):
+        result = verdict(self.old, header([SLOT_A], major=2, data="int a; short b;"), modules=manifest(built=None))
+        self.assertIn("moved or changed size", result.summary)
+
     def test_going_down_fails(self):
         result = verdict(header([SLOT_A], major=3), header([SLOT_A], major=2), modules=manifest())
         self.assertFalse(result.ok)

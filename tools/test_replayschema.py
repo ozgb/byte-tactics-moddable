@@ -34,7 +34,7 @@ class Interface(unittest.TestCase):
         names = [s["name"] for s in iface["slots"]]
         self.assertEqual(names[0], "UpdateWind")
         self.assertEqual(len(names), 8)
-        self.assertEqual(iface["version"], [3, 0])
+        self.assertEqual(iface["version"], [3, 1])
         update = iface["slots"][0]
         self.assertEqual((update["conv"], update["ret"], update["params"]), ("__cdecl", "void", [{"type": "RandStream", "name": "stream"}]))
 

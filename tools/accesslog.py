@@ -28,7 +28,7 @@ between two ticks fell into the window that ends at marker 1.
 
 Two more windows cover saving and loading: `save` is SaveGameFile, and `load` is LoadSavedGameState and
 LoadBattleAssets (a match loads on the load thread, so the thread a save or load window opens on is the one
-recorded). Neither touches the tick's evidence: their rows go to `<scenario>.saveload.csv`, with the edges file's
+recorded, and the window it interrupts gets its window and thread back when it ends). Neither touches the tick's evidence: their rows go to `<scenario>.saveload.csv`, with the edges file's
 columns and the phase `save` or `load`, and tools/privatestate.py judges them as it judges the tick's.
 
 Evidence, per (writer, reader, item, phase), counted in the column `count`:

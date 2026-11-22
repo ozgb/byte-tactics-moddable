@@ -14,6 +14,10 @@ void AccessLogInit();
 
 int AccessLogWindow(int window);
 
+unsigned AccessLogThread();
+
+void AccessLogRestore(int window, unsigned thread);
+
 void AccessLogMarker(int phase, unsigned tick);
 
 void AccessLogFinish();
@@ -67,9 +71,10 @@ struct AccessLogScope {
 };
 
 struct AccessLogSaveLoadScope {
+    unsigned thread;
     int before;
-    explicit AccessLogSaveLoadScope(int window) : before(AccessLogWindow(window)) {}
-    ~AccessLogSaveLoadScope() { AccessLogWindow(before); }
+    explicit AccessLogSaveLoadScope(int window) : thread(AccessLogThread()), before(AccessLogWindow(window)) {}
+    ~AccessLogSaveLoadScope() { AccessLogRestore(before, thread); }
 };
 
 #endif

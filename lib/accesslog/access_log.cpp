@@ -1760,7 +1760,7 @@ NS void AccessLogInit()
     g_ready = true;
 }
 
-NS int AccessLogWindow(int window)
+NS static int OpenWindow(int window, unsigned thread)
 {
     int before = g_window;
     if (!g_ready)
@@ -1799,7 +1799,7 @@ NS int AccessLogWindow(int window)
         return before;
     }
     g_started = true;
-    g_simThread = ThreadId();
+    g_simThread = thread;
     g_blockLo = (unsigned)SimBlockBase();
     if (SaveOrLoad(window))
         g_classifier.BeginIsolatedWindow(window);
@@ -1807,6 +1807,21 @@ NS int AccessLogWindow(int window)
         g_classifier.BeginWindow(window);
     g_on = 1;
     return before;
+}
+
+NS int AccessLogWindow(int window)
+{
+    return OpenWindow(window, ThreadId());
+}
+
+NS unsigned AccessLogThread()
+{
+    return g_simThread;
+}
+
+NS void AccessLogRestore(int window, unsigned thread)
+{
+    OpenWindow(window, thread != 0 ? thread : ThreadId());
 }
 
 NS void AccessLogMarker(int phase, unsigned tick)

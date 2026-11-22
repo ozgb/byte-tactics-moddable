@@ -748,6 +748,16 @@ class RegionTest(unittest.TestCase):
         self.assertIn("access.saveload.csv", al.OUTPUT_FILES)
         self.assertIn('("saveload.csv", "access.saveload.csv")', Path(al.__file__).read_text())
 
+    def test_a_save_or_load_scope_gives_the_window_back_on_the_thread_it_took_it_from(self):
+        header = (ROOT / "lib/accesslog/access_log.h").read_text()
+        scope = header.split("struct AccessLogSaveLoadScope")[1].split("};")[0]
+        self.assertIn("thread(AccessLogThread())", scope)
+        self.assertIn("AccessLogRestore(before, thread)", scope)
+        self.assertNotIn("AccessLogWindow(before)", scope)
+        runtime = (ROOT / "lib/accesslog/access_log.cpp").read_text()
+        self.assertIn("g_simThread = thread;", runtime)
+        self.assertEqual(runtime.count("g_simThread = "), 1)
+
 
 class SourceOrderTest(unittest.TestCase):
     SOURCE = """// FUNCTION: 0x401000

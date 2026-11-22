@@ -324,9 +324,9 @@ The HPA* demo of `src/ai/pathfind_hpa.cpp` (#930) is counted apart, with the rea
 
 Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
-Coverage: 84.2% of functions (96 of 114), 86.1% of lines, 71.7% of branches; 18 live functions no scenario enters, and 19 more are dead (data/coverage.csv).
+Coverage: 84.3% of functions (97 of 115), 86.2% of lines, 71.6% of branches; 18 live functions no scenario enters, and 19 more are dead (data/coverage.csv).
 
-**weapons, functions no scenario enters** (18 of 114 after the scenarios of `reference/scenarios/`; 96 are entered, 84.2%), by reason:
+**weapons, functions no scenario enters** (18 of 115 after the scenarios of `reference/scenarios/`; 97 are entered, 84.3%), by reason:
 
 - Shutdown only (4): `DebrisCache::FreeBuffer`, `FreeExplosions`, `FreeWeaponArray` and `FreeWeaponTypes`. `ShutdownIngameSystems` calls them, and test mode ends with `host_exit` after the last tick, which ends the process with `TerminateProcess`.
 - Network only (5): `ApplyProjectileHitPacket`, `ApplyWeaponFirePacket`, `FindRemoteProjectileForPacket`, `SamePos` and `SameTargetPos`. `ApplyProjectileHitPacket` and `ApplyWeaponFirePacket` are the handlers of the projectile packets of `net_game.cpp`, and the other three are statics only they call. Test mode runs every player on one machine.
@@ -773,7 +773,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **features** | 54 of 55 | 98.2% | 87.3% | 73.7% | 1 | 4 |
 | **ai** | 87 of 109 | 79.8% | 75.6% | 72.9% | 22 | 31 |
 | **pathfinding** | 69 of 78 | 88.5% | 82.3% | 69.4% | 9 | 10 |
-| **weapons** | 96 of 114 | 84.2% | 86.1% | 71.7% | 18 | 19 |
+| **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
 | **targeting** | 21 of 21 | 100.0% | 96.1% | 79.6% | 0 | 1 |
 | **los_radar** | 89 of 98 | 90.8% | 87.7% | 74.4% | 9 | 22 |
 | **orders** | 234 of 245 | 95.5% | 85.4% | 65.3% | 11 | 17 |

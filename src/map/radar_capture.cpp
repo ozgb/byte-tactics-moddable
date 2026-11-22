@@ -34,7 +34,7 @@ struct RadarUnitDefView {
 #include "../../link/globals.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_radar.h"
-#include "../files/files_api.h"
+#include "../files/files_bank.h"
 
 static Player* Player_Get(unsigned char p)
 {
@@ -226,7 +226,8 @@ void __stdcall LoadMappingData(HapiBank* file)
     if (file->OpenAccount("Mapping") && file->OpenNamedBox("Data")) {
         unsigned int size = g_game->width * g_game->height * sizeof(short) / 4;
         if (file->GetBoxSize() == size) {
-            unsigned char* dst = (unsigned char*)(void*)g_game->visibilityMask;
+            unsigned short* mask = g_game->visibilityMask;
+            unsigned char* dst = reinterpret_cast<unsigned char*>(mask);
             unsigned char chunk[1024];
             unsigned int done = 0;
             while (done < size) {

@@ -501,8 +501,8 @@ it compares the runs that differed.
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--tier` is the same `--check` restricted to the 38 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 37,450 ticks of the 373,200 that the suite's 89 scenarios play (10.0%), none longer than 9000.
+`--tier` is the same `--check` restricted to the 40 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 38,200 ticks of the 373,950 that the suite's 91 scenarios play (10.2%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
@@ -529,6 +529,9 @@ the five that draw extra numbers from the view random stream before tick 1 joine
 `share-all` (#953) is in the tier by hand: it is the only scenario of the tier that shares resources with an ally, so
 without it the tier would never enter the resource sharing of a network game.
 
+`save-targets` and `load-targets` (#1029) are in it by hand too: theirs is the only save of the suite in which a weapon
+holds a target (one a unit, one a ground point), so they are what catches a target saved or loaded wrongly.
+
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
 scenarios it takes, with their players, ticks and new lines, and their lines and functions as a share of the union of every
@@ -552,6 +555,7 @@ upper bound. Replay parts pick their recordings from it.
 | eight-full-moon | 8 | 9000 |
 | hailstorm-los-off | 2 | 150 |
 | load-midgame | 0 | 900 |
+| load-targets | 0 | 300 |
 | mission-build-unit | 0 | 180 |
 | mission-capture | 0 | 660 |
 | mission-defeat-passes-x | 0 | 270 |
@@ -572,6 +576,7 @@ upper bound. Replay parts pick their recordings from it.
 | orders-tier2-spider | 2 | 700 |
 | orders-tier2-vader | 2 | 420 |
 | save-midgame | 2 | 1800 |
+| save-targets | 2 | 450 |
 | sensors-floating-teeth-los-off | 2 | 400 |
 | share-all | 2 | 960 |
 | ui-build-menu | 2 | 200 |

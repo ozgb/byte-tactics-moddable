@@ -1,0 +1,243 @@
+bt-replay 2
+subsystem targeting 3.1
+call 149 GetWeaponTargetPos
+  r Game.seaLevel 0
+  r Unit#1.unitDefIndex 34
+  r Unit#1.killCount 0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 36700160
+  r Unit#1.posY 65536
+  r Unit#1.posZ 15728640
+  r Unit#1.weapon0TargetX 0
+  r Unit#1.weapon0TargetZ -32768
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon0Flags 18
+  r Unit#1.weapon1TargetX 0
+  r Unit#1.weapon1TargetZ -32768
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
+  r Unit#1.weapon2TargetX 0
+  r Unit#1.weapon2TargetZ -32768
+  r Unit#1.weapon2Def weapondef#22
+  r Unit#1.weapon2Flags 26
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
+  r weapondef#20.flags 0x00080809
+  r weapondef#20.speed 873813
+  r weapondef#0.flags 0x00000000
+  r weapondef#0.speed 0
+  r weapondef#22.flags 0x04480a09
+  r weapondef#22.speed 436906
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 149 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 149 GetWeaponTargetPos
+  r Unit#2.unitDefIndex 71
+  r Unit#2.killCount 0
+  r Unit#2.motion null
+  r Unit#2.posX 210763776
+  r Unit#2.posY 65536
+  r Unit#2.posZ 92274688
+  r Unit#2.weapon0TargetX 251
+  r Unit#2.weapon0TargetZ -32768
+  r Unit#2.weapon0Def weapondef#80
+  r Unit#2.weapon0Flags 3
+  r Unit#2.weapon1TargetX 0
+  r Unit#2.weapon1TargetZ -32768
+  r Unit#2.weapon1Def weapondef#0
+  r Unit#2.weapon1Flags 20
+  r Unit#2.weapon2TargetX 0
+  r Unit#2.weapon2TargetZ -32768
+  r Unit#2.weapon2Def weapondef#0
+  r Unit#2.weapon2Flags 24
+  r weapondef#80.flags 0x00080809
+  r weapondef#80.speed 1966080
+  r Unit#251.unitDefIndex 167
+  r Unit#251.motion UnitMotion#2
+  r UnitMotion#2.velocityX 0
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ 0
+  a unit Unit#2
+  a weapon 0
+  i scripts.GetSweetSpot Unit#251
+  o out (221232169,1321931,92083651)
+  o pos.x 221232169
+  o pos.y 1321931
+  o pos.z 92083651
+  o result 1
+call 149 GetWeaponTargetPos
+  r Unit#3.unitDefIndex 71
+  r Unit#3.killCount 0
+  r Unit#3.motion null
+  r Unit#3.posX 210763776
+  r Unit#3.posY 65536
+  r Unit#3.posZ 82837504
+  r Unit#3.weapon0TargetX 3140
+  r Unit#3.weapon0TargetZ 1180
+  r Unit#3.weapon0Def weapondef#80
+  r Unit#3.weapon0Flags 3
+  r Unit#3.weapon1TargetX 3140
+  r Unit#3.weapon1TargetZ 1180
+  r Unit#3.weapon1Def weapondef#0
+  r Unit#3.weapon1Flags 20
+  r Unit#3.weapon2TargetX 0
+  r Unit#3.weapon2TargetZ -32768
+  r Unit#3.weapon2Def weapondef#0
+  r Unit#3.weapon2Flags 24
+  a unit Unit#3
+  a weapon 0
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  o pos.x 205783040
+  o pos.y 65536
+  o pos.z 77332480
+  o result 1
+call 149 GetWeaponTargetPos
+  r Unit#251.killCount 0
+  r Unit#251.posX 221249536
+  r Unit#251.posY 65536
+  r Unit#251.posZ 92274688
+  r Unit#251.weapon0TargetX 0
+  r Unit#251.weapon0TargetZ -32768
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon0Flags 18
+  r Unit#251.weapon1TargetX 0
+  r Unit#251.weapon1TargetZ -32768
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
+  r Unit#251.weapon2TargetX 0
+  r Unit#251.weapon2TargetZ -32768
+  r Unit#251.weapon2Def weapondef#23
+  r Unit#251.weapon2Flags 26
+  r weapondef#21.flags 0x00080809
+  r weapondef#21.speed 873813
+  r weapondef#23.flags 0x04480a09
+  r weapondef#23.speed 436906
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 149 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i scripts.GetSweetSpot Unit#251
+  o out (221232169,1321931,92083651)
+  o pos.x 221232169
+  o pos.y 1321931
+  o pos.z 92083651
+  o result 1
+call 150 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  o pos.x 205783040
+  o pos.y 65536
+  o pos.z 77332480
+  o result 1
+call 150 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 150 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0
+call 150 SavedTargetPair
+  a unit Unit#1
+  a weapon 0
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#1
+  a weapon 1
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#1
+  a weapon 2
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#2
+  a weapon 0
+  o result -2147483397
+call 150 SavedTargetPair
+  a unit Unit#2
+  a weapon 1
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#2
+  a weapon 2
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#3
+  a weapon 0
+  o result 77335620
+call 150 SavedTargetPair
+  a unit Unit#3
+  a weapon 1
+  o result 77335620
+call 150 SavedTargetPair
+  a unit Unit#3
+  a weapon 2
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#251
+  a weapon 0
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#251
+  a weapon 1
+  o result -2147483648
+call 150 SavedTargetPair
+  a unit Unit#251
+  a weapon 2
+  o result -2147483648
+call 151 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 0
+  o result 0
+call 151 GetWeaponTargetPos
+  a unit Unit#1
+  a weapon 2
+  o result 0
+call 151 GetWeaponTargetPos
+  a unit Unit#2
+  a weapon 0
+  i scripts.GetSweetSpot Unit#251
+  o out (221232169,1321931,92083651)
+  o pos.x 221232169
+  o pos.y 1321931
+  o pos.z 92083651
+  o result 1
+call 151 GetWeaponTargetPos
+  a unit Unit#3
+  a weapon 0
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  i map.GetGroundHeight pos=(205783040,77332480) = 1
+  o pos.x 205783040
+  o pos.y 65536
+  o pos.z 77332480
+  o result 1
+call 151 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 0
+  o result 0
+call 151 GetWeaponTargetPos
+  a unit Unit#251
+  a weapon 2
+  o result 0

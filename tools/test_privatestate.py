@@ -21,7 +21,7 @@ class PrivateItemTest(unittest.TestCase):
             self.assertTrue(ps.is_private(item), item)
 
     def test_other_items_are_not(self):
-        for item in ("Unit::pos", "g_game", "players", "HpaInit: GameAllocIgnoreTag AISearch region", "Pathfinders", "PathEvent::kind",
+        for item in ("g_game", "players", "HpaInit: GameAllocIgnoreTag AISearch region", "Pathfinders", "PathEvent::kind",
                      "rng.parkMiller"):
             self.assertFalse(ps.is_private(item), item)
 
@@ -104,8 +104,8 @@ class FeaturesOwnerTest(unittest.TestCase):
                 "reads": [("-", "weapons", "FeatureAnimEntry::bytes_10"), ("-", "map", "scanIndex")], "presentation": [("-", "presentation", "Cell::spot")]}
         self.assertEqual(ps.violations(rows), [])
 
-    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_players_ai_weapons_orders_and_movement(self):
-        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons", "orders", "movement"])
+    def test_the_owners_are_pathfinding_economy_wind_meteors_features_targeting_los_radar_map_players_ai_weapons_orders_movement_scripts_and_units(self):
+        self.assertEqual([o.name for o in ps.OWNERS], ["pathfinding", "economy", "wind_meteors", "features", "targeting", "los_radar", "map", "players", "ai", "weapons", "orders", "movement", "scripts", "units"])
 
 
 
@@ -114,9 +114,9 @@ class TargetingOwnerTest(unittest.TestCase):
         for item in ("Unit::current", "Unit::field_20", "Unit::weapon2Target"):
             self.assertEqual(ps.private_to(item), ("targeting", ("writer",)), item)
 
-    def test_other_unit_members_are_not_private(self):
+    def test_other_unit_members_are_not_targetings(self):
         for item in ("Unit::netDirtyFlags", "Unit::pos", "Unit::current2", "Unit::weapon2Target2"):
-            self.assertFalse(ps.is_private(item), item)
+            self.assertNotEqual(ps.private_to(item)[0], "targeting", item)
 
     def test_a_targeting_write_passes(self):
         rows = {"edges": [("targeting", "weapons", "Unit::current"), ("targeting", "-", "Unit::field_20"), ("-", "targeting", "Unit::weapon2Target")],
@@ -131,7 +131,7 @@ class TargetingOwnerTest(unittest.TestCase):
                           "edges: writer weapons on Unit::field_20, which is written only by targeting"])
 
     def test_a_read_and_a_shared_flag_write_pass(self):
-        rows = {"edges": [("-", "weapons", "Unit::current"), ("targeting", "units", "Unit::weapon2Target"), ("weapons", "-", "Unit::netDirtyFlags")],
+        rows = {"edges": [("-", "weapons", "Unit::current"), ("targeting", "units", "Unit::weapon2Target"), ("targeting", "-", "Unit::netDirtyFlags")],
                 "reads": [("-", "ai", "Unit::field_20")]}
         self.assertEqual(ps.violations(rows), [])
 
@@ -150,7 +150,7 @@ class LosRadarOwnerTest(unittest.TestCase):
             self.assertEqual(ps.private_to(item), ("los_radar", ("writer", "reader")), item)
 
     def test_the_cells_and_the_shared_state_are_not_private(self):
-        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::height", "Unit::unusedLosCache", "Unit::flags",
+        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::height",
                      "Game::mapFlags_14281", "InitPlayerSlot: operator new Group", "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY 2"):
             self.assertFalse(ps.is_private(item), item)
 
@@ -187,8 +187,7 @@ class MapOwnerTest(unittest.TestCase):
             self.assertEqual(ps.private_to(item), ("map", ("writer", "reader")), item)
 
     def test_the_cells_and_the_shared_unit_state_are_not_private(self):
-        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::unit", "Cell::flags", "Unit::cargoNext", "Unit::flags", "Unit::bit2",
-                     "Unit::cobStateFlags", "cells_1429f", "overflowBucket", "BuildAllPassMaps: operator new unsigned short"):
+        for item in ("LoadTntMap: GameAllocIgnoreTag PLOT MEMORY", "Cell::unit", "Cell::flags", "cells_1429f", "overflowBucket", "BuildAllPassMaps: operator new unsigned short"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_map_access_passes(self):
@@ -255,8 +254,9 @@ class AiOwnerTest(unittest.TestCase):
         for item in ("PlayerAI::lastTick", "Player::groups", "g_aiCommandsEnabled", "g_playerAI"):
             self.assertEqual(ps.private_to(item), ("ai", ("writer",)), item)
 
-    def test_the_group_of_a_unit_and_the_ai_of_a_player_are_not_private(self):
-        for item in ("Unit::group", "Player::ai", "Player::econ"):
+    def test_the_group_of_a_unit_is_units_and_the_ai_of_a_player_is_not_private(self):
+        self.assertEqual(ps.private_to("Unit::group")[0], "units")
+        for item in ("Player::ai", "Player::econ"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_an_ai_access_passes(self):
@@ -283,7 +283,7 @@ class WeaponsOwnerTest(unittest.TestCase):
 
     def test_the_aim_pairs_stay_targetings_and_the_rest_is_not_private(self):
         self.assertEqual(ps.private_to("Unit::current")[0], "targeting")
-        for item in ("Unit::health", "Debris::ref1", "Debris::ref2", "WeaponDef::damage"):
+        for item in ("Debris::ref1", "Debris::ref2", "WeaponDef::damage"):
             self.assertFalse(ps.is_private(item), item)
 
     def test_a_weapons_write_passes_and_a_read_by_anyone_passes(self):
@@ -307,7 +307,7 @@ class OrdersOwnerTest(unittest.TestCase):
         self.assertEqual(ps.private_to("Unit::list2"), ("orders", ("writer", "reader")))
 
     def test_the_net_dirty_flags_and_the_motion_are_not_orders(self):
-        self.assertFalse(ps.is_private("Unit::netDirtyFlags"))
+        self.assertEqual(ps.private_to("Unit::netDirtyFlags")[0], "units")
         self.assertEqual(ps.private_to("Unit::motion")[0], "movement")
 
     def test_an_orders_write_passes_and_a_read_by_anyone_passes(self):
@@ -362,8 +362,58 @@ class MovementOwnerTest(unittest.TestCase):
         rows = {"edges": [("units", "movement", "PathOrder::ref"), ("units", "-", "PathOrder::pos_z")]}
         self.assertEqual(ps.violations(rows), ["edges: writer units on PathOrder::pos_z, which is written only by movement"])
 
-    def test_the_owners_list_ends_with_orders_and_movement(self):
-        self.assertEqual([o.name for o in ps.OWNERS][-2:], ["orders", "movement"])
+    def test_the_owners_list_has_orders_and_movement_before_scripts_and_units(self):
+        self.assertEqual([o.name for o in ps.OWNERS][-4:], ["orders", "movement", "scripts", "units"])
+
+
+class ScriptsOwnerTest(unittest.TestCase):
+    def test_the_scripts_records_and_the_script_pointer_are_private_for_writes_only(self):
+        for item in ("CobScript::scale", "UnitScript::state", "Channel::pc", "Piece::move", "ModelPiece::rotation", "Unit::script",
+                     "NewUnitScript: new UnitScript", "CobScript::SetCob: realloc int"):
+            self.assertEqual(ps.private_to(item), ("scripts", ("writer",)), item)
+
+    def test_the_model_states_view_is_not_scripts(self):
+        self.assertFalse(ps.is_private("ModelState::cacheDrawCount"))
+        self.assertFalse(ps.is_private("ModelState::bitmap"))
+
+    def test_a_scripts_write_passes_and_units_may_write_the_script_pointer(self):
+        rows = {"edges": [("scripts", "weapons", "Piece::move"), ("scripts", "-", "Unit::script"), ("units", "-", "Unit::script")],
+                "reads": [("-", "presentation", "ModelPiece::rotation"), ("-", "orders", "UnitScript::state")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("weapons", "-", "Piece::spin"), ("presentation", "-", "ModelPiece::visible"), ("orders", "-", "Unit::script")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer orders on Unit::script, which is written only by scripts",
+                          "edges: writer presentation on ModelPiece::visible, which is written only by scripts",
+                          "edges: writer weapons on Piece::spin, which is written only by scripts"])
+
+
+class UnitsOwnerTest(unittest.TestCase):
+    def test_the_unit_record_is_private_for_writes_only(self):
+        for item in ("Unit::health", "Unit::pos", "Unit::cargo", "Unit::def", "Unit::flags"):
+            self.assertEqual(ps.private_to(item), ("units", ("writer",)), item)
+
+    def test_the_fields_of_other_owners_stay_theirs(self):
+        for item, owner in (("Unit::list", "orders"), ("Unit::motion", "movement"), ("Unit::spatialBucket", "map"), ("Unit::current", "targeting"),
+                            ("Unit::weapon", "weapons"), ("Unit::script", "scripts")):
+            self.assertEqual(ps.private_to(item)[0], owner, item)
+
+    def test_the_views_in_the_record_are_written_by_their_subsystems(self):
+        rows = {"edges": [("map", "-", "Unit::cargoNext"), ("map", "-", "Unit::cobStateFlags"), ("los_radar", "-", "Unit::flags"),
+                          ("map", "-", "Unit::flags"), ("presentation", "-", "Unit::flags"), ("los_radar", "-", "Unit::workTime"),
+                          ("economy", "-", "Unit::extraction"), ("ai", "-", "Unit::group"), ("targeting", "-", "Unit::netDirtyFlags"),
+                          ("units", "-", "Unit::health")],
+                "reads": [("-", "weapons", "Unit::health"), ("-", "ai", "Unit::pos")]}
+        self.assertEqual(ps.violations(rows), [])
+
+    def test_another_subsystem_write_fails(self):
+        rows = {"edges": [("orders", "-", "Unit::health"), ("weapons", "-", "Unit::pos"), ("map", "-", "Unit::group"), ("ai", "-", "Unit::flags")]}
+        self.assertEqual(ps.violations(rows),
+                         ["edges: writer ai on Unit::flags, which is written only by units",
+                          "edges: writer map on Unit::group, which is written only by units",
+                          "edges: writer orders on Unit::health, which is written only by units",
+                          "edges: writer weapons on Unit::pos, which is written only by units"])
 
 
 class ViolationTest(unittest.TestCase):
@@ -382,7 +432,7 @@ class ViolationTest(unittest.TestCase):
         self.assertTrue(any(line.startswith("presentation: reader presentation") for line in found))
 
     def test_other_items_are_not_judged(self):
-        self.assertEqual(ps.violations({"edges": [("orders", "units", "Unit::pos")]}), [])
+        self.assertEqual(ps.violations({"edges": [("orders", "units", "Pathfinders::pos")]}), [])
 
     def test_a_row_is_reported_once(self):
         rows = {"edges": [("units", "orders", "pathfinder")] * 3}

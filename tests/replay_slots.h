@@ -279,48 +279,6 @@ void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2
     (void)r;
 }
 
-int __stdcall Imp_scripts_StartScript(CobScript* a0, const char* a1, Callback* a2, int a3)
-{
-    ReplayText t;
-    StartImport(t, "scripts.StartScript");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
-    Space(t);
-    t.AddString((const char*)a1);
-    Space(t);
-    t.Add("?");
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
-int __stdcall Imp_scripts_StartScriptWithArgs(CobScript* a0, char* a1, Callback* a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-    ReplayText t;
-    StartImport(t, "scripts.StartScriptWithArgs");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
-    Space(t);
-    t.AddString((const char*)a1);
-    Space(t);
-    t.Add("?");
-    Space(t);
-    ReplayValue(t, a3);
-    Space(t);
-    ReplayValue(t, a4);
-    Space(t);
-    ReplayValue(t, a5);
-    Space(t);
-    ReplayValue(t, a6);
-    Space(t);
-    ReplayValue(t, a7);
-    Space(t);
-    ReplayValue(t, a8);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
 void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
 {
     ReplayText t;
@@ -1125,8 +1083,6 @@ void BindSeams()
     g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
     g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
     g_seams.scripts = &g_import_scripts;
-    g_import_scripts.StartScript = Imp_scripts_StartScript;
-    g_import_scripts.StartScriptWithArgs = Imp_scripts_StartScriptWithArgs;
     g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
     g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;

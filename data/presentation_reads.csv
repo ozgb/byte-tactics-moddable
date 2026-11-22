@@ -255,7 +255,7 @@ Unit::pos,presentation,every-frame,,per-player-filter,88
 Unit::postTransferHoldoff,orders,unknown,,per-player-filter,3
 Unit::postTransferHoldoff,presentation,ui-action,,per-player-filter,8
 Unit::script,presentation,every-frame,,per-player-filter,88
-Unit::script,units,unknown,,per-player-filter,3
+Unit::script,scripts,unknown,,per-player-filter,3
 Unit::selectState,presentation,ui-action,,per-player-filter,0
 Unit::selectable,presentation,after-event,SIM_EVENT_FOCUS_COMMANDER,per-player-filter,0
 Unit::selected,presentation,after-event,SIM_EVENT_RADAR_UNITS,per-player-filter,0

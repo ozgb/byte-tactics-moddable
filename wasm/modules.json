@@ -27,11 +27,11 @@
     "players": 4,
     "rand_stream": 1,
     "ref": 2,
-    "scripts": 1,
+    "scripts": 2,
     "services": 2,
     "state_writer": 1,
     "targeting": 3,
-    "units": 5,
+    "units": 6,
     "weapons": 3,
     "wind_meteors": 3
   },

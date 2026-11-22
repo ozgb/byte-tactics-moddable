@@ -1,4 +1,6 @@
+#include "../game/scripts_events.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
 
 
 #include "../scripts/cob_script.h"
@@ -42,7 +44,7 @@ void SfxOccupyTracker::UpdateSfxOccupy(Unit* unit)
         newState = 0;
     }
     if (*(int*)unit->unknown_10a != newState) {
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), "setSFXoccupy", nullptr, 1, 1, newState, 0, 0, 0);
+        ScriptsPublishStartWithArgs(SCHED_UNITS, unit, "setSFXoccupy", 1, 1, newState, 0, 0, 0);
         *(int*)unit->unknown_10a = newState;
     }
 }

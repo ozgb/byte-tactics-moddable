@@ -52,6 +52,17 @@ void __stdcall SchedDeliver(int module)
     }
 }
 
+int __stdcall SchedInboxHolds(int module, int kind, unsigned int word, unsigned int value)
+{
+    Inbox* inbox = &s_inboxes[module];
+    for (unsigned int i = inbox->head; i != inbox->tail; i++) {
+        const InboxEntry* entry = &inbox->entries[i % kInboxCapacity];
+        if (entry->words[0] == (unsigned int)kind && entry->words[word] == value)
+            return 1;
+    }
+    return 0;
+}
+
 void __stdcall ScheduleUnitsDeliver()
 {
     ReplayImport call(RI_SCHEDULE_UNITS_DELIVER);
@@ -158,6 +169,11 @@ void SchedUnitsPhase()
                                 SchedDeliver(SCHED_WEAPONS);
                                 g_seams.weapons->UpdateUnitWeapons(u);
                             }
+                        }
+                        SchedDeliver(SCHED_UNITS);
+                        if (u->script != 0) {
+                            SchedDeliver(SCHED_SCRIPTS);
+                            g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
                         }
                         SchedDeliver(SCHED_UNITS);
                         int moved = 0;

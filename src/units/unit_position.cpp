@@ -268,9 +268,6 @@ void __stdcall UpdateUnitHead(Unit* u)
 int __stdcall UpdateUnitBody(Unit* u)
 {
     int runOrders = 0;
-    if (u->script != 0) {
-        g_seams.scripts->RunScripts((CobScript*)u->script.get(), 1);
-    }
     if (u->recentlyDamagedTimer != 0) {
         u->recentlyDamagedTimer--;
     }

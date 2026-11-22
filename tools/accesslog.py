@@ -161,6 +161,8 @@ ATTR_MAGIC = b"ALAT"
 ITEMS_MAGIC = b"ALIT"
 FUNCS_MAGIC = b"ALFN"
 UNKNOWN = "unknown"
+PLATFORM = "platform"
+TEMPLATE_INSTANCE = "?$"
 IGNORED = 0xFFFF
 NONE = 0xFFFFFFFF
 IGNORED_OBJECTS = ("block.cpp", "access_log.cpp")
@@ -257,7 +259,7 @@ DELETING_DESTRUCTOR = re.compile(r"\?\?_[GE](.+?)@@")
 def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
     """The subsystem of a function: the row of its name and source file, else its only subsystem, else (for a scalar or
     vector deleting destructor) the row of its class's destructor or the only subsystem of its class's members, else the only subsystem of its source file (a template
-    instance, a constructor or a function the csv leaves out), else unknown."""
+    instance, a constructor or a function the csv leaves out; for a template instance, the only one but platform), else unknown."""
     source = object_source(obj)
     deleting = DELETING_DESTRUCTOR.match(name)
     owner = "::".join(reversed(deleting.group(1).split("@"))) if deleting else ""
@@ -276,7 +278,9 @@ def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
         members = {s for key, found in rows.items() if key.startswith(owner + "::") for _, s in found}
         if len(members) == 1:
             return next(iter(members))
-    in_file = rows.files.get(source, ())
+    in_file = set(rows.files.get(source, ()))
+    if len(in_file) != 1 and TEMPLATE_INSTANCE in name:
+        in_file -= {PLATFORM}
     return next(iter(in_file)) if len(in_file) == 1 else UNKNOWN
 
 

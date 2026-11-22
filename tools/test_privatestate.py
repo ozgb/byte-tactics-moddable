@@ -496,14 +496,39 @@ class ShadowTest(unittest.TestCase):
 class StoreTest(unittest.TestCase):
     def test_reads_are_sorted_and_gzipped_without_a_time(self):
         with tempfile.TemporaryDirectory() as tmp:
-            source, out = Path(tmp) / "src", Path(tmp) / "out"
+            source, out, saved = Path(tmp) / "src", Path(tmp) / "out", Path(tmp) / "saved"
             source.mkdir()
             (source / "a.reads.csv").write_text('item,reader,count,first_tick\n"Node::data.g",units,3,5\n"A::b",pathfinding,1,2\n')
-            self.assertEqual(ps.store(source, out), 1)
+            self.assertEqual(ps.store(source, out, saved), (1, 0))
             data = (out / "a.reads.csv.gz").read_bytes()
             self.assertEqual(gzip.decompress(data).decode(), 'item,reader,count,first_tick\nA::b,pathfinding,1,2\nNode::data.g,units,3,5\n')
-            ps.store(source, out)
+            ps.store(source, out, saved)
             self.assertEqual((out / "a.reads.csv.gz").read_bytes(), data)
+
+    def test_saveload_rows_are_sorted_and_gzipped_without_a_time(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source, out, saved = Path(tmp) / "src", Path(tmp) / "out", Path(tmp) / "saved"
+            source.mkdir()
+            (source / "a.saveload.csv").write_text('writer,reader,item,phase,evidence,count,first_tick\n'
+                                                   'units,-,"Unit::list",load,write-unread,1,0\n-,ai,"Group::units",save,read-unwritten,4,9\n')
+            self.assertEqual(ps.store(source, out, saved), (0, 1))
+            data = (saved / "a.saveload.csv.gz").read_bytes()
+            self.assertEqual(gzip.decompress(data).decode(), 'writer,reader,item,phase,evidence,count,first_tick\n'
+                                                             '-,ai,Group::units,save,read-unwritten,4,9\nunits,-,Unit::list,load,write-unread,1,0\n')
+            ps.store(source, out, saved)
+            self.assertEqual((saved / "a.saveload.csv.gz").read_bytes(), data)
+
+
+class SaveLoadTest(unittest.TestCase):
+    def test_another_writer_at_load_fails_as_in_the_tick(self):
+        rows = {"saveload": [("units", "-", "Unit::list"), ("orders", "-", "Unit::list"), ("files", "-", ps.LOS_RADAR_WRITE_ITEMS[0])]}
+        found = ps.violations(rows)
+        self.assertEqual(found, ["saveload: writer files on %s, which is written only by los_radar" % ps.LOS_RADAR_WRITE_ITEMS[0],
+                                 "saveload: writer units on Unit::list, which is written only by orders"])
+
+    def test_another_reader_of_private_state_at_save_fails(self):
+        found = ps.violations({"saveload": [("-", "weapons", "g_meteorWeaponName"), ("-", "units", "Unit::current")]})
+        self.assertEqual(found, ["saveload: reader weapons on g_meteorWeaponName, which is private to wind_meteors"])
 
 
 if __name__ == "__main__":

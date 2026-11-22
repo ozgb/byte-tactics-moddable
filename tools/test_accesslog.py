@@ -96,6 +96,7 @@ int main()
     unsigned a, b, d, e, f;
     while (scanf(" %c", &op) == 1) {
         if (op == 'B') { scanf("%u", &a); c.BeginWindow(a); }
+        else if (op == 'I') { scanf("%u", &a); c.BeginIsolatedWindow(a); }
         else if (op == 'L') { scanf("%u", &a); c.ResolveLabel(a); }
         else if (op == 'E') { scanf("%u", &a); c.EndWindow(a); }
         else if (op == 'r') { scanf("%u %u %u %u %u", &a, &b, &d, &e, &f); { unsigned fl = c.Read(a, b, d, e, f); fprintf(stderr, "%u\n", (fl & 1) ? fl | (c.MatchLevel() << 2) : fl); } }
@@ -133,6 +134,7 @@ int main()
 
 NO_SUB = 0xFFFF
 PENDING = 10
+LOAD = 12
 RAW, UNWRITTEN, UNREAD, ORDERED, CROSS, CARRIED = range(6)
 EARLIER_ENTITY, SAME_RECORD = 1, 2
 
@@ -153,6 +155,7 @@ class ReferenceClassifier:
         self.window_labels = [[0] * 32, [0] * 32]
         self.levels = [[0, 0]]
         self.flags = []
+        self.isolated = False
 
     def count(self, writer, reader, item, evidence, tick, frm=0):
         key = (writer, reader, item, self.label, frm, evidence)
@@ -161,11 +164,19 @@ class ReferenceClassifier:
         else:
             self.edges[key] = [1, tick]
 
+    def begin_isolated(self, label):
+        self.stamp += 1
+        self.label = label
+        self.written = []
+        self.levels = [[0, 0]]
+        self.isolated = True
+
     def begin(self, label):
         self.stamp += 1
         self.label = label
         self.written = []
         self.levels = [[0, 0]]
+        self.isolated = False
         if label == PENDING:
             self.epoch += 1
             self.current ^= 1
@@ -218,7 +229,9 @@ class ReferenceClassifier:
                     break
         else:
             self.count(NO_SUB, sub, item, UNWRITTEN, tick)
-            if s["epoch"] == self.epoch and s["wsub"] != sub:
+            if self.isolated:
+                pass
+            elif s["epoch"] == self.epoch and s["wsub"] != sub:
                 self.count(s["wsub"], sub, item, CROSS, tick, self.window_labels[self.current][s["win"]])
             elif s["epoch"] != 0 and s["epoch"] + 1 == self.epoch and s["wsub"] != sub:
                 frm = self.window_labels[self.current ^ 1][s["win"]]
@@ -231,8 +244,9 @@ class ReferenceClassifier:
         if s["stamp"] != self.stamp:
             s["stamp"] = self.stamp
             self.written.append(item)
-        s["writer"], s["ent"], s["read"] = sub, (a, b), 0
-        s["ord"], s["epoch"], s["wsub"], s["win"] = self.levels[-1][0], self.epoch, sub, self.window
+        s["writer"], s["ent"], s["read"], s["ord"] = sub, (a, b), 0, self.levels[-1][0]
+        if not self.isolated:
+            s["epoch"], s["wsub"], s["win"] = self.epoch, sub, self.window
 
     def set_entity(self, ordinal, floor=0):
         self.levels[-1] = [ordinal, floor]
@@ -258,7 +272,7 @@ class ReferenceClassifier:
 def feed(script, reference):
     """Run a script (a list of tuples) through the Python reference and return the C++ driver's text for it."""
     for op, *args in script:
-        {"B": reference.begin, "L": reference.resolve, "E": reference.end, "r": reference.read, "w": reference.write,
+        {"B": reference.begin, "I": reference.begin_isolated, "L": reference.resolve, "E": reference.end, "r": reference.read, "w": reference.write,
          "o": reference.ordered, "n": reference.set_entity, "m": reference.set_entity, "p": lambda: reference.push(), "q": lambda: reference.pop()}[op](*args)
     return "\n".join("%s %s" % (op, " ".join(str(a) for a in args)) for op, *args in script) + "\n"
 
@@ -332,6 +346,17 @@ class ClassifierTest(unittest.TestCase):
         lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("r", 5, 0, 0, 2, 2), ("E", 2)])
         self.assertIn("1 2 5 2 %u 1 2 1" % CROSS, lines)
         self.assertIn("%u 2 5 2 %u 1 2" % (NO_SUB, UNWRITTEN), lines)
+
+    def test_a_save_or_load_window_records_its_own_edges_and_leaves_the_ticks_alone(self):
+        tick = [("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1)]
+        later = [("B", 2), ("r", 5, 0, 0, 2, 2), ("r", 6, 0, 0, 2, 2), ("E", 2)]
+        alone = self.both(tick + later)
+        load = [("I", LOAD), ("w", 5, 0, 0, 3, 1), ("r", 5, 0, 0, 4, 1), ("r", 6, 0, 0, 4, 1), ("w", 7, 0, 0, 3, 1), ("E", 1)]
+        lines = self.both(tick + load + later)
+        self.assertEqual([line for line in lines if line.split()[3] != str(LOAD)], alone)
+        self.assertEqual(sorted(line for line in lines if line.split()[3] == str(LOAD)),
+                         sorted(["3 4 5 %u %u 1 1" % (LOAD, RAW), "%u 4 6 %u %u 1 1" % (NO_SUB, LOAD, UNWRITTEN),
+                                 "3 %u 7 %u %u 1 1" % (NO_SUB, LOAD, UNREAD)]))
 
     def test_the_same_subsystem_reading_an_earlier_phase_write_is_no_cross_edge(self):
         lines = self.both([("B", PENDING), ("w", 5, 0, 0, 1, 1), ("L", 1), ("E", 1), ("B", 2), ("r", 5, 0, 0, 1, 2), ("E", 2)])
@@ -499,6 +524,15 @@ class MapTest(unittest.TestCase):
         self.assertEqual(al.subsystem_of("??_ELite@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), "movement")
         self.assertEqual(al.subsystem_of("??_EPos@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), al.UNKNOWN)
         self.assertEqual(al.subsystem_of("??_GOther@@UAEPAXI@Z", "0003_goal.cpp.obj", rows), al.UNKNOWN)
+
+    def test_a_template_instance_is_its_files_only_subsystem_but_platform(self):
+        path = Path(self.tmp.name) / "ai.csv"
+        path.write_text("function,file,subsystem,rule,override\n"
+                        "PlayerAI::Think,src/ai/ai_player.cpp,ai,file:src/ai/,\n"
+                        "MakeVec3,src/ai/ai_player.cpp,platform,file:src/ai/,platform\n")
+        rows = al.read_subsystems(path)
+        self.assertEqual(al.subsystem_of("?Resize@?$BlockVector@E@@QAEXIABE@Z", "0082_ai_player.cpp.obj", rows), "ai")
+        self.assertEqual(al.subsystem_of("?Guess@@YAXXZ", "0082_ai_player.cpp.obj", rows), al.UNKNOWN)
 
     def test_attribution_table_ignores_the_block_and_the_ref_helpers(self):
         subs, ranges, counts = al.attribution_table(self.info, self.rows)
@@ -709,6 +743,10 @@ class RegionTest(unittest.TestCase):
     def test_the_reads_file_is_collected_and_kept(self):
         self.assertIn("access.reads.csv", al.OUTPUT_FILES)
         self.assertIn('("reads.csv", "access.reads.csv")', Path(al.__file__).read_text())
+
+    def test_the_saveload_file_is_collected_and_kept(self):
+        self.assertIn("access.saveload.csv", al.OUTPUT_FILES)
+        self.assertIn('("saveload.csv", "access.saveload.csv")', Path(al.__file__).read_text())
 
 
 class SourceOrderTest(unittest.TestCase):

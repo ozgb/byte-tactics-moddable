@@ -145,6 +145,18 @@ Where they come from and how they travel:
 - **Replays:** a recording of a subsystem (`docs/replay-format.md`) calls the world view, whose
   `SearchStepLimit` returns the value like any other read. The format is unchanged.
 
+## Ownership at save and load
+
+The access log (`tools/accesslog.py`, `lib/accesslog`) records the windows of every tick and, apart from them, a save
+window around `SaveGameFile` and a load window around `LoadSavedGameState` and `LoadBattleAssets` (the match load, on the
+load thread). `tools/privatestate.py --check` holds both to the owner rules of the tick: a module that writes or reads
+another module's private state fails whether it does so inside a tick or while a game is saved or loaded. The summaries of
+the two windows are `data/access_saveload/<scenario>.saveload.csv.gz`, and a save or load window adds no evidence to the
+tick's. A module restores its own state at load, through its own load slot or through an event it consumes (targeting's
+LOAD, map's LOAD_PATH_LOCK_STAMP, wind_meteors' LIMITS and RESET); section 5 of each interface document lists what it
+restores. `tools/seamlink.py --private-state` reads `data/rwsets.csv`, which has every function and no windows, so it
+covers the save and load code as it covers the tick's.
+
 ## Determinism findings
 
 - **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` in `CheckPlayerTimeouts` (net_game.cpp), and `IsTimedOut` reads it. This is network only and already a #40 task.

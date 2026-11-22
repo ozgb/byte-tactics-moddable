@@ -6,7 +6,7 @@ Prints `<tick> <phase> <hash>` for every phase row and the world row of each dum
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. Sections 24 and 25 are the records los_radar and units write through the state writer (`losRadarIndex[i].*`, `unitsFactories[i].*`). The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
-shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), weapons' report (`weaponsState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results (section 32), the economy events
+shape but not hashed; economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), weapons' report (`weaponsState.*`), orders' report (`ordersState.*`), movement's report (`movementState.*`), units' report (`unitsState.*`), scripts' report (`scriptsState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results (section 32), the economy events
 (section 33), the share packets (section 35), wind_meteors' events (section 37), targeting's events (section 38), los_radar's events (section 39), map's events (section 40), players' events (section 41), ai's events (section 42), weapons' events (section 47), orders' events (section 48), movement's events (section 49), units' events (section 50) and scripts' events (section 51) are dumped only, and skipped.
 """
 
@@ -135,6 +135,7 @@ class Walker:
         self.pos = 0
         self.hash = Hasher()
         self.live: list[int] = []
+        self.scripted: set[int] = set()
         self.fx_count = 0
 
     def skip_dumped(self, prefixes: tuple[str, ...]) -> None:
@@ -196,7 +197,9 @@ class Walker:
         return values
 
     def table(self, table: str, prefix: str) -> dict[int, str]:
-        values = self.read_table(table, prefix)
+        return self.hash_table(table, self.read_table(table, prefix), prefix)
+
+    def hash_table(self, table: str, values: dict[int, str], prefix: str) -> dict[int, str]:
         by_offset = {f["offset"]: f for f in self.schema.fields(table)}
         for entry in self.schema.plan(table):
             if entry["kind"] in ("pointer", "ref") or "mask" in entry:
@@ -243,7 +246,6 @@ class Walker:
         h.h32(int(self.take("rng.crtHoldrand"), 16))
         self.units()
         self.projectiles()
-        self.explosions()
         self.players()
         self.features()
         self.wind()
@@ -269,40 +271,6 @@ class Walker:
         first = re.escape(field_name(self.schema.fields("Projectile")[0]))
         self.indexed_tables("Projectile", rf"projectiles\[(\d+)\]\.{first}", "projectiles[%d]")
         self.hash.end()
-
-    def explosions(self) -> None:
-        h = self.hash
-        h.h8(3)
-        first = re.escape(field_name(self.schema.fields("ExplodedPiece")[0]))
-        while (slot := self.next_index(rf"explodedPieces\[(\d+)\]\.{first}")) is not None:
-            h.h32(slot)
-            self.table("ExplodedPiece", f"explodedPieces[{slot}]")
-            self.table("PieceRec", f"explodedPieces[{slot}].rec")
-        h.end()
-        h.h8(4)
-        remembered = set()
-        first_field = self.schema.fields("Debris")[0]
-        first = re.escape(field_name(first_field))
-        while (d := self.next_index(rf"debris\[(\d+)\]\.{first}")) is not None:
-            h.h32(d)
-            values = self.table("Debris", f"debris[{d}]")
-            tag, index = self.pointer_id(values[first_field["offset"]])
-            if tag == 8:
-                remembered.add(index)
-        h.end()
-        h.h8(5)
-        first = re.escape(field_name(self.schema.fields("Piece")[0]))
-        seen = []
-        while (i := self.next_index(rf"pieces\[(\d+)\]\.{first}")) is not None:
-            h.h32(i)
-            seen.append(i)
-            self.table("Piece", f"pieces[{i}]")
-            h.run(self.hex_run(f"pieces[{i}].vertices"))
-            for k in range(6):
-                self.table("Face", f"pieces[{i}].faces[{k}]")
-        if set(seen) != remembered:
-            raise Error(f"pieces in the dump {sorted(seen)} differ from the pieces debris points at {sorted(remembered)}")
-        h.end()
 
     def players(self) -> None:
         self.hash.h8(6)
@@ -339,8 +307,18 @@ class Walker:
         self.flat_list(self.schema.data["globals"]["meteors"], "meteors.")
         self.hash.end()
 
+    def records(self, pattern: str) -> list[int]:
+        found = []
+        for path, _ in self.lines:
+            m = re.fullmatch(pattern, path)
+            if m:
+                found.append(int(m.group(1)))
+        return found
+
     def world_row(self, tick: int = 0) -> int:
         self.hash.reset()
+        self.live = self.records(r"unitsState\.units\[(\d+)\]\.head")
+        self.scripted = set(self.records(r"scriptsState\.units\[(\d+)\]\.scale"))
         self.game()
         self.cells()
         self.visibility()
@@ -413,7 +391,8 @@ class Walker:
             self.pathfinder_report()
         finally:
             self.hash = hashed
-        self.skip_dumped(("economyState.", "aiState.", "mapState.", "playersState.", "weaponsState."))
+        self.skip_dumped(("economyState.", "aiState.", "mapState.", "playersState.", "weaponsState.",
+                           "ordersState.", "movementState.", "scriptsState."))
 
     def pathfinder_report(self) -> None:
         h = self.hash
@@ -488,11 +467,8 @@ class Walker:
     def orders(self) -> None:
         h = self.hash
         h.h8(20)
-        self.live = []
-        while (i := self.next_index(r"units\[(\d+)\]\.head")) is not None:
-            self.live.append(i)
+        for i in self.live:
             h.h32(i)
-            h.pointer(*self.pointer_id(self.take(f"units[{i}].head")))
             for which, chain in enumerate(("list", "list2")):
                 h.h8(which + 1)
                 n = 0
@@ -505,23 +481,6 @@ class Walker:
                 h.h8(0)
         h.end()
 
-    def goal(self, prefix: str) -> None:
-        h = self.hash
-        cls = int(self.take(f"{prefix}.class"), 16)
-        h.h32(cls)
-        if cls == 1:
-            self.table("PatrolGoal", prefix)
-            h.run(self.hex_run(f"{prefix}.points"))
-        elif cls == 2:
-            self.table("AiSearchGoal", prefix)
-            h.run(self.hex_run(f"{prefix}.points"))
-        elif cls in (3, 4, 5):
-            self.table("PackedGoal", prefix)
-            if cls == 4:
-                self.table("LiteGoalState", prefix)
-        elif cls != 0:
-            raise Error(f"{prefix}: unknown goal class {cls}")
-
     def motions(self) -> None:
         h = self.hash
         h.h8(21)
@@ -531,30 +490,31 @@ class Walker:
             h.h8(int(present))
             if present:
                 self.table("UnitMotion", f"units[{i}].motion")
-                self.goal(f"units[{i}].motion.goal")
         h.end()
 
     def order_effects(self) -> None:
         h = self.hash
         h.h8(22)
-        fx_tables = {1: ("ApproachRadius",), 2: ("RingApproach",), 3: ("PointMarker",)}
         while (fx := self.next_index(r"orderFx\[(\d+)\]\.class")) is not None:
             prefix = f"orderFx[{fx}]"
             cls = int(self.take(f"{prefix}.class"), 16)
-            h.h32(fx)
-            h.h32(cls)
-            if cls in fx_tables:
-                self.table(fx_tables[cls][0], prefix)
-            elif cls == 4:
-                self.table("PathOrder", prefix)
-                for extra in ("PathOrderPosY", "PathOrderHeading", "PathOrderPiece", "PathOrderFollow"):
-                    if self.present(extra, prefix):
-                        self.table(extra, prefix)
-            elif cls == 5:
-                self.table("AirManeuverOrder", prefix)
-                if self.present("AirManeuverOrderHeading", prefix):
-                    self.table("AirManeuverOrderHeading", prefix)
-            else:
+            start = self.pos
+            while (self.peek() or "").startswith(f"{prefix}."):
+                self.pos += 1
+            group = dict(self.lines[start : self.pos])
+            if cls == 4:
+                h.h32(fx)
+                values = {}
+                for f in self.schema.fields("PathOrderRef"):
+                    values[f["offset"]] = group.get(f"{prefix}.{field_name(f)}")
+                    if values[f["offset"]] is None:
+                        raise Error(f"{prefix}: {field_name(f)} is missing")
+                self.hash_table("PathOrderRef", values, prefix)
+            elif cls == 0:
+                h.h32(fx)
+                h.h32(cls)
+                h.h32(int(group[f"{prefix}.vtableDelta"], 16))
+            elif cls not in (1, 2, 3, 5):
                 raise Error(f"{prefix}: unknown order effect class {cls}")
         h.end()
 
@@ -563,39 +523,16 @@ class Walker:
         h.h8(23)
         for i in self.live:
             h.h32(i)
-            prefix = f"units[{i}].script"
-            present = self.present("ScriptState", prefix)
-            h.h8(int(present))
-            if present:
-                self.script(prefix)
+            h.h8(int(i in self.scripted))
+            if i in self.scripted:
+                self.transforms(f"units[{i}].script")
         h.end()
 
-    def script(self, prefix: str) -> None:
-        h = self.hash
-        self.table("ScriptState", prefix)
-        for c in range(8):
-            self.channel(f"{prefix}.channels[{c}]")
-        h.h32(int(self.take(f"{prefix}.statics"), 16))
-        h.run(self.hex_run(f"{prefix}.statics"))
-        first = re.escape(field_name(self.schema.fields("ScriptPiece")[0]))
-        pattern = rf"{re.escape(prefix)}\.pieces\[(\d+)\]\.{first}"
-        while (p := self.next_index(pattern)) is not None:
-            self.table("ScriptPiece", f"{prefix}.pieces[{p}]")
+    def transforms(self, prefix: str) -> None:
         first = re.escape(field_name(self.schema.fields("PieceTransform")[0]))
         pattern = rf"{re.escape(prefix)}\.transforms\[(\d+)\]\.{first}"
         while (q := self.next_index(pattern)) is not None:
             self.table("PieceTransform", f"{prefix}.transforms[{q}]")
-
-    def channel(self, prefix: str) -> None:
-        h = self.hash
-        if int(self.lines[self.pos][1], 16) == 0:
-            h.h32(int(self.take(f"{prefix}.state"), 16))
-            return
-        self.table("ScriptChannel", prefix)
-        h.run(self.hex_run(f"{prefix}.stack"))
-        for extra in ("ScriptChannelPiece", "ScriptChannelDelay", "ScriptChannelWait"):
-            if self.present(extra, prefix):
-                self.table(extra, prefix)
 
     def unit_vector(self, path: str) -> None:
         self.hash.h32(int(self.take(f"{path}.size"), 16))
@@ -624,6 +561,7 @@ class Walker:
             h.h32(int(self.take(f"{prefix}.player"), 16))
             self.unit_vector(f"{prefix}.factories")
             h.end()
+        self.skip_dumped(("unitsState.",))
 
     def unit_resources(self) -> None:
         h = self.hash

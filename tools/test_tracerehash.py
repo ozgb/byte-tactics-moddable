@@ -440,6 +440,135 @@ class DumpedOnlyTest(unittest.TestCase):
         self.assertEqual(w.pos, 1)
 
 
+def field(name, offset, size, kind="scalar", target=None):
+    return {"name": name, "offset": offset, "size": size, "kind": kind, "target": target}
+
+
+HEAP_SCHEMA = tr.Schema(
+    {
+        "targets": [{"tag": 1, "name": "heap"}, {"tag": 2, "name": "unit"}],
+        "tables": {
+            "PathOrderRef": {
+                "fields": [field("refOwner", 0, 4, "ref", "unit"), field("refNext", 4, 4, "ref", "unit")],
+                "plan": [field("refOwner", 0, 4, "ref", "unit"), field("refNext", 4, 4, "ref", "unit")],
+            },
+            "Order": {"fields": [field("unit", 0, 4, "ref", "unit")], "plan": [field("unit", 0, 4, "ref", "unit")]},
+            "UnitMotion": {"fields": [field("speed", 0, 4)], "plan": [field("", 0, 4, "bytes")]},
+            "PieceTransform": {
+                "fields": [field("angle", 0, 4)],
+                "plan": [field("", 0, 4, "bytes")],
+            },
+        },
+    }
+)
+
+
+class SharedStateTest(unittest.TestCase):
+    def test_live_units_come_from_the_units_report(self):
+        w = tr.Walker(HEAP_SCHEMA, [("ordersState.units[2].list[0].kind", "0x01"), ("unitsState.units[0].head", "null"),
+                                    ("unitsState.units[0].hoverBobPhase", "0x0000"), ("unitsState.units[5].head", "heap")])
+        self.assertEqual(w.records(r"unitsState\.units\[(\d+)\]\.head"), [0, 5])
+
+    def test_the_other_module_reports_are_skipped_after_the_spatial_section(self):
+        lines = [("pathfinder.counter", "0x00000005"), ("weaponsState.units[0].weapons[0].aimCob.vtable", "null"),
+                 ("ordersState.units[0].list[0].kind", "0x01"), ("movementState.units[0].goal.class", "0x00000000"),
+                 ("scriptsState.units[0].scale", "0x00000001"), ("moveClasses[0].x", "0x00000001")]
+        w = tr.Walker(RESULTS, lines)
+        w.pathfinder()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 5)
+
+    def test_the_units_report_after_the_factory_index_is_skipped(self):
+        w = tr.Walker(RESULTS, [("unitsState.units[0].head", "null"), ("players[0].econ.x", "0x01")])
+        w.factory_index()
+        self.assertEqual(w.hash.h, tr.OFFSET_BASIS)
+        self.assertEqual(w.pos, 1)
+
+    def test_orders_hash_the_index_of_each_live_unit_only(self):
+        w = tr.Walker(HEAP_SCHEMA, [])
+        w.live = [1, 4]
+        w.orders()
+        want = tr.Hasher()
+        want.h8(20)
+        for i in (1, 4):
+            want.h32(i)
+            want.h8(1)
+            want.h8(0)
+            want.h8(2)
+            want.h8(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+
+    def test_motions_hash_no_goal(self):
+        w = tr.Walker(HEAP_SCHEMA, [("units[3].motion.goal.class", "0x00000001")])
+        w.live = [3]
+        w.motions()
+        want = tr.Hasher()
+        want.h8(21)
+        want.h32(3)
+        want.h8(0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, 0)
+
+    def test_order_effects_hash_only_the_link_of_a_path_order(self):
+        lines = [("orderFx[0].class", "0x00000001"), ("orderFx[0].source", "heap"),
+                 ("orderFx[1].class", "0x00000004"), ("orderFx[1].source", "heap"), ("orderFx[1].refOwner", "unit:3"),
+                 ("orderFx[1].refNext", "null"), ("orderFx[1].pos.x", "0x00000001"),
+                 ("orderFx[2].class", "0x00000005"), ("orderFx[2].saveOnly", "0x00")]
+        w = tr.Walker(HEAP_SCHEMA, lines)
+        w.order_effects()
+        want = tr.Hasher()
+        want.h8(22)
+        want.h32(1)
+        want.pointer(2, 3)
+        want.pointer(0, 0)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+        self.assertEqual(w.pos, len(lines))
+
+    def test_an_unknown_order_effect_still_hashes_its_class(self):
+        lines = [("orderFx[0].class", "0x00000000"), ("orderFx[0].vtableDelta", "0x00000010")]
+        w = tr.Walker(HEAP_SCHEMA, lines)
+        w.order_effects()
+        want = tr.Hasher()
+        want.h8(22)
+        want.h32(0)
+        want.h32(0)
+        want.h32(0x10)
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+
+    def test_scripts_hash_only_the_presence_and_the_transforms(self):
+        lines = [("units[1].script.transforms[0].angle", "0x00000007"),
+                 ("units[1].script.transforms[1].angle", "0x00000008")]
+        w = tr.Walker(HEAP_SCHEMA, lines)
+        w.live = [0, 1]
+        w.scripted = {1}
+        w.scripts()
+        want = tr.Hasher()
+        want.h8(23)
+        want.h32(0)
+        want.h8(0)
+        want.h32(1)
+        want.h8(1)
+        want.run(bytes([7, 0, 0, 0]))
+        want.run(bytes([8, 0, 0, 0]))
+        want.end()
+        self.assertEqual(w.hash.h, want.h)
+
+    def test_the_phase_row_has_no_explosion_sections(self):
+        lines = [("gameTick", "0x00000001"), ("rng.parkMiller", "0x00000002"), ("rng.crtHoldrand", "0x00000003")]
+        w = tr.Walker(RESULTS, lines)
+        for name in ("units", "projectiles", "players", "features", "wind", "meteors"):
+            setattr(w, name, lambda: None)
+        w.phase_row(1)
+        want = tr.Hasher()
+        for v in (1, 2, 3):
+            want.h32(v)
+        self.assertEqual(w.hash.h, want.h)
+
+
 class ReadTextTest(unittest.TestCase):
     def test_xz_path_is_decompressed(self):
         with tempfile.TemporaryDirectory() as d:

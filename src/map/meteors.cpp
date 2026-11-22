@@ -36,7 +36,9 @@ void InitMeteors()
 {
     g_meteorActive = 0;
     g_meteorNextStrikeTime = g_meteorSpawnInterval;
-    g_meteorWeapon = g_seams.weapons->FindWeaponByName(g_meteorWeaponName);
+    char weaponName[sizeof(MeteorShowerParams::weapon)];
+    memcpy(weaponName, g_meteorWeaponName, sizeof weaponName);
+    g_meteorWeapon = g_seams.weapons->FindWeaponByName(weaponName);
     if (g_meteorWeapon == 0) {
         g_meteorWeapon = g_game->weapons;
         return;
@@ -236,6 +238,16 @@ void __stdcall WindMeteorsApply(const WindMeteorsEventHeader* event, unsigned in
         break;
     case WIND_METEORS_START:
         StartMeteorShower();
+        break;
+    case WIND_METEORS_LIMITS:
+        if (size >= sizeof(WindMeteorsLimits)) {
+            g_game->windSpeedMin = reinterpret_cast<const WindMeteorsLimits*>(event)->min;
+            g_game->windSpeedMax = reinterpret_cast<const WindMeteorsLimits*>(event)->max;
+        }
+        break;
+    case WIND_METEORS_RESET:
+        g_game->windSpeedDenominator = 5000;
+        g_game->windCounter = 0;
         break;
     }
 }

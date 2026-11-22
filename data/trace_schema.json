@@ -1636,6 +1636,8 @@
       "65": {"name": "WIND_METEORS_DISABLE", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
       "66": {"name": "WIND_METEORS_PARAMS", "size": 52, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "params", "size": 48, "kind": "bytes", "target": null}]},
       "67": {"name": "WIND_METEORS_START", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
+      "68": {"name": "WIND_METEORS_LIMITS", "size": 12, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "min", "size": 4, "kind": "scalar", "target": null}, {"name": "max", "size": 4, "kind": "scalar", "target": null}]},
+      "69": {"name": "WIND_METEORS_RESET", "size": 4, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}]},
       "80": {"name": "WIND_METEORS_EFFECT_SPAWN", "size": 36, "fields": [{"name": "kind", "size": 4, "kind": "scalar", "target": null}, {"name": "weapon", "size": 4, "kind": "scalar", "target": null}, {"name": "pos", "size": 12, "kind": "bytes", "target": null}, {"name": "vel", "size": 12, "kind": "bytes", "target": null}, {"name": "announce", "size": 4, "kind": "scalar", "target": null}]}
     }
   },

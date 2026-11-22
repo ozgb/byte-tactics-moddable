@@ -22,4 +22,13 @@ inline void PublishWindMeteors(int kind, const MeteorShowerParams* params)
     SchedPublish(SCHED_ENGINE, &event, sizeof event);
 }
 
+inline void PublishWindMeteorsLimits(int min, int max)
+{
+    WindMeteorsLimits event;
+    event.h.kind = WIND_METEORS_LIMITS;
+    event.min = min;
+    event.max = max;
+    SchedPublish(SCHED_ENGINE, &event, sizeof event);
+}
+
 #endif

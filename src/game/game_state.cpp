@@ -110,6 +110,7 @@ void __stdcall SetGameMode(int param)
 
 #include "../util/math.h"
 #include "scheduler.h"
+#include "wind_meteors_events.h"
 
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -507,8 +508,7 @@ void LoadBattleAssets()
     MapMoveLimits limits[32];
     int classes = g_seams.units->GetMovementLimits(limits, 32);
     g_seams.map->BuildAllPassMaps(limits, classes);
-    g_game->windSpeedDenominator = 5000;
-    g_game->windCounter = 0;
+    PublishWindMeteors(WIND_METEORS_RESET, nullptr);
     SchedWindPhase(RAND_STREAM_LOAD);
     g_game->xform = GameAllocIgnoreTag("TEMP XFORM PTS", 0x960);
     g_game->projected = GameAllocIgnoreTag("TEMP PROJECTED PTS", 0x640);

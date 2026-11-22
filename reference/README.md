@@ -332,7 +332,7 @@ game state after each phase of each tick, then a hash of the world tables, flush
 every tick. LF line endings.
 
 ```
-bt-trace 7
+bt-trace 8
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -358,17 +358,14 @@ per phase, because they are large and no phase owns them:
 - the movement classes and their pass maps;
 - the heap objects of the units (format 3), walked in unit index order and numbered as the
   walk meets them:
-  - each unit's order chains (`Unit.list`, then `list2`), every order with all its fields
-    except the vtables, `cached` and bit `0x200000` of its flags (only the draw path writes
-    and reads them), and the head of the unit's link list;
-  - each unit's `UnitMotion` and its goal object (`PatrolGoal`, `AiSearchGoal`, `LiteGoal` or
-    `PackedPosGoal`, with the live waypoints only);
-  - the order effects (`ApproachRadius`, `RingApproach`, `PointMarker`, `PathOrder` and
-    `AirManeuverOrder`) that orders and goals point at, once each, with the fields the
-    class reads in its current state;
-  - each unit's `UnitScript`: the header, every channel that is not idle with its stack up
-    to `sp`, the statics, the script piece records, and the piece transforms of `Unit.state`
-    (translation, rotation, visible, cached, shaded).
+  - each unit's order chains (`Unit.list`, then `list2`), the fields of every order that
+    other subsystems read (format 8: see below);
+  - each unit's `UnitMotion` without `p2` and `turn`, with `lastMoveTick` (no goal object);
+  - the order effects that orders and goals point at, once each (`ApproachRadius`,
+    `RingApproach`, `PointMarker`, `PathOrder` and `AirManeuverOrder`): format 8 hashes only the
+    class tag of an unknown one and, of a `PathOrder`, its link (`refOwner`, `refNext`, `refValue`);
+  - each unit's `UnitScript`: the piece transforms of `Unit.state` (translation, rotation,
+    visible, cached, shaded).
 
   They are in the world row, not the per-phase tables, because a script alone is over a
   kilobyte, and a divergence there names the tick and the section, not the phase.
@@ -389,6 +386,21 @@ and `playersState.*` (46), which no row hashes.
 
 Format 7 changes no row and no digest of the reference: it is the number of moddable's dump, whose event sections
 describe one field list per kind of event (#1009). The reference writes no event sections, so only its number moves.
+
+Since format 8 the rows hash only the state that more than one subsystem reads (#1024). Left out of the unit
+rows: the weapon slot words (unit bytes `0x8` to `0xf`, `0x14` to `0x1d`, `0x24` to `0x2b`, `0x30` to `0x39`,
+`0x40` to `0x47`, `0x4c` to `0x55`), `head`, `hoverBobPhase`, `healthPercent`, `prevHealthPercent`,
+`unfinishedInitZero`, the four bytes at `0x10a` and `zBufferFlag`. Left out of the projectile rows: everything but
+`type`, `position`, `target`, `attacker` and `owner`. The `explosions` row hashes nothing, and the world row no longer
+hashes the exploded pieces, the debris or the pieces (sections 3 to 5 are gone). Of an order, the world row keeps
+`unit`, the link, `pos.x`, `pos.z` and `flags`. Each of the left-out fields is dumped, never hashed, in the record of the subsystem that owns it:
+`weaponsState.*` (record 48: `explodedPieces[s]`, `debris[d]`, `pieces[i]` with `.vertices` and `.faces[k]`,
+`units[i]` with `weapons[k].*`, and `projectiles[p]`), `ordersState.units[i]` (52: `list[n].*`, `list2[n].*`),
+`movementState.units[i]` (53: `motion.p2.*`, `motion.turn` and `goal.*`, the goal objects), `unitsState.units[i]` (54)
+and `scriptsState.units[i]` (55: the script header, `channels[c].*`, `statics` and `pieces[p].*`). Their lines read
+`<tick> <phase> <record>.<field> <value>`, an integer as `0x` and two digits a byte, bytes as `hex:`, a unit handle as
+`unit:<slot>` and any other pointer as `heap` or `null`. The reference writes no `weaponsState` count record: only
+moddable does.
 
 The hash is 64-bit FNV-1a over a canonical serialisation of that state: 8-byte
 little-endian words first, then the remaining bytes one at a time (so the result does not
@@ -414,7 +426,7 @@ A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 7
+bt-dump 8
 <tick> <phase> <path> <value>
 ```
 
@@ -427,14 +439,14 @@ Paths are `gameTick`, `rng.parkMiller`, `rng.crtHoldrand`, `units[i].<field>`,
 `pathfinder.<field>` (with `.pool[k]`, `.heap[k]`, `.dirty[w]`, `.cells[k].flags`),
 `pathfinder.playerTickLoad` and the other budget globals, `results.count` and
 `results[k].<field>` (the path results), `moveClasses[i].<field>` and
-`moveClasses[i].passMap[k]`, and for the unit heap objects `units[i].head`,
-`units[i].list[k].<field>` and `units[i].list2[k].<field>`, `units[i].motion.<field>` with
-`units[i].motion.goal.class` (0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed
-position; any other vtable fails the run) and `.goal.<field>`
-and `.goal.points`, `orderFx[id].<field>` with `orderFx[id].class` (1 approach radius, 2 ring
-approach, 3 point marker, 4 path order, 5 air maneuver), and `units[i].script.<field>`,
-`.channels[c].<field>` and `.channels[c].stack`, `.statics`, `.pieces[p].<field>` and
-`.transforms[p].<field>`. Every phase dumps all of them, not only its own subsystem's.
+`moveClasses[i].passMap[k]`, and for the unit heap objects `units[i].list[k].<field>` and
+`units[i].list2[k].<field>`, `units[i].motion.<field>`, `orderFx[id].<field>` with
+`orderFx[id].class` (1 approach radius, 2 ring approach, 3 point marker, 4 path order, 5 air
+maneuver) and `units[i].script.transforms[p].<field>`; `weaponsState.*`, `ordersState.*`,
+`movementState.*` (with `goal.class`: 0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed
+position; any other vtable fails the run, and `goal.<field>` and `goal.points`), `unitsState.*` and
+`scriptsState.*` for the fields no row hashes since format 8. Every phase dumps all of them, not only its own
+subsystem's.
 
 A scenario with a remote slot also runs the share pass of every tick. The resource share packets a step
 would send are not sent; they are recorded and dumped as `packets.count` and
@@ -548,8 +560,8 @@ per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `wor
 The file:
 
 ```
-bt-digest 7
-trace_format bt-trace 7
+bt-digest 8
+trace_format bt-trace 8
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>

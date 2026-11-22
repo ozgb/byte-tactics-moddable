@@ -139,7 +139,7 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
+#include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 #include "../game/orders_events.h"
 #include "../game/movement_events.h"
@@ -492,7 +492,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     UnitList units;
     int range=SearchRange(unit);
     GroundAllyVisitor visitor((Player*)unit->player,&units,unit);
-    VisitUnitsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
+    ForEachUnitInRange(&unit->pos,range,[&visitor](Unit* ally) { visitor.CollectGroundAlly(ally); });
     if (!units.empty()) {
         order->SetAttachedFx(0);
         MissionType kind=GetOrderType(7, unit, units[0], nullptr);
@@ -2072,7 +2072,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 RepairableUnitVisitor collector((Player*)unit->player, &units, unit);
-                VisitUnitsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                ForEachUnitInRange(&unit->pos, range, [&collector](Unit* other) { collector.CollectRepairableUnit(other); });
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (g_seams.units->CanRepair(unit, target) && target->buildLeft == 0.0f) {

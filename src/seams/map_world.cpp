@@ -37,20 +37,6 @@ void MapOnFeaturesPassMaps(const void* event, unsigned int size)
     MapInbox(&passMaps, sizeof(passMaps));
 }
 
-void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor)
-{
-    unsigned short ids[256];
-    int skip = 0;
-    for (;;) {
-        int count = g_seams.map->UnitsInRange(pos, range, skip, ids, 256);
-        for (int i = 0; i < count; i++)
-            visitor->Visit(&g_game->units[ids[i]]);
-        if (count < 256)
-            return;
-        skip += count;
-    }
-}
-
 int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)
 {
     ReplayImport call(RI_SCHEDULE_MAP_CAN_BUILD_AT);

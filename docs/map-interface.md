@@ -143,13 +143,13 @@ can.
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
 inside map's. Map 4.0's `UnitsInRange` writes the ids of the units in range to a buffer the caller gives, in the
 same order, skipping the first `skip` of them, and returns how many it wrote, at most the buffer's capacity, as
-pathfinding's `Poll` fills a caller's buffer. The service `VisitUnitsInRange` (services 1.16, `src/seams/map_world.cpp`) pages
-through it, 256 ids at a time, and calls the visitor for each unit, so its callers (orders' patrol and repair
-orders, the victory condition `VictoryMoveUnitToRadius`, los_radar's `UpdateSensorRadarAndCloak`) keep their
-visitors. The order is 3.1c's because no visitor moves a unit or publishes to map: they count, collect or test the
-units they are given. That is the service's contract: a visitor must not move a unit or change map's grid, since
-`VisitUnitsInRange` takes a page of ids before it calls the visitors, and a changed grid would page differently
-once more than 256 units are in range. `VisitObjectsInRect`, 3.1c's visitor over a rectangle, had no caller; it is
+pathfinding's `Poll` fills a caller's buffer. Its callers (orders' patrol and repair orders, the victory condition
+`VictoryMoveUnitToRadius`, los_radar's `UpdateSensorRadarAndCloak`) page through it, 256 ids at a time, and handle
+each unit in turn (`ForEachUnitInRange`, `src/seams/units_in_range.h`); until #1028 the service `VisitUnitsInRange`
+(services 1.16 to 2.x) did the paging and called a visitor, a callback across the boundary. The order is 3.1c's
+because no caller moves a unit or publishes to map while it pages: they count, collect or test the units they are
+given. A page of ids is taken before its units are handled, and a changed grid would page differently once more
+than 256 units are in range. `VisitObjectsInRect`, 3.1c's visitor over a rectangle, had no caller; it is
 removed, so map calls no visitor.
 
 **The mission, campaign and map-list slots left map in 5.0.** They are not simulation: they read and write the
@@ -250,7 +250,7 @@ Map's CELL_HEIGHTS to los_radar, published by ADD_UNIT and REMOVE_UNIT for a bui
 phase can see a difference while it is pending (`docs/los-radar-interface.md`, section 4).
 
 **What others read of map:**
-- **Queries:** `UnitsInRange` (through the service `VisitUnitsInRange`), `GetCellMeanHeight` (features, players,
+- **Queries:** `UnitsInRange` (orders, the victory conditions, los_radar), `GetCellMeanHeight` (features, players,
   weapons),
   `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` (orders), `GetGroundHeight` (features, los_radar,
   movement, orders, scripts, targeting, units, weapons and the minimap's cursor), `PassMapGet` and `PassMapInBounds`

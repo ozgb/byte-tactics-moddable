@@ -75,7 +75,7 @@ static void WriteUnitRecords(const StateWriter* w)
         w->Int("healthPercent", 0, 1, u->healthPercent);
         w->Int("prevHealthPercent", 0, 1, u->prevHealthPercent);
         w->Int("unfinishedInitZero", 0, 4, (unsigned int)u->unfinishedInitZero);
-        w->Bytes("unknown_10a", 0, u->unknown_10a, 4);
+        w->Bytes("unknown_10a", 0, (const unsigned char*)u + 0x10a, 4);
         w->Int("zBufferFlag", 0, 4, (unsigned int)u->zBufferFlag);
     }
 }

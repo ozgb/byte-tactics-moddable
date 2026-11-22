@@ -378,12 +378,13 @@ static void WriteDebrisAndPieces(const StateWriter* w)
         n = 300;
     for (unsigned int d = 0; d < n; d++) {
         const Debris* e = &g_game->debris[d];
-        if (e->field_0.offset == 0)
+        unsigned int pieceOffset = ReadWord((const unsigned char*)e, 4);
+        if (pieceOffset == 0)
             continue;
         sprintf(name, "weaponsState.debris[%u]", d);
         w->Begin(48, name);
         WriteFields(w, (const unsigned char*)e, FIELDS(kDebris), 0);
-        const unsigned char* obj = (const unsigned char*)e->field_0.get();
+        const unsigned char* obj = (const unsigned char*)SimBlockBase() + pieceOffset;
         const unsigned char* slots = (const unsigned char*)&g_game->slots[0];
         if (obj >= slots && (unsigned int)(obj - slots) % sizeof(DebrisPiece) == 0 && (unsigned int)(obj - slots) / sizeof(DebrisPiece) < 300)
             used[(unsigned int)(obj - slots) / sizeof(DebrisPiece)] = 1;

@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem wind_meteors 3.0
+subsystem wind_meteors 3.1
 call 0 Apply
   r Game.width 0
   r Game.height 0
@@ -84,6 +84,18 @@ call 0 Apply
   a event.duration f32:0x40a00000
   a event.interval f32:0x42700000
   a size 52
+call 0 Apply
+  r rng.load 0x000005ac
+  r rng.seed 0x66e294b7
+  a event.kind 68
+  a event.min 100
+  a event.max 3000
+  a size 12
+call 0 Apply
+  r Game.width 224
+  r Game.height 102
+  a event.kind 69
+  a size 4
 call 0 UpdateWind
   r Game.windCounter 0
   r Game.windSpeedDenominator 5000
@@ -92,8 +104,6 @@ call 0 UpdateWind
   r Game.windStrength f32:0x00000000
   r Game.windSpeedMin 100
   r Game.windSpeedMax 3000
-  r rng.load 0x000005ac
-  r rng.seed 0x66e294b7
   a stream load
   w Game.windX 0
   w Game.windZ 0
@@ -121,8 +131,6 @@ call 1 UpdateWind
   w rng.main 0x12ac3dbf
   w rng.seed 0x21873b87
 call 1 UpdateMeteors
-  r Game.width 224
-  r Game.height 102
 call 2 UpdateWind
   a stream main
   w Game.windEnabled 0

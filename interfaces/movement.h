@@ -83,7 +83,7 @@ struct MovementSavedState {
     // The velocity, in world units with 16 fractional bits: x, y and z.
     int velocity[3];
     // The smoothed acceleration that banks and pitches an aircraft: x, y and z.
-    int p2[3];
+    int smoothedAcceleration[3];
     // The speed.
     int speed;
     // The turn of the last tick.

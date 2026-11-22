@@ -1574,9 +1574,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "velocity0", offsetof(MovementLoadState, state.velocity[0]), sizeof(((MovementLoadState*)nullptr)->state.velocity[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "velocity1", offsetof(MovementLoadState, state.velocity[1]), sizeof(((MovementLoadState*)nullptr)->state.velocity[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "velocity2", offsetof(MovementLoadState, state.velocity[2]), sizeof(((MovementLoadState*)nullptr)->state.velocity[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p20", offsetof(MovementLoadState, state.p2[0]), sizeof(((MovementLoadState*)nullptr)->state.p2[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p21", offsetof(MovementLoadState, state.p2[1]), sizeof(((MovementLoadState*)nullptr)->state.p2[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p22", offsetof(MovementLoadState, state.p2[2]), sizeof(((MovementLoadState*)nullptr)->state.p2[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration0", offsetof(MovementLoadState, state.smoothedAcceleration[0]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration1", offsetof(MovementLoadState, state.smoothedAcceleration[1]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration2", offsetof(MovementLoadState, state.smoothedAcceleration[2]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "speed", offsetof(MovementLoadState, state.speed), sizeof(((MovementLoadState*)nullptr)->state.speed), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "turn", offsetof(MovementLoadState, state.turn), sizeof(((MovementLoadState*)nullptr)->state.turn), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "mode", offsetof(MovementLoadState, state.mode), sizeof(((MovementLoadState*)nullptr)->state.mode), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -2378,9 +2378,9 @@ static_assert(sizeof(((MovementLoadState*)nullptr)->h.unit) == 4, "MovementLoadS
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[0]) == 4, "MovementLoadState::velocity0 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[1]) == 4, "MovementLoadState::velocity1 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[2]) == 4, "MovementLoadState::velocity2 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[0]) == 4, "MovementLoadState::p20 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[1]) == 4, "MovementLoadState::p21 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[2]) == 4, "MovementLoadState::p22 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[0]) == 4, "MovementLoadState::smoothedAcceleration0 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[1]) == 4, "MovementLoadState::smoothedAcceleration1 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[2]) == 4, "MovementLoadState::smoothedAcceleration2 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.speed) == 4, "MovementLoadState::speed has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.turn) == 4, "MovementLoadState::turn has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.mode) == 4, "MovementLoadState::mode has the size the schema says");

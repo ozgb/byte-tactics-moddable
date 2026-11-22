@@ -87,9 +87,9 @@ static void LoadMotionState(UnitMotion* motion, const MovementSavedState* state)
     motion->velocity.x = state->velocity[0];
     motion->velocity.y = state->velocity[1];
     motion->velocity.z = state->velocity[2];
-    motion->p2.x = state->p2[0];
-    motion->p2.y = state->p2[1];
-    motion->p2.z = state->p2[2];
+    motion->p2.x = state->smoothedAcceleration[0];
+    motion->p2.y = state->smoothedAcceleration[1];
+    motion->p2.z = state->smoothedAcceleration[2];
     motion->speed = state->speed;
     motion->turn = (short)state->turn;
     motion->mode = state->mode;
@@ -177,9 +177,9 @@ void __stdcall MovementGetMotionState(Unit* unit, MovementSavedState* out)
     out->velocity[0] = motion->velocity.x;
     out->velocity[1] = motion->velocity.y;
     out->velocity[2] = motion->velocity.z;
-    out->p2[0] = motion->p2.x;
-    out->p2[1] = motion->p2.y;
-    out->p2[2] = motion->p2.z;
+    out->smoothedAcceleration[0] = motion->p2.x;
+    out->smoothedAcceleration[1] = motion->p2.y;
+    out->smoothedAcceleration[2] = motion->p2.z;
     out->speed = motion->speed;
     out->turn = motion->turn;
     out->mode = motion->mode;

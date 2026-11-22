@@ -326,9 +326,9 @@ static void LoadUnitMotion(Unit* unit, HapiBank* file)
     state.velocity[0] = rec.velocity[0];
     state.velocity[1] = rec.velocity[1];
     state.velocity[2] = rec.velocity[2];
-    state.p2[0] = rec.p2[0];
-    state.p2[1] = rec.p2[1];
-    state.p2[2] = rec.p2[2];
+    state.smoothedAcceleration[0] = rec.p2[0];
+    state.smoothedAcceleration[1] = rec.p2[1];
+    state.smoothedAcceleration[2] = rec.p2[2];
     state.speed = rec.speed;
     state.turn = rec.turn;
     state.mode = rec.mode;
@@ -348,9 +348,9 @@ static void SaveUnitMotion(Unit* unit, HapiBank* file)
     hdr.velocity[0] = state.velocity[0];
     hdr.velocity[1] = state.velocity[1];
     hdr.velocity[2] = state.velocity[2];
-    hdr.p2[0] = state.p2[0];
-    hdr.p2[1] = state.p2[1];
-    hdr.p2[2] = state.p2[2];
+    hdr.p2[0] = state.smoothedAcceleration[0];
+    hdr.p2[1] = state.smoothedAcceleration[1];
+    hdr.p2[2] = state.smoothedAcceleration[2];
     hdr.speed = state.speed;
     hdr.turn = (short)state.turn;
     hdr.pathLockStamp = g_seams.map->PathLockStamp(unit);

@@ -120,7 +120,7 @@ uv run tools/tracedigest.py trace.txt --commit <sha> --scenario reference/scenar
 diff mine.txt reference/traces/skirmish2.txt
 ```
 
-The digest file starts with a header (`bt-digest 4`, trace format, commit,
+The digest file starts with a header (`bt-digest 8`, trace format, commit,
 scenario, seeds, `fpu_control_word`), then one `<tick> <digest>` line per
 tick. Your header must agree with the stored one except for `commit`. The
 first differing tick is where your engine first diverges.
@@ -354,8 +354,8 @@ and so on), and this page is updated to name it. The current tag is
   `prevHealthPercent`, `unfinishedInitZero`, the 4 bytes at 0x10a and `zBufferFlag`) and the scripts' own state
   (section 23 hashes only the piece transforms). A motion's `lastMoveTick` is hashed again. What left the rows is
   dumped as records 48 (grown), 52, 53, 54 and 55 (`ordersState`, `movementState`, `unitsState`, `scriptsState`).
-  Every digest changes; the event digests, sound logs, UI logs and frames are those of v31, and the save decodes
-  equal to v31's.
+  Every digest changes; the event digests, sound logs, UI logs and frames are those of v31, with two new frames of
+  `combat-deaths` at ticks 870 and 900 that show the debris, and the save decodes equal to v31's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

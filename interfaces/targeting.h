@@ -7,7 +7,7 @@ struct Vec3;
 // Major version of the targeting interface, changed when a slot is removed or its signature changes.
 #define TARGETING_VERSION_MAJOR 3
 // Minor version of the targeting interface, changed when a slot is added.
-#define TARGETING_VERSION_MINOR 0
+#define TARGETING_VERSION_MINOR 1
 
 // The fields every targeting event and effect starts with.
 struct TargetingEventHeader {
@@ -79,6 +79,8 @@ struct TargetingSeam {
     Unit* (__stdcall* FindBestTargetIfFireAtWill)(Unit* unit);
     // Returns the weapon a unit fires first at its target; a query (thiscall in 3.1c, this first). Hooks: none.
     unsigned char (__fastcall* ChooseWeapon)(Unit* unit);
+    // Returns the target pair of a weapon of a unit as a saved game keeps it, the two 16-bit halves TARGETING_LOAD sets, the first in the low half; a query, which a saved game reads outside the tick. Hooks: none.
+    int (__stdcall* SavedTargetPair)(Unit* unit, int weapon);
 };
 
 #endif

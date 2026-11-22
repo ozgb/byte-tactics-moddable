@@ -17,6 +17,7 @@ int __stdcall UnitCanBuild(Unit* unit, short id);
 void __stdcall NotifyUnitRefs(Unit* obj, int event);
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
 int __stdcall ApplyTargetingEvent(const TargetingEventHeader* e, unsigned int size);
+int __stdcall SavedTargetPair(Unit* unit, int weapon);
 int __stdcall IsTargetingUnit(Unit* list, Unit* obj);
 void __stdcall AlignUnitToGround(Unit* u);
 

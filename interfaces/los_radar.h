@@ -13,11 +13,12 @@ struct Cell;
 struct Player;
 struct Unit;
 struct Vec3;
+class HapiBank;
 
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
 #define LOS_RADAR_VERSION_MAJOR 4
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 0
+#define LOS_RADAR_VERSION_MINOR 1
 
 // The field every los_radar event starts with.
 struct LosRadarEventHeader {
@@ -195,6 +196,10 @@ struct LosRadarSeam {
     void (__stdcall* SightCache)(Unit* unit, LosSightCache* out);
     // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Reads the visibility layer of a saved game, the "Mapping" account, from a bank, outside the tick. Hooks: none.
+    void (__stdcall* LoadMappingData)(HapiBank* file);
+    // Writes the visibility layer of a saved game, the "Mapping" account, to a bank, outside the tick. Hooks: none.
+    void (__stdcall* SaveMappingData)(HapiBank* file);
 };
 
 #endif

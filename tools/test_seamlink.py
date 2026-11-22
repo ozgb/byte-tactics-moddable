@@ -842,10 +842,11 @@ TARGETING_HEADER = """struct TargetingSeam {
     Unit* (__stdcall* FindWeaponTarget)(Unit* unit, unsigned char weapon, int useRange);
     Unit* (__stdcall* FindBestTargetIfFireAtWill)(Unit* unit);
     unsigned char (__fastcall* ChooseWeapon)(Unit* unit);
+    int (__stdcall* SavedTargetPair)(Unit* unit, int weapon);
 };
 """
 TARGETING_FILLERS = {"Apply": "TgApply", "GetWeaponTargetUnit": "TgUnit", "GetWeaponTargetPos": "TgPos", "FindWeaponTarget": "TgFind",
-                     "FindBestTargetIfFireAtWill": "TgWill", "ChooseWeapon": "TgChoose"}
+                     "FindBestTargetIfFireAtWill": "TgWill", "ChooseWeapon": "TgChoose", "SavedTargetPair": "TgPair"}
 
 
 class TargetingPilotTest(unittest.TestCase):
@@ -856,12 +857,13 @@ Order,src/orders/unit_orders.cpp,orders,x,
 TgApply,src/units/unit_targets.cpp,targeting,x,
 TgUnit,src/units/unit_targets.cpp,targeting,x,
 TgChoose,src/units/unit_targets.cpp,targeting,x,
+TgPair,src/units/unit_targets.cpp,targeting,x,
 TgHelp,src/units/unit_targets.cpp,targeting,x,
 """
 
     def check(self, rows, header=TARGETING_HEADER, fillers=None):
         fillers = TARGETING_FILLERS if fillers is None else fillers
-        rows = [(f, "src/units/unit_targets.cpp", "function", "") for f in ("TgUnit", "TgChoose")] + list(rows)
+        rows = [(f, "src/units/unit_targets.cpp", "function", "") for f in ("TgUnit", "TgChoose", "TgPair")] + list(rows)
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             (root / "data").mkdir()
@@ -884,7 +886,7 @@ TgHelp,src/units/unit_targets.cpp,targeting,x,
     def test_the_pilots_table_lists_targeting_before_los_radar(self):
         self.assertEqual(seamlink.PILOTS[-10].owner, "targeting")
         self.assertEqual(seamlink.TARGETING.writing, ("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"))
-        self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon"))
+        self.assertEqual(seamlink.TARGETING.query, ("GetWeaponTargetUnit", "ChooseWeapon", "SavedTargetPair"))
         self.assertEqual(seamlink.TARGETING.setup + seamlink.TARGETING.phase_slots + seamlink.TARGETING.allowed_indirect, ())
         header = seamlink.ROOT / "interfaces/targeting.h"
         if header.exists():
@@ -997,7 +999,8 @@ LrList,src/map/line_of_sight_index.cpp,los_radar,x,
         self.assertEqual(seamlink.PILOTS[-9].owner, "los_radar")
         self.assertEqual(seamlink.LOS_RADAR.writing, ("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak",
                                                      "RecordRadarMapped", "ExpireEyeballs", "RefreshUnitIndex", "Init", "Shutdown"))
-        self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"))
+        self.assertEqual(seamlink.LOS_RADAR.setup, ("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex",
+                                                          "LoadMappingData", "SaveMappingData"))
         header = seamlink.ROOT / "interfaces/los_radar.h"
         if header.exists():
             pilot = seamlink.LOS_RADAR

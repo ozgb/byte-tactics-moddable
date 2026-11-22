@@ -159,6 +159,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../game/weapons_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/targeting_events.h"
+#include "../../interfaces/targeting.h"
 #include "../game/movement_events.h"
 
 // FUNCTION: 0x4010b0
@@ -442,7 +443,7 @@ void __stdcall SaveUnits(HapiBank* file)
             rec.flags.e = (u >> 14) & 0xfff;
 
             for (int k = 0; k < 3; k++) {
-                rec.pieces[k].f0 = *(int*)&unit->weapons[k];
+                rec.pieces[k].f0 = g_seams.targeting->SavedTargetPair(unit, k);
                 rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
                 rec.pieces[k].f8 = unit->weapons[k].weapon.get()->index;
                 rec.pieces[k].fc = unit->weapons[k].muzzleAimFromDeltaZ;

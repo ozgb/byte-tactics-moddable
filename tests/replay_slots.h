@@ -409,6 +409,7 @@ TargetingSeam g_native_targeting = {
     FindWeaponTarget,
     FindBestTargetIfFireAtWill,
     ChooseWeaponSlot,
+    SavedTargetPair,
 };
 
 MapSeam g_native_map = {
@@ -419,10 +420,8 @@ MapSeam g_native_map = {
     CanPlaceUnitFootprint,
     BuildAllPassMaps,
     FreePassMaps,
-    LoadMappingData,
     LoadMetalPlotmap,
     LoadPlayerFeaturesPlotmap,
-    SaveMappingData,
     SaveMetalPlotmap,
     SavePlayerFeaturesPlotmap,
     SnapWorldPosToFootprint,

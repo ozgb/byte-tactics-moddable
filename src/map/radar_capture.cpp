@@ -1,4 +1,5 @@
 #include "radar_capture.h"
+#include <string.h>
 
 #pragma pack(push, 1)
 
@@ -33,6 +34,7 @@ struct RadarUnitDefView {
 #include "../../link/globals.h"
 #include "../../interfaces/services.h"
 #include "../state/sim_radar.h"
+#include "../files/files_api.h"
 
 static Player* Player_Get(unsigned char p)
 {
@@ -207,4 +209,34 @@ void __stdcall RecordRadarMapped(void)
     }
     unsigned int args[1] = {offset};
     RecordSimEvent(SIM_EVENT_RADAR_MAPPED, 0, args, 1);
+}
+
+// FUNCTION: 0x484f50
+void __stdcall SaveMappingData(HapiBank* file)
+{
+    file->OpenAccount("Mapping");
+    unsigned int size = g_game->width * g_game->height * sizeof(short) / 4;
+    file->OpenNamedBox("Data");
+    file->WriteBox((void *)g_game->visibilityMask, size);
+}
+
+// FUNCTION: 0x484fa0
+void __stdcall LoadMappingData(HapiBank* file)
+{
+    if (file->OpenAccount("Mapping") && file->OpenNamedBox("Data")) {
+        unsigned int size = g_game->width * g_game->height * sizeof(short) / 4;
+        if (file->GetBoxSize() == size) {
+            unsigned char* dst = (unsigned char*)(void*)g_game->visibilityMask;
+            unsigned char chunk[1024];
+            unsigned int done = 0;
+            while (done < size) {
+                unsigned int want = size - done < sizeof(chunk) ? size - done : sizeof(chunk);
+                int got = file->ReadBox(chunk, want);
+                if (got <= 0)
+                    break;
+                memcpy(dst + done, chunk, got);
+                done += got;
+            }
+        }
+    }
 }

@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 7.1), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 8.0), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -112,7 +112,7 @@ can.
 | `CanBuildAt`, `CanPlaceUnitFootprint`, `PickRandomReclaimableResourcesInRadius` | synchronous slots, through the `ScheduleMap` services |
 | `GetCellMeanHeight`, `SnapWorldPosToFootprint`, `CanPlaceFootprintAt`, `IsPadSlotFree` | queries |
 | `GetGameType`, `GetNameSlot` | queries of the mission, read inside the tick |
-| `BuildAllPassMaps`, `FreeOtaEnumCacheAndMission`, `SetMissionType`, `LoadMappingData`, `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap`, `SaveMappingData`, `SaveMetalPlotmap`, `SavePlayerFeaturesPlotmap` | set-up, save and load slots, outside the tick |
+| `BuildAllPassMaps`, `FreeOtaEnumCacheAndMission`, `SetMissionType`, `LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap`, `SaveMetalPlotmap`, `SavePlayerFeaturesPlotmap` | set-up, save and load slots, outside the tick |
 | `AdvanceMission`, `GetCampaignName`, `GetMissionIndex`, `GetMissionName`, `GetStartPosition`, `LoadCampaign`, `LoadMissionByName`, `MissionExists`, `RefreshMapList`, `SelectMission`, `ComputeMapChecksum`, `GetTerrainLength` | the mission, campaign and map-list slots, outside the tick |
 
 **Every slot of 4.1.** What map 5.0 changed:
@@ -135,7 +135,9 @@ can.
 | units' `FreeMovementClasses`, which also freed the pass maps | map's `FreePassMaps`, a shutdown slot the engine calls after units' `FreeMovementClasses`, which now frees only the names |
 | every other slot | unchanged |
 
-**Map 7.1 (#1019).** The path lock stamp (`UnitMotion::pathLockStamp`) became map's: the field stays in movement's motion record, as the bucket fields and claim bits stay in units' record, and map keeps it. The kind LOAD_PATH_LOCK_STAMP 169 (payload `MapPathLockStamp`) is the saved game's way to set it, and the query `PathLockStamp(unit)`, the last slot of the seam, is the way to read it for the save, outside the tick: it returns the stamp, or 0 for a unit with no movement. The slot is appended, so the version is 7.1. The stamp was movement's event PLACED until movement 4.0 (`docs/movement-interface.md`).
+**Map 7.1 (#1019).** The path lock stamp (`UnitMotion::pathLockStamp`) became map's: the field stays in movement's motion record, as the bucket fields and claim bits stay in units' record, and map keeps it. The kind LOAD_PATH_LOCK_STAMP 169 (payload `MapPathLockStamp`) is the saved game's way to set it, and the query `PathLockStamp(unit)`, the last slot of the seam, is the way to read it for the save, outside the tick: it returns the stamp, or 0 for a unit with no movement. The slot is appended, so the version is 7.1.
+
+**Map 8.0.** `LoadMappingData` and `SaveMappingData` left the seam for los_radar 4.1 (`docs/los-radar-interface.md`): they save and load only the visibility mask, which los_radar owns, so a slot was removed and the major is 8. The other set-up slots are unchanged. The stamp was movement's event PLACED until movement 4.0 (`docs/movement-interface.md`).
 
 **`VisitObjectsInRange` became a query.** 3.1c's took a `UnitVisitor` and called its `Visit` for each unit within
 range of a position, in the spatial grid's order. The callback is not plain data and would run the caller's code
@@ -210,7 +212,7 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
 An effect for any of these would need a synchronous route, because units and orders read each of them back in the
 same update (the `immediate` rows of section 4), and would only move the write.
 
-**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 7.1; 7.1 added LOAD_PATH_LOCK_STAMP, and the other payloads are unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size. LOAD_PATH_LOCK_STAMP has outcome 1, or 0 when the unit has no movement.
+**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 8.0; 7.1 added LOAD_PATH_LOCK_STAMP, and the other payloads are unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size. LOAD_PATH_LOCK_STAMP has outcome 1, or 0 when the unit has no movement.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -301,6 +303,8 @@ item is every field of every cell, so a row with it is any field. Each is served
 | weapons → map | `Debris::pos` | explosions | Read by `GetCellMeanHeight`, a query, at the caller's statement. |
 
 ## 5. State and the trace
+
+A saved game gives map back the metal and the player feature plot maps of the cells (`LoadMetalPlotmap`, `LoadPlayerFeaturesPlotmap`) and the path lock stamp of each unit (`LoadUnit` publishes LOAD_PATH_LOCK_STAMP); the explored layer of the saved game is los_radar's since 8.0.
 
 Map keeps no private region, but it has a `WriteState` since 4.1 (#979) and it allocates and frees the bucket array.
 What only map reads left the hash in trace format 6 and is reported by `WriteState`, dumped and required equal for the

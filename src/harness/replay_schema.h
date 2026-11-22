@@ -216,6 +216,7 @@ enum ReplayObjectKindId {
     ROK_WEAPONFIRE,
     ROK_WINDMETEORSEVENTHEADER,
     ROK_WINDMETEORSPARAMS,
+    ROK_WINDMETEORSLIMITS,
     ROK_WINDMETEORSSPAWN,
     ROK_TARGETINGEVENTHEADER,
     ROK_TARGETINGSETUNIT,
@@ -530,6 +531,8 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 65, ROK_WINDMETEORSEVENTHEADER },
     { 66, ROK_WINDMETEORSPARAMS },
     { 67, ROK_WINDMETEORSEVENTHEADER },
+    { 68, ROK_WINDMETEORSLIMITS },
+    { 69, ROK_WINDMETEORSEVENTHEADER },
     { 80, ROK_WINDMETEORSSPAWN },
     { 96, ROK_TARGETINGSETUNIT },
     { 97, ROK_TARGETINGSETPOS },
@@ -661,18 +664,19 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 419, ROK_SCRIPTSSTATE },
 };
 static const ReplayEventTable kReplayEventTables[] = {
-    { ROK_WINDMETEORSEVENTHEADER, 0, 5 },
-    { ROK_TARGETINGEVENTHEADER, 5, 6 },
-    { ROK_LOSRADAREVENTHEADER, 11, 11 },
-    { ROK_MAPEVENTHEADER, 22, 10 },
-    { ROK_WEAPONSEVENTHEADER, 32, 25 },
-    { ROK_ORDERSEVENTHEADER, 57, 22 },
-    { ROK_MOVEMENTEVENTHEADER, 79, 23 },
-    { ROK_UNITSEVENTHEADER, 102, 27 },
-    { ROK_SCRIPTSEVENTHEADER, 129, 4 },
+    { ROK_WINDMETEORSEVENTHEADER, 0, 7 },
+    { ROK_TARGETINGEVENTHEADER, 7, 6 },
+    { ROK_LOSRADAREVENTHEADER, 13, 11 },
+    { ROK_MAPEVENTHEADER, 24, 10 },
+    { ROK_WEAPONSEVENTHEADER, 34, 25 },
+    { ROK_ORDERSEVENTHEADER, 59, 22 },
+    { ROK_MOVEMENTEVENTHEADER, 81, 23 },
+    { ROK_UNITSEVENTHEADER, 104, 27 },
+    { ROK_SCRIPTSEVENTHEADER, 131, 4 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
+static_assert(sizeof(WindMeteorsLimits) <= REPLAY_EVENT_MAX, "WindMeteorsLimits fits the event buffer");
 static_assert(sizeof(WindMeteorsSpawn) <= REPLAY_EVENT_MAX, "WindMeteorsSpawn fits the event buffer");
 static_assert(sizeof(TargetingSetUnit) <= REPLAY_EVENT_MAX, "TargetingSetUnit fits the event buffer");
 static_assert(sizeof(TargetingSetPos) <= REPLAY_EVENT_MAX, "TargetingSetPos fits the event buffer");
@@ -829,6 +833,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "WeaponFire", sizeof(WeaponDef), RS_STATE, 12, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "WindMeteorsLimits", sizeof(WindMeteorsLimits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsSpawn", sizeof(WindMeteorsSpawn), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "TargetingEventHeader", sizeof(TargetingEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "TargetingSetUnit", sizeof(TargetingSetUnit), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -934,7 +939,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "ScriptsDetachPiece", sizeof(ScriptsDetachPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsState", sizeof(ScriptsState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 147;
+static const unsigned kReplayObjectKindCount = 148;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -1303,6 +1308,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "density", offsetof(WindMeteorsParams, params.density), sizeof(((WindMeteorsParams*)nullptr)->params.density), ROK_WINDMETEORSPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "duration", offsetof(WindMeteorsParams, params.duration), sizeof(((WindMeteorsParams*)nullptr)->params.duration), ROK_WINDMETEORSPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "interval", offsetof(WindMeteorsParams, params.interval), sizeof(((WindMeteorsParams*)nullptr)->params.interval), ROK_WINDMETEORSPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(WindMeteorsLimits, h.kind), sizeof(((WindMeteorsLimits*)nullptr)->h.kind), ROK_WINDMETEORSLIMITS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "min", offsetof(WindMeteorsLimits, min), sizeof(((WindMeteorsLimits*)nullptr)->min), ROK_WINDMETEORSLIMITS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "max", offsetof(WindMeteorsLimits, max), sizeof(((WindMeteorsLimits*)nullptr)->max), ROK_WINDMETEORSLIMITS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsSpawn, h.kind), sizeof(((WindMeteorsSpawn*)nullptr)->h.kind), ROK_WINDMETEORSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "weapon", offsetof(WindMeteorsSpawn, weapon), sizeof(((WindMeteorsSpawn*)nullptr)->weapon), ROK_WINDMETEORSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos0", offsetof(WindMeteorsSpawn, pos[0]), sizeof(((WindMeteorsSpawn*)nullptr)->pos[0]), ROK_WINDMETEORSSPAWN, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1766,7 +1774,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "state", offsetof(ScriptsState, state), sizeof(((ScriptsState*)nullptr)->state), ROK_SCRIPTSSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "feature", offsetof(ScriptsState, feature), sizeof(((ScriptsState*)nullptr)->feature), ROK_SCRIPTSSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 802;
+static const unsigned kReplayObjectFieldCount = 805;
 static const unsigned kReplayWalkableFieldCount = 161;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 37, 35, 38, 45, 51, 53, 108 };
@@ -2106,6 +2114,9 @@ static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.radius) == 4, "WindMe
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.density) == 4, "WindMeteorsParams::density has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.duration) == 4, "WindMeteorsParams::duration has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.interval) == 4, "WindMeteorsParams::interval has the size the schema says");
+static_assert(sizeof(((WindMeteorsLimits*)nullptr)->h.kind) == 4, "WindMeteorsLimits::kind has the size the schema says");
+static_assert(sizeof(((WindMeteorsLimits*)nullptr)->min) == 4, "WindMeteorsLimits::min has the size the schema says");
+static_assert(sizeof(((WindMeteorsLimits*)nullptr)->max) == 4, "WindMeteorsLimits::max has the size the schema says");
 static_assert(sizeof(((WindMeteorsSpawn*)nullptr)->h.kind) == 4, "WindMeteorsSpawn::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsSpawn*)nullptr)->weapon) == 4, "WindMeteorsSpawn::weapon has the size the schema says");
 static_assert(sizeof(((WindMeteorsSpawn*)nullptr)->pos[0]) == 4, "WindMeteorsSpawn::pos0 has the size the schema says");
@@ -3500,18 +3511,18 @@ static const ReplaySlotSets kReplaySlots[] = {
 static const unsigned kReplaySlotCount = RSL_COUNT;
 
 static const ReplaySubsystem kReplaySubsystems[] = {
-    { "wind_meteors", 3, 0, 1, 0, 8 },
+    { "wind_meteors", 3, 1, 1, 0, 8 },
     { "economy", 5, 0, 0, 8, 12 },
     { "features", 4, 0, 0, 20, 22 },
     { "ai", 6, 0, 0, 42, 15 },
     { "pathfinding", 4, 0, 0, 57, 9 },
     { "weapons", 3, 0, 1, 66, 6 },
-    { "targeting", 3, 0, 1, 72, 6 },
-    { "los_radar", 4, 0, 0, 78, 28 },
+    { "targeting", 3, 1, 1, 72, 6 },
+    { "los_radar", 4, 1, 0, 78, 28 },
     { "orders", 5, 0, 0, 106, 11 },
     { "units", 6, 0, 0, 117, 44 },
     { "players", 4, 0, 0, 161, 28 },
-    { "map", 7, 1, 1, 189, 11 },
+    { "map", 8, 0, 1, 189, 11 },
     { "scripts", 2, 0, 0, 200, 23 },
     { "movement", 4, 0, 0, 223, 20 },
     { "mission", 1, 1, 0, 243, 0 },

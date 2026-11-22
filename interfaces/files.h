@@ -22,21 +22,21 @@ struct FilesSeam {
     // Closes a file handle and frees it, and returns 0. Hooks: none.
     int (__stdcall* Close)(FileHandle* file);
     // Returns 1 when the file is read from an archive and 0 when it is loose on disk. Hooks: none.
-    bool (__stdcall* IsInArchive)(FileHandle* file);
+    int (__stdcall* IsInArchive)(FileHandle* file);
     // Moves the read position of a file, where pos -1 means the end, and returns the new position of a loose file, 0 for an archived file, or -1 on failure. Hooks: none.
-    long (__stdcall* Seek)(FileHandle* file, long pos);
+    int (__stdcall* Seek)(FileHandle* file, int pos);
     // Returns the read position of a file. Hooks: none.
-    long (__stdcall* Tell)(FileHandle* file);
+    int (__stdcall* Tell)(FileHandle* file);
     // Reads up to size bytes from a file into buf and returns the number read, or -1 when an archived block cannot be read. Hooks: none.
     int (__stdcall* Read)(FileHandle* file, void* buf, int size);
     // Writes size bytes to a loose file and returns the number written, or 0xffffffff for an archived file. Hooks: none.
     unsigned int (__stdcall* Write)(FileHandle* file, const void* buf, unsigned int size);
     // Returns the size of an open file in bytes, or 0 when it has no file. Hooks: none.
-    long (__stdcall* Length)(FileHandle* file);
+    int (__stdcall* Length)(FileHandle* file);
     // Returns the size in bytes of the named file, or 0 when it is missing. Hooks: none.
-    long (__stdcall* LengthByName)(const char* name);
+    int (__stdcall* LengthByName)(const char* name);
     // Reads size bytes from the given position of the named file into buffer and returns buffer, or 0. Hooks: none.
-    void* (__stdcall* ReadAt)(const char* name, void* buffer, long pos, unsigned int size);
+    void* (__stdcall* ReadAt)(const char* name, void* buffer, int pos, unsigned int size);
     // Loads the whole named file into a new buffer and returns it, or 0 when the file is missing or empty; stores the size in size when given, or -1 on failure. Hooks: none.
     void* (__stdcall* Load)(const char* name, int* size);
     // Loads the whole file of an open handle into a new buffer named after name and returns it, or 0 when it is empty; stores the size in outSize, or 0xffffffff on failure. Hooks: none.

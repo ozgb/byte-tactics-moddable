@@ -163,7 +163,7 @@ int __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius,
 }
 
 // FUNCTION: 0x40b0d0
-bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range)
+int __stdcall HasReadyUnitInRange(int player, const Vec3* p, int range)
 {
     int r2 = range * range;
     BlockVector<Ref<Unit> >& units = EntryOf(player)->visible;
@@ -176,10 +176,10 @@ bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range)
             if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32) <= r2
                 && (u->flags & 0x10000000)
                 && !(u->flags & 0x4000))
-                return true;
+                return 1;
         } while (++it != units.End());
     }
-    return false;
+    return 0;
 }
 
 int __stdcall GetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)

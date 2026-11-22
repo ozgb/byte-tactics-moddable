@@ -173,7 +173,7 @@ struct LosRadarSeam {
     // Writes to out, as Ref<Unit>, the first capacity of the ready enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, of the ready enemy units with flag 0x100 there, and returns how many there are; flags is unused. Hooks: none.
     int (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
     // Returns whether an enemy unit a player saw at its last RefreshUnitIndex is within a range of a position, ready (flag 0x10000000) and not dying (flag 0x4000). Hooks: none.
-    bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
+    int (__stdcall* HasReadyUnitInRange)(int player, const Vec3* pos, int range);
     // Returns 1 when the viewing player sees a position, on the grid of a player's explored map. Hooks: none.
     int (__stdcall* IsPointVisible)(Player* player, Vec3* pos);
     // Writes to out, as Ref<Unit>, the first capacity of the enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, ready or not, and returns how many there are. Hooks: none.

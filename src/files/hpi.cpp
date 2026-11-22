@@ -192,7 +192,7 @@ int __stdcall HAPI_CloseFile(FileHandle* file)
 }
 
 // FUNCTION: 0x4bb650
-bool __stdcall HAPI_IsInArchive(FileHandle* obj)
+int __stdcall HAPI_IsInArchive(FileHandle* obj)
 {
     return obj->shared != 0;
 }
@@ -221,7 +221,7 @@ FileHandle* __stdcall HAPI_CreateFile(const char* path)
 }
 
 // FUNCTION: 0x4bb710
-long __stdcall HAPI_SeekFile(FileHandle* file, long pos)
+int __stdcall HAPI_SeekFile(FileHandle* file, int pos)
 {
     if (file->shared != 0) {
         unsigned int old = file->pos;
@@ -236,7 +236,7 @@ long __stdcall HAPI_SeekFile(FileHandle* file, long pos)
         }
         return 0;
     }
-    long result;
+    int result;
     if (pos == -1) {
         result = host_file_seek(file->fp, 0, HOST_SEEK_END);
     } else {
@@ -249,7 +249,7 @@ long __stdcall HAPI_SeekFile(FileHandle* file, long pos)
 }
 
 // FUNCTION: 0x4bb7a0
-long __stdcall HAPI_TellFile(FileHandle* file)
+int __stdcall HAPI_TellFile(FileHandle* file)
 {
     if (file->shared != 0) {
         return file->pos;
@@ -385,13 +385,13 @@ void __stdcall RemoveFile(const char* path)
 }
 
 // FUNCTION: 0x4bbc40
-long __stdcall HAPI_FileLengthByName(const char* name)
+int __stdcall HAPI_FileLengthByName(const char* name)
 {
     FileHandle* h = (FileHandle*)HAPI_OpenFile(name, "rb");
     if (h == 0)
         return 0;
 
-    long len;
+    int len;
     if (h->shared != 0)
         len = h->info->size;
     else if (h->fp != 0)
@@ -419,7 +419,7 @@ long __stdcall HAPI_FileLengthByName(const char* name)
 }
 
 // FUNCTION: 0x4bbd00
-long __stdcall HAPI_FileLength(FileHandle* file)
+int __stdcall HAPI_FileLength(FileHandle* file)
 {
     if (file->shared != 0)
         return file->info->size;
@@ -429,7 +429,7 @@ long __stdcall HAPI_FileLength(FileHandle* file)
 }
 
 // FUNCTION: 0x4bbd30
-void* __stdcall HAPI_ReadFileAt(const char* name, void* buffer, long pos, unsigned int size)
+void* __stdcall HAPI_ReadFileAt(const char* name, void* buffer, int pos, unsigned int size)
 {
     FileHandle* file = HAPI_OpenFile(name, "rb");
     if (file == 0) {

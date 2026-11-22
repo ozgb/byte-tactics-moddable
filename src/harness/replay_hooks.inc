@@ -1378,7 +1378,7 @@ int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a
     return result;
 }
 
-bool __stdcall RecLosRadarHasReadyUnitInRange(int a0, Vec3* a1, int a2)
+int __stdcall RecLosRadarHasReadyUnitInRange(int a0, const Vec3* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_HASREADYUNITINRANGE, SUB_LOS_RADAR, roots);
@@ -1387,7 +1387,7 @@ bool __stdcall RecLosRadarHasReadyUnitInRange(int a0, Vec3* a1, int a2)
         ArgPending(s_call, "pos");
         ArgValue(s_call, "range", a2);
     }
-    bool result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
+    int result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3577,21 +3577,21 @@ int __stdcall RecFilesClose(FileHandle* a0)
     return result;
 }
 
-bool __stdcall RecFilesIsInArchive(FileHandle* a0)
+int __stdcall RecFilesIsInArchive(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_ISINARCHIVE, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    bool result = s_inner_files->IsInArchive(a0);
+    int result = s_inner_files->IsInArchive(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesSeek(FileHandle* a0, long a1)
+int __stdcall RecFilesSeek(FileHandle* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_SEEK, SUB_FILES, roots);
@@ -3599,21 +3599,21 @@ long __stdcall RecFilesSeek(FileHandle* a0, long a1)
         ArgPending(s_call, "file");
         ArgValue(s_call, "pos", a1);
     }
-    long result = s_inner_files->Seek(a0, a1);
+    int result = s_inner_files->Seek(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesTell(FileHandle* a0)
+int __stdcall RecFilesTell(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_TELL, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    long result = s_inner_files->Tell(a0);
+    int result = s_inner_files->Tell(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3652,35 +3652,35 @@ unsigned int __stdcall RecFilesWrite(FileHandle* a0, const void* a1, unsigned in
     return result;
 }
 
-long __stdcall RecFilesLength(FileHandle* a0)
+int __stdcall RecFilesLength(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTH, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    long result = s_inner_files->Length(a0);
+    int result = s_inner_files->Length(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesLengthByName(const char* a0)
+int __stdcall RecFilesLengthByName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTHBYNAME, SUB_FILES, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
-    long result = s_inner_files->LengthByName(a0);
+    int result = s_inner_files->LengthByName(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-void* __stdcall RecFilesReadAt(const char* a0, void* a1, long a2, unsigned int a3)
+void* __stdcall RecFilesReadAt(const char* a0, void* a1, int a2, unsigned int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_READAT, SUB_FILES, roots);

@@ -28,17 +28,17 @@ static inline int HAPI_CloseFile(FileHandle* file)
     return g_seams.files->Close(file);
 }
 
-static inline bool HAPI_IsInArchive(FileHandle* file)
+static inline int HAPI_IsInArchive(FileHandle* file)
 {
     return g_seams.files->IsInArchive(file);
 }
 
-static inline long HAPI_SeekFile(FileHandle* file, long pos)
+static inline int HAPI_SeekFile(FileHandle* file, int pos)
 {
     return g_seams.files->Seek(file, pos);
 }
 
-static inline long HAPI_TellFile(FileHandle* file)
+static inline int HAPI_TellFile(FileHandle* file)
 {
     return g_seams.files->Tell(file);
 }
@@ -53,17 +53,17 @@ static inline unsigned int HAPI_WriteFile(FileHandle* file, const void* buf, uns
     return g_seams.files->Write(file, buf, size);
 }
 
-static inline long HAPI_FileLength(FileHandle* file)
+static inline int HAPI_FileLength(FileHandle* file)
 {
     return g_seams.files->Length(file);
 }
 
-static inline long HAPI_FileLengthByName(const char* name)
+static inline int HAPI_FileLengthByName(const char* name)
 {
     return g_seams.files->LengthByName(name);
 }
 
-static inline void* HAPI_ReadFileAt(const char* name, void* buffer, long pos, unsigned int size)
+static inline void* HAPI_ReadFileAt(const char* name, void* buffer, int pos, unsigned int size)
 {
     return g_seams.files->ReadAt(name, buffer, pos, size);
 }
@@ -208,17 +208,17 @@ static inline int HAPI_CloseFile(void* file)
     return HAPI_CloseFile((FileHandle*)file);
 }
 
-static inline bool HAPI_IsInArchive(void* file)
+static inline int HAPI_IsInArchive(void* file)
 {
     return HAPI_IsInArchive((FileHandle*)file);
 }
 
-static inline long HAPI_SeekFile(void* file, long pos)
+static inline int HAPI_SeekFile(void* file, int pos)
 {
     return HAPI_SeekFile((FileHandle*)file, pos);
 }
 
-static inline long HAPI_TellFile(void* file)
+static inline int HAPI_TellFile(void* file)
 {
     return HAPI_TellFile((FileHandle*)file);
 }
@@ -233,7 +233,7 @@ static inline unsigned int HAPI_WriteFile(void* file, const void* buf, unsigned 
     return HAPI_WriteFile((FileHandle*)file, buf, size);
 }
 
-static inline long HAPI_FileLength(void* file)
+static inline int HAPI_FileLength(void* file)
 {
     return HAPI_FileLength((FileHandle*)file);
 }

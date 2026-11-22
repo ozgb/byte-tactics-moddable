@@ -16,6 +16,8 @@
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/movement.h"
+#include "../../interfaces/units.h"
+#include "../../interfaces/scripts.h"
 
 enum TraceKind { TF_SCALAR, TF_BYTES, TF_POINTER, TF_REF, TF_HANDLE };
 enum TraceTarget { TT_NONE, TT_HEAP, TT_UNIT, TT_PLAYER, TT_UNITDEF, TT_WEAPONDEF, TT_PROJECTILE,
@@ -2594,6 +2596,292 @@ static const TraceEventKind kMovementKinds[] = {
     { 347, "MOVEMENT_EFFECT_START_SCRIPT", sizeof(MovementStartScript), kEventMovementEffectStartScript, 4 },
 };
 static const TraceEventModule kMovementEvents = { "movementEvents", 49, kMovementKinds, 23 };
+
+static_assert(sizeof(UnitsSetStateBits) == 16, "UnitsSetStateBits");
+static const TraceField kEventUnitsSetStateBits[] = {
+    { "kind", offsetof(UnitsSetStateBits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetStateBits, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "mask", offsetof(UnitsSetStateBits, mask), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(UnitsSetStateBits, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetFlags) == 16, "UnitsSetFlags");
+static const TraceField kEventUnitsSetFlags[] = {
+    { "kind", offsetof(UnitsSetFlags, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetFlags, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "clear", offsetof(UnitsSetFlags, clear), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(UnitsSetFlags, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetNetDirty) == 16, "UnitsSetNetDirty");
+static const TraceField kEventUnitsSetNetDirty[] = {
+    { "kind", offsetof(UnitsSetNetDirty, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetNetDirty, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "clear", offsetof(UnitsSetNetDirty, clear), 4, TF_SCALAR, TT_NONE, 0 },
+    { "set", offsetof(UnitsSetNetDirty, set), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetWorkTime) == 12, "UnitsSetWorkTime");
+static const TraceField kEventUnitsSetWorkTime[] = {
+    { "kind", offsetof(UnitsSetWorkTime, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetWorkTime, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "until", offsetof(UnitsSetWorkTime, until), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetPosition) == 24, "UnitsSetPosition");
+static const TraceField kEventUnitsSetPosition[] = {
+    { "kind", offsetof(UnitsSetPosition, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetPosition, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(UnitsSetPosition, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "mode", offsetof(UnitsSetPosition, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsAttachToPiece) == 20, "UnitsAttachToPiece");
+static const TraceField kEventUnitsAttachToPiece[] = {
+    { "kind", offsetof(UnitsAttachToPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsAttachToPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "target", offsetof(UnitsAttachToPiece, target), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(UnitsAttachToPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "mode", offsetof(UnitsAttachToPiece, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsFinishConstruction) == 12, "UnitsFinishConstruction");
+static const TraceField kEventUnitsFinishConstruction[] = {
+    { "kind", offsetof(UnitsFinishConstruction, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsFinishConstruction, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "builder", offsetof(UnitsFinishConstruction, builder), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsBuildDecay) == 12, "UnitsBuildDecay");
+static const TraceField kEventUnitsBuildDecay[] = {
+    { "kind", offsetof(UnitsBuildDecay, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsBuildDecay, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ticks", offsetof(UnitsBuildDecay, ticks), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsRepair) == 16, "UnitsRepair");
+static const TraceField kEventUnitsRepair[] = {
+    { "kind", offsetof(UnitsRepair, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsRepair, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "builder", offsetof(UnitsRepair, builder), 4, TF_REF, TT_UNIT, 0 },
+    { "amount", offsetof(UnitsRepair, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsUnlink) == 12, "UnitsUnlink");
+static const TraceField kEventUnitsUnlink[] = {
+    { "kind", offsetof(UnitsUnlink, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsUnlink, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "ref", offsetof(UnitsUnlink, ref), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetStance) == 24, "UnitsSetStance");
+static const TraceField kEventUnitsSetStance[] = {
+    { "kind", offsetof(UnitsSetStance, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetStance, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "fields", offsetof(UnitsSetStance, fields), 4, TF_SCALAR, TT_NONE, 0 },
+    { "moveOrder", offsetof(UnitsSetStance, moveOrder), 4, TF_SCALAR, TT_NONE, 0 },
+    { "fireOrder", offsetof(UnitsSetStance, fireOrder), 4, TF_SCALAR, TT_NONE, 0 },
+    { "group", offsetof(UnitsSetStance, group), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetAngles) == 24, "UnitsSetAngles");
+static const TraceField kEventUnitsSetAngles[] = {
+    { "kind", offsetof(UnitsSetAngles, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetAngles, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "fields", offsetof(UnitsSetAngles, fields), 4, TF_SCALAR, TT_NONE, 0 },
+    { "bank", offsetof(UnitsSetAngles, bank), 4, TF_SCALAR, TT_NONE, 0 },
+    { "heading", offsetof(UnitsSetAngles, heading), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pitch", offsetof(UnitsSetAngles, pitch), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetBuildState) == 16, "UnitsSetBuildState");
+static const TraceField kEventUnitsSetBuildState[] = {
+    { "kind", offsetof(UnitsSetBuildState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetBuildState, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "buildLeft", offsetof(UnitsSetBuildState, buildLeft), 4, TF_SCALAR, TT_NONE, 0 },
+    { "health", offsetof(UnitsSetBuildState, health), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsTurn) == 12, "UnitsTurn");
+static const TraceField kEventUnitsTurn[] = {
+    { "kind", offsetof(UnitsTurn, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsTurn, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "delta", offsetof(UnitsTurn, delta), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsMove) == 20, "UnitsMove");
+static const TraceField kEventUnitsMove[] = {
+    { "kind", offsetof(UnitsMove, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsMove, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(UnitsMove, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsChangeCell) == 32, "UnitsChangeCell");
+static const TraceField kEventUnitsChangeCell[] = {
+    { "kind", offsetof(UnitsChangeCell, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsChangeCell, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "pos", offsetof(UnitsChangeCell, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "cell", offsetof(UnitsChangeCell, cell), 8, TF_BYTES, TT_NONE, 0 },
+    { "mode", offsetof(UnitsChangeCell, mode), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetMoved) == 12, "UnitsSetMoved");
+static const TraceField kEventUnitsSetMoved[] = {
+    { "kind", offsetof(UnitsSetMoved, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetMoved, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "moved", offsetof(UnitsSetMoved, moved), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsEventHeader) == 8, "UnitsEventHeader");
+static const TraceField kEventUnitsSfxOccupy[] = {
+    { "kind", offsetof(UnitsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsScriptValue) == 16, "UnitsScriptValue");
+static const TraceField kEventUnitsScriptValue[] = {
+    { "kind", offsetof(UnitsScriptValue, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsScriptValue, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "which", offsetof(UnitsScriptValue, which), 4, TF_SCALAR, TT_NONE, 0 },
+    { "value", offsetof(UnitsScriptValue, value), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsNotifyRefs) == 12, "UnitsNotifyRefs");
+static const TraceField kEventUnitsNotifyRefs[] = {
+    { "kind", offsetof(UnitsNotifyRefs, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsNotifyRefs, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "event", offsetof(UnitsNotifyRefs, event), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsEventHeader) == 8, "UnitsEventHeader");
+static const TraceField kEventUnitsAttackedSpeech[] = {
+    { "kind", offsetof(UnitsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsEventHeader) == 8, "UnitsEventHeader");
+static const TraceField kEventUnitsMarkDamaged[] = {
+    { "kind", offsetof(UnitsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsDamageRecord) == 16, "UnitsDamageRecord");
+static const TraceField kEventUnitsDamageRecord[] = {
+    { "kind", offsetof(UnitsDamageRecord, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsDamageRecord, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "damageKind", offsetof(UnitsDamageRecord, damageKind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "attacker", offsetof(UnitsDamageRecord, attacker), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSetHealth) == 16, "UnitsSetHealth");
+static const TraceField kEventUnitsSetHealth[] = {
+    { "kind", offsetof(UnitsSetHealth, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSetHealth, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "health", offsetof(UnitsSetHealth, health), 4, TF_SCALAR, TT_NONE, 0 },
+    { "dying", offsetof(UnitsSetHealth, dying), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsKill) == 12, "UnitsKill");
+static const TraceField kEventUnitsKill[] = {
+    { "kind", offsetof(UnitsKill, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsKill, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "selfDestruct", offsetof(UnitsKill, selfDestruct), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsSend) == 12, "UnitsSend");
+static const TraceField kEventUnitsSend[] = {
+    { "kind", offsetof(UnitsSend, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsSend, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(UnitsSend, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsCapture) == 48, "UnitsCapture");
+static const TraceField kEventUnitsCapture[] = {
+    { "kind", offsetof(UnitsCapture, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsCapture, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(UnitsCapture, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "present", offsetof(UnitsCapture, present), 4, TF_SCALAR, TT_NONE, 0 },
+    { "hitPoints", offsetof(UnitsCapture, hitPoints), 4, TF_SCALAR, TT_NONE, 0 },
+    { "buildPercent", offsetof(UnitsCapture, buildPercent), 4, TF_SCALAR, TT_NONE, 0 },
+    { "angles", offsetof(UnitsCapture, angles), 12, TF_BYTES, TT_NONE, 0 },
+    { "stockpiles", offsetof(UnitsCapture, stockpiles), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kUnitsKinds[] = {
+    { 352, "UNITS_SET_STATE_BITS", sizeof(UnitsSetStateBits), kEventUnitsSetStateBits, 5 },
+    { 353, "UNITS_SET_FLAGS", sizeof(UnitsSetFlags), kEventUnitsSetFlags, 5 },
+    { 354, "UNITS_SET_NET_DIRTY", sizeof(UnitsSetNetDirty), kEventUnitsSetNetDirty, 5 },
+    { 355, "UNITS_SET_WORK_TIME", sizeof(UnitsSetWorkTime), kEventUnitsSetWorkTime, 4 },
+    { 356, "UNITS_SET_POSITION", sizeof(UnitsSetPosition), kEventUnitsSetPosition, 5 },
+    { 357, "UNITS_ATTACH_TO_PIECE", sizeof(UnitsAttachToPiece), kEventUnitsAttachToPiece, 6 },
+    { 358, "UNITS_FINISH_CONSTRUCTION", sizeof(UnitsFinishConstruction), kEventUnitsFinishConstruction, 4 },
+    { 359, "UNITS_BUILD_DECAY", sizeof(UnitsBuildDecay), kEventUnitsBuildDecay, 4 },
+    { 360, "UNITS_REPAIR", sizeof(UnitsRepair), kEventUnitsRepair, 5 },
+    { 361, "UNITS_UNLINK", sizeof(UnitsUnlink), kEventUnitsUnlink, 4 },
+    { 362, "UNITS_SET_STANCE", sizeof(UnitsSetStance), kEventUnitsSetStance, 7 },
+    { 363, "UNITS_SET_ANGLES", sizeof(UnitsSetAngles), kEventUnitsSetAngles, 7 },
+    { 364, "UNITS_SET_BUILD_STATE", sizeof(UnitsSetBuildState), kEventUnitsSetBuildState, 5 },
+    { 365, "UNITS_TURN", sizeof(UnitsTurn), kEventUnitsTurn, 4 },
+    { 366, "UNITS_MOVE", sizeof(UnitsMove), kEventUnitsMove, 4 },
+    { 367, "UNITS_CHANGE_CELL", sizeof(UnitsChangeCell), kEventUnitsChangeCell, 6 },
+    { 384, "UNITS_SET_MOVED", sizeof(UnitsSetMoved), kEventUnitsSetMoved, 4 },
+    { 385, "UNITS_SFX_OCCUPY", sizeof(UnitsEventHeader), kEventUnitsSfxOccupy, 3 },
+    { 386, "UNITS_SCRIPT_VALUE", sizeof(UnitsScriptValue), kEventUnitsScriptValue, 5 },
+    { 387, "UNITS_NOTIFY_REFS", sizeof(UnitsNotifyRefs), kEventUnitsNotifyRefs, 4 },
+    { 388, "UNITS_ATTACKED_SPEECH", sizeof(UnitsEventHeader), kEventUnitsAttackedSpeech, 3 },
+    { 389, "UNITS_MARK_DAMAGED", sizeof(UnitsEventHeader), kEventUnitsMarkDamaged, 3 },
+    { 390, "UNITS_DAMAGE_RECORD", sizeof(UnitsDamageRecord), kEventUnitsDamageRecord, 5 },
+    { 391, "UNITS_SET_HEALTH", sizeof(UnitsSetHealth), kEventUnitsSetHealth, 5 },
+    { 392, "UNITS_KILL", sizeof(UnitsKill), kEventUnitsKill, 4 },
+    { 393, "UNITS_SEND", sizeof(UnitsSend), kEventUnitsSend, 4 },
+    { 394, "UNITS_CAPTURE", sizeof(UnitsCapture), kEventUnitsCapture, 9 },
+};
+static const TraceEventModule kUnitsEvents = { "unitsEvents", 50, kUnitsKinds, 27 };
+
+static_assert(sizeof(ScriptsStart) == 76, "ScriptsStart");
+static const TraceField kEventScriptsStart[] = {
+    { "kind", offsetof(ScriptsStart, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(ScriptsStart, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "form", offsetof(ScriptsStart, form), 4, TF_SCALAR, TT_NONE, 0 },
+    { "index", offsetof(ScriptsStart, index), 4, TF_SCALAR, TT_NONE, 0 },
+    { "name", offsetof(ScriptsStart, name), 32, TF_BYTES, TT_NONE, 0 },
+    { "callback", offsetof(ScriptsStart, callback), 4, TF_HANDLE, TT_NONE, 0 },
+    { "update", offsetof(ScriptsStart, update), 4, TF_SCALAR, TT_NONE, 0 },
+    { "count", offsetof(ScriptsStart, count), 4, TF_SCALAR, TT_NONE, 0 },
+    { "args", offsetof(ScriptsStart, args), 16, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(ScriptsDetachPiece) == 16, "ScriptsDetachPiece");
+static const TraceField kEventScriptsDetachPiece[] = {
+    { "kind", offsetof(ScriptsDetachPiece, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(ScriptsDetachPiece, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "piece", offsetof(ScriptsDetachPiece, piece), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pose", offsetof(ScriptsDetachPiece, pose), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(ScriptsState) == 16, "ScriptsState");
+static const TraceField kEventScriptsFreeState[] = {
+    { "kind", offsetof(ScriptsState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(ScriptsState, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "state", offsetof(ScriptsState, state), 4, TF_HANDLE, TT_NONE, 0 },
+    { "feature", offsetof(ScriptsState, feature), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(ScriptsState) == 16, "ScriptsState");
+static const TraceField kEventScriptsInitState[] = {
+    { "kind", offsetof(ScriptsState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(ScriptsState, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "state", offsetof(ScriptsState, state), 4, TF_HANDLE, TT_NONE, 0 },
+    { "feature", offsetof(ScriptsState, feature), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static const TraceEventKind kScriptsKinds[] = {
+    { 416, "SCRIPTS_START", sizeof(ScriptsStart), kEventScriptsStart, 10 },
+    { 417, "SCRIPTS_DETACH_PIECE", sizeof(ScriptsDetachPiece), kEventScriptsDetachPiece, 5 },
+    { 418, "SCRIPTS_FREE_STATE", sizeof(ScriptsState), kEventScriptsFreeState, 5 },
+    { 419, "SCRIPTS_INIT_STATE", sizeof(ScriptsState), kEventScriptsInitState, 5 },
+};
+static const TraceEventModule kScriptsEvents = { "scriptsEvents", 51, kScriptsKinds, 4 };
 
 static const TraceField kWindFields[] = {
     { "windCounter", 0x37ec4, 4, TF_SCALAR, TT_NONE, 0x0 },

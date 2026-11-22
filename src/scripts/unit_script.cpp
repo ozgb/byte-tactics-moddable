@@ -21,6 +21,7 @@
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
 #include "../game/map_events.h"
+#include "../game/units_events.h"
 #include "../../interfaces/services.h"
 #include "../graphics/particles.h"
 #include "../util/math.h"
@@ -130,28 +131,9 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
 void UnitScript::SetUnitValue(int which, int value)
 {
     Unit* unit = state->unit;
-    switch (which) {
-    case 1:
-        g_seams.units->SetStateBits(unit, 1, value);
-        break;
-    case 5:
-        unit->bit0 = value;
-        break;
-    case 6:
-        unit->bit1 = value;
-        break;
-    case 18:
-        // TODO(#986): publish from SCHED_SCRIPTS
-        MapPublishSetYard(SCHED_UNITS, unit, value);
-        break;
-    case 19:
-        unit->bit3 = value;
-        break;
-    case 20:
-        g_seams.units->SetStateBits(unit, 2, value);
-        break;
-    }
-    unit->dirty = true;
+    if (which == 18)
+        MapPublishSetYard(SCHED_SCRIPTS, unit, value);
+    UnitsPublishScriptValue(SCHED_SCRIPTS, unit, which, value);
 }
 
 // FUNCTION: 0x480c30
@@ -322,7 +304,7 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000)
         && (u->carrier == 0 || u->carrier == state->unit)) {
-        g_seams.units->AttachUnitToPiece(u, state->unit, a, b);
+        UnitsPublishAttachToPiece(SCHED_SCRIPTS, u, state->unit.get(), a, b);
     }
 }
 
@@ -332,7 +314,7 @@ void UnitScript::DropUnit(unsigned short id)
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000) && u->carrier == state->unit) {
         if (ScheduleMapCanPlaceUnitFootprint(u->def, (unsigned short)u->id, *(Point16*)&u->cell, 1)) {
-            g_seams.units->AttachUnitToPiece(u, nullptr, -1, 1);
+            UnitsPublishAttachToPiece(SCHED_SCRIPTS, u, (Unit*)nullptr, -1, 1);
         }
     }
 }

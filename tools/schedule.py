@@ -1279,10 +1279,7 @@ LOOPS = {
     ("wind", 1): "the wind once per tick: the pass has one entity.",
     ("meteors", 1): "the meteor shower once per tick: the pass has one entity.",
 }
-SILENT_INTENTS = {
-    "scripts.FindScript": "a lookup that writes nothing: units' handler of targeting's CLEARED effect calls it and "
-                          "drops the index, as 3.1c does.",
-}
+SILENT_INTENTS: dict[str, str] = {}
 LIMITS = """\
 The orders are read from the program, not from a run. That decides what they claim:
 

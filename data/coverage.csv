@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,374,289,5932,3632,2204,894,,23,
+game,*,,385,300,6071,3768,2272,955,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -277,7 +277,7 @@ los_radar,SightTilesRaw,src/map/line_of_sight.cpp,0,0,0,0,0,0,?SightTilesRaw@@YG
 los_radar,StoreDwordIfDst,src/map/los_tables.cpp,0,0,0,0,0,0,?StoreDwordIfDst@@YGXPAH0@Z,1,
 los_radar,ToggleShareLos,src/game/share_commands.cpp,0,0,0,0,0,0,?ToggleShareLos@@YGXH@Z,1,
 los_radar,UpdateAllCellHeightRanges,src/map/line_of_sight.cpp,0,0,0,0,0,0,?UpdateAllCellHeightRanges@@YGXXZ,1,
-map,*,,78,73,1583,1478,856,704,,9,
+map,*,,76,71,1568,1463,850,700,,9,
 map,ClaimFootprintsInArea,src/map/terrain.cpp,0,0,0,0,0,0,?ClaimFootprintsInArea@@YGXUPoint16@@0@Z,1,
 map,FUN_0047caf0,src/map/terrain.cpp,0,0,0,0,0,0,?FUN_0047caf0@@YGXXZ,1,
 map,FindHighestPointOnLine,src/map/terrain.cpp,0,0,0,0,0,0,?FindHighestPointOnLine@@YGHUVec3@@0@Z,1,
@@ -313,7 +313,7 @@ mission,Mission::GetTranslatedName,src/mission/map_list.cpp,1,0,0,0,0,0,?GetTran
 mission,Mission::HasMissionName,src/mission/map_list.cpp,1,0,0,0,0,0,?HasMissionName@Mission@@QAE_NXZ,0,menu
 mission,Mission::MissionExists,src/mission/map_list.cpp,1,0,0,0,0,0,?MissionExists@Mission@@QAEHH@Z,0,campaign-menu
 mission,Mission::SelectMission,src/mission/map_list.cpp,1,0,0,0,0,0,?SelectMission@Mission@@QAEHH@Z,0,campaign-menu
-movement,*,,174,118,1680,1206,524,347,,8,
+movement,*,,173,117,1669,1195,504,328,,8,
 movement,AiSearchGoal::HasNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 movement,AiSearchGoal::SerializeNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
 movement,AiSearchGoal::TruncateWaypointsFrom,src/movement/order_targets.cpp,0,0,0,0,0,0,?TruncateWaypointsFrom@AiSearchGoal@@QAEXH@Z,1,
@@ -2191,7 +2191,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-scripts,*,,87,68,1545,1392,636,535,,6,
+scripts,*,,83,64,1472,1319,590,495,,6,
 scripts,Channel::XorOp,src/scripts/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 scripts,CobScript::AttachUnit,src/scripts/cob.cpp,1,0,0,0,0,0,?AttachUnit@CobScript@@UAEXGHH@Z,0,base-slot
 scripts,CobScript::DropUnit,src/scripts/cob.cpp,1,0,0,0,0,0,?DropUnit@CobScript@@UAEXG@Z,0,base-slot
@@ -2217,7 +2217,7 @@ scripts,UnitScript::ExplodeLegacy,src/scripts/unit_script.cpp,1,0,0,0,0,0,?Explo
 scripts,UnitScript::GetTransporterId,src/scripts/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0,unused-opcode
 scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0,unused-opcode
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
-seams,*,,176,156,1245,1145,116,57,,0,
+seams,*,,222,200,1765,1643,270,156,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YGHXZ,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YGHXZ,0,
 seams,CountMissionsNative,src/seams/native.cpp,1,0,0,0,0,0,?CountMissionsNative@@YGHXZ,0,
@@ -2236,9 +2236,11 @@ seams,HasMissionNameNative,src/seams/native.cpp,1,0,0,0,0,0,?HasMissionNameNativ
 seams,MissionExistsNative,src/seams/native.cpp,1,0,0,0,0,0,?MissionExistsNative@@YGHH@Z,0,
 seams,SelectMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?SelectMissionNative@@YGHH@Z,0,
 seams,StartScriptWithArgsByIndexNative,src/seams/native.cpp,1,0,0,0,0,0,?StartScriptWithArgsByIndexNative@@YGHPAVCobScript@@HPAUCallback@@HHHHHH@Z,0,
+seams,UnitsOnOrdersSetPosition,src/seams/units_world.cpp,1,0,0,0,0,0,?UnitsOnOrdersSetPosition@@YGXPBXI@Z,0,unset-case
+seams,UnitsOnPlayersSendUnit,src/seams/units_world.cpp,1,0,0,0,0,0,?UnitsOnPlayersSendUnit@@YGXPBXI@Z,0,network-game
 seams,WorldLineOfSight,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldLineOfSight@@YGHIHHHH@Z,0,
 seams,WorldTerrainPass,src/seams/pathfinding_world.cpp,1,0,0,0,0,0,?WorldTerrainPass@@YGHIHH@Z,0,
-state,*,,553,486,1714,1205,1176,577,,59,
+state,*,,552,485,1713,1204,1176,578,,59,
 state,??3@YAXPAXABUSimHeap@@@Z,src/state/block.cpp,0,0,0,0,0,0,??3@YAXPAXABUSimHeap@@@Z,1,
 state,??8@YG_NABU?$Ref@D@@PAD@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@D@@PAD@Z,0,unused-instance
 state,??8@YG_NABU?$Ref@G@@PAG@Z,interfaces/ref.h,1,0,0,0,0,0,??8@YG_NABU?$Ref@G@@PAG@Z,0,unused-instance
@@ -2365,9 +2367,9 @@ state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPlayerFrameInfo@@@@
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VUnitRef@@@@QBEPAVUnitRef@@XZ,0,unused-instance
 state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAAUPlayerInfo@@XZ,0,unused-instance
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
-targeting,*,,20,20,228,219,108,86,,1,
+targeting,*,,20,20,229,220,108,86,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,163,146,3215,2778,1310,882,,28,
+units,*,,125,109,2995,2573,1246,883,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
 units,CheckDownloadableFlags,src/units/unit_types.cpp,0,0,0,0,0,0,?CheckDownloadableFlags@@YGXXZ,1,
 units,ClampPointToSegment,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ClampPointToSegment@@YGXPAUPoint16@@U1@1@Z,1,
@@ -2409,8 +2411,7 @@ units,UnitRef::ClearRef,src/units/unit_targets.cpp,0,0,0,0,0,0,?ClearRef@UnitRef
 units,UnitRef::Get,src/units/unit_ref.h,0,0,0,0,0,0,?Get@UnitRef@@QAEPAUUnit@@XZ,1,
 units,UnitRef::LinkToUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?LinkToUnit@UnitRef@@QAEXPAUUnit@@@Z,1,
 units,UnitRef::UnlinkFromUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?UnlinkFromUnit@UnitRef@@QAEXXZ,1,
-units,UnitsOnOrdersSetPosition,src/units/orders_effects.cpp,1,0,0,0,0,0,?UnitsOnOrdersSetPosition@@YGXPBXI@Z,0,unset-case
-units,UnitsOnPlayersSendUnit,src/units/players_effects.cpp,1,0,0,0,0,0,?UnitsOnPlayersSendUnit@@YGXPBXI@Z,0,network-game
+units,UnitsApplySend,src/units/units_apply.cpp,1,0,0,0,0,0,?UnitsApplySend@@YGXPAUUnit@@H@Z,0,network-game
 units,WriteUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,0,network
 units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0,unit-info
 weapons,*,,110,96,2540,2256,1108,820,,19,

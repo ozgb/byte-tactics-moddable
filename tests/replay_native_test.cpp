@@ -106,6 +106,14 @@ void __stdcall HarnessMovementEvent(const MovementEventHeader*, unsigned int, in
 {
 }
 
+void __stdcall HarnessUnitsEvent(const UnitsEventHeader*, unsigned int, int)
+{
+}
+
+void __stdcall HarnessScriptsEvent(const ScriptsEventHeader*, unsigned int, int)
+{
+}
+
 Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
@@ -746,7 +754,13 @@ void ParseScalar(const char* v, Point16& out)
     out.x = (short)x;
     out.y = (short)y;
 }
-void ParseScalar(const char* v, Vec3& out) { sscanf(v, "(%d,%d,%d)", &out.x, &out.y, &out.z); }
+void ParseScalar(const char* v, Vec3& out)
+{
+    if (sscanf(v, "(%d,%d,%d)", &out.x, &out.y, &out.z) == 2) {
+        out.z = out.y;
+        out.y = 0;
+    }
+}
 
 template <class T> T ArgScalar(const char* name)
 {

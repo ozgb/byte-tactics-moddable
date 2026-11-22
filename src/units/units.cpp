@@ -1,3 +1,4 @@
+#include "../game/scripts_events.h"
 #include "../game/orders_events.h"
 #include "../game/movement_events.h"
 #include "../../interfaces/movement.h"
@@ -396,7 +397,7 @@ void __stdcall InitUnitScript(Unit* self)
         g_seams.scripts->SetCob((CobScript*)self->script.get(), (ScriptTable*)self->def->data);
         self->state = (SpotState*)g_seams.scripts->CreatePlayerObjectState(obj, (ScriptTable*)self->def->data, self);
         g_seams.scripts->SetObjectState((UnitScript*)self->script.get(), (ModelState*)self->state.get());
-        g_seams.scripts->StartScript((CobScript*)self->script.get(), "Create", 0, 1);
+        ScriptsPublishStart(SCHED_UNITS, self, "Create", 1);
     } else {
         self->script = 0;
         self->state = (SpotState*)g_seams.scripts->CreateObjectState(obj);
@@ -695,7 +696,7 @@ void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
     if ((g_game->mapFlags & 2) == 2)
         LosRadarPublishRemoveUnit(SCHED_UNITS, unit);
     if (local == 0 && cmd->cobKilledSeverity > 0)
-        g_seams.scripts->StartScriptWithArgs((CobScript*)unit->script.get(), g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
+        ScriptsPublishStartWithArgs(SCHED_UNITS, unit, g_killedScriptName, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
 
     int credited = 0;
     switch (cmd->killType) {

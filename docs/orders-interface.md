@@ -46,17 +46,17 @@ Orders' place in it:
 - **Routes:** each route's reason is in section 4.
 - **Runs:** `RunOrders` and `RunSecondaryOrders`, called by the scheduler as steps of the units pass, after
   `UpdateUnitBody` and before movement's `UpdateMotion`, each with orders' inbox delivered first (section 6).
-- **Synchronous calls out:** the calls that also return an answer stay synchronous slots of their owners, with a
-  `TODO(#986)` in the code (section 3): `units.CreateUnit`, `AddBuildProgress` and `AddRepairProgress`,
+- **Synchronous calls out:** the calls that also return an answer stay synchronous slots of their owners, as #986
+  decided (section 3): `units.CreateUnit`, `AddBuildProgress` and `AddRepairProgress`,
   `scripts.GetNanoPiecePosition` and `QueryScript`. Movement's `New*` slots return the target they build and are
   synchronous by their contract.
 - **Queries:** `GetOrderFlags`, `GetOrderType` and `MissionTypeFromName`, as of orders' last apply.
 - **Effects out of orders:** thirteen effects to units (SET_STATE_BITS, SET_POSITION, ATTACH_TO_PIECE,
   FINISH_CONSTRUCTION, BUILD_DECAY, REPAIR, UNLINK, BUSY, SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and
   SET_BUILD_STATE) and one to scripts (START_SCRIPT, in three forms), besides the events to movement, weapons,
-  targeting, features, economy and players that orders published before. Units and scripts are not on the model yet
-  (#986), so their handlers (`src/units/orders_effects.cpp`, `src/scripts/orders_effects.cpp`) are adapters that hold
-  3.1c's calls and writes.
+  targeting, features, economy and players that orders published before. Their handlers are
+  adapters in `src/seams/units_world.cpp` and `src/seams/scripts_world.cpp` (now, since #986, handlers of units' and
+  scripts' inboxes: `UnitsApply` and `ScriptsApply` hold 3.1c's calls and writes).
 - **Module ids:** orders keeps `SCHED_ORDERS = 3`, which its outbox already used; movement keeps `SCHED_MOVEMENT = 14`.
 - **Versions:** orders 5.0 (11 slots; 4.0 had 18), movement 3.0, units 5.0 (`UpdateUnitBody` returns an int,
   `UpdateUnitTail`, `UnitRefGet` and `UnitRefSetValue` are new), services 2.1 (`HarnessOrdersEvent` and
@@ -155,8 +155,9 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | the write of `buildLeft` and `health` | SET_BUILD_STATE | `UnitsOnOrdersSetBuildState` |
 | `scripts.StartScript`, `StartScriptWithArgs`, `StartScriptWithArgsByIndex` | START_SCRIPT | `ScriptsOnOrdersStartScript`: the script's start, by `OrdersStartScript::form` (by name, by name with arguments, by index with arguments); the three starts are one effect |
 
-The handlers are the adapters of units and scripts, which hold 3.1c's writes until #986 puts units and scripts on the
-scheduler. The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
+The handlers are the adapters of units and scripts (`src/seams/units_world.cpp`, `src/seams/scripts_world.cpp`); since
+#986 they publish units' and scripts' events, and the slots the third column names left the seams (`UnitsApply` and
+`ScriptsApply` call the code). The effects kinds are 304 to 317, in the upper half of orders' block, so no second block was taken: BUSY,
 SET_FLAGS, CLEAR_NET_DIRTY, SET_STANCE, SET_ANGLES and SET_BUILD_STATE are the six that go beyond the issue's list of
 intents, for writes of the unit record that orders made directly.
 
@@ -181,7 +182,8 @@ intents, for writes of the unit record that orders made directly.
 
 **Calls that also return an answer stay synchronous slots of their owners (#986).** Each is mixed: the answer is read
 in the same statement, and each of them can draw from the game logic stream or record sim events, in the owner's own
-code. Orders' callers carry a `TODO(#986)` in the code naming the answers they read:
+code. #986 keeps each as a synchronous slot (`docs/units-interface.md`, section 4, "The mixed slots"). Orders' callers
+are:
 
 | Call | Callers (`src/orders/`) |
 |---|---|
@@ -191,8 +193,7 @@ code. Orders' callers carry a `TODO(#986)` in the code naming the answers they r
 | `units.CreateUnit` | `BuildingBuildOrder`, `MobileBuildOrder`, `ResurrectOrder` (`unit_orders.cpp`); `VtolMobileBuildOrder` (`vtol_orders.cpp`) |
 | `scripts.QueryScript` | `BuildingBuildOrder` (`unit_orders.cpp`); `FindLandingPad`, `VtolPickupOrder` (`vtol_orders.cpp`) |
 
-(Each `TODO(#986)` marker sits above its function; `SelfRepairOrder`, `RepairUnitOrder` and `RepairUnitNoMoveOrder` carry
-a second marker at the `AddRepairProgress` call.) `units.CreateUnit` is the one whose answer, the new unit, orders
+`units.CreateUnit` is the one whose answer, the new unit, orders
 keeps using as #967 left it (`docs/players-interface.md`), unchanged.
 
 **Routes orders already published, kept as they were:** REQUEST and INCOME to economy (queued), RECLAIM and REMOVE to
@@ -274,15 +275,15 @@ cite the document that decided them; the routes new in this change cite the gate
 | orders SET_POSITION, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `TeleportOrder` moves other units, and the rest of the step reads every unit's position: `RunSecondaryOrders`' target searches and map's `UnitsInRange` read `Unit::pos` and the cells `SetUnitPosition` writes, before units' delivery after `UpdateMotion`. |
 | orders ATTACH_TO_PIECE, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but a transport detaches itself (`OrdersPublishAttachToPiece(unit, 0, -1, 2)` in `PrepVtolClimb` and the VTOL orders that follow it), and the same unit's `UpdateMotion`, which the scheduler runs after `RunSecondaryOrders` with only movement's inbox delivered, reads `u->carrier` in `UnitMotion::UpdatePosition`; and the attach's handler publishes movement's SET_MODE, which the next statement reads (`unit->motion->flags & 3`). |
 | orders FINISH_CONSTRUCTION, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but `BuildingBuildOrder`'s cancel branch publishes it for the half-built target and, in the next statement, a synchronous DAMAGE of 30000 on the same unit, and `ApplyUnitDamage` (`damage.cpp`) returns for a victim whose `flags & 0x4000` is set, a bit `FinishConstruction` sets (with `buildLeft` and `lastDamageType`) for a type with `b24`. |
-| orders BUILD_DECAY, to units | queued | #952's rule finds no read: its only publisher is `GetBuiltOrder`, for the unit being built, and its handler (`ApplyUnfinishedBuildDecay`) is `AddBuildProgress` on that unit; the readers of `buildLeft` and `health` in `src/orders/` are of `order->target`, another unit, or in later runs of the order. |
+| orders BUILD_DECAY, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code: its only publisher is `GetBuiltOrder`, for the unit being built, and its handler (`ApplyUnfinishedBuildDecay`) is `AddBuildProgress` on that unit; the readers of `buildLeft` and `health` in `src/orders/` are of `order->target`, another unit, or in later runs of the order. |
 | orders REPAIR, to units | synchronous | #952's rule. Queued it stayed equal on the tier, but its handler (`AddRepairProgress`) spends the player's energy through economy's synchronous request, and `RunOrders`' loop and `RunSecondaryOrders` request energy for the unit's other orders before units' next delivery, reading the energy it would have spent. |
 | orders UNLINK, to units | synchronous | The gate (section 8). |
 | orders BUSY, to units | queued | #952's rule finds no read: `Unit::workTime` is read by economy's cloak upkeep (`economy.cpp`, through `WorldUnitInfo`) in the players phase, after a phase boundary has delivered it, and by the info panel, outside the tick; nothing in `src/orders/` reads it. |
 | orders SET_FLAGS, to units | queued | #952's rule finds no read: it sets and clears bits 0x20, 0x800 and 0x8000 of `Unit::flags` (`MakeSelectableOrder`, `CloakOnOrder`, `CloakOffOrder`), whose readers are economy's and victory's in the players phase and the UI. |
 | orders CLEAR_NET_DIRTY, to units | synchronous | The gate (section 8). |
-| orders SET_STANCE, to units | queued | #952's rule finds no read: the stance is read back only at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, and by the orders panel, outside the tick. |
-| orders SET_ANGLES, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head. |
-| orders SET_BUILD_STATE, to units | queued | #952's rule finds no read: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` run in later states of the order or in the unit's own update. |
+| orders SET_STANCE, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code before units' next delivery. The stance is read back at `unit_orders.cpp` lines 420 and 547, which copy one unit's stance into a SET_STANCE of another, by the orders panel, outside the tick, and by targeting's `FindBestTargetIfFireAtWill` (`unit_targets.cpp`, through `ScheduleTargetingFireAtWill`), which reads `Unit::fireOrder` and which the patrol, guard and VTOL orders call from `RunOrders`. That read is safe: `RunOrders` publishes CLEAR_NET_DIRTY, synchronous, at the top of every turn of its loop before the order runs, and a synchronous route delivers its subscriber's inbox first, so units' inbox is empty when the next order runs; and no order of the second list (`RunSecondaryOrders`) calls the search. |
+| orders SET_ANGLES, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, whose own update comes later in the phase, after units' inbox is delivered at its head. |
+| orders SET_BUILD_STATE, to units | synchronous | Since #986, because a script or a units query can read what it writes before units' next delivery (`docs/units-interface.md`, section 4). Before #986 it was queued, because #952's rule found no read in the publisher's code: its only publisher is `ResurrectOrder` (state 5), for the unit it has just created, and the readers of that unit's `buildLeft` and `health` run in later states of the order or in the unit's own update. |
 | orders START_SCRIPT, to scripts | synchronous | The gate (section 8). |
 | orders REQUEST, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
 | orders INCOME, to economy | queued | As before (`docs/economy-interface.md`, section 4). |
@@ -297,6 +298,13 @@ cite the document that decided them; the routes new in this change cite the gate
 | orders SET_POS, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders CLEAR, to targeting | synchronous | As before (`docs/targeting-interface.md`, section 8). |
 | orders to movement (six routes) | synchronous | Each with its reason in `docs/movement-interface.md`, section 4. |
+
+**The queued routes to units rest on CLEAR_NET_DIRTY.** BUSY and SET_FLAGS reach units queued because CLEAR_NET_DIRTY is published unconditionally before each order of the first list
+runs and is synchronous, so its delivery empties units' inbox between two orders of one unit. If CLEAR_NET_DIRTY became
+queued, or were published only when a dirty bit is pending, each of these routes would need #952's rule again. #986
+made SET_STANCE, SET_ANGLES, SET_BUILD_STATE and BUILD_DECAY synchronous, since scripts and units' queries read what
+they write (`docs/units-interface.md`, section 4). Since #986 the handlers are units' inbox handlers (`docs/units-interface.md`), and CLEAR_NET_DIRTY stays a synchronous route
+to units, so this still holds.
 
 **The immediate rows of `docs/schedule.md`.** `data/dependencies.csv` has 80 rows of class `immediate` with orders as
 writer or reader and the other side not movement alone (the rows between orders and movement are in the table too; the
@@ -350,7 +358,7 @@ the rest of `Order`:
 
 **Record and sections.** The module's `WriteState` writes no record (movement's neither). The trace dumps orders' events
 in section 48 (`docs/trace-format.md`, section 8.32) and movement's in section 49 (section 8.33), and hashes none of
-them. Sections 50 and 51 are reserved for units and scripts (#986). Section 48 is also the number of weapons' record 48,
+them. Sections 50 and 51 are units' and scripts' events (`docs/trace-format.md`, sections 8.34 and 8.35). Section 48 is also the number of weapons' record 48,
 `weaponsState`: records and sections are keyed by name in the dump (`ordersEvents.*`, `weaponsState`), so they do not
 clash. Each record is an event with the outcome `Apply` gave, or an effect orders published (outcome 1), in orders'
 order, after section 47's. The sections are new, so the trace format's schema changes.
@@ -438,15 +446,15 @@ outside the tick; with them and map's PLACED queued together, the tier was equal
 | orders SET_POSITION | equal | none (synchronous by #952's rule, section 4) |
 | orders ATTACH_TO_PIECE | equal | none (synchronous by #952's rule, section 4) |
 | orders FINISH_CONSTRUCTION | equal | none (synchronous by #952's rule, section 4) |
-| orders BUILD_DECAY | equal | none (queued, section 4: #952's rule finds no read) |
+| orders BUILD_DECAY | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
 | orders REPAIR | equal | none (synchronous by #952's rule, section 4) |
 | orders UNLINK | diverged | conditions-dark-side, tick 302: stored 75eb1125904e65c8, got d190d9504c9ba36a. The comparison's report timed out after 300 s. |
 | orders BUSY | equal | none (queued, section 4: #952's rule finds no read) |
 | orders SET_FLAGS | equal | none (queued, section 4: #952's rule finds no read) |
 | orders CLEAR_NET_DIRTY | diverged | mission-build-unit, tick 79, units phase (`UpdateAllUnits`, 0x48ad30): `rng.parkMiller` (reference 0x770d7425, queued 0x1219520c). |
-| orders SET_STANCE | equal | none (queued, section 4: #952's rule finds no read) |
-| orders SET_ANGLES | equal | none (queued, section 4: #952's rule finds no read) |
-| orders SET_BUILD_STATE | equal | none (queued, section 4: #952's rule finds no read) |
+| orders SET_STANCE | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
+| orders SET_ANGLES | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
+| orders SET_BUILD_STATE | equal | none (queued, section 4: #952's rule finds no read; synchronous since #986, `docs/units-interface.md`, section 4) |
 | orders START_SCRIPT | diverged | orders-air, tick 1688, world phase: stored 2f9520d4ff7b7f17, got 151c8cc16975ad77. |
 | ai ADD_ORDER, QUEUE_BUILD, STOP | unchanged | synchronous as before (`docs/ai-interface.md`, section 8) |
 | weapons ATTACKED, PARALYZE, HIT | unchanged | synchronous as before (`docs/ai-interface.md`, section 8, and `docs/weapons-interface.md`, section 8) |

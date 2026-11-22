@@ -14,13 +14,13 @@ struct Quirks {
     bool patrolNullEnemySkip;
     // units.skip-empty-yardmap (sim): setting YARD_OPEN on a unit with no yardmap does nothing.
     bool skipEmptyYardmap;
-    // util.bound-language-copy (view): bound the copy of the language string.
+    // util.bound-language-copy (view): a language name copied into its 64-byte buffer stops at 63 bytes.
     bool boundLanguageCopy;
-    // units.render-pose-reads (sim): read the renderer's posed model instead of re-posing from game state.
+    // units.render-pose-reads (sim): piece queries read the renderer's posed model, as 3.1c does, instead of re-posing it from game state.
     bool renderPoseReads;
     // units.hover-bob-wall-clock (sim): a hover unit's bob phase comes from the wall clock.
     bool hoverBobWallClock;
-    // frontend.bound-logo-select (view): bound the logo selection.
+    // frontend.bound-logo-select (view): the list of free logos stops at 24, so every index fits its array.
     bool boundLogoSelect;
 };
 

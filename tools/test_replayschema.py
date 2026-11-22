@@ -2162,7 +2162,7 @@ class ArgumentShapes(unittest.TestCase):
         self.assertEqual(errors, [])
         args = model["subsystems"]["scripts"]["slots"]["QueryScript"]["args"]
         self.assertEqual([a["mode"] for a in args[2:]], ["value"] * 4)
-        self.assertIn('ArgInOutScalar(s_call, "p5", a5);', files[rs.HOOKS_H])
+        self.assertIn('ArgInOutScalar(s_call, "arg3", a5);', files[rs.HOOKS_H])
 
     def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
         ann = annotations()

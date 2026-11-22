@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 268 immediate, 13 deferrable, 1218 read-only, 1520 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1218 read-only, 1523 unobserved.
 
 ## Cutting rule
 
@@ -24,16 +24,16 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 
 | subsystem | ordered | immediate | deferrable | read-only | unobserved | can be cut from |
 |---|---|---|---|---|---|---|
-| wind_meteors | 0 | 0 | 0 | 18 | 123 | 14 of 14 |
+| wind_meteors | 0 | 0 | 0 | 18 | 125 | 14 of 14 |
 | economy | 0 | 42 | 0 | 4 | 85 | 5 of 14 |
-| features | 15 | 16 | 1 | 77 | 206 | 8 of 14 |
-| ai | 11 | 18 | 2 | 102 | 231 | 6 of 14 |
+| features | 15 | 16 | 2 | 77 | 206 | 8 of 14 |
+| ai | 11 | 18 | 2 | 102 | 233 | 6 of 14 |
 | pathfinding | 0 | 0 | 0 | 66 | 57 | 14 of 14 |
 | weapons | 30 | 66 | 2 | 229 | 223 | 4 of 14 |
-| targeting | 11 | 31 | 1 | 40 | 109 | 5 of 14 |
+| targeting | 11 | 31 | 1 | 40 | 110 | 5 of 14 |
 | los_radar | 6 | 33 | 2 | 140 | 260 | 5 of 14 |
-| orders | 18 | 55 | 8 | 138 | 297 | 4 of 14 |
-| units | 28 | 152 | 6 | 79 | 445 | 3 of 14 |
+| orders | 18 | 55 | 9 | 138 | 297 | 4 of 14 |
+| units | 28 | 152 | 6 | 79 | 446 | 3 of 14 |
 | players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
 | map | 9 | 41 | 1 | 98 | 226 | 4 of 14 |
 | scripts | 16 | 29 | 0 | 29 | 140 | 9 of 14 |
@@ -218,7 +218,7 @@ Gaps in what the data say:
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 18 |
-| unobserved | 64 | 59 |
+| unobserved | 66 | 59 |
 
 **Ordered** (0).
 
@@ -242,7 +242,7 @@ None.
 
 | other | wind_meteors is writer | wind_meteors is reader |
 |---|---|---|
-| ai | 5 | 5 |
+| ai | 7 | 5 |
 | features | 7 | 5 |
 | los_radar | 5 | 5 |
 | map | 5 | 5 |
@@ -445,7 +445,7 @@ It has no deferrable edge.
 |---|---|---|
 | ordered | 7 | 8 |
 | immediate | 13 | 3 |
-| deferrable | 1 | 0 |
+| deferrable | 2 | 0 |
 | read-only | 0 | 77 |
 | unobserved | 107 | 99 |
 
@@ -490,11 +490,12 @@ It has no deferrable edge.
 | writes to weapons | `FeatureAnimEntry::bytes_8` | units | 2 | skirmish4-long@25321 |
 | writes to los_radar | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | units | 1 | sensors-floating-teeth-los-off@10 |
 
-**Deferrable** (1).
+**Deferrable** (2).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
 | writes to weapons | `FeatureAnimEntry::bytes_8` | projectiles | 2 | skirmish4-long@23996 |
+| writes to orders | `FeatureAnimEntry::bytes_10` | units | 1 | orders-tier2-core@615 |
 
 **Read-only**, by the other subsystem.
 
@@ -596,6 +597,7 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 89 | equal | 0 | 0 |
 | features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 89 | equal | 0 | 0 |
 
 ## ai
@@ -608,7 +610,7 @@ The 15 groups with the most rows are shown.
 | immediate | 0 | 18 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 102 |
-| unobserved | 75 | 156 |
+| unobserved | 75 | 158 |
 
 **Ordered** (11).
 
@@ -679,7 +681,7 @@ The 15 groups with the most rows are shown.
 | targeting | 4 | 4 |
 | units | 7 | 43 |
 | weapons | 5 | 8 |
-| wind_meteors | 5 | 5 |
+| wind_meteors | 5 | 7 |
 
 ### Cut from
 
@@ -1054,7 +1056,7 @@ The 15 groups with the most rows are shown.
 | immediate | 3 | 28 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 40 |
-| unobserved | 50 | 59 |
+| unobserved | 50 | 60 |
 
 **Ordered** (11).
 
@@ -1134,7 +1136,7 @@ The 15 groups with the most rows are shown.
 | orders | 4 | 4 |
 | players | 4 | 6 |
 | scripts | 4 | 4 |
-| units | 4 | 12 |
+| units | 4 | 13 |
 | weapons | 5 | 6 |
 | wind_meteors | 3 | 3 |
 
@@ -1390,7 +1392,7 @@ The 15 groups with the most rows are shown.
 |---|---|---|
 | ordered | 9 | 9 |
 | immediate | 8 | 47 |
-| deferrable | 2 | 6 |
+| deferrable | 2 | 7 |
 | read-only | 0 | 138 |
 | unobserved | 128 | 169 |
 
@@ -1464,7 +1466,7 @@ The 15 groups with the most rows are shown.
 
 The 40 rows with the most runs are shown; the other 15 are in data/dependencies.csv.
 
-**Deferrable** (8).
+**Deferrable** (9).
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
@@ -1474,6 +1476,7 @@ The 40 rows with the most runs are shown; the other 15 are in data/dependencies.
 | reads from units | `Unit::killCount` | units | 4 | mission-capture@236 |
 | reads from units | `Unit::lastDamageType` | units | 3 | skirmish4-long@25498 |
 | reads from weapons | `Unit::field_1e` | units | 2 | ai-antinuke-intercept@480 |
+| reads from features | `FeatureAnimEntry::bytes_10` | units | 1 | orders-tier2-core@615 |
 | writes to los_radar | `Order::pos` | units | 1 | orders-tier2-core@615 |
 | reads from units | `Unit::activateFlags` | units | 1 | orders-air-repair@757 |
 
@@ -1599,6 +1602,7 @@ The 15 groups with the most rows are shown.
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
 | ai -> orders | `Unit::group` | units | g1 | 89 | equal | 0 | 0 |
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 89 | equal | 0 | 0 |
 | orders -> los_radar | `Order::pos` | units | g1 | 89 | equal | 0 | 0 |
 | orders -> movement | `Order::unit` | projectiles | g11 | 89 | equal | 0 | 0 |
 | units -> orders | `Unit::activateFlags` | units | g3 | 89 | equal | 0 | 1688 |
@@ -1617,7 +1621,7 @@ The 15 groups with the most rows are shown.
 | immediate | 130 | 22 |
 | deferrable | 6 | 0 |
 | read-only | 0 | 79 |
-| unobserved | 305 | 140 |
+| unobserved | 306 | 140 |
 
 **Ordered** (28).
 
@@ -1731,7 +1735,7 @@ The 40 rows with the most runs are shown; the other 112 are in data/dependencies
 | pathfinding | 2 | 2 |
 | players | 23 | 32 |
 | scripts | 21 | 7 |
-| targeting | 12 | 4 |
+| targeting | 13 | 4 |
 | weapons | 32 | 17 |
 | wind_meteors | 5 | 8 |
 
@@ -1803,7 +1807,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `FinishConstruction` | 9 | 5 | `Unit::flags` | 5 |
 | units.players | `AlignUnitToGround` | 9 | 1 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 13 |
 | units | `ApplyAttachUnit` | 8 | 4 | `Unit::cargoNext` | 7 |
-| units | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 14 |
+| units | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 15 |
 | units.players | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 9 |
 | units | `AddBuildProgress` | 7 | 3 | `Unit::flags` | 24 |
 | units | `Unit::CanRepair` | 7 | 3 | `Unit::flags` | 5 |

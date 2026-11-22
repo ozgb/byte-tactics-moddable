@@ -1947,9 +1947,9 @@ Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, Vec3 a2,
         ArgValue(s_call, "player", a0);
         ArgValue(s_call, "typeId", a1);
         ArgValue(s_call, "pos", a2);
-        ArgValue(s_call, "param_4", a3);
+        ArgValue(s_call, "finished", a3);
         ArgValue(s_call, "mode", a4);
-        ArgValue(s_call, "param_6", a5);
+        ArgValue(s_call, "id", a5);
     }
     Unit* result = s_inner_units->CreateUnit(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {

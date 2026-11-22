@@ -100,7 +100,7 @@ void __stdcall SetupPlayerSlot(int player, char type);
 struct OwnershipTransferPacket;
 #include "../units/unit_types.h"
 #include "../units/unit_save.h"
-Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int finished, int mode, int id);
 UnitDef* __stdcall FindUnitType(const char* name);
 int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);

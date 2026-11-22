@@ -453,7 +453,7 @@ static inline void __stdcall InitSpawnedUnit(unsigned short unitType, Vec3 pos,
 
 // FUNCTION: 0x485f50
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos,
-                                      int param_5, int mode, unsigned short id)
+                                      int finished, int mode, unsigned short id)
 {
     int off = player * 0x14b;
     Player* pl = (Player*)((char*)g_game + off + 0x1b63);
@@ -485,12 +485,12 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos
     }
     return 0;
 found:
-    InitSpawnedUnit(typeId, pos, param_5, unit);
+    InitSpawnedUnit(typeId, pos, finished, unit);
     unit->mode = mode;
     UpdateUnitHeight(unit);
     MapPublishUnit(SCHED_UNITS, MAP_ADD_UNIT, unit);
     g_seams.network->SendNewUnit(unit);
-    if (param_5) {
+    if (finished) {
         if (type->mobile == 0)
             g_seams.network->SendBuilderLink(unit, unit);
         if (((TypeFlags*)&unit->def->flags1)->bit18)

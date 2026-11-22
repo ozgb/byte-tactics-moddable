@@ -534,8 +534,8 @@ struct TdfField {
     }
     // Releases the key and the value.
     ~TdfField();
-    // Assigns a field from another one in a record copy.
-    void* AssignPair(int* param_1);
+    // Assigns the key and value of a field from those of another field, which other points at as two string references, and returns the field.
+    void* AssignPair(int* other);
 };
 #pragma pack(pop)
 

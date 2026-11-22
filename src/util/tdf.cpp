@@ -602,10 +602,10 @@ TdfField::~TdfField()
 }
 
 // FUNCTION: 0x4c5470
-void* TdfField::AssignPair(int* param_1)
+void* TdfField::AssignPair(int* other)
 {
-    ((StringRef*)this)->Assign((StringRef*)param_1);
-    ((StringRef*)&value)->Assign((StringRef*)(param_1 + 1));
+    ((StringRef*)this)->Assign((StringRef*)other);
+    ((StringRef*)&value)->Assign((StringRef*)(other + 1));
     return this;
 }
 

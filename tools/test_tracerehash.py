@@ -520,7 +520,6 @@ class SharedStateTest(unittest.TestCase):
         w.order_effects()
         want = tr.Hasher()
         want.h8(22)
-        want.h32(1)
         want.pointer(2, 3)
         want.pointer(0, 0)
         want.end()

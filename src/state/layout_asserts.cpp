@@ -11,7 +11,7 @@
 #pragma pack(push, 1)
 #include "../util/vec3.h"
 #include "../../include/v4i.h"
-#include "../../interfaces/services.h"
+#include "../../interfaces/quirks.h"
 #include "../ai/group.h"
 #include "../ai/pathfinder.h"
 #include "../ai/player_ai.h"
@@ -117,7 +117,6 @@
 #include "../orders/order.h"
 #include "../orders/order_base.h"
 #include "../orders/order_type_entry.h"
-#include "../quirks/quirks.h"
 #include "../scripts/cob_script.h"
 #include "../scripts/cob_types.h"
 #include "../scripts/unit_script.h"
@@ -130,6 +129,7 @@
 #include "../units/unit_def.h"
 #include "../units/unit_type_set.h"
 #include "../util/angles.h"
+#include "../util/engine_services.h"
 #include "../util/mouse_event.h"
 #include "../util/point.h"
 #include "../util/rot16.h"
@@ -2294,7 +2294,7 @@ static_assert(sizeof(TdfField) == 8, "");
 static_assert(offsetof(TdfField, key) == 0, "");
 static_assert(offsetof(TdfField, value) == 4, "");
 static_assert(sizeof(TdfFieldList) == 16, "");
-static_assert(offsetof(TdfFieldList, unknown_0) == 0, "");
+static_assert(offsetof(TdfFieldList, allocatorPad) == 0, "");
 static_assert(offsetof(TdfFieldList, first) == 4, "");
 static_assert(offsetof(TdfFieldList, last) == 8, "");
 static_assert(offsetof(TdfFieldList, end) == 12, "");
@@ -2308,7 +2308,7 @@ static_assert(offsetof(TdfRecord, children) == 4, "");
 static_assert(offsetof(TdfRecord, entries) == 20, "");
 static_assert(offsetof(TdfRecord, text) == 37, "");
 static_assert(sizeof(TdfRecordList) == 16, "");
-static_assert(offsetof(TdfRecordList, unknown_0) == 0, "");
+static_assert(offsetof(TdfRecordList, allocatorPad) == 0, "");
 static_assert(offsetof(TdfRecordList, first) == 4, "");
 static_assert(offsetof(TdfRecordList, last) == 8, "");
 static_assert(offsetof(TdfRecordList, end) == 12, "");

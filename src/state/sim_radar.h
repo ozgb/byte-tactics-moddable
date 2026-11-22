@@ -1,7 +1,7 @@
 #ifndef STATE_SIM_RADAR_H
 #define STATE_SIM_RADAR_H
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 enum : unsigned int { SIM_RADAR_ARENA_BYTES = 2u << 20 };
 

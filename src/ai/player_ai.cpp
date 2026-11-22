@@ -31,7 +31,7 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 static inline Point16 WorldToCell(Vec3 v, Point16 origin)
 {

@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/wind_meteors.h"
 
 inline void PublishWindMeteors(int kind, const MeteorShowerParams* params)

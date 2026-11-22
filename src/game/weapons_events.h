@@ -6,7 +6,7 @@
 #include "../../interfaces/weapons.h"
 #include "weapons_event_size.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 struct Unit;
 

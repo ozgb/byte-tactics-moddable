@@ -2,9 +2,7 @@
 #define STATE_GAME_RAND_H
 
 #include "../../interfaces/rand_stream.h"
-
-// LIBCMT rand on the named stream: advances it and returns the next value, 0 to 0x7fff.
-int __cdecl GameRand(RandStream stream);
+#include "../../interfaces/services.h"
 
 // LIBCMT srand on the named stream: restarts it from seed.
 void __cdecl GameSrand(RandStream stream, unsigned int seed);

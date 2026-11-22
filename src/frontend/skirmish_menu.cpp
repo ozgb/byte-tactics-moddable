@@ -613,7 +613,7 @@ void __stdcall UpdateSkirmishMapSelection(Gui* menu, Gadget* unused)
 }
 
 #include "../mission/map_list.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../debug/debug_lib.h"
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 #include "../gui/file_list.h"

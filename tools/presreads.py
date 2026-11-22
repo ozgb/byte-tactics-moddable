@@ -14,7 +14,7 @@ read sets of data/rwsets.csv although no run reached it. Columns:
   reader               the subsystem of the function that read it (data/subsystems.csv); `presentation` for the
                        static-only rows
   pattern              every-frame, ui-action, after-event or unknown (below)
-  covered_by_event     a SIM_EVENT_* kind of interfaces/services.h (name as written there), or empty
+  covered_by_event     a SIM_EVENT_* kind of interfaces/sim_events.h (name as written there), or empty
   visibility           own, all-players or per-player-filter (below)
   runs                 the number of scenarios of reference/scenarios whose presentation window showed the row;
                        0 for a static-only row
@@ -56,7 +56,7 @@ through function pointers or virtual methods, so a reach is an upper bound; a fu
 
 covered_by_event. The kind whose case of DrainSimEvents (src/ingame/sim_event_drain.cpp) reaches the reading function by direct
 calls in data/rwsets.csv, when exactly one kind reaches a function of the row; else the kind the runs found to precede it
-(the smallest, when more); empty when neither says. The name is the enum's, as in interfaces/services.h.
+(the smallest, when more); empty when neither says. The name is the enum's, as in interfaces/sim_events.h.
 
 visibility, by the item's type or container (VISIBILITY below): `per-player-filter` for units, features, projectiles,
 debris and their pieces and models, and a unit's orders (what another player sees depends on line of sight and radar),
@@ -95,7 +95,7 @@ STORED = ROOT / "data/access_presentation"
 STATE_CLASSES = ROOT / "data/state_classes.csv"
 RWSETS = ROOT / "data/rwsets.csv"
 SUBSYSTEMS = ROOT / "data/subsystems.csv"
-SERVICES = ROOT / "interfaces/services.h"
+SERVICES = ROOT / "interfaces/sim_events.h"
 DRAIN = ROOT / "src/ingame/sim_event_drain.cpp"
 GAME_HEADER = ROOT / "src/game/game.h"
 COLUMNS = ["item", "reader", "pattern", "covered_by_event", "visibility", "runs"]
@@ -138,7 +138,7 @@ def read_csv(path: Path) -> list[dict]:
 
 
 def kind_names(text: str) -> dict[int, str]:
-    """{number: name} of the SIM_EVENT_* enumerators of interfaces/services.h, without SIM_EVENT_NONE."""
+    """{number: name} of the SIM_EVENT_* enumerators of interfaces/sim_events.h, without SIM_EVENT_NONE."""
     return {int(n): k for k, n in KIND_LINE.findall(text) if int(n) != 0}
 
 

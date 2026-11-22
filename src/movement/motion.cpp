@@ -7,6 +7,7 @@
 #include "../state/block.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
+#include "../util/engine_services.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -71,7 +72,6 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 #include "../game/map_events.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
-#include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/movement_events.h"

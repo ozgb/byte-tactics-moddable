@@ -2,7 +2,7 @@
 #define GAME_SETTINGS_H
 
 #include "mission_option_flags.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #pragma pack(push, 1)
 struct SkirmishPlayer {

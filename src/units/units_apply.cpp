@@ -13,7 +13,7 @@
 #include "../../interfaces/units.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/game.h"
 #include "../game/units_event_size.h"
 #include "../game/weapons_events.h"

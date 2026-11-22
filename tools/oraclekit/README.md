@@ -82,7 +82,7 @@ the record and each kind. Three files carry it.
 `layout.json` has the record `SimEvent` (32 bytes: `kind`, `flags`, `tick`, `args`) and the queue `SimEventQueue` (`head`,
 `tail`, `dropped`, `reserved` and the ring `records`) next to the records of the state block.
 
-`interfaces/sim_events.csv` has a row for each kind of `SimEventKind` in `interfaces/services.h`, sorted by value. The columns
+`interfaces/sim_events.csv` has a row for each kind of `SimEventKind` in `interfaces/sim_events.h`, sorted by value. The columns
 are `kind` (the enumerator), `value`, `arguments` (how many arguments the event has, the second record's included), `records`
 (0 for the empty record, 1, or 2 when the event has more than six arguments), `flags` (the bits of `SimEvent.flags` the kind
 sets, or `none`), `phases` (where the call graph reaches a record of the kind, as the page's `Phases:` line states) and
@@ -147,7 +147,7 @@ evidence `none`. `runs` is the most scenarios that any one reader showed.
 
 `presentation_reads.csv` lists the items that the view reads between ticks. `pattern` is `every-frame` (read every
 tick), `ui-action` (read when the player acts), `after-event` (read after one kind of sim event, named in
-`covered_by_event` as in `interfaces/services.h`) or `unknown`; `visibility` is `own` (the player's own records),
+`covered_by_event` as in `interfaces/sim_events.h`) or `unknown`; `visibility` is `own` (the player's own records),
 `per-player-filter` (units, features, projectiles and their kin, as line of sight shows them) or `all-players`; a `runs`
 of 0 means no scenario showed the read.
 

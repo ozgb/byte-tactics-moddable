@@ -5,7 +5,7 @@
 #include "game.h"
 #pragma pack(pop)
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../../link/globals.h"

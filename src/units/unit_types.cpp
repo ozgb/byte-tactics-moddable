@@ -41,7 +41,7 @@ static inline int FixedField(TdfRecord* record, char* key, int def)
     return out;
 }
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/host.h"
 
 #include "../orders/mission_type.h"

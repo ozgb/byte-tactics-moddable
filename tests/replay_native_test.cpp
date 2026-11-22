@@ -10,7 +10,7 @@
 #include "../src/harness/replay_schema.h"
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
 #include "../src/map/meteors.h"

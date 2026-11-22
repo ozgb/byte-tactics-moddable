@@ -1,6 +1,6 @@
 #ifndef DEBUG_LIB_H
 #define DEBUG_LIB_H
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include <stddef.h>
 

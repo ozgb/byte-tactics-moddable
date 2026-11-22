@@ -98,7 +98,7 @@ void FreeWeaponArray(void)
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/weapons.h"
 
 // FUNCTION: 0x499ab0

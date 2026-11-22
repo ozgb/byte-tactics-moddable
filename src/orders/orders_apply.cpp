@@ -18,7 +18,7 @@
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/orders.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/orders_events.h"
 #include "../game/orders_event_size.h"
 #include "../game/targeting_events.h"

@@ -5,7 +5,7 @@
 #pragma pack(pop)
 
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/ref.h"
 #include "../game/weapons_events.h"
 #include "unit_script.h"

@@ -44,7 +44,7 @@ typedef std::vector<Point16> PointMarkerCellVector;
 
 #pragma pack(push, 2)
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/movement_events.h"
 #include "movement_seam.h"
 

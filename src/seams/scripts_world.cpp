@@ -13,7 +13,7 @@
 #include "../../interfaces/features.h"
 #include "../../interfaces/targeting.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/scripts_events.h"
 #include "scripts_world.h"
 

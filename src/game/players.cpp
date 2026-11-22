@@ -441,7 +441,7 @@ void __stdcall PlaySoundByName(char* str, int flag);
 
 
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);

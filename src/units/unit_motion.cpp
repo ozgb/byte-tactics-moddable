@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include "../graphics/object_pool.h"
 #include "../debug/debug_lib.h"

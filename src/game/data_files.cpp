@@ -594,7 +594,7 @@ void FreeTextureGafs()
 
 #include "../units/unit_def.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include "../util/math.h"
 #include "../debug/debug_lib.h"

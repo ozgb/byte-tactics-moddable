@@ -12,7 +12,7 @@
 #include "../mission/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_effects.h"
 
 

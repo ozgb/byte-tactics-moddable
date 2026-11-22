@@ -201,7 +201,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
 #include "../sound/sound.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../units/squads.h"

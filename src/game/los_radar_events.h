@@ -7,7 +7,7 @@
 #include "../../interfaces/los_radar.h"
 #include "los_radar_event_size.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 template <class U>
 inline LosRadarUnit LosRadarUnitEventOf(int kind, U* unit)

@@ -5,7 +5,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/orders.h"
 #include "../interfaces/units.h"
 #include "../interfaces/weapons.h"

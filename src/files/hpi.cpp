@@ -940,7 +940,7 @@ int __stdcall CountDirectoryEntries(const char* path, int flag)
     return count;
 }
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 typedef std::vector<StringRef> FileList;
 

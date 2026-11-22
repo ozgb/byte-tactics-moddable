@@ -1,5 +1,5 @@
 #include "radar_picture.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include "../graphics/gaf_frame.h"
 

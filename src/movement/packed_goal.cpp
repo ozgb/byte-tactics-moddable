@@ -2,7 +2,7 @@
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
 #include "../util/vec3.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 struct Unit;
 class HapiBank;

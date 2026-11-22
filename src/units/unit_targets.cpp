@@ -14,7 +14,7 @@
 #include "../util/vec3.h"
 #include "../quirks/quirks.h"
 #include "../util/tdf.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "squad.h"
 #include "../../interfaces/seams.h"
 

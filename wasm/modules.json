@@ -25,6 +25,7 @@
     "orders": 5,
     "pathfinding": 4,
     "players": 4,
+    "quirks": 1,
     "rand_stream": 1,
     "ref": 2,
     "scripts": 2,

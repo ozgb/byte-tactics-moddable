@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <time.h>
 #include "../../interfaces/host.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/game_rand.h"
 #include "../files/files_api.h"
 

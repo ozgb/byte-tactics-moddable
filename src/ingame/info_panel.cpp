@@ -184,7 +184,7 @@ public:
 
 #include "../../link/globals.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../seams/units_in_range.h"
 #include "../../interfaces/economy.h"
 

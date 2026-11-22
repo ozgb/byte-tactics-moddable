@@ -8,7 +8,7 @@
 #include "replay_schema.h"
 #include "../../interfaces/host.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/rand_stream.h"
 #include "../game/los_helpers.h"

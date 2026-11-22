@@ -155,7 +155,7 @@ void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int 
 unsigned int GetTicks();
 #include "../../interfaces/wind_meteors.h"
 #include "wind_meteors_events.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
 #include "../graphics/display.h"

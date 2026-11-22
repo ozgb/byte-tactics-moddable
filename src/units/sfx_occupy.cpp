@@ -1,6 +1,6 @@
 #include "../game/scripts_events.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 
 #include "../scripts/cob_script.h"

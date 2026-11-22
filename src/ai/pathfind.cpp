@@ -16,7 +16,7 @@ static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/ref.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/state_writer.h"
 
 static int StepsFor(const PathWorldView* world)
@@ -42,7 +42,7 @@ void __stdcall CopyOneByte(char* dest, char* src)
 }
 
 // FUNCTION: 0x40d620
-void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int*, HeapEntry*)
+void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int* distanceTag, HeapEntry* valueTag)
 {
     int n = last - first;
     for (int h = n / 2; 0 < h; ) {
@@ -73,7 +73,7 @@ void __stdcall AdjustHeap(HeapEntry* first, int hole, int len, HeapEntry val)
 
 // FUNCTION: 0x40d700
 void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest,
-                             HeapEntry val, int*)
+                             HeapEntry val, int* distanceTag)
 {
     *dest = *first;
     AdjustHeap(first, 0, last - first, val);

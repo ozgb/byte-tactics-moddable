@@ -16,7 +16,7 @@ struct TdfParserView {
 
 #include "movement_class.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"

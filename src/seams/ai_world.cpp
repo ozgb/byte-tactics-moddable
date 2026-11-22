@@ -5,7 +5,7 @@
 
 #include "../../interfaces/ai.h"
 #include "../../interfaces/weapons.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "ai_world.h"
 
 void AiInbox(const void* event, unsigned int size)

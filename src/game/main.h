@@ -1,6 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include "../../include/win_types.h"
 

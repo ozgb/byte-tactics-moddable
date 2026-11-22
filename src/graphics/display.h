@@ -161,7 +161,7 @@ void __stdcall InitDisplayDefaults(Display* p);
 int __stdcall InitEnvironment(Display* d);
 void __stdcall ShutdownEnvironment(Display* d);
 void __stdcall QuitApp(char* message);
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 unsigned long __stdcall GetMilliseconds(void);
 int __stdcall GetScreenWidth();
 int __stdcall GetScreenHeight();

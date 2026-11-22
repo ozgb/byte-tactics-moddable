@@ -1034,7 +1034,8 @@ replayer's native table keeps its `native` symbol in place. The tool rejects `"r
 
 `uv run tools/replayschema.py` also writes the recorder's tables, the recording copy of every seam table with its argument
 hooks and the import hooks, and the slot runners, import stubs and native seam tables of the replayer. The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
-annotation: each entry names its declaration in `interfaces/services.h` (checked against the header) and how its arguments,
+annotation: each entry names its declaration, in `interfaces/services.h` or in the engine header that holds the services no
+module imports (checked against the header), and how its arguments,
 result and `o` lines are written. From it the tool writes the ids and names, the recorder's lines and
 the replayer's answers. The one thing
 it cannot write is the hook itself, an import-recording line at the top of each function in the game source:

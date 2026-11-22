@@ -5,7 +5,7 @@
 
 #include "../../interfaces/scripts.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 inline ScriptsEventHeader ScriptsHeaderOf(int kind)
 {

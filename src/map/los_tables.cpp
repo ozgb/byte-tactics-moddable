@@ -9,7 +9,7 @@
 #include "los_tables.h"
 
 #include "../state/block_vector.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 struct OwnedString {
     char* data;

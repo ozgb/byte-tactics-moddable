@@ -212,6 +212,7 @@ see: inside `UnitAccount` itself, a write to the region looks like the write to 
 - not the economy events: section 33 records every event and effect as it is delivered, with its outcome, in the
   dump only (moddable only: the reference has no such records), as a diagnostic for a divergence;
 - economy's `WriteState` (the accounts of the units in play) is dumped (section 34) and not hashed.
+- **At load**: a saved game restores each unit's account (the 12 floats) through the event LOAD, which units' `LoadUnitAccounts` (`unit_save.cpp`) publishes with the account it read from the unit's `u%04xacc` box, outside the tick. The players' stores are players', restored by `LoadPlayers`.
 
 ## 6. Where entry points split
 

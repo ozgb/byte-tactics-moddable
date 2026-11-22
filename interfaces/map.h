@@ -11,9 +11,9 @@ struct Player;
 class HapiBank;
 
 // Major version of the map interface, changed when a slot is removed or its signature changes.
-#define MAP_VERSION_MAJOR 7
+#define MAP_VERSION_MAJOR 8
 // Minor version of the map interface, changed when a slot is added.
-#define MAP_VERSION_MINOR 1
+#define MAP_VERSION_MINOR 0
 
 // A movement class's footprint and limits, as units reads them from the game data; map copies them when it builds the pass maps.
 struct MapMoveLimits {
@@ -127,14 +127,10 @@ struct MapSeam {
     void (__stdcall* BuildAllPassMaps)(const MapMoveLimits* limits, int count);
     // Frees the pass maps when a match shuts down, outside the tick. Hooks: none.
     void (__stdcall* FreePassMaps)(void);
-    // Reads the explored-map state of a saved game from a bank. Hooks: none.
-    void (__stdcall* LoadMappingData)(HapiBank* file);
     // Reads the metal plot map of a saved game from a bank. Hooks: none.
     void (__stdcall* LoadMetalPlotmap)(HapiBank* file);
     // Reads the player feature plot map of a saved game from a bank. Hooks: none.
     void (__stdcall* LoadPlayerFeaturesPlotmap)(HapiBank* file);
-    // Writes the explored-map state of a saved game to a bank. Hooks: none.
-    void (__stdcall* SaveMappingData)(HapiBank* file);
     // Writes the metal plot map of a saved game to a bank. Hooks: none.
     void (__stdcall* SaveMetalPlotmap)(HapiBank* file);
     // Writes the player feature plot map of a saved game to a bank. Hooks: none.

@@ -207,6 +207,7 @@ void __stdcall InitFeatureAnimPool(TntInfo* info)
     m->featureUnit->def = g_game->defs;
     m->names = nullptr;
     m->nameCount = 0;
+    g_game->scanIndex = 0;
 
     for (int j = 0; j < info->featureCount; j++) {
         LoadFeatureType(info->featureNames[j].name);

@@ -288,6 +288,8 @@ hashes none of them. Each record is an event with the outcome `Apply` gave (`out
 published (`outcome` 1, as it is recorded before the publish), in players' order. The section is new, so the trace
 format's schema changes and the gate of this change is the full suite.
 
+**At load**: `LoadPlayers` restores the game time (`GameTime` box), each player's stores, totals, kills and losses, the clocks `updateTime` and `winLoseTime`, the display timer, colour, side and alliances; `LoadPlayerControllers` (from the match load, before) restores each slot's controller and type; and `LoadConditions` restores the conditions' state through each condition's `LoadState`, in a campaign game only (game type 1). The units' and the features' own records are restored by their modules.
+
 ## 6. Random draws and sim events
 
 Players draws from the game logic stream in one place: the commander's respawn draws a position (`RandomInt`) in

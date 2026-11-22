@@ -382,6 +382,12 @@ int __stdcall ApplyTargetingEvent(const TargetingEventHeader* e, unsigned int si
     return 0;
 }
 
+int __stdcall SavedTargetPair(Unit* unit, int weapon)
+{
+    UnitWeaponSlot* elem = &unit->weapons[weapon];
+    return (int)((unsigned int)(unsigned short)elem->aimTargetXOrUnitId | ((unsigned int)(unsigned short)elem->aimTargetZOrUnitSentinel << 16));
+}
+
 // FUNCTION: 0x48a190
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
 {

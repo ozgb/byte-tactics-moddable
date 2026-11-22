@@ -7077,6 +7077,7 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::flags_110
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::flags_114
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,FeaturePseudoUnit::unitDefIndex
+0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,Game::scanIndex
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,function,
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,global_read,g_game
 0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Cell *
@@ -9959,12 +9960,13 @@ address,function,file,kind,target
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,call,operator MissionConditions *
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,FeaturesSeam::LoadFeatures
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Game::list_391ed
-0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,MapSeam::LoadMappingData
+0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,LosRadarSeam::LoadMappingData
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,MapSeam::LoadMetalPlotmap
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,MapSeam::LoadPlayerFeaturesPlotmap
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,PlayersSeam::LoadConditions
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,PlayersSeam::LoadPlayers
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Seams::features
+0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Seams::los_radar
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Seams::map
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Seams::players
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,field_read,Seams::units
@@ -9978,7 +9980,7 @@ address,function,file,kind,target
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,global_read,g_seams
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,global_read,g_summaryAccountName
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [FeaturesSeam::LoadFeatures]
-0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadMappingData]
+0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [LosRadarSeam::LoadMappingData]
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadMetalPlotmap]
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::LoadPlayerFeaturesPlotmap]
 0x432610,LoadSavedGameState,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadPlayers]
@@ -10017,7 +10019,7 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Game::numPlayers
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Game::options
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Game::ticks
-0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SaveMappingData
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,LosRadarSeam::SaveMappingData
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SaveMetalPlotmap
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MapSeam::SavePlayerFeaturesPlotmap
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,MatchSetup::blockBytes
@@ -10032,6 +10034,7 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,PlayersSeam::SavePlayers
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,SaveGamePlayerEntry::info
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Seams::features
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Seams::los_radar
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Seams::map
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Seams::mission
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,field_read,Seams::players
@@ -10077,7 +10080,7 @@ address,function,file,kind,target
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via int (*)(int) __attribute__((stdcall)) [MissionSeam::SelectMission]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [FeaturesSeam::SaveFeatures]
-0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::SaveMappingData]
+0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [LosRadarSeam::SaveMappingData]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::SaveMetalPlotmap]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [MapSeam::SavePlayerFeaturesPlotmap]
 0x4326b0,SaveGameFile,src/game/settings_campaign.cpp,indirect_call,indirect via void (*)(HapiBank *) __attribute__((stdcall)) [PlayersSeam::SavePlayers]
@@ -10813,6 +10816,7 @@ address,function,file,kind,target
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,field_read,CacheChunk::size
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,field_write,CacheChunk::owner
 0x437c90,CMemoryCache::ReleaseHandle,src/units/unit_motion.cpp,function,
+0x437cd0,InitMeteors,src/map/meteors.cpp,call,memcpy
 0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator->
 0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator=
 0x437cd0,InitMeteors,src/map/meteors.cpp,call,operator==
@@ -10821,7 +10825,7 @@ address,function,file,kind,target
 0x437cd0,InitMeteors,src/map/meteors.cpp,field_read,Seams::weapons
 0x437cd0,InitMeteors,src/map/meteors.cpp,field_read,WeaponsSeam::FindWeaponByName
 0x437cd0,InitMeteors,src/map/meteors.cpp,function,
-0x437cd0,InitMeteors,src/map/meteors.cpp,global_maybe_written,g_meteorWeaponName
+0x437cd0,InitMeteors,src/map/meteors.cpp,global_escape,g_meteorWeaponName
 0x437cd0,InitMeteors,src/map/meteors.cpp,global_read,g_game
 0x437cd0,InitMeteors,src/map/meteors.cpp,global_read,g_meteorSpawnInterval
 0x437cd0,InitMeteors,src/map/meteors.cpp,global_read,g_meteorWeapon
@@ -20320,7 +20324,6 @@ address,function,file,kind,target
 0x464700,InitPlayerSlot,src/game/players.cpp,call,EconPublish
 0x464700,InitPlayerSlot,src/game/players.cpp,call,PlayerSlotOf
 0x464700,InitPlayerSlot,src/game/players.cpp,call,SimAlloc
-0x464700,InitPlayerSlot,src/game/players.cpp,call,memset
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator bool
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator delete
 0x464700,InitPlayerSlot,src/game/players.cpp,call,operator new
@@ -25868,6 +25871,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,GameFreeThunk
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,LoadFileWithProgress
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,LosTables::LoadLosTables
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,PublishWindMeteorsLimits
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,SimAllocTagged
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,UpdateCellHeightRange
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,get
@@ -25942,7 +25946,6 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::blocksX
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::blocksY
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::cells
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::featureReproduceCursor
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::grid
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::height
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::iconSet
@@ -25959,8 +25962,6 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::tidal
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::visibilityMask
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::width
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::windSpeedMax
-0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapSettings::windSpeedMin
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,MapViewFlags::raw
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Point16::x
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,field_write,Point16::y
@@ -26193,25 +26194,26 @@ address,function,file,kind,target
 0x484e80,LoadPlayerFeaturesPlotmap,src/map/plot_map.cpp,field_write,Cell::plotFeature4
 0x484e80,LoadPlayerFeaturesPlotmap,src/map/plot_map.cpp,function,
 0x484e80,LoadPlayerFeaturesPlotmap,src/map/plot_map.cpp,global_read,g_game
-0x484f50,SaveMappingData,src/map/plot_map.cpp,call,HapiBank::OpenAccount
-0x484f50,SaveMappingData,src/map/plot_map.cpp,call,HapiBank::OpenNamedBox
-0x484f50,SaveMappingData,src/map/plot_map.cpp,call,HapiBank::WriteBox
-0x484f50,SaveMappingData,src/map/plot_map.cpp,call,operator unsigned short *
-0x484f50,SaveMappingData,src/map/plot_map.cpp,field_read,Game::height
-0x484f50,SaveMappingData,src/map/plot_map.cpp,field_read,Game::visibilityMask
-0x484f50,SaveMappingData,src/map/plot_map.cpp,field_read,Game::width
-0x484f50,SaveMappingData,src/map/plot_map.cpp,function,
-0x484f50,SaveMappingData,src/map/plot_map.cpp,global_read,g_game
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,call,HapiBank::GetBoxSize
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,call,HapiBank::OpenAccount
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,call,HapiBank::OpenNamedBox
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,call,HapiBank::ReadBox
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,call,operator unsigned short *
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,field_read,Game::height
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,field_read,Game::visibilityMask
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,field_read,Game::width
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,function,
-0x484fa0,LoadMappingData,src/map/plot_map.cpp,global_read,g_game
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,call,HapiBank::OpenAccount
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,call,HapiBank::OpenNamedBox
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,call,HapiBank::WriteBox
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,call,operator unsigned short *
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,field_read,Game::height
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,field_read,Game::visibilityMask
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,field_read,Game::width
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,function,
+0x484f50,SaveMappingData,src/map/radar_capture.cpp,global_read,g_game
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,HapiBank::GetBoxSize
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,HapiBank::OpenAccount
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,HapiBank::OpenNamedBox
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,HapiBank::ReadBox
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,memcpy
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,call,operator unsigned short *
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,field_read,Game::height
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,field_read,Game::visibilityMask
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,field_read,Game::width
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,function,
+0x484fa0,LoadMappingData,src/map/radar_capture.cpp,global_read,g_game
 0x485010,GetCellHeight,src/map/terrain.cpp,call,CellAt
 0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Cell::height
 0x485010,GetCellHeight,src/map/terrain.cpp,field_read,Point16::x
@@ -26285,7 +26287,6 @@ address,function,file,kind,target
 0x485420,ShareMapInfo,src/map/line_of_sight.cpp,global_read,g_game
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,SimAllocTagged
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,get
-0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,memset
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,operator=
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,call,sort
 0x4854a0,AllocateUnitMemory,src/units/units.cpp,deref_read,*unsigned char
@@ -26891,8 +26892,6 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,deref_read,*int
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::cell
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::footprint
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::weapons
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,UnitWeaponSlot::flags
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_maybe_written,SaveRec::name
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::units
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::unitsEnd
@@ -26900,14 +26899,13 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,LosSightCache::cell
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,LosSightCache::frameIdx
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,OrdersSeam::SaveOrders
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b0
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b1
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b23
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b4
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,ScriptsSeam::SaveScriptState
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::los_radar
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::orders
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::scripts
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::targeting
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::weapons
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,TargetingSeam::SavedTargetPair
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::activateFlags
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::angles
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::attacker
@@ -26936,14 +26934,15 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::speed_bits
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::transportPiece
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::workTime
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::fireHeading
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::firePitch
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::muzzleAimFromDeltaZ
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::reloadTimer
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::stockpile
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::weapon
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponAimCobCb::nAimCobDone
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponDef::index
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSeam::SaveState
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::aimDone
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::aimOffset
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::flags
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::heading
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::pitch
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::reload
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::stockpile
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::typeByte
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a0
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a1
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a2
@@ -26993,8 +26992,10 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,global_read,g_game
 0x4876c0,SaveUnits,src/units/unit_save.cpp,global_read,g_seams
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(Unit *, HapiBank *) __attribute__((stdcall)) [OrdersSeam::SaveOrders]"
+0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::SavedTargetPair]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(CobScript *, HapiBank *) __attribute__((stdcall)) [ScriptsSeam::SaveScriptState]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, LosSightCache *) __attribute__((stdcall)) [LosRadarSeam::SightCache]"
+0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, int, WeaponsSlotState *) __attribute__((stdcall)) [WeaponsSeam::SaveState]"
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,IdAt
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,_strcmpi
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,deref_read,*int
@@ -29428,6 +29429,7 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,LoadTextureGafs
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,MatchSetupSizeBlock
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,NativeEconomyWorld
+0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,PublishWindMeteors
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetCameraState
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetChatHudIndices
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,call,ResetSpeech
@@ -29506,8 +29508,6 @@ address,function,file,kind,target
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::projected
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::restartMissionRequest
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::ticks
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::windCounter
-0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::windSpeedDenominator
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,Game::xform
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,LosRadarMapInfo::unitSlots
 0x4917d0,LoadBattleAssets,src/game/game_state.cpp,field_write,PathMapInfo::height
@@ -36115,6 +36115,7 @@ address,function,file,kind,target
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,HapiBank::GetBoxSize
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,HapiBank::ReadBox
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,HapiBank::SeekBox
+0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,ReadBoxInto
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,SimAllocTagged
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,operator Piece *
 0x4b2040,CobScript::LoadScriptState,src/scripts/cob.cpp,call,operator int *
@@ -49124,11 +49125,13 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::InitRadar
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::IsPointVisible
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::IsUnitVisibleToPlayer
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::LoadMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::LoadTntMap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarMapped
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RecordRadarUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RefreshUnitIndex
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::RegionSize
+,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SaveMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::Shutdown
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SightCache
 ,InstallNativeSeams,src/seams/native.cpp,field_write,LosRadarSeam::SoundHeardMask
@@ -49146,7 +49149,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetCellMeanHeight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::GetGroundHeight
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::IsPadSlotFree
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadMetalPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::LoadPlayerFeaturesPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PassMapGet
@@ -49155,7 +49157,6 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::PickRandomReclaimableResourcesInRadius
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshMovedUnits
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::RefreshUnitIfStale
-,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SaveMappingData
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SaveMetalPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SavePlayerFeaturesPlotmap
 ,InstallNativeSeams,src/seams/native.cpp,field_write,MapSeam::SnapWorldPosToFootprint
@@ -49335,6 +49336,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::FindWeaponTarget
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::GetWeaponTargetPos
 ,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::GetWeaponTargetUnit
+,InstallNativeSeams,src/seams/native.cpp,field_write,TargetingSeam::SavedTargetPair
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AddBuildProgress
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AddRepairProgress
 ,InstallNativeSeams,src/seams/native.cpp,field_write,UnitsSeam::AllocateUnitMemory
@@ -49390,6 +49392,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::InitExplosions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::LoadState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::LoadWeaponTypes
+,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::SaveState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateExplosions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateUnitWeapons
@@ -49734,6 +49737,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SaveScriptStateNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SaveStartDirectory
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,SaveUnits
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,SavedTargetPair
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ScanFeatureCell
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ScriptsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ScriptsWriteState
@@ -49788,6 +49792,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsLoadState
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsSaveState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsWriteState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WindMeteorsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WriteBufferToFile
@@ -53553,6 +53558,11 @@ address,function,file,kind,target
 ,PublishWindMeteors,src/game/wind_meteors_events.h,field_write,WindMeteorsEventHeader::kind
 ,PublishWindMeteors,src/game/wind_meteors_events.h,field_write,WindMeteorsParams::params
 ,PublishWindMeteors,src/game/wind_meteors_events.h,function,
+,PublishWindMeteorsLimits,src/game/wind_meteors_events.h,call,SchedPublish
+,PublishWindMeteorsLimits,src/game/wind_meteors_events.h,field_write,WindMeteorsEventHeader::kind
+,PublishWindMeteorsLimits,src/game/wind_meteors_events.h,field_write,WindMeteorsLimits::max
+,PublishWindMeteorsLimits,src/game/wind_meteors_events.h,field_write,WindMeteorsLimits::min
+,PublishWindMeteorsLimits,src/game/wind_meteors_events.h,function,
 ,PumpNetPackets,src/network/net_game.cpp,call,HandleNetPackets
 ,PumpNetPackets,src/network/net_game.cpp,call,PacketManager::SendAllQueued
 ,PumpNetPackets,src/network/net_game.cpp,function,
@@ -53746,6 +53756,9 @@ address,function,file,kind,target
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::x
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,field_read,ReachUnitVec3::z
 ,ReachUnitLineOfFire,src/weapons/weapons.cpp,function,
+,ReadBoxInto,src/scripts/cob.cpp,call,HapiBank::ReadBox
+,ReadBoxInto,src/scripts/cob.cpp,call,memcpy
+,ReadBoxInto,src/scripts/cob.cpp,function,
 ,ReadCommandLine,src/game/match_setup.cpp,call,Fatal
 ,ReadCommandLine,src/game/match_setup.cpp,call,MatchSetupBlockBytesValid
 ,ReadCommandLine,src/game/match_setup.cpp,call,MatchSetupSearchStepsValid
@@ -59197,6 +59210,10 @@ address,function,file,kind,target
 ,SaveStartDirectory,src/files/files_api.h,function,
 ,SaveStartDirectory,src/files/files_api.h,global_read,g_seams
 ,SaveStartDirectory,src/files/files_api.h,indirect_call,indirect via void (*)() __attribute__((stdcall)) [FilesSeam::SaveStartDirectory]
+,SavedTargetPair,src/units/unit_targets.cpp,field_escape,Unit::weapons
+,SavedTargetPair,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetXOrUnitId
+,SavedTargetPair,src/units/unit_targets.cpp,field_read,UnitWeaponSlot::aimTargetZOrUnitSentinel
+,SavedTargetPair,src/units/unit_targets.cpp,function,
 ,Scale,src/graphics/model_render.cpp,function,
 ,ScaleBodyOffset,src/units/unit_targets.cpp,field_read,Vec3::x
 ,ScaleBodyOffset,src/units/unit_targets.cpp,field_read,Vec3::y
@@ -63451,6 +63468,31 @@ address,function,file,kind,target
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,field_write,WeaponsSetStockpiles::h
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,field_write,WeaponsSetStockpiles::stockpiles
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,function,
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,call,get
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_escape,Unit::weapons
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_escape,UnitWeaponSlot::flags
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit0
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit1
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit2
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit3
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit4
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::fireHeading
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::firePitch
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::muzzleAimFromDeltaZ
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::reloadTimer
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::stockpile
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::weapon
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,WeaponAimCobCb::nAimCobDone
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,WeaponDef::index
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::aimDone
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::aimOffset
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::flags
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::heading
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::pitch
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::reload
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::stockpile
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::typeByte
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,function,
 ,WeaponsScriptName,src/seams/scripts_world.cpp,function,
 ,WeaponsScriptName,src/seams/scripts_world.cpp,global_escape,g_hitByWeaponScriptName
 ,WeaponsScriptName,src/seams/scripts_world.cpp,global_escape,g_takeDamageScriptName
@@ -63486,8 +63528,15 @@ address,function,file,kind,target
 ,WindMeteorsApply,src/map/meteors.cpp,call,SetMeteorParams
 ,WindMeteorsApply,src/map/meteors.cpp,call,StartMeteorShower
 ,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsEventHeader::kind
+,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsLimits::max
+,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsLimits::min
 ,WindMeteorsApply,src/map/meteors.cpp,field_read,WindMeteorsParams::params
+,WindMeteorsApply,src/map/meteors.cpp,field_write,Game::windCounter
+,WindMeteorsApply,src/map/meteors.cpp,field_write,Game::windSpeedDenominator
+,WindMeteorsApply,src/map/meteors.cpp,field_write,Game::windSpeedMax
+,WindMeteorsApply,src/map/meteors.cpp,field_write,Game::windSpeedMin
 ,WindMeteorsApply,src/map/meteors.cpp,function,
+,WindMeteorsApply,src/map/meteors.cpp,global_read,g_game
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,strcmp
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_data_address
 ,WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,call,wl_data_count

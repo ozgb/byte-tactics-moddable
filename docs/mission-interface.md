@@ -171,6 +171,8 @@ same position.
 that reaches `Game::net` or a member of `Mission`, `MissionUnit`, `MissionFeature` or `MissionRule` from a function
 outside the subsystem mission, other than the mission's fillers in `src/seams/native.cpp`.
 
+**At load**: nothing is restored from the saved game's body. The save keeps only the mission's name, and the saved game's menu path (`savegame.cpp`) calls `LoadMissionByName` with it before `LoadSavedGameState` runs, so the record is read again from the mission's file, as for a new match.
+
 ## 6. Replays
 
 The mission subsystem is `pending` in `data/replay_schema.json`: its 34 slots are annotated `record: false`, with the

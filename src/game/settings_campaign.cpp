@@ -85,9 +85,16 @@ HapiBank* __stdcall OpenHapiBank(char* name)
 
 #include "../../interfaces/seams.h"
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x432610
 int __stdcall LoadSavedGameState(HapiBank* file)
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_LOAD);
+#endif
     file->OpenAccount(g_summaryAccountName);
     if (file->HasItem("maxunits"))
         g_game->maxUnits_37eec = file->GetIntegerItem("maxunits", 0);
@@ -96,7 +103,7 @@ int __stdcall LoadSavedGameState(HapiBank* file)
     g_seams.features->LoadFeatures(file);
     g_seams.map->LoadMetalPlotmap(file);
     g_seams.map->LoadPlayerFeaturesPlotmap(file);
-    g_seams.map->LoadMappingData(file);
+    g_seams.los_radar->LoadMappingData(file);
     g_seams.units->LoadUnits(file);
     g_seams.wind_meteors->LoadMeteors(file);
     g_seams.players->LoadConditions(g_game->list_391ed, 0, file);
@@ -107,6 +114,9 @@ int __stdcall LoadSavedGameState(HapiBank* file)
 // FUNCTION: 0x4326b0
 int __stdcall SaveGameFile(char* path, char* description, int gameId)
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_SAVE);
+#endif
     HapiBank file;
     char buf[256];
 
@@ -157,7 +167,7 @@ int __stdcall SaveGameFile(char* path, char* description, int gameId)
         WriteCameraPosition(&file);
         g_seams.players->SavePlayers(&file);
         g_seams.units->SaveUnits(&file);
-        g_seams.map->SaveMappingData(&file);
+        g_seams.los_radar->SaveMappingData(&file);
         g_seams.features->SaveFeatures(&file);
         g_seams.map->SavePlayerFeaturesPlotmap(&file);
         g_seams.map->SaveMetalPlotmap(&file);

@@ -925,6 +925,21 @@ void CobScript::SaveScriptState(HapiBank* file)
     }
 }
 
+static int ReadBoxInto(HapiBank* file, int* dst, int size)
+{
+    char chunk[256];
+    int done = 0;
+    while (done < size) {
+        int want = size - done < (int)sizeof chunk ? size - done : (int)sizeof chunk;
+        int got = file->ReadBox(chunk, want);
+        memcpy((char*)dst + done, chunk, got);
+        done += got;
+        if (got != want)
+            break;
+    }
+    return done;
+}
+
 // FUNCTION: 0x4b2040
 int CobScript::LoadScriptState(HapiBank* file)
 {
@@ -946,7 +961,7 @@ int CobScript::LoadScriptState(HapiBank* file)
         channels[n].callback = 0;
     }
     activeCount = big.activeCount;
-    if (file->ReadBox(statics, size) != size) {
+    if (ReadBoxInto(file, statics, size) != size) {
         return 0;
     }
     SavedPiece* buffer = (SavedPiece*)SimAllocTagged("Piece States", bytes);

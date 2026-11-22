@@ -1701,6 +1701,11 @@ void __stdcall LoadWeaponsStateSlot(Unit* unit, int slot, const WeaponsSlotState
     WeaponsLoadState(unit, slot, state);
 }
 
+void __stdcall SaveWeaponsStateSlot(Unit* unit, int slot, WeaponsSlotState* state)
+{
+    WeaponsSaveState(unit, slot, state);
+}
+
 int __fastcall GetGameTypeSlot(Mission* self)
 {
     return self->GetGameType();

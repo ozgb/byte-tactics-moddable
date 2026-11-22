@@ -26,6 +26,11 @@ phase 1: the test-mode scenarios call RunGameSteps with showStats 0, so there is
 phase 1 hold the previous tick's tail for that reason: with no marker 0, the drawing and input of the main loop
 between two ticks fell into the window that ends at marker 1.
 
+Two more windows cover saving and loading: `save` is SaveGameFile, and `load` is LoadSavedGameState and
+LoadBattleAssets (a match loads on the load thread, so the thread a save or load window opens on is the one
+recorded, and the window it interrupts gets its window and thread back when it ends). Neither touches the tick's evidence: their rows go to `<scenario>.saveload.csv`, with the edges file's
+columns and the phase `save` or `load`, and tools/privatestate.py judges them as it judges the tick's.
+
 Evidence, per (writer, reader, item, phase), counted in the column `count`:
 
   read-after-write  the item was written in this window by another subsystem, or by the same subsystem on
@@ -123,7 +128,7 @@ misses what the compiler did not instrument or the callbacks cannot see:
   * optimiser effects: a read served from a register or folded into an earlier one is not seen, and the
     instrumented build is compiled with the game's /O2, so the sequence of accesses is the compiled
     code's and not the source's;
-  * another thread's accesses: only the thread that runs the first window is recorded.
+  * another thread's accesses: only the thread that opened the latest window is recorded.
 """
 
 import argparse
@@ -161,6 +166,8 @@ ATTR_MAGIC = b"ALAT"
 ITEMS_MAGIC = b"ALIT"
 FUNCS_MAGIC = b"ALFN"
 UNKNOWN = "unknown"
+PLATFORM = "platform"
+TEMPLATE_INSTANCE = "?$"
 IGNORED = 0xFFFF
 NONE = 0xFFFFFFFF
 IGNORED_OBJECTS = ("block.cpp", "access_log.cpp")
@@ -182,7 +189,7 @@ FLATTENED = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
 REGION_TAGS = ("AISearch region",)
 REGION_OWNER_FUNCTION = "LoadBattleAssets"
 OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
-                "access.ordered.csv", "access.reads.csv")
+                "access.ordered.csv", "access.reads.csv", "access.saveload.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -257,7 +264,7 @@ DELETING_DESTRUCTOR = re.compile(r"\?\?_[GE](.+?)@@")
 def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
     """The subsystem of a function: the row of its name and source file, else its only subsystem, else (for a scalar or
     vector deleting destructor) the row of its class's destructor or the only subsystem of its class's members, else the only subsystem of its source file (a template
-    instance, a constructor or a function the csv leaves out), else unknown."""
+    instance, a constructor or a function the csv leaves out; for a template instance, the only one but platform), else unknown."""
     source = object_source(obj)
     deleting = DELETING_DESTRUCTOR.match(name)
     owner = "::".join(reversed(deleting.group(1).split("@"))) if deleting else ""
@@ -276,7 +283,9 @@ def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
         members = {s for key, found in rows.items() if key.startswith(owner + "::") for _, s in found}
         if len(members) == 1:
             return next(iter(members))
-    in_file = rows.files.get(source, ())
+    in_file = set(rows.files.get(source, ()))
+    if len(in_file) != 1 and TEMPLATE_INSTANCE in name:
+        in_file -= {PLATFORM}
     return next(iter(in_file)) if len(in_file) == 1 else UNKNOWN
 
 
@@ -977,7 +986,8 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         failed += why is not None
         for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
                                ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),
-                               ("ordered.csv", "access.ordered.csv"), ("reads.csv", "access.reads.csv"), ("raw.txt", RAW_FILE)):
+                               ("ordered.csv", "access.ordered.csv"), ("reads.csv", "access.reads.csv"),
+                               ("saveload.csv", "access.saveload.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

@@ -5,12 +5,18 @@ enum AccessWindow {
     ACCESS_WINDOW_TAIL = 8,
     ACCESS_WINDOW_PRESENTATION = 9,
     ACCESS_WINDOW_PENDING = 10,
-    ACCESS_WINDOW_OFF = 11
+    ACCESS_WINDOW_SAVE = 11,
+    ACCESS_WINDOW_LOAD = 12,
+    ACCESS_WINDOW_OFF = 13
 };
 
 void AccessLogInit();
 
-void AccessLogWindow(int window);
+int AccessLogWindow(int window);
+
+unsigned AccessLogThread();
+
+void AccessLogRestore(int window, unsigned thread);
 
 void AccessLogMarker(int phase, unsigned tick);
 
@@ -62,6 +68,13 @@ struct AccessLogScope {
     int after;
     AccessLogScope(int during, int next) : after(next) { AccessLogWindow(during); }
     ~AccessLogScope() { AccessLogWindow(after); }
+};
+
+struct AccessLogSaveLoadScope {
+    unsigned thread;
+    int before;
+    explicit AccessLogSaveLoadScope(int window) : thread(AccessLogThread()), before(AccessLogWindow(window)) {}
+    ~AccessLogSaveLoadScope() { AccessLogRestore(before, thread); }
 };
 
 #endif

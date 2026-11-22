@@ -345,6 +345,8 @@ record `unitsState.units[i]` with `head`, `hoverBobPhase`, `healthPercent`, `pre
 section 21 again for it (`docs/movement-interface.md`, section 5). Scripts' state is in
 `docs/scripts-interface.md`, section 6.
 
+**At load**: `LoadUnits` reads every unit record of the save through `LoadUnit`, which creates the unit (`CreateUnit`), sets its fields and flags from the record, and hands the rest to the owners: LOAD to economy, movement, targeting and los_radar, SET_SQUAD to ai, LOAD_PATH_LOCK_STAMP to map, and the slots `LoadOrders` (orders), `LoadScriptState` (scripts) and `LoadState` (weapons, once per weapon slot); a unit a record names as its child or attacker is loaded first.
+
 ## 6. Random draws, sim events and the unit loop
 
 Units draws from the game logic stream (`RandomInt`) when it creates or loads a unit (the build angle and the hover

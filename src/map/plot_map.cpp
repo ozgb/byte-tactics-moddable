@@ -83,22 +83,3 @@ void __stdcall LoadPlayerFeaturesPlotmap(HapiBank* file)
         }
     }
 }
-
-// FUNCTION: 0x484f50
-void __stdcall SaveMappingData(HapiBank* file)
-{
-    file->OpenAccount("Mapping");
-    unsigned int size = g_game->width * g_game->height * sizeof(short) / 4;
-    file->OpenNamedBox("Data");
-    file->WriteBox((void *)g_game->visibilityMask, size);
-}
-
-// FUNCTION: 0x484fa0
-void __stdcall LoadMappingData(HapiBank* file)
-{
-    if (file->OpenAccount("Mapping") && file->OpenNamedBox("Data")) {
-        unsigned int size = g_game->width * g_game->height * sizeof(short) / 4;
-        if (file->GetBoxSize() == size)
-            file->ReadBox((void *)g_game->visibilityMask, size);
-    }
-}

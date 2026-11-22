@@ -95,9 +95,9 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 callers are LoadBattleAssets (src/game/game_state.cpp), LoadSavedGameState and SaveGameFile
                 (src/game/settings_campaign.cpp), LoadTntMap and FreeMapResources (src/map/line_of_sight.cpp) and
                 LoadUnitFbi (src/units/unit_types.cpp).
-                Los_radar's set-up slots, LoadTntMap, InitRadar, FreeRadar, FreeMapResources, CreateUnitIndex and FreeUnitIndex, run outside the tick too;
-                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and FreePlayers and InitPlayerSlot (src/game/players.cpp).
-                Map's set-up slots, BuildAllPassMaps, FreePassMaps, LoadMappingData, LoadMetalPlotmap, LoadPlayerFeaturesPlotmap, SaveMappingData,
+                Los_radar's set-up slots, LoadTntMap, InitRadar, FreeRadar, FreeMapResources, CreateUnitIndex, FreeUnitIndex, LoadMappingData and SaveMappingData, run outside the tick too;
+                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp), FreePlayers and InitPlayerSlot (src/game/players.cpp) and LoadSavedGameState and SaveGameFile (src/game/settings_campaign.cpp).
+                Map's set-up slots, BuildAllPassMaps, FreePassMaps, LoadMetalPlotmap, LoadPlayerFeaturesPlotmap,
                 SaveMetalPlotmap, SavePlayerFeaturesPlotmap, AllocateBuckets and FreeBuckets, run outside the tick, from the loader and the saved game
                 (the mission's slots left map for the mission interface, #983); their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp),
                 LoadSavedGameState and SaveGameFile (src/game/settings_campaign.cpp) and BuildDerivedLayers and FreeMapResources (src/map/line_of_sight.cpp).
@@ -111,11 +111,11 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 ReparseAiWeightScriptsIfLimitNotSticky, CreateSquads, FreeSquads, CreateSquadManager and FreeSquadManager, run outside the tick, from the console and
                 players' set-up; their callers are CmdPrintWeights and CmdReloadAIProfiles (src/game/console_commands.cpp) and FreePlayers, InitPlayerSlot,
                 LoadDefaultAIScript and RebuildAIFeatureCells (src/game/players.cpp).
-                Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions, FreeExplosions and LoadState, run outside the tick;
-                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and LoadUnit (src/units/unit_save.cpp, the saved game).
+                Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions, FreeExplosions, LoadState and SaveState, run outside the tick;
+                their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and LoadUnit and SaveUnits (src/units/unit_save.cpp, the saved game).
   queries       for each query slot (economy: RegionSize, RequestGranted, GetEnergyUse, UnitAccount, WriteState;
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
-                FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon; los_radar: GetMapCell, GetMapCellAtPosition,
+                FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon, SavedTargetPair; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
                 GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
                 SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds, PathLockStamp; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
@@ -304,7 +304,7 @@ FEATURES = Pilot(
 TARGETING = Pilot(
     owner="targeting", header="interfaces/targeting.h", seam="TargetingSeam",
     writing=("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"),
-    query=("GetWeaponTargetUnit", "ChooseWeapon"),
+    query=("GetWeaponTargetUnit", "ChooseWeapon", "SavedTargetPair"),
     engine_files=(SCHEDULER_FILE, TARGETING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
     by_params=False)
 LOS_RADAR = Pilot(
@@ -319,16 +319,17 @@ LOS_RADAR = Pilot(
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::IsPointVisible"),
     filler_locals=(("IsUnitVisibleToPlayer", "Vec3"), ("IsUnitVisibleToPlayer", "<anon>")),
     rowless_calls=("BlockVector::Begin", "BlockVector::End", "empty", "operator[]", "push_back", "size", "BlockVector::Size", "sprintf"),
-    setup=("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex"),
+    setup=("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex", "LoadMappingData", "SaveMappingData"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
-                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp")))
+                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),
+                   ("LoadSavedGameState", "src/game/settings_campaign.cpp"), ("SaveGameFile", "src/game/settings_campaign.cpp")))
 MAP = Pilot(
     owner="map", header="interfaces/map.h", seam="MapSeam",
     writing=("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius", "RefreshMovedUnits", "RefreshUnitIfStale"),
     query=("UnitsInRange", "GetCellMeanHeight", "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "GetGroundHeight",
            "PassMapGet", "PassMapInBounds", "WriteState", "PathLockStamp"),
     engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, PATHFINDING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
-    setup=("BuildAllPassMaps", "FreePassMaps", "LoadMappingData", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap", "SaveMappingData",
+    setup=("BuildAllPassMaps", "FreePassMaps", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap",
            "SaveMetalPlotmap", "SavePlayerFeaturesPlotmap", "AllocateBuckets", "FreeBuckets"),
     allowed_indirect=("LosRadarSeam::GetMapCell", "FeaturesSeam::GetCellFeature"),
     filler_locals=(("SnapWorldPosToFootprint", "Point16"),),
@@ -376,9 +377,9 @@ WEAPONS = Pilot(
     info_types=("Fixed", "MovableVec3", "ReachPosVec3", "ReachUnitVec3", "WakeVector"),
     rowless_calls=("_strcmpi", "strcmp", "operator Projectile *", "operator WeaponDef *", "operator bool", "bx_acos", "bx_hypot", "bx_sqrt", "sprintf", "memset"),
     frame_writers=(("WriteState", "CountExplosionTables"),),
-    setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions", "LoadState"),
+    setup=("AllocWeaponArray", "FreeWeaponArray", "LoadWeaponTypes", "FreeWeaponTypes", "InitExplosions", "FreeExplosions", "LoadState", "SaveState"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
-                   ("LoadUnit", "src/units/unit_save.cpp")))
+                   ("LoadUnit", "src/units/unit_save.cpp"), ("SaveUnits", "src/units/unit_save.cpp")))
 ORDERS = Pilot(
     owner="orders", header="interfaces/orders.h", seam="OrdersSeam",
     writing=("Apply", "RunOrders", "RunSecondaryOrders"),

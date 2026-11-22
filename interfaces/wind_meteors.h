@@ -8,7 +8,7 @@ class HapiBank;
 // Major version of the wind_meteors interface, changed when a slot is removed or its signature changes.
 #define WIND_METEORS_VERSION_MAJOR 3
 // Minor version of the wind_meteors interface, changed when a slot is added.
-#define WIND_METEORS_VERSION_MINOR 0
+#define WIND_METEORS_VERSION_MINOR 1
 
 // The meteor showers of a map, as plain data: the map's own figures or the default data file's.
 struct MeteorShowerParams {
@@ -39,7 +39,11 @@ enum WindMeteorsEventKind {
     // Sets the meteor weapon's name and the shower timing (WindMeteorsParams); InitMeteors looks the weapon up.
     WIND_METEORS_PARAMS = 66,
     // Starts a shower now, centred on a random cell, whether showers are enabled or not; the header alone.
-    WIND_METEORS_START = 67
+    WIND_METEORS_START = 67,
+    // Sets the wind speed limits of the map (WindMeteorsLimits), when the map loads.
+    WIND_METEORS_LIMITS = 68,
+    // Sets the wind's speed divisor to 5000 and its timer to 0, at match load; the header alone.
+    WIND_METEORS_RESET = 69
 };
 
 // The kinds of effect wind_meteors publishes to its outbox, for the modules that subscribe to them.
@@ -54,6 +58,16 @@ struct WindMeteorsParams {
     WindMeteorsEventHeader h;
     // The parameters it sets.
     MeteorShowerParams params;
+};
+
+// The payload of LIMITS.
+struct WindMeteorsLimits {
+    // The kind.
+    WindMeteorsEventHeader h;
+    // The slowest wind of the map.
+    int min;
+    // The fastest wind of the map.
+    int max;
 };
 
 // The payload of SPAWN.

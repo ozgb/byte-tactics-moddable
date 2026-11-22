@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 4.0), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 4.1), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -117,6 +117,12 @@ none of these, so no trace moves; a module publishing from WASM can.
 | `RegionSize`, `Init`, `Shutdown` | as economy's: the engine asks for the bytes of the private region for a map (`LosRadarMapInfo`, the unit slots), allocates it in `LoadBattleAssets`, gives it to `Init`, and frees what `Shutdown` returns |
 | `SightCache` | query: fills a `LosSightCache` (`cell`, `frameIdx`) with a unit's cache, for a saved game |
 | `WriteState` | writes record 44 `losRadarState` and the hashed records of section 24 (section 5) |
+
+**The slots of 4.1.** Los_radar 4.1 adds two set-up slots at the end, outside the tick, which left map's seam (map 8.0, `docs/map-interface.md`):
+
+| Slot | What it is |
+|---|---|
+| `LoadMappingData`, `SaveMappingData` | read and write the visibility mask, the allocation `LoadTntMap` tags "MAPPED MEMORY", as the "Mapping" account of a saved game; `LoadSavedGameState` and `SaveGameFile` call them |
 | SIGHT_RESET (137) | event: sets a unit's cache back to zero, as units' set-up did to the bytes; outcome 1, 0 for a null unit |
 | SIGHT_LOAD (138) | event: sets a unit's cache to the `cell` and `frameIdx` of the payload (`LosRadarSightLoad`), as a saved game restores it; outcome 1, 0 for a null unit |
 
@@ -138,7 +144,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
   `RevealAroundUnit` and cleared by the fog's drawing; the trace masks it out (0xfff7). The field stays in the game
   record as view state: the settings' writers are the engine's, and los_radar writes only bit 3.
 
-**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 4.0) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
+**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -226,6 +232,8 @@ cells share a row.
 | los_radar → ai, orders, targeting, units | `Unit::flags` | players | The sensor bits (0x100, 0x200, 0x400, 0x1000), written only by `UpdateSensorRadarAndCloak`, which the engine runs at 3.1c's place between players' updates. |
 
 ## 5. State and the trace
+
+A saved game gives los_radar back the visibility layer, from the "Mapping" account, through its own `LoadMappingData`, which copies the box into the mask in chunks, so that the write is los_radar's and not the files module's.
 
 Los_radar has a private region since 3.2 (`RegionSize`, `Init` and `Shutdown`, as economy's), allocated in
 `LoadBattleAssets` with the tag "LosRadar region" and freed in `ShutdownIngameSystems`, and a `WriteState` that reports

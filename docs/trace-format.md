@@ -1193,6 +1193,8 @@ for k in 0 .. n-1, in order of consumption and publication:
 | 65 | WIND_METEORS_DISABLE | none |
 | 66 | WIND_METEORS_PARAMS | `params` (48 bytes) |
 | 67 | WIND_METEORS_START | none |
+| 68 | WIND_METEORS_LIMITS | `min`, `max` |
+| 69 | WIND_METEORS_RESET | none |
 | 80 | WIND_METEORS_EFFECT_SPAWN | `weapon`, `pos` (12 bytes), `vel` (12 bytes), `announce` |
 
 - `kind` is an event: 64 ENABLE, 65 DISABLE, 66 PARAMS, 67 START; or an effect: 80 EFFECT_SPAWN. ENABLE, DISABLE and

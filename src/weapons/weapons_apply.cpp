@@ -101,6 +101,22 @@ void __stdcall WeaponsLoadState(Unit* unit, int slot, const WeaponsSlotState* st
     flags->bits.bit4 = state->flags >> 4 & 1;
 }
 
+void __stdcall WeaponsSaveState(Unit* unit, int slot, WeaponsSlotState* state)
+{
+    if (unit == nullptr || slot < 0 || slot > 2)
+        return;
+    const UnitWeaponSlot* s = &unit->weapons[slot];
+    state->aimDone = s->aimCob.nAimCobDone;
+    state->typeByte = s->weapon.get()->index;
+    state->aimOffset = s->muzzleAimFromDeltaZ;
+    state->reload = s->reloadTimer;
+    state->heading = s->fireHeading;
+    state->pitch = s->firePitch;
+    state->stockpile = s->stockpile;
+    const WeaponSlotFlagBits* flags = (const WeaponSlotFlagBits*)&s->flags;
+    state->flags = flags->bits.bit0 | flags->bits.bit1 << 1 | flags->bits.bit2 << 2 | flags->bits.bit3 << 3 | flags->bits.bit4 << 4;
+}
+
 int __stdcall WeaponsApply(const WeaponsEventHeader* e, unsigned int size)
 {
     if (size < sizeof(WeaponsEventHeader))

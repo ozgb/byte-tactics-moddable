@@ -1,7 +1,7 @@
 """Check, over the stored access-log summaries, that the pilots' state is private to them and that pathfinding's written state shows no shadow field.
 
     uv run tools/accesslog.py run --build-dir build/access <every scenario>
-    uv run tools/privatestate.py --store build/access/access    # keeps the reads files, gzipped, in data/access_reads
+    uv run tools/privatestate.py --store build/access/access    # keeps the reads and saveload files, gzipped, in data/access_reads and data/access_saveload
     uv run tools/privatestate.py --check                        # both checks below, on the stored data
     uv run tools/test_privatestate.py                           # tests, on synthetic summaries
 
@@ -9,12 +9,21 @@ Private. The state of the default pathfinder is one allocation of the state bloc
 and reached through `Game::pathfinder`, the item `pathfinder`). tools/accesslog.py names the parts of the allocation as
 `Pathfinder::field`, `PathExtra::field`, `Node::field`, `PathCell::field` and `PathPending::field` and the others
 `<allocation>.<part>`. --check fails on any row of the stored summaries (data/access/*.edges.csv.gz, the cross, pass and
-presentation files of data/access_phases and data/access_presentation, and the reads files) in which a subsystem other than
+presentation files of data/access_phases and data/access_presentation, the reads files and the saveload files) in which a subsystem other than
 pathfinding is the writer or the reader of such an item. A writer or reader `-` is no subsystem.
 
 Reads. `<scenario>.reads.csv` (item,reader,count,first_tick, written by lib/accesslog) lists every subsystem that read an item
 at all in the windows of a tick, a subsystem's reads of its own writes included, which the edges files leave out
 (lib/accesslog/classifier.h). The `presentation` window is not in it.
+
+Save and load. lib/accesslog opens a window of its own around SaveGameFile (`save`) and around LoadSavedGameState and
+LoadBattleAssets (`load`), on the thread that opens it (a match loads on the load thread). `<scenario>.saveload.csv`
+(writer,reader,item,phase,evidence,count,first_tick: the edges columns, phase `save` or `load`) holds every access of
+those windows that an edges file would: a write and the reads of it by another subsystem, an unread write and a read of
+an item the window did not write. The window starts no tick epoch and adds no cross or carried evidence, so the summaries
+of the tick are what they would be without it. --store keeps the saveload files, gzipped, in data/access_saveload, and
+--check applies every owner rule below to them as to the tick's windows: a subsystem that writes or reads another's
+private state while a game is saved or loaded fails, as it does inside the tick.
 
 Shadow fields. The harness dumps sections 16 and 17 of docs/trace-format.md (a diagnostic, not hashed since bt-trace 4) from the records
 that the default pathfinder writes (PathfindingWriteState): the
@@ -35,9 +44,8 @@ WriteState (section 34) is dumped and never hashed, so no shadow-field check app
 wind_meteors owns no allocation, only named items of the state block. The 13 meteor globals of SimGlobals (g_meteorNextStrikeTime and the others
 in METEOR_GLOBALS, named in the log by the global's name) are private for reads and writes: any subsystem but wind_meteors that reads or writes one
 fails. The wind fields of the Game record (WIND_FIELDS, named in the log by the bare field name) are its view: others read them, so they are private
-for writes only, and any writer but wind_meteors fails. Like every check here it sees the windows of a tick only, so it holds the wind to
-wind_meteors inside the tick: at load the engine still writes windCounter and windSpeedDenominator (LoadBattleAssets) and the map loader
-the limits windSpeedMin and windSpeedMax (MapSettings), which the log does not cover.
+for writes only, and any writer but wind_meteors fails, at load too: the engine resets the wind and the map loader gives the limits
+through wind_meteors' RESET and LIMITS events.
 
 Features' state stays in the state block, hashed and read by others as a view, and is written by features alone, like the player accounts: the
 links of the feature animation pool's spots (the 0x800 entries of 0x30 bytes allocated by InitFeatureAnimPool as "FEATURE ANIM DATA", which the log
@@ -54,9 +62,8 @@ weapon slots of a unit (`UnitWeaponSlot::aimTargetXOrUnitId` and `aimTargetZOrUn
 `Unit` that starts each slot's words: `Unit::current` (slot 0), `Unit::field_20` (slot 1) and `Unit::weapon2Target` (slot 2), each the pair's four bytes.
 The other members of a slot (`Unit::field_8`, `Unit::unknown_24`, `Unit::weapon2AimCob`) are not the pair and are shared with the unit's own set-up and
 weapons, so they are not listed. `Unit::netDirtyFlags` is not listed either: targeting clears bits of it, but weapons and orders write it too. Any
-writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events.
-Like every check here it sees the windows of a tick only, and a saved game loads outside them: no stored summary covers LoadUnit, whose restore
-of the pair goes through targeting's LOAD by the same rule (#1010) but is not checked.
+writer but targeting fails, which is what makes every aim, clear and reset of a weapon's target reach the pair through the scheduler's events,
+and a saved game's restore of it through targeting's LOAD (LoadUnit).
 
 Los_radar's state is a region and a view. The region is one allocation, "LosRadar region" (allocated by the engine in LoadBattleAssets), which holds the
 unit sight cache (the 12 bytes of the Unit record that stay unused, `Unit::unusedLosCache` and `unusedLosSightFrame`): no subsystem but los_radar writes or reads a part of it. The eyeballs (the members of `Eye`, the count
@@ -75,7 +82,7 @@ map fails, which is what makes every placement, move and removal reach these ite
 Players' state is one region, "Players region" (allocated by the engine in LoadBattleAssets), with the two clocks and the end-game countdown that the Player and Game records keep unused, and the mission conditions: the members of `MissionCondition` and of each victory and defeat condition type, such as `VictoryTimerRunsOut` and `DefeatCommanderKilled`, are private for reads and writes, and `playersState` reports them.
 Two items are read elsewhere, so private for writes only: `MissionConditions` (the list, whose registration the seams read) and `VictoryMoveUnitToRadius` (map's radius walk calls its visitor, which the log charges to map). The rest of a player's fields (units, the economy's accounts, the controller and the slot's set-up) are not listed: others write them. Any writer but players fails, which is what makes every capture, kill, transfer and creation or death of a unit reach the conditions through the scheduler's events.
 
-Ai's state is written by ai alone: the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`) and the records a computer player's AI holds (`KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`) are private for reads and writes, and `aiState` reports them. `PlayerAI` itself is private for writes only: the log charges reads of its `vec_65` and `vec_8d` to no subsystem (`unknown`), and they are ai's own code (PlayerAI::ComputeBaseWeights). The pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI` are private for writes only too: others read the pointers of `g_playerAI` through the indexes of los_radar and units.
+Ai's state is written by ai alone: the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`) and the records a computer player's AI holds (`KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`) are private for reads and writes, and `aiState` reports them. `PlayerAI` itself is private for writes only. The pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI` are private for writes only too: others read the pointers of `g_playerAI` through the indexes of los_radar and units.
 `Unit::group` is not listed: orders' GetBuiltOrder gives a human player's built unit its factory's group, a UI group, and LoadUnit writes it. `Player::ai` is not listed either: players' slot set-up writes it. Any writer but ai fails, which is what makes every reaction, squad change and weight or limit command reach these items through the scheduler's events.
 
 Weapons' state is written by weapons alone and read by others: the projectile table and its count (`Game::projectiles`, `Game::projectileCount` and the members of `Projectile`, which ai and los_radar read), the explosions and debris (`Game::count_1491b`, the `debris` array, the members of `Explosion`, `ExplodedPiece` and `Debris` but `Debris::ref1` and `Debris::ref2`, which the GAF helpers of game and presentation write, `DebrisPiece::state` and `DebrisCache::cur`, `Debris::pos` is read by map) and the exploded pieces (`g_explodedPieces`), and the weapon slots of a unit (`Unit::weapons`, src/weapons/unit_weapon_slot.h), which the log names by the members of the union of `Unit` that starts each word of a slot: the cob callback, the weapon, the reload timer, the fire angles, the flags and the three pads of each slot. Not listed: the aim target pair of each slot (targeting's, above). The stockpile of each slot (`Unit::field_1e`, `Unit::b3a` and `Unit::b56`) is listed: orders' build order adds a round through ADD_STOCKPILE. Any writer but weapons fails, which is what makes every damage, claim, release, detonation, stockpile and aim reach these items through the scheduler's events. Part of it is private for reads and writes as well, since only weapons reads it: the explosions part of the Game record (the exploded pieces' table `g_explodedPieces` and the `ExplodedPiece` allocations, the debris table `count_1491b` and `debris` with the members of `Debris` but `Debris::ref1` and `Debris::ref2`, and the pieces of debris, `DebrisPiece`), the aim callback, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading` and `firePitch` of each slot of a unit (the log names them by the members of the union that start each of their words: `Unit::field_8`, `Unit::type`, `Unit::unknown_14`, `Unit::field_16`, `Unit::field_18`, `Unit::unknown_1a`, `Unit::f_1b`, `Unit::unknown_1c`, `Unit::unknown_24`, `Unit::unknown_2a`, `Unit::unknown_30`, `Unit::weapon2AimCob` and `Unit::unknown_4c`) and the members of `Projectile` but `type`, `position`, `attacker`, `owner` and `target`, which ai, los_radar and the network read. The weapon, stockpile and flags of a slot stay shared. Map's read of `Debris::pos` (weapons passes it to the cell height query) and the reads of presentation, platform, game and seams (the frame dumps, the copies and the GAF cursors act for the owner) do not count.
@@ -84,7 +91,7 @@ Orders' state is the orders of a unit, written by orders alone and read by other
 
 Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. The path lock stamp (`UnitMotion::pathLockStamp`) is not movement's but map's (above): movement neither writes it nor carries it in its events. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events. The fields only movement reads are private for reads and writes: `UnitMotion::p2` and `UnitMotion::turn` (`UnitMotion::lastMoveTick`, `velocity`, `speed`, `flags` and `movementClass` stay shared), every member of the goals and of the targets (`PathOrder` but `PathOrder::ref`, which units shares, `AirManeuverOrder`, `ApproachRadius`, `RingApproach` and `PointMarker`) and their allocations (`<function>: new <type>`). Map's reads of `PathOrder::pos` (movement passes it to the ground height query) and the reads of presentation, platform, game and seams do not count.
 
-Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it. Those objects are private for reads and writes: the members of `CobScript`, `UnitScript`, `Channel` (with the stacks) and `Piece` (the script's piece records), the statics and the allocation of `NewUnitScript`. The piece transforms (`ModelPiece`) stay shared: weapons reads them. The reads of presentation, platform, game and seams do not count.
+Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it. Those objects are private for reads and writes: the members of `CobScript`, `UnitScript`, `Channel` (with the stacks) and `Piece` (the script's piece records), the statics and the allocation of `NewUnitScript`. The piece transforms (`ModelPiece`) stay shared: weapons reads them. The reads of presentation, platform, game and seams do not count, nor does the files module's read of the statics at save: `SaveScriptState` hands the statics to the bank's `WriteBox`, which copies them into the save for scripts.
 
 Units' state is the unit record, written by units alone but for the items of the owners above it in the table (targeting, weapons, orders, movement, map and scripts) and for the views of the record that other subsystems keep: map's `Unit::cargoNext` (the bucket link: SpatialBucket::UnlinkUnit, SpatialBucket::PrependUnit, SetOwner, ClearFootprintAndUnlink) and `Unit::cobStateFlags` (SetYardOpen), los_radar's and map's and presentation's bits of `Unit::flags` (UpdateSensorRadarAndCloak and the jam visitors; ClaimFootprintCells, AddUnitToMap, RemoveUnitFromMap, SetYardOpen, ForceNeighborFootprintReclaim; the selection functions), los_radar's `Unit::workTime` (charged by the log), economy's `Unit::extraction` (EconomyUpdateMetalExtraction), ai's `Unit::group` (SetUnitSquad) and targeting's `Unit::netDirtyFlags` (SetWeaponTargetUnit, SetWeaponTargetPos): the `also_written_by` of the owner. The fields only units reads are private for reads and writes: `Unit::head`, `hoverBobPhase`, `healthPercent`, `prevHealthPercent`, `unfinishedInitZero`, `unknown_10a` and `zBufferFlag`. The reads of presentation, platform, game and seams do not count.
 
@@ -111,6 +118,9 @@ READS_SUFFIX = ".reads.csv"
 ACCESS_DIR = ROOT / "data/access"
 PHASES_DIR = ROOT / "data/access_phases"
 PRESENTATION_DIR = ROOT / "data/access_presentation"
+SAVELOAD_DIR = ROOT / "data/access_saveload"
+SAVELOAD_SUFFIX = ".saveload.csv"
+SAVELOAD_COLUMNS = ["writer", "reader", "item", "phase", "evidence", "count", "first_tick"]
 SCHEMA = ROOT / "data/trace_schema.json"
 ALLOW = ROOT / "data/shadow_field_allow.csv"
 ALLOW_COLUMNS = ["item", "reason"]
@@ -229,7 +239,7 @@ SCRIPTS_TYPES = ("CobScript", "UnitScript", "Channel", "Piece")
 
 SCRIPTS_ALLOCATED = ("UnitScript",)
 
-SCRIPTS_ALSO_READ_BY = ACTING_FOR_OWNER
+SCRIPTS_ALSO_READ_BY = ACTING_FOR_OWNER + (("CobScript::SetCob: realloc int", "files"),)
 
 SCRIPTS_WRITE_TYPES = ("CobScript", "UnitScript", "Channel", "Piece", "ModelPiece")
 
@@ -364,8 +374,9 @@ def read_gz(path: Path) -> list[dict]:
 
 def stored_rows() -> dict[str, list[tuple[str, str, str]]]:
     """{file kind: [(writer, reader, item)]} of every stored summary with an item, `-` for a column the file does not have."""
-    out: dict[str, list[tuple[str, str, str]]] = {"edges": [], "cross": [], "pass": [], "presentation": [], "reads": []}
-    for kind, directory in (("edges", ACCESS_DIR), ("cross", PHASES_DIR), ("pass", PHASES_DIR), ("reads", READS_DIR)):
+    out: dict[str, list[tuple[str, str, str]]] = {"edges": [], "cross": [], "pass": [], "presentation": [], "reads": [], "saveload": []}
+    for kind, directory in (("edges", ACCESS_DIR), ("cross", PHASES_DIR), ("pass", PHASES_DIR), ("reads", READS_DIR),
+                            ("saveload", SAVELOAD_DIR)):
         suffix = ".%s.csv.gz" % kind
         for path in sorted(directory.glob("*" + suffix)):
             for r in read_gz(path):
@@ -427,24 +438,30 @@ def read_allow() -> dict[str, str]:
         return {r["item"]: r["reason"] for r in csv.DictReader(fh)}
 
 
-def store(source: Path, directory: Path) -> int:
-    """Keep each reads file of source (accesslog.py's output) in directory, sorted and gzipped."""
+def store_sorted(source: Path, suffix: str, directory: Path, columns: list[str]) -> int:
+    """Keep each file of source that ends with suffix in directory, its rows sorted by the columns and gzipped."""
+    directory.mkdir(exist_ok=True)
+    count = 0
+    for path in sorted(source.glob("*" + suffix)):
+        with path.open(newline="") as fh:
+            rows = sorted(csv.DictReader(fh), key=lambda r: [r[c] for c in columns])
+        buf = io.StringIO()
+        w = csv.writer(buf, lineterminator="\n")
+        w.writerow(columns)
+        w.writerows([r[c] for c in columns] for r in rows)
+        (directory / (path.name + ".gz")).write_bytes(gzip.compress(buf.getvalue().encode(), 9, mtime=0))
+        count += 1
+    return count
+
+
+def store(source: Path, directory: Path, saveload: Path) -> tuple[int, int]:
+    """Keep each reads file of source (accesslog.py's output) in directory and each saveload file in saveload, sorted and gzipped."""
     import accesslog
 
     for stats in sorted(source.glob("*.stats.txt")):
         accesslog.check_stats(stats.name[: -len(".stats.txt")], stats)
-    directory.mkdir(exist_ok=True)
-    count = 0
-    for path in sorted(source.glob("*" + READS_SUFFIX)):
-        with path.open(newline="") as fh:
-            rows = sorted(csv.DictReader(fh), key=lambda r: (r["item"], r["reader"]))
-        buf = io.StringIO()
-        w = csv.writer(buf, lineterminator="\n")
-        w.writerow(["item", "reader", "count", "first_tick"])
-        w.writerows([r["item"], r["reader"], r["count"], r["first_tick"]] for r in rows)
-        (directory / (path.name + ".gz")).write_bytes(gzip.compress(buf.getvalue().encode(), 9, mtime=0))
-        count += 1
-    return count
+    reads = store_sorted(source, READS_SUFFIX, directory, ["item", "reader", "count", "first_tick"])
+    return reads, store_sorted(source, SAVELOAD_SUFFIX, saveload, SAVELOAD_COLUMNS)
 
 
 def check() -> list[str]:
@@ -452,6 +469,9 @@ def check() -> list[str]:
     names = {p.name[: -len(READS_SUFFIX + ".gz")] for p in READS_DIR.glob("*" + READS_SUFFIX + ".gz")}
     for s in depclass.missing_scenarios({n: [] for n in names}):
         problems.append("no summary data/access_reads/%s.reads.csv.gz for reference/scenarios/%s.txt" % (s, s))
+    saved = {p.name[: -len(SAVELOAD_SUFFIX + ".gz")] for p in SAVELOAD_DIR.glob("*" + SAVELOAD_SUFFIX + ".gz")}
+    for s in depclass.missing_scenarios({n: [] for n in saved}):
+        problems.append("no summary data/access_saveload/%s.saveload.csv.gz for reference/scenarios/%s.txt" % (s, s))
     problems += violations(stored_rows())
     schema = json.loads(SCHEMA.read_text())
     wanted, bad = exposed(schema)
@@ -466,11 +486,11 @@ def check() -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = ap.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--store", type=Path, metavar="DIR", help="store the reads files of DIR in data/access_reads")
+    mode.add_argument("--store", type=Path, metavar="DIR", help="store the reads and saveload files of DIR in data/access_reads and data/access_saveload")
     mode.add_argument("--check", action="store_true", help="fail on another subsystem's access to the region or on a shadow field")
     args = ap.parse_args()
     if args.store:
-        print("privatestate: stored %d reads files" % store(args.store, READS_DIR))
+        print("privatestate: stored %d reads files and %d saveload files" % store(args.store, READS_DIR, SAVELOAD_DIR))
         return 0
     problems = check()
     if problems:

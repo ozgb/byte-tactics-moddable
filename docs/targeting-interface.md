@@ -1,6 +1,6 @@
 # The targeting interface
 
-Targeting sits behind `interfaces/targeting.h` (version 3.0; 2.1 added LOAD), the third module on the scheduler
+Targeting sits behind `interfaces/targeting.h` (version 3.1; 2.1 added LOAD, 3.1 added the query `SavedTargetPair`), the third module on the scheduler
 after economy (`docs/economy-interface.md`) and features (`docs/features-interface.md`), and the first whose state
 stays in the `Unit` record (#955). 3.1c's targeting code is its default implementation. This page is the inventory
 the interface was cut from:
@@ -82,7 +82,7 @@ callers passed pointers and could publish none of these, so no trace moves; a mo
 The `FindScript` call looks up a function whose answer 3.1c threw away, and it writes nothing. Since #986 the handler is
 scripts' own, and it drops the lookup.
 
-**Payloads.** Every event and effect starts with `TargetingEventHeader`: `kind`, `unit` (the unit whose weapon aims, a block offset) and `weapon` (0 to 2). Each kind has the payload of `interfaces/targeting.h` (version 3.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, with a null unit or a weapon outside 0 to 2, and a SET_UNIT with a null `target`.
+**Payloads.** Every event and effect starts with `TargetingEventHeader`: `kind`, `unit` (the unit whose weapon aims, a block offset) and `weapon` (0 to 2). Each kind has the payload of `interfaces/targeting.h` (version 3.1) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, with a null unit or a weapon outside 0 to 2, and a SET_UNIT with a null `target`.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -101,7 +101,7 @@ ai's and los_radar's views), all as of each module's last run. `FindWeaponTarget
 **What others read of targeting:**
 - **The target pair, in the `Unit` record, hashed** (section 5). No code outside targeting reads it: every read went
   through `GetWeaponTargetUnit` or `GetWeaponTargetPos` in 3.1c, and goes through them now.
-- **Queries:** `GetWeaponTargetUnit` and `ChooseWeapon`.
+- **Queries:** `GetWeaponTargetUnit`, `ChooseWeapon` and, since 3.1, `SavedTargetPair(unit, weapon)`, the pair's four bytes as a saved game keeps them (x or the unit number in the low half, z or the sentinel in the high half), the word LOAD gives back; `SaveUnit` reads it outside the tick.
 - **`Unit::netDirtyFlags`**, the notices a unit's orders wait on, is not targeting's: weapons sets the bits of a shot
   fired, a command fire and a target out of reach, orders consumes them in `RunOrders`, and units clears them as it
   sets a unit up. SET_UNIT and SET_POS clear the three weapon notices (and two others), as 3.1c did; that write
@@ -152,9 +152,9 @@ Targeting keeps no private region, and so it has no `WriteState` report: its sta
 - **The target pair** of each of a unit's three weapon slots (a target unit's number with the mark 0x8000, or a
   ground point's x and z in whole units, or none) stays in the `Unit` record and in the hash (section 1 of the trace, `units[i]`).
   It is targeting's alone to write: `privatestate.py --check` fails when another subsystem writes it inside the
-  tick. A saved game loads outside the tick, where the access log records nothing, so the check cannot see the
-  load: until #1010 units' `LoadUnit` wrote the pair itself and the check passed. LOAD holds the load to the same
-  rule. Moving it to a
+  tick. The access log records a save window and a load window outside the tick, so the check sees a
+  saved game too: `SaveUnit` reads the pair through `SavedTargetPair` (3.1) and `LoadUnit` writes it through LOAD, each in
+  targeting's code; until #1010 and 3.1 units wrote and read the pair itself. Moving it to a
   private region would be a trace format bump with a reference half (#946's path) for no gain in what a
   re-implementation must match: every reader already reaches it through targeting's slots, and the hash is what shows
   a wrong target at the tick it is chosen (the negative test, `tests/targeting_writer_test.cpp`).

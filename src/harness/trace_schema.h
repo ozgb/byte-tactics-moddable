@@ -1491,6 +1491,16 @@ static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
 static const TraceField kEventWindMeteorsStart[] = {
     { "kind", offsetof(WindMeteorsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(WindMeteorsLimits) == 12, "WindMeteorsLimits");
+static const TraceField kEventWindMeteorsLimits[] = {
+    { "kind", offsetof(WindMeteorsLimits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "min", offsetof(WindMeteorsLimits, min), 4, TF_SCALAR, TT_NONE, 0 },
+    { "max", offsetof(WindMeteorsLimits, max), 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
+static const TraceField kEventWindMeteorsReset[] = {
+    { "kind", offsetof(WindMeteorsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(WindMeteorsSpawn) == 36, "WindMeteorsSpawn");
 static const TraceField kEventWindMeteorsEffectSpawn[] = {
     { "kind", offsetof(WindMeteorsSpawn, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1504,9 +1514,11 @@ static const TraceEventKind kWindMeteorsKinds[] = {
     { 65, "WIND_METEORS_DISABLE", sizeof(WindMeteorsEventHeader), kEventWindMeteorsDisable, 1 },
     { 66, "WIND_METEORS_PARAMS", sizeof(WindMeteorsParams), kEventWindMeteorsParams, 2 },
     { 67, "WIND_METEORS_START", sizeof(WindMeteorsEventHeader), kEventWindMeteorsStart, 1 },
+    { 68, "WIND_METEORS_LIMITS", sizeof(WindMeteorsLimits), kEventWindMeteorsLimits, 3 },
+    { 69, "WIND_METEORS_RESET", sizeof(WindMeteorsEventHeader), kEventWindMeteorsReset, 1 },
     { 80, "WIND_METEORS_EFFECT_SPAWN", sizeof(WindMeteorsSpawn), kEventWindMeteorsEffectSpawn, 5 },
 };
-static const TraceEventModule kWindMeteorsEvents = { "windMeteors", 37, kWindMeteorsKinds, 5 };
+static const TraceEventModule kWindMeteorsEvents = { "windMeteors", 37, kWindMeteorsKinds, 7 };
 
 static_assert(sizeof(TargetingSetUnit) == 16, "TargetingSetUnit");
 static const TraceField kEventTargetingSetUnit[] = {

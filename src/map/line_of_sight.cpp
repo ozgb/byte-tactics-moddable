@@ -101,6 +101,7 @@ struct GraphicsOptionFlagsView {
 #include "../game/game.h"
 #include "../game/features_events.h"
 #include "../game/los_radar_events.h"
+#include "../game/wind_meteors_events.h"
 
 #pragma pack(pop)
 
@@ -705,16 +706,19 @@ void LoadTntMap()
         break;
     }
 
+    int windSpeedMin;
+    int windSpeedMax;
     a.n = mission.minWindSpeed;
     if (a.n >= 0 && info.version >= 0x2000)
-        mapSettings->windSpeedMin = a.n;
+        windSpeedMin = a.n;
     else
-        mapSettings->windSpeedMin = info.sea_a;
+        windSpeedMin = info.sea_a;
     a.n = mission.maxWindSpeed;
     if (a.n >= 0 && info.version >= 0x2000)
-        mapSettings->windSpeedMax = a.n;
+        windSpeedMax = a.n;
     else
-        mapSettings->windSpeedMax = info.sea_b;
+        windSpeedMax = info.sea_b;
+    PublishWindMeteorsLimits(windSpeedMin, windSpeedMax);
     a.n = mission.gravity;
     if (a.n >= 0 && info.version >= 0x2000)
         mapSettings->rise = (int)((a.n * 65536.0) * 0.0011111111111111111);
@@ -882,7 +886,6 @@ void LoadTntMap()
     g_seams.features->StampFeatureMetal();
     g_game->count_14277 = 0;
     g_game->eyes = (Eye*)SimAllocTagged("EYEBALL MEMORY", kEyeCapacity * sizeof(Eye));
-    mapSettings->featureReproduceCursor = 0;
     g_game->loadProgress = 100;
 }
 

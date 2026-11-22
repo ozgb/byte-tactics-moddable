@@ -13,6 +13,7 @@
 #include "../../interfaces/economy.h"
 #include "../../interfaces/los_radar.h"
 #include "../../interfaces/players.h"
+#include "../../interfaces/wind_meteors.h"
 #include "../seams/economy_world.h"
 #include "../../interfaces/host.h"
 #include "game_state.h"
@@ -110,6 +111,7 @@ void __stdcall SetGameMode(int param)
 
 #include "../util/math.h"
 #include "scheduler.h"
+#include "wind_meteors_events.h"
 
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
@@ -470,6 +472,9 @@ unsigned int GetTicks();
 // FUNCTION: 0x4917d0
 void LoadBattleAssets()
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_LOAD);
+#endif
     ResetChatHudIndices();
     memset(&g_game->chatRecipients_2bf1_b, 0, 11);
     g_game->orderMode = 1;
@@ -504,8 +509,7 @@ void LoadBattleAssets()
     MapMoveLimits limits[32];
     int classes = g_seams.units->GetMovementLimits(limits, 32);
     g_seams.map->BuildAllPassMaps(limits, classes);
-    g_game->windSpeedDenominator = 5000;
-    g_game->windCounter = 0;
+    PublishWindMeteors(WIND_METEORS_RESET, nullptr);
     SchedWindPhase(RAND_STREAM_LOAD);
     g_game->xform = GameAllocIgnoreTag("TEMP XFORM PTS", 0x960);
     g_game->projected = GameAllocIgnoreTag("TEMP PROJECTED PTS", 0x640);

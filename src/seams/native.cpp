@@ -694,6 +694,7 @@ void InstallNativeSeams()
     s_features.FirstFeatureSpot = FirstFeatureSpot;
     s_features.UpdateFeatureSpot = UpdateFeatureSpot;
     s_targeting.Apply = ApplyTargetingEvent;
+    s_targeting.SavedTargetPair = SavedTargetPair;
     s_targeting.GetWeaponTargetUnit = GetWeaponTargetUnit;
     s_targeting.GetWeaponTargetPos = GetWeaponTargetPosNative;
     s_targeting.FindWeaponTarget = FindWeaponTarget;
@@ -743,6 +744,8 @@ void InstallNativeSeams()
     s_los_radar.Shutdown = LosRadarShutdown;
     s_los_radar.SightCache = LosRadarSightCache;
     s_los_radar.WriteState = LosRadarWriteState;
+    s_los_radar.LoadMappingData = LoadMappingData;
+    s_los_radar.SaveMappingData = SaveMappingData;
     s_units.GetFactoriesInRadius = GetFactoriesInRadius;
     s_units.CreateFactoryIndex = CreateFactoryIndex;
     s_units.FreeFactoryIndex = FreeFactoryIndex;
@@ -830,10 +833,8 @@ void InstallNativeSeams()
     s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreePassMaps = FreePassMaps;
-    s_map.LoadMappingData = LoadMappingData;
     s_map.LoadMetalPlotmap = LoadMetalPlotmap;
     s_map.LoadPlayerFeaturesPlotmap = LoadPlayerFeaturesPlotmap;
-    s_map.SaveMappingData = SaveMappingData;
     s_map.SaveMetalPlotmap = SaveMetalPlotmap;
     s_map.SavePlayerFeaturesPlotmap = SavePlayerFeaturesPlotmap;
     s_map.SnapWorldPosToFootprint = SnapWorldPosToFootprint;
@@ -956,6 +957,7 @@ void InstallNativeSeams()
     s_weapons.Apply = WeaponsApply;
     s_weapons.LoadState = WeaponsLoadState;
     s_weapons.WriteState = WeaponsWriteState;
+    s_weapons.SaveState = WeaponsSaveState;
     s_units.UpdateAllUnits = UpdateAllUnits;
     s_players.UpdatePlayers = UpdatePlayers;
     s_files.OpenRead = HAPI_OpenFileRead;

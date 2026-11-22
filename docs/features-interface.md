@@ -172,6 +172,7 @@ by value.
 
 Features keeps no private region, and so it has no `WriteState` report: its state is view state, hashed where it was.
 
+- **What features restores at load.** `InitFeatureAnimPool` sets up the spot pool and zeroes the scan index, in the map load, before the first tick.
 - **The spot pool** (`FeatureAnimEntry`, 0x800 spots on a used and a free list, with the scan's cell index) is
   features' alone to write, and `privatestate.py --check` fails when another subsystem writes a spot's list links
   (`next`, `prev`), the scan index or a cell's feature fields. The rest of a spot is not checked: it holds the spot's

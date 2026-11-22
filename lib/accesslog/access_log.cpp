@@ -1132,6 +1132,8 @@ NS void DeferLoad()
 }
 #endif
 
+NS inline bool SaveOrLoad(int window) { return window == ACCESS_WINDOW_SAVE || window == ACCESS_WINDOW_LOAD; }
+
 NS void NoteRead(unsigned item, unsigned sub)
 {
     if (g_reads == 0 || sub >= g_subCount)
@@ -1186,7 +1188,7 @@ NS void Record(int store, unsigned a, unsigned size, void* ra)
             g_stats.writes++;
             g_classifier.Write(h.item, h.entA, h.entB, sub, g_tick);
         } else {
-            if (g_window != ACCESS_WINDOW_PRESENTATION) {
+            if (g_window != ACCESS_WINDOW_PRESENTATION && !SaveOrLoad(g_window)) {
                 NoteRead(h.item, sub);
                 if (size <= 16 && h.end < end)
                     NoteReadSpan(h.end, end, sub);
@@ -1432,7 +1434,7 @@ NS void WriteWhole(const char* path, const Out& out)
 }
 
 const char* const kPhaseNames[] = {"net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors",
-                                   "tail", "presentation", "pending"};
+                                   "tail", "presentation", "pending", "save", "load"};
 const char* const kEvidenceNames[] = {"read-after-write", "read-unwritten", "write-unread", "ordered", "read-after-write",
                                       "read-before-write"};
 
@@ -1758,10 +1760,11 @@ NS void AccessLogInit()
     g_ready = true;
 }
 
-NS void AccessLogWindow(int window)
+NS static int OpenWindow(int window, unsigned thread)
 {
+    int before = g_window;
     if (!g_ready)
-        return;
+        return before;
     ProcessSimEvent();
     if (g_draws != 0)
         FlushEntity();
@@ -1793,15 +1796,32 @@ NS void AccessLogWindow(int window)
     g_window = window;
     if (window == ACCESS_WINDOW_OFF) {
         g_on = 0;
-        return;
+        return before;
     }
-    if (!g_started) {
-        g_started = true;
-        g_simThread = ThreadId();
-    }
+    g_started = true;
+    g_simThread = thread;
     g_blockLo = (unsigned)SimBlockBase();
-    g_classifier.BeginWindow(window);
+    if (SaveOrLoad(window))
+        g_classifier.BeginIsolatedWindow(window);
+    else
+        g_classifier.BeginWindow(window);
     g_on = 1;
+    return before;
+}
+
+NS int AccessLogWindow(int window)
+{
+    return OpenWindow(window, ThreadId());
+}
+
+NS unsigned AccessLogThread()
+{
+    return g_simThread;
+}
+
+NS void AccessLogRestore(int window, unsigned thread)
+{
+    OpenWindow(window, thread != 0 ? thread : ThreadId());
 }
 
 NS void AccessLogMarker(int phase, unsigned tick)
@@ -1841,7 +1861,7 @@ NS void AccessLogDraw(int stream, void* ra)
     unsigned s = (unsigned)stream < 3 ? (unsigned)stream : 2;
     g_stats.draws++;
     g_classifier.Ordered(s, g_idRng[s], sub, g_tick);
-    if (g_draws == 0)
+    if (g_draws == 0 || SaveOrLoad(g_window))
         return;
     unsigned pass = g_pass != ACCESS_PASS_NONE ? (unsigned)g_pass : g_window == ACCESS_WINDOW_PRESENTATION ? kPresentationPass : 0u;
     unsigned func = FunctionOf(ra);
@@ -1895,20 +1915,25 @@ NS void AccessLogFinish()
     cross.Add("writer,reader,item,phase_from,phase_to,evidence,count,first_tick\n");
     Out events = {0, 0, 0};
     events.Add("writer,reader,item,phase,evidence,count,first_tick\n");
-    unsigned crossRows = 0, edgeRows = 0;
+    Out saveLoad = {0, 0, 0};
+    saveLoad.Add("writer,reader,item,phase,evidence,count,first_tick\n");
+    unsigned crossRows = 0, edgeRows = 0, saveLoadRows = 0;
     for (unsigned i = 0; i < n; i++) {
         const ClassifierEdge& e = rows[i].e;
-        bool isEvent = e.item == g_idSimEvent;
-        Out& o = isEvent ? events : e.evidence >= EVIDENCE_CROSS ? cross : out;
-        crossRows += !isEvent && e.evidence >= EVIDENCE_CROSS;
-        edgeRows += !isEvent && e.evidence < EVIDENCE_CROSS;
+        bool isSaveLoad = SaveOrLoad((int)e.label);
+        bool isEvent = !isSaveLoad && e.item == g_idSimEvent;
+        bool isCross = !isSaveLoad && !isEvent && e.evidence >= EVIDENCE_CROSS;
+        Out& o = isSaveLoad ? saveLoad : isEvent ? events : isCross ? cross : out;
+        crossRows += isCross;
+        edgeRows += !isSaveLoad && !isEvent && !isCross;
+        saveLoadRows += isSaveLoad;
         o.Add(SubName(e.writer));
         o.Add(",");
         o.Add(SubName(e.reader));
         o.Add(",\"");
         o.Add(g_itemNames[e.item]);
         o.Add("\",");
-        if (!isEvent && e.evidence >= EVIDENCE_CROSS) {
+        if (isCross) {
             o.Add(kPhaseNames[e.from]);
             o.Add(",");
         }
@@ -1924,6 +1949,7 @@ NS void AccessLogFinish()
     WriteWhole("access.edges.csv", out);
     WriteWhole("access.cross.csv", cross);
     WriteWhole("access.ordered.csv", events);
+    WriteWhole("access.saveload.csv", saveLoad);
     FlushEntity();
     WriteDraws();
     WritePassReads();
@@ -1937,7 +1963,7 @@ NS void AccessLogFinish()
                  {"unresolved_image", g_stats.unresolvedImage}, {"unresolved_block", g_stats.unresolvedBlock},
                  {"writes", g_stats.writes}, {"range_calls", g_stats.ranges}, {"range_capped", g_stats.rangeCapped},
                  {"random_draws", g_stats.draws}, {"sound_records", g_stats.sounds}, {"ui_records", g_stats.uiRecords},
-                 {"edges", edgeRows}, {"cross_rows", crossRows}, {"draw_rows", g_drawsUsed}, {"pass_read_rows", g_passReadsUsed},
+                 {"edges", edgeRows}, {"cross_rows", crossRows}, {"save_load_rows", saveLoadRows}, {"draw_rows", g_drawsUsed}, {"pass_read_rows", g_passReadsUsed},
                  {"phase_overflow", g_phaseOverflow ? 1u : 0u}, {"overflow", g_classifier.Overflowed() ? 1u : 0u}, {"allocations", g_allocSeq},
                  {"presentation_windows", g_presWindows}, {"presentation_active_windows", g_presActiveWindows},
                  {"presentation_rows", g_presUsed}, {"presentation_overflow", g_presOverflow ? 1u : 0u}};

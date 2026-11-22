@@ -4,4 +4,8 @@
 void __stdcall RecordRadarUnits(void);
 void __stdcall RecordRadarMapped(void);
 
+class HapiBank;
+void __stdcall SaveMappingData(HapiBank* file);
+void __stdcall LoadMappingData(HapiBank* file);
+
 #endif

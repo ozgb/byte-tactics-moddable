@@ -1043,7 +1043,7 @@ units,Unit::def,units,AlignUnitToGround,other-record,13,mission-build-unit@1
 units,Unit::def,units,AlignUnitToGround,same-record,4,units-transport@2115
 units,Unit::def,units,ApplyUnfinishedBuildDecay,other-record,1,long-greenhaven-8p@44232
 units,Unit::def,units,ApplyUnitDeath,other-record,13,mission-build-unit@1
-units,Unit::def,units,CreateUnitCorpse,other-record,14,mission-build-unit@1
+units,Unit::def,units,CreateUnitCorpse,other-record,15,mission-build-unit@1
 units,Unit::def,units,FinishConstruction,other-record,4,mission-kill-of-type@182
 units,Unit::def,units,GetFactoriesInRadius,other-record,1,orders-air-repair@382
 units,Unit::def,units,KillUnit,other-record,15,mission-build-unit@1

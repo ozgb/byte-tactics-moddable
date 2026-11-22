@@ -2,7 +2,7 @@
 
     uv run tools/abidiff.py                      # baseline: newest interfaces-v* tag, else the merge base with origin/moddable
     uv run tools/abidiff.py --base REF           # baseline: the headers at REF
-    uv run tools/abidiff.py --report-standins    # list the int*, void* and char* in slot signatures
+    uv run tools/abidiff.py --report-standins    # list the writable int*, void* and char* in slot signatures
     uv run tools/test_abidiff.py                 # tests, on synthetic header pairs
 
 For each interfaces/*.h that has `<NAME>_VERSION_MAJOR` and `_MINOR` macros, the tool compares the
@@ -86,7 +86,7 @@ LAYOUT_START = re.compile(r"^\*\*\* Dumping AST Record Layout\s*$", re.M)
 LAYOUT_MEMBER = re.compile(r"^\s*(\d+(?::\d+-\d+)?)\s*\|(\s*)(.*?)\s*$")
 ANONYMOUS = re.compile(r"\(anonymous((?: \w+)?) at [^)]*\)")
 LAYOUT_SIZE = re.compile(r"^\s*\|\s*\[sizeof=(\d+), align=(\d+)")
-STAND_IN = re.compile(r"(?:(?:const|volatile) )*(?:int|void|char) \*(?: (?:const|volatile))*")
+STAND_IN = re.compile(r"(?:volatile )?(?:int|void|char) \*(?: (?:const|volatile))*")
 POINTER = re.compile(r".*\*(?: (?:const|volatile))*$")
 SMALL_INTEGER = {"int", "unsigned", "signed", "short", "char", "long", "bool", "const", "volatile"}
 JSON_START = re.compile(r'^\{\n  "id"', re.M)
@@ -488,7 +488,7 @@ def extract_baseline(ref: str, target: Path) -> None:
 
 
 def standins(directory: Path) -> list[str]:
-    """One line for each int*, void* and char* in a slot signature of the headers in directory."""
+    """One line for each int*, void* and char* whose target is not const in a slot signature of the headers in directory."""
     out = []
     with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
         for header in sorted(directory.glob("*.h")):
@@ -504,12 +504,12 @@ def standins(directory: Path) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--base", metavar="REF", help="baseline ref (default: newest interfaces-v* tag, else the merge base with %s)" % BASE_BRANCH)
-    parser.add_argument("--report-standins", action="store_true", help="list every int*, void* and char* in a slot signature")
+    parser.add_argument("--report-standins", action="store_true", help="list every int*, void* and char* whose target is not const in a slot signature")
     args = parser.parse_args()
     if args.report_standins:
         lines = standins(ROOT / "interfaces")
         print("\n".join(lines))
-        print("%d int*, void* or char* in slot signatures" % len(lines))
+        print("%d writable int*, void* or char* in slot signatures" % len(lines))
         return
     ref, tagged = baseline_ref()
     ref = args.base or ref

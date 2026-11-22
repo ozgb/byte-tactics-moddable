@@ -13,6 +13,10 @@ call 0 Apply
   r rng.seed 0x00000000
   a event.kind 65
   a size 4
+  w Game.windCounter 0
+  w Game.windSpeedDenominator 0
+  w Game.windSpeedMin 0
+  w Game.windSpeedMax 0
   w SimGlobals.g_meteorNextStrikeTime 0
   w SimGlobals.g_meteorSpawnMagnitude 0
   w SimGlobals.g_meteorSpawnInterval 0
@@ -77,19 +81,18 @@ call 0 Apply
   a event.min 2200
   a event.max 4000
   a size 12
+  w Game.windSpeedMin 2200
+  w Game.windSpeedMax 4000
 call 0 Apply
   r Game.width 384
   r Game.height 320
   a event.kind 69
   a size 4
+  w Game.windSpeedDenominator 5000
 call 0 UpdateWind
-  r Game.windCounter 0
-  r Game.windSpeedDenominator 5000
   r Game.windDirection 0
   r Game.windSpeed 0
   r Game.windStrength f32:0x00000000
-  r Game.windSpeedMin 2200
-  r Game.windSpeedMax 4000
   a stream load
   w Game.windX 0
   w Game.windZ 0

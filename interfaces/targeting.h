@@ -67,11 +67,11 @@ struct TargetingLoad {
 
 // Target selection for weapons. The engine delivers targeting's pending inbox, through Apply, before each slot below but Apply and ChooseWeapon, and at each phase boundary.
 struct TargetingSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const TargetingEventHeader* event, unsigned int size);
     // Returns the unit a weapon aims at, or null; a query. Hooks: none.
     Unit* (__stdcall* GetWeaponTargetUnit)(Unit* unit, int weapon);
-    // Synchronous: writes the position a weapon aims at and returns whether it has a target, for a caller that aims or fires at it in the same statement; a target unit is gone when its slot holds no unit (unitDefIndex 0), and is then cleared first, as TARGETING_CLEAR clears it, and the answer is 0; a target that died but whose slot still holds it, or whose slot a new unit took, is not gone, and the slot is aimed at. Hooks: none.
+    // Synchronous: writes the position a weapon aims at and returns whether it has a target, for a caller that aims or fires at it in the same statement; a target unit is gone when its slot holds no unit (unitDefIndex 0), and is then cleared first, as TARGETING_CLEAR clears it, and the answer is 0; a target that died but whose slot still holds it, or whose slot a new unit took, is not gone, and the slot is aimed at. Hooks: VeterancyLevel.
     int (__stdcall* GetWeaponTargetPos)(Unit* unit, Vec3* pos, int weapon);
     // Synchronous: picks the best enemy for one weapon, within its range or the unit's sight, drawing from the generator of the service RandomInt (rng.seed in the recordings, not a game logic stream), for a caller that aims at it in the same statement. Hooks: FilterTargets.
     Unit* (__stdcall* FindWeaponTarget)(Unit* unit, unsigned char weapon, int useRange);

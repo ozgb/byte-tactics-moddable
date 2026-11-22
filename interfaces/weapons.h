@@ -22,7 +22,7 @@ struct WeaponsEventHeader {
 
 // The kinds of damage event other modules publish to weapons' inbox: every kind of damage to a unit, a weapon's or not, enters weapons here; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it names a null unit or is smaller than its payload.
 enum WeaponsDamageEventKind {
-    // unit takes damage (WeaponsDamage); unless the kind of damage is 10, the amount is first scaled by unit's armour (its damage modifier while it is closed, and its experience), and the damage the unit takes is announced to the other machines when unit's player is remote; outcome 1.
+    // unit takes damage (WeaponsDamage); unless the kind of damage is 10, the amount is first scaled by unit's armour (its damage modifier while it is closed, and its experience), and the damage the unit takes is announced to the other machines when unit's player is remote; outcome 1. Hooks: VeterancyLevel.
     WEAPONS_DAMAGE = 256,
     // unit takes damage (WeaponsDamage) as another machine already computed and announced it; outcome 1.
     WEAPONS_REMOTE_DAMAGE = 257
@@ -48,7 +48,7 @@ enum WeaponsEventKind {
     WEAPONS_DETONATE = 258,
     // unit's weapon is released from its orders, to choose its own targets (WeaponsRelease); a weapon that was claimed has its target cleared; outcome 1.
     WEAPONS_RELEASE = 259,
-    // unit's weapon is claimed by its orders, which choose its targets (WeaponsClaim); a weapon that was released has its target cleared; outcome 1.
+    // unit's weapon is claimed by its orders, which choose its targets (WeaponsClaim); a weapon that was released has its target cleared; outcome 1. Hooks: WeaponSlotsForOrder.
     WEAPONS_CLAIM = 260,
     // unit's three weapon slots are set up from its unit type: each slot's weapon, a reload of 0, an empty stockpile and the offset of its aim; then unit's script is told the longest reload of its weapons; the header alone; outcome 1.
     WEAPONS_INIT_SLOTS = 261,
@@ -316,13 +316,13 @@ struct WeaponsSlotState {
 
 // Weapons, projectiles and explosions, and the damage rules for every kind of damage to a unit. The engine delivers weapons' pending inbox, through Apply, before each run (UpdateProjectiles, UpdateExplosions, UpdateUnitWeapons), and at each phase boundary.
 struct WeaponsSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const WeaponsEventHeader* event, unsigned int size);
-    // Moves every projectile and resolves its hits for one tick.
+    // Moves every projectile and resolves its hits for one tick. Hooks: ProjectileExpired, VeterancyLevel.
     void (__stdcall* UpdateProjectiles)(void);
-    // Advances every explosion, exploded piece and piece of debris for one tick.
+    // Advances every explosion, exploded piece and piece of debris for one tick. Hooks: none.
     void (__stdcall* UpdateExplosions)(void);
-    // Aims and fires a unit's weapons for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: none.
+    // Aims and fires a unit's weapons for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: VeterancyLevel, WeaponSpread.
     void (__stdcall* UpdateUnitWeapons)(Unit* unit);
     // Finds a weapon definition by its TDF name, or null; a query. Hooks: none.
     WeaponDef* (__stdcall* FindWeaponByName)(const char* name);
@@ -348,7 +348,7 @@ struct WeaponsSeam {
     void (__stdcall* FreeExplosions)(void);
     // Sets one of a unit's weapon slots (0 to 2) to the state a saved game keeps, outside the tick; a slot outside 0 to 2 changes nothing. Hooks: none.
     void (__stdcall* LoadState)(Unit* unit, int slot, const WeaponsSlotState* state);
-    // Writes weapons' state as records of the trace, which the engine dumps and does not hash.
+    // Writes weapons' state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
     // Fills state with one of a unit's weapon slots (0 to 2) as a saved game keeps it, outside the tick; a slot outside 0 to 2 leaves state as it was. Hooks: none.
     void (__stdcall* SaveState)(Unit* unit, int slot, WeaponsSlotState* state);

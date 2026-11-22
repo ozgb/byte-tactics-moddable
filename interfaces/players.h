@@ -23,7 +23,7 @@ struct PlayersEventHeader {
 
 // The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
 enum PlayersEventKind {
-    // Hands unit to a player (PlayersGiveUnit): the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of the ownership record when it is present); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it.
+    // Hands unit to a player (PlayersGiveUnit): the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of the ownership record when it is present); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it. Hooks: UnitTransfer.
     PLAYERS_GIVE_UNIT = 192,
     // Kills every unit of a player that is alive and not dying, one by one in the order of the player's units: by its own damage when its owner plays, else by self-destruct (PlayersKillUnits); outcome 1.
     PLAYERS_KILL_UNITS = 193,
@@ -127,9 +127,9 @@ struct PlayersMapInfo {
 
 // Per-player state: the players, their mission conditions and the end of the game. The engine delivers players' pending inbox, through Apply, before each run (UpdatePlayerHead, UpdatePlayerBody, UpdatePlayerTail, UpdatePlayersFinish), and at each phase boundary.
 struct PlayersSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const PlayersEventHeader* event, unsigned int size);
-    // Advances every player's state for one tick.
+    // Advances every player's state for one tick. Hooks: none.
     void (__stdcall* UpdatePlayers)(void);
     // Runs the AI script of the mission, or the default one, and parses the AI weight scripts of the computer players. Hooks: none.
     void (__stdcall* LoadDefaultAIScript)(void);
@@ -163,7 +163,7 @@ struct PlayersSeam {
     void (__stdcall* FreeConditions)(MissionConditions* conditions);
     // Frees the condition objects and then the conditions object itself. Hooks: none.
     void (__stdcall* DeleteConditions)(MissionConditions* conditions);
-    // Advances every player's state for one tick like UpdatePlayers, but draws from the given stream; UpdatePlayers draws from the main stream.
+    // Advances every player's state for one tick like UpdatePlayers, but draws from the given stream; UpdatePlayers draws from the main stream. Hooks: none.
     void (__stdcall* UpdatePlayersOnStream)(RandStream stream);
     // Builds an empty conditions object, active and with no victory or defeat conditions. Hooks: none.
     MissionConditions* (__stdcall* NewConditions)(void);
@@ -175,13 +175,13 @@ struct PlayersSeam {
     void (__stdcall* UpdatePlayerTail)(int player);
     // Runs what is left of the players' tick after the last player: the end of a network game when no player is left to fight. Hooks: none.
     void (__stdcall* UpdatePlayersFinish)(void);
-    // The bytes of private state the implementation needs for a match; called before Init.
+    // The bytes of private state the implementation needs for a match; called before Init. Hooks: none.
     unsigned int (__stdcall* RegionSize)(const PlayersMapInfo* info);
-    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before InitPlayers and before any event.
+    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before InitPlayers and before any event. Hooks: none.
     void (__stdcall* Init)(const PlayersMapInfo* info, void* region, unsigned int size);
-    // Ends the match and returns the region, which the engine frees.
+    // Ends the match and returns the region, which the engine frees. Hooks: none.
     void* (__stdcall* Shutdown)(void);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

@@ -401,6 +401,17 @@ reads the payload of the kind it subscribed to, and does nothing with an effect 
   is running (an import that calls back into the engine). The handle table and the fuel counter treat
   only the outermost call as the boundary (sections 8 and 11).
 
+- **Hook points.** Every slot's doc comment ends with a `Hooks:` line: the synced mod hooks of
+  [#1](https://github.com/ozgb/byte-tactics-moddable/issues/1) that attach to that call, or
+  `Hooks: none`. The `Apply` slots, the tick drivers and the world-view slots have one too. A hook
+  that changes how a module answers an event (`UnitDestroyed`, `AllowCommand`) is named on that
+  event kind's doc comment instead, and an event kind with no hook has no `Hooks:` line. A hook that
+  runs once a tick (`GameFrame`) is named on the tick driver that starts the tick,
+  `units.UpdateAllUnits`. A named slot or event kind is where the hook runs, so a re-implementation
+  keeps it as a call or an event of its own, with the same arguments and at the same point in the
+  tick: it does not fold it into another slot or inline it into its caller. Milestone 3 decides how
+  a module calls the hook; until then the line only fixes where.
+
 ## 7. Argument kinds and the pointer rule
 
 A kind says what an argument or a result is. The wasm type of `int`, `linear`, `block`, `scratch`
@@ -418,6 +429,17 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `handle` | an opaque u32 (section 8) |
 
 A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsParams` (a payload the `Apply` slot reads) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
+
+The published headers spell every integer at the boundary as `int` or `unsigned`, which are 32 bits
+on every target; `long` and `size_t`, whose width depends on the platform, are not used. A slot or a
+service may still take or return a `char`, a `short` or a `bool` (`unsigned char player`, an
+`unsigned short` unit id). Each is the `int` kind, an i32, carried as clang's wasm32 C ABI carries
+it: the side that produces the value extends it to 32 bits, the caller for an argument and the
+callee for a result, and the side that receives it does not extend it again. A `signed char` or a
+`short` is sign-extended, an `unsigned char` or an `unsigned short` is zero-extended, and a `bool` is
+0 or 1. A module in another language must keep the same rule: it passes and returns these values
+already extended, and it may rely on what it receives being extended. A `bool` field of a record is
+one byte of the record's layout (`struct Quirks`); it is not an argument kind.
 
 ### 7.1 The pointer rule for Milestone 2
 

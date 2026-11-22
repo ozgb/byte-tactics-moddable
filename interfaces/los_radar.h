@@ -138,7 +138,7 @@ struct LosRadarSightLoad {
 
 // Line of sight and radar. The engine delivers los_radar's pending inbox, through Apply, before each pass below and at each phase boundary.
 struct LosRadarSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const LosRadarEventHeader* event, unsigned int size);
     // Returns the map cell at a position, or null outside the map; the cell records are read only, a view as of each owner's last run. Hooks: none.
     Cell* (__stdcall* GetMapCell)(int x, int y);
@@ -184,15 +184,15 @@ struct LosRadarSeam {
     void (__stdcall* FreeUnitIndex)(int player);
     // Every 30 ticks of a player that has an index, refills it from the ready units: the enemy units the player sees, the enemy units with flag 0x100, and whether it has a finished unit of a type with flag 0x400 switched on. Hooks: none.
     void (__stdcall* RefreshUnitIndex)(int player);
-    // The bytes of private state the implementation needs for a map; called before Init.
+    // The bytes of private state the implementation needs for a map; called before Init. Hooks: none.
     unsigned int (__stdcall* RegionSize)(const LosRadarMapInfo* map);
-    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before the first tick and before any event.
+    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before the first tick and before any event. Hooks: none.
     void (__stdcall* Init)(const LosRadarMapInfo* map, void* region, unsigned int size);
-    // Ends the match and returns the region, which the engine frees.
+    // Ends the match and returns the region, which the engine frees. Hooks: none.
     void* (__stdcall* Shutdown)(void);
     // Fills the sight cache of a unit as it stands, for a saved game; a query. Hooks: none.
     void (__stdcall* SightCache)(Unit* unit, LosSightCache* out);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
     // Reads the visibility layer of a saved game, the "Mapping" account, from a bank, outside the tick. Hooks: none.
     void (__stdcall* LoadMappingData)(HapiBank* file);

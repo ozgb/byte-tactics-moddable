@@ -91,7 +91,7 @@ struct ScriptsState {
 
 // Unit scripts and piece state.
 struct ScriptsSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const ScriptsEventHeader* event, unsigned int size);
     // Starts a script by the index of its name with up to four arguments and returns its thread, for a unit's script that another machine started (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* StartScriptWithArgsByIndex)(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d);

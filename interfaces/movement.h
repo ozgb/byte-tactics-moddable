@@ -256,7 +256,7 @@ struct MovementStartScript {
 
 // Unit motion, its goals and the targets the goals steer to. A target is named by its block offset, a handle the caller keeps and never reads through.
 struct MovementSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const MovementEventHeader* event, unsigned int size);
     // Steers a unit, moves it and updates its move rate for one tick, in the unit's update; the engine calls it for a unit with a movement after its orders. Hooks: none.
     void (__stdcall* UpdateMotion)(Unit* unit);
@@ -294,7 +294,7 @@ struct MovementSeam {
     int (__stdcall* TargetType)(unsigned int target);
     // Returns the target the goal of a unit's movement steers to, or 0, also for a unit with no movement; a query. Hooks: none.
     unsigned int (__stdcall* UnitTarget)(Unit* unit);
-    // Writes movement's state as records of the trace, which the engine dumps and does not hash.
+    // Writes movement's state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

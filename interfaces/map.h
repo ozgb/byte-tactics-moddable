@@ -113,7 +113,7 @@ struct MapCellsChanged {
 
 // Terrain and map data: the cells units stand on and their heights, the spatial grid of units, the pass maps and when they are current, and the placement tests. The engine delivers map's pending inbox, through Apply, before each synchronous slot below, and at each phase boundary.
 struct MapSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const MapEventHeader* event, unsigned int size);
     // Writes to ids the unit ids of the units within range of pos, in the order the spatial grid holds them, skipping the first skip of them, and returns how many it wrote, at most capacity; a query. Hooks: none.
     int (__stdcall* UnitsInRange)(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity);
@@ -157,7 +157,7 @@ struct MapSeam {
     void (__stdcall* RefreshMovedUnits)(int moveClass, Unit* unit);
     // Synchronous, after a path search for a unit: computes again the pass map of the movement class of an index over the cells of unit when its stamp is older than the class's window, publishing CELLS_CHANGED. Hooks: none.
     void (__stdcall* RefreshUnitIfStale)(int moveClass, Unit* unit);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
     // Returns the path lock stamp of a unit's movement, the tick map last stamped it with when it placed the unit or computed a pass map again for it, or 0 for a unit with no movement; a query, which a saved game reads outside the tick. Hooks: none.
     int (__stdcall* PathLockStamp)(Unit* unit);

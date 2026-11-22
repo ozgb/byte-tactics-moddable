@@ -49,7 +49,7 @@ enum OrdersEventKind {
     ORDERS_ATTACKED = 293,
     // unit is paralysed for more ticks (OrdersParalyze): when its first order is a paralysis, that order lasts longer, else a paralysis order is added after its orders; outcome 1.
     ORDERS_PARALYZE = 294,
-    // The player commands unit (OrdersAdd): with queue 1, an order of the same type against the same target, at the same position give or take 16 world units, is deleted from unit's orders when it has one, and is otherwise added as ADD adds it; outcome 1.
+    // The player commands unit (OrdersAdd): with queue 1, an order of the same type against the same target, at the same position give or take 16 world units, is deleted from unit's orders when it has one, and is otherwise added as ADD adds it; outcome 1. Hooks: AllowCommand.
     ORDERS_COMMAND = 295
 };
 
@@ -317,15 +317,15 @@ struct OrdersStartScript {
 
 // Unit orders and command queues.
 struct OrdersSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const OrdersEventHeader* event, unsigned int size);
-    // Runs the first order of a unit for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: none.
+    // Runs the first order of a unit for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: AllowBuild, AircraftSeekRepair, GuardResponse, IdleBuilderAction.
     void (__stdcall* RunOrders)(Unit* unit);
     // Runs the secondary orders of a unit for one tick, after RunOrders. Hooks: none.
     void (__stdcall* RunSecondaryOrders)(Unit* unit);
     // Returns the flags of the first order of a unit, or 0 when it has none; a query. Hooks: none.
     int (__stdcall* GetOrderFlags)(Unit* unit);
-    // Returns the kind of order a unit gets against a target unit or position for a relation mode; a query. Hooks: none.
+    // Returns the kind of order a unit gets against a target unit or position for a relation mode; a query. Hooks: AllowCommand.
     MissionType (__stdcall* GetOrderType)(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
     // Returns the order kind a name in the order type table stands for; a query. Hooks: none.
     MissionType (__stdcall* MissionTypeFromName)(const char* name);
@@ -337,7 +337,7 @@ struct OrdersSeam {
     void (__stdcall* LoadOrders)(Unit* unit, HapiBank* file, int count);
     // Writes the orders of a unit to a saved game bank and returns how many it wrote, outside the tick. Hooks: none.
     int (__stdcall* SaveOrders)(Unit* unit, HapiBank* file);
-    // Writes orders' state as records of the trace, which the engine dumps and does not hash.
+    // Writes orders' state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

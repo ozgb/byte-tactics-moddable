@@ -19,7 +19,7 @@ struct AiEventHeader {
 
 // The kinds of event other modules publish to ai's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; REACT_TO_ATTACK or SET_SQUAD names a null unit; SET_SQUAD names a squad outside -1 to 9, or a unit whose player has no squads; PLAN names a bit above 3; the kind is unknown.
 enum AiEventKind {
-    // unit was attacked (AiReactToAttack); when unit's player is an active computer player, its AI may react with orders for unit; outcome 1.
+    // unit was attacked (AiReactToAttack); when unit's player is an active computer player, its AI may react with orders for unit; outcome 1. Hooks: AIOnDamaged.
     AI_REACT_TO_ATTACK = 224,
     // unit joins a squad of its player and leaves the squad it was in, or only leaves it (AiSetSquad); outcome 1.
     AI_SET_SQUAD = 226,
@@ -153,7 +153,7 @@ struct AiSetStates {
 
 // Computer player decisions: what each computer player's AI wants, and the orders and targets it gives its units; other modules call no slot of it but through the engine. The engine delivers ai's pending inbox, through Apply, before each run (UpdateSquads, UpdatePlayerAI), and at each phase boundary.
 struct AiSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const AiEventHeader* event, unsigned int size);
     // Writes a report on the AI of a player to a file. Hooks: none.
     void (__stdcall* DumpPlayerAI)(int player, void* file);
@@ -175,13 +175,13 @@ struct AiSeam {
     void (__stdcall* CreateSquads)(Player* player);
     // Frees the squads of a player. Hooks: none.
     void (__stdcall* FreeSquads)(Player* player);
-    // Runs one tick of a player's squads when it is an active computer player: the orders and targets its AI gives. Hooks: none.
+    // Runs one tick of a player's squads when it is an active computer player: the orders and targets its AI gives. Hooks: AIAssignSquad, AIAttackReady, AIPatrolTarget, AIFactoryTick, AIBuilderAvailable.
     void (__stdcall* UpdateSquads)(int player);
     // Creates the squad manager of a player, which UpdateSquads runs. Hooks: none.
     void (__stdcall* CreateSquadManager)(Player* player);
     // Frees the squad manager of a player that CreateSquadManager made, and its timers. Hooks: none.
     void (__stdcall* FreeSquadManager)(Player* player);
-    // Writes ai's state as records of the trace, which the engine dumps and does not hash.
+    // Writes ai's state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

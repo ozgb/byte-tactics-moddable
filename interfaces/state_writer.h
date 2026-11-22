@@ -23,15 +23,15 @@ enum StateHandleKind {
 
 // The functions the host gives a module to write its private state as records; a field name is a fixed string with at most one %u, filled with the index, and a null name hashes the value without dumping it.
 struct StateWriter {
-    // Starts a record of a section of the trace, named name in the dump; ends the record that was open.
+    // Starts a record of a section of the trace, named name in the dump; ends the record that was open. Hooks: none.
     void (__stdcall* Begin)(int section, const char* name);
-    // Writes an integer of size 1, 2 or 4 bytes; it is hashed on its own, in the byte order of the machine.
+    // Writes an integer of size 1, 2 or 4 bytes; it is hashed on its own, in the byte order of the machine. Hooks: none.
     void (__stdcall* Int)(const char* field, int index, int size, unsigned int value);
-    // Writes size bytes; they are hashed on their own, in eight-byte words from the first byte and then singly.
+    // Writes size bytes; they are hashed on their own, in eight-byte words from the first byte and then singly. Hooks: none.
     void (__stdcall* Bytes)(const char* field, int index, const void* data, int size);
-    // Writes a handle of a StateHandleKind; value is the handle as the engine gave it, 0 for none.
+    // Writes a handle of a StateHandleKind; value is the handle as the engine gave it, 0 for none. Hooks: none.
     void (__stdcall* Handle)(const char* field, int index, int kind, unsigned int value);
-    // Makes the next count Int and Bytes writes one run, hashed as if they were one Bytes of their bytes; no Handle or Begin may come between them.
+    // Makes the next count Int and Bytes writes one run, hashed as if they were one Bytes of their bytes; no Handle or Begin may come between them. Hooks: none.
     void (__stdcall* Run)(int count);
 };
 

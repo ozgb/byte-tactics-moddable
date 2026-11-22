@@ -151,7 +151,7 @@ struct FeaturesAreaDamage {
 
 // Map features such as wrecks and trees. The engine delivers features' pending inbox, through Apply, before each run of the features phase (AnimateFeatureType, ScanFeatureCell, UpdateFeatureSpot) and each synchronous slot, and at each phase boundary.
 struct FeaturesSeam {
-    // Runs the features phase: the engine's scheduler calls the slots below for each feature type, the map scan and each spot of the used list.
+    // Runs the features phase: the engine's scheduler calls the slots below for each feature type, the map scan and each spot of the used list. Hooks: none.
     void (__stdcall* UpdateFeatures)(void);
     // Reads the feature file list from the data files at match start. Hooks: none.
     void (__stdcall* LoadFeatureFileList)(void);
@@ -179,7 +179,7 @@ struct FeaturesSeam {
     void (__stdcall* SaveFeatures)(HapiBank* file);
     // Reads the features from a saved game, outside the tick. Hooks: none.
     void (__stdcall* LoadFeatures)(HapiBank* file);
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const FeaturesEventHeader* event, unsigned int size);
     // Synchronous: applies a placement after the engine delivered the pending inbox, and returns its outcome, visible at once; for a caller that needs it in the same statement. Hooks: none.
     int (__stdcall* Place)(const FeaturesPlace* place);

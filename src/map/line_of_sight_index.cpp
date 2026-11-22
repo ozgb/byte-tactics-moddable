@@ -127,9 +127,10 @@ void __stdcall RefreshUnitIndex(int player)
 }
 
 // FUNCTION: 0x40ad80
-void __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*>* out)
+int __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
 {
     int radius2 = radius * radius;
+    int count = 0;
     LosUnitIndexEntry* entry = EntryOf(player);
     BlockVector<Ref<Unit> >::iterator it;
     BlockVector<Ref<Unit> >& visible = entry->visible;
@@ -138,29 +139,26 @@ void __stdcall GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius
         int dz = pos->z - unit->pos.z;
         int dx = pos->x - unit->pos.x;
         int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
-        if (d <= radius2 && unit->Ready())
-            out->push_back(unit);
+        if (d <= radius2 && unit->Ready()) {
+            if (count < capacity)
+                out[count] = unit;
+            count++;
+        }
     }
-    if (entry->hasSpecial && out->empty()) {
+    if (entry->hasSpecial && count == 0) {
         BlockVector<Ref<Unit> >& known = entry->known;
         for (it = known.Begin(); it != known.End(); ++it) {
             Unit* unit = *it;
             int dz = pos->z - unit->pos.z;
             int dx = pos->x - unit->pos.x;
             int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
-            if (d <= radius2 && unit->Ready())
-                out->push_back(unit);
+            if (d <= radius2 && unit->Ready()) {
+                if (count < capacity)
+                    out[count] = unit;
+                count++;
+            }
         }
     }
-}
-
-int __stdcall GetVisibleEnemiesInRadiusList(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
-{
-    std::vector<Unit*> found;
-    GetVisibleEnemiesInRadius(player, pos, radius, flags, &found);
-    int count = (int)found.size();
-    for (int i = 0; i < count && i < capacity; i++)
-        out[i] = found[i];
     return count;
 }
 

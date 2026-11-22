@@ -28,6 +28,40 @@ def build(rows, ann=None, assignment=None):
     return rs.build(ann or annotations(), rows, assignment or rs.read_assignment())
 
 
+
+LEGACY_VECTOR_SLOT = (
+    "    void (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*, std::allocator<Unit*> >* out);\n"
+    "    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);\n")
+
+
+class legacy_los_radar:
+    """The los_radar interface as a vector slot and a buffer slot that plays as it, with their annotations: the form `playsAs` was made for."""
+
+    def __enter__(self):
+        self.dir = tempfile.TemporaryDirectory()
+        root = Path(self.dir.name)
+        for header in rs.INTERFACES.glob("*.h"):
+            (root / header.name).write_text(header.read_text())
+        text = (root / "los_radar.h").read_text()
+        text = re.sub(r"    int \(__stdcall\* GetVisibleEnemiesInRadius\)[^\n]*\n", lambda m: LEGACY_VECTOR_SLOT, text, count=1)
+        (root / "los_radar.h").write_text(text)
+        self.patch = mock.patch.object(rs, "INTERFACES", root)
+        self.patch.start()
+        ann = annotations()
+        slots = ann["subsystems"]["los_radar"]["slots"]
+        reach = slots["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
+        slots["GetVisibleEnemiesInRadius"]["args"]["out"] = {"mode": "units", "dir": "out", "kind": "Unit", "reach": reach, "depth": 2}
+        vec = slots["GetVisibleEnemiesInRadius"]["args"]
+        slots["GetVisibleEnemiesInRadiusList"] = {"playsAs": "GetVisibleEnemiesInRadius", "args": {
+            "pos": dict(vec["pos"]), "out": {"mode": "units-buffer", "dir": "out", "kind": "Unit", "capacity": "capacity"}}}
+        return ann
+
+    def __exit__(self, *exc):
+        self.patch.stop()
+        self.dir.cleanup()
+        return False
+
+
 class Interface(unittest.TestCase):
     def test_slots_come_from_the_header(self):
         iface = rs.parse_interface("wind_meteors", "WindMeteorsSeam")
@@ -382,21 +416,49 @@ class TargetingForms(unittest.TestCase):
         self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])
         self.assertIn('ApplyVec3(a1, "out");', files[rs.SLOTS_H])
 
-    def test_a_unit_vector_out_carries_its_reach_into_the_table(self):
-        files, _, model = self.generated()
+    def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
+        files, errors, model = self.generated()
+        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
+        slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]
+        self.assertNotIn("playsAs", slot)
+        self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
+        out = slot["args"][4]
+        self.assertEqual((out["reachCount"], out["depth"]), (7, 2))
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecLosRadarGetVisibleEnemiesInRadius"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('line.Add("  i los_radar.GetVisibleEnemiesInRadius");', body)
+        self.assertIn('ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + %d, 7);' % out["reachFirst"], body)
+        self.assertNotIn("ImportValue(line, a5);", body)
+        self.assertNotIn("ImportResult", body)
+        stub = files[rs.SLOTS_H]
+        body = stub[stub.index("Imp_los_radar_GetVisibleEnemiesInRadius("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('StartImport(t, "los_radar.GetVisibleEnemiesInRadius");', body)
+        self.assertIn("return EnterList(t, a4, a5);", body)
+        self.assertNotIn("a5);\n    Space", body)
+        self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;", stub)
+
+    def test_a_self_recording_unit_buffer_needs_a_reach_and_a_capacity(self):
+        ann = annotations()
+        del ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("needs a reach list" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["capacity"] = "pos"
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
+
+    def test_a_unit_buffer_that_plays_as_another_slot_is_a_stub_of_that_slot(self):
+        with legacy_los_radar() as ann:
+            files, errors, model = self.generated(ann)
+        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
         out = [a for a in model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"] if a["name"] == "out"][0]
         self.assertEqual((out["mode"], out["reachCount"], out["depth"]), ("units", 7, 2))
         self.assertIn("ImportOutUnits(line, \"out\", a4, kReplayReachFields + %d, 7);" % out["reachFirst"], files[rs.HOOKS_H])
         self.assertIn("ApplyUnits(a4, \"out\");", files[rs.SLOTS_H])
-
-    def test_a_unit_buffer_slot_is_played_as_the_recorded_vector_form(self):
-        files, errors, model = self.generated()
-        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadiusList" in e], [])
         slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]
         self.assertEqual(slot["playsAs"], "GetVisibleEnemiesInRadius")
-        self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(pos)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(out)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
         stub = files[rs.SLOTS_H]
         body = stub[stub.index("Imp_los_radar_GetVisibleEnemiesInRadiusList"):]
         body = body[:body.index("\n}\n")]
@@ -404,18 +466,14 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("return EnterList(t, a4, a5);", body)
         self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;", stub)
 
-    def test_a_unit_buffer_needs_a_slot_to_play_as_and_a_capacity(self):
-        ann = annotations()
-        del ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"]
-        _, errors, _ = self.generated(ann)
-        self.assertTrue(any("has a unit buffer and no `playsAs`" in e for e in errors), errors)
-        ann = annotations()
-        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "GetMapCell"
-        _, errors, _ = self.generated(ann)
+    def test_a_unit_buffer_that_plays_as_another_slot_needs_the_same_arguments_and_a_capacity(self):
+        with legacy_los_radar() as ann:
+            ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "GetMapCell"
+            _, errors, _ = self.generated(ann)
         self.assertTrue(any("`playsAs` GetMapCell takes the arguments" in e for e in errors), errors)
-        ann = annotations()
-        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
-        _, errors, _ = self.generated(ann)
+        with legacy_los_radar() as ann:
+            ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
+            _, errors, _ = self.generated(ann)
         self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
 
     def test_a_reach_deeper_than_its_depth_is_an_error(self):

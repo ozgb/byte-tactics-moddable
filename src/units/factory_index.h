@@ -24,7 +24,7 @@ struct FactoryIndex {
 void __stdcall CreateFactoryIndex(int player);
 void __stdcall FreeFactoryIndex(int player);
 void __stdcall RefreshFactoryIndex(int player);
-void __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, std::vector<Unit*>* out);
+int __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
 const BlockVector<Ref<Unit> >* FactoryIndexOf(int player);
 void __stdcall UnitsWriteState(const StateWriter* w);
 

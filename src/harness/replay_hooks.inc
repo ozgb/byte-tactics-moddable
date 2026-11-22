@@ -1348,7 +1348,7 @@ void __stdcall RecLosRadarFreeMapResources()
     }
 }
 
-void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS, SUB_LOS_RADAR, roots);
@@ -1357,6 +1357,7 @@ void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int 
         ArgVec3(s_call, "pos", a1);
         ArgValue(s_call, "radius", a2);
         ArgValue(s_call, "flags", a3);
+        ArgValue(s_call, "capacity", a5);
     }
     ReplayText line;
     if (scope.Import()) {
@@ -1366,27 +1367,11 @@ void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int 
         ImportValue(line, a2);
         ImportValue(line, a3);
     }
-    s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
+    int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
-        ImportOutUnits(line, "out", a4, kReplayReachFields + 11, 7);
+        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 11, 7);
         FinishImport(line);
     }
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecLosRadarGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUSLIST, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "flags", a3);
-        ArgValue(s_call, "capacity", a5);
-    }
-    int result = s_inner_los_radar->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1986,18 +1971,20 @@ unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
     return result;
 }
 
-int __stdcall RecUnitsFindMissionUnit(char* a0, std::vector<Unit*, std::allocator<Unit*> >* a1, int a2)
+Unit* __stdcall RecUnitsFindMissionUnit(const char* a0, const Ref<Unit>* a1, int a2, Unit* a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNIT, a3);
     SlotScope scope(RSL_UNITS_FINDMISSIONUNIT, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
         ArgPending(s_call, "units");
-        ArgValue(s_call, "value", a2);
+        ArgValue(s_call, "count", a2);
+        ArgObject(s_call, "after", ROK_UNIT, a3);
     }
-    int result = s_inner_units->FindMissionUnit(a0, a1, a2);
+    Unit* result = s_inner_units->FindMissionUnit(a0, a1, a2, a3);
     if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
+        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
     }
     return result;
 }
@@ -2146,7 +2133,7 @@ void __stdcall RecUnitsUpdateUnitTail(Unit* a0, int a1)
     }
 }
 
-void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
+int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots);
@@ -2155,10 +2142,13 @@ void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std:
         ArgPending(s_call, "pos");
         ArgValue(s_call, "radius", a2);
         ArgPending(s_call, "out");
+        ArgValue(s_call, "capacity", a4);
     }
-    s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3);
+    int result = s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3, a4);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
+    return result;
 }
 
 void __stdcall RecUnitsCreateFactoryIndex(int a0)
@@ -5125,8 +5115,6 @@ void HookSeams(const bool* on)
         s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
     if (on[SUB_LOS_RADAR] || on[SUB_TARGETING])
         s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.GetVisibleEnemiesInRadiusList = RecLosRadarGetVisibleEnemiesInRadiusList;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
     if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])

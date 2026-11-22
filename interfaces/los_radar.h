@@ -170,10 +170,8 @@ struct LosRadarSeam {
     void (__stdcall* FreeRadar)(void);
     // Releases the map's line of sight, sorting and icon data when a match shuts down. Hooks: none.
     void (__stdcall* FreeMapResources)(void);
-    // Appends to out the ready enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, the ready enemy units with flag 0x100 there; flags is unused. Hooks: none.
-    void (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*, std::allocator<Unit*> >* out);
-    // Writes to out, as Ref<Unit>, the first capacity of the units GetVisibleEnemiesInRadius appends and returns how many there are. Hooks: none.
-    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
+    // Writes to out, as Ref<Unit>, the first capacity of the ready enemy units within a radius of a position that a player saw at its last RefreshUnitIndex, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, of the ready enemy units with flag 0x100 there, and returns how many there are; flags is unused. Hooks: none.
+    int (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);
     // Returns whether an enemy unit a player saw at its last RefreshUnitIndex is within a range of a position, ready (flag 0x10000000) and not dying (flag 0x4000). Hooks: none.
     bool (__stdcall* HasReadyUnitInRange)(int player, Vec3* pos, int range);
     // Returns 1 when the viewing player sees a position, on the grid of a player's explored map. Hooks: none.

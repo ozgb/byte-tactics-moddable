@@ -124,11 +124,6 @@ public:
     Unit* self;
 };
 
-class LandingPadList : public std::vector<Unit*> {
-public:
-    LandingPadList();
-};
-
 #include "../../link/globals.h"
 
 #include "../util/math.h"
@@ -452,23 +447,13 @@ Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
 }
 #pragma auto_inline(on)
 
-#pragma auto_inline(off)
-// FUNCTION: 0x410830
-LandingPadList::LandingPadList()
-{
-    unsigned char local;
-    ((unsigned char*)this)[0] = local;
-    _First = 0;
-    _Last = 0;
-    _End = 0;
-}
-#pragma auto_inline(on)
 
 class UnitList : public std::vector<Unit*> {};
 
-static inline void FindPads(Unit* u, std::vector<Unit*>* pads)
+static inline int FindPads(int player, const Vec3* pos, std::vector<Ref<Unit> >& pads)
 {
-    g_seams.units->GetFactoriesInRadius(((Player*)u->player)->index,&u->pos,0xf00,pads);
+    pads.resize(g_game->poolCount);
+    return g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.empty() ? nullptr : &pads[0],(int)pads.size());
 }
 
 static inline int SearchRange(Unit* u)
@@ -479,11 +464,11 @@ static inline int SearchRange(Unit* u)
 static inline int Patrol(Unit* unit, Order* order, int flags)
 {
     if (IsDamaged(unit)) {
-        LandingPadList pads;
-        FindPads(unit,&pads);
-        if (!pads.empty()) {
+        std::vector<Ref<Unit> > pads;
+        int padCount=FindPads(((Player*)unit->player)->index,&unit->pos,pads);
+        if (padCount!=0) {
             order->SetAttachedFx(0);
-            Unit* pad=pads[RandomInt(pads.size())];
+            Unit* pad=pads[RandomInt(padCount)];
             AppendOrder(unit,new (kSim) Order("VTOL_LANDING",pad,0,0,0,0));
             order->flags=0;
             return 0;
@@ -796,11 +781,11 @@ int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
 static inline int Land(Unit* unit, Order* order)
 {
     if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-        std::vector<Unit*> pads;
-        g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &pads);
-        if (!pads.empty()) {
+        std::vector<Ref<Unit> > pads;
+        int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, pads);
+        if (padCount != 0) {
             order->SetAttachedFx(0);
-            Unit* pad = pads[RandomInt(pads.size())];
+            Unit* pad = pads[RandomInt(padCount)];
             AppendOrder(unit, new (kSim) Order("VTOL_LANDING", pad, 0, 0, 0, 0));
             order->flags = 0;
             return 1;
@@ -939,11 +924,11 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Unit*> v;
-            g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            std::vector<Ref<Unit> > v;
+            int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1186,11 +1171,11 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Unit*> v;
-            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            std::vector<Ref<Unit> > v;
+            int padCount = FindPads(unit->player->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1464,11 +1449,11 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         AttachMove(order, dest, 0x80);
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
-            std::vector<Unit*> pads;
-            g_seams.units->GetFactoriesInRadius(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, 0xf00, &pads);
-            if (!pads.empty()) {
+            std::vector<Ref<Unit> > pads;
+            int padCount = FindPads(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, pads);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* pad = pads[RandomInt(pads.size())];
+                Unit* pad = pads[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", pad, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1578,11 +1563,11 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     }
     case 4: {
         if (IsDamaged(unit)) {
-            LandingPadList v;
-            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            std::vector<Ref<Unit> > v;
+            int padCount = FindPads(unit->player->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1901,11 +1886,11 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
     case 1: {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
-            LandingPadList pads;
-            g_seams.units->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
-            if (!pads.empty()) {
+            std::vector<Ref<Unit> > pads;
+            int padCount = FindPads(unit->player.get()->index, &unit->pos, pads);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* pad=pads[RandomInt(pads.size())];
+                Unit* pad=pads[RandomInt(padCount)];
                 AppendOrder(unit,new (kSim) Order("VTOL_LANDING",pad,0,0,0,0));
                 order->flags=0;
                 return 0;

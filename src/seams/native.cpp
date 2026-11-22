@@ -102,7 +102,7 @@ struct OwnershipTransferPacket;
 #include "../units/unit_save.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
 UnitDef* __stdcall FindUnitType(const char* name);
-int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
+Unit* __stdcall FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
 #include "../scripts/piece_queries.h"
@@ -734,7 +734,6 @@ void InstallNativeSeams()
     s_los_radar.HasReadyUnitInRange = HasReadyUnitInRange;
     s_los_radar.IsPointVisible = IsPointVisible;
     s_los_radar.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
-    s_los_radar.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
     s_los_radar.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
     s_los_radar.CreateUnitIndex = CreateUnitIndex;
     s_los_radar.FreeUnitIndex = FreeUnitIndex;

@@ -1680,7 +1680,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             for a in args:
                 if a.get("when") and (a["mode"] != "struct" or a.get("dir") != "out" or a["when"] != "result != 0" or s["ret"] == "void"):
                     errors.append("%s.%s(%s): `when` is only `result != 0`, on an out struct of a slot that returns a value" % (sub, s["name"], a["name"]))
-                if a["mode"] == "units":
+                if a["mode"] == "units" or (a["mode"] == "units-buffer" and "playsAs" not in note):
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], note.get("result"), ann)
             errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
@@ -1693,8 +1693,6 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 into.update(blobs[i] for i in list(into) if i in blobs)
             if "playsAs" in note:
                 errors += check_plays_as("%s.%s" % (sub, s["name"]), note["playsAs"], args, slots)
-            elif any(a["mode"] == "units-buffer" for a in args):
-                errors.append("%s.%s has a unit buffer and no `playsAs`, the slot whose recorded form it replays" % (sub, s["name"]))
             entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
@@ -2252,6 +2250,17 @@ def struct_roots(a: dict, i: int, objects: dict, object_fields: list) -> list[st
     return L
 
 
+def self_buffer(s: dict):
+    """The indices of the unit buffer and its capacity when the slot records itself (no `playsAs`), else None."""
+    if "playsAs" in s:
+        return None
+    names = [a["name"] for a in s["args"]]
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "units-buffer":
+            return i, names.index(a["capacity"])
+    return None
+
+
 def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False,
             object_fields: list = ()) -> list[str]:
     params = ", ".join("%s a%d" % (raw_type(s, i), i) for i in range(len(s["args"])))
@@ -2266,6 +2275,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             a["countIndex"] = names.index(a["count"])
         if a.get("size") in names:
             a["sizeIndex"] = names.index(a["size"])
+    own = self_buffer(s)
     L = ["%s %s Rec%s%s(%s)" % (ret, s["conv"], camel(sub), slot, params), "{"]
     for i, a in enumerate(s["args"]):
         if a["mode"] == "event" and a.get("unrecorded"):
@@ -2314,7 +2324,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("    if (%s) {" % condition)
         L.append("        " + head)
         for i, a in enumerate(s["args"]):
-            L += ["        " + x for x in arg_out(a, i, "i", objects)]
+            if own is None or i != own[1]:
+                L += ["        " + x for x in arg_out(a, i, "i", objects)]
         L.append("    }")
     inner = "s_inner_%s->%s(%s)" % (sub, slot, call_args)
     res = s["result"]
@@ -2326,7 +2337,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         for i in callback_args:
             L.append("    cb%d.Stop();" % i)
         L.append("    if (scope.Import()) {")
-        if res is not None:
+        if res is not None and own is None:
             L += ["        " + x for x in result_out(res, objects, "i")]
         for i in callback_args:
             L.append("        line.AddText(cb%d.Lines());" % i)
@@ -2339,6 +2350,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        %sImportOutVec3(line, "%s", %s);' % ("if (result != 0) " if a.get("when") else "", a["line"], arg_var(a, i)))
             elif a["mode"] == "units":
                 L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
+            elif a["mode"] == "units-buffer" and own is not None:
+                L.append('        ImportOutUnitBuffer(line, "%s.%s", "%s", a%d, result, a%d, kReplayReachFields + %d, %d);' % (sub, slot, a["line"], i, own[1], a["reachFirst"], a["reachCount"]))
             elif a["mode"] == "vector":
                 L.append('        ImportOutValues(line, "%s", ROK_%s, a%d);' % (a["line"], upper(a["elem"]["kind"]), i))
             elif a["mode"] == "struct" and a.get("dir") == "inout":
@@ -2526,7 +2539,8 @@ def render_slots(ann: dict, model: dict) -> str:
     for seam, slots in imports.items():
         spec = subsystems[seam]
         for slot in slots:
-            L += import_stub(seam, slot, {**spec["slots"], **imported_unrecorded(spec)}[slot])
+            entry = {**spec["slots"], **imported_unrecorded(spec)}[slot]
+            L += list_stub(seam, slot, entry) if self_buffer(entry) is not None else import_stub(seam, slot, entry)
         for slot, s in spec["slots"].items():
             if s.get("playsAs") in slots:
                 replays.setdefault(seam, []).append(slot)
@@ -2619,12 +2633,12 @@ def nested_player(ready: dict) -> list[str]:
 
 
 def list_stub(seam: str, slot: str, s: dict) -> list[str]:
-    """The stub of a slot that fills a caller's buffer: it asks for the recorded import of its `playsAs` slot and answers the module from that line."""
+    """The stub of a slot that fills a caller's buffer: it asks for the recorded import of its `playsAs` slot, or of itself, and answers the module from that line."""
     params = ", ".join("%s a%d" % (s["params"][i], i) for i in range(len(s["args"])))
     names = [a["name"] for a in s["args"]]
     buffer = [i for i, a in enumerate(s["args"]) if a["mode"] == "units-buffer"][0]
     capacity = names.index(s["args"][buffer]["capacity"])
-    L = ["%s %s Imp_%s_%s(%s)" % (s["ret"], s["conv"], seam, slot, params), "{", "    ReplayText t;", '    StartImport(t, "%s.%s");' % (seam, s["playsAs"])]
+    L = ["%s %s Imp_%s_%s(%s)" % (s["ret"], s["conv"], seam, slot, params), "{", "    ReplayText t;", '    StartImport(t, "%s.%s");' % (seam, s.get("playsAs", slot))]
     for i, a in enumerate(s["args"]):
         if i in (buffer, capacity):
             continue

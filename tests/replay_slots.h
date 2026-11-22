@@ -140,25 +140,7 @@ unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
     return ParseResult<unsigned int>(r);
 }
 
-void __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
-{
-    ReplayText t;
-    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    ApplyUnits(a4, "out");
-    (void)r;
-}
-
-int __stdcall Imp_los_radar_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
 {
     ReplayText t;
     StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
@@ -1075,7 +1057,6 @@ void BindSeams()
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
-    g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;
     g_seams.network = &g_import_network;
     g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;

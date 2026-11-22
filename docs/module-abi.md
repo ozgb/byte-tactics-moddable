@@ -456,14 +456,16 @@ behaviour is the contract the existing module was built against.
 
 ### 7.3 A buffer the caller supplies
 
-A slot that returns a list of objects takes a buffer from the caller, so that no native container
-layout is part of the contract. `los_radar.GetVisibleEnemiesInRadiusList` (kinds `[int, linear, int, int, linear, int] -> int`: the player, a
-position, a radius, flags, the output buffer and its capacity in units) is the slot of this form.
+A slot that returns a list of objects takes a buffer from the caller, so that no memory is handed
+across the seam and no native container layout is part of the contract. `los_radar.GetVisibleEnemiesInRadius` (kinds `[int, linear, int, int, linear, int] -> int`: the player, a
+position, a radius, flags, the output buffer and its capacity in units) is the slot of this form, and
+`units.GetFactoriesInRadius` (the player, a position, a radius, the buffer and its capacity) has it too.
 
 - It returns the number of units found, which may be above `capacity`.
 - It writes the first `min(count, capacity)` units to `out`, each as a block offset (section 7.1), in
-  the order the native vector holds them, and writes nothing past `capacity`.
-- A caller that gets a count above its capacity calls again with a larger buffer.
+  the order the engine finds them, and writes nothing past `capacity`.
+- A caller sizes the buffer for the most the list can hold: the engine's list of units has each unit
+  once, so a buffer of one entry per slot of the unit pool never gets a count above its capacity.
 
 ## 8. Handles and the loader data words
 

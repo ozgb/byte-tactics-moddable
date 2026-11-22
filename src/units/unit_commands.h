@@ -2,7 +2,7 @@
 #define UNIT_COMMANDS_H
 #include "../util/angles.h"
 struct Unit;
-struct UnitPtrVectorView;
+template <class T> struct Ref;
 
 class UnitTypeSet;
 struct Player;
@@ -32,6 +32,6 @@ unsigned short __stdcall FindUnitTypeId(const char* name);
 UnitTypeSet* __stdcall GetCategoryMask(char* name);
 UnitTypeSet* __stdcall GetLoadCategoryMask(char* name);
 
-void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table);
+void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units, int unitCount);
 
 #endif

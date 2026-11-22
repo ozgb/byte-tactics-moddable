@@ -94,10 +94,6 @@ struct Mission;
 
 #include "../mission/mission.h"
 
-struct MissionUnitIdTable {
-    char unknown_0[4];
-    int* ids;
-};
 #pragma pack(pop)
 
 #include "../files/files_api.h"
@@ -470,33 +466,27 @@ void __stdcall SaveUnits(HapiBank* file)
     }
 }
 
-static inline int* IdAt(int* arr, int i)
-{
-    return arr + i;
-}
-
 // FUNCTION: 0x487af0
-int __stdcall FindMissionUnit(char* name, MissionUnitIdTable* param_2, int value)
+Unit* __stdcall FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after)
 {
     int i = 0;
-    int count = g_seams.mission->CountMissionUnits();
 
-    if (value) {
-        while (*IdAt(param_2->ids, i++) != value) {
+    if (after) {
+        while (units[i++].get() != after) {
             if (i >= count)
-                return 0;
+                return nullptr;
         }
     }
     if (i >= count)
-        return 0;
+        return nullptr;
     for (; i < count; i++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
         g_seams.mission->GetMissionUnit(i, e);
-        if (e->ident && _strcmpi(e->ident, name) == 0 && param_2->ids[i])
-            return param_2->ids[i];
-        if (e->name && _strcmpi(e->name, name) == 0 && param_2->ids[i])
-            return param_2->ids[i];
+        if (e->ident && _strcmpi(e->ident, name) == 0 && units[i].get())
+            return units[i].get();
+        if (e->name && _strcmpi(e->name, name) == 0 && units[i].get())
+            return units[i].get();
     }
-    return 0;
+    return nullptr;
 }

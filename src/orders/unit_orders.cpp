@@ -159,9 +159,9 @@ int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int unused)
 int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
 {
     if(order->radius) {
-        std::vector<Unit*> units;
-        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units);
-        if(!units.empty()) return 5;
+        std::vector<Ref<Unit> > units(g_game->poolCount);
+        int unitCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units[0],(int)units.size());
+        if(unitCount!=0) return 5;
         if(order->wait<=0) return 5;
         int delay=RandomInt(30)+150;
         order->wait-=delay;
@@ -290,10 +290,10 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 3: {
-        std::vector<Unit*> units;
-        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
-        if (!units.empty()) {
-            g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, units[RandomInt(units.size())]);
+        std::vector<Ref<Unit> > units(g_game->poolCount);
+        int unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units[0], (int)units.size());
+        if (unitCount != 0) {
+            g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, units[RandomInt(unitCount)]);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->state = 1;
             return 2;

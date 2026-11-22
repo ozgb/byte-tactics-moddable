@@ -357,7 +357,7 @@ points of a patrol or AI search goal as `goal.points`). The targets of section 2
 holds every one of them as `orderFx[id].*`, as before, but hashes only a move target's link. The reference build writes
 the same lines itself.
 
-**Where a wrong value shows.** With a wrong goal point, TAMPER(movement:goal). A wrong `p2` or `turn` changes where the
+**Where a wrong value shows.** With a wrong goal point, orders-move-attack first diverges at tick 25, phase units, `units[1].heading` (0xaa6e against 0xaa5c): at tick 20 both points of the commander's AI search goal were moved 8 along x. A wrong `p2` or `turn` changes where the
 unit moves next, and diverges through its hashed position or heading.
 
 **Reads through views.** Other subsystems read motion records by offset through views the access log names by their own

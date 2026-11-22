@@ -261,7 +261,7 @@ The reference build writes the same record itself. `WriteState` reads only scrip
 `StateWriter`.
 
 **Where a wrong value shows.** The channels, statics and pieces decide which script runs and what it does. With a
-wrong program counter, TAMPER(scripts:pc). A wrong statics word, signal or piece target diverges through what the
+wrong program counter, orders-build-patrol first diverges at tick 201, phase world, `units[1].script.transforms[0].rotation` (`hex:000040020000` against `hex:0000781b0000`): at tick 200 the commander's first running channel was sent back to the start of the code. A wrong statics word, signal or piece target diverges through what the
 script then sets: the piece transforms (hashed), the unit's bits, and the events it publishes.
 
 This change adds scripts to the owners of `privatestate.py`. With them, `--check` fails when another subsystem writes

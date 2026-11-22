@@ -364,7 +364,7 @@ order list, one record `ordersState.units[i]` with the fields that left, for eac
 order: `list[n].kind`, `.state`, `.flags6`, `.wakeFrame`, `.start.x`, `.start.y`, `.arg0`, `.arg1`, `.arg2`,
 `.created`, `.subFlags` and `.attached` (and `list2[n].*`). The reference build writes the same record itself.
 
-**Where a wrong value shows.** With a wrong order `wakeFrame`, TAMPER(orders:wakeFrame). The kind, the state and the
+**Where a wrong value shows.** With a wrong order `wakeFrame`, orders-build-patrol first diverges at tick 70, phase units, `units[2].speed` (0x3f7df2aa against 0x3f7ef955): at tick 50 the commander's current order had its `wakeFrame` moved from 0xffffffff to 59. The kind, the state and the
 arguments decide which order runs and what it does, and diverge through the unit's position, its goal or its other
 hashed fields. A wrong `created` or `kind` that only presentation reads is judged by the frame dumps.
 

@@ -321,14 +321,14 @@ also, in this order:
 The reference build writes the same records itself, so the two builds are compared line by line.
 
 **Where a wrong value shows.** A wrong value of a field that left the hash is caught by what it drives:
-- **Slot words.** With a wrong `reloadTimer`, TAMPER(weapons:reloadTimer). The other words of the slot (the aim
+- **Slot words.** With a wrong `reloadTimer`, edges-targeting-lead first diverges at tick 78, phase units, `units[251].f_1f` (the slot's flags, 0x12 against 0x13): at tick 75 the first slot of unit 251 had its timer cut from 25 to 0. The other words of the slot (the aim
   callback, `fireHeading`, `firePitch`) decide when the weapon fires and at what, and diverge through the shots they
   change.
-- **Projectile fields.** With a wrong projectile `time`, TAMPER(weapons:projectileTime). A wrong `start`, `direction`,
+- **Projectile fields.** With a wrong projectile `time`, edges-targeting-lead first diverges at tick 75, phase projectiles: projectile 0, its `time` set to the current tick at tick 75, is gone from the table there while the true run still has it (`projectiles[0].type` `weapondef:20`). A wrong `start`, `direction`,
   `speed`, `range` or `angles` moves the projectile's hashed `position`, and the rest decide when it ends or smokes.
-- **The debris and the exploded pieces.** With a wrong debris field, TAMPER(weapons:debris). A wrong angle, spin,
+- **The debris and the exploded pieces.** With a wrong debris field, combat-deaths diverges in no row: at tick 858 debris entry 4 had its `angle_y` turned a quarter and its `spin.y` negated, and every row stays equal to the end, tick 1000, while the frames at ticks 870 and 900 differ. The same holds for the exploded pieces (slot 0's `vel_x` and `vel_z` negated at tick 858). A wrong angle, spin,
   size or flag changes only what presentation draws, so no hashed state sees it: the frame dumps judge it
-  (`reference/frames`, the scenarios combat-deaths and commander-death), and nothing is hashed in its place. Hashed
+  (`reference/frames`: combat-deaths' frames line holds ticks 870 and 900 for this, after its two deaths), and nothing is hashed in its place. Hashed
   state sees the debris only through the table's cap of 300 (a full table stops drawing random numbers) and through
   a slot's lifetime, and those still diverge the rows.
 

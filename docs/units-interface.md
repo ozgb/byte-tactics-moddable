@@ -333,7 +333,7 @@ the unit. Among the fields units owns, `workTime` is read by economy (the cloak 
   diverge on it, and the record only reports it.
 - Only presentation reads `zBufferFlag`. A wrong value changes only what is drawn, so the frame dumps judge it and
   nothing is hashed in its place.
-- `head` and `hoverBobPhase` drive the unit's own state. With a wrong `hoverBobPhase`, TAMPER(units:hoverBobPhase).
+- `head` and `hoverBobPhase` drive the unit's own state. With a wrong `hoverBobPhase`, units-transport first diverges at tick 3500, phase units, `units[3].field_64` (the bank angle, 0x0146 against 0xfeba): at tick 3500 every unit's phase was moved by a quarter turn.
 
 Every field keeps its bytes in the unit record, so no offset moves.
 

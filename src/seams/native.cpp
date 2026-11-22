@@ -957,6 +957,7 @@ void InstallNativeSeams()
     s_weapons.Apply = WeaponsApply;
     s_weapons.LoadState = WeaponsLoadState;
     s_weapons.WriteState = WeaponsWriteState;
+    s_weapons.SaveState = WeaponsSaveState;
     s_units.UpdateAllUnits = UpdateAllUnits;
     s_players.UpdatePlayers = UpdatePlayers;
     s_files.OpenRead = HAPI_OpenFileRead;

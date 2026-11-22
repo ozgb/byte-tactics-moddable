@@ -444,17 +444,19 @@ void __stdcall SaveUnits(HapiBank* file)
 
             for (int k = 0; k < 3; k++) {
                 rec.pieces[k].f0 = g_seams.targeting->SavedTargetPair(unit, k);
-                rec.pieces[k].f4 = unit->weapons[k].aimCob.nAimCobDone;
-                rec.pieces[k].f8 = unit->weapons[k].weapon.get()->index;
-                rec.pieces[k].fc = unit->weapons[k].muzzleAimFromDeltaZ;
-                rec.pieces[k].f10 = unit->weapons[k].reloadTimer;
-                rec.pieces[k].f12 = unit->weapons[k].fireHeading;
-                rec.pieces[k].f14 = unit->weapons[k].firePitch;
-                rec.pieces[k].f16 = unit->weapons[k].stockpile;
-                rec.pieces[k].fl.b0 = ((PieceBits*)&unit->weapons[k].flags)->b0;
-                rec.pieces[k].fl.b1 = ((PieceBits*)&unit->weapons[k].flags)->b1;
-                rec.pieces[k].fl.b23 = ((PieceBits*)&unit->weapons[k].flags)->b23;
-                rec.pieces[k].fl.b4 = ((PieceBits*)&unit->weapons[k].flags)->b4;
+                WeaponsSlotState state;
+                g_seams.weapons->SaveState(unit, k, &state);
+                rec.pieces[k].f4 = state.aimDone;
+                rec.pieces[k].f8 = state.typeByte;
+                rec.pieces[k].fc = state.aimOffset;
+                rec.pieces[k].f10 = state.reload;
+                rec.pieces[k].f12 = state.heading;
+                rec.pieces[k].f14 = state.pitch;
+                rec.pieces[k].f16 = state.stockpile;
+                rec.pieces[k].fl.b0 = state.flags & 1;
+                rec.pieces[k].fl.b1 = state.flags >> 1 & 1;
+                rec.pieces[k].fl.b23 = state.flags >> 2 & 3;
+                rec.pieces[k].fl.b4 = state.flags >> 4 & 1;
             }
 
             file->OpenNumberedBox(count);

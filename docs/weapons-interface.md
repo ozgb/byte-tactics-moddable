@@ -1,6 +1,6 @@
 # The weapons interface
 
-Weapons sits behind `interfaces/weapons.h` (version 3.0), the eighth module on the scheduler after economy
+Weapons sits behind `interfaces/weapons.h` (version 3.1; 3.1 added the slot `SaveState`), the eighth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`), players (`docs/players-interface.md`) and ai
 (`docs/ai-interface.md`) (#984). It is the weapons, projectiles and explosions of the simulation, and the damage rules
@@ -89,6 +89,7 @@ another machine already computed and announced, and skips the armour and the net
 | units: a unit dies (`ApplyUnitDeath`) | `RemoveUnitProjectiles` | REMOVE_PROJECTILES from units |
 | units: a unit captured by another player (`UnitsOnPlayersCaptureUnit`) | the stockpiles copied into the new unit's slots | SET_STOCKPILES from units |
 | units: a saved game loads (`unit_save.cpp`) | the slot's fields restored, but its target pair | the slot `LoadState(unit, slot, state)`, called by units for each slot while a saved game loads, outside the tick, with a `WeaponsSlotState`; the target pair is targeting's, restored by targeting's LOAD (`docs/targeting-interface.md`, section 2) |
+| units: a game is saved (`SaveUnits`, `unit_save.cpp`) | the slot's fields read, but its target pair | the slot `SaveState(unit, slot, state)` (3.1), called by units for each slot while a game is saved, outside the tick; it fills a `WeaponsSlotState` and writes nothing; the target pair is read through targeting's `SavedTargetPair` |
 | orders: a stockpile weapon's build order finishes a round (`BuildWeaponOrder`, `unit_orders.cpp`) | the slot's `stockpile` raised by one | ADD_STOCKPILE from orders, with `WeaponsAddStockpile::weapon` the weapon (0 to 2) |
 | scripts: an aim thread ends, or the aim script is missing (`cob.cpp`) | `WeaponAimCobComplete` | AIM_DONE from scripts |
 | scripts: the explode opcode (`script_explode.cpp`) | `CobScriptExplodePiece` | EXPLODE_PIECE from scripts |
@@ -205,6 +206,8 @@ as the effects above. It writes its own state: the projectile table, the explosi
 
 **`LoadState`.** `LoadState(unit, slot, state)` replaces the LOAD_SLOT event of weapons 2.0. Units calls it for each of a unit's slots while a saved game loads, outside the tick, with a `WeaponsSlotState`: `aimDone`, `typeByte` (a byte of the weapon's type that the save keeps), `aimOffset`, `reload`, `heading`, `pitch`, `stockpile` and `flags` (the slot's flag bits 0, 1, 2 to 3 and 4). It sets the slot's fields as the save held them and writes nothing else; the slot's target pair is restored by targeting's LOAD.
 
+**`SaveState`.** `SaveState(unit, slot, state)` (3.1) is the other half of `LoadState`. Units calls it for each of a unit's slots while a game is saved, outside the tick, and writes the `WeaponsSlotState` it fills into the unit's record: the same fields, `typeByte` the index of the slot's weapon type, and `flags` the slot's flag bits 0, 1, 2 to 3 and 4. It writes nothing, so a save reads the slots' private fields only through weapons.
+
 **NOTICE.** Weapons 2.0 had one NOTICE effect whose value held the bits to set in a unit's `netDirtyFlags`. The three bits are now kinds of their own, SHOT_FIRED (0x400), COMMAND_SHOT_FIRED (0x800) and OUT_OF_REACH (0x1000), each the header alone, and the units side ORs the bit of the kind it receives.
 
 ## 4. Views and routes
@@ -240,7 +243,7 @@ delivers it.
 | units INIT_SLOTS | synchronous | The gate (section 8). |
 | units REMOVE_PROJECTILES | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit dies in the units phase (`ApplyUnitDeath`), and later units' `UpdateUnitWeapons` read the projectile table (`FindTargetableProjectile`, an anti-missile weapon's target) before the phase boundary. |
 | units SET_STOCKPILES | synchronous | #952's rule. Queued it stayed equal on the tier, but the captured unit's (or copy's) stockpiles are read by its own `UpdateUnitWeapons` (a stockpile weapon fires only with stock) and by the network's unit-state packet, later in the same phase. |
-| units `LoadState` | slot | Called directly, not an event: it replaces LOAD_SLOT, which was queued and equal. Units calls it for each slot while a saved game loads (`unit_save.cpp`), outside the tick. |
+| units `LoadState`, `SaveState` | slot | Called directly, not an event: it replaces LOAD_SLOT, which was queued and equal. Units calls it for each slot while a saved game loads (`unit_save.cpp`), outside the tick. |
 | engine REMOTE_DAMAGE | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: the net phase (`HandleNetPackets`) applies packets in order, and the packets after it in the same phase read the damaged unit (a unit's state packet, a kill packet). The same argument as the engine's KILL_UNITS and GIVE_UNIT rows of `docs/players-interface.md`. |
 | scripts AIM_DONE | synchronous | #952's rule. Queued it stayed equal on the tier, but a missing aim script answers at once, inside weapons' own START_SCRIPT in `UpdateUnitWeapons` (`StartScriptWithArgsByIndex`, `cob.cpp`), and the same update then reads `aimCob.nAimCobDone` in the fire step before the phase ends. |
 | scripts EXPLODE_PIECE | synchronous | The gate (section 8). |
@@ -339,7 +342,7 @@ state or calls its entry points, and no query slot writes state.
 hashes none of them. Each record is an event with the outcome `Apply` gave, or an effect weapons published (`outcome`
 1), in weapons' order.
 
-**At load**: weapons restores each weapon slot of each unit through the slot `LoadState(unit, slot, state)`, which units' `LoadUnit` calls for the three slots with a `WeaponsSlotState`, and sets all of the slot's fields but its target pair, which targeting's LOAD restores.
+**At load**: weapons restores each weapon slot of each unit through the slot `LoadState(unit, slot, state)`, which units' `LoadUnit` calls for the three slots with a `WeaponsSlotState`, and sets all of the slot's fields but its target pair, which targeting's LOAD restores. At save, units' `SaveUnits` reads the same fields through the slot `SaveState` (3.1).
 
 ## 6. Random draws and sim events
 
@@ -438,7 +441,7 @@ section 4).
 **Inbox depths.** Every route into weapons but one is synchronous, so its inbox holds an event only while wind_meteors'
 SPAWN waits for the phase boundary: it was never deeper than 1, in any scenario (the SPAWNs of meteors-hailstorm and
 hailstorm-los-off, 150 each, and of console-features and meteors-earthquake, each delivered before the next was
-published). The slot `LoadState` is called only while a save loads, outside the tick. The most
+published). The slots `LoadState` and `SaveState` are called only while a save loads or is written, outside the tick. The most
 events delivered to weapons inside one tick was 541, in edges-economy-targeting at tick 245. A synchronous delivery
 into weapons ran inside another one 7 times, all orders' RELEASE: a DAMAGE (or features' AREA_DAMAGE) publishes
 ATTACKED, ai's handler reacts to the attack with an order that releases the unit's weapons, and that RELEASE runs

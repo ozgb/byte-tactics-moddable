@@ -10,7 +10,7 @@ struct StateWriter;
 // Major version of the weapons interface, changed when a slot is removed or its signature changes.
 #define WEAPONS_VERSION_MAJOR 3
 // Minor version of the weapons interface, changed when a slot is added.
-#define WEAPONS_VERSION_MINOR 0
+#define WEAPONS_VERSION_MINOR 1
 
 // The fields every weapons event and effect starts with.
 struct WeaponsEventHeader {
@@ -350,6 +350,8 @@ struct WeaponsSeam {
     void (__stdcall* LoadState)(Unit* unit, int slot, const WeaponsSlotState* state);
     // Writes weapons' state as records of the trace, which the engine dumps and does not hash.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Fills state with one of a unit's weapon slots (0 to 2) as a saved game keeps it, outside the tick; a slot outside 0 to 2 leaves state as it was. Hooks: none.
+    void (__stdcall* SaveState)(Unit* unit, int slot, WeaponsSlotState* state);
 };
 
 #endif

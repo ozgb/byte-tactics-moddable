@@ -400,6 +400,7 @@ WeaponsSeam g_native_weapons = {
     FreeExplosions,
     LoadWeaponsStateSlot,
     WriteWeaponsStateSlot,
+    SaveWeaponsStateSlot,
 };
 
 TargetingSeam g_native_targeting = {

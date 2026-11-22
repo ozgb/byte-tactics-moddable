@@ -3079,7 +3079,7 @@ static const unsigned short kReplayUnitsKillUnitsOfTypeObjReads[] = { 45 };
 static const unsigned short kReplayUnitsReloadUnitTypeObjReads[] = { 108 };
 static const unsigned short kReplayUnitsKillUnitObjReads[] = { 0, 22, 23, 24, 33, 34, 35, 36, 37, 43, 44, 47, 77, 78, 124 };
 static const unsigned short kReplayUnitsKillUnitObjWrites[] = { 23 };
-static const unsigned short kReplayUnitsSaveUnitsObjReads[] = { 33, 35, 37, 38, 39, 40, 42, 43, 44, 46, 47, 48, 50, 56, 61, 66, 69, 72, 74, 77, 78, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 138, 331 };
+static const unsigned short kReplayUnitsSaveUnitsObjReads[] = { 33, 35, 37, 38, 39, 40, 42, 43, 44, 46, 47, 48, 50, 69, 72, 74, 77, 78, 79 };
 static const unsigned short kReplayUnitsLoadUnitObjReads[] = { 37, 39, 42, 43, 69, 77, 78, 79 };
 static const unsigned short kReplayUnitsLoadUnitObjWrites[] = { 33, 37, 38, 39, 40, 46, 48, 69, 74, 77, 78, 79 };
 static const unsigned short kReplayUnitsCreateUnitObjReads[] = { 4, 5, 26, 27, 35, 45, 79, 108, 122 };
@@ -3319,7 +3319,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "ReloadUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsReloadUnitTypeObjReads, 1, nullptr, 0, nullptr, 0 },
     { "KillUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsKillUnitObjReads, 15, kReplayUnitsKillUnitObjWrites, 1, nullptr, 0 },
     { "LoadUnits", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "SaveUnits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSaveUnitsObjReads, 39, nullptr, 0, nullptr, 0 },
+    { "SaveUnits", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsSaveUnitsObjReads, 19, nullptr, 0, nullptr, 0 },
     { "LoadUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsLoadUnitObjReads, 8, kReplayUnitsLoadUnitObjWrites, 12, nullptr, 0 },
     { "CreateUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCreateUnitObjReads, 9, kReplayUnitsCreateUnitObjWrites, 3, nullptr, 0 },
     { "FindUnitType", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsFindUnitTypeAllOf, 1 },
@@ -3517,7 +3517,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "features", 4, 0, 0, 20, 22 },
     { "ai", 6, 0, 0, 42, 15 },
     { "pathfinding", 4, 0, 0, 57, 9 },
-    { "weapons", 3, 0, 1, 66, 6 },
+    { "weapons", 3, 1, 1, 66, 6 },
     { "targeting", 3, 1, 1, 72, 6 },
     { "los_radar", 4, 1, 0, 78, 28 },
     { "orders", 5, 0, 0, 106, 11 },

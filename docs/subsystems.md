@@ -548,7 +548,7 @@ Coverage: 95.5% of functions (234 of 245), 85.4% of lines, 65.3% of branches; 11
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (152 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (9). It is called most by game (26 distinct functions) and seams (8). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.3% of functions (110 of 126), 85.9% of lines, 70.8% of branches; 16 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 16 is under **units, functions no scenario enters** below.
+**units** (152 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (9). It is called most by game (26 distinct functions) and seams (8). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.3% of functions (110 of 126), 86.0% of lines, 71.0% of branches; 16 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 16 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (16 of 126 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 110 are entered, 87.3%), by reason:
 
@@ -777,13 +777,13 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **targeting** | 21 of 21 | 100.0% | 96.1% | 79.6% | 0 | 1 |
 | **los_radar** | 89 of 98 | 90.8% | 87.7% | 74.4% | 9 | 22 |
 | **orders** | 234 of 245 | 95.5% | 85.4% | 65.3% | 11 | 17 |
-| **units** | 110 of 126 | 87.3% | 85.9% | 70.8% | 16 | 28 |
+| **units** | 110 of 126 | 87.3% | 86.0% | 71.0% | 16 | 28 |
 | **players** | 103 of 156 | 66.0% | 67.6% | 61.0% | 53 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |
 | **mission** | 28 of 47 | 59.6% | 74.9% | 62.7% | 19 | 1 |
 | **scripts** | 65 of 87 | 74.7% | 86.5% | 78.2% | 22 | 6 |
 | **movement** | 118 of 177 | 66.7% | 69.4% | 62.2% | 59 | 8 |
-| files | 112 of 142 | 78.9% | 79.6% | 65.0% | 30 | 35 |
+| files | 112 of 142 | 78.9% | 79.6% | 65.1% | 30 | 35 |
 | game | 302 of 389 | 77.6% | 61.9% | 41.8% | 87 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
 | platform | 400 of 748 | 53.5% | 41.0% | 28.0% | 348 | 86 |

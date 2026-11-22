@@ -29,6 +29,8 @@
 #include "../src/seams/units_world.h"
 #include "../src/weapons/damage.h"
 #include "../src/weapons/weapons_apply.h"
+#include "../src/weapons/projectile.h"
+#include "../interfaces/state_writer.h"
 
 Game* g_game;
 Seams g_seams;
@@ -253,6 +255,110 @@ static void Play(Run* run, bool tamper)
     run->applied = s_applied;
 }
 
+void CountExplosionTables(unsigned int* explosions, unsigned int* debris, unsigned int* pieces)
+{
+    *explosions = 0;
+    *debris = 0;
+    *pieces = 0;
+}
+
+struct Line {
+    char record[64];
+    char field[64];
+    int index;
+    int size;
+    unsigned int value;
+};
+static Line s_lines[2048];
+static int s_lineCount;
+static char s_record[64];
+
+static void AddLine(const char* field, int index, int size, unsigned int value)
+{
+    if (s_lineCount >= 2048)
+        return;
+    Line* l = &s_lines[s_lineCount++];
+    strcpy(l->record, s_record);
+    strcpy(l->field, field);
+    l->index = index;
+    l->size = size;
+    l->value = value;
+}
+
+static void __stdcall RecBegin(int, const char* name)
+{
+    strcpy(s_record, name);
+}
+
+static void __stdcall RecInt(const char* field, int index, int size, unsigned int value)
+{
+    AddLine(field, index, size, value);
+}
+
+static void __stdcall RecBytes(const char* field, int index, const void*, int size)
+{
+    AddLine(field, index, -size, 0);
+}
+
+static void __stdcall RecHandle(const char* field, int index, int, unsigned int value)
+{
+    AddLine(field, index, 0, value);
+}
+
+static void __stdcall RecRun(int) {}
+
+static const Line* Find(const char* record, const char* field, int index)
+{
+    for (int i = 0; i < s_lineCount; i++)
+        if (strcmp(s_lines[i].record, record) == 0 && strcmp(s_lines[i].field, field) == 0 && s_lines[i].index == index)
+            return &s_lines[i];
+    return nullptr;
+}
+
+static void Dump(void (__stdcall* writeState)(const StateWriter*))
+{
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    s_lineCount = 0;
+    s_record[0] = 0;
+    writeState(&writer);
+}
+
+static void CheckStateRecords()
+{
+    g_game->poolCount = kUnits + 1;
+    UnitWeaponSlot* slot = &s_units[kVictim].weapons[1];
+    slot->reloadTimer = 7;
+    slot->fireHeading = -2;
+    slot->aimCob.nAimCobDone = 3;
+    Projectile* shots = (Projectile*)SimAlloc(2 * sizeof(Projectile));
+    memset(shots, 0, 2 * sizeof(Projectile));
+    shots[0].speed = 0x1234;
+    shots[1].speed = 0x4321;
+    shots[1].flags = 2;
+    g_game->projectiles = shots;
+    g_game->projectileCount = 2;
+    Dump(WeaponsWriteState);
+    const Line* reload = Find("weaponsState.units[1]", "weapons[%u].reloadTimer", 1);
+    Check(reload != nullptr && reload->size == 2 && reload->value == 7, "the unit's record holds the reload timer of its slot");
+    const Line* heading = Find("weaponsState.units[1]", "weapons[%u].fireHeading", 1);
+    Check(heading != nullptr && heading->value == 0xfffe, "the unit's record holds the fire heading of its slot as two bytes");
+    const Line* done = Find("weaponsState.units[1]", "weapons[%u].aimCob.done", 1);
+    Check(done != nullptr && done->size == 4 && done->value == 3, "the unit's record holds the aim callback's done count");
+    Check(Find("weaponsState.units[1]", "weapons[%u].firePitch", 2) != nullptr && Find("weaponsState.units[0]", "weapons[%u].firePitch", 0) == nullptr,
+          "only the live unit has a record, with all three slots");
+    const Line* speed = Find("weaponsState.projectiles[0]", "speed", 0);
+    Check(speed != nullptr && speed->value == 0x1234, "a projectile's record holds its speed");
+    Check(Find("weaponsState.projectiles[1]", "speed", 0) == nullptr, "a projectile marked dead has no record");
+    slot->reloadTimer = 9;
+    shots[0].speed = 0x2222;
+    Dump(WeaponsWriteState);
+    reload = Find("weaponsState.units[1]", "weapons[%u].reloadTimer", 1);
+    speed = Find("weaponsState.projectiles[0]", "speed", 0);
+    Check(reload != nullptr && reload->value == 9, "tampering with a slot's reload timer changes its record");
+    Check(speed != nullptr && speed->value == 0x2222, "tampering with a projectile's speed changes its record");
+    g_game->projectileCount = 0;
+}
+
 int main()
 {
     Setup();
@@ -303,6 +409,7 @@ int main()
     Check(first == kTamperTick, "the unit's health differs first at the tampered tick");
     Check(differing == kTicks - kTamperTick, "the unit's health differs at every tick from the tampered tick on");
     Check(dyingFirst == plainDeath, "the default's unit is marked dying at a tick where the tampered one is not yet");
+    CheckStateRecords();
     printf("tampered tick %d, first differing tick %d, %d differing ticks, death at tick %d against tick %d\n", tampered.tampered, first, differing, plainDeath, tamperedDeath);
 
     printf(g_failures ? "FAILED\n" : "weapons_writer_test: all passed\n");

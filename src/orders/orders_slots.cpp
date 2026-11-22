@@ -6,6 +6,7 @@
 #include "../units/unit_def.h"
 #include "../network/player.h"
 #include "../units/unit.h"
+#include "../game/game.h"
 #pragma pack(pop)
 
 #include "../util/vec3.h"
@@ -17,6 +18,7 @@
 #include "order_queue.h"
 #include "order_dispatch.h"
 #include "orders_seam.h"
+#include "../../link/globals.h"
 
 void __stdcall OrdersRunOrders(Unit* unit)
 {
@@ -98,6 +100,44 @@ int __stdcall OrdersSaveOrders(Unit* unit, HapiBank* file)
     return n;
 }
 
-void __stdcall OrdersWriteState(const StateWriter* writer)
+static const char* const kOrderFields[2][12] = {
+    {"list[%u].kind", "list[%u].state", "list[%u].flags6", "list[%u].wakeFrame", "list[%u].start.x", "list[%u].start.y", "list[%u].arg0", "list[%u].arg1",
+     "list[%u].arg2", "list[%u].created", "list[%u].subFlags", "list[%u].attached"},
+    {"list2[%u].kind", "list2[%u].state", "list2[%u].flags6", "list2[%u].wakeFrame", "list2[%u].start.x", "list2[%u].start.y", "list2[%u].arg0", "list2[%u].arg1",
+     "list2[%u].arg2", "list2[%u].created", "list2[%u].subFlags", "list2[%u].attached"},
+};
+
+static void WriteChain(const StateWriter* w, Order* order, int which)
 {
+    for (unsigned int n = 0; order != nullptr && n < 4096; n++) {
+        const char* const* names = kOrderFields[which];
+        w->Int(names[0], (int)n, 1, order->kind.index);
+        w->Int(names[1], (int)n, 1, order->state);
+        w->Int(names[2], (int)n, 4, order->flags);
+        w->Int(names[3], (int)n, 4, order->wakeFrame);
+        w->Int(names[4], (int)n, 2, (unsigned short)order->start.x);
+        w->Int(names[5], (int)n, 2, (unsigned short)order->start.y);
+        w->Int(names[6], (int)n, 4, (unsigned int)order->type);
+        w->Int(names[7], (int)n, 4, (unsigned int)order->radius);
+        w->Int(names[8], (int)n, 4, (unsigned int)order->progress);
+        w->Int(names[9], (int)n, 4, order->created);
+        w->Int(names[10], (int)n, 4, order->subFlags);
+        w->Handle(names[11], (int)n, STATE_HANDLE_HEAP, order->attached.offset);
+        order = order->next.get();
+    }
+}
+
+void __stdcall OrdersWriteState(const StateWriter* w)
+{
+    Unit* units = g_game->units.get();
+    char name[64];
+    for (unsigned int i = 0; units != nullptr && i < g_game->poolCount; i++) {
+        Unit* u = &units[i];
+        if (u->unitDefIndex == 0 || (u->list.offset == 0 && u->list2.offset == 0))
+            continue;
+        sprintf(name, "ordersState.units[%u]", i);
+        w->Begin(52, name);
+        WriteChain(w, u->list.get(), 0);
+        WriteChain(w, u->list2.get(), 1);
+    }
 }

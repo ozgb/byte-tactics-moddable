@@ -3224,6 +3224,18 @@ void __stdcall RecScriptsDeleteScript(CobScript* a0)
     }
 }
 
+void __stdcall RecScriptsWriteState(const StateWriter* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_SCRIPTS_WRITESTATE, SUB_SCRIPTS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "writer");
+    }
+    s_inner_scripts->WriteState(a0);
+    if (scope.Open()) {
+    }
+}
+
 int __stdcall RecMovementApply(const MovementEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -5369,6 +5381,8 @@ void HookSeams(const bool* on)
         s_rec_scripts.LoadScriptState = RecScriptsLoadScriptState;
     if (on[SUB_SCRIPTS])
         s_rec_scripts.DeleteScript = RecScriptsDeleteScript;
+    if (on[SUB_SCRIPTS])
+        s_rec_scripts.WriteState = RecScriptsWriteState;
     if (on[SUB_MOVEMENT])
         s_rec_movement.Apply = RecMovementApply;
     if (on[SUB_MOVEMENT])

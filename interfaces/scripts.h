@@ -8,6 +8,7 @@ struct UnitDrawView;
 struct ScriptTable;
 struct Callback;
 struct Vec3;
+struct StateWriter;
 struct Angles16;
 class CobScript;
 class UnitScript;
@@ -16,7 +17,7 @@ class HapiBank;
 // Major version of the scripts interface, changed when a slot is removed or its signature changes.
 #define SCRIPTS_VERSION_MAJOR 2
 // Minor version of the scripts interface, changed when a slot is added.
-#define SCRIPTS_VERSION_MINOR 0
+#define SCRIPTS_VERSION_MINOR 1
 
 // The fields every scripts event starts with.
 struct ScriptsEventHeader {
@@ -136,6 +137,8 @@ struct ScriptsSeam {
     int (__stdcall* LoadScriptState)(CobScript* script, HapiBank* file);
     // Destroys a unit script and frees its memory (the virtual deleting destructor); synchronous, as its unit dies. Hooks: none.
     void (__stdcall* DeleteScript)(CobScript* script);
+    // Writes the private state of every unit script as records (section 55), for the trace's dump; reads only, changes nothing. Hooks: none.
+    void (__stdcall* WriteState)(const StateWriter* writer);
 };
 
 #endif

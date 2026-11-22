@@ -40,11 +40,11 @@ const BlockVector<Ref<Unit> >* FactoryIndexOf(int player)
     return &s_index->players[player].factories;
 }
 
+static void WriteUnitRecords(const StateWriter* w);
+
 void __stdcall UnitsWriteState(const StateWriter* w)
 {
-    if (s_index == nullptr)
-        return;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; s_index != nullptr && i < 10; i++) {
         FactoryIndexEntry& entry = s_index->players[i];
         if (!entry.live)
             continue;
@@ -56,6 +56,27 @@ void __stdcall UnitsWriteState(const StateWriter* w)
         unsigned int k = 0;
         for (BlockVector<Ref<Unit> >::iterator it = entry.factories.Begin(); it != entry.factories.End(); ++it, ++k)
             w->Handle("factories[%u]", k, STATE_HANDLE_UNIT, (*it).offset);
+    }
+    WriteUnitRecords(w);
+}
+
+static void WriteUnitRecords(const StateWriter* w)
+{
+    Unit* units = g_game->units.get();
+    char name[64];
+    for (unsigned int i = 0; units != nullptr && i < g_game->poolCount; i++) {
+        Unit* u = &units[i];
+        if (u->unitDefIndex == 0)
+            continue;
+        sprintf(name, "unitsState.units[%u]", i);
+        w->Begin(54, name);
+        w->Handle("head", 0, STATE_HANDLE_HEAP, u->head.offset);
+        w->Int("hoverBobPhase", 0, 2, u->hoverBobPhase);
+        w->Int("healthPercent", 0, 1, u->healthPercent);
+        w->Int("prevHealthPercent", 0, 1, u->prevHealthPercent);
+        w->Int("unfinishedInitZero", 0, 4, (unsigned int)u->unfinishedInitZero);
+        w->Bytes("unknown_10a", 0, u->unknown_10a, 4);
+        w->Int("zBufferFlag", 0, 4, (unsigned int)u->zBufferFlag);
     }
 }
 

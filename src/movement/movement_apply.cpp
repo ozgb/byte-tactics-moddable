@@ -4,6 +4,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/state_writer.h"
+#include "../state/state_fields.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -209,23 +210,13 @@ unsigned int __stdcall MovementUnitTarget(Unit* unit)
     return ((PathGoal*)unit->motion->obj.get())->target.offset;
 }
 
-enum FieldKind { F_INT, F_BYTES, F_HEAP, F_UNIT };
-
-struct Field {
-    const char* name;
-    unsigned short offset;
-    unsigned char size;
-    unsigned char kind;
-    unsigned int mask;
-};
-
-static const Field kPatrolGoal[] = {
+static const StateField kPatrolGoal[] = {
     {"goal.target", 4, 4, F_HEAP, 0x0},
     {"goal.owner", 8, 4, F_UNIT, 0x0},
     {"goal.count", 24, 4, F_INT, 0x0},
 };
 
-static const Field kAiSearchGoal[] = {
+static const StateField kAiSearchGoal[] = {
     {"goal.target", 4, 4, F_HEAP, 0x0},
     {"goal.owner", 8, 4, F_UNIT, 0x0},
     {"goal.count", 92, 4, F_INT, 0x0},
@@ -233,7 +224,7 @@ static const Field kAiSearchGoal[] = {
     {"goal.flags", 100, 1, F_INT, 0xb},
 };
 
-static const Field kPackedGoal[] = {
+static const StateField kPackedGoal[] = {
     {"goal.target", 4, 4, F_HEAP, 0x0},
     {"goal.owner", 8, 4, F_UNIT, 0x0},
     {"goal.pos.x", 12, 4, F_INT, 0x0},
@@ -245,45 +236,11 @@ static const Field kPackedGoal[] = {
     {"goal.heading", 36, 2, F_INT, 0x0},
 };
 
-static const Field kLiteGoalState[] = {
+static const StateField kLiteGoalState[] = {
     {"goal.netDirty", 39, 1, F_INT, 0x7},
 };
 
 enum GoalClass { GOAL_NONE, GOAL_PATROL, GOAL_AISEARCH, GOAL_PACKED, GOAL_LITE, GOAL_PACKEDPOS, GOAL_UNKNOWN };
-
-static unsigned int ReadWord(const unsigned char* p, unsigned int size)
-{
-    unsigned int v = 0;
-    for (unsigned int b = size; b > 0; b--)
-        v = (v << 8) | p[b - 1];
-    return v;
-}
-
-static void WriteFields(const StateWriter* w, const unsigned char* base, const Field* fields, unsigned int count)
-{
-    for (unsigned int k = 0; k < count; k++) {
-        const Field* f = &fields[k];
-        const unsigned char* p = base + f->offset;
-        switch (f->kind) {
-        case F_INT: {
-            unsigned int v = ReadWord(p, f->size);
-            w->Int(f->name, 0, f->size, f->mask != 0 ? v & f->mask : v);
-            break;
-        }
-        case F_BYTES:
-            w->Bytes(f->name, 0, p, f->size);
-            break;
-        case F_HEAP:
-            w->Handle(f->name, 0, STATE_HANDLE_HEAP, ReadWord(p, 4));
-            break;
-        case F_UNIT:
-            w->Handle(f->name, 0, STATE_HANDLE_UNIT, ReadWord(p, 4));
-            break;
-        }
-    }
-}
-
-#define FIELDS(table) table, sizeof(table) / sizeof(table[0])
 
 static GoalClass ClassOfGoal(const unsigned char* goal)
 {
@@ -303,7 +260,7 @@ static GoalClass ClassOfGoal(const unsigned char* goal)
 
 static void WritePoints(const StateWriter* w, const unsigned char* goal, unsigned int countOffset, unsigned int limit)
 {
-    unsigned int n = ReadWord(goal + countOffset, 4);
+    unsigned int n = ReadStateWord(goal + countOffset, 4);
     if (n > limit)
         n = limit;
     w->Bytes("goal.points", 0, goal + 0xc, (int)(n * 4));
@@ -315,20 +272,20 @@ static void WriteGoal(const StateWriter* w, const unsigned char* goal)
     w->Int("goal.class", 0, 4, (unsigned int)cls);
     switch (cls) {
     case GOAL_PATROL:
-        WriteFields(w, goal, FIELDS(kPatrolGoal));
+        WriteStateFields(w, goal, STATE_FIELDS(kPatrolGoal), 0);
         WritePoints(w, goal, 0x18, 3);
         break;
     case GOAL_AISEARCH:
-        WriteFields(w, goal, FIELDS(kAiSearchGoal));
+        WriteStateFields(w, goal, STATE_FIELDS(kAiSearchGoal), 0);
         WritePoints(w, goal, 0x5c, 20);
         break;
     case GOAL_PACKED:
     case GOAL_PACKEDPOS:
-        WriteFields(w, goal, FIELDS(kPackedGoal));
+        WriteStateFields(w, goal, STATE_FIELDS(kPackedGoal), 0);
         break;
     case GOAL_LITE:
-        WriteFields(w, goal, FIELDS(kPackedGoal));
-        WriteFields(w, goal, FIELDS(kLiteGoalState));
+        WriteStateFields(w, goal, STATE_FIELDS(kPackedGoal), 0);
+        WriteStateFields(w, goal, STATE_FIELDS(kLiteGoalState), 0);
         break;
     default:
         break;

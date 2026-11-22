@@ -54052,6 +54052,8 @@ address,function,file,kind,target
 ,ReadSpawn,src/harness/harness.cpp,global_escape,s_spawns@src/harness/harness.cpp
 ,ReadSpawn,src/harness/harness.cpp,global_read,s_spawnCount@src/harness/harness.cpp
 ,ReadSpawn,src/harness/harness.cpp,global_write,s_spawnCount@src/harness/harness.cpp
+,ReadStateWord,src/state/state_fields.h,deref_read,*unsigned char
+,ReadStateWord,src/state/state_fields.h,function,
 ,ReadU32At,src/harness/harness.cpp,deref_read,*unsigned int
 ,ReadU32At,src/harness/harness.cpp,function,
 ,ReadUnsigned,src/wasm/modules.cpp,deref_read,*unsigned char
@@ -54059,12 +54061,6 @@ address,function,file,kind,target
 ,ReadUnsigned,src/wasm/modules.cpp,deref_write,*int
 ,ReadUnsigned,src/wasm/modules.cpp,deref_write,*unsigned int
 ,ReadUnsigned,src/wasm/modules.cpp,function,
-,ReadWord,src/movement/movement_apply.cpp,deref_read,*unsigned char
-,ReadWord,src/movement/movement_apply.cpp,function,
-,ReadWord,src/scripts/scripts_state.cpp,deref_read,*unsigned char
-,ReadWord,src/scripts/scripts_state.cpp,function,
-,ReadWord,src/weapons/weapons_apply.cpp,deref_read,*unsigned char
-,ReadWord,src/weapons/weapons_apply.cpp,function,
 ,ReallocLocked,src/state/block.cpp,call,AllocLocked
 ,ReallocLocked,src/state/block.cpp,call,At
 ,ReallocLocked,src/state/block.cpp,call,ChunkSizeFor
@@ -64062,7 +64058,7 @@ address,function,file,kind,target
 ,WriteChain,src/orders/orders_slots.cpp,global_escape,kOrderFields@src/orders/orders_slots.cpp
 ,WriteChain,src/orders/orders_slots.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
 ,WriteChain,src/orders/orders_slots.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
-,WriteChannel,src/scripts/scripts_state.cpp,call,WriteFields
+,WriteChannel,src/scripts/scripts_state.cpp,call,WriteStateFields
 ,WriteChannel,src/scripts/scripts_state.cpp,field_escape,Channel::stack
 ,WriteChannel,src/scripts/scripts_state.cpp,field_read,Channel::sp
 ,WriteChannel,src/scripts/scripts_state.cpp,field_read,Channel::state
@@ -64086,9 +64082,9 @@ address,function,file,kind,target
 ,WriteCondition,src/game/players.cpp,function,
 ,WriteCondition,src/game/players.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteCondition,src/game/players.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
-,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,ReadWord
+,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,ReadStateWord
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,SimBlockBase
-,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,WriteFields
+,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,WriteStateFields
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,memset
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,sprintf
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_escape,Game::debris
@@ -64125,7 +64121,7 @@ address,function,file,kind,target
 ,WriteDump,src/host/win32/display.cpp,global_read,g_windowedWidth
 ,WriteDump,src/host/win32/display.cpp,global_write,g_dumpIndex
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,call,SimBlockBase
-,WriteExplodedPieces,src/weapons/weapons_apply.cpp,call,WriteFields
+,WriteExplodedPieces,src/weapons/weapons_apply.cpp,call,WriteStateFields
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,call,sprintf
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,field_read,Ref<ExplodedPiece>::offset
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,field_read,StateWriter::Begin
@@ -64134,51 +64130,9 @@ address,function,file,kind,target
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,global_read,kExplodedPiece@src/weapons/weapons_apply.cpp
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,global_read,kPieceRec@src/weapons/weapons_apply.cpp
 ,WriteExplodedPieces,src/weapons/weapons_apply.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
-,WriteFields,src/movement/movement_apply.cpp,call,ReadWord
-,WriteFields,src/movement/movement_apply.cpp,deref_escape,*Field
-,WriteFields,src/movement/movement_apply.cpp,field_read,Field::kind
-,WriteFields,src/movement/movement_apply.cpp,field_read,Field::mask
-,WriteFields,src/movement/movement_apply.cpp,field_read,Field::name
-,WriteFields,src/movement/movement_apply.cpp,field_read,Field::offset
-,WriteFields,src/movement/movement_apply.cpp,field_read,Field::size
-,WriteFields,src/movement/movement_apply.cpp,field_read,StateWriter::Bytes
-,WriteFields,src/movement/movement_apply.cpp,field_read,StateWriter::Handle
-,WriteFields,src/movement/movement_apply.cpp,field_read,StateWriter::Int
-,WriteFields,src/movement/movement_apply.cpp,function,
-,WriteFields,src/movement/movement_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
-,WriteFields,src/movement/movement_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
-,WriteFields,src/movement/movement_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
-,WriteFields,src/scripts/scripts_state.cpp,call,ReadWord
-,WriteFields,src/scripts/scripts_state.cpp,deref_escape,*Field
-,WriteFields,src/scripts/scripts_state.cpp,field_read,Field::kind
-,WriteFields,src/scripts/scripts_state.cpp,field_read,Field::mask
-,WriteFields,src/scripts/scripts_state.cpp,field_read,Field::name
-,WriteFields,src/scripts/scripts_state.cpp,field_read,Field::offset
-,WriteFields,src/scripts/scripts_state.cpp,field_read,Field::size
-,WriteFields,src/scripts/scripts_state.cpp,field_read,StateWriter::Bytes
-,WriteFields,src/scripts/scripts_state.cpp,field_read,StateWriter::Handle
-,WriteFields,src/scripts/scripts_state.cpp,field_read,StateWriter::Int
-,WriteFields,src/scripts/scripts_state.cpp,function,
-,WriteFields,src/scripts/scripts_state.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
-,WriteFields,src/scripts/scripts_state.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
-,WriteFields,src/scripts/scripts_state.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
-,WriteFields,src/weapons/weapons_apply.cpp,call,ReadWord
-,WriteFields,src/weapons/weapons_apply.cpp,deref_escape,*Field
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,Field::kind
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,Field::mask
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,Field::name
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,Field::offset
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,Field::size
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,StateWriter::Bytes
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,StateWriter::Handle
-,WriteFields,src/weapons/weapons_apply.cpp,field_read,StateWriter::Int
-,WriteFields,src/weapons/weapons_apply.cpp,function,
-,WriteFields,src/weapons/weapons_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
-,WriteFields,src/weapons/weapons_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
-,WriteFields,src/weapons/weapons_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteGoal,src/movement/movement_apply.cpp,call,ClassOfGoal
-,WriteGoal,src/movement/movement_apply.cpp,call,WriteFields
 ,WriteGoal,src/movement/movement_apply.cpp,call,WritePoints
+,WriteGoal,src/movement/movement_apply.cpp,call,WriteStateFields
 ,WriteGoal,src/movement/movement_apply.cpp,field_read,StateWriter::Int
 ,WriteGoal,src/movement/movement_apply.cpp,function,
 ,WriteGoal,src/movement/movement_apply.cpp,global_read,kAiSearchGoal@src/movement/movement_apply.cpp
@@ -64226,11 +64180,11 @@ address,function,file,kind,target
 ,WriteNodes,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
 ,WriteNodes,src/ai/pathfind.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteNodes,src/ai/pathfind.cpp,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [StateWriter::Run]
-,WritePoints,src/movement/movement_apply.cpp,call,ReadWord
+,WritePoints,src/movement/movement_apply.cpp,call,ReadStateWord
 ,WritePoints,src/movement/movement_apply.cpp,field_read,StateWriter::Bytes
 ,WritePoints,src/movement/movement_apply.cpp,function,
 ,WritePoints,src/movement/movement_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
-,WriteProjectiles,src/weapons/weapons_apply.cpp,call,WriteFields
+,WriteProjectiles,src/weapons/weapons_apply.cpp,call,WriteStateFields
 ,WriteProjectiles,src/weapons/weapons_apply.cpp,call,get
 ,WriteProjectiles,src/weapons/weapons_apply.cpp,call,sprintf
 ,WriteProjectiles,src/weapons/weapons_apply.cpp,deref_read,*unsigned short
@@ -64256,7 +64210,7 @@ address,function,file,kind,target
 ,WriteRequest,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
 ,WriteRequest,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteScript,src/scripts/scripts_state.cpp,call,WriteChannel
-,WriteScript,src/scripts/scripts_state.cpp,call,WriteFields
+,WriteScript,src/scripts/scripts_state.cpp,call,WriteStateFields
 ,WriteScript,src/scripts/scripts_state.cpp,call,get
 ,WriteScript,src/scripts/scripts_state.cpp,field_read,CobScript::channels
 ,WriteScript,src/scripts/scripts_state.cpp,field_read,CobScript::pieces
@@ -64348,6 +64302,20 @@ address,function,file,kind,target
 ,WriteSearch,src/ai/pathfind_hpa.cpp,function,
 ,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
 ,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,WriteStateFields,src/state/state_fields.h,call,ReadStateWord
+,WriteStateFields,src/state/state_fields.h,deref_escape,*StateField
+,WriteStateFields,src/state/state_fields.h,field_read,StateField::kind
+,WriteStateFields,src/state/state_fields.h,field_read,StateField::mask
+,WriteStateFields,src/state/state_fields.h,field_read,StateField::name
+,WriteStateFields,src/state/state_fields.h,field_read,StateField::offset
+,WriteStateFields,src/state/state_fields.h,field_read,StateField::size
+,WriteStateFields,src/state/state_fields.h,field_read,StateWriter::Bytes
+,WriteStateFields,src/state/state_fields.h,field_read,StateWriter::Handle
+,WriteStateFields,src/state/state_fields.h,field_read,StateWriter::Int
+,WriteStateFields,src/state/state_fields.h,function,
+,WriteStateFields,src/state/state_fields.h,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
+,WriteStateFields,src/state/state_fields.h,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
+,WriteStateFields,src/state/state_fields.h,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteTabsInline,src/gui/gui_file.cpp,call,HAPI_WriteFile
 ,WriteTabsInline,src/gui/gui_file.cpp,function,
 ,WriteTiming,src/wasm/modules.cpp,call,ModulesFatal

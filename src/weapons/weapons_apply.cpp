@@ -18,6 +18,7 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/services.h"
 #include "../../interfaces/state_writer.h"
+#include "../state/state_fields.h"
 #include "damage.h"
 #include "projectile.h"
 #include "debris.h"
@@ -191,17 +192,7 @@ int __stdcall WeaponsApply(const WeaponsEventHeader* e, unsigned int size)
     return 1;
 }
 
-enum FieldKind { F_INT, F_BYTES, F_HEAP, F_UNIT };
-
-struct Field {
-    const char* name;
-    unsigned short offset;
-    unsigned char size;
-    unsigned char kind;
-    unsigned int mask;
-};
-
-static const Field kExplodedPiece[] = {
+static const StateField kExplodedPiece[] = {
     {"unit", 0, 4, F_UNIT, 0x0},
     {"index", 4, 4, F_INT, 0x0},
     {"angVelZ", 8, 4, F_INT, 0x0},
@@ -216,7 +207,7 @@ static const Field kExplodedPiece[] = {
     {"rec", 44, 4, F_HEAP, 0x0},
 };
 
-static const Field kPieceRec[] = {
+static const StateField kPieceRec[] = {
     {"rec.desc", 0, 4, F_HEAP, 0x0},
     {"rec.+0x4", 4, 12, F_BYTES, 0x0},
     {"rec.angle_10", 16, 2, F_INT, 0x0},
@@ -233,7 +224,7 @@ static const Field kPieceRec[] = {
     {"rec.link2", 50, 4, F_HEAP, 0x0},
 };
 
-static const Field kDebris[] = {
+static const StateField kDebris[] = {
     {"obj", 0, 4, F_HEAP, 0x0},
     {"ref1.index", 4, 2, F_INT, 0x0},
     {"ref1.value", 6, 2, F_INT, 0x0},
@@ -263,7 +254,7 @@ static const Field kDebris[] = {
     {"flag", 82, 2, F_INT, 0x0},
 };
 
-static const Field kPiece[] = {
+static const StateField kPiece[] = {
     {"state", 0, 1, F_INT, 0x0},
     {"+0x1", 1, 3, F_BYTES, 0x0},
     {"vertexCount", 4, 4, F_INT, 0x0},
@@ -280,7 +271,7 @@ static const Field kPiece[] = {
     {"child", 48, 4, F_HEAP, 0x0},
 };
 
-static const Field kFace[] = {
+static const StateField kFace[] = {
     {"faces[%u].color", 0, 4, F_INT, 0x0},
     {"faces[%u].nverts", 4, 4, F_INT, 0x0},
     {"faces[%u].+0x8", 8, 4, F_INT, 0x0},
@@ -292,7 +283,7 @@ static const Field kFace[] = {
     {"faces[%u].flags", 28, 4, F_INT, 0x0},
 };
 
-static const Field kProjectile[] = {
+static const StateField kProjectile[] = {
     {"start.x", 0x10, 4, F_INT, 0},
     {"start.y", 0x14, 4, F_INT, 0},
     {"start.z", 0x18, 4, F_INT, 0},
@@ -319,40 +310,6 @@ static const Field kProjectile[] = {
     {"flags", 0x69, 2, F_INT, 0},
 };
 
-static unsigned int ReadWord(const unsigned char* p, unsigned int size)
-{
-    unsigned int v = 0;
-    for (unsigned int b = size; b > 0; b--)
-        v = (v << 8) | p[b - 1];
-    return v;
-}
-
-static void WriteFields(const StateWriter* w, const unsigned char* base, const Field* fields, unsigned int count, int index)
-{
-    for (unsigned int k = 0; k < count; k++) {
-        const Field* f = &fields[k];
-        const unsigned char* p = base + f->offset;
-        switch (f->kind) {
-        case F_INT: {
-            unsigned int v = ReadWord(p, f->size);
-            w->Int(f->name, index, f->size, f->mask != 0 ? v & f->mask : v);
-            break;
-        }
-        case F_BYTES:
-            w->Bytes(f->name, index, p, f->size);
-            break;
-        case F_HEAP:
-            w->Handle(f->name, index, STATE_HANDLE_HEAP, ReadWord(p, 4));
-            break;
-        case F_UNIT:
-            w->Handle(f->name, index, STATE_HANDLE_UNIT, ReadWord(p, 4));
-            break;
-        }
-    }
-}
-
-#define FIELDS(table) table, sizeof(table) / sizeof(table[0])
-
 static void WriteExplodedPieces(const StateWriter* w)
 {
     char name[64];
@@ -363,8 +320,8 @@ static void WriteExplodedPieces(const StateWriter* w)
         const unsigned char* p = (const unsigned char*)SimBlockBase() + offset;
         sprintf(name, "weaponsState.explodedPieces[%u]", s);
         w->Begin(48, name);
-        WriteFields(w, p, FIELDS(kExplodedPiece), 0);
-        WriteFields(w, p + 0x30, FIELDS(kPieceRec), 0);
+        WriteStateFields(w, p, STATE_FIELDS(kExplodedPiece), 0);
+        WriteStateFields(w, p + 0x30, STATE_FIELDS(kPieceRec), 0);
     }
 }
 
@@ -378,12 +335,12 @@ static void WriteDebrisAndPieces(const StateWriter* w)
         n = 300;
     for (unsigned int d = 0; d < n; d++) {
         const Debris* e = &g_game->debris[d];
-        unsigned int pieceOffset = ReadWord((const unsigned char*)e, 4);
+        unsigned int pieceOffset = ReadStateWord((const unsigned char*)e, 4);
         if (pieceOffset == 0)
             continue;
         sprintf(name, "weaponsState.debris[%u]", d);
         w->Begin(48, name);
-        WriteFields(w, (const unsigned char*)e, FIELDS(kDebris), 0);
+        WriteStateFields(w, (const unsigned char*)e, STATE_FIELDS(kDebris), 0);
         const unsigned char* obj = (const unsigned char*)SimBlockBase() + pieceOffset;
         const unsigned char* slots = (const unsigned char*)&g_game->slots[0];
         if (obj >= slots && (unsigned int)(obj - slots) % sizeof(DebrisPiece) == 0 && (unsigned int)(obj - slots) / sizeof(DebrisPiece) < 300)
@@ -394,10 +351,10 @@ static void WriteDebrisAndPieces(const StateWriter* w)
             continue;
         sprintf(name, "weaponsState.pieces[%u]", i);
         w->Begin(48, name);
-        WriteFields(w, (const unsigned char*)&g_game->slots[i], FIELDS(kPiece), 0);
+        WriteStateFields(w, (const unsigned char*)&g_game->slots[i], STATE_FIELDS(kPiece), 0);
         w->Bytes("vertices", 0, g_game->vertices[i], 96);
         for (unsigned int k = 0; k < 6; k++)
-            WriteFields(w, (const unsigned char*)&g_game->frames[i][k], FIELDS(kFace), (int)k);
+            WriteStateFields(w, (const unsigned char*)&g_game->frames[i][k], STATE_FIELDS(kFace), (int)k);
     }
 }
 
@@ -433,7 +390,7 @@ static void WriteProjectiles(const StateWriter* w)
             continue;
         sprintf(name, "weaponsState.projectiles[%u]", (unsigned int)p);
         w->Begin(48, name);
-        WriteFields(w, e, FIELDS(kProjectile), 0);
+        WriteStateFields(w, e, STATE_FIELDS(kProjectile), 0);
     }
 }
 

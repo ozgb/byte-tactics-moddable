@@ -2738,6 +2738,8 @@ movement,files,call,HapiBank::SeekBox,10
 movement,files,call,HapiBank::WriteBox,5
 movement,game,call,MovementEventSize,1
 movement,game,call,MovementPublishOrderFlags,1
+movement,game,call,ReadStateWord,1
+movement,game,call,WriteStateFields,1
 movement,game,shared_write,Point16::x,1
 movement,game,shared_write,Point16::y,1
 movement,game,shared_write,Ref<Unit>::offset,7
@@ -4970,6 +4972,7 @@ scripts,game,call,RecordWhiteSmoke,1
 scripts,game,call,ScriptsEventSize,1
 scripts,game,call,SimAllocTagged,4
 scripts,game,call,SimRealloc,1
+scripts,game,call,WriteStateFields,2
 scripts,game,shared_write,Angles16::heading,1
 scripts,game,shared_write,Ref<Unit>::offset,7
 scripts,game,shared_write,Unit::script,1
@@ -6726,6 +6729,7 @@ weapons,game,call,EconHandleOf,1
 weapons,game,call,EconSpend,1
 weapons,game,call,FeaturesPublishDamage,1
 weapons,game,call,GameRand,1
+weapons,game,call,ReadStateWord,1
 weapons,game,call,RecordBuildMenuUpdate,1
 weapons,game,call,RecordCdActivity,1
 weapons,game,call,RecordScreenShake,1
@@ -6743,6 +6747,7 @@ weapons,game,call,WeaponsPublishDamageRecord,1
 weapons,game,call,WeaponsPublishHealth,1
 weapons,game,call,WeaponsPublishMarkDamaged,1
 weapons,game,call,WeaponsPublishParalyze,2
+weapons,game,call,WriteStateFields,3
 weapons,game,shared_write,Angles16::heading,1
 weapons,game,shared_write,Ref<Unit>::offset,7
 weapons,game,shared_write,Vec3::x,4

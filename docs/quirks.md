@@ -10,6 +10,12 @@ mechanism landed in
 The list of flags is [`src/quirks/quirks.def`](../src/quirks/quirks.def).
 This page describes each one, and gets a row whenever a flag is added there.
 
+The layout is published as `struct Quirks` in
+[`interfaces/quirks.h`](../interfaces/quirks.h): one `bool` per flag, in the
+order of `quirks.def`. A new flag needs a member appended there too, and the
+build fails when the two disagree. Appending a flag is a minor bump of the
+quirks interface, and removing or reordering one is a major bump.
+
 ## Choosing flags
 
 A flag set is a spec: a preset, then `+flag` or `-flag` words.

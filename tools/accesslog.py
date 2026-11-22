@@ -182,7 +182,7 @@ FLATTENED = ("Pathfinder", "PathExtra", "Node", "PathCell", "PathPending")
 REGION_TAGS = ("AISearch region",)
 REGION_OWNER_FUNCTION = "LoadBattleAssets"
 OUTPUT_FILES = ("access.edges.csv", "access.stats.txt", "access.presentation.csv", "access.cross.csv", "access.draws.csv", "access.pass.csv",
-                "access.ordered.csv", "access.reads.csv")
+                "access.ordered.csv", "access.reads.csv", "access.saveload.csv")
 RAW_FILE = "access.raw.txt"
 REF_HELPER = re.compile(r"\$(?:Pod)?Ref@")
 
@@ -977,7 +977,8 @@ def run(build_dir: Path, names: list[str], game_dir: Path, raw: bool, twice: boo
         failed += why is not None
         for suffix, source in (("edges.csv", "access.edges.csv"), ("stats.txt", "access.stats.txt"), ("presentation.csv", "access.presentation.csv"),
                                ("cross.csv", "access.cross.csv"), ("draws.csv", "access.draws.csv"), ("pass.csv", "access.pass.csv"),
-                               ("ordered.csv", "access.ordered.csv"), ("reads.csv", "access.reads.csv"), ("raw.txt", RAW_FILE)):
+                               ("ordered.csv", "access.ordered.csv"), ("reads.csv", "access.reads.csv"),
+                               ("saveload.csv", "access.saveload.csv"), ("raw.txt", RAW_FILE)):
             if (directory / source).is_file():
                 shutil.copyfile(directory / source, out / ("%s.%s" % (name, suffix)))
         if twice:

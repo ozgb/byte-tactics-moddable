@@ -27,6 +27,7 @@ public:
 
     bool Init(unsigned items, unsigned edgeBits, AllocFn alloc);
     void BeginWindow(unsigned label);
+    void BeginIsolatedWindow(unsigned label);
     void ResolveLabel(unsigned label);
     void EndWindow(unsigned tick);
     unsigned Read(unsigned item, unsigned entA, unsigned entB, unsigned sub, unsigned tick);
@@ -97,6 +98,7 @@ private:
     unsigned matchLevel = 0;
     unsigned windowLabels[2][kWindows] = {};
     unsigned current = 0;
+    bool isolated = false;
     bool overflow = false;
 };
 
@@ -156,6 +158,19 @@ inline void Classifier::Count(unsigned writer, unsigned reader, unsigned item, u
     s->count += amount;
 }
 
+inline void Classifier::BeginIsolatedWindow(unsigned lab)
+{
+    stamp++;
+    label = lab;
+    writtenCount = 0;
+    depth = 0;
+    for (unsigned i = 0; i < kLevels; i++) {
+        level[i].entity = 0;
+        level[i].floor = 0;
+    }
+    isolated = true;
+}
+
 inline void Classifier::BeginWindow(unsigned lab)
 {
     stamp++;
@@ -166,6 +181,7 @@ inline void Classifier::BeginWindow(unsigned lab)
         level[i].entity = 0;
         level[i].floor = 0;
     }
+    isolated = false;
     if (lab == kPendingLabel) {
         epoch++;
         current ^= 1;
@@ -235,6 +251,8 @@ inline unsigned Classifier::Read(unsigned item, unsigned entA, unsigned entB, un
         }
     } else {
         Count(kNoSub, sub, item, EVIDENCE_UNWRITTEN, tick, 1);
+        if (isolated)
+            return flags;
         if (s->tickEpoch == epoch && s->tickWriter != sub) {
             Count(s->tickWriter, sub, item, EVIDENCE_CROSS, tick, 1, windowLabels[current][s->tickWin]);
         } else if (s->tickEpoch != 0 && s->tickEpoch + 1 == epoch && s->tickWriter != sub) {
@@ -258,10 +276,12 @@ inline void Classifier::Write(unsigned item, unsigned entA, unsigned entB, unsig
     s->entA = entA;
     s->entB = entB;
     s->writerOrd = level[depth].entity;
+    s->read = 0;
+    if (isolated)
+        return;
     s->tickEpoch = epoch;
     s->tickWriter = sub;
     s->tickWin = window;
-    s->read = 0;
 }
 
 inline void Classifier::Ordered(unsigned stream, unsigned item, unsigned sub, unsigned tick)

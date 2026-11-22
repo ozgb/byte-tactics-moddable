@@ -85,9 +85,16 @@ HapiBank* __stdcall OpenHapiBank(char* name)
 
 #include "../../interfaces/seams.h"
 
+#if BT_ACCESS_LOG
+#include "../../lib/accesslog/access_log.h"
+#endif
+
 // FUNCTION: 0x432610
 int __stdcall LoadSavedGameState(HapiBank* file)
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_LOAD);
+#endif
     file->OpenAccount(g_summaryAccountName);
     if (file->HasItem("maxunits"))
         g_game->maxUnits_37eec = file->GetIntegerItem("maxunits", 0);
@@ -107,6 +114,9 @@ int __stdcall LoadSavedGameState(HapiBank* file)
 // FUNCTION: 0x4326b0
 int __stdcall SaveGameFile(char* path, char* description, int gameId)
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_SAVE);
+#endif
     HapiBank file;
     char buf[256];
 

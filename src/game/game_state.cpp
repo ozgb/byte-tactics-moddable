@@ -470,6 +470,9 @@ unsigned int GetTicks();
 // FUNCTION: 0x4917d0
 void LoadBattleAssets()
 {
+#if BT_ACCESS_LOG
+    AccessLogSaveLoadScope accessWindow(ACCESS_WINDOW_LOAD);
+#endif
     ResetChatHudIndices();
     memset(&g_game->chatRecipients_2bf1_b, 0, 11);
     g_game->orderMode = 1;

@@ -219,7 +219,7 @@ int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int upd
 }
 
 // FUNCTION: 0x4b0bc0
-int CobScript::QueryScript(char* name, int* p2, int* p3, int* p4, int* p5)
+int CobScript::QueryScript(const char* name, int* p2, int* p3, int* p4, int* p5)
 {
     return QueryScriptByIndex(FindScript(name), p2, p3, p4, p5);
 }

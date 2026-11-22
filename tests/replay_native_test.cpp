@@ -1681,7 +1681,7 @@ void __stdcall WriteStateSlot(const StateWriter* writer)
     MapWriteState(writer);
 }
 
-WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
+WeaponDef* __stdcall FindWeaponByNameSlot(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
 }
@@ -1711,7 +1711,7 @@ int __fastcall GetGameTypeSlot(Mission* self)
     return self->GetGameType();
 }
 
-char* __stdcall GetNameSlotSlot(Mission* mission, int index)
+const char* __stdcall GetNameSlotSlot(Mission* mission, int index)
 {
     return mission->GetNameSlot(index);
 }
@@ -1751,7 +1751,7 @@ int __fastcall AdvanceMissionSlot(Mission* self)
     return self->AdvanceMission();
 }
 
-char* __fastcall GetCampaignNameSlot(Mission* self)
+const char* __fastcall GetCampaignNameSlot(Mission* self)
 {
     return self->GetCampaignName();
 }
@@ -1761,7 +1761,7 @@ int __fastcall GetMissionIndexSlot(Mission* self)
     return self->GetMissionIndex();
 }
 
-char* __fastcall GetMissionNameSlot(Mission* self)
+const char* __fastcall GetMissionNameSlot(Mission* self)
 {
     return self->GetMissionName();
 }
@@ -1771,12 +1771,12 @@ int __fastcall GetStartPositionSlot(Mission* self, int unusedEdx, Vec3* out, int
     return self->GetStartPosition(out, id);
 }
 
-void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, char* file)
+void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, const char* file)
 {
     self->LoadCampaign(file);
 }
 
-int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, char* name)
+int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, const char* name)
 {
     return self->LoadMissionByName(name);
 }

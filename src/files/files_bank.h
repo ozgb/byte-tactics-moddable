@@ -21,15 +21,15 @@ public:
     {
         g_seams.files->BankNew(this);
     }
-    int OpenBank(char* filename, char* name, char* account)
+    int OpenBank(const char* filename, const char* name, const char* account)
     {
         return g_seams.files->BankOpen(this, filename, name, account);
     }
-    int SaveBank(char* filename, char* name, int compress, int audit)
+    int SaveBank(const char* filename, const char* name, int compress, int audit)
     {
         return g_seams.files->BankSave(this, filename, name, compress, audit);
     }
-    int OpenAccount(char* name)
+    int OpenAccount(const char* name)
     {
         return g_seams.files->BankOpenAccount(this, name);
     }
@@ -41,19 +41,19 @@ public:
     {
         return g_seams.files->BankSetDouble(this, name, value);
     }
-    int SetStringItem(const char* name, char* value)
+    int SetStringItem(const char* name, const char* value)
     {
         return g_seams.files->BankSetString(this, name, value);
     }
-    int GetIntegerItem(char* name, int def)
+    int GetIntegerItem(const char* name, int def)
     {
         return g_seams.files->BankGetInteger(this, name, def);
     }
-    double GetDoubleItem(char* name, double def)
+    double GetDoubleItem(const char* name, double def)
     {
         return g_seams.files->BankGetDouble(this, name, def);
     }
-    char* GetStringItem(char* name, char* def)
+    const char* GetStringItem(const char* name, const char* def)
     {
         return g_seams.files->BankGetString(this, name, def);
     }
@@ -65,7 +65,7 @@ public:
     {
         return g_seams.files->BankOpenNumberedBox(this, number);
     }
-    int OpenNamedBox(char* name)
+    int OpenNamedBox(const char* name)
     {
         return g_seams.files->BankOpenNamedBox(this, name);
     }

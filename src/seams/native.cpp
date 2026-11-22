@@ -143,7 +143,7 @@ static int __stdcall FindScriptNative(CobScript* script, const char* name)
     return script->FindScript(name);
 }
 
-static int __stdcall QueryScriptNative(CobScript* script, char* name, int* p2, int* p3, int* p4, int* p5)
+static int __stdcall QueryScriptNative(CobScript* script, const char* name, int* p2, int* p3, int* p4, int* p5)
 {
     return script->QueryScript(name, p2, p3, p4, p5);
 }
@@ -171,7 +171,7 @@ static void __stdcall CreateSquadManagerNative(Player* player)
     player->ai = new (kSim) SquadManager(player);
 }
 
-static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char* text, int* out)
+static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, const char* text, int* out)
 {
     self->AddTypeOrCategory(text, out);
 }
@@ -196,7 +196,7 @@ static int __stdcall GetCellMeanHeightNative(Vec3* pos)
     return GetCellMeanHeight(pos);
 }
 
-static WeaponDef* __stdcall FindWeaponByNameNative(char* name)
+static WeaponDef* __stdcall FindWeaponByNameNative(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
 }
@@ -216,7 +216,7 @@ static int __stdcall GetGameTypeNative()
     return TheMission()->GetGameType();
 }
 
-static char* __stdcall GetNameSlotNative(int index)
+static const char* __stdcall GetNameSlotNative(int index)
 {
     return TheMission()->GetNameSlot(index);
 }
@@ -226,7 +226,7 @@ static int __stdcall AdvanceMissionNative()
     return TheMission()->AdvanceMission();
 }
 
-static char* __stdcall GetCampaignNameNative()
+static const char* __stdcall GetCampaignNameNative()
 {
     return TheMission()->GetCampaignName();
 }
@@ -236,7 +236,7 @@ static int __stdcall GetMissionIndexNative()
     return TheMission()->GetMissionIndex();
 }
 
-static char* __stdcall GetMissionNameNative()
+static const char* __stdcall GetMissionNameNative()
 {
     return TheMission()->GetMissionName();
 }
@@ -246,12 +246,12 @@ static int __stdcall GetStartPositionNative(Vec3* out, int id)
     return TheMission()->GetStartPosition(out, id);
 }
 
-static void __stdcall LoadCampaignNative(char* file)
+static void __stdcall LoadCampaignNative(const char* file)
 {
     TheMission()->LoadCampaign(file);
 }
 
-static int __stdcall LoadMissionByNameNative(char* name)
+static int __stdcall LoadMissionByNameNative(const char* name)
 {
     return TheMission()->LoadMissionByName(name);
 }
@@ -296,12 +296,12 @@ static int __stdcall CountStartPositionsNative()
     return TheMission()->CountStartPositions();
 }
 
-static char* __stdcall GetBriefingNative()
+static const char* __stdcall GetBriefingNative()
 {
     return TheMission()->GetBriefing();
 }
 
-static char* __stdcall GetDescriptionNative()
+static const char* __stdcall GetDescriptionNative()
 {
     return TheMission()->GetDescription();
 }
@@ -316,7 +316,7 @@ static int __stdcall GetTerrainSizeTierNative()
     return TheMission()->GetTerrainSizeTier();
 }
 
-static char* __stdcall GetTranslatedNameNative()
+static const char* __stdcall GetTranslatedNameNative()
 {
     return TheMission()->GetTranslatedName();
 }
@@ -361,12 +361,12 @@ static int __stdcall GetMissionFeatureNative(int index, MissionFeatureInfo* out)
     return TheMission()->GetFeature(index, out);
 }
 
-static char* __stdcall GetMemoryNative()
+static const char* __stdcall GetMemoryNative()
 {
     return TheMission()->GetMemory();
 }
 
-static char* __stdcall GetNumPlayersNative()
+static const char* __stdcall GetNumPlayersNative()
 {
     return TheMission()->GetNumPlayers();
 }
@@ -559,17 +559,17 @@ static void __stdcall BankNewNative(HapiBank* self)
     ((AccountBank*)self)->NewBank();
 }
 
-static int __stdcall BankOpenNative(HapiBank* self, char* filename, char* name, char* account)
+static int __stdcall BankOpenNative(HapiBank* self, const char* filename, const char* name, const char* account)
 {
     return ((AccountBank*)self)->OpenBank(filename, name, account);
 }
 
-static int __stdcall BankSaveNative(HapiBank* self, char* filename, char* name, int compress, int audit)
+static int __stdcall BankSaveNative(HapiBank* self, const char* filename, const char* name, int compress, int audit)
 {
     return ((AccountBank*)self)->SaveBank(filename, name, compress, audit);
 }
 
-static int __stdcall BankOpenAccountNative(HapiBank* self, char* name)
+static int __stdcall BankOpenAccountNative(HapiBank* self, const char* name)
 {
     return ((AccountBank*)self)->OpenAccount(name);
 }
@@ -584,22 +584,22 @@ static int __stdcall BankSetDoubleNative(HapiBank* self, const char* name, doubl
     return ((AccountBank*)self)->SetDoubleItem(name, value);
 }
 
-static int __stdcall BankSetStringNative(HapiBank* self, const char* name, char* value)
+static int __stdcall BankSetStringNative(HapiBank* self, const char* name, const char* value)
 {
     return ((AccountBank*)self)->SetStringItem(name, value);
 }
 
-static int __stdcall BankGetIntegerNative(HapiBank* self, char* name, int def)
+static int __stdcall BankGetIntegerNative(HapiBank* self, const char* name, int def)
 {
     return ((AccountBank*)self)->GetIntegerItem(name, def);
 }
 
-static double __stdcall BankGetDoubleNative(HapiBank* self, char* name, double def)
+static double __stdcall BankGetDoubleNative(HapiBank* self, const char* name, double def)
 {
     return ((AccountBank*)self)->GetDoubleItem(name, def);
 }
 
-static char* __stdcall BankGetStringNative(HapiBank* self, char* name, char* def)
+static const char* __stdcall BankGetStringNative(HapiBank* self, const char* name, const char* def)
 {
     return ((AccountBank*)self)->GetStringItem(name, def);
 }
@@ -614,7 +614,7 @@ static int __stdcall BankOpenNumberedBoxNative(HapiBank* self, int number)
     return ((AccountBank*)self)->OpenNumberedBox(number);
 }
 
-static int __stdcall BankOpenNamedBoxNative(HapiBank* self, char* name)
+static int __stdcall BankOpenNamedBoxNative(HapiBank* self, const char* name)
 {
     return ((AccountBank*)self)->OpenNamedBox(name);
 }
@@ -644,7 +644,7 @@ static void __stdcall ListDirectoryNative(const char* path, int dirsOnly, FileNa
     ListDirectory(path, dirsOnly, (std::vector<StringRef>*)list);
 }
 
-static void __stdcall FindFilesRecursiveNative(char* path, const char* pat, FileNameList* tree, int state, int recursive)
+static void __stdcall FindFilesRecursiveNative(const char* path, const char* pat, FileNameList* tree, int state, int recursive)
 {
     FindFilesRecursive(path, pat, (std::vector<StringRef>*)tree, state, recursive);
 }

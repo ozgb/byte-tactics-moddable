@@ -283,7 +283,7 @@ void __cdecl GameFree(void* p)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4d8610
-char* __cdecl GameStrdup(char* s)
+char* __cdecl GameStrdup(const char* s)
 {
     if (!s)
         return 0;

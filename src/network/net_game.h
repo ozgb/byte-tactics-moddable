@@ -50,7 +50,7 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target);
 int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name);
 int __stdcall SendScriptCallNoArgs(Unit* obj, short index);
 int __stdcall SendScriptCall(Unit* obj, short index, char argCount, int arg0, int arg1, int arg2, int arg3);
-int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount, int arg0, int arg1, int arg2, int arg3);
+int __stdcall SendScriptCallByName(Unit* obj, const char* name, char argCount, int arg0, int arg1, int arg2, int arg3);
 void __stdcall SendNetHeartbeat();
 int __stdcall AreAllPlayersReady();
 void __stdcall ReportPacketGap(int, int, int);

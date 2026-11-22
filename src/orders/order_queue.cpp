@@ -50,7 +50,7 @@ struct OrderSaveRecord {
 
 #include "order_list.h"
 OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
-                                       char* const& value, int(__stdcall* pred)(int, char*),
+                                       const char* const& value, int(__stdcall* pred)(int, const char*),
                                        int* unused);
 #include "../network/net_game.h"
 #include "../sound/sound.h"
@@ -403,7 +403,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     return 0;
 }
 
-static unsigned char OrderKindFromName(char* s)
+static unsigned char OrderKindFromName(const char* s)
 {
     OrderTableEntry* e = LowerBoundOrderTypes(g_missionOrderTableVec.Begin(), g_missionOrderTableVec.End(), s, OrderTypeNameLess, 0);
     if (e == g_missionOrderTableVec.End() || _strcmpi(e->name, s) != 0)
@@ -450,7 +450,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     char buf1[0x80];
     sprintf(buf1, "%s%s", name, "_name");
     {
-        char* s = file->GetStringItem(buf1, 0);
+        const char* s = file->GetStringItem(buf1, 0);
         if (s != 0)
             desc.kind = OrderKindFromName(s);
         else

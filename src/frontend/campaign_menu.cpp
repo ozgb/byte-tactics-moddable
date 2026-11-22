@@ -270,7 +270,7 @@ int __stdcall BuildMissionNameList(char** out)
 void StartBriefingNarration()
 {
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_seams.mission->GetNameSlot(3);
+        const char* name = g_seams.mission->GetNameSlot(3);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -281,7 +281,7 @@ void StartBriefingNarration()
 void StartGlamourSound()
 {
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_seams.mission->GetNameSlot(8);
+        const char* name = g_seams.mission->GetNameSlot(8);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -326,7 +326,7 @@ char* __stdcall AllocColorMarkupText(char* s)
 // FUNCTION: 0x476d80
 void InitBriefingText()
 {
-    char* text = g_seams.mission->GetBriefing();
+    const char* text = g_seams.mission->GetBriefing();
     if (text) {
         Gadget* gadgets = g_game->gui.layer->entries;
         int i = FindGadgetIndex(gadgets, "SOLARSYSTEM", 0xe);
@@ -342,7 +342,7 @@ void InitBriefingText()
         DrawHelpPage();
     }
     if (g_game->mode_391f1 != 6) {
-        char* name = (char*)g_seams.mission->GetNameSlot(3);
+        const char* name = g_seams.mission->GetNameSlot(3);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }
@@ -1147,7 +1147,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
         if (!GetButtonStageByName(menu, "SHUTUP")) {
             ((Sound *)g_game->sound)->StopStream();
         } else if (g_game->mode_391f1 != 6) {
-            char* text = (char*)g_seams.mission->GetNameSlot(3);
+            const char* text = g_seams.mission->GetNameSlot(3);
             if (text) {
                 StreamSoundDelayed(text, 0, 0x3c);
             }

@@ -16,7 +16,7 @@ void __stdcall LoadTextureGafs();
 void __stdcall FreeTextureGafs();
 
 #include "../../interfaces/services.h"
-GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY);
+GafFrame* __stdcall LoadRadarPic(const char* path, int* outX, int* outY);
 int __stdcall LoadDefaultPalette();
 
 #endif

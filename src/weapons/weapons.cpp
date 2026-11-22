@@ -1628,7 +1628,7 @@ void __stdcall SubtractVec3(int* a, int* b, int* dx, int* dy, int* dz)
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
 // FUNCTION: 0x49e5b0
-char* __stdcall FindWeaponByName(char* name)
+char* __stdcall FindWeaponByName(const char* name)
 {
     if (name == 0 || strlen(name) == 0)
         return 0;

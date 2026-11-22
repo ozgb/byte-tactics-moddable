@@ -2879,7 +2879,7 @@ int __stdcall SendScriptCallNoArgs(Unit* obj, short index)
 }
 
 // FUNCTION: 0x456200
-int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
+int __stdcall SendScriptCallByName(Unit* obj, const char* name, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
 {
     UnitScriptCallPacket packet;

@@ -9,7 +9,7 @@ public:
 
     int Contains(unsigned short index) const { return bits[index >> 5] & (1 << (index & 31)); }
     UnitTypeSet() { memset(this, 0, sizeof(UnitTypeSet)); }
-    void AddTypeOrCategory(char* text, int* out);
+    void AddTypeOrCategory(const char* text, int* out);
 };
 
 #endif

@@ -89,7 +89,7 @@ static inline StringRef* EntriesInsertNew(TdfRecord* r, TdfField* e, const Strin
     return &Rows(r).insert(e, MakePair(key, StringRef()))->value;
 }
 
-inline TdfRecord* TdfRecord::FindChild(char* key)
+inline TdfRecord* TdfRecord::FindChild(const char* key)
 {
     for (TdfRecord** p = Kids(this).begin(); p < Kids(this).end(); p++) {
         if (_strcmpi((*p)->name, key) == 0)
@@ -176,7 +176,7 @@ void TdfFile::StripComments(char* p)
 }
 
 // FUNCTION: 0x4c3410
-int TdfFile::SelectRecord(char* name)
+int TdfFile::SelectRecord(const char* name)
 {
     ReplayImport call(RI_TDF_SELECT_RECORD);
     call.Ptr(this);
@@ -242,7 +242,7 @@ static inline char* SkipSpace(char* p)
 }
 
 // FUNCTION: 0x4c3e40
-TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
+TdfRecord::TdfRecord(char* name, char* text, char** nextblock, const char* filename)
 {
     children.first = 0;
     children.last = 0;
@@ -616,7 +616,7 @@ TdfField::TdfField(const StringRef& a, const StringRef& b)
 }
 
 // FUNCTION: 0x4c2f60
-int TdfFile::LoadFile(char* path)
+int TdfFile::LoadFile(const char* path)
 {
     ReplayImport call(RI_TDF_LOAD_FILE);
     call.Ptr(this);
@@ -807,7 +807,7 @@ char* __stdcall Translate(const char* key)
 }
 
 // FUNCTION: 0x4c5840
-int __stdcall FindTranslation(char* name)
+int __stdcall FindTranslation(const char* name)
 {
     if (name == nullptr || g_translations == nullptr)
         return 0;

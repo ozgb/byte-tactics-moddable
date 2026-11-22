@@ -178,7 +178,7 @@ void SetUpEndMissionScreen()
     *(float*)&g_game->savedPaletteBrightness = display->paletteBrightness;
     display->paletteBrightness = 1.0f;
     unsigned char* palette = (unsigned char*)GameAllocIgnoreTag("Palette", 0x400);
-    char* name = g_seams.mission->GetNameSlot(5);
+    const char* name = g_seams.mission->GetNameSlot(5);
     if (name == 0)
         g_game->image_3907b = 0;
     if (g_seams.mission->GetGameType() == 1

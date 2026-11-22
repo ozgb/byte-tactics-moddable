@@ -504,7 +504,7 @@ void __stdcall QuitApp(char* message)
 }
 
 // FUNCTION: 0x4b6290
-void __stdcall FatalError(char* message)
+void __stdcall FatalError(const char* message)
 {
     ReplayImport call(RI_FATAL_ERROR);
     call.Ptr(message);

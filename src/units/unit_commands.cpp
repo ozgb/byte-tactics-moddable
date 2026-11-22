@@ -548,7 +548,7 @@ UnitTypeSet* __stdcall GetLoadCategoryMask(char* name)
     return p;
 }
 
-static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, char* text)
+static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, const char* text)
 {
     int n = (int)((char*)last - (char*)first) / 0x249;
     while (n > 0) {
@@ -567,7 +567,7 @@ static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefN
 }
 
 // FUNCTION: 0x488d30
-void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
+void UnitTypeSet::AddTypeOrCategory(const char* text, int* out)
 {
     UnitDefNameKeyView* base = (UnitDefNameKeyView *)g_game->defs.get();
     UnitDefNameKeyView* last = base + g_game->unitDefCount;

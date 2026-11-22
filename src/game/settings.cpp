@@ -511,7 +511,7 @@ void ApplyUseOnlyUnits()
 {
     TdfFile parser;
     char name[256];
-    char* file = g_seams.mission->GetNameSlot(6);
+    const char* file = g_seams.mission->GetNameSlot(6);
     if (file == 0)
         return;
     if (!parser.LoadFile(file))

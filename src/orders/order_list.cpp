@@ -376,7 +376,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 }
 
 // FUNCTION: 0x43a940
-int __stdcall OrderTypeNameLess(int param_1, char* param_2)
+int __stdcall OrderTypeNameLess(int param_1, const char* param_2)
 {
     int result = _strcmpi(*(char**)(param_1 + 0x15), param_2);
     return result < 0;
@@ -1022,11 +1022,11 @@ template class std::vector<OrderTableEntry>;
 
 // FUNCTION: 0x43c3a0 ?insert@?$vector@UOrderTableEntry@@V?$allocator@UOrderTableEntry@@@std@@@std@@QAEXPAUOrderTableEntry@@IABU3@@Z
 
-typedef int (__stdcall* OrderTableNamePred)(const OrderTableEntry& entry, char* name);
+typedef int (__stdcall* OrderTableNamePred)(const OrderTableEntry& entry, const char* name);
 
 // FUNCTION: 0x43c6b0
 OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
-                                      char* const& value, OrderTableNamePred pred, int*)
+                                      const char* const& value, OrderTableNamePred pred, int*)
 {
     int n = 0;
     n += last - first;

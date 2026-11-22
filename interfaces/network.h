@@ -48,7 +48,7 @@ struct NetworkSeam {
     // Calls the unit's script function by index on the remote humans, with up to four arguments, and returns 0 when nothing was sent. Hooks: none.
     int (__stdcall* SendScriptCall)(Unit* unit, short index, char argCount, int arg0, int arg1, int arg2, int arg3);
     // Calls the unit's script function by name on the remote humans, with up to four arguments, and returns 0 when nothing was sent. Hooks: none.
-    int (__stdcall* SendScriptCallByName)(Unit* unit, char* name, char argCount, int arg0, int arg1, int arg2, int arg3);
+    int (__stdcall* SendScriptCallByName)(Unit* unit, const char* name, char argCount, int arg0, int arg1, int arg2, int arg3);
     // Sends a gift of resource kind 1 (called metal by the sharing code) from slot from to the remote human in slot to. Hooks: none.
     void (__stdcall* SendShareMetal)(unsigned char from, unsigned char to, float amount);
     // Sends a gift of resource kind 2 (called energy by the sharing code) from slot from to the remote human in slot to. Hooks: none.

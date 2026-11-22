@@ -2,7 +2,7 @@
 
 // included by replay_native_test.cpp after its helpers
 
-WeaponDef* __stdcall Imp_weapons_FindWeaponByName(char* a0)
+WeaponDef* __stdcall Imp_weapons_FindWeaponByName(const char* a0)
 {
     ReplayText t;
     StartImport(t, "weapons.FindWeaponByName");
@@ -40,7 +40,7 @@ int __stdcall Imp_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a
     return ParseResult<int>(r);
 }
 
-int __stdcall Imp_files_BankOpenAccount(HapiBank* a0, char* a1)
+int __stdcall Imp_files_BankOpenAccount(HapiBank* a0, const char* a1)
 {
     ReplayText t;
     StartImport(t, "files.BankOpenAccount");
@@ -66,7 +66,7 @@ int __stdcall Imp_files_BankSetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-int __stdcall Imp_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
+int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
 {
     ReplayText t;
     StartImport(t, "files.BankGetInteger");
@@ -207,7 +207,7 @@ void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
     (void)r;
 }
 
-int __stdcall Imp_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayText t;
     StartImport(t, "network.SendScriptCallByName");
@@ -316,7 +316,7 @@ Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
     return ParseValueText<Vec3>(ROK_VEC3, r);
 }
 
-int __stdcall Imp_scripts_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, int* a3, int* a4, int* a5)
 {
     ReplayText t;
     StartImport(t, "scripts.QueryScript");

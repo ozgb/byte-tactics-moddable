@@ -14,11 +14,11 @@ struct FileNameList;
 // Game data files, loose or inside archives, the account files of saved games, and the SQSH packer.
 struct FilesSeam {
     // Opens a file for reading, loose or from an archive, and returns its handle or 0. Hooks: none.
-    FileHandle* (__stdcall* OpenRead)(char* path);
+    FileHandle* (__stdcall* OpenRead)(const char* path);
     // Opens a file in append mode, falling back to an archived file for reading, and returns its handle or 0. Hooks: none.
-    FileHandle* (__stdcall* OpenAppend)(char* path);
+    FileHandle* (__stdcall* OpenAppend)(const char* path);
     // Creates a file for writing and returns its handle or 0. Hooks: none.
-    FileHandle* (__stdcall* Create)(char* path);
+    FileHandle* (__stdcall* Create)(const char* path);
     // Closes a file handle and frees it, and returns 0. Hooks: none.
     int (__stdcall* Close)(FileHandle* file);
     // Returns 1 when the file is read from an archive and 0 when it is loose on disk. Hooks: none.
@@ -30,19 +30,19 @@ struct FilesSeam {
     // Reads up to size bytes from a file into buf and returns the number read, or -1 when an archived block cannot be read. Hooks: none.
     int (__stdcall* Read)(FileHandle* file, void* buf, int size);
     // Writes size bytes to a loose file and returns the number written, or 0xffffffff for an archived file. Hooks: none.
-    unsigned int (__stdcall* Write)(FileHandle* file, void* buf, unsigned int size);
+    unsigned int (__stdcall* Write)(FileHandle* file, const void* buf, unsigned int size);
     // Returns the size of an open file in bytes, or 0 when it has no file. Hooks: none.
     long (__stdcall* Length)(FileHandle* file);
     // Returns the size in bytes of the named file, or 0 when it is missing. Hooks: none.
-    long (__stdcall* LengthByName)(char* name);
+    long (__stdcall* LengthByName)(const char* name);
     // Reads size bytes from the given position of the named file into buffer and returns buffer, or 0. Hooks: none.
-    void* (__stdcall* ReadAt)(char* name, void* buffer, long pos, unsigned int size);
+    void* (__stdcall* ReadAt)(const char* name, void* buffer, long pos, unsigned int size);
     // Loads the whole named file into a new buffer and returns it, or 0 when the file is missing or empty; stores the size in size when given, or -1 on failure. Hooks: none.
-    void* (__stdcall* Load)(char* name, int* size);
+    void* (__stdcall* Load)(const char* name, int* size);
     // Loads the whole file of an open handle into a new buffer named after name and returns it, or 0 when it is empty; stores the size in outSize, or 0xffffffff on failure. Hooks: none.
-    void* (__stdcall* LoadOpenFile)(char* name, FileHandle* file, unsigned int* outSize);
+    void* (__stdcall* LoadOpenFile)(const char* name, FileHandle* file, unsigned int* outSize);
     // Writes a buffer to a new loose file and returns the number of bytes written, or -1 when the file cannot be created. Hooks: none.
-    int (__stdcall* WriteBuffer)(char* filename, void* data, int size);
+    int (__stdcall* WriteBuffer)(const char* filename, const void* data, int size);
     // Deletes a loose file. Hooks: none.
     void (__stdcall* Remove)(const char* path);
     // Renames a loose file. Hooks: none.
@@ -50,9 +50,9 @@ struct FilesSeam {
     // Writes the letter of the current drive into buf. Hooks: none.
     void (__stdcall* GetCurrentDriveLetter)(char* buf);
     // Makes the given drive current and returns 0 on success, or -1 on failure or when drive is null. Hooks: none.
-    int (__stdcall* ChangeDrive)(char* drive);
+    int (__stdcall* ChangeDrive)(const char* drive);
     // Writes the current directory of the given drive, or of the current drive when drive is null, into buf of size bytes and returns buf. Hooks: none.
-    char* (__stdcall* GetDriveDirectory)(char* drive, char* buf, int size);
+    const char* (__stdcall* GetDriveDirectory)(const char* drive, char* buf, int size);
     // Makes the given directory current. Hooks: none.
     void (__stdcall* ChangeDirectory)(const char* path);
     // Returns 1 when a name matches a pattern with * and ? wildcards, ignoring case. Hooks: none.
@@ -68,13 +68,13 @@ struct FilesSeam {
     // Appends the names matching a search path, without . and .., to list, or only the directories when dirsOnly is set. Hooks: none.
     void (__stdcall* ListDirectory)(const char* path, int dirsOnly, FileNameList* list);
     // Appends the full paths of the files under a path that match a pattern, descending into subdirectories. Hooks: none.
-    void (__stdcall* FindFilesRecursive)(char* path, const char* pat, FileNameList* tree, int state, int recursive);
+    void (__stdcall* FindFilesRecursive)(const char* path, const char* pat, FileNameList* tree, int state, int recursive);
     // Creates every directory along a path. Hooks: none.
-    void (__stdcall* MakeDirectoryPath)(char* path);
+    void (__stdcall* MakeDirectoryPath)(const char* path);
     // Stores the current directory as the start directory. Hooks: none.
     void (__stdcall* SaveStartDirectory)(void);
-    // Copies the stored start directory into param. Hooks: none.
-    void (__stdcall* GetStartDirectory)(char* param);
+    // Copies the stored start directory into out. Hooks: none.
+    void (__stdcall* GetStartDirectory)(char* out);
     // Opens an archive and adds it to the search order, returning it or 0 when it is already added or missing. Hooks: none.
     void* (__stdcall* AddArchive)(const char* name, int mode);
     // Closes an archive's file and frees its record, without removing it from the search order. Hooks: none.
@@ -98,29 +98,29 @@ struct FilesSeam {
     // Empties a bank and leaves it without a current account (thiscall in 3.1c, this first). Hooks: none.
     void (__stdcall* BankNew)(HapiBank* self);
     // Loads a bank from a saved game file whose stored name matches name (any when null), keeping only the named account (all when null), and returns 1 on success or 0 on failure (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankOpen)(HapiBank* self, char* filename, char* name, char* account);
+    int (__stdcall* BankOpen)(HapiBank* self, const char* filename, const char* name, const char* account);
     // Saves a bank to a saved game file and returns 1 on success, or 0 when the bank is empty or the file cannot be created (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankSave)(HapiBank* self, char* filename, char* name, int compress, int audit);
+    int (__stdcall* BankSave)(HapiBank* self, const char* filename, const char* name, int compress, int audit);
     // Makes the named account current, adding it when missing, and returns 1 when it already existed or 0 when it was created (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankOpenAccount)(HapiBank* self, char* name);
+    int (__stdcall* BankOpenAccount)(HapiBank* self, const char* name);
     // Stores an integer item in the current account and returns 1, or 0 when there is no current account (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankSetInteger)(HapiBank* self, const char* name, int value);
     // Stores a double item in the current account and returns 1, or 0 when there is no current account (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankSetDouble)(HapiBank* self, const char* name, double value);
     // Stores a copy of a string item in the current account and returns 1, or 0 when there is no current account or value is null (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankSetString)(HapiBank* self, const char* name, char* value);
+    int (__stdcall* BankSetString)(HapiBank* self, const char* name, const char* value);
     // Returns an integer item of the current account, or def when it is missing (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankGetInteger)(HapiBank* self, char* name, int def);
+    int (__stdcall* BankGetInteger)(HapiBank* self, const char* name, int def);
     // Returns a double item of the current account, or def when it is missing (thiscall in 3.1c, this first). Hooks: none.
-    double (__stdcall* BankGetDouble)(HapiBank* self, char* name, double def);
+    double (__stdcall* BankGetDouble)(HapiBank* self, const char* name, double def);
     // Returns a string item of the current account, or def when it is missing (thiscall in 3.1c, this first). Hooks: none.
-    char* (__stdcall* BankGetString)(HapiBank* self, char* name, char* def);
+    const char* (__stdcall* BankGetString)(HapiBank* self, const char* name, const char* def);
     // Returns 1 when the current account holds the named item (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankHasItem)(HapiBank* self, const char* name);
     // Makes the numbered box of the current account current, adding it when missing, and returns 1 when it holds data (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankOpenNumberedBox)(HapiBank* self, int number);
     // Makes the named box of the current account current, adding it when missing, and returns 1 when it holds data (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* BankOpenNamedBox)(HapiBank* self, char* name);
+    int (__stdcall* BankOpenNamedBox)(HapiBank* self, const char* name);
     // Returns the size of the open box (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* BankGetBoxSize)(HapiBank* self);
     // Moves the position in the open box, clamped to its size (thiscall in 3.1c, this first). Hooks: none.

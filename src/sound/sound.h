@@ -114,7 +114,7 @@ public:
     void* LoadSample(char* path);
     int PlaySample(const char* param1, int param2, int param3);
     void StreamSample(char* a, int b);
-    int StreamSampleDelayed(char* name, int value, int delay);
+    int StreamSampleDelayed(const char* name, int value, int delay);
     int FindChunkSize(void* file, char* target);
     int ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* channels);
     int FindDataChunkSize(void* file);
@@ -128,7 +128,7 @@ void __stdcall SetNoDirectSound();
 void __stdcall SetUseWindowsSound();
 void* __stdcall LoadSoundFile(const char* name);
 void __stdcall FreeSoundSet(void** set);
-void __stdcall StreamSoundDelayed(char*, int, int);
+void __stdcall StreamSoundDelayed(const char*, int, int);
 void __stdcall PlayNextSpeech();
 void __stdcall QueueUnitSpeechIfVisible(Unit* unit, int kind, char* text);
 

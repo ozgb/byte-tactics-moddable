@@ -713,7 +713,7 @@ int GetServiceProviderIndex()
 int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
 {
     void* block = 0;
-    unsigned long size = 0;
+    unsigned size = 0;
     CompoundAddressElement elements[3];
     GUID guid;
     char buf1[200];
@@ -1169,7 +1169,7 @@ struct Len { unsigned int v; };
 void __stdcall OpenModemDialog()
 {
     char* addr = 0;
-    unsigned long size = 0;
+    unsigned size = 0;
     Len len;
     int r;
     Layer* gadget;

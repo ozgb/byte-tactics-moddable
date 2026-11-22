@@ -353,9 +353,9 @@ void __cdecl SimBlockForEach(void(__cdecl* fn)(void* payload, unsigned int size,
     }
 }
 
-bool __cdecl SimOwns(const void* p)
+int __cdecl SimOwns(const void* p)
 {
-    return g_base != 0 && (unsigned int)((const char*)p - g_base) < Size();
+    return g_base != 0 && (unsigned int)((const char*)p - g_base) < Size() ? 1 : 0;
 }
 
 unsigned int __cdecl SimHighWater()

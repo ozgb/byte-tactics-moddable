@@ -37,19 +37,19 @@ extern "C" unsigned int HOST_CALL host_file_write(void* file, const void* buf, u
     return fwrite(buf, 1, size, (FILE*)file);
 }
 
-extern "C" long HOST_CALL host_file_seek(void* file, long offset, int origin)
+extern "C" int HOST_CALL host_file_seek(void* file, int offset, int origin)
 {
     if (fseek((FILE*)file, offset, origin) != 0)
         return -1;
     return ftell((FILE*)file);
 }
 
-extern "C" long HOST_CALL host_file_size(void* file)
+extern "C" int HOST_CALL host_file_size(void* file)
 {
     return _filelength(_fileno((FILE*)file));
 }
 
-extern "C" int HOST_CALL host_file_truncate(void* file, long size)
+extern "C" int HOST_CALL host_file_truncate(void* file, int size)
 {
     return _chsize(_fileno((FILE*)file), size) == 0;
 }

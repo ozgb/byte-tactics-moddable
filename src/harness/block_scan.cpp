@@ -118,7 +118,7 @@ void __cdecl OnLeave()
 
 bool Inside(unsigned addr)
 {
-    return SimOwns((const void*)addr);
+    return SimOwns((const void*)addr) != 0;
 }
 
 unsigned SpanLowerBound(unsigned addr)

@@ -389,11 +389,11 @@ unsigned int HOST_CALL host_file_read(void* file, void* buf, unsigned int size);
 // Writes size bytes from buf and returns how many were written.
 unsigned int HOST_CALL host_file_write(void* file, const void* buf, unsigned int size);
 // Moves the file position by offset from origin and returns the new position from the start, or -1 on failure.
-long HOST_CALL host_file_seek(void* file, long offset, int origin);
+int HOST_CALL host_file_seek(void* file, int offset, int origin);
 // Returns the length of the file in bytes, or -1 on failure.
-long HOST_CALL host_file_size(void* file);
+int HOST_CALL host_file_size(void* file);
 // Sets the length of the file to size bytes and returns 1, or 0 on failure.
-int HOST_CALL host_file_truncate(void* file, long size);
+int HOST_CALL host_file_truncate(void* file, int size);
 // Closes the file and frees its handle.
 void HOST_CALL host_file_close(void* file);
 
@@ -556,7 +556,7 @@ struct host_net_pair;
 
 // A 16-byte globally unique id, copied and compared whole.
 struct host_guid {
-    unsigned long data[4];
+    unsigned data[4];
 };
 
 // Returns the text of a network error (the result of a host_net call), never NULL.
@@ -568,15 +568,15 @@ void HOST_CALL host_net_free(void* block);
 // Sets whether packets are sent guaranteed and returns the setting before.
 int HOST_CALL host_net_guarantee_packets(int enable);
 // Sends a packet from player id from to id to and returns 0 or a network error.
-int HOST_CALL host_net_send_packet(struct host_net* net, unsigned long from, unsigned long to, void* data, unsigned long size);
+int HOST_CALL host_net_send_packet(struct host_net* net, unsigned from, unsigned to, void* data, unsigned size);
 // Receives the next packet into data (size holds its capacity and receives the length) and returns 0 or a network error.
-int HOST_CALL host_net_receive_packet(struct host_net* net, void* data, unsigned long* size);
+int HOST_CALL host_net_receive_packet(struct host_net* net, void* data, unsigned* size);
 // Names the open session and sets its four user values, and returns 1 on success.
 int HOST_CALL host_net_update_game_info(struct host_net* net, char* name, char* data, int user1, int user2, int user3, int user4);
 // Opens a new session with the name, password and user values and returns 1 on success.
 int HOST_CALL host_net_create_new_game(struct host_net* net, char* name, char* password, int user1, int user2, int user3, int user4);
 // Creates or joins the session of the lobby connection, filling the settings it lacks, and returns 1 on success.
-int HOST_CALL host_net_create_or_join_lobby_game(struct host_net* net, char* password, unsigned long max_players, unsigned long user1, unsigned long user2, unsigned long user3, unsigned long user4);
+int HOST_CALL host_net_create_or_join_lobby_game(struct host_net* net, char* password, unsigned max_players, unsigned user1, unsigned user2, unsigned user3, unsigned user4);
 // Closes the session and frees the interfaces and the lobby connection.
 void HOST_CALL host_net_uninit(struct host_net* net);
 // Sets the default player limit and enumeration timeout.
@@ -596,25 +596,25 @@ int HOST_CALL host_net_init_lobbied_connection(struct host_net* net);
 // Opens the connection with the id in *connection and returns 1 on success.
 int HOST_CALL host_net_init_connection(struct host_net* net, int* connection);
 // Adds a local player to the session, stores its id in *id and returns 1 on success.
-int HOST_CALL host_net_add_player(struct host_net* net, unsigned long* id, char* short_name, char* long_name, char* name, short version_major, short version_minor);
+int HOST_CALL host_net_add_player(struct host_net* net, unsigned* id, char* short_name, char* long_name, char* name, short version_major, short version_minor);
 // Removes a player from the session and returns 1 on success.
-int HOST_CALL host_net_remove_player(struct host_net* net, unsigned long id);
+int HOST_CALL host_net_remove_player(struct host_net* net, unsigned id);
 // Reads a player's name into data (size holds its capacity and receives the length) and returns 0 or a network error.
-int HOST_CALL host_net_get_player_name(struct host_net* net, unsigned long id, void* data, unsigned long* size);
+int HOST_CALL host_net_get_player_name(struct host_net* net, unsigned id, void* data, unsigned* size);
 // Sets a player's name and returns 0 or a network error.
-int HOST_CALL host_net_set_player_name(struct host_net* net, unsigned long id, void* name, unsigned long flags);
+int HOST_CALL host_net_set_player_name(struct host_net* net, unsigned id, void* name, unsigned flags);
 // Calls callback for each player of the session and returns 0 or a network error.
-int HOST_CALL host_net_enum_players(struct host_net* net, void* session, void* callback, void* context, unsigned long flags);
+int HOST_CALL host_net_enum_players(struct host_net* net, void* session, void* callback, void* context, unsigned flags);
 // Builds an address from count elements into address (size holds its capacity and receives the length) and returns 0 or a network error.
-int HOST_CALL host_net_create_compound_address(struct host_net* net, void* elements, unsigned long count, void* address, unsigned long* size);
+int HOST_CALL host_net_create_compound_address(struct host_net* net, void* elements, unsigned count, void* address, unsigned* size);
 // Calls callback for each element of an address and returns 0 or a network error.
-int HOST_CALL host_net_enum_address(struct host_net* net, void* callback, void* address, unsigned long size, void* context);
+int HOST_CALL host_net_enum_address(struct host_net* net, void* callback, void* address, unsigned size, void* context);
 // Creates the interface handles of a service provider into *pair and returns 0 or a network error.
 int HOST_CALL host_net_create_play_interface(const struct host_guid* provider, struct host_net_pair* pair);
 // Releases the interface handles of a pair.
 int HOST_CALL host_net_release_play_interface(struct host_net_pair* pair);
 // Reads a player's address into data (size holds its capacity and receives the length) and returns 0 or a network error.
-int HOST_CALL host_net_get_player_address(struct host_net_pair* pair, unsigned long player, void* data, unsigned long* size);
+int HOST_CALL host_net_get_player_address(struct host_net_pair* pair, unsigned player, void* data, unsigned* size);
 // Registers the program with the platform's game lobby (DirectPlay on Win32) and returns nonzero on success.
 int HOST_CALL host_net_register_application(const char* name, const char* file, const char* command_line, const char* folder);
 // Runs a button command of Cavedog's online service (online.dll), translating its text through translate, and returns its result, or 2 when the service is missing or too old.

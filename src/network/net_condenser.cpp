@@ -91,7 +91,7 @@ int NetCondenser::ReceivePacket(void* net, char* data, int* size)
     }
 
     CondensedHeader* received = (CondensedHeader*)data;
-    int result = host_net_receive_packet((host_net*)net, data, (unsigned long*)size);
+    int result = host_net_receive_packet((host_net*)net, data, (unsigned*)size);
     if (((NetSenderView*)net)->from != 0) {
         if (result == 0) {
             CountPacket(*size, 0, 0);

@@ -10,8 +10,8 @@
 #include "host.h"
 #include "services.h"
 
-// True when p lies inside the sim block.
-bool __cdecl SimOwns(const void* p);
+// 1 when p lies inside the sim block.
+int __cdecl SimOwns(const void* p);
 // The first byte of the sim block, or null before it is reserved.
 void* __cdecl SimBlockBase();
 

@@ -370,7 +370,7 @@ extern "C" int HOST_CALL host_net_guarantee_packets(int enable)
 }
 
 // FUNCTION: 0x4c97b0
-extern "C" int HOST_CALL host_net_send_packet(host_net* net, unsigned long from, unsigned long to, void* data, unsigned long size)
+extern "C" int HOST_CALL host_net_send_packet(host_net* net, unsigned from, unsigned to, void* data, unsigned size)
 {
     HapinetTrace("HAPINET_sendpacket\n");
     int result = 0x887700aa;
@@ -381,12 +381,12 @@ extern "C" int HOST_CALL host_net_send_packet(host_net* net, unsigned long from,
 }
 
 // FUNCTION: 0x4c9840
-extern "C" int HOST_CALL host_net_receive_packet(host_net* net, void* data, unsigned long* size)
+extern "C" int HOST_CALL host_net_receive_packet(host_net* net, void* data, unsigned* size)
 {
     HapinetTrace("HAPINET_receivepacket\n");
     int result = 0x887700aa;
     if (net->dp != 0) {
-        result = net->dp->Receive(&net->from, &net->to, 1, data, size);
+        result = net->dp->Receive(&net->from, &net->to, 1, data, (unsigned long*)size);
     }
     return result;
 }
@@ -443,9 +443,9 @@ extern "C" int HOST_CALL host_net_create_new_game(host_net* net, char* name, cha
 }
 
 // FUNCTION: 0x4c9a70
-extern "C" int HOST_CALL host_net_create_or_join_lobby_game(host_net* net, char* password, unsigned long maxPlayers,
-                                                            unsigned long user1, unsigned long user2, unsigned long user3,
-                                                            unsigned long user4)
+extern "C" int HOST_CALL host_net_create_or_join_lobby_game(host_net* net, char* password, unsigned maxPlayers,
+                                                            unsigned user1, unsigned user2, unsigned user3,
+                                                            unsigned user4)
 {
     HapinetTrace("HAPINET_createorjoinlobbygame\n");
     int hr = 0;
@@ -639,7 +639,7 @@ extern "C" int HOST_CALL host_net_init_connection(host_net* net, int* connection
 }
 
 // FUNCTION: 0x4ca6a0
-extern "C" int HOST_CALL host_net_add_player(host_net* net, unsigned long* id, char* shortName, char* longName,
+extern "C" int HOST_CALL host_net_add_player(host_net* net, unsigned* id, char* shortName, char* longName,
                                              char* name, short versionMajor, short versionMinor)
 {
     HapinetTrace("HAPINET_addplayer\n");
@@ -656,14 +656,14 @@ extern "C" int HOST_CALL host_net_add_player(host_net* net, unsigned long* id, c
         strncpy(data.name, name, 16);
         data.versionMajor = versionMajor;
         data.versionMinor = versionMinor;
-        int hr = net->dp->CreatePlayer(id, &dpname, 0, &data, sizeof(data), 0);
+        int hr = net->dp->CreatePlayer((unsigned long*)id, &dpname, 0, &data, sizeof(data), 0);
         return hr == 0 ? 1 : 0;
     }
     return 0;
 }
 
 // FUNCTION: 0x4ca780
-extern "C" int HOST_CALL host_net_remove_player(host_net* net, unsigned long id)
+extern "C" int HOST_CALL host_net_remove_player(host_net* net, unsigned id)
 {
     HapinetTrace("HAPINET_removeplayer\n");
     if (net->dp != 0) {
@@ -674,17 +674,17 @@ extern "C" int HOST_CALL host_net_remove_player(host_net* net, unsigned long id)
 }
 
 // FUNCTION: 0x4ca7c0
-extern "C" int HOST_CALL host_net_get_player_name(host_net* net, unsigned long id, void* data, unsigned long* size)
+extern "C" int HOST_CALL host_net_get_player_name(host_net* net, unsigned id, void* data, unsigned* size)
 {
     HapinetTrace("HAPINET_getplayername\n");
     if (net->dp != 0) {
-        return net->dp->GetPlayerName(id, data, size);
+        return net->dp->GetPlayerName(id, data, (unsigned long*)size);
     }
     return 0x88770140;
 }
 
 // FUNCTION: 0x4ca800
-extern "C" int HOST_CALL host_net_set_player_name(host_net* net, unsigned long id, void* name, unsigned long flags)
+extern "C" int HOST_CALL host_net_set_player_name(host_net* net, unsigned id, void* name, unsigned flags)
 {
     HapinetTrace("HAPINET_setplayername\n");
     if (net->dp != 0) {
@@ -694,7 +694,7 @@ extern "C" int HOST_CALL host_net_set_player_name(host_net* net, unsigned long i
 }
 
 // FUNCTION: 0x4ca840
-extern "C" int HOST_CALL host_net_enum_players(host_net* net, void* session, void* callback, void* context, unsigned long flags)
+extern "C" int HOST_CALL host_net_enum_players(host_net* net, void* session, void* callback, void* context, unsigned flags)
 {
     HapinetTrace("HAPINET_enumplayers\n");
     if (net->dp != 0) {
@@ -704,18 +704,18 @@ extern "C" int HOST_CALL host_net_enum_players(host_net* net, void* session, voi
 }
 
 // FUNCTION: 0x4ca880
-extern "C" int HOST_CALL host_net_create_compound_address(host_net* net, void* elements, unsigned long count, void* address,
-                                                          unsigned long* size)
+extern "C" int HOST_CALL host_net_create_compound_address(host_net* net, void* elements, unsigned count, void* address,
+                                                          unsigned* size)
 {
     HapinetTrace("HAPINET_createcompoundaddress\n");
     if (net->lobby != 0) {
-        return net->lobby->CreateCompoundAddress(elements, count, address, size);
+        return net->lobby->CreateCompoundAddress(elements, count, address, (unsigned long*)size);
     }
     return 0x88770140;
 }
 
 // FUNCTION: 0x4ca8c0
-extern "C" int HOST_CALL host_net_enum_address(host_net* net, void* callback, void* address, unsigned long size, void* context)
+extern "C" int HOST_CALL host_net_enum_address(host_net* net, void* callback, void* address, unsigned size, void* context)
 {
     HapinetTrace("HAPINET_enumaddress\n");
     if (net->lobby != 0) {
@@ -753,11 +753,11 @@ extern "C" int HOST_CALL host_net_release_play_interface(host_net_pair* net)
 }
 
 // FUNCTION: 0x4ca990
-extern "C" int HOST_CALL host_net_get_player_address(host_net_pair* net, unsigned long player, void* data, unsigned long* size)
+extern "C" int HOST_CALL host_net_get_player_address(host_net_pair* net, unsigned player, void* data, unsigned* size)
 {
     HapinetTrace("HAPINET_getplayeraddress\n");
     if (net->dp3 != 0)
-        return net->dp3->GetPlayerAddress(player, data, size);
+        return net->dp3->GetPlayerAddress(player, data, (unsigned long*)size);
     return 0x88770140;
 }
 

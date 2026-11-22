@@ -228,7 +228,7 @@ int __stdcall GetPlayerName(int dpid, char* shortName, char* longName)
     int r;
     if (dpid != -1) {
         char buf[0x400];
-        unsigned long size = 0x400;
+        unsigned size = 0x400;
         r = host_net_get_player_name((host_net*)g_game->net_14, dpid, buf, &size);
         if (r == 0) {
             strcpy(shortName, ((DPNAME*)buf)->lpszShortNameA);
@@ -510,7 +510,7 @@ int __stdcall AddNetPlayer(int id)
     if (flag) {
         return 1;
     }
-    unsigned long size;
+    unsigned size;
     SideDataPacket packet;
     char buf[0x400];
     int result;
@@ -758,7 +758,7 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
     info->versionMajor = g_game->version;
     info->versionMinor = g_game->versionMinor;
 
-    int r = host_net_add_player((host_net*)g_game->net_14, (unsigned long*)&player->id,
+    int r = host_net_add_player((host_net*)g_game->net_14, (unsigned*)&player->id,
                          buf, buf, g_game->password, 0, 0x50);
     if (r == 0) {
         g_game->players[playerIndex].SetType(0);
@@ -1964,7 +1964,7 @@ int __stdcall ReceiveNetPacket(void)
         }
     } else {
         while (1) {
-            int result = host_net_receive_packet((host_net*)g_game->net_14, g_game->recvPacketPtr, (unsigned long*)&size);
+            int result = host_net_receive_packet((host_net*)g_game->net_14, g_game->recvPacketPtr, (unsigned*)&size);
             if (result == 0) {
                 CountMessage(*g_game->recvPacketPtr, size, 0);
                 CountPacket(size, 0, 0);

@@ -503,7 +503,6 @@ class Walker:
                 self.pos += 1
             group = dict(self.lines[start : self.pos])
             if cls == 4:
-                h.h32(fx)
                 values = {}
                 for f in self.schema.fields("PathOrderRef"):
                     values[f["offset"]] = group.get(f"{prefix}.{field_name(f)}")

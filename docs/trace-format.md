@@ -722,7 +722,7 @@ Dump: `<prefix>.<field>` for the tables and `<prefix>.points` as one `hex:` line
 H8(22)
 for id in 0 .. fxCount-1:                   # the order effects in numbering order (section 5)
     f = the effect with number id
-    path order (4):  H32(id);  HT(PathOrderRef, f)       # dump: orderFx[id].refOwner, .refNext, .refValue
+    path order (4):  HT(PathOrderRef, f)                 # dump: orderFx[id].refOwner, .refNext, .refValue
     unknown (0):     H32(id);  H32(0);  H32(a number identifying the object's type)   # never seen in a conforming run
     any other class: nothing is hashed
 END
@@ -750,8 +750,9 @@ air maneuver (5):     flags = u16 at f+8
 order exists and its kind name is `VTOL_MobileBuild` or `VTOL_Reclaim`.
 Dump: `orderFx[id].<field>`.
 
-Since format 8 section 22 hashes only, for a path order (a move target), `H32(id)` and the table `PathOrderRef` (a
-split of `PathOrder`: `refOwner`, `refNext`, `refValue`, units' link, which units reads). Nothing is hashed for the other classes, not even
+Since format 8 section 22 hashes only, for a path order (a move target), the table `PathOrderRef` (a
+split of `PathOrder`: `refOwner`, `refNext`, `refValue`, units' link, which units reads). Not its number: the numbers
+count the targets of every class, and the other classes are movement's own. Nothing is hashed for the other classes, not even
 their `H32(id)` or class. An unknown class still hashes `H32(id)`, its class and the type number. The fields of the targets are only
 movement's (`docs/movement-interface.md`, section 5), and a wrong value of one shows through the unit's motion.
 

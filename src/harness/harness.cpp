@@ -2862,6 +2862,7 @@ static void VisitModuleState()
     g_seams.movement->WriteState(&s_stateWriter);
     g_seams.map->WriteState(&s_stateWriter);
     g_seams.players->WriteState(&s_stateWriter);
+    g_seams.scripts->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -3399,7 +3400,7 @@ static void VisitFx()
         unsigned fx = s_fxList[id];
         int cls = FxClassOf(fx);
         unsigned flags;
-        if (cls == FX_PATH || cls == FX_UNKNOWN)
+        if (cls == FX_UNKNOWN)
             HashU32(id);
         if (s_dumpNow)
             sprintf(path, "orderFx[%u]", id);

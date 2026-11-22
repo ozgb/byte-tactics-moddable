@@ -660,8 +660,7 @@ void LoadTntMap()
     MissionParams mission;
 
     g_seams.mission->GetMissionParams(&mission);
-    tnt = (int*)g_seams.mission->GetNameSlot(1);
-    tnt = (int *)LoadFileWithProgress((char *)tnt);
+    tnt = (int*)LoadFileWithProgress(g_seams.mission->GetNameSlot(1));
     info.version = *tnt;
     switch (info.version) {
     case 0x1020:

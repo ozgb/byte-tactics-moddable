@@ -1423,18 +1423,18 @@ static void SetUpLoadedGame()
     HapiBank* bank = g_game->pendingSaveStore;
     bank->OpenAccount("summary");
     BeginMission(bank->GetIntegerItem("Gametype", 0));
-    char* campaign = bank->GetStringItem("Campaign", nullptr);
+    const char* campaign = bank->GetStringItem("Campaign", nullptr);
     if (campaign != nullptr)
         g_seams.mission->LoadCampaign(campaign);
     g_game->flag_37ef2 = bank->GetIntegerItem("Side", 0);
     g_game->difficulty = bank->GetIntegerItem("Difficulty", 0);
-    char* name = bank->GetStringItem("Mission", nullptr);
+    const char* name = bank->GetStringItem("Mission", nullptr);
     if (name == nullptr || strlen(name) == 0 || g_seams.mission->LoadMissionByName(name) == 0) {
         FailLoad("the save names a map the game cannot load: ", s_savePath);
         return;
     }
     strcpy(t->mapName, name);
-    char* thumbs = bank->GetStringItem("Thumbs", nullptr);
+    const char* thumbs = bank->GetStringItem("Thumbs", nullptr);
     if (thumbs != nullptr)
         strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
     if (strlen(g_game->campaignMissionStatus) != 0x19)

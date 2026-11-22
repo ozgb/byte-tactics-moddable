@@ -157,14 +157,14 @@ void __stdcall ShowSavedGameInfo()
             SetTranslatedTextByName(menu, "GAMETYPE", name, 0);
 
             if (gametype == 1) {
-                char* campaign = file->GetStringItem("Campaign", 0);
+                const char* campaign = file->GetStringItem("Campaign", 0);
                 if (campaign != 0) {
                     strcpy(name, campaign);
                     SetTranslatedTextByName(menu, "CAMPAIGN", name, 0);
                     SetGadgetActiveByName(menu, "CAMPTEXT", 1);
                     SetGadgetActiveByName(menu, "CAMPAIGN", 1);
                 }
-                char* mission = file->GetStringItem("Mission", 0);
+                const char* mission = file->GetStringItem("Mission", 0);
                 if (mission != 0) {
                     strcpy(name, mission);
                     SetTranslatedTextByName(menu, "MISSION", name, 0);
@@ -172,7 +172,7 @@ void __stdcall ShowSavedGameInfo()
             } else {
                 SetGadgetActiveByName(menu, "CAMPTEXT", 0);
                 SetGadgetActiveByName(menu, "CAMPAIGN", 0);
-                char* mission = file->GetStringItem("Map", 0);
+                const char* mission = file->GetStringItem("Map", 0);
                 if (mission != 0) {
                     strcpy(name, mission);
                     SetTranslatedTextByName(menu, "MISSION", name, 0);
@@ -292,7 +292,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
             goto invalid;
         (((HapiBank*)g_game->pendingSaveStore))->OpenAccount("summary");
         g_seams.mission->SetMissionType((((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Gametype", 0));
-        char* campaign = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Campaign", 0);
+        const char* campaign = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Campaign", 0);
         if (campaign != 0)
             g_seams.mission->LoadCampaign(campaign);
         g_game->flag_37ef2 = (((HapiBank*)g_game->pendingSaveStore))->GetIntegerItem("Side", 0);
@@ -306,7 +306,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
                 g_game->p1cd5->bSideId = 0;
             }
         }
-        char* mission = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Mission", 0);
+        const char* mission = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Mission", 0);
         if (mission == 0)
             goto invalid;
         if (strlen(mission) == 0)
@@ -314,7 +314,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
         if (g_seams.mission->LoadMissionByName(mission) == 0)
             goto invalid;
         strcpy(g_game->options->mapName, mission);
-        char* thumbs = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Thumbs", 0);
+        const char* thumbs = (((HapiBank*)g_game->pendingSaveStore))->GetStringItem("Thumbs", 0);
         strncpy(g_game->campaignMissionStatus, thumbs, 0x19);
         if (strlen(g_game->campaignMissionStatus) != 0x19)
             InitMissionStatus();
@@ -402,7 +402,7 @@ char* __stdcall ListSavedGames(int* count)
     for (i = 0; i < *count; i++) {
         sprintf(buf, "%s\\%s", g_savegameDir, SkipTextLines(copy, i));
         HapiBank* file = OpenSummaryBank(buf);
-        char* desc = 0;
+        const char* desc = 0;
         if (file)
             desc = file->GetStringItem("Description", 0);
         if (file && desc) {

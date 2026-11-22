@@ -4684,7 +4684,7 @@
    {
     "name": "FatalError",
     "id": "RI_FATAL_ERROR",
-    "declaration": "void __stdcall FatalError(char* message);",
+    "declaration": "void __stdcall FatalError(const char* message);",
     "args": [
      {
       "mode": "text",
@@ -4751,7 +4751,7 @@
     "name": "TdfFile_LoadFile",
     "id": "RI_TDF_LOAD_FILE",
     "owner": "TdfFile",
-    "declaration": "int LoadFile(char* path);",
+    "declaration": "int LoadFile(const char* path);",
     "args": [
      {
       "mode": "handle",
@@ -4781,7 +4781,7 @@
     "name": "TdfFile_SelectRecord",
     "id": "RI_TDF_SELECT_RECORD",
     "owner": "TdfFile",
-    "declaration": "int SelectRecord(char* name);",
+    "declaration": "int SelectRecord(const char* name);",
     "args": [
      {
       "mode": "handle",
@@ -6547,7 +6547,7 @@
     "Rename": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "oldName", "type": "char*", "line": "oldName", "mode": "text"}, {"name": "newName", "type": "char*", "line": "newName", "mode": "text"}], "result": null, "native": "Rename"},
     "GetCurrentDriveLetter": {"conv": "__stdcall", "ret": "void", "functions": ["GetCurrentDriveLetter"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "buf", "type": "char*", "line": "buf", "mode": "text"}], "result": null, "native": "GetCurrentDriveLetter"},
     "ChangeDrive": {"conv": "__stdcall", "ret": "int", "functions": ["ChangeDrive"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "ChangeDrive"},
-    "GetDriveDirectory": {"conv": "__stdcall", "ret": "char*", "functions": ["GetDriveDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}, {"name": "buf", "type": "char*", "line": "buf", "mode": "text"}, {"name": "size", "type": "int", "line": "size", "mode": "scalar"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetDriveDirectory"},
+    "GetDriveDirectory": {"conv": "__stdcall", "ret": "const char*", "functions": ["GetDriveDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "drive", "type": "char*", "line": "drive", "mode": "text"}, {"name": "buf", "type": "char*", "line": "buf", "mode": "text"}, {"name": "size", "type": "int", "line": "size", "mode": "scalar"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "GetDriveDirectory"},
     "ChangeDirectory": {"conv": "__stdcall", "ret": "void", "functions": ["ChangeDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}], "result": null, "native": "ChangeDirectory"},
     "MatchWildcard": {"conv": "__stdcall", "ret": "int", "functions": ["MatchWildcard"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "str", "type": "char*", "line": "str", "mode": "text"}, {"name": "pat", "type": "char*", "line": "pat", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "MatchWildcard"},
     "FindFirst": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}, {"name": "fd", "type": "void*", "line": "fd", "mode": "pending"}, {"name": "state", "type": "int", "line": "state", "mode": "scalar"}, {"name": "recursive", "type": "char", "line": "recursive", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "FindFirst"},
@@ -6558,7 +6558,7 @@
     "FindFilesRecursive": {"conv": "__stdcall", "ret": "void", "functions": ["FindFilesRecursive"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}, {"name": "pat", "type": "char*", "line": "pat", "mode": "text"}, {"name": "tree", "type": "FileNameList*", "line": "tree", "mode": "pending"}, {"name": "state", "type": "int", "line": "state", "mode": "scalar"}, {"name": "recursive", "type": "int", "line": "recursive", "mode": "scalar"}], "result": null, "native": "FindFilesRecursive"},
     "MakeDirectoryPath": {"conv": "__stdcall", "ret": "void", "functions": ["MakeDirectoryPath"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "path", "type": "char*", "line": "path", "mode": "text"}], "result": null, "native": "MakeDirectoryPath"},
     "SaveStartDirectory": {"conv": "__stdcall", "ret": "void", "functions": ["SaveStartDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "SaveStartDirectory"},
-    "GetStartDirectory": {"conv": "__stdcall", "ret": "void", "functions": ["GetStartDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "param", "type": "char*", "line": "param", "mode": "text"}], "result": null, "native": "GetStartDirectory"},
+    "GetStartDirectory": {"conv": "__stdcall", "ret": "void", "functions": ["GetStartDirectory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "out", "type": "char*", "line": "out", "mode": "text"}], "result": null, "native": "GetStartDirectory"},
     "AddArchive": {"conv": "__stdcall", "ret": "void*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "mode", "type": "int", "line": "mode", "mode": "scalar"}], "result": {"type": "void*", "mode": "pending"}, "native": "AddArchive"},
     "CloseArchive": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "archive", "type": "OPENHAPIFILE*", "line": "archive", "mode": "pending"}], "result": null, "native": "CloseArchive"},
     "DropMissingArchives": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "DropMissingArchives"},
@@ -6578,7 +6578,7 @@
     "BankSetString": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "value", "type": "char*", "line": "value", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankSetString"},
     "BankGetInteger": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "int", "line": "def", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankGetInteger"},
     "BankGetDouble": {"conv": "__stdcall", "ret": "double", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "double", "line": "def", "mode": "scalar"}], "result": {"type": "double", "mode": "scalar"}, "native": "BankGetDouble"},
-    "BankGetString": {"conv": "__stdcall", "ret": "char*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "char*", "line": "def", "mode": "text"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "BankGetString"},
+    "BankGetString": {"conv": "__stdcall", "ret": "const char*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "def", "type": "char*", "line": "def", "mode": "text"}], "result": {"type": "char*", "mode": "object", "kind": "alloc"}, "native": "BankGetString"},
     "BankHasItem": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankHasItem"},
     "BankOpenNumberedBox": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "number", "type": "int", "line": "number", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankOpenNumberedBox"},
     "BankOpenNamedBox": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "self", "type": "HapiBank*", "line": "self", "mode": "handle", "kind": "bank"}, {"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "int", "mode": "scalar"}, "native": "BankOpenNamedBox"},

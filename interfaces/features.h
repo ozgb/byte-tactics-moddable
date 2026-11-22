@@ -172,7 +172,7 @@ struct FeaturesSeam {
     // Returns the feature number on a cell, or a code for none or a part of a larger footprint; a query, as of features' last run. Hooks: none.
     unsigned short (__stdcall* GetCellFeature)(Cell* cell);
     // Returns the number of a feature type by name, loading it when it is new; called while unit types load. Hooks: none.
-    unsigned short (__stdcall* FindOrLoadFeatureType)(char* name);
+    unsigned short (__stdcall* FindOrLoadFeatureType)(const char* name);
     // Returns the world position of the centre of a feature's footprint; a query. Hooks: none.
     Vec3 (__stdcall* GetFootprintCentre)(Point16* cell, Feature* def);
     // Writes the features to a saved game; it reads only. Hooks: none.

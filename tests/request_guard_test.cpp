@@ -48,7 +48,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char*)
+void __stdcall FatalError(const char*)
 {
     s_fatals++;
 }

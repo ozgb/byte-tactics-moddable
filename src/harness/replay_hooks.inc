@@ -407,7 +407,7 @@ unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
     return result;
 }
 
-unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
+unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FINDORLOADFEATURETYPE, SUB_FEATURES, roots);
@@ -1716,7 +1716,7 @@ void __stdcall RecUnitsUpdateAllUnits()
     }
 }
 
-void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, char* a1, int* a2)
+void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, const char* a1, int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY, SUB_UNITS, roots);
@@ -2849,7 +2849,7 @@ int __stdcall RecScriptsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callba
     return result;
 }
 
-int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+int __stdcall RecScriptsQueryScript(CobScript* a0, const char* a1, int* a2, int* a3, int* a4, int* a5)
 {
     ReplayRoots roots;
     roots.Add(ROK_COBSCRIPT, a0);
@@ -3534,7 +3534,7 @@ void __stdcall RecMovementWriteState(const StateWriter* a0)
     }
 }
 
-FileHandle* __stdcall RecFilesOpenRead(char* a0)
+FileHandle* __stdcall RecFilesOpenRead(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENREAD, SUB_FILES, roots);
@@ -3547,7 +3547,7 @@ FileHandle* __stdcall RecFilesOpenRead(char* a0)
     return result;
 }
 
-FileHandle* __stdcall RecFilesOpenAppend(char* a0)
+FileHandle* __stdcall RecFilesOpenAppend(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENAPPEND, SUB_FILES, roots);
@@ -3560,7 +3560,7 @@ FileHandle* __stdcall RecFilesOpenAppend(char* a0)
     return result;
 }
 
-FileHandle* __stdcall RecFilesCreate(char* a0)
+FileHandle* __stdcall RecFilesCreate(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CREATE, SUB_FILES, roots);
@@ -3646,7 +3646,7 @@ int __stdcall RecFilesRead(FileHandle* a0, void* a1, int a2)
     return result;
 }
 
-unsigned int __stdcall RecFilesWrite(FileHandle* a0, void* a1, unsigned int a2)
+unsigned int __stdcall RecFilesWrite(FileHandle* a0, const void* a1, unsigned int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITE, SUB_FILES, roots);
@@ -3676,7 +3676,7 @@ long __stdcall RecFilesLength(FileHandle* a0)
     return result;
 }
 
-long __stdcall RecFilesLengthByName(char* a0)
+long __stdcall RecFilesLengthByName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTHBYNAME, SUB_FILES, roots);
@@ -3690,7 +3690,7 @@ long __stdcall RecFilesLengthByName(char* a0)
     return result;
 }
 
-void* __stdcall RecFilesReadAt(char* a0, void* a1, long a2, unsigned int a3)
+void* __stdcall RecFilesReadAt(const char* a0, void* a1, long a2, unsigned int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_READAT, SUB_FILES, roots);
@@ -3706,7 +3706,7 @@ void* __stdcall RecFilesReadAt(char* a0, void* a1, long a2, unsigned int a3)
     return result;
 }
 
-void* __stdcall RecFilesLoad(char* a0, int* a1)
+void* __stdcall RecFilesLoad(const char* a0, int* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOAD, SUB_FILES, roots);
@@ -3720,7 +3720,7 @@ void* __stdcall RecFilesLoad(char* a0, int* a1)
     return result;
 }
 
-void* __stdcall RecFilesLoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
+void* __stdcall RecFilesLoadOpenFile(const char* a0, FileHandle* a1, unsigned int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOADOPENFILE, SUB_FILES, roots);
@@ -3735,7 +3735,7 @@ void* __stdcall RecFilesLoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
     return result;
 }
 
-int __stdcall RecFilesWriteBuffer(char* a0, void* a1, int a2)
+int __stdcall RecFilesWriteBuffer(const char* a0, const void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITEBUFFER, SUB_FILES, roots);
@@ -3788,7 +3788,7 @@ void __stdcall RecFilesGetCurrentDriveLetter(char* a0)
     }
 }
 
-int __stdcall RecFilesChangeDrive(char* a0)
+int __stdcall RecFilesChangeDrive(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CHANGEDRIVE, SUB_FILES, roots);
@@ -3802,7 +3802,7 @@ int __stdcall RecFilesChangeDrive(char* a0)
     return result;
 }
 
-char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
+const char* __stdcall RecFilesGetDriveDirectory(const char* a0, char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETDRIVEDIRECTORY, SUB_FILES, roots);
@@ -3811,7 +3811,7 @@ char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
         ArgValue(s_call, "buf", (const char*)a1);
         ArgValue(s_call, "size", a2);
     }
-    char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
+    const char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
@@ -3920,7 +3920,7 @@ void __stdcall RecFilesListDirectory(const char* a0, int a1, FileNameList* a2)
     }
 }
 
-void __stdcall RecFilesFindFilesRecursive(char* a0, const char* a1, FileNameList* a2, int a3, int a4)
+void __stdcall RecFilesFindFilesRecursive(const char* a0, const char* a1, FileNameList* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDFILESRECURSIVE, SUB_FILES, roots);
@@ -3936,7 +3936,7 @@ void __stdcall RecFilesFindFilesRecursive(char* a0, const char* a1, FileNameList
     }
 }
 
-void __stdcall RecFilesMakeDirectoryPath(char* a0)
+void __stdcall RecFilesMakeDirectoryPath(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_MAKEDIRECTORYPATH, SUB_FILES, roots);
@@ -3964,7 +3964,7 @@ void __stdcall RecFilesGetStartDirectory(char* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETSTARTDIRECTORY, SUB_FILES, roots);
     if (scope.Open()) {
-        ArgValue(s_call, "param", (const char*)a0);
+        ArgValue(s_call, "out", (const char*)a0);
     }
     s_inner_files->GetStartDirectory(a0);
     if (scope.Open()) {
@@ -4113,7 +4113,7 @@ void __stdcall RecFilesBankNew(HapiBank* a0)
     }
 }
 
-int __stdcall RecFilesBankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
+int __stdcall RecFilesBankOpen(HapiBank* a0, const char* a1, const char* a2, const char* a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPEN, SUB_FILES, roots);
@@ -4130,7 +4130,7 @@ int __stdcall RecFilesBankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
     return result;
 }
 
-int __stdcall RecFilesBankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
+int __stdcall RecFilesBankSave(HapiBank* a0, const char* a1, const char* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSAVE, SUB_FILES, roots);
@@ -4148,7 +4148,7 @@ int __stdcall RecFilesBankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
     return result;
 }
 
-int __stdcall RecFilesBankOpenAccount(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenAccount(HapiBank* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENACCOUNT, SUB_FILES, roots);
@@ -4216,7 +4216,7 @@ int __stdcall RecFilesBankSetDouble(HapiBank* a0, const char* a1, double a2)
     return result;
 }
 
-int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, char* a2)
+int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, const char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSETSTRING, SUB_FILES, roots);
@@ -4232,7 +4232,7 @@ int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, char* a2)
     return result;
 }
 
-int __stdcall RecFilesBankGetInteger(HapiBank* a0, char* a1, int a2)
+int __stdcall RecFilesBankGetInteger(HapiBank* a0, const char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETINTEGER, SUB_FILES, roots);
@@ -4259,7 +4259,7 @@ int __stdcall RecFilesBankGetInteger(HapiBank* a0, char* a1, int a2)
     return result;
 }
 
-double __stdcall RecFilesBankGetDouble(HapiBank* a0, char* a1, double a2)
+double __stdcall RecFilesBankGetDouble(HapiBank* a0, const char* a1, double a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETDOUBLE, SUB_FILES, roots);
@@ -4275,7 +4275,7 @@ double __stdcall RecFilesBankGetDouble(HapiBank* a0, char* a1, double a2)
     return result;
 }
 
-char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
+const char* __stdcall RecFilesBankGetString(HapiBank* a0, const char* a1, const char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETSTRING, SUB_FILES, roots);
@@ -4284,7 +4284,7 @@ char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
         ArgValue(s_call, "name", (const char*)a1);
         ArgValue(s_call, "def", (const char*)a2);
     }
-    char* result = s_inner_files->BankGetString(a0, a1, a2);
+    const char* result = s_inner_files->BankGetString(a0, a1, a2);
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
@@ -4321,7 +4321,7 @@ int __stdcall RecFilesBankOpenNumberedBox(HapiBank* a0, int a1)
     return result;
 }
 
-int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENNAMEDBOX, SUB_FILES, roots);
@@ -4680,7 +4680,7 @@ int __stdcall RecNetworkSendScriptCall(Unit* a0, short a1, char a2, int a3, int 
     return result;
 }
 
-int __stdcall RecNetworkSendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall RecNetworkSendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4783,7 +4783,7 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
-WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);

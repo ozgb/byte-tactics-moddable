@@ -691,7 +691,7 @@ void LoadingScreenFrame(void)
         DrawSurface(&gadget, (void*)((int)g_game->surface), 0, 0);
         if (g_seams.mission->GetGameType() != 1) {
             SetTextColors(color, 0xfe);
-            char* name = g_seams.mission->GetMissionName();
+            const char* name = g_seams.mission->GetMissionName();
             strncpy(namebuf, name, 100);
             namebuf[99] = 0;
             if (GetPreferredLanguage() != 0 && _strcmpi((const char*)GetPreferredLanguage(), "english") != 0) {

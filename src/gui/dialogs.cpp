@@ -975,7 +975,7 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
 }
 
 // FUNCTION: 0x4ac4c0
-char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
+char* __stdcall WordWrapText(Gui* menu, const char* text, int width, int index)
 {
     Gadget* gadgets = menu->layer->entries;
     text += 1; text -= 1;
@@ -992,7 +992,7 @@ char* __stdcall WordWrapText(Gui* menu, char* text, int width, int index)
     memset(buf, 0, size);
     int i = 0;
     char c = *text;
-    char* s = text;
+    const char* s = text;
     char* p = buf;
     while (c != 0) {
         if (*s == (char)0xff)

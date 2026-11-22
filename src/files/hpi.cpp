@@ -56,7 +56,7 @@ struct OPENHAPIFILE {
 #include "hpi.h"
 
 // FUNCTION: 0x4bb2c0
-FileHandle* __stdcall HAPI_OpenFileAppend(char* param1)
+FileHandle* __stdcall HAPI_OpenFileAppend(const char* param1)
 {
     return HAPI_OpenFile(param1, "a+b");
 }
@@ -70,7 +70,7 @@ static inline int nblocks(int w)
 }
 
 // FUNCTION: 0x4bb2e0
-FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
+FileHandle* __stdcall HAPI_OpenFile(const char* filename, const char* mode)
 {
     int size;
     int off;
@@ -123,12 +123,12 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
 }
 
 // FUNCTION: 0x4bb4e0
-ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path)
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, const char* path)
 {
     int len;
-    char* name;
+    const char* name;
     int last;
-    char* sep;
+    const char* sep;
     for (;;) {
         sep = strchr(path, '\\');
         if (sep) {
@@ -160,7 +160,7 @@ ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path)
 }
 
 // FUNCTION: 0x4bb5b0
-FileHandle* __stdcall HAPI_OpenFileRead(char* param1)
+FileHandle* __stdcall HAPI_OpenFileRead(const char* param1)
 {
     return HAPI_OpenFile(param1, "rb");
 }
@@ -205,7 +205,7 @@ void FileHandle::SetFileName(const char* text)
 }
 
 // FUNCTION: 0x4bb6a0
-FileHandle* __stdcall HAPI_CreateFile(char* path)
+FileHandle* __stdcall HAPI_CreateFile(const char* path)
 {
     void* fp = host_file_create(path, 0);
     if (fp) {
@@ -365,7 +365,7 @@ done:
 }
 
 // FUNCTION: 0x4bbbe0
-unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* buf, unsigned int size)
+unsigned int __stdcall HAPI_WriteFile(FileHandle* file, const void* buf, unsigned int size)
 {
     if (file->shared != 0)
         return 0xffffffff;
@@ -385,7 +385,7 @@ void __stdcall RemoveFile(const char* path)
 }
 
 // FUNCTION: 0x4bbc40
-long __stdcall HAPI_FileLengthByName(char* name)
+long __stdcall HAPI_FileLengthByName(const char* name)
 {
     FileHandle* h = (FileHandle*)HAPI_OpenFile(name, "rb");
     if (h == 0)
@@ -429,7 +429,7 @@ long __stdcall HAPI_FileLength(FileHandle* file)
 }
 
 // FUNCTION: 0x4bbd30
-void* __stdcall HAPI_ReadFileAt(char* name, void* buffer, long pos, unsigned int size)
+void* __stdcall HAPI_ReadFileAt(const char* name, void* buffer, long pos, unsigned int size)
 {
     FileHandle* file = HAPI_OpenFile(name, "rb");
     if (file == 0) {
@@ -480,7 +480,7 @@ fail:
 }
 
 // FUNCTION: 0x4bbe50
-void* __stdcall HAPI_LoadFile(char* name, int* size)
+void* __stdcall HAPI_LoadFile(const char* name, int* size)
 {
     char buf[0x100];
     char* data = 0;
@@ -554,7 +554,7 @@ close:
 }
 
 // FUNCTION: 0x4bbff0
-void* __stdcall HAPI_LoadOpenFile(char* name, FileHandle* file, unsigned int* outSize)
+void* __stdcall HAPI_LoadOpenFile(const char* name, FileHandle* file, unsigned int* outSize)
 {
     long len;
     char buf[256];
@@ -663,7 +663,7 @@ fail:
 }
 
 // FUNCTION: 0x4bc290
-int __stdcall WriteBufferToFile(char* filename, void* data, int size)
+int __stdcall WriteBufferToFile(const char* filename, const void* data, int size)
 {
     void* f = host_file_create(filename, 0);
     if (f == NULL) {
@@ -682,7 +682,7 @@ void __stdcall GetCurrentDriveLetter(char* buf)
 }
 
 // FUNCTION: 0x4bc300
-int __stdcall ChangeDrive(char* drive)
+int __stdcall ChangeDrive(const char* drive)
 {
     if (drive == 0) {
         return -1;
@@ -691,7 +691,7 @@ int __stdcall ChangeDrive(char* drive)
 }
 
 // FUNCTION: 0x4bc320
-char* __stdcall GetDriveDirectory(char* drive, char* buf, int size)
+const char* __stdcall GetDriveDirectory(const char* drive, char* buf, int size)
 {
     int n;
     if (drive == NULL)
@@ -967,7 +967,7 @@ void __stdcall ListDirectory(const char* path, int dirsOnly, FileList* list)
 }
 
 // FUNCTION: 0x4bcb50
-void __stdcall FindFilesRecursive(char* path, const char* pat, FileList* tree, int state, int recursive)
+void __stdcall FindFilesRecursive(const char* path, const char* pat, FileList* tree, int state, int recursive)
 {
     char buf[0x100];
     struct _finddata_t fd;
@@ -1054,11 +1054,11 @@ void __stdcall GetLastDirectory(char* dst)
 }
 
 // FUNCTION: 0x4bcec0
-void __stdcall GetStartDirectory(char* param)
+void __stdcall GetStartDirectory(char* out)
 {
     Display* p = GetDisplay();
     char* src = p->cwd;
-    strncpy(param, src, 0x100);
+    strncpy(out, src, 0x100);
 }
 
 // FUNCTION: 0x4bcee0
@@ -1068,7 +1068,7 @@ void RestoreStartDirectory() {
 }
 
 // FUNCTION: 0x4bcf00
-void __stdcall MakeDirectoryPath(char* path)
+void __stdcall MakeDirectoryPath(const char* path)
 {
     char buf[260];
     strcpy(buf, path);

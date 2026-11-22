@@ -32,7 +32,7 @@ int __stdcall RandomInt(int range)
     return atoi(result);
 }
 
-void __stdcall FatalError(char* message)
+void __stdcall FatalError(const char* message)
 {
     ReplayText t;
     StartImport(t, RI_FATAL_ERROR);
@@ -79,7 +79,7 @@ TdfFile::~TdfFile()
     (void)r;
 }
 
-int TdfFile::LoadFile(char* path)
+int TdfFile::LoadFile(const char* path)
 {
     ReplayText t;
     StartImport(t, RI_TDF_LOAD_FILE);
@@ -95,7 +95,7 @@ int TdfFile::LoadFile(char* path)
     return atoi(result);
 }
 
-int TdfFile::SelectRecord(char* name)
+int TdfFile::SelectRecord(const char* name)
 {
     ReplayText t;
     StartImport(t, RI_TDF_SELECT_RECORD);

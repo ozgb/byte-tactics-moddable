@@ -12,7 +12,7 @@
 // Returns a random number in [0, range) from a generator of its own (rng.seed in the recordings), not a game logic stream; a range below 2 gives 0 and leaves the generator alone.
 int __stdcall RandomInt(int range);
 // Shows the message in the window of the display and ends the program.
-void __stdcall FatalError(char* message);
+void __stdcall FatalError(const char* message);
 // Builds dir/name.ext below the data directory in buf and returns buf.
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
 // The extension of TDF data files.
@@ -177,7 +177,7 @@ void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 // Frees a block of the game heap.
 void __cdecl GameFreeThunk(void* p);
 // Copies a string into a new block of the game heap, or returns null for null.
-char* __cdecl GameStrdup(char* s);
+char* __cdecl GameStrdup(const char* s);
 // Makes the pages of a block of the game heap read-only.
 void __cdecl ProtectBlockReadOnly(void* p);
 // Makes the pages of a block of the game heap writable.
@@ -202,13 +202,13 @@ unsigned char FindHostSlot();
 // Returns the translation of a key.
 char* __stdcall Translate(const char* key);
 // Returns the index of a translation key.
-int __stdcall FindTranslation(char* name);
+int __stdcall FindTranslation(const char* name);
 // Skips n lines of text and returns the rest.
 char* __stdcall SkipTextLines(char* text, int n);
 // Writes formatted text to a host file and returns its length, or -1 on failure.
 int FilePrintf(void* file, const char* fmt, ...);
 // Loads a whole data file into the game heap, counting the load progress.
-char* __stdcall LoadFileWithProgress(char* path);
+char* __stdcall LoadFileWithProgress(const char* path);
 // Loads a 3DO model of the data directory and binds its textures.
 void* __stdcall LoadObject3d(const char* name);
 // Returns non-zero when the data files are read from archives.
@@ -571,14 +571,14 @@ public:
     int text;
 
     // Parses a record and its children from text, setting nextblock past it.
-    TdfRecord(char* name, char* text, char** nextblock, char* filename);
+    TdfRecord(char* name, char* text, char** nextblock, const char* filename);
     // Frees the record and its children.
     ~TdfRecord();
 
     // Returns the text between start and end without surrounding blanks.
     StringRef MakeTrimmedString(char* start, char* end);
     // Returns the child record with the given name, or null.
-    TdfRecord* FindChild(char* key);
+    TdfRecord* FindChild(const char* key);
     // Returns the child record at an index.
     TdfRecord* GetChild(int index);
     // Adds the text between start and end to the file checksum.
@@ -633,7 +633,7 @@ public:
     // Returns the value of a field of the current record.
     char* GetValue(char* key) { return (char*)current->FindFieldValue(key); }
     // Loads and parses the file at a path.
-    int LoadFile(char* path);
+    int LoadFile(const char* path);
     // Removes the comments from TDF text in place.
     void StripComments(char* p);
     // Parses TDF text already in memory.
@@ -641,7 +641,7 @@ public:
     // Frees the parsed records.
     void Unload();
     // Selects the record with the given name as the current one.
-    int SelectRecord(char* name);
+    int SelectRecord(const char* name);
     // Selects the record at an index as the current one.
     int SelectRecordAt(int index);
     // Selects the root record again.

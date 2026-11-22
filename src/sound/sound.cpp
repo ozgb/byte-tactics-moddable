@@ -257,7 +257,7 @@ void __stdcall FreeSoundSet(void** set)
 }
 
 // FUNCTION: 0x47f090
-void __stdcall StreamSoundDelayed(char* param_1, int param_2, int param_3)
+void __stdcall StreamSoundDelayed(const char* param_1, int param_2, int param_3)
 {
     if (g_noDirectSound == 0) {
         ((Sound *)g_game->sound)->StreamSampleDelayed(param_1, param_2, param_3);

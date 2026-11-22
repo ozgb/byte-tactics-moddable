@@ -273,7 +273,7 @@ void BattleFrame(void)
             CloseTopScreen((Gui *)g_game->message);
             BlankScreen();
             int a = g_seams.mission->GetMissionIndex();
-            char* b = g_seams.mission->GetCampaignName();
+            const char* b = g_seams.mission->GetCampaignName();
             g_seams.mission->LoadCampaign(b);
             if (g_seams.mission->SelectMission(a) != 0) {
                 g_game->netGameFlags_2a44.bits.b3 = 1;

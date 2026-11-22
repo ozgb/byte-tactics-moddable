@@ -8,17 +8,17 @@
 #include "files_bank.h"
 #include "file_handle.h"
 
-static inline FileHandle* HAPI_OpenFileRead(char* path)
+static inline FileHandle* HAPI_OpenFileRead(const char* path)
 {
     return g_seams.files->OpenRead(path);
 }
 
-static inline FileHandle* HAPI_OpenFileAppend(char* path)
+static inline FileHandle* HAPI_OpenFileAppend(const char* path)
 {
     return g_seams.files->OpenAppend(path);
 }
 
-static inline FileHandle* HAPI_CreateFile(char* path)
+static inline FileHandle* HAPI_CreateFile(const char* path)
 {
     return g_seams.files->Create(path);
 }
@@ -48,7 +48,7 @@ static inline int HAPI_readfromfile(FileHandle* file, void* buf, int size)
     return g_seams.files->Read(file, buf, size);
 }
 
-static inline unsigned int HAPI_WriteFile(FileHandle* file, void* buf, unsigned int size)
+static inline unsigned int HAPI_WriteFile(FileHandle* file, const void* buf, unsigned int size)
 {
     return g_seams.files->Write(file, buf, size);
 }
@@ -58,27 +58,27 @@ static inline long HAPI_FileLength(FileHandle* file)
     return g_seams.files->Length(file);
 }
 
-static inline long HAPI_FileLengthByName(char* name)
+static inline long HAPI_FileLengthByName(const char* name)
 {
     return g_seams.files->LengthByName(name);
 }
 
-static inline void* HAPI_ReadFileAt(char* name, void* buffer, long pos, unsigned int size)
+static inline void* HAPI_ReadFileAt(const char* name, void* buffer, long pos, unsigned int size)
 {
     return g_seams.files->ReadAt(name, buffer, pos, size);
 }
 
-static inline void* HAPI_LoadFile(char* name, int* size)
+static inline void* HAPI_LoadFile(const char* name, int* size)
 {
     return g_seams.files->Load(name, size);
 }
 
-static inline void* HAPI_LoadOpenFile(char* name, FileHandle* file, unsigned int* outSize)
+static inline void* HAPI_LoadOpenFile(const char* name, FileHandle* file, unsigned int* outSize)
 {
     return g_seams.files->LoadOpenFile(name, file, outSize);
 }
 
-static inline int WriteBufferToFile(char* filename, void* data, int size)
+static inline int WriteBufferToFile(const char* filename, const void* data, int size)
 {
     return g_seams.files->WriteBuffer(filename, data, size);
 }
@@ -98,12 +98,12 @@ static inline void GetCurrentDriveLetter(char* buf)
     g_seams.files->GetCurrentDriveLetter(buf);
 }
 
-static inline int ChangeDrive(char* drive)
+static inline int ChangeDrive(const char* drive)
 {
     return g_seams.files->ChangeDrive(drive);
 }
 
-static inline char* GetDriveDirectory(char* drive, char* buf, int size)
+static inline const char* GetDriveDirectory(const char* drive, char* buf, int size)
 {
     return g_seams.files->GetDriveDirectory(drive, buf, size);
 }
@@ -143,12 +143,12 @@ static inline void ListDirectory(const char* path, int dirsOnly, std::vector<Str
     g_seams.files->ListDirectory(path, dirsOnly, (FileNameList*)list);
 }
 
-static inline void FindFilesRecursive(char* path, const char* pat, std::vector<StringRef>* tree, int state, int recursive)
+static inline void FindFilesRecursive(const char* path, const char* pat, std::vector<StringRef>* tree, int state, int recursive)
 {
     g_seams.files->FindFilesRecursive(path, pat, (FileNameList*)tree, state, recursive);
 }
 
-static inline void MakeDirectoryPath(char* path)
+static inline void MakeDirectoryPath(const char* path)
 {
     g_seams.files->MakeDirectoryPath(path);
 }
@@ -158,9 +158,9 @@ static inline void SaveStartDirectory(void)
     g_seams.files->SaveStartDirectory();
 }
 
-static inline void GetStartDirectory(char* param)
+static inline void GetStartDirectory(char* out)
 {
-    g_seams.files->GetStartDirectory(param);
+    g_seams.files->GetStartDirectory(out);
 }
 
 static inline void* HAPI_AddArchive(const char* name, int mode)
@@ -228,7 +228,7 @@ static inline int HAPI_readfromfile(void* file, void* buf, int size)
     return HAPI_readfromfile((FileHandle*)file, buf, size);
 }
 
-static inline unsigned int HAPI_WriteFile(void* file, void* buf, unsigned int size)
+static inline unsigned int HAPI_WriteFile(void* file, const void* buf, unsigned int size)
 {
     return HAPI_WriteFile((FileHandle*)file, buf, size);
 }
@@ -238,7 +238,7 @@ static inline long HAPI_FileLength(void* file)
     return HAPI_FileLength((FileHandle*)file);
 }
 
-static inline void* HAPI_LoadOpenFile(char* name, void* file, unsigned int* outSize)
+static inline void* HAPI_LoadOpenFile(const char* name, void* file, unsigned int* outSize)
 {
     return HAPI_LoadOpenFile(name, (FileHandle*)file, outSize);
 }

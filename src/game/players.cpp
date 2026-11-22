@@ -318,7 +318,7 @@ guard:
 void LoadDefaultAIScript()
 {
     int size;
-    char* name = g_seams.mission->GetNameSlot(7);
+    const char* name = g_seams.mission->GetNameSlot(7);
     char* text = (char*)HAPI_LoadFile(name, &size);
     if (text == 0) {
         text = (char*)HAPI_LoadFile("ai\\default.txt", &size);

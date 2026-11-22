@@ -313,7 +313,7 @@ IMPORT(FindWeaponByNameImport)
 {
     (void)user;
     NEED("FindWeaponByName", 0);
-    WeaponDef* weapon = g_seams.weapons->FindWeaponByName((char*)Linear(a[0].i32));
+    WeaponDef* weapon = g_seams.weapons->FindWeaponByName((const char*)Linear(a[0].i32));
     if (weapon != nullptr && !SimOwns(weapon))
         return ImportError("FindWeaponByName", "returned a weapon outside the sim block");
     a[0].i32 = weapon == nullptr ? 0 : (int)((unsigned char*)weapon - ModulesMemory()->base);

@@ -63,7 +63,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;
@@ -90,7 +90,7 @@ char* __stdcall Translate(const char* key)
 {
     return (char*)key;
 }
-char* __stdcall LoadFileWithProgress(char*)
+char* __stdcall LoadFileWithProgress(const char*)
 {
     Unexpected("LoadFileWithProgress");
     return 0;

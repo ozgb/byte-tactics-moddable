@@ -335,7 +335,7 @@ void FreeFeatureFileList()
 }
 
 // FUNCTION: 0x422460
-TdfFile* __stdcall FindFeatureFile(char* name)
+TdfFile* __stdcall FindFeatureFile(const char* name)
 {
     for (TdfFile** p = s_featureTdfParsers->begin(); p < s_featureTdfParsers->end(); p++) {
         (*p)->ResetCurrentRecord();
@@ -367,7 +367,7 @@ static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, 
 }
 
 // FUNCTION: 0x4224b0
-int __stdcall LoadFeatureType(char* name)
+int __stdcall LoadFeatureType(const char* name)
 {
     Gaf* anims;
     int j;
@@ -464,7 +464,7 @@ int __stdcall LoadFeatureType(char* name)
 }
 
 // FUNCTION: 0x422dd0
-short __stdcall FindFeatureType(char* name)
+short __stdcall FindFeatureType(const char* name)
 {
     for (int i = 0; i < g_game->featureCount; i++) {
         if (_strcmpi(name, g_game->features[i].name) == 0) {
@@ -475,7 +475,7 @@ short __stdcall FindFeatureType(char* name)
 }
 
 // FUNCTION: 0x422e40
-unsigned short __stdcall FindOrLoadFeatureType(char* name)
+unsigned short __stdcall FindOrLoadFeatureType(const char* name)
 {
     unsigned short i = (unsigned short)FindFeatureType(name);
     if (i == 0xffff)

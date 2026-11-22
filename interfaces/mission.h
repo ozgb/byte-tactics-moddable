@@ -82,7 +82,7 @@ struct MissionSeam {
     // Returns the game type of the mission (0 none, 1 campaign, 2 skirmish, 3 multiplayer); a query of a record nothing in the tick writes. Hooks: none.
     int (__stdcall* GetGameType)(void);
     // Returns one of the file names of the mission by slot number (0 the campaign file, 1 the terrain file, 2 the briefing), or 0 when the slot is empty; a query of a record nothing in the tick writes. Hooks: none.
-    char* (__stdcall* GetNameSlot)(int index);
+    const char* (__stdcall* GetNameSlot)(int index);
     // Makes a new, empty mission of a game type, unless the mission already has that type, outside the tick. Hooks: none.
     void (__stdcall* SetMissionType)(int type);
     // Frees the cache of map names and the mission, outside the tick. Hooks: none.
@@ -90,17 +90,17 @@ struct MissionSeam {
     // Moves a campaign on to its next mission and loads it, and returns 1 when there is one. Hooks: none.
     int (__stdcall* AdvanceMission)(void);
     // Returns the name of the campaign file, or 0 when the mission has no campaign. Hooks: none.
-    char* (__stdcall* GetCampaignName)(void);
+    const char* (__stdcall* GetCampaignName)(void);
     // Returns the index of the current mission of the campaign. Hooks: none.
     int (__stdcall* GetMissionIndex)(void);
     // Returns the name of the current mission. Hooks: none.
-    char* (__stdcall* GetMissionName)(void);
+    const char* (__stdcall* GetMissionName)(void);
     // Writes the start position of a player and returns 1 when the mission has one. Hooks: none.
     int (__stdcall* GetStartPosition)(Vec3* out, int id);
     // Loads a campaign file and its first mission, or empties the campaign for an empty name. Hooks: none.
-    void (__stdcall* LoadCampaign)(char* file);
+    void (__stdcall* LoadCampaign)(const char* file);
     // Loads a map (skirmish and multiplayer) or a mission of the campaign by its name, and returns 1 when it exists. Hooks: none.
-    int (__stdcall* LoadMissionByName)(char* name);
+    int (__stdcall* LoadMissionByName)(const char* name);
     // Returns 1 when the campaign has a mission of that index. Hooks: none.
     int (__stdcall* MissionExists)(int index);
     // Builds the list of maps again when it has none or when it leaves multiplayer, for multiplayer when set, and loads its first map. Hooks: none.
@@ -118,15 +118,15 @@ struct MissionSeam {
     // Returns how many start positions the mission has. Hooks: none.
     int (__stdcall* CountStartPositions)(void);
     // Returns the text of the mission's briefing, or 0 when it has none. Hooks: none.
-    char* (__stdcall* GetBriefing)(void);
+    const char* (__stdcall* GetBriefing)(void);
     // Returns the description of the map. Hooks: none.
-    char* (__stdcall* GetDescription)(void);
+    const char* (__stdcall* GetDescription)(void);
     // Returns the planet of the map. Hooks: none.
     char* (__stdcall* GetPlanet)(void);
     // Returns the memory a player needs for the terrain file, in megabytes, by its size. Hooks: none.
     int (__stdcall* GetTerrainSizeTier)(void);
     // Returns the name of the map in the player's language. Hooks: none.
-    char* (__stdcall* GetTranslatedName)(void);
+    const char* (__stdcall* GetTranslatedName)(void);
     // Returns 1 when the mission has a name. Hooks: none.
     int (__stdcall* HasMissionName)(void);
     // Reads from a map's parsed file the schema of a game type for the players of the match, by name when schema is given, and returns 1 when the map has one. Hooks: none.
@@ -144,9 +144,9 @@ struct MissionSeam {
     // Writes the mission's feature of that index to a struct the caller owns, and returns 0 when the mission has no such feature. Hooks: none.
     int (__stdcall* GetMissionFeature)(int index, MissionFeatureInfo* out);
     // Returns the memory the map says a player needs, as the map's text (memory). Hooks: none.
-    char* (__stdcall* GetMemory)(void);
+    const char* (__stdcall* GetMemory)(void);
     // Returns the numbers of players the map is for, as the map's text (numplayers). Hooks: none.
-    char* (__stdcall* GetNumPlayers)(void);
+    const char* (__stdcall* GetNumPlayers)(void);
 };
 
 #endif

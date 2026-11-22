@@ -325,7 +325,7 @@ struct WeaponsSeam {
     // Aims and fires a unit's weapons for one tick, in the unit's update; the engine calls it for a unit of an active player of type 1 or 2. Hooks: none.
     void (__stdcall* UpdateUnitWeapons)(Unit* unit);
     // Finds a weapon definition by its TDF name, or null; a query. Hooks: none.
-    WeaponDef* (__stdcall* FindWeaponByName)(char* name);
+    WeaponDef* (__stdcall* FindWeaponByName)(const char* name);
     // Returns the range of one of a unit's weapons; a view read. Hooks: none.
     int (__stdcall* GetWeaponRange)(Unit* unit, unsigned int weapon);
     // Returns whether one of a unit's weapons can reach another unit; a query. Hooks: none.

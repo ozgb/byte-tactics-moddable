@@ -72,7 +72,7 @@ void __stdcall SchedPublish(int, const void*, unsigned int)
     s_effects++;
 }
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;
@@ -114,11 +114,11 @@ GafFrame* __stdcall GetGafSequenceFrame(Handle*)
 void StringRefView::ReleaseRef() {}
 TdfFile::TdfFile() {}
 TdfFile::~TdfFile() {}
-int TdfFile::LoadFile(char*)
+int TdfFile::LoadFile(const char*)
 {
     return 0;
 }
-int TdfFile::SelectRecord(char*)
+int TdfFile::SelectRecord(const char*)
 {
     return 0;
 }

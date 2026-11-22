@@ -1871,8 +1871,8 @@ with the prefix `scriptsState.`, after `playersState.*`. For each live unit with
 2. For each channel c in 0 .. 7 at script + 0x1c + c * 0xa4, as in section 8.12: `channels[c].state` alone when its state is 0;
    else the table `ScriptChannel` (`state`, `pc`, `sp`, `signal`, `callback`) as `channels[c].<field>`, `channels[c].stack`
    (a bytes field of live * 4 bytes at +0x24, live = 0 when `sp` < -1, else sp + 1, at most 32) and, when
-   `state & 0xff000000` is 0x2000000, by `state & 0xf00000`: 0x100000 or 0x200000 the table `ScriptChannelPiece`,
-   0x400000 `ScriptChannelDelay`, 0x800000 `ScriptChannelWait`.
+   `state & 0xff000000` is 0x02000000, by `state & 0x00f00000`: 0x00100000 or 0x00200000 the table `ScriptChannelPiece`,
+   0x00400000 `ScriptChannelDelay`, 0x00800000 `ScriptChannelWait`.
 3. `statics.count` (4 bytes), then `statics` (a bytes field of that count * 4 bytes), the count as in section 8.12 (0 when the
    table or the statics ref is null or the count is above 4096).
 4. For each piece p in 0 .. pieceCount-1 (as in section 8.12): the table `ScriptPiece` at pieces + p * 0x4c, as `pieces[p].<field>`.

@@ -503,9 +503,9 @@ in/out name in the closing names of its call, so that an `o count (9)` line afte
 not name `count` itself. A mismatch of the value coming out is reported at the argument (`count`).
 
 A pointer to a scalar (`int*`, `short*`, `unsigned char*`, and the unsigned forms of the first two) that a callee reads and writes back,
-as `QueryScript` does with `p2` to `p5`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
-struct form with the value in parentheses: `a p2 (5)` going in, `a p3 null` for a null pointer, `o p2 (9)` coming out when the pointer is not
-null (in an import line ` (5)` and ` null`, and `o p2 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
+as `QueryScript` does with `arg0` to `arg3`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
+struct form with the value in parentheses: `a arg0 (5)` going in, `a arg1 null` for a null pointer, `o arg0 (9)` coming out when the pointer is not
+null (in an import line ` (5)` and ` null`, and `o arg0 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
 import writes the `o` line back through the pointer. It is neither `cast`, which stays `void*`, nor a one-field struct kind, which would
 describe an `int` as something it is not. A `value` with a `dir` other than `inout`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
 

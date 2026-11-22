@@ -315,10 +315,10 @@ int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, in
     Space(t);
     AddInOutScalar(t, a5);
     const char* r = Enter(t);
-    ApplyInOutScalar(a2, "p2");
-    ApplyInOutScalar(a3, "p3");
-    ApplyInOutScalar(a4, "p4");
-    ApplyInOutScalar(a5, "p5");
+    ApplyInOutScalar(a2, "arg0");
+    ApplyInOutScalar(a3, "arg1");
+    ApplyInOutScalar(a4, "arg2");
+    ApplyInOutScalar(a5, "arg3");
     return ParseResult<int>(r);
 }
 

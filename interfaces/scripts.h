@@ -95,8 +95,8 @@ struct ScriptsSeam {
     int (__stdcall* Apply)(const ScriptsEventHeader* event, unsigned int size);
     // Starts a script by the index of its name with up to four arguments and returns its thread, for a unit's script that another machine started (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* StartScriptWithArgsByIndex)(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d);
-    // Runs a named script that answers a query and returns its result; synchronous: the script runs at once and the caller reads the answer in the same statement (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* QueryScript)(CobScript* script, const char* name, int* p2, int* p3, int* p4, int* p5);
+    // Runs a named script that answers a query and returns 1, or 0 when it could not start; each non-null argument is passed to the script and receives its value back; synchronous: the script runs at once and the caller reads the answer in the same statement (thiscall in 3.1c, this first). Hooks: none.
+    int (__stdcall* QueryScript)(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3);
     // Returns the index of a named script of a unit, or a negative number when it has none (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* FindScript)(CobScript* script, const char* name);
     // Returns the offset of a piece of a unit from its position. Hooks: none.

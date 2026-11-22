@@ -2847,10 +2847,10 @@ int __stdcall RecScriptsQueryScript(CobScript* a0, const char* a1, int* a2, int*
     if (scope.Open()) {
         ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgValue(s_call, "name", (const char*)a1);
-        ArgInOutScalar(s_call, "p2", a2);
-        ArgInOutScalar(s_call, "p3", a3);
-        ArgInOutScalar(s_call, "p4", a4);
-        ArgInOutScalar(s_call, "p5", a5);
+        ArgInOutScalar(s_call, "arg0", a2);
+        ArgInOutScalar(s_call, "arg1", a3);
+        ArgInOutScalar(s_call, "arg2", a4);
+        ArgInOutScalar(s_call, "arg3", a5);
     }
     ReplayText line;
     if (scope.Import()) {
@@ -2865,17 +2865,17 @@ int __stdcall RecScriptsQueryScript(CobScript* a0, const char* a1, int* a2, int*
     int result = s_inner_scripts->QueryScript(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
         ImportResult(line, result);
-        ImportOutInOutScalar(line, "p2", a2);
-        ImportOutInOutScalar(line, "p3", a3);
-        ImportOutInOutScalar(line, "p4", a4);
-        ImportOutInOutScalar(line, "p5", a5);
+        ImportOutInOutScalar(line, "arg0", a2);
+        ImportOutInOutScalar(line, "arg1", a3);
+        ImportOutInOutScalar(line, "arg2", a4);
+        ImportOutInOutScalar(line, "arg3", a5);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgInOutScalarExit(s_tail, "p2", a2);
-        ArgInOutScalarExit(s_tail, "p3", a3);
-        ArgInOutScalarExit(s_tail, "p4", a4);
-        ArgInOutScalarExit(s_tail, "p5", a5);
+        ArgInOutScalarExit(s_tail, "arg0", a2);
+        ArgInOutScalarExit(s_tail, "arg1", a3);
+        ArgInOutScalarExit(s_tail, "arg2", a4);
+        ArgInOutScalarExit(s_tail, "arg3", a5);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;

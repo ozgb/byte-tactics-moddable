@@ -143,9 +143,9 @@ static int __stdcall FindScriptNative(CobScript* script, const char* name)
     return script->FindScript(name);
 }
 
-static int __stdcall QueryScriptNative(CobScript* script, const char* name, int* p2, int* p3, int* p4, int* p5)
+static int __stdcall QueryScriptNative(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
 {
-    return script->QueryScript(name, p2, p3, p4, p5);
+    return script->QueryScript(name, arg0, arg1, arg2, arg3);
 }
 
 static void __stdcall UpdateSquadsNative(int player)

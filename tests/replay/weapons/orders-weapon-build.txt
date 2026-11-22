@@ -9305,17 +9305,17 @@ call 720 Apply
   a event.unit Unit#252
   a size 8
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
   i scripts.GetAimFromPosition Unit#252 0
   o out (195559424,65536,83361792)
   i scripts.QueryScript CobScript#4 "QuerySecondary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
   i scripts.GetAimFromPosition Unit#252 1
   o out (195559424,65536,83361792)
   i scripts.QueryScript CobScript#4 "QueryTertiary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#252 0 = (0,0,0)
   i scripts.GetAimFromPosition Unit#252 2
   o out (195559424,65536,83361792)

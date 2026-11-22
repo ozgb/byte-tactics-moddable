@@ -26,6 +26,11 @@ phase 1: the test-mode scenarios call RunGameSteps with showStats 0, so there is
 phase 1 hold the previous tick's tail for that reason: with no marker 0, the drawing and input of the main loop
 between two ticks fell into the window that ends at marker 1.
 
+Two more windows cover saving and loading: `save` is SaveGameFile, and `load` is LoadSavedGameState and
+LoadBattleAssets (a match loads on the load thread, so the thread a save or load window opens on is the one
+recorded). Neither touches the tick's evidence: their rows go to `<scenario>.saveload.csv`, with the edges file's
+columns and the phase `save` or `load`, and tools/privatestate.py judges them as it judges the tick's.
+
 Evidence, per (writer, reader, item, phase), counted in the column `count`:
 
   read-after-write  the item was written in this window by another subsystem, or by the same subsystem on
@@ -123,7 +128,7 @@ misses what the compiler did not instrument or the callbacks cannot see:
   * optimiser effects: a read served from a register or folded into an earlier one is not seen, and the
     instrumented build is compiled with the game's /O2, so the sequence of accesses is the compiled
     code's and not the source's;
-  * another thread's accesses: only the thread that runs the first window is recorded.
+  * another thread's accesses: only the thread that opened the latest window is recorded.
 """
 
 import argparse

@@ -283,13 +283,11 @@ update** means the scheduler's order is that of 3.1c's `UpdateUnit`; **synchrono
 
 ## 5. State and the trace
 
-**Everything stays hashed in this change** (the human, 2026-11-16, on PR #978, and 2026-11-17, on #984): the unit
-record (section 1 of the trace, `docs/trace-format.md`, section 7.1), the factory index units' `WriteState` writes
-(record 25, section 8.14, hashed as before), and the scripts' objects (section 23, `docs/scripts-interface.md`, section
-6). #979 covers los_radar, map, players and ai only; what this section lists moves out of the hash in one later format
-bump for weapons, orders, movement, units and scripts, with a reference half, which the maintainer files when this
-lands. Units' events are dumped in section 50 of the trace (section 8.34) and scripts' in section 51 (section 8.35),
-never hashed; both sections are new, so the trace format's schema changes.
+Units keeps no private region, and since format 8 of the trace (#1024) the fields of the unit record that only units
+reads are not hashed: its `WriteState` dumps them in record 54, `unitsState`, after the factory index it writes in
+record 25 (`docs/trace-format.md`, section 8.14, hashed as before). The unit record is section 1 of the trace
+(section 7.1) and the scripts' objects are section 23 (`docs/scripts-interface.md`, section 6). Units' events are
+dumped in section 50 of the trace (section 8.34) and scripts' in section 51 (section 8.35), never hashed.
 
 **The unit record, field by field.** Who writes each field of `Unit` and who reads it, by the access logs of every
 scenario (`data/access/`; `seams` is the glue of `src/seams/`, an event's handler, and `network` and `platform` read
@@ -307,7 +305,7 @@ whose view state it is:
 | units, with targeting's view | `netDirtyFlags` (`SetWeaponTargetUnit`, `SetWeaponTargetPos`) | units, targeting | orders, targeting, units |
 | units, with ai's view | `group` (`SetUnitSquad`) | units, ai | ai, orders |
 | units, with economy's view | `extraction` (`EconomyUpdateMetalExtraction`) | economy | economy's handler (`seams`) |
-| units | `workTime` | units (`UnitsApply`, for weapons' and orders' BUSY); the log also charges los_radar, in the players phase, with no write of los_radar's in the code (as on `moddable` before this change) | economy's handler |
+| units, with los_radar's view | `workTime` | units (`UnitsApply`, for weapons' and orders' BUSY); los_radar (`UpdateSensorRadarAndCloak` sets it to the tick plus 90 when an enemy unit is within the minimum cloak distance: the decloak hold-off) | economy's handler (`seams`), for the cloak upkeep |
 | scripts | `script` | scripts; units, when it creates and frees the script (`InitUnitScript`, `ApplyUnitDeath`) | game, network, orders, scripts, units, weapons |
 | weapons | the weapon slots: `weapon`, `type`, `f2c`, `f48`, `f_1f`, `f_3b`, `f_57`, `b3a`, `b56`, `field_18`, `field_1e`, `field_8`, `lastTick`, `weapon2AimCob`, `unknown_14`, `unknown_1a`, `unknown_1c`, `unknown_24`, `unknown_30`, `unknown_4c` | weapons | ai, los_radar, orders, targeting, units, weapons (`docs/weapons-interface.md`, section 5) |
 | targeting | `current`, `field_20`, `weapon2Target` | targeting | targeting |
@@ -323,11 +321,29 @@ scripts' writing slots but the engine and the callers each slot names (section 2
 `GetWeaponTargetPos` calls scripts' `GetSweetSpot`, mixed, as weapons calls `GetAimFromPosition`), and that no query
 slot writes state.
 
-**Hashed state only units reads, a candidate for the later bump:** `head`, `healthPercent`, `prevHealthPercent`,
-`hoverBobPhase`, `unknown_10a`, `zBufferFlag` and `unfinishedInitZero` (no other simulation module reads them in the
-logs). The rest of the record is read by other modules
-and stays hashed with the unit. Scripts' candidates are in `docs/scripts-interface.md`, section 6: the threads, the
-statics, the piece records and the transforms.
+**What is hashed, and who reads it.** The rest of the record is read by other modules and stays in section 1 with
+the unit. Among the fields units owns, `workTime` is read by economy (the cloak upkeep, and los_radar writes it),
+`recentlyDamagedTimer` by los_radar, `postTransferHoldoff` by players and `owner` by weapons.
+
+**What left the hash.** `head` (and its link in section 20, which no longer hashes it), `healthPercent`,
+`prevHealthPercent`, `hoverBobPhase`, `unknown_10a` (the 4 bytes at +0x10a), `zBufferFlag` and `unfinishedInitZero`.
+- Nothing reads `healthPercent`, `prevHealthPercent`, `unknown_10a` and `unfinishedInitZero`: units writes them and
+  nothing reads them back. Scripts does not read `healthPercent`: the script value for the health percentage is
+  computed from `health` and the maximum health. A wrong value of these four delivers nothing, so no run can
+  diverge on it, and the record only reports it.
+- Only presentation reads `zBufferFlag`. A wrong value changes only what is drawn, so the frame dumps judge it and
+  nothing is hashed in its place.
+- `head` and `hoverBobPhase` drive the unit's own state. With a wrong `hoverBobPhase`, TAMPER(units:hoverBobPhase).
+
+Every field keeps its bytes in the unit record, so no offset moves.
+
+**Record 54, `unitsState`** (dumped, never hashed; `docs/trace-format.md`, section 8.38). For each live unit, one
+record `unitsState.units[i]` with `head`, `hoverBobPhase`, `healthPercent`, `prevHealthPercent`,
+`unfinishedInitZero`, `unknown_10a` and `zBufferFlag`. The reference build writes the same record itself.
+
+`lastMoveTick` of the unit's motion is read here (the hover bob's damping, by the unit's age), and is hashed in
+section 21 again for it (`docs/movement-interface.md`, section 5). Scripts' state is in
+`docs/scripts-interface.md`, section 6.
 
 ## 6. Random draws, sim events and the unit loop
 

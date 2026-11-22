@@ -339,29 +339,42 @@ in the table of routes above.
 
 ## 5. State and the trace
 
-**Everything stays hashed in this change** (the human, 2026-11-16, on PR #978, and 2026-11-17, on #984): the order
-lists, the order effects, the motions and the goals. #979 covers los_radar, map, players and ai only; what follows
-moves out of the hash in one later format bump for weapons, orders and units. Nothing leaves the hash in this change.
-The module has no private region, and its `WriteState` writes no record.
+Orders keeps no private region. Its state is in the state block, where it was, and since format 8 of the trace (#1024)
+the fields only orders reads are not hashed: its `WriteState` dumps them in record 52, `ordersState`.
 
-**The hashed state only orders reads, a candidate for that bump.** The order lists are read by units, ai, map,
-movement, weapons and targeting only through the fields of section 4 (`Unit::list`, `Order::flags_42`, `pos`,
-`subFlags`, `unit`, `target`, `unknown_1a`); a search of `data/dependencies.csv` finds no row naming another reader of
-the rest of `Order`:
+**What is hashed, and who reads it.** The walk of section 20 (`docs/trace-format.md`, section 8.9) still visits every
+order of both lists of each live unit, in list order, and hashes the fields other subsystems read:
 
-| State | Trace section | Written by | Read by |
-|---|---|---|---|
-| the order's `kind`, `state`, `wakeFrame`, `next`, its `flags` (but `flags_42`) and the per-kind counters of its `type`, `id`, `wait`, `ticks`, `time` union | the unit's order list, section 3 of the trace (`docs/trace-format.md`, section 8.10) | orders | orders (the `Order` fields `flags`, `next` and `unit` are logged read-only by orders itself) |
-| the order effect class and its numbering (the targets of movement, `docs/movement-interface.md`, section 5) | section 22 | movement | movement |
+| Hashed field of an order | Read by |
+|---|---|
+| `unit` | movement |
+| the link (`linkOwner`, `linkNext`, `linkValue`), `target` and `unknown_1a` | units |
+| `pos` (`x`, `z`, and `y` for the kinds that write it) | features, los_radar, movement |
+| `flags_42` (the byte at +0x42, masked) | ai, movement |
+| `Unit::list` (the head of the order list) | ai, movement |
 
-`Unit::list` (the head of the order list) is read by ai, movement and units and stays hashed for them.
+**What left the hash.** `kind`, `state`, `flags` (the word at +6), `wakeFrame`, `start`, `arg0`, `arg1`, `arg2`,
+`created`, `subFlags` and `attached`. In the simulation only orders reads them. Presentation's markers and overlays
+read `kind` and `created`, and the frame dumps and UI logs judge presentation. `subFlags` has no other reader: what
+movement reads is `flags_42`, which stays. The unit's `head` is units' and left with units' state (`docs/units-interface.md`,
+section 5), so section 20 no longer hashes it.
 
-**Record and sections.** The module's `WriteState` writes no record (movement's neither). The trace dumps orders' events
-in section 48 (`docs/trace-format.md`, section 8.32) and movement's in section 49 (section 8.33), and hashes none of
-them. Sections 50 and 51 are units' and scripts' events (`docs/trace-format.md`, sections 8.34 and 8.35). Section 48 is also the number of weapons' record 48,
-`weaponsState`: records and sections are keyed by name in the dump (`ordersEvents.*`, `weaponsState`), so they do not
-clash. Each record is an event with the outcome `Apply` gave, or an effect orders published (outcome 1), in orders'
-order, after section 47's. The sections are new, so the trace format's schema changes.
+**Record 52, `ordersState`** (dumped, never hashed; `docs/trace-format.md`, section 8.36). For each live unit with an
+order list, one record `ordersState.units[i]` with the fields that left, for each order of `list` and `list2` in list
+order: `list[n].kind`, `.state`, `.flags6`, `.wakeFrame`, `.start.x`, `.start.y`, `.arg0`, `.arg1`, `.arg2`,
+`.created`, `.subFlags` and `.attached` (and `list2[n].*`). The reference build writes the same record itself.
+
+**Where a wrong value shows.** With a wrong order `wakeFrame`, TAMPER(orders:wakeFrame). The kind, the state and the
+arguments decide which order runs and what it does, and diverge through the unit's position, its goal or its other
+hashed fields. A wrong `created` or `kind` that only presentation reads is judged by the frame dumps.
+
+The order effects of section 22 are movement's targets (`docs/movement-interface.md`, section 5).
+
+**The trace dumps orders' events** in section 48 (`docs/trace-format.md`, section 8.32) and movement's in section 49
+(section 8.33), and hashes none of them. Sections 50 and 51 are units' and scripts' events (sections 8.34 and 8.35).
+Section 48 is also the number of weapons' record 48, `weaponsState`: records and sections are keyed by name in the
+dump (`ordersEvents.*`, `weaponsState`), so they do not clash. Each record is an event with the outcome `Apply` gave,
+or an effect orders published (outcome 1), in orders' order, after section 47's.
 
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes orders'
 state or calls its entry points, and no query slot writes state.

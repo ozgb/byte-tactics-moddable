@@ -317,28 +317,27 @@ route inside the tick is synchronous, each for the reason in the table of routes
 
 ## 5. State and the trace
 
-Movement keeps no private region, and its `WriteState` writes no record: its state is sim state in the shared block,
-hashed where it was. It stays where it is and stays hashed in this change (the human, 2026-11-16 and 2026-11-17, on #978
-and #984, for weapons, orders and units); nothing leaves the hash in this change. The heap rows of
+Movement keeps no private region. Its state is sim state in the shared block, and since format 8 of the trace (#1024)
+what only movement reads is not hashed: its `WriteState` dumps it in record 53, `movementState`. The heap rows of
 `data/state_classes.csv` (`UnitMotion::UnitMotion: new ...`, the goals, and the `New*Native` and `Load*Native` rows) name
-movement as the class's owner, and the format bump of weapons, orders and units takes out of the hash what only its
-owner reads. The trace hashes the motions and goals in section 21 and the order effects in section 22
-(`docs/trace-format.md`, sections 8.10 and 8.11); this change edits neither.
+movement as the class's owner. The trace hashes the motions in section 21 and the order effects in section 22
+(`docs/trace-format.md`, sections 8.10 and 8.11).
 
-| Movement's state | Where | Read by | Only movement reads it |
+| Movement's state | Where | Read by | Hashed |
 |---|---|---|---|
-| The motion record (`UnitMotion`: `velocity`, `p2`, `turn`, `lastMoveTick`) | the unit's heap object, hashed (section 21) | movement | yes |
-| `UnitMotion::speed` | the same | movement, units (`ReadUnitState`, `WriteUnitState`), weapons (by view) | no: units reads it in the unit's network state, and writes it by SET_SPEED |
-| `UnitMotion::mode`, `flag` | the same | movement; units (`ApplyAttachUnit`, by SET_MODE) | no |
-| `UnitMotion::flags`, `velocity`, `field_22` | the same | movement, orders (the VTOL orders: `PrepVtolClimb`, `VtolFollowOrder`, `VtolHelpBuildOrder`, `VtolMobileBuildOrder`, `VtolSeekAttackOrder`, `AirToAirOrder`, `AirStrikeOrder`) | no |
-| `UnitMotion::pathLockStamp` | the same | map (the issue #1019 decision): `AddUnitToMap` sets it to the tick the unit was placed, its pass map refreshes stamp it again, and LOAD_PATH_LOCK_STAMP sets it from a saved game; movement does not write it | no: it is map's field, kept in movement's motion record, as map keeps its bucket fields in units' record; units' saved game reads it through map's `PathLockStamp`, not through `GetMotionState` |
-| `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (`src/seams/pathfinding_world.cpp`, by offset) | no |
-| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network (`NetSendUnitStates` passes the unit to the slots), orders (through `UnitTarget`), pathfinding (by offset) | no: it is the object the slots take |
-| The target a goal steers to (`PathGoal::target`) | the goal, hashed | movement, orders (through `UnitTarget`) | no: orders reads it through the slot |
-| The goals' fields (`PatrolGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `AiSearchGoal`) | the goal's heap object, hashed (section 21) | movement; presentation (`AiSearchGoal::DrawOnSurface` reads `active`, `count` and `owner`, console debug overlay) | yes, in the simulation |
+| `UnitMotion::velocity` | the unit's heap object (section 21) | movement, orders, targeting, weapons | yes |
+| `UnitMotion::speed` | the same | movement, units (`ReadUnitState`, `WriteUnitState`), weapons (by view) | yes: units reads it in the unit's network state, and writes it by SET_SPEED |
+| `UnitMotion::mode`, `flag` | the same | movement; units (`ApplyAttachUnit`, by SET_MODE) | yes |
+| `UnitMotion::flags`, `field_22` | the same | movement, orders (the VTOL orders) | yes |
+| `UnitMotion::pathLockStamp` | the same | map (the issue #1019 decision): `AddUnitToMap` sets it to the tick the unit was placed, its pass map refreshes stamp it again, and LOAD_PATH_LOCK_STAMP sets it from a saved game; movement does not write it | yes: it is map's field, kept in movement's motion record, as map keeps its bucket fields in units' record |
+| `UnitMotion::movementClass` (and the planner view of its first field) | the same | movement, pathfinding (by offset) | yes |
+| `UnitMotion::lastMoveTick` | the same | movement, units (the hover bob's damping reads the unit's age) | yes: it came back into the hash in format 8 |
+| The goal pointer (`UnitMotion::player` / `obj`) | the same | movement, network, orders (through `UnitTarget`), pathfinding (by offset) | no: the pointer is a presence byte; the goal's fields left (below) |
+| `UnitMotion::p2` and `turn` | the same | movement | no: record 53 |
+| The goals' fields (`PatrolGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `AiSearchGoal`), `PathGoal::target` included | the goal's heap object | movement; orders gets the target only as the answer of the `UnitTarget` query; presentation's debug overlay (behind a debug toggle) | no: record 53 |
 | The goal areas (`PathGoalArea`) | filled by the goals | movement; pathfinding, through `PathGoalCells`, `PathGoalContains` and `PathGoalDistance` | no |
-| The targets' fields (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) | the order effect, hashed (section 22) | movement; `OrderFx::source` is the order | yes: orders reaches them only through the slots and events |
-| The unit reference of a move target (`PathOrder::ref`, a `PathOrderAttach`) | the target, hashed | movement, units (the list, `UnitRefGet`, `UnitRefSetValue`), orders (`Order::link`, `Matches`) | no: it is units' (section 7) |
+| The targets' fields (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`) but the unit reference | the order effect (section 22) | movement; `OrderFx::source` is the order | no: dumped under `orderFx[id].*` |
+| The unit reference of a move target (`PathOrder::ref`, a `PathOrderAttach`) | the target | movement, units (the list, `UnitRefGet`, `UnitRefSetValue`), orders (`Order::link`, `Matches`) | yes: it is units' link (section 7) |
 
 What movement writes of others' state, from `uv run tools/coupling.py --summary movement`: the unit record (`pos`,
 `angles`, `flags`, `mode`, `moved`, units') by effects, `Order::subFlags` (orders') by ORDER_FLAGS, `PathRequest`
@@ -346,28 +345,32 @@ fields (pathfinding's) and the `AiSearchGoal` repath claim. It reads `Game::tick
 `Game::overflowBucket`, `Unit::motion`, `Unit::def` and `Unit::cell` among others, and the fields of the unit
 definition, as of the last write of the owner.
 
-**The hashed state only movement reads**, for the later format bump:
-- the motion record's `velocity` is read by orders and its `p2`, `turn` and `lastMoveTick` by movement alone (units reads
-  `lastMoveTick` by view in the access log), so the bump can drop `p2` and `turn` and keep the fields others read;
-- every field of the goals (`PatrolGoal` points and count, `AiSearchGoal` points, flags and repath claim,
-  `PackedGoal` pose, `LiteGoal` mode, dirty flags and state), but for what the debug overlay of presentation reads;
-- every field of the targets of section 22 (`PathOrder` altitude, approach radius, heading, piece, position and follow
-  offset, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), the order effect class and its
-  numbering, and not the unit reference of a move target (section 7).
+**What left the hash,** in format 8: the motion's `p2` and `turn`; every field of the goals; every field of the
+targets of section 22 but the unit reference. Section 21 hashes the motion without them and no goal, and section 22
+hashes, for a move target, only the link of its unit reference. The debug overlay of the goals is presentation, and
+draws only behind a debug toggle, so nothing is kept in the hash for it.
+
+**Record 53, `movementState`** (dumped, never hashed; `docs/trace-format.md`, section 8.37). For each live unit with
+a motion, one record `movementState.units[i]` holds `motion.p2.x`, `.y`, `.z`, `motion.turn`, `goal.class` (0 none, 1
+patrol, 2 AI search, 3 packed, 4 lite, 5 packed position) and, by class, the goal's fields as `goal.<field>` (the
+points of a patrol or AI search goal as `goal.points`). The targets of section 22 are not in the record: the dump
+holds every one of them as `orderFx[id].*`, as before, but hashes only a move target's link. The reference build writes
+the same lines itself.
+
+**Where a wrong value shows.** With a wrong goal point, TAMPER(movement:goal). A wrong `p2` or `turn` changes where the
+unit moves next, and diverges through its hashed position or heading.
 
 **Reads through views.** Other subsystems read motion records by offset through views the access log names by their own
 type, so `UnitMotion::...` does not show them: weapons reads the word at `+0x20` (`UnitMotion::speed`) as a range, a
-parameter and an id (`MotionRangeView`, `DroppedMotionParamView`, `DroppedMotionIdView` in `weapons.cpp`) and
-`explosions.cpp` reads `+8` as a size (`Size`); pathfinding's `UnitMotionPlannerView` reads the first two fields. A bump
+parameter and an id and reads `+8` as a size; pathfinding's planner view reads the first two fields. A change
 that moves `speed`, `velocity`, `movementClass` or the goal pointer out of the unit's record has to give these readers a
-slot or keep the offsets. `AddUnitToMap`'s write of `pathLockStamp` (`+0x26`) was the event PLACED in 3.0; since 4.0 it is map's own write of its field, so no other subsystem
-writes the motion record by offset.
+slot or keep the offsets. `AddUnitToMap`'s write of `pathLockStamp` (`+0x26`) was the event PLACED in 3.0; since 4.0 it is
+map's own write of its field, so no other subsystem writes the motion record by offset.
 
 **The trace dumps movement's events** in section 49 (`docs/trace-format.md`, section 8.33), after orders' section 48
 (`docs/orders-interface.md`, section 5), and hashes none of them. Each record is an event with the outcome `Apply`
 gave, or an effect movement published (outcome 1), in movement's order. Sections 50 and 51 are units' and
-scripts' events (`docs/trace-format.md`, sections 8.34 and 8.35). The section is new, so the trace format's schema changes. Neither module's `WriteState` writes a
-record.
+scripts' events (`docs/trace-format.md`, sections 8.34 and 8.35).
 
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes movement's
 state or calls its entry points, and no query slot writes state.
@@ -469,9 +472,8 @@ After this change:
   `StartScript` left the seams: `UnitsApply` calls the first three, and the start is scripts' event START.
 - **The network's writers (#948):** `ReceiveUnitStates` calls `ReadNetState` and `UpdateMotion` directly (`TODO(#948)`),
   and `NetSendUnitStates` calls the net-state slots.
-- **The state** stays hashed where it is until the format bump of section 5 (weapons, orders and units).
-- **The steering reads of orders** (the VTOL orders read `UnitMotion::flags`, `velocity`, `field_22` by view) stay views
-  until that bump.
+- **The state** is in the shared block, and only what other subsystems read stays hashed (section 5).
+- **The steering reads of orders** (the VTOL orders read `UnitMotion::flags`, `velocity`, `field_22` by view) stay views.
 
 ## 8. What the gate decided
 

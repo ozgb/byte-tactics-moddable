@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 7`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 8`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 7
+bt-trace 8
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -121,7 +121,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 7. |
+| `trace_format` | The format number, 8. |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
@@ -292,7 +292,7 @@ H32(random state 1)                  # the state of the Park-Miller generator th
 H32(random state 2)                  # the main thread's C runtime generator state ("holdrand")
 section 1 units            (7.1)
 section 2 projectiles      (7.2)
-section 3, 4, 5 explosions (7.3)
+section 3, 4, 5 explosions (7.3; no longer hashed, format 8)
 section 6 players          (7.4)
 section 7 features         (7.5)
 section 8 wind             (7.6)
@@ -306,12 +306,12 @@ the row since format 6, and sections 24 and 25 hold other content (sections 8.13
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
 section 8.21), the economy events (section 33, section 8.22), the share packets (section 35,
-section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) ai's events (section 42, section 8.30) weapons' events (section 47, section 8.31), orders' events (section 48, section 8.32) movement's events (section 49, section 8.33), units' events (section 50, section 8.34) and scripts' events (section 51, section 8.35) are in a dump and in no row, as diagnostics, and so are the records 43 to 46 and 48 (ai's, los_radar's, map's, players' and weapons' reports, sections 8.30, 8.6, 8.28, 8.17 and 8.31). Pathfinding and economy are judged by the state they leave in the sections that are
+section 8.23), wind_meteors' events (section 37, section 8.24), the features events (section 36, section 8.25), targeting's events (section 38, section 8.26) los_radar's events (section 39, section 8.27) map's events (section 40, section 8.28) players' events (section 41, section 8.29) ai's events (section 42, section 8.30) weapons' events (section 47, section 8.31), orders' events (section 48, section 8.32) movement's events (section 49, section 8.33), units' events (section 50, section 8.34) and scripts' events (section 51, section 8.35) are in a dump and in no row, as diagnostics, and so are the records 43 to 46, 48 and 52 to 55 (ai's, los_radar's, map's, players', weapons', orders', movement's, units' and scripts' reports, sections 8.30, 8.6, 8.28, 8.17, 8.31, 8.36, 8.37, 8.38 and 8.39). Pathfinding and economy are judged by the state they leave in the sections that are
 hashed: what the orders and goals keep of a path (sections 20 and 21), and the players' and units'
 resource fields.
 
 Each section begins with `H8(section number)` and ends with `END`, except where noted (the
-`explosions` group is three sections, 3 to 5, each with its own `END`; the pathfinder's dump is two
+`explosions` group is three sections, 3 to 5, each with its own `END`, until format 7; the pathfinder's dump is two
 sections, 16 and 17).
 
 ## 7. Sections of the phase rows
@@ -335,6 +335,18 @@ END
 ```
 Dump: `units[i].<field>`.
 
+Since format 8 the table `Unit` leaves out what only one module reads, and the module reports it in a record that no
+row hashes:
+- weapons': in each of the three weapon slots (the slot k starts at byte 4 + 0x1c*k of the unit), the aim callback
+  (8 bytes), `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading` and `firePitch`, as the byte ranges `+0x8..+0xf`,
+  `+0x14..+0x1d`, `+0x24..+0x2b`, `+0x30..+0x39`, `+0x40..+0x47` and `+0x4c..+0x55`. The slot's target pair,
+  `weapon`, `stockpile` and `flags` stay hashed. Record 48 (section 8.31) reports them.
+- units': `head`, `hoverBobPhase`, `healthPercent`, `prevHealthPercent`, `unfinishedInitZero`, the 4 bytes at `+0x10a`
+  and `zBufferFlag`. Record 54 (section 8.38) reports them. Nothing reads `healthPercent`, `prevHealthPercent`,
+  `unknown_10a` and `unfinishedInitZero`, and only drawing reads `zBufferFlag`.
+
+The excluded fields have no `units[i].<field>` line; the dump holds them under the record's prefix.
+
 ### 7.2 projectiles (section 2)
 
 ```
@@ -347,7 +359,19 @@ END
 ```
 Dump: `projectiles[i].<field>`.
 
-### 7.3 explosions (sections 3, 4 and 5)
+Since format 8 the table `Projectile` hashes only `type`, `position`, `target`, `attacker` and `owner`. These left, and
+record 48 (section 8.31) reports them: `start`, `direction` and `angles` (each its three components), `speed`,
+`range`, `spawnTick`, `time`, `nextSmokeTick`, the handle at `+0x4e`, the one at `+0x56`, `cellX`, `cellZ`, `radius`,
+`active`, `piece`, `propellerSpin`, `compactIndex` and `flags`. The skip test (a free slot) is unchanged and still
+reads the u16 at `p+0x69`. The excluded fields have no `projectiles[i].<field>` line.
+
+### 7.3 explosions (sections 3, 4 and 5, until format 7)
+
+Sections 3, 4 and 5 are not in the phase rows since format 8: no `H8(3)` to `H8(5)` and no `END` of them is hashed,
+and the harness visits nothing there. The phase list is unchanged: the `explosions` row still exists and hashes the same
+things as the other phase rows (the tick, the random states, and sections 1, 2 and 6 to 9). Only weapons reads the exploded
+pieces, the debris and the pieces of debris, and drawing shows them, so weapons reports them in record 48 (section
+8.31) and the frame dumps judge a wrong value; nothing is hashed in its place. The walk below is the one of format 7 (record 48 writes the same entries in the same order, but hashes none of them):
 
 ```
 H8(3)                                      # exploded pieces
@@ -376,8 +400,10 @@ END
 The piece a debris record "points at" is the u32 at its offset 0: piece `i` is remembered if that
 value is the address `game+0x1ab9f + i*0x34` for some i below 300 (the address of the first byte of
 the piece).
-Dump: `explodedPieces[slot].<field>` and `explodedPieces[slot].rec.<field>`; `debris[d].<field>`;
-`pieces[i].<field>`, `pieces[i].vertices` (a `hex:` line of 96 bytes) and `pieces[i].faces[k].<field>`.
+Dump (format 7): `explodedPieces[slot].<field>` and `explodedPieces[slot].rec.<field>`; `debris[d].<field>`;
+`pieces[i].<field>`, `pieces[i].vertices` (a `hex:` line of 96 bytes) and `pieces[i].faces[k].<field>`. Format 8
+writes them as `weaponsState.explodedPieces[slot].<field>` (and `.rec.<field>`), `weaponsState.debris[d].<field>`,
+`weaponsState.pieces[i].<field>`, `.vertices` and `.faces[k].<field>`, never hashed.
 
 ### 7.4 players (section 6)
 
@@ -636,18 +662,23 @@ First the maps of section 5 are built (the numbering walk). Then:
 H8(20)
 for each live unit u, in index order, i its index:
     H32(i)
-    HP(u.head, link, is_ref=false)           # u.head: the ref at offset 0xa2, as an address; dump: units[i].head
     for which in (0, 1):                    # 0: u.list (offset 0x5c), 1: u.list2 (offset 0x60)
         o = chain head as an address (the ref plus the block base)
         H8(which + 1)
         n = 0
         while o != 0 and n < 4096:
-            HT(Order, o)                    # dump: units[i].list[n].<field>, or list2[n]
+            HT(Order, o)                    # dump: units[i].list[n].<field>, or list2[n]; the table without the fields below
             if not posYUnset(o): HT(OrderPosY, o)
             o = ref at o+0x4a;  n += 1
         H8(0)
 END
 ```
+Since format 8 the table `Order` hashes `unit`, the link (`linkOwner`, `linkNext`, `linkValue`), `target`,
+`unknown_1a`, `pos.x`, `pos.z` and `flags_42` (the byte at +0x42, masked). Only orders reads the rest: `kind`, `state`,
+`flags6` (the word at +6), `wakeFrame`, `start`, `arg0`, `arg1`, `arg2`, `created`, `subFlags` and `attached`, and
+record 52 (section 8.36) reports them. The walk, `H32(i)`, the two chains and their markers are unchanged, and the
+unit's `head` is no longer hashed here (it is units', record 54, section 8.38).
+
 The order's kind is the u8 at offset 4, and its **kind name** is the name the game's order kind table
 gives that number. `posYUnset(o)` is true when the kind name is `MobileBuild`, `VTOL_MobileBuild`,
 `Reclaim` or `VTOL_Reclaim`: those orders never write their `pos.y` (the field of the table
@@ -662,9 +693,14 @@ for each live unit u, in index order:
     H32(i);  H8(m != null)
     if m == null: continue
     HT(UnitMotion, m)                       # dump: units[i].motion.<field>
-    goal(prefix = "units[i].motion.goal", g = ref at m+0)
 END
 ```
+
+Since format 8 the table `UnitMotion` leaves out `p2` (x, y, z) and `turn`, which only movement reads, and hashes
+`lastMoveTick` (the 4 bytes at +0x2a) again: units reads it for the hover bob's damping. **No goal is hashed**: the
+section has no goal walk, no class and no goal fields. Movement reports the motion's `p2` and `turn` and the goal in
+record 53 (section 8.37). `goal(g)` below describes what that record writes: the prefix is
+`movementState.units[i].goal`, each `H32` is a 4-byte value line, each `HB` a `hex:` line, and nothing is hashed.
 
 `goal(g)`, with the goal's class by the kind of object it is (none 0, patrol 1, AI search 2, packed 3,
 lite 4, packed position 5):
@@ -686,28 +722,38 @@ Dump: `<prefix>.<field>` for the tables and `<prefix>.points` as one `hex:` line
 H8(22)
 for id in 0 .. fxCount-1:                   # the order effects in numbering order (section 5)
     f = the effect with number id
-    H32(id)
-    H32(class of f)                         # dump: orderFx[id].class
-    if the class is unknown (0):
-        H32(a number identifying the object's type)   # dump: orderFx[id].vtableDelta; never seen in a conforming run
-        continue
-    approach radius (1):  HT(ApproachRadius, f)
-    ring approach (2):    HT(RingApproach, f)
-    point marker (3):     HT(PointMarker, f)
-    path order (4):       flags = u16 at f+8
-                          HT(PathOrder, f)
-                          if fxPosYSet(f):            HT(PathOrderPosY, f)
-                          if flags AND 0x40:          HT(PathOrderHeading, f)
-                          if flags AND 1:             HT(PathOrderPiece, f)
-                          if (flags AND 0x82) == 2:   HT(PathOrderFollow, f)
-    air maneuver (5):     flags = u16 at f+8
-                          HT(AirManeuverOrder, f)
-                          if flags AND 1:             HT(AirManeuverOrderHeading, f)
+    path order (4):  H32(id);  HT(PathOrderRef, f)       # dump: orderFx[id].refOwner, .refNext, .refValue
+    unknown (0):     H32(id);  H32(0);  H32(a number identifying the object's type)   # never seen in a conforming run
+    any other class: nothing is hashed
 END
 ```
-`fxPosYSet(f)`: the source order is the ref at `f+4`; the `PathOrderPosY` table is hashed unless that
+The harness also dumps every effect, whatever its class, with these lines (none hashed, but the ones of `PathOrderRef`
+above):
+
+```
+orderFx[id].class                           # the class of f
+if the class is unknown (0): orderFx[id].vtableDelta
+approach radius (1):  HT(ApproachRadius, f)
+ring approach (2):    HT(RingApproach, f)
+point marker (3):     HT(PointMarker, f)
+path order (4):       flags = u16 at f+8
+                      HT(PathOrder, f)
+                      if fxPosYSet(f):            HT(PathOrderPosY, f)
+                      if flags AND 0x40:          HT(PathOrderHeading, f)
+                      if flags AND 1:             HT(PathOrderPiece, f)
+                      if (flags AND 0x82) == 2:   HT(PathOrderFollow, f)
+air maneuver (5):     flags = u16 at f+8
+                      HT(AirManeuverOrder, f)
+                      if flags AND 1:             HT(AirManeuverOrderHeading, f)
+```
+`fxPosYSet(f)`: the source order is the ref at `f+4`; the `PathOrderPosY` table is dumped unless that
 order exists and its kind name is `VTOL_MobileBuild` or `VTOL_Reclaim`.
 Dump: `orderFx[id].<field>`.
+
+Since format 8 section 22 hashes only, for a path order (a move target), `H32(id)` and the table `PathOrderRef` (a
+split of `PathOrder`: `refOwner`, `refNext`, `refValue`, units' link, which units reads). Nothing is hashed for the other classes, not even
+their `H32(id)` or class. An unknown class still hashes `H32(id)`, its class and the type number. The fields of the targets are only
+movement's (`docs/movement-interface.md`, section 5), and a wrong value of one shows through the unit's motion.
 
 ### 8.12 scripts (section 23)
 
@@ -722,20 +768,30 @@ END
 
 ```
 script(i, s):
-    HT(ScriptState, s)                                  # dump: units[i].script.<field>
-    table = u32 at s+8 (a plain address);  statics = ref at s+0x10;  pieces = ref at s+0x14
+    table = u32 at s+8 (a plain address);  pieces = ref at s+0x14
     object_state = ref at s+0x540
+    pieceCount = 0
+    if table != 0: pieceCount = u32 at table+8
+    if pieceCount > 512 or pieces == 0 or object_state == 0: pieceCount = 0
+    for q in 0 .. pieceCount-1: HT(PieceTransform, object_state + 0x22 + q*0x36)   # dump: units[i].script.transforms[q].<field>
+```
+
+Since format 8 section 23 hashes only the piece transforms, which weapons reads directly. The script's own words, the 8
+channels, the statics and the piece records are only scripts', and record 55 (section 8.39) reports them. The
+description below is the layout of what record 55 writes, with the prefix `scriptsState.units[i]` (so the channel prefix is
+`scriptsState.units[i].channels[c]`), and the lines are not hashed:
+
+```
+script state:
+    table = u32 at s+8;  statics = ref at s+0x10;  pieces = ref at s+0x14
     staticCount = pieceCount = 0
     if table != 0: staticCount = u32 at table+0x10;  pieceCount = u32 at table+8
     if staticCount > 4096 or statics == 0: staticCount = 0
     if pieceCount > 512: pieceCount = 0
-    for c in 0 .. 7:  channel(s + 0x1c + c*0xa4)        # dump prefix units[i].script.channels[c]
-    H32(staticCount)                                    # dump: units[i].script.statics
-    HB(staticCount*4 bytes at statics)                  # dump: units[i].script.statics (hex:)
+    for c in 0 .. 7:  channel(s + 0x1c + c*0xa4)        # prefix channels[c]
+    count and bytes of the statics
     if pieces == 0: pieceCount = 0
-    for p in 0 .. pieceCount-1: HT(ScriptPiece, pieces + p*0x4c)       # dump: units[i].script.pieces[p].<field>
-    if object_state == 0: pieceCount = 0
-    for q in 0 .. pieceCount-1: HT(PieceTransform, object_state + 0x22 + q*0x36)   # dump: units[i].script.transforms[q].<field>
+    for p in 0 .. pieceCount-1: the table ScriptPiece at pieces + p*0x4c
 
 channel(ch):
     state = u32 at ch+0
@@ -1551,6 +1607,30 @@ weaponsState.debris                            # the debris table
 weaponsState.pieces                            # the exploded-piece table
 ```
 
+Since format 8 the record also holds what left the hash, in this order (each line `weaponsState.<name>.<field>`, the
+fields in the schema's order, a pointer as `null` or `heap`):
+
+```
+weaponsState.explodedPieces[s].<field>         # for each slot s in 0 .. 99 with a block: the table ExplodedPiece, then PieceRec as rec.<field>
+weaponsState.debris[d].<field>                 # for d in 0 .. min(count, 300)-1 with a used entry: the table Debris
+weaponsState.pieces[i].<field>                 # for each piece of debris i remembered: the table Piece,
+weaponsState.pieces[i].vertices                #   a hex: line of 96 bytes, and for k in 0 .. 5
+weaponsState.pieces[i].faces[k].<field>        #   the table Face
+weaponsState.units[i].weapons[k].aimCob.vtable # for each live unit i, k in 0 .. 2: the slot words that left the hash:
+weaponsState.units[i].weapons[k].aimCob.done   #   the aim callback (the u32 at +4 as a handle, then the 4 bytes at +8),
+weaponsState.units[i].weapons[k].muzzleAimFromDeltaZ   # 4 bytes
+weaponsState.units[i].weapons[k].reloadTimer   # 2 bytes
+weaponsState.units[i].weapons[k].fireHeading   # 2 bytes
+weaponsState.units[i].weapons[k].firePitch     # 2 bytes
+weaponsState.projectiles[p].<field>            # for each used projectile p (the skip test of section 7.2): start.x, start.y, start.z,
+                                               #   direction.x, .y, .z, angles.bank, .heading, .pitch, speed, range, spawnTick, time,
+                                               #   nextSmokeTick, the handle at +0x4e, the handle at +0x56, cellX, cellZ, radius, active,
+                                               #   piece, propellerSpin, compactIndex (2 bytes) and flags (2 bytes)
+```
+
+The counts come first, then these lines in this order. The reference build writes the same lines, and the four counts
+only in the moddable build. A unit's slot k starts at byte 4 + 0x1c*k of the unit; the aim callback's handle is the u32 at +4 of the
+slot and `done` the 4 bytes at +8.
 ### 8.32 orders events (section 48, dumped only)
 
 The events and effects of orders in this tick (`interfaces/orders.h`). No row hashes them (section 6): a dump
@@ -1725,6 +1805,81 @@ for k in 0 .. n-1, in order, by the kind of the record:
 - `outcome` is the result of `Apply`.
 
 
+### 8.36 orders' report (record 52)
+
+Since format 8 orders writes record 52 through the `StateWriter` of its `WriteState`: what only orders reads of the order
+lists. It is dumped and never hashed, with the prefix `ordersState.`, after `weaponsState.*`. For each live unit whose
+`list` or `list2` (the refs at +0x5c and +0x60) is not null, one record `ordersState.units[i]`. For each chain `list`,
+`list2` and each order n along it (at most 4096, the limit of section 8.9), the lines `list[n].<field>` or
+`list2[n].<field>`:
+
+| Field | Size | Kind |
+| --- | --- | --- |
+| `kind` | 1 | scalar (+4) |
+| `state` | 1 | scalar (+5) |
+| `flags6` | 4 | scalar (+6, the order's `flags`) |
+| `wakeFrame` | 4 | scalar (+0xa) |
+| `start.x` | 2 | scalar (+0x2e) |
+| `start.y` | 2 | scalar (+0x30) |
+| `arg0` | 4 | scalar (+0x36) |
+| `arg1` | 4 | scalar (+0x3a) |
+| `arg2` | 4 | scalar (+0x3e) |
+| `created` | 4 | scalar (+0x46) |
+| `subFlags` | 4 | scalar (+0x4e) |
+| `attached` | 4 | pointer (+0x52): `null` or `heap` |
+
+### 8.37 movement's report (record 53)
+
+Since format 8 movement writes record 53, dumped and never hashed, with the prefix `movementState.`, after `ordersState.*`.
+For each live unit with a motion (the ref at +0 of the unit), one record `movementState.units[i]`:
+
+| Field | Size | Kind |
+| --- | --- | --- |
+| `motion.p2.x`, `motion.p2.y`, `motion.p2.z` | 4 | scalar (the motion at +0x14, +0x18, +0x1c) |
+| `motion.turn` | 2 | scalar (the motion at +0x24) |
+| `goal.class` | 4 | scalar: 0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed position (the numbers of section 8.10) |
+
+then, by the goal's class, the lines `goal.<field>`:
+- 1: the table `PatrolGoal`, then `goal.points`, a bytes field of min(count, 3) * 4 bytes at +0xc;
+- 2: the table `AiSearchGoal` (flags masked 0x0b), then `goal.points`, min(count, 20) * 4 bytes at +0xc;
+- 3 and 5: the table `PackedGoal`;
+- 4: the table `PackedGoal`, then the table `LiteGoalState` (`netDirty` masked 0x07).
+
+The targets of section 22 are not in this record: the dump holds them as `orderFx[id].*` (section 8.11).
+
+### 8.38 units' report (record 54)
+
+Since format 8 units writes record 54 in its `WriteState`, after the lines of section 25, dumped and never hashed, with the
+prefix `unitsState.`. For each live unit, one record `unitsState.units[i]`:
+
+| Field | Size | Kind |
+| --- | --- | --- |
+| `head` | 4 | pointer (+0xa2): `null` or `heap` |
+| `hoverBobPhase` | 2 | scalar (+0xaa) |
+| `healthPercent` | 1 | scalar (+0xf6) |
+| `prevHealthPercent` | 1 | scalar (+0xf7) |
+| `unfinishedInitZero` | 4 | scalar (+0x100) |
+| `unknown_10a` | 4 | bytes (+0x10a), a `hex:` line |
+| `zBufferFlag` | 4 | scalar (+0x114) |
+
+### 8.39 scripts' report (record 55)
+
+Since format 8 scripts writes record 55 in its `WriteState` (a slot since scripts' interface 2.1), dumped and never hashed,
+with the prefix `scriptsState.`, after `playersState.*`. For each live unit with a script (the ref at +0x9a), one record
+`scriptsState.units[i]`, with these lines in order:
+1. The table `ScriptState` (`scale`, `table`, `checksum`, `changed`, `activeCount`), as the lines `<field>`.
+2. For each channel c in 0 .. 7 at script + 0x1c + c * 0xa4, as in section 8.12: `channels[c].state` alone when its state is 0;
+   else the table `ScriptChannel` (`state`, `pc`, `sp`, `signal`, `callback`) as `channels[c].<field>`, `channels[c].stack`
+   (a bytes field of live * 4 bytes at +0x24, live = 0 when `sp` < -1, else sp + 1, at most 32) and, when
+   `state & 0xff000000` is 0x2000000, by `state & 0xf00000`: 0x100000 or 0x200000 the table `ScriptChannelPiece`,
+   0x400000 `ScriptChannelDelay`, 0x800000 `ScriptChannelWait`.
+3. `statics.count` (4 bytes), then `statics` (a bytes field of that count * 4 bytes), the count as in section 8.12 (0 when the
+   table or the statics ref is null or the count is above 4096).
+4. For each piece p in 0 .. pieceCount-1 (as in section 8.12): the table `ScriptPiece` at pieces + p * 0x4c, as `pieces[p].<field>`.
+
+A scalar of a table is `0x` and twice its size in hex digits, a masked scalar is written masked, a bytes field is a `hex:` line
+and a pointer is `null` or `heap`; a field with no name is `+0x<offset>`.
+
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
@@ -1742,8 +1897,8 @@ It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the st
 The digest file is:
 
 ```
-bt-digest 7
-trace_format bt-trace 7
+bt-digest 8
+trace_format bt-trace 8
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
@@ -1758,7 +1913,7 @@ with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a 
 
 The reference writes `dump.txt` when it is run with `-testdump <tick>` (and `-testmode`). It holds
 every hashed value of that one tick, after each phase of the tick, and the lines no row hashes: those
-of sections 16 and 17, of economy's and ai's reports, and of sections 32, 33, 35, 36 to 42 and 47 to 51. The first line is `bt-dump N`, N the format number (section 12); every
+of sections 16 and 17, of the reports of economy, ai, weapons, orders, movement, units and scripts, and of sections 32, 33, 35, 36 to 42 and 47 to 51. The first line is `bt-dump N`, N the format number (section 12); every
 other line is
 
 ```
@@ -1775,10 +1930,10 @@ tick is 1; sections 29 to 31 appear only at tick 1, in every phase block of that
 lines of section 27), then the lines of sections 32, 33, 37, 36, 38 to 42 and 47 to 51, in that order, which end the block and are
 not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29, 8.30, 8.31, 8.32, 8.33, 8.34 and 8.35). The `meteors` block ends with the lines of section 35 after them
 (section 8.23), also not hash input. The `pathfinder.*` lines of
-sections 16 and 17, and the `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*` and `weaponsState.*` lines of economy's, ai's, map's, players' and weapons' own reports that follow them, sit between those of
-sections 14 and 18 but are not hash input (sections 8.7, 8.22, 8.30, 8.28, 8.17 and 8.31), and the `losRadarState.*` lines sit before those of section 24 (section 8.6). Every
+sections 16 and 17, and the `economyState.*`, `aiState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `mapState.*`, `playersState.*` and `scriptsState.*` lines of the own reports of economy, ai, weapons, orders, movement, map, players and scripts that follow them, sit between those of
+sections 14 and 18 but are not hash input (sections 8.7, 8.22, 8.30, 8.31, 8.36, 8.37, 8.28, 8.17 and 8.39), the `losRadarState.*` lines sit before those of section 24 (section 8.6), and the `unitsState.*` lines sit after those of section 25 (section 8.38). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*`, `weaponsState.*`, `losRadarState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
+block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `unitsState.*`, `scriptsState.*`, `losRadarState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -1796,7 +1951,7 @@ the structure: the index is in the path; a presence byte is 1 exactly when the o
 present; a section's bytes are `H8(section)` first and `END` last. A loop over a fixed range (the
 players, the squad slots, the AI records, the timers) hashes its index and a presence byte of 0 for
 every absent object, although such an object has no line. A loop over live units covers the units
-with a `units[i].head` line in the block (every live unit has one).
+with a `units[i].unitDefIndex` line in the block (every live unit has one).
 
 **Values.**
 
@@ -1817,7 +1972,7 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*`, `aiState.*` and `weaponsState.*` lines that follow them (sections 8.22, 8.30 and 8.31)
+1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*`, `aiState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `unitsState.*` and `scriptsState.*` lines that follow them (sections 8.22, 8.30, 8.31 and 8.36 to 8.39)
    and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*`, `map.*`, `playersEvents.*`, `aiEvents.*`, `weaponsEvents.*`, `ordersEvents.*`, `movementEvents.*` and `packets.*` lines that end the block (sections 8.21 to 8.33), and parse the
    paths into the structure of sections 6 to 8.
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
@@ -1871,7 +2026,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 7.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 8.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
@@ -1902,6 +2057,14 @@ payloads are the structs of the interface headers, so a kind's fields are the he
 `outcome`; the `unit`, `target`, `source` and `attacker` fields that name a unit are pointer IDs as before. No row
 and no digest changes, and the line syntax is the same: a reader that skips the event prefixes changes only its
 number.
+
+Format 8 took the state that only its owner reads out of the hash for weapons, orders, movement, units and scripts (#1024).
+Sections 3, 4 and 5 (the exploded pieces, the debris and the pieces of debris) left the phase rows. The tables `Unit` and
+`Projectile` and the tables of sections 20 to 23 hash less (sections 7.1, 7.2 and 8.9 to 8.12): `UnitMotion::lastMoveTick` is
+hashed again, section 21 hashes no goal, section 22 hashes only a path target's link (the table `PathOrderRef`) and section 23 hashes only the piece transforms. Record 48
+grew, and four records are new: 52 `ordersState`, 53 `movementState`, 54 `unitsState` and 55 `scriptsState` (sections 8.31 and 8.36 to 8.39),
+with the prefixes `weaponsState.`, `ordersState.`, `movementState.`, `unitsState.` and `scriptsState.`. A reader of format 7 must
+read the new rows, and a reader of the dump must skip the four new prefixes. The digests of the stored scenarios change, and so does the tag.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

@@ -584,14 +584,16 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
     int fallbackDistance=0x7fffffff;
     int bestDistance=0x7fffffff;
     Unit* best=0;
-    std::vector<Unit*> candidates;
-    if(useRange) g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
-    else g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
+    std::vector<Ref<Unit> > candidates(g_game->poolCount);
+    int candidateCount;
+    if(useRange) candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates[0],(int)candidates.size());
+    else candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates[0],(int)candidates.size());
     for(int count=0;count<50;++count) {
-        if(candidates.empty()) break;
-        std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());
-        Unit* target=*it;
-        ((UnitSwapEraseVector*)&candidates)->EraseSwapBack(it);
+        if(candidateCount==0) break;
+        int pick=RandomInt(candidateCount);
+        Unit* target=candidates[pick];
+        candidates[pick]=candidates[candidateCount-1];
+        --candidateCount;
         if((target->flags&0x10000000) && !(target->flags&0x4000) &&
            ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
            ((unit->def->flags1&0x10000000) || g_seams.weapons->WeaponCanReachUnit(unit,target,weapon)) &&

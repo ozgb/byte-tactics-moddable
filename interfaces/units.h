@@ -398,8 +398,8 @@ struct UnitsSeam {
     UnitDef* (__stdcall* FindUnitType)(const char* name);
     // Returns the index of the unit type of a name, or 0 when there is none. Hooks: none.
     unsigned short (__stdcall* FindUnitTypeId)(const char* name);
-    // Looks a mission unit up by its name among the units made so far. Hooks: none.
-    int (__stdcall* FindMissionUnit)(char* name, std::vector<Unit*, std::allocator<Unit*> >* units, int value);
+    // Looks a mission unit up by its name in the caller's table of the units made for the mission units (count entries, indexed by mission unit), starting after the unit after when it is not null, and returns it or null. Hooks: none.
+    Unit* (__stdcall* FindMissionUnit)(const char* name, const Ref<Unit>* units, int count, Unit* after);
     // Adds build progress to a unit under construction and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: none.
     int (__stdcall* AddBuildProgress)(Unit* builder, Unit* unit, float amount);
     // Adds repair progress to a unit and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: none.
@@ -418,8 +418,8 @@ struct UnitsSeam {
     int (__stdcall* UpdateUnitBody)(Unit* unit);
     // Finishes one unit's update for one tick, after its orders and its movement: its height when moved is 1 (its movement ran), then a pending death. Hooks: none.
     void (__stdcall* UpdateUnitTail)(Unit* unit, int moved);
-    // Appends to out the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
-    void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
+    // Writes to out, as Ref<Unit>, the first capacity of the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on, and returns how many there are. Hooks: none.
+    int (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
     // Creates the empty index of a player's factories, refreshed by the next RefreshFactoryIndex, outside the tick. Hooks: none.
     void (__stdcall* CreateFactoryIndex)(int player);
     // Frees the index of a player's factories, outside the tick. Hooks: none.

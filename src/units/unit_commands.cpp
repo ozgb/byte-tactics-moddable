@@ -26,11 +26,6 @@ struct UnitDefMaxHealthView {
 #include "unit.h"
 #include "units_seam.h"
 
-struct UnitPtrVectorView {
-    char allocator_byte;
-    char pad[3];
-    Unit** ids;
-};
 #pragma pack(pop)
 
 #include "../orders/mission_type.h"
@@ -48,7 +43,7 @@ struct Outs_t {
 };
 
 // FUNCTION: 0x487bf0
-void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table)
+void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units, int unitCount)
 {
     int count;
     struct { float f1, f2; int n; Vec3 pos; int move; } L;
@@ -106,10 +101,10 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
         case 'G':
         case 'g': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-            if (target != 0) {
-                out.g.type = g_seams.orders->GetOrderType(7, unit, (Unit*)target, 0);
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.g.type.index, 1, (Unit*)target, (Vec3*)nullptr, 0, 0);
+            Unit* target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+            if (target != nullptr) {
+                out.g.type = g_seams.orders->GetOrderType(7, unit, target, 0);
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.g.type.index, 1, target, (Vec3*)nullptr, 0, 0);
                 processed = 1;
             }
             break;
@@ -173,12 +168,12 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
         case 'w':
             if (buf[1] == 'a' || buf[1] == 'A') {
                 count = sscanf(buf + 2, " %[a-zA-Z0-9.]", buf);
-                int target = 0;
+                Unit* target = nullptr;
                 if (count == 1)
-                    target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-                if (target == 0)
-                    target = (int)unit;
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAITFORATTACK").index, 1, (Unit*)target, (Vec3*)nullptr, 0, 0);
+                    target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+                if (target == nullptr)
+                    target = unit;
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAITFORATTACK").index, 1, target, (Vec3*)nullptr, 0, 0);
                 processed = 1;
             } else {
                 M2.wf = 0.0f;
@@ -203,9 +198,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
         case 'I':
         case 'i': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-            if (target != 0)
-                UnitsPublishAttachToPiece(SCHED_ENGINE, unit, (Unit*)target, -1, 0);
+            Unit* target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+            if (target != nullptr)
+                UnitsPublishAttachToPiece(SCHED_ENGINE, unit, target, -1, 0);
             break;
         }
         }
@@ -242,48 +237,13 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
 #include <memory.h>
 #include <vector>
 
-namespace std {
-template<> class vector<Unit*, allocator<Unit*> > {
-public:
-    typedef Unit* T;
-    typedef allocator<Unit*> A;
-    typedef A::size_type size_type;
-
-    vector(size_type _N, const T& _V = T(), const A& _Al = A())
-        : allocator(_Al)
-    {
-        _First = allocator.allocate(_N, (void *)0);
-        _Ufill(_First, _N, _V);
-        _Last = _First + _N;
-        _End = _Last;
-    }
-    ~vector()
-        { allocator.deallocate(_First, _End - _First); }
-    T& operator[](size_type _P)
-        { return (*(_First + _P)); }
-
-protected:
-    A allocator;
-    T* _First;
-    T* _Last;
-    T* _End;
-    void _Ufill(T* _F, size_type _N, const T& _X);
-};
-}
-
-void std::vector<Unit*, std::allocator<Unit*> >::_Ufill(Unit** _F, size_type _N, Unit* const& _X)
-{
-    for (; 0 < _N; --_N, ++_F)
-        *_F = _X;
-}
-
 // FUNCTION: 0x488310
 void __cdecl CreateMissionUnits()
 {
     Player* p;
     char buf[100];
     int n = g_seams.mission->CountMissionUnits();
-    std::vector<Unit*> units(n);
+    std::vector<Ref<Unit> > units(n);
     for (int i = 0; i < n; i++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
@@ -312,12 +272,13 @@ void __cdecl CreateMissionUnits()
             units[i] = u;
         }
     }
+    const Ref<Unit>* table = n > 0 ? &units[0] : nullptr;
     for (int j = 0; j < n; j++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
         g_seams.mission->GetMissionUnit(j, e);
         if (e->initialMission && units[j])
-            RunInitialMission(units[j], e->initialMission, (UnitPtrVectorView*)&units);
+            RunInitialMission(units[j], e->initialMission, table, n);
     }
     if (n <= 0)
         g_seams.players->DeactivateConditions(g_game->list_391ed);

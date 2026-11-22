@@ -650,6 +650,21 @@ void ImportOutUnits(ReplayText& t, const char* name, const std::vector<Unit*, st
     lines.Free();
 }
 
+void ImportOutUnitBuffer(ReplayText& t, const char* slot, const char* name, const Ref<Unit>* units, int result, int capacity, const unsigned short* limit, unsigned limitCount)
+{
+    if (result > capacity) {
+        char message[200];
+        _snprintf(message, sizeof message, "%s returned %d units for a buffer of %d: a recording would lose units", slot, result, capacity);
+        message[sizeof message - 1] = '\0';
+        ReplayFail(message);
+        return;
+    }
+    std::vector<Unit*, std::allocator<Unit*> > list;
+    for (int i = 0; i < result; i++)
+        list.push_back(units[i].get());
+    ImportOutUnits(t, name, &list, limit, limitCount);
+}
+
 void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsigned count, ...)
 {
     t.Add(" = ");

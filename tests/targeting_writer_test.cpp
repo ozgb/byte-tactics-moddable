@@ -136,9 +136,12 @@ static unsigned int HandleOf(Unit* unit)
     return Ref<Unit>(unit).offset;
 }
 
-static void __stdcall GetVisibleEnemies(int, const Vec3*, int, int, std::vector<Unit*, std::allocator<Unit*> >* out)
+static int __stdcall GetVisibleEnemies(int, const Vec3*, int, int, Ref<Unit>* out, int capacity)
 {
-    *out = s_candidates;
+    int count = (int)s_candidates.size();
+    for (int i = 0; i < count && i < capacity; i++)
+        out[i] = s_candidates[i];
+    return count;
 }
 
 static void __stdcall GetSweetSpot(Unit* unit, Vec3* out)
@@ -194,6 +197,7 @@ static void Setup()
     s_units = (Unit*)SimAlloc(kUnits * sizeof(Unit));
     memset(s_units, 0, kUnits * sizeof(Unit));
     g_game->units = s_units;
+    g_game->poolCount = kUnits;
 
     Player* players = (Player*)SimAlloc(2 * sizeof(Player));
     memset(players, 0, 2 * sizeof(Player));

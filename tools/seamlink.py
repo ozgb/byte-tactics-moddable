@@ -117,12 +117,12 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
                 FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon, SavedTargetPair; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
-                GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
+                HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
                 SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds, PathLockStamp; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
-                  it holds (los_radar's GetVisibleEnemiesInRadiusList and GetSeenUnitsInRadius: the Ref<Unit> array they fill; economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
+                  it holds (los_radar's GetVisibleEnemiesInRadius and GetSeenUnitsInRadius, and units' GetFactoriesInRadius: the Ref<Unit> array they fill; economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
                   MeteorShowerParams; features' queries take no out parameter), or of the struct a slot returns by value
                   (features' GetFootprintCentre: Vec3; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
                   its IsUnitVisibleToPlayer the Vec3 and word view that it builds in its own frame, the pilot's filler_locals), and except economy's world view info structs (EconUnitInfo,
@@ -312,7 +312,7 @@ LOS_RADAR = Pilot(
     writing=("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak", "RecordRadarMapped", "ExpireEyeballs",
              "RefreshUnitIndex", "Init", "Shutdown"),
     query=("GetMapCell", "GetMapCellAtPosition", "GetOriginCellAtPosition", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer",
-           "SoundHeardMask", "GetVisibleEnemiesInRadius", "GetVisibleEnemiesInRadiusList", "HasReadyUnitInRange", "IsPointVisible",
+           "SoundHeardMask", "GetVisibleEnemiesInRadius", "HasReadyUnitInRange", "IsPointVisible",
            "GetSeenUnitsInRadius", "RegionSize", "SightCache", "WriteState"),
     engine_files=(SCHEDULER_FILE, LOS_RADAR_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")),

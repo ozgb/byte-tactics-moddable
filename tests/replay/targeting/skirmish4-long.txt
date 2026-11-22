@@ -543,6 +543,7 @@ call 25750 GetWeaponTargetPos
   o result 0
 call 25750 FindBestTargetIfFireAtWill
   r Game.uiOptionFlags 12
+  r Game.poolCount 2501
   r rng.main 0x9f49b0ef
   r rng.load 0x45daf040
   r rng.seed 0x322de312

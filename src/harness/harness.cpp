@@ -2227,61 +2227,6 @@ static void VisitProjectiles()
     EndSection();
 }
 
-static void VisitExplosions()
-{
-    char path[64];
-    unsigned char pieceUsed[PIECE_COUNT];
-    unsigned debrisCount = GameU32(GAME_DEBRIS_COUNT);
-    unsigned char* pieces = GameAt(GAME_PIECES);
-    memset(pieceUsed, 0, sizeof pieceUsed);
-    if (debrisCount > PIECE_COUNT)
-        debrisCount = PIECE_COUNT;
-
-    HashByte(3);
-    for (unsigned slot = 0; slot < EXPLODED_SLOTS; slot++) {
-        unsigned char* block = g_explodedPieces[slot];
-        if (block == NULL)
-            continue;
-        HashU32(slot);
-        sprintf(path, "explodedPieces[%u]", slot);
-        VisitElement(path, block, &kExplodedPieceTable);
-        sprintf(path, "explodedPieces[%u].rec", slot);
-        VisitElement(path, block + 0x30, &kPieceRecTable);
-    }
-    EndSection();
-
-    HashByte(4);
-    for (unsigned d = 0; d < debrisCount; d++) {
-        unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
-        unsigned obj = *(unsigned*)e;
-        if (obj == 0)
-            continue;
-        HashU32(d);
-        sprintf(path, "debris[%u]", d);
-        VisitElement(path, e, &kDebrisTable);
-        if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
-            && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT)
-            pieceUsed[(obj - (unsigned)pieces) / PIECE_STRIDE] = 1;
-    }
-    EndSection();
-
-    HashByte(5);
-    for (unsigned i = 0; i < PIECE_COUNT; i++) {
-        if (!pieceUsed[i])
-            continue;
-        HashU32(i);
-        sprintf(path, "pieces[%u]", i);
-        VisitElement(path, pieces + i * PIECE_STRIDE, &kPieceTable);
-        sprintf(path, "pieces[%u].vertices", i);
-        VisitRaw(path, GameAt(GAME_VERTICES) + i * 96, 96);
-        for (unsigned k = 0; k < 6; k++) {
-            sprintf(path, "pieces[%u].faces[%u]", i, k);
-            VisitElement(path, GameAt(GAME_FACES) + (i * 6 + k) * 0x20, &kFaceTable);
-        }
-    }
-    EndSection();
-}
-
 static void VisitPlayers()
 {
     char path[64];
@@ -2797,9 +2742,6 @@ static void VisitOrders(unsigned char* units, unsigned count)
         if (!UnitIsLive(u))
             continue;
         HashU32(i);
-        if (s_dumpNow)
-            sprintf(path, "units[%u].head", i);
-        VisitPointer(path, ReadU32At((unsigned)u, UNIT_HEAD), TT_LINK);
         for (unsigned which = 0; which < 2; which++) {
             unsigned order = ReadU32At((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
             HashByte((unsigned char)(which + 1));
@@ -2815,51 +2757,6 @@ static void VisitOrders(unsigned char* units, unsigned count)
         }
     }
     EndSection();
-}
-
-static void VisitGoal(const char* prefix, unsigned goal)
-{
-    char path[112];
-    int cls;
-    unsigned n;
-    if (s_dumpNow)
-        sprintf(path, "%s.class", prefix);
-    if (goal == 0) {
-        VisitU32(path, 0);
-        return;
-    }
-    cls = GoalClassOf(goal);
-    VisitU32(path, (unsigned)cls);
-    if (cls == GOAL_UNKNOWN) {
-        char msg[160];
-        sprintf(msg, "testmode: unknown motion goal at %08x (vtable %08x)\n", goal, ReadU32At(goal, 0));
-        Fail(msg);
-    }
-    switch (cls) {
-    case GOAL_PATROL:
-        VisitElement(prefix, (const unsigned char*)goal, &kPatrolGoalTable);
-        n = ReadU32At(goal, PATROL_COUNT);
-        if (n > PATROL_POINT_LIMIT)
-            n = PATROL_POINT_LIMIT;
-        if (s_dumpNow)
-            sprintf(path, "%s.points", prefix);
-        VisitRaw(path, (const unsigned char*)goal + PATROL_POINTS, n * 4);
-        break;
-    case GOAL_AISEARCH:
-        VisitElement(prefix, (const unsigned char*)goal, &kAiSearchGoalTable);
-        n = ReadU32At(goal, AISEARCH_COUNT);
-        if (n > AISEARCH_POINT_LIMIT)
-            n = AISEARCH_POINT_LIMIT;
-        if (s_dumpNow)
-            sprintf(path, "%s.points", prefix);
-        VisitRaw(path, (const unsigned char*)goal + AISEARCH_POINTS, n * 4);
-        break;
-    default:
-        VisitElement(prefix, (const unsigned char*)goal, &kPackedGoalTable);
-        if (cls == GOAL_LITE)
-            VisitElement(prefix, (const unsigned char*)goal, &kLiteGoalStateTable);
-        break;
-    }
 }
 
 static void VisitMotions(unsigned char* units, unsigned count)
@@ -2879,11 +2776,14 @@ static void VisitMotions(unsigned char* units, unsigned count)
         if (s_dumpNow)
             sprintf(path, "units[%u].motion", i);
         VisitElement(path, (const unsigned char*)motion, &kUnitMotionTable);
-        if (s_dumpNow)
-            strcat(path, ".goal");
-        VisitGoal(path, ReadU32At(motion, 0));
     }
     EndSection();
+}
+
+static void DumpElement(const char* path, const unsigned char* base, const TraceTable* t)
+{
+    if (s_dumpNow)
+        DumpFields(path, base, t->fields, t->fieldCount);
 }
 
 static void VisitFx()
@@ -2895,124 +2795,69 @@ static void VisitFx()
         unsigned fx = s_fxList[id];
         int cls = FxClassOf(fx);
         unsigned flags;
-        HashU32(id);
-        if (s_dumpNow)
+        if (cls == FX_PATH || cls == FX_UNKNOWN)
+            HashU32(id);
+        if (s_dumpNow) {
             sprintf(path, "orderFx[%u]", id);
-        if (s_dumpNow)
             sprintf(field, "%s.class", path);
-        VisitU32(field, (unsigned)cls);
+        }
         if (cls == FX_UNKNOWN) {
+            VisitU32(field, (unsigned)cls);
             if (s_dumpNow)
                 sprintf(field, "%s.vtableDelta", path);
             VisitU32(field, ReadU32At(fx, 0) - (unsigned)g_pathOrderVtable);
             continue;
         }
+        if (s_dumpNow) {
+            DumpPrefix(field);
+            fprintf(s_dump, "0x%08x\n", (unsigned)cls);
+        }
         switch (cls) {
         case FX_APPROACH:
-            VisitElement(path, (const unsigned char*)fx, &kApproachRadiusTable);
+            DumpElement(path, (const unsigned char*)fx, &kApproachRadiusTable);
             break;
         case FX_RING:
-            VisitElement(path, (const unsigned char*)fx, &kRingApproachTable);
+            DumpElement(path, (const unsigned char*)fx, &kRingApproachTable);
             break;
         case FX_MARKER:
-            VisitElement(path, (const unsigned char*)fx, &kPointMarkerTable);
+            DumpElement(path, (const unsigned char*)fx, &kPointMarkerTable);
             break;
         case FX_PATH:
             flags = *(const unsigned short*)(fx + PATHORDER_FLAGS);
-            VisitElement(path, (const unsigned char*)fx, &kPathOrderTable);
+            DumpElement(path, (const unsigned char*)fx, &kPathOrderTable);
+            VisitElement(path, (const unsigned char*)fx, &kPathOrderRefTable);
             if (!FxPosYUnset(fx))
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderPosYTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderPosYTable);
             if (flags & 0x40)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderHeadingTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderHeadingTable);
             if (flags & 1)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderPieceTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderPieceTable);
             if ((flags & 0x82) == 2)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderFollowTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderFollowTable);
             break;
         case FX_AIR:
             flags = *(const unsigned short*)(fx + AIRMANEUVER_FLAGS);
-            VisitElement(path, (const unsigned char*)fx, &kAirManeuverOrderTable);
+            DumpElement(path, (const unsigned char*)fx, &kAirManeuverOrderTable);
             if (flags & 1)
-                VisitElement(path, (const unsigned char*)fx, &kAirManeuverOrderHeadingTable);
+                DumpElement(path, (const unsigned char*)fx, &kAirManeuverOrderHeadingTable);
             break;
         }
     }
     EndSection();
 }
 
-static void VisitChannel(const char* prefix, const unsigned char* channel)
-{
-    char path[128];
-    unsigned state = *(const unsigned*)channel;
-    int sp;
-    unsigned live;
-    if (state == 0) {
-        if (s_dumpNow)
-            sprintf(path, "%s.state", prefix);
-        VisitU32(path, 0);
-        return;
-    }
-    VisitElement(prefix, channel, &kScriptChannelTable);
-    sp = *(const int*)(channel + 8);
-    live = sp < -1 ? 0 : (unsigned)(sp + 1);
-    if (live > SCRIPT_STACK_LIMIT)
-        live = SCRIPT_STACK_LIMIT;
-    if (s_dumpNow)
-        sprintf(path, "%s.stack", prefix);
-    VisitRaw(path, channel + SCRIPT_STACK, live * 4);
-    if ((state & 0xff000000) == 0x2000000) {
-        switch (state & 0xf00000) {
-        case 0x100000:
-        case 0x200000:
-            VisitElement(prefix, channel, &kScriptChannelPieceTable);
-            break;
-        case 0x400000:
-            VisitElement(prefix, channel, &kScriptChannelDelayTable);
-            break;
-        case 0x800000:
-            VisitElement(prefix, channel, &kScriptChannelWaitTable);
-            break;
-        }
-    }
-}
-
 static void VisitScript(unsigned i, const unsigned char* script)
 {
     char path[112];
     unsigned table = ReadU32At((unsigned)script, SCRIPT_TABLE);
-    unsigned statics = ReadU32At((unsigned)script, SCRIPT_STATICS);
     unsigned pieces = ReadU32At((unsigned)script, SCRIPT_PIECES);
     unsigned objectState = ReadU32At((unsigned)script, SCRIPT_OBJECT_STATE);
-    unsigned staticCount = 0;
     unsigned pieceCount = 0;
-    if (s_dumpNow)
-        sprintf(path, "units[%u].script", i);
-    VisitElement(path, script, &kScriptStateTable);
-    if (table != 0) {
-        staticCount = ReadU32At(table, TABLE_STATIC_COUNT);
+    if (table != 0)
         pieceCount = ReadU32At(table, TABLE_PIECE_COUNT);
-    }
-    if (staticCount > SCRIPT_STATIC_LIMIT || statics == 0)
-        staticCount = 0;
     if (pieceCount > SCRIPT_PIECE_LIMIT)
         pieceCount = 0;
-    for (unsigned c = 0; c < SCRIPT_CHANNEL_COUNT; c++) {
-        if (s_dumpNow)
-            sprintf(path, "units[%u].script.channels[%u]", i, c);
-        VisitChannel(path, script + SCRIPT_CHANNELS + c * SCRIPT_CHANNEL_STRIDE);
-    }
-    if (s_dumpNow)
-        sprintf(path, "units[%u].script.statics", i);
-    VisitU32(path, staticCount);
-    VisitRaw(path, (const unsigned char*)statics, staticCount * 4);
-    if (pieces == 0)
-        pieceCount = 0;
-    for (unsigned p = 0; p < pieceCount; p++) {
-        if (s_dumpNow)
-            sprintf(path, "units[%u].script.pieces[%u]", i, p);
-        VisitElement(path, (const unsigned char*)pieces + p * SCRIPT_PIECE_STRIDE, &kScriptPieceTable);
-    }
-    if (objectState == 0)
+    if (pieces == 0 || objectState == 0)
         pieceCount = 0;
     for (unsigned q = 0; q < pieceCount; q++) {
         if (s_dumpNow)
@@ -3417,6 +3262,358 @@ static void VisitPlayersState()
     EndSection();
 }
 
+struct DumpSpec {
+    const char* name;
+    unsigned offset;
+    unsigned size;
+};
+
+static const DumpSpec s_weaponSlotDump[] = {
+    { "aimCob.vtable", 4, 0 },
+    { "aimCob.done", 8, 4 },
+    { "muzzleAimFromDeltaZ", 0x10, 4 },
+    { "reloadTimer", 0x14, 2 },
+    { "fireHeading", 0x16, 2 },
+    { "firePitch", 0x18, 2 },
+};
+
+static const DumpSpec s_projectileDump[] = {
+    { "start.x", 0x10, 4 }, { "start.y", 0x14, 4 }, { "start.z", 0x18, 4 },
+    { "direction.x", 0x1c, 4 }, { "direction.y", 0x20, 4 }, { "direction.z", 0x24, 4 },
+    { "angles.bank", 0x34, 2 }, { "angles.heading", 0x36, 2 }, { "angles.pitch", 0x38, 2 },
+    { "speed", 0x3a, 4 }, { "range", 0x3e, 4 }, { "spawnTick", 0x42, 4 }, { "time", 0x46, 4 },
+    { "nextSmokeTick", 0x4a, 4 }, { "+0x4e", 0x4e, 0 }, { "+0x56", 0x56, 0 },
+    { "cellX", 0x5a, 2 }, { "cellZ", 0x5c, 2 }, { "radius", 0x5e, 2 }, { "active", 0x60, 2 },
+    { "piece", 0x62, 2 }, { "propellerSpin", 0x64, 2 }, { "compactIndex", 0x67, 2 }, { "flags", 0x69, 2 },
+};
+
+static const DumpSpec s_orderDump[] = {
+    { "kind", 4, 1 }, { "state", 5, 1 }, { "flags6", 6, 4 }, { "wakeFrame", 0xa, 4 },
+    { "start.x", 0x2e, 2 }, { "start.y", 0x30, 2 }, { "arg0", 0x36, 4 }, { "arg1", 0x3a, 4 },
+    { "arg2", 0x3e, 4 }, { "created", 0x46, 4 }, { "subFlags", 0x4e, 4 }, { "attached", 0x52, 0 },
+};
+
+static const DumpSpec s_motionDump[] = {
+    { "motion.p2.x", 0x14, 4 }, { "motion.p2.y", 0x18, 4 }, { "motion.p2.z", 0x1c, 4 },
+    { "motion.turn", 0x24, 2 },
+};
+
+static const DumpSpec s_unitsDump[] = {
+    { "head", 0xa2, 0 }, { "hoverBobPhase", 0xaa, 2 }, { "healthPercent", 0xf6, 1 },
+    { "prevHealthPercent", 0xf7, 1 }, { "unfinishedInitZero", 0x100, 4 },
+};
+
+static void DumpPlainValue(const unsigned char* p, const TraceField* f)
+{
+    TraceField g = *f;
+    if (g.kind == TF_POINTER && g.target != TT_UNIT)
+        g.target = TT_HEAP;
+    DumpValue(p, &g);
+}
+
+static void DumpTable(const char* record, const char* prefix, const unsigned char* base, const TraceTable* t)
+{
+    char path[240];
+    for (unsigned k = 0; k < t->fieldCount; k++) {
+        const TraceField* f = &t->fields[k];
+        if (f->name[0] != '\0')
+            sprintf(path, "%s.%s%s", record, prefix, f->name);
+        else
+            sprintf(path, "%s.%s+0x%x", record, prefix, f->offset);
+        DumpPrefix(path);
+        DumpPlainValue(base + f->offset, f);
+    }
+}
+
+static void DumpInt(const char* record, const char* field, const unsigned char* p, unsigned size)
+{
+    char path[240];
+    sprintf(path, "%s.%s", record, field);
+    DumpPrefix(path);
+    fputs("0x", s_dump);
+    for (unsigned b = size; b > 0; b--)
+        fprintf(s_dump, "%02x", p[b - 1]);
+    fputc('\n', s_dump);
+}
+
+static void DumpBytes(const char* record, const char* field, const unsigned char* p, unsigned n)
+{
+    char path[240];
+    sprintf(path, "%s.%s", record, field);
+    DumpPrefix(path);
+    fputs("hex:", s_dump);
+    for (unsigned b = 0; b < n; b++)
+        fprintf(s_dump, "%02x", p[b]);
+    fputc('\n', s_dump);
+}
+
+static void DumpHeap(const char* record, const char* field, unsigned value)
+{
+    char path[240];
+    sprintf(path, "%s.%s", record, field);
+    DumpPrefix(path);
+    fputs(value != 0 ? "heap\n" : "null\n", s_dump);
+}
+
+static void DumpSpecs(const char* record, const char* prefix, const unsigned char* base, const DumpSpec* specs,
+                      unsigned n)
+{
+    char field[120];
+    for (unsigned k = 0; k < n; k++) {
+        sprintf(field, "%s%s", prefix, specs[k].name);
+        if (specs[k].size == 0)
+            DumpHeap(record, field, *(const unsigned*)(base + specs[k].offset));
+        else
+            DumpInt(record, field, base + specs[k].offset, specs[k].size);
+    }
+}
+
+static void DumpWeaponsState()
+{
+    char record[96];
+    char prefix[32];
+    unsigned i;
+    unsigned char pieceUsed[PIECE_COUNT];
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    unsigned debrisCount = GameU32(GAME_DEBRIS_COUNT);
+    unsigned char* pieces = GameAt(GAME_PIECES);
+    unsigned char* projectiles = (unsigned char*)GameU32(GAME_PROJECTILES);
+    unsigned projectileCount = GameU32(GAME_PROJECTILE_COUNT);
+    memset(pieceUsed, 0, sizeof pieceUsed);
+    if (debrisCount > PIECE_COUNT)
+        debrisCount = PIECE_COUNT;
+
+    for (unsigned slot = 0; slot < EXPLODED_SLOTS; slot++) {
+        unsigned char* block = g_explodedPieces[slot];
+        if (block == NULL)
+            continue;
+        sprintf(record, "weaponsState.explodedPieces[%u]", slot);
+        DumpTable(record, "", block, &kExplodedPieceTable);
+        DumpTable(record, "rec.", block + 0x30, &kPieceRecTable);
+    }
+    for (unsigned d = 0; d < debrisCount; d++) {
+        unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
+        unsigned obj = *(unsigned*)e;
+        if (obj == 0)
+            continue;
+        sprintf(record, "weaponsState.debris[%u]", d);
+        DumpTable(record, "", e, &kDebrisTable);
+        if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
+            && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT)
+            pieceUsed[(obj - (unsigned)pieces) / PIECE_STRIDE] = 1;
+    }
+    for (i = 0; i < PIECE_COUNT; i++) {
+        if (!pieceUsed[i])
+            continue;
+        sprintf(record, "weaponsState.pieces[%u]", i);
+        DumpTable(record, "", pieces + i * PIECE_STRIDE, &kPieceTable);
+        DumpBytes(record, "vertices", GameAt(GAME_VERTICES) + i * 96, 96);
+        for (unsigned k = 0; k < 6; k++) {
+            sprintf(prefix, "faces[%u].", k);
+            DumpTable(record, prefix, GameAt(GAME_FACES) + (i * 6 + k) * 0x20, &kFaceTable);
+        }
+    }
+    for (i = 0; units != NULL && i < slots; i++) {
+        unsigned char* u = units + i * UNIT_STRIDE;
+        if (!UnitIsLive(u))
+            continue;
+        sprintf(record, "weaponsState.units[%u]", i);
+        for (unsigned k = 0; k < 3; k++) {
+            sprintf(prefix, "weapons[%u].", k);
+            DumpSpecs(record, prefix, u + 4 + 0x1c * k, s_weaponSlotDump,
+                      sizeof s_weaponSlotDump / sizeof s_weaponSlotDump[0]);
+        }
+    }
+    for (i = 0; projectiles != NULL && i < projectileCount; i++) {
+        unsigned char* pr = projectiles + i * PROJECTILE_STRIDE;
+        if (*(unsigned short*)(pr + 0x69) & 2)
+            continue;
+        sprintf(record, "weaponsState.projectiles[%u]", i);
+        DumpSpecs(record, "", pr, s_projectileDump, sizeof s_projectileDump / sizeof s_projectileDump[0]);
+    }
+}
+
+static void DumpOrdersState()
+{
+    char record[96];
+    char prefix[32];
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    for (unsigned i = 0; units != NULL && i < slots; i++) {
+        unsigned char* u = units + i * UNIT_STRIDE;
+        if (!UnitIsLive(u))
+            continue;
+        if (ReadU32At((unsigned)u, UNIT_LIST) == 0 && ReadU32At((unsigned)u, UNIT_LIST2) == 0)
+            continue;
+        sprintf(record, "ordersState.units[%u]", i);
+        for (unsigned which = 0; which < 2; which++) {
+            unsigned order = ReadU32At((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
+            for (unsigned n = 0; order != 0 && n < ORDER_CHAIN_LIMIT; n++) {
+                sprintf(prefix, "%s[%u].", which == 0 ? "list" : "list2", n);
+                DumpSpecs(record, prefix, (const unsigned char*)order, s_orderDump,
+                          sizeof s_orderDump / sizeof s_orderDump[0]);
+                order = ReadU32At(order, ORDER_NEXT);
+            }
+        }
+    }
+}
+
+static void DumpGoal(const char* record, unsigned goal)
+{
+    unsigned cls = 0;
+    unsigned n;
+    if (goal != 0) {
+        cls = (unsigned)GoalClassOf(goal);
+        if (cls == GOAL_UNKNOWN) {
+            char msg[160];
+            sprintf(msg, "testmode: unknown motion goal at %08x (vtable %08x)\n", goal, ReadU32At(goal, 0));
+            Fail(msg);
+        }
+    }
+    DumpInt(record, "goal.class", (const unsigned char*)&cls, 4);
+    switch (cls) {
+    case GOAL_PATROL:
+        DumpTable(record, "goal.", (const unsigned char*)goal, &kPatrolGoalTable);
+        n = ReadU32At(goal, PATROL_COUNT);
+        if (n > PATROL_POINT_LIMIT)
+            n = PATROL_POINT_LIMIT;
+        DumpBytes(record, "goal.points", (const unsigned char*)goal + PATROL_POINTS, n * 4);
+        break;
+    case GOAL_AISEARCH:
+        DumpTable(record, "goal.", (const unsigned char*)goal, &kAiSearchGoalTable);
+        n = ReadU32At(goal, AISEARCH_COUNT);
+        if (n > AISEARCH_POINT_LIMIT)
+            n = AISEARCH_POINT_LIMIT;
+        DumpBytes(record, "goal.points", (const unsigned char*)goal + AISEARCH_POINTS, n * 4);
+        break;
+    case GOAL_PACKED:
+    case GOAL_PACKEDPOS:
+        DumpTable(record, "goal.", (const unsigned char*)goal, &kPackedGoalTable);
+        break;
+    case GOAL_LITE:
+        DumpTable(record, "goal.", (const unsigned char*)goal, &kPackedGoalTable);
+        DumpTable(record, "goal.", (const unsigned char*)goal, &kLiteGoalStateTable);
+        break;
+    }
+}
+
+static void DumpMovementState()
+{
+    char record[96];
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    for (unsigned i = 0; units != NULL && i < slots; i++) {
+        unsigned char* u = units + i * UNIT_STRIDE;
+        unsigned motion;
+        if (!UnitIsLive(u))
+            continue;
+        motion = ReadU32At((unsigned)u, UNIT_MOTION);
+        if (motion == 0)
+            continue;
+        sprintf(record, "movementState.units[%u]", i);
+        DumpSpecs(record, "", (const unsigned char*)motion, s_motionDump, sizeof s_motionDump / sizeof s_motionDump[0]);
+        DumpGoal(record, ReadU32At(motion, 0));
+    }
+}
+
+static void DumpChannel(const char* record, unsigned c, const unsigned char* channel)
+{
+    char prefix[32];
+    char field[48];
+    unsigned state = *(const unsigned*)channel;
+    int sp;
+    unsigned live;
+    sprintf(prefix, "channels[%u].", c);
+    if (state == 0) {
+        sprintf(field, "%sstate", prefix);
+        DumpInt(record, field, channel, 4);
+        return;
+    }
+    DumpTable(record, prefix, channel, &kScriptChannelTable);
+    sp = *(const int*)(channel + 8);
+    live = sp < -1 ? 0 : (unsigned)(sp + 1);
+    if (live > SCRIPT_STACK_LIMIT)
+        live = SCRIPT_STACK_LIMIT;
+    sprintf(field, "%sstack", prefix);
+    DumpBytes(record, field, channel + SCRIPT_STACK, live * 4);
+    if ((state & 0xff000000) == 0x2000000) {
+        switch (state & 0xf00000) {
+        case 0x100000:
+        case 0x200000:
+            DumpTable(record, prefix, channel, &kScriptChannelPieceTable);
+            break;
+        case 0x400000:
+            DumpTable(record, prefix, channel, &kScriptChannelDelayTable);
+            break;
+        case 0x800000:
+            DumpTable(record, prefix, channel, &kScriptChannelWaitTable);
+            break;
+        }
+    }
+}
+
+static void DumpScriptsState()
+{
+    char record[96];
+    char prefix[32];
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    for (unsigned i = 0; units != NULL && i < slots; i++) {
+        unsigned char* u = units + i * UNIT_STRIDE;
+        unsigned script;
+        unsigned table;
+        unsigned statics;
+        unsigned pieces;
+        unsigned staticCount = 0;
+        unsigned pieceCount = 0;
+        if (!UnitIsLive(u))
+            continue;
+        script = ReadU32At((unsigned)u, UNIT_SCRIPT);
+        if (script == 0)
+            continue;
+        sprintf(record, "scriptsState.units[%u]", i);
+        table = ReadU32At(script, SCRIPT_TABLE);
+        statics = ReadU32At(script, SCRIPT_STATICS);
+        pieces = ReadU32At(script, SCRIPT_PIECES);
+        if (table != 0) {
+            staticCount = ReadU32At(table, TABLE_STATIC_COUNT);
+            pieceCount = ReadU32At(table, TABLE_PIECE_COUNT);
+        }
+        if (staticCount > SCRIPT_STATIC_LIMIT || statics == 0)
+            staticCount = 0;
+        if (pieceCount > SCRIPT_PIECE_LIMIT || pieces == 0)
+            pieceCount = 0;
+        DumpTable(record, "", (const unsigned char*)script, &kScriptStateTable);
+        for (unsigned c = 0; c < SCRIPT_CHANNEL_COUNT; c++)
+            DumpChannel(record, c, (const unsigned char*)script + SCRIPT_CHANNELS + c * SCRIPT_CHANNEL_STRIDE);
+        DumpInt(record, "statics.count", (const unsigned char*)&staticCount, 4);
+        DumpBytes(record, "statics", (const unsigned char*)statics, staticCount * 4);
+        for (unsigned q = 0; q < pieceCount; q++) {
+            sprintf(prefix, "pieces[%u].", q);
+            DumpTable(record, prefix, (const unsigned char*)pieces + q * SCRIPT_PIECE_STRIDE, &kScriptPieceTable);
+        }
+    }
+}
+
+static void DumpUnitsState()
+{
+    char record[96];
+    unsigned char* units = (unsigned char*)GameU32(GAME_UNITS);
+    unsigned slots = *(unsigned short*)GameAt(GAME_POOL_COUNT);
+    if (!s_dumpNow)
+        return;
+    for (unsigned i = 0; units != NULL && i < slots; i++) {
+        unsigned char* u = units + i * UNIT_STRIDE;
+        if (!UnitIsLive(u))
+            continue;
+        sprintf(record, "unitsState.units[%u]", i);
+        DumpSpecs(record, "", u, s_unitsDump, sizeof s_unitsDump / sizeof s_unitsDump[0]);
+        DumpBytes(record, "unknown_10a", u + 0x10a, 4);
+        DumpInt(record, "zBufferFlag", u + 0x114, 4);
+    }
+}
+
 static void VisitPrivateState()
 {
     unsigned lo = s_hashLo;
@@ -3424,8 +3621,12 @@ static void VisitPrivateState()
     if (!s_dumpNow)
         return;
     VisitAiState();
+    DumpWeaponsState();
+    DumpOrdersState();
+    DumpMovementState();
     VisitMapState();
     VisitPlayersState();
+    DumpScriptsState();
     s_hashLo = lo;
     s_hashHi = hi;
 }
@@ -3559,6 +3760,7 @@ static void VisitMission()
 static void VisitPlayerHeap()
 {
     VisitLosRadarAndUnitsIndex();
+    DumpUnitsState();
     VisitUnitResources();
 }
 
@@ -4598,7 +4800,6 @@ void HarnessPhase(int phase)
     VisitU32("rng.crtHoldrand", holdrand);
     VisitUnits();
     VisitProjectiles();
-    VisitExplosions();
     VisitPlayers();
     VisitFeatures();
     VisitWind();

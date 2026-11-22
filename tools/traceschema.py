@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 7
+TRACE_FORMAT = 8
 TYPES = ROOT / "include/ta_types.h"
 OUT = ROOT / "src/harness/trace_schema.h"
 
@@ -50,9 +50,57 @@ POINTER_NAMES: dict[tuple[str, int], str] = {}
 
 EXCLUDED_RANGES: list[tuple[str, int, int, str]] = [
     ("Unit", 0xBC, 0xEC, "the resource account: economy's private state"),
+    ("Unit", 0x8, 0x10, "read only by weapons: reported by weaponsState"),
+    ("Unit", 0x14, 0x1E, "read only by weapons: reported by weaponsState"),
+    ("Unit", 0x24, 0x2C, "read only by weapons: reported by weaponsState"),
+    ("Unit", 0x30, 0x3A, "read only by weapons: reported by weaponsState"),
+    ("Unit", 0x40, 0x48, "read only by weapons: reported by weaponsState"),
+    ("Unit", 0x4C, 0x56, "read only by weapons: reported by weaponsState"),
 ]
 
 EXCLUSIONS: list[tuple[str, str, str]] = [
+    ("Unit", "head", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "fix_lo", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "field_f6", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "field_f7", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "field_100", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "+0x10a", "units' own state, read by nothing else: reported by unitsState"),
+    ("Unit", "pad114", "units' own state, read by nothing else: reported by unitsState"),
+    ("Projectile", "start", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_1c", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_20", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_24", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "roll", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "angle", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "pitch0", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_3a", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "range", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_42", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "time", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "f4a", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "+0x4e", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "+0x56", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "cellX", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "cellZ", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "radius", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "active", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "piece", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_64", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "field_67", "read only by weapons: reported by weaponsState"),
+    ("Projectile", "flag0", "read only by weapons: reported by weaponsState"),
+    ("Order", "kind", "read only by orders: reported by ordersState"),
+    ("Order", "state", "read only by orders: reported by ordersState"),
+    ("Order", "flags6", "read only by orders: reported by ordersState"),
+    ("Order", "wakeFrame", "read only by orders: reported by ordersState"),
+    ("Order", "start", "read only by orders: reported by ordersState"),
+    ("Order", "arg0", "read only by orders: reported by ordersState"),
+    ("Order", "arg1", "read only by orders: reported by ordersState"),
+    ("Order", "arg2", "read only by orders: reported by ordersState"),
+    ("Order", "created", "read only by orders: reported by ordersState"),
+    ("Order", "subFlags", "read only by orders: reported by ordersState"),
+    ("Order", "attached", "read only by orders: reported by ordersState"),
+    ("UnitMotion", "p2", "read only by movement: reported by movementState"),
+    ("UnitMotion", "turn", "read only by movement: reported by movementState"),
     ("Unit", "field_7a", "the sight cache cell, los_radar's private state"),
     ("Unit", "field_f8", "the sight frame index, los_radar's private state"),
     ("Rec", "a", "the spatial grid's private bookkeeping: orders reads b only"),
@@ -79,7 +127,6 @@ EXCLUSIONS: list[tuple[str, str, str]] = [
     ("AirManeuverOrder", "saveOnly22", "set to 0 by the constructor and read only by SerializeToSave"),
     ("AirManeuverOrder", "value26", "set only by the loading constructors and read only by SerializeToSave"),
     ("UnitMotion", "obj", "the goal object: the visit hashes its class and fields"),
-    ("UnitMotion", "lastMoveTick", "written by UpdatePosition (order_list.cpp:2001) and read by nothing"),
     ("PatrolGoal", "vptr", "the class is hashed as a tag"),
     ("PatrolGoal", "points", "only the first count points are live: the visit hashes those"),
     ("AiSearchGoal", "vptr", "the class is hashed as a tag"),
@@ -168,7 +215,8 @@ PATHFINDER_SEARCH_FIELDS = {
 SPLITS: dict[str, list[tuple[str, set[str]]]] = {
     "Pathfinder": [("PathfinderSearch", PATHFINDER_SEARCH_FIELDS)],
     "PathOrder": [("PathOrderHeading", {"heading"}), ("PathOrderPiece", {"piece"}),
-                  ("PathOrderFollow", {"followOffset"}), ("PathOrderPosY", {"pos.y"})],
+                  ("PathOrderFollow", {"followOffset"}), ("PathOrderPosY", {"pos.y"}),
+                  ("PathOrderRef", {"refOwner", "refNext", "refValue"})],
     "AirManeuverOrder": [("AirManeuverOrderHeading", {"heading"})],
     "Order": [("OrderPosY", {"pos.y"})],
     "PackedGoal": [("LiteGoalState", {"netDirty"})],

@@ -1115,6 +1115,22 @@ unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
     return result;
 }
 
+int __stdcall RecTargetingSavedTargetPair(Unit* a0, int a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a0);
+    SlotScope scope(RSL_TARGETING_SAVEDTARGETPAIR, SUB_TARGETING, roots);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, a0);
+        ArgValue(s_call, "weapon", a1);
+    }
+    int result = s_inner_targeting->SavedTargetPair(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecLosRadarApply(const LosRadarEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -5091,6 +5107,8 @@ void HookSeams(const bool* on)
         s_rec_targeting.FindBestTargetIfFireAtWill = RecTargetingFindBestTargetIfFireAtWill;
     if (on[SUB_TARGETING])
         s_rec_targeting.ChooseWeapon = RecTargetingChooseWeapon;
+    if (on[SUB_TARGETING])
+        s_rec_targeting.SavedTargetPair = RecTargetingSavedTargetPair;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.Apply = RecLosRadarApply;
     if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_MAP])

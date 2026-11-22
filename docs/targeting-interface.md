@@ -101,7 +101,8 @@ ai's and los_radar's views), all as of each module's last run. `FindWeaponTarget
 **What others read of targeting:**
 - **The target pair, in the `Unit` record, hashed** (section 5). No code outside targeting reads it: every read went
   through `GetWeaponTargetUnit` or `GetWeaponTargetPos` in 3.1c, and goes through them now.
-- **Queries:** `GetWeaponTargetUnit`, `ChooseWeapon` and, since 3.1, `SavedTargetPair(unit, weapon)`, the pair's four bytes as a saved game keeps them (x or the unit number in the low half, z or the sentinel in the high half), the word LOAD gives back; `SaveUnit` reads it outside the tick.
+- **Queries:** `GetWeaponTargetUnit`, `ChooseWeapon` and, since 3.1, `SavedTargetPair(unit, weapon)`, the pair's four bytes as a saved game keeps them (x or the unit number in the low half, z or the sentinel in the high half), the word LOAD gives back; `SaveUnit` reads it outside the tick. The recorder records it like the other queries, with the tick of the
+  save (`tests/replay/targeting/save-targets.txt`, #1029).
 - **`Unit::netDirtyFlags`**, the notices a unit's orders wait on, is not targeting's: weapons sets the bits of a shot
   fired, a command fire and a target out of reach, orders consumes them in `RunOrders`, and units clears them as it
   sets a unit up. SET_UNIT and SET_POS clear the three weapon notices (and two others), as 3.1c did; that write

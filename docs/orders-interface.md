@@ -366,6 +366,8 @@ order, after section 47's. The sections are new, so the trace format's schema ch
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes orders'
 state or calls its entry points, and no query slot writes state.
 
+**At load**: orders restores each unit's order list through the slot `LoadOrders`, which units' `LoadUnit` (`unit_save.cpp`) calls once per unit with the saved order count: each `Order` is read from the unit's `u%04xm%04x` boxes into the unit's normal or second list, its target is read through movement's slot `LoadTarget`, and the first order takes back its effects (`ReattachFxToUnit`).
+
 ## 6. Random draws and sim events
 
 Orders draws from the game logic stream (`RandomInt`) in its state machines (a wander's offset, a random delay, a pad's

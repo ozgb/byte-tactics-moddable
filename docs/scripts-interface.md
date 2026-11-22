@@ -269,6 +269,8 @@ Scripts read, and write nothing of, the unit's position, heading, angles, flags,
 Nothing else in the hash is scripts'. The unit's `script`, `state` and bits stay in the unit's section with the
 unit.
 
+**At load**: scripts restores each unit's script through the slot `LoadScriptState`, which units' `LoadUnit` (`unit_save.cpp`) calls once per unit after orders, from the unit's `Script<n>` box: the eight thread channels (their callbacks cleared), the active count, the statics and each piece's state. It restores nothing when the box's size or the script's checksum differs from the one the save was written with.
+
 ## 7. What is left
 
 The following is left, and no issue is opened for it here:

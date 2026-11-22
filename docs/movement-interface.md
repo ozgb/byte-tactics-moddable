@@ -372,6 +372,8 @@ record.
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes movement's
 state or calls its entry points, and no query slot writes state.
 
+**At load**: movement restores each unit's motion through the event LOAD (`MovementSavedState`), published by units' `LoadUnitMotion` (`unit_save.cpp`) from the unit's `u%04xmob` box, only when the unit's record has a motion, and each order's target (path order, air manoeuvre, approach radius, ring approach, point marker) through the slot `LoadTarget`, which orders' `Order` constructor calls. The path lock stamp read from the same box is map's: LOAD_PATH_LOCK_STAMP sets it.
+
 ## 6. Random draws and sim events
 
 Movement's own code (`src/movement/`) makes no draw from the game logic stream and records no sim event: a draw or a

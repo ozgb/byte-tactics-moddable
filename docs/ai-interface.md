@@ -285,6 +285,8 @@ it is recorded before the publish), in ai's order. Ai's `WriteState` report (rec
 hashed (see above). The section is new, so the trace format's schema changes and the gate of this change is
 the full suite.
 
+**At load**: ai restores nothing from a saved game itself, and `LoadSavedGameState` calls none of its slots. The save keeps each unit's squad number, which units' `LoadUnit` hands to ai as SET_SQUAD (`SetUnitSquad`). `PlayerAI` and the squad managers are made by the match load through players' set-up slots, and `RebuildAIFeatureCells` (players, at the end of the load) calls ai's `RebuildFeatureCells` for each player.
+
 ## 6. Random draws and sim events
 
 Ai draws from the game logic stream in its runs (the timers and `UpdatePlayerAI`'s `RandomInt(0x1e)`, in the players

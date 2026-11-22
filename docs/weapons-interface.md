@@ -311,6 +311,8 @@ state or calls its entry points, and no query slot writes state.
 hashes none of them. Each record is an event with the outcome `Apply` gave, or an effect weapons published (`outcome`
 1), in weapons' order. The section is new, so the trace format's schema changes.
 
+**At load**: weapons restores each weapon slot of each unit through the slot `LoadState(unit, slot, state)`, which units' `LoadUnit` calls for the three slots with a `WeaponsSlotState`, and sets all of the slot's fields but its target pair, which targeting's LOAD restores.
+
 ## 6. Random draws and sim events
 
 Weapons draws from the game logic stream (`RandomInt`) when a shot spreads or a projectile explodes, in the fire step of

@@ -178,6 +178,8 @@ which section 21 hashes, and the layout of sections 16 and 17 is the trace forma
 Nothing in these sections is a result: the results are in section 21 (the goal objects) and section 20 (the orders'
 flags), which the consumers own, and the events that carried them are dumped in section 32.
 
+**At load**: pathfinding restores nothing from a saved game: no slot of it is called while one loads. Its record, grids and budgets are the ones `Init` made in `LoadBattleAssets`. The orders and targets the save brings back are restored by orders' `LoadOrders` and movement's `LoadTarget`, and no search state is read from the save.
+
 ## 6. Quirks that stay inside the default
 
 - **Budget starvation:** a long search is charged to one player's bank, and that player's later turns

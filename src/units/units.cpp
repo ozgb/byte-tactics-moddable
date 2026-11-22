@@ -218,7 +218,6 @@ void __stdcall AllocateUnitMemory(void)
 
     unsigned char* pool = (unsigned char*)SimAllocTagged("UNIT MEMORY", g_game->poolCount * 0x118);
     g_game->units = (Unit*)pool;
-    memset(pool, 0, g_game->poolCount * 0x118);
 
     unsigned int ten = g_game->maxUnitsSetting * 10;
     g_game->list_1435f = (unsigned short*)SimAllocTagged("HOT UNITS", ten * 2);

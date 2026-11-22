@@ -302,8 +302,6 @@ guard:
     int& sz = p->exploredSize;
     sz = (h * w + 7) & ~7;
     p->explored = sz ? (unsigned char*)SimAlloc(sz) : 0;
-    Ref<unsigned char>& bref = p->explored;
-    memset(bref, 0, sz);
     g_seams.ai->CreateSquads(p);
     if (!p->active || p->type != 3) {
         g_seams.ai->CreateSquadManager(p);

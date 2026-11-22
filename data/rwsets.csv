@@ -62878,6 +62878,7 @@ address,function,file,kind,target
 ,VisitModuleState,src/harness/harness.cpp,field_read,OrdersSeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,field_read,PathfindingSeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,field_read,PlayersSeam::WriteState
+,VisitModuleState,src/harness/harness.cpp,field_read,ScriptsSeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::ai
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::economy
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::map
@@ -62885,6 +62886,7 @@ address,function,file,kind,target
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::orders
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::pathfinding
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::players
+,VisitModuleState,src/harness/harness.cpp,field_read,Seams::scripts
 ,VisitModuleState,src/harness/harness.cpp,field_read,Seams::weapons
 ,VisitModuleState,src/harness/harness.cpp,field_read,WeaponsSeam::WriteState
 ,VisitModuleState,src/harness/harness.cpp,function,
@@ -62901,6 +62903,7 @@ address,function,file,kind,target
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [OrdersSeam::WriteState]
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [PathfindingSeam::WriteState]
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [PlayersSeam::WriteState]
+,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [ScriptsSeam::WriteState]
 ,VisitModuleState,src/harness/harness.cpp,indirect_call,indirect via void (*)(const StateWriter *) __attribute__((stdcall)) [WeaponsSeam::WriteState]
 ,VisitMotions,src/harness/harness.cpp,call,EndSection
 ,VisitMotions,src/harness/harness.cpp,call,HashByte
@@ -64083,16 +64086,15 @@ address,function,file,kind,target
 ,WriteCondition,src/game/players.cpp,function,
 ,WriteCondition,src/game/players.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteCondition,src/game/players.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
+,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,ReadWord
+,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,SimBlockBase
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,WriteFields
-,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,get
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,memset
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,call,sprintf
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_escape,Game::debris
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_escape,Game::slots
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_escape,Game::vertices
-,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_read,Debris::field_0
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_read,Game::count_1491b
-,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_read,Ref<DebrisPiece>::offset
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_read,StateWriter::Begin
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,field_read,StateWriter::Bytes
 ,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,function,
@@ -64364,7 +64366,6 @@ address,function,file,kind,target
 ,WriteUnitRecords,src/units/factory_index.cpp,call,get
 ,WriteUnitRecords,src/units/factory_index.cpp,call,sprintf
 ,WriteUnitRecords,src/units/factory_index.cpp,deref_escape,*Unit
-,WriteUnitRecords,src/units/factory_index.cpp,field_escape,Unit::unknown_10a
 ,WriteUnitRecords,src/units/factory_index.cpp,field_read,Game::poolCount
 ,WriteUnitRecords,src/units/factory_index.cpp,field_read,Game::units
 ,WriteUnitRecords,src/units/factory_index.cpp,field_read,Ref<PathOrderAttach>::offset

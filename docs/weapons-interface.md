@@ -280,36 +280,64 @@ flags, attacker, the damage record, the notice bits) are units' in them. Each pa
 
 ## 5. State and the trace
 
-**Everything stays hashed in this change** (the human, 2026-11-16, on PR #978, and 2026-11-17, on #984): the projectile
-table, the explosions, the debris, the exploded pieces and the weapon slots. #979 covers los_radar, map, players and ai
-only; what follows moves out of the hash in one later format bump for weapons, orders and units. The module has no
-private region and no state of its own that leaves the hash here.
+Weapons keeps no private region. Its state is in the state block, where it was, and since format 8 of the trace
+(#1024) most of it is not hashed: what only weapons reads left the hash, and `WriteState` dumps it in record 48.
+`docs/trace-format.md` has the lines (section 8.31).
 
-**The hashed state only weapons reads, a candidate for that bump.** A search of the source (`Game::debris`,
-`Game::count_1491b`, `Game::slots`, `g_explodedPieces`, `g_debrisMemCache`) finds no reader outside `src/weapons/` and
-the trace harness but the info panel's drawing of a piece (`DrawDebrisProjected`, a presentation function) and the
-engine's set-up and free (`endgame.cpp`):
+**What is hashed, and who reads it.** A field stays in the hash when code of another simulation subsystem reads it
+directly, because the hash is the contract a replacement is judged on.
 
-| State | Trace section | Written by | Read by |
-|---|---|---|---|
-| the debris table, `Game::count_1491b` and `Game::debris[300]` (the explosions and the pieces of debris, 0x54 bytes each) | 4 | weapons | weapons (the explosions pass and `WriteState`); the access log also names map as a reader of `Debris::pos` (section 4), though map's code never names the table |
-| the pieces used by debris, `Game::slots[300]` and their vertices and faces | 5 | weapons | weapons |
-| the exploded pieces, `g_explodedPieces[100]` and their blocks | 3 | weapons | weapons |
+| Hashed state | Trace section | Read by |
+|---|---|---|
+| the weapon slots of a unit: the target pair, `weapon`, `stockpile` and `flags` (the slot's other words left) | 1 | ai, los_radar, orders, targeting, units |
+| the projectile table: `type`, `position`, `attacker`, `owner` and `target` (the other fields left) | 2 | ai (`attacker`), los_radar (`position`), the network |
 
-**What stays hashed for others to read:** the projectile table (section 2 of the trace), read by ai
-(`Projectile::attacker`), los_radar (`Projectile::position`) and map (`radar_capture.cpp`); and the weapon slots in the
-unit record (section 3), read by ai, orders, targeting and units.
+**What left the hash.** Only weapons reads these, and presentation draws some of them. The reads of presentation, of
+the platform and game helpers (copies and the graphic cursors of a piece of debris) and of the glue that acts for the
+owner do not make another reader:
 
-**Record 48, `weaponsState`** (dumped, never hashed; `docs/trace-format.md`, section 8.31): four counts, the used
-entries of the projectile table, of the explosions, of the debris and of the exploded pieces. The debris table holds
-the explosions (entries with no model object) and the pieces of debris, and `WriteState` counts them apart.
+| State | Where it was hashed | Why only weapons reads it |
+|---|---|---|
+| the exploded pieces: the block of each of the 100 slots and its piece record | section 3 | weapons steps them; presentation draws them |
+| the debris table, `count_1491b` and the 300 entries (the explosions and the pieces of debris, 0x54 bytes each) | section 4 | weapons' explosions pass; presentation draws them. The access log also names map as a reader of `Debris::pos`: that is weapons passing the position as the argument of map's cell-height query |
+| the pieces used by debris, with their vertices and faces | section 5 | weapons; presentation draws them |
+| in each of a unit's three weapon slots: the aim callback (8 bytes), `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading` and `firePitch` | section 1 | weapons |
+| in each projectile: `start`, `direction`, `angles`, `speed`, `range`, `spawnTick`, `time`, `nextSmokeTick`, `targetUnit` (+0x4e), `field_56`, `cellX`, `cellZ`, `radius`, `active`, `piece`, `propellerSpin`, `compactIndex` and `flags` | section 2 | weapons |
+
+Sections 3, 4 and 5 are not in the phase rows any more. The phase list is unchanged: the `explosions` row still exists
+and hashes what the other phase rows hash.
+
+**Record 48, `weaponsState`** (dumped, never hashed; `docs/trace-format.md`, section 8.31) holds the four counts it
+held (the used entries of the projectile table, of the explosions, of the debris and of the exploded pieces) and now
+also, in this order:
+- `weaponsState.explodedPieces[s]`, the block and piece record of each used slot s;
+- `weaponsState.debris[d]`, each used entry of the debris table (the first 300), and `weaponsState.pieces[i]`, each
+  piece of debris used by one of them, with `vertices` and the six `faces[k]`;
+- `weaponsState.units[i]`, for each live unit, the six words of each of its three weapon slots that left the hash
+  (`weapons[k].aimCob.vtable`, `.aimCob.done`, `.muzzleAimFromDeltaZ`, `.reloadTimer`, `.fireHeading`,
+  `.firePitch`);
+- `weaponsState.projectiles[p]`, for each used projectile, the fields of the second row above.
+
+The reference build writes the same records itself, so the two builds are compared line by line.
+
+**Where a wrong value shows.** A wrong value of a field that left the hash is caught by what it drives:
+- **Slot words.** With a wrong `reloadTimer`, edges-targeting-lead first diverges at tick 78, phase units, `units[251].f_1f` (the slot's flags, 0x12 against 0x13): at tick 75 the first slot of unit 251 had its timer cut from 25 to 0. The other words of the slot (the aim
+  callback, `fireHeading`, `firePitch`) decide when the weapon fires and at what, and diverge through the shots they
+  change.
+- **Projectile fields.** With a wrong projectile `time`, edges-targeting-lead first diverges at tick 75, phase projectiles: projectile 0, its `time` set to the current tick at tick 75, is gone from the table there while the true run still has it (`projectiles[0].type` `weapondef:20`). A wrong `start`, `direction`,
+  `speed`, `range` or `angles` moves the projectile's hashed `position`, and the rest decide when it ends or smokes.
+- **The debris and the exploded pieces.** With a wrong debris field, combat-deaths diverges in no row: at tick 858 debris entry 4 had its `angle_y` turned a quarter and its `spin.y` negated, and every row stays equal to the end, tick 1000, while the frames at ticks 870 and 900 differ. The same holds for the exploded pieces (slot 0's `vel_x` and `vel_z` negated at tick 858). A wrong angle, spin,
+  size or flag changes only what presentation draws, so no hashed state sees it: the frame dumps judge it
+  (`reference/frames`: combat-deaths' frames line holds ticks 870 and 900 for this, after its two deaths), and nothing is hashed in its place. Hashed
+  state sees the debris only through the table's cap of 300 (a full table stops drawing random numbers) and through
+  a slot's lifetime, and those still diverge the rows.
 
 `privatestate.py --check` and `seamlink.py --pilot-seams` check the seam: no other simulation subsystem writes weapons'
 state or calls its entry points, and no query slot writes state.
 
 **The trace dumps weapons' events** in section 47 (`docs/trace-format.md`, section 8.31), after ai's section 42, and
 hashes none of them. Each record is an event with the outcome `Apply` gave, or an effect weapons published (`outcome`
-1), in weapons' order. The section is new, so the trace format's schema changes.
+1), in weapons' order.
 
 **At load**: weapons restores each weapon slot of each unit through the slot `LoadState(unit, slot, state)`, which units' `LoadUnit` calls for the three slots with a `WeaponsSlotState`, and sets all of the slot's fields but its target pair, which targeting's LOAD restores.
 

@@ -322,10 +322,10 @@ class SchemaJsonTest(unittest.TestCase):
 
     def test_the_unit_account_is_not_hashed(self):
         unit = self.model["tables"]["Unit"]
-        self.assertEqual([e["field"] for e in unit["excluded"]], ["+0xbc..+0xeb", "unusedLosCache", "unusedLosSightFrame"])
+        self.assertEqual([e["field"] for e in unit["excluded"]][:3], ["+0xbc..+0xeb", "unusedLosCache", "unusedLosSightFrame"])
         for f in unit["fields"] + unit["plan"]:
             self.assertFalse(0xBC <= f["offset"] <= 0xEB, f)
-        self.assertIn({"name": "", "offset": 0xA6, "size": 22, "kind": "bytes", "target": None}, unit["plan"])
+        self.assertIn({"name": "", "offset": 0xA6, "size": 4, "kind": "bytes", "target": None}, unit["plan"])
 
 
 class EventKindsTest(unittest.TestCase):
@@ -364,8 +364,43 @@ class OwnerOnlyStateTest(unittest.TestCase):
     def setUp(self):
         self.model = json.loads(ts.JSON_OUT.read_text())
 
-    def test_the_format_is_7(self):
-        self.assertEqual(ts.TRACE_FORMAT, 7)
+    def test_the_format_is_8(self):
+        self.assertEqual(ts.TRACE_FORMAT, 8)
+
+    def test_unit_leaves_the_weapon_slots_and_its_own_state_to_the_records(self):
+        unit = self.model["tables"]["Unit"]
+        kept = {f["offset"] for f in unit["fields"]}
+        for lo, hi in ((0x8, 0xF), (0x14, 0x1D), (0x24, 0x2B), (0x30, 0x39), (0x40, 0x47), (0x4C, 0x55)):
+            self.assertFalse(any(lo <= o <= hi for o in kept), (lo, hi))
+        for offset in (0xA2, 0xAA, 0xF6, 0xF7, 0x100, 0x10A, 0x114):
+            self.assertNotIn(offset, kept)
+        for offset in (0x4, 0x10, 0x3A, 0x56, 0xA6, 0xA8):
+            self.assertIn(offset, kept)
+
+    def test_projectile_keeps_type_position_target_attacker_and_owner(self):
+        names = [f["name"] for f in self.model["tables"]["Projectile"]["fields"]]
+        self.assertEqual(names, ["type", "position.x", "position.y", "position.z", "target.x", "target.y", "target.z",
+                                 "attacker", "owner"])
+
+    def test_order_keeps_the_links_the_position_and_the_masked_flags(self):
+        names = [f["name"] for f in self.model["tables"]["Order"]["fields"]]
+        self.assertEqual(names, ["unit", "linkOwner", "linkNext", "linkValue", "pos.x", "pos.z", "flags"])
+
+    def test_motion_hashes_the_last_move_tick_but_not_p2_or_turn(self):
+        names = [f["name"] for f in self.model["tables"]["UnitMotion"]["fields"]]
+        self.assertIn("lastMoveTick", names)
+        self.assertEqual([n for n in names if n.startswith("p2") or n == "turn"], [])
+
+    def test_path_order_ref_is_the_link_of_a_path_order(self):
+        tables = self.model["tables"]
+        self.assertEqual([f["name"] for f in tables["PathOrderRef"]["fields"]], ["refOwner", "refNext", "refValue"])
+        for name in ("refOwner", "refNext", "refValue"):
+            self.assertNotIn(name, [f["name"] for f in tables["PathOrder"]["fields"]])
+
+    def test_the_tables_of_the_dumped_records_stay(self):
+        for name in ("ExplodedPiece", "PieceRec", "Debris", "Piece", "Face", "PatrolGoal", "AiSearchGoal", "PackedGoal",
+                     "LiteGoalState", "ScriptState", "ScriptChannel", "ScriptPiece", "PieceTransform"):
+            self.assertIn(name, self.model["tables"])
 
     def test_rec_hashes_only_b(self):
         rec = self.model["tables"]["Rec"]

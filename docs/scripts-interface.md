@@ -1,6 +1,6 @@
 # The scripts interface
 
-Scripts sit behind `interfaces/scripts.h` (version 2.0), the first of two simulation subsystems cut out of units and
+Scripts sit behind `interfaces/scripts.h` (version 2.1), the first of two simulation subsystems cut out of units and
 orders in #993 (the other is movement, `docs/movement-interface.md`). Scripts are a unit's COB scripts as the
 simulation sees them: the interpreter and its threads, the piece state a script poses, and the piece queries (where a
 piece is, what angles it has, where a weapon aims from). 3.1c's code is its default implementation. This page is the
@@ -26,7 +26,7 @@ called; every route into units that writes what a script reads is synchronous (`
 There is no WASM module (the maintainer, 2026-11-19, on #993, option 1). The seam is over native code, like the other
 simulation subsystems: the fillers are in `src/seams/native.cpp` (`<Slot>Native`), and `g_seams.scripts` is set there.
 
-Versions: scripts 2.0 (`StartScript`, `StartScriptWithArgs` and `InitObjectState` left the seam and `Apply` is new),
+Versions: scripts 2.1 (`WriteState` is new, #1024), after 2.0 (`StartScript`, `StartScriptWithArgs` and `InitObjectState` left the seam and `Apply` is new),
 units 6.0 (`docs/units-interface.md`) and services 2.2 (`HarnessUnitsEvent` and `HarnessScriptsEvent`). Before #986
 scripts were 1.0: units went to 2.0 when the 16 slots that moved here left `UnitsSeam`, and orders to 4.0 for
 movement's slots (`docs/movement-interface.md`).
@@ -55,7 +55,7 @@ Scripts' effects on units and map are events now, and every other module's start
 
 Of the slots of 1.0, `StartScript`, `StartScriptWithArgs` and `InitObjectState` are gone: every caller publishes the
 event START (for the first two) or INIT_STATE (for the third), which scripts' `Apply` consumes. The other 22 are
-synchronous slots. No subsystem calls into `src/scripts/` except through `g_seams.scripts`. Every slot has a harness
+synchronous slots, and `WriteState` (2.1) is the 23rd, the engine's report of state. No subsystem calls into `src/scripts/` except through `g_seams.scripts`. Every slot has a harness
 replay hook (`RecScripts<Slot>`, `src/harness/replay_hooks.inc`), which the callers below do not list again.
 
 "In the tick" is yes when the callers run under a phase (`UpdateAllUnits`, `RunOrders`, `UpdateProjectiles`, phase 0's
@@ -92,6 +92,7 @@ delivery.
 | `SaveScriptState` | writes a script's threads to a saved game | units (`unit_save.cpp`: `SaveUnits`) | no | new: was `CobScript::SaveScriptState` from `unit_save.cpp` |
 | `LoadScriptState` | reads a script's threads from a saved game | units (`unit_save.cpp`: `LoadUnit`) | no | new: was `CobScript::LoadScriptState` from `unit_save.cpp` |
 | `DeleteScript` | destroys a unit script (the virtual deleting destructor) | units (`units.cpp`: `ApplyUnitDeath`) | yes | new: was a `delete` of the `CobScript` from `units.cpp` |
+| `WriteState` | writes record 55 `scriptsState`: the script state that left the hash (section 6); it reads only scripts' own state and writes through the `StateWriter` | the engine (the trace harness, at a dump tick) | yes | new in 2.1 |
 
 Notes on the table:
 - **`InitUnitScript` stays in units** (`units.cpp`, `FUNCTION: 0x485d40`): it is the unit's creation, and it makes
@@ -224,28 +225,44 @@ INIT_STATE and CLEARED keep their modes, and EXTRACTOR becomes synchronous.
 
 ## 6. State and the trace
 
-Scripts' events are dumped in section 51 of the trace (units' in section 50), never hashed (`docs/trace-format.md`).
-Scripts keep no private region, so they have no `WriteState` report: their state is the script object of each unit
-and its piece state, hashed where they are (the human, 2026-11-16 and 2026-11-17, on #978 and #984). It stays hashed
-in this change as section 23 of `docs/trace-format.md` (8.12, "scripts"), and the units' section hashes the unit's
-`script` and `state` pointers as before. Sections 50 and 51 are in `docs/trace-format.md` as 8.34 and 8.35. The scripts'
-class rows in `data/state_classes.csv` name `src/scripts/` as the owner (`NewUnitScript: new UnitScript`,
-`CreateObjectState` and `CreatePlayerObjectState: GameAllocIgnoreTag ModelState`). A later format bump, for weapons,
-orders and units, moves out of the hash what only its owner reads (as #979 does for los_radar, players, ai and map);
-the last list below is what scripts adds to that bump.
+Scripts keep no private region. Since format 8 of the trace (#1024) the script state that only scripts reads is not
+hashed, and scripts' `WriteState` (a slot since 2.1) dumps it in record 55, `scriptsState`. The state stays where it
+was: the script object of each unit, its statics and its piece records are scripts' own allocations, and
+`data/state_classes.csv` names `src/scripts/` as their owner (`NewUnitScript: new UnitScript`, `CreateObjectState` and
+`CreatePlayerObjectState: GameAllocIgnoreTag ModelState`). Scripts' events are dumped in section 51 of the trace
+(units' in section 50), never hashed (`docs/trace-format.md`, sections 8.34 and 8.35).
 
-| Scripts' state | Where | Read by | Only scripts reads it |
+| Scripts' state | Where | Read by | Hashed |
 |---|---|---|---|
-| The threads: 8 `Channel` records of a `CobScript` (state, program counter, stack pointer, the stack of 32 words, signal, delay, wait, piece and axis, the callback pointer) | the unit's script object, hashed (section 23, `channels[c]`) | scripts | yes |
-| The script's statics (`CobScript::statics`, as many words as the compiled data names) | a block allocation, hashed (`script.statics`) | scripts | yes |
-| The piece records (`Piece`: move, turn and spin targets, speeds, acceleration, active bits) | a block allocation, hashed (`script.pieces[p]`) | scripts | yes |
-| The script's own words (`CobScript::scale`, `table`, `changed`, `activeCount`; `UnitScript::state`) | the script object, hashed (`script.<field>`) | scripts | yes |
-| The piece transforms (`PieceState`: translation, rotation, visible, cached, shaded) | the model state of the unit, hashed (`script.transforms[q]`) | scripts (the piece queries); presentation (drawing, `model_render.cpp`) | yes, in the simulation: drawing reads the pose, nothing else in the tick does |
-| The model state's derived data (`ModelState::pos`, `root`, `animDirty`, `cacheDrawCount`; each piece's cached `points`) | the model state, not hashed | scripts, presentation | not hashed: the derived position, the caches and the draw frame are view |
+| The threads: 8 `Channel` records of a `CobScript` (state, program counter, stack pointer, the stack of 32 words, signal, delay, wait, piece and axis, the callback pointer) | the unit's script object | scripts | no: record 55 `channels[c]` |
+| The script's statics (`CobScript::statics`, as many words as the compiled data names) | a block allocation | scripts | no: record 55 `statics` |
+| The piece records (`Piece`: move, turn and spin targets, speeds, acceleration, active bits) | a block allocation | scripts | no: record 55 `pieces[p]` |
+| The script's own words (`CobScript::scale`, `table`, `checksum`, `changed`, `activeCount`) | the script object | scripts | no: record 55, the fields of the script state |
+| The piece transforms (`PieceState`: translation, rotation, visible, cached, shaded) | the model state of the unit (section 23, `script.transforms[q]`) | scripts (the piece queries); weapons (reads them for the pieces it blows off and for debris); presentation (drawing) | yes |
+| The model state's derived data (`ModelState::pos`, `root`, `animDirty`, `cacheDrawCount`; each piece's cached `points`) | the model state | scripts, presentation | not hashed: the derived position, the caches and the draw frame are view |
 | The model state's `unit` back-pointer and `drawFrame` | the model state, a pointer marker only | scripts, presentation; units writes them (`InitUnitScript`) | no: units writes them |
-| A unit's `script` and `state` pointers (`Unit::script`, `Unit::state`) | the unit record, hashed | units, and every caller of a slot, which passes the script as its first argument | no |
-| The unit's bit0, bit1 and bit3 (`UnitScript::SetUnitValue`, `GetUnitValue`) | the unit record, hashed with the unit | scripts write them directly; the word they sit in is read as `Unit::flags` by units, orders and map | no |
-| The feature's model state (`PlaceFeature`, `FREE_STATE`, `INIT_STATE`) | the feature, hashed as a pointer marker | features, presentation; scripts builds and fills it | no |
+| A unit's `script` and `state` pointers (`Unit::script`, `Unit::state`) | the unit record, hashed | units, and every caller of a slot, which passes the script as its first argument | yes |
+| The unit's bit0, bit1 and bit3 (`UnitScript::SetUnitValue`, `GetUnitValue`) | the unit record, hashed with the unit | scripts write them directly; the word they sit in is read as `Unit::flags` by units, orders and map | yes |
+| The feature's model state (`PlaceFeature`, `FREE_STATE`, `INIT_STATE`) | the feature, hashed as a pointer marker | features, presentation; scripts builds and fills it | yes |
+
+**What is hashed, and who reads it.** Section 23 (`docs/trace-format.md`, section 8.12) hashes, for each live unit, a
+presence byte and, for a unit with a script, only the piece transforms. Weapons reads them directly, for the pieces it
+blows off and the debris it makes of them, so they stay. The unit's `script`, `state` and bits stay in the unit's
+section with the unit.
+
+**What left the hash.** The 8 channels (state, program counter, stack pointer, the live stack words, signal, callback
+and the delay, wait, piece and axis of a channel that has them), the statics, the piece records and the script's own
+words (`scale`, the table pointer, `checksum`, `changed`, `activeCount`). Only scripts reads them.
+
+**Record 55, `scriptsState`** (dumped, never hashed; `docs/trace-format.md`, section 8.39). For each live unit with a
+script, one record `scriptsState.units[i]` holds the fields of the script state, the 8 channels as
+`channels[c].<field>` (and `.stack`), `statics.count` and `statics`, and the piece records as `pieces[p].<field>`.
+The reference build writes the same record itself. `WriteState` reads only scripts' state and writes through the
+`StateWriter`.
+
+**Where a wrong value shows.** The channels, statics and pieces decide which script runs and what it does. With a
+wrong program counter, orders-build-patrol first diverges at tick 201, phase world, `units[1].script.transforms[0].rotation` (`hex:000040020000` against `hex:0000781b0000`): at tick 200 the commander's first running channel was sent back to the start of the code. A wrong statics word, signal or piece target diverges through what the
+script then sets: the piece transforms (hashed), the unit's bits, and the events it publishes.
 
 This change adds scripts to the owners of `privatestate.py`. With them, `--check` fails when another subsystem writes
 any of the items scripts alone writes: the script objects (`CobScript`, `UnitScript`, the channels), the statics and
@@ -256,18 +273,6 @@ scripts`), the sim items scripts writes are those and the unit's `script` pointe
 `ModelState::cacheDrawCount` and `ObjectState::unit` (drawing), and units writes the model state's `unit` pointer.
 Scripts read, and write nothing of, the unit's position, heading, angles, flags, health, `cargo`, `cargoNext`,
 `carrier`, `def` and `state`.
-
-**Hashed state only scripts reads,** for the later format bump (weapons, orders and units):
-- the 8 channels of each unit's script: state, program counter, stack pointer, the live stack words, signal, delay,
-  wait, piece and axis (`script.channels[c].*`, including `.stack`);
-- the statics (`script.statics`);
-- the piece records (`script.pieces[p].*`);
-- the script's own words (`script.<field>`: `scale`, the table pointer, `changed`, `activeCount`, `UnitScript::state`);
-- the piece transforms (`script.transforms[q].*`), only scripts reading them in the simulation: the piece queries
-  (`GetPiecePosition` and the others) are scripts' slots, and drawing reads them outside it.
-
-Nothing else in the hash is scripts'. The unit's `script`, `state` and bits stay in the unit's section with the
-unit.
 
 **At load**: scripts restores each unit's script through the slot `LoadScriptState`, which units' `LoadUnit` (`unit_save.cpp`) calls once per unit after orders, from the unit's `Script<n>` box: the eight thread channels (their callbacks cleared), the active count, the statics and each piece's state. It restores nothing when the box's size or the script's checksum differs from the one the save was written with.
 

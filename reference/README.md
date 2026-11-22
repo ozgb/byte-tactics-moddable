@@ -132,7 +132,9 @@ directory into the game directory for the header.
 
 `-testdump <tick>` (`--testdump <tick>` for playtest.py, with `-testmode`) also
 writes `dump.txt`: every hashed field after each phase of that tick, the `world`
-tables included. It is ignored without `-testmode`; a value that does not parse
+tables included, and the state that only one module reads, which the rows do not hash since
+trace format 8 (the records of weapons, orders, movement, units and scripts; the reference
+build writes the same records as the modules do). It is ignored without `-testmode`; a value that does not parse
 exits with status 2. A dump of a large map is large: the cells, the explored
 grids and the pass maps are one line per record. The line format, the paths and
 the pointer IDs (`unit:12`, `heap`, `null`, and so on) are in

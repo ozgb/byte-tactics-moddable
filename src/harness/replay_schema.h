@@ -2829,6 +2829,7 @@ enum ReplaySlotId {
     RSL_SCRIPTS_SAVESCRIPTSTATE,
     RSL_SCRIPTS_LOADSCRIPTSTATE,
     RSL_SCRIPTS_DELETESCRIPT,
+    RSL_SCRIPTS_WRITESTATE,
     RSL_MOVEMENT_APPLY,
     RSL_MOVEMENT_UPDATEMOTION,
     RSL_MOVEMENT_APPLYPATHEVENT,
@@ -3405,6 +3406,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SaveScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "WriteState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdateMotion", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementUpdateMotionObjReads, 1, nullptr, 0, nullptr, 0 },
     { "ApplyPathEvent", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3522,11 +3524,11 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "units", 6, 0, 0, 117, 44 },
     { "players", 4, 0, 0, 161, 28 },
     { "map", 8, 0, 1, 189, 11 },
-    { "scripts", 2, 0, 0, 200, 23 },
-    { "movement", 4, 0, 0, 223, 20 },
-    { "mission", 1, 1, 0, 243, 0 },
-    { "files", 2, 0, 0, 243, 58 },
-    { "network", 1, 0, 0, 301, 22 },
+    { "scripts", 2, 1, 0, 200, 24 },
+    { "movement", 4, 0, 0, 224, 20 },
+    { "mission", 1, 1, 0, 244, 0 },
+    { "files", 2, 0, 0, 244, 58 },
+    { "network", 1, 0, 0, 302, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

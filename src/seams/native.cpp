@@ -951,6 +951,7 @@ void InstallNativeSeams()
     s_scripts.SaveScriptState = SaveScriptStateNative;
     s_scripts.LoadScriptState = LoadScriptStateNative;
     s_scripts.DeleteScript = DeleteScriptNative;
+    s_scripts.WriteState = ScriptsWriteState;
     s_weapons.UpdateProjectiles = UpdateProjectiles;
     s_weapons.UpdateExplosions = UpdateExplosions;
     s_weapons.Apply = WeaponsApply;

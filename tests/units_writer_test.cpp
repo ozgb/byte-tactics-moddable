@@ -41,6 +41,7 @@
 #include "../src/seams/units_world.h"
 #include "../src/units/units_seam.h"
 #include "../src/units/factory_index.h"
+#include "../interfaces/state_writer.h"
 #include "../src/map/line_of_sight_index.h"
 
 Game* g_game;
@@ -817,10 +818,95 @@ static void CheckHumanUnderIdle()
     g_seams.ai = &s_standard;
 }
 
+struct ULine {
+    char record[64];
+    char field[64];
+    int index;
+    int size;
+    unsigned int value;
+};
+static ULine su_lines[2048];
+static int su_lineCount;
+static char su_record[64];
+
+static void UAddLine(const char* field, int index, int size, unsigned int value)
+{
+    if (su_lineCount >= 2048)
+        return;
+    ULine* l = &su_lines[su_lineCount++];
+    strcpy(l->record, su_record);
+    strcpy(l->field, field);
+    l->index = index;
+    l->size = size;
+    l->value = value;
+}
+
+static void __stdcall URecBegin(int, const char* name)
+{
+    strcpy(su_record, name);
+}
+
+static void __stdcall URecInt(const char* field, int index, int size, unsigned int value)
+{
+    UAddLine(field, index, size, value);
+}
+
+static void __stdcall URecBytes(const char* field, int index, const void*, int size)
+{
+    UAddLine(field, index, -size, 0);
+}
+
+static void __stdcall URecHandle(const char* field, int index, int, unsigned int value)
+{
+    UAddLine(field, index, 0, value);
+}
+
+static void __stdcall URecRun(int) {}
+
+static const ULine* UFind(const char* record, const char* field, int index)
+{
+    for (int i = 0; i < su_lineCount; i++)
+        if (strcmp(su_lines[i].record, record) == 0 && strcmp(su_lines[i].field, field) == 0 && su_lines[i].index == index)
+            return &su_lines[i];
+    return nullptr;
+}
+
+static void UDump(void (__stdcall* writeState)(const StateWriter*))
+{
+    StateWriter writer = { URecBegin, URecInt, URecBytes, URecHandle, URecRun };
+    su_lineCount = 0;
+    su_record[0] = 0;
+    writeState(&writer);
+}
+
+static void CheckUnitRecords()
+{
+    Layout();
+    g_game->poolCount = kUnits + 1;
+    Unit* u = &s_units[kGuard];
+    u->hoverBobPhase = 0x1234;
+    u->healthPercent = 77;
+    u->prevHealthPercent = 78;
+    u->zBufferFlag = 1;
+    UDump(UnitsWriteState);
+    char name[32];
+    sprintf(name, "unitsState.units[%d]", kGuard);
+    const ULine* bob = UFind(name, "hoverBobPhase", 0);
+    Check(bob != nullptr && bob->size == 2 && bob->value == 0x1234, "the unit's record holds its hover bob phase");
+    Check(UFind(name, "healthPercent", 0) != nullptr && UFind(name, "healthPercent", 0)->value == 77, "the unit's record holds its health percent");
+    Check(UFind(name, "unknown_10a", 0) != nullptr && UFind(name, "unknown_10a", 0)->size == -4, "the unit's record holds the four bytes at 0x10a");
+    Check(UFind(name, "zBufferFlag", 0) != nullptr && UFind(name, "zBufferFlag", 0)->value == 1, "the unit's record holds its z buffer flag");
+    Check(UFind("unitsState.units[0]", "head", 0) == nullptr, "a slot with no unit type has no record");
+    u->hoverBobPhase = 0x4321;
+    UDump(UnitsWriteState);
+    Check(UFind(name, "hoverBobPhase", 0)->value == 0x4321, "tampering with a unit's hover bob phase changes its record");
+}
+
 int main()
 {
     Setup();
     CheckFactoryIndex();
+    CheckUnitRecords();
     CheckRouteOrder();
     CheckSplitAttack();
     CheckReturnFireGates();

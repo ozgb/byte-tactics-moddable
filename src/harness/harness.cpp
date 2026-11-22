@@ -2434,61 +2434,6 @@ static void VisitProjectiles()
 
 static unsigned ReadRefAt(unsigned p, unsigned offset);
 
-static void VisitExplosions()
-{
-    char path[64];
-    unsigned char pieceUsed[PIECE_COUNT];
-    unsigned debrisCount = GameU32(GAME_DEBRIS_COUNT);
-    unsigned char* pieces = GameAt(GAME_PIECES);
-    memset(pieceUsed, 0, sizeof pieceUsed);
-    if (debrisCount > PIECE_COUNT)
-        debrisCount = PIECE_COUNT;
-
-    HashByte(3);
-    for (unsigned slot = 0; slot < EXPLODED_SLOTS; slot++) {
-        unsigned char* block = g_explodedPieces[slot];
-        if (block == NULL)
-            continue;
-        HashU32(slot);
-        FormatPath(path, "explodedPieces[%u]", slot);
-        VisitElement(path, block, &kExplodedPieceTable);
-        FormatPath(path, "explodedPieces[%u].rec", slot);
-        VisitElement(path, block + 0x30, &kPieceRecTable);
-    }
-    EndSection();
-
-    HashByte(4);
-    for (unsigned d = 0; d < debrisCount; d++) {
-        unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
-        unsigned obj = ReadRefAt((unsigned)e, 0);
-        if (obj == 0)
-            continue;
-        HashU32(d);
-        FormatPath(path, "debris[%u]", d);
-        VisitElement(path, e, &kDebrisTable);
-        if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
-            && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT)
-            pieceUsed[(obj - (unsigned)pieces) / PIECE_STRIDE] = 1;
-    }
-    EndSection();
-
-    HashByte(5);
-    for (unsigned i = 0; i < PIECE_COUNT; i++) {
-        if (!pieceUsed[i])
-            continue;
-        HashU32(i);
-        FormatPath(path, "pieces[%u]", i);
-        VisitElement(path, pieces + i * PIECE_STRIDE, &kPieceTable);
-        FormatPath(path, "pieces[%u].vertices", i);
-        VisitRaw(path, GameAt(GAME_VERTICES) + i * 96, 96);
-        for (unsigned k = 0; k < 6; k++) {
-            FormatPath(path, "pieces[%u].faces[%u]", i, k);
-            VisitElement(path, GameAt(GAME_FACES) + (i * 6 + k) * 0x20, &kFaceTable);
-        }
-    }
-    EndSection();
-}
-
 static void VisitPlayers()
 {
     char path[64];
@@ -2917,6 +2862,7 @@ static void VisitModuleState()
     g_seams.movement->WriteState(&s_stateWriter);
     g_seams.map->WriteState(&s_stateWriter);
     g_seams.players->WriteState(&s_stateWriter);
+    g_seams.scripts->WriteState(&s_stateWriter);
     WriterEndRecord();
     s_hash = kept;
 }
@@ -3276,7 +3222,6 @@ static void VisitPassMaps()
 }
 
 enum FxClass { FX_UNKNOWN, FX_APPROACH, FX_RING, FX_MARKER, FX_PATH, FX_AIR };
-enum GoalClass { GOAL_UNKNOWN, GOAL_PATROL, GOAL_AISEARCH, GOAL_PACKED, GOAL_LITE, GOAL_PACKEDPOS };
 
 static unsigned ReadU32At(unsigned p, unsigned offset)
 {
@@ -3303,22 +3248,6 @@ static int FxClassOf(unsigned fx)
     if (vptr == (unsigned)g_airManeuverOrderVtable)
         return FX_AIR;
     return FX_UNKNOWN;
-}
-
-static int GoalClassOf(unsigned goal)
-{
-    unsigned vptr = ReadU32At(goal, 0);
-    if (vptr == (unsigned)g_patrolGoalVtable)
-        return GOAL_PATROL;
-    if (vptr == (unsigned)g_aiSearchGoalVtable)
-        return GOAL_AISEARCH;
-    if (vptr == (unsigned)g_packedGoalVtable)
-        return GOAL_PACKED;
-    if (vptr == (unsigned)g_liteGoalVtable)
-        return GOAL_LITE;
-    if (vptr == (unsigned)g_packedPosGoalVtable)
-        return GOAL_PACKEDPOS;
-    return GOAL_UNKNOWN;
 }
 
 static void RegisterFx(unsigned fx)
@@ -3410,9 +3339,6 @@ static void VisitOrders(unsigned char* units, unsigned count)
         if (!UnitIsLive(u))
             continue;
         HashU32(i);
-        if (s_dumpNow)
-            sprintf(path, "units[%u].head", i);
-        VisitPointer(path, ReadRefAt((unsigned)u, UNIT_HEAD), TT_LINK);
         for (unsigned which = 0; which < 2; which++) {
             unsigned order = ReadRefAt((unsigned)u, which == 0 ? UNIT_LIST : UNIT_LIST2);
             HashByte((unsigned char)(which + 1));
@@ -3428,51 +3354,6 @@ static void VisitOrders(unsigned char* units, unsigned count)
         }
     }
     EndSection();
-}
-
-static void VisitGoal(const char* prefix, unsigned goal)
-{
-    char path[112];
-    int cls;
-    unsigned n;
-    if (s_dumpNow)
-        sprintf(path, "%s.class", prefix);
-    if (goal == 0) {
-        VisitU32(path, 0);
-        return;
-    }
-    cls = GoalClassOf(goal);
-    VisitU32(path, (unsigned)cls);
-    if (cls == GOAL_UNKNOWN) {
-        char msg[160];
-        sprintf(msg, "testmode: unknown motion goal at %08x (vtable %08x)\n", goal, ReadU32At(goal, 0));
-        Fail(msg);
-    }
-    switch (cls) {
-    case GOAL_PATROL:
-        VisitElement(prefix, (const unsigned char*)goal, &kPatrolGoalTable);
-        n = ReadU32At(goal, PATROL_COUNT);
-        if (n > PATROL_POINT_LIMIT)
-            n = PATROL_POINT_LIMIT;
-        if (s_dumpNow)
-            sprintf(path, "%s.points", prefix);
-        VisitRaw(path, (const unsigned char*)goal + PATROL_POINTS, n * 4);
-        break;
-    case GOAL_AISEARCH:
-        VisitElement(prefix, (const unsigned char*)goal, &kAiSearchGoalTable);
-        n = ReadU32At(goal, AISEARCH_COUNT);
-        if (n > AISEARCH_POINT_LIMIT)
-            n = AISEARCH_POINT_LIMIT;
-        if (s_dumpNow)
-            sprintf(path, "%s.points", prefix);
-        VisitRaw(path, (const unsigned char*)goal + AISEARCH_POINTS, n * 4);
-        break;
-    default:
-        VisitElement(prefix, (const unsigned char*)goal, &kPackedGoalTable);
-        if (cls == GOAL_LITE)
-            VisitElement(prefix, (const unsigned char*)goal, &kLiteGoalStateTable);
-        break;
-    }
 }
 
 static void VisitMotions(unsigned char* units, unsigned count)
@@ -3492,11 +3373,22 @@ static void VisitMotions(unsigned char* units, unsigned count)
         if (s_dumpNow)
             sprintf(path, "units[%u].motion", i);
         VisitElement(path, (const unsigned char*)motion, &kUnitMotionTable);
-        if (s_dumpNow)
-            strcat(path, ".goal");
-        VisitGoal(path, ReadRefAt(motion, 0));
     }
     EndSection();
+}
+
+static void DumpElement(const char* path, const unsigned char* base, const TraceTable* t)
+{
+    if (s_dumpNow)
+        DumpFields(path, base, t->fields, t->fieldCount);
+}
+
+static void DumpU32(const char* path, unsigned value)
+{
+    if (s_dumpNow) {
+        DumpPrefix(path);
+        fprintf(s_dump, "0x%08x\n", value);
+    }
 }
 
 static void VisitFx()
@@ -3508,124 +3400,64 @@ static void VisitFx()
         unsigned fx = s_fxList[id];
         int cls = FxClassOf(fx);
         unsigned flags;
-        HashU32(id);
+        if (cls == FX_UNKNOWN)
+            HashU32(id);
         if (s_dumpNow)
             sprintf(path, "orderFx[%u]", id);
         if (s_dumpNow)
             sprintf(field, "%s.class", path);
-        VisitU32(field, (unsigned)cls);
         if (cls == FX_UNKNOWN) {
+            VisitU32(field, (unsigned)cls);
             if (s_dumpNow)
                 sprintf(field, "%s.vtableDelta", path);
             VisitU32(field, ReadU32At(fx, 0) - (unsigned)g_pathOrderVtable);
             continue;
         }
+        DumpU32(field, (unsigned)cls);
         switch (cls) {
         case FX_APPROACH:
-            VisitElement(path, (const unsigned char*)fx, &kApproachRadiusTable);
+            DumpElement(path, (const unsigned char*)fx, &kApproachRadiusTable);
             break;
         case FX_RING:
-            VisitElement(path, (const unsigned char*)fx, &kRingApproachTable);
+            DumpElement(path, (const unsigned char*)fx, &kRingApproachTable);
             break;
         case FX_MARKER:
-            VisitElement(path, (const unsigned char*)fx, &kPointMarkerTable);
+            DumpElement(path, (const unsigned char*)fx, &kPointMarkerTable);
             break;
         case FX_PATH:
             flags = *(const unsigned short*)(fx + PATHORDER_FLAGS);
-            VisitElement(path, (const unsigned char*)fx, &kPathOrderTable);
+            DumpElement(path, (const unsigned char*)fx, &kPathOrderTable);
+            VisitElement(path, (const unsigned char*)fx, &kPathOrderRefTable);
             if (!FxPosYUnset(fx))
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderPosYTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderPosYTable);
             if (flags & 0x40)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderHeadingTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderHeadingTable);
             if (flags & 1)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderPieceTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderPieceTable);
             if ((flags & 0x82) == 2)
-                VisitElement(path, (const unsigned char*)fx, &kPathOrderFollowTable);
+                DumpElement(path, (const unsigned char*)fx, &kPathOrderFollowTable);
             break;
         case FX_AIR:
             flags = *(const unsigned short*)(fx + AIRMANEUVER_FLAGS);
-            VisitElement(path, (const unsigned char*)fx, &kAirManeuverOrderTable);
+            DumpElement(path, (const unsigned char*)fx, &kAirManeuverOrderTable);
             if (flags & 1)
-                VisitElement(path, (const unsigned char*)fx, &kAirManeuverOrderHeadingTable);
+                DumpElement(path, (const unsigned char*)fx, &kAirManeuverOrderHeadingTable);
             break;
         }
     }
     EndSection();
 }
 
-static void VisitChannel(const char* prefix, const unsigned char* channel)
-{
-    char path[128];
-    unsigned state = *(const unsigned*)channel;
-    int sp;
-    unsigned live;
-    if (state == 0) {
-        if (s_dumpNow)
-            sprintf(path, "%s.state", prefix);
-        VisitU32(path, 0);
-        return;
-    }
-    VisitElement(prefix, channel, &kScriptChannelTable);
-    sp = *(const int*)(channel + 8);
-    live = sp < -1 ? 0 : (unsigned)(sp + 1);
-    if (live > SCRIPT_STACK_LIMIT)
-        live = SCRIPT_STACK_LIMIT;
-    if (s_dumpNow)
-        sprintf(path, "%s.stack", prefix);
-    VisitRaw(path, channel + SCRIPT_STACK, live * 4);
-    if ((state & 0xff000000) == 0x2000000) {
-        switch (state & 0xf00000) {
-        case 0x100000:
-        case 0x200000:
-            VisitElement(prefix, channel, &kScriptChannelPieceTable);
-            break;
-        case 0x400000:
-            VisitElement(prefix, channel, &kScriptChannelDelayTable);
-            break;
-        case 0x800000:
-            VisitElement(prefix, channel, &kScriptChannelWaitTable);
-            break;
-        }
-    }
-}
-
 static void VisitScript(unsigned i, const unsigned char* script)
 {
     char path[112];
     unsigned table = ReadU32At((unsigned)script, SCRIPT_TABLE);
-    unsigned statics = ReadRefAt((unsigned)script, SCRIPT_STATICS);
     unsigned pieces = ReadRefAt((unsigned)script, SCRIPT_PIECES);
     unsigned objectState = ReadRefAt((unsigned)script, SCRIPT_OBJECT_STATE);
-    unsigned staticCount = 0;
     unsigned pieceCount = 0;
-    if (s_dumpNow)
-        sprintf(path, "units[%u].script", i);
-    VisitElement(path, script, &kScriptStateTable);
-    if (table != 0) {
-        staticCount = ReadU32At(table, TABLE_STATIC_COUNT);
+    if (table != 0)
         pieceCount = ReadU32At(table, TABLE_PIECE_COUNT);
-    }
-    if (staticCount > SCRIPT_STATIC_LIMIT || statics == 0)
-        staticCount = 0;
-    if (pieceCount > SCRIPT_PIECE_LIMIT)
-        pieceCount = 0;
-    for (unsigned c = 0; c < SCRIPT_CHANNEL_COUNT; c++) {
-        if (s_dumpNow)
-            sprintf(path, "units[%u].script.channels[%u]", i, c);
-        VisitChannel(path, script + SCRIPT_CHANNELS + c * SCRIPT_CHANNEL_STRIDE);
-    }
-    if (s_dumpNow)
-        sprintf(path, "units[%u].script.statics", i);
-    VisitU32(path, staticCount);
-    VisitRaw(path, (const unsigned char*)statics, staticCount * 4);
-    if (pieces == 0)
-        pieceCount = 0;
-    for (unsigned p = 0; p < pieceCount; p++) {
-        if (s_dumpNow)
-            sprintf(path, "units[%u].script.pieces[%u]", i, p);
-        VisitElement(path, (const unsigned char*)pieces + p * SCRIPT_PIECE_STRIDE, &kScriptPieceTable);
-    }
-    if (objectState == 0)
+    if (pieceCount > SCRIPT_PIECE_LIMIT || pieces == 0 || objectState == 0)
         pieceCount = 0;
     for (unsigned q = 0; q < pieceCount; q++) {
         if (s_dumpNow)
@@ -4546,7 +4378,6 @@ void HarnessPhase(int phase)
     VisitU32("rng.crtHoldrand", holdrand);
     VisitUnits();
     VisitProjectiles();
-    VisitExplosions();
     VisitPlayers();
     VisitFeatures();
     VisitWind();

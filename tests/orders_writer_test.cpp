@@ -30,6 +30,7 @@
 #include "../src/orders/order_list.h"
 #include "../src/orders/orders_seam.h"
 #include "../src/seams/orders_world.h"
+#include "../interfaces/state_writer.h"
 
 void __stdcall RegisterOrderTypes(OrderTableEntry* from, int count);
 
@@ -233,6 +234,99 @@ static void Play(Run* run, bool tamper)
     run->applied = s_applied;
 }
 
+struct Line {
+    char record[64];
+    char field[64];
+    int index;
+    int size;
+    unsigned int value;
+};
+static Line s_lines[2048];
+static int s_lineCount;
+static char s_record[64];
+
+static void AddLine(const char* field, int index, int size, unsigned int value)
+{
+    if (s_lineCount >= 2048)
+        return;
+    Line* l = &s_lines[s_lineCount++];
+    strcpy(l->record, s_record);
+    strcpy(l->field, field);
+    l->index = index;
+    l->size = size;
+    l->value = value;
+}
+
+static void __stdcall RecBegin(int, const char* name)
+{
+    strcpy(s_record, name);
+}
+
+static void __stdcall RecInt(const char* field, int index, int size, unsigned int value)
+{
+    AddLine(field, index, size, value);
+}
+
+static void __stdcall RecBytes(const char* field, int index, const void*, int size)
+{
+    AddLine(field, index, -size, 0);
+}
+
+static void __stdcall RecHandle(const char* field, int index, int, unsigned int value)
+{
+    AddLine(field, index, 0, value);
+}
+
+static void __stdcall RecRun(int) {}
+
+static const Line* Find(const char* record, const char* field, int index)
+{
+    for (int i = 0; i < s_lineCount; i++)
+        if (strcmp(s_lines[i].record, record) == 0 && strcmp(s_lines[i].field, field) == 0 && s_lines[i].index == index)
+            return &s_lines[i];
+    return nullptr;
+}
+
+static void Dump(void (__stdcall* writeState)(const StateWriter*))
+{
+    StateWriter writer = { RecBegin, RecInt, RecBytes, RecHandle, RecRun };
+    s_lineCount = 0;
+    s_record[0] = 0;
+    writeState(&writer);
+}
+
+static Order* NewOrder(int kind, unsigned int wake, int arg0)
+{
+    Order* o = (Order*)SimAlloc(sizeof(Order));
+    memset((void*)o, 0, sizeof(Order));
+    o->kind = MissionType((unsigned char)kind);
+    o->wakeFrame = wake;
+    o->type = arg0;
+    return o;
+}
+
+static void CheckStateRecords()
+{
+    g_game->poolCount = kUnits + 1;
+    Order* first = NewOrder(3, 40, 5);
+    Order* second = NewOrder(4, 50, 6);
+    first->next = second;
+    s_units[kUnit].list = first;
+    Dump(OrdersWriteState);
+    Check(Find("ordersState.units[1]", "list[%u].wakeFrame", 0) != nullptr && Find("ordersState.units[1]", "list[%u].wakeFrame", 0)->value == 40, "the unit's record holds the wake frame of its first order");
+    Check(Find("ordersState.units[1]", "list[%u].arg0", 1) != nullptr && Find("ordersState.units[1]", "list[%u].arg0", 1)->value == 6, "the unit's record holds the first argument of its second order");
+    Check(Find("ordersState.units[1]", "list[%u].kind", 1) != nullptr && Find("ordersState.units[1]", "list[%u].kind", 1)->value == 4, "the unit's record holds the kind of its second order");
+    Check(Find("ordersState.units[1]", "list[%u].kind", 2) == nullptr && Find("ordersState.units[1]", "list2[%u].kind", 0) == nullptr, "the record stops at the end of each list");
+    first->wakeFrame = 41;
+    second->type = 9;
+    Dump(OrdersWriteState);
+    Check(Find("ordersState.units[1]", "list[%u].wakeFrame", 0)->value == 41, "tampering with an order's wake frame changes its record");
+    Check(Find("ordersState.units[1]", "list[%u].arg0", 1)->value == 9, "tampering with an order's first argument changes its record");
+    s_units[kUnit].list = 0;
+    Dump(OrdersWriteState);
+    Check(s_lineCount == 0, "a unit without orders has no record");
+}
+
 int main()
 {
     Setup();
@@ -249,6 +343,7 @@ int main()
     g_seams.orders = &tamperedSeam;
     Play(&tampered, true);
 
+    CheckStateRecords();
     int sum = 0;
     for (int t = 0; t < kTicks; t++)
         sum += Ticks(t);

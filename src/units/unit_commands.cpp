@@ -264,7 +264,7 @@ void __cdecl CreateMissionUnits()
         Vec3 pos = {e->x, e->y, e->z};
         g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, &pos);
         g_seams.mission->SetMissionUnitPosition(i, &pos);
-        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, pos, 1, 1, 0);
+        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, &pos, 1, 1, 0);
         if (u) {
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
             u->health = (unsigned short)((unsigned)(((UnitDefMaxHealthView*)u->def.get())->f1fa * e->health) / 100);

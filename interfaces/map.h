@@ -120,9 +120,9 @@ struct MapSeam {
     // Returns the mean ground height of the cell under a position; a query. Hooks: none.
     int (__stdcall* GetCellMeanHeight)(Vec3* pos);
     // Synchronous: returns 1 when a unit type can be built at a cell, with a visibility check when player is given, and leaves the metal of the cells it read and the height of a fit in the placement record, which the caller reads in the same statement. Hooks: none.
-    int (__stdcall* CanBuildAt)(UnitDef* unit, Point16 cell, short type, Player* player);
+    int (__stdcall* CanBuildAt)(UnitDef* unit, const Point16* cell, short type, Player* player);
     // Synchronous: returns 1 when the footprint of a unit type fits at a cell (flags 2 counts a cell off the map as a fit); for a type that does not move it answers and fills the placement record as CanBuildAt does. Hooks: none.
-    int (__stdcall* CanPlaceUnitFootprint)(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
+    int (__stdcall* CanPlaceUnitFootprint)(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags);
     // Copies the footprint and limits of count movement classes and builds their pass maps for the loaded terrain, outside the tick; the classes not given have none. Hooks: none.
     void (__stdcall* BuildAllPassMaps)(const MapMoveLimits* limits, int count);
     // Frees the pass maps when a match shuts down, outside the tick. Hooks: none.

@@ -634,7 +634,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         Vec3 snapped = order->pos;
         g_seams.map->SnapWorldPosToFootprint(def, &snapped);
         order->pos = snapped;
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,order->pos,0,1,0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,&order->pos,0,1,0));
         if (!order->target) { RecordUnitSpeech(unit,7,SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS); return 8; }
         RecordUnitSpeech(unit,9,SIM_SPEECH_STARTING_CONSTRUCTION);
         AddOrder("GETBUILT",1,order->target,unit,0,0,0);
@@ -981,7 +981,8 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             int height = target->def->modelMaxY;
             OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME_WITH_ARGS, 0, "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             g_seams.network->SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
-            Vec3 offset = g_seams.scripts->GetPieceOffset(unit, order->piece);
+            Vec3 offset;
+            g_seams.scripts->GetPieceOffset(unit, order->piece, &offset);
             unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, -1);
             MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, -((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);

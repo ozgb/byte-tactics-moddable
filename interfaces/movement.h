@@ -285,7 +285,7 @@ struct MovementSeam {
     // Builds a ring target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
     unsigned int (__stdcall* NewRingApproach)(unsigned int order, int x, int y, int inner, int outer);
     // Builds a footprint marker target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
-    unsigned int (__stdcall* NewPointMarker)(unsigned int order, Point16 pos, Point16 size);
+    unsigned int (__stdcall* NewPointMarker)(unsigned int order, const Point16* pos, const Point16* size);
     // Reads a target of a kind (as TargetType returns it, 2 to 6) for an order from a saved game bank under a name and returns it, or 0 for another kind, outside the tick. Hooks: none.
     unsigned int (__stdcall* LoadTarget)(int type, unsigned int order, HapiBank* file, const char* name);
     // Writes a target for an order to a saved game bank under a name, outside the tick. Hooks: none.

@@ -310,7 +310,7 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        unsigned int obj = g_seams.movement->NewPointMarker(Ref<Order>(this).offset, cell, size);
+        unsigned int obj = g_seams.movement->NewPointMarker(Ref<Order>(this).offset, &cell, &size);
         if (unit->motion.get()) {
             if (attached) {
                 MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);

@@ -59,7 +59,7 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
     call.Int(type);
     call.Ptr(player);
     SchedDeliver(SCHED_MAP);
-    return call.Result(g_seams.map->CanBuildAt(unit, cell, type, player));
+    return call.Result(g_seams.map->CanBuildAt(unit, &cell, type, player));
 }
 
 int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags)
@@ -70,7 +70,7 @@ int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short oth
     call.Ptr(&cell);
     call.Int(flags);
     SchedDeliver(SCHED_MAP);
-    return call.Result(g_seams.map->CanPlaceUnitFootprint(unit, otherTypeId, cell, flags));
+    return call.Result(g_seams.map->CanPlaceUnitFootprint(unit, otherTypeId, &cell, flags));
 }
 
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)

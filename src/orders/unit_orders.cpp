@@ -397,7 +397,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     case 2: {
         int piece = -1;
         g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
-        order->pos = g_seams.scripts->GetPiecePosition(unit, piece);
+        g_seams.scripts->GetPiecePosition(unit, piece, &order->pos);
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
         if (!ScheduleMapCanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {
@@ -405,7 +405,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             order->flags |= 2;
             return 2;
         }
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, &order->pos, 0, 1, 0));
         if (order->target == 0) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);
@@ -1679,7 +1679,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         g_seams.map->SnapWorldPosToFootprint(def, &snapped);
         order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)((char*)order + 0x12),
-            g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
+            g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, &order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);
@@ -2049,7 +2049,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 5: {
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, &order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);

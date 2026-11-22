@@ -869,7 +869,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         if (MatchWildcard(def->unitname,args->GetArg(0,g_emptyText))) {
             if (count) pos.x-=def->modelMinX;
             g_seams.map->SnapWorldPosToFootprint(def,&pos);
-            g_seams.units->CreateUnit(args->GetIntArg(1,0),i,pos,1,1,0);
+            g_seams.units->CreateUnit(args->GetIntArg(1,0),i,&pos,1,1,0);
             pos.x+=def->modelMaxX+0x200000;
             if (pos.x >= (g_game->mapWidth<<16)) { pos.x=0xa00000; pos.z+=0xa00000; }
             ++count;

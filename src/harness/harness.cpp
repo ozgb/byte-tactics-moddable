@@ -3921,7 +3921,7 @@ static void IssueScriptedSpawn(const ScriptedSpawn* sp)
     WorldPosition(sp->x, sp->z, (int*)&pos);
     UnitDef* def = (UnitDef*)((unsigned char*)GameRef(GAME_DEFS) + defIndex * UNITDEF_STRIDE);
     g_seams.map->SnapWorldPosToFootprint(def, &pos);
-    g_seams.units->CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, pos, 1, 1, 0);
+    g_seams.units->CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, &pos, 1, 1, 0);
 }
 
 void __stdcall ExecuteCommandLine(char* commandLine, int mask);

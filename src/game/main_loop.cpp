@@ -310,7 +310,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     if (g_seams.mission->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = g_seams.units->FindUnitTypeId(
             g_game->sideDefs[g_game->players[team].info->side].commander);
-        g_seams.units->CreateUnit(team, id, *(Vec3*)&pos, 1, 1, 0);
+        g_seams.units->CreateUnit(team, id, (Vec3*)&pos, 1, 1, 0);
     } else {
         char buf[128];
         sprintf(buf,

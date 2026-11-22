@@ -81,6 +81,7 @@ INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "sho
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream"}
+VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16"}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
 SLOT = re.compile(r"([\w:<>\*\s&,]+?)\s*\(\s*(__\w+)\s*\*\s*(\w+)\s*\)\s*\(([^;]*?)\)\s*;")
 TYPE_WORDS = {"unsigned", "char", "short", "int", "long", "float", "double", "bool"}
@@ -1083,6 +1084,9 @@ def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
             out["poly"] = kind
     elif ctype == "WeaponDef*":
         out["mode"] = "weapon"
+    elif ctype.endswith("*") and re.match(r"^\s*const\b", param["type"]) and ctype[:-1] in VALUE_POINTER_TYPES and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "value"}:
+        kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1] and s["scope"] == "value"][0]
+        out.update({"mode": "value", "kind": kind, "byPointer": True})
     else:
         out["mode"] = "pending"
     return out
@@ -1151,6 +1155,21 @@ SCALAR_INOUT = {"int*", "unsigned int*", "short*", "unsigned short*", "unsigned 
 def is_vec3_out(a: dict) -> bool:
     """A `Vec3` struct the slot fills (dir out): as an import argument it is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds."""
     return a["mode"] == "struct" and a.get("dir") == "out" and a.get("kind") == "Vec3"
+
+
+def is_value_ptr(a: dict) -> bool:
+    """A `const` pointer to a value kind that the slot reads (`const Point16*`, `const Vec3*`): recorded as the value by itself, the line a by-value argument writes (`a cell (185,78)`)."""
+    return a["mode"] == "value" and bool(a.get("byPointer"))
+
+
+def is_value_out(a: dict) -> bool:
+    """A pointer to a value kind that the slot fills (`{"mode": "value", "dir": "out"}`): recorded as the `result` of the call, the line a by-value result writes (`= (x,y,z)` in an import, `o result (x,y,z)` in a slot). A slot has one, and no other result."""
+    return a["mode"] == "value" and a.get("dir") == "out"
+
+
+def pointee(a: dict) -> str:
+    """The type an argument points at: its type without the trailing star."""
+    return arg_type(a)[:-1]
 
 
 def is_scalar_inout(a: dict) -> bool:
@@ -1297,9 +1316,13 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             if a["type"] not in SCALAR_INOUT:
                 errors.append("%s: %s is %s, and a scalar in/out value is a pointer to one of %s" % (where, label, a["type"], ", ".join(sorted(SCALAR_INOUT))))
         elif a["mode"] == "value":
-            if "dir" in a:
-                errors.append("%s: %s is a value with the direction %s, and only inout is allowed on a value" % (where, label, a["dir"]))
-            value_kind(a, label, False)
+            if "dir" in a and a["dir"] != "out":
+                errors.append("%s: %s is a value with the direction %s, and only inout and out are allowed on a value" % (where, label, a["dir"]))
+            if a.get("byPointer") and "dir" in a:
+                errors.append("%s: %s is a value by a const pointer, which takes no direction" % (where, label))
+            if a.get("dir") == "out" and result is not None:
+                errors.append("%s: %s is a value out, which is the result of the slot, and the slot has a result" % (where, label))
+            value_kind(a, label, bool(a.get("byPointer")) or a.get("dir") == "out")
         elif a["mode"] == "callback":
             entry = ann.get("callbacks", {}).get(a.get("callback"))
             if entry is None:
@@ -2339,6 +2362,9 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("    if (scope.Import()) {")
         if res is not None and own is None:
             L += ["        " + x for x in result_out(res, objects, "i")]
+        for i, a in enumerate(s["args"]):
+            if is_value_out(a):
+                L.append("        ImportResultValue(line, ROK_%s, %s);" % (upper(a["kind"]), arg_var(a, i)))
         for i in callback_args:
             L.append("        line.AddText(cb%d.Lines());" % i)
         for i, a in enumerate(s["args"]):
@@ -2445,11 +2471,15 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportInOutScalar(line, %s);" % var]
         return ['ArgInOutScalarExit(s_tail, "%s", %s);' % (line, var)]
+    elif mode == "value" and is_value_out(a):
+        if phase == "o":
+            return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, %s);' % (upper(a["kind"]), var)]
     elif mode == "value":
+        ref = "" if is_value_ptr(a) else "&"
         if phase == "a":
-            return ['ArgValueStruct(s_call, "a", "%s", ROK_%s, &%s);' % (line, upper(a["kind"]), var)]
+            return ['ArgValueStruct(s_call, "a", "%s", ROK_%s, %s%s);' % (line, upper(a["kind"]), ref, var)]
         if phase == "i":
-            return ["ImportValueStruct(line, ROK_%s, &%s);" % (upper(a["kind"]), var)]
+            return ["ImportValueStruct(line, ROK_%s, %s%s);" % (upper(a["kind"]), ref, var)]
     elif mode == "argv":
         if phase == "a":
             return ["ArgArgv(s_call, %s);" % var]
@@ -2568,7 +2598,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2692,8 +2722,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
         elif m == "bytes-in":
             L.append("    Space(t);\n    AddBytes(t, %s, %s);" % (v, length_parts(a, i)[1]))
+        elif is_value_out(a):
+            pass
         elif m == "value":
-            L.append("    Space(t);\n    AddValueStruct(t, ROK_%s, &%s);" % (upper(a["kind"]), v))
+            L.append("    Space(t);\n    AddValueStruct(t, ROK_%s, %s%s);" % (upper(a["kind"]), "" if is_value_ptr(a) else "&", v))
         else:
             L.append("    Space(t);\n    t.Add(\"?\");")
     L.append("    const char* r = Enter(t);")
@@ -2705,6 +2737,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
         elif (a["mode"] == "vec3" and a.get("dir") == "out") or is_vec3_out(a):
             L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
+        elif is_value_out(a):
+            L.append("    *%s = ParseValueText<%s>(ROK_%s, r);" % (arg_var(a, i), pointee(a), upper(a["kind"])))
         elif a["mode"] == "units":
             L.append('    ApplyUnits(a%d, "%s");' % (i, a["line"]))
         elif a["mode"] == "vector":
@@ -2811,6 +2845,16 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             closing.append(line + " ")
             after.append('    CompareInOutScalar("%s", %s_null ? nullptr : &%s);' % (line, g, g))
             call.append(v)
+        elif is_value_out(a):
+            g = "g_out_%s_%s_%d" % (sub, slot, i)
+            head.append("%s %s;" % (pointee(a), g))
+            L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
+            closing.append("result")
+            after.append('    CompareValueResult(ROK_%s, &%s);' % (upper(a["kind"]), g))
+            call.append("&" + g)
+        elif is_value_ptr(a):
+            L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (pointee(a), v, pointee(a), line, upper(a["kind"]), v))
+            call.append("&" + v)
         elif m == "value":
             L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
             call.append(v)

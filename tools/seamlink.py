@@ -123,8 +123,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
                   it holds (los_radar's GetVisibleEnemiesInRadius and GetSeenUnitsInRadius, and units' GetFactoriesInRadius: the Ref<Unit> array they fill; economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
-                  MeteorShowerParams; features' queries take no out parameter), or of the struct a slot returns by value
-                  (features' GetFootprintCentre: Vec3; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
+                  MeteorShowerParams; features' queries are not checked by their parameters), or of the struct a slot returns by value
+                  or fills in the filler's own frame (features' GetFootprintCentre: the Vec3 it is given; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
                   its IsUnitVisibleToPlayer the Vec3 and word view that it builds in its own frame, the pilot's filler_locals), and except economy's world view info structs (EconUnitInfo,
                   EconTypeInfo, EconPlayerInfo), which no state holds (info_types);
                   makes an indirect call other than through a read-only slot of the pilot's world view (economy's
@@ -293,7 +293,7 @@ FEATURES = Pilot(
     engine_files=(SCHEDULER_FILE, FEATURES_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::GetMapCell"),
-    filler_locals=(("FindFeatureAtPos", "Point16"),),
+    filler_locals=(("FindFeatureAtPos", "Point16"), ("GetFootprintCentre", "Vec3")),
     setup=("LoadFeatureFileList", "FreeFeatureFileList", "NopAfterFeatureEnum", "ResolveFeatureLinks", "InitFeatureAnimPool",
            "FreeFeaturePool", "PlaceMissionFeatures", "StampFeatureMetal", "FindOrLoadFeatureType", "SaveFeatures", "LoadFeatures"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),

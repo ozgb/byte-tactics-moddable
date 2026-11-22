@@ -393,7 +393,7 @@ struct UnitsSeam {
     // Reads one unit of a saved game from a bank and returns it; synchronous: the caller reads the unit in the same statement. Hooks: none.
     Unit* (__stdcall* LoadUnit)(unsigned short id, HapiBank* file);
     // Creates a unit of a type for a player at a position and returns it, or 0; finished is 1 for a built unit and 0 for one under construction, and id is the unit slot to take or 0 for the first free one; synchronous: the caller reads the new unit in the same statement. Hooks: UnitCreated.
-    Unit* (__stdcall* CreateUnit)(unsigned char player, unsigned short typeId, Vec3 pos, int finished, int mode, int id);
+    Unit* (__stdcall* CreateUnit)(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id);
     // Returns the unit type of a name, or 0 when there is none. Hooks: none.
     UnitDef* (__stdcall* FindUnitType)(const char* name);
     // Returns the index of the unit type of a name, or 0 when there is none. Hooks: none.

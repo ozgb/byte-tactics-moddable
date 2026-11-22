@@ -2107,7 +2107,8 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 dist.value = VectorLength(&v);
                 distance = dist.whole;
             } else {
-                Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature]);
+                Vec3 centre;
+                g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature], &centre);
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
                 Fixed dist;

@@ -99,12 +99,12 @@ struct ScriptsSeam {
     int (__stdcall* QueryScript)(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3);
     // Returns the index of a named script of a unit, or a negative number when it has none (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* FindScript)(CobScript* script, const char* name);
-    // Returns the offset of a piece of a unit from its position. Hooks: none.
-    Vec3 (__stdcall* GetPieceOffset)(Unit* unit, int piece);
-    // Returns the world position of a piece of a unit. Hooks: none.
-    Vec3 (__stdcall* GetPiecePosition)(Unit* unit, int piece);
-    // Returns the angles of a piece of a unit. Hooks: none.
-    Angles16 (__stdcall* GetPieceAngles)(Unit* unit, int piece);
+    // Writes to out the offset of a piece of a unit from its position. Hooks: none.
+    void (__stdcall* GetPieceOffset)(Unit* unit, int piece, Vec3* out);
+    // Writes to out the world position of a piece of a unit. Hooks: none.
+    void (__stdcall* GetPiecePosition)(Unit* unit, int piece, Vec3* out);
+    // Writes to out the angles of a piece of a unit. Hooks: none.
+    void (__stdcall* GetPieceAngles)(Unit* unit, int piece, Angles16* out);
     // Runs the unit's script that names its nano piece and writes the piece's world position; synchronous: the caller reads the position in the same statement. Hooks: none.
     void (__stdcall* GetNanoPiecePosition)(Unit* unit, Vec3* out);
     // Runs the unit's scripts that name the piece a weapon aims from and writes the piece's world position; synchronous: the caller reads the position in the same statement. Hooks: none.

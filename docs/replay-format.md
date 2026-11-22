@@ -502,12 +502,19 @@ the type it points at. Only the value is written, not a line per field: the same
 in/out name in the closing names of its call, so that an `o count (9)` line after an import is the import's when the slot does
 not name `count` itself. A mismatch of the value coming out is reported at the argument (`count`).
 
+A `const` pointer to a value kind (`const Point16*`, `const Vec3*`) that a slot only reads is recorded as the value itself, the line of the
+by-value form (`a cell (185,78)`, and ` (185,78)` in an import line). It needs no annotation: the generator takes it from the `const` in the
+header (`"byPointer": true`), and the replayer passes the address of the parsed value. A pointer to a value kind that a slot fills is
+`{"mode": "value", "kind": "Vec3", "dir": "out"}`, for a slot with no other result. It is recorded as the result of the call: ` = (x,y,z)`
+in an import line and `o result (x,y,z)` in a slot, the lines of a slot that returns the value, and the stub of an import writes the parsed
+value through the pointer.
+
 A pointer to a scalar (`int*`, `short*`, `unsigned char*`, and the unsigned forms of the first two) that a callee reads and writes back,
 as `QueryScript` does with `arg0` to `arg3`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
 struct form with the value in parentheses: `a arg0 (5)` going in, `a arg1 null` for a null pointer, `o arg0 (9)` coming out when the pointer is not
 null (in an import line ` (5)` and ` null`, and `o arg0 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
 import writes the `o` line back through the pointer. It is neither `cast`, which stays `void*`, nor a one-field struct kind, which would
-describe an `int` as something it is not. A `value` with a `dir` other than `inout`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
+describe an `int` as something it is not. A `value` with a `dir` other than `inout` and `out`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
 
 ### A void* argument with a known kind
 

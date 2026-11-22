@@ -325,7 +325,7 @@ void __cdecl LoadMatch(void*)
                 if (rec->active != 0 && rec->team == 1)
                     start = pos;
                 unsigned short id = g_seams.units->FindUnitTypeId(g_game->sideDefs[side].commander);
-                g_seams.units->CreateUnit(rec->kind, id, *(Vec3*)&pos, 1, 1, 0);
+                g_seams.units->CreateUnit(rec->kind, id, (Vec3*)&pos, 1, 1, 0);
                 int s1 = pl->energy * 100;
                 int s2 = pl->metal * 100;
                 rec->flags_149.started = 1;

@@ -80,7 +80,7 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-Vec3 __stdcall Imp_features_GetFootprintCentre(Point16* a0, Feature* a1)
+void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "features.GetFootprintCentre");
@@ -89,7 +89,8 @@ Vec3 __stdcall Imp_features_GetFootprintCentre(Point16* a0, Feature* a1)
     Space(t);
     ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
@@ -274,7 +275,7 @@ void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char 
     (void)r;
 }
 
-Vec3 __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1)
+void __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "scripts.GetPieceOffset");
@@ -283,10 +284,11 @@ Vec3 __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1)
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
-Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
+void __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "scripts.GetPiecePosition");
@@ -295,7 +297,8 @@ Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
 int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, int* a3, int* a4, int* a5)
@@ -399,8 +402,8 @@ MapSeam g_native_map = {
     ApplyMapEventSlot,
     UnitsInRange,
     GetCellMeanHeight,
-    CanBuildAt,
-    CanPlaceUnitFootprint,
+    CanBuildAtSlot,
+    CanPlaceUnitFootprintSlot,
     BuildAllPassMaps,
     FreePassMaps,
     LoadMetalPlotmap,
@@ -723,11 +726,12 @@ int g_result_map_CanBuildAt;
 void Run_map_CanBuildAt()
 {
     UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
-    Point16 p1 = ArgScalar<Point16>("cell");
+    Point16 p1 = Point16();
+    ParseValueArg("cell", ROK_POINT16, &p1);
     short p2 = ArgScalar<short>("type");
     Player* p3 = (Player*)ArgObject("player", ROK_PLAYER);
     SetClosing("result");
-    g_result_map_CanBuildAt = g_seams.map->CanBuildAt(p0, p1, p2, p3);
+    g_result_map_CanBuildAt = g_seams.map->CanBuildAt(p0, &p1, p2, p3);
 }
 
 void After_map_CanBuildAt()
@@ -741,10 +745,11 @@ void Run_map_CanPlaceUnitFootprint()
 {
     UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
     unsigned short p1 = ArgScalar<unsigned short>("otherTypeId");
-    Point16 p2 = ArgScalar<Point16>("cell");
+    Point16 p2 = Point16();
+    ParseValueArg("cell", ROK_POINT16, &p2);
     int p3 = ArgScalar<int>("flags");
     SetClosing("result");
-    g_result_map_CanPlaceUnitFootprint = g_seams.map->CanPlaceUnitFootprint(p0, p1, p2, p3);
+    g_result_map_CanPlaceUnitFootprint = g_seams.map->CanPlaceUnitFootprint(p0, p1, &p2, p3);
 }
 
 void After_map_CanPlaceUnitFootprint()

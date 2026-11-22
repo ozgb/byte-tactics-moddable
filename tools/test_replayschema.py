@@ -939,29 +939,28 @@ class StructForms(unittest.TestCase):
     def test_a_struct_by_value_is_written_as_its_fields_in_one_line(self):
         ann = annotations()
         movement = ann["subsystems"]["movement"].setdefault("slots", {})
-        movement.setdefault("NewPointMarker", {}).setdefault("args", {})["pos"] = {"mode": "value", "kind": "Point16"}
+        movement.setdefault("NewPointMarker", {}).setdefault("args", {})["pos"] = {"mode": "value", "kind": "Point16", "byPointer": True}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
-        self.assertIn('ArgValueStruct(s_call, "a", "pos", ROK_POINT16, &a1);', files[rs.HOOKS_H])
+        self.assertIn('ArgValueStruct(s_call, "a", "pos", ROK_POINT16, a1);', files[rs.HOOKS_H])
 
-    def test_a_result_by_value_is_recorded_in_the_import_line_and_the_closing_line(self):
+    def test_a_value_out_is_recorded_as_the_result_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["imports"].append("scripts.GetPieceAngles")
-        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "Angles16"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
         body = hooks[hooks.index("RecScriptsGetPieceAngles"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ImportResultValue(line, ROK_ANGLES16, &result);", body)
-        self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, &result);', body)
-        self.assertIn("return ParseValueText<Angles16>(ROK_ANGLES16, r);", files[rs.SLOTS_H])
+        self.assertIn("ImportResultValue(line, ROK_ANGLES16, a2);", body)
+        self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, a2);', body)
+        self.assertIn("*a2 = ParseValueText<Angles16>(ROK_ANGLES16, r);", files[rs.SLOTS_H])
 
-    def test_a_result_by_value_of_another_type_is_an_error(self):
+    def test_a_value_out_of_another_type_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "MissionType"}}
+        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"args": {"out": {"mode": "value", "kind": "MissionType", "dir": "out"}}}
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("the result is Angles16" in e for e in errors), errors)
+        self.assertTrue(any("the argument out is Angles16*, and the kind MissionType is MissionType*" in e for e in errors), errors)
 
     def test_an_unknown_mode_is_an_error(self):
         _, errors, _ = self.generated(self.targeting(mode="nonsense"))
@@ -2154,8 +2153,51 @@ class ArgumentShapes(unittest.TestCase):
             self.assertTrue(any("a scalar in/out value is a pointer to one of" in e for e in errors), (ctype, errors))
         errors = self.errors([("int*", "p2")], {"p2": dict(self.SCALAR_INOUT, kind="FixtureAmount")})
         self.assertTrue(any("a scalar in/out value, which takes no `kind`" in e for e in errors), errors)
-        errors = self.errors([("FixtureAmount", "p2")], {"p2": {"mode": "value", "kind": "FixtureAmount", "dir": "out"}})
-        self.assertTrue(any("only inout is allowed on a value" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount", "p2")], {"p2": {"mode": "value", "kind": "FixtureAmount", "dir": "both"}})
+        self.assertTrue(any("only inout and out are allowed on a value" in e for e in errors), errors)
+
+    VALUE_OUT = {"mode": "value", "kind": "FixtureAmount", "dir": "out"}
+
+    def test_a_const_pointer_to_a_value_kind_is_recorded_as_the_value(self):
+        s, _ = self.slot([("const Point16*", "amount")], {})
+        a = s["args"][0]
+        self.assertEqual((a["mode"], a["kind"], a["byPointer"]), ("value", "Point16", True))
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgValueStruct(s_call, "a", "amount", ROK_POINT16, a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), ["ImportValueStruct(line, ROK_POINT16, a0);"])
+        self.assertIn("AddValueStruct(t, ROK_POINT16, a0);", "\n".join(rs.import_stub("units", "Query", s)))
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('Point16 p0 = Point16();\n    ParseValueArg("amount", ROK_POINT16, &p0);', runner)
+        self.assertIn("g_seams.units->Query(&p0)", runner)
+        self.assertEqual(self.errors([("const Point16*", "amount")], {}), [])
+
+    def test_a_pointer_to_a_value_kind_without_const_stays_pending(self):
+        s, _ = self.slot([("Point16*", "amount")], {})
+        self.assertEqual(s["args"][0]["mode"], "pending")
+
+    def test_a_value_out_is_the_result_line_of_the_call(self):
+        s, _ = self.slot([("int", "piece"), ("FixtureAmount*", "out")], {"out": self.VALUE_OUT})
+        a = s["args"][1]
+        self.assertEqual(rs.arg_out(a, 1, "a", {}), [])
+        self.assertEqual(rs.arg_out(a, 1, "i", {}), [])
+        self.assertEqual(rs.arg_out(a, 1, "o", {}), ['ArgValueStruct(s_tail, "o", "result", ROK_FIXTUREAMOUNT, a1);'])
+        wrapper = "\n".join(rs.wrapper("units", {}, "Query", s, {}, True))
+        self.assertIn("ImportResultValue(line, ROK_FIXTUREAMOUNT, a1);", wrapper)
+        stub = "\n".join(rs.import_stub("units", "Query", s))
+        self.assertIn("*a1 = ParseValueText<FixtureAmount>(ROK_FIXTUREAMOUNT, r);", stub)
+        self.assertNotIn("AddValueStruct", stub)
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('SetClosing("result");', runner)
+        self.assertIn("g_seams.units->Query(p0, &g_out_units_Query_1)", runner)
+        self.assertIn("CompareValueResult(ROK_FIXTUREAMOUNT, &g_out_units_Query_1);", runner)
+
+    def test_a_value_out_is_a_pointer_to_its_kind_and_the_slot_has_no_other_result(self):
+        self.assertEqual(self.errors([("FixtureAmount*", "out")], {"out": self.VALUE_OUT}), [])
+        errors = self.errors([("FixtureAmount", "out")], {"out": self.VALUE_OUT})
+        self.assertTrue(any("is FixtureAmount, and the kind FixtureAmount is FixtureAmount*" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount*", "out")], {"out": self.VALUE_OUT}, "int", {"mode": "scalar"})
+        self.assertTrue(any("is a value out, which is the result of the slot" in e for e in errors), errors)
+        errors = self.errors([("const FixtureAmount*", "amount")], {"amount": {"mode": "value", "kind": "FixtureAmount", "byPointer": True, "dir": "out"}})
+        self.assertTrue(any("takes no direction" in e for e in errors), errors)
 
     def test_query_script_takes_its_four_values_as_scalar_in_out(self):
         files, errors, model = self.generated(annotations())

@@ -196,6 +196,42 @@ static int __stdcall GetCellMeanHeightNative(Vec3* pos)
     return GetCellMeanHeight(pos);
 }
 
+static void __stdcall GetFootprintCentreNative(const Point16* cell, Feature* def, Vec3* out)
+{
+    Point16 at = *cell;
+    *out = GetFootprintCentre(&at, def);
+}
+
+static int __stdcall CanBuildAtNative(UnitDef* unit, const Point16* cell, short type, Player* los)
+{
+    return CanBuildAt(unit, *cell, type, los);
+}
+
+static int __stdcall CanPlaceUnitFootprintNative(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+{
+    return CanPlaceUnitFootprint(unit, otherTypeId, *cell, flags);
+}
+
+static void __stdcall GetPieceOffsetNative(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPieceOffset(unit, piece);
+}
+
+static void __stdcall GetPiecePositionNative(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPiecePosition((Object*)unit, piece);
+}
+
+static void __stdcall GetPieceAnglesNative(Unit* unit, int piece, Angles16* out)
+{
+    *out = GetPieceAngles(unit, piece);
+}
+
+static Unit* __stdcall CreateUnitNative(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+{
+    return CreateUnit(player, typeId, *pos, finished, mode, id);
+}
+
 static WeaponDef* __stdcall FindWeaponByNameNative(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
@@ -682,7 +718,7 @@ void InstallNativeSeams()
     s_features.StampFeatureMetal = StampFeatureMetal;
     s_features.GetCellFeature = GetCellFeature;
     s_features.FindOrLoadFeatureType = FindOrLoadFeatureType;
-    s_features.GetFootprintCentre = GetFootprintCentre;
+    s_features.GetFootprintCentre = GetFootprintCentreNative;
     s_features.SaveFeatures = SaveFeatures;
     s_features.LoadFeatures = LoadFeatures;
     s_features.Apply = ApplyEvent;
@@ -821,15 +857,15 @@ void InstallNativeSeams()
     s_map.WriteState = MapWriteState;
     s_map.PathLockStamp = PathLockStamp;
     s_map.UnitsInRange = UnitsInRange;
-    s_map.CanBuildAt = CanBuildAt;
-    s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
+    s_map.CanBuildAt = CanBuildAtNative;
+    s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprintNative;
     s_players.Apply = PlayersApply;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
     s_scripts.QueryScript = QueryScriptNative;
     s_scripts.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
-    s_scripts.GetPieceOffset = GetPieceOffset;
-    s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_scripts.GetPieceOffset = GetPieceOffsetNative;
+    s_scripts.GetPiecePosition = GetPiecePositionNative;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreePassMaps = FreePassMaps;
     s_map.LoadMetalPlotmap = LoadMetalPlotmap;
@@ -883,12 +919,12 @@ void InstallNativeSeams()
     s_units.LoadUnits = LoadUnits;
     s_units.SaveUnits = SaveUnits;
     s_units.LoadUnit = LoadUnit;
-    s_units.CreateUnit = CreateUnit;
+    s_units.CreateUnit = CreateUnitNative;
     s_units.FindUnitType = FindUnitType;
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_scripts.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
-    s_scripts.GetPieceAngles = GetPieceAngles;
+    s_scripts.GetPieceAngles = GetPieceAnglesNative;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;
     s_units.CanLoad = CanLoadNative;

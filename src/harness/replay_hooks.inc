@@ -421,7 +421,7 @@ unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(const char* a0)
     return result;
 }
 
-Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
+void __stdcall RecFeaturesGetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_FEATURE, a1);
@@ -435,15 +435,14 @@ Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
         line.Add("  i features.GetFootprintCentre");
         ImportObject(line, ROK_FEATURE, a1);
     }
-    Vec3 result = s_inner_features->GetFootprintCentre(a0, a1);
+    s_inner_features->GetFootprintCentre(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
 void __stdcall RecFeaturesSaveFeatures(HapiBank* a0)
@@ -1400,7 +1399,7 @@ int __stdcall RecLosRadarHasReadyUnitInRange(int a0, const Vec3* a1, int a2)
     SlotScope scope(RSL_LOS_RADAR_HASREADYUNITINRANGE, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "range", a2);
     }
     int result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
@@ -1940,14 +1939,14 @@ Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
     return result;
 }
 
-Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, Vec3 a2, int a3, int a4, int a5)
+Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, const Vec3* a2, int a3, int a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_CREATEUNIT, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
         ArgValue(s_call, "typeId", a1);
-        ArgValue(s_call, "pos", a2);
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a2);
         ArgValue(s_call, "finished", a3);
         ArgValue(s_call, "mode", a4);
         ArgValue(s_call, "id", a5);
@@ -2152,7 +2151,7 @@ int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<U
     SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "radius", a2);
         ArgPending(s_call, "out");
         ArgValue(s_call, "capacity", a4);
@@ -2665,7 +2664,7 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     return result;
 }
 
-int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
+int __stdcall RecMapCanBuildAt(UnitDef* a0, const Point16* a1, short a2, Player* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -2673,7 +2672,7 @@ int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
     SlotScope scope(RSL_MAP_CANBUILDAT, SUB_MAP, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNITDEF, a0);
-        ArgValue(s_call, "cell", a1);
+        ArgValueStruct(s_call, "a", "cell", ROK_POINT16, a1);
         ArgValue(s_call, "type", a2);
         ArgObject(s_call, "player", ROK_PLAYER, a3);
     }
@@ -2684,7 +2683,7 @@ int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
     return result;
 }
 
-int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point16 a2, int a3)
+int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, const Point16* a2, int a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -2692,7 +2691,7 @@ int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point1
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNITDEF, a0);
         ArgValue(s_call, "otherTypeId", a1);
-        ArgValue(s_call, "cell", a2);
+        ArgValueStruct(s_call, "a", "cell", ROK_POINT16, a2);
         ArgValue(s_call, "flags", a3);
     }
     int result = s_inner_map->CanPlaceUnitFootprint(a0, a1, a2, a3);
@@ -2913,7 +2912,7 @@ int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
     return result;
 }
 
-Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
+void __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2928,18 +2927,17 @@ Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
         ImportObject(line, ROK_UNIT, a0);
         ImportValue(line, a1);
     }
-    Vec3 result = s_inner_scripts->GetPieceOffset(a0, a1);
+    s_inner_scripts->GetPieceOffset(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
-Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
+void __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2954,18 +2952,17 @@ Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
         ImportObject(line, ROK_UNIT, a0);
         ImportValue(line, a1);
     }
-    Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
+    s_inner_scripts->GetPiecePosition(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
-Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
+void __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1, Angles16* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2974,10 +2971,10 @@ Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "piece", a1);
     }
-    Angles16 result = s_inner_scripts->GetPieceAngles(a0, a1);
+    s_inner_scripts->GetPieceAngles(a0, a1, a2);
     if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, a2);
     }
-    return result;
 }
 
 void __stdcall RecScriptsGetNanoPiecePosition(Unit* a0, Vec3* a1)
@@ -3341,7 +3338,7 @@ unsigned int __stdcall RecMovementNewPathOrderAt(unsigned int a0, const Vec3* a1
     SlotScope scope(RSL_MOVEMENT_NEWPATHORDERAT, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
     }
     unsigned int result = s_inner_movement->NewPathOrderAt(a0, a1);
     if (scope.Open()) {
@@ -3374,7 +3371,7 @@ unsigned int __stdcall RecMovementNewPathOrderToUnitAt(unsigned int a0, Unit* a1
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
         ArgObject(s_call, "unit", ROK_UNIT, a1);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a2);
     }
     unsigned int result = s_inner_movement->NewPathOrderToUnitAt(a0, a1, a2);
     if (scope.Open()) {
@@ -3406,8 +3403,8 @@ unsigned int __stdcall RecMovementNewAirManeuverOrder(unsigned int a0, const Vec
     SlotScope scope(RSL_MOVEMENT_NEWAIRMANEUVERORDER, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgPending(s_call, "from");
-        ArgPending(s_call, "to");
+        ArgValueStruct(s_call, "a", "from", ROK_VEC3, a1);
+        ArgValueStruct(s_call, "a", "to", ROK_VEC3, a2);
     }
     unsigned int result = s_inner_movement->NewAirManeuverOrder(a0, a1, a2);
     if (scope.Open()) {
@@ -3451,14 +3448,14 @@ unsigned int __stdcall RecMovementNewRingApproach(unsigned int a0, int a1, int a
     return result;
 }
 
-unsigned int __stdcall RecMovementNewPointMarker(unsigned int a0, Point16 a1, Point16 a2)
+unsigned int __stdcall RecMovementNewPointMarker(unsigned int a0, const Point16* a1, const Point16* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MOVEMENT_NEWPOINTMARKER, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgValue(s_call, "pos", a1);
-        ArgValue(s_call, "size", a2);
+        ArgValueStruct(s_call, "a", "pos", ROK_POINT16, a1);
+        ArgValueStruct(s_call, "a", "size", ROK_POINT16, a2);
     }
     unsigned int result = s_inner_movement->NewPointMarker(a0, a1, a2);
     if (scope.Open()) {

@@ -592,7 +592,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
 
                         {
                             Unit* unit = g_seams.units->CreateUnit(
-                                g_game->localPlayer, typeId, pos, 1, 1, 0);
+                                g_game->localPlayer, typeId, &pos, 1, 1, 0);
                             SetStartingStorageBonus(pi,
                                          self->metal * 100,
                                          self->energy * 100);

@@ -1641,6 +1641,16 @@ Projectile* __stdcall FindTargetableProjectileSlot(Unit* unit, unsigned int weap
     return FindTargetableProjectile((InterceptorUnitView*)unit, (int)weapon);
 }
 
+int __stdcall CanBuildAtSlot(UnitDef* unit, const Point16* cell, short type, Player* player)
+{
+    return CanBuildAt(unit, *cell, type, player);
+}
+
+int __stdcall CanPlaceUnitFootprintSlot(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+{
+    return CanPlaceUnitFootprint(unit, otherTypeId, *cell, flags);
+}
+
 int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);

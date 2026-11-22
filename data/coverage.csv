@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,386,301,6075,3773,2274,957,,23,
+game,*,,388,301,6103,3773,2290,957,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -210,6 +210,7 @@ game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
 game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
+game,ReadStateWord,src/state/state_fields.h,1,0,0,0,0,0,?ReadStateWord@@YGIPBEI@Z,0,test-only
 game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,unset-case
 game,RecordMessage,src/state/sim_effects.h,1,0,0,0,0,0,?RecordMessage@@YGXW4SimMessageText@@H@Z,0,network
 game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,unset-case
@@ -245,6 +246,7 @@ game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHove
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WeaponsPublishRemoteDamage,src/game/weapons_events.h,1,0,0,0,0,0,?WeaponsPublishRemoteDamage@@YGXHPAUUnit@@0HHE@Z,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
+game,WriteStateFields,src/state/state_fields.h,1,0,0,0,0,0,?WriteStateFields@@YGXPBUStateWriter@@PBEPBUStateField@@IH@Z,0,test-only
 los_radar,*,,96,87,2004,1755,994,740,,22,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUStringValueElem@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUStringValueElem@@PAU1@00@Z,1,
@@ -313,7 +315,7 @@ mission,Mission::GetTranslatedName,src/mission/map_list.cpp,1,0,0,0,0,0,?GetTran
 mission,Mission::HasMissionName,src/mission/map_list.cpp,1,0,0,0,0,0,?HasMissionName@Mission@@QAE_NXZ,0,menu
 mission,Mission::MissionExists,src/mission/map_list.cpp,1,0,0,0,0,0,?MissionExists@Mission@@QAEHH@Z,0,campaign-menu
 mission,Mission::SelectMission,src/mission/map_list.cpp,1,0,0,0,0,0,?SelectMission@Mission@@QAEHH@Z,0,campaign-menu
-movement,*,,174,118,1680,1206,524,347,,8,
+movement,*,,177,118,1739,1206,558,347,,8,
 movement,AiSearchGoal::HasNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?HasNetUnitState@AiSearchGoal@@UAEHXZ,0,network
 movement,AiSearchGoal::SerializeNetUnitState,src/movement/order_targets.cpp,1,0,0,0,0,0,?SerializeNetUnitState@AiSearchGoal@@UAEXPAVBitWriter@@@Z,0,network
 movement,AiSearchGoal::TruncateWaypointsFrom,src/movement/order_targets.cpp,0,0,0,0,0,0,?TruncateWaypointsFrom@AiSearchGoal@@QAEXH@Z,1,
@@ -329,6 +331,7 @@ movement,ApproachRadius::AppendGoalCell,src/movement/order_targets.cpp,1,0,0,0,0
 movement,ApproachRadius::ApproachRadius,src/movement/order_targets.cpp,1,0,0,0,0,0,??0ApproachRadius@@QAE@HPAVHapiBank@@PAD@Z,0,save-load
 movement,ApproachRadius::ApproxDistExcess,src/movement/order_targets.cpp,1,0,0,0,0,0,?ApproxDistExcess@ApproachRadius@@QAEHHH@Z,0,unused-slot
 movement,ApproachRadius::Serialize,src/movement/order_targets.cpp,1,0,0,0,0,0,?Serialize@ApproachRadius@@QAEHHPAVHapiBank@@PAD@Z,0,save-load
+movement,ClassOfGoal,src/movement/movement_apply.cpp,1,0,0,0,0,0,?ClassOfGoal@@YG?AW4GoalClass@@PBE@Z,0,test-only
 movement,CopyDwordRangeUnchecked,src/movement/order_targets.cpp,0,0,0,0,0,0,?CopyDwordRangeUnchecked@@YGPAUPoint16@@PAU1@00@Z,1,
 movement,LiteGoal::HasNetUnitState,src/movement/packed_goal.cpp,1,0,0,0,0,0,?HasNetUnitState@LiteGoal@@UAEHXZ,0,network
 movement,LiteGoal::SerializeNetUnitState,src/movement/packed_goal.cpp,1,0,0,0,0,0,?SerializeNetUnitState@LiteGoal@@UAEXPAVBitWriter@@@Z,0,network
@@ -378,6 +381,8 @@ movement,TryGetDesiredHeading,src/movement/order_targets.cpp,1,0,0,0,0,0,?TryGet
 movement,UnitMotion::ApplyClampedTurnDelta,src/movement/motion.cpp,0,0,0,0,0,0,?ApplyClampedTurnDelta@UnitMotion@@QAEXPAUUnit@@F@Z,1,
 movement,UnitMotion::ClaimRepath,src/movement/motion.cpp,0,0,0,0,0,0,?ClaimRepath@UnitMotion@@QAEPAVAiSearchGoal@@XZ,1,
 movement,UnitMotion::ReadNetState,src/movement/motion.cpp,1,0,0,0,0,0,?ReadNetState@UnitMotion@@QAEXPAVBitReader@@@Z,0,network
+movement,WriteGoal,src/movement/movement_apply.cpp,1,0,0,0,0,0,?WriteGoal@@YGXPBUStateWriter@@PBE@Z,0,test-only
+movement,WritePoints,src/movement/movement_apply.cpp,1,0,0,0,0,0,?WritePoints@@YGXPBUStateWriter@@PBEII@Z,0,test-only
 network,*,,297,54,5276,584,2568,106,,74,
 network,??$copy@PAIPAI@std@@YGPAIPAI00@Z,src/network/unit_sync.cpp,0,0,0,0,0,0,??$copy@PAIPAI@std@@YGPAIPAI00@Z,1,
 network,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,src/network/unit_sync.cpp,1,0,0,0,0,0,??$copy@PAVUnitSyncPlayer@@PAV1@@std@@YGPAVUnitSyncPlayer@@PAV1@00@Z,0,menu
@@ -696,7 +701,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,244,234,5092,4373,2866,1882,,17,
+orders,*,,245,234,5121,4373,2880,1882,,17,
 orders,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,src/game/orders_events.h,1,0,0,0,0,0,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,0,unset-case
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
@@ -723,6 +728,7 @@ orders,Sub,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Sub@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Sub,src/orders/unit_orders.cpp,1,0,0,0,0,0,?Sub@@YG?AUVec@@ABU1@0@Z,0,no-caller
 orders,VtolGetRepairedOrder,src/orders/vtol_orders.cpp,1,0,0,0,0,0,?VtolGetRepairedOrder@@YGHPAUUnit@@PAUOrder@@H@Z,0,no-caller
 orders,Whole,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Whole@@YGFABH@Z,1,
+orders,WriteChain,src/orders/orders_slots.cpp,1,0,0,0,0,0,?WriteChain@@YGXPBUStateWriter@@PAUOrder@@H@Z,0,test-only
 orders,WriteUnitTypeNameKey,src/orders/order_list.cpp,0,0,0,0,0,0,?WriteUnitTypeNameKey@@YGXPAVHapiBank@@G@Z,1,
 pathfinding,*,,78,69,1143,941,432,300,,10,
 pathfinding,Align8,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?Align8@?A0x@@YGHH@Z,0,demo: hpa
@@ -2191,7 +2197,7 @@ presentation,YesNoDialogHandler,src/gui/dialogs.cpp,0,0,0,0,0,0,?YesNoDialogHand
 presentation,clear_screen,src/graphics/surface.cpp,1,0,0,0,0,0,?clear_screen@@YGXPAUDisplay@@H@Z,0,
 presentation,color_taken,src/frontend/skirmish_menu.cpp,1,0,0,0,0,0,?color_taken@@YGHH@Z,0,
 presentation,entry_at,src/gui/gui.cpp,1,0,0,0,0,0,?entry_at@@YGPAUGadget@@PAUGui@@H@Z,0,
-scripts,*,,83,64,1475,1322,594,498,,6,
+scripts,*,,86,64,1531,1322,636,498,,6,
 scripts,Channel::XorOp,src/scripts/cob_script.h,1,0,0,0,0,0,?XorOp@Channel@@QAEXXZ,0,unused-opcode
 scripts,CobScript::AttachUnit,src/scripts/cob.cpp,1,0,0,0,0,0,?AttachUnit@CobScript@@UAEXGHH@Z,0,base-slot
 scripts,CobScript::DropUnit,src/scripts/cob.cpp,1,0,0,0,0,0,?DropUnit@CobScript@@UAEXG@Z,0,base-slot
@@ -2213,11 +2219,14 @@ scripts,CobScript::StartScriptByIndex,src/scripts/cob.cpp,0,0,0,0,0,0,?StartScri
 scripts,CobScript::StartThreadByName,src/scripts/cob.cpp,0,0,0,0,0,0,?StartThreadByName@CobScript@@QAEHPBD@Z,1,
 scripts,CreateObjectState,src/scripts/object_state.cpp,1,0,0,0,0,0,?CreateObjectState@@YGPAUModelState@@PAUObject3do@@@Z,0,unset-case
 scripts,EmitUnitScriptDeletingDtor,src/scripts/unit_script_alloc.cpp,0,0,0,0,0,0,?EmitUnitScriptDeletingDtor@@YGPAVUnitScript@@XZ,1,
+scripts,ScriptsWriteState,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?ScriptsWriteState@@YGXPBUStateWriter@@@Z,0,test-only
 scripts,UnitScript::ExplodeLegacy,src/scripts/unit_script.cpp,1,0,0,0,0,0,?ExplodeLegacy@UnitScript@@UAEXHHH@Z,0,unset-case
 scripts,UnitScript::GetTransporterId,src/scripts/unit_script.cpp,1,0,0,0,0,0,?GetTransporterId@UnitScript@@UAEHXZ,0,unused-opcode
 scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCarryingUnit@UnitScript@@UAEHH@Z,0,unused-opcode
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
-seams,*,,222,200,1766,1644,270,156,,0,
+scripts,WriteChannel,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteChannel@@YGXPBUStateWriter@@PBUChannel@@H@Z,0,test-only
+scripts,WriteScript,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteScript@@YGXPBUStateWriter@@PAVCobScript@@@Z,0,test-only
+seams,*,,222,200,1767,1645,270,156,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YGHXZ,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YGHXZ,0,
 seams,CountMissionsNative,src/seams/native.cpp,1,0,0,0,0,0,?CountMissionsNative@@YGHXZ,0,
@@ -2369,7 +2378,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,20,20,229,220,108,86,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,125,109,2999,2575,1250,884,,28,
+units,*,,126,110,3016,2592,1256,889,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
 units,CheckDownloadableFlags,src/units/unit_types.cpp,0,0,0,0,0,0,?CheckDownloadableFlags@@YGXXZ,1,
 units,ClampPointToSegment,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ClampPointToSegment@@YGXPAUPoint16@@U1@1@Z,1,
@@ -2414,7 +2423,7 @@ units,UnitRef::UnlinkFromUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?UnlinkFrom
 units,UnitsApplySend,src/units/units_apply.cpp,1,0,0,0,0,0,?UnitsApplySend@@YGXPAUUnit@@H@Z,0,network-game
 units,WriteUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,0,network
 units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0,unit-info
-weapons,*,,110,96,2540,2256,1108,820,,19,
+weapons,*,,114,96,2620,2256,1144,820,,19,
 weapons,??$WeaponsHeaderOf@URockUnitView@@@@YG?AUWeaponsEventHeader@@HPAURockUnitView@@@Z,src/game/weapons_events.h,0,0,0,0,0,0,??$WeaponsHeaderOf@URockUnitView@@@@YG?AUWeaponsEventHeader@@HPAURockUnitView@@@Z,1,
 weapons,??$WeaponsPublishStartScriptWithArgs@URockUnitView@@@@YGXPAURockUnitView@@HIHHHHHH@Z,src/game/weapons_events.h,0,0,0,0,0,0,??$WeaponsPublishStartScriptWithArgs@URockUnitView@@@@YGXPAURockUnitView@@HIHHHHHH@Z,1,
 weapons,??8@YG_NABVStringRef@@0@Z,src/weapons/weapon_types.cpp,1,0,0,0,0,0,??8@YG_NABVStringRef@@0@Z,0,unset-case
@@ -2448,6 +2457,10 @@ weapons,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,0,0,0,0,0,0,?Spawn
 weapons,UntrackProjectile,src/weapons/weapons.cpp,0,0,0,0,0,0,?UntrackProjectile@@YGXPAUProjectile@@@Z,1,
 weapons,UpdateExplodedPieces,src/weapons/explosions.cpp,0,0,0,0,0,0,?UpdateExplodedPieces@@YGXXZ,1,
 weapons,WeaponsWriteState,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WeaponsWriteState@@YGXPBUStateWriter@@@Z,0,test-only
+weapons,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteDebrisAndPieces@@YGXPBUStateWriter@@@Z,0,test-only
+weapons,WriteExplodedPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteExplodedPieces@@YGXPBUStateWriter@@@Z,0,test-only
+weapons,WriteProjectiles,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteProjectiles@@YGXPBUStateWriter@@@Z,0,test-only
+weapons,WriteUnitSlots,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteUnitSlots@@YGXPBUStateWriter@@@Z,0,test-only
 wind_meteors,*,,15,0,183,0,50,0,,0,
 wind_meteors,AddPoints,src/map/meteors.cpp,1,0,0,0,0,0,?AddPoints@@YG?AUPoint16@@U1@0@Z,0,wasm
 wind_meteors,DisableMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?DisableMeteors@@YGXXZ,0,wasm

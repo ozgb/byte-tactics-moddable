@@ -1,8 +1,10 @@
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/state_writer.h"
+#include "../state/state_fields.h"
 #include "../../interfaces/ref.h"
 #include "../state/block.h"
 #include "../network/player.h"
@@ -20,6 +22,12 @@
 #include "../../interfaces/movement.h"
 #include "../../link/globals.h"
 #include "movement_seam.h"
+
+extern void* g_patrolGoalVtable[];
+extern void* g_aiSearchGoalVtable[];
+extern void* g_packedGoalVtable[];
+extern void* g_liteGoalVtable[];
+extern void* g_packedPosGoalVtable[];
 
 static Unit* UnitOfOffset(unsigned int offset)
 {
@@ -202,6 +210,103 @@ unsigned int __stdcall MovementUnitTarget(Unit* unit)
     return ((PathGoal*)unit->motion->obj.get())->target.offset;
 }
 
-void __stdcall MovementWriteState(const StateWriter*)
+static const StateField kPatrolGoal[] = {
+    {"goal.target", 4, 4, F_HEAP, 0x0},
+    {"goal.owner", 8, 4, F_UNIT, 0x0},
+    {"goal.count", 24, 4, F_INT, 0x0},
+};
+
+static const StateField kAiSearchGoal[] = {
+    {"goal.target", 4, 4, F_HEAP, 0x0},
+    {"goal.owner", 8, 4, F_UNIT, 0x0},
+    {"goal.count", 92, 4, F_INT, 0x0},
+    {"goal.repathClaimTick", 96, 4, F_INT, 0x0},
+    {"goal.flags", 100, 1, F_INT, 0xb},
+};
+
+static const StateField kPackedGoal[] = {
+    {"goal.target", 4, 4, F_HEAP, 0x0},
+    {"goal.owner", 8, 4, F_UNIT, 0x0},
+    {"goal.pos.x", 12, 4, F_INT, 0x0},
+    {"goal.pos.y", 16, 4, F_INT, 0x0},
+    {"goal.pos.z", 20, 4, F_INT, 0x0},
+    {"goal.vel.x", 24, 4, F_INT, 0x0},
+    {"goal.vel.y", 28, 4, F_INT, 0x0},
+    {"goal.vel.z", 32, 4, F_INT, 0x0},
+    {"goal.heading", 36, 2, F_INT, 0x0},
+};
+
+static const StateField kLiteGoalState[] = {
+    {"goal.netDirty", 39, 1, F_INT, 0x7},
+};
+
+enum GoalClass { GOAL_NONE, GOAL_PATROL, GOAL_AISEARCH, GOAL_PACKED, GOAL_LITE, GOAL_PACKEDPOS, GOAL_UNKNOWN };
+
+static GoalClass ClassOfGoal(const unsigned char* goal)
 {
+    void** vptr = *(void***)goal;
+    if (vptr == g_patrolGoalVtable)
+        return GOAL_PATROL;
+    if (vptr == g_aiSearchGoalVtable)
+        return GOAL_AISEARCH;
+    if (vptr == g_packedGoalVtable)
+        return GOAL_PACKED;
+    if (vptr == g_liteGoalVtable)
+        return GOAL_LITE;
+    if (vptr == g_packedPosGoalVtable)
+        return GOAL_PACKEDPOS;
+    return GOAL_UNKNOWN;
+}
+
+static void WritePoints(const StateWriter* w, const unsigned char* goal, unsigned int countOffset, unsigned int limit)
+{
+    unsigned int n = ReadStateWord(goal + countOffset, 4);
+    if (n > limit)
+        n = limit;
+    w->Bytes("goal.points", 0, goal + 0xc, (int)(n * 4));
+}
+
+static void WriteGoal(const StateWriter* w, const unsigned char* goal)
+{
+    GoalClass cls = goal == nullptr ? GOAL_NONE : ClassOfGoal(goal);
+    w->Int("goal.class", 0, 4, (unsigned int)cls);
+    switch (cls) {
+    case GOAL_PATROL:
+        WriteStateFields(w, goal, STATE_FIELDS(kPatrolGoal), 0);
+        WritePoints(w, goal, 0x18, 3);
+        break;
+    case GOAL_AISEARCH:
+        WriteStateFields(w, goal, STATE_FIELDS(kAiSearchGoal), 0);
+        WritePoints(w, goal, 0x5c, 20);
+        break;
+    case GOAL_PACKED:
+    case GOAL_PACKEDPOS:
+        WriteStateFields(w, goal, STATE_FIELDS(kPackedGoal), 0);
+        break;
+    case GOAL_LITE:
+        WriteStateFields(w, goal, STATE_FIELDS(kPackedGoal), 0);
+        WriteStateFields(w, goal, STATE_FIELDS(kLiteGoalState), 0);
+        break;
+    default:
+        break;
+    }
+}
+
+void __stdcall MovementWriteState(const StateWriter* w)
+{
+    Unit* units = g_game->units.get();
+    char name[64];
+    for (unsigned int i = 0; units != nullptr && i < g_game->poolCount; i++) {
+        Unit* u = &units[i];
+        if (u->unitDefIndex == 0 || u->motion.offset == 0)
+            continue;
+        UnitMotion* motion = u->motion.get();
+        sprintf(name, "movementState.units[%u]", i);
+        w->Begin(53, name);
+        w->Int("motion.p2.x", 0, 4, (unsigned int)motion->p2.x);
+        w->Int("motion.p2.y", 0, 4, (unsigned int)motion->p2.y);
+        w->Int("motion.p2.z", 0, 4, (unsigned int)motion->p2.z);
+        w->Int("motion.turn", 0, 2, (unsigned short)motion->turn);
+        WriteGoal(w, (const unsigned char*)motion->obj.get());
+    }
 }

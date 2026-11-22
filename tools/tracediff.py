@@ -18,7 +18,7 @@ phase that differs, with its value in A and in B. Set WINEARCH=win64 for Wine.
         units[12].health: a=0x0064 b=0x0063
 
 The row `world` is the tables hashed once per tick (game scalars, map, line of sight, orders), after the last
-phase's row. The pathfinder's own report (`pathfinder.*`), economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), weapons' report (`weaponsState.*`), los_radar's sight cache and eyes (`losRadarState.*`), the path results
+phase's row. The pathfinder's own report (`pathfinder.*`), economy's report (`economyState.*`), ai's report (`aiState.*`), map's report (`mapState.*`), players' report (`playersState.*`), weapons' report (`weaponsState.*`), los_radar's sight cache and eyes (`losRadarState.*`), weapons' report (`weaponsState.explodedPieces[i].*`, `weaponsState.debris[d].*`, `weaponsState.pieces[i].*`, `weaponsState.units[i].*`, `weaponsState.projectiles[p].*`), orders' report (`ordersState.units[i].*`), movement's report (`movementState.units[i].*`), units' report (`unitsState.units[i].*`), scripts' report (`scriptsState.units[i].*`), the path results
 (`results[k].*`), the economy events (`economy[k].*`), the features events (`features[k].*`), the share packets
 (`packets[k].*`) wind_meteors' events (`windMeteors[k].*`), targeting's events (`targeting[k].*`) los_radar's events (`los_radar[k].*`) map's events (`map[k].*`) players' events (`playersEvents[k].*`) ai's events (`aiEvents[k].*`) weapons' events (`weaponsEvents[k].*`), orders' events (`ordersEvents[k].*`), movement's events (`movementEvents[k].*`), units' events (`unitsEvents[k].*`) and scripts' events (`scriptsEvents[k].*`) are dumped but not hashed: they show the modules' state
 and what they delivered at a divergence. A dump holds them after every phase
@@ -78,28 +78,17 @@ DEFAULT_REFERENCE_REF = "origin/reference"
 FIELD_TABLE = re.compile(r"static const TraceField (k\w+Fields)\[\] = \{\n(.*?)\n\};", re.S)
 FIELD_ROW = re.compile(r'\{ "([^"]*)", 0x([0-9a-f]+), (\d+), (TF_\w+),')
 ORDER_TABLES = ("Order", "OrderPosY")
-FX_TABLES = ("ApproachRadius", "RingApproach", "PointMarker", "PathOrder", "PathOrderPosY", "PathOrderHeading",
+FX_TABLES = ("ApproachRadius", "RingApproach", "PointMarker", "PathOrder", "PathOrderRef", "PathOrderPosY", "PathOrderHeading",
              "PathOrderPiece", "PathOrderFollow", "AirManeuverOrder", "AirManeuverOrderHeading")
 TIMER_TABLES = ("AssaultTimer", "EscortTimer", "SpatialTimer", "SquadTimer")
-CHANNEL_TABLES = ("ScriptChannel", "ScriptChannelDelay", "ScriptChannelWait", "ScriptChannelPiece")
-GOAL_TABLES = ("PatrolGoal", "AiSearchGoal", "PackedGoal", "LiteGoalState")
 CONDITION_TABLES = ("MissionCondition", "ConditionNumUnits", "ConditionNumLeft")
 PATH_TABLES = [
     (r"units\[\d+\]\.(?:list|list2)\[\d+\]", ORDER_TABLES),
-    (r"units\[\d+\]\.motion\.goal", GOAL_TABLES),
     (r"units\[\d+\]\.motion", ("UnitMotion",)),
-    (r"units\[\d+\]\.script\.channels\[\d+\]", CHANNEL_TABLES),
-    (r"units\[\d+\]\.script\.pieces\[\d+\]", ("ScriptPiece",)),
     (r"units\[\d+\]\.script\.transforms\[\d+\]", ("PieceTransform",)),
-    (r"units\[\d+\]\.script", ("ScriptState",)),
     (r"units\[\d+\]", ("Unit",)),
     (r"orderFx\[\d+\]", FX_TABLES),
     (r"projectiles\[\d+\]", ("Projectile",)),
-    (r"explodedPieces\[\d+\]\.rec", ("PieceRec",)),
-    (r"explodedPieces\[\d+\]", ("ExplodedPiece",)),
-    (r"debris\[\d+\]", ("Debris",)),
-    (r"pieces\[\d+\]\.faces\[\d+\]", ("Face",)),
-    (r"pieces\[\d+\]", ("Piece",)),
     (r"aiState\.players\[\d+\]\.ai", ("PlayerAI",)),
     (r"aiState\.players\[\d+\]\.squadManager\.timers\[\d+\]", TIMER_TABLES),
     (r"aiState\.players\[\d+\]\.squadManager", ("SquadManager",)),

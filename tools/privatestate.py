@@ -24,7 +24,7 @@ the three globals. EXPOSED maps each of those fields to the log item that holds 
   * an item of EXPOSED has no read by pathfinding in any stored scenario: the writer shows state that the simulation never
     reads, a shadow field. data/shadow_field_allow.csv (item,reason) lists the ones that are 3.1c state the trace has always
     hashed, each with a reason; a row for an item that is read is stale.
-Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar, map, players, ai, weapons, orders and movement.
+Owners. OWNERS is the table of subsystems with private state: pathfinding (the region above, read and written by pathfinding alone), economy, features, targeting, los_radar, map, players, ai, weapons, orders, movement, scripts and units.
 Economy's unit accounts live in one allocation, "Economy region" (allocated by the engine in LoadBattleAssets, set up by EconomyInit), whose
 parts the log names `<allocation>.<part>` like pathfinding's: no subsystem but economy writes or reads one. The player accounts
 (`players[i].econ`, type UnitResources) stay in the state block and are read by others, so a `UnitResources::*` item is private for writes
@@ -78,15 +78,15 @@ Two items are read elsewhere, so private for writes only: `MissionConditions` (t
 Ai's state is written by ai alone: the squad manager and its timers (`SquadManager`, `SquadTimer` and the six timers that derive from it), the squad records (`Group`) and the records a computer player's AI holds (`KeyedCell`, `BuildRatingWeights`, `PercentByte`, `UnitTypeInt`, `CenterPos` and `AiVec3`) are private for reads and writes, and `aiState` reports them. `PlayerAI` itself is private for writes only: the log charges reads of its `vec_65` and `vec_8d` to no subsystem (`unknown`), and they are ai's own code (PlayerAI::ComputeBaseWeights). The pointer to the squads of a player (`Player::groups`) and the two globals `g_aiCommandsEnabled` and `g_playerAI` are private for writes only too: others read the pointers of `g_playerAI` through the indexes of los_radar and units.
 `Unit::group` is not listed: orders' GetBuiltOrder gives a human player's built unit its factory's group, a UI group, and LoadUnit writes it. `Player::ai` is not listed either: players' slot set-up writes it. Any writer but ai fails, which is what makes every reaction, squad change and weight or limit command reach these items through the scheduler's events.
 
-Weapons' state is written by weapons alone and read by others: the projectile table and its count (`Game::projectiles`, `Game::projectileCount` and the members of `Projectile`, which ai and los_radar read), the explosions and debris (`Game::count_1491b`, the `debris` array, the members of `Explosion`, `ExplodedPiece` and `Debris` but `Debris::ref1` and `Debris::ref2`, which the GAF helpers of game and presentation write, `DebrisPiece::state` and `DebrisCache::cur`, `Debris::pos` is read by map) and the exploded pieces (`g_explodedPieces`), and the weapon slots of a unit (`Unit::weapons`, src/weapons/unit_weapon_slot.h), which the log names by the members of the union of `Unit` that starts each word of a slot: the cob callback, the weapon, the reload timer, the fire angles, the flags and the three pads of each slot. Not listed: the aim target pair of each slot (targeting's, above). The stockpile of each slot (`Unit::field_1e`, `Unit::b3a` and `Unit::b56`) is listed: orders' build order adds a round through ADD_STOCKPILE. Any writer but weapons fails, which is what makes every damage, claim, release, detonation, stockpile and aim reach these items through the scheduler's events.
+Weapons' state is written by weapons alone and read by others: the projectile table and its count (`Game::projectiles`, `Game::projectileCount` and the members of `Projectile`, which ai and los_radar read), the explosions and debris (`Game::count_1491b`, the `debris` array, the members of `Explosion`, `ExplodedPiece` and `Debris` but `Debris::ref1` and `Debris::ref2`, which the GAF helpers of game and presentation write, `DebrisPiece::state` and `DebrisCache::cur`, `Debris::pos` is read by map) and the exploded pieces (`g_explodedPieces`), and the weapon slots of a unit (`Unit::weapons`, src/weapons/unit_weapon_slot.h), which the log names by the members of the union of `Unit` that starts each word of a slot: the cob callback, the weapon, the reload timer, the fire angles, the flags and the three pads of each slot. Not listed: the aim target pair of each slot (targeting's, above). The stockpile of each slot (`Unit::field_1e`, `Unit::b3a` and `Unit::b56`) is listed: orders' build order adds a round through ADD_STOCKPILE. Any writer but weapons fails, which is what makes every damage, claim, release, detonation, stockpile and aim reach these items through the scheduler's events. Part of it is private for reads and writes as well, since only weapons reads it: the explosions part of the Game record (the exploded pieces' table `g_explodedPieces` and the `ExplodedPiece` allocations, the debris table `count_1491b` and `debris` with the members of `Debris` but `Debris::ref1` and `Debris::ref2`, and the pieces of debris, `DebrisPiece`), the aim callback, `muzzleAimFromDeltaZ`, `reloadTimer`, `fireHeading` and `firePitch` of each slot of a unit (the log names them by the members of the union that start each of their words: `Unit::field_8`, `Unit::type`, `Unit::unknown_14`, `Unit::field_16`, `Unit::field_18`, `Unit::unknown_1a`, `Unit::f_1b`, `Unit::unknown_1c`, `Unit::unknown_24`, `Unit::unknown_2a`, `Unit::unknown_30`, `Unit::weapon2AimCob` and `Unit::unknown_4c`) and the members of `Projectile` but `type`, `position`, `attacker`, `owner` and `target`, which ai, los_radar and the network read. The weapon, stockpile and flags of a slot stay shared. Map's read of `Debris::pos` (weapons passes it to the cell height query) and the reads of presentation, platform, game and seams (the frame dumps, the copies and the GAF cursors act for the owner) do not count.
 
-Orders' state is the orders of a unit, written by orders alone and read by others: the members of `Order` (the order objects; ai, features, map, movement and presentation read them) and the head of the unit's first order list (`Unit::list`, read by ai, movement and presentation) are private for writes only, and the head of its second list (`Unit::list2`, which only orders reads) for reads and writes. `Unit::netDirtyFlags` is not listed: orders, scripts, targeting and units write it. The unit record's position, heading, cell and flags stay units': orders publishes effects that units' handlers apply. An order's link (`PathOrderAttach`, the words `Order::unknown_12`, `Order::target` and `Order::unknown_1a`) is an entry of the list of references to its target unit, which units keeps (UnitRefSetUnit, UnitRefSetValue and the link's constructor and destructor), so units may write those three items too (ALSO_WRITTEN_BY). Any other writer but orders fails, which is what makes every command, stop, queue, attack and paralysis reach the orders through the scheduler's events.
+Orders' state is the orders of a unit, written by orders alone and read by others: the members of `Order` (the order objects; ai, features, map, movement and presentation read them) and the head of the unit's first order list (`Unit::list`, read by ai, movement and presentation) are private for writes only, and the head of its second list (`Unit::list2`, which only orders reads) for reads and writes. `Unit::netDirtyFlags` is not listed: orders, scripts, targeting and units write it. The unit record's position, heading, cell and flags stay units': orders publishes effects that units' handlers apply. An order's link (`PathOrderAttach`, the words `Order::unknown_12`, `Order::target` and `Order::unknown_1a`) is an entry of the list of references to its target unit, which units keeps (UnitRefSetUnit, UnitRefSetValue and the link's constructor and destructor), so units may write those three items too (ALSO_WRITTEN_BY). Any other writer but orders fails, which is what makes every command, stop, queue, attack and paralysis reach the orders through the scheduler's events. The fields only orders reads are private for reads and writes: `Order::kind`, `state`, `flags`, `wakeFrame`, `start` (`Order::start` and `Order::z`), the three words of the order's argument (the log names them by the first member of each union: `Order::type`, `Order::radius` and `Order::progress`), `created`, `subFlags` and `attached`, and the allocations of `Order` (`<function>: new Order`). The link, `unit`, `target`, `pos` and `flags_42` stay shared. Presentation's reads do not count.
 
-Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. The path lock stamp (`UnitMotion::pathLockStamp`) is not movement's but map's (above): movement neither writes it nor carries it in its events. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events.
+Movement's state is the motion of a unit and the goals and targets that steer it, written by movement alone and read by others: the members of `UnitMotion`, of the goals (`PathGoal`, `AiSearchGoal`, `PackedGoal`, `LiteGoal`, `PackedPosGoal`, `PatrolGoal`) and of the targets that orders hold (`PathOrder`, `AirManeuverOrder`, `ApproachRadius`, `RingApproach`, `PointMarker`), which the harness reads for the trace, and the pointer to a unit's motion (`Unit::motion`) are private for writes only. `Unit::netDirtyFlags` is not listed (see orders). The unit record's position, heading, cell and flags stay units': movement publishes effects that units' handlers apply. A path target's link (`PathOrder::ref`) is units' like an order's, so units may write it too. The path lock stamp (`UnitMotion::pathLockStamp`) is not movement's but map's (above): movement neither writes it nor carries it in its events. Any other writer but movement fails, which is what makes every creation, destruction, load, mode, speed, target and path event reach the motion through the scheduler's events. The fields only movement reads are private for reads and writes: `UnitMotion::p2` and `UnitMotion::turn` (`UnitMotion::lastMoveTick`, `velocity`, `speed`, `flags` and `movementClass` stay shared), every member of the goals and of the targets (`PathOrder` but `PathOrder::ref`, which units shares, `AirManeuverOrder`, `ApproachRadius`, `RingApproach` and `PointMarker`) and their allocations (`<function>: new <type>`). Map's reads of `PathOrder::pos` (movement passes it to the ground height query) and the reads of presentation, platform, game and seams do not count.
 
-Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it.
+Scripts' state is the script objects of the units, written by scripts alone: the members of `CobScript`, `UnitScript`, `Channel`, `Piece` and the piece transforms (`ModelPiece`), the statics (the realloc of `CobScript::SetCob`), the allocation of `NewUnitScript` and the unit's `script` pointer, which units writes too (`InitUnitScript`, `ApplyUnitDeath`). The model state (`ModelState`, named `SpotState` where only scripts writes it) is not listed: units, presentation and the platform write parts of it. Those objects are private for reads and writes: the members of `CobScript`, `UnitScript`, `Channel` (with the stacks) and `Piece` (the script's piece records), the statics and the allocation of `NewUnitScript`. The piece transforms (`ModelPiece`) stay shared: weapons reads them. The reads of presentation, platform, game and seams do not count.
 
-Units' state is the unit record, written by units alone but for the items of the owners above it in the table (targeting, weapons, orders, movement, map and scripts) and for the views of the record that other subsystems keep: map's `Unit::cargoNext` (the bucket link: SpatialBucket::UnlinkUnit, SpatialBucket::PrependUnit, SetOwner, ClearFootprintAndUnlink) and `Unit::cobStateFlags` (SetYardOpen), los_radar's and map's and presentation's bits of `Unit::flags` (UpdateSensorRadarAndCloak and the jam visitors; ClaimFootprintCells, AddUnitToMap, RemoveUnitFromMap, SetYardOpen, ForceNeighborFootprintReclaim; the selection functions), los_radar's `Unit::workTime` (charged by the log), economy's `Unit::extraction` (EconomyUpdateMetalExtraction), ai's `Unit::group` (SetUnitSquad) and targeting's `Unit::netDirtyFlags` (SetWeaponTargetUnit, SetWeaponTargetPos): the `also_written_by` of the owner.
+Units' state is the unit record, written by units alone but for the items of the owners above it in the table (targeting, weapons, orders, movement, map and scripts) and for the views of the record that other subsystems keep: map's `Unit::cargoNext` (the bucket link: SpatialBucket::UnlinkUnit, SpatialBucket::PrependUnit, SetOwner, ClearFootprintAndUnlink) and `Unit::cobStateFlags` (SetYardOpen), los_radar's and map's and presentation's bits of `Unit::flags` (UpdateSensorRadarAndCloak and the jam visitors; ClaimFootprintCells, AddUnitToMap, RemoveUnitFromMap, SetYardOpen, ForceNeighborFootprintReclaim; the selection functions), los_radar's `Unit::workTime` (charged by the log), economy's `Unit::extraction` (EconomyUpdateMetalExtraction), ai's `Unit::group` (SetUnitSquad) and targeting's `Unit::netDirtyFlags` (SetWeaponTargetUnit, SetWeaponTargetPos): the `also_written_by` of the owner. The fields only units reads are private for reads and writes: `Unit::head`, `hoverBobPhase`, `healthPercent`, `prevHealthPercent`, `unfinishedInitZero`, `unknown_10a` and `zBufferFlag`. The reads of presentation, platform, game and seams do not count.
 
 A field is judged by its item, so the ten cursors count as one item, and a field of a union as the first member of the union.
 Standard library plus tools/depclass.py.
@@ -152,6 +152,24 @@ AI_TYPES = ("KeyedCell", "BuildRatingWeights", "PercentByte", "UnitTypeInt", "Ce
                   "SquadManager", "SquadTimer", "AssaultTimer", "EscortTimer", "SquadScoutTimer", "ScoutTimer", "BuildTimer", "SpatialTimer", "Group")
 
 
+WEAPONS_TYPES = ("ExplodedPiece", "DebrisPiece")
+
+WEAPONS_ALLOCATED = ("ExplodedPiece",)
+
+WEAPONS_ITEMS = ("count_1491b", "debris", "g_explodedPieces", "DebrisCache::cur",
+                 "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
+                 "Unit::field_8", "Unit::type", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b", "Unit::unknown_1c",
+                 "Unit::unknown_24", "Unit::unknown_2a", "Unit::unknown_30", "Unit::weapon2AimCob", "Unit::unknown_4c",
+                 "Projectile::start", "Projectile::direction", "Projectile::angles", "Projectile::speed", "Projectile::range", "Projectile::spawnTick",
+                 "Projectile::time", "Projectile::nextSmokeTick", "Projectile::targetUnit", "Projectile::field_56", "Projectile::cellX", "Projectile::cellZ",
+                 "Projectile::radius", "Projectile::active", "Projectile::piece", "Projectile::propellerSpin", "Projectile::compactIndex", "Projectile::flags")
+
+ANY_ITEM = "*"
+
+ACTING_FOR_OWNER = ((ANY_ITEM, "presentation"), (ANY_ITEM, "platform"), (ANY_ITEM, "game"), (ANY_ITEM, "seams"))
+
+WEAPONS_ALSO_READ_BY = ACTING_FOR_OWNER + (("Debris::pos", "map"),)
+
 WEAPONS_WRITE_TYPES = ("Projectile", "Explosion", "ExplodedPiece")
 
 WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris", "g_explodedPieces", "DebrisPiece::state", "DebrisCache::cur",
@@ -163,9 +181,25 @@ WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris"
 
 ORDERS_WRITE_TYPES = ("Order",)
 
-ORDERS_ITEMS = ("Unit::list2",)
+ORDERS_ALLOCATED = ("Order",)
+
+ORDERS_ALSO_READ_BY = ACTING_FOR_OWNER
+
+ORDERS_ITEMS = ("Unit::list2", "Order::kind", "Order::state", "Order::flags", "Order::wakeFrame", "Order::start", "Order::z", "Order::type", "Order::radius",
+                "Order::progress", "Order::created", "Order::subFlags", "Order::attached")
 
 ORDERS_WRITE_ITEMS = ("Unit::list",)
+
+MOVEMENT_TYPES = ("PathGoal", "AiSearchGoal", "PackedGoal", "LiteGoal", "LiteGoalState", "PackedPosGoal", "PatrolGoal", "PathOrder",
+                  "AirManeuverOrder", "ApproachRadius", "RingApproach", "PointMarker")
+
+MOVEMENT_ALLOCATED = MOVEMENT_TYPES
+
+MOVEMENT_ITEMS = ("UnitMotion::p2", "UnitMotion::turn")
+
+MOVEMENT_WRITE_ONLY_ITEMS = ("PathOrder::ref",)
+
+MOVEMENT_ALSO_READ_BY = ACTING_FOR_OWNER + (("PathOrder::pos", "map"), ("PathOrder::pos_z", "map"))
 
 MOVEMENT_WRITE_TYPES = ("UnitMotion", "PathGoal", "AiSearchGoal", "PackedGoal", "LiteGoal", "PackedPosGoal", "PatrolGoal", "PathOrder",
                         "AirManeuverOrder", "ApproachRadius", "RingApproach", "PointMarker")
@@ -180,11 +214,22 @@ ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "uni
 MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"),)
 
 
+UNITS_ITEMS = ("Unit::head", "Unit::hoverBobPhase", "Unit::healthPercent", "Unit::prevHealthPercent", "Unit::unfinishedInitZero", "Unit::unknown_10a",
+               "Unit::zBufferFlag")
+
+UNITS_ALSO_READ_BY = ACTING_FOR_OWNER
+
 UNITS_WRITE_TYPES = ("Unit",)
 
 UNITS_ALSO_WRITTEN_BY = (("Unit::cargoNext", "map"), ("Unit::cobStateFlags", "map"), ("Unit::flags", "los_radar"), ("Unit::flags", "map"),
                          ("Unit::flags", "presentation"), ("Unit::workTime", "los_radar"), ("Unit::extraction", "economy"),
                          ("Unit::group", "ai"), ("Unit::netDirtyFlags", "targeting"))
+
+SCRIPTS_TYPES = ("CobScript", "UnitScript", "Channel", "Piece")
+
+SCRIPTS_ALLOCATED = ("UnitScript",)
+
+SCRIPTS_ALSO_READ_BY = ACTING_FOR_OWNER
 
 SCRIPTS_WRITE_TYPES = ("CobScript", "UnitScript", "Channel", "Piece", "ModelPiece")
 
@@ -205,8 +250,12 @@ class Owner:
     write_items: tuple = ()
     except_items: tuple = ()
     also_written_by: tuple = ()
+    allocated: tuple = ()
+    write_only_items: tuple = ()
+    also_read_by: tuple = ()
 
 
+ALLOCATION_OF_TYPE = re.compile(r": (?:operator )?new (\w+)(?: #\d+)?$")
 METEOR_GLOBALS = ("g_meteorNextStrikeTime", "g_meteorWeaponName", "g_meteorSpawnMagnitude", "g_meteorSpawnInterval", "g_meteorActive",
                   "g_meteorStrikeEndTime", "g_meteorOrigin", "g_meteorShowerDuration", "g_meteorWeapon", "g_meteorsEnabled",
                   "g_meteorNextHitTime", "g_meteorTarget", "g_meteorScheduleGap")
@@ -222,12 +271,16 @@ OWNERS = (Owner(OWNER, REGION_ROOT, REGION_TYPES, REGION_ALLOCATION),
           Owner("map", "", MAP_TYPES, NO_ALLOCATION, write_items=MAP_WRITE_ITEMS),
           Owner("players", "", PLAYERS_TYPES, re.compile(r"Players region"), PLAYERS_WRITE_TYPES),
           Owner("ai", "", AI_TYPES, NO_ALLOCATION, AI_WRITE_TYPES, write_items=AI_WRITE_ITEMS),
-          Owner("weapons", "", (), NO_ALLOCATION, WEAPONS_WRITE_TYPES, write_items=WEAPONS_WRITE_ITEMS),
-          Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS, also_written_by=ORDERS_ALSO_WRITTEN_BY),
-          Owner("movement", "", (), NO_ALLOCATION, MOVEMENT_WRITE_TYPES, write_items=MOVEMENT_WRITE_ITEMS, except_items=MOVEMENT_EXCEPT,
-                also_written_by=MOVEMENT_ALSO_WRITTEN_BY),
-          Owner("scripts", "", (), NO_ALLOCATION, SCRIPTS_WRITE_TYPES, write_items=SCRIPTS_WRITE_ITEMS, also_written_by=SCRIPTS_ALSO_WRITTEN_BY),
-          Owner("units", "", (), NO_ALLOCATION, UNITS_WRITE_TYPES, also_written_by=UNITS_ALSO_WRITTEN_BY))
+          Owner("weapons", "", WEAPONS_TYPES, NO_ALLOCATION, WEAPONS_WRITE_TYPES, WEAPONS_ITEMS, WEAPONS_WRITE_ITEMS, allocated=WEAPONS_ALLOCATED,
+                also_read_by=WEAPONS_ALSO_READ_BY),
+          Owner("orders", "", (), NO_ALLOCATION, ORDERS_WRITE_TYPES, ORDERS_ITEMS, ORDERS_WRITE_ITEMS, also_written_by=ORDERS_ALSO_WRITTEN_BY,
+                allocated=ORDERS_ALLOCATED, also_read_by=ORDERS_ALSO_READ_BY),
+          Owner("movement", "", MOVEMENT_TYPES, NO_ALLOCATION, MOVEMENT_WRITE_TYPES, MOVEMENT_ITEMS, MOVEMENT_WRITE_ITEMS, MOVEMENT_EXCEPT,
+                MOVEMENT_ALSO_WRITTEN_BY, MOVEMENT_ALLOCATED, MOVEMENT_WRITE_ONLY_ITEMS, MOVEMENT_ALSO_READ_BY),
+          Owner("scripts", "", SCRIPTS_TYPES, NO_ALLOCATION, SCRIPTS_WRITE_TYPES, write_items=SCRIPTS_WRITE_ITEMS, also_written_by=SCRIPTS_ALSO_WRITTEN_BY,
+                allocated=SCRIPTS_ALLOCATED, also_read_by=SCRIPTS_ALSO_READ_BY),
+          Owner("units", "", (), NO_ALLOCATION, UNITS_WRITE_TYPES, UNITS_ITEMS, also_written_by=UNITS_ALSO_WRITTEN_BY,
+                also_read_by=UNITS_ALSO_READ_BY))
 
 RECORD = {"pool": "Pathfinder::pool", "items": "Pathfinder::items", "freeHead": "Pathfinder::freeHead", "used": "Pathfinder::used",
           "count": "Pathfinder::count", "topPopped": "Pathfinder::topPopped", "cells": "Pathfinder::grid.cells",
@@ -284,7 +337,12 @@ def private_to(item: str) -> tuple[str, tuple[str, ...]]:
             continue
         if o.root and item == o.root:
             return o.name, ("writer", "reader")
+        if item in o.write_only_items:
+            return o.name, ("writer",)
         if item.split("::")[0] in o.types:
+            return o.name, ("writer", "reader")
+        allocated = ALLOCATION_OF_TYPE.search(item)
+        if allocated is not None and allocated.group(1) in o.allocated:
             return o.name, ("writer", "reader")
         if item.startswith(REGION_FUNCTION + ":") and o.allocation.search(item) is not None:
             return o.name, ("writer", "reader")
@@ -326,9 +384,11 @@ def violations(rows: dict[str, list[tuple[str, str, str]]]) -> list[str]:
             owner, roles = private_to(item)
             if not owner:
                 continue
-            also = {w for i, w in next(o for o in OWNERS if o.name == owner).also_written_by if i == item}
+            o = next(o for o in OWNERS if o.name == owner)
+            also = {w for i, w in o.also_written_by if i == item}
+            also_read = {w for i, w in o.also_read_by if i in (item, ANY_ITEM)}
             for role, who in (("writer", writer), ("reader", reader)):
-                if role in roles and who not in (NONE, owner) and not (role == "writer" and who in also):
+                if role in roles and who not in (NONE, owner) and not (role == "writer" and who in also) and not (role == "reader" and who in also_read):
                     found.add((kind, role, who, item, owner, "private" if len(roles) > 1 else "written only by"))
     return ["%s: %s %s on %s, which is %s %s" % (k, r, w, i, "private to" if how == "private" else "written only by", o)
             for k, r, w, i, o, how in sorted(found)]

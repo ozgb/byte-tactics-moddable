@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5807 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5808 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -23,7 +23,7 @@ The subsystems and the issue each maps to:
 | [features](#features) | 57 | #12 |
 | [ai](#ai) | 132 | #13 |
 | [pathfinding](#pathfinding) | 148 | #14 |
-| [weapons](#weapons) | 117 | #15 |
+| [weapons](#weapons) | 118 | #15 |
 | [targeting](#targeting) | 15 | #16 |
 | [los_radar](#los_radar) | 114 | #17 |
 | [orders](#orders) | 247 | #18 |
@@ -322,7 +322,7 @@ The HPA* demo of `src/ai/pathfind_hpa.cpp` (#930) is counted apart, with the rea
 
 ## weapons
 
-Issue #15. 117 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
+Issue #15. 118 functions. `UpdateProjectiles`, `UpdateExplosions`, `UpdateUnitWeapons`, ballistics, damage and the weapon definitions (`src/weapons/*.cpp`).
 
 Coverage: 84.2% of functions (96 of 114), 86.1% of lines, 71.7% of branches; 18 live functions no scenario enters, and 19 more are dead (data/coverage.csv).
 
@@ -359,7 +359,7 @@ Coverage: 84.2% of functions (96 of 114), 86.1% of lines, 71.7% of branches; 18 
 
 `Projectile::flags` (mixed); `Projectile::targetUnit` (mixed); `Game::projectileCount` (mixed); `Angles16::heading` (mixed); `Projectile::speed` (sim); `Angles16::pitch` (mixed); `Game::tracked` (mixed); `Game::trackedPos` (mixed)
 
-**Sim reads.** 173 items only read, 172 named. The most used (`g_game`, the root pointer, left out):
+**Sim reads.** 165 items only read, 164 named. The most used (`g_game`, the root pointer, left out):
 
 `Unit::def` (mixed); `Unit::heading` (sim); `Game::ticks` (mixed); `Unit::player` (sim); `Game::seaLevel` (mixed); `Seams::scripts` (sim); `ScriptsSeam::QueryScript` (sim); `Game::gravity` (sim); `Unit::playerIndex` (sim); `MissionParams::noSeaLevelTrigger` (sim); `Unit::id` (sim)
 

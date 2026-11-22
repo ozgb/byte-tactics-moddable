@@ -26892,7 +26892,6 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,deref_read,*int
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::cell
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,Unit::footprint
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_escape,UnitWeaponSlot::flags
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_maybe_written,SaveRec::name
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::units
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Game::unitsEnd
@@ -26900,15 +26899,12 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,LosSightCache::cell
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,LosSightCache::frameIdx
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,OrdersSeam::SaveOrders
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b0
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b1
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b23
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,PieceBits::b4
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,ScriptsSeam::SaveScriptState
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::los_radar
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::orders
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::scripts
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::targeting
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Seams::weapons
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,TargetingSeam::SavedTargetPair
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::activateFlags
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::angles
@@ -26938,14 +26934,15 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::speed_bits
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::transportPiece
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,Unit::workTime
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::fireHeading
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::firePitch
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::muzzleAimFromDeltaZ
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::reloadTimer
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::stockpile
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,UnitWeaponSlot::weapon
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponAimCobCb::nAimCobDone
-0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponDef::index
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSeam::SaveState
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::aimDone
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::aimOffset
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::flags
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::heading
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::pitch
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::reload
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::stockpile
+0x4876c0,SaveUnits,src/units/unit_save.cpp,field_read,WeaponsSlotState::typeByte
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a0
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a1
 0x4876c0,SaveUnits,src/units/unit_save.cpp,field_write,FlagBits::a2
@@ -26998,6 +26995,7 @@ address,function,file,kind,target
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::SavedTargetPair]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(CobScript *, HapiBank *) __attribute__((stdcall)) [ScriptsSeam::SaveScriptState]"
 0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, LosSightCache *) __attribute__((stdcall)) [LosRadarSeam::SightCache]"
+0x4876c0,SaveUnits,src/units/unit_save.cpp,indirect_call,"indirect via void (*)(Unit *, int, WeaponsSlotState *) __attribute__((stdcall)) [WeaponsSeam::SaveState]"
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,IdAt
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,_strcmpi
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,deref_read,*int
@@ -49394,6 +49392,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::InitExplosions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::LoadState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::LoadWeaponTypes
+,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::SaveState
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateExplosions
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateProjectiles
 ,InstallNativeSeams,src/seams/native.cpp,field_write,WeaponsSeam::UpdateUnitWeapons
@@ -49793,6 +49792,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponCanReachUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsLoadState
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsSaveState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WeaponsWriteState
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WindMeteorsApply
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,WriteBufferToFile
@@ -63468,6 +63468,31 @@ address,function,file,kind,target
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,field_write,WeaponsSetStockpiles::h
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,field_write,WeaponsSetStockpiles::stockpiles
 ,WeaponsPublishSetStockpiles,src/game/weapons_events.h,function,
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,call,get
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_escape,Unit::weapons
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_escape,UnitWeaponSlot::flags
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit0
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit1
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit2
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit3
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,<anon>::bit4
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::fireHeading
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::firePitch
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::muzzleAimFromDeltaZ
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::reloadTimer
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::stockpile
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,UnitWeaponSlot::weapon
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,WeaponAimCobCb::nAimCobDone
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_read,WeaponDef::index
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::aimDone
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::aimOffset
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::flags
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::heading
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::pitch
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::reload
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::stockpile
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,field_write,WeaponsSlotState::typeByte
+,WeaponsSaveState,src/weapons/weapons_apply.cpp,function,
 ,WeaponsScriptName,src/seams/scripts_world.cpp,function,
 ,WeaponsScriptName,src/seams/scripts_world.cpp,global_escape,g_hitByWeaponScriptName
 ,WeaponsScriptName,src/seams/scripts_world.cpp,global_escape,g_takeDamageScriptName

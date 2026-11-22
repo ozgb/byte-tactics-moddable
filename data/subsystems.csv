@@ -5529,6 +5529,7 @@ WeaponsPublishRelease,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsPublishRemoteDamage,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsPublishRemoveProjectiles,src/game/weapons_events.h,game,name:Weapon,game
 WeaponsPublishSetStockpiles,src/game/weapons_events.h,game,name:Weapon,game
+WeaponsSaveState,src/weapons/weapons_apply.cpp,weapons,file:src/weapons/,
 WeaponsScriptName,src/seams/scripts_world.cpp,seams,folder:src/seams/,
 WeaponsWriteState,src/weapons/weapons_apply.cpp,weapons,file:src/weapons/,
 WhereText,src/wasm/modules.cpp,platform,folder:src/wasm/,

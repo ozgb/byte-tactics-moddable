@@ -3404,7 +3404,7 @@ orders,players,shared_write,Vec3::z,3
 orders,presentation,shared_write,Box::hi,1
 orders,presentation,shared_write,Box::lo,1
 orders,presentation,shared_write,Fixed::value,7
-orders,presentation,shared_write,MissionType::index,6
+orders,presentation,shared_write,MissionType::index,5
 orders,presentation,shared_write,Order::flags_42,1
 orders,presentation,shared_write,Order::next,1
 orders,presentation,shared_write,Order::pos,3
@@ -4607,7 +4607,7 @@ presentation,orders,shared_write,Box::lo,7
 presentation,orders,shared_write,Fixed::value,8
 presentation,orders,shared_write,Fixed::whole,4
 presentation,orders,shared_write,Game::interfaceType,2
-presentation,orders,shared_write,MissionType::index,26
+presentation,orders,shared_write,MissionType::index,28
 presentation,orders,shared_write,Order::flags_42,42
 presentation,orders,shared_write,Player::active,3
 presentation,orders,shared_write,Player::allied,10

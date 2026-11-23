@@ -1665,8 +1665,8 @@ address,function,file,kind,target
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,function,
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_seams
-0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(Unit *, Vec3 *, Vec3 *, int) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachPos]"
+0x407e90,SpatialTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x408090,IsPointVisible,src/map/line_of_sight_index.cpp,call,operator unsigned short *
 0x408090,IsPointVisible,src/map/line_of_sight_index.cpp,deref_read,*unsigned short
 0x408090,IsPointVisible,src/map/line_of_sight_index.cpp,field_read,Game::playerIndex
@@ -1727,7 +1727,7 @@ address,function,file,kind,target
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,function,
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
 0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_seams
-0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
+0x408100,ScoutTimer::OnTimer,src/ai/ai_player.cpp,indirect_call,"indirect via int (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x408600,ScoutTimer::ScoutTimer,src/ai/ai_player.cpp,function,
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,AiPublishQueueBuild
 0x408620,BuildTimer::TryIssueIdleFactoryBuildOrder,src/ai/ai_player.cpp,call,ChooseBuildOption
@@ -5136,7 +5136,6 @@ address,function,file,kind,target
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,Game::defs
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,Game::localPlayer
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,Game::pos
-0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,MissionType::index
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,MouseEvent::keyFlags
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,OrdersSeam::MissionTypeFromName
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,field_read,Player::unitsBegin
@@ -5151,7 +5150,7 @@ address,function,file,kind,target
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,function,
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,global_read,g_game
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,global_read,g_seams
-0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,indirect_call,indirect via int (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
 0x4197d0,UpdatePlacementGhostValidity,src/ingame/control_panel.cpp,call,CanBuildAt
 0x4197d0,UpdatePlacementGhostValidity,src/ingame/control_panel.cpp,call,GetBuildSiteHeight
 0x4197d0,UpdatePlacementGhostValidity,src/ingame/control_panel.cpp,call,GetFootprintHeight
@@ -25144,7 +25143,7 @@ address,function,file,kind,target
 0x480460,OrderSquad,src/units/squads.cpp,field_read,Unit::unitDefIndex
 0x480460,OrderSquad,src/units/squads.cpp,function,
 0x480460,OrderSquad,src/units/squads.cpp,global_read,g_seams
-0x480460,OrderSquad,src/units/squads.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
+0x480460,OrderSquad,src/units/squads.cpp,indirect_call,"indirect via int (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x4804e0,StepTowards,src/units/unit_script_calls.cpp,function,
 0x480510,StepPointTowards,src/units/unit_script_calls.cpp,field_read,Point16::x
 0x480510,StepPointTowards,src/units/unit_script_calls.cpp,field_read,Point16::y
@@ -27034,9 +27033,9 @@ address,function,file,kind,target
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,field_write,Vec3::z
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,function,
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,global_read,g_seams
-0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
-0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,"indirect via MissionType (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,"indirect via Unit *(*)(const char *, const Ref<Unit> *, int, Unit *) __attribute__((stdcall)) [UnitsSeam::FindMissionUnit]"
+0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,indirect via int (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,"indirect via int (*)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,FatalError
 0x488310,CreateMissionUnits,src/units/unit_commands.cpp,call,RunInitialMission
@@ -51166,7 +51165,7 @@ address,function,file,kind,target
 ,MissionHolder::MissionHolder,src/units/unit_types.cpp,field_read,Seams::orders
 ,MissionHolder::MissionHolder,src/units/unit_types.cpp,function,
 ,MissionHolder::MissionHolder,src/units/unit_types.cpp,global_read,g_seams
-,MissionHolder::MissionHolder,src/units/unit_types.cpp,indirect_call,indirect via MissionType (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+,MissionHolder::MissionHolder,src/units/unit_types.cpp,indirect_call,indirect via int (*)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
 ,MissionSlot::MissionSlot,src/units/unit_commands.cpp,function,
 ,MissionType::MissionType,src/orders/mission_type.h,function,
 ,MissionType::operator==,src/orders/mission_type.h,field_read,MissionType::index
@@ -52228,6 +52227,7 @@ address,function,file,kind,target
 ,OrdersGetOrderFlags,src/orders/orders_slots.cpp,call,GetOrderFlags
 ,OrdersGetOrderFlags,src/orders/orders_slots.cpp,function,
 ,OrdersGetOrderType,src/orders/orders_slots.cpp,call,GetOrderType
+,OrdersGetOrderType,src/orders/orders_slots.cpp,field_read,MissionType::index
 ,OrdersGetOrderType,src/orders/orders_slots.cpp,function,
 ,OrdersHeaderOf,src/game/orders_events.h,field_write,OrdersEventHeader::kind
 ,OrdersHeaderOf,src/game/orders_events.h,field_write,OrdersEventHeader::unit
@@ -52253,6 +52253,7 @@ address,function,file,kind,target
 ,OrdersLoadOrders,src/orders/orders_slots.cpp,field_read,Unit::list
 ,OrdersLoadOrders,src/orders/orders_slots.cpp,function,
 ,OrdersLoadOrders,src/orders/orders_slots.cpp,global_read,kSim
+,OrdersMissionTypeFromName,src/orders/orders_slots.cpp,field_read,MissionType::index
 ,OrdersMissionTypeFromName,src/orders/orders_slots.cpp,function,
 ,OrdersOnAiAddOrder,src/seams/orders_world.cpp,call,OrdersHeaderOf
 ,OrdersOnAiAddOrder,src/seams/orders_world.cpp,call,OrdersInbox
@@ -55917,7 +55918,8 @@ address,function,file,kind,target
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,function,
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersGetOrderType,src/harness/replay_hooks.inc,indirect_call,"indirect via MissionType (*const)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,global_read,s_tail
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
 ,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,ArgObject
@@ -55930,7 +55932,6 @@ address,function,file,kind,target
 ,RecOrdersLoadOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersLoadOrders,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, HapiBank *, int) __attribute__((stdcall)) [OrdersSeam::LoadOrders]"
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValue
-,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,field_read,OrdersSeam::MissionTypeFromName
@@ -55938,7 +55939,7 @@ address,function,file,kind,target
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_tail
-,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,indirect_call,indirect via MissionType (*const)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
+,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
 ,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,field_read,OrdersSeam::RegisterAllOrderTypes

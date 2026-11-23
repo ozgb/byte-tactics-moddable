@@ -1,8 +1,8 @@
 # The units interface
 
-Units sits behind `interfaces/units.h` (version 6.0), the seam over the unit record (`Unit`, 0x118 bytes,
+Units sits behind `interfaces/units.h` (version 7.0; 7.0 passes `CreateUnit`'s position by pointer and names its `finished` and `id`, writes the units of `GetFactoriesInRadius` to a caller buffer, has `FindMissionUnit` take the caller's table of the mission units' units and return the match after a given unit, in place of a vector, makes `CanLoad`, `CanReclaim`, `CanRepair` and `UnitRefUnlink` stdcall instead of thiscall with no unused register argument, and makes the read-only strings const), the seam over the unit record (`Unit`, 0x118 bytes,
 `src/units/unit.h`) that every simulation module reads, and since #986 it is on the scheduler with scripts
-(`interfaces/scripts.h`, version 2.0; `docs/scripts-interface.md`). 3.1c's code is its default implementation. This
+(`interfaces/scripts.h`, version 3.0; `docs/scripts-interface.md`). 3.1c's code is its default implementation. This
 page is the inventory the interface was cut from, written from the code as it now is:
 - where units sits, and what it is not;
 - what other subsystems did to the unit record in 3.1c, and what each became;

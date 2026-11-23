@@ -1,6 +1,6 @@
 # The mission interface
 
-The mission sits behind `interfaces/mission.h` (version 1.1: 1.0 in #983, the slots of the record's fields in #1003). It is the match's mission as the engine sees it:
+The mission sits behind `interfaces/mission.h` (version 2.0: 1.0 in #983, the slots of the record's fields in #1003, and 2.0 makes the strings the slots take and return const). It is the match's mission as the engine sees it:
 the game type, the files of the match (the campaign, the terrain, the briefing), the campaign and its missions, the
 start positions and the list of maps. By the human's ruling of 2026-11-17 on #980 it is its own interface, a module
 that can be replaced like any other, rather than a part of map or of the engine. 3.1c's code is its default

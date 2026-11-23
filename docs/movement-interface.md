@@ -1,6 +1,6 @@
 # The movement interface
 
-Movement sits behind `interfaces/movement.h` (version 4.0), the seam over a unit's motion, the goals it steers to and
+Movement sits behind `interfaces/movement.h` (version 5.0; 5.0 passes the points of `NewPointMarker` by pointer and names `MovementSavedState`'s `p2` `smoothedAcceleration`), the seam over a unit's motion, the goals it steers to and
 the targets orders hand those goals (#993), and since #985 the tenth module on the scheduler, with orders
 (`docs/orders-interface.md`). 3.1c's code is its default implementation. It was cut from orders (which held
 `UnitMotion`, the order targets and the virtual calls on them) and units (which held the unit's reference) by #993, and
@@ -88,7 +88,7 @@ Movement's place in it:
 | `PathOrderSetHeading` | event: SET_HEADING, from orders (`VtolMobileBuildOrder`, `VtolHelpBuildOrder`) |
 | `GoalSetPathOrder` | event: SET_TARGET, from orders (`Order::SetAttachedFx`, the attach functions of `order_queue.cpp`, `Order::ReattachFxToUnit`), with the target or 0 for none |
 | `OrderFxDestroy` | event: DESTROY_TARGET, from orders (`Order::~Order` and the same functions), with the target |
-| `NewPathOrderAt`, `NewPathOrderToUnit`, `NewPathOrderToUnitAt`, `NewPathOrderToUnitAtAngle`, `NewAirManeuverOrder`, `NewApproachRadius`, `NewRingApproach`, `NewPointMarker` | synchronous slots, unchanged but for the types: the order and the answer are block offsets |
+| `NewPathOrderAt`, `NewPathOrderToUnit`, `NewPathOrderToUnitAt`, `NewPathOrderToUnitAtAngle`, `NewAirManeuverOrder`, `NewApproachRadius`, `NewRingApproach`, `NewPointMarker` | synchronous slots, unchanged but for the types: the order and the answer are block offsets, and since 5.0 `NewPointMarker` takes its position and size by pointer |
 | `LoadPathOrder`, `LoadAirManeuverOrder`, `LoadApproachRadius`, `LoadRingApproach`, `LoadPointMarker` | one slot, `LoadTarget(type, order, file, name)`, outside the tick |
 | `OrderFxSerializeToSave` | slot `SaveTarget`, outside the tick |
 | `OrderFxGetType` | query: `TargetType` |
@@ -175,13 +175,13 @@ SET_ALTITUDE for a target that is neither a move target nor an air maneuver (SET
 move target).
 
 **Payloads.** Every event and effect starts with `MovementEventHeader`: `kind` and `unit` (the unit it is about, a block
-offset; 0 for the kinds about a target). Each kind has the payload of `interfaces/movement.h` (version 4.0) that starts
+offset; 0 for the kinds about a target). Each kind has the payload of `interfaces/movement.h` (version 5.0) that starts
 with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
 | NEW 320, DESTROY 321 | the header alone | none |
-| LOAD 322 | `MovementLoadState` | `state` (`MovementSavedState`: `velocity[3]`, `p2[3]`, `speed`, `turn`, `mode`, `flag`) |
+| LOAD 322 | `MovementLoadState` | `state` (`MovementSavedState`: `velocity[3]`, `smoothedAcceleration[3]` (the motion's `p2`), `speed`, `turn`, `mode`, `flag`) |
 | SET_MODE 323, SET_FLIGHT_MODE 328 | `MovementSetMode` | `mode`, 0 to 3 |
 | SET_SPEED 324 | `MovementSetSpeed` | `speed` |
 | SET_TARGET 326, DESTROY_TARGET 327 | `MovementTarget` | `target` (a block offset, 0 for none) |

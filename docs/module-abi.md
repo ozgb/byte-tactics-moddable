@@ -431,7 +431,7 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsParams` (a payload the `Apply` slot reads) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
 
 The published headers spell every integer at the boundary as `int` or `unsigned`, which are 32 bits
-on every target; `long` and `size_t`, whose width depends on the platform, are not used. A slot or a
+on every target; `long` and the C library's size type, whose width depends on the platform, are not used. A slot or a
 service may still take or return a `char`, a `short` or a `bool` (`unsigned char player`, an
 `unsigned short` unit id). Each is the `int` kind, an i32, carried as clang's wasm32 C ABI carries
 it: the side that produces the value extends it to 32 bits, the caller for an argument and the
@@ -603,12 +603,12 @@ with it. The `services` list of a subsystem in the replay schema (`annotations.s
 `data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
 targeting's names only `RandomInt`, and its recordings still carry the native module's publishing lines.
 
-The services interface is at major 2 and minor 2 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 3 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
-of the dump's events and `WindMeteorsEmit` the payload's size, and minors 1 and 2 the recorders of orders, movement,
-units and scripts. The bump to major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF
-members become free functions under their import names, and the rest moves to the engine header. Since the import names
-and kinds stay, a module built against major 2 imports the same functions.
+of the dump's events and `WindMeteorsEmit` the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
+units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
+members become free functions under their import names, the strings they only read become const, the size
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
@@ -630,7 +630,7 @@ An interface has a major version that changes when a slot is removed or its sign
 ### 10.1 What the manifest records
 
 - `majors`: the current major of each interface and of each import group's interface, read from the
-  interface headers. The game manifest has, for example, `services` 2 and `wind_meteors` 3.
+  interface headers. The game manifest has, for example, `services` 3 and `wind_meteors` 3.
 - `modules[].interface`: the interface whose slots the module implements.
 - `modules[].majors`: for its own interface and for every import group, the major the module was
   built against.

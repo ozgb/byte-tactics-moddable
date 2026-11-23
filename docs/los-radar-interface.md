@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 4.1), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 5.0; 5.0 writes the units of `GetVisibleEnemiesInRadius` to a caller buffer, in place of a vector and its list twin, and `HasReadyUnitInRange` returns int instead of bool and takes a const position), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -144,7 +144,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
   `RevealAroundUnit` and cleared by the fog's drawing; the trace masks it out (0xfff7). The field stays in the game
   record as view state: the settings' writers are the engine's, and los_radar writes only bit 3.
 
-**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
+**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 5.0; the payloads are unchanged since 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

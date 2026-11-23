@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 8.0), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 9.0; 9.0 passes the cell of `CanBuildAt` and `CanPlaceUnitFootprint` by pointer), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -212,7 +212,7 @@ map alone writes, inside its own events, at the publisher's statement, as los_ra
 An effect for any of these would need a synchronous route, because units and orders read each of them back in the
 same update (the `immediate` rows of section 4), and would only move the write.
 
-**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 8.0; 7.1 added LOAD_PATH_LOCK_STAMP, and the other payloads are unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size. LOAD_PATH_LOCK_STAMP has outcome 1, or 0 when the unit has no movement.
+**Payloads.** Every event and effect starts with `MapEventHeader`: `kind` and `unit` (a block offset; 0 for PASS_MAPS and CELLS_CHANGED, which name none). Each kind has the payload of `interfaces/map.h` (version 9.0; 7.1 added LOAD_PATH_LOCK_STAMP, and the other payloads are unchanged since 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a null unit, a bucket change the unit's bucket does not allow, or a rectangle of negative size. LOAD_PATH_LOCK_STAMP has outcome 1, or 0 when the unit has no movement.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

@@ -192,7 +192,7 @@ index, which is not ai's (section 5), or no ai state at all:
 | Query | Now | Callers inside the tick |
 |---|---|---|
 | `GetVisibleEnemiesInRadius` | los_radar's (`docs/los-radar-interface.md`); they read los_radar's visible and known lists, then the units' positions and flags | orders (`GuardNoMoveOrder`, `WaitOrder`) and targeting's weapon search (`FindWeaponTarget`) |
-| `GetFactoriesInRadius` | units' (`interfaces/units.h`; units has no interface document yet); it reads units' factory list, then the factories' type and `activateFlags` | orders (the VTOL orders' pad search: `FindPads`, `Land`, `AirStrikeOrder`, ...) |
+| `GetFactoriesInRadius` | units' (`docs/units-interface.md`); it reads units' factory list, then the factories' type and `activateFlags`, and since units 7.0 writes them to the caller's buffer | orders (the VTOL orders' pad search: `FindPads`, `Land`, `AirStrikeOrder`, ...) |
 | `HasReadyUnitInRange` | los_radar's; it reads the visible list, then the units' flags | the info panel (`UpdateSensorRadarAndCloak`), presentation only |
 | `IsPointVisible` | los_radar's (it never read ai state): the player's explored size and the line of sight mask (`Game::visibilityMask`) | weapons' drawing (`DrawProjectiles`) and players' `IsVisible` |
 | (new) `GetSeenUnitsInRadius` | los_radar's: the buffer form, with no ready filter and no known fallback | ai's spatial timer |

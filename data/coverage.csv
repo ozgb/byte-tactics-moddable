@@ -70,7 +70,7 @@ features,AssignTdfFileVector,src/map/features.cpp,0,0,0,0,0,0,?AssignTdfFileVect
 features,FreeFeaturePool,src/map/features.cpp,1,0,0,0,0,0,?FreeFeaturePool@@YGXXZ,0,shutdown
 features,ReplaceFeatureWithBurnt,src/map/features.cpp,0,0,0,0,0,0,?ReplaceFeatureWithBurnt@@YGXPAUFeatureSite@@@Z,1,
 features,ReserveUShortVector,src/map/features.cpp,0,0,0,0,0,0,?ReserveUShortVector@@YGXPAV?$vector@GV?$allocator@G@std@@@std@@H@Z,1,
-files,*,,142,112,2211,1759,846,550,,35,
+files,*,,142,112,2211,1759,846,551,,35,
 files,AccountBank::SeekBoxEnd,src/files/hapi_bank.cpp,0,0,0,0,0,0,?SeekBoxEnd@AccountBank@@QAEHXZ,1,
 files,AccountBank::WriteAuditFile,src/files/hapi_bank.cpp,1,0,0,0,0,0,?WriteAuditFile@AccountBank@@QAEXPAD@Z,0,save-load
 files,ChangeDirectory,src/files/files_api.h,0,0,0,0,0,0,?ChangeDirectory@@YGXPBD@Z,1,
@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPADPAXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,389,302,6109,3779,2290,957,,23,
+game,*,,389,302,6109,3779,2290,958,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -2378,7 +2378,7 @@ state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAA
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
 targeting,*,,21,21,233,224,108,86,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
-units,*,,126,110,3017,2593,1256,889,,28,
+units,*,,126,110,3017,2596,1256,892,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
 units,CheckDownloadableFlags,src/units/unit_types.cpp,0,0,0,0,0,0,?CheckDownloadableFlags@@YGXXZ,1,
 units,ClampPointToSegment,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ClampPointToSegment@@YGXPAUPoint16@@U1@1@Z,1,

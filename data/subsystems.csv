@@ -4700,6 +4700,7 @@ RecTargetingFindBestTargetIfFireAtWill,src/harness/replay_hooks.inc,harness,fold
 RecTargetingFindWeaponTarget,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecTargetingGetWeaponTargetPos,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,harness,folder:src/harness/,
+RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,harness,folder:src/harness/,

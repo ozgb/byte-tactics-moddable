@@ -48034,6 +48034,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::FindWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetUnit
+,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::SavedTargetPair
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddRepairProgress
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AllocateUnitMemory
@@ -48359,6 +48360,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingFindWeaponTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetUnit
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingSavedTargetPair
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddRepairProgress
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAllocateUnitMemory
@@ -56617,6 +56619,17 @@ address,function,file,kind,target
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_inner_targeting
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecTargetingGetWeaponTargetUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via Unit *(*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::GetWeaponTargetUnit]"
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,call,Add
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,call,ArgObject
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,field_read,TargetingSeam::SavedTargetPair
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,function,
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,global_read,s_call
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,global_read,s_inner_targeting
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,global_read,s_tail
+,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::SavedTargetPair]"
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgValue

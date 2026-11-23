@@ -1,6 +1,6 @@
 bt-digest 8
 trace_format bt-trace 8
-commit 295d4e579128572f9c756227febd057a19fb8fac
+commit 49cf35528e0d1f6d428aa36b99d9ac30d6f9e7ac
 scenario reference/scenarios/mission-passes-z.txt
 game_seed 465
 crt_seed 1465

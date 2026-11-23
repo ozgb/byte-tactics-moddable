@@ -157,6 +157,12 @@ class RwsetsTest(unittest.TestCase):
             ("field_write", "Unit::hp"), ("field_read", "Unit::game"), ("field_read", "Game::tick"),
             ("global_read", "g_game"), ("field_write", "Game::values")})
 
+    def test_a_lambda_capture_is_not_a_field(self):
+        source = ("struct Unit { int hp; };\ntemplate <class F> void Each(F f) { f(0); }\n"
+                  "int Sum(Unit* u) { int total = 0; Each([&](int i) { total += u[i].hp; }); return total; }\n")
+        _, by_function = rows_of(source)
+        self.assertEqual(by_function["Sum"], {("field_read", "Unit::hp"), ("call", "Each")})
+
     def test_indirect_call(self):
         self.assertEqual(self.by_function["Indirect"], {
             ("indirect_call", "indirect via int (*)(int) [g_handlers]"),

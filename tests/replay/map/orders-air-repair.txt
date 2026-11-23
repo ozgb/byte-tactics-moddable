@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem map 8.0
+subsystem map 9.0
 call 380 GetGroundHeight
   r Game.width 224
   r Game.height 102

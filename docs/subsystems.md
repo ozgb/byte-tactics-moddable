@@ -348,12 +348,11 @@ Coverage: 84.3% of functions (97 of 115), 86.2% of lines, 71.6% of branches; 18 
 
 - platform (27): `RandomInt`, `GameFreeThunk`, `operator new`, `operator-`, and 23 more
 - game (23): `EconHandleOf`, `EconSpend`, `FeaturesPublishDamage`, `GameRand`, `ReadStateWord`, `RecordBuildMenuUpdate`, `RecordCdActivity`, `RecordScreenShake`, `RecordSmoke`, `RecordSoundAt`, `RecordWeaponSmoke`, `RecordWhiteSmoke`, `SimAllocTagged`, `SimBlockBase`, `StepGafSequence`, `WeaponsAimScript`, `WeaponsEventSize`, `WeaponsFireScript`, `WeaponsPublishDamageRecord`, `WeaponsPublishHealth`, `WeaponsPublishMarkDamaged`, `WeaponsPublishParalyze`, `WriteStateFields`
+- seams (8): `GetCellMeanHeightNative`, `GetPiecePositionNative`, `QueryScriptNative`, `ScheduleTargetingTargetPos`, and 4 more
 - presentation (7): `AllocFrame`, `BuildLensFrame`, `FindGafEntry`, `GetGafFrame`, `InitGafSequence`, `Load3do`, `MirrorObject`
 - network (5): `NetSendWeaponFire`, `NetSendUnitDamage`, `NetSendProjectileDetonated`, `NetSendWeaponFireAt`, `SendScriptCallByName`
-- seams (8): `GetCellMeanHeightNative`, `GetGroundHeightNative`, `QueryScriptNative`, `ScheduleTargetingTargetPos`, and 4 more
 - los_radar (2): `GetMapCellAtPosition`, `GetMapCell`
-- scripts (2): `GetPieceOffset`, `GetPiecePosition`
-- 3 smaller targets: features (1), files (1), map (1)
+- 2 smaller targets: files (1), map (1)
 
 **Sim writes.** 173 items in all, 169 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
@@ -398,7 +397,7 @@ Coverage: 100.0% of functions (21 of 21), 96.1% of lines, 79.6% of branches; 0 l
 
 **Imports.** 9 functions of 7 subsystems, by target, each with the number of functions it calls there:
 
-- platform (2): `RandomInt`, `UnitSwapEraseVector::EraseSwapBack`, `UnitTypeSet::Contains`
+- platform (2): `RandomInt`, `UnitTypeSet::Contains`
 - seams (2): `GetSweetSpotNative`, `GetWeaponRangeNative`
 - game (1): `SchedPublish`
 - harness (1): `HarnessTargetingEvent`
@@ -460,9 +459,9 @@ Coverage: 90.8% of functions (89 of 98), 87.7% of lines, 74.4% of branches; 9 li
 - game (11): `FeaturesPublishPlace`, `Game::Current`, `Game::SlotOf`, `LosRadarEventSize`, `PublishWindMeteorsLimits`, `RecordMessage`, `RecordSimEvent`, `SimAlloc`, `SimAllocTagged`, `SimBlockTrack`, `SimCaptureAlloc`
 - files (5): `HapiBank::GetBoxSize`, `HapiBank::OpenAccount`, `HapiBank::OpenNamedBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`
 - features (4): `FreeFeaturePool`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`
-- map (4): `GetGroundHeight`, `MapAllocateBuckets`, `MapFreeBuckets`
+- map (4): `GetGroundHeight`, `MapAllocateBuckets`, `MapFreeBuckets`, `UnitsInRange`
 - presentation (3): `BuildTedRadarFrame`, `GetGafFrame`, `StringRef::ReleaseRef`
-- seams (2): `GetNameSlotNative`, `GetMissionParamsNative`, `VisitUnitsInRange`
+- seams (2): `GetNameSlotNative`, `GetMissionParamsNative`
 - network (1): `BroadcastPlayerInfo`
 
 **Sim writes.** 116 items in all, 111 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -515,12 +514,13 @@ Coverage: 95.5% of functions (234 of 245), 85.4% of lines, 65.3% of branches; 11
 
 - movement (33): `PathGoal::SetPathOrder`, `OrderFx::Destroy`, `OrderFx::GetType`, `SerializeSave`, and 29 more
 - game (28): `EconHandleOf`, `EconPublish`, `FeaturesPublishRemove`, `MovementPublishSetMode`, `MovementPublishTarget`, `MovementPublishTargetValue`, `OrdersEventSize`, `OrdersPublishAttachToPiece`, `OrdersPublishBuildDecay`, `OrdersPublishBusy`, `OrdersPublishClearNetDirty`, `OrdersPublishFinishConstruction`, `OrdersPublishRepair`, `OrdersPublishSetBuildState`, `OrdersPublishSetFlags`, `OrdersPublishSetStance`, `OrdersPublishSetStateBits`, `OrdersPublishStartScript`, `RecordBuildMenuUpdate`, `RecordNanoParticles`, `RecordReverseNanoParticles`, `RecordSelectionOrdersDirty`, `RecordTeleportParticles`, `RecordUnitSpeech`, `WeaponsPublishAddStockpile`, `WeaponsPublishClaim`, `WeaponsPublishDamage`, `WeaponsPublishRelease`
-- seams (16): `ScheduleTargetingTargetUnit`, `GetGameTypeNative`, `QueryScriptNative`, `VisitUnitsInRange`, and 12 more
+- seams (16): `ScheduleTargetingTargetUnit`, `GetGameTypeNative`, `QueryScriptNative`, `CreateUnitNative`, and 12 more
 - platform (10): `operator new`, `RandomInt`, `GetHeadingBetween`, `operator==`, and 6 more
-- units (7): `AddBuildProgress`, `AddRepairProgress`, `CreateUnit`, `UnitRefGet`, and 3 more
 - files (7): `HapiBank::OpenNamedBox`, `HapiBank::SeekBox`, `HapiBank::ReadBox`, `HapiBank::WriteBox`, and 3 more
+- units (7): `AddBuildProgress`, `AddRepairProgress`, `UnitRefGet`, `LoadUnit`, and 3 more
+- map (5): `CanPlaceFootprintAt`, `GetGroundHeight`, `IsPadSlotFree`, `SnapWorldPosToFootprint`, and 1 more
 - network (5): `SendScriptCall`, `SendScriptCallByName`, `Player::GetEnergy`, `Player::GetMetal`, and 1 more
-- 6 smaller targets: map (5), los_radar (3), scripts (1), features (2), economy (1), weapons (1)
+- 5 smaller targets: los_radar (3), features (2), economy (1), scripts (1), weapons (1)
 
 **Sim writes.** 50 items in all, 44 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 

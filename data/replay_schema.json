@@ -2729,6 +2729,12 @@
    },
    {
     "kind": "field_escape",
+    "target": "TntFeatureName::name",
+    "rule": "fields",
+    "note": "the feature name table of the map file the loader passes in, not state"
+   },
+   {
+    "kind": "field_escape",
     "target": "Game::anim",
     "rule": "fields",
     "reads": [
@@ -6293,7 +6299,7 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 1, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "Apply(event)", "Place(place)", "FindFeatureAtPos(pos)", "FindFeatureAtPos(cell)", "FindFeatureAtPos(size)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 0, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "Apply(event)", "Place(place)", "FindFeatureAtPos(pos)", "FindFeatureAtPos(cell)", "FindFeatureAtPos(size)"]}},
    "slots": {
     "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateFeatures"},
     "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadFeatureFileList"},

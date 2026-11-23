@@ -258,7 +258,7 @@ when the walk reaches it, and the field it reads only when it is in the slot's r
 A kind that lives inside another kind lists its sites, `"inside": [{"kind": "Spot", "member": "anim"}, {"kind": "Feature", "member": "anim"}]`,
 and each site is an `embed` field of its container (`{"name": "anim", "kind": "embed", "target": "Handle"}`). An embedded object is named
 by its site, `Spot#3.anim`, in every line that names it: the walk's `r` and `w` lines (`r Spot#3.anim.index 2`), the `i` and `o` lines of a service
-that takes it (`i services.StepGafSequence Spot#3.anim`, `o Spot#3.anim.value 7`) and the argument values. The replayer resolves such a
+that takes it (`i services.<step cursor> Spot#3.anim`, `o Spot#3.anim.value 7`) and the argument values. The replayer resolves such a
 name to the bytes at the site inside its container, and never allocates a separate object. A free-standing object of the same kind, one on a
 caller's stack, is named by order as any other, `Handle#1`.
 
@@ -266,9 +266,9 @@ A container named by order (not a table kind) is named before its embedded objec
 
 ```
   r Spot#3.anim.index 2
-  i services.StepGafSequence Spot#3.anim = 1
+  i services.<step cursor> Spot#3.anim = 1
   o Spot#3.anim.value 7
-  i services.StepGafSequence Handle#1 = 1
+  i services.<step cursor> Handle#1 = 1
 ```
 
 ### Features, spots and the pool
@@ -293,7 +293,7 @@ The `Handle` at `Feature#N.anim` and `Feature#N.shadowAnim`, and at `Spot#N.anim
   r Feature#5.filename "tree1"
   r Spot#9.anim.index 2
   r Spot#9.timer 12
-  i services.StepGafSequence Spot#9.anim = 1
+  i services.<step cursor> Spot#9.anim = 1
 ```
 
 A pair of pointer fields that bound a slice of a table is a closed range: the schema marks the end field with
@@ -863,13 +863,13 @@ an empty copy of its target kind (see A pointer to an object no line named), and
 
 ## Snapshots
 
-Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: `SimCaptureAlloc(bytes,
-&offset)` hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
+Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: the engine's capture allocation takes a size and
+an out offset and hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
 "bytes": "bytes", "offset": "offset"`, `bytes` naming its int argument and `offset` its skipped out argument) is written with the size
 and a handle, numbered in the outermost call by first use, and the bytes follow at the end of the call:
 
 ```
-  i services.SimCaptureAlloc 64 = snapshot#1
+  i services.<capture allocation> 64 = snapshot#1
   w Game.timer 0x00000000
   o snapshot#1 x:0100000002000000...
 ```
@@ -1098,53 +1098,59 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`, `ctype`, `reach`) | ` = GafFrame#1`, then `o GafFrame#1.width 64` for each field of the `reach` |
 | `alloc` (`size`, `tag`) | ` = alloc#1`, or ` = PlayerInfo#1` when the annotation `alloc_tags` names the tag |
 | `snapshot` (`bytes`, `offset`) | ` = snapshot#1` (see Snapshots) |
-| `arg` (`param`) | nothing: the function returns the argument (`GetFieldFixed` returns `dst`) |
+| `arg` (`param`) | nothing: the function returns the argument (a service that fills an out argument `dst` and returns `dst`) |
 
 An out is an `o` line after the import line: `o dest "Armada"` for a text written through a pointer, `o dst 98304` for an int
 (`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
-(the replayer builds the formatted text of `FilePrintf` from its own arguments), `effect` lines (the replayer's definition does what
-the function does to its object: `count = 0;` for `InitArgs`), `cast` and `into_size`.
+(what the replayer's definition does before it reads the line: it empties `root` and `current` for `TdfFile_Construct`, and builds the
+formatted text of a service that formats its arguments from those arguments), `effect` lines (the replayer's definition does what
+the function does to its object or to the state: `GameRand` advances its stream), `cast` and `into_size`.
 
 A cursor that a service starts or steps is an `object` argument with a `reach`, so each call records the fields it left in it, a `ptr` among
-them (`InitGafSequence` and `StepGafSequence`, whose `Handle.src` is the entry or `null`):
+them (the services that start a cursor on an animation entry and step it, whose `Handle.src` is the entry or `null`):
 
 ```
-  i services.InitGafSequence Handle#1 FrameTable#1 0
+  i services.<start cursor> Handle#1 FrameTable#1 0
   o Handle#1.index 0
   o Handle#1.value 4
   o Handle#1.kind 1
   o Handle#1.src FrameTable#1
-  i services.StepGafSequence Handle#1 = 1
+  i services.<step cursor> Handle#1 = 1
   o Handle#1.index 1
   o Handle#1.value 7
   o Handle#1.kind 1
   o Handle#1.src FrameTable#1
 ```
 
-One line per group, from the self-test:
+One line per group, the engine's own services written by what they do:
 
 ```
-  i services.TdfRecord_FindSubRecord rec#1 "units" = rec#2
-  i services.TdfRecord_GetFieldFixed rec#3 "scale" 5
-  o dst 98304
-  i services.FilePrintf "%d units" "3 units" = 7
-  i services.Translate "key" = "Teksti"
-  i services.ComputeChecksum x:0102ff 3 = 1234567
+  i services.BuildDataPath "gamedata" "meteor" "tdf" = "gamedata\\meteor.tdf"
+  i services.TdfFile_LoadFile file#1 "gamedata\\meteor.tdf" = 1
+  o file#1.root rec#1
+  o file#1.current null
+  i services.TdfRecord_GetFieldString rec#2 "MeteorWeapon" 32 "" = 1
+  o dst "Meteor"
+  i services.<translation> "key" = "Teksti"
+  i services.<checksum> x:0102ff 3 = 1234567
   i services.SimAlloc 64 = alloc#1
   i services.<tagged allocation> "Player Info" 185 = PlayerInfo#1
   i services.SimFree alloc#1
   i services.RecordSimEvent 2 1 [3,4] 2
-  i services.FindSlotByDpid 77 = 2
-  i services.GetGafFrame FrameTable#1 2 = GafFrame#1
+  i services.GameRand main = 4620
+  i services.<slot lookup> 77 = 2
+  i services.<frame read> FrameTable#1 2 = GafFrame#1
   o GafFrame#1.width 64
 ```
 
-The services of the files and data group are `FilePrintf` (the format and the formatted text) and the TDF calls that the subsystems make on records
-and files; the commands group is `Translate`, `CommandArgs.InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, the tagged allocation (the size
-and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
-`GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
-`GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
-the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services of this group. The bank operations of a
+The services of the files and data group are `BuildDataPath`, the TDF calls that the subsystems make on records and files
+(`TdfFile_LoadFile`, `TdfFile_SelectRecord`, `TdfRecord_GetFieldInt` and the others of `interfaces/services.h`) and a formatted write to a
+file (the format and the formatted text); the commands group is a translation of a text, the reset of a command argument list and a
+checksum of a buffer; sim plumbing is `SimAlloc`, the tagged allocation (the size and the tag are compared), `SimFree`, `RecordSimEvent`
+(kind, flags, args and count), `GameRand` and `RandomInt`, the capture allocation of Snapshots and the lookups between a player slot and
+its network id; the load reads are the loads of an animation file, of an animation of it, of an entry and of a frame of an entry or of a
+cursor, and the loads of a 3D model and of its height, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and
+`Object3do` and the fields that the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services of this group. The bank operations of a
 saved game that a module calls are the imports `services.HapiBank_OpenAccount`, `services.HapiBank_SetIntegerItem` and
 `services.HapiBank_GetIntegerItem` (the bank as a `handle`, `docs/module-abi.md` section 9.3), and the other slots of the `files` seam,
 the box reads and seeks, are recorded as `files.<Slot>` imports, as any import is. A hook records only for the thread that opened the slot, so
@@ -1156,17 +1162,17 @@ generated answer takes the place of the function: it checks the `i` line the mod
 block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
 allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
 
-`ExecuteCommandText` is re-entrant. The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
+A service that runs a command text through the command slots is re-entrant (`"nested": true`). The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
 as the calls of a callback are:
 
 ```
-  i services.ExecuteCommandText "plan 1" 6 ["x"] -1 = 1
+  i services.<run command text> "plan 1" 6 ["x"] -1 = 1
     c ai.CmdPlan ["plan","1"]
 ```
 
 The arguments of a nested call are written by the modes of a slot argument and the result follows ` = `. What a nested call writes shows in the
 `w` lines of the outer call. The services a nested call makes are ordinary `i` lines, and they come before the `i` line of
-`ExecuteCommandText`, because that line is written when the function returns; the stub finds its own line among them, makes the nested
+the re-entrant service, because that line is written when the function returns; the stub finds its own line among them, makes the nested
 calls through the seam table of the module with the cursor set back over those lines, and reports a result that differs at
 `<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
 inside a nested command fails the recording.
@@ -1225,7 +1231,7 @@ format, whether or not a recording uses it: the indexed tables (`Projectile#3.sp
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake capture allocation) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`) and callbacks held in state (a `FixtureNotify` whose `ptr` and `ref` hold a callback and a slot
 that gets a third: the module's calls on them replay equal, and a different, a missing, an extra and a misplaced call are each reported at `callback#3.Complete`). Three
 more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`

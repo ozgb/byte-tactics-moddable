@@ -96,6 +96,8 @@ FUEL_PASS = "tools/wasm_fuel.py"
 SIM_EVENTS_PAGE = "docs/sim-events.md"
 SIM_EVENTS_TABLE = "interfaces/sim_events.csv"
 SIM_EVENTS_HEADER = "interfaces/sim_events.h"
+SERVICES_HEADER = "interfaces/services.h"
+FREE_FUNCTION = re.compile(r"^[ \t]*(?!//|#)([^\n;{}()]*?\b(\w+)[ \t]*\([^;{}]*\)[ \t]*;)", re.M)
 TERMS_SOURCE = "tools/oraclekit/sim_event_terms.csv"
 MODULE_SOURCE_FIELDS = ("cxx", "c")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
@@ -567,9 +569,30 @@ def drop(entry: dict, fields: tuple[str, ...]) -> None:
             entry.pop(field, None)
 
 
-def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[str] = frozenset()) -> bytes:
+def free_functions(header: str) -> dict[str, str]:
+    """The function declarations of a header, by name, each as its one line of text."""
+    return {m.group(2): " ".join(m.group(1).split()) for m in FREE_FUNCTION.finditer(header)}
+
+
+def kit_services(services: list[dict], header: str) -> list[dict]:
+    """The services of the kit: a member service (one with an `owner`) whose name the kit's services header declares as a free
+    function, with that declaration in place of its member one; one the header does not declare is left out."""
+    declared = free_functions(header)
+    kept = []
+    for service in services:
+        if "owner" in service:
+            if service.get("name") not in declared:
+                continue
+            service["declaration"] = declared[service["name"]]
+        kept.append(service)
+    return kept
+
+
+def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[str] = frozenset(),
+               services_header: str | None = None) -> bytes:
     """The replay schema of the kit: without the fields that name source files, functions, globals and types, without the
-    services and callback interfaces named by an `undeclared` identifier, and with each code table entry renamed to its kit
+    services and callback interfaces named by an `undeclared` identifier, with each member service declared as the free
+    function of `services_header` (or left out when it declares none), and with each code table entry renamed to its kit
     name. Refusal when an entry has no kit name or a kit name has no entry."""
     schema = json.loads(data)
     annotations = schema.get("annotations", {})
@@ -594,6 +617,8 @@ def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[s
             callbacks[name].pop("header", None)
     if "services" in annotations:
         annotations["services"] = [s for s in annotations["services"] if s.get("name") not in undeclared]
+        if services_header is not None:
+            annotations["services"] = kit_services(annotations["services"], services_header)
     for service in annotations.get("services", []):
         drop(service, SERVICE_SOURCE_FIELDS)
     entries = set()
@@ -976,7 +1001,8 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
         except subprocess.CalledProcessError:
             raise Refusal("refused: %s has no tracked file" % CODE_TABLES_SOURCE)
         index = speclint.source_index(root, speclint.DEFAULT_RUN)
-        files[SCHEMA] = kit_schema(files[SCHEMA], names, index[0] - declared_names(files))
+        files[SCHEMA] = kit_schema(files[SCHEMA], names, index[0] - declared_names(files),
+                                   (text_of(files[SERVICES_HEADER]) or "") if SERVICES_HEADER in files else "")
     if SIM_EVENTS_PAGE in files and listed(SIM_EVENTS_PAGE, contents):
         page = files[SIM_EVENTS_PAGE].decode()
         try:

@@ -62,7 +62,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 
 #include "../util/vec3.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 

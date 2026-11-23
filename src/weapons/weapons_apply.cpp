@@ -16,7 +16,7 @@
 #include "../state/sim_globals.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/state_writer.h"
 #include "../state/state_fields.h"
 #include "damage.h"

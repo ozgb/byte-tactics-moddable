@@ -1,6 +1,6 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/los_radar.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "los_radar_world.h"
 
 void LosRadarInbox(const void* event, unsigned int size)

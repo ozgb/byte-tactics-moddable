@@ -8,7 +8,7 @@
 #include <time.h>
 #include <stdarg.h>
 #include "../../interfaces/host.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/economy.h"
 
 #include "../game/game.h"

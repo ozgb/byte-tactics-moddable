@@ -36,7 +36,7 @@ struct UnitDef;
 
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_effects.h"
 struct Chunk;
 class SquadManager;
@@ -100,7 +100,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
+#include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"
@@ -1809,7 +1809,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 DamagedAllyCollector collector(unit->player, &units, unit);
-                VisitUnitsInRange(&unit->pos, range, &collector);
+                ForEachUnitInRange(&unit->pos, range, [&collector](Unit* ally) { collector.Visit(ally); });
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {

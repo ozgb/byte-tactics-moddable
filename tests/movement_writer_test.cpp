@@ -6,7 +6,7 @@
 #include "../src/state/block.h"
 #include "../src/movement/movement_seam.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/state_writer.h"
 #include "../src/state/sim_globals.h"
 #include "../src/util/vec3.h"

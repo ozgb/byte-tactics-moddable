@@ -44,7 +44,7 @@ Players' place in it:
   statement (section 3). The placement test of the respawn is map's synchronous `CanPlaceUnitFootprint`, through
   `ScheduleMapCanPlaceUnitFootprint` (services 1.16).
   - **Queries:** map's `GetCellMeanHeight`, the mission's `GetGameType` and `GetNameSlot` (map's until map 5.0), units' `FindUnitTypeId`, features'
-  `FindFeatureAtPos` (weapons' until #984), los_radar's `ClampWorldPosToTerrain` and the service `VisitUnitsInRange`, all as of the owner's
+  `FindFeatureAtPos` (weapons' until #984), los_radar's `ClampWorldPosToTerrain` and map's `UnitsInRange`, all as of the owner's
   last apply.
 - **Views:** the `Player` records (`Game::players`), which players, economy, units and the network write
   (section 4), and the conditions' objects, which only players reads.

@@ -4,7 +4,7 @@
 #include "../harness/harness.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/game.h"
 #include "../../link/globals.h"
 

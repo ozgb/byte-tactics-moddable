@@ -6,7 +6,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/ai.h"
 #include "../interfaces/orders.h"
 #include "../src/state/sim_globals.h"

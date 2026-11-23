@@ -10,7 +10,7 @@
 its body or calls a function that does (a recording wrapper); a call into another subsystem's slot does not count, that
 subsystem records it. A function that holds a kind name and that data/subsystems.csv does not map is printed to stderr.
 
-The kinds are the enumerators of `enum SimEventKind` in interfaces/services.h. The heading convention of the doc: a kind
+The kinds are the enumerators of `enum SimEventKind` in interfaces/sim_events.h. The heading convention of the doc: a kind
 has a section when a heading of level 2 or 3 (`## NAME` or `### NAME`) is exactly the enumerator's name, with nothing
 else on the line. The check fails for:
 
@@ -44,7 +44,7 @@ import hazards
 import stateclasses as sc
 
 ROOT = Path(__file__).resolve().parent.parent
-HEADER = ROOT / "interfaces" / "services.h"
+HEADER = ROOT / "interfaces" / "sim_events.h"
 DOC = ROOT / "docs" / "sim-events.md"
 SRC = ROOT / "src"
 
@@ -266,7 +266,7 @@ def main() -> None:
     parser.add_argument("--check", action="store_true", help="fail if a kind has no section, a section names no kind, or a Phases line differs from the call graph")
     parser.add_argument("--phases", action="store_true", help="print the computed phases of each kind")
     parser.add_argument("--emitters", action="store_true", help="print the kinds recorded by the code of each subsystem")
-    parser.add_argument("--header", type=Path, default=HEADER, help="the header (default interfaces/services.h)")
+    parser.add_argument("--header", type=Path, default=HEADER, help="the header (default interfaces/sim_events.h)")
     parser.add_argument("--doc", type=Path, default=DOC, help="the doc (default docs/sim-events.md)")
     args = parser.parse_args()
     if args.check + args.phases + args.emitters != 1:

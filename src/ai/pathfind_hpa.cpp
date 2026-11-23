@@ -5,7 +5,7 @@
 #include "../../interfaces/pathfinding.h"
 #include "../../interfaces/state_writer.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../network/player.h"
 #include "../game/game.h"
 

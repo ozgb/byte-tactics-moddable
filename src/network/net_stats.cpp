@@ -9,7 +9,7 @@
 #include "net_stats.h"
 #include "../../link/globals.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 
 void __stdcall StepGafSequence(void* item);

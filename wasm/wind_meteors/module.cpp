@@ -30,7 +30,7 @@ IMPORT("services", "TdfFile_LoadFile") int service_TdfFile_LoadFile(TdfFile* sel
 IMPORT("services", "TdfFile_SelectRecord") int service_TdfFile_SelectRecord(TdfFile* self, const char* name);
 IMPORT("services", "TdfRecord_GetFieldInt") int service_TdfRecord_GetFieldInt(TdfRecord* self, const char* name, int def);
 IMPORT("services", "TdfRecord_GetFieldDouble") double service_TdfRecord_GetFieldDouble(TdfRecord* self, const char* name, double def);
-IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, char* key, size_t size, char* def);
+IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, char* key, int size, char* def);
 IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(HapiBank* self, const char* name);
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
 IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
@@ -52,7 +52,7 @@ int TdfFile::LoadFile(const char* path) { return service_TdfFile_LoadFile(this, 
 int TdfFile::SelectRecord(const char* name) { return service_TdfFile_SelectRecord(this, name); }
 int TdfRecord::GetFieldInt(const char* name, int def) { return service_TdfRecord_GetFieldInt(this, name, def); }
 double TdfRecord::GetFieldDouble(const char* name, double def) { return service_TdfRecord_GetFieldDouble(this, name, def); }
-int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
+int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }

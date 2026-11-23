@@ -3,7 +3,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../src/game/economy.h"
 #pragma pack(push, 1)
 #include "../src/game/unit_resources.h"

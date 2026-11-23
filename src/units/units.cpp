@@ -22,7 +22,7 @@ class UnitResources;
 #include "../game/los_radar_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 struct SpotStateUnitView;
 struct Object3do;
 

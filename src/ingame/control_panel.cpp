@@ -58,7 +58,7 @@ struct CursorState {
 
 #include "../game/game.h"
 #include "../state/sim_effects.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/game_state.h"
 
 #pragma pack(pop)

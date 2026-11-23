@@ -4,7 +4,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/targeting.h"
 #include "../interfaces/los_radar.h"
 #include "../interfaces/units.h"

@@ -550,7 +550,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
 #include "../mission/map_list.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../gui/file_list.h"
 #include "options.h"
 void __stdcall RejectPlayer(int param_1, int param_2);

@@ -5,7 +5,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"
@@ -35,20 +35,6 @@ void MapOnFeaturesPassMaps(const void* event, unsigned int size)
     footprint.y = (short)effect->height;
     MapPassMaps passMaps = MapPassMapsOf(at, footprint);
     MapInbox(&passMaps, sizeof(passMaps));
-}
-
-void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor)
-{
-    unsigned short ids[256];
-    int skip = 0;
-    for (;;) {
-        int count = g_seams.map->UnitsInRange(pos, range, skip, ids, 256);
-        for (int i = 0; i < count; i++)
-            visitor->Visit(&g_game->units[ids[i]]);
-        if (count < 256)
-            return;
-        skip += count;
-    }
 }
 
 int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)

@@ -161,7 +161,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
 **What los_radar reads:** a unit's position and fractions, flags, `activateFlags`, definition (sight, radar and sonar
 distances, jamming, cloak), player and the sight cache (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`);
 the players' alliances, sharing flags and the fields of the game record behind `pad_1df4`, `unknown_1b8e` and
-`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); and map's `UnitsInRange` (through the engine's `VisitUnitsInRange`). The
+`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); and map's `UnitsInRange`. The
 queries `HasReadyUnitInRange` and `IsPointVisible` are its own since 3.1; they were ai's in 3.0. All as of each
 module's last run.
 

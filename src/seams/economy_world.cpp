@@ -9,7 +9,7 @@
 #include "../map/cell.h"
 #include "../units/unit_def.h"
 #include "../units/unit.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../harness/harness.h"

@@ -7,7 +7,7 @@
 #include "../../interfaces/map.h"
 #include "map_event_size.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 template <class U>
 inline void MapPublishUnit(int outbox, int kind, U* unit)

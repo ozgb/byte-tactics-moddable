@@ -2,7 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/targeting.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../util/vec3.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"

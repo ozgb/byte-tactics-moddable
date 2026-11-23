@@ -5,7 +5,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/los_radar.h"
 #include "../interfaces/map.h"
 #include "../src/state/sim_globals.h"

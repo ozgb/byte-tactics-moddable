@@ -8,8 +8,9 @@
 
 #if !defined(__wasm32__)
 #include "host.h"
-#include "services.h"
 
+// Returns nonzero when the harness runs in test mode.
+int HarnessTestMode();
 // 1 when p lies inside the sim block.
 int __cdecl SimOwns(const void* p);
 // The first byte of the sim block, or null before it is reserved.

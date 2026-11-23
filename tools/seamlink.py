@@ -22,7 +22,8 @@ source file; a file with no simulation function is not checked:
                 the scheduler (src/game/scheduler.cpp) that data/subsystems.csv gives a `phase:` rule (the engine's entry
                 point for a phase, which the default seam slot of it calls)
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
-  service       declared at depth 0 in interfaces/services.h, or a member of a class it defines
+  service       declared at depth 0 in interfaces/services.h or src/util/engine_services.h, or a member of a class
+                one of them defines
   host          declared in interfaces/host.h
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
@@ -191,7 +192,7 @@ CONST_CLASSES = ("const", "sim")
 KINDS = ("seam", "state", "service", "host", "bitexact", "library", "own", "const")
 STATE_HEADERS = ("interfaces/ref.h",)
 SEAMS_HEADER = "interfaces/seams.h"
-SERVICES_HEADER = "interfaces/services.h"
+SERVICES_HEADERS = ("interfaces/services.h", "src/util/engine_services.h")
 HOST_HEADER = "interfaces/host.h"
 BITEXACT_HEADER = "lib/bitexact/bitexact.h"
 SEAM_TABLE = "g_seams"
@@ -664,10 +665,11 @@ def build_rules(root: Path, units: list) -> Rules:
             code_defs.setdefault(name, set()).add(unit.file)
         for name in unit.data:
             data_defs.setdefault(name, set()).add(unit.file)
-    services_path = root / SERVICES_HEADER
-    services = header_names(root, SERVICES_HEADER)
-    if services_path.exists():
-        services |= members(services_path.read_text(encoding="latin-1"))
+    services = set()
+    for header in SERVICES_HEADERS:
+        services |= header_names(root, header)
+        if (root / header).exists():
+            services |= members((root / header).read_text(encoding="latin-1"))
     state = set()
     for header in STATE_HEADERS:
         state |= header_names(root, header)

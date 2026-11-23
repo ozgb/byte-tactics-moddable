@@ -30,7 +30,7 @@ struct Point16FromShorts : Point16 {
 #include "../game/map_events.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/orders_events.h"

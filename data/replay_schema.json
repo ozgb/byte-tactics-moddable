@@ -4650,7 +4650,6 @@
    {
     "name": "GameRand",
     "id": "RI_GAME_RAND",
-    "header": "src/state/game_rand.h",
     "declaration": "int __cdecl GameRand(RandStream stream);",
     "args": [
      {
@@ -4725,6 +4724,7 @@
    {
     "name": "TdfFile_Construct",
     "id": "RI_TDF_CONSTRUCT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "TdfFile();",
     "pre": [
@@ -4742,6 +4742,7 @@
    {
     "name": "TdfFile_Destruct",
     "id": "RI_TDF_DESTRUCT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "~TdfFile();",
     "args": [
@@ -4755,6 +4756,7 @@
    {
     "name": "TdfFile_LoadFile",
     "id": "RI_TDF_LOAD_FILE",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "int LoadFile(const char* path);",
     "args": [
@@ -4785,6 +4787,7 @@
    {
     "name": "TdfFile_SelectRecord",
     "id": "RI_TDF_SELECT_RECORD",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "int SelectRecord(const char* name);",
     "args": [
@@ -4811,6 +4814,7 @@
    {
     "name": "TdfRecord_GetFieldInt",
     "id": "RI_TDF_GET_INT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "int GetFieldInt(const char* name, int def);",
     "args": [
@@ -4833,6 +4837,7 @@
    {
     "name": "TdfRecord_GetFieldDouble",
     "id": "RI_TDF_GET_DOUBLE",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "double GetFieldDouble(const char* name, double def);",
     "args": [
@@ -4855,8 +4860,9 @@
    {
     "name": "TdfRecord_GetFieldString",
     "id": "RI_TDF_GET_STRING",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
-    "declaration": "int GetFieldString(char* dst, char* key, size_t size, char* def);",
+    "declaration": "int GetFieldString(char* dst, char* key, int size, char* def);",
     "args": [
      {
       "mode": "handle",
@@ -4892,6 +4898,7 @@
    {
     "name": "CommandArgs_GetIntArg",
     "id": "RI_GET_INT_ARG",
+    "header": "src/util/engine_services.h",
     "owner": "CommandArgs",
     "declaration": "int GetIntArg(int index, int default_val);",
     "args": [
@@ -4909,6 +4916,7 @@
    {
     "name": "FilePrintf",
     "id": "RI_FILE_PRINTF",
+    "header": "src/util/engine_services.h",
     "declaration": "int FilePrintf(void* file, const char* fmt, ...);",
     "args": [
      {
@@ -4936,6 +4944,7 @@
    {
     "name": "TdfFile_Unload",
     "id": "RI_TDF_UNLOAD",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "void Unload();",
     "args": [
@@ -4954,6 +4963,7 @@
    {
     "name": "TdfFile_SelectRecordAt",
     "id": "RI_TDF_SELECT_RECORD_AT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "int SelectRecordAt(int index);",
     "args": [
@@ -4980,6 +4990,7 @@
    {
     "name": "TdfFile_ResetCurrentRecord",
     "id": "RI_TDF_RESET_CURRENT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "void ResetCurrentRecord();",
     "args": [
@@ -5001,6 +5012,7 @@
    {
     "name": "TdfFile_GetCurrentRecord",
     "id": "RI_TDF_GET_CURRENT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "int GetCurrentRecord();",
     "args": [
@@ -5016,6 +5028,7 @@
    {
     "name": "TdfFile_SetCurrentRecord",
     "id": "RI_TDF_SET_CURRENT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfFile",
     "declaration": "void SetCurrentRecord(int val);",
     "args": [
@@ -5038,6 +5051,7 @@
    {
     "name": "TdfRecord_FindSubRecord",
     "id": "RI_TDF_FIND_SUB_RECORD",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "TdfRecord* FindSubRecord(const char* name);",
     "args": [
@@ -5057,6 +5071,7 @@
    {
     "name": "TdfRecord_GetSubRecord",
     "id": "RI_TDF_GET_SUB_RECORD",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "TdfRecord* GetSubRecord(int index);",
     "args": [
@@ -5076,6 +5091,7 @@
    {
     "name": "TdfRecord_GetSubRecordCount",
     "id": "RI_TDF_GET_SUB_RECORD_COUNT",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "int GetSubRecordCount();",
     "args": [
@@ -5090,6 +5106,7 @@
    {
     "name": "TdfRecord_GetFieldName",
     "id": "RI_TDF_GET_FIELD_NAME",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "char* GetFieldName(int index);",
     "args": [
@@ -5108,8 +5125,9 @@
    {
     "name": "TdfRecord_CopyRecordName",
     "id": "RI_TDF_COPY_RECORD_NAME",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
-    "declaration": "void CopyRecordName(char* dest, size_t count);",
+    "declaration": "void CopyRecordName(char* dest, int count);",
     "args": [
      {
       "mode": "handle",
@@ -5136,6 +5154,7 @@
    {
     "name": "TdfRecord_GetRecordName",
     "id": "RI_TDF_GET_RECORD_NAME",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "int GetRecordName();",
     "args": [
@@ -5151,6 +5170,7 @@
    {
     "name": "TdfRecord_FindFieldValue",
     "id": "RI_TDF_FIND_FIELD_VALUE",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "int FindFieldValue(char* name);",
     "args": [
@@ -5170,6 +5190,7 @@
    {
     "name": "TdfRecord_GetFieldFixed",
     "id": "RI_TDF_GET_FIELD_FIXED",
+    "header": "src/util/engine_services.h",
     "owner": "TdfRecord",
     "declaration": "int* GetFieldFixed(int* dst, char* key, int def);",
     "args": [
@@ -5203,6 +5224,7 @@
    {
     "name": "Translate",
     "id": "RI_TRANSLATE",
+    "header": "src/util/engine_services.h",
     "declaration": "char* __stdcall Translate(const char* key);",
     "args": [
      {
@@ -5216,6 +5238,7 @@
    {
     "name": "CommandArgs_InitArgs",
     "id": "RI_INIT_ARGS",
+    "header": "src/util/engine_services.h",
     "owner": "CommandArgs",
     "declaration": "CommandArgs* InitArgs();",
     "args": [
@@ -5233,6 +5256,7 @@
    {
     "name": "ComputeChecksum",
     "id": "RI_COMPUTE_CHECKSUM",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ComputeChecksum(unsigned char* data, int len);",
     "args": [
      {
@@ -5299,6 +5323,7 @@
    {
     "name": "RecordSimEvent",
     "id": "RI_RECORD_SIM_EVENT",
+    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);",
     "args": [
      {
@@ -5323,6 +5348,7 @@
    {
     "name": "SchedPublish",
     "id": "RI_SCHED_PUBLISH",
+    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);",
     "args": [
      {
@@ -5343,6 +5369,7 @@
    {
     "name": "ScheduleEconomySpend",
     "id": "RI_SCHEDULE_ECONOMY_SPEND",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleEconomySpend(const EconomySpend* spend);",
     "args": [
      {
@@ -5355,6 +5382,7 @@
    {
     "name": "ScheduleEconomyRequestGranted",
     "id": "RI_SCHEDULE_ECONOMY_REQUEST_GRANTED",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);",
     "args": [
      {
@@ -5373,6 +5401,7 @@
    {
     "name": "ScheduleMetalExtraction",
     "id": "RI_SCHEDULE_METAL_EXTRACTION",
+    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall ScheduleMetalExtraction(unsigned int unit);",
     "args": [
      {
@@ -5385,6 +5414,7 @@
    {
     "name": "ScheduleUnitsDeliver",
     "id": "RI_SCHEDULE_UNITS_DELIVER",
+    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall ScheduleUnitsDeliver();",
     "args": []
    },
@@ -5409,6 +5439,7 @@
    {
     "name": "ScheduleFeaturesPlace",
     "id": "RI_SCHEDULE_FEATURES_PLACE",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleFeaturesPlace(const FeaturesPlace* place);",
     "args": [
      {
@@ -5421,6 +5452,7 @@
    {
     "name": "ScheduleTargetingTargetUnit",
     "id": "RI_SCHEDULE_TARGETING_TARGET_UNIT",
+    "header": "src/util/engine_services.h",
     "declaration": "Unit* __stdcall ScheduleTargetingTargetUnit(Unit* unit, int weapon);",
     "args": [
      {
@@ -5440,6 +5472,7 @@
    {
     "name": "ScheduleTargetingTargetPos",
     "id": "RI_SCHEDULE_TARGETING_TARGET_POS",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleTargetingTargetPos(Unit* unit, Vec3* pos, int weapon);",
     "args": [
      {
@@ -5492,6 +5525,7 @@
    {
     "name": "ScheduleTargetingFind",
     "id": "RI_SCHEDULE_TARGETING_FIND",
+    "header": "src/util/engine_services.h",
     "declaration": "Unit* __stdcall ScheduleTargetingFind(Unit* unit, unsigned char weapon, int useRange);",
     "args": [
      {
@@ -5515,6 +5549,7 @@
    {
     "name": "ScheduleTargetingFireAtWill",
     "id": "RI_SCHEDULE_TARGETING_FIRE_AT_WILL",
+    "header": "src/util/engine_services.h",
     "declaration": "Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit);",
     "args": [
      {
@@ -5530,6 +5565,7 @@
    {
     "name": "ScheduleMapCanBuildAt",
     "id": "RI_SCHEDULE_MAP_CAN_BUILD_AT",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);",
     "args": [
      {
@@ -5554,6 +5590,7 @@
    {
     "name": "ScheduleMapCanPlaceUnitFootprint",
     "id": "RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);",
     "args": [
      {
@@ -5578,6 +5615,7 @@
    {
     "name": "ScheduleMapPickReclaimable",
     "id": "RI_SCHEDULE_MAP_PICK_RECLAIMABLE",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);",
     "args": [
      {
@@ -5610,6 +5648,7 @@
    {
     "name": "SimCaptureAlloc",
     "id": "RI_SIM_CAPTURE_ALLOC",
+    "header": "src/util/engine_services.h",
     "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
     "args": [
      {
@@ -5628,6 +5667,7 @@
    {
     "name": "FindSlotByDpid",
     "id": "RI_FIND_SLOT_BY_DPID",
+    "header": "src/util/engine_services.h",
     "declaration": "unsigned char __stdcall FindSlotByDpid(int id);",
     "args": [
      {
@@ -5641,6 +5681,7 @@
    {
     "name": "GetSlotDpid",
     "id": "RI_GET_SLOT_DPID",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall GetSlotDpid(unsigned char index);",
     "args": [
      {
@@ -5654,6 +5695,7 @@
    {
     "name": "LoadGaf",
     "id": "RI_LOAD_GAF",
+    "header": "src/util/engine_services.h",
     "declaration": "GafArchive* __stdcall LoadGaf(const char* path);",
     "args": [
      {
@@ -5668,6 +5710,7 @@
    {
     "name": "LoadAnimGaf",
     "id": "RI_LOAD_ANIM_GAF",
+    "header": "src/util/engine_services.h",
     "declaration": "void* __stdcall LoadAnimGaf(char* name);",
     "args": [
      {
@@ -5682,6 +5725,7 @@
    {
     "name": "FindGafEntry",
     "id": "RI_FIND_GAF_ENTRY",
+    "header": "src/util/engine_services.h",
     "declaration": "GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name);",
     "args": [
      {
@@ -5704,6 +5748,7 @@
    {
     "name": "GetGafFrame",
     "id": "RI_GET_GAF_FRAME",
+    "header": "src/util/engine_services.h",
     "declaration": "GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);",
     "args": [
      {
@@ -5730,6 +5775,7 @@
    {
     "name": "GetGafSequenceFrame",
     "id": "RI_GET_GAF_SEQUENCE_FRAME",
+    "header": "src/util/engine_services.h",
     "declaration": "GafFrame* __stdcall GetGafSequenceFrame(Handle* player);",
     "args": [
      {
@@ -5752,6 +5798,7 @@
    {
     "name": "InitGafSequence",
     "id": "RI_INIT_GAF_SEQUENCE",
+    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);",
     "args": [
      {
@@ -5779,6 +5826,7 @@
    {
     "name": "StepGafSequence",
     "id": "RI_STEP_GAF_SEQUENCE",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall StepGafSequence(Handle* player);",
     "args": [
      {
@@ -5798,6 +5846,7 @@
    {
     "name": "Load3do",
     "id": "RI_LOAD_3DO",
+    "header": "src/util/engine_services.h",
     "declaration": "void* __stdcall Load3do(char* path);",
     "args": [
      {
@@ -5818,6 +5867,7 @@
    {
     "name": "LoadObject3d",
     "id": "RI_LOAD_OBJECT_3D",
+    "header": "src/util/engine_services.h",
     "declaration": "void* __stdcall LoadObject3d(const char* name);",
     "args": [
      {
@@ -5838,6 +5888,7 @@
    {
     "name": "GetObjectHeight",
     "id": "RI_GET_OBJECT_HEIGHT",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall GetObjectHeight(Object3do* model);",
     "args": [
      {
@@ -5851,6 +5902,7 @@
    {
     "name": "ExecuteCommandText",
     "id": "RI_EXECUTE_COMMAND_TEXT",
+    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask);",
     "args": [
      {

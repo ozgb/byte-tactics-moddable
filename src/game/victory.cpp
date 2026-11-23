@@ -1,6 +1,6 @@
 #include <string.h>
 #include "../state/sim_effects.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/block.h"
 #include "../state/game_rand.h"
 #include <stdio.h>
@@ -91,7 +91,7 @@ extern Game* g_game;
 
 void __stdcall PlaySoundByName(char* str, int flag);
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
+#include "../seams/units_in_range.h"
 
 static inline void AddCondition(Ref<MissionCondition>* list, int* count, MissionCondition* value)
 {
@@ -492,7 +492,7 @@ int VictoryMoveUnitToRadius::IsSatisfied()
     if (pos.y == 0x12345678) {
         g_seams.los_radar->ClampWorldPosToTerrain(pos.x, pos.z, &pos);
     }
-    VisitUnitsInRange(&pos, radius, (UnitVisitor*)(RadiusUnitVisitor*)this);
+    ForEachUnitInRange(&pos, radius, [this](Unit* unit) { VisitUnit(unit); });
     return satisfied;
 }
 

@@ -1,7 +1,7 @@
 #ifndef MAP_CACHE_ENTRY_H
 #define MAP_CACHE_ENTRY_H
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 class Mission;
 

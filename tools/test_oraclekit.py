@@ -575,7 +575,7 @@ SIM_TERMS = (
     "state 2 of the pickup order,The transport starts a pickup attempt.,layout.json Order.state\n"
     "kill type 3,A self-destruct.,\n"
 )
-SIM_FILES = {"interfaces/services.h": SIM_HEADER, oraclekit.SIM_EVENTS_PAGE: SIM_PAGE, oraclekit.TERMS_SOURCE: SIM_TERMS}
+SIM_FILES = {oraclekit.SIM_EVENTS_HEADER: SIM_HEADER, oraclekit.SIM_EVENTS_PAGE: SIM_PAGE, oraclekit.TERMS_SOURCE: SIM_TERMS}
 SIM_CONTENTS = [("dir", "interfaces", ""), ("file", oraclekit.SIM_EVENTS_PAGE, "")]
 REAL_LAYOUT: dict = {}
 

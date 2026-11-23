@@ -2,7 +2,7 @@
 #define PATHFINDER_H
 
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/block.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"

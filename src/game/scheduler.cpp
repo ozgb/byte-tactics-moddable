@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../network/player.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"

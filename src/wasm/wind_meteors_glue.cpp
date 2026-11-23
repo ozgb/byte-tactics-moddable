@@ -13,7 +13,7 @@
 #include "../util/vec3.h"
 #include "../files/files_bank.h"
 #include "../../interfaces/host.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 #include "../map/meteors.h"
@@ -247,7 +247,7 @@ IMPORT(TdfRecordGetFieldStringImport)
     const char* error = LiveOf("TdfRecord_GetFieldString", (unsigned)a[0].i32, &record);
     if (error != nullptr)
         return error;
-    a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), (size_t)(unsigned)a[3].i32, (char*)Linear(a[4].i32));
+    a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), a[3].i32, (char*)Linear(a[4].i32));
     return nullptr;
 }
 

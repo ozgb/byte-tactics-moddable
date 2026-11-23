@@ -8,7 +8,7 @@
 #include <new>
 
 #include "../../link/globals.h"
-#include "../../interfaces/services.h"
+#include "engine_services.h"
 #include "tdf.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
@@ -357,12 +357,12 @@ void TdfRecord::ComputeRecordChecksum(char* start, char* end)
 }
 
 // FUNCTION: 0x4c4420
-void TdfRecord::CopyRecordName(char* dest, size_t count)
+void TdfRecord::CopyRecordName(char* dest, int count)
 {
     ReplayImport call(RI_TDF_COPY_RECORD_NAME);
     call.Ptr(this);
     call.Ptr(dest);
-    call.Int((int)count);
+    call.Int(count);
     strncpy(dest, name, count);
 }
 
@@ -545,7 +545,7 @@ int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
 }
 
 // FUNCTION: 0x4c48c0
-int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
+int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     ReplayImport call(RI_TDF_GET_STRING);
     call.Ptr(this);
@@ -819,7 +819,7 @@ int __stdcall FindTranslation(const char* name)
 }
 
 // FUNCTION: 0x4c58a0
-int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t size,
+int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, int size,
                            char* def)
 {
     char full[256];

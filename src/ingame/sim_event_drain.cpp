@@ -15,7 +15,7 @@
 #include "../state/sim_events.h"
 #include "../state/sim_radar.h"
 #include "radar.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/harness.h"
 #include "../units/unit.h"
 #include "../util/vec3.h"

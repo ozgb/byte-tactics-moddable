@@ -2,7 +2,7 @@
 #define OBJECT_POOL_H
 
 #include <vector>
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 struct PoolBlock {
     int unknown_0;

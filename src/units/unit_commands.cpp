@@ -369,7 +369,7 @@ Player** __stdcall Partition(Player** first, Player** last,
     }
 }
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_globals.h"
 
 class UnitCategory {

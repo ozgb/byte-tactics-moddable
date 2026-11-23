@@ -1,6 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#include "../../interfaces/services.h"
+#include "engine_services.h"
 
 struct ConsoleCommand {
     const char* name;

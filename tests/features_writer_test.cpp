@@ -3,7 +3,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/features.h"
 #include "../src/state/sim_globals.h"
 #include "../src/map/cell.h"
@@ -131,7 +131,7 @@ double TdfRecord::GetFieldDouble(const char*, double def)
 {
     return def;
 }
-int TdfRecord::GetFieldString(char*, char*, size_t, char*)
+int TdfRecord::GetFieldString(char*, char*, int, char*)
 {
     return 0;
 }

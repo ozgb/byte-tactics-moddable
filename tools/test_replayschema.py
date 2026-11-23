@@ -1357,7 +1357,8 @@ class Snapshots(unittest.TestCase):
     """N9: an import that returns a buffer the slot fills is recorded by its size and a handle, and the bytes at slot exit."""
 
     def spec(self, **changes):
-        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "header": "src/util/engine_services.h",
+               "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
                "args": [{"mode": "int", "param": "bytes"}, {"mode": "skip", "param": "offset"}], "result": "snapshot", "bytes": "bytes", "offset": "offset"}
         out.update(changes)
         return out

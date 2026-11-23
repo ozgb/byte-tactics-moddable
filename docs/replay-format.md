@@ -1007,7 +1007,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
-| `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
+| `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
 | `vector` (`dir: out`) | a vector of `Point16` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |
 | `units` (`dir: out`) | a vector of `Unit` pointers an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
@@ -1041,7 +1041,8 @@ replayer's native table keeps its `native` symbol in place. The tool rejects `"r
 
 `uv run tools/replayschema.py` also writes the recorder's tables, the recording copy of every seam table with its argument
 hooks and the import hooks, and the slot runners, import stubs and native seam tables of the replayer. The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
-annotation: each entry names its declaration in `interfaces/services.h` (checked against the header) and how its arguments,
+annotation: each entry names its declaration, in `interfaces/services.h` or in the engine header that holds the services no
+module imports (checked against the header), and how its arguments,
 result and `o` lines are written. From it the tool writes the ids and names, the recorder's lines and
 the replayer's answers. The one thing
 it cannot write is the hook itself, an import-recording line at the top of each function in the game source:

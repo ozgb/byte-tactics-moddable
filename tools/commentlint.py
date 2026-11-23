@@ -52,6 +52,7 @@ PUBLISHED_INTERFACES = {
     "lib/bitexact/bitexact.h",
     "src/state/block.h",
     "src/state/game_rand.h",
+    "src/util/engine_services.h",
 }
 PUBLISHED_INTERFACE_DIRS = ("interfaces/",)
 

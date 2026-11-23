@@ -138,7 +138,7 @@ double TdfRecord::GetFieldDouble(const char* name, double def)
     return ParseF64(result);
 }
 
-int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
+int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     ReplayText t;
     StartImport(t, RI_TDF_GET_STRING);
@@ -299,7 +299,7 @@ char* TdfRecord::GetFieldName(int index)
     return text;
 }
 
-void TdfRecord::CopyRecordName(char* dest, size_t count)
+void TdfRecord::CopyRecordName(char* dest, int count)
 {
     ReplayText t;
     StartImport(t, RI_TDF_COPY_RECORD_NAME);

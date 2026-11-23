@@ -2,7 +2,7 @@
 #define LOS_TABLES_H
 
 #include "../state/block_vector.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "los_lines.h"
 struct StringValueElem;
 

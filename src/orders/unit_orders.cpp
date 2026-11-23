@@ -16,6 +16,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include <string.h>
 
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include "../util/vec3.h"
 
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }

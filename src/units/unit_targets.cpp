@@ -3,6 +3,7 @@
 #include "win_types.h"
 #include "unit_def.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
 #include "../state/block.h"
 #include <stdio.h>
 #include <string.h>

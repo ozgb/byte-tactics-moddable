@@ -112,7 +112,7 @@ source calls, and gives each the functions it can reach:
                 that resolve a seam slot (reason "seam slot filled by ...")
 
 An entry or a method is found among the functions of data/rwsets.csv by its qualified name,
-or by its last name when the array writes it unqualified. A call through a class declared in interfaces/*.h (a published callback, such as UnitVisitor) is listed as
+or by its last name when the array writes it unqualified. A call through a class declared in interfaces/*.h (a published callback; the interfaces declare none today) is listed as
 a published callback and is not a crossing. A call is listed when the caller's subsystem and a callee's are both sim subsystems and differ,
 or the caller is `game` and the callee is a sim subsystem (the same edges as --seams). Each
 callee class is shown with the `new` sites of it under src/ and the subsystems of their files, as

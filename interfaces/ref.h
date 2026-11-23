@@ -1,8 +1,8 @@
 #ifndef INTERFACES_REF_H
 #define INTERFACES_REF_H
 
-// Major version of the Ref interface, changed when the stored representation changes.
-#define REF_VERSION_MAJOR 2
+// Major version of the Ref interface, changed when the stored representation or a function's signature changes.
+#define REF_VERSION_MAJOR 3
 // Minor version of the Ref interface, changed when a member is added.
 #define REF_VERSION_MINOR 0
 

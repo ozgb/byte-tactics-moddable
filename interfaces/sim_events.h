@@ -1,6 +1,11 @@
 #ifndef INTERFACES_SIM_EVENTS_H
 #define INTERFACES_SIM_EVENTS_H
 
+// Major version of the sim events interface, changed when a kind is removed or its arguments change.
+#define SIM_EVENTS_VERSION_MAJOR 1
+// Minor version of the sim events interface, changed when a kind is added.
+#define SIM_EVENTS_VERSION_MINOR 0
+
 // The kinds of sim event, each with the meaning of its arguments (positions are fixed-point integers; players and units are indices).
 enum SimEventKind : unsigned short {
     // Marks an empty record, never recorded.

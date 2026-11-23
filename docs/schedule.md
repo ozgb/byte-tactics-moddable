@@ -462,10 +462,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. a sim event is recorded
 
-### `los_radar.UpdateSensorRadarAndCloak`
-
-1. `map.UnitsInRange`: query
-
 ### `map.Apply`
 
 1. `los_radar.Apply`: mixed
@@ -643,7 +639,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `features.FindFeatureAtPos`: query
 1. `map.GetGroundHeight`: query
 1. `units.CanReclaim`: query
-1. `map.UnitsInRange`: query
 1. `map.PickRandomReclaimableResourcesInRadius`: mixed
 1. `units.AddRepairProgress`: mixed
 1. `los_radar.GetOriginCellAtPosition`: query
@@ -702,7 +697,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `features.FindFeatureAtPos`: query
 1. `map.GetGroundHeight`: query
 1. `units.CanReclaim`: query
-1. `map.UnitsInRange`: query
 1. `map.PickRandomReclaimableResourcesInRadius`: mixed
 1. `units.AddRepairProgress`: mixed
 1. `los_radar.GetOriginCellAtPosition`: query
@@ -1067,7 +1061,6 @@ is not listed.
 | features | `scripts.Apply` | mixed |
 | features | `scripts.ObjectStateSize` | query |
 | features | `weapons.Apply` | mixed |
-| los_radar | `map.UnitsInRange` | query |
 | map | `features.GetCellFeature` | query |
 | map | `los_radar.Apply` | mixed |
 | map | `los_radar.GetMapCell` | query |
@@ -1100,7 +1093,6 @@ is not listed.
 | orders | `map.IsPadSlotFree` | query |
 | orders | `map.PickRandomReclaimableResourcesInRadius` | mixed |
 | orders | `map.SnapWorldPosToFootprint` | query |
-| orders | `map.UnitsInRange` | query |
 | orders | `mission.GetGameType` | view read |
 | orders | `mission.GetMissionParams` | mixed |
 | orders | `movement.Apply` | mixed |
@@ -1400,11 +1392,11 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 3 | 0 / 1 | 0 | 0 | 0 |
 | weapons | 0 / 2 | 10 / 3 | 0 / 2 | 11 / 4 | 19 | 47 | 66 |
 | targeting | 1 / 0 | 3 / 4 | 0 / 0 | 2 / 7 | 3 | 28 | 31 |
-| los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 5 | 11 | 22 | 32 |
-| orders | 3 / 0 | 21 / 1 | 1 / 3 | 30 / 4 | 8 | 47 | 55 |
+| los_radar | 0 / 0 | 0 / 14 | 0 / 5 | 0 / 5 | 11 | 22 | 32 |
+| orders | 3 / 0 | 20 / 1 | 1 / 3 | 30 / 4 | 8 | 47 | 55 |
 | units | 1 / 1 | 5 / 6 | 14 / 3 | 17 / 17 | 130 | 22 | 152 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 8 / 3 | 1 | 12 | 11 |
-| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 16 | 25 | 41 |
+| map | 0 / 1 | 3 / 13 | 0 / 2 | 1 / 7 | 16 | 25 | 41 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 7 | 0 / 15 | 14 | 15 | 29 |
 | movement | 0 / 0 | 3 / 1 | 3 / 2 | 9 / 12 | 14 | 26 | 40 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |

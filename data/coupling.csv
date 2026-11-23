@@ -1319,6 +1319,7 @@ game,seams,indirect,AdvanceMissionNative,1
 game,seams,indirect,AiInbox,2
 game,seams,indirect,AiOnWeaponsAttacked,2
 game,seams,indirect,CountMissionUnitsNative,1
+game,seams,indirect,CreateUnitNative,4
 game,seams,indirect,DeactivateConditionsNative,2
 game,seams,indirect,EconomyInbox,2
 game,seams,indirect,FeaturesInbox,2
@@ -1475,7 +1476,6 @@ game,targeting,shared_write,Vec3::x,3
 game,targeting,shared_write,Vec3::y,2
 game,targeting,shared_write,Vec3::z,3
 game,units,indirect,AllocateUnitMemory,1
-game,units,indirect,CreateUnit,4
 game,units,indirect,FindMissionUnit,1
 game,units,indirect,FindUnitType,1
 game,units,indirect,FindUnitTypeId,4
@@ -1788,7 +1788,7 @@ harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,89
+harness,orders,call,Add,90
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,indirect,OrdersWriteState,1
@@ -1831,7 +1831,7 @@ harness,orders,shared_write,Seams::movement,30
 harness,orders,shared_write,Seams::network,5
 harness,orders,shared_write,Seams::scripts,20
 harness,orders,shared_write,Seams::targeting,1
-harness,orders,shared_write,Seams::units,32
+harness,orders,shared_write,Seams::units,26
 harness,orders,shared_write,Seams::weapons,8
 harness,orders,shared_write,TargetingSeam::ChooseWeapon,1
 harness,orders,shared_write,UnitsSeam::AddBuildProgress,5
@@ -1841,7 +1841,7 @@ harness,orders,shared_write,UnitsSeam::CanReclaim,3
 harness,orders,shared_write,UnitsSeam::CanRepair,5
 harness,orders,shared_write,UnitsSeam::CreateUnit,4
 harness,orders,shared_write,UnitsSeam::FindUnitTypeId,4
-harness,orders,shared_write,UnitsSeam::GetFactoriesInRadius,7
+harness,orders,shared_write,UnitsSeam::GetFactoriesInRadius,1
 harness,orders,shared_write,UnitsSeam::UnitRefGet,3
 harness,orders,shared_write,UnitsSeam::UnitRefSetUnit,9
 harness,orders,shared_write,WeaponsSeam::GetWeaponRange,2
@@ -2088,7 +2088,7 @@ harness,seams,shared_write,Seams::economy,5
 harness,seams,shared_write,Seams::features,3
 harness,seams,shared_write,Seams::files,1
 harness,seams,shared_write,Seams::los_radar,3
-harness,seams,shared_write,Seams::map,10
+harness,seams,shared_write,Seams::map,9
 harness,seams,shared_write,Seams::mission,1
 harness,seams,shared_write,Seams::movement,2
 harness,seams,shared_write,Seams::network,1
@@ -2261,6 +2261,7 @@ los_radar,harness,shared_write,Vec3::z,3
 los_radar,map,indirect,GetGroundHeight,1
 los_radar,map,indirect,MapAllocateBuckets,1
 los_radar,map,indirect,MapFreeBuckets,1
+los_radar,map,indirect,UnitsInRange,1
 los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
@@ -2380,7 +2381,6 @@ los_radar,scripts,shared_write,Unit::flags,3
 los_radar,scripts,shared_write,Vec3::x,7
 los_radar,scripts,shared_write,Vec3::y,7
 los_radar,scripts,shared_write,Vec3::z,7
-los_radar,seams,call,VisitUnitsInRange,1
 los_radar,seams,indirect,GetMissionParamsNative,2
 los_radar,seams,indirect,GetNameSlotNative,1
 los_radar,seams,shared_write,Game::visibilityMask,1
@@ -2845,13 +2845,13 @@ movement,presentation,shared_write,Unit::motion,1
 movement,presentation,shared_write,Vec3::x,43
 movement,presentation,shared_write,Vec3::y,43
 movement,presentation,shared_write,Vec3::z,42
-movement,scripts,indirect,GetPieceAngles,1
-movement,scripts,indirect,GetPiecePosition,2
 movement,scripts,shared_write,Ref<Unit>::offset,1
 movement,scripts,shared_write,Vec3::x,7
 movement,scripts,shared_write,Vec3::y,7
 movement,scripts,shared_write,Vec3::z,7
 movement,seams,call,ScheduleMapCanPlaceUnitFootprint,1
+movement,seams,indirect,GetPieceAnglesNative,1
+movement,seams,indirect,GetPiecePositionNative,2
 movement,seams,indirect,UnitRefUnlinkNative,3
 movement,seams,shared_write,PathPoint::x,1
 movement,seams,shared_write,PathPoint::y,1
@@ -2872,7 +2872,7 @@ movement,units,shared_write,BitWriter::bit,1
 movement,units,shared_write,BitWriter::index,1
 movement,units,shared_write,MovementSavedState::flag,2
 movement,units,shared_write,MovementSavedState::mode,2
-movement,units,shared_write,MovementSavedState::p2,2
+movement,units,shared_write,MovementSavedState::smoothedAcceleration,2
 movement,units,shared_write,MovementSavedState::speed,2
 movement,units,shared_write,MovementSavedState::turn,2
 movement,units,shared_write,MovementSavedState::velocity,2
@@ -3318,6 +3318,7 @@ orders,map,indirect,CanPlaceFootprintAt,1
 orders,map,indirect,GetGroundHeight,4
 orders,map,indirect,IsPadSlotFree,2
 orders,map,indirect,SnapWorldPosToFootprint,2
+orders,map,indirect,UnitsInRange,3
 orders,map,shared_write,Fixed::value,2
 orders,map,shared_write,Point16::x,17
 orders,map,shared_write,Point16::y,17
@@ -3415,8 +3416,6 @@ orders,presentation,shared_write,Vec3::x,43
 orders,presentation,shared_write,Vec3::y,43
 orders,presentation,shared_write,Vec3::z,42
 orders,scripts,indirect,GetNanoPiecePosition,15
-orders,scripts,indirect,GetPieceOffset,1
-orders,scripts,indirect,GetPiecePosition,1
 orders,scripts,shared_write,Ref<Unit>::offset,1
 orders,scripts,shared_write,Vec3::x,7
 orders,scripts,shared_write,Vec3::y,7
@@ -3425,14 +3424,16 @@ orders,seams,call,ScheduleMapCanPlaceUnitFootprint,4
 orders,seams,call,ScheduleMapPickReclaimable,2
 orders,seams,call,ScheduleTargetingFireAtWill,6
 orders,seams,call,ScheduleTargetingTargetUnit,4
-orders,seams,call,VisitUnitsInRange,3
 orders,seams,indirect,CanLoadNative,2
 orders,seams,indirect,CanReclaimNative,3
 orders,seams,indirect,CanRepairNative,5
 orders,seams,indirect,ChooseWeaponNative,1
+orders,seams,indirect,CreateUnitNative,4
 orders,seams,indirect,FindScriptNative,3
 orders,seams,indirect,GetGameTypeNative,1
 orders,seams,indirect,GetMissionParamsNative,1
+orders,seams,indirect,GetPieceOffsetNative,1
+orders,seams,indirect,GetPiecePositionNative,1
 orders,seams,indirect,GetWeaponRangeNative,2
 orders,seams,indirect,QueryScriptNative,3
 orders,seams,shared_write,Point16::x,3
@@ -3447,7 +3448,6 @@ orders,targeting,shared_write,Vec3::y,2
 orders,targeting,shared_write,Vec3::z,3
 orders,units,indirect,AddBuildProgress,5
 orders,units,indirect,AddRepairProgress,3
-orders,units,indirect,CreateUnit,4
 orders,units,indirect,FindUnitTypeId,4
 orders,units,indirect,GetFactoriesInRadius,7
 orders,units,indirect,LoadUnit,2
@@ -3943,8 +3943,7 @@ players,game,call,EconSpend,2
 players,game,call,LosRadarPublishRecalculate,1
 players,game,call,PlayersEventSize,1
 players,game,call,RecordFocusCommander,1
-players,game,call,RecordSimEvent,2
-players,game,call,RecordSound,10
+players,game,call,RecordSimEvent,3
 players,game,call,SchedPlayersPhase,2
 players,game,call,SimAlloc,1
 players,game,call,SimBlockTrack,1
@@ -4022,6 +4021,7 @@ players,los_radar,shared_write,Ref<Unit>::offset,2
 players,los_radar,shared_write,Vec3::x,16
 players,los_radar,shared_write,Vec3::y,13
 players,los_radar,shared_write,Vec3::z,16
+players,map,indirect,UnitsInRange,1
 players,map,shared_write,Game::mapFlags,1
 players,map,shared_write,Game::playerIndex,1
 players,map,shared_write,Player::active,2
@@ -4195,8 +4195,8 @@ players,scripts,shared_write,Vec3::x,7
 players,scripts,shared_write,Vec3::y,7
 players,scripts,shared_write,Vec3::z,7
 players,seams,call,ScheduleMapCanPlaceUnitFootprint,1
-players,seams,call,VisitUnitsInRange,1
 players,seams,indirect,CreateSquadManagerNative,1
+players,seams,indirect,CreateUnitNative,1
 players,seams,indirect,FreeSquadManagerNative,1
 players,seams,indirect,GetCellMeanHeightNative,1
 players,seams,indirect,GetGameTypeNative,10
@@ -4225,7 +4225,6 @@ players,targeting,shared_write,Vec3::x,3
 players,targeting,shared_write,Vec3::y,2
 players,targeting,shared_write,Vec3::z,3
 players,units,indirect,CreateFactoryIndex,1
-players,units,indirect,CreateUnit,1
 players,units,indirect,FindUnitTypeId,4
 players,units,indirect,FreeFactoryIndex,1
 players,units,shared_write,Game::localPlayer,1
@@ -4620,7 +4619,7 @@ presentation,orders,shared_write,Point16::y,22
 presentation,orders,shared_write,Unit::attacker,2
 presentation,orders,shared_write,Unit::flags,24
 presentation,orders,shared_write,Unit::lastAttackerSlot,2
-presentation,orders,shared_write,Unit::pos,49
+presentation,orders,shared_write,Unit::pos,48
 presentation,orders,shared_write,Vec3::x,55
 presentation,orders,shared_write,Vec3::y,35
 presentation,orders,shared_write,Vec3::z,55
@@ -5141,6 +5140,7 @@ seams,economy,shared_write,NetworkSeam::BroadcastPlayerInfo,2
 seams,economy,shared_write,NetworkSeam::SendShareMapInfo,1
 seams,economy,shared_write,Ref<Unit>::offset,1
 seams,economy,shared_write,Seams::network,3
+seams,features,call,GetFootprintCentre,1
 seams,features,indirect,ApplyEvent,1
 seams,features,indirect,PlaceEvent,1
 seams,features,shared_write,LosRadarSeam::GetMapCell,14
@@ -5488,10 +5488,7 @@ seams,harness,shared_write,WeaponsSeam::UpdateUnitWeapons,2
 seams,harness,shared_write,WeaponsSeam::WeaponCanReachUnit,2
 seams,harness,shared_write,WindMeteorsSeam::Apply,2
 seams,los_radar,indirect,ApplyLosRadarEvent,1
-seams,los_radar,indirect,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,1
 seams,los_radar,indirect,GetMapCell,1
-seams,los_radar,indirect,RadarJamVisitor::ApplyRadarJamFlag,1
-seams,los_radar,indirect,SonarJamVisitor::ApplySonarJamFlag,1
 seams,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 seams,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
 seams,los_radar,shared_write,MapSeam::GetGroundHeight,1
@@ -5508,6 +5505,8 @@ seams,los_radar,shared_write,Seams::network,3
 seams,los_radar,shared_write,Vec3::x,16
 seams,los_radar,shared_write,Vec3::y,13
 seams,los_radar,shared_write,Vec3::z,16
+seams,map,call,CanBuildAt,1
+seams,map,call,CanPlaceUnitFootprint,1
 seams,map,call,GetCellMeanHeight,1
 seams,map,call,GetTerrainPassValue,1
 seams,map,call,PassMap::Get,1
@@ -5515,10 +5514,7 @@ seams,map,call,PassMap::InBounds,1
 seams,map,call,PassMap::RefreshMovedUnits,1
 seams,map,call,PassMap::RefreshUnitIfStale,1
 seams,map,indirect,ApplyMapEvent,1
-seams,map,indirect,CanBuildAt,1
-seams,map,indirect,CanPlaceUnitFootprint,1
 seams,map,indirect,PickRandomReclaimableResourcesInRadius,1
-seams,map,indirect,UnitsInRange,1
 seams,map,shared_write,FeaturesSeam::GetCellFeature,1
 seams,map,shared_write,LosRadarSeam::GetMapCell,1
 seams,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
@@ -5596,10 +5592,7 @@ seams,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 seams,network,shared_write,Seams::mission,7
 seams,network,shared_write,Seams::movement,1
 seams,network,shared_write,Seams::scripts,3
-seams,orders,indirect,DamagedAllyCollector::Visit,1
-seams,orders,indirect,GroundAllyVisitor::CollectGroundAlly,1
 seams,orders,indirect,OrdersApply,1
-seams,orders,indirect,RepairableUnitVisitor::CollectRepairableUnit,1
 seams,orders,shared_write,FeaturesSeam::FindFeatureAtPos,3
 seams,orders,shared_write,FeaturesSeam::GetCellFeature,1
 seams,orders,shared_write,LosRadarSeam::GetMapCellAtPosition,3
@@ -5650,7 +5643,7 @@ seams,orders,shared_write,Seams::movement,30
 seams,orders,shared_write,Seams::network,5
 seams,orders,shared_write,Seams::scripts,20
 seams,orders,shared_write,Seams::targeting,1
-seams,orders,shared_write,Seams::units,32
+seams,orders,shared_write,Seams::units,26
 seams,orders,shared_write,Seams::weapons,8
 seams,orders,shared_write,TargetingSeam::ChooseWeapon,1
 seams,orders,shared_write,UnitsSeam::AddBuildProgress,5
@@ -5660,7 +5653,7 @@ seams,orders,shared_write,UnitsSeam::CanReclaim,3
 seams,orders,shared_write,UnitsSeam::CanRepair,5
 seams,orders,shared_write,UnitsSeam::CreateUnit,4
 seams,orders,shared_write,UnitsSeam::FindUnitTypeId,4
-seams,orders,shared_write,UnitsSeam::GetFactoriesInRadius,7
+seams,orders,shared_write,UnitsSeam::GetFactoriesInRadius,1
 seams,orders,shared_write,UnitsSeam::UnitRefGet,3
 seams,orders,shared_write,UnitsSeam::UnitRefSetUnit,9
 seams,orders,shared_write,Vec3::x,55
@@ -5701,7 +5694,6 @@ seams,players,call,MissionConditions::RegisterConditions,1
 seams,players,call,MissionConditions::SaveConditions,1
 seams,players,call,MissionConditions::~MissionConditions,1
 seams,players,indirect,PlayersApply,1
-seams,players,indirect,VictoryMoveUnitToRadius::VisitUnit,1
 seams,players,shared_write,FeaturesSeam::FindFeatureAtPos,1
 seams,players,shared_write,LosRadarSeam::ClampWorldPosToTerrain,1
 seams,players,shared_write,MapSeam::GetCellMeanHeight,1
@@ -5759,6 +5751,9 @@ seams,scripts,call,CobScript::SetCob,1
 seams,scripts,call,CobScript::StartScriptWithArgsByIndex,1
 seams,scripts,call,CobScript::~CobScript,1
 seams,scripts,call,CreatePlayerObjectState,1
+seams,scripts,call,GetPieceAngles,1
+seams,scripts,call,GetPieceOffset,1
+seams,scripts,call,GetPiecePosition,1
 seams,scripts,call,GetSweetSpot,1
 seams,scripts,call,NewUnitScript,1
 seams,scripts,call,UnitScript::SetObjectState,1
@@ -5795,6 +5790,7 @@ seams,targeting,shared_write,Vec3::y,2
 seams,targeting,shared_write,Vec3::z,3
 seams,targeting,shared_write,WeaponsSeam::GetWeaponRange,1
 seams,targeting,shared_write,WeaponsSeam::WeaponCanReachUnit,1
+seams,units,call,CreateUnit,1
 seams,units,call,PathOrderAttach::PathOrderAttach,1
 seams,units,call,PathOrderAttach::SetUnit,1
 seams,units,call,Unit::CanLoad,1
@@ -5962,7 +5958,6 @@ targeting,orders,shared_write,Vec3::x,55
 targeting,orders,shared_write,Vec3::y,35
 targeting,orders,shared_write,Vec3::z,55
 targeting,platform,call,RandomInt,1
-targeting,platform,call,UnitSwapEraseVector::EraseSwapBack,1
 targeting,platform,call,UnitTypeSet::Contains,1
 targeting,platform,shared_write,Vec3::x,22
 targeting,platform,shared_write,Vec3::y,14
@@ -6246,7 +6241,7 @@ units,movement,shared_write,Game::poolCount,1
 units,movement,shared_write,Game::units,2
 units,movement,shared_write,MovementSavedState::flag,2
 units,movement,shared_write,MovementSavedState::mode,2
-units,movement,shared_write,MovementSavedState::p2,2
+units,movement,shared_write,MovementSavedState::smoothedAcceleration,2
 units,movement,shared_write,MovementSavedState::speed,2
 units,movement,shared_write,MovementSavedState::turn,2
 units,movement,shared_write,MovementSavedState::velocity,2
@@ -6334,7 +6329,7 @@ units,orders,indirect,OrdersSaveOrders,1
 units,orders,shared_write,Angles16::heading,5
 units,orders,shared_write,Fixed::value,8
 units,orders,shared_write,Game::defs,9
-units,orders,shared_write,Game::poolCount,1
+units,orders,shared_write,Game::poolCount,4
 units,orders,shared_write,Game::unitDefCount,4
 units,orders,shared_write,Game::units,4
 units,orders,shared_write,Game::unitsEnd,2
@@ -6360,8 +6355,8 @@ units,orders,shared_write,Unit::lastDamageType,2
 units,orders,shared_write,Unit::mode,3
 units,orders,shared_write,Unit::moveOrder,2
 units,orders,shared_write,Unit::netDirtyFlags,1
-units,orders,shared_write,Unit::player,20
-units,orders,shared_write,Unit::pos,49
+units,orders,shared_write,Unit::player,19
+units,orders,shared_write,Unit::pos,48
 units,orders,shared_write,Unit::script,6
 units,orders,shared_write,Unit::unitDefIndex,5
 units,orders,shared_write,UnitDef::altitude,13
@@ -6613,7 +6608,7 @@ units,seams,indirect,GetGameTypeNative,1
 units,seams,indirect,GetMissionParamsNative,1
 units,seams,indirect,GetMissionUnitNative,1
 units,seams,shared_write,Game::defs,2
-units,seams,shared_write,Game::units,2
+units,seams,shared_write,Game::units,1
 units,seams,shared_write,Game::unitsPerPlayer,1
 units,seams,shared_write,MovementClass::footprintX,1
 units,seams,shared_write,MovementClass::footprintZ,1
@@ -6648,6 +6643,7 @@ units,seams,shared_write,Vec3::x,1
 units,seams,shared_write,Vec3::y,1
 units,seams,shared_write,Vec3::z,1
 units,targeting,indirect,SavedTargetPair,1
+units,targeting,shared_write,Game::poolCount,1
 units,targeting,shared_write,Game::units,2
 units,targeting,shared_write,Ref<Unit>::offset,2
 units,targeting,shared_write,Unit::activateFlags,1
@@ -6715,7 +6711,6 @@ weapons,ai,shared_write,Vec3::y,12
 weapons,ai,shared_write,Vec3::z,15
 weapons,ai,shared_write,Vec3Words::yWhole,1
 weapons,economy,shared_write,Ref<Unit>::offset,1
-weapons,features,indirect,GetFootprintCentre,1
 weapons,features,shared_write,GafFrame::xOffset,1
 weapons,features,shared_write,GafFrame::yOffset,1
 weapons,features,shared_write,Ref<Unit>::offset,1
@@ -6926,8 +6921,6 @@ weapons,presentation,shared_write,WeaponDef::lifetime,1
 weapons,presentation,shared_write,WeaponDef::range,1
 weapons,presentation,shared_write,WeaponDef::reloadTime,1
 weapons,presentation,shared_write,g_explodedPieces,2
-weapons,scripts,indirect,GetPieceOffset,1
-weapons,scripts,indirect,GetPiecePosition,1
 weapons,scripts,shared_write,Angles16::bank,2
 weapons,scripts,shared_write,Angles16::heading,3
 weapons,scripts,shared_write,Angles16::pitch,3
@@ -6938,7 +6931,10 @@ weapons,scripts,shared_write,Vec3::z,7
 weapons,seams,call,ScheduleTargetingTargetPos,1
 weapons,seams,call,ScheduleTargetingTargetUnit,1
 weapons,seams,indirect,GetCellMeanHeightNative,2
+weapons,seams,indirect,GetFootprintCentreNative,1
 weapons,seams,indirect,GetMissionParamsNative,4
+weapons,seams,indirect,GetPieceOffsetNative,1
+weapons,seams,indirect,GetPiecePositionNative,1
 weapons,seams,indirect,QueryScriptNative,1
 weapons,seams,shared_write,Ref<Unit>::offset,9
 weapons,seams,shared_write,Vec3::x,1

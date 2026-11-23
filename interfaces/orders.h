@@ -5,10 +5,9 @@ class HapiBank;
 struct Unit;
 struct Vec3;
 struct StateWriter;
-class MissionType;
 
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
-#define ORDERS_VERSION_MAJOR 5
+#define ORDERS_VERSION_MAJOR 6
 // Minor version of the orders interface, changed when a slot is added.
 #define ORDERS_VERSION_MINOR 0
 
@@ -325,10 +324,10 @@ struct OrdersSeam {
     void (__stdcall* RunSecondaryOrders)(Unit* unit);
     // Returns the flags of the first order of a unit, or 0 when it has none; a query. Hooks: none.
     int (__stdcall* GetOrderFlags)(Unit* unit);
-    // Returns the kind of order a unit gets against a target unit or position for a relation mode; a query. Hooks: AllowCommand.
-    MissionType (__stdcall* GetOrderType)(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
-    // Returns the order kind a name in the order type table stands for; a query. Hooks: none.
-    MissionType (__stdcall* MissionTypeFromName)(const char* name);
+    // Returns the index in the order type table of the kind of order a unit gets against a target unit or position for a relation mode; a query. Hooks: AllowCommand.
+    int (__stdcall* GetOrderType)(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
+    // Returns the index of the order kind a name in the order type table stands for; a query. Hooks: none.
+    int (__stdcall* MissionTypeFromName)(const char* name);
     // Registers the order types of every module in the order type table, outside the tick. Hooks: none.
     void (__stdcall* RegisterAllOrderTypes)(void);
     // Empties the order type table, outside the tick. Hooks: none.

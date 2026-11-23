@@ -1,6 +1,6 @@
 # The orders interface
 
-Orders sits behind `interfaces/orders.h` (version 5.0), the ninth module on the scheduler after economy
+Orders sits behind `interfaces/orders.h` (version 6.0; 6.0 returns the order kind of `GetOrderType` and `MissionTypeFromName` as its index, an `int`), the ninth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`), players (`docs/players-interface.md`), ai
 (`docs/ai-interface.md`) and weapons (`docs/weapons-interface.md`), and the tenth with movement
@@ -123,7 +123,7 @@ unit's player is active and of type 1 or 2, the unit can return fire, is complet
 as 3.1c's adapter had it.
 
 **Payloads.** Every event and effect starts with `OrdersEventHeader`: `kind` and `unit` (the unit it is about, a block
-offset; 0 for none). Each kind has the payload of `interfaces/orders.h` (version 5.0) that starts with it, or is the
+offset; 0 for none). Each kind has the payload of `interfaces/orders.h` (version 6.0, the payloads unchanged since 5.0) that starts with it, or is the
 header alone. `Apply(event, size)` refuses an event smaller than its kind's payload before it reads a field.
 
 | Kind | Payload | Fields after the header |
@@ -428,7 +428,7 @@ it was filed; movement has none, because the access logs predate movement's modu
 
 3.1c's types and limits are the default's, not the interface's: the order kinds and their state machines, the order
 type table, the order flags (the interface names only the ones callers need to name an order, `ORDER_FLAG_*`), the
-`MissionType`, the order list a unit keeps, the saved game's order records and the network's order packets. An event
+`MissionType` (the slots return its index as an `int`), the order list a unit keeps, the saved game's order records and the network's order packets. An event
 carries a unit as its block offset, an order, a target and a reference as block offsets, a unit type as its name bytes
 and an order type as its index: no pointers, no `Unit*`, `Order*`, `OrderBase*`, `UnitMotion*` or `HapiBank*` in an
 event. The set-up slots (`RegisterAllOrderTypes`, `ClearOrderTypeTable`) and the saved game's `LoadOrders` and

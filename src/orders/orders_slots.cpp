@@ -35,14 +35,14 @@ int __stdcall OrdersGetOrderFlags(Unit* unit)
     return GetOrderFlags(unit);
 }
 
-MissionType __stdcall OrdersGetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
+int __stdcall OrdersGetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
 {
-    return GetOrderType(mode, unit, target, pos);
+    return GetOrderType(mode, unit, target, pos).index;
 }
 
-MissionType __stdcall OrdersMissionTypeFromName(const char* name)
+int __stdcall OrdersMissionTypeFromName(const char* name)
 {
-    return MissionType(name);
+    return MissionType(name).index;
 }
 
 void __stdcall OrdersRegisterAllOrderTypes(void)

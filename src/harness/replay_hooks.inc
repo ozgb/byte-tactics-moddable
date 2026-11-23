@@ -1593,7 +1593,7 @@ int __stdcall RecOrdersGetOrderFlags(Unit* a0)
     return result;
 }
 
-MissionType __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
+int __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -1605,22 +1605,23 @@ MissionType __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2
         ArgObject(s_call, "target", ROK_UNIT, a2);
         ArgPending(s_call, "pos");
     }
-    MissionType result = s_inner_orders->GetOrderType(a0, a1, a2, a3);
+    int result = s_inner_orders->GetOrderType(a0, a1, a2, a3);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-MissionType __stdcall RecOrdersMissionTypeFromName(const char* a0)
+int __stdcall RecOrdersMissionTypeFromName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_MISSIONTYPEFROMNAME, SUB_ORDERS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
-    MissionType result = s_inner_orders->MissionTypeFromName(a0);
+    int result = s_inner_orders->MissionTypeFromName(a0);
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONTYPE, &result);
+        ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }

@@ -73,7 +73,7 @@ void __stdcall OrderSquad(Player* owner, int key, unsigned char mode, int remove
 {
     for (Unit* u = owner->unitsBegin; u <= owner->unitsEnd; u++) {
         if (((short)u->unitDefIndex) != 0 && u->group == key) {
-            MissionType kind = g_seams.orders->GetOrderType(mode, u, target, (Vec3*)flags);
+            MissionType kind = MissionType(g_seams.orders->GetOrderType(mode, u, target, (Vec3*)flags));
             AiPublishAddOrder(u, kind.index, remove, target, (Vec3*)flags, param_7, param_8);
         }
     }

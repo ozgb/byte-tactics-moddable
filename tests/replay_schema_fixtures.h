@@ -3896,7 +3896,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "weapons", 4, 0, 1, 66, 6 },
     { "targeting", 4, 0, 1, 72, 7 },
     { "los_radar", 5, 0, 0, 79, 27 },
-    { "orders", 5, 0, 0, 106, 11 },
+    { "orders", 6, 0, 0, 106, 11 },
     { "units", 7, 0, 0, 117, 44 },
     { "players", 5, 0, 0, 161, 28 },
     { "map", 9, 0, 1, 189, 11 },

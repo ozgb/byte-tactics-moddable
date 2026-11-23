@@ -1,12 +1,12 @@
 #ifndef INTERFACES_QUIRKS_H
 #define INTERFACES_QUIRKS_H
 
-// Major version of the quirks interface, changed when a flag is removed or reordered.
+// Major version of the quirks interface, changed when a flag is retired: it keeps its byte under a retired name, since a flag never moves.
 #define QUIRKS_VERSION_MAJOR 1
 // Minor version of the quirks interface, changed when a flag is appended at the end.
 #define QUIRKS_VERSION_MINOR 0
 
-// The quirk flags of a match, one bool per flag in the order of quirks.def; a new flag goes at the end.
+// The quirk flags of a match, one bool per flag in the order of quirks.def; a new flag goes at the end, and no flag moves or goes away.
 struct Quirks {
     // units.ignore-null-death-record (sim): ignore a unit-killed record with unit id 0.
     bool ignoreNullDeathRecord;

@@ -13,8 +13,12 @@ This page describes each one, and gets a row whenever a flag is added there.
 The layout is published as `struct Quirks` in
 [`interfaces/quirks.h`](../interfaces/quirks.h): one `bool` per flag, in the
 order of `quirks.def`. A new flag needs a member appended there too, and the
-build fails when the two disagree. Appending a flag is a minor bump of the
-quirks interface, and removing or reordering one is a major bump.
+build fails when the two disagree. A flag never moves or goes away, so a
+module built against an older version finds every flag where it was:
+`tools/abidiff.py` refuses any moved member. Appending a flag is a minor bump
+of the quirks interface. Retiring one is a major bump: the flag keeps its line
+in `quirks.def` and its byte in `Quirks`, renamed `retired<Name>`, and is
+always off.
 
 ## Choosing flags
 

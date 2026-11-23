@@ -12,9 +12,9 @@ extern "C" {
 #endif
 
 // Major version of the host interface, changed when a function is removed or its signature changes.
-#define HOST_VERSION_MAJOR 2
+#define HOST_VERSION_MAJOR 3
 // Minor version of the host interface, changed when a function is added.
-#define HOST_VERSION_MINOR 3
+#define HOST_VERSION_MINOR 0
 
 // Timeout for host_event_wait that never expires.
 #define HOST_WAIT_FOREVER 0xffffffffu

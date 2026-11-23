@@ -15,9 +15,9 @@ class UnitScript;
 class HapiBank;
 
 // Major version of the scripts interface, changed when a slot is removed or its signature changes.
-#define SCRIPTS_VERSION_MAJOR 2
+#define SCRIPTS_VERSION_MAJOR 3
 // Minor version of the scripts interface, changed when a slot is added.
-#define SCRIPTS_VERSION_MINOR 1
+#define SCRIPTS_VERSION_MINOR 0
 
 // The fields every scripts event starts with.
 struct ScriptsEventHeader {

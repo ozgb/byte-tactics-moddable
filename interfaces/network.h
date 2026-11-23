@@ -9,7 +9,7 @@ struct WeaponDef;
 struct Projectile;
 
 // Major version of the network interface, changed when a slot is removed or its signature changes.
-#define NETWORK_VERSION_MAJOR 1
+#define NETWORK_VERSION_MAJOR 2
 // Minor version of the network interface, changed when a slot is added.
 #define NETWORK_VERSION_MINOR 0
 

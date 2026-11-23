@@ -9,7 +9,7 @@ class MissionConditions;
 class TdfFile;
 
 // Major version of the players interface, changed when a slot is removed or its signature changes.
-#define PLAYERS_VERSION_MAJOR 4
+#define PLAYERS_VERSION_MAJOR 5
 // Minor version of the players interface, changed when a slot is added.
 #define PLAYERS_VERSION_MINOR 0
 

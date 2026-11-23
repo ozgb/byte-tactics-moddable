@@ -5,9 +5,9 @@ struct Unit;
 struct Vec3;
 
 // Major version of the targeting interface, changed when a slot is removed or its signature changes.
-#define TARGETING_VERSION_MAJOR 3
+#define TARGETING_VERSION_MAJOR 4
 // Minor version of the targeting interface, changed when a slot is added.
-#define TARGETING_VERSION_MINOR 1
+#define TARGETING_VERSION_MINOR 0
 
 // The fields every targeting event and effect starts with.
 struct TargetingEventHeader {

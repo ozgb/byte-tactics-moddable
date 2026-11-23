@@ -7,7 +7,7 @@ class HapiBank;
 struct FileNameList;
 
 // Major version of the files interface, changed when a slot is removed or its signature changes.
-#define FILES_VERSION_MAJOR 2
+#define FILES_VERSION_MAJOR 3
 // Minor version of the files interface, changed when a slot is added.
 #define FILES_VERSION_MINOR 0
 

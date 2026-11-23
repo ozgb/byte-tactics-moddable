@@ -12,7 +12,7 @@ struct Vec3;
 struct StateWriter;
 
 // Major version of the movement interface, changed when a slot is removed or its signature changes.
-#define MOVEMENT_VERSION_MAJOR 4
+#define MOVEMENT_VERSION_MAJOR 5
 // Minor version of the movement interface, changed when a slot is added.
 #define MOVEMENT_VERSION_MINOR 0
 

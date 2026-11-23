@@ -4,9 +4,9 @@
 #include "rand_stream.h"
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
-#define SERVICES_VERSION_MAJOR 2
+#define SERVICES_VERSION_MAJOR 3
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 2
+#define SERVICES_VERSION_MINOR 0
 
 // Advances the named random stream of the game logic (LIBCMT rand) and returns the next value, 0 to 0x7fff; the stream's state is in the block.
 int __cdecl GameRand(RandStream stream);

@@ -9,7 +9,7 @@ struct TntInfo;
 class HapiBank;
 
 // Major version of the features interface, changed when a slot is removed or its signature changes.
-#define FEATURES_VERSION_MAJOR 4
+#define FEATURES_VERSION_MAJOR 5
 // Minor version of the features interface, changed when a slot is added.
 #define FEATURES_VERSION_MINOR 0
 

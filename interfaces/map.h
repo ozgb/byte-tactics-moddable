@@ -11,7 +11,7 @@ struct Player;
 class HapiBank;
 
 // Major version of the map interface, changed when a slot is removed or its signature changes.
-#define MAP_VERSION_MAJOR 8
+#define MAP_VERSION_MAJOR 9
 // Minor version of the map interface, changed when a slot is added.
 #define MAP_VERSION_MINOR 0
 

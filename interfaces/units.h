@@ -3,11 +3,7 @@
 
 #include "state_writer.h"
 
-namespace std {
-template<class T> class allocator;
-template<class T, class A> class vector;
-}
-
+template <class T> struct Ref;
 struct MapMoveLimits;
 struct Unit;
 struct UnitDef;
@@ -18,7 +14,7 @@ class UnitRef;
 class UnitTypeSet;
 
 // Major version of the units interface, changed when a slot is removed or its signature changes.
-#define UNITS_VERSION_MAJOR 6
+#define UNITS_VERSION_MAJOR 7
 // Minor version of the units interface, changed when a slot is added.
 #define UNITS_VERSION_MINOR 0
 

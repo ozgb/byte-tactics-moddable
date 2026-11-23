@@ -3,11 +3,6 @@
 
 #include "state_writer.h"
 
-namespace std {
-template<class T> class allocator;
-template<class T, class A> class vector;
-}
-
 template <class T> struct Ref;
 struct Cell;
 struct Player;
@@ -16,9 +11,9 @@ struct Vec3;
 class HapiBank;
 
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
-#define LOS_RADAR_VERSION_MAJOR 4
+#define LOS_RADAR_VERSION_MAJOR 5
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 1
+#define LOS_RADAR_VERSION_MINOR 0
 
 // The field every los_radar event starts with.
 struct LosRadarEventHeader {

@@ -384,8 +384,10 @@ def compare_layout(record: str, old: tuple, new: tuple) -> list[Change]:
     old_members, old_size, _ = old
     new_members, new_size, _ = new
     old_shapes, new_shapes = [member_shape(m) for m in old_members], [member_shape(m) for m in new_members]
-    old_names = {(m[1], m[2].rsplit(" ", 1)[-1]): m[0] for m in old_members}
-    moved = any(old_names.get((m[1], m[2].rsplit(" ", 1)[-1]), m[0]) != m[0] for m in new_members)
+    old_offsets: dict[tuple, set] = {}
+    for offset, depth, text in old_members:
+        old_offsets.setdefault((depth, text.rsplit(" ", 1)[-1]), set()).add(offset)
+    moved = any(m[0] not in old_offsets.get((m[1], m[2].rsplit(" ", 1)[-1]), {m[0]}) for m in new_members)
     if new_shapes[:len(old_shapes)] != old_shapes or new_size < old_size or moved:
         return [Change("layout", "field moved or changed size in %s" % record)]
     changes = []

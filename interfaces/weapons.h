@@ -8,9 +8,9 @@ struct Projectile;
 struct StateWriter;
 
 // Major version of the weapons interface, changed when a slot is removed or its signature changes.
-#define WEAPONS_VERSION_MAJOR 3
+#define WEAPONS_VERSION_MAJOR 4
 // Minor version of the weapons interface, changed when a slot is added.
-#define WEAPONS_VERSION_MINOR 1
+#define WEAPONS_VERSION_MINOR 0
 
 // The fields every weapons event and effect starts with.
 struct WeaponsEventHeader {

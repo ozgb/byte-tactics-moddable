@@ -5,9 +5,9 @@ struct Vec3;
 class TdfFile;
 
 // Major version of the mission interface, changed when a slot is removed or its signature changes.
-#define MISSION_VERSION_MAJOR 1
+#define MISSION_VERSION_MAJOR 2
 // Minor version of the mission interface, changed when a slot is added.
-#define MISSION_VERSION_MINOR 1
+#define MISSION_VERSION_MINOR 0
 
 // The figures of the mission that the simulation reads, as plain data, as of the mission's last load.
 struct MissionParams {

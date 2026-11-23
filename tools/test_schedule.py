@@ -666,5 +666,34 @@ class Main(unittest.TestCase):
             self.assertEqual(self.run_main(["--check"], Path(tmp) / "none.md")[0], 1)
 
 
+HELPER = """struct Seam { int (__stdcall* Near)(int skip); };
+struct Seams { Seam* seam; };
+extern Seams g_seams;
+template <class F> inline void ForEach(F visit) { for (int i = g_seams.seam->Near(0); i > 0; i--) visit(i); }
+"""
+
+OTHER = """template <class F> inline void Elsewhere(F visit) { visit(g_seams.seam->Near(1)); }
+"""
+
+
+@unittest.skipUnless(shutil.which("clang-cl"), "clang-cl is not installed")
+class SeamHelperTemplates(unittest.TestCase):
+    def test_a_template_under_src_seams_is_walked_and_others_are_not(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {"BT_NO_ASTCACHE": "1"}):
+            root = Path(tmp)
+            (root / "src/seams").mkdir(parents=True)
+            (root / "src/seams/each.h").write_text(HELPER)
+            (root / "src/other.h").write_text(OTHER)
+            (root / "src/a.cpp").write_text('#include "seams/each.h"\n#include "other.h"\n'
+                                            "void Caller() { ForEach([](int) {}); Elsewhere([](int) {}); }\n")
+            argv = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
+                    "-fms-extensions", "-fsyntax-only", "-Xclang", "-ast-dump=json", "--", str(root / "src/a.cpp")]
+            functions = {f["function"]: f for f in sc.analyse((root, argv, str(root)))}
+        self.assertEqual([t.split("[")[-1].rstrip("]") for _, kind, t, _ in functions["ForEach"]["calls"] if kind == "indirect_call"],
+                         ["Seam::Near"])
+        self.assertNotIn("Elsewhere", functions)
+        self.assertIn("ForEach", [t for _, kind, t, _ in functions["Caller"]["calls"] if kind == "call"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -144,6 +144,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 error of the block's Ref (a service: it ends the run), and copies a unit's flags into a stack union (UnitOrderTypeFlags, its walk_locals).
                 Movement's queries call the virtual PathGoal::HasNetUnitState, PathGoal::SerializeNetUnitState and OrderFx::GetType of its own goals and targets,
                 which read them (allowed_indirect), and build a Ref<OrderFx> on the stack in TargetOfOffset (walk_locals).
+                Features' GetFootprintCentre and scripts' GetPieceOffset and GetPieceAngles build their result (a Vec3 or Angles16)
+                in their own frame, which the slot's native wrapper copies to the caller's out pointer (walk_locals).
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
                 TdfRecord::GetFieldDouble, GetFieldInt, GetFieldString) and ends in FatalError when the file is bogus. They
@@ -295,6 +297,7 @@ FEATURES = Pilot(
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::GetMapCell"),
     filler_locals=(("FindFeatureAtPos", "Point16"), ("GetFootprintCentre", "Vec3")),
+    walk_locals=(("GetFootprintCentre", "GetFootprintCentre", "Vec3"),),
     setup=("LoadFeatureFileList", "FreeFeatureFileList", "NopAfterFeatureEnum", "ResolveFeatureLinks", "InitFeatureAnimPool",
            "FreeFeaturePool", "PlaceMissionFeatures", "StampFeatureMetal", "FindOrLoadFeatureType", "SaveFeatures", "LoadFeatures"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
@@ -448,7 +451,8 @@ SCRIPTS = Pilot(
     engine_files=(SCHEDULER_FILE, SCRIPTS_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(),
     walk_locals=(("GetPieceOffset", "RotateByAngles", "Vec3"), ("GetPiecePosition", "RotateByAngles", "Vec3"),
-                 ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord")),
+                 ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord"),
+                 ("GetPieceOffset", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "Angles16")),
     rowless_calls=("RotatePoint2D", "operator PieceAngleRecord *", "operator PieceRecord *", "operator PieceTable *", "operator+", "strcmp", "sprintf"),
     slot_callers=SCRIPTS_SLOT_CALLERS + tuple((slot, "units") for slot in ("NewUnitScript", "SetCob", "CreatePlayerObjectState", "SetObjectState",
                                                                              "CreateObjectState", "DeleteScript", "FreeObjectState",

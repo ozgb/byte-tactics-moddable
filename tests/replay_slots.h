@@ -670,6 +670,21 @@ void After_targeting_ChooseWeapon()
     CompareResult(g_result_targeting_ChooseWeapon);
 }
 
+int g_result_targeting_SavedTargetPair;
+
+void Run_targeting_SavedTargetPair()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("weapon");
+    SetClosing("result");
+    g_result_targeting_SavedTargetPair = g_seams.targeting->SavedTargetPair(p0, p1);
+}
+
+void After_targeting_SavedTargetPair()
+{
+    CompareResult(g_result_targeting_SavedTargetPair);
+}
+
 int g_result_map_Apply;
 
 void Run_map_Apply()
@@ -935,6 +950,10 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_targeting_ChooseWeapon();
         return true;
     }
+    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SavedTargetPair") == 0) {
+        Run_targeting_SavedTargetPair();
+        return true;
+    }
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0) {
         Run_map_Apply();
         return true;
@@ -1008,6 +1027,8 @@ void RunAfter(const char* subsystem, const char* slot)
         After_targeting_FindBestTargetIfFireAtWill();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "ChooseWeapon") == 0)
         After_targeting_ChooseWeapon();
+    if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SavedTargetPair") == 0)
+        After_targeting_SavedTargetPair();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0)
         After_map_Apply();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0)

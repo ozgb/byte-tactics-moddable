@@ -1246,6 +1246,11 @@ among the candidates, a paralyzer weapon against a paralyzed target, a veteran c
 the D-gun (`Apply` of a SET_POS on weapon 2), and an aim at ground under the sea (`map.GetGroundHeight` returns 1). Each
 `GetWeaponTargetPos` that returns nonzero records the `pos` it wrote (`o pos.x`); one that returns 0 leaves the stack local of its caller untouched, so
 nothing is recorded of it.
+`save-targets`, ticks 149 to 151 only, holds the `SavedTargetPair` calls of a saved game: the game is saved after the step of
+tick 150, and the calls carry that tick. `Unit#2` (a tower attacking the Core commander, `Unit#251`) returns 0x800000fb (-2147483397) for
+weapon 0, and `Unit#3` (a tower attacking the ground at (3140, 1180)) returns 0x049c0c44 (77335620) for weapons 0 and 1; every other
+weapon returns 0x80000000. `load-targets`, ticks 150 to 151 only, loads that game: its `Apply` calls of LOAD give the same halves back
+(`xOrUnit` 251 and `zOrSentinel` -32768, and 3140 and 1180).
 
 `edges-targeting-lead` (the whole run) holds three outcomes the other recordings lack. All its lines are of `tests/replay/targeting/edges-targeting-lead.txt`:
 

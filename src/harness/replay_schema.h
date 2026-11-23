@@ -2684,6 +2684,7 @@ enum ReplaySlotId {
     RSL_TARGETING_FINDWEAPONTARGET,
     RSL_TARGETING_FINDBESTTARGETIFFIREATWILL,
     RSL_TARGETING_CHOOSEWEAPON,
+    RSL_TARGETING_SAVEDTARGETPAIR,
     RSL_LOS_RADAR_APPLY,
     RSL_LOS_RADAR_GETMAPCELL,
     RSL_LOS_RADAR_GETMAPCELLATPOSITION,
@@ -3014,6 +3015,8 @@ static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = {
 static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 46, 47, 48 };
 static const unsigned short kReplayTargetingFindBestTargetIfFireAtWillObjReads[] = { 0, 24, 35, 36, 37, 38, 45, 47, 51, 52, 53, 56, 61, 66, 108, 109, 110, 111, 112, 113, 129, 175 };
 static const unsigned short kReplayTargetingChooseWeaponObjReads[] = { 57, 62, 67 };
+static const unsigned short kReplayTargetingSavedTargetPairObjReads[] = { 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67 };
+static const unsigned short kReplayTargetingSavedTargetPairObjWrites[] = { 54, 55, 59, 60, 64, 65 };
 static const unsigned char kReplayLosRadarApplyAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayLosRadarApplyReads[] = { 0, 1, 2, 16, 17, 20, 22 };
 static const unsigned short kReplayLosRadarApplyObjReads[] = { 0, 22, 24, 25, 29, 30, 35, 36, 41, 42, 45, 109, 125, 152, 158, 266, 269, 270 };
@@ -3260,6 +3263,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FindWeaponTarget", SUB_TARGETING, kReplayTargetingFindWeaponTargetReads, 5, kReplayTargetingFindWeaponTargetWrites, 3, kReplayTargetingFindWeaponTargetObjReads, 22, nullptr, 0, nullptr, 0 },
     { "FindBestTargetIfFireAtWill", SUB_TARGETING, kReplayTargetingFindBestTargetIfFireAtWillReads, 5, kReplayTargetingFindBestTargetIfFireAtWillWrites, 3, kReplayTargetingFindBestTargetIfFireAtWillObjReads, 22, nullptr, 0, nullptr, 0 },
     { "ChooseWeapon", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingChooseWeaponObjReads, 3, nullptr, 0, nullptr, 0 },
+    { "SavedTargetPair", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingSavedTargetPairObjReads, 12, kReplayTargetingSavedTargetPairObjWrites, 6, nullptr, 0 },
     { "Apply", SUB_LOS_RADAR, kReplayLosRadarApplyReads, 7, nullptr, 0, kReplayLosRadarApplyObjReads, 18, kReplayLosRadarApplyObjWrites, 3, kReplayLosRadarApplyAllOf, 1 },
     { "GetMapCell", SUB_LOS_RADAR, kReplayLosRadarGetMapCellReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetMapCellAtPosition", SUB_LOS_RADAR, kReplayLosRadarGetMapCellAtPositionReads, 2, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3516,17 +3520,17 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "ai", 6, 0, 0, 42, 15 },
     { "pathfinding", 4, 0, 0, 57, 9 },
     { "weapons", 3, 1, 1, 66, 6 },
-    { "targeting", 3, 1, 1, 72, 6 },
-    { "los_radar", 4, 1, 0, 78, 27 },
-    { "orders", 5, 0, 0, 105, 11 },
-    { "units", 6, 0, 0, 116, 44 },
-    { "players", 4, 0, 0, 160, 28 },
-    { "map", 8, 0, 1, 188, 11 },
-    { "scripts", 2, 1, 0, 199, 24 },
-    { "movement", 4, 0, 0, 223, 20 },
-    { "mission", 1, 1, 0, 243, 0 },
-    { "files", 2, 0, 0, 243, 58 },
-    { "network", 1, 0, 0, 301, 22 },
+    { "targeting", 3, 1, 1, 72, 7 },
+    { "los_radar", 4, 1, 0, 79, 27 },
+    { "orders", 5, 0, 0, 106, 11 },
+    { "units", 6, 0, 0, 117, 44 },
+    { "players", 4, 0, 0, 161, 28 },
+    { "map", 8, 0, 1, 189, 11 },
+    { "scripts", 2, 1, 0, 200, 24 },
+    { "movement", 4, 0, 0, 224, 20 },
+    { "mission", 1, 1, 0, 244, 0 },
+    { "files", 2, 0, 0, 244, 58 },
+    { "network", 1, 0, 0, 302, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

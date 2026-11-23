@@ -73,7 +73,7 @@ struct FilesSeam {
     void (__stdcall* MakeDirectoryPath)(const char* path);
     // Stores the current directory as the start directory. Hooks: none.
     void (__stdcall* SaveStartDirectory)(void);
-    // Copies the stored start directory into out. Hooks: none.
+    // Copies the stored start directory into out, which must hold 256 bytes: all 256 are written, zero-padded, and a directory of 256 bytes or more is cut there with no terminator. Hooks: none.
     void (__stdcall* GetStartDirectory)(char* out);
     // Opens an archive and adds it to the search order, returning it or 0 when it is already added or missing. Hooks: none.
     void* (__stdcall* AddArchive)(const char* name, int mode);

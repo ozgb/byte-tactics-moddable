@@ -974,7 +974,7 @@ from the layout), and the export refuses a copy that names any other source name
   union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
   is none of these is an error naming the row (`field_read OpenHeap.count`): the type of a kind or of a value kind, an alias of a kind's field
   (`aliases`), a type in `exempt_types`, a target in `exempt` (one member of a type, for an anonymous struct: `<anon>.whole`), a hand rule for
-  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, `CommandArgs`). A type with no
+  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, or the argument list of a command). A type with no
   reason is an error. A pending subsystem is not asked.
 - `indirect_call` rows of a complete subsystem. Every `indirect_call` row of a function behind a recorded slot, and of every function
   `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam.CanLoad]`)
@@ -1003,7 +1003,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
-| `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
+| `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
@@ -1088,7 +1088,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`) | `Gaf#1` | an object of a kind of the schema, named by first appearance in the file |
 | `object` (`kind`, `reach`) | `Handle#1` | an object the import writes: its `reach` fields follow the result as `o Handle#1.index 0` lines, and the replayer restores them |
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
-| `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
+| `commandargs` | `["x","y"]` or `null` | the strings of the argument list of a command |
 | `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
 
 | Result | Written as |

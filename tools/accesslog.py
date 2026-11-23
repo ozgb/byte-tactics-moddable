@@ -112,6 +112,8 @@ phase ends, and the classifier is off. tools/playtest.py copies accesslog.attr, 
 the exe, so `reference.py --check --native-modules --exe build/defer/TotalA.exe` plays the whole suite against it. The control,
 `accesslog.py run --build-dir build/defer --defer tests/defer/immediate-control.defer mission-build-unit`, holds back the write
 of an immediate edge: it must print `trace DIFFERS` (exit 1) and leave `defer_held` above 0 in build/defer/access/mission-build-unit.stats.txt.
+tools/test_accesslog.py fails when a row of the control is not an immediate edge of data/dependencies.csv, so a regeneration
+that drops or reclassifies the edge needs a new one.
 
 `tables` writes accesslog.attr and accesslog.items next to the exe after the link, from TotalA.map,
 data/subsystems.csv, data/state_classes.csv, data/globals.csv and the record layouts clang prints for

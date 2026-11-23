@@ -860,6 +860,52 @@ class RunTest(unittest.TestCase):
             self.assertIn("x2.0", lines[2])
 
 
+CONTROL = ROOT / "tests/defer/immediate-control.defer"
+DEPENDENCIES = ROOT / "data/dependencies.csv"
+
+
+def defer_rows(text):
+    """The writer,reader,item,phase rows of a defer file, split as lib/accesslog/access_log.cpp splits them."""
+    rows = []
+    for line in text.splitlines():
+        if not line or line.startswith("writer,"):
+            continue
+        writer, reader, rest = line.split(",", 2)
+        item, phase = rest.rsplit(",", 1)
+        if len(item) >= 2 and item[0] == item[-1] == '"':
+            item = item[1:-1]
+        rows.append((writer, reader, item, phase))
+    return rows
+
+
+def not_immediate(defer, dependencies):
+    """The rows of a defer file that the dependencies file does not hold with class immediate."""
+    with dependencies.open(newline="") as f:
+        immediate = {(r["writer"], r["reader"], r["item"], r["phase"]) for r in csv.DictReader(f) if r["class"] == "immediate"}
+    return [row for row in defer_rows(defer.read_text()) if row not in immediate]
+
+
+class ControlTest(unittest.TestCase):
+    def test_the_control_holds_back_an_immediate_edge(self):
+        self.assertTrue(defer_rows(CONTROL.read_text()))
+        self.assertEqual(not_immediate(CONTROL, DEPENDENCIES), [],
+                         "%s names edges that %s does not hold as immediate: pick an immediate edge whose held "
+                         "writes make the control print trace DIFFERS" % (CONTROL.relative_to(ROOT), DEPENDENCIES.relative_to(ROOT)))
+
+    def test_a_dropped_or_reclassified_edge_is_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            deps = Path(tmp) / "dependencies.csv"
+            defer = Path(tmp) / "c.defer"
+            defer.write_text('writer,reader,item,phase\nunits,map,Unit::cell,units\nmap,units,"A::b",units\r\n\n')
+            header = "writer,reader,item,phase,class,runs,example,flags\n"
+            deps.write_text(header + "units,map,Unit::cell,units,immediate,77,s@1,\nmap,units,A::b,units,immediate,3,s@1,\n")
+            self.assertEqual(not_immediate(defer, deps), [])
+            deps.write_text(header + "units,map,Unit::cell,units,immediate,77,s@1,\nmap,units,A::b,units,deferrable,3,s@1,\n")
+            self.assertEqual(not_immediate(defer, deps), [("map", "units", "A::b", "units")])
+            deps.write_text(header + "map,units,A::b,units,immediate,3,s@1,\n")
+            self.assertEqual(not_immediate(defer, deps), [("units", "map", "Unit::cell", "units")])
+
+
 class LoadedSaveTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

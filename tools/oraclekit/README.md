@@ -11,14 +11,14 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | --- | --- | --- |
 | `docs/trace-format.md`, `data/trace_schema.json` | the trace format and its schema | `docs/trace-format.md` |
 | `tools/tracerehash.py` | recomputes every trace hash from a test-mode dump, standard library only | `docs/trace-format.md` |
-| `reference/traces/` | the stored traces, one per scenario | `docs/reference-traces.md` |
+| `reference/traces/` | the stored traces, one per scenario: for each tick, the digest of every row and the end-of-tick state (`docs/trace-format.md`, section 9) | `docs/reference-traces.md` |
 | `reference/scenarios/` | the scenarios the traces come from | `docs/scenario-format.md` |
 | `reference/saves/` | the saved games some scenarios load | `docs/reference-traces.md` |
 | `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
 | `reference/frames/` | the stored frames | `docs/frame-dump.md` |
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
-| `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events | `docs/events-log.md` |
-| `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`) | `docs/events-log.md` |
+| `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
+| `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`; it reads the order classes from `docs/sim-events.md`) | `docs/events-log.md` |
 | `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
 | `docs/scenario-format.md` | the scenario format, the test-mode run and its outputs | itself |
 | `docs/module-abi.md` | the module ABI | itself |

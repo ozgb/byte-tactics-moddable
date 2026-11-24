@@ -397,8 +397,8 @@ Coverage: 100.0% of functions (21 of 21), 96.2% of lines, 79.6% of branches; 0 l
 
 **Imports.** 13 functions of 7 subsystems, by target, each with the number of functions it calls there:
 
+- seams (6): `GetSweetSpotNative`, `GetWeaponRangeNative`, `UnitQueryBuffer::Capacity`, `UnitQueryBuffer::Data`, `UnitQueryBuffer::Grow`, `UnitQueryBuffer::Written`
 - platform (2): `RandomInt`, `UnitTypeSet::Contains`
-- seams (6): `GetSweetSpotNative`, `GetWeaponRangeNative`
 - game (1): `SchedPublish`
 - harness (1): `HarnessTargetingEvent`
 - los_radar (1): `GetVisibleEnemiesInRadius`
@@ -416,7 +416,7 @@ Coverage: 100.0% of functions (21 of 21), 96.2% of lines, 79.6% of branches; 0 l
 **Draft interface.**
 
 - Exports: 7 functions (all of them are target setters, getters and searches; `ClearWeaponTarget` and `GetWeaponTargetUnit` are the busiest).
-- Needs from seams: 13 functions in platform, seams, game, harness, los_radar, map, weapons.
+- Needs from seams: 13 functions in seams, platform, game, harness, los_radar, map, weapons.
 - Owns: 7 named sim items that only this subsystem writes, for example `UnitWeaponSlot::aimTargetXOrUnitId`, `UnitWeaponSlot::aimTargetZOrUnitSentinel`.
 - Shares: 2 named sim items that other subsystems also write.
 - It writes the target position of the weapon slot (`UnitWeaponSlot`) and no other named sim item; its other written items are `Vec3` and `Point` value types. The setters probably write the rest of the target through a pointer, which counts as a read.

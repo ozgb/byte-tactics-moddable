@@ -2801,7 +2801,6 @@ units,scripts,Vec3::y,-,unobserved,0,,
 units,scripts,Vec3::z,-,unobserved,0,,
 units,scripts,rng.parkMiller,units,ordered,6,mission-kill-of-type@99,
 units,scripts,sim-event,units,ordered,3,mission-radius@2523,
-units,targeting,Game::poolCount,-,unobserved,0,,
 units,targeting,Game::units,-,unobserved,0,,
 units,targeting,Ref<Unit>::offset,-,unobserved,0,,
 units,targeting,SavedTargetPair,-,unobserved,0,,indirect

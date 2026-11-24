@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1219 read-only, 1509 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1219 read-only, 1508 unobserved.
 
 ## Cutting rule
 
@@ -30,10 +30,10 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | ai | 11 | 18 | 2 | 102 | 233 | 6 of 14 |
 | pathfinding | 0 | 0 | 0 | 66 | 57 | 14 of 14 |
 | weapons | 30 | 66 | 2 | 229 | 206 | 4 of 14 |
-| targeting | 11 | 31 | 1 | 40 | 111 | 5 of 14 |
+| targeting | 11 | 31 | 1 | 40 | 110 | 5 of 14 |
 | los_radar | 6 | 33 | 2 | 140 | 261 | 5 of 14 |
 | orders | 18 | 55 | 9 | 139 | 296 | 4 of 14 |
-| units | 28 | 152 | 6 | 79 | 436 | 3 of 14 |
+| units | 28 | 152 | 6 | 79 | 435 | 3 of 14 |
 | players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
 | map | 9 | 41 | 1 | 98 | 229 | 4 of 14 |
 | scripts | 16 | 29 | 0 | 29 | 136 | 9 of 14 |
@@ -1056,7 +1056,7 @@ The 15 groups with the most rows are shown.
 | immediate | 3 | 28 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 40 |
-| unobserved | 50 | 61 |
+| unobserved | 50 | 60 |
 
 **Ordered** (11).
 
@@ -1136,7 +1136,7 @@ The 15 groups with the most rows are shown.
 | orders | 4 | 4 |
 | players | 4 | 6 |
 | scripts | 4 | 4 |
-| units | 4 | 14 |
+| units | 4 | 13 |
 | weapons | 5 | 6 |
 | wind_meteors | 3 | 3 |
 
@@ -1621,7 +1621,7 @@ The 15 groups with the most rows are shown.
 | immediate | 130 | 22 |
 | deferrable | 6 | 0 |
 | read-only | 0 | 79 |
-| unobserved | 306 | 130 |
+| unobserved | 305 | 130 |
 
 **Ordered** (28).
 
@@ -1735,7 +1735,7 @@ The 40 rows with the most runs are shown; the other 112 are in data/dependencies
 | pathfinding | 2 | 2 |
 | players | 23 | 31 |
 | scripts | 23 | 7 |
-| targeting | 14 | 4 |
+| targeting | 13 | 4 |
 | weapons | 26 | 9 |
 | wind_meteors | 5 | 8 |
 

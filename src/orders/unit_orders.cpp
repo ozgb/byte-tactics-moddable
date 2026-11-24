@@ -101,6 +101,7 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
+#include "../seams/unit_query_buffer.h"
 #include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 
@@ -160,8 +161,8 @@ int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int unused)
 int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
 {
     if(order->radius) {
-        std::vector<Ref<Unit> > units(g_game->poolCount);
-        int unitCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units[0],(int)units.size());
+        UnitQueryBuffer units;
+        int unitCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,units.Data(),units.Capacity());
         if(unitCount!=0) return 5;
         if(order->wait<=0) return 5;
         int delay=RandomInt(30)+150;
@@ -291,8 +292,11 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 3: {
-        std::vector<Ref<Unit> > units(g_game->poolCount);
-        int unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units[0], (int)units.size());
+        UnitQueryBuffer units;
+        int unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, units.Data(), units.Capacity());
+        if (units.Grow(unitCount))
+            unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, units.Data(), units.Capacity());
+        unitCount = units.Written(unitCount);
         if (unitCount != 0) {
             g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, units[RandomInt(unitCount)]);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);

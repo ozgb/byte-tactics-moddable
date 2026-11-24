@@ -18,6 +18,7 @@
 #include "../util/engine_services.h"
 #include "squad.h"
 #include "../../interfaces/seams.h"
+#include "../seams/unit_query_buffer.h"
 
 class UnitRef;
 
@@ -585,10 +586,12 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
     int fallbackDistance=0x7fffffff;
     int bestDistance=0x7fffffff;
     Unit* best=0;
-    std::vector<Ref<Unit> > candidates(g_game->poolCount);
-    int candidateCount;
-    if(useRange) candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates[0],(int)candidates.size());
-    else candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates[0],(int)candidates.size());
+    UnitQueryBuffer candidates;
+    int radius=useRange ? g_seams.weapons->GetWeaponRange(unit,weapon) : unit->def->range;
+    int candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,radius,0,candidates.Data(),candidates.Capacity());
+    if(candidates.Grow(candidateCount))
+        candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,radius,0,candidates.Data(),candidates.Capacity());
+    candidateCount=candidates.Written(candidateCount);
     for(int count=0;count<50;++count) {
         if(candidateCount==0) break;
         int pick=RandomInt(candidateCount);

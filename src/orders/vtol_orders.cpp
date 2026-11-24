@@ -108,7 +108,7 @@ struct Mover {
 
 class GroundAllyVisitor {
 public:
-    virtual void CollectGroundAlly(Unit*);
+    void CollectGroundAlly(Unit*);
     GroundAllyVisitor(Player* o, std::vector<Unit*>* u, Unit* s) : owner(o), units(u), self(s) {}
     Player* owner;
     std::vector<Unit*>* units;
@@ -117,7 +117,7 @@ public:
 
 class RepairableUnitVisitor {
 public:
-    virtual void CollectRepairableUnit(Unit*);
+    void CollectRepairableUnit(Unit*);
     RepairableUnitVisitor(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
     Player* owner;
     std::vector<Unit*>* units;
@@ -134,6 +134,7 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
+#include "../seams/unit_query_buffer.h"
 #include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 #include "../game/orders_events.h"
@@ -450,10 +451,12 @@ Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
 
 class UnitList : public std::vector<Unit*> {};
 
-static inline int FindPads(int player, const Vec3* pos, std::vector<Ref<Unit> >& pads)
+static inline int FindPads(int player, const Vec3* pos, UnitQueryBuffer& pads)
 {
-    pads.resize(g_game->poolCount);
-    return g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.empty() ? nullptr : &pads[0],(int)pads.size());
+    int count = g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.Data(),pads.Capacity());
+    if (pads.Grow(count))
+        count = g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.Data(),pads.Capacity());
+    return pads.Written(count);
 }
 
 static inline int SearchRange(Unit* u)
@@ -464,7 +467,7 @@ static inline int SearchRange(Unit* u)
 static inline int Patrol(Unit* unit, Order* order, int flags)
 {
     if (IsDamaged(unit)) {
-        std::vector<Ref<Unit> > pads;
+        UnitQueryBuffer pads;
         int padCount=FindPads(((Player*)unit->player)->index,&unit->pos,pads);
         if (padCount!=0) {
             order->SetAttachedFx(0);
@@ -781,7 +784,7 @@ int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
 static inline int Land(Unit* unit, Order* order)
 {
     if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-        std::vector<Ref<Unit> > pads;
+        UnitQueryBuffer pads;
         int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, pads);
         if (padCount != 0) {
             order->SetAttachedFx(0);
@@ -924,7 +927,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Ref<Unit> > v;
+            UnitQueryBuffer v;
             int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, v);
             if (padCount != 0) {
                 order->SetAttachedFx(0);
@@ -1172,7 +1175,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Ref<Unit> > v;
+            UnitQueryBuffer v;
             int padCount = FindPads(unit->player->index, &unit->pos, v);
             if (padCount != 0) {
                 order->SetAttachedFx(0);
@@ -1450,7 +1453,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         AttachMove(order, dest, 0x80);
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
-            std::vector<Ref<Unit> > pads;
+            UnitQueryBuffer pads;
             int padCount = FindPads(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, pads);
             if (padCount != 0) {
                 order->SetAttachedFx(0);
@@ -1564,7 +1567,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     }
     case 4: {
         if (IsDamaged(unit)) {
-            std::vector<Ref<Unit> > v;
+            UnitQueryBuffer v;
             int padCount = FindPads(unit->player->index, &unit->pos, v);
             if (padCount != 0) {
                 order->SetAttachedFx(0);
@@ -1887,7 +1890,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
     case 1: {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
-            std::vector<Ref<Unit> > pads;
+            UnitQueryBuffer pads;
             int padCount = FindPads(unit->player.get()->index, &unit->pos, pads);
             if (padCount != 0) {
                 order->SetAttachedFx(0);

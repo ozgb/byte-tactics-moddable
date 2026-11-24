@@ -13,10 +13,10 @@ enum QuirkIndex {
 };
 
 #define QUIRK(member, flagName, scope, openAnnihilationId) \
-    static_assert(offsetof(Quirks, member) == QUIRK_INDEX_##member, "Quirks::" #member " is not at its place in quirks.def");
+    static_assert(offsetof(Quirks, member) == QUIRK_INDEX_##member * sizeof(int), "Quirks::" #member " is not at its place in quirks.def");
 #include "quirks.def"
 #undef QUIRK
-static_assert(sizeof(Quirks) == QUIRK_COUNT, "Quirks and quirks.def differ in size");
+static_assert(sizeof(Quirks) == QUIRK_COUNT * sizeof(int), "Quirks and quirks.def differ in size");
 
 bool QuirksParse(const char* spec, Quirks* out, char* err, int errLen);
 

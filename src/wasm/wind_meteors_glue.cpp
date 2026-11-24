@@ -13,7 +13,7 @@
 #include "../util/vec3.h"
 #include "../files/files_bank.h"
 #include "../../interfaces/host.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/seams.h"
 #include "../state/sim_globals.h"
 #include "../map/meteors.h"
@@ -128,6 +128,23 @@ void* Linear(unsigned p)
     if (!InMemory((unsigned)a[slot].i32)) \
         return ImportError(import, "pointer argument " #slot " is outside the module memory")
 
+const char* BufferError(const char* import, unsigned p, int size)
+{
+    if (size < 1)
+        return ImportError(import, "the buffer size is below 1");
+    if ((unsigned)size > ModulesMemory()->size - p)
+        return ImportError(import, "the buffer runs past the module memory");
+    return nullptr;
+}
+
+#define NEED_BUFFER(import, slot, sizeSlot) \
+    do { \
+        NEED(import, slot); \
+        const char* bufferError = BufferError(import, (unsigned)a[slot].i32, a[sizeSlot].i32); \
+        if (bufferError != nullptr) \
+            return bufferError; \
+    } while (0)
+
 #define IMPORT(name) const char* __cdecl name(void* user, wasmtime_val_raw_t* a)
 
 IMPORT(GameRandImport)
@@ -240,14 +257,14 @@ IMPORT(TdfRecordGetFieldDoubleImport)
 IMPORT(TdfRecordGetFieldStringImport)
 {
     (void)user;
-    NEED("TdfRecord_GetFieldString", 1);
+    NEED_BUFFER("TdfRecord_GetFieldString", 1, 3);
     NEED("TdfRecord_GetFieldString", 2);
     NEED("TdfRecord_GetFieldString", 4);
     void* record;
     const char* error = LiveOf("TdfRecord_GetFieldString", (unsigned)a[0].i32, &record);
     if (error != nullptr)
         return error;
-    a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), (size_t)(unsigned)a[3].i32, (char*)Linear(a[4].i32));
+    a[0].i32 = ((TdfRecord*)record)->GetFieldString((char*)Linear(a[1].i32), (char*)Linear(a[2].i32), a[3].i32, (char*)Linear(a[4].i32));
     return nullptr;
 }
 
@@ -313,7 +330,7 @@ IMPORT(FindWeaponByNameImport)
 {
     (void)user;
     NEED("FindWeaponByName", 0);
-    WeaponDef* weapon = g_seams.weapons->FindWeaponByName((char*)Linear(a[0].i32));
+    WeaponDef* weapon = g_seams.weapons->FindWeaponByName((const char*)Linear(a[0].i32));
     if (weapon != nullptr && !SimOwns(weapon))
         return ImportError("FindWeaponByName", "returned a weapon outside the sim block");
     a[0].i32 = weapon == nullptr ? 0 : (int)((unsigned char*)weapon - ModulesMemory()->base);

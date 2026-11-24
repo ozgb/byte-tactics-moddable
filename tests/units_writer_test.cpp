@@ -6,7 +6,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/ai.h"
 #include "../interfaces/los_radar.h"
 #include "../interfaces/orders.h"
@@ -78,7 +78,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;
@@ -331,7 +331,6 @@ static void Setup()
     losRadar.FreeUnitIndex = FreeUnitIndex;
     losRadar.RefreshUnitIndex = RefreshUnitIndex;
     losRadar.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
-    losRadar.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
     losRadar.HasReadyUnitInRange = HasReadyUnitInRange;
     losRadar.IsPointVisible = IsPointVisible;
     losRadar.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
@@ -476,6 +475,14 @@ static void CheckFactoryRecords(const UnitsSeam& units, unsigned int factories)
     Check(s_recorded.size == factories && (unsigned int)s_recorded.handles == factories, "the section 25 record lists the factories of the index");
 }
 
+static void FillFound(const UnitsSeam& units, int player, const Vec3* at, int radius, std::vector<Unit*>* found)
+{
+    Ref<Unit> refs[kUnits + 1];
+    int count = units.GetFactoriesInRadius(player, at, radius, refs, kUnits + 1);
+    for (int i = 0; i < count; i++)
+        found->push_back(refs[i]);
+}
+
 static void CheckFactoryIndex()
 {
     Reset(1, 2);
@@ -523,22 +530,22 @@ static void CheckFactoryIndex()
     at.x = (12 * kCell) << 16;
     at.y = 0;
     at.z = (10 * kCell) << 16;
-    units.GetFactoriesInRadius(0, &at, 10, &found);
+    FillFound(units, 0, &at, 10, &found);
     Check(found.size() == 1 && found[0] == &s_units[kPad], "GetFactoriesInRadius appends the factory in range");
     found.clear();
-    units.GetFactoriesInRadius(0, &at, 40, &found);
+    FillFound(units, 0, &at, 40, &found);
     Check(found.size() == 1, "GetFactoriesInRadius leaves out a factory out of range");
     found.clear();
-    units.GetFactoriesInRadius(0, &at, 200, &found);
+    FillFound(units, 0, &at, 200, &found);
     Check(found.size() == 2 && found[0] == &s_units[kPad] && found[1] == &s_units[kPadOff], "GetFactoriesInRadius appends the factories in the index's order");
     s_units[kPadOff].activateFlags = 0;
     found.clear();
-    units.GetFactoriesInRadius(0, &at, 200, &found);
+    FillFound(units, 0, &at, 200, &found);
     Check(found.size() == 1, "GetFactoriesInRadius leaves out a factory switched off since the refill");
     s_units[kPadOff].activateFlags = 1;
     s_defs[kPadOff].flags1 &= ~0x200u;
     found.clear();
-    units.GetFactoriesInRadius(0, &at, 200, &found);
+    FillFound(units, 0, &at, 200, &found);
     Check(found.size() == 1, "GetFactoriesInRadius leaves out a factory whose type has no pad");
     s_defs[kPadOff].flags1 |= 0x200;
 
@@ -772,14 +779,18 @@ static void Observe(const AiSeam* ai, Snapshot* s)
     Unit* guard = &s_units[kGuard];
     const int radii[] = { 10, 40, 100, 200, 2000 };
     for (int i = 0; i < 5; i++) {
+        Ref<Unit> refs[kUnits + 1];
         std::vector<Unit*> found;
-        g_seams.los_radar->GetVisibleEnemiesInRadius(0, &guard->pos, radii[i], 0, &found);
+        int count = g_seams.los_radar->GetVisibleEnemiesInRadius(0, &guard->pos, radii[i], 0, refs, kUnits + 1);
+        for (int k = 0; k < count; k++)
+            found.push_back(refs[k]);
         Note(s, found);
         s->values.push_back(g_seams.los_radar->HasReadyUnitInRange(0, &guard->pos, radii[i]) ? 1 : 0);
-        Ref<Unit> refs[4];
-        s->values.push_back(g_seams.los_radar->GetVisibleEnemiesInRadiusList(0, &guard->pos, radii[i], 0, refs, 4));
+        s->values.push_back(g_seams.los_radar->GetVisibleEnemiesInRadius(0, &guard->pos, radii[i], 0, refs, 4));
         found.clear();
-        g_seams.units->GetFactoriesInRadius(0, &guard->pos, radii[i], &found);
+        count = g_seams.units->GetFactoriesInRadius(0, &guard->pos, radii[i], refs, kUnits + 1);
+        for (int k = 0; k < count; k++)
+            found.push_back(refs[k]);
         Note(s, found);
     }
     s_log.clear();

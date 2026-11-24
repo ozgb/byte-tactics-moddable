@@ -1,11 +1,22 @@
 #ifndef QUIRKS_QUIRKS_H
 #define QUIRKS_QUIRKS_H
 
-struct Quirks {
-#define QUIRK(member, flagName, scope, openAnnihilationId) bool member;
+#include <stddef.h>
+
+#include "../../interfaces/quirks.h"
+
+enum QuirkIndex {
+#define QUIRK(member, flagName, scope, openAnnihilationId) QUIRK_INDEX_##member,
 #include "quirks.def"
 #undef QUIRK
+    QUIRK_COUNT
 };
+
+#define QUIRK(member, flagName, scope, openAnnihilationId) \
+    static_assert(offsetof(Quirks, member) == QUIRK_INDEX_##member * sizeof(int), "Quirks::" #member " is not at its place in quirks.def");
+#include "quirks.def"
+#undef QUIRK
+static_assert(sizeof(Quirks) == QUIRK_COUNT * sizeof(int), "Quirks and quirks.def differ in size");
 
 bool QuirksParse(const char* spec, Quirks* out, char* err, int errLen);
 

@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 3.1
+subsystem weapons 4.0
 call 30518 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 45
@@ -22247,10 +22247,10 @@ call 30518 UpdateUnitWeapons
   o z 20447232
   i services.ScheduleTargetingTargetUnit Unit#1783 0 = null
   i scripts.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#1783 0 = (221111,0,-43982)
   i scripts.QueryScript CobScript#275 "QueryPrimary" (0) null null null = 1
-  o p2 (0)
+  o arg0 (0)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(342103469,23199744,13069824) = 128
   i services.RecordSimEvent 30 0 [42,342103469,23199744,13069824,128] 5

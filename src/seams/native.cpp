@@ -100,9 +100,9 @@ void __stdcall SetupPlayerSlot(int player, char type);
 struct OwnershipTransferPacket;
 #include "../units/unit_types.h"
 #include "../units/unit_save.h"
-Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int finished, int mode, int id);
 UnitDef* __stdcall FindUnitType(const char* name);
-int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
+Unit* __stdcall FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after);
 Angles16 __stdcall GetPieceAngles(Unit* unit, int piece);
 #include "../ingame/control_panel.h"
 #include "../scripts/piece_queries.h"
@@ -143,9 +143,9 @@ static int __stdcall FindScriptNative(CobScript* script, const char* name)
     return script->FindScript(name);
 }
 
-static int __stdcall QueryScriptNative(CobScript* script, char* name, int* p2, int* p3, int* p4, int* p5)
+static int __stdcall QueryScriptNative(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
 {
-    return script->QueryScript(name, p2, p3, p4, p5);
+    return script->QueryScript(name, arg0, arg1, arg2, arg3);
 }
 
 static void __stdcall UpdateSquadsNative(int player)
@@ -171,12 +171,12 @@ static void __stdcall CreateSquadManagerNative(Player* player)
     player->ai = new (kSim) SquadManager(player);
 }
 
-static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, char* text, int* out)
+static void __stdcall UnitTypeSetAddTypeOrCategoryNative(UnitTypeSet* self, const char* text, int* out)
 {
     self->AddTypeOrCategory(text, out);
 }
 
-static unsigned char __fastcall ChooseWeaponNative(Unit* self)
+static unsigned char __stdcall ChooseWeaponNative(Unit* self)
 {
     return self->ChooseWeapon();
 }
@@ -196,7 +196,43 @@ static int __stdcall GetCellMeanHeightNative(Vec3* pos)
     return GetCellMeanHeight(pos);
 }
 
-static WeaponDef* __stdcall FindWeaponByNameNative(char* name)
+static void __stdcall GetFootprintCentreNative(const Point16* cell, Feature* def, Vec3* out)
+{
+    Point16 at = *cell;
+    *out = GetFootprintCentre(&at, def);
+}
+
+static int __stdcall CanBuildAtNative(UnitDef* unit, const Point16* cell, short type, Player* los)
+{
+    return CanBuildAt(unit, *cell, type, los);
+}
+
+static int __stdcall CanPlaceUnitFootprintNative(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+{
+    return CanPlaceUnitFootprint(unit, otherTypeId, *cell, flags);
+}
+
+static void __stdcall GetPieceOffsetNative(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPieceOffset(unit, piece);
+}
+
+static void __stdcall GetPiecePositionNative(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPiecePosition((Object*)unit, piece);
+}
+
+static void __stdcall GetPieceAnglesNative(Unit* unit, int piece, Angles16* out)
+{
+    *out = GetPieceAngles(unit, piece);
+}
+
+static Unit* __stdcall CreateUnitNative(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+{
+    return CreateUnit(player, typeId, *pos, finished, mode, id);
+}
+
+static WeaponDef* __stdcall FindWeaponByNameNative(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
 }
@@ -216,7 +252,7 @@ static int __stdcall GetGameTypeNative()
     return TheMission()->GetGameType();
 }
 
-static char* __stdcall GetNameSlotNative(int index)
+static const char* __stdcall GetNameSlotNative(int index)
 {
     return TheMission()->GetNameSlot(index);
 }
@@ -226,7 +262,7 @@ static int __stdcall AdvanceMissionNative()
     return TheMission()->AdvanceMission();
 }
 
-static char* __stdcall GetCampaignNameNative()
+static const char* __stdcall GetCampaignNameNative()
 {
     return TheMission()->GetCampaignName();
 }
@@ -236,7 +272,7 @@ static int __stdcall GetMissionIndexNative()
     return TheMission()->GetMissionIndex();
 }
 
-static char* __stdcall GetMissionNameNative()
+static const char* __stdcall GetMissionNameNative()
 {
     return TheMission()->GetMissionName();
 }
@@ -246,12 +282,12 @@ static int __stdcall GetStartPositionNative(Vec3* out, int id)
     return TheMission()->GetStartPosition(out, id);
 }
 
-static void __stdcall LoadCampaignNative(char* file)
+static void __stdcall LoadCampaignNative(const char* file)
 {
     TheMission()->LoadCampaign(file);
 }
 
-static int __stdcall LoadMissionByNameNative(char* name)
+static int __stdcall LoadMissionByNameNative(const char* name)
 {
     return TheMission()->LoadMissionByName(name);
 }
@@ -296,12 +332,12 @@ static int __stdcall CountStartPositionsNative()
     return TheMission()->CountStartPositions();
 }
 
-static char* __stdcall GetBriefingNative()
+static const char* __stdcall GetBriefingNative()
 {
     return TheMission()->GetBriefing();
 }
 
-static char* __stdcall GetDescriptionNative()
+static const char* __stdcall GetDescriptionNative()
 {
     return TheMission()->GetDescription();
 }
@@ -316,7 +352,7 @@ static int __stdcall GetTerrainSizeTierNative()
     return TheMission()->GetTerrainSizeTier();
 }
 
-static char* __stdcall GetTranslatedNameNative()
+static const char* __stdcall GetTranslatedNameNative()
 {
     return TheMission()->GetTranslatedName();
 }
@@ -361,37 +397,37 @@ static int __stdcall GetMissionFeatureNative(int index, MissionFeatureInfo* out)
     return TheMission()->GetFeature(index, out);
 }
 
-static char* __stdcall GetMemoryNative()
+static const char* __stdcall GetMemoryNative()
 {
     return TheMission()->GetMemory();
 }
 
-static char* __stdcall GetNumPlayersNative()
+static const char* __stdcall GetNumPlayersNative()
 {
     return TheMission()->GetNumPlayers();
 }
 
-static void __fastcall DeactivateConditionsNative(MissionConditions* self)
+static void __stdcall DeactivateConditionsNative(MissionConditions* self)
 {
     self->Deactivate();
 }
 
-static void __fastcall LoadConditionsNative(MissionConditions* self, int unusedEdx, HapiBank* file)
+static void __stdcall LoadConditionsNative(MissionConditions* self, HapiBank* file)
 {
     self->LoadConditions(file);
 }
 
-static void __fastcall SaveConditionsNative(MissionConditions* self, int unusedEdx, HapiBank* file)
+static void __stdcall SaveConditionsNative(MissionConditions* self, HapiBank* file)
 {
     self->SaveConditions(file);
 }
 
-static void __fastcall RegisterConditionsNative(MissionConditions* self, int unusedEdx, TdfFile* mission)
+static void __stdcall RegisterConditionsNative(MissionConditions* self, TdfFile* mission)
 {
     self->RegisterConditions((ConditionParams*)mission);
 }
 
-static void __fastcall FreeConditionsNative(MissionConditions* self)
+static void __stdcall FreeConditionsNative(MissionConditions* self)
 {
     self->FreeConditions();
 }
@@ -406,22 +442,22 @@ static MissionConditions* __stdcall NewConditionsNative(void)
     return new (kSim) MissionConditions;
 }
 
-static int __fastcall CanLoadNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanLoadNative(Unit* self, Unit* target)
 {
     return self->CanLoad(target);
 }
 
-static int __fastcall CanReclaimNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanReclaimNative(Unit* self, Unit* target)
 {
     return self->CanReclaim(target);
 }
 
-static int __fastcall CanRepairNative(Unit* self, int unusedEdx, Unit* target)
+static int __stdcall CanRepairNative(Unit* self, Unit* target)
 {
     return self->CanRepair(target);
 }
 
-static void __fastcall UnitRefUnlinkNative(UnitRef* self)
+static void __stdcall UnitRefUnlinkNative(UnitRef* self)
 {
     self->Unlink();
 }
@@ -559,17 +595,17 @@ static void __stdcall BankNewNative(HapiBank* self)
     ((AccountBank*)self)->NewBank();
 }
 
-static int __stdcall BankOpenNative(HapiBank* self, char* filename, char* name, char* account)
+static int __stdcall BankOpenNative(HapiBank* self, const char* filename, const char* name, const char* account)
 {
     return ((AccountBank*)self)->OpenBank(filename, name, account);
 }
 
-static int __stdcall BankSaveNative(HapiBank* self, char* filename, char* name, int compress, int audit)
+static int __stdcall BankSaveNative(HapiBank* self, const char* filename, const char* name, int compress, int audit)
 {
     return ((AccountBank*)self)->SaveBank(filename, name, compress, audit);
 }
 
-static int __stdcall BankOpenAccountNative(HapiBank* self, char* name)
+static int __stdcall BankOpenAccountNative(HapiBank* self, const char* name)
 {
     return ((AccountBank*)self)->OpenAccount(name);
 }
@@ -584,22 +620,22 @@ static int __stdcall BankSetDoubleNative(HapiBank* self, const char* name, doubl
     return ((AccountBank*)self)->SetDoubleItem(name, value);
 }
 
-static int __stdcall BankSetStringNative(HapiBank* self, const char* name, char* value)
+static int __stdcall BankSetStringNative(HapiBank* self, const char* name, const char* value)
 {
     return ((AccountBank*)self)->SetStringItem(name, value);
 }
 
-static int __stdcall BankGetIntegerNative(HapiBank* self, char* name, int def)
+static int __stdcall BankGetIntegerNative(HapiBank* self, const char* name, int def)
 {
     return ((AccountBank*)self)->GetIntegerItem(name, def);
 }
 
-static double __stdcall BankGetDoubleNative(HapiBank* self, char* name, double def)
+static double __stdcall BankGetDoubleNative(HapiBank* self, const char* name, double def)
 {
     return ((AccountBank*)self)->GetDoubleItem(name, def);
 }
 
-static char* __stdcall BankGetStringNative(HapiBank* self, char* name, char* def)
+static const char* __stdcall BankGetStringNative(HapiBank* self, const char* name, const char* def)
 {
     return ((AccountBank*)self)->GetStringItem(name, def);
 }
@@ -614,7 +650,7 @@ static int __stdcall BankOpenNumberedBoxNative(HapiBank* self, int number)
     return ((AccountBank*)self)->OpenNumberedBox(number);
 }
 
-static int __stdcall BankOpenNamedBoxNative(HapiBank* self, char* name)
+static int __stdcall BankOpenNamedBoxNative(HapiBank* self, const char* name)
 {
     return ((AccountBank*)self)->OpenNamedBox(name);
 }
@@ -644,7 +680,7 @@ static void __stdcall ListDirectoryNative(const char* path, int dirsOnly, FileNa
     ListDirectory(path, dirsOnly, (std::vector<StringRef>*)list);
 }
 
-static void __stdcall FindFilesRecursiveNative(char* path, const char* pat, FileNameList* tree, int state, int recursive)
+static void __stdcall FindFilesRecursiveNative(const char* path, const char* pat, FileNameList* tree, int state, int recursive)
 {
     FindFilesRecursive(path, pat, (std::vector<StringRef>*)tree, state, recursive);
 }
@@ -682,7 +718,7 @@ void InstallNativeSeams()
     s_features.StampFeatureMetal = StampFeatureMetal;
     s_features.GetCellFeature = GetCellFeature;
     s_features.FindOrLoadFeatureType = FindOrLoadFeatureType;
-    s_features.GetFootprintCentre = GetFootprintCentre;
+    s_features.GetFootprintCentre = GetFootprintCentreNative;
     s_features.SaveFeatures = SaveFeatures;
     s_features.LoadFeatures = LoadFeatures;
     s_features.Apply = ApplyEvent;
@@ -734,7 +770,6 @@ void InstallNativeSeams()
     s_los_radar.HasReadyUnitInRange = HasReadyUnitInRange;
     s_los_radar.IsPointVisible = IsPointVisible;
     s_los_radar.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
-    s_los_radar.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
     s_los_radar.GetSeenUnitsInRadius = GetSeenUnitsInRadius;
     s_los_radar.CreateUnitIndex = CreateUnitIndex;
     s_los_radar.FreeUnitIndex = FreeUnitIndex;
@@ -822,15 +857,15 @@ void InstallNativeSeams()
     s_map.WriteState = MapWriteState;
     s_map.PathLockStamp = PathLockStamp;
     s_map.UnitsInRange = UnitsInRange;
-    s_map.CanBuildAt = CanBuildAt;
-    s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprint;
+    s_map.CanBuildAt = CanBuildAtNative;
+    s_map.CanPlaceUnitFootprint = CanPlaceUnitFootprintNative;
     s_players.Apply = PlayersApply;
     s_players.LoadDefaultAIScript = LoadDefaultAIScript;
     s_units.UnitTypeSetAddTypeOrCategory = UnitTypeSetAddTypeOrCategoryNative;
     s_scripts.QueryScript = QueryScriptNative;
     s_scripts.GetAimFromPosition = (void (__stdcall *)(Unit *, Vec3 *, unsigned char))GetAimFromPosition;
-    s_scripts.GetPieceOffset = GetPieceOffset;
-    s_scripts.GetPiecePosition = (Vec3 (__stdcall *)(Unit *, int))GetPiecePosition;
+    s_scripts.GetPieceOffset = GetPieceOffsetNative;
+    s_scripts.GetPiecePosition = GetPiecePositionNative;
     s_map.BuildAllPassMaps = BuildAllPassMaps;
     s_map.FreePassMaps = FreePassMaps;
     s_map.LoadMetalPlotmap = LoadMetalPlotmap;
@@ -884,12 +919,12 @@ void InstallNativeSeams()
     s_units.LoadUnits = LoadUnits;
     s_units.SaveUnits = SaveUnits;
     s_units.LoadUnit = LoadUnit;
-    s_units.CreateUnit = CreateUnit;
+    s_units.CreateUnit = CreateUnitNative;
     s_units.FindUnitType = FindUnitType;
     s_units.FindUnitTypeId = FindUnitTypeId;
     s_units.FindMissionUnit = FindMissionUnit;
     s_scripts.GetNanoPiecePosition = (void (__stdcall *)(Unit *, Vec3 *))GetNanoPiecePosition;
-    s_scripts.GetPieceAngles = GetPieceAngles;
+    s_scripts.GetPieceAngles = GetPieceAnglesNative;
     s_units.AddBuildProgress = AddBuildProgress;
     s_units.AddRepairProgress = AddRepairProgress;
     s_units.CanLoad = CanLoadNative;

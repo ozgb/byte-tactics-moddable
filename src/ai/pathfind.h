@@ -1,6 +1,6 @@
 #ifndef PATHFIND_H
 #define PATHFIND_H
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 struct HeapEntry;
 
 struct HeapEntry;

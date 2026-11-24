@@ -22,7 +22,8 @@ source file; a file with no simulation function is not checked:
                 the scheduler (src/game/scheduler.cpp) that data/subsystems.csv gives a `phase:` rule (the engine's entry
                 point for a phase, which the default seam slot of it calls)
   state         g_game, a symbol defined in src/state/, or declared in interfaces/ref.h and not defined elsewhere
-  service       declared at depth 0 in interfaces/services.h, or a member of a class it defines
+  service       declared at depth 0 in interfaces/services.h or src/util/engine_services.h, or a member of a class
+                one of them defines
   host          declared in interfaces/host.h
   bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
@@ -117,14 +118,14 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 wind_meteors: LoadMeteorDefaults; features: GetCellFeature, GetFootprintCentre, FeatureTypeCount,
                 FirstFeatureSpot, FindFeatureAtPos; orders: GetOrderFlags, GetOrderType, MissionTypeFromName, WriteState; movement: GetMotionState, HasNetState, WriteNetState, TargetType, UnitTarget, WriteState; targeting: GetWeaponTargetUnit, ChooseWeapon, SavedTargetPair; los_radar: GetMapCell, GetMapCellAtPosition,
                 GetOriginCellAtPosition, ClampWorldPosToTerrain, IsUnitVisibleToPlayer, SoundHeardMask, GetVisibleEnemiesInRadius,
-                GetVisibleEnemiesInRadiusList, HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
+                HasReadyUnitInRange, IsPointVisible, GetSeenUnitsInRadius; map: UnitsInRange, GetCellMeanHeight,
                 SnapWorldPosToFootprint, CanPlaceFootprintAt, IsPadSlotFree, GetGroundHeight, PassMapGet, PassMapInBounds, PathLockStamp; ai: WriteState), the function that fills it and every function it calls by name (rwsets keys functions
                 by name, so every overload), when one
                   writes anything (a *_write or *_maybe_written row), except a field or deref write, in the filler
                   itself, of the type that a non-const pointer parameter of the slot points to or of a struct type that
-                  it holds (los_radar's GetVisibleEnemiesInRadiusList and GetSeenUnitsInRadius: the Ref<Unit> array they fill; economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
-                  MeteorShowerParams; features' queries take no out parameter), or of the struct a slot returns by value
-                  (features' GetFootprintCentre: Vec3; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
+                  it holds (los_radar's GetVisibleEnemiesInRadius and GetSeenUnitsInRadius, and units' GetFactoriesInRadius: the Ref<Unit> array they fill; economy's UnitAccount: EconAccount and EconLedger; wind_meteors' LoadMeteorDefaults:
+                  MeteorShowerParams; features' queries are not checked by their parameters), or of the struct a slot returns by value
+                  or fills in the filler's own frame (features' GetFootprintCentre: the Vec3 it is given; map's UnitsInRange writes the unsigned shorts of its ids and SnapWorldPosToFootprint the Vec3 it is given and the Point16 cell it builds in its own frame; targeting's queries take pointers to units and write nothing; los_radar's ClampWorldPosToTerrain writes the Vec3 it is given, and
                   its IsUnitVisibleToPlayer the Vec3 and word view that it builds in its own frame, the pilot's filler_locals), and except economy's world view info structs (EconUnitInfo,
                   EconTypeInfo, EconPlayerInfo), which no state holds (info_types);
                   makes an indirect call other than through a read-only slot of the pilot's world view (economy's
@@ -143,6 +144,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 error of the block's Ref (a service: it ends the run), and copies a unit's flags into a stack union (UnitOrderTypeFlags, its walk_locals).
                 Movement's queries call the virtual PathGoal::HasNetUnitState, PathGoal::SerializeNetUnitState and OrderFx::GetType of its own goals and targets,
                 which read them (allowed_indirect), and build a Ref<OrderFx> on the stack in TargetOfOffset (walk_locals).
+                Features' GetFootprintCentre and scripts' GetPieceOffset and GetPieceAngles build their result (a Vec3 or Angles16)
+                in their own frame, which the slot's native wrapper copies to the caller's out pointer (walk_locals).
                 A pilot's `services` are called by name and not walked: wind_meteors' LoadMeteorDefaults reads the default
                 meteor data file through the TDF services (BuildDataPath, TdfFile::LoadFile, SelectRecord, ~TdfFile,
                 TdfRecord::GetFieldDouble, GetFieldInt, GetFieldString) and ends in FatalError when the file is bogus. They
@@ -191,7 +194,7 @@ CONST_CLASSES = ("const", "sim")
 KINDS = ("seam", "state", "service", "host", "bitexact", "library", "own", "const")
 STATE_HEADERS = ("interfaces/ref.h",)
 SEAMS_HEADER = "interfaces/seams.h"
-SERVICES_HEADER = "interfaces/services.h"
+SERVICES_HEADERS = ("interfaces/services.h", "src/util/engine_services.h")
 HOST_HEADER = "interfaces/host.h"
 BITEXACT_HEADER = "lib/bitexact/bitexact.h"
 SEAM_TABLE = "g_seams"
@@ -293,7 +296,8 @@ FEATURES = Pilot(
     engine_files=(SCHEDULER_FILE, FEATURES_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::GetMapCell"),
-    filler_locals=(("FindFeatureAtPos", "Point16"),),
+    filler_locals=(("FindFeatureAtPos", "Point16"), ("GetFootprintCentre", "Vec3")),
+    walk_locals=(("GetFootprintCentre", "GetFootprintCentre", "Vec3"),),
     setup=("LoadFeatureFileList", "FreeFeatureFileList", "NopAfterFeatureEnum", "ResolveFeatureLinks", "InitFeatureAnimPool",
            "FreeFeaturePool", "PlaceMissionFeatures", "StampFeatureMetal", "FindOrLoadFeatureType", "SaveFeatures", "LoadFeatures"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
@@ -312,7 +316,7 @@ LOS_RADAR = Pilot(
     writing=("Apply", "UpdateUnitLineOfSight", "RecordRadarUnits", "UpdateSensorRadarAndCloak", "RecordRadarMapped", "ExpireEyeballs",
              "RefreshUnitIndex", "Init", "Shutdown"),
     query=("GetMapCell", "GetMapCellAtPosition", "GetOriginCellAtPosition", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer",
-           "SoundHeardMask", "GetVisibleEnemiesInRadius", "GetVisibleEnemiesInRadiusList", "HasReadyUnitInRange", "IsPointVisible",
+           "SoundHeardMask", "GetVisibleEnemiesInRadius", "HasReadyUnitInRange", "IsPointVisible",
            "GetSeenUnitsInRadius", "RegionSize", "SightCache", "WriteState"),
     engine_files=(SCHEDULER_FILE, LOS_RADAR_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")),
@@ -447,7 +451,8 @@ SCRIPTS = Pilot(
     engine_files=(SCHEDULER_FILE, SCRIPTS_GLUE_FILE, REPLAY_HOOKS_FILE),
     engine_functions=(),
     walk_locals=(("GetPieceOffset", "RotateByAngles", "Vec3"), ("GetPiecePosition", "RotateByAngles", "Vec3"),
-                 ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord")),
+                 ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord"),
+                 ("GetPieceOffset", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "Angles16")),
     rowless_calls=("RotatePoint2D", "operator PieceAngleRecord *", "operator PieceRecord *", "operator PieceTable *", "operator+", "strcmp", "sprintf"),
     slot_callers=SCRIPTS_SLOT_CALLERS + tuple((slot, "units") for slot in ("NewUnitScript", "SetCob", "CreatePlayerObjectState", "SetObjectState",
                                                                              "CreateObjectState", "DeleteScript", "FreeObjectState",
@@ -664,10 +669,11 @@ def build_rules(root: Path, units: list) -> Rules:
             code_defs.setdefault(name, set()).add(unit.file)
         for name in unit.data:
             data_defs.setdefault(name, set()).add(unit.file)
-    services_path = root / SERVICES_HEADER
-    services = header_names(root, SERVICES_HEADER)
-    if services_path.exists():
-        services |= members(services_path.read_text(encoding="latin-1"))
+    services = set()
+    for header in SERVICES_HEADERS:
+        services |= header_names(root, header)
+        if (root / header).exists():
+            services |= members((root / header).read_text(encoding="latin-1"))
     state = set()
     for header in STATE_HEADERS:
         state |= header_names(root, header)

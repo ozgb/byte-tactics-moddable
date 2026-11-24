@@ -10,7 +10,8 @@ phase marks of the tick function, each pass's scope and each loop's entity mark,
 compiled only into the access-log and harness builds. The order of entry points within a part of a pass is the
 order of the call sites in the syntax trees (tools/rwsets.py's walker, which also gives each function's reads and
 writes), with calls inside the subsystem inlined and seam calls (interfaces/seams.h, src/seams/native.cpp and the
-slot rows of data/hazard_edges.csv) named `subsystem.Slot`. Each cross-subsystem call is classed by whether the
+slot rows of data/hazard_edges.csv) named `subsystem.Slot`. A function template under src/seams/ (a seam helper,
+such as the walk over the units in range) is walked as written, so the seam calls it makes count for its callers. Each cross-subsystem call is classed by whether the
 caller uses its value and whether what it runs writes state; each `immediate` row of data/dependencies.csv is placed
 at the first write step before a read step (Splits). LOOPS and TICK_STEPS describe the loops and the tick's engine
 steps in behavioural terms; --check also fails when a pass, loop or engine step has no description or a description
@@ -64,6 +65,7 @@ TICK_END = re.compile(r"\bHarnessAfterStep\(\)")
 SEAMS_HEADER = ROOT / "interfaces" / "seams.h"
 SEAM_FIELD = re.compile(r"^\s*(\w+)\*\s+(\w+);", re.M)
 NATIVE = ROOT / "src" / "seams" / "native.cpp"
+SEAM_HELPERS = "src/seams/"
 NATIVE_TABLE = re.compile(r"^static (\w+) s_(\w+);", re.M)
 NATIVE_SELF = re.compile(r"^static [^;{(]*?\b(\w+)\s*\(\s*(?:const\s+)?\w+\s*\*\s*self\b", re.M)
 NATIVE_SLOT = re.compile(r"^\s*s_(\w+)\.(\w+)\s*=\s*(?:\(.*\))?\s*(\w+);", re.M)
@@ -320,6 +322,14 @@ class OrderWalker(rwsets.Walker):
 
 class OrderAnalyzer(rwsets.Analyzer):
     """rwsets' analyzer with OrderWalker, keeping each function's calls in order, its end line and its return type."""
+
+    def declare(self, node: dict, owner: str | None) -> None:
+        if node["kind"] == "FunctionTemplateDecl" and (self.relative(node.get("_file", "")) or "").startswith(SEAM_HELPERS):
+            for child in node.get("inner", ()):
+                if child["kind"] == "FunctionDecl" and any(c["kind"].endswith("Stmt") for c in child.get("inner", ())):
+                    self.function(child, child.get("name", "?"))
+            return
+        super().declare(node, owner)
 
     def function(self, node: dict, name: str) -> None:
         rel = self.relative(node["_file"])

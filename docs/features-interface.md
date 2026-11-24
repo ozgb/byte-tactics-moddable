@@ -1,6 +1,6 @@
 # The features interface
 
-Features sits behind `interfaces/features.h` (version 4.0), the second module on the scheduler after economy
+Features sits behind `interfaces/features.h` (version 5.0; 5.0 passes the cell of `GetFootprintCentre` by pointer and writes the centre to an out argument, and makes `FindOrLoadFeatureType`'s name const), the second module on the scheduler after economy
 (`docs/economy-interface.md`), and the first with random draws to keep in order (#954). 3.1c's feature code is its
 default implementation. This page is the inventory the interface was cut from:
 - what other subsystems did to features' state in 3.1c, and what each became;
@@ -97,7 +97,7 @@ adapters onto units', map's and weapons' seam slots that `src/game/routes.cpp` r
 subsystem outside an interface. A reclaim in a multiplayer game still sends its packet through
 `network.SendFeatureReclaimed`, a seam slot, as 3.1c did; network is outside the model (section 8).
 
-**Payloads.** Every event and effect starts with `FeaturesEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/features.h` (version 4.0) that starts with it; a publisher passes the payload's size, `Apply(event, size)` refuses an event smaller than its kind's payload with outcome 0 and no change, and `Place(const FeaturesPlace*)` takes the PLACE payload.
+**Payloads.** Every event and effect starts with `FeaturesEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/features.h` (version 5.0; the payloads are unchanged since 4.0) that starts with it; a publisher passes the payload's size, `Apply(event, size)` refuses an event smaller than its kind's payload with outcome 0 and no change, and `Place(const FeaturesPlace*)` takes the PLACE payload.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

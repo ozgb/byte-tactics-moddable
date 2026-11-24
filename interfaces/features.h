@@ -9,7 +9,7 @@ struct TntInfo;
 class HapiBank;
 
 // Major version of the features interface, changed when a slot is removed or its signature changes.
-#define FEATURES_VERSION_MAJOR 4
+#define FEATURES_VERSION_MAJOR 5
 // Minor version of the features interface, changed when a slot is added.
 #define FEATURES_VERSION_MINOR 0
 
@@ -151,7 +151,7 @@ struct FeaturesAreaDamage {
 
 // Map features such as wrecks and trees. The engine delivers features' pending inbox, through Apply, before each run of the features phase (AnimateFeatureType, ScanFeatureCell, UpdateFeatureSpot) and each synchronous slot, and at each phase boundary.
 struct FeaturesSeam {
-    // Runs the features phase: the engine's scheduler calls the slots below for each feature type, the map scan and each spot of the used list.
+    // Runs the features phase: the engine's scheduler calls the slots below for each feature type, the map scan and each spot of the used list. Hooks: none.
     void (__stdcall* UpdateFeatures)(void);
     // Reads the feature file list from the data files at match start. Hooks: none.
     void (__stdcall* LoadFeatureFileList)(void);
@@ -172,14 +172,14 @@ struct FeaturesSeam {
     // Returns the feature number on a cell, or a code for none or a part of a larger footprint; a query, as of features' last run. Hooks: none.
     unsigned short (__stdcall* GetCellFeature)(Cell* cell);
     // Returns the number of a feature type by name, loading it when it is new; called while unit types load. Hooks: none.
-    unsigned short (__stdcall* FindOrLoadFeatureType)(char* name);
-    // Returns the world position of the centre of a feature's footprint; a query. Hooks: none.
-    Vec3 (__stdcall* GetFootprintCentre)(Point16* cell, Feature* def);
+    unsigned short (__stdcall* FindOrLoadFeatureType)(const char* name);
+    // Writes to out the world position of the centre of a feature's footprint; a query. Hooks: none.
+    void (__stdcall* GetFootprintCentre)(const Point16* cell, Feature* def, Vec3* out);
     // Writes the features to a saved game; it reads only. Hooks: none.
     void (__stdcall* SaveFeatures)(HapiBank* file);
     // Reads the features from a saved game, outside the tick. Hooks: none.
     void (__stdcall* LoadFeatures)(HapiBank* file);
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const FeaturesEventHeader* event, unsigned int size);
     // Synchronous: applies a placement after the engine delivered the pending inbox, and returns its outcome, visible at once; for a caller that needs it in the same statement. Hooks: none.
     int (__stdcall* Place)(const FeaturesPlace* place);

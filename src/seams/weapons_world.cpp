@@ -4,7 +4,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/features.h"
 #include "../../interfaces/weapons.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/weapons_events.h"
 #include "weapons_world.h"
 

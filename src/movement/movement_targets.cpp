@@ -79,9 +79,9 @@ unsigned int __stdcall MovementNewRingApproach(unsigned int order, int x, int y,
     return OffsetOfTarget(target);
 }
 
-unsigned int __stdcall MovementNewPointMarker(unsigned int order, Point16 pos, Point16 size)
+unsigned int __stdcall MovementNewPointMarker(unsigned int order, const Point16* pos, const Point16* size)
 {
-    PointMarker* target = new (kSim) PointMarker(OrderOfOffset(order), pos, size);
+    PointMarker* target = new (kSim) PointMarker(OrderOfOffset(order), *pos, *size);
     return OffsetOfTarget(target);
 }
 

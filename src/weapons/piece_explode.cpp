@@ -59,7 +59,7 @@ void __stdcall ExplodeUnitPiece(Unit* unit, int a, unsigned int b)
     }
     if (b & 0x3f00) {
         Vec3 v;
-        v = g_seams.scripts->GetPiecePosition(unit, a);
+        g_seams.scripts->GetPiecePosition(unit, a, &v);
         if (b & 0x100)
             AddExplosionEffect(&v, g_game->sources[0], 2, 0);
         if (b & 0x200)

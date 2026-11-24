@@ -2,7 +2,7 @@
 
     uv run tools/abidiff.py                      # baseline: newest interfaces-v* tag, else the merge base with origin/moddable
     uv run tools/abidiff.py --base REF           # baseline: the headers at REF
-    uv run tools/abidiff.py --report-standins    # list the int*, void* and char* in slot signatures
+    uv run tools/abidiff.py --report-standins    # list the writable int*, void* and char* in slot signatures
     uv run tools/test_abidiff.py                 # tests, on synthetic header pairs
 
 For each interfaces/*.h that has `<NAME>_VERSION_MAJOR` and `_MINOR` macros, the tool compares the
@@ -40,6 +40,11 @@ Otherwise it fails with `FAIL (adapter required: Foo, Bar)`, naming the slots wi
 major is the old major; a module built against a major between the baseline's and the current one is not seen.
 
 A bump with nothing changed is fine. A version that goes down fails.
+
+For services.h, the entries must also be exactly the union of the modules' `imports.services` in wasm/modules.json,
+by import name (`Class::Method` is imported as `Class_Method`): one line, `services (imports): ok` or a FAIL naming each
+entry no module imports and each import the header doesn't declare. The engine's other services live in
+src/util/engine_services.h, which no module includes.
 
 A retype is a parameter or return type that changed in a slot. Once an `interfaces-v*` tag exists, every
 retype is breaking (even `void*` to `Foo*`). Until then (the baseline is the merge base), a retype that
@@ -86,7 +91,7 @@ LAYOUT_START = re.compile(r"^\*\*\* Dumping AST Record Layout\s*$", re.M)
 LAYOUT_MEMBER = re.compile(r"^\s*(\d+(?::\d+-\d+)?)\s*\|(\s*)(.*?)\s*$")
 ANONYMOUS = re.compile(r"\(anonymous((?: \w+)?) at [^)]*\)")
 LAYOUT_SIZE = re.compile(r"^\s*\|\s*\[sizeof=(\d+), align=(\d+)")
-STAND_IN = re.compile(r"(?:(?:const|volatile) )*(?:int|void|char) \*(?: (?:const|volatile))*")
+STAND_IN = re.compile(r"(?:volatile )?(?:int|void|char) \*(?: (?:const|volatile))*")
 POINTER = re.compile(r".*\*(?: (?:const|volatile))*$")
 SMALL_INTEGER = {"int", "unsigned", "signed", "short", "char", "long", "bool", "const", "volatile"}
 JSON_START = re.compile(r'^\{\n  "id"', re.M)
@@ -255,7 +260,7 @@ def load_interface(header: Path, scratch: Path) -> Interface:
             add_entry(found_entries, node["name"], node, "")
         if node.get("isImplicit") or node["kind"] != "CXXRecordDecl" or "name" not in node:
             continue
-        if not node.get("completeDefinition"):
+        if not node.get("completeDefinition") or not in_header:
             continue
         slots, data = [], False
         for member in node.get("inner", []):
@@ -364,16 +369,33 @@ def compare_entries(old: dict, new: dict) -> list[Change]:
     return out
 
 
+SAME_WIDTH = re.compile(r"\blong(?! long)\b(?<!long long)")
+
+
+def member_shape(member: tuple) -> tuple:
+    """A layout member without its name, with long spelled int (the same width on every target): (offset, depth, type)."""
+    offset, depth, text = member
+    return offset, depth, SAME_WIDTH.sub("int", text.rsplit(" ", 1)[0])
+
+
 def compare_layout(record: str, old: tuple, new: tuple) -> list[Change]:
     if old is None or new is None:
         return [Change("layout", "no layout from clang for %s" % record)] if old != new else []
     old_members, old_size, _ = old
     new_members, new_size, _ = new
-    if new_members[:len(old_members)] != old_members or new_size < old_size:
+    old_shapes, new_shapes = [member_shape(m) for m in old_members], [member_shape(m) for m in new_members]
+    old_offsets: dict[tuple, set] = {}
+    for offset, depth, text in old_members:
+        old_offsets.setdefault((depth, text.rsplit(" ", 1)[-1]), set()).add(offset)
+    moved = any(m[0] not in old_offsets.get((m[1], m[2].rsplit(" ", 1)[-1]), {m[0]}) for m in new_members)
+    if new_shapes[:len(old_shapes)] != old_shapes or new_size < old_size or moved:
         return [Change("layout", "field moved or changed size in %s" % record)]
-    if new_members != old_members:
-        return [Change("additive", "field appended to %s" % record)]
-    return []
+    changes = []
+    if new_members[:len(old_members)] != old_members:
+        changes.append(Change("breaking", "field renamed or retyped at the same offset and width in %s" % record))
+    if len(new_members) > len(old_members):
+        changes.append(Change("additive", "field appended to %s" % record))
+    return changes
 
 
 def compare_interfaces(old: Interface, new: Interface, tagged: bool) -> list[Change]:
@@ -437,6 +459,79 @@ def judge(old: Interface, new: Interface, changes: list[Change], manifest: dict 
     return Result(new.name, True, "ok (additive, %s)" % bump_text(old, new), details)
 
 
+def import_name(entry: str) -> str:
+    """The name a module imports an entry by: `Class::Method` as `Class_Method`, an overload without its parameters."""
+    return entry.split("(")[0].replace("::", "_")
+
+
+def manifest_imports(manifest: dict | None, interface: str) -> set[str]:
+    """The union of every module's imports of an interface in the manifest."""
+    return {name for m in (manifest or {}).get("modules", []) for name in m.get("imports", {}).get(interface, {})}
+
+
+HANDLE_CLASS = re.compile(r"^(?://.*only as a handle.*)\n(?:class|struct)\s+(\w+)\s*;", re.M)
+FLOAT_KIND = {"float": "f32", "double": "f64"}
+
+
+def handle_classes(header_text: str) -> set[str]:
+    """The classes a header forward-declares for modules to hold only as a handle: the declaration whose comment line says "only as a handle"."""
+    return set(HANDLE_CLASS.findall(header_text))
+
+
+def kind_of(type_text: str, handles: set[str]) -> str:
+    """The kind (docs/module-abi.md section 7) of a C type: float f32, double f64, void void, a pointer to a handle class
+    handle, any other pointer linear, anything else (integers, bool, enums) int. A result of kind block (a pointer into
+    the block, FindWeaponByName) is not told from linear by the type: the entry-point headers declare none, and the
+    services entries return none."""
+    words = type_text.replace("*", " * ").split()
+    if "*" in words:
+        base = [w for w in words if w not in ("const", "volatile", "struct", "class", "*")]
+        return "handle" if base and base[-1] in handles and words.count("*") == 1 else "linear"
+    bare = [w for w in words if w not in ("const", "volatile")]
+    if bare == ["void"]:
+        return "void"
+    return FLOAT_KIND.get(" ".join(bare), "int")
+
+
+def signature_kinds(sig: Signature, handles: set[str]) -> tuple[list[str], str]:
+    """The manifest's form of a declared entry: the kinds of its parameters and of its result."""
+    params = [] if sig.params == ("void",) else sig.params
+    return [kind_of(p, handles) for p in params], kind_of(sig.ret, handles)
+
+
+def check_imports(iface: Interface, manifest: dict | None, handles: set[str] | None = None) -> Result:
+    """Whether a named-entry interface declares exactly what the modules import of it, each with the parameter and result
+    kinds the manifest's signatures give it."""
+    declared = {import_name(e): sig for e, sig in iface.entries.items()}
+    imported = manifest_imports(manifest, iface.name)
+    details = ["declared but imported by no module: %s" % ", ".join(sorted(set(declared) - imported))] if set(declared) - imported else []
+    details += ["imported but not declared: %s" % ", ".join(sorted(imported - set(declared)))] if imported - set(declared) else []
+    name = "%s (imports)" % iface.name
+    if details:
+        return Result(name, False, "FAIL (the entries differ from the modules' imports)", details)
+    recorded = (manifest or {}).get("signatures", {}).get(iface.name, {})
+    for entry in sorted(declared):
+        params, ret = signature_kinds(declared[entry], handles or set())
+        have = recorded.get(entry)
+        if have is None or [list(have[0]), have[1]] != [params, ret]:
+            details.append("%s: the header declares (%s) -> %s, the manifest has %s" % (
+                entry, ", ".join(params), ret, "no signature" if have is None else "(%s) -> %s" % (", ".join(have[0]), have[1])))
+    if details:
+        return Result(name, False, "FAIL (the kinds differ from the manifest's signatures)", details)
+    return Result(name, True, "ok (%d entries, each imported with its kinds)" % len(declared))
+
+
+def imports_results(directory: Path, manifest: dict | None) -> list[Result]:
+    """The import check of each named-entry interface header in directory."""
+    out = []
+    with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
+        for name in sorted(NAMED_ENTRIES):
+            header = directory / ("%s.h" % name)
+            if header.exists():
+                out.append(check_imports(load_interface(header, Path(tmp) / name), manifest, handle_classes(header.read_text())))
+    return out
+
+
 def bump_text(old: Interface, new: Interface) -> str:
     if new.major != old.major:
         return "major %d->%d" % (old.major, new.major)
@@ -488,7 +583,7 @@ def extract_baseline(ref: str, target: Path) -> None:
 
 
 def standins(directory: Path) -> list[str]:
-    """One line for each int*, void* and char* in a slot signature of the headers in directory."""
+    """One line for each int*, void* and char* whose target is not const in a slot signature of the headers in directory."""
     out = []
     with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
         for header in sorted(directory.glob("*.h")):
@@ -504,18 +599,20 @@ def standins(directory: Path) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--base", metavar="REF", help="baseline ref (default: newest interfaces-v* tag, else the merge base with %s)" % BASE_BRANCH)
-    parser.add_argument("--report-standins", action="store_true", help="list every int*, void* and char* in a slot signature")
+    parser.add_argument("--report-standins", action="store_true", help="list every int*, void* and char* whose target is not const in a slot signature")
     args = parser.parse_args()
     if args.report_standins:
         lines = standins(ROOT / "interfaces")
         print("\n".join(lines))
-        print("%d int*, void* or char* in slot signatures" % len(lines))
+        print("%d writable int*, void* or char* in slot signatures" % len(lines))
         return
     ref, tagged = baseline_ref()
     ref = args.base or ref
+    manifest = json.loads(MODULES_JSON.read_text())
     with tempfile.TemporaryDirectory(prefix="abidiff-base-") as tmp:
         extract_baseline(ref, Path(tmp))
-        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, json.loads(MODULES_JSON.read_text()))
+        results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, manifest)
+    results += imports_results(ROOT / "interfaces", manifest)
     print("baseline: %s (%s)" % (ref, "interfaces-v* tag exists" if tagged else "before interfaces-v1"))
     for result in results:
         print("%s: %s" % (result.name, result.summary))

@@ -98,7 +98,7 @@ void FreeWeaponArray(void)
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/weapons.h"
 
 // FUNCTION: 0x499ab0
@@ -1628,7 +1628,7 @@ void __stdcall SubtractVec3(int* a, int* b, int* dx, int* dy, int* dz)
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
 // FUNCTION: 0x49e5b0
-char* __stdcall FindWeaponByName(char* name)
+char* __stdcall FindWeaponByName(const char* name)
 {
     if (name == 0 || strlen(name) == 0)
         return 0;
@@ -2107,7 +2107,8 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 dist.value = VectorLength(&v);
                 distance = dist.whole;
             } else {
-                Vec3 centre = g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature]);
+                Vec3 centre;
+                g_seams.features->GetFootprintCentre((Point16*)&at, &g_game->features[feature], &centre);
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
                 Fixed dist;

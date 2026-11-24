@@ -375,7 +375,7 @@ the fields of that kind, or has no payload struct, in which case the event is th
 header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
 offset. Two kinds share one payload struct only when their fields mean the same.
 
-The publisher passes the payload's size with it: `SchedPublish(outbox, &payload, sizeof payload)`. An event of fewer
+The publisher passes the payload's size with it: `WindMeteorsEmit(&payload, sizeof payload)`. An event of fewer
 than 4 bytes has no kind to route by, and is a fatal error. The scheduler copies `size` bytes into a 128-byte inbox entry,
 keeps the size with it, and hands the subscriber the event as a pointer to the header together with the size the publisher
 gave, whether it delivers the event at once or from the inbox. A slot that consumes an event takes the header and that
@@ -401,6 +401,17 @@ reads the payload of the kind it subscribed to, and does nothing with an effect 
   is running (an import that calls back into the engine). The handle table and the fuel counter treat
   only the outermost call as the boundary (sections 8 and 11).
 
+- **Hook points.** Every slot's doc comment ends with a `Hooks:` line: the synced mod hooks of
+  [#1](https://github.com/ozgb/byte-tactics-moddable/issues/1) that attach to that call, or
+  `Hooks: none`. The `Apply` slots, the tick drivers and the world-view slots have one too. A hook
+  that changes how a module answers an event (`UnitDestroyed`, `AllowCommand`) is named on that
+  event kind's doc comment instead, and an event kind with no hook has no `Hooks:` line. A hook that
+  runs once a tick (`GameFrame`) is named on the tick driver that starts the tick,
+  `units.UpdateAllUnits`. A named slot or event kind is where the hook runs, so a re-implementation
+  keeps it as a call or an event of its own, with the same arguments and at the same point in the
+  tick: it does not fold it into another slot or inline it into its caller. Milestone 3 decides how
+  a module calls the hook; until then the line only fixes where.
+
 ## 7. Argument kinds and the pointer rule
 
 A kind says what an argument or a result is. The wasm type of `int`, `linear`, `block`, `scratch`
@@ -418,6 +429,17 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `handle` | an opaque u32 (section 8) |
 
 A params or event record such as `MeteorShowerParams` (the `LoadMeteorDefaults` argument) or `WindMeteorsParams` (a payload the `Apply` slot reads) is a `linear` argument: the caller owns the object and the callee reads and writes it in place.
+
+The published headers spell every integer at the boundary as `int` or `unsigned`, which are 32 bits
+on every target; `long` and the C library's size type, whose width depends on the platform, are not used. A slot or a
+service may still take or return a `char`, a `short` or a `bool` (`unsigned char player`, an
+`unsigned short` unit id). Each is the `int` kind, an i32, carried as clang's wasm32 C ABI carries
+it: the side that produces the value extends it to 32 bits, the caller for an argument and the
+callee for a result, and the side that receives it does not extend it again. A `signed char` or a
+`short` is sign-extended, an `unsigned char` or an `unsigned short` is zero-extended, and a `bool` is
+0 or 1. A module in another language must keep the same rule: it passes and returns these values
+already extended, and it may rely on what it receives being extended. A `bool` field of a record is
+one byte of the record's layout; it is not an argument kind.
 
 ### 7.1 The pointer rule for Milestone 2
 
@@ -446,24 +468,26 @@ behaviour is the contract the existing module was built against.
   scratch area is a fatal error.
 - A `scratch` slot argument is always such a copy. All copies start at the scratch base, so a slot
   has at most one `scratch` argument. The module reads such an object only through the import that
-  takes it (`CommandArgs_GetIntArg`, `CommandArgs_Count`); its raw bytes and the offsets inside them are for the
-  engine, which is free to change them.
+  takes it; its raw bytes and the offsets inside them are for the engine, which is free to change them.
 - An import's `linear` argument is checked to lie inside the memory (not past its size); an
-  argument outside it is a trap that names the import and the argument index. The check does not
-  look at how many bytes the callee will use, so the module is responsible for passing a buffer big
-  enough.
+  argument outside it is a trap that names the import and the argument index. An import that takes a
+  buffer together with its size checks the whole buffer, from its address to its size, and refuses a
+  size below 1. An import that takes a buffer without a size does not look at how many bytes the callee
+  will use, so the module is responsible for passing a buffer big enough.
 - A `block` result that is not inside the block is a trap.
 
 ### 7.3 A buffer the caller supplies
 
-A slot that returns a list of objects takes a buffer from the caller, so that no native container
-layout is part of the contract. `los_radar.GetVisibleEnemiesInRadiusList` (kinds `[int, linear, int, int, linear, int] -> int`: the player, a
-position, a radius, flags, the output buffer and its capacity in units) is the slot of this form.
+A slot that returns a list of objects takes a buffer from the caller, so that no memory is handed
+across the seam and no native container layout is part of the contract. `los_radar.GetVisibleEnemiesInRadius` (kinds `[int, linear, int, int, linear, int] -> int`: the player, a
+position, a radius, flags, the output buffer and its capacity in units) is the slot of this form, and
+`units.GetFactoriesInRadius` (the player, a position, a radius, the buffer and its capacity) has it too.
 
 - It returns the number of units found, which may be above `capacity`.
 - It writes the first `min(count, capacity)` units to `out`, each as a block offset (section 7.1), in
-  the order the native vector holds them, and writes nothing past `capacity`.
-- A caller that gets a count above its capacity calls again with a larger buffer.
+  the order the engine finds them, and writes nothing past `capacity`.
+- A caller sizes the buffer for the most the list can hold: the engine's list of units has each unit
+  once, so a buffer of one entry per slot of the unit pool never gets a count above its capacity.
 
 ## 8. Handles and the loader data words
 
@@ -540,10 +564,14 @@ signature. The game manifest's module imports `weapons.FindWeaponByName`. The ho
 
 ### 9.3 Engine services
 
-The `services` group is the engine's plain functions and the member functions of its classes. A
-C++ member is imported as `<Class>_<Member>`, with `this` as the first argument, a `linear` address
-when the object lives in the module's memory and a `handle` when it is an engine object. Their
-signatures are below; those the manifest's modules import are also `signatures.services` of the manifest.
+The `services` group is the engine functions a module may import, and `interfaces/services.h` declares exactly those:
+the union of `imports.services` over the manifest's modules, each as a free function under its import name. An engine
+class's member is imported as `<Class>_<Member>`, with the object as the first argument: a `linear` address when it
+lives in the module's memory (a `TdfFileLayout`) and a `handle` when it is an engine object (a `TdfRecord`, a
+`HapiBank`). The rest of the engine's services (the scheduler's publishing and synchronous calls, the recorders of the
+dump's events, the allocator, the whole TDF and console command classes) are in an engine header outside `interfaces/`,
+which only the native engine includes. The imports' signatures are below; they are also `signatures.services` of the
+manifest.
 
 | Import | Signature (kinds) | Behaviour |
 | --- | --- | --- |
@@ -551,59 +579,46 @@ signatures are below; those the manifest's modules import are also `signatures.s
 | `RandomInt` | `[int] -> int` | a random number in `[0, range)` from a generator of its own, whose state is `rng.seed` in the recordings and is not a game logic stream (`rng.main`, `rng.load`); a range below 2 gives 0 and leaves the generator alone |
 | `FatalError` | `[linear] -> void` | ends the game with the NUL-terminated message after the call unwinds (section 13); does not return to the module |
 | `BuildDataPath` | `[linear, linear, linear, linear] -> linear` | builds `dir/name.ext` below the data directory into the buffer (first argument) and returns the buffer's address; the host traps if the result is not the buffer |
-| `TdfFile_Construct` | `[linear] -> void` | builds an empty `TdfFile` in place |
+| `TdfFile_Construct` | `[linear] -> void` | builds an empty file in place, a `TdfFileLayout` (root, current record, flags) |
 | `TdfFile_Destruct` | `[linear] -> void` | unloads the file and frees the engine's records |
 | `TdfFile_LoadFile` | `[linear, linear] -> int` | loads and parses the file at a path; the result is the engine's status |
-| `TdfFile_SelectRecord` | `[linear, linear] -> int` | selects the record of the given name as the current one |
+| `TdfFile_SelectRecord` | `[linear, linear] -> int` | selects the child of the given name of the current record (of the root when none is current) as the current one |
 | `TdfRecord_GetFieldInt` | `[handle, linear, int] -> int` | reads an integer field, or the default (third argument) when it is missing |
 | `TdfRecord_GetFieldDouble` | `[handle, linear, f64] -> f64` | reads a double field, or the default |
 | `TdfRecord_GetFieldString` | `[handle, linear, linear, int, linear] -> int` | copies a field's text into a buffer (arguments: record, destination, key, size, default) |
-| `CommandArgs_GetIntArg` | `[scratch, int, int] -> int` | reads argument *index* of a console command as an integer, or the default |
-| `CommandArgs_Count` | `[scratch] -> int` | the number of arguments of a console command, its name included (`meteor 1` has 2); the recordings carry it as the `a args.count` line |
-| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the host refuses, as an import error, any kind but SPAWN, a size other than SPAWN's payload, and a weapon slot outside the table of weapons; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
-| `SchedPublish` | `[int, linear, int] -> void` | publishes the event or effect at the second argument (a payload, 6.1: plain data that starts with its kind, as many bytes as the third argument says) to the outbox the first argument names (a `SchedModule`); the scheduler's router copies it to the inbox of each module that subscribes to its kind, with its size, which the subscriber's `Apply` receives; fewer than 4 bytes is a fatal error |
-| `HarnessEconomyEvent` | `[linear, int, int] -> void` | in test mode, records an economy event or effect, its payload of the size in bytes that the second argument gives, with its outcome (third argument) for the dump's economy events; outside test mode it does nothing |
-| `HarnessFeaturesEvent` | `[linear, int, int] -> void` | the same for a features event or effect and the dump's features events |
-| `HarnessTargetingEvent` | `[linear, int, int] -> void` | the same for a targeting event or effect and the dump's targeting events |
-| `HarnessLosRadarEvent` | `[linear, int, int] -> void` | the same for a los_radar event and the dump's los_radar events |
-| `HarnessMapEvent` | `[linear, int, int] -> void` | the same for a map event or effect and the dump's map events |
-| `HarnessPlayersEvent` | `[linear, int, int] -> void` | the same for a players event or effect and the dump's players events |
-| `HarnessAiEvent` | `[linear, int, int] -> void` | the same for an ai event or effect and the dump's ai events |
+| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the host refuses, as an import error, any kind but SPAWN, a size other than SPAWN's payload, and a weapon slot outside the table of weapons; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
-(`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30), and two parties record them. The engine records each event
-it delivers to a module's inbox, with the outcome `Apply` returns, and each synchronous call into the module (economy's
-`Spend`, features' `Place`) with its answer. The module records each effect it publishes: it calls `Harness<X>Event`
-with the effect and outcome 1 just before `SchedPublish`. Economy's world view `Emit` and wind_meteors' `WindMeteorsEmit`
-make both calls in one. So a module built from a spec that publishes with `SchedPublish` has to make the recording call
-itself, or the dump's events section loses its effects; no trace row hashes these records, so the traces would not show it. A replay judges
-neither call's effect: a `SchedPublish` made inside a recorded slot is an `i services.SchedPublish` line with the
-outbox and the size but not the event's bytes, and a `Harness<X>Event` call is not recorded. The gate judges an effect
-through what its subscribers do with it. The `services` list of a subsystem in the replay schema
-(`annotations.subsystems.<name>.services` of `data/replay_schema.json`) is not the module's import list, which is
-`imports.services` of its manifest entry: targeting's names only `RandomInt`, and its recordings still carry
-`SchedPublish` lines.
+(`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30). The engine records each event it delivers to a module's
+inbox, with the outcome `Apply` returns, and each synchronous call into the module (economy's `Spend`, features'
+`Place`) with its answer. An effect is recorded by the service that publishes it: `WindMeteorsEmit` puts the effect in
+the outbox and records it in one call, so a module built from a spec has nothing else to call, and the dump's events
+come out whole. The engine's native modules publish and record their effects with engine services that no module
+imports; a module that takes over another subsystem gets a publishing service of its own, as wind_meteors has, added to
+`interfaces/services.h` and to its manifest's imports together. No trace row hashes these records. A replay carries a
+publishing service's call as an `i services.<Name>` line, and the gate judges an effect through what its subscribers do
+with it. The `services` list of a subsystem in the replay schema (`annotations.subsystems.<name>.services` of
+`data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
+targeting's names only `RandomInt`, and its recordings still carry the native module's publishing lines.
 
-The services interface is at major 2 and minor 0 in the headers (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
-`interfaces/services.h`). `CommandArgs_Count` came with minor 8, the goal-area services (`PathGoalContains`,
-`PathGoalDistance`, `PathGoalCells`) with minor 9 and `HarnessPathEvent`, which the players phase calls for the trace's
-path results, with minor 10 and `HarnessEconomyEvent`, which the scheduler calls for the trace's economy events, with minor 11,
-`WindMeteorsEmit`, the meteors' SPAWN effect, and `HarnessWindMeteorsEvent` with minor 12, `HarnessFeaturesEvent` and
-`ScheduleFeaturesPlace`, features' synchronous placement, with minor 13, and `HarnessTargetingEvent` and the calls into
-targeting (`ScheduleTargetingTargetUnit`, `ScheduleTargetingTargetPos`, `ScheduleTargetingFind`,
-`ScheduleTargetingFireAtWill`) with minor 14, `HarnessLosRadarEvent` with minor 15, and `HarnessMapEvent`, the calls into
-map (`ScheduleMapCanBuildAt`, `ScheduleMapCanPlaceUnitFootprint`, `ScheduleMapPickReclaimable`) and the module id
-`SCHED_PATHFINDING` with minor 16, `HarnessPlayersEvent` with minor 17, `HarnessAiEvent` with minor 18, and the module ids `SCHED_SCRIPTS` and `SCHED_MOVEMENT` with minor 19, all of the 1.x line. Major 2 gives every `Harness<X>Event` the payload's size (`Harness<X>Event(header, size, outcome)`, `HarnessPathEvent(header, size, points, capacity)`) and `WindMeteorsEmit` its size (`WindMeteorsEmit(header, size)`), and `ScheduleEconomySpend` and `ScheduleFeaturesPlace` take their payloads (`const EconomySpend*`, `const FeaturesPlace*`). Each minor addition is an addition: a module built without it needs nothing.
+The services interface is at major 3 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+`interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
+of the dump's events and `WindMeteorsEmit` the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
+units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
+members become free functions under their import names, the strings they only read become const, the size
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
 types, const-ness, calling convention and `static`. An entry removed or retyped is breaking and needs a major bump; one
 added needs the minor bump. An overload added to a name that had one signature is breaking too, since both signatures
-would map to the same `Class_Method` import.
-The baseline is the newest `interfaces-v*` tag, `interfaces-v2` from this change on, the first that has `services.h`.
+would map to the same `Class_Method` import. It also ties the header to the manifest: the entries, by import name, must
+be exactly the union of the modules' `imports.services`, or the `services (imports)` line fails. A service a module
+starts to import is added to the header and the manifest in one change.
+The baseline is the newest `interfaces-v*` tag.
 
 A service never returns a native address. A service that finds something outside what it may reach
 (a pointer outside the memory, an unknown handle) traps with a message that names it (section 13).
@@ -616,7 +631,7 @@ An interface has a major version that changes when a slot is removed or its sign
 ### 10.1 What the manifest records
 
 - `majors`: the current major of each interface and of each import group's interface, read from the
-  interface headers. The game manifest has, for example, `services` 2 and `wind_meteors` 3.
+  interface headers. The game manifest has, for example, `services` 3 and `wind_meteors` 3.
 - `modules[].interface`: the interface whose slots the module implements.
 - `modules[].majors`: for its own interface and for every import group, the major the module was
   built against.
@@ -748,7 +763,8 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   of <budget> in one tick`.
 - **Hidden state.** `<module> kept state between ticks: its statics changed at tick <tick>`.
 - **An import's refusal** is a trap whose text begins `import <name>: ` and names the cause:
-  `pointer argument <n> is outside the module memory`, `unknown handle <n>`, `null handle`,
+  `pointer argument <n> is outside the module memory`, `the buffer size is below 1`,
+  `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the

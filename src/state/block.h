@@ -39,7 +39,7 @@ void* __cdecl SimRealloc(void* p, unsigned int size);
 void __cdecl SimFree(void* p);
 
 // True when p lies inside the sim block.
-bool __cdecl SimOwns(const void* p);
+int __cdecl SimOwns(const void* p);
 
 // The peak bytes of the block in use since start-up, headers included.
 unsigned int __cdecl SimHighWater();

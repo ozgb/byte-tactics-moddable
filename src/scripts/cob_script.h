@@ -80,8 +80,8 @@ class CobScript
     int StartScriptByIndex(int id, Callback* callback, int update);
     int StartScriptWithArgs(char* name, Callback* callback, int update, int count, int a, int b, int c, int d);
     int StartScriptWithArgsByIndex(int index, Callback* callback, int update, int count, int a, int b, int c, int d);
-    int QueryScript(char* name, int* p2, int* p3, int* p4, int* p5);
-    int QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5);
+    int QueryScript(const char* name, int* arg0, int* arg1, int* arg2, int* arg3);
+    int QueryScriptByIndex(int index, int* arg0, int* arg1, int* arg2, int* arg3);
     void RemoveCallback(Callback* callback);
     void RunScripts(int elapsed);
     void RunThread(unsigned int channel, int elapsed);

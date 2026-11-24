@@ -8,7 +8,7 @@
 #include <new>
 
 #include "../../link/globals.h"
-#include "../../interfaces/services.h"
+#include "engine_services.h"
 #include "tdf.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
@@ -89,7 +89,7 @@ static inline StringRef* EntriesInsertNew(TdfRecord* r, TdfField* e, const Strin
     return &Rows(r).insert(e, MakePair(key, StringRef()))->value;
 }
 
-inline TdfRecord* TdfRecord::FindChild(char* key)
+inline TdfRecord* TdfRecord::FindChild(const char* key)
 {
     for (TdfRecord** p = Kids(this).begin(); p < Kids(this).end(); p++) {
         if (_strcmpi((*p)->name, key) == 0)
@@ -176,7 +176,7 @@ void TdfFile::StripComments(char* p)
 }
 
 // FUNCTION: 0x4c3410
-int TdfFile::SelectRecord(char* name)
+int TdfFile::SelectRecord(const char* name)
 {
     ReplayImport call(RI_TDF_SELECT_RECORD);
     call.Ptr(this);
@@ -242,7 +242,7 @@ static inline char* SkipSpace(char* p)
 }
 
 // FUNCTION: 0x4c3e40
-TdfRecord::TdfRecord(char* name, char* text, char** nextblock, char* filename)
+TdfRecord::TdfRecord(char* name, char* text, char** nextblock, const char* filename)
 {
     children.first = 0;
     children.last = 0;
@@ -357,12 +357,12 @@ void TdfRecord::ComputeRecordChecksum(char* start, char* end)
 }
 
 // FUNCTION: 0x4c4420
-void TdfRecord::CopyRecordName(char* dest, size_t count)
+void TdfRecord::CopyRecordName(char* dest, int count)
 {
     ReplayImport call(RI_TDF_COPY_RECORD_NAME);
     call.Ptr(this);
     call.Ptr(dest);
-    call.Int((int)count);
+    call.Int(count);
     strncpy(dest, name, count);
 }
 
@@ -545,7 +545,7 @@ int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
 }
 
 // FUNCTION: 0x4c48c0
-int TdfRecord::GetFieldString(char* dst, char* key, size_t size, char* def)
+int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     ReplayImport call(RI_TDF_GET_STRING);
     call.Ptr(this);
@@ -602,10 +602,10 @@ TdfField::~TdfField()
 }
 
 // FUNCTION: 0x4c5470
-void* TdfField::AssignPair(int* param_1)
+void* TdfField::AssignPair(int* other)
 {
-    ((StringRef*)this)->Assign((StringRef*)param_1);
-    ((StringRef*)&value)->Assign((StringRef*)(param_1 + 1));
+    ((StringRef*)this)->Assign((StringRef*)other);
+    ((StringRef*)&value)->Assign((StringRef*)(other + 1));
     return this;
 }
 
@@ -616,7 +616,7 @@ TdfField::TdfField(const StringRef& a, const StringRef& b)
 }
 
 // FUNCTION: 0x4c2f60
-int TdfFile::LoadFile(char* path)
+int TdfFile::LoadFile(const char* path)
 {
     ReplayImport call(RI_TDF_LOAD_FILE);
     call.Ptr(this);
@@ -807,7 +807,7 @@ char* __stdcall Translate(const char* key)
 }
 
 // FUNCTION: 0x4c5840
-int __stdcall FindTranslation(char* name)
+int __stdcall FindTranslation(const char* name)
 {
     if (name == nullptr || g_translations == nullptr)
         return 0;
@@ -819,7 +819,7 @@ int __stdcall FindTranslation(char* name)
 }
 
 // FUNCTION: 0x4c58a0
-int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t size,
+int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, int size,
                            char* def)
 {
     char full[256];

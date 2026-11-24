@@ -10,7 +10,7 @@ double __stdcall DotProduct(float ax, float ay, float az, float bx, float by, fl
 float __stdcall VectorLengthFloat(float x, float y, float z);
 
 void __stdcall SeedRandom(unsigned int seed);
-#include "../../interfaces/services.h"
+#include "engine_services.h"
 
 void __stdcall RotateAboutZ(Vec3* in, Vec3* out, int angle);
 void __stdcall RotateAboutY(Vec3* in, Vec3* out, int angle);

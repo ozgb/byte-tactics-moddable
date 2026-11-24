@@ -707,7 +707,7 @@ FEATURES_HEADER = """struct FeaturesSeam {
     void (__stdcall* LoadFeatureFileList)(void);
     void (__stdcall* InitFeatureAnimPool)(TntInfo* info);
     unsigned short (__stdcall* GetCellFeature)(Cell* cell);
-    Vec3 (__stdcall* GetFootprintCentre)(Point16* cell, Feature* def);
+    void (__stdcall* GetFootprintCentre)(const Point16* cell, Feature* def, Vec3* out);
     int (__stdcall* Apply)(const FeaturesEvent* event);
     void (__stdcall* UpdateFeatureSpot)(int spot);
 };
@@ -814,7 +814,7 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual([f[2:] for f in found], [("FeCell", "FeaturesSeam::GetCellFeature field write Cell::feature"),
                                                  ("FeHelp", "FeaturesSeam::GetCellFeature global write g_x")])
 
-    def test_a_query_slot_may_write_the_vector_it_returns_in_its_own_filler_only(self):
+    def test_a_query_slot_may_write_the_vector_it_is_given_in_its_own_filler_only(self):
         self.assertEqual(self.check([("FeCentre", "src/map/features.cpp", "field_write", "Vec3::x")]), [])
         found = self.check([("FeCell", "src/map/features.cpp", "call", "FeHelp"), ("FeHelp", "src/map/features.cpp", "field_write", "Vec3::x")])
         self.assertEqual([f[2:] for f in found], [("FeHelp", "FeaturesSeam::GetCellFeature field write Vec3::x")])

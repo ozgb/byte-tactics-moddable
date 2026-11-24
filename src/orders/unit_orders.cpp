@@ -16,6 +16,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include <string.h>
 
 #include "../state/block.h"
+#include "../../interfaces/ref.h"
 #include "../util/vec3.h"
 
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
@@ -36,7 +37,7 @@ struct UnitDef;
 
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_effects.h"
 struct Chunk;
 class SquadManager;
@@ -100,7 +101,8 @@ inline int Order::Advance(int distance) {
 }
 
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
+#include "../seams/unit_query_buffer.h"
+#include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 
 #include "../../link/globals.h"
@@ -159,9 +161,9 @@ int __stdcall MakeSelectableOrder(Unit* unit, Order* order, int unused)
 int __stdcall WaitOrder(Unit* unit, Order* order, int flags)
 {
     if(order->radius) {
-        std::vector<Unit*> units;
-        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,&units);
-        if(!units.empty()) return 5;
+        UnitQueryBuffer units;
+        int unitCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,&unit->pos,order->radius,0,units.Data(),units.Capacity());
+        if(unitCount!=0) return 5;
         if(order->wait<=0) return 5;
         int delay=RandomInt(30)+150;
         order->wait-=delay;
@@ -290,10 +292,13 @@ int __stdcall GuardNoMoveOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 3: {
-        std::vector<Unit*> units;
-        g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, &units);
-        if (!units.empty()) {
-            g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, units[RandomInt(units.size())]);
+        UnitQueryBuffer units;
+        int unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, units.Data(), units.Capacity());
+        if (units.Grow(unitCount))
+            unitCount = g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex, &order->pos, 0x280, 0, units.Data(), units.Capacity());
+        unitCount = units.Written(unitCount);
+        if (unitCount != 0) {
+            g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, units[RandomInt(unitCount)]);
             TargetingPublishSetUnit(SCHED_ORDERS, unit, order->target, 0);
             order->state = 1;
             return 2;
@@ -397,7 +402,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     case 2: {
         int piece = -1;
         g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
-        order->pos = g_seams.scripts->GetPiecePosition(unit, piece);
+        g_seams.scripts->GetPiecePosition(unit, piece, &order->pos);
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
         if (!ScheduleMapCanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {
@@ -405,7 +410,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
             order->flags |= 2;
             return 2;
         }
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, &order->pos, 0, 1, 0));
         if (order->target == 0) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);
@@ -1030,7 +1035,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     switch (state) {
     case 0:
         if (unit->motion && (unit->def->flags2 & 0x400)) {
-            if (!g_seams.units->CanReclaim(unit, 0, target)) {
+            if (!g_seams.units->CanReclaim(unit, target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_THAT_UNIT_CANNOT_BE_RECLAIMED);
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
                 return 8;
@@ -1064,7 +1069,7 @@ int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         range = unit->def->buildRange;
         range += target->def->radius184;
         int square = SquaredDistance(delta.x, delta.z);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, target)) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, target)) {
             if (order->duration >= 15) {
                 WeaponsPublishDamage(SCHED_ORDERS, unit, target, order->elapsed, 5, 0);
                 order->duration = 0;
@@ -1679,7 +1684,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         g_seams.map->SnapWorldPosToFootprint(def, &snapped);
         order->pos = snapped;
         g_seams.units->UnitRefSetUnit((UnitRef*)((char*)order + 0x12),
-            g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, order->pos, 0, 1, 0));
+            g_seams.units->CreateUnit(unit->playerIndex, (short)order->type, &order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);
@@ -1809,7 +1814,7 @@ int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 DamagedAllyCollector collector(unit->player, &units, unit);
-                VisitUnitsInRange(&unit->pos, range, &collector);
+                ForEachUnitInRange(&unit->pos, range, [&collector](Unit* ally) { collector.Visit(ally); });
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
                     if (unit->player->allied[target->player->index]) {
@@ -2049,7 +2054,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 5: {
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex, order->unitType, &order->pos, 0, 1, 0));
         if (!order->target) {
             RecordUnitSpeech(unit, 7, SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS);
             order->SetDeadlineTicks(300);

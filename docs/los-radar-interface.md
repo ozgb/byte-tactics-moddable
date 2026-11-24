@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 4.1), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 5.0; 5.0 writes the units of `GetVisibleEnemiesInRadius` to a caller buffer, in place of a vector and its list twin, and `HasReadyUnitInRange` returns int instead of bool and takes a const position), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -38,7 +38,7 @@ Los_radar's place in it:
   `RefreshUnitIndex(player)` (section 5), with the inbox delivered first. Players no longer calls any of them: its update is split into `UpdatePlayerHead`, `UpdatePlayerBody` and
   `UpdatePlayerTail` (players 2.0), and the head's and body's answers tell the engine whether the player goes on.
 - **Queries:** `IsUnitVisibleToPlayer`, `SoundHeardMask` and `ClampWorldPosToTerrain`, and, since 3.1,
-  `GetVisibleEnemiesInRadius`, `GetVisibleEnemiesInRadiusList`, `HasReadyUnitInRange`, `IsPointVisible` and
+  `GetVisibleEnemiesInRadius`, `HasReadyUnitInRange`, `IsPointVisible` and
   `GetSeenUnitsInRadius`, called directly, as of los_radar's last apply (section 4).
 - **Views:** the cell records, through `GetMapCell`, `GetMapCellAtPosition` and `GetOriginCellAtPosition`
   (section 4), and the sensor bits of `Unit::flags` (section 3).
@@ -103,7 +103,7 @@ none of these, so no trace moves; a module publishing from WASM can.
 
 | Slot | What it is |
 |---|---|
-| `GetVisibleEnemiesInRadius`, `GetVisibleEnemiesInRadiusList` | queries, formerly ai's: the ready enemy units within a radius of a position that a player saw at its last `RefreshUnitIndex`, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, the ready enemy units with flag 0x100 there; the list form writes them as `Ref<Unit>` to a buffer. Their callers are orders' guard and wait and targeting's weapon search. |
+| `GetVisibleEnemiesInRadius` | query, formerly ai's: the ready enemy units within a radius of a position that a player saw at its last `RefreshUnitIndex`, or, when it saw none there and has a finished unit of a type with flag 0x400 switched on, the ready enemy units with flag 0x100 there; it writes the first `capacity` of them to the caller's buffer and returns how many there are. Its callers are orders' guard and wait and targeting's weapon search. |
 | `HasReadyUnitInRange` | query, formerly ai's: whether an enemy unit the player saw is within a range, ready (flag 0x10000000) and not dying (flag 0x4000); the info panel calls it |
 | `IsPointVisible` | query, formerly ai's: whether the viewing player sees a position, on the grid of the player's explored map; weapons' drawing and players' `IsVisible` call it |
 | `GetSeenUnitsInRadius` | new query, the buffer form of the visible query with no ready filter and no known fallback; ai's spatial timer sums its ratings from it (it read the list directly before) |
@@ -144,7 +144,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
   `RevealAroundUnit` and cleared by the fog's drawing; the trace masks it out (0xfff7). The field stays in the game
   record as view state: the settings' writers are the engine's, and los_radar writes only bit 3.
 
-**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
+**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 5.0; the payloads are unchanged since 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -161,7 +161,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
 **What los_radar reads:** a unit's position and fractions, flags, `activateFlags`, definition (sight, radar and sonar
 distances, jamming, cloak), player and the sight cache (`Unit::losCacheCell`, `losCacheCellZ`, `losSightFrameIdx`);
 the players' alliances, sharing flags and the fields of the game record behind `pad_1df4`, `unknown_1b8e` and
-`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); and map's `UnitsInRange` (through the engine's `VisitUnitsInRange`). The
+`unknown_1cd9` (a player's alliance and sharing words); projectiles' positions (the radar snapshot); and map's `UnitsInRange`. The
 queries `HasReadyUnitInRange` and `IsPointVisible` are its own since 3.1; they were ai's in 3.0. All as of each
 module's last run.
 

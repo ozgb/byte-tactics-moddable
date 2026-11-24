@@ -12,7 +12,7 @@ struct Vec3;
 struct StateWriter;
 
 // Major version of the movement interface, changed when a slot is removed or its signature changes.
-#define MOVEMENT_VERSION_MAJOR 4
+#define MOVEMENT_VERSION_MAJOR 5
 // Minor version of the movement interface, changed when a slot is added.
 #define MOVEMENT_VERSION_MINOR 0
 
@@ -83,7 +83,7 @@ struct MovementSavedState {
     // The velocity, in world units with 16 fractional bits: x, y and z.
     int velocity[3];
     // The smoothed acceleration that banks and pitches an aircraft: x, y and z.
-    int p2[3];
+    int smoothedAcceleration[3];
     // The speed.
     int speed;
     // The turn of the last tick.
@@ -256,7 +256,7 @@ struct MovementStartScript {
 
 // Unit motion, its goals and the targets the goals steer to. A target is named by its block offset, a handle the caller keeps and never reads through.
 struct MovementSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const MovementEventHeader* event, unsigned int size);
     // Steers a unit, moves it and updates its move rate for one tick, in the unit's update; the engine calls it for a unit with a movement after its orders. Hooks: none.
     void (__stdcall* UpdateMotion)(Unit* unit);
@@ -285,7 +285,7 @@ struct MovementSeam {
     // Builds a ring target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
     unsigned int (__stdcall* NewRingApproach)(unsigned int order, int x, int y, int inner, int outer);
     // Builds a footprint marker target for an order and returns it; synchronous: the answer is the new target. Hooks: none.
-    unsigned int (__stdcall* NewPointMarker)(unsigned int order, Point16 pos, Point16 size);
+    unsigned int (__stdcall* NewPointMarker)(unsigned int order, const Point16* pos, const Point16* size);
     // Reads a target of a kind (as TargetType returns it, 2 to 6) for an order from a saved game bank under a name and returns it, or 0 for another kind, outside the tick. Hooks: none.
     unsigned int (__stdcall* LoadTarget)(int type, unsigned int order, HapiBank* file, const char* name);
     // Writes a target for an order to a saved game bank under a name, outside the tick. Hooks: none.
@@ -294,7 +294,7 @@ struct MovementSeam {
     int (__stdcall* TargetType)(unsigned int target);
     // Returns the target the goal of a unit's movement steers to, or 0, also for a unit with no movement; a query. Hooks: none.
     unsigned int (__stdcall* UnitTarget)(Unit* unit);
-    // Writes movement's state as records of the trace, which the engine dumps and does not hash.
+    // Writes movement's state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

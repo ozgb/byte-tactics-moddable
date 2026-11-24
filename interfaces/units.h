@@ -3,11 +3,7 @@
 
 #include "state_writer.h"
 
-namespace std {
-template<class T> class allocator;
-template<class T, class A> class vector;
-}
-
+template <class T> struct Ref;
 struct MapMoveLimits;
 struct Unit;
 struct UnitDef;
@@ -18,7 +14,7 @@ class UnitRef;
 class UnitTypeSet;
 
 // Major version of the units interface, changed when a slot is removed or its signature changes.
-#define UNITS_VERSION_MAJOR 6
+#define UNITS_VERSION_MAJOR 7
 // Minor version of the units interface, changed when a slot is added.
 #define UNITS_VERSION_MINOR 0
 
@@ -44,11 +40,11 @@ enum UnitsEventKind {
     UNITS_SET_POSITION = 356,
     // unit is attached to a piece of a target unit, or detached when the target is 0 (UnitsAttachToPiece); outcome 1.
     UNITS_ATTACH_TO_PIECE = 357,
-    // unit, which a builder built, is finished (UnitsFinishConstruction); outcome 1.
+    // unit, which a builder built, is finished (UnitsFinishConstruction); outcome 1. Hooks: UnitFinished.
     UNITS_FINISH_CONSTRUCTION = 358,
     // unit, unfinished and left alone, decays for a number of ticks (UnitsBuildDecay); outcome 1.
     UNITS_BUILD_DECAY = 359,
-    // unit is repaired by a builder (UnitsRepair); outcome 1.
+    // unit is repaired by a builder (UnitsRepair); outcome 1. Hooks: RepairAmount.
     UNITS_REPAIR = 360,
     // A reference an order holds to a unit is unlinked from that unit (UnitsUnlink); the header's unit is the unit the reference points at, which Apply does not read; outcome 1, or 0 for no reference.
     UNITS_UNLINK = 361,
@@ -66,7 +62,7 @@ enum UnitsEventKind {
     UNITS_CHANGE_CELL = 367,
     // unit has moved this tick, or not (UnitsSetMoved); outcome 1.
     UNITS_SET_MOVED = 384,
-    // unit's script is told whether unit is in the water, on the ground or in the air, when that changed; the header alone; outcome 1.
+    // unit's script is told whether unit is in the water, on the ground or in the air, when that changed; the header alone; outcome 1. Hooks: UnitWaterState.
     UNITS_SFX_OCCUPY = 385,
     // A script of unit sets one of its unit's values, and marks unit dirty for the network (UnitsScriptValue); outcome 1.
     UNITS_SCRIPT_VALUE = 386,
@@ -80,11 +76,11 @@ enum UnitsEventKind {
     UNITS_DAMAGE_RECORD = 390,
     // unit's health is set, and unit is marked dying (UnitsSetHealth); outcome 1.
     UNITS_SET_HEALTH = 391,
-    // unit is killed by its player, or self-destructs (UnitsKill); outcome 1.
+    // unit is killed by its player, or self-destructs (UnitsKill); outcome 1. Hooks: UnitDestroyed.
     UNITS_KILL = 392,
     // unit is sent to another player (UnitsSend); outcome 1.
     UNITS_SEND = 393,
-    // unit is captured by another player, who gets a copy of it (UnitsCapture); outcome 1, or 0 when no copy could be made.
+    // unit is captured by another player, who gets a copy of it (UnitsCapture); outcome 1, or 0 when no copy could be made. Hooks: UnitCreated.
     UNITS_CAPTURE = 394
 };
 
@@ -350,12 +346,12 @@ struct UnitsCapture {
 
 // Unit simulation.
 struct UnitsSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const UnitsEventHeader* event, unsigned int size);
-    // Advances every unit for one tick.
+    // Advances every unit for one tick. Hooks: GameFrame.
     void (__stdcall* UpdateAllUnits)(void);
     // Adds a unit type, or the unit types of a category, to a set by name, and writes 1 to out for a type and 0 for a category (thiscall in 3.1c, this first). Hooks: none.
-    void (__stdcall* UnitTypeSetAddTypeOrCategory)(UnitTypeSet* self, char* text, int* out);
+    void (__stdcall* UnitTypeSetAddTypeOrCategory)(UnitTypeSet* self, const char* text, int* out);
     // Allocates the memory of the unit table. Hooks: none.
     void (__stdcall* AllocateUnitMemory)(void);
     // Frees the memory of the unit table. Hooks: none.
@@ -384,7 +380,7 @@ struct UnitsSeam {
     void (__stdcall* KillUnitsOfType)(short id);
     // Loads a unit type again from its file. Hooks: none.
     void (__stdcall* ReloadUnitType)(unsigned short id);
-    // Kills a unit, with a cause; synchronous, outside the tick (the engine's shutdown kills every unit). Hooks: none.
+    // Kills a unit, with a cause; synchronous, outside the tick (the engine's shutdown kills every unit). Hooks: UnitDestroyed.
     void (__stdcall* KillUnit)(Unit* unit, int cause);
     // Reads the units of a saved game from a bank. Hooks: none.
     void (__stdcall* LoadUnits)(HapiBank* file);
@@ -392,34 +388,34 @@ struct UnitsSeam {
     void (__stdcall* SaveUnits)(HapiBank* file);
     // Reads one unit of a saved game from a bank and returns it; synchronous: the caller reads the unit in the same statement. Hooks: none.
     Unit* (__stdcall* LoadUnit)(unsigned short id, HapiBank* file);
-    // Creates a unit of a type for a player at a position and returns it, or 0; synchronous: the caller reads the new unit in the same statement. Hooks: none.
-    Unit* (__stdcall* CreateUnit)(unsigned char player, unsigned short typeId, Vec3 pos, int param_4, int mode, int param_6);
+    // Creates a unit of a type for a player at a position and returns it, or 0; finished is 1 for a built unit and 0 for one under construction, and id is the unit slot to take or 0 for the first free one; synchronous: the caller reads the new unit in the same statement. Hooks: UnitCreated.
+    Unit* (__stdcall* CreateUnit)(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id);
     // Returns the unit type of a name, or 0 when there is none. Hooks: none.
     UnitDef* (__stdcall* FindUnitType)(const char* name);
     // Returns the index of the unit type of a name, or 0 when there is none. Hooks: none.
     unsigned short (__stdcall* FindUnitTypeId)(const char* name);
-    // Looks a mission unit up by its name among the units made so far. Hooks: none.
-    int (__stdcall* FindMissionUnit)(char* name, std::vector<Unit*, std::allocator<Unit*> >* units, int value);
-    // Adds build progress to a unit under construction and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: none.
+    // Looks a mission unit up by its name in the caller's table of the units made for the mission units (count entries, indexed by mission unit, and at most the mission's CountMissionUnits; a larger count is clamped to it), starting after the unit after when it is not null, and returns it or null; a count of 0 reads no entry, so the table may then be null. Hooks: none.
+    Unit* (__stdcall* FindMissionUnit)(const char* name, const Ref<Unit>* units, int count, Unit* after);
+    // Adds build progress to a unit under construction and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: UnitFinished.
     int (__stdcall* AddBuildProgress)(Unit* builder, Unit* unit, float amount);
-    // Adds repair progress to a unit and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: none.
+    // Adds repair progress to a unit and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: RepairAmount.
     int (__stdcall* AddRepairProgress)(Unit* builder, Unit* unit, float amount);
-    // Returns 1 when a unit can load a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanLoad)(Unit* unit, int unusedEdx, Unit* target);
-    // Returns 1 when a unit can reclaim a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanReclaim)(Unit* unit, int unusedEdx, Unit* target);
-    // Returns 1 when a unit can repair a target (thiscall in 3.1c: this in ecx). Hooks: none.
-    int (__fastcall* CanRepair)(Unit* unit, int unusedEdx, Unit* target);
-    // Unlinks a reference from the list of the unit it points at (thiscall in 3.1c: this in ecx). Hooks: none.
-    void (__fastcall* UnitRefUnlink)(UnitRef* ref);
+    // Returns 1 when a unit can load a target. Hooks: none.
+    int (__stdcall* CanLoad)(Unit* unit, Unit* target);
+    // Returns 1 when a unit can reclaim a target. Hooks: none.
+    int (__stdcall* CanReclaim)(Unit* unit, Unit* target);
+    // Returns 1 when a unit can repair a target. Hooks: none.
+    int (__stdcall* CanRepair)(Unit* unit, Unit* target);
+    // Unlinks a reference from the list of the unit it points at. Hooks: none.
+    void (__stdcall* UnitRefUnlink)(UnitRef* ref);
     // Starts one unit's update for one tick, before its weapons: the count of units updated and its wind generator; UpdateAllUnits calls it for each unit of each player. Hooks: none.
     void (__stdcall* UpdateUnitHead)(Unit* unit);
-    // Continues one unit's update for one tick, after its weapons and its scripts: its timers, health percentage, water damage and self-repair; returns 1 when the unit's player is active and of type 1 or 2, so that its orders and its movement run next. Hooks: none.
+    // Continues one unit's update for one tick, after its weapons and its scripts: its timers, health percentage, water damage and self-repair; returns 1 when the unit's player is active and of type 1 or 2, so that its orders and its movement run next. Hooks: SelfHeal.
     int (__stdcall* UpdateUnitBody)(Unit* unit);
-    // Finishes one unit's update for one tick, after its orders and its movement: its height when moved is 1 (its movement ran), then a pending death. Hooks: none.
+    // Finishes one unit's update for one tick, after its orders and its movement: its height when moved is 1 (its movement ran), then a pending death. Hooks: UnitDestroyed.
     void (__stdcall* UpdateUnitTail)(Unit* unit, int moved);
-    // Appends to out the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on. Hooks: none.
-    void (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, std::vector<Unit*, std::allocator<Unit*> >* out);
+    // Writes to out, as Ref<Unit>, the first capacity of the factories of a player within a radius of a position that its last RefreshFactoryIndex found and that still have a pad (unit type flags 0x40 and 0x200) and are switched on, and returns how many there are. Hooks: none.
+    int (__stdcall* GetFactoriesInRadius)(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity);
     // Creates the empty index of a player's factories, refreshed by the next RefreshFactoryIndex, outside the tick. Hooks: none.
     void (__stdcall* CreateFactoryIndex)(int player);
     // Frees the index of a player's factories, outside the tick. Hooks: none.
@@ -434,7 +430,7 @@ struct UnitsSeam {
     Unit* (__stdcall* UnitRefGet)(UnitRef* ref);
     // Gives a reference the order that listens to the unit it points at. Hooks: none.
     void (__stdcall* UnitRefSetValue)(UnitRef* ref, OrderBase* value);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
     // Writes to out the footprint and limits of each movement class the game data defines, in index order, at most capacity of them, and returns how many it wrote; a query, outside the tick. Hooks: none.
     int (__stdcall* GetMovementLimits)(MapMoveLimits* out, int capacity);

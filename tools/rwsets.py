@@ -672,7 +672,7 @@ class Walker:
                     self.visit(base, "R")
                 else:
                     self.path(base, mode)
-                if not path:
+                if not path and not record_name(base["type"]).startswith("(lambda at "):
                     self.access("field", "%s::%s" % (record_name(base["type"]), node.get("name") or "<anon>"), mode)
         elif kind == "ArraySubscriptExpr":
             base, index = inner[0], inner[1]

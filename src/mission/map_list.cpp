@@ -62,7 +62,7 @@ int RIReport(int, int, int, int, int, int, int, int, int, int);
 
 #include "../util/vec3.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/host.h"
 #include "../state/sim_globals.h"
 
@@ -184,7 +184,7 @@ int Mission::GetGameType()
 }
 
 // FUNCTION: 0x435110
-void Mission::LoadCampaign(char* file)
+void Mission::LoadCampaign(const char* file)
 {
     char msg[0x80];
 
@@ -209,7 +209,7 @@ void Mission::LoadCampaign(char* file)
 }
 
 // FUNCTION: 0x4352b0
-char* Mission::GetCampaignName()
+const char* Mission::GetCampaignName()
 {
     char* ptr = campaign;
     if (strlen(ptr) > 0) {
@@ -237,13 +237,13 @@ void Mission::LoadBriefing()
 }
 
 // FUNCTION: 0x4353a0
-char* Mission::GetBriefing()
+const char* Mission::GetBriefing()
 {
     return briefing;
 }
 
 // FUNCTION: 0x4353b0
-void Mission::SetNameSlot(int index, char* text)
+void Mission::SetNameSlot(int index, const char* text)
 {
     strcpy(names[index], text);
     if (index == 1) {
@@ -255,7 +255,7 @@ void Mission::SetNameSlot(int index, char* text)
 }
 
 // FUNCTION: 0x435430
-void Mission::BuildCampaignFilePath(int index, char* dir, char* name, char* ext)
+void Mission::BuildCampaignFilePath(int index, const char* dir, const char* name, const char* ext)
 {
     char path[256];
     if (strlen(name) == 0) {
@@ -283,7 +283,7 @@ void Mission::BuildCampaignFilePath(int index, char* dir, char* name, char* ext)
 }
 
 // FUNCTION: 0x4356c0
-char* Mission::GetNameSlot(int index)
+const char* Mission::GetNameSlot(int index)
 {
     char* ptr = names[index];
     if (strlen(ptr) > 0)
@@ -349,7 +349,7 @@ int Mission::GetTerrainLength()
 }
 
 // FUNCTION: 0x435900
-char* Mission::GetDescription()
+const char* Mission::GetDescription()
 {
     return description;
 }
@@ -398,7 +398,7 @@ int Mission::MissionExists(int index)
 }
 
 // FUNCTION: 0x435a20
-int Mission::LoadMissionByName(char* map)
+int Mission::LoadMissionByName(const char* map)
 {
     int res;
 
@@ -446,13 +446,13 @@ int Mission::SelectMission(int index)
 }
 
 // FUNCTION: 0x435c20
-char* Mission::GetTranslatedName()
+const char* Mission::GetTranslatedName()
 {
     return text_b14;
 }
 
 // FUNCTION: 0x435c30
-char* Mission::GetMissionName()
+const char* Mission::GetMissionName()
 {
     return missionName;
 }
@@ -511,7 +511,7 @@ void Mission::RefreshMapList(int multiplayer)
 }
 
 // FUNCTION: 0x435da0
-int Mission::LoadMission(char* map)
+int Mission::LoadMission(const char* map)
 {
     TdfFile parser;
     char schema[0x20];
@@ -597,7 +597,7 @@ int Mission::LoadMission(char* map)
             BuildCampaignFilePath(1, "Maps", map, "TNT");
             break;
         }
-        map = (char *)FindTranslation(map);
+        map = (const char*)FindTranslation(map);
         if (map == 0)
             return 0;
         strcpy(missionName, map);
@@ -652,7 +652,7 @@ int Mission::LoadMission(char* map)
     noSeaLevelTrigger = parser.current->GetFieldInt("nosealeveltrigger", 0);
     waterDoesDamage = parser.current->GetFieldInt("waterdoesdamage", 0);
     waterDamage = parser.current->GetFieldInt("waterdamage", 0);
-    g_seams.players->RegisterConditions(g_game->list_391ed, 0, &parser);
+    g_seams.players->RegisterConditions(g_game->list_391ed, &parser);
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!SelectSchema(type, &parser, schema)) {
@@ -1044,12 +1044,12 @@ int Mission::GetFeature(int index, MissionFeatureInfo* out)
     return 1;
 }
 
-char* Mission::GetMemory()
+const char* Mission::GetMemory()
 {
     return memory;
 }
 
-char* Mission::GetNumPlayers()
+const char* Mission::GetNumPlayers()
 {
     return numPlayers;
 }
@@ -1060,7 +1060,7 @@ int Mission::ComputeMapChecksum()
     if (tntChecksum != 0) {
         return headerChecksum ^ tntChecksum;
     }
-    char* name = GetNameSlot(1);
+    const char* name = GetNameSlot(1);
     MapCacheEntry* it;
     for (it = g_mapCacheBegin; it != g_mapCacheEnd; it++) {
         if (_strcmpi(it->handle.data, name) == 0) {

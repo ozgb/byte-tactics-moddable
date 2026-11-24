@@ -71,7 +71,7 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 #include "../game/map_events.h"
 #include "../../interfaces/map.h"
 #include "spatial_bucket.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_globals.h"
 #include "grid2.h"
 #include "line_of_sight.h"

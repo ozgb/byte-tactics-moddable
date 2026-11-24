@@ -916,7 +916,7 @@ void __stdcall OnStreamTimer(int unused1)
 }
 
 // FUNCTION: 0x4d06c0
-int Sound::StreamSampleDelayed(char* name, int value, int delay)
+int Sound::StreamSampleDelayed(const char* name, int value, int delay)
 {
     strcpy(g_delayedSampleName, name);
     g_delayedSampleVolume = value;

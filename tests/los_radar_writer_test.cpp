@@ -5,7 +5,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/los_radar.h"
 #include "../src/state/sim_globals.h"
 #include "../src/units/unit_def.h"
@@ -63,7 +63,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;
@@ -90,7 +90,7 @@ char* __stdcall Translate(const char* key)
 {
     return (char*)key;
 }
-char* __stdcall LoadFileWithProgress(char*)
+char* __stdcall LoadFileWithProgress(const char*)
 {
     Unexpected("LoadFileWithProgress");
     return 0;
@@ -579,7 +579,10 @@ static int ListCount(int player, int cell, int z, int radius, std::vector<Unit*>
     at.y = 0;
     at.z = WorldOfLosCell(z);
     out->clear();
-    g_seams.los_radar->GetVisibleEnemiesInRadius(player, &at, radius, 0, out);
+    Ref<Unit> refs[kUnits + 1];
+    int count = g_seams.los_radar->GetVisibleEnemiesInRadius(player, &at, radius, 0, refs, kUnits + 1);
+    for (int i = 0; i < count; i++)
+        out->push_back(refs[i]);
     return (int)out->size();
 }
 
@@ -778,10 +781,10 @@ static void CheckUnitIndex()
     at.x = WorldOfLosCell(12);
     at.y = 0;
     at.z = WorldOfLosCell(4);
-    int count = seam.GetVisibleEnemiesInRadiusList(0, &at, 40, 0, refs, 1);
-    Check(count == 2 && refs[0] == &s_units[kPatroller] && refs[1] == 0, "the list form counts all and writes only the capacity");
-    count = seam.GetVisibleEnemiesInRadiusList(0, &at, 40, 0, refs, 2);
-    Check(count == 2 && refs[1] == &s_units[kWatched], "the list form writes every unit within the capacity");
+    int count = seam.GetVisibleEnemiesInRadius(0, &at, 40, 0, refs, 1);
+    Check(count == 2 && refs[0] == &s_units[kPatroller] && refs[1] == 0, "the slot counts all and writes only the capacity");
+    count = seam.GetVisibleEnemiesInRadius(0, &at, 40, 0, refs, 2);
+    Check(count == 2 && refs[1] == &s_units[kWatched], "the slot writes every unit within the capacity");
 
     at.x = WorldOfLosCell(1);
     at.z = WorldOfLosCell(1);
@@ -835,7 +838,6 @@ int main()
     seam.FreeUnitIndex = FreeUnitIndex;
     seam.RefreshUnitIndex = RefreshUnitIndex;
     seam.GetVisibleEnemiesInRadius = GetVisibleEnemiesInRadius;
-    seam.GetVisibleEnemiesInRadiusList = GetVisibleEnemiesInRadiusList;
     seam.HasReadyUnitInRange = HasReadyUnitInRange;
     seam.IsPointVisible = IsPointVisible;
     seam.GetSeenUnitsInRadius = GetSeenUnitsInRadius;

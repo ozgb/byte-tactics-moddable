@@ -1,6 +1,6 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../movement/ai_search_goal.h"
 #include "../movement/air_maneuver_order.h"
 #include "../units/unit_def.h"
@@ -50,7 +50,7 @@ struct OrderSaveRecord {
 
 #include "order_list.h"
 OrderTableEntry* __stdcall LowerBoundOrderTypes(OrderTableEntry* first, OrderTableEntry* last,
-                                       char* const& value, int(__stdcall* pred)(int, char*),
+                                       const char* const& value, int(__stdcall* pred)(int, const char*),
                                        int* unused);
 #include "../network/net_game.h"
 #include "../sound/sound.h"
@@ -310,7 +310,7 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
     if (!(unit->def->flags1 & 0x800)) {
-        unsigned int obj = g_seams.movement->NewPointMarker(Ref<Order>(this).offset, cell, size);
+        unsigned int obj = g_seams.movement->NewPointMarker(Ref<Order>(this).offset, &cell, &size);
         if (unit->motion.get()) {
             if (attached) {
                 MovementPublishTarget(SCHED_ORDERS, MOVEMENT_SET_TARGET, unit, 0);
@@ -403,7 +403,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     return 0;
 }
 
-static unsigned char OrderKindFromName(char* s)
+static unsigned char OrderKindFromName(const char* s)
 {
     OrderTableEntry* e = LowerBoundOrderTypes(g_missionOrderTableVec.Begin(), g_missionOrderTableVec.End(), s, OrderTypeNameLess, 0);
     if (e == g_missionOrderTableVec.End() || _strcmpi(e->name, s) != 0)
@@ -450,7 +450,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     char buf1[0x80];
     sprintf(buf1, "%s%s", name, "_name");
     {
-        char* s = file->GetStringItem(buf1, 0);
+        const char* s = file->GetStringItem(buf1, 0);
         if (s != 0)
             desc.kind = OrderKindFromName(s);
         else

@@ -155,7 +155,7 @@ void __stdcall WriteScreenshot(char* name, char* description, int x, int y, int 
 unsigned int GetTicks();
 #include "../../interfaces/wind_meteors.h"
 #include "wind_meteors_events.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../util/commands.h"
 #include "../graphics/object_pool.h"
 #include "../graphics/display.h"
@@ -869,7 +869,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         if (MatchWildcard(def->unitname,args->GetArg(0,g_emptyText))) {
             if (count) pos.x-=def->modelMinX;
             g_seams.map->SnapWorldPosToFootprint(def,&pos);
-            g_seams.units->CreateUnit(args->GetIntArg(1,0),i,pos,1,1,0);
+            g_seams.units->CreateUnit(args->GetIntArg(1,0),i,&pos,1,1,0);
             pos.x+=def->modelMaxX+0x200000;
             if (pos.x >= (g_game->mapWidth<<16)) { pos.x=0xa00000; pos.z+=0xa00000; }
             ++count;

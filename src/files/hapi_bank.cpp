@@ -160,7 +160,7 @@ void AccountBank::NewBank()
 }
 
 // FUNCTION: 0x4b3770
-int AccountBank::OpenBank(char* filename, char* name, char* account)
+int AccountBank::OpenBank(const char* filename, const char* name, const char* account)
 {
     void* raw;
     BankFileHeader h;
@@ -250,7 +250,7 @@ int AccountBank::OpenBank(char* filename, char* name, char* account)
 }
 
 // FUNCTION: 0x4b39c0
-int AccountBank::SaveBank(char* filename, char* name, int compress, int audit)
+int AccountBank::SaveBank(const char* filename, const char* name, int compress, int audit)
 {
     char path[256];
     BankFileHeader header;
@@ -446,7 +446,7 @@ void AccountBank::SaveAccount(int index, void* file, StringPool* buf, int compre
 }
 
 // FUNCTION: 0x4b4270
-void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
+void AccountBank::LoadAccount(FileHandle* fh, int* image, const char* name)
 {
     int buf;
     int len;
@@ -523,7 +523,7 @@ void AccountBank::LoadAccount(FileHandle* fh, int* image, char* name)
 }
 
 // FUNCTION: 0x4b4560
-int AccountBank::OpenAccount(char* name)
+int AccountBank::OpenAccount(const char* name)
 {
     for (int i = 0; i < bank->count; i++) {
         if (_strcmpi(bank->accounts[i].name, name) == 0) {
@@ -571,7 +571,7 @@ int AccountBank::SetDoubleItem(const char* name, double value)
 }
 
 // FUNCTION: 0x4b4750
-int AccountBank::SetStringItem(const char* name, char* value)
+int AccountBank::SetStringItem(const char* name, const char* value)
 {
     if (bank && bank->current >= 0 && value) {
         int i = FindItem(name, 1);
@@ -585,7 +585,7 @@ int AccountBank::SetStringItem(const char* name, char* value)
 }
 
 // FUNCTION: 0x4b4800
-int AccountBank::GetIntegerItem(char* name, int def)
+int AccountBank::GetIntegerItem(const char* name, int def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -596,7 +596,7 @@ int AccountBank::GetIntegerItem(char* name, int def)
 }
 
 // FUNCTION: 0x4b4850
-double AccountBank::GetDoubleItem(char* name, double def)
+double AccountBank::GetDoubleItem(const char* name, double def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -607,7 +607,7 @@ double AccountBank::GetDoubleItem(char* name, double def)
 }
 
 // FUNCTION: 0x4b48a0
-char* AccountBank::GetStringItem(char* name, char* def)
+const char* AccountBank::GetStringItem(const char* name, const char* def)
 {
     if (bank && bank->current >= 0) {
         int i = FindItem(name, 0);
@@ -668,7 +668,7 @@ int AccountBank::FindNumberedBox(int number, int create)
 }
 
 // FUNCTION: 0x4b4a80
-int AccountBank::FindNamedBox(char* name, int create)
+int AccountBank::FindNamedBox(const char* name, int create)
 {
     AccountList* t = bank;
     if (!t || t->current < 0)
@@ -698,7 +698,7 @@ int AccountBank::OpenNumberedBox(int number)
 }
 
 // FUNCTION: 0x4b4ba0
-int AccountBank::OpenNamedBox(char* name)
+int AccountBank::OpenNamedBox(const char* name)
 {
     int i = FindNamedBox(name, 1);
     bank->accounts[bank->current].currentBox = i;
@@ -768,7 +768,7 @@ int AccountBank::WriteBox(const void* src, int len)
 }
 
 // FUNCTION: 0x4b4d70
-void AccountBank::WriteAuditFile(char* filename)
+void AccountBank::WriteAuditFile(const char* filename)
 {
     void* file = host_file_create(filename, HOST_FILE_TEXT);
     int i;

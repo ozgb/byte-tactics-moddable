@@ -1,6 +1,6 @@
 # The targeting interface
 
-Targeting sits behind `interfaces/targeting.h` (version 3.1; 2.1 added LOAD, 3.1 added the query `SavedTargetPair`), the third module on the scheduler
+Targeting sits behind `interfaces/targeting.h` (version 4.0; 2.1 added LOAD, 3.1 added the query `SavedTargetPair`, 4.0 made `ChooseWeapon` stdcall instead of fastcall), the third module on the scheduler
 after economy (`docs/economy-interface.md`) and features (`docs/features-interface.md`), and the first whose state
 stays in the `Unit` record (#955). 3.1c's targeting code is its default implementation. This page is the inventory
 the interface was cut from:
@@ -82,7 +82,7 @@ callers passed pointers and could publish none of these, so no trace moves; a mo
 The `FindScript` call looks up a function whose answer 3.1c threw away, and it writes nothing. Since #986 the handler is
 scripts' own, and it drops the lookup.
 
-**Payloads.** Every event and effect starts with `TargetingEventHeader`: `kind`, `unit` (the unit whose weapon aims, a block offset) and `weapon` (0 to 2). Each kind has the payload of `interfaces/targeting.h` (version 3.1) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, with a null unit or a weapon outside 0 to 2, and a SET_UNIT with a null `target`.
+**Payloads.** Every event and effect starts with `TargetingEventHeader`: `kind`, `unit` (the unit whose weapon aims, a block offset) and `weapon` (0 to 2). Each kind has the payload of `interfaces/targeting.h` (version 4.0; the payloads are unchanged since 3.1) that starts with it, or is the header alone. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, with a null unit or a weapon outside 0 to 2, and a SET_UNIT with a null `target`.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

@@ -180,7 +180,7 @@ class Main(unittest.TestCase):
 
     def run_main(self, header, doc):
         with tempfile.TemporaryDirectory() as tmp:
-            h, d = Path(tmp) / "services.h", Path(tmp) / "sim-events.md"
+            h, d = Path(tmp) / "sim_events.h", Path(tmp) / "sim-events.md"
             h.write_text(header)
             if doc is not None:
                 d.write_text(doc)

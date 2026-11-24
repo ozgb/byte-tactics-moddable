@@ -5,7 +5,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/units.h"
 #include "../interfaces/weapons.h"
 #include "../src/state/sim_globals.h"
@@ -66,7 +66,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;

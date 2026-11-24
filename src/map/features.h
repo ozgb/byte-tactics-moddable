@@ -31,9 +31,9 @@ void __stdcall FreeFeaturePool();
 void* __stdcall FindOptionalGafEntry(void* list, int unused, char* name);
 void __stdcall LoadFeatureFileList();
 void __stdcall FreeFeatureFileList();
-TdfFile* __stdcall FindFeatureFile(char* name);
-short __stdcall FindFeatureType(char* name);
-unsigned short __stdcall FindOrLoadFeatureType(char* name);
+TdfFile* __stdcall FindFeatureFile(const char* name);
+short __stdcall FindFeatureType(const char* name);
+unsigned short __stdcall FindOrLoadFeatureType(const char* name);
 void __stdcall PlaceMissionFeatures(void);
 int __stdcall AllocFeatureSpot();
 void __stdcall MoveFeatureSpot(int index, int* head);
@@ -60,7 +60,7 @@ int __stdcall RemoveFeature(Cell* cell, int flag);
 void __stdcall ResolveFeatureLinks();
 void __stdcall LoadFeatures(HapiBank* file);
 
-int __stdcall LoadFeatureType(char* name);
+int __stdcall LoadFeatureType(const char* name);
 
 void __stdcall InitFeatureAnimPool(TntInfo* info);
 

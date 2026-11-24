@@ -7,6 +7,7 @@
 #include "../state/block.h"
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
+#include "../util/engine_services.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
@@ -71,7 +72,6 @@ static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 #include "../game/map_events.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/orders.h"
-#include "../../interfaces/services.h"
 #include "../game/targeting_events.h"
 #include "../game/los_radar_events.h"
 #include "../game/movement_events.h"
@@ -466,12 +466,13 @@ void UnitMotion::UpdatePosition(Unit* u)
 {
     if (u->carrier != 0) {
         Vec3 v;
-        v = g_seams.scripts->GetPiecePosition(u->carrier, (signed char)u->transportPiece);
+        g_seams.scripts->GetPiecePosition(u->carrier, (signed char)u->transportPiece, &v);
         if (((UnitDefMoveView*)u->def.get())->b19) {
             v.y = ORDER_MAX(v.y, MakeFixed(((UnitDefMoveView*)u->def.get())->draft * 0xffff + g_game->seaLevel).value);
         }
         MovementPublishSetPosition(u, v.x, v.y, v.z, mode);
-        Angles16 o = g_seams.scripts->GetPieceAngles(u->carrier, (signed char)u->transportPiece);
+        Angles16 o;
+        g_seams.scripts->GetPieceAngles(u->carrier, (signed char)u->transportPiece, &o);
         MovementPublishAngles(u, o.bank, o.heading, o.pitch);
         if (((CarrierMotionView*)u->carrier.get())->motion != 0) {
             speed = ((CarrierMotionView*)u->carrier.get())->motion->speed;

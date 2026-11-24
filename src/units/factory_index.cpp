@@ -116,18 +116,23 @@ void __stdcall RefreshFactoryIndex(int player)
 }
 
 // FUNCTION: 0x40b530
-void __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, std::vector<Unit*>* out)
+int __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
     BlockVector<Ref<Unit> >& list = s_index->players[player].factories;
     radius *= radius;
+    int count = 0;
     for (BlockVector<Ref<Unit> >::iterator it = list.Begin(); it != list.End(); ++it) {
         Unit* unit = *it;
         if ((unit->def->flags1 & 0x40) && (unit->def->flags1 & 0x200) && (unit->activateFlags & 1)) {
             int dz = pos->z - unit->pos.z;
             int dx = pos->x - unit->pos.x;
             int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
-            if (d <= radius)
-                out->push_back(*it);
+            if (d <= radius) {
+                if (count < capacity)
+                    out[count] = unit;
+                count++;
+            }
         }
     }
+    return count;
 }

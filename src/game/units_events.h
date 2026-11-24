@@ -3,7 +3,7 @@
 
 #include "../../interfaces/units.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 inline UnitsEventHeader UnitsHeaderOf(int kind)
 {

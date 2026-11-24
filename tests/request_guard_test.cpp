@@ -4,7 +4,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/economy.h"
 #include "../src/state/sim_globals.h"
 #include "../src/game/scheduler.h"
@@ -48,7 +48,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall FatalError(char*)
+void __stdcall FatalError(const char*)
 {
     s_fatals++;
 }

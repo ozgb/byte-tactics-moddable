@@ -47,7 +47,7 @@ struct Pair16 { short lo, hi; };
 #include "../mission/mission.h"
 #include "../sound/sound.h"
 #include "../state/sim_speech.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_effects.h"
 struct BmpFileHeader;
 struct BmpInfo;
@@ -108,7 +108,7 @@ struct Mover {
 
 class GroundAllyVisitor {
 public:
-    virtual void CollectGroundAlly(Unit*);
+    void CollectGroundAlly(Unit*);
     GroundAllyVisitor(Player* o, std::vector<Unit*>* u, Unit* s) : owner(o), units(u), self(s) {}
     Player* owner;
     std::vector<Unit*>* units;
@@ -117,16 +117,11 @@ public:
 
 class RepairableUnitVisitor {
 public:
-    virtual void CollectRepairableUnit(Unit*);
+    void CollectRepairableUnit(Unit*);
     RepairableUnitVisitor(Player* o, std::vector<Unit*>* v, Unit* s) : owner(o), units(v), self(s) {}
     Player* owner;
     std::vector<Unit*>* units;
     Unit* self;
-};
-
-class LandingPadList : public std::vector<Unit*> {
-public:
-    LandingPadList();
 };
 
 #include "../../link/globals.h"
@@ -139,7 +134,8 @@ struct UnitOrderTypeView;
 struct FixedPosView;
 #include "order_dispatch.h"
 #include "../../interfaces/seams.h"
-#include "../map/unit_visitor.h"
+#include "../seams/unit_query_buffer.h"
+#include "../seams/units_in_range.h"
 #include "../../interfaces/orders.h"
 #include "../game/orders_events.h"
 #include "../game/movement_events.h"
@@ -452,23 +448,15 @@ Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale)
 }
 #pragma auto_inline(on)
 
-#pragma auto_inline(off)
-// FUNCTION: 0x410830
-LandingPadList::LandingPadList()
-{
-    unsigned char local;
-    ((unsigned char*)this)[0] = local;
-    _First = 0;
-    _Last = 0;
-    _End = 0;
-}
-#pragma auto_inline(on)
 
 class UnitList : public std::vector<Unit*> {};
 
-static inline void FindPads(Unit* u, std::vector<Unit*>* pads)
+static inline int FindPads(int player, const Vec3* pos, UnitQueryBuffer& pads)
 {
-    g_seams.units->GetFactoriesInRadius(((Player*)u->player)->index,&u->pos,0xf00,pads);
+    int count = g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.Data(),pads.Capacity());
+    if (pads.Grow(count))
+        count = g_seams.units->GetFactoriesInRadius(player,pos,0xf00,pads.Data(),pads.Capacity());
+    return pads.Written(count);
 }
 
 static inline int SearchRange(Unit* u)
@@ -479,11 +467,11 @@ static inline int SearchRange(Unit* u)
 static inline int Patrol(Unit* unit, Order* order, int flags)
 {
     if (IsDamaged(unit)) {
-        LandingPadList pads;
-        FindPads(unit,&pads);
-        if (!pads.empty()) {
+        UnitQueryBuffer pads;
+        int padCount=FindPads(((Player*)unit->player)->index,&unit->pos,pads);
+        if (padCount!=0) {
             order->SetAttachedFx(0);
-            Unit* pad=pads[RandomInt(pads.size())];
+            Unit* pad=pads[RandomInt(padCount)];
             AppendOrder(unit,new (kSim) Order("VTOL_LANDING",pad,0,0,0,0));
             order->flags=0;
             return 0;
@@ -492,7 +480,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     UnitList units;
     int range=SearchRange(unit);
     GroundAllyVisitor visitor((Player*)unit->player,&units,unit);
-    VisitUnitsInRange(&unit->pos,range,(UnitVisitor*)&visitor);
+    ForEachUnitInRange(&unit->pos,range,[&visitor](Unit* ally) { visitor.CollectGroundAlly(ally); });
     if (!units.empty()) {
         order->SetAttachedFx(0);
         MissionType kind=GetOrderType(7, unit, units[0], nullptr);
@@ -649,7 +637,7 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         Vec3 snapped = order->pos;
         g_seams.map->SnapWorldPosToFootprint(def, &snapped);
         order->pos = snapped;
-        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,order->pos,0,1,0));
+        g_seams.units->UnitRefSetUnit((UnitRef*)&order->link, g_seams.units->CreateUnit(unit->playerIndex,(short)order->type,&order->pos,0,1,0));
         if (!order->target) { RecordUnitSpeech(unit,7,SIM_SPEECH_UNABLE_TO_CREATE_ANY_MORE_UNITS); return 8; }
         RecordUnitSpeech(unit,9,SIM_SPEECH_STARTING_CONSTRUCTION);
         AddOrder("GETBUILT",1,order->target,unit,0,0,0);
@@ -720,7 +708,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
     switch (order->state) {
     case 0:
         if (unit->motion && (unit->def->flags1 & 0x800)) {
-            if (!g_seams.units->CanRepair(unit, 0, order->target)) {
+            if (!g_seams.units->CanRepair(unit, order->target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIR_MISSION_FAILED);
                 return 8;
             }
@@ -796,11 +784,11 @@ int __stdcall VtolGetRepairedOrder(Unit* unit, Order* order, int unused)
 static inline int Land(Unit* unit, Order* order)
 {
     if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-        std::vector<Unit*> pads;
-        g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &pads);
-        if (!pads.empty()) {
+        UnitQueryBuffer pads;
+        int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, pads);
+        if (padCount != 0) {
             order->SetAttachedFx(0);
-            Unit* pad = pads[RandomInt(pads.size())];
+            Unit* pad = pads[RandomInt(padCount)];
             AppendOrder(unit, new (kSim) Order("VTOL_LANDING", pad, 0, 0, 0, 0));
             order->flags = 0;
             return 1;
@@ -939,11 +927,11 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Unit*> v;
-            g_seams.units->GetFactoriesInRadius(((Player*)unit->player)->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            UnitQueryBuffer v;
+            int padCount = FindPads(((Player*)unit->player)->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -996,7 +984,8 @@ int __stdcall VtolPickupOrder(Unit* unit, Order* order, int flags)
             int height = target->def->modelMaxY;
             OrdersPublishStartScript(unit, ORDERS_SCRIPT_BY_NAME_WITH_ARGS, 0, "BeginTransport", 0, 1, 1, height, 0, 0, 0);
             g_seams.network->SendScriptCallByName(unit, "BeginTransport", 1, height, 0, 0, 0);
-            Vec3 offset = g_seams.scripts->GetPieceOffset(unit, order->piece);
+            Vec3 offset;
+            g_seams.scripts->GetPieceOffset(unit, order->piece, &offset);
             unsigned int obj = g_seams.movement->NewPathOrderToUnitAtAngle(Ref<Order>(order).offset, order->target, -1);
             MovementPublishTargetValue(SCHED_ORDERS, MOVEMENT_SET_ALTITUDE, unit, obj, -((Vec3Words*)&offset)->yWhole);
             order->SetAttachedFx(obj);
@@ -1093,7 +1082,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                     }
                 }
             }
-            if (g_seams.units->CanRepair(unit, 0, order->target)) {
+            if (g_seams.units->CanRepair(unit, order->target)) {
                 MissionType kind=GetOrderType(8, unit, (Unit*)order->target, nullptr);
                 if (kind.index) {
                     order->SetAttachedFx(0);
@@ -1102,7 +1091,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 }
             }
             if (order->target->list && order->target->list->kind.index && (unit->def->flags1&0x40) &&
-                g_seams.units->CanRepair(unit, 0, order->target->list->target) &&
+                g_seams.units->CanRepair(unit, order->target->list->target) &&
                 (order->target->def->flags1&0x40) && order->target->list &&
                 (order->target->list->flags_42&0x100000) && unit!=order->target->list->target) {
                 int building = order->target->list->kind=="MobileBuild" || order->target->list->kind=="BuildingBuild" || order->target->list->kind=="VTOL_MobileBuild";
@@ -1186,11 +1175,11 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         order->flags |= 0xe0;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
-            std::vector<Unit*> v;
-            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            UnitQueryBuffer v;
+            int padCount = FindPads(unit->player->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1464,11 +1453,11 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         AttachMove(order, dest, 0x80);
         order->flags = 0xe2;
         if (unit->health < unit->def->maxHealth / 4 * 3) {
-            std::vector<Unit*> pads;
-            g_seams.units->GetFactoriesInRadius(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, 0xf00, &pads);
-            if (!pads.empty()) {
+            UnitQueryBuffer pads;
+            int padCount = FindPads(((Struct_Unit96*)unit->player.get())->slotIndex, &unit->pos, pads);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* pad = pads[RandomInt(pads.size())];
+                Unit* pad = pads[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", pad, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1578,11 +1567,11 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
     }
     case 4: {
         if (IsDamaged(unit)) {
-            LandingPadList v;
-            g_seams.units->GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
-            if (!v.empty()) {
+            UnitQueryBuffer v;
+            int padCount = FindPads(unit->player->index, &unit->pos, v);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* target = v[RandomInt(v.size())];
+                Unit* target = v[RandomInt(padCount)];
                 AppendOrder(unit, new (kSim) Order("VTOL_LANDING", target, 0, 0, 0, 0));
                 order->flags = 0;
                 return 0;
@@ -1802,7 +1791,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_RECLAMATION_FAILED);
                 return 7;
             }
-            if (!g_seams.units->CanReclaim(unit, 0, target)) {
+            if (!g_seams.units->CanReclaim(unit, target)) {
                 RecordUnitSpeech(unit, 7, SIM_SPEECH_THAT_UNIT_CANNOT_BE_RECLAIMED);
                 return 8;
             }
@@ -1831,7 +1820,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         int range = 0;
         range = unit->def->buildRange;
         int square = Square(delta);
-        if (square <= range * range && g_seams.units->CanReclaim(unit, 0, order->target)) {
+        if (square <= range * range && g_seams.units->CanReclaim(unit, order->target)) {
             if (order->duration >= 15) {
                 WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, order->elapsed, 5, 0);
                 order->duration = 0;
@@ -1901,11 +1890,11 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
     case 1: {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
         if ((unsigned int)unit->health < (unit->def->maxHealth>>2)*3) {
-            LandingPadList pads;
-            g_seams.units->GetFactoriesInRadius(unit->player.get()->index,&unit->pos,0xf00,&pads);
-            if (!pads.empty()) {
+            UnitQueryBuffer pads;
+            int padCount = FindPads(unit->player.get()->index, &unit->pos, pads);
+            if (padCount != 0) {
                 order->SetAttachedFx(0);
-                Unit* pad=pads[RandomInt(pads.size())];
+                Unit* pad=pads[RandomInt(padCount)];
                 AppendOrder(unit,new (kSim) Order("VTOL_LANDING",pad,0,0,0,0));
                 order->flags=0;
                 return 0;
@@ -2072,15 +2061,15 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
                 std::vector<Unit*> units;
                 int range = unit->def->range << 16;
                 RepairableUnitVisitor collector((Player*)unit->player, &units, unit);
-                VisitUnitsInRange(&unit->pos, range, (UnitVisitor*)&collector);
+                ForEachUnitInRange(&unit->pos, range, [&collector](Unit* other) { collector.CollectRepairableUnit(other); });
                 if (!units.empty()) {
                     Unit* target = units[RandomInt(units.size())];
-                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft == 0.0f) {
+                    if (g_seams.units->CanRepair(unit, target) && target->buildLeft == 0.0f) {
                         if (IssueRepairOrder(unit, target, 0))
                             return 6;
                         return 3;
                     }
-                    if (g_seams.units->CanRepair(unit, 0, target) && target->buildLeft != 0.0f) {
+                    if (g_seams.units->CanRepair(unit, target) && target->buildLeft != 0.0f) {
                         order->SetAttachedFx(0);
                         AppendOrder(unit, new (kSim) Order("VTOL_HELPBUILD", target, 0, 0, 0, 0));
                         order->flags = 0;

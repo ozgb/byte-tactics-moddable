@@ -3,13 +3,14 @@
 #include <ctype.h>
 
 #include "quirks.h"
+#include "../../interfaces/quirks.h"
 
 
 namespace {
 
 struct QuirkInfo {
     const char* name;
-    bool Quirks::*member;
+    int Quirks::*member;
     bool sim;
 };
 
@@ -28,7 +29,7 @@ const int s_quirkCount = (int)(sizeof s_quirks / sizeof s_quirks[0]);
 void SetAll(Quirks* q, bool on)
 {
     for (int i = 0; i < s_quirkCount; i++)
-        q->*s_quirks[i].member = on;
+        q->*s_quirks[i].member = on ? 1 : 0;
 }
 
 void Fail(char* err, int errLen, const char* what, const char* token)
@@ -92,7 +93,7 @@ bool QuirksParse(const char* spec, Quirks* out, char* err, int errLen)
             Fail(err, errLen, "unknown quirk flag", token + 1);
             return false;
         }
-        q.*s_quirks[found].member = token[0] == '+';
+        q.*s_quirks[found].member = token[0] == '+' ? 1 : 0;
     }
     *out = q;
     return true;
@@ -127,7 +128,7 @@ unsigned QuirksHash(const Quirks& q)
     for (int i = 0; i < s_quirkCount; i++) {
         if (!s_quirks[i].sim)
             continue;
-        hash ^= q.*s_quirks[i].member ? 1u : 0u;
+        hash ^= q.*s_quirks[i].member != 0 ? 1u : 0u;
         hash *= 16777619u;
     }
     return hash;
@@ -146,7 +147,7 @@ bool QuirksFlipFirstSim(Quirks* q)
 {
     for (int i = 0; i < s_quirkCount; i++) {
         if (s_quirks[i].sim) {
-            q->*s_quirks[i].member = !(q->*s_quirks[i].member);
+            q->*s_quirks[i].member = q->*s_quirks[i].member == 0 ? 1 : 0;
             return true;
         }
     }

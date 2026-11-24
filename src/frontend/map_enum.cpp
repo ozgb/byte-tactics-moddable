@@ -25,7 +25,7 @@ void __stdcall SetCursorMode(int n);
 #include "../network/net_game.h"
 
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../../interfaces/seams.h"
 
 void FreeOtaEnumCache()

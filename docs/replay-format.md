@@ -258,7 +258,7 @@ when the walk reaches it, and the field it reads only when it is in the slot's r
 A kind that lives inside another kind lists its sites, `"inside": [{"kind": "Spot", "member": "anim"}, {"kind": "Feature", "member": "anim"}]`,
 and each site is an `embed` field of its container (`{"name": "anim", "kind": "embed", "target": "Handle"}`). An embedded object is named
 by its site, `Spot#3.anim`, in every line that names it: the walk's `r` and `w` lines (`r Spot#3.anim.index 2`), the `i` and `o` lines of a service
-that takes it (`i services.StepGafSequence Spot#3.anim`, `o Spot#3.anim.value 7`) and the argument values. The replayer resolves such a
+that takes it (`i services.<step cursor> Spot#3.anim`, `o Spot#3.anim.value 7`) and the argument values. The replayer resolves such a
 name to the bytes at the site inside its container, and never allocates a separate object. A free-standing object of the same kind, one on a
 caller's stack, is named by order as any other, `Handle#1`.
 
@@ -266,9 +266,9 @@ A container named by order (not a table kind) is named before its embedded objec
 
 ```
   r Spot#3.anim.index 2
-  i services.StepGafSequence Spot#3.anim = 1
+  i services.<step cursor> Spot#3.anim = 1
   o Spot#3.anim.value 7
-  i services.StepGafSequence Handle#1 = 1
+  i services.<step cursor> Handle#1 = 1
 ```
 
 ### Features, spots and the pool
@@ -293,7 +293,7 @@ The `Handle` at `Feature#N.anim` and `Feature#N.shadowAnim`, and at `Spot#N.anim
   r Feature#5.filename "tree1"
   r Spot#9.anim.index 2
   r Spot#9.timer 12
-  i services.StepGafSequence Spot#9.anim = 1
+  i services.<step cursor> Spot#9.anim = 1
 ```
 
 A pair of pointer fields that bound a slice of a table is a closed range: the schema marks the end field with
@@ -502,12 +502,19 @@ the type it points at. Only the value is written, not a line per field: the same
 in/out name in the closing names of its call, so that an `o count (9)` line after an import is the import's when the slot does
 not name `count` itself. A mismatch of the value coming out is reported at the argument (`count`).
 
+A `const` pointer to a value kind (`const Point16*`, `const Vec3*`) that a slot only reads is recorded as the value itself, the line of the
+by-value form (`a cell (185,78)`, and ` (185,78)` in an import line). It needs no annotation: the generator takes it from the `const` in the
+header (`"byPointer": true`), and the replayer passes the address of the parsed value. A pointer to a value kind that a slot fills is
+`{"mode": "value", "kind": "Vec3", "dir": "out"}`, for a slot with no other result. It is recorded as the result of the call: ` = (x,y,z)`
+in an import line and `o result (x,y,z)` in a slot, the lines of a slot that returns the value, and the stub of an import writes the parsed
+value through the pointer.
+
 A pointer to a scalar (`int*`, `short*`, `unsigned char*`, and the unsigned forms of the first two) that a callee reads and writes back,
-as `QueryScript` does with `p2` to `p5`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
-struct form with the value in parentheses: `a p2 (5)` going in, `a p3 null` for a null pointer, `o p2 (9)` coming out when the pointer is not
-null (in an import line ` (5)` and ` null`, and `o p2 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
+as `QueryScript` does with `arg0` to `arg3`, is `{"mode": "value", "dir": "inout", "nullable": true}` with no `kind`. The lines are those of the
+struct form with the value in parentheses: `a arg0 (5)` going in, `a arg1 null` for a null pointer, `o arg0 (9)` coming out when the pointer is not
+null (in an import line ` (5)` and ` null`, and `o arg0 (9)` after it). The replayer passes the scalar by address, or NULL, and the stub of an
 import writes the `o` line back through the pointer. It is neither `cast`, which stays `void*`, nor a one-field struct kind, which would
-describe an `int` as something it is not. A `value` with a `dir` other than `inout`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
+describe an `int` as something it is not. A `value` with a `dir` other than `inout` and `out`, a `kind` on an in/out scalar, and a pointer to any other type are errors.
 
 ### A void* argument with a known kind
 
@@ -856,13 +863,13 @@ an empty copy of its target kind (see A pointer to an object no line named), and
 
 ## Snapshots
 
-Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: `SimCaptureAlloc(bytes,
-&offset)` hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
+Some imports return a buffer that the slot then fills, and the bytes it leaves there are the output that counts: the engine's capture allocation takes a size and
+an out offset and hands out a buffer of the capture arena for a radar snapshot. A service whose result is `snapshot` (`"result": "snapshot",
 "bytes": "bytes", "offset": "offset"`, `bytes` naming its int argument and `offset` its skipped out argument) is written with the size
 and a handle, numbered in the outermost call by first use, and the bytes follow at the end of the call:
 
 ```
-  i services.SimCaptureAlloc 64 = snapshot#1
+  i services.<capture allocation> 64 = snapshot#1
   w Game.timer 0x00000000
   o snapshot#1 x:0100000002000000...
 ```
@@ -967,7 +974,7 @@ from the layout), and the export refuses a copy that names any other source name
   union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
   is none of these is an error naming the row (`field_read OpenHeap.count`): the type of a kind or of a value kind, an alias of a kind's field
   (`aliases`), a type in `exempt_types`, a target in `exempt` (one member of a type, for an anonymous struct: `<anon>.whole`), a hand rule for
-  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, `CommandArgs`). A type with no
+  the row, the table of a seam (`Seams`, `UnitsSeam`), or a service class the subsystem lists in `services` (`TdfFile`, or the argument list of a command). A type with no
   reason is an error. A pending subsystem is not asked.
 - `indirect_call` rows of a complete subsystem. Every `indirect_call` row of a function behind a recorded slot, and of every function
   `through` adds, is an error (`pending indirect`) unless one of these accounts for it: a call through a seam table (`[UnitsSeam.CanLoad]`)
@@ -996,15 +1003,15 @@ from the layout), and the export refuses a copy that names any other source name
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
-| `argv` | `CommandArgs*` | `a args.count 2`, `a args[0] "x"` |
+| `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
-| `callback` | `UnitVisitor*` and the like, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
+| `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
 | `callback` | `Callback*` and the like, a slot's argument | `a done callback#3` or `a done null`, and a `c` line for each call the module made on it during the slot (see "A callback held in state") |
 | `vector` (`dir: out`) | a vector of `Point16` an import fills, `{"mode": "vector", "dir": "out", "elem": {"mode": "value", "kind": "Point16"}}` | `o goals [(3,4),(5,6)]` after the import line: the whole vector, each element as the by-value form writes it, `[]` when it is empty; the stub pushes the elements |
 | `units` (`dir: out`) | a vector of `Unit` pointers an import fills | `o out [Unit#3,Unit#9]` after the import line, then `o Unit#3.flags 0x00000021` for each field of the `reach` of the elements that changed since last written; the stub pushes the named units and restores those fields |
-| `units-buffer` (`dir: out`, `capacity`) | a buffer of `Ref<Unit>` the caller supplies, with the argument that holds its capacity; the slot has `playsAs`, the recorded slot whose line it replays | nothing in the call; the stub is the import of the `playsAs` slot (the arguments but the buffer and capacity), so it reads that slot's `o out` line |
+| `units-buffer` (`dir: out`, `capacity`, `reach`, `depth`) | a buffer of unit references the caller supplies, with the argument that holds its capacity; the slot returns the count of units | the import line has the slot's own name and its arguments but the buffer and its capacity; then `o out [Unit#3,Unit#9]` for the first `min(count, capacity)` units and the `reach` lines of their fields, as for a unit list; the count is not printed, the length of the list is it. A count above the capacity fails the recording, which would lose units. The stub is the import of the slot itself: it reads the `o out` line, writes the first `capacity` units of the list and returns its length. A slot that has `playsAs` instead (and no `reach`) replays the line of that other recorded slot, with the same arguments but the buffer and capacity |
 | `pending` | anything else | `?` |
 
 A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result.
@@ -1034,7 +1041,8 @@ replayer's native table keeps its `native` symbol in place. The tool rejects `"r
 
 `uv run tools/replayschema.py` also writes the recorder's tables, the recording copy of every seam table with its argument
 hooks and the import hooks, and the slot runners, import stubs and native seam tables of the replayer. The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
-annotation: each entry names its declaration in `interfaces/services.h` (checked against the header) and how its arguments,
+annotation: each entry names its declaration, in `interfaces/services.h` or in the engine header that holds the services no
+module imports (checked against the header), and how its arguments,
 result and `o` lines are written. From it the tool writes the ids and names, the recorder's lines and
 the replayer's answers. The one thing
 it cannot write is the hook itself, an import-recording line at the top of each function in the game source:
@@ -1080,7 +1088,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`) | `Gaf#1` | an object of a kind of the schema, named by first appearance in the file |
 | `object` (`kind`, `reach`) | `Handle#1` | an object the import writes: its `reach` fields follow the result as `o Handle#1.index 0` lines, and the replayer restores them |
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
-| `commandargs` | `["x","y"]` or `null` | the strings of a `CommandArgs` |
+| `commandargs` | `["x","y"]` or `null` | the strings of the argument list of a command |
 | `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
 
 | Result | Written as |
@@ -1090,53 +1098,59 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`, `ctype`, `reach`) | ` = GafFrame#1`, then `o GafFrame#1.width 64` for each field of the `reach` |
 | `alloc` (`size`, `tag`) | ` = alloc#1`, or ` = PlayerInfo#1` when the annotation `alloc_tags` names the tag |
 | `snapshot` (`bytes`, `offset`) | ` = snapshot#1` (see Snapshots) |
-| `arg` (`param`) | nothing: the function returns the argument (`GetFieldFixed` returns `dst`) |
+| `arg` (`param`) | nothing: the function returns the argument (a service that fills an out argument `dst` and returns `dst`) |
 
 An out is an `o` line after the import line: `o dest "Armada"` for a text written through a pointer, `o dst 98304` for an int
 (`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
-(the replayer builds the formatted text of `FilePrintf` from its own arguments), `effect` lines (the replayer's definition does what
-the function does to its object: `count = 0;` for `InitArgs`), `cast` and `into_size`.
+(what the replayer's definition does before it reads the line: it empties `root` and `current` for `TdfFile_Construct`, and builds the
+formatted text of a service that formats its arguments from those arguments), `effect` lines (the replayer's definition does what
+the function does to its object or to the state: `GameRand` advances its stream), `cast` and `into_size`.
 
 A cursor that a service starts or steps is an `object` argument with a `reach`, so each call records the fields it left in it, a `ptr` among
-them (`InitGafSequence` and `StepGafSequence`, whose `Handle.src` is the entry or `null`):
+them (the services that start a cursor on an animation entry and step it, whose `Handle.src` is the entry or `null`):
 
 ```
-  i services.InitGafSequence Handle#1 FrameTable#1 0
+  i services.<start cursor> Handle#1 FrameTable#1 0
   o Handle#1.index 0
   o Handle#1.value 4
   o Handle#1.kind 1
   o Handle#1.src FrameTable#1
-  i services.StepGafSequence Handle#1 = 1
+  i services.<step cursor> Handle#1 = 1
   o Handle#1.index 1
   o Handle#1.value 7
   o Handle#1.kind 1
   o Handle#1.src FrameTable#1
 ```
 
-One line per group, from the self-test:
+One line per group, the engine's own services written by what they do:
 
 ```
-  i services.TdfRecord_FindSubRecord rec#1 "units" = rec#2
-  i services.TdfRecord_GetFieldFixed rec#3 "scale" 5
-  o dst 98304
-  i services.FilePrintf "%d units" "3 units" = 7
-  i services.Translate "key" = "Teksti"
-  i services.ComputeChecksum x:0102ff 3 = 1234567
+  i services.BuildDataPath "gamedata" "meteor" "tdf" = "gamedata\\meteor.tdf"
+  i services.TdfFile_LoadFile file#1 "gamedata\\meteor.tdf" = 1
+  o file#1.root rec#1
+  o file#1.current null
+  i services.TdfRecord_GetFieldString rec#2 "MeteorWeapon" 32 "" = 1
+  o dst "Meteor"
+  i services.<translation> "key" = "Teksti"
+  i services.<checksum> x:0102ff 3 = 1234567
   i services.SimAlloc 64 = alloc#1
   i services.<tagged allocation> "Player Info" 185 = PlayerInfo#1
   i services.SimFree alloc#1
   i services.RecordSimEvent 2 1 [3,4] 2
-  i services.FindSlotByDpid 77 = 2
-  i services.GetGafFrame FrameTable#1 2 = GafFrame#1
+  i services.GameRand main = 4620
+  i services.<slot lookup> 77 = 2
+  i services.<frame read> FrameTable#1 2 = GafFrame#1
   o GafFrame#1.width 64
 ```
 
-The services of the files and data group are `FilePrintf` (the format and the formatted text) and the TDF calls that the subsystems make on records
-and files; the commands group is `Translate`, `CommandArgs.InitArgs` and `ComputeChecksum`; sim plumbing is `SimAlloc`, the tagged allocation (the size
-and the tag are compared), `SimFree`, `RecordSimEvent` (kind, flags, args and count), `SimCaptureAlloc` and the slot lookups `FindSlotByDpid` and
-`GetSlotDpid`; the load reads are `LoadGaf`, `LoadAnimGaf`, `FindGafEntry`, `GetGafFrame`, `GetGafSequenceFrame`, `Load3do`, `LoadObject3d` and
-`GetObjectHeight`, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and `Object3do` and the fields that
-the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services of this group. The bank operations of a
+The services of the files and data group are `BuildDataPath`, the TDF calls that the subsystems make on records and files
+(`TdfFile_LoadFile`, `TdfFile_SelectRecord`, `TdfRecord_GetFieldInt` and the others of `interfaces/services.h`) and a formatted write to a
+file (the format and the formatted text); the commands group is a translation of a text, the reset of a command argument list and a
+checksum of a buffer; sim plumbing is `SimAlloc`, the tagged allocation (the size and the tag are compared), `SimFree`, `RecordSimEvent`
+(kind, flags, args and count), `GameRand` and `RandomInt`, the capture allocation of Snapshots and the lookups between a player slot and
+its network id; the load reads are the loads of an animation file, of an animation of it, of an entry and of a frame of an entry or of a
+cursor, and the loads of a 3D model and of its height, with results that are objects of the load kinds `Gaf`, `FrameTable`, `GafFrame` and
+`Object3do` and the fields that the subsystems read as the `reach`. The `HAPI_*` file calls and the boxes of `HapiBank` are not services of this group. The bank operations of a
 saved game that a module calls are the imports `services.HapiBank_OpenAccount`, `services.HapiBank_SetIntegerItem` and
 `services.HapiBank_GetIntegerItem` (the bank as a `handle`, `docs/module-abi.md` section 9.3), and the other slots of the `files` seam,
 the box reads and seeks, are recorded as `files.<Slot>` imports, as any import is. A hook records only for the thread that opened the slot, so
@@ -1148,17 +1162,17 @@ generated answer takes the place of the function: it checks the `i` line the mod
 block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
 allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
 
-`ExecuteCommandText` is re-entrant. The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
+A service that runs a command text through the command slots is re-entrant (`"nested": true`). The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
 as the calls of a callback are:
 
 ```
-  i services.ExecuteCommandText "plan 1" 6 ["x"] -1 = 1
+  i services.<run command text> "plan 1" 6 ["x"] -1 = 1
     c ai.CmdPlan ["plan","1"]
 ```
 
 The arguments of a nested call are written by the modes of a slot argument and the result follows ` = `. What a nested call writes shows in the
 `w` lines of the outer call. The services a nested call makes are ordinary `i` lines, and they come before the `i` line of
-`ExecuteCommandText`, because that line is written when the function returns; the stub finds its own line among them, makes the nested
+the re-entrant service, because that line is written when the function returns; the stub finds its own line among them, makes the nested
 calls through the seam table of the module with the cursor set back over those lines, and reports a result that differs at
 `<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
 inside a nested command fails the recording.
@@ -1179,7 +1193,7 @@ targeting:
 - `FindBestTargetIfFireAtWill` with a fire order of 3: `Unit.fireOrder` takes its value from `standingfireorder` of the unit's FBI at creation (the shipped units have 0, 2 or none, which is 2), from the `STANDING_FIREORDER` order (the order type `Standing_FireOrder`, whose mode the order panel gives as 0, 1 or 2 and the scenario `firestate` line limits to 0, 1 and 2), or by copy from the builder or factory (`getbuilt`). A 3 is only what the order panel shows when the selected units have different fire orders ("mixed"), and is never an order's mode. Fire order 1 is recorded: `orders-immediate`, ticks 740 to 770 only, holds the call at tick 752 (the `firestate 1` of tick 750, before `firestate 2` at 755 and `firestate 0` at 760), which returns null without an import.
 - A negative `UnitDef.range`: the unit type loader stores the key `sightdistance` in it as a signed 16-bit number and nothing writes it again, so only a value below 0 or above 32767 gives one, and the `SightDistance` of the 821 shipped `units/*.fbi` lies between 55 and 490. `FindWeaponTarget` with `useRange` 0 and `FindBestTargetIfFireAtWill` pass it to `GetVisibleEnemiesInRadius` as the radius.
 - `GetWeaponTargetPos` with a cruise weapon, or a weapon of speed 0, and a unit with more than five kills (the other lead conditions are met): not reached by the scenario suite; it would need a veteran missile silo or bomber.
-- `los_radar.GetVisibleEnemiesInRadiusList`: it has no 3.1c call site, only the vector form `los_radar.GetVisibleEnemiesInRadius` is called, which the recordings carry. The replayer answers a call of it from the next recorded vector line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
+- `los_radar.GetVisibleEnemiesInRadius` with a count above the capacity of its buffer: the callers size the buffer for every unit of the pool (one entry per unit slot), and the list holds each unit once, so the count never exceeds it. A recording of such a call would lose units, so the recorder fails the run instead. The replayer answers a call from the next recorded line with the same player, position, radius and flags: it writes the first `capacity` units of the recorded list, in order, and returns the recorded count; a repeat with the same arguments and a larger capacity, after a count above the capacity, is answered from the same line and takes no further import, and any other extra call is a divergence.
 - A unit target with `unitDefIndex` 0 where the second condition of the guard (the aim target field being nonzero) is false: that condition is always true there.
 
 weapons:
@@ -1217,7 +1231,7 @@ format, whether or not a recording uses it: the indexed tables (`Projectile#3.sp
 chunks, deltas and a null, for an object and a block field, with a changed element reported at its field and byte), a nullable
 struct, an array of structs and a struct by value (a changed field reported at `pos.z`, `points[1].y`, `result`), polymorphic objects (an
 `Order` that leads to an `ApproachRadius` and a `RingApproach`, rebuilt with the replayer's vtables, and an `OrderTableEntry` whose `notify`
-is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake `SimCaptureAlloc`) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
+is a code pointer), block vectors (a `PlayerAI` whose unit list, cells and counts are pushed to, grown, emptied and compared) snapshots (two buffers of a fake capture allocation) and raw pointer fields (a `Handle` whose `src` is a `ptr`, rebuilt and compared, with a changed `src` reported at `Handle#1.src`; a `ptr` to an object no line named, restored to an empty copy) and masked views (a union whose live view switches on a masked bit, or on a bit of another object, with the dead view neither written, compared nor restored) and an object embedded at two sites (named by its site in the walk and in a service line, and restored inside its container) and services (the files, commands, sim plumbing, load reads and GAF cursors, with their changed arguments reported at the import) and callbacks (a visitor of the module called twice by a fake import, recorded as two `c` lines and replayed on a
 second object, with a changed result reported at `import 0 fixture.Scan.c[0]`) and callbacks held in state (a `FixtureNotify` whose `ptr` and `ref` hold a callback and a slot
 that gets a third: the module's calls on them replay equal, and a different, a missing, an extra and a misplaced call are each reported at `callback#3.Complete`). Three
 more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`

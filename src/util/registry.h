@@ -1,6 +1,6 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
-#include "../../interfaces/services.h"
+#include "engine_services.h"
 struct Rect;
 
 struct Rect;

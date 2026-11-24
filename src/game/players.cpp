@@ -318,7 +318,7 @@ guard:
 void LoadDefaultAIScript()
 {
     int size;
-    char* name = g_seams.mission->GetNameSlot(7);
+    const char* name = g_seams.mission->GetNameSlot(7);
     char* text = (char*)HAPI_LoadFile(name, &size);
     if (text == 0) {
         text = (char*)HAPI_LoadFile("ai\\default.txt", &size);
@@ -441,7 +441,7 @@ void __stdcall PlaySoundByName(char* str, int flag);
 
 
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../util/math.h"
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                            Vec3 pos, int a, int b, int c);
@@ -592,7 +592,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
 
                         {
                             Unit* unit = g_seams.units->CreateUnit(
-                                g_game->localPlayer, typeId, pos, 1, 1, 0);
+                                g_game->localPlayer, typeId, &pos, 1, 1, 0);
                             SetStartingStorageBonus(pi,
                                          self->metal * 100,
                                          self->energy * 100);

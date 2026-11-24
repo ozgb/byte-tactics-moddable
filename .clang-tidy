@@ -36,7 +36,7 @@ CheckOptions:
   readability-identifier-naming.TypedefCase: 'CamelCase'
   readability-identifier-naming.TypedefIgnoredRegexp: '^((.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.FunctionCase: 'CamelCase'
-  readability-identifier-naming.FunctionIgnoredRegexp: '^(HAPI_[A-Za-z0-9_]+|host_[A-Za-z0-9_]+|sort|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
+  readability-identifier-naming.FunctionIgnoredRegexp: '^(HAPI_[A-Za-z0-9_]+|host_[A-Za-z0-9_]+|(TdfFile|TdfRecord|HapiBank)_[A-Z][A-Za-z0-9]*|sort|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.MethodCase: 'CamelCase'
   readability-identifier-naming.MethodIgnoredRegexp: '^(v[0-9]+|unused[0-9]*|(.*_00[0-9a-fA-F]{6}|(field|unknown|unk|param|vec)_[0-9a-fA-F]+|.*_[0-9a-f]*[0-9][0-9a-f]*|_.*|(FUN|DAT)_.*|field_.*|unk.*|param_.*|SimType_.*))$'
   readability-identifier-naming.MemberCase: 'camelBack'

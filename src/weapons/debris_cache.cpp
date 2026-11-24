@@ -1,6 +1,6 @@
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../graphics/memory_cache.h"
 
 DebrisCache* DebrisCache::ClearPointers()

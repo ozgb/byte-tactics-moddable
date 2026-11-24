@@ -5,7 +5,7 @@
 #include "cob_script.h"
 #include "cob_types.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/weapons_events.h"
 
 struct QueryChannelView {
@@ -219,13 +219,13 @@ int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int upd
 }
 
 // FUNCTION: 0x4b0bc0
-int CobScript::QueryScript(char* name, int* p2, int* p3, int* p4, int* p5)
+int CobScript::QueryScript(const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
 {
-    return QueryScriptByIndex(FindScript(name), p2, p3, p4, p5);
+    return QueryScriptByIndex(FindScript(name), arg0, arg1, arg2, arg3);
 }
 
 // FUNCTION: 0x4b0c40
-int CobScript::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
+int CobScript::QueryScriptByIndex(int index, int* arg0, int* arg1, int* arg2, int* arg3)
 {
     int i = this->StartThread(index);
     if (i < 0)
@@ -233,16 +233,16 @@ int CobScript::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
     QueryChannelView* c = (QueryChannelView*)((char*)this + i * 0xa4);
     c->unknown_3c = 0;
     int& cnt = c->count;
-    c->values[++cnt] = p2 ? *p2 : 0;
-    c->values[++cnt] = p3 ? *p3 : 0;
-    c->values[++cnt] = p4 ? *p4 : 0;
-    c->values[++cnt] = p5 ? *p5 : 0;
+    c->values[++cnt] = arg0 ? *arg0 : 0;
+    c->values[++cnt] = arg1 ? *arg1 : 0;
+    c->values[++cnt] = arg2 ? *arg2 : 0;
+    c->values[++cnt] = arg3 ? *arg3 : 0;
     c->count = 3;
     this->RunThread(i, 0);
-    if (p2) *p2 = c->values[0];
-    if (p3) *p3 = c->values[1];
-    if (p4) *p4 = c->values[2];
-    if (p5) *p5 = c->values[3];
+    if (arg0) *arg0 = c->values[0];
+    if (arg1) *arg1 = c->values[1];
+    if (arg2) *arg2 = c->values[2];
+    if (arg3) *arg3 = c->values[3];
     return 1;
 }
 

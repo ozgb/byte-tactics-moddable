@@ -1,6 +1,6 @@
 # The scripts interface
 
-Scripts sit behind `interfaces/scripts.h` (version 2.1), the first of two simulation subsystems cut out of units and
+Scripts sit behind `interfaces/scripts.h` (version 3.0; 3.0 has `GetPieceOffset`, `GetPiecePosition` and `GetPieceAngles` write to an out argument instead of returning a struct, names `QueryScript`'s in/out arguments `arg0` to `arg3`, and makes its name const), the first of two simulation subsystems cut out of units and
 orders in #993 (the other is movement, `docs/movement-interface.md`). Scripts are a unit's COB scripts as the
 simulation sees them: the interpreter and its threads, the piece state a script poses, and the piece queries (where a
 piece is, what angles it has, where a weapon aims from). 3.1c's code is its default implementation. This page is the

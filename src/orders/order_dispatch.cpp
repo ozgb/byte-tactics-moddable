@@ -216,7 +216,7 @@ int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCurso
     case 9:
         return def->c06 ? 7 : 0x13;
     case 8:
-        return g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) ? 6 : 0x13;
+        return g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) ? 6 : 0x13;
     case 7:
         if (!(def->flags2 & 0x20) || !friendly)
             break;
@@ -225,7 +225,7 @@ int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCurso
         break;
     case 12:
         RECLAIM_CHECK(def, unit, pos, 0x400, 0xb);
-        if (target && g_seams.units->CanReclaim(((Unit*)unit), 0, (Unit*)target))
+        if (target && g_seams.units->CanReclaim(((Unit*)unit), (Unit*)target))
             return 0xb;
         break;
     case 13:
@@ -233,7 +233,7 @@ int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCurso
             return 4;
         break;
     case 6:
-        if (!target || !g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
+        if (!target || !g_seams.units->CanLoad(((Unit*)unit), (Unit*)target))
             break;
         return def->flying ? 8 : 0xc;
     case 5:
@@ -261,15 +261,15 @@ int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCurso
             return 0xe;
         if ((def->flags2 & 0x1000) && enemy)
             return 4;
-        if (enemy && g_seams.units->CanReclaim(((Unit*)unit), 0, (Unit*)target))
+        if (enemy && g_seams.units->CanReclaim(((Unit*)unit), (Unit*)target))
             return 0xb;
-        if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
+        if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) && target->buildLeft != 0.0f)
             return 6;
-        if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target))
+        if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target))
             return 6;
         if ((def->flags1 & 0x800) && (target->def->flags1 & 0x200))
             return 0xd;
-        if (g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
+        if (g_seams.units->CanLoad(((Unit*)unit), (Unit*)target))
             return def->flying ? 8 : 0xc;
         if ((def->flags2 & 0x20) && friendly)
             return 5;
@@ -290,7 +290,7 @@ int __stdcall GetOrderCursor(unsigned char mode, UnitCursorView* unit, UnitCurso
             return GetOrderCursor(3, unit, target, pos);
         if ((def->flags2 & 0x400) && enemy)
             return GetOrderCursor(0xc, unit, target, pos);
-        if (target && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
+        if (target && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) && target->buildLeft != 0.0f)
             return 6;
         if (Selectable(target))
             return 0xf;
@@ -431,7 +431,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targ
         }
         break;
     case 8:
-        if (!g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target))
+        if (!g_seams.units->CanRepair(((Unit*)unit), (Unit*)target))
             break;
         if (target->buildLeft != 0.0f)
             return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
@@ -459,7 +459,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targ
             return MissionType("CAPTURE");
         break;
     case 6:
-        if (!target || !g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
+        if (!target || !g_seams.units->CanLoad(((Unit*)unit), (Unit*)target))
             break;
         return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
     case 5:
@@ -491,14 +491,14 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targ
             return MissionType("CAPTURE");
         if ((def->f245 & 0x400) && enemy)
             return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
-        if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
+        if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) && target->buildLeft != 0.0f)
             return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
-        if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) &&
+        if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) &&
             (unsigned int)target->health < target->def->f1fa)
             return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
         if ((def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
             return MissionType("VTOL_LANDING");
-        if (g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
+        if (g_seams.units->CanLoad(((Unit*)unit), (Unit*)target))
             return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
         if ((def->f245 & 0x20) && friendly)
             return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -509,13 +509,13 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targ
                 return GetOrderType(3, unitArg, targetArg, posArg);
             if ((def->f245 & 0x400) && enemy)
                 return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
-            if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
+            if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) && target->buildLeft != 0.0f)
                 return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
-            if (friendly && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target))
+            if (friendly && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target))
                 return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
             if ((def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                 return MissionType("VTOL_LANDING");
-            if (target && g_seams.units->CanLoad(((Unit*)unit), 0, (Unit*)target))
+            if (target && g_seams.units->CanLoad(((Unit*)unit), (Unit*)target))
                 return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
             if ((def->f245 & 0x20) && friendly)
                 return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -529,7 +529,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit* unitArg, Unit* targ
                 return GetOrderType(3, unitArg, targetArg, posArg);
             if ((def->f245 & 0x400) && enemy)
                 return GetOrderType(0xc, unitArg, targetArg, posArg);
-            if (target && g_seams.units->CanRepair(((Unit*)unit), 0, (Unit*)target) && target->buildLeft != 0.0f)
+            if (target && g_seams.units->CanRepair(((Unit*)unit), (Unit*)target) && target->buildLeft != 0.0f)
                 return GetOrderType(8, unitArg, targetArg, posArg);
             if (target && target->unknown_ff[0] == g_game->localPlayer && (target->flags & 0x20) &&
                 target->buildLeft == 0.0f && target->postTransferHoldoff == 0 &&

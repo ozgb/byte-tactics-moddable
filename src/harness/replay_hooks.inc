@@ -407,7 +407,7 @@ unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
     return result;
 }
 
-unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
+unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FINDORLOADFEATURETYPE, SUB_FEATURES, roots);
@@ -421,7 +421,7 @@ unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(char* a0)
     return result;
 }
 
-Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
+void __stdcall RecFeaturesGetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_FEATURE, a1);
@@ -435,15 +435,14 @@ Vec3 __stdcall RecFeaturesGetFootprintCentre(Point16* a0, Feature* a1)
         line.Add("  i features.GetFootprintCentre");
         ImportObject(line, ROK_FEATURE, a1);
     }
-    Vec3 result = s_inner_features->GetFootprintCentre(a0, a1);
+    s_inner_features->GetFootprintCentre(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
 void __stdcall RecFeaturesSaveFeatures(HapiBank* a0)
@@ -1100,7 +1099,7 @@ Unit* __stdcall RecTargetingFindBestTargetIfFireAtWill(Unit* a0)
     return result;
 }
 
-unsigned char __fastcall RecTargetingChooseWeapon(Unit* a0)
+unsigned char __stdcall RecTargetingChooseWeapon(Unit* a0)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -1364,7 +1363,7 @@ void __stdcall RecLosRadarFreeMapResources()
     }
 }
 
-void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
+int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS, SUB_LOS_RADAR, roots);
@@ -1373,6 +1372,7 @@ void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int 
         ArgVec3(s_call, "pos", a1);
         ArgValue(s_call, "radius", a2);
         ArgValue(s_call, "flags", a3);
+        ArgValue(s_call, "capacity", a5);
     }
     ReplayText line;
     if (scope.Import()) {
@@ -1382,43 +1382,27 @@ void __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int 
         ImportValue(line, a2);
         ImportValue(line, a3);
     }
-    s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4);
+    int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
-        ImportOutUnits(line, "out", a4, kReplayReachFields + 11, 7);
+        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 11, 7);
         FinishImport(line);
     }
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecLosRadarGetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUSLIST, SUB_LOS_RADAR, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "flags", a3);
-        ArgValue(s_call, "capacity", a5);
-    }
-    int result = s_inner_los_radar->GetVisibleEnemiesInRadiusList(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-bool __stdcall RecLosRadarHasReadyUnitInRange(int a0, Vec3* a1, int a2)
+int __stdcall RecLosRadarHasReadyUnitInRange(int a0, const Vec3* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_HASREADYUNITINRANGE, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "range", a2);
     }
-    bool result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
+    int result = s_inner_los_radar->HasReadyUnitInRange(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1609,7 +1593,7 @@ int __stdcall RecOrdersGetOrderFlags(Unit* a0)
     return result;
 }
 
-MissionType __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
+int __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a1);
@@ -1621,22 +1605,23 @@ MissionType __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2
         ArgObject(s_call, "target", ROK_UNIT, a2);
         ArgPending(s_call, "pos");
     }
-    MissionType result = s_inner_orders->GetOrderType(a0, a1, a2, a3);
+    int result = s_inner_orders->GetOrderType(a0, a1, a2, a3);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-MissionType __stdcall RecOrdersMissionTypeFromName(const char* a0)
+int __stdcall RecOrdersMissionTypeFromName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ORDERS_MISSIONTYPEFROMNAME, SUB_ORDERS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
-    MissionType result = s_inner_orders->MissionTypeFromName(a0);
+    int result = s_inner_orders->MissionTypeFromName(a0);
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONTYPE, &result);
+        ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
@@ -1732,7 +1717,7 @@ void __stdcall RecUnitsUpdateAllUnits()
     }
 }
 
-void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, char* a1, int* a2)
+void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, const char* a1, int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY, SUB_UNITS, roots);
@@ -1955,17 +1940,17 @@ Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
     return result;
 }
 
-Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, Vec3 a2, int a3, int a4, int a5)
+Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, const Vec3* a2, int a3, int a4, int a5)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_CREATEUNIT, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
         ArgValue(s_call, "typeId", a1);
-        ArgValue(s_call, "pos", a2);
-        ArgValue(s_call, "param_4", a3);
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a2);
+        ArgValue(s_call, "finished", a3);
         ArgValue(s_call, "mode", a4);
-        ArgValue(s_call, "param_6", a5);
+        ArgValue(s_call, "id", a5);
     }
     Unit* result = s_inner_units->CreateUnit(a0, a1, a2, a3, a4, a5);
     if (scope.Open()) {
@@ -2002,18 +1987,20 @@ unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
     return result;
 }
 
-int __stdcall RecUnitsFindMissionUnit(char* a0, std::vector<Unit*, std::allocator<Unit*> >* a1, int a2)
+Unit* __stdcall RecUnitsFindMissionUnit(const char* a0, const Ref<Unit>* a1, int a2, Unit* a3)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNIT, a3);
     SlotScope scope(RSL_UNITS_FINDMISSIONUNIT, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
         ArgPending(s_call, "units");
-        ArgValue(s_call, "value", a2);
+        ArgValue(s_call, "count", a2);
+        ArgObject(s_call, "after", ROK_UNIT, a3);
     }
-    int result = s_inner_units->FindMissionUnit(a0, a1, a2);
+    Unit* result = s_inner_units->FindMissionUnit(a0, a1, a2, a3);
     if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
+        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
     }
     return result;
 }
@@ -2054,61 +2041,58 @@ int __stdcall RecUnitsAddRepairProgress(Unit* a0, Unit* a1, float a2)
     return result;
 }
 
-int __fastcall RecUnitsCanLoad(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanLoad(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANLOAD, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanLoad(a0, a1, a2);
+    int result = s_inner_units->CanLoad(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __fastcall RecUnitsCanReclaim(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanReclaim(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANRECLAIM, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanReclaim(a0, a1, a2);
+    int result = s_inner_units->CanReclaim(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-int __fastcall RecUnitsCanRepair(Unit* a0, int a1, Unit* a2)
+int __stdcall RecUnitsCanRepair(Unit* a0, Unit* a1)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a2);
+    roots.Add(ROK_UNIT, a1);
     SlotScope scope(RSL_UNITS_CANREPAIR, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgObject(s_call, "target", ROK_UNIT, a2);
+        ArgObject(s_call, "target", ROK_UNIT, a1);
     }
-    int result = s_inner_units->CanRepair(a0, a1, a2);
+    int result = s_inner_units->CanRepair(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-void __fastcall RecUnitsUnitRefUnlink(UnitRef* a0)
+void __stdcall RecUnitsUnitRefUnlink(UnitRef* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_UNITREFUNLINK, SUB_UNITS, roots);
@@ -2162,19 +2146,22 @@ void __stdcall RecUnitsUpdateUnitTail(Unit* a0, int a1)
     }
 }
 
-void __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, std::vector<Unit*, std::allocator<Unit*> >* a3)
+int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
         ArgValue(s_call, "radius", a2);
         ArgPending(s_call, "out");
+        ArgValue(s_call, "capacity", a4);
     }
-    s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3);
+    int result = s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3, a4);
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
     }
+    return result;
 }
 
 void __stdcall RecUnitsCreateFactoryIndex(int a0)
@@ -2437,7 +2424,7 @@ void __stdcall RecPlayersUpdateBlink()
     }
 }
 
-void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
+void __stdcall RecPlayersDeactivateConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_DEACTIVATECONDITIONS, SUB_PLAYERS, roots);
@@ -2449,49 +2436,46 @@ void __fastcall RecPlayersDeactivateConditions(MissionConditions* a0)
     }
 }
 
-void __fastcall RecPlayersLoadConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __stdcall RecPlayersLoadConditions(MissionConditions* a0, HapiBank* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_LOADCONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
     }
-    s_inner_players->LoadConditions(a0, a1, a2);
+    s_inner_players->LoadConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersSaveConditions(MissionConditions* a0, int a1, HapiBank* a2)
+void __stdcall RecPlayersSaveConditions(MissionConditions* a0, HapiBank* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_SAVECONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
+        ArgHandle(s_call, "file", OBJ_BANK, a1);
     }
-    s_inner_players->SaveConditions(a0, a1, a2);
+    s_inner_players->SaveConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersRegisterConditions(MissionConditions* a0, int a1, TdfFile* a2)
+void __stdcall RecPlayersRegisterConditions(MissionConditions* a0, TdfFile* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_REGISTERCONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
         ArgPending(s_call, "conditions");
-        ArgValue(s_call, "unusedEdx", a1);
         ArgPending(s_call, "mission");
     }
-    s_inner_players->RegisterConditions(a0, a1, a2);
+    s_inner_players->RegisterConditions(a0, a1);
     if (scope.Open()) {
     }
 }
 
-void __fastcall RecPlayersFreeConditions(MissionConditions* a0)
+void __stdcall RecPlayersFreeConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_FREECONDITIONS, SUB_PLAYERS, roots);
@@ -2681,7 +2665,7 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     return result;
 }
 
-int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
+int __stdcall RecMapCanBuildAt(UnitDef* a0, const Point16* a1, short a2, Player* a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -2689,7 +2673,7 @@ int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
     SlotScope scope(RSL_MAP_CANBUILDAT, SUB_MAP, roots);
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNITDEF, a0);
-        ArgValue(s_call, "cell", a1);
+        ArgValueStruct(s_call, "a", "cell", ROK_POINT16, a1);
         ArgValue(s_call, "type", a2);
         ArgObject(s_call, "player", ROK_PLAYER, a3);
     }
@@ -2700,7 +2684,7 @@ int __stdcall RecMapCanBuildAt(UnitDef* a0, Point16 a1, short a2, Player* a3)
     return result;
 }
 
-int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point16 a2, int a3)
+int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, const Point16* a2, int a3)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNITDEF, a0);
@@ -2708,7 +2692,7 @@ int __stdcall RecMapCanPlaceUnitFootprint(UnitDef* a0, unsigned short a1, Point1
     if (scope.Open()) {
         ArgObject(s_call, "unit", ROK_UNITDEF, a0);
         ArgValue(s_call, "otherTypeId", a1);
-        ArgValue(s_call, "cell", a2);
+        ArgValueStruct(s_call, "a", "cell", ROK_POINT16, a2);
         ArgValue(s_call, "flags", a3);
     }
     int result = s_inner_map->CanPlaceUnitFootprint(a0, a1, a2, a3);
@@ -2871,7 +2855,7 @@ int __stdcall RecScriptsStartScriptWithArgsByIndex(CobScript* a0, int a1, Callba
     return result;
 }
 
-int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+int __stdcall RecScriptsQueryScript(CobScript* a0, const char* a1, int* a2, int* a3, int* a4, int* a5)
 {
     ReplayRoots roots;
     roots.Add(ROK_COBSCRIPT, a0);
@@ -2879,10 +2863,10 @@ int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, i
     if (scope.Open()) {
         ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgValue(s_call, "name", (const char*)a1);
-        ArgInOutScalar(s_call, "p2", a2);
-        ArgInOutScalar(s_call, "p3", a3);
-        ArgInOutScalar(s_call, "p4", a4);
-        ArgInOutScalar(s_call, "p5", a5);
+        ArgInOutScalar(s_call, "arg0", a2);
+        ArgInOutScalar(s_call, "arg1", a3);
+        ArgInOutScalar(s_call, "arg2", a4);
+        ArgInOutScalar(s_call, "arg3", a5);
     }
     ReplayText line;
     if (scope.Import()) {
@@ -2897,17 +2881,17 @@ int __stdcall RecScriptsQueryScript(CobScript* a0, char* a1, int* a2, int* a3, i
     int result = s_inner_scripts->QueryScript(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
         ImportResult(line, result);
-        ImportOutInOutScalar(line, "p2", a2);
-        ImportOutInOutScalar(line, "p3", a3);
-        ImportOutInOutScalar(line, "p4", a4);
-        ImportOutInOutScalar(line, "p5", a5);
+        ImportOutInOutScalar(line, "arg0", a2);
+        ImportOutInOutScalar(line, "arg1", a3);
+        ImportOutInOutScalar(line, "arg2", a4);
+        ImportOutInOutScalar(line, "arg3", a5);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgInOutScalarExit(s_tail, "p2", a2);
-        ArgInOutScalarExit(s_tail, "p3", a3);
-        ArgInOutScalarExit(s_tail, "p4", a4);
-        ArgInOutScalarExit(s_tail, "p5", a5);
+        ArgInOutScalarExit(s_tail, "arg0", a2);
+        ArgInOutScalarExit(s_tail, "arg1", a3);
+        ArgInOutScalarExit(s_tail, "arg2", a4);
+        ArgInOutScalarExit(s_tail, "arg3", a5);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -2929,7 +2913,7 @@ int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
     return result;
 }
 
-Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
+void __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2944,18 +2928,17 @@ Vec3 __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1)
         ImportObject(line, ROK_UNIT, a0);
         ImportValue(line, a1);
     }
-    Vec3 result = s_inner_scripts->GetPieceOffset(a0, a1);
+    s_inner_scripts->GetPieceOffset(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
-Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
+void __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1, Vec3* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2970,18 +2953,17 @@ Vec3 __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1)
         ImportObject(line, ROK_UNIT, a0);
         ImportValue(line, a1);
     }
-    Vec3 result = s_inner_scripts->GetPiecePosition(a0, a1);
+    s_inner_scripts->GetPiecePosition(a0, a1, a2);
     if (scope.Import()) {
-        ImportResultValue(line, ROK_VEC3, &result);
+        ImportResultValue(line, ROK_VEC3, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
-        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, &result);
+        ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
-    return result;
 }
 
-Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
+void __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1, Angles16* a2)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -2990,10 +2972,10 @@ Angles16 __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
         ArgValue(s_call, "piece", a1);
     }
-    Angles16 result = s_inner_scripts->GetPieceAngles(a0, a1);
+    s_inner_scripts->GetPieceAngles(a0, a1, a2);
     if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, a2);
     }
-    return result;
 }
 
 void __stdcall RecScriptsGetNanoPiecePosition(Unit* a0, Vec3* a1)
@@ -3357,7 +3339,7 @@ unsigned int __stdcall RecMovementNewPathOrderAt(unsigned int a0, const Vec3* a1
     SlotScope scope(RSL_MOVEMENT_NEWPATHORDERAT, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
     }
     unsigned int result = s_inner_movement->NewPathOrderAt(a0, a1);
     if (scope.Open()) {
@@ -3390,7 +3372,7 @@ unsigned int __stdcall RecMovementNewPathOrderToUnitAt(unsigned int a0, Unit* a1
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
         ArgObject(s_call, "unit", ROK_UNIT, a1);
-        ArgPending(s_call, "pos");
+        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a2);
     }
     unsigned int result = s_inner_movement->NewPathOrderToUnitAt(a0, a1, a2);
     if (scope.Open()) {
@@ -3422,8 +3404,8 @@ unsigned int __stdcall RecMovementNewAirManeuverOrder(unsigned int a0, const Vec
     SlotScope scope(RSL_MOVEMENT_NEWAIRMANEUVERORDER, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgPending(s_call, "from");
-        ArgPending(s_call, "to");
+        ArgValueStruct(s_call, "a", "from", ROK_VEC3, a1);
+        ArgValueStruct(s_call, "a", "to", ROK_VEC3, a2);
     }
     unsigned int result = s_inner_movement->NewAirManeuverOrder(a0, a1, a2);
     if (scope.Open()) {
@@ -3467,14 +3449,14 @@ unsigned int __stdcall RecMovementNewRingApproach(unsigned int a0, int a1, int a
     return result;
 }
 
-unsigned int __stdcall RecMovementNewPointMarker(unsigned int a0, Point16 a1, Point16 a2)
+unsigned int __stdcall RecMovementNewPointMarker(unsigned int a0, const Point16* a1, const Point16* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_MOVEMENT_NEWPOINTMARKER, SUB_MOVEMENT, roots);
     if (scope.Open()) {
         ArgValue(s_call, "order", a0);
-        ArgValue(s_call, "pos", a1);
-        ArgValue(s_call, "size", a2);
+        ArgValueStruct(s_call, "a", "pos", ROK_POINT16, a1);
+        ArgValueStruct(s_call, "a", "size", ROK_POINT16, a2);
     }
     unsigned int result = s_inner_movement->NewPointMarker(a0, a1, a2);
     if (scope.Open()) {
@@ -3556,7 +3538,7 @@ void __stdcall RecMovementWriteState(const StateWriter* a0)
     }
 }
 
-FileHandle* __stdcall RecFilesOpenRead(char* a0)
+FileHandle* __stdcall RecFilesOpenRead(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENREAD, SUB_FILES, roots);
@@ -3569,7 +3551,7 @@ FileHandle* __stdcall RecFilesOpenRead(char* a0)
     return result;
 }
 
-FileHandle* __stdcall RecFilesOpenAppend(char* a0)
+FileHandle* __stdcall RecFilesOpenAppend(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_OPENAPPEND, SUB_FILES, roots);
@@ -3582,7 +3564,7 @@ FileHandle* __stdcall RecFilesOpenAppend(char* a0)
     return result;
 }
 
-FileHandle* __stdcall RecFilesCreate(char* a0)
+FileHandle* __stdcall RecFilesCreate(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CREATE, SUB_FILES, roots);
@@ -3609,21 +3591,21 @@ int __stdcall RecFilesClose(FileHandle* a0)
     return result;
 }
 
-bool __stdcall RecFilesIsInArchive(FileHandle* a0)
+int __stdcall RecFilesIsInArchive(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_ISINARCHIVE, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    bool result = s_inner_files->IsInArchive(a0);
+    int result = s_inner_files->IsInArchive(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesSeek(FileHandle* a0, long a1)
+int __stdcall RecFilesSeek(FileHandle* a0, int a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_SEEK, SUB_FILES, roots);
@@ -3631,21 +3613,21 @@ long __stdcall RecFilesSeek(FileHandle* a0, long a1)
         ArgPending(s_call, "file");
         ArgValue(s_call, "pos", a1);
     }
-    long result = s_inner_files->Seek(a0, a1);
+    int result = s_inner_files->Seek(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesTell(FileHandle* a0)
+int __stdcall RecFilesTell(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_TELL, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    long result = s_inner_files->Tell(a0);
+    int result = s_inner_files->Tell(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3668,7 +3650,7 @@ int __stdcall RecFilesRead(FileHandle* a0, void* a1, int a2)
     return result;
 }
 
-unsigned int __stdcall RecFilesWrite(FileHandle* a0, void* a1, unsigned int a2)
+unsigned int __stdcall RecFilesWrite(FileHandle* a0, const void* a1, unsigned int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITE, SUB_FILES, roots);
@@ -3684,35 +3666,35 @@ unsigned int __stdcall RecFilesWrite(FileHandle* a0, void* a1, unsigned int a2)
     return result;
 }
 
-long __stdcall RecFilesLength(FileHandle* a0)
+int __stdcall RecFilesLength(FileHandle* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTH, SUB_FILES, roots);
     if (scope.Open()) {
         ArgPending(s_call, "file");
     }
-    long result = s_inner_files->Length(a0);
+    int result = s_inner_files->Length(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-long __stdcall RecFilesLengthByName(char* a0)
+int __stdcall RecFilesLengthByName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LENGTHBYNAME, SUB_FILES, roots);
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
-    long result = s_inner_files->LengthByName(a0);
+    int result = s_inner_files->LengthByName(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
 }
 
-void* __stdcall RecFilesReadAt(char* a0, void* a1, long a2, unsigned int a3)
+void* __stdcall RecFilesReadAt(const char* a0, void* a1, int a2, unsigned int a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_READAT, SUB_FILES, roots);
@@ -3728,7 +3710,7 @@ void* __stdcall RecFilesReadAt(char* a0, void* a1, long a2, unsigned int a3)
     return result;
 }
 
-void* __stdcall RecFilesLoad(char* a0, int* a1)
+void* __stdcall RecFilesLoad(const char* a0, int* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOAD, SUB_FILES, roots);
@@ -3742,7 +3724,7 @@ void* __stdcall RecFilesLoad(char* a0, int* a1)
     return result;
 }
 
-void* __stdcall RecFilesLoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
+void* __stdcall RecFilesLoadOpenFile(const char* a0, FileHandle* a1, unsigned int* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_LOADOPENFILE, SUB_FILES, roots);
@@ -3757,7 +3739,7 @@ void* __stdcall RecFilesLoadOpenFile(char* a0, FileHandle* a1, unsigned int* a2)
     return result;
 }
 
-int __stdcall RecFilesWriteBuffer(char* a0, void* a1, int a2)
+int __stdcall RecFilesWriteBuffer(const char* a0, const void* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_WRITEBUFFER, SUB_FILES, roots);
@@ -3810,7 +3792,7 @@ void __stdcall RecFilesGetCurrentDriveLetter(char* a0)
     }
 }
 
-int __stdcall RecFilesChangeDrive(char* a0)
+int __stdcall RecFilesChangeDrive(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_CHANGEDRIVE, SUB_FILES, roots);
@@ -3824,7 +3806,7 @@ int __stdcall RecFilesChangeDrive(char* a0)
     return result;
 }
 
-char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
+const char* __stdcall RecFilesGetDriveDirectory(const char* a0, char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETDRIVEDIRECTORY, SUB_FILES, roots);
@@ -3833,7 +3815,7 @@ char* __stdcall RecFilesGetDriveDirectory(char* a0, char* a1, int a2)
         ArgValue(s_call, "buf", (const char*)a1);
         ArgValue(s_call, "size", a2);
     }
-    char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
+    const char* result = s_inner_files->GetDriveDirectory(a0, a1, a2);
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
@@ -3942,7 +3924,7 @@ void __stdcall RecFilesListDirectory(const char* a0, int a1, FileNameList* a2)
     }
 }
 
-void __stdcall RecFilesFindFilesRecursive(char* a0, const char* a1, FileNameList* a2, int a3, int a4)
+void __stdcall RecFilesFindFilesRecursive(const char* a0, const char* a1, FileNameList* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_FINDFILESRECURSIVE, SUB_FILES, roots);
@@ -3958,7 +3940,7 @@ void __stdcall RecFilesFindFilesRecursive(char* a0, const char* a1, FileNameList
     }
 }
 
-void __stdcall RecFilesMakeDirectoryPath(char* a0)
+void __stdcall RecFilesMakeDirectoryPath(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_MAKEDIRECTORYPATH, SUB_FILES, roots);
@@ -3986,7 +3968,7 @@ void __stdcall RecFilesGetStartDirectory(char* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_GETSTARTDIRECTORY, SUB_FILES, roots);
     if (scope.Open()) {
-        ArgValue(s_call, "param", (const char*)a0);
+        ArgValue(s_call, "out", (const char*)a0);
     }
     s_inner_files->GetStartDirectory(a0);
     if (scope.Open()) {
@@ -4135,7 +4117,7 @@ void __stdcall RecFilesBankNew(HapiBank* a0)
     }
 }
 
-int __stdcall RecFilesBankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
+int __stdcall RecFilesBankOpen(HapiBank* a0, const char* a1, const char* a2, const char* a3)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPEN, SUB_FILES, roots);
@@ -4152,7 +4134,7 @@ int __stdcall RecFilesBankOpen(HapiBank* a0, char* a1, char* a2, char* a3)
     return result;
 }
 
-int __stdcall RecFilesBankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
+int __stdcall RecFilesBankSave(HapiBank* a0, const char* a1, const char* a2, int a3, int a4)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSAVE, SUB_FILES, roots);
@@ -4170,7 +4152,7 @@ int __stdcall RecFilesBankSave(HapiBank* a0, char* a1, char* a2, int a3, int a4)
     return result;
 }
 
-int __stdcall RecFilesBankOpenAccount(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenAccount(HapiBank* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENACCOUNT, SUB_FILES, roots);
@@ -4238,7 +4220,7 @@ int __stdcall RecFilesBankSetDouble(HapiBank* a0, const char* a1, double a2)
     return result;
 }
 
-int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, char* a2)
+int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, const char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKSETSTRING, SUB_FILES, roots);
@@ -4254,7 +4236,7 @@ int __stdcall RecFilesBankSetString(HapiBank* a0, const char* a1, char* a2)
     return result;
 }
 
-int __stdcall RecFilesBankGetInteger(HapiBank* a0, char* a1, int a2)
+int __stdcall RecFilesBankGetInteger(HapiBank* a0, const char* a1, int a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETINTEGER, SUB_FILES, roots);
@@ -4281,7 +4263,7 @@ int __stdcall RecFilesBankGetInteger(HapiBank* a0, char* a1, int a2)
     return result;
 }
 
-double __stdcall RecFilesBankGetDouble(HapiBank* a0, char* a1, double a2)
+double __stdcall RecFilesBankGetDouble(HapiBank* a0, const char* a1, double a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETDOUBLE, SUB_FILES, roots);
@@ -4297,7 +4279,7 @@ double __stdcall RecFilesBankGetDouble(HapiBank* a0, char* a1, double a2)
     return result;
 }
 
-char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
+const char* __stdcall RecFilesBankGetString(HapiBank* a0, const char* a1, const char* a2)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKGETSTRING, SUB_FILES, roots);
@@ -4306,7 +4288,7 @@ char* __stdcall RecFilesBankGetString(HapiBank* a0, char* a1, char* a2)
         ArgValue(s_call, "name", (const char*)a1);
         ArgValue(s_call, "def", (const char*)a2);
     }
-    char* result = s_inner_files->BankGetString(a0, a1, a2);
+    const char* result = s_inner_files->BankGetString(a0, a1, a2);
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ALLOC, result, "o");
     }
@@ -4343,7 +4325,7 @@ int __stdcall RecFilesBankOpenNumberedBox(HapiBank* a0, int a1)
     return result;
 }
 
-int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, char* a1)
+int __stdcall RecFilesBankOpenNamedBox(HapiBank* a0, const char* a1)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_FILES_BANKOPENNAMEDBOX, SUB_FILES, roots);
@@ -4702,7 +4684,7 @@ int __stdcall RecNetworkSendScriptCall(Unit* a0, short a1, char a2, int a3, int 
     return result;
 }
 
-int __stdcall RecNetworkSendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall RecNetworkSendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayRoots roots;
     roots.Add(ROK_UNIT, a0);
@@ -4805,7 +4787,7 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
-WeaponDef* __stdcall RecWeaponsFindWeaponByName(char* a0)
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
 {
     ReplayRoots roots;
     SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);
@@ -5143,8 +5125,6 @@ void HookSeams(const bool* on)
         s_rec_los_radar.FreeMapResources = RecLosRadarFreeMapResources;
     if (on[SUB_LOS_RADAR] || on[SUB_TARGETING])
         s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
-    if (on[SUB_LOS_RADAR])
-        s_rec_los_radar.GetVisibleEnemiesInRadiusList = RecLosRadarGetVisibleEnemiesInRadiusList;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
     if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])

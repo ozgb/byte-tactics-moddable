@@ -26,11 +26,6 @@ struct UnitDefMaxHealthView {
 #include "unit.h"
 #include "units_seam.h"
 
-struct UnitPtrVectorView {
-    char allocator_byte;
-    char pad[3];
-    Unit** ids;
-};
 #pragma pack(pop)
 
 #include "../orders/mission_type.h"
@@ -48,7 +43,7 @@ struct Outs_t {
 };
 
 // FUNCTION: 0x487bf0
-void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* table)
+void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units, int unitCount)
 {
     int count;
     struct { float f1, f2; int n; Vec3 pos; int move; } L;
@@ -87,7 +82,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             L.pos.x = (int)(L.f1 * 65536.0);
             L.pos.y = 0;
             L.pos.z = (int)(L.f2 * 65536.0);
-            out.m.type = g_seams.orders->GetOrderType(2, unit, 0, (Vec3*)&L.pos);
+            out.m.type = MissionType(g_seams.orders->GetOrderType(2, unit, 0, (Vec3*)&L.pos));
             OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.m.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
             processed = 1;
             break;
@@ -98,7 +93,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             L.pos.x = (int)(L.f1 * 65536.0);
             L.pos.y = 0;
             L.pos.z = (int)(65536.0 * L.f2);
-            out.u.type = g_seams.orders->GetOrderType(5, unit, 0, (Vec3*)&L.pos);
+            out.u.type = MissionType(g_seams.orders->GetOrderType(5, unit, 0, (Vec3*)&L.pos));
             OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.u.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
             processed = 1;
             break;
@@ -106,10 +101,10 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
         case 'G':
         case 'g': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-            if (target != 0) {
-                out.g.type = g_seams.orders->GetOrderType(7, unit, (Unit*)target, 0);
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.g.type.index, 1, (Unit*)target, (Vec3*)nullptr, 0, 0);
+            Unit* target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+            if (target != nullptr) {
+                out.g.type = MissionType(g_seams.orders->GetOrderType(7, unit, target, 0));
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.g.type.index, 1, target, (Vec3*)nullptr, 0, 0);
                 processed = 1;
             }
             break;
@@ -121,7 +116,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             L.pos.x = (int)(L.f1 * 65536.0);
             L.pos.y = 0;
             L.pos.z = (int)(L.f2 * 65536.0);
-            out.p.type = g_seams.orders->GetOrderType(9, unit, 0, (Vec3*)&L.pos);
+            out.p.type = MissionType(g_seams.orders->GetOrderType(9, unit, 0, (Vec3*)&L.pos));
             OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.p.type.index, 1, 0, (Vec3*)&L.pos, (int)(M2.pf * 30.0f), 0);
             processed = 1;
             selected = 1;
@@ -133,7 +128,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
                 L.pos.x = (int)(L.f1 * 65536.0);
                 L.pos.y = 0;
                 L.pos.z = (int)(L.f2 * 65536.0);
-                out.a.type = g_seams.orders->GetOrderType(3, unit, 0, (Vec3*)&L.pos);
+                out.a.type = MissionType(g_seams.orders->GetOrderType(3, unit, 0, (Vec3*)&L.pos));
                 OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.a.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
                 selected = 1;
                 processed = 1;
@@ -141,7 +136,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
                 sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
                 unsigned short id = g_seams.units->FindUnitTypeId(buf);
                 if (id != 0) {
-                    OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("ATTACKUTYPE").index, 1, 0, (Vec3*)nullptr, id, 0);
+                    OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("ATTACKUTYPE"), 1, 0, (Vec3*)nullptr, id, 0);
                     processed = 1;
                 }
             }
@@ -152,7 +147,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
             L.n = 1;
             if (buf[1] == 'w' || buf[1] == 'W') {
                 sscanf(buf + 2, " %d", &L.n);
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("BUILDWEAPON").index, 1, 0, (Vec3*)nullptr, 0, L.n);
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("BUILDWEAPON"), 1, 0, (Vec3*)nullptr, 0, L.n);
             } else {
                 sscanf(buf + 1, " %[a-zA-Z0-9_.] %d %f %f", buf, &L.n, &L.f1, &L.f2);
                 L.pos.x = (int)(L.f1 * 65536.0);
@@ -161,9 +156,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
                 unsigned short id = g_seams.units->FindUnitTypeId(buf);
                 if (id != 0) {
                     if (unit->motion != 0)
-                        OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MOBILEBUILD").index, 1, 0, (Vec3*)&L.pos, id, L.n);
+                        OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MOBILEBUILD"), 1, 0, (Vec3*)&L.pos, id, L.n);
                     else
-                        OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("BUILDINGBUILD").index, 1, 0, (Vec3*)nullptr, id, L.n);
+                        OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("BUILDINGBUILD"), 1, 0, (Vec3*)nullptr, id, L.n);
                     processed = 1;
                 }
             }
@@ -173,39 +168,39 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
         case 'w':
             if (buf[1] == 'a' || buf[1] == 'A') {
                 count = sscanf(buf + 2, " %[a-zA-Z0-9.]", buf);
-                int target = 0;
+                Unit* target = nullptr;
                 if (count == 1)
-                    target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-                if (target == 0)
-                    target = (int)unit;
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAITFORATTACK").index, 1, (Unit*)target, (Vec3*)nullptr, 0, 0);
+                    target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+                if (target == nullptr)
+                    target = unit;
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAITFORATTACK"), 1, target, (Vec3*)nullptr, 0, 0);
                 processed = 1;
             } else {
                 M2.wf = 0.0f;
                 L.move = 0;
                 sscanf(buf + 1, " %f %d", &M2.wf, &L.move);
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAIT").index, 1, 0, (Vec3*)nullptr, (int)(M2.wf * 30.0f), L.move);
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAIT"), 1, 0, (Vec3*)nullptr, (int)(M2.wf * 30.0f), L.move);
                 processed = 1;
             }
             break;
         case 'D':
         case 'd':
-            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("SELFDESTRUCTFG").index, 1, 0, (Vec3*)nullptr, 1, 0);
+            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("SELFDESTRUCTFG"), 1, 0, (Vec3*)nullptr, 1, 0);
             processed = 1;
             selected = 1;
             break;
         case 'S':
         case 's':
-            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MAKESELECTABLE").index, 1, 0, (Vec3*)nullptr, 0, 0);
+            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MAKESELECTABLE"), 1, 0, (Vec3*)nullptr, 0, 0);
             processed = 1;
             selected = 1;
             break;
         case 'I':
         case 'i': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = g_seams.units->FindMissionUnit(buf, (std::vector<Unit*, std::allocator<Unit*> >*)table, 0);
-            if (target != 0)
-                UnitsPublishAttachToPiece(SCHED_ENGINE, unit, (Unit*)target, -1, 0);
+            Unit* target = g_seams.units->FindMissionUnit(buf, units, unitCount, nullptr);
+            if (target != nullptr)
+                UnitsPublishAttachToPiece(SCHED_ENGINE, unit, target, -1, 0);
             break;
         }
         }
@@ -213,7 +208,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, UnitPtrVectorView* tabl
     if (processed) {
         unit->flags &= ~0x20u;
         if (selected == 0)
-            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MAKESELECTABLE").index, 1, 0, (Vec3*)nullptr, 0, 0);
+            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("MAKESELECTABLE"), 1, 0, (Vec3*)nullptr, 0, 0);
     }
 }
 
@@ -242,48 +237,13 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
 #include <memory.h>
 #include <vector>
 
-namespace std {
-template<> class vector<Unit*, allocator<Unit*> > {
-public:
-    typedef Unit* T;
-    typedef allocator<Unit*> A;
-    typedef A::size_type size_type;
-
-    vector(size_type _N, const T& _V = T(), const A& _Al = A())
-        : allocator(_Al)
-    {
-        _First = allocator.allocate(_N, (void *)0);
-        _Ufill(_First, _N, _V);
-        _Last = _First + _N;
-        _End = _Last;
-    }
-    ~vector()
-        { allocator.deallocate(_First, _End - _First); }
-    T& operator[](size_type _P)
-        { return (*(_First + _P)); }
-
-protected:
-    A allocator;
-    T* _First;
-    T* _Last;
-    T* _End;
-    void _Ufill(T* _F, size_type _N, const T& _X);
-};
-}
-
-void std::vector<Unit*, std::allocator<Unit*> >::_Ufill(Unit** _F, size_type _N, Unit* const& _X)
-{
-    for (; 0 < _N; --_N, ++_F)
-        *_F = _X;
-}
-
 // FUNCTION: 0x488310
 void __cdecl CreateMissionUnits()
 {
     Player* p;
     char buf[100];
     int n = g_seams.mission->CountMissionUnits();
-    std::vector<Unit*> units(n);
+    std::vector<Ref<Unit> > units(n);
     for (int i = 0; i < n; i++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
@@ -304,7 +264,7 @@ void __cdecl CreateMissionUnits()
         Vec3 pos = {e->x, e->y, e->z};
         g_seams.map->SnapWorldPosToFootprint((UnitDef*)item, &pos);
         g_seams.mission->SetMissionUnitPosition(i, &pos);
-        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, pos, 1, 1, 0);
+        Unit* u = g_seams.units->CreateUnit((unsigned char)(e->player - 1), item->id, &pos, 1, 1, 0);
         if (u) {
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
             u->health = (unsigned short)((unsigned)(((UnitDefMaxHealthView*)u->def.get())->f1fa * e->health) / 100);
@@ -312,12 +272,13 @@ void __cdecl CreateMissionUnits()
             units[i] = u;
         }
     }
+    const Ref<Unit>* table = n > 0 ? &units[0] : nullptr;
     for (int j = 0; j < n; j++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
         g_seams.mission->GetMissionUnit(j, e);
         if (e->initialMission && units[j])
-            RunInitialMission(units[j], e->initialMission, (UnitPtrVectorView*)&units);
+            RunInitialMission(units[j], e->initialMission, table, n);
     }
     if (n <= 0)
         g_seams.players->DeactivateConditions(g_game->list_391ed);
@@ -408,7 +369,7 @@ Player** __stdcall Partition(Player** first, Player** last,
     }
 }
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_globals.h"
 
 class UnitCategory {
@@ -548,7 +509,7 @@ UnitTypeSet* __stdcall GetLoadCategoryMask(char* name)
     return p;
 }
 
-static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, char* text)
+static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefNameKeyView* last, const char* text)
 {
     int n = (int)((char*)last - (char*)first) / 0x249;
     while (n > 0) {
@@ -567,7 +528,7 @@ static inline UnitDefNameKeyView* FindByName(UnitDefNameKeyView* first, UnitDefN
 }
 
 // FUNCTION: 0x488d30
-void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
+void UnitTypeSet::AddTypeOrCategory(const char* text, int* out)
 {
     UnitDefNameKeyView* base = (UnitDefNameKeyView *)g_game->defs.get();
     UnitDefNameKeyView* last = base + g_game->unitDefCount;

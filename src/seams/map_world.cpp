@@ -5,7 +5,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/map.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"
@@ -37,20 +37,6 @@ void MapOnFeaturesPassMaps(const void* event, unsigned int size)
     MapInbox(&passMaps, sizeof(passMaps));
 }
 
-void __stdcall VisitUnitsInRange(const Vec3* pos, int range, UnitVisitor* visitor)
-{
-    unsigned short ids[256];
-    int skip = 0;
-    for (;;) {
-        int count = g_seams.map->UnitsInRange(pos, range, skip, ids, 256);
-        for (int i = 0; i < count; i++)
-            visitor->Visit(&g_game->units[ids[i]]);
-        if (count < 256)
-            return;
-        skip += count;
-    }
-}
-
 int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)
 {
     ReplayImport call(RI_SCHEDULE_MAP_CAN_BUILD_AT);
@@ -59,7 +45,7 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
     call.Int(type);
     call.Ptr(player);
     SchedDeliver(SCHED_MAP);
-    return call.Result(g_seams.map->CanBuildAt(unit, cell, type, player));
+    return call.Result(g_seams.map->CanBuildAt(unit, &cell, type, player));
 }
 
 int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags)
@@ -70,7 +56,7 @@ int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short oth
     call.Ptr(&cell);
     call.Int(flags);
     SchedDeliver(SCHED_MAP);
-    return call.Result(g_seams.map->CanPlaceUnitFootprint(unit, otherTypeId, cell, flags));
+    return call.Result(g_seams.map->CanPlaceUnitFootprint(unit, otherTypeId, &cell, flags));
 }
 
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)

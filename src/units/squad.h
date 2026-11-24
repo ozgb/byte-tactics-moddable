@@ -19,21 +19,6 @@ public:
     Squad(Player*, int);
 };
 
-class UnitSwapEraseVector {
-public:
-    typedef std::vector<Unit*> UnitVector;
-    UnitVector units;
-
-    // FUNCTION: 0x4800c0
-    UnitVector::iterator EraseSwapBack(UnitVector::iterator where)
-    {
-        UnitVector::iterator last = units.end() - 1;
-        *where = *last;
-        units.erase(last);
-        return where;
-    }
-};
-
 class IntDynArray {
 public:
     std::vector<int> items;

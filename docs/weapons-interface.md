@@ -1,6 +1,6 @@
 # The weapons interface
 
-Weapons sits behind `interfaces/weapons.h` (version 3.1; 3.1 added the slot `SaveState`), the eighth module on the scheduler after economy
+Weapons sits behind `interfaces/weapons.h` (version 4.0; 3.1 added the slot `SaveState`, 4.0 made `FindWeaponByName`'s name const), the eighth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`), players (`docs/players-interface.md`) and ai
 (`docs/ai-interface.md`) (#984). It is the weapons, projectiles and explosions of the simulation, and the damage rules
@@ -176,7 +176,7 @@ rules run in `src/weapons/damage.cpp` (`DamageUnit`, `ApplyUnitDamage`, `Paralyz
 as the effects above. It writes its own state: the projectile table, the explosions, the debris and the exploded pieces
 (section 5).
 
-**Payloads.** Every event and effect starts with `WeaponsEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for SPAWN, AREA_DAMAGE and AIM_DONE, which name none). Each kind has the payload of `interfaces/weapons.h` (version 3.0) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `WeaponsEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for SPAWN, AREA_DAMAGE and AIM_DONE, which name none). Each kind has the payload of `interfaces/weapons.h` (version 4.0; the payloads are unchanged since 3.0) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

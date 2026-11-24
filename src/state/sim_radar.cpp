@@ -4,7 +4,7 @@
 #include "block.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 static SimRadarArena* g_simRadar;
 

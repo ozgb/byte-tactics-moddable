@@ -88,6 +88,9 @@ jobs:
       - name: Test the spec lint
         run: python3 tools/test_speclint.py
 
+      - name: Test the quirk flag doc comments
+        run: python3 tools/test_quirks.py
+
       - name: Data notes cite no line numbers
         run: |
           python3 tools/test_citecheck.py

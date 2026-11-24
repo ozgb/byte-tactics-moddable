@@ -3,6 +3,7 @@
 #include "win_types.h"
 #include "unit_def.h"
 #include "../../interfaces/ref.h"
+#include "../../interfaces/services.h"
 #include "../state/block.h"
 #include <stdio.h>
 #include <string.h>
@@ -14,9 +15,10 @@
 #include "../util/vec3.h"
 #include "../quirks/quirks.h"
 #include "../util/tdf.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "squad.h"
 #include "../../interfaces/seams.h"
+#include "../seams/unit_query_buffer.h"
 
 class UnitRef;
 
@@ -584,14 +586,18 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
     int fallbackDistance=0x7fffffff;
     int bestDistance=0x7fffffff;
     Unit* best=0;
-    std::vector<Unit*> candidates;
-    if(useRange) g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,g_seams.weapons->GetWeaponRange(unit,weapon),0,&candidates);
-    else g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,unit->def->range,0,&candidates);
+    UnitQueryBuffer candidates;
+    int radius=useRange ? g_seams.weapons->GetWeaponRange(unit,weapon) : unit->def->range;
+    int candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,radius,0,candidates.Data(),candidates.Capacity());
+    if(candidates.Grow(candidateCount))
+        candidateCount=g_seams.los_radar->GetVisibleEnemiesInRadius(unit->playerIndex,(const Vec3*)&unit->pos,radius,0,candidates.Data(),candidates.Capacity());
+    candidateCount=candidates.Written(candidateCount);
     for(int count=0;count<50;++count) {
-        if(candidates.empty()) break;
-        std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());
-        Unit* target=*it;
-        ((UnitSwapEraseVector*)&candidates)->EraseSwapBack(it);
+        if(candidateCount==0) break;
+        int pick=RandomInt(candidateCount);
+        Unit* target=candidates[pick];
+        candidates[pick]=candidates[candidateCount-1];
+        --candidateCount;
         if((target->flags&0x10000000) && !(target->flags&0x4000) &&
            ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
            ((unit->def->flags1&0x10000000) || g_seams.weapons->WeaponCanReachUnit(unit,target,weapon)) &&

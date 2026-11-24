@@ -184,8 +184,8 @@ public:
 
 #include "../../link/globals.h"
 #include "../../interfaces/seams.h"
-#include "../../interfaces/services.h"
-#include "../map/unit_visitor.h"
+#include "../util/engine_services.h"
+#include "../seams/units_in_range.h"
 #include "../../interfaces/economy.h"
 
 struct GafSequenceRecord;
@@ -301,7 +301,7 @@ void UpdateSensorRadarAndCloak(void)
                 v.radarRangeSq = t;
                 v.sonarRangeSq = s;
                 v.pos = u->pos;
-                VisitUnitsInRange((Vec3*)pp, (int)a << 16, (UnitVisitor*)&v);
+                ForEachUnitInRange(pp, (int)a << 16, [&v](Unit* unit) { v.MarkUnitsInRadarOrSonarRadius(unit); });
             }
         }
     }
@@ -313,13 +313,13 @@ void UpdateSensorRadarAndCloak(void)
                 int r = (int)u->def->radardistancejam << 16;
                 Vec3* pp = &u->pos;
                 RadarJamVisitor v;
-                VisitUnitsInRange((Vec3*)pp, r, (UnitVisitor*)&v);
+                ForEachUnitInRange(pp, r, [&v](Unit* unit) { v.ApplyRadarJamFlag(unit); });
             }
             if (u->def->sonardistancejam != 0) {
                 int r2 = (int)u->def->sonardistancejam << 16;
                 Vec3* pp2 = &u->pos;
                 SonarJamVisitor v;
-                VisitUnitsInRange((Vec3*)pp2, r2, (UnitVisitor*)&v);
+                ForEachUnitInRange(pp2, r2, [&v](Unit* unit) { v.ApplySonarJamFlag(unit); });
             }
         }
     }

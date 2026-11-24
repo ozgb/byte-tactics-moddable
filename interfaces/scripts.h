@@ -15,9 +15,9 @@ class UnitScript;
 class HapiBank;
 
 // Major version of the scripts interface, changed when a slot is removed or its signature changes.
-#define SCRIPTS_VERSION_MAJOR 2
+#define SCRIPTS_VERSION_MAJOR 3
 // Minor version of the scripts interface, changed when a slot is added.
-#define SCRIPTS_VERSION_MINOR 1
+#define SCRIPTS_VERSION_MINOR 0
 
 // The fields every scripts event starts with.
 struct ScriptsEventHeader {
@@ -91,20 +91,20 @@ struct ScriptsState {
 
 // Unit scripts and piece state.
 struct ScriptsSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const ScriptsEventHeader* event, unsigned int size);
     // Starts a script by the index of its name with up to four arguments and returns its thread, for a unit's script that another machine started (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* StartScriptWithArgsByIndex)(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d);
-    // Runs a named script that answers a query and returns its result; synchronous: the script runs at once and the caller reads the answer in the same statement (thiscall in 3.1c, this first). Hooks: none.
-    int (__stdcall* QueryScript)(CobScript* script, char* name, int* p2, int* p3, int* p4, int* p5);
+    // Runs a named script that answers a query and returns 1, or 0 when it could not start; each non-null argument is passed to the script and receives its value back; synchronous: the script runs at once and the caller reads the answer in the same statement (thiscall in 3.1c, this first). Hooks: none.
+    int (__stdcall* QueryScript)(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3);
     // Returns the index of a named script of a unit, or a negative number when it has none (thiscall in 3.1c, this first). Hooks: none.
     int (__stdcall* FindScript)(CobScript* script, const char* name);
-    // Returns the offset of a piece of a unit from its position. Hooks: none.
-    Vec3 (__stdcall* GetPieceOffset)(Unit* unit, int piece);
-    // Returns the world position of a piece of a unit. Hooks: none.
-    Vec3 (__stdcall* GetPiecePosition)(Unit* unit, int piece);
-    // Returns the angles of a piece of a unit. Hooks: none.
-    Angles16 (__stdcall* GetPieceAngles)(Unit* unit, int piece);
+    // Writes to out the offset of a piece of a unit from its position. Hooks: none.
+    void (__stdcall* GetPieceOffset)(Unit* unit, int piece, Vec3* out);
+    // Writes to out the world position of a piece of a unit. Hooks: none.
+    void (__stdcall* GetPiecePosition)(Unit* unit, int piece, Vec3* out);
+    // Writes to out the angles of a piece of a unit. Hooks: none.
+    void (__stdcall* GetPieceAngles)(Unit* unit, int piece, Angles16* out);
     // Runs the unit's script that names its nano piece and writes the piece's world position; synchronous: the caller reads the position in the same statement. Hooks: none.
     void (__stdcall* GetNanoPiecePosition)(Unit* unit, Vec3* out);
     // Runs the unit's scripts that name the piece a weapon aims from and writes the piece's world position; synchronous: the caller reads the position in the same statement. Hooks: none.

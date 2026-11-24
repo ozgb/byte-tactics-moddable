@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <time.h>
 #include "../../interfaces/host.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/game_rand.h"
 #include "../files/files_api.h"
 
@@ -325,7 +325,7 @@ void __cdecl LoadMatch(void*)
                 if (rec->active != 0 && rec->team == 1)
                     start = pos;
                 unsigned short id = g_seams.units->FindUnitTypeId(g_game->sideDefs[side].commander);
-                g_seams.units->CreateUnit(rec->kind, id, *(Vec3*)&pos, 1, 1, 0);
+                g_seams.units->CreateUnit(rec->kind, id, (Vec3*)&pos, 1, 1, 0);
                 int s1 = pl->energy * 100;
                 int s2 = pl->metal * 100;
                 rec->flags_149.started = 1;
@@ -691,7 +691,7 @@ void LoadingScreenFrame(void)
         DrawSurface(&gadget, (void*)((int)g_game->surface), 0, 0);
         if (g_seams.mission->GetGameType() != 1) {
             SetTextColors(color, 0xfe);
-            char* name = g_seams.mission->GetMissionName();
+            const char* name = g_seams.mission->GetMissionName();
             strncpy(namebuf, name, 100);
             namebuf[99] = 0;
             if (GetPreferredLanguage() != 0 && _strcmpi((const char*)GetPreferredLanguage(), "english") != 0) {

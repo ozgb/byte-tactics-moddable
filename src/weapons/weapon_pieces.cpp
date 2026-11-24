@@ -34,6 +34,8 @@ void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weap
 {
     if (piece < 0)
         piece = QueryWeaponPiece(obj, weapon);
-    *out = obj->pos + g_seams.scripts->GetPieceOffset((Unit*)obj, piece);
+    Vec3 offset;
+    g_seams.scripts->GetPieceOffset((Unit*)obj, piece, &offset);
+    *out = obj->pos + offset;
 }
 

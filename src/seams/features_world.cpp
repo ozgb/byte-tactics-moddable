@@ -2,7 +2,7 @@
 
 #include "../../interfaces/seams.h"
 #include "../../interfaces/features.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
 #include "../game/scheduler.h"

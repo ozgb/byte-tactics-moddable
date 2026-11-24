@@ -1626,7 +1626,7 @@ StringRefAppendView* StringRefAppendView::Append(const StringRefAppendView& othe
     return this;
 }
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 // FUNCTION: 0x4c9180 ??0StringRef@@QAE@XZ
 StringRef::StringRef()

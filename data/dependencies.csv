@@ -1557,6 +1557,7 @@ los_radar,map,Point16::y,-,unobserved,0,,
 los_radar,map,Rec::flags,-,unobserved,0,,
 los_radar,map,Ref<Unit>::offset,-,unobserved,0,,
 los_radar,map,Unit::flags,-,unobserved,0,,
+los_radar,map,UnitsInRange,-,unobserved,0,,indirect
 los_radar,map,Vec3::x,-,unobserved,0,,
 los_radar,map,Vec3::y,-,unobserved,0,,
 los_radar,map,Vec3::z,-,unobserved,0,,
@@ -1883,8 +1884,6 @@ movement,players,Unit::motion,units,immediate,1,mission-kill-mobile@180,
 movement,players,Vec3::x,-,unobserved,0,,
 movement,players,Vec3::y,-,unobserved,0,,
 movement,players,Vec3::z,-,unobserved,0,,
-movement,scripts,GetPieceAngles,-,unobserved,0,,indirect
-movement,scripts,GetPiecePosition,-,unobserved,0,,indirect
 movement,scripts,Ref<Unit>::offset,-,unobserved,0,,
 movement,scripts,Vec3::x,-,unobserved,0,,
 movement,scripts,Vec3::y,-,unobserved,0,,
@@ -1900,7 +1899,7 @@ movement,units,BitWriter::index,-,unobserved,0,,
 movement,units,LoadUnit,-,unobserved,0,,indirect
 movement,units,MovementSavedState::flag,-,unobserved,0,,
 movement,units,MovementSavedState::mode,-,unobserved,0,,
-movement,units,MovementSavedState::p2,-,unobserved,0,,
+movement,units,MovementSavedState::smoothedAcceleration,-,unobserved,0,,
 movement,units,MovementSavedState::speed,-,unobserved,0,,
 movement,units,MovementSavedState::turn,-,unobserved,0,,
 movement,units,MovementSavedState::velocity,-,unobserved,0,,
@@ -1964,6 +1963,7 @@ orders,map,Point16::x,-,unobserved,0,,
 orders,map,Point16::y,-,unobserved,0,,
 orders,map,Ref<Unit>::offset,-,unobserved,0,,
 orders,map,SnapWorldPosToFootprint,-,unobserved,0,,indirect
+orders,map,UnitsInRange,-,unobserved,0,,indirect
 orders,map,Vec3::x,-,unobserved,0,,
 orders,map,Vec3::y,-,unobserved,0,,
 orders,map,Vec3::z,-,unobserved,0,,
@@ -2027,8 +2027,6 @@ orders,players,Vec3::x,-,unobserved,0,,
 orders,players,Vec3::y,-,unobserved,0,,
 orders,players,Vec3::z,-,unobserved,0,,
 orders,scripts,GetNanoPiecePosition,-,unobserved,0,,indirect
-orders,scripts,GetPieceOffset,-,unobserved,0,,indirect
-orders,scripts,GetPiecePosition,-,unobserved,0,,indirect
 orders,scripts,Ref<Unit>::offset,-,unobserved,0,,
 orders,scripts,Vec3::x,-,unobserved,0,,
 orders,scripts,Vec3::y,-,unobserved,0,,
@@ -2042,7 +2040,6 @@ orders,targeting,Vec3::z,-,unobserved,0,,
 orders,targeting,rng.parkMiller,units,ordered,7,mission-build-unit@36,
 orders,units,AddBuildProgress,-,unobserved,0,,indirect
 orders,units,AddRepairProgress,-,unobserved,0,,indirect
-orders,units,CreateUnit,-,unobserved,0,,indirect
 orders,units,FindUnitTypeId,-,unobserved,0,,indirect
 orders,units,Fixed::value,-,unobserved,0,,
 orders,units,GetFactoriesInRadius,-,unobserved,0,,indirect
@@ -2201,6 +2198,7 @@ players,map,Player::type,-,unobserved,0,,
 players,map,Point16::x,-,unobserved,0,,
 players,map,Point16::y,-,unobserved,0,,
 players,map,Ref<Unit>::offset,-,unobserved,0,,
+players,map,UnitsInRange,-,unobserved,0,,indirect
 players,map,Vec3::x,-,unobserved,0,,
 players,map,Vec3::y,-,unobserved,0,,
 players,map,Vec3::z,-,unobserved,0,,
@@ -2245,7 +2243,6 @@ players,targeting,Vec3::x,-,unobserved,0,,
 players,targeting,Vec3::y,-,unobserved,0,,
 players,targeting,Vec3::z,-,unobserved,0,,
 players,units,CreateFactoryIndex,-,unobserved,0,,indirect
-players,units,CreateUnit,-,unobserved,0,,indirect
 players,units,FindUnitTypeId,-,unobserved,0,,indirect
 players,units,FreeFactoryIndex,-,unobserved,0,,indirect
 players,units,Game::localPlayer,-,unobserved,0,,
@@ -2606,7 +2603,7 @@ units,movement,MovementGetMotionState,-,unobserved,0,,indirect
 units,movement,MovementReadNetState,-,unobserved,0,,indirect
 units,movement,MovementSavedState::flag,-,unobserved,0,,
 units,movement,MovementSavedState::mode,-,unobserved,0,,
-units,movement,MovementSavedState::p2,-,unobserved,0,,
+units,movement,MovementSavedState::smoothedAcceleration,-,unobserved,0,,
 units,movement,MovementSavedState::speed,-,unobserved,0,,
 units,movement,MovementSavedState::turn,-,unobserved,0,,
 units,movement,MovementSavedState::velocity,-,unobserved,0,,
@@ -2901,7 +2898,6 @@ weapons,ai,rng.parkMiller,units,ordered,1,edges-economy-targeting@244,
 weapons,economy,Ref<Unit>::offset,-,unobserved,0,,
 weapons,features,GafFrame::xOffset,-,unobserved,0,,
 weapons,features,GafFrame::yOffset,-,unobserved,0,,
-weapons,features,GetFootprintCentre,-,unobserved,0,,indirect
 weapons,features,Ref<Unit>::offset,-,unobserved,0,,
 weapons,features,Vec3::x,-,unobserved,0,,
 weapons,features,Vec3::y,-,unobserved,0,,
@@ -2983,8 +2979,6 @@ weapons,players,Vec3::z,-,unobserved,0,,
 weapons,scripts,Angles16::bank,-,unobserved,0,,
 weapons,scripts,Angles16::heading,-,unobserved,0,,
 weapons,scripts,Angles16::pitch,-,unobserved,0,,
-weapons,scripts,GetPieceOffset,-,unobserved,0,,indirect
-weapons,scripts,GetPiecePosition,-,unobserved,0,,indirect
 weapons,scripts,Ref<Unit>::offset,-,unobserved,0,,
 weapons,scripts,Vec3::x,-,unobserved,0,,
 weapons,scripts,Vec3::y,-,unobserved,0,,

@@ -373,7 +373,8 @@ class ModuleManifestTest(unittest.TestCase):
         meteors = next(e for e in document["modules"] if e["name"] == "wind_meteors")
         self.assertEqual(meteors["imports"]["services"]["WindMeteorsEmit"], [["linear", "int"], "void"])
         self.assertEqual(meteors["exports"][:2], ["UpdateWind", "UpdateMeteors"])
-        self.assertEqual(document["majors"]["services"], 2)
+        major = re.search(r"#define SERVICES_VERSION_MAJOR (\d+)", (ROOT / oraclekit.SERVICES_HEADER).read_text())
+        self.assertEqual(document["majors"]["services"], int(major.group(1)))
 
     def test_the_name_check_finds_paths_and_files(self):
         for text in ("src/a", "x lib/b", "a.cpp", "m.h ", "orig/TotalA.exe", "build/tools"):
@@ -575,7 +576,7 @@ SIM_TERMS = (
     "state 2 of the pickup order,The transport starts a pickup attempt.,layout.json Order.state\n"
     "kill type 3,A self-destruct.,\n"
 )
-SIM_FILES = {"interfaces/services.h": SIM_HEADER, oraclekit.SIM_EVENTS_PAGE: SIM_PAGE, oraclekit.TERMS_SOURCE: SIM_TERMS}
+SIM_FILES = {oraclekit.SIM_EVENTS_HEADER: SIM_HEADER, oraclekit.SIM_EVENTS_PAGE: SIM_PAGE, oraclekit.TERMS_SOURCE: SIM_TERMS}
 SIM_CONTENTS = [("dir", "interfaces", ""), ("file", oraclekit.SIM_EVENTS_PAGE, "")]
 REAL_LAYOUT: dict = {}
 
@@ -956,11 +957,12 @@ SCHEMA_TEXT = json.dumps({
 CODE_TABLES_TEXT = "table,entry,kit_name\norderNotify,ReadyOrder,Ready\norderNotify,AttackChaseOrder,Attack_Chase\n"
 SCHEMA_SOURCE = ("int ReadyOrder(int a) { return a; }\nint AttackChaseOrder(int a) { return a; }\n"
                  "struct HiddenView { int y; };\nint g_hiddenTable[4];\nint g_hiddenVtable[2];\nint velY;\n")
-SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, "")]
+SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, ""), ("file", oraclekit.SERVICES_HEADER, "")]
 
 
-def schema_repo(tmp: str, doc: str = "alpha\n", tables: str = CODE_TABLES_TEXT) -> Path:
-    return repo(tmp, {"docs/a.md": doc, oraclekit.SCHEMA: SCHEMA_TEXT, oraclekit.CODE_TABLES_SOURCE: tables, "src/o.cpp": SCHEMA_SOURCE})
+def schema_repo(tmp: str, doc: str = "alpha\n", tables: str = CODE_TABLES_TEXT, services: bool = True) -> Path:
+    extra = {oraclekit.SERVICES_HEADER: "int GameRand(int s);\n"} if services else {}
+    return repo(tmp, {"docs/a.md": doc, oraclekit.SCHEMA: SCHEMA_TEXT, oraclekit.CODE_TABLES_SOURCE: tables, "src/o.cpp": SCHEMA_SOURCE, **extra})
 
 
 class ReplaySchemaKitTest(unittest.TestCase):
@@ -994,6 +996,35 @@ class ReplaySchemaKitTest(unittest.TestCase):
         self.assertEqual(kit["annotations"]["services"], [{"name": "SimAlloc"}])
         self.assertEqual(list(kit["annotations"]["callbacks"]), ["UnitVisitor"])
 
+    def test_a_member_service_takes_the_free_function_declaration_of_the_services_header(self):
+        header = ("// Loads a file.\nint __stdcall TdfFile_LoadFile(TdfFileLayout* file,\n                             const char* path);\n"
+                  "// Draws a number.\nint __cdecl GameRand(RandStream stream);\nclass TdfRecord;\n")
+        schema = json.dumps({"annotations": {"services": [
+            {"name": "GameRand", "declaration": "int __cdecl GameRand(RandStream stream);"},
+            {"name": "TdfFile_LoadFile", "owner": "TdfFile", "declaration": "int LoadFile(const char* path);", "result": "int",
+             "args": [{"mode": "handle", "param": "this", "kind": "file"}, {"mode": "text", "param": "path"}]},
+            {"name": "CommandArgs_GetIntArg", "owner": "CommandArgs", "declaration": "int GetIntArg(int index, int default_val);"}]}}).encode()
+        kit = json.loads(oraclekit.kit_schema(schema, {}, set(), header))
+        self.assertEqual(kit["annotations"]["services"], [
+            {"name": "GameRand", "declaration": "int __cdecl GameRand(RandStream stream);"},
+            {"name": "TdfFile_LoadFile", "owner": "TdfFile", "declaration": "int __stdcall TdfFile_LoadFile(TdfFileLayout* file, const char* path);",
+             "result": "int", "args": [{"mode": "handle", "param": "this", "kind": "file"}, {"mode": "text", "param": "path"}]}])
+
+    def test_without_a_services_header_every_member_service_is_left_out(self):
+        schema = json.dumps({"annotations": {"services": [{"name": "GameRand"}, {"name": "TdfFile_LoadFile", "owner": "TdfFile"}]}}).encode()
+        self.assertEqual(json.loads(oraclekit.kit_schema(schema, {}, set(), ""))["annotations"]["services"], [{"name": "GameRand"}])
+        self.assertEqual(len(json.loads(oraclekit.kit_schema(schema, {}))["annotations"]["services"]), 2)
+
+    def test_the_real_member_services_take_the_declarations_of_the_real_services_header(self):
+        names = oraclekit.code_table_names((ROOT / oraclekit.CODE_TABLES_SOURCE).read_bytes())
+        header = (ROOT / oraclekit.SERVICES_HEADER).read_text()
+        kit = json.loads(oraclekit.kit_schema((ROOT / oraclekit.SCHEMA).read_bytes(), names, set(), header))
+        declared = oraclekit.free_functions(header)
+        members = [s for s in kit["annotations"]["services"] if "owner" in s]
+        self.assertTrue(members)
+        for service in members:
+            self.assertEqual(service["declaration"], declared[service["name"]])
+
     def test_a_schema_entry_naming_an_undeclared_source_global_or_type_is_refused_with_its_path_and_key(self):
         schema = json.dumps({"annotations": {"game_aliases": {"g_hiddenTable": "Game.table"},
                                              "objects": {"Spot": {"type": "HiddenView", "fields": [
@@ -1016,7 +1047,7 @@ class ReplaySchemaKitTest(unittest.TestCase):
         schema["annotations"]["objects"]["Spot"]["type"] = "HiddenView"
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp, {"docs/a.md": "alpha\n", oraclekit.SCHEMA: json.dumps(schema), oraclekit.CODE_TABLES_SOURCE: CODE_TABLES_TEXT,
-                              "src/o.cpp": SCHEMA_SOURCE})
+                              "src/o.cpp": SCHEMA_SOURCE, oraclekit.SERVICES_HEADER: "int GameRand(int s);\n"})
             kit = Path(out) / "k"
             with self.assertRaises(oraclekit.Refusal) as caught:
                 oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
@@ -1031,6 +1062,15 @@ class ReplaySchemaKitTest(unittest.TestCase):
                 oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
             self.assertIn("docs/a.md:3: function 'AttackChaseOrder' is declared by no interface header", str(caught.exception))
             self.assertIn("docs/a.md:3: identifier 'AttackChaseOrder' is in the source but not in the kit", str(caught.exception))
+            self.assertFalse(kit.exists())
+
+    def test_a_schema_without_a_tracked_services_header_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = schema_repo(tmp, services=False)
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.export(root, kit, True, {"records": {}}, CONTENTS + [("file", oraclekit.SCHEMA, "")])
+            self.assertEqual(str(caught.exception), "refused: interfaces/services.h has no tracked file")
             self.assertFalse(kit.exists())
 
     def test_a_code_table_entry_without_a_row_or_a_row_without_an_entry_is_refused(self):

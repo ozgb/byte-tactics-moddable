@@ -2,7 +2,7 @@
 
 // included by replay_native_test.cpp after its helpers
 
-WeaponDef* __stdcall Imp_weapons_FindWeaponByName(char* a0)
+WeaponDef* __stdcall Imp_weapons_FindWeaponByName(const char* a0)
 {
     ReplayText t;
     StartImport(t, "weapons.FindWeaponByName");
@@ -40,7 +40,7 @@ int __stdcall Imp_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a
     return ParseResult<int>(r);
 }
 
-int __stdcall Imp_files_BankOpenAccount(HapiBank* a0, char* a1)
+int __stdcall Imp_files_BankOpenAccount(HapiBank* a0, const char* a1)
 {
     ReplayText t;
     StartImport(t, "files.BankOpenAccount");
@@ -66,7 +66,7 @@ int __stdcall Imp_files_BankSetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-int __stdcall Imp_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
+int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
 {
     ReplayText t;
     StartImport(t, "files.BankGetInteger");
@@ -80,7 +80,7 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-Vec3 __stdcall Imp_features_GetFootprintCentre(Point16* a0, Feature* a1)
+void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "features.GetFootprintCentre");
@@ -89,7 +89,8 @@ Vec3 __stdcall Imp_features_GetFootprintCentre(Point16* a0, Feature* a1)
     Space(t);
     ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
@@ -140,25 +141,7 @@ unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
     return ParseResult<unsigned int>(r);
 }
 
-void __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, std::vector<Unit*, std::allocator<Unit*> >* a4)
-{
-    ReplayText t;
-    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    const char* r = Enter(t);
-    ApplyUnits(a4, "out");
-    (void)r;
-}
-
-int __stdcall Imp_los_radar_GetVisibleEnemiesInRadiusList(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
 {
     ReplayText t;
     StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
@@ -207,7 +190,7 @@ void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
     (void)r;
 }
 
-int __stdcall Imp_network_SendScriptCallByName(Unit* a0, char* a1, char a2, int a3, int a4, int a5, int a6)
+int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
 {
     ReplayText t;
     StartImport(t, "network.SendScriptCallByName");
@@ -292,7 +275,7 @@ void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char 
     (void)r;
 }
 
-Vec3 __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1)
+void __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "scripts.GetPieceOffset");
@@ -301,10 +284,11 @@ Vec3 __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1)
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
-Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
+void __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "scripts.GetPiecePosition");
@@ -313,10 +297,11 @@ Vec3 __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1)
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseValueText<Vec3>(ROK_VEC3, r);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
 }
 
-int __stdcall Imp_scripts_QueryScript(CobScript* a0, char* a1, int* a2, int* a3, int* a4, int* a5)
+int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, int* a3, int* a4, int* a5)
 {
     ReplayText t;
     StartImport(t, "scripts.QueryScript");
@@ -333,10 +318,10 @@ int __stdcall Imp_scripts_QueryScript(CobScript* a0, char* a1, int* a2, int* a3,
     Space(t);
     AddInOutScalar(t, a5);
     const char* r = Enter(t);
-    ApplyInOutScalar(a2, "p2");
-    ApplyInOutScalar(a3, "p3");
-    ApplyInOutScalar(a4, "p4");
-    ApplyInOutScalar(a5, "p5");
+    ApplyInOutScalar(a2, "arg0");
+    ApplyInOutScalar(a3, "arg1");
+    ApplyInOutScalar(a4, "arg2");
+    ApplyInOutScalar(a5, "arg3");
     return ParseResult<int>(r);
 }
 
@@ -417,8 +402,8 @@ MapSeam g_native_map = {
     ApplyMapEventSlot,
     UnitsInRange,
     GetCellMeanHeight,
-    CanBuildAt,
-    CanPlaceUnitFootprint,
+    CanBuildAtSlot,
+    CanPlaceUnitFootprintSlot,
     BuildAllPassMaps,
     FreePassMaps,
     LoadMetalPlotmap,
@@ -741,11 +726,12 @@ int g_result_map_CanBuildAt;
 void Run_map_CanBuildAt()
 {
     UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
-    Point16 p1 = ArgScalar<Point16>("cell");
+    Point16 p1 = Point16();
+    ParseValueArg("cell", ROK_POINT16, &p1);
     short p2 = ArgScalar<short>("type");
     Player* p3 = (Player*)ArgObject("player", ROK_PLAYER);
     SetClosing("result");
-    g_result_map_CanBuildAt = g_seams.map->CanBuildAt(p0, p1, p2, p3);
+    g_result_map_CanBuildAt = g_seams.map->CanBuildAt(p0, &p1, p2, p3);
 }
 
 void After_map_CanBuildAt()
@@ -759,10 +745,11 @@ void Run_map_CanPlaceUnitFootprint()
 {
     UnitDef* p0 = (UnitDef*)ArgObject("unit", ROK_UNITDEF);
     unsigned short p1 = ArgScalar<unsigned short>("otherTypeId");
-    Point16 p2 = ArgScalar<Point16>("cell");
+    Point16 p2 = Point16();
+    ParseValueArg("cell", ROK_POINT16, &p2);
     int p3 = ArgScalar<int>("flags");
     SetClosing("result");
-    g_result_map_CanPlaceUnitFootprint = g_seams.map->CanPlaceUnitFootprint(p0, p1, p2, p3);
+    g_result_map_CanPlaceUnitFootprint = g_seams.map->CanPlaceUnitFootprint(p0, p1, &p2, p3);
 }
 
 void After_map_CanPlaceUnitFootprint()
@@ -1096,7 +1083,6 @@ void BindSeams()
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
-    g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;
     g_seams.network = &g_import_network;
     g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;

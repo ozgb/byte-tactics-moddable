@@ -28,6 +28,40 @@ def build(rows, ann=None, assignment=None):
     return rs.build(ann or annotations(), rows, assignment or rs.read_assignment())
 
 
+
+LEGACY_VECTOR_SLOT = (
+    "    void (__stdcall* GetVisibleEnemiesInRadius)(int player, const Vec3* pos, int radius, int flags, std::vector<Unit*, std::allocator<Unit*> >* out);\n"
+    "    int (__stdcall* GetVisibleEnemiesInRadiusList)(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity);\n")
+
+
+class legacy_los_radar:
+    """The los_radar interface as a vector slot and a buffer slot that plays as it, with their annotations: the form `playsAs` was made for."""
+
+    def __enter__(self):
+        self.dir = tempfile.TemporaryDirectory()
+        root = Path(self.dir.name)
+        for header in rs.INTERFACES.glob("*.h"):
+            (root / header.name).write_text(header.read_text())
+        text = (root / "los_radar.h").read_text()
+        text = re.sub(r"    int \(__stdcall\* GetVisibleEnemiesInRadius\)[^\n]*\n", lambda m: LEGACY_VECTOR_SLOT, text, count=1)
+        (root / "los_radar.h").write_text(text)
+        self.patch = mock.patch.object(rs, "INTERFACES", root)
+        self.patch.start()
+        ann = annotations()
+        slots = ann["subsystems"]["los_radar"]["slots"]
+        reach = slots["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
+        slots["GetVisibleEnemiesInRadius"]["args"]["out"] = {"mode": "units", "dir": "out", "kind": "Unit", "reach": reach, "depth": 2}
+        vec = slots["GetVisibleEnemiesInRadius"]["args"]
+        slots["GetVisibleEnemiesInRadiusList"] = {"playsAs": "GetVisibleEnemiesInRadius", "args": {
+            "pos": dict(vec["pos"]), "out": {"mode": "units-buffer", "dir": "out", "kind": "Unit", "capacity": "capacity"}}}
+        return ann
+
+    def __exit__(self, *exc):
+        self.patch.stop()
+        self.dir.cleanup()
+        return False
+
+
 class Interface(unittest.TestCase):
     def test_slots_come_from_the_header(self):
         iface = rs.parse_interface("wind_meteors", "WindMeteorsSeam")
@@ -382,21 +416,49 @@ class TargetingForms(unittest.TestCase):
         self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])
         self.assertIn('ApplyVec3(a1, "out");', files[rs.SLOTS_H])
 
-    def test_a_unit_vector_out_carries_its_reach_into_the_table(self):
-        files, _, model = self.generated()
+    def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
+        files, errors, model = self.generated()
+        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
+        slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]
+        self.assertNotIn("playsAs", slot)
+        self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
+        out = slot["args"][4]
+        self.assertEqual((out["reachCount"], out["depth"]), (7, 2))
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecLosRadarGetVisibleEnemiesInRadius"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('line.Add("  i los_radar.GetVisibleEnemiesInRadius");', body)
+        self.assertIn('ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + %d, 7);' % out["reachFirst"], body)
+        self.assertNotIn("ImportValue(line, a5);", body)
+        self.assertNotIn("ImportResult", body)
+        stub = files[rs.SLOTS_H]
+        body = stub[stub.index("Imp_los_radar_GetVisibleEnemiesInRadius("):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('StartImport(t, "los_radar.GetVisibleEnemiesInRadius");', body)
+        self.assertIn("return EnterList(t, a4, a5);", body)
+        self.assertNotIn("a5);\n    Space", body)
+        self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;", stub)
+
+    def test_a_self_recording_unit_buffer_needs_a_reach_and_a_capacity(self):
+        ann = annotations()
+        del ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("needs a reach list" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"]["out"]["capacity"] = "pos"
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
+
+    def test_a_unit_buffer_that_plays_as_another_slot_is_a_stub_of_that_slot(self):
+        with legacy_los_radar() as ann:
+            files, errors, model = self.generated(ann)
+        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
         out = [a for a in model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]["args"] if a["name"] == "out"][0]
         self.assertEqual((out["mode"], out["reachCount"], out["depth"]), ("units", 7, 2))
         self.assertIn("ImportOutUnits(line, \"out\", a4, kReplayReachFields + %d, 7);" % out["reachFirst"], files[rs.HOOKS_H])
         self.assertIn("ApplyUnits(a4, \"out\");", files[rs.SLOTS_H])
-
-    def test_a_unit_buffer_slot_is_played_as_the_recorded_vector_form(self):
-        files, errors, model = self.generated()
-        self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadiusList" in e], [])
         slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]
         self.assertEqual(slot["playsAs"], "GetVisibleEnemiesInRadius")
-        self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(pos)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
-        self.assertNotIn("GetVisibleEnemiesInRadiusList(out)", model["subsystems"]["los_radar"]["pending"]["unannotatedArgs"])
         stub = files[rs.SLOTS_H]
         body = stub[stub.index("Imp_los_radar_GetVisibleEnemiesInRadiusList"):]
         body = body[:body.index("\n}\n")]
@@ -404,18 +466,14 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("return EnterList(t, a4, a5);", body)
         self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadiusList = Imp_los_radar_GetVisibleEnemiesInRadiusList;", stub)
 
-    def test_a_unit_buffer_needs_a_slot_to_play_as_and_a_capacity(self):
-        ann = annotations()
-        del ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"]
-        _, errors, _ = self.generated(ann)
-        self.assertTrue(any("has a unit buffer and no `playsAs`" in e for e in errors), errors)
-        ann = annotations()
-        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "GetMapCell"
-        _, errors, _ = self.generated(ann)
+    def test_a_unit_buffer_that_plays_as_another_slot_needs_the_same_arguments_and_a_capacity(self):
+        with legacy_los_radar() as ann:
+            ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["playsAs"] = "GetMapCell"
+            _, errors, _ = self.generated(ann)
         self.assertTrue(any("`playsAs` GetMapCell takes the arguments" in e for e in errors), errors)
-        ann = annotations()
-        ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
-        _, errors, _ = self.generated(ann)
+        with legacy_los_radar() as ann:
+            ann["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadiusList"]["args"]["out"]["capacity"] = "pos"
+            _, errors, _ = self.generated(ann)
         self.assertTrue(any("needs a `capacity` that names an integer argument" in e for e in errors), errors)
 
     def test_a_reach_deeper_than_its_depth_is_an_error(self):
@@ -881,29 +939,28 @@ class StructForms(unittest.TestCase):
     def test_a_struct_by_value_is_written_as_its_fields_in_one_line(self):
         ann = annotations()
         movement = ann["subsystems"]["movement"].setdefault("slots", {})
-        movement.setdefault("NewPointMarker", {}).setdefault("args", {})["pos"] = {"mode": "value", "kind": "Point16"}
+        movement.setdefault("NewPointMarker", {}).setdefault("args", {})["pos"] = {"mode": "value", "kind": "Point16", "byPointer": True}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
-        self.assertIn('ArgValueStruct(s_call, "a", "pos", ROK_POINT16, &a1);', files[rs.HOOKS_H])
+        self.assertIn('ArgValueStruct(s_call, "a", "pos", ROK_POINT16, a1);', files[rs.HOOKS_H])
 
-    def test_a_result_by_value_is_recorded_in_the_import_line_and_the_closing_line(self):
+    def test_a_value_out_is_recorded_as_the_result_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["imports"].append("scripts.GetPieceAngles")
-        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "Angles16"}}
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
         body = hooks[hooks.index("RecScriptsGetPieceAngles"):]
         body = body[:body.index("\n}\n")]
-        self.assertIn("ImportResultValue(line, ROK_ANGLES16, &result);", body)
-        self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, &result);', body)
-        self.assertIn("return ParseValueText<Angles16>(ROK_ANGLES16, r);", files[rs.SLOTS_H])
+        self.assertIn("ImportResultValue(line, ROK_ANGLES16, a2);", body)
+        self.assertIn('ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, a2);', body)
+        self.assertIn("*a2 = ParseValueText<Angles16>(ROK_ANGLES16, r);", files[rs.SLOTS_H])
 
-    def test_a_result_by_value_of_another_type_is_an_error(self):
+    def test_a_value_out_of_another_type_is_an_error(self):
         ann = annotations()
-        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"result": {"mode": "value", "kind": "MissionType"}}
+        ann["subsystems"]["scripts"]["slots"]["GetPieceAngles"] = {"args": {"out": {"mode": "value", "kind": "MissionType", "dir": "out"}}}
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("the result is Angles16" in e for e in errors), errors)
+        self.assertTrue(any("the argument out is Angles16*, and the kind MissionType is MissionType*" in e for e in errors), errors)
 
     def test_an_unknown_mode_is_an_error(self):
         _, errors, _ = self.generated(self.targeting(mode="nonsense"))
@@ -1300,7 +1357,8 @@ class Snapshots(unittest.TestCase):
     """N9: an import that returns a buffer the slot fills is recorded by its size and a handle, and the bytes at slot exit."""
 
     def spec(self, **changes):
-        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
+        out = {"name": "SimCaptureAlloc", "id": "RI_SIM_CAPTURE_ALLOC", "header": "src/util/engine_services.h",
+               "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
                "args": [{"mode": "int", "param": "bytes"}, {"mode": "skip", "param": "offset"}], "result": "snapshot", "bytes": "bytes", "offset": "offset"}
         out.update(changes)
         return out
@@ -2096,15 +2154,58 @@ class ArgumentShapes(unittest.TestCase):
             self.assertTrue(any("a scalar in/out value is a pointer to one of" in e for e in errors), (ctype, errors))
         errors = self.errors([("int*", "p2")], {"p2": dict(self.SCALAR_INOUT, kind="FixtureAmount")})
         self.assertTrue(any("a scalar in/out value, which takes no `kind`" in e for e in errors), errors)
-        errors = self.errors([("FixtureAmount", "p2")], {"p2": {"mode": "value", "kind": "FixtureAmount", "dir": "out"}})
-        self.assertTrue(any("only inout is allowed on a value" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount", "p2")], {"p2": {"mode": "value", "kind": "FixtureAmount", "dir": "both"}})
+        self.assertTrue(any("only inout and out are allowed on a value" in e for e in errors), errors)
+
+    VALUE_OUT = {"mode": "value", "kind": "FixtureAmount", "dir": "out"}
+
+    def test_a_const_pointer_to_a_value_kind_is_recorded_as_the_value(self):
+        s, _ = self.slot([("const Point16*", "amount")], {})
+        a = s["args"][0]
+        self.assertEqual((a["mode"], a["kind"], a["byPointer"]), ("value", "Point16", True))
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgValueStruct(s_call, "a", "amount", ROK_POINT16, a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), ["ImportValueStruct(line, ROK_POINT16, a0);"])
+        self.assertIn("AddValueStruct(t, ROK_POINT16, a0);", "\n".join(rs.import_stub("units", "Query", s)))
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('Point16 p0 = Point16();\n    ParseValueArg("amount", ROK_POINT16, &p0);', runner)
+        self.assertIn("g_seams.units->Query(&p0)", runner)
+        self.assertEqual(self.errors([("const Point16*", "amount")], {}), [])
+
+    def test_a_pointer_to_a_value_kind_without_const_stays_pending(self):
+        s, _ = self.slot([("Point16*", "amount")], {})
+        self.assertEqual(s["args"][0]["mode"], "pending")
+
+    def test_a_value_out_is_the_result_line_of_the_call(self):
+        s, _ = self.slot([("int", "piece"), ("FixtureAmount*", "out")], {"out": self.VALUE_OUT})
+        a = s["args"][1]
+        self.assertEqual(rs.arg_out(a, 1, "a", {}), [])
+        self.assertEqual(rs.arg_out(a, 1, "i", {}), [])
+        self.assertEqual(rs.arg_out(a, 1, "o", {}), ['ArgValueStruct(s_tail, "o", "result", ROK_FIXTUREAMOUNT, a1);'])
+        wrapper = "\n".join(rs.wrapper("units", {}, "Query", s, {}, True))
+        self.assertIn("ImportResultValue(line, ROK_FIXTUREAMOUNT, a1);", wrapper)
+        stub = "\n".join(rs.import_stub("units", "Query", s))
+        self.assertIn("*a1 = ParseValueText<FixtureAmount>(ROK_FIXTUREAMOUNT, r);", stub)
+        self.assertNotIn("AddValueStruct", stub)
+        runner = "\n".join(rs.runner("units", "Query", s))
+        self.assertIn('SetClosing("result");', runner)
+        self.assertIn("g_seams.units->Query(p0, &g_out_units_Query_1)", runner)
+        self.assertIn("CompareValueResult(ROK_FIXTUREAMOUNT, &g_out_units_Query_1);", runner)
+
+    def test_a_value_out_is_a_pointer_to_its_kind_and_the_slot_has_no_other_result(self):
+        self.assertEqual(self.errors([("FixtureAmount*", "out")], {"out": self.VALUE_OUT}), [])
+        errors = self.errors([("FixtureAmount", "out")], {"out": self.VALUE_OUT})
+        self.assertTrue(any("is FixtureAmount, and the kind FixtureAmount is FixtureAmount*" in e for e in errors), errors)
+        errors = self.errors([("FixtureAmount*", "out")], {"out": self.VALUE_OUT}, "int", {"mode": "scalar"})
+        self.assertTrue(any("is a value out, which is the result of the slot" in e for e in errors), errors)
+        errors = self.errors([("const FixtureAmount*", "amount")], {"amount": {"mode": "value", "kind": "FixtureAmount", "byPointer": True, "dir": "out"}})
+        self.assertTrue(any("takes no direction" in e for e in errors), errors)
 
     def test_query_script_takes_its_four_values_as_scalar_in_out(self):
         files, errors, model = self.generated(annotations())
         self.assertEqual(errors, [])
         args = model["subsystems"]["scripts"]["slots"]["QueryScript"]["args"]
         self.assertEqual([a["mode"] for a in args[2:]], ["value"] * 4)
-        self.assertIn('ArgInOutScalar(s_call, "p5", a5);', files[rs.HOOKS_H])
+        self.assertIn('ArgInOutScalar(s_call, "arg3", a5);', files[rs.HOOKS_H])
 
     def test_a_slot_with_an_in_out_value_gets_an_after_function(self):
         ann = annotations()

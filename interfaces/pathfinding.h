@@ -171,67 +171,67 @@ struct PathUnitState {
 
 // The world as pathfinding sees it, read only apart from BeginSearch and EndSearch; given by the engine.
 struct PathWorldView {
-    // The tick being played.
+    // The tick being played. Hooks: none.
     unsigned int (__stdcall* Tick)(void);
-    // The most search work per tick the match setup allows, in the implementation's own units of work, or 0 when the match sets no limit and the implementation uses its own default budget.
+    // The most search work per tick the match setup allows, in the implementation's own units of work, or 0 when the match sets no limit and the implementation uses its own default budget. Hooks: none.
     unsigned int (__stdcall* SearchStepLimit)(void);
-    // The number of players in the match.
+    // The number of players in the match. Hooks: none.
     int (__stdcall* PlayerCount)(void);
-    // Whether a player (0 to 9) is in the match and plays.
+    // Whether a player (0 to 9) is in the match and plays. Hooks: none.
     int (__stdcall* IsPlaying)(int player);
-    // The number of unit slots each player has.
+    // The number of unit slots each player has. Hooks: none.
     int (__stdcall* UnitsPerPlayer)(void);
-    // The first unit slot of a player.
+    // The first unit slot of a player. Hooks: none.
     PathUnit (__stdcall* FirstUnit)(int player);
-    // The last unit slot of a player.
+    // The last unit slot of a player. Hooks: none.
     PathUnit (__stdcall* LastUnit)(int player);
-    // The unit slot after a slot.
+    // The unit slot after a slot. Hooks: none.
     PathUnit (__stdcall* NextUnit)(PathUnit unit);
-    // Fills a unit's state; returns 0 when the slot is empty or the unit has no movement class.
+    // Fills a unit's state; returns 0 when the slot is empty or the unit has no movement class. Hooks: none.
     int (__stdcall* UnitState)(PathUnit unit, PathUnitState* out);
-    // Movement class number 0 to 31, or 0 when that number is unused.
+    // Movement class number 0 to 31, or 0 when that number is unused. Hooks: none.
     PathClass (__stdcall* MoveClass)(int index);
-    // Whether a cell is on the map for a movement class.
+    // Whether a cell is on the map for a movement class. Hooks: none.
     int (__stdcall* InBounds)(PathClass moveClass, int x, int y);
-    // A cell's pass state for a movement class: 0 blocked, 1 passable at a cost, 2 or more open.
+    // A cell's pass state for a movement class: 0 blocked, 1 passable at a cost, 2 or more open. Hooks: none.
     int (__stdcall* Pass)(PathClass moveClass, int x, int y);
-    // The size of the visibility grid, whose cells are 2 by 2 cells.
+    // The size of the visibility grid, whose cells are 2 by 2 cells. Hooks: none.
     void (__stdcall* SeenSize)(int* width, int* height);
-    // Whether a player has seen a cell of the visibility grid.
+    // Whether a player has seen a cell of the visibility grid. Hooks: none.
     int (__stdcall* Seen)(int player, int x, int y);
-    // Whether a unit of a movement class can go straight between two cells: every cell the segment crosses is in bounds and not blocked.
+    // Whether a unit of a movement class can go straight between two cells: every cell the segment crosses is in bounds and not blocked. Hooks: none.
     int (__stdcall* LineOfSight)(PathClass moveClass, int x0, int y0, int x1, int y1);
-    // A cell's pass state for a movement class from terrain and features alone, as Pass without the stamps of units: 0 blocked, 1 passable at a cost, 2 or more open.
+    // A cell's pass state for a movement class from terrain and features alone, as Pass without the stamps of units: 0 blocked, 1 passable at a cost, 2 or more open. Hooks: none.
     int (__stdcall* TerrainPass)(PathClass moveClass, int x, int y);
-    // Brings the pass state of a unit's movement class up to date; every implementation calls it before it reads the pass state for a search of the unit, because movement reads the maps it refreshes.
+    // Brings the pass state of a unit's movement class up to date; every implementation calls it before it reads the pass state for a search of the unit, because movement reads the maps it refreshes. Hooks: none.
     void (__stdcall* BeginSearch)(PathUnit unit);
-    // Brings the unit's own cells up to date; every implementation calls it when a search of the unit ends or is dropped, because movement reads the maps it refreshes.
+    // Brings the unit's own cells up to date; every implementation calls it when a search of the unit ends or is dropped, because movement reads the maps it refreshes. Hooks: none.
     void (__stdcall* EndSearch)(PathUnit unit);
 };
 
 // Path searches for units.
 struct PathfindingSeam {
-    // The bytes of private state the implementation needs for a map; it depends on the map alone, and is called before Init.
+    // The bytes of private state the implementation needs for a map; it depends on the map alone, and is called before Init. Hooks: none.
     unsigned int (__stdcall* RegionSize)(const PathMapInfo* map);
-    // Builds the state for a map that has just loaded, in a region the engine allocated of the size RegionSize gave; called once per match, before the first step.
+    // Builds the state for a map that has just loaded, in a region the engine allocated of the size RegionSize gave; called once per match, before the first step. Hooks: none.
     void (__stdcall* Init)(const PathMapInfo* map, void* region, unsigned int size);
-    // Ends the match and returns the region, which the engine frees.
+    // Ends the match and returns the region, which the engine frees. Hooks: none.
     void* (__stdcall* Shutdown)(void);
-    // Adds a request, or replaces the pending one of the same requester; ignored while that requester's search runs. It is first considered at the next step.
+    // Adds a request, or replaces the pending one of the same requester; ignored while that requester's search runs. It is first considered at the next step. Hooks: none.
     void (__stdcall* Submit)(const PathRequest* request);
-    // Drops a requester's pending or running request; no event of it is polled afterwards.
+    // Drops a requester's pending or running request; no event of it is polled afterwards. Hooks: none.
     void (__stdcall* Cancel)(PathHandle requester);
-    // Tells the implementation that the cells of a rectangle changed in the pass maps of the movement classes whose index bits are set in classes, for a PathChange; called when they change, so before the next step, and possibly during one.
+    // Tells the implementation that the cells of a rectangle changed in the pass maps of the movement classes whose index bits are set in classes, for a PathChange; called when they change, so before the next step, and possibly during one. Hooks: none.
     void (__stdcall* CellsChanged)(int left, int top, int right, int bottom, unsigned int classes, int cause);
-    // Does this tick's search work, as much as the implementation chooses; called once per tick, in the players phase.
+    // Does this tick's search work, as much as the implementation chooses; called once per tick, in the players phase. Hooks: none.
     void (__stdcall* Step)(void);
-    // Takes the next event of the last step, in the order they happened, copies its payload to out, at most size bytes of it, and the first min(count, capacity) waypoints of its route to points; returns the payload's size, or 0 when none is left; the engine stops polling at a return smaller than the header. Called after Step, in the same phase.
+    // Takes the next event of the last step, in the order they happened, copies its payload to out, at most size bytes of it, and the first min(count, capacity) waypoints of its route to points; returns the payload's size, or 0 when none is left; the engine stops polling at a return smaller than the header. Called after Step, in the same phase. Hooks: none.
     int (__stdcall* Poll)(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
-    // Optional, null when the implementation has none: applies the second number of the search console command, in 16.16 fixed point.
+    // Optional, null when the implementation has none: applies the second number of the search console command, in 16.16 fixed point. Hooks: none.
     void (__stdcall* SetSearchScale)(int scale);
-    // Optional, null when the implementation has none: fills what the debug overlay draws on a cell. Bits 0 and 1 of flags are 0 not visited, 1 open, 2 closed or 3 blocked, bit 2 marks a goal cell, and dir is a grid direction (0 north, then counter-clockwise).
+    // Optional, null when the implementation has none: fills what the debug overlay draws on a cell. Bits 0 and 1 of flags are 0 not visited, 1 open, 2 closed or 3 blocked, bit 2 marks a goal cell, and dir is a grid direction (0 north, then counter-clockwise). Hooks: none.
     void (__stdcall* DebugCell)(int x, int y, int* flags, int* dir);
 };
 

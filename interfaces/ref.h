@@ -1,17 +1,18 @@
 #ifndef INTERFACES_REF_H
 #define INTERFACES_REF_H
 
-// Major version of the Ref interface, changed when the stored representation changes.
-#define REF_VERSION_MAJOR 2
+// Major version of the Ref interface, changed when the stored representation or a function's signature changes.
+#define REF_VERSION_MAJOR 3
 // Minor version of the Ref interface, changed when a member is added.
 #define REF_VERSION_MINOR 0
 
 #if !defined(__wasm32__)
 #include "host.h"
-#include "services.h"
 
-// True when p lies inside the sim block.
-bool __cdecl SimOwns(const void* p);
+// Returns nonzero when the harness runs in test mode.
+int HarnessTestMode();
+// 1 when p lies inside the sim block.
+int __cdecl SimOwns(const void* p);
 // The first byte of the sim block, or null before it is reserved.
 void* __cdecl SimBlockBase();
 

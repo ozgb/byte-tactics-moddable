@@ -8,7 +8,7 @@ struct HapiBuf;
 struct OPENHAPIFILE;
 struct _finddata_t;
 
-FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+FileHandle* __stdcall HAPI_OpenFile(const char* filename, const char* mode);
 int* __stdcall HAPI_LoadFileInto(char* name, int* buf);
 void __stdcall GetDirectoryEntry(struct _finddata_t* fd, int index, const char* pattern, int flag);
 int __stdcall SetLastDirectory(char* path);
@@ -19,7 +19,7 @@ int __stdcall HAPI_PackageBuildNullStub(int, int);
 unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int* total);
 OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode);
 void __stdcall HAPI_RemoveArchive(OPENHAPIFILE* pRecord);
-ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* path);
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, const char* path);
 ArchiveDirectory* __stdcall HAPI_FindDirectory(ArchiveDirectory* list, char* path);
 void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list);
 void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive);

@@ -94,10 +94,6 @@ struct Mission;
 
 #include "../mission/mission.h"
 
-struct MissionUnitIdTable {
-    char unknown_0[4];
-    int* ids;
-};
 #pragma pack(pop)
 
 #include "../files/files_api.h"
@@ -154,7 +150,7 @@ void __stdcall LoadUnits(HapiBank* file)
 #include "../../interfaces/economy.h"
 #include "../../interfaces/los_radar.h"
 #include "../../interfaces/weapons.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/ai_events.h"
 #include "../game/weapons_events.h"
 #include "../game/los_radar_events.h"
@@ -330,9 +326,9 @@ static void LoadUnitMotion(Unit* unit, HapiBank* file)
     state.velocity[0] = rec.velocity[0];
     state.velocity[1] = rec.velocity[1];
     state.velocity[2] = rec.velocity[2];
-    state.p2[0] = rec.p2[0];
-    state.p2[1] = rec.p2[1];
-    state.p2[2] = rec.p2[2];
+    state.smoothedAcceleration[0] = rec.p2[0];
+    state.smoothedAcceleration[1] = rec.p2[1];
+    state.smoothedAcceleration[2] = rec.p2[2];
     state.speed = rec.speed;
     state.turn = rec.turn;
     state.mode = rec.mode;
@@ -352,9 +348,9 @@ static void SaveUnitMotion(Unit* unit, HapiBank* file)
     hdr.velocity[0] = state.velocity[0];
     hdr.velocity[1] = state.velocity[1];
     hdr.velocity[2] = state.velocity[2];
-    hdr.p2[0] = state.p2[0];
-    hdr.p2[1] = state.p2[1];
-    hdr.p2[2] = state.p2[2];
+    hdr.p2[0] = state.smoothedAcceleration[0];
+    hdr.p2[1] = state.smoothedAcceleration[1];
+    hdr.p2[2] = state.smoothedAcceleration[2];
     hdr.speed = state.speed;
     hdr.turn = (short)state.turn;
     hdr.pathLockStamp = g_seams.map->PathLockStamp(unit);
@@ -470,33 +466,30 @@ void __stdcall SaveUnits(HapiBank* file)
     }
 }
 
-static inline int* IdAt(int* arr, int i)
-{
-    return arr + i;
-}
-
 // FUNCTION: 0x487af0
-int __stdcall FindMissionUnit(char* name, MissionUnitIdTable* param_2, int value)
+Unit* __stdcall FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after)
 {
+    int missionUnits = g_seams.mission->CountMissionUnits();
+    if (count > missionUnits)
+        count = missionUnits;
     int i = 0;
-    int count = g_seams.mission->CountMissionUnits();
 
-    if (value) {
-        while (*IdAt(param_2->ids, i++) != value) {
+    if (after) {
+        for (;;) {
             if (i >= count)
-                return 0;
+                return nullptr;
+            if (units[i++].get() == after)
+                break;
         }
     }
-    if (i >= count)
-        return 0;
     for (; i < count; i++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;
         g_seams.mission->GetMissionUnit(i, e);
-        if (e->ident && _strcmpi(e->ident, name) == 0 && param_2->ids[i])
-            return param_2->ids[i];
-        if (e->name && _strcmpi(e->name, name) == 0 && param_2->ids[i])
-            return param_2->ids[i];
+        if (e->ident && _strcmpi(e->ident, name) == 0 && units[i].get())
+            return units[i].get();
+        if (e->name && _strcmpi(e->name, name) == 0 && units[i].get())
+            return units[i].get();
     }
-    return 0;
+    return nullptr;
 }

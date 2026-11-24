@@ -16,7 +16,7 @@ int __stdcall GetOrderTargetIfFlagged(void*);
 void __stdcall DeleteOrders(Unit* owner, int all);
 void __stdcall EnsurePatrolReturnOrder(Unit* p, Order* item);
 void __stdcall WriteUnitTypeNameKey(HapiBank* file, unsigned short id);
-int __stdcall OrderTypeNameLess(int, char*);
+int __stdcall OrderTypeNameLess(int, const char*);
 void __stdcall InsertOrderBefore(Unit* owner, Order* node, Order* before);
 void __stdcall AppendOrder(Unit* owner, Order* node);
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);

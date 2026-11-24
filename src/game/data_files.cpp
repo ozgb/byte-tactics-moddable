@@ -186,7 +186,7 @@ struct RadarPicHeader {
 #include "../graphics/gaf.h"
 
 // FUNCTION: 0x4295b0
-GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
+GafFrame* __stdcall LoadRadarPic(const char* path, int* outX, int* outY)
 {
     FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0) {
@@ -213,7 +213,7 @@ GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
 }
 
 // FUNCTION: 0x429660
-char* __stdcall LoadFileWithProgress(char* path)
+char* __stdcall LoadFileWithProgress(const char* path)
 {
     FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0) {
@@ -594,7 +594,7 @@ void FreeTextureGafs()
 
 #include "../units/unit_def.h"
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 
 #include "../util/math.h"
 #include "../debug/debug_lib.h"

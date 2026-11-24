@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem weapons 3.1
+subsystem weapons 4.0
 call 1 UpdateUnitWeapons
   r Game.flags_2a44 4
   r Game.seaLevel 0
@@ -8838,17 +8838,17 @@ call 10 Apply
   a event.unit Unit#2
   a size 8
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (-564099,1322680,866551)
   i scripts.GetAimFromPosition Unit#2 0
   o out (212044678,1366098,87109797)
   i scripts.QueryScript CobScript#3 "QuerySecondary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#2 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#2 1
   o out (212336640,967967,87162880)
   i scripts.QueryScript CobScript#3 "QueryTertiary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#2 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#2 2
   o out (212336640,967967,87162880)
@@ -8930,17 +8930,17 @@ call 10 Apply
   a event.unit Unit#3
   a size 8
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (-564099,1322680,866551)
   i scripts.GetAimFromPosition Unit#3 0
   o out (204180358,1366098,81866917)
   i scripts.QueryScript CobScript#4 "QuerySecondary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#3 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#3 1
   o out (204472320,967967,81920000)
   i scripts.QueryScript CobScript#4 "QueryTertiary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#3 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#3 2
   o out (204472320,967967,81920000)
@@ -9022,17 +9022,17 @@ call 10 Apply
   a event.unit Unit#4
   a size 8
   i scripts.QueryScript CobScript#5 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#4 3 = (-564099,1322680,866551)
   i scripts.GetAimFromPosition Unit#4 0
   o out (201558918,1366098,81866917)
   i scripts.QueryScript CobScript#5 "QuerySecondary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#4 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#4 1
   o out (201850880,967967,81920000)
   i scripts.QueryScript CobScript#5 "QueryTertiary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#4 0 = (0,902431,0)
   i scripts.GetAimFromPosition Unit#4 2
   o out (201850880,967967,81920000)
@@ -9122,17 +9122,17 @@ call 10 Apply
   a event.unit Unit#5
   a size 8
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#5 0 = (874250,168427,-488243)
   i scripts.GetAimFromPosition Unit#5 0
   o out (197482250,233963,84708557)
   i scripts.QueryScript CobScript#6 "QuerySecondary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#5 0 = (874250,168427,-488243)
   i scripts.GetAimFromPosition Unit#5 1
   o out (197482250,233963,84708557)
   i scripts.QueryScript CobScript#6 "QueryTertiary" (0) null null null = 0
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#5 0 = (874250,168427,-488243)
   i scripts.GetAimFromPosition Unit#5 2
   o out (197482250,233963,84708557)
@@ -11337,10 +11337,10 @@ call 50 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212146677,1366098,87390857)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (476459,1322680,917663)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212813099,1388216,88080543) = 3
   i services.RecordSimEvent 30 0 [53,212813099,1388216,88080543,3] 5
@@ -12265,10 +12265,10 @@ call 62 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212423464,1366098,86879118)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022322,1322680,-90993)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213358962,1388216,87071887) = 3
   i services.RecordSimEvent 30 0 [53,213358962,1388216,87071887,3] 5
@@ -13363,10 +13363,10 @@ call 74 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142255,1366098,87387098)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (458421,1322680,926805)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212795061,1388216,88089685) = 3
   i services.RecordSimEvent 30 0 [53,212795061,1388216,88089685,3] 5
@@ -13638,12 +13638,12 @@ call 77 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#251 0
   o out (221249536,1654783,92291072)
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#251 1 = (-1211761,1971584,244207)
   i services.RandomInt 16 = 2
   i services.RandomInt 16 = 9
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(220037775,2037120,92518895) = 3
   i services.RecordSimEvent 30 0 [57,220037775,2037120,92518895,3] 5
@@ -14723,10 +14723,10 @@ call 86 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212424117,1366098,86879318)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022529,1322680,-88640)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359169,1388216,87074240) = 3
   i services.RecordSimEvent 30 0 [53,213359169,1388216,87074240,3] 5
@@ -15926,12 +15926,12 @@ call 98 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142147,1366098,87387005)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (457977,1322680,927025)
   i services.RandomInt 574 = 529
   i services.RandomInt 574 = 39
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212794617,1388216,88089905) = 3
   i services.RecordSimEvent 30 0 [53,212794617,1388216,88089905,3] 5
@@ -17050,12 +17050,12 @@ call 110 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212424117,1366098,86879318)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022529,1322680,-88640)
   i services.RandomInt 574 = 102
   i services.RandomInt 574 = 415
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359169,1388216,87074240) = 3
   i services.RecordSimEvent 30 0 [53,213359169,1388216,87074240,3] 5
@@ -17359,12 +17359,12 @@ call 113 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#251 0
   o out (221249536,1654783,92291072)
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#251 1 = (-1211826,1971584,243858)
   i services.RandomInt 62 = 20
   i services.RandomInt 62 = 35
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(220037710,2037120,92518546) = 3
   i services.RecordSimEvent 30 0 [57,220037710,2037120,92518546,3] 5
@@ -18519,12 +18519,12 @@ call 122 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142147,1366098,87387005)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (457977,1322680,927025)
   i services.RandomInt 574 = 202
   i services.RandomInt 574 = 7
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212794617,1388216,88089905) = 3
   i services.RecordSimEvent 30 0 [53,212794617,1388216,88089905,3] 5
@@ -19622,10 +19622,10 @@ call 133 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213519590,1316946,84953093)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (253637,1278906,1002265)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214010334,1344442,85776919) = 3
   i services.RecordSimEvent 30 0 [53,214010334,1344442,85776919,3] 5
@@ -19740,12 +19740,12 @@ call 134 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212424117,1366098,86879318)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022529,1322680,-88640)
   i services.RandomInt 1147 = 65
   i services.RandomInt 1147 = 899
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359169,1388216,87074240) = 3
   i services.RecordSimEvent 30 0 [53,213359169,1388216,87074240,3] 5
@@ -20372,10 +20372,10 @@ call 139 UpdateUnitWeapons
   o z 92188824
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (0)
+  o arg0 (0)
   i scripts.GetPieceOffset Unit#5 0 = (-506891,47425,-1301923)
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (0)
+  o arg0 (0)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(201414933,5445243,83386487) = 1
   i services.RecordSimEvent 30 0 [46,201414933,5445243,83386487,1] 5
@@ -21539,10 +21539,10 @@ call 145 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213915242,1338789,84523810)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#3 4 = (1010156,1295371,181678)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214766853,1360907,84956332) = 3
   i services.RecordSimEvent 30 0 [53,214766853,1360907,84956332,3] 5
@@ -21759,12 +21759,12 @@ call 147 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142147,1366098,87387005)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (457977,1322680,927025)
   i services.RandomInt 1147 = 879
   i services.RandomInt 1147 = 339
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212794617,1388216,88089905) = 3
   i services.RecordSimEvent 30 0 [53,212794617,1388216,88089905,3] 5
@@ -22040,12 +22040,12 @@ call 149 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#251 0
   o out (221249536,1654783,92291072)
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#251 1 = (-1211761,1971584,244207)
   i services.RandomInt 108 = 22
   i services.RandomInt 108 = 93
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(220037775,2037120,92518895) = 3
   i services.RecordSimEvent 30 0 [57,220037775,2037120,92518895,3] 5
@@ -23685,10 +23685,10 @@ call 157 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213510580,1366098,84940442)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (200949,1322680,1014268)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213957646,1388216,85788922) = 3
   i services.RecordSimEvent 30 0 [53,213957646,1388216,85788922,3] 5
@@ -24203,12 +24203,12 @@ call 160 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212424117,1366098,86879318)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022529,1322680,-88640)
   i services.RandomInt 1721 = 681
   i services.RandomInt 1721 = 106
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359169,1388216,87074240) = 3
   i services.RecordSimEvent 30 0 [53,213359169,1388216,87074240,3] 5
@@ -25753,10 +25753,10 @@ call 169 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213915314,1366098,84523855)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#3 4 = (1010104,1322680,181969)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214766801,1388216,84956623) = 3
   i services.RecordSimEvent 30 0 [53,214766801,1388216,84956623,3] 5
@@ -26387,12 +26387,12 @@ call 174 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142233,1366098,87387080)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (458333,1322680,926849)
   i services.RandomInt 1721 = 840
   i services.RandomInt 1721 = 695
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212794973,1388216,88089729) = 3
   i services.RecordSimEvent 30 0 [53,212794973,1388216,88089729,3] 5
@@ -27557,10 +27557,10 @@ call 181 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213510596,1366098,84940466)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (201047,1322680,1014248)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213957744,1388216,85788902) = 3
   i services.RecordSimEvent 30 0 [53,213957744,1388216,85788902,3] 5
@@ -28531,12 +28531,12 @@ call 188 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212424008,1366098,86879285)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022494,1322680,-89032)
   i services.RandomInt 1721 = 978
   i services.RandomInt 1721 = 1203
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359134,1388216,87073848) = 3
   i services.RecordSimEvent 30 0 [53,213359134,1388216,87073848,3] 5
@@ -29347,10 +29347,10 @@ call 193 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213915267,1366098,84523825)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#3 4 = (1010138,1322680,181775)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214766835,1388216,84956429) = 3
   i services.RecordSimEvent 30 0 [53,214766835,1388216,84956429,3] 5
@@ -30602,12 +30602,12 @@ call 202 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142513,1366098,87387322)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (459487,1322680,926277)
   i services.RandomInt 1721 = 285
   i services.RandomInt 1721 = 1234
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212796127,1388216,88089157) = 3
   i services.RecordSimEvent 30 0 [53,212796127,1388216,88089157,3] 5
@@ -31070,10 +31070,10 @@ call 205 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213510612,1366098,84940489)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (201144,1322680,1014228)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213957841,1388216,85788882) = 3
   i services.RecordSimEvent 30 0 [53,213957841,1388216,85788882,3] 5
@@ -32709,12 +32709,12 @@ call 216 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212423600,1366098,86879159)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022365,1322680,-90503)
   i services.RandomInt 1721 = 1477
   i services.RandomInt 1721 = 26
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359005,1388216,87072377) = 3
   i services.RecordSimEvent 30 0 [53,213359005,1388216,87072377,3] 5
@@ -32940,10 +32940,10 @@ call 217 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213915242,1366098,84523810)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#3 4 = (1010156,1322680,181678)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214766853,1388216,84956332) = 3
   i services.RecordSimEvent 30 0 [53,214766853,1388216,84956332,3] 5
@@ -34592,10 +34592,10 @@ call 229 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213510596,1366098,84940466)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#3 3 = (201047,1322680,1014248)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213957744,1388216,85788902) = 3
   i services.RecordSimEvent 30 0 [53,213957744,1388216,85788902,3] 5
@@ -34643,7 +34643,7 @@ call 229 UpdateUnitWeapons
   o z 92149261
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022841,122238,954532)
   w Unit#5.weapon0ReloadTimer 0
   w Unit#5.weapon0FireHeading 12243
@@ -34719,12 +34719,12 @@ call 230 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212142513,1366098,87387322)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i scripts.GetPieceOffset Unit#2 3 = (459487,1322680,926277)
   i services.RandomInt 1721 = 543
   i services.RandomInt 1721 = 641
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (3)
+  o arg0 (3)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(212796127,1388216,88089157) = 3
   i services.RecordSimEvent 30 0 [53,212796127,1388216,88089157,3] 5
@@ -34790,7 +34790,7 @@ call 230 UpdateUnitWeapons
   o z 92142214
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022809,123093,954455)
   w Unit#5.weapon0FirePitch -2081
 call 230 UpdateUnitWeapons
@@ -34881,7 +34881,7 @@ call 231 UpdateUnitWeapons
   o z 92149261
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022777,123948,954378)
   w Unit#5.weapon0FireHeading 12245
   w Unit#5.weapon0FirePitch -2037
@@ -34959,7 +34959,7 @@ call 232 UpdateUnitWeapons
   o z 92149261
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022745,124802,954302)
   w Unit#5.weapon0FireHeading 12246
   w Unit#5.weapon0FirePitch -1995
@@ -35180,7 +35180,7 @@ call 233 UpdateUnitWeapons
   o z 92149261
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022718,125535,954235)
   w Unit#5.weapon0FireHeading 12247
   w Unit#5.weapon0FirePitch -1955
@@ -35409,7 +35409,7 @@ call 234 UpdateUnitWeapons
   o z 92142214
   i services.ScheduleTargetingTargetUnit Unit#5 0 = Unit#251
   i scripts.QueryScript CobScript#6 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#5 1 = (-1022695,126146,954180)
   w Unit#5.weapon0FireHeading 12246
   w Unit#5.weapon0FirePitch -1917
@@ -36574,10 +36574,10 @@ call 241 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#3 0
   o out (213915242,1366098,84523810)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#3 4 = (1010156,1322680,181678)
   i scripts.QueryScript CobScript#4 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(214766853,1388216,84956332) = 3
   i services.RecordSimEvent 30 0 [53,214766853,1388216,84956332,3] 5
@@ -36857,12 +36857,12 @@ call 244 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#2 0
   o out (212423600,1366098,86879159)
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i scripts.GetPieceOffset Unit#2 4 = (1022365,1322680,-90503)
   i services.RandomInt 1721 = 171
   i services.RandomInt 1721 = 288
   i scripts.QueryScript CobScript#3 "QueryPrimary" (0) null null null = 1
-  o p2 (4)
+  o arg0 (4)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(213359005,1388216,87072377) = 3
   i services.RecordSimEvent 30 0 [53,213359005,1388216,87072377,3] 5
@@ -37039,12 +37039,12 @@ call 245 UpdateUnitWeapons
   i scripts.GetAimFromPosition Unit#251 0
   o out (221249536,1654783,92291072)
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i scripts.GetPieceOffset Unit#251 1 = (-1229171,1973223,-79375)
   i services.RandomInt 376 = 248
   i services.RandomInt 376 = 163
   i scripts.QueryScript CobScript#2 "QueryPrimary" (0) null null null = 1
-  o p2 (1)
+  o arg0 (1)
   i services.SchedPublish 6 12
   i los_radar.SoundHeardMask at=(220020365,2038759,92195313) = 3
   i services.RecordSimEvent 30 0 [57,220020365,2038759,92195313,3] 5

@@ -44,7 +44,7 @@ typedef std::vector<Point16> PointMarkerCellVector;
 
 #pragma pack(push, 2)
 
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/movement_events.h"
 #include "movement_seam.h"
 
@@ -900,7 +900,7 @@ int PathOrder::FillWorldPos(Vec3* out)
         if (ref.owner == 0 || (int)ref.owner->spatialBucket.get() == (int)g_game->overflowBucket.get())
             return 0;
         Vec3* p = &pos;
-        *p = g_seams.scripts->GetPiecePosition(ref.owner, piece);
+        g_seams.scripts->GetPiecePosition(ref.owner, piece, p);
         if (flags & 2) {
             short angle = ref.owner->heading;
             if (flags & 0x40)

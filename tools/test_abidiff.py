@@ -106,6 +106,22 @@ class MajorBumpTest(unittest.TestCase):
         self.assertFalse(result.ok, result)
         self.assertIn("moved or changed size", result.summary)
 
+    def test_a_renamed_field_is_breaking(self):
+        renamed = header([SLOT_A], data="int a; int c;")
+        self.assertFalse(verdict(self.old, renamed, modules=manifest(built=None)).ok)
+        result = verdict(self.old, header([SLOT_A], major=2, data="int a; int c;"), modules=manifest(built=None))
+        self.assertTrue(result.ok, result)
+        self.assertIn("field renamed or retyped at the same offset and width in Data", result.details)
+
+    def test_long_to_int_is_a_retype_not_a_move(self):
+        old = header([SLOT_A], data="unsigned long a; long b;")
+        result = verdict(old, header([SLOT_A], major=2, data="unsigned a; int b;"), modules=manifest(built=None))
+        self.assertTrue(result.ok, result)
+
+    def test_a_field_that_changes_width_fails(self):
+        result = verdict(self.old, header([SLOT_A], major=2, data="int a; short b;"), modules=manifest(built=None))
+        self.assertIn("moved or changed size", result.summary)
+
     def test_going_down_fails(self):
         result = verdict(header([SLOT_A], major=3), header([SLOT_A], major=2), modules=manifest())
         self.assertFalse(result.ok)
@@ -349,6 +365,83 @@ class ServicesEntriesTest(unittest.TestCase):
         old = header([SLOT_A]) + "void Free(int a);\n"
         new = header([SLOT_A]) + "void Free(char a);\n"
         self.assertEqual(verdict(old, new).summary, "ok (no change)")
+
+
+class IncludedRecordsTest(unittest.TestCase):
+    def test_a_record_of_an_included_header_is_judged_there_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for side, include in (("old", '#include "other.h"\n'), ("new", "")):
+                (root / side).mkdir()
+                (root / side / "t.h").write_text(include + header([SLOT_A]))
+            (root / "old" / "other.h").write_text("struct Moved { int a; };\n")
+            (root / "new" / "other.h").write_text("struct Kept { int a; };\n")
+            verdicts = {r.name: r for r in abidiff.diff_dirs(root / "old", root / "new", True)}
+        self.assertEqual(verdicts["t"].summary, "ok (no change)")
+        self.assertEqual(verdicts["other"].summary, "skipped (no version macros)")
+
+
+KINDS = {"Roll": [["int"], "int"], "Fail": [["linear"], "void"], "Args_Get": [["int"], "int"], "Extra": [[], "void"]}
+
+
+def imports_verdict(text: str, imports: list[list[str]], kinds: dict | None = None) -> list[abidiff.Result]:
+    """The import check of a services header against modules importing the given names of services, with the manifest's kinds."""
+    signatures = dict(KINDS, **(kinds or {}))
+    modules = {"modules": [{"name": "m%d" % i, "imports": {"services": {n: signatures[n] for n in names}}}
+                           for i, names in enumerate(imports)],
+               "signatures": {"services": signatures}}
+    with tempfile.TemporaryDirectory() as tmp:
+        (Path(tmp) / "services.h").write_text(text)
+        return abidiff.imports_results(Path(tmp), modules)
+
+
+class ServicesImportsTest(unittest.TestCase):
+    text = services("int Get(int i);", "int __stdcall Roll(int range); void Fail(char* message);")
+
+    def test_declared_exactly_the_union_of_the_imports_passes(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Args_Get"], ["Fail", "Roll"]])
+        self.assertTrue(result.ok, result)
+        self.assertEqual((result.name, result.summary), ("services (imports)", "ok (3 entries, each imported with its kinds)"))
+
+    def test_an_entry_no_module_imports_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail"]])
+        self.assertFalse(result.ok)
+        self.assertEqual(result.summary, "FAIL (the entries differ from the modules' imports)")
+        self.assertEqual(result.details, ["declared but imported by no module: Args_Get"])
+
+    def test_an_import_the_header_does_not_declare_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get", "Extra"]])
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["imported but not declared: Extra"])
+
+    def test_one_parameter_of_another_kind_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get"]], {"Fail": [["int"], "void"]})
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["Fail: the header declares (linear) -> void, the manifest has (int) -> void"])
+
+    def test_a_result_of_another_kind_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get"]], {"Roll": [["int"], "void"]})
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["Roll: the header declares (int) -> int, the manifest has (int) -> void"])
+
+    def test_a_class_declared_for_handles_is_a_handle_and_other_pointers_are_linear(self):
+        text = services("", "// A thing, which a module holds only as a handle.\nclass Thing;\nstruct Other;\n"
+                            "double Use(Thing* t, Other* o, const char* s, float f, unsigned char c, bool b);")
+        kinds = {"Use": [["handle", "linear", "linear", "f32", "int", "int"], "f64"]}
+        (result,) = imports_verdict(text, [["Use"]], kinds)
+        self.assertTrue(result.ok, result)
+        (bad,) = imports_verdict(text, [["Use"]], {"Use": [["linear", "linear", "linear", "f32", "int", "int"], "f64"]})
+        self.assertFalse(bad.ok)
+
+    def test_no_module_means_nothing_may_be_declared(self):
+        (result,) = imports_verdict(self.text, [])
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["declared but imported by no module: Args_Get, Fail, Roll"])
+
+    def test_only_named_entry_headers_are_checked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "t.h").write_text(header([SLOT_A]) + "void Free(int a);\n")
+            self.assertEqual(abidiff.imports_results(Path(tmp), {"modules": []}), [])
 
 
 if __name__ == "__main__":

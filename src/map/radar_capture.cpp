@@ -32,7 +32,7 @@ struct RadarUnitDefView {
 #pragma pack(pop)
 
 #include "../../link/globals.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../state/sim_radar.h"
 #include "../files/files_bank.h"
 

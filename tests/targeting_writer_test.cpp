@@ -4,7 +4,7 @@
 
 #include "../src/state/block.h"
 #include "../interfaces/seams.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/targeting.h"
 #include "../interfaces/los_radar.h"
 #include "../interfaces/units.h"
@@ -59,7 +59,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
 
 void __stdcall HarnessTargetingEvent(const TargetingEventHeader*, unsigned int, int) {}
 void __stdcall SchedPublish(int, const void*, unsigned int) {}
-void __stdcall FatalError(char* text)
+void __stdcall FatalError(const char* text)
 {
     printf("FAIL: FatalError: %s\n", text);
     g_failures++;
@@ -136,9 +136,12 @@ static unsigned int HandleOf(Unit* unit)
     return Ref<Unit>(unit).offset;
 }
 
-static void __stdcall GetVisibleEnemies(int, const Vec3*, int, int, std::vector<Unit*, std::allocator<Unit*> >* out)
+static int __stdcall GetVisibleEnemies(int, const Vec3*, int, int, Ref<Unit>* out, int capacity)
 {
-    *out = s_candidates;
+    int count = (int)s_candidates.size();
+    for (int i = 0; i < count && i < capacity; i++)
+        out[i] = s_candidates[i];
+    return count;
 }
 
 static void __stdcall GetSweetSpot(Unit* unit, Vec3* out)
@@ -194,6 +197,7 @@ static void Setup()
     s_units = (Unit*)SimAlloc(kUnits * sizeof(Unit));
     memset(s_units, 0, kUnits * sizeof(Unit));
     g_game->units = s_units;
+    g_game->poolCount = kUnits;
 
     Player* players = (Player*)SimAlloc(2 * sizeof(Player));
     memset(players, 0, 2 * sizeof(Player));

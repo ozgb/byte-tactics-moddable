@@ -550,7 +550,7 @@ void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* par
 #include "../network/unit_sync.h"
 #include "../network/unit_sync_state.h"
 #include "../mission/map_list.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../gui/file_list.h"
 #include "options.h"
 void __stdcall RejectPlayer(int param_1, int param_2);
@@ -713,7 +713,7 @@ int GetServiceProviderIndex()
 int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
 {
     void* block = 0;
-    unsigned long size = 0;
+    unsigned size = 0;
     CompoundAddressElement elements[3];
     GUID guid;
     char buf1[200];
@@ -1169,7 +1169,7 @@ struct Len { unsigned int v; };
 void __stdcall OpenModemDialog()
 {
     char* addr = 0;
-    unsigned long size = 0;
+    unsigned size = 0;
     Len len;
     int r;
     Layer* gadget;
@@ -1557,7 +1557,7 @@ void ShowSelectedMapInfo()
 
     if (FindGadgetIndex(g_game->gui.layer->entries, "MAPNAME", 5) != -1) {
         SetTranslatedTextByName(&g_game->gui, "MAPNAME",
-                     (char*)g_seams.mission->GetTranslatedName(), 0);
+                     g_seams.mission->GetTranslatedName(), 0);
     }
 
     sprintf(buffer, "%s  %s: %s",
@@ -1572,14 +1572,14 @@ void ShowSelectedMapInfo()
         entry->u.hotspot.frame = 0;
     }
     void* bmp = LoadRadarPic(
-        (char*)g_seams.mission->GetNameSlot(1), &outX, &outY);
+        g_seams.mission->GetNameSlot(1), &outX, &outY);
     entry->u.hotspot.frame = (GafFrame*)bmp;
     if (bmp != 0) {
         ResizeRadarPicture((GafFrame *)bmp, entry->width, entry->height, outX << 4, outY << 4);
     }
 
     SetTranslatedTextByName(&g_game->gui, "DESCRIPTION",
-                 (char*)g_seams.mission->GetDescription(), 0);
+                 g_seams.mission->GetDescription(), 0);
     MarkChanged(&g_game->gui);
 }
 
@@ -3226,12 +3226,12 @@ void RefreshBattleRoomRows()
     output->u.list.rowCount = count;
 
     Gadget* mapname = FindGadgetChecked_C(g_game->gui.layer->entries, "MAPNAME");
-    char* map = g_seams.mission->GetMissionName();
+    const char* map = g_seams.mission->GetMissionName();
     if (!g_seams.mission->HasMissionName()) {
         mapname->colour = 0xc;
         SetTranslatedTextByName(&g_game->gui, "MAPNAME", "NOT SELECTED", 0);
     } else {
-        char* cur = g_seams.mission->GetTranslatedName();
+        const char* cur = g_seams.mission->GetTranslatedName();
         str = mapname->u.text;
         int differs = strcmp(str, cur);
         if (differs) {

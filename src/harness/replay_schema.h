@@ -1574,9 +1574,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "velocity0", offsetof(MovementLoadState, state.velocity[0]), sizeof(((MovementLoadState*)nullptr)->state.velocity[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "velocity1", offsetof(MovementLoadState, state.velocity[1]), sizeof(((MovementLoadState*)nullptr)->state.velocity[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "velocity2", offsetof(MovementLoadState, state.velocity[2]), sizeof(((MovementLoadState*)nullptr)->state.velocity[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p20", offsetof(MovementLoadState, state.p2[0]), sizeof(((MovementLoadState*)nullptr)->state.p2[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p21", offsetof(MovementLoadState, state.p2[1]), sizeof(((MovementLoadState*)nullptr)->state.p2[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "p22", offsetof(MovementLoadState, state.p2[2]), sizeof(((MovementLoadState*)nullptr)->state.p2[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration0", offsetof(MovementLoadState, state.smoothedAcceleration[0]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[0]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration1", offsetof(MovementLoadState, state.smoothedAcceleration[1]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[1]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "smoothedAcceleration2", offsetof(MovementLoadState, state.smoothedAcceleration[2]), sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[2]), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "speed", offsetof(MovementLoadState, state.speed), sizeof(((MovementLoadState*)nullptr)->state.speed), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "turn", offsetof(MovementLoadState, state.turn), sizeof(((MovementLoadState*)nullptr)->state.turn), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "mode", offsetof(MovementLoadState, state.mode), sizeof(((MovementLoadState*)nullptr)->state.mode), ROK_MOVEMENTLOADSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -2378,9 +2378,9 @@ static_assert(sizeof(((MovementLoadState*)nullptr)->h.unit) == 4, "MovementLoadS
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[0]) == 4, "MovementLoadState::velocity0 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[1]) == 4, "MovementLoadState::velocity1 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.velocity[2]) == 4, "MovementLoadState::velocity2 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[0]) == 4, "MovementLoadState::p20 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[1]) == 4, "MovementLoadState::p21 has the size the schema says");
-static_assert(sizeof(((MovementLoadState*)nullptr)->state.p2[2]) == 4, "MovementLoadState::p22 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[0]) == 4, "MovementLoadState::smoothedAcceleration0 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[1]) == 4, "MovementLoadState::smoothedAcceleration1 has the size the schema says");
+static_assert(sizeof(((MovementLoadState*)nullptr)->state.smoothedAcceleration[2]) == 4, "MovementLoadState::smoothedAcceleration2 has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.speed) == 4, "MovementLoadState::speed has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.turn) == 4, "MovementLoadState::turn has the size the schema says");
 static_assert(sizeof(((MovementLoadState*)nullptr)->state.mode) == 4, "MovementLoadState::mode has the size the schema says");
@@ -2702,7 +2702,6 @@ enum ReplaySlotId {
     RSL_LOS_RADAR_FREERADAR,
     RSL_LOS_RADAR_FREEMAPRESOURCES,
     RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS,
-    RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUSLIST,
     RSL_LOS_RADAR_HASREADYUNITINRANGE,
     RSL_LOS_RADAR_ISPOINTVISIBLE,
     RSL_LOS_RADAR_CREATEUNITINDEX,
@@ -2948,7 +2947,7 @@ static const unsigned char kReplayWindMeteorsSaveMeteorsReads[] = { 31, 35, 36, 
 static const unsigned short kReplayWindMeteorsSaveMeteorsObjReads[] = { 41, 42 };
 static const unsigned char kReplayWindMeteorsLoadMeteorsWrites[] = { 31, 35, 36, 37, 40, 41, 42 };
 static const unsigned short kReplayFeaturesResolveFeatureLinksObjReads[] = { 280 };
-static const unsigned short kReplayFeaturesResolveFeatureLinksObjWrites[] = { 280, 301, 302, 303 };
+static const unsigned short kReplayFeaturesResolveFeatureLinksObjWrites[] = { 301, 302, 303 };
 static const unsigned short kReplayFeaturesInitFeatureAnimPoolObjReads[] = { 326, 327, 328, 329, 330 };
 static const unsigned short kReplayFeaturesInitFeatureAnimPoolObjWrites[] = { 326, 327, 328, 329, 330 };
 static const unsigned char kReplayFeaturesFreeFeaturePoolReads[] = { 19 };
@@ -3210,7 +3209,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "LoadFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeFeatureFileList", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "NopAfterFeatureEnum", SUB_FEATURES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "ResolveFeatureLinks", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesResolveFeatureLinksObjReads, 1, kReplayFeaturesResolveFeatureLinksObjWrites, 4, nullptr, 0 },
+    { "ResolveFeatureLinks", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesResolveFeatureLinksObjReads, 1, kReplayFeaturesResolveFeatureLinksObjWrites, 3, nullptr, 0 },
     { "InitFeatureAnimPool", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesInitFeatureAnimPoolObjReads, 5, kReplayFeaturesInitFeatureAnimPoolObjWrites, 5, nullptr, 0 },
     { "FreeFeaturePool", SUB_FEATURES, kReplayFeaturesFreeFeaturePoolReads, 1, kReplayFeaturesFreeFeaturePoolWrites, 1, kReplayFeaturesFreeFeaturePoolObjReads, 9, kReplayFeaturesFreeFeaturePoolObjWrites, 4, nullptr, 0 },
     { "PlaceMissionFeatures", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesPlaceMissionFeaturesObjReads, 3, nullptr, 0, nullptr, 0 },
@@ -3282,7 +3281,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FreeRadar", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FreeMapResources", SUB_LOS_RADAR, kReplayLosRadarFreeMapResourcesReads, 1, kReplayLosRadarFreeMapResourcesWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetVisibleEnemiesInRadius", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetVisibleEnemiesInRadiusList", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "HasReadyUnitInRange", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, kReplayLosRadarHasReadyUnitInRangeObjReads, 1, nullptr, 0, nullptr, 0 },
     { "IsPointVisible", SUB_LOS_RADAR, kReplayLosRadarIsPointVisibleReads, 2, nullptr, 0, kReplayLosRadarIsPointVisibleObjReads, 2, nullptr, 0, nullptr, 0 },
     { "CreateUnitIndex", SUB_LOS_RADAR, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3518,21 +3516,21 @@ static const unsigned kReplaySlotCount = RSL_COUNT;
 static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 3, 1, 1, 0, 8 },
     { "economy", 5, 0, 0, 8, 12 },
-    { "features", 4, 0, 0, 20, 22 },
+    { "features", 5, 0, 0, 20, 22 },
     { "ai", 6, 0, 0, 42, 15 },
     { "pathfinding", 4, 0, 0, 57, 9 },
-    { "weapons", 3, 1, 1, 66, 6 },
-    { "targeting", 3, 1, 1, 72, 7 },
-    { "los_radar", 4, 1, 0, 79, 28 },
-    { "orders", 5, 0, 0, 107, 11 },
-    { "units", 6, 0, 0, 118, 44 },
-    { "players", 4, 0, 0, 162, 28 },
-    { "map", 8, 0, 1, 190, 11 },
-    { "scripts", 2, 1, 0, 201, 24 },
-    { "movement", 4, 0, 0, 225, 20 },
-    { "mission", 1, 1, 0, 245, 0 },
-    { "files", 2, 0, 0, 245, 58 },
-    { "network", 1, 0, 0, 303, 22 },
+    { "weapons", 4, 0, 1, 66, 6 },
+    { "targeting", 4, 0, 1, 72, 7 },
+    { "los_radar", 5, 0, 0, 79, 27 },
+    { "orders", 6, 0, 0, 106, 11 },
+    { "units", 7, 0, 0, 117, 44 },
+    { "players", 5, 0, 0, 161, 28 },
+    { "map", 9, 0, 1, 189, 11 },
+    { "scripts", 3, 0, 0, 200, 24 },
+    { "movement", 5, 0, 0, 224, 20 },
+    { "mission", 2, 0, 0, 244, 0 },
+    { "files", 3, 0, 0, 244, 58 },
+    { "network", 2, 0, 0, 302, 22 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

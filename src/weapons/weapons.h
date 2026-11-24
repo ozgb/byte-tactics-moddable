@@ -44,7 +44,7 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag);
 void __stdcall SetWeaponFireHandler(WeaponDef* weapon);
 void __stdcall InitUnitWeaponSlots(Unit* unit);
 void __stdcall UpdateUnitWeapons(Unit* unit);
-char* __stdcall FindWeaponByName(char* name);
+char* __stdcall FindWeaponByName(const char* name);
 void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* proj);
 
 int __stdcall FireTurretWeapon(Unit* fire, UnitWeaponSlot* unit, Unit* target, Vec3* point);

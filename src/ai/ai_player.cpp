@@ -201,7 +201,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "../util/file_printf.h"
 #include "../orders/unit_orders.h"
 #include "../sound/sound.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/targeting_events.h"
 #include "../../interfaces/economy.h"
 #include "../units/squads.h"
@@ -873,7 +873,7 @@ void SpatialTimer::OnTimer()
         Unit* u = *it;
         if (u->def->c04) {
             if (u->motion || g_seams.weapons->WeaponCanReachPos(u, (Vec3*)&u->pos, (Vec3*)&best, 0)) {
-                MissionType kind = g_seams.orders->GetOrderType(3, u, nullptr, (Vec3*)&best);
+                MissionType kind = MissionType(g_seams.orders->GetOrderType(3, u, nullptr, (Vec3*)&best));
                 if (kind.index)
                     AiPublishAddOrder(u, kind.index, 0, nullptr, &best, 0, 0);
             }
@@ -930,7 +930,7 @@ void ScoutTimer::OnTimer()
                         ok = 0;
                 }
                 if (ok) {
-                    MissionType kind = g_seams.orders->GetOrderType(0xe, u, nullptr, &pos);
+                    MissionType kind = MissionType(g_seams.orders->GetOrderType(0xe, u, nullptr, &pos));
                     AiPublishAddOrder(u, kind.index, 0, nullptr, &pos, idx, 1);
                 }
             }
@@ -949,9 +949,9 @@ void ScoutTimer::OnTimer()
                     d = Direction(RandomInt(0x10000), 0x2800000);
                 target = origin + d;
                 MissionType kind;
-                kind = g_seams.orders->GetOrderType(2, u, nullptr, &target);
+                kind = MissionType(g_seams.orders->GetOrderType(2, u, nullptr, &target));
                 AiPublishAddOrder(u, kind.index, 0, nullptr, &target, 0, 0);
-                kind = g_seams.orders->GetOrderType(9, u, nullptr, &origin);
+                kind = MissionType(g_seams.orders->GetOrderType(9, u, nullptr, &origin));
                 AiPublishAddOrder(u, kind.index, 1, nullptr, &origin, 0, 0);
             } else {
                 Vec3 d = origin - u->pos;
@@ -967,7 +967,7 @@ void ScoutTimer::OnTimer()
                     }
                     target = u->pos + d;
                 }
-                MissionType kind = g_seams.orders->GetOrderType(9, u, nullptr, &target);
+                MissionType kind = MissionType(g_seams.orders->GetOrderType(9, u, nullptr, &target));
                 AiPublishAddOrder(u, kind.index, 0, nullptr, &target, 0, 0);
             }
         }

@@ -65,7 +65,7 @@ enum EconomyEventKind {
     ECONOMY_REQUEST = 2,
     // A spend, made through the Spend slot (EconomySpend): takes energy and metal from the store of the account's player and books it as used; outcome 1, or 0 when the store is short and nothing changes.
     ECONOMY_SPEND = 3,
-    // Adds income to an account (EconomyIncome); the implementation decides what the account's player is given; outcome 1.
+    // Adds income to an account (EconomyIncome); the implementation decides what the account's player is given; outcome 1. Hooks: ResourceIncome.
     ECONOMY_INCOME = 4
 };
 
@@ -237,51 +237,51 @@ struct EconPlayerInfo {
 
 // The world as economy sees it, read only apart from Emit, as of each module's last run; given by the engine.
 struct EconomyWorldView {
-    // The tick being played.
+    // The tick being played. Hooks: none.
     unsigned int (__stdcall* Tick)(void);
-    // The difficulty the computer players are set to, 0 easiest.
+    // The difficulty the computer players are set to, 0 easiest. Hooks: none.
     int (__stdcall* Difficulty)(void);
-    // Whether the match is a network game that shares resources between allies.
+    // Whether the match is a network game that shares resources between allies. Hooks: none.
     int (__stdcall* SharingEnabled)(void);
-    // The wind's strength, in the units windGenerator multiplies.
+    // The wind's strength, in the units windGenerator multiplies. Hooks: none.
     float (__stdcall* Wind)(void);
-    // The tide's strength, in the units tidalGenerator multiplies.
+    // The tide's strength, in the units tidalGenerator multiplies. Hooks: none.
     float (__stdcall* Tide)(void);
-    // Fills a player's info.
+    // Fills a player's info. Hooks: none.
     void (__stdcall* PlayerInfo)(int player, EconPlayerInfo* out);
-    // Whether two players are allied, as from sees it.
+    // Whether two players are allied, as from sees it. Hooks: none.
     int (__stdcall* Allied)(int from, int to);
-    // The first unit slot of a player.
+    // The first unit slot of a player. Hooks: none.
     EconUnit (__stdcall* FirstUnit)(int player);
-    // The last unit slot of a player.
+    // The last unit slot of a player. Hooks: none.
     EconUnit (__stdcall* LastUnit)(int player);
-    // The unit slot after a slot.
+    // The unit slot after a slot. Hooks: none.
     EconUnit (__stdcall* NextUnit)(EconUnit unit);
-    // The index of a unit's slot, from 0 to unitSlots - 1.
+    // The index of a unit's slot, from 0 to unitSlots - 1. Hooks: none.
     int (__stdcall* UnitSlot)(EconUnit unit);
-    // Fills a unit's info; returns 0 when the unit is not in play, which settlement skips.
+    // Fills a unit's info; returns 0 when the unit is not in play, which settlement skips. Hooks: none.
     int (__stdcall* UnitInfo)(EconUnit unit, EconUnitInfo* out);
-    // Fills a unit type's info.
+    // Fills a unit type's info. Hooks: none.
     void (__stdcall* TypeInfo)(EconType type, EconTypeInfo* out);
-    // The metal of a map cell, or -1 when the cell is off the map.
+    // The metal of a map cell, or -1 when the cell is off the map. Hooks: none.
     int (__stdcall* CellMetal)(int x, int y);
-    // Publishes an effect, its payload of size bytes, to economy's outbox; the router delivers it to its subscribers at the next phase boundary, or before Emit returns for a kind its table marks synchronous.
+    // Publishes an effect, its payload of size bytes, to economy's outbox; the router delivers it to its subscribers at the next phase boundary, or before Emit returns for a kind its table marks synchronous. Hooks: none.
     void (__stdcall* Emit)(const EconomyEventHeader* effect, unsigned int size);
 };
 
 // Resources: the players' stores and the accounts of players and units. The engine delivers economy's pending inbox, through Apply, before each run (UpdatePlayerEconomy, UpdateMetalExtraction, UpdateResourceSharing) and each synchronous slot, and at each phase boundary.
 struct EconomySeam {
-    // The bytes of private state the implementation needs for a map; called before Init.
+    // The bytes of private state the implementation needs for a map; called before Init. Hooks: none.
     unsigned int (__stdcall* RegionSize)(const EconMapInfo* map);
-    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before the first tick and before any event.
+    // Builds the state for a match in a region the engine allocated of the size RegionSize gave; called once per match, before the first tick and before any event. Hooks: none.
     void (__stdcall* Init)(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size);
-    // Ends the match and returns the region, which the engine frees.
+    // Ends the match and returns the region, which the engine frees. Hooks: none.
     void* (__stdcall* Shutdown)(void);
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, 0 for a refused intent, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, 0 for a refused intent, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const EconomyEventHeader* event, unsigned int size);
     // Synchronous: applies a spend after the engine delivered the pending inbox, and returns its outcome, visible at once. Hooks: none.
     int (__stdcall* Spend)(const EconomySpend* spend);
-    // Settles one player's units for a tick, in the players phase: charges their upkeep, adds their income and emits their effects. Hooks: ResourceIncome, StatsAccumulate.
+    // Settles one player's units for a tick, in the players phase: charges their upkeep, adds their income and emits their effects. Hooks: AllowCloak, ResourceIncome, StatsAccumulate.
     void (__stdcall* UpdatePlayerEconomy)(int player);
     // Sets a metal extractor's rate from the metal under its footprint and emits its effect; called when the unit is created or loaded. Hooks: none.
     void (__stdcall* UpdateMetalExtraction)(EconUnit unit);
@@ -293,7 +293,7 @@ struct EconomySeam {
     double (__stdcall* GetEnergyUse)(EconType type);
     // Fills a unit's account as it stands, for a saved game or a display; a query. Hooks: none.
     void (__stdcall* UnitAccount)(EconUnit unit, EconAccount* out);
-    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing.
+    // Writes the state that decides what the implementation does next and that the engine does not already hash elsewhere; it reads only, and keeps nothing. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
 };
 

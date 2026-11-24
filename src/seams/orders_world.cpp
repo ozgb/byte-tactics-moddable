@@ -6,7 +6,7 @@
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/movement.h"
 #include "../../interfaces/orders.h"
-#include "../../interfaces/services.h"
+#include "../util/engine_services.h"
 #include "../game/game.h"
 #include "../units/unit_def.h"
 #include "../game/orders_events.h"

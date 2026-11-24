@@ -1,6 +1,6 @@
 # The players interface
 
-Players sits behind `interfaces/players.h` (version 4.0), the sixth module on the scheduler after economy
+Players sits behind `interfaces/players.h` (version 5.0; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument), the sixth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`) and map (`docs/map-interface.md`) (#967). It is the players as the
 simulation sees them: each player's update (its resources' bookkeeping, the commander's respawn, the end of the game),
@@ -42,9 +42,9 @@ Players' place in it:
   step of the tail, called by `RunGameSteps` as before.
 - **Synchronous calls out:** the commander's respawn calls units' `CreateUnit` and reads the new unit in the same
   statement (section 3). The placement test of the respawn is map's synchronous `CanPlaceUnitFootprint`, through
-  `ScheduleMapCanPlaceUnitFootprint` (services 1.16).
+  `ScheduleMapCanPlaceUnitFootprint` (services 1.16; an engine service, outside `interfaces/services.h`, since services 3.0).
   - **Queries:** map's `GetCellMeanHeight`, the mission's `GetGameType` and `GetNameSlot` (map's until map 5.0), units' `FindUnitTypeId`, features'
-  `FindFeatureAtPos` (weapons' until #984), los_radar's `ClampWorldPosToTerrain` and the service `VisitUnitsInRange`, all as of the owner's
+  `FindFeatureAtPos` (weapons' until #984), los_radar's `ClampWorldPosToTerrain` and map's `UnitsInRange`, all as of the owner's
   last apply.
 - **Views:** the `Player` records (`Game::players`), which players, economy, units and the network write
   (section 4), and the conditions' objects, which only players reads.
@@ -163,7 +163,7 @@ scenario plays (section 6).
 `Unit`, `UnitMotion` or `Order`. It writes its own: the `Player` records' fields it owns (section 4), the conditions'
 objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
 
-**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 5.0; the payloads are unchanged since 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

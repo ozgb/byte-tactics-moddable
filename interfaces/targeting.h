@@ -5,9 +5,9 @@ struct Unit;
 struct Vec3;
 
 // Major version of the targeting interface, changed when a slot is removed or its signature changes.
-#define TARGETING_VERSION_MAJOR 3
+#define TARGETING_VERSION_MAJOR 4
 // Minor version of the targeting interface, changed when a slot is added.
-#define TARGETING_VERSION_MINOR 1
+#define TARGETING_VERSION_MINOR 0
 
 // The fields every targeting event and effect starts with.
 struct TargetingEventHeader {
@@ -67,18 +67,18 @@ struct TargetingLoad {
 
 // Target selection for weapons. The engine delivers targeting's pending inbox, through Apply, before each slot below but Apply and ChooseWeapon, and at each phase boundary.
 struct TargetingSeam {
-    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one.
+    // Consumes one queued event of the inbox, its payload of size bytes, and returns its outcome, which the engine records in the trace's dump and returns to no one. Hooks: none.
     int (__stdcall* Apply)(const TargetingEventHeader* event, unsigned int size);
     // Returns the unit a weapon aims at, or null; a query. Hooks: none.
     Unit* (__stdcall* GetWeaponTargetUnit)(Unit* unit, int weapon);
-    // Synchronous: writes the position a weapon aims at and returns whether it has a target, for a caller that aims or fires at it in the same statement; a target unit is gone when its slot holds no unit (unitDefIndex 0), and is then cleared first, as TARGETING_CLEAR clears it, and the answer is 0; a target that died but whose slot still holds it, or whose slot a new unit took, is not gone, and the slot is aimed at. Hooks: none.
+    // Synchronous: writes the position a weapon aims at and returns whether it has a target, for a caller that aims or fires at it in the same statement; a target unit is gone when its slot holds no unit (unitDefIndex 0), and is then cleared first, as TARGETING_CLEAR clears it, and the answer is 0; a target that died but whose slot still holds it, or whose slot a new unit took, is not gone, and the slot is aimed at. Hooks: VeterancyLevel.
     int (__stdcall* GetWeaponTargetPos)(Unit* unit, Vec3* pos, int weapon);
     // Synchronous: picks the best enemy for one weapon, within its range or the unit's sight, drawing from the generator of the service RandomInt (rng.seed in the recordings, not a game logic stream), for a caller that aims at it in the same statement. Hooks: FilterTargets.
     Unit* (__stdcall* FindWeaponTarget)(Unit* unit, unsigned char weapon, int useRange);
     // Synchronous: picks the best enemy for a unit that fires at will, as FindWeaponTarget does for its first weapon, or returns null. Hooks: FilterTargets.
     Unit* (__stdcall* FindBestTargetIfFireAtWill)(Unit* unit);
-    // Returns the weapon a unit fires first at its target; a query (thiscall in 3.1c, this first). Hooks: none.
-    unsigned char (__fastcall* ChooseWeapon)(Unit* unit);
+    // Returns the weapon a unit fires first at its target; a query. Hooks: none.
+    unsigned char (__stdcall* ChooseWeapon)(Unit* unit);
     // Returns the target pair of a weapon of a unit as a saved game keeps it, the two 16-bit halves TARGETING_LOAD sets, the first in the low half; a query, which a saved game reads outside the tick. Hooks: none.
     int (__stdcall* SavedTargetPair)(Unit* unit, int weapon);
 };

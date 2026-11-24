@@ -10,7 +10,7 @@
 #include "../src/harness/replay_schema.h"
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
-#include "../interfaces/services.h"
+#include "../src/util/engine_services.h"
 #include "../interfaces/seams.h"
 #include "../src/game/game_state.h"
 #include "../src/map/meteors.h"
@@ -1587,7 +1587,7 @@ int EnterList(ReplayText& t, Ref<Unit>* out, int capacity)
     return count;
 }
 
-unsigned char __fastcall ChooseWeaponSlot(Unit* unit)
+unsigned char __stdcall ChooseWeaponSlot(Unit* unit)
 {
     return unit->ChooseWeapon();
 }
@@ -1641,6 +1641,16 @@ Projectile* __stdcall FindTargetableProjectileSlot(Unit* unit, unsigned int weap
     return FindTargetableProjectile((InterceptorUnitView*)unit, (int)weapon);
 }
 
+int __stdcall CanBuildAtSlot(UnitDef* unit, const Point16* cell, short type, Player* player)
+{
+    return CanBuildAt(unit, *cell, type, player);
+}
+
+int __stdcall CanPlaceUnitFootprintSlot(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+{
+    return CanPlaceUnitFootprint(unit, otherTypeId, *cell, flags);
+}
+
 int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);
@@ -1681,7 +1691,7 @@ void __stdcall WriteStateSlot(const StateWriter* writer)
     MapWriteState(writer);
 }
 
-WeaponDef* __stdcall FindWeaponByNameSlot(char* name)
+WeaponDef* __stdcall FindWeaponByNameSlot(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
 }
@@ -1711,7 +1721,7 @@ int __fastcall GetGameTypeSlot(Mission* self)
     return self->GetGameType();
 }
 
-char* __stdcall GetNameSlotSlot(Mission* mission, int index)
+const char* __stdcall GetNameSlotSlot(Mission* mission, int index)
 {
     return mission->GetNameSlot(index);
 }
@@ -1751,7 +1761,7 @@ int __fastcall AdvanceMissionSlot(Mission* self)
     return self->AdvanceMission();
 }
 
-char* __fastcall GetCampaignNameSlot(Mission* self)
+const char* __fastcall GetCampaignNameSlot(Mission* self)
 {
     return self->GetCampaignName();
 }
@@ -1761,7 +1771,7 @@ int __fastcall GetMissionIndexSlot(Mission* self)
     return self->GetMissionIndex();
 }
 
-char* __fastcall GetMissionNameSlot(Mission* self)
+const char* __fastcall GetMissionNameSlot(Mission* self)
 {
     return self->GetMissionName();
 }
@@ -1771,12 +1781,12 @@ int __fastcall GetStartPositionSlot(Mission* self, int unusedEdx, Vec3* out, int
     return self->GetStartPosition(out, id);
 }
 
-void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, char* file)
+void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, const char* file)
 {
     self->LoadCampaign(file);
 }
 
-int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, char* name)
+int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, const char* name)
 {
     return self->LoadMissionByName(name);
 }
@@ -3164,7 +3174,7 @@ void EnemyListSelfTest()
     LoadCall(call);
     BeginImport();
     memset(wide, 0, sizeof wide);
-    int count = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    int count = Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, wide, 5);
     Check(g_diffs == 0 && count == 3 && wide[0].get() != nullptr && wide[1].get() != nullptr && wide[2].get() != nullptr && wide[3].get() == nullptr, "a capacity at or above the count gets every unit in one call");
     Check(wide[0].get() != wide[1].get() && wide[1].get() != wide[2].get(), "in the recorded order, one unit each");
 
@@ -3173,20 +3183,20 @@ void EnemyListSelfTest()
     BeginImport();
     memset(narrow, 0, sizeof narrow);
     memset(wide, 0, sizeof wide);
-    count = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
+    count = Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, narrow, 2);
     Check(g_diffs == 0 && count == 3 && narrow[0].get() != nullptr && narrow[1].get() != nullptr, "a capacity below the count gets the first units and the full count");
-    int again = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    int again = Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, wide, 5);
     Check(g_diffs == 0 && again == 3 && g_importIndex == 1, "a repeat with a larger buffer is answered from the same line");
     Check(wide[0].get() == narrow[0].get() && wide[1].get() == narrow[1].get() && wide[2].get() != nullptr && wide[3].get() == nullptr, "with the same units in the same order");
-    again = Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, wide, 5);
+    again = Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, wide, 5);
     printf("a third call: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a third call is reported as an extra import");
 
     ResetBlock();
     LoadCall(call);
     BeginImport();
-    Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 300, 0, narrow, 2);
-    Imp_los_radar_GetVisibleEnemiesInRadiusList(1, &pos, 301, 0, wide, 5);
+    Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, narrow, 2);
+    Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 301, 0, wide, 5);
     printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
 }

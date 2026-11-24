@@ -18,7 +18,7 @@ unsigned int __stdcall MovementNewPathOrderToUnitAtAngle(unsigned int order, Uni
 unsigned int __stdcall MovementNewAirManeuverOrder(unsigned int order, const Vec3* from, const Vec3* to);
 unsigned int __stdcall MovementNewApproachRadius(unsigned int order, int x, int y, int radius);
 unsigned int __stdcall MovementNewRingApproach(unsigned int order, int x, int y, int inner, int outer);
-unsigned int __stdcall MovementNewPointMarker(unsigned int order, Point16 pos, Point16 size);
+unsigned int __stdcall MovementNewPointMarker(unsigned int order, const Point16* pos, const Point16* size);
 unsigned int __stdcall MovementLoadTarget(int type, unsigned int order, HapiBank* file, const char* name);
 void __stdcall MovementSaveTarget(unsigned int target, unsigned int order, HapiBank* file, const char* name);
 int __stdcall MovementTargetType(unsigned int target);

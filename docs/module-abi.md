@@ -608,10 +608,10 @@ targeting's names `RandomInt` and `Emit`, and its recordings carry `i services.E
 
 The services interface is at major 4 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
-of the dump's events and `WindMeteorsEmit` the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
+of the dump's events and wind_meteors' publishing import the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
 units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
 members become free functions under their import names, the strings they only read become const, the size
-of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces `WindMeteorsEmit` with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports `WindMeteorsEmit`, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import.
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter

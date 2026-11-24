@@ -4849,6 +4849,10 @@ static void WriteTickRow()
     unsigned holdrand = *(unsigned*)((char*)_getptd() + 0x14);
 #endif
     unsigned parkMiller = g_randomSeed;
+    unsigned* displayTimer = (unsigned*)(PlayerAt(*GameAt(GAME_PLAYER_INDEX)) + 0xf8);
+    unsigned heldDisplayTimer = *displayTimer;
+    if (*displayTimer < tick)
+        *displayTimer += 0x1e;
 
     s_traceTick = tick;
     s_tracePhase = "tick";
@@ -4867,6 +4871,7 @@ static void WriteTickRow()
     VisitMeteors();
     VisitWorld();
 
+    *displayTimer = heldDisplayTimer;
     fprintf(s_trace, "%u tick %08x%08x\n", tick, s_hashHi, s_hashLo);
     fflush(s_trace);
     if (s_dumpNow)

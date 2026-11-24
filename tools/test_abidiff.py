@@ -299,18 +299,18 @@ class ServicesEntriesTest(unittest.TestCase):
 
     def test_unchanged_in_any_order(self):
         old = services(self.members, self.free)
-        self.assertEqual(judged(old, old).summary, "ok (no change)")
+        self.assertEqual(judged(old, old).summary, "ok (no change, 5 entries)")
         reordered = services("int Size() const; static int Sum(int a, int b); int Get(int i);",
                              "void Fail(char* message); int __stdcall Roll(int range);")
-        self.assertEqual(judged(old, reordered).summary, "ok (no change)")
+        self.assertEqual(judged(old, reordered).summary, "ok (no change, 5 entries)")
 
     def test_an_added_member_needs_the_minor(self):
         old = services(self.members)
         new = self.members + " void Clear();"
-        self.assertEqual(judged(old, services(new, minor=1)).summary, "ok (additive, minor 0->1)")
+        self.assertEqual(judged(old, services(new, minor=1)).summary, "ok (additive, minor 0->1, 4 entries)")
         result = judged(old, services(new))
         self.assertFalse(result.ok)
-        self.assertEqual(result.summary, "FAIL (additive change needs a minor bump, version is 1.0 -> 1.0)")
+        self.assertEqual(result.summary, "FAIL (additive change needs a minor bump, version is 1.0 -> 1.0, 4 entries)")
         self.assertIn("new entry: Args::Clear", result.details)
 
     def test_a_removed_member_is_breaking(self):
@@ -336,7 +336,7 @@ class ServicesEntriesTest(unittest.TestCase):
     def test_a_free_function_is_added_removed_and_retyped(self):
         old = services(self.members, self.free)
         added = judged(old, services(self.members, self.free + " void Extra();", minor=1))
-        self.assertEqual(added.summary, "ok (additive, minor 0->1)")
+        self.assertEqual(added.summary, "ok (additive, minor 0->1, 6 entries)")
         self.assertFalse(judged(old, services(self.members, self.free + " void Extra();")).ok)
         removed = judged(old, services(self.members, "int __stdcall Roll(int range);", minor=1))
         self.assertFalse(removed.ok)
@@ -348,7 +348,7 @@ class ServicesEntriesTest(unittest.TestCase):
 
     def test_overloads_are_told_apart(self):
         old = services("void Put(int a); void Put(char* a);")
-        self.assertEqual(judged(old, services("void Put(char* a); void Put(int a);")).summary, "ok (no change)")
+        self.assertEqual(judged(old, services("void Put(char* a); void Put(int a);")).summary, "ok (no change, 2 entries)")
         self.assertFalse(judged(old, services("void Put(int a);", minor=1)).ok)
 
     def test_an_added_overload_is_one_breaking_change(self):
@@ -365,6 +365,57 @@ class ServicesEntriesTest(unittest.TestCase):
         old = header([SLOT_A]) + "void Free(int a);\n"
         new = header([SLOT_A]) + "void Free(char a);\n"
         self.assertEqual(verdict(old, new).summary, "ok (no change)")
+
+
+def host(functions: str, minor: int = 0, major: int = 1) -> str:
+    return """#ifdef __cplusplus
+extern "C" {
+#endif
+#define HOST_VERSION_MAJOR %d
+#define HOST_VERSION_MINOR %d
+struct host_thing { int a; int b; };
+%s
+#ifdef __cplusplus
+}
+#endif
+""" % (major, minor, functions)
+
+
+class HostEntriesTest(unittest.TestCase):
+    functions = "int __cdecl host_open(const char* path); void __cdecl host_close(int handle);"
+
+    def judged(self, new: str) -> abidiff.Result:
+        return verdict(host(self.functions), new, name="host", modules=manifest(built=None))
+
+    def test_unchanged_reports_its_entries(self):
+        self.assertEqual(self.judged(host(self.functions)).summary, "ok (no change, 2 entries)")
+
+    def test_a_changed_parameter_type_is_breaking(self):
+        result = self.judged(host("int __cdecl host_open(char* path); void __cdecl host_close(int handle);", minor=1))
+        self.assertFalse(result.ok)
+        self.assertEqual(result.summary, "FAIL (breaking change needs a major bump, version is 1.0 -> 1.1, 2 entries)")
+        self.assertEqual(result.details, ["host_open: int (const char *) cdecl -> int (char *) cdecl"])
+
+    def test_an_added_function_needs_the_minor(self):
+        added = self.functions + " int __cdecl host_size(int handle);"
+        self.assertEqual(self.judged(host(added, minor=1)).summary, "ok (additive, minor 0->1, 3 entries)")
+        result = self.judged(host(added))
+        self.assertFalse(result.ok)
+        self.assertIn("new entry: host_size", result.details)
+
+    def test_a_removed_function_is_breaking(self):
+        result = self.judged(host("int __cdecl host_open(const char* path);", minor=1))
+        self.assertFalse(result.ok)
+        self.assertIn("entry removed: host_close", result.details)
+
+    def test_a_record_inside_extern_c_keeps_its_layout(self):
+        moved = host(self.functions, minor=1).replace("int a; int b;", "int b; int a;")
+        self.assertIn("moved or changed size", self.judged(moved).summary)
+
+    def test_the_modules_do_not_import_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "host.h").write_text(host(self.functions))
+            self.assertEqual(abidiff.imports_results(Path(tmp), {"modules": []}), [])
 
 
 class IncludedRecordsTest(unittest.TestCase):

@@ -15,9 +15,11 @@ What is compared, per struct or class the header defines:
            full signature and calling convention
   layout   the member offsets, member types and size, for a struct with data members or a class with
            a vtable pointer, bases or data members (a pure function table is covered by its slots)
-  entries  for services.h only: every free function and non-virtual member function (static ones too),
-           keyed `Class::Method` or the plain name, with its return type, parameter types and const-ness;
-           order doesn't matter, as a module imports them by name
+  entries  for services.h and host.h only: every free function and non-virtual member function (static ones
+           too), keyed `Class::Method` or the plain name, with its return type, parameter types and const-ness;
+           order doesn't matter, as a module imports them by name and a host exports them by name. Declarations
+           inside `extern "C" {` count as top-level ones (host.h holds all of its own there). The verdict line
+           of these two ends with the number of entries judged
   version  the `_VERSION_MAJOR` and `_VERSION_MINOR` macros
 
 Every change is classed, and the class decides which bump it needs:
@@ -86,7 +88,8 @@ CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-co
 MAJOR = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MAJOR\s+(\d+)", re.M)
 MINOR = re.compile(r"^\s*#\s*define\s+(\w+)_VERSION_MINOR\s+(\d+)", re.M)
 CALLCONV = re.compile(r"\s*__attribute__\(\((\w+)\)\)\s*$")
-NAMED_ENTRIES = {"services"}
+ENTRY_INTERFACES = {"services", "host"}
+IMPORTED_INTERFACES = {"services"}
 LAYOUT_START = re.compile(r"^\*\*\* Dumping AST Record Layout\s*$", re.M)
 LAYOUT_MEMBER = re.compile(r"^\s*(\d+(?::\d+-\d+)?)\s*\|(\s*)(.*?)\s*$")
 ANONYMOUS = re.compile(r"\(anonymous((?: \w+)?) at [^)]*\)")
@@ -248,10 +251,10 @@ def load_interface(header: Path, scratch: Path) -> Interface:
     iface.major, iface.minor = int(major.group(2)), int(minor.group(2))
     tree, layout_text = clang_dump(header, scratch)
     layouts = parse_layouts(layout_text)
-    named = header.stem in NAMED_ENTRIES
+    named = header.stem in ENTRY_INTERFACES
     found_entries: dict[str, list[Signature]] = {}
     here = None
-    for node in tree["inner"]:
+    for node in top_level(tree["inner"]):
         loc = node.get("loc", {})
         file = loc.get("file") or (loc.get("spellingLoc") or {}).get("file") or (loc.get("expansionLoc") or {}).get("file")
         here = file or here
@@ -281,6 +284,16 @@ def load_interface(header: Path, scratch: Path) -> Interface:
         for sig in sigs:
             iface.entries[name if len(sigs) == 1 else "%s(%s)" % (name, ", ".join(sig.params))] = sig
     return iface
+
+
+def top_level(nodes: list) -> list:
+    """The top-level declarations in source order, with those of each `extern "C"` block in its place."""
+    out = []
+    for node in nodes:
+        out.append(node)
+        if node["kind"] == "LinkageSpecDecl":
+            out += top_level(node.get("inner", []))
+    return out
 
 
 def add_entry(found: dict, name: str, node: dict, extra: str) -> None:
@@ -500,7 +513,7 @@ def signature_kinds(sig: Signature, handles: set[str]) -> tuple[list[str], str]:
 
 
 def check_imports(iface: Interface, manifest: dict | None, handles: set[str] | None = None) -> Result:
-    """Whether a named-entry interface declares exactly what the modules import of it, each with the parameter and result
+    """Whether an imported interface declares exactly what the modules import of it, each with the parameter and result
     kinds the manifest's signatures give it."""
     declared = {import_name(e): sig for e, sig in iface.entries.items()}
     imported = manifest_imports(manifest, iface.name)
@@ -522,10 +535,10 @@ def check_imports(iface: Interface, manifest: dict | None, handles: set[str] | N
 
 
 def imports_results(directory: Path, manifest: dict | None) -> list[Result]:
-    """The import check of each named-entry interface header in directory."""
+    """The import check of each interface header in directory that modules import by name."""
     out = []
     with tempfile.TemporaryDirectory(prefix="abidiff-") as tmp:
-        for name in sorted(NAMED_ENTRIES):
+        for name in sorted(IMPORTED_INTERFACES):
             header = directory / ("%s.h" % name)
             if header.exists():
                 out.append(check_imports(load_interface(header, Path(tmp) / name), manifest, handle_classes(header.read_text())))
@@ -549,7 +562,10 @@ def diff_headers(old_path: Path, new_path: Path, scratch: Path, tagged: bool, ma
     new = load_interface(new_path, scratch / "new")
     if not new.major and not new.minor and not old.major and not old.minor:
         return Result(name, True, "skipped (no version macros)")
-    return judge(old, new, compare_interfaces(old, new, tagged), manifest)
+    result = judge(old, new, compare_interfaces(old, new, tagged), manifest)
+    if name in ENTRY_INTERFACES:
+        result.summary = "%s, %d entries)" % (result.summary[:-1], len(new.entries))
+    return result
 
 
 def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool, manifest: dict | None = None) -> list[Result]:

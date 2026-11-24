@@ -184,6 +184,81 @@ class EventKindsTest(unittest.TestCase):
                                  ("targeting[1].kind", "0x00000062", "0x00000063")])
 
 
+class EndOfTickEventsTest(unittest.TestCase):
+    SOUND = "5 units sound 0x0 0 0"
+    SOUND_AT = "5 units sound_at 0x0 1 2 3 4 5"
+    SMOKE = "5 units smoke 0x0 1 2 3 15 900 9"
+    NEXT = "6 units sound 0x0 7 0"
+
+    @staticmethod
+    def log(*lines):
+        return "bt-events 1\n" + "".join(line + "\n" for line in lines)
+
+    def test_equal_ticks_with_a_commuting_swap_are_equal(self):
+        a = self.log(self.SOUND, self.SMOKE, self.NEXT)
+        b = self.log(self.SMOKE, self.SOUND, self.NEXT)
+        self.assertIsNotNone(td.event_difference(a, b))
+        self.assertIsNone(td.end_of_tick_event_difference(a, b))
+
+    def test_a_swap_that_counts_names_the_pair_and_the_first_record_that_differs(self):
+        a = self.log(self.SMOKE, self.SOUND, self.SOUND_AT, self.NEXT)
+        b = self.log(self.SMOKE, self.SOUND_AT, self.SOUND, self.NEXT)
+        lines = td.end_of_tick_event_difference(a, b).splitlines()
+        self.assertTrue(lines[0].startswith("event records at tick 5: the tick lines differ: a `5 tick 3 "), lines[0])
+        self.assertIn("the order of the kinds `sound` and `sound_at` differs", lines[1])
+        self.assertEqual(lines[2], "  is number 1 of 2 and 2")
+        self.assertEqual(lines[3], f"  a: line 3 `{self.SOUND}`")
+        self.assertEqual(lines[4], f"  b: line 3 `{self.SOUND_AT}`")
+
+    def test_the_first_pair_in_ascending_order_is_named(self):
+        a = self.log(self.SOUND, self.SOUND_AT, "5 units sound 0x0 1 0")
+        b = self.log("5 units sound 0x0 1 0", self.SOUND_AT, self.SOUND)
+        report = td.end_of_tick_event_difference(a, b)
+        self.assertIn("the order of the kinds `sound` and `sound` differs", report)
+        self.assertIn(f"a: line 2 `{self.SOUND}`", report)
+        self.assertIn("b: line 2 `5 units sound 0x0 1 0`", report)
+
+    def test_a_record_that_only_one_log_has_is_named_as_a_set_difference(self):
+        a = self.log(self.SOUND, self.SMOKE, self.NEXT)
+        b = self.log(self.SOUND, self.NEXT)
+        report = td.end_of_tick_event_difference(a, b)
+        self.assertIn("the records differ as a set", report)
+        self.assertIn(f"a: line 3 `{self.SMOKE}`", report)
+        self.assertIn("b: no such record", report)
+
+    def test_a_changed_argument_shows_both_records(self):
+        changed = self.SOUND.replace("0 0", "1 0")
+        report = td.end_of_tick_event_difference(self.log(self.SOUND, self.NEXT), self.log(changed, self.NEXT))
+        self.assertIn("the records differ as a set", report)
+        self.assertIn(f"a: line 2 `{self.SOUND}`", report)
+        self.assertIn("b: no such record", report)
+
+    def test_the_first_differing_tick_is_named_not_a_later_one(self):
+        a = self.log(self.SOUND, self.NEXT)
+        b = self.log(self.SOUND, self.NEXT.replace("7 0", "8 0"), "7 units sound 0x0 0 0")
+        self.assertTrue(td.end_of_tick_event_difference(a, b).startswith("event records at tick 6: "))
+
+    def test_a_tick_only_one_log_has_is_named(self):
+        report = td.end_of_tick_event_difference(self.log(self.SOUND), self.log(self.SOUND, self.NEXT))
+        self.assertEqual(report, "event records at tick 6: only b has records of the tick (1, the first at line 3)")
+
+    def test_a_phase_change_is_not_a_difference(self):
+        a = self.log(self.SOUND, self.NEXT)
+        b = self.log(self.SOUND.replace("units", "players"), self.NEXT)
+        self.assertIsNone(td.end_of_tick_event_difference(a, b))
+
+    def test_the_command_line_takes_the_switch_for_event_logs(self):
+        with tempfile.TemporaryDirectory() as d:
+            one, two = Path(d) / "a.txt", Path(d) / "b.txt"
+            one.write_text(self.log(self.SOUND, self.SMOKE))
+            two.write_text(self.log(self.SMOKE, self.SOUND))
+            for extra, code in (([], 1), (["--end-of-tick"], 0)):
+                out = io.StringIO()
+                with mock.patch("sys.argv", ["tracediff.py", "--event-logs", str(one), str(two), *extra]), contextlib.redirect_stdout(out):
+                    self.assertEqual(td.main(), code)
+            self.assertIn("equal at the end of every tick", out.getvalue())
+
+
 class CommandLineTest(unittest.TestCase):
     def run_main(self, *argv):
         out, err = io.StringIO(), io.StringIO()

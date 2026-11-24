@@ -29,6 +29,8 @@ The row `tick` is hashed after the whole step (the tail after `meteors` included
 tables of `world`, in one hash. Its dump block is the `tick` block. `--end-of-tick` (two exes, or `--traces`)
 compares only the `tick` rows and reports the first tick whose `tick` row differs, as phase `tick`.
 
+With `--events` or `--event-logs`, `--end-of-tick` compares the two sim event logs tick by tick under the rule of docs/events-log.md ("What the check compares"): it names the first tick whose `tick` line of the event digest differs and, in it, the first record that the logs hold a different number of times, or else the first pair of kinds whose projection differs and the first record of that projection that differs, with both records and their line numbers.
+
 `--traces` compares existing trace files without running, and reports the first
 divergence only. `--dumps` diffs the phase of two existing dump files.
 
@@ -62,6 +64,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
 
+import eventdigest
 from traceschema import TRACE_FORMAT
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -509,10 +512,82 @@ def event_difference(a: str, b: str) -> str | None:
     return None
 
 
-def print_event_difference(a: str, b: str) -> int:
-    """Print the first record where two event logs differ (or that they are equal); 1 when they differ."""
-    diff = event_difference(a, b)
-    print(diff or f"event logs identical ({len(a.splitlines())} lines)")
+def describe_record(side: str, record: eventdigest.Record | None) -> str:
+    return f"  {side}: no such record" if record is None else f"  {side}: line {record.number} `{record.line}`"
+
+
+def kind_name(value: int) -> str:
+    return next(name for name, v in eventdigest.load_classes().values.items() if v == value)
+
+
+def end_of_tick_event_difference(a: str, b: str) -> str | None:
+    """Where two sim event logs first differ under the end-of-tick rule of docs/events-log.md, or None when every tick's `tick` line is equal.
+
+    The first tick whose `tick` line differs is named. When the records as a multiset differ, the first record (in sorted order of the
+    records' bytes) that the two logs hold a different number of times is shown; otherwise the first pair of kinds whose projection
+    differs, and the first record of that projection that differs."""
+    _, records_a = eventdigest.parse_log(a)
+    _, records_b = eventdigest.parse_log(b)
+    by_tick: list[dict[str, list[eventdigest.Record]]] = []
+    for records in (records_a, records_b):
+        grouped: dict[str, list[eventdigest.Record]] = {}
+        for record in records:
+            grouped.setdefault(record.tick, []).append(record)
+        by_tick.append(grouped)
+    for tick in sorted(set(by_tick[0]) | set(by_tick[1]), key=int):
+        one, two = by_tick[0].get(tick), by_tick[1].get(tick)
+        if one is None or two is None:
+            side, only = ("a", one) if two is None else ("b", two)
+            return f"event records at tick {tick}: only {side} has records of the tick ({len(only)}, the first at line {only[0].number})"
+        line_a, line_b = eventdigest.tick_line(tick, one), eventdigest.tick_line(tick, two)
+        if line_a == line_b:
+            continue
+        out = [f"event records at tick {tick}: the tick lines differ: a `{line_a}`, b `{line_b}`"]
+        first_a = {}
+        first_b = {}
+        for record in one:
+            first_a.setdefault(record.raw, record)
+        for record in two:
+            first_b.setdefault(record.raw, record)
+        counts_a = {raw: sum(1 for r in one if r.raw == raw) for raw in first_a}
+        counts_b = {raw: sum(1 for r in two if r.raw == raw) for raw in first_b}
+        for raw in sorted(set(first_a) | set(first_b)):
+            if counts_a.get(raw, 0) != counts_b.get(raw, 0):
+                out.append(f"the records differ as a set: the first record (in sorted order) the logs hold a different number of times is held {counts_a.get(raw, 0)} times by a and {counts_b.get(raw, 0)} times by b")
+                out.append(describe_record("a", first_a.get(raw)))
+                out.append(describe_record("b", first_b.get(raw)))
+                return "\n".join(out)
+        hashes_a = {(x, y): h for x, y, h in eventdigest.projection_hashes(one)}
+        hashes_b = {(x, y): h for x, y, h in eventdigest.projection_hashes(two)}
+        for pair in sorted(set(hashes_a) | set(hashes_b)):
+            if hashes_a.get(pair) != hashes_b.get(pair):
+                x, y = pair
+                proj_a = [r for r in one if r.kind in pair]
+                proj_b = [r for r in two if r.kind in pair]
+                out.append(f"the order of the kinds `{kind_name(x)}` and `{kind_name(y)}` differs: the first record of their projection that differs")
+                for n in range(max(len(proj_a), len(proj_b))):
+                    ra = proj_a[n] if n < len(proj_a) else None
+                    rb = proj_b[n] if n < len(proj_b) else None
+                    if ra is None or rb is None or ra.raw != rb.raw:
+                        out.append(f"  is number {n + 1} of {len(proj_a)} and {len(proj_b)}")
+                        out.append(describe_record("a", ra))
+                        out.append(describe_record("b", rb))
+                        break
+                return "\n".join(out)
+        return "\n".join(out)
+    return None
+
+
+def print_event_difference(a: str, b: str, end_of_tick: bool = False) -> int:
+    """Print the first record where two event logs differ (or that they are equal); 1 when they differ.
+
+    With `end_of_tick` the logs are compared tick by tick under the rule of docs/events-log.md."""
+    if end_of_tick:
+        diff = end_of_tick_event_difference(a, b)
+        print(diff or f"event logs equal at the end of every tick ({len(a.splitlines())} and {len(b.splitlines())} lines)")
+    else:
+        diff = event_difference(a, b)
+        print(diff or f"event logs identical ({len(a.splitlines())} lines)")
     return 1 if diff else 0
 
 
@@ -529,7 +604,7 @@ def compare_events(args: argparse.Namespace) -> int:
     for side, log in zip("ab", logs):
         if log is None:
             raise Error(f"the run of {side} wrote no events.txt")
-    return print_event_difference(logs[0], logs[1])
+    return print_event_difference(logs[0], logs[1], args.end_of_tick)
 
 
 def compare(args: argparse.Namespace) -> int:
@@ -581,8 +656,8 @@ def main() -> int:
     modes = [bool(args.traces), bool(args.dumps), bool(args.exe), bool(args.event_logs)]
     if sum(modes) != 1:
         ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE, or --event-logs A B")
-    if args.end_of_tick and (args.dumps or args.event_logs or args.events):
-        ap.error("--end-of-tick applies to two exes and to --traces")
+    if args.end_of_tick and args.dumps:
+        ap.error("--end-of-tick applies to two exes, to --traces and to --event-logs")
     if args.events and not args.exe:
         ap.error("--events needs two exes and --scenario")
     if args.exe and (len(args.exe) != 2 or not args.scenario):
@@ -609,7 +684,7 @@ def main() -> int:
             print_divergence(*div)
             return 1
         if args.event_logs:
-            return print_event_difference(*(Path(p).read_text() for p in args.event_logs))
+            return print_event_difference(*(Path(p).read_text() for p in args.event_logs), args.end_of_tick)
         if args.dumps:
             maps = load_maps(args.reference_ref) if args.reference else None
             diffs = diff_dumps(Path(args.dumps[0]), Path(args.dumps[1]), int(args.at[0]), args.at[1],

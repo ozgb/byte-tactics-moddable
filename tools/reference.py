@@ -22,6 +22,7 @@ scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier ch
 judged state at the end of the tick), not on the digest of all the rows of the tick. It is the verdict for a re-implementation that keeps the
 end-of-tick contract with its own order inside the tick (#1037). Each scenario's line then ends with ` [digest differs from tick T]` when its
 digest column differs, which does not fail it, and `K of M scenarios equal on every row` follows the total.
+The sim event digests (`bt-event-digest 2`) are then compared on their `tick` lines alone, and the first differing record is named under the same rule (tools/tracediff.py `--events --end-of-tick`).
 
 `--check --both-modes` plays every scenario once in WASM and once with `-modules=native` in one pool (each line names its
 mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
@@ -173,7 +174,7 @@ KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "ref
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
              "tools/blockpointers.py", "tools/eventdigest.py", "tools/tracerehash.py")
-KEY_DATA = ("data/block_pointers.csv",)
+KEY_DATA = ("data/block_pointers.csv", "docs/sim-events.md")
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
@@ -1281,10 +1282,11 @@ def event_digest(log: Path) -> str | None:
         return f"unreadable: {e}\n"
 
 
-def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path) -> tuple[list[str], list[str]]:
+def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
+                  end_of_tick: bool = False) -> tuple[list[str], list[str]]:
     """(the scenarios whose sim event digest differs from reference/events/, the report lines): stored digests missing are only counted.
 
-    `logs` hold each run's digest text (eventdigest.digest_text)."""
+    `logs` hold each run's digest text (eventdigest.digest_text). With `end_of_tick` the digests are compared on their `tick` lines alone."""
     differing: list[str] = []
     lines: list[str] = []
     unstored: list[str] = []
@@ -1295,7 +1297,7 @@ def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], direc
             unstored.append(name)
             continue
         got = logs.get(name)
-        diff = eventdigest.digest_difference(stored.read_text(), got) if got is not None else f"the run wrote no {EVENTS_FILE}"
+        diff = eventdigest.digest_difference(stored.read_text(), got, end_of_tick) if got is not None else f"the run wrote no {EVENTS_FILE}"
         if diff:
             differing.append(name)
             lines.append(f"DIFF {name} {diff}")
@@ -1559,7 +1561,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print("\n".join(label + line for line in sound_lines))
         ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
         print("\n".join(label + line for line in ui_lines))
-        events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS)
+        events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS, end_of_tick)
         print("\n".join(label + line for line in events_lines))
         frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
         print("\n".join(label + line for line in frame_lines))
@@ -1579,7 +1581,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if first_events is not None:
-            report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir)
+            report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
         if pointers or sound_bad or ui_bad or events_bad or frame_bad or save_bad:
             sys.exit(1)
         if tier:
@@ -1604,8 +1606,8 @@ def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenario
 
 
 def report_event_records(name: str, mode: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path],
-                         poison: bool, game_dir: str | None) -> None:
-    """Play the reference build of the scenario's stored trace and the exe on `name`, and print the first record of their event logs that differs."""
+                         poison: bool, game_dir: str | None, end_of_tick: bool = False) -> None:
+    """Play the reference build of the scenario's stored trace and the exe on `name`, and print the first record of their event logs that differs (under the end-of-tick rule of docs/events-log.md with `end_of_tick`)."""
     sha = expected[name][0].get("commit", "unknown")
     print(f"\nevent records for {name}: a = the reference at {sha}, b = {exe} ({mode})", flush=True)
     if resolve_quiet(sha) is None:
@@ -1613,7 +1615,7 @@ def report_event_records(name: str, mode: str, expected: dict[str, tuple], exe: 
     ref_dir = build_cached(sha)
     if mode == "native":
         os.environ["BT_NATIVE_MODULES"] = "1"
-    cmd = tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir) + ["--events"]
+    cmd = tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir, end_of_tick) + ["--events"]
     subprocess.run(cmd)
 
 

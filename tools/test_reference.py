@@ -79,9 +79,11 @@ class EventsLogTest(unittest.TestCase):
 
     def test_the_digest_has_a_line_for_each_tick_and_phase(self):
         lines = self.DIGEST.splitlines()
-        self.assertEqual(lines[:2], ["bt-event-digest 1", "log bt-events 1"])
-        self.assertEqual([line.rsplit(" ", 1)[0] for line in lines[2:]], ["0 load 1", "5 units 2", "5 players 1"])
-        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{16}", line.rsplit(" ", 1)[1]) for line in lines[2:]))
+        self.assertEqual(lines[:2], ["bt-event-digest 2", "log bt-events 1"])
+        runs = [line for line in lines[2:] if " tick " not in line]
+        self.assertEqual([line.rsplit(" ", 1)[0] for line in runs], ["0 load 1", "5 units 2", "5 players 1"])
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{16}", line.rsplit(" ", 1)[1]) for line in runs))
+        self.assertEqual([line.split(" ")[:3] for line in eventdigest.tick_lines(self.DIGEST)], [["0", "tick", "1"], ["5", "tick", "3"]])
 
     def test_the_hash_is_the_trace_hash_of_the_records_bytes(self):
         hasher = tracerehash.Hasher()
@@ -94,7 +96,7 @@ class EventsLogTest(unittest.TestCase):
     def test_a_changed_record_changes_the_hash_of_its_tick_and_phase(self):
         got = eventdigest.digest_text(self.LOG.replace("sound 0x0 1 0", "sound 0x0 2 0"))
         diff = eventdigest.digest_difference(self.DIGEST, got)
-        self.assertTrue(diff.startswith("events digest line 4 (tick 5, phase units): stored `5 units 2 "), diff)
+        self.assertTrue(diff.startswith("events digest line 5 (tick 5, phase units): stored `5 units 2 "), diff)
 
     def test_a_missing_or_extra_record_changes_the_count(self):
         got = eventdigest.digest_text(self.LOG.replace("5 units sound 0x0 1 0\n", ""))
@@ -108,7 +110,7 @@ class EventsLogTest(unittest.TestCase):
 
     def test_a_longer_digest_differs_at_the_extra_line(self):
         got = eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n")
-        self.assertIn("line 6 (tick 6, phase meteors): only the got digest has it (`6 meteors 1 ", eventdigest.digest_difference(self.DIGEST, got))
+        self.assertIn("line 8 (tick 6, phase meteors): only the got digest has it (`6 meteors 1 ", eventdigest.digest_difference(self.DIGEST, got))
 
     def test_a_dropped_line_is_a_record_of_its_phase(self):
         got = eventdigest.digest_text(self.LOG + "5 players dropped 3\n")
@@ -144,6 +146,31 @@ class EventsLogTest(unittest.TestCase):
                 differing, lines = reference.events_report(scenarios, logs, directory)
         self.assertEqual(differing, ["other"])
         self.assertIn("1 of 3 equal, 1 differ, 1 with no stored digest", lines[-1])
+
+    def test_end_of_tick_compares_the_tick_lines_only(self):
+        moved = eventdigest.digest_text(self.LOG.replace("5 players radar_units", "5 units radar_units"))
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "a.txt").write_text(self.DIGEST)
+            (directory / "b.txt").write_text(self.DIGEST)
+            scenarios = {"a": Path("a"), "b": Path("b")}
+            logs = {"a": moved, "b": eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n")}
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                strict, _ = reference.events_report(scenarios, logs, directory)
+                loose, lines = reference.events_report(scenarios, logs, directory, end_of_tick=True)
+        self.assertEqual(strict, ["a", "b"])
+        self.assertEqual(loose, ["b"])
+        self.assertIn("1 of 2 equal, 1 differ", lines[-1])
+        self.assertIn("(tick 6)", lines[0])
+
+    def test_the_event_records_report_passes_the_end_of_tick_switch_to_tracediff(self):
+        for end_of_tick in (False, True):
+            with mock.patch.object(reference, "resolve_quiet", return_value="abc"), mock.patch.object(reference, "build_cached", return_value=Path("ref")), \
+                    mock.patch.object(reference.subprocess, "run") as run, contextlib.redirect_stdout(io.StringIO()):
+                reference.report_event_records("a", "wasm", {"a": ({"commit": "abc"},)}, Path("x.exe"), {"a": Path("s.txt")}, False, None, end_of_tick)
+            cmd = run.call_args[0][0]
+            self.assertEqual(cmd[-1], "--events")
+            self.assertEqual("--end-of-tick" in cmd, end_of_tick)
 
     def test_a_run_with_no_event_log_differs_from_a_stored_one(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1620,6 +1647,8 @@ class GateCacheTest(unittest.TestCase):
         (self.root / "reference/commit.txt").write_text("c1")
         (self.root / "data").mkdir()
         (self.root / "data/block_pointers.csv").write_text("site,class\n")
+        (self.root / "docs").mkdir()
+        (self.root / "docs/sim-events.md").write_text("### SIM_EVENT_SOUND\n")
         (self.root / "tools/reference.py").write_text("import helper\nfrom helper import x\n")
         (self.root / "tools/helper.py").write_text("def f():\n    import deeper\n")
         (self.root / "tools/deeper.py").write_text("x = 1\n")
@@ -1656,7 +1685,7 @@ class GateCacheTest(unittest.TestCase):
 
     def test_savefile_block_pointers_and_imports_change_the_key(self):
         base = self.key()
-        for relative in ("tools/savefile.py", "data/block_pointers.csv", "tools/deeper.py"):
+        for relative in ("tools/savefile.py", "data/block_pointers.csv", "docs/sim-events.md", "tools/deeper.py"):
             self.assertIn(relative, (*reference.KEY_TOOLS, *reference.KEY_DATA, "tools/deeper.py"))
             path = self.root / relative
             old = path.read_text()

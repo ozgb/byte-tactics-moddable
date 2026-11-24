@@ -46,7 +46,7 @@ Both roles normally run inside a [bwai sandbox](https://github.com/ozgb/bubblewr
 
 Every lead acts as the same GitHub account, so each one names itself:
 
-- **`BT_LEAD_NAME`** names the lead. Unset, it is `lead`, and a single lead behaves as it always has.
+- **`BT_LEAD_NAME`** names the lead: letters, digits, `-` and `_`, unique among the leads, and never `maintainer` (whose Valkey cursor it would share). Unset, it is `lead`, and a single lead behaves as it always has.
 - **`BT_LEAD_LANE`** is a comma-separated list of parent issues. The lead takes only the issues that are those parents' sub-issues, at any depth. Unset, it takes from all of #2.
 
 ```sh

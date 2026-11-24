@@ -9,7 +9,7 @@ Read `docs/team.md` now: it is how you and the maintainer talk (signing, the rev
 
 Before the first cycle, check the setup (`AGENTS.md` step 1, and `docs/team.md`, "Directories"): you are in the lead's own clone, `BT_ROLE=lead` is set, `origin` is `ozgb/byte-tactics-moddable`, and the clone root is a clean checkout of `moddable`. Stop and report if any of these is wrong.
 
-Then check your name and lane (`docs/team.md`, "More than one lead"): `BT_LEAD_NAME` (unset means `lead`) and `BT_LEAD_LANE` (unset means all of #2), with `echo "${BT_LEAD_NAME:-lead} ${BT_LEAD_LANE:-all}"`. A name is letters, digits, `-` and `_`; a lane is issue numbers, comma-separated. Stop and report if either is malformed. Below, `<name>` is your name; print both at the top of every report.
+Then check your name and lane (`docs/team.md`, "More than one lead"): `BT_LEAD_NAME` (unset means `lead`) and `BT_LEAD_LANE` (unset means all of #2), with `echo "${BT_LEAD_NAME:-lead} ${BT_LEAD_LANE:-all}"`. A name is letters, digits, `-` and `_`, and never `maintainer`; a lane is issue numbers, comma-separated. Stop and report if either is malformed. Below, `<name>` is your name; print both at the top of every report.
 
 ## A cycle
 

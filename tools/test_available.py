@@ -261,6 +261,8 @@ class OwnTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             available.main(["--lead", "a b"], source=today())
         with self.assertRaises(SystemExit):
+            available.main(["--lead", "maintainer"], source=today())
+        with self.assertRaises(SystemExit):
             available.main(["--lane", "1043,x"], source=today())
 
 

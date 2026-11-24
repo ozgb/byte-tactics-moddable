@@ -304,8 +304,8 @@ def main(argv=None, source=None) -> int:
     what.add_argument("--claims", action="store_true")
     what.add_argument("--prs", action="store_true")
     args = ap.parse_args(argv)
-    if not NAME.match(args.lead):
-        raise SystemExit(f"available.py: bad lead name {args.lead!r}: letters, digits, - and _ only")
+    if not NAME.match(args.lead) or args.lead == "maintainer":
+        raise SystemExit(f"available.py: bad lead name {args.lead!r}: letters, digits, - and _ only, not maintainer")
     lane = parse_lane(args.lane)
     source = source or Gh(args.repo)
 

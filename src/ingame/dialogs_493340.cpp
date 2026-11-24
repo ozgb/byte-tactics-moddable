@@ -1249,6 +1249,7 @@ void UpdateFramePacing()
 }
 
 void HarnessAfterStep();
+void HarnessEndOfTick();
 void HarnessBeforeStep();
 void HarnessPhase(int phase);
 int __stdcall HarnessSharing();
@@ -1314,6 +1315,7 @@ void __stdcall RunGameSteps(int showStats)
     EmptyPostSimStepHook_C();
     ExpireOldestMessage();
     ExpireEyeballs();
+    HarnessEndOfTick();
     g_game->profileTimingBars.AccumulateProfileTime(8);
 }
 

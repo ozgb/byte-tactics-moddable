@@ -1621,6 +1621,9 @@ void HarnessStartSkirmish()
 static void UiEndOfTick();
 static void VisitSharePackets();
 
+static void WriteTickRow();
+static int s_stepEnded = 0;
+
 void HarnessAfterStep()
 {
     s_eventPhase = -1;
@@ -1645,6 +1648,16 @@ void HarnessAfterStep()
     if (!s_testMode)
         return;
     UiEndOfTick();
+    s_stepEnded = 1;
+}
+
+void HarnessEndOfTick()
+{
+    if (!s_testMode || !s_stepEnded)
+        return;
+    s_stepEnded = 0;
+    if (s_trace != NULL)
+        WriteTickRow();
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
@@ -4825,6 +4838,39 @@ void HarnessPhase(int phase)
         if (s_dumpNow)
             fflush(s_dump);
     }
+}
+
+static void WriteTickRow()
+{
+    unsigned tick = GameU32(GAME_TICK);
+#ifdef BX_ROUTE
+    unsigned holdrand = bx_game_holdrand();
+#else
+    unsigned holdrand = *(unsigned*)((char*)_getptd() + 0x14);
+#endif
+    unsigned parkMiller = g_randomSeed;
+
+    s_traceTick = tick;
+    s_tracePhase = "tick";
+    s_dumpNow = s_dumpEnabled && tick == s_dumpTick;
+    s_hashLo = 0x84222325;
+    s_hashHi = 0xcbf29ce4;
+
+    VisitU32("gameTick", tick);
+    VisitU32("rng.parkMiller", parkMiller);
+    VisitU32("rng.crtHoldrand", holdrand);
+    VisitUnits();
+    VisitProjectiles();
+    VisitPlayers();
+    VisitFeatures();
+    VisitWind();
+    VisitMeteors();
+    VisitWorld();
+
+    fprintf(s_trace, "%u tick %08x%08x\n", tick, s_hashHi, s_hashLo);
+    fflush(s_trace);
+    if (s_dumpNow)
+        fflush(s_dump);
 }
 
 static void OpenTrace(unsigned controlWord)

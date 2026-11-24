@@ -44,7 +44,7 @@ from pathlib import Path
 from traceschema import TRACE_FORMAT
 
 ROOT = Path(__file__).resolve().parent.parent
-PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world")
+PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick")
 PHASE_FUNCTIONS = {
     "net": ("HandleNetPackets", 0x453D40),
     "units": ("UpdateAllUnits", 0x48AD30),
@@ -125,6 +125,8 @@ def diff_dumps(a: Path, b: Path, tick: int, phase: str) -> list[tuple[str, str, 
 
 def describe_phase(phase: str) -> str:
     """The function a phase's hash follows, from RunGameSteps (src/ingame/dialogs_493340.cpp)."""
+    if phase == "tick":
+        return "none (the end of the tick, hashed after the whole step)"
     if phase not in PHASE_FUNCTIONS:
         return "none (the once-per-tick tables, hashed after UpdateMeteors)"
     name, address = PHASE_FUNCTIONS[phase]

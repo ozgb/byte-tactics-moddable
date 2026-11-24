@@ -830,8 +830,10 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
    that start, and the loader's message is the result: `refused`. A module linked at another base inside its window is not
    refused by either step (section 5.2): it is judged like any other, and differs where its data is not where the loader zeroed
    it.
-4. It plays `tools/reference.py --check --tier` on that runtime (`--full`: the full `--check`), and then
+4. It plays `tools/reference.py --check --end-of-tick --tier` on that runtime (`--full`: the full `--check --end-of-tick`), and then
    `tools/replay.py --check --subsystem <subsystem>` on the recordings of `tests/replay/<subsystem>/`. The comparisons are theirs.
+   `--end-of-tick` judges each scenario on its `state` column (the `tick` row, `docs/trace-format.md`, section 6), the state at
+   the end of each tick, and reports the `digest` column (every row of the tick) beside it without failing on it.
    The shared gate lock is kept, a cached pass is not used, and the key of the cache covers the module, so a cached pass could
    not stand for another one.
 
@@ -839,14 +841,15 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
 
 | Field | Meaning |
 | --- | --- |
-| `format` | 1 |
-| `verdict` | `equal`, `differs`, `failed` (a run did not finish, or a check other than the traces failed) or `refused` |
+| `format` | 2 |
+| `verdict` | `equal`, `differs`, `failed` (a run did not finish, or a check other than the traces failed) or `refused`; a scenario counts by its `state` verdict |
+| `digest` | `equal`, `differs` or `not_judged`: whether every judged scenario is also equal on every row of each tick (absent with `refused`) |
 | `subsystem`, `suite` | the subsystem, and `tier` or `full` |
 | `module` | `sha256` and `bytes` of the submitted file |
 | `kit` | `interfaces` and `reference_traces`: the newest `interfaces-v*` and `reference-traces-v*` tags |
 | `seconds` | wall time of the run |
 | `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
-| `scenarios` | by scenario name: `status` and, for `differs`, `tick`, `phase`, `field` and `value`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
+| `scenarios` | by scenario name: `status` (the end-of-tick state) and, for `differs`, `tick`, `phase`, `field` and `value`; `digest`: `status` `equal`, `differs` with the first `tick` whose digest differs, or `not_judged`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
 | `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value` |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first
@@ -854,6 +857,10 @@ divergence before this scenario was reported). Only the first divergence of a ru
 scenario: the others have their `tick`. A `value` is what the module produced; the reference's value, its memory and anything of
 the build other than the names of the traced fields are never in the file. The raw reports are kept in `DIR/logs/` for the host
 and are not part of the result.
+
+A module that is equal on `state` and differs on `digest` kept the end-of-tick contract with another order of work inside the
+tick: the state at the end of each tick is 3.1c's, and some phase row in between is not. Format 1 had no `digest` and judged
+the scenarios on every row.
 
 Exit status: 0 when everything is equal, 1 when something differs or failed, 2 when the loader refused the module.
 

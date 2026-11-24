@@ -166,7 +166,7 @@ The phase function is the one `RunGameSteps` calls just before the phase's hash
 `UpdateAllUnits`, `projectiles` `UpdateProjectiles`, `explosions`
 `UpdateExplosions`, `players` `UpdatePlayers`, `features` `UpdateFeatures`,
 `wind` `UpdateWind` and `meteors` `UpdateMeteors`. The `world` row follows `UpdateMeteors`
-and has no function of its own.
+and has no function of its own, and nor has the `tick` row, at the end of the step.
 
 Traces with different scenario or seeds are refused (exit 2).
 Exit status is 0 for identical traces, 1 for a divergence and 2 for an error.
@@ -254,8 +254,9 @@ seeds) and runs deterministically: two runs give identical traces.
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase
 hashes: the digest of a tick is computed from the tick's rows as
 [docs/trace-format.md](../docs/trace-format.md), "The per-tick digest", says. In
-test mode there are 8 rows per tick (the 7 phases `units` to `meteors`, since `net`
-does not run, then `world`).
+test mode there are 9 rows per tick (the 7 phases `units` to `meteors`, since `net`
+does not run, then `world` and `tick`). Each line also carries the tick's `tick` row,
+the end-of-tick state, which `tools/reference.py --check --end-of-tick` compares alone.
 
 `tools/tracedigest.py trace.txt` converts a `trace.txt` to this form.
 

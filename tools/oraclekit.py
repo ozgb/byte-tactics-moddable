@@ -1001,8 +1001,10 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
         except subprocess.CalledProcessError:
             raise Refusal("refused: %s has no tracked file" % CODE_TABLES_SOURCE)
         index = speclint.source_index(root, speclint.DEFAULT_RUN)
+        if SERVICES_HEADER not in files:
+            raise Refusal("refused: %s has no tracked file" % SERVICES_HEADER)
         files[SCHEMA] = kit_schema(files[SCHEMA], names, index[0] - declared_names(files),
-                                   (text_of(files[SERVICES_HEADER]) or "") if SERVICES_HEADER in files else "")
+                                   text_of(files[SERVICES_HEADER]) or "")
     if SIM_EVENTS_PAGE in files and listed(SIM_EVENTS_PAGE, contents):
         page = files[SIM_EVENTS_PAGE].decode()
         try:

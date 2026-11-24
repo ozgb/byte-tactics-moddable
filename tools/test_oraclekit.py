@@ -957,11 +957,12 @@ SCHEMA_TEXT = json.dumps({
 CODE_TABLES_TEXT = "table,entry,kit_name\norderNotify,ReadyOrder,Ready\norderNotify,AttackChaseOrder,Attack_Chase\n"
 SCHEMA_SOURCE = ("int ReadyOrder(int a) { return a; }\nint AttackChaseOrder(int a) { return a; }\n"
                  "struct HiddenView { int y; };\nint g_hiddenTable[4];\nint g_hiddenVtable[2];\nint velY;\n")
-SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, "")]
+SCHEMA_CONTENTS = CONTENTS + [("file", oraclekit.SCHEMA, ""), ("file", oraclekit.SERVICES_HEADER, "")]
 
 
-def schema_repo(tmp: str, doc: str = "alpha\n", tables: str = CODE_TABLES_TEXT) -> Path:
-    return repo(tmp, {"docs/a.md": doc, oraclekit.SCHEMA: SCHEMA_TEXT, oraclekit.CODE_TABLES_SOURCE: tables, "src/o.cpp": SCHEMA_SOURCE})
+def schema_repo(tmp: str, doc: str = "alpha\n", tables: str = CODE_TABLES_TEXT, services: bool = True) -> Path:
+    extra = {oraclekit.SERVICES_HEADER: "int GameRand(int s);\n"} if services else {}
+    return repo(tmp, {"docs/a.md": doc, oraclekit.SCHEMA: SCHEMA_TEXT, oraclekit.CODE_TABLES_SOURCE: tables, "src/o.cpp": SCHEMA_SOURCE, **extra})
 
 
 class ReplaySchemaKitTest(unittest.TestCase):
@@ -1046,7 +1047,7 @@ class ReplaySchemaKitTest(unittest.TestCase):
         schema["annotations"]["objects"]["Spot"]["type"] = "HiddenView"
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
             root = repo(tmp, {"docs/a.md": "alpha\n", oraclekit.SCHEMA: json.dumps(schema), oraclekit.CODE_TABLES_SOURCE: CODE_TABLES_TEXT,
-                              "src/o.cpp": SCHEMA_SOURCE})
+                              "src/o.cpp": SCHEMA_SOURCE, oraclekit.SERVICES_HEADER: "int GameRand(int s);\n"})
             kit = Path(out) / "k"
             with self.assertRaises(oraclekit.Refusal) as caught:
                 oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
@@ -1061,6 +1062,15 @@ class ReplaySchemaKitTest(unittest.TestCase):
                 oraclekit.export(root, kit, True, {"records": {}}, SCHEMA_CONTENTS)
             self.assertIn("docs/a.md:3: function 'AttackChaseOrder' is declared by no interface header", str(caught.exception))
             self.assertIn("docs/a.md:3: identifier 'AttackChaseOrder' is in the source but not in the kit", str(caught.exception))
+            self.assertFalse(kit.exists())
+
+    def test_a_schema_without_a_tracked_services_header_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = schema_repo(tmp, services=False)
+            kit = Path(out) / "k"
+            with self.assertRaises(oraclekit.Refusal) as caught:
+                oraclekit.export(root, kit, True, {"records": {}}, CONTENTS + [("file", oraclekit.SCHEMA, "")])
+            self.assertEqual(str(caught.exception), "refused: interfaces/services.h has no tracked file")
             self.assertFalse(kit.exists())
 
     def test_a_code_table_entry_without_a_row_or_a_row_without_an_entry_is_refused(self):

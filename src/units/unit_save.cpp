@@ -469,16 +469,19 @@ void __stdcall SaveUnits(HapiBank* file)
 // FUNCTION: 0x487af0
 Unit* __stdcall FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after)
 {
+    int missionUnits = g_seams.mission->CountMissionUnits();
+    if (count > missionUnits)
+        count = missionUnits;
     int i = 0;
 
     if (after) {
-        while (units[i++].get() != after) {
+        for (;;) {
             if (i >= count)
                 return nullptr;
+            if (units[i++].get() == after)
+                break;
         }
     }
-    if (i >= count)
-        return nullptr;
     for (; i < count; i++) {
         MissionUnitInfo info;
         MissionUnitInfo* e = &info;

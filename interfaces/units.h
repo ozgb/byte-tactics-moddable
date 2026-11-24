@@ -394,7 +394,7 @@ struct UnitsSeam {
     UnitDef* (__stdcall* FindUnitType)(const char* name);
     // Returns the index of the unit type of a name, or 0 when there is none. Hooks: none.
     unsigned short (__stdcall* FindUnitTypeId)(const char* name);
-    // Looks a mission unit up by its name in the caller's table of the units made for the mission units (count entries, indexed by mission unit), starting after the unit after when it is not null, and returns it or null. Hooks: none.
+    // Looks a mission unit up by its name in the caller's table of the units made for the mission units (count entries, indexed by mission unit, and at most the mission's CountMissionUnits; a larger count is clamped to it), starting after the unit after when it is not null, and returns it or null; a count of 0 reads no entry, so the table may then be null. Hooks: none.
     Unit* (__stdcall* FindMissionUnit)(const char* name, const Ref<Unit>* units, int count, Unit* after);
     // Adds build progress to a unit under construction and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: UnitFinished.
     int (__stdcall* AddBuildProgress)(Unit* builder, Unit* unit, float amount);

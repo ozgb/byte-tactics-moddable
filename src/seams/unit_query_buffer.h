@@ -9,10 +9,10 @@ struct Unit;
 
 class UnitQueryBuffer {
 public:
-    enum { kInlineCapacity = 64 };
+    enum { INLINE_CAPACITY = 64 };
 
     Ref<Unit>* Data() { return heap.empty() ? local : &heap[0]; }
-    int Capacity() const { return heap.empty() ? (int)kInlineCapacity : (int)heap.size(); }
+    int Capacity() const { return heap.empty() ? (int)INLINE_CAPACITY : (int)heap.size(); }
     bool Grow(int total)
     {
         if (total <= Capacity())
@@ -24,7 +24,7 @@ public:
     Ref<Unit>& operator[](int i) { return Data()[i]; }
 
 private:
-    Ref<Unit> local[kInlineCapacity];
+    Ref<Unit> local[INLINE_CAPACITY];
     std::vector<Ref<Unit> > heap;
 };
 

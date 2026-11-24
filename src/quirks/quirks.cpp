@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include "quirks.h"
+#include "../../interfaces/quirks.h"
 
 
 namespace {

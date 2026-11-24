@@ -50,11 +50,11 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 Issue #9. 16 functions. `UpdateWind`, `UpdateMeteors`, `Apply` (the inbox of the meteor set-up and console events), the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWindOnStream` in `src/game/game_state.cpp`).
 
-Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live function no scenario enters, and 0 more are dead (data/coverage.csv).
+Coverage: 0.0% of functions (0 of 16), 0.0% of lines, 0.0% of branches; 16 live function no scenario enters, and 0 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (15 of 15 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 0 are entered, 0.0%), by reason:
+**Live functions no scenario enters** (16 of 16 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445); 0 are entered, 0.0%), by reason:
 
-- Native modules switch only (14): `AddPoints`, `DisableMeteors`, `EnableMeteors`, `InitMeteors`, `LoadMeteorDefaults`, `LoadMeteors`, `MakePoint`, `SaveMeteors`, `SetMeteorParams`, `StartMeteorShower`, `StartShower`, `UpdateMeteors`, `UpdateWindOnStream`, `WindMeteorsApply`. Wind and meteors run in `wind_meteors.wasm` by default (#564), so their native code runs only with `-modules=native` (`reference.py --check --native-modules`), which the coverage run does not pass. Every scenario enters the module's copies. The console's `meteor` commands are events since #970: `CmdMeteor` is game code that publishes them, and `console-features` (#445) enters it and, through the module's `Apply`, the module's `StartMeteorShower` (`meteor` and `meteor 1`).
+- Native modules switch only (15): `AddPoints`, `DisableMeteors`, `EnableMeteors`, `InitMeteors`, `LoadMeteorDefaults`, `LoadMeteors`, `MakePoint`, `SaveMeteors`, `SetMeteorParams`, `StartMeteorShower`, `StartShower`, `UpdateMeteors`, `UpdateWindOnStream`, `WindMeteorsApply`, `WindMeteorsEmit`. Wind and meteors run in `wind_meteors.wasm` by default (#564), so their native code runs only with `-modules=native` (`reference.py --check --native-modules`), which the coverage run does not pass. Every scenario enters the module's copies. The console's `meteor` commands are events since #970: `CmdMeteor` is game code that publishes them, and `console-features` (#445) enters it and, through the module's `Apply`, the module's `StartMeteorShower` (`meteor` and `meteor 1`).
 - Shutdown only (1): `EmptyShutdownPreCleanup`.
 
 **Entry points.** Phase roots: `UpdateWindOnStream` (the `UpdateWind` slot) and `UpdateMeteors`, both called through the scheduler (`SchedWindPhase`, `SchedMeteorsPhase`), which delivers the inbox through `Apply` first. `UpdateWindOnStream` is also called from `LoadBattleAssets` (game).
@@ -622,7 +622,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **game** (375 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 239 functions are called from outside, by platform (85 distinct functions) and presentation (33); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 624 functions, the most of any subsystem, 218 of them from presentation, then platform 103, network 31, files 23 and units 25.
 
-**game, functions no scenario enters** (87 of 388 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 301 are entered, 77.6%), by reason:
+**game, functions no scenario enters** (87 of 389 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 302 are entered, 77.6%), by reason:
 
 - Network only (6): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes), `ScheduleUnitsDeliver` (units' inbox, delivered by `ReceiveUnitStates` after each unit's `UpdateMotion`). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
@@ -765,7 +765,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
-| **wind_meteors** | 0 of 15 | 0.0% | 0.0% | 0.0% | 15 | 0 |
+| **wind_meteors** | 0 of 16 | 0.0% | 0.0% | 0.0% | 16 | 0 |
 | **economy** | 51 of 54 | 94.4% | 91.4% | 73.9% | 3 | 3 |
 | **features** | 54 of 55 | 98.2% | 87.3% | 73.7% | 1 | 4 |
 | **ai** | 87 of 109 | 79.8% | 75.6% | 72.9% | 22 | 31 |
@@ -781,11 +781,11 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **scripts** | 65 of 87 | 74.7% | 86.5% | 78.2% | 22 | 6 |
 | **movement** | 118 of 177 | 66.7% | 69.4% | 62.2% | 59 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.1% | 30 | 35 |
-| game | 301 of 388 | 77.6% | 61.8% | 41.8% | 87 | 23 |
+| game | 302 of 389 | 77.6% | 61.9% | 41.8% | 87 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
-| platform | 401 of 749 | 53.5% | 41.0% | 28.0% | 348 | 86 |
+| platform | 403 of 751 | 53.7% | 41.2% | 28.2% | 348 | 86 |
 | presentation | 568 of 1153 | 49.3% | 36.3% | 29.6% | 585 | 295 |
-| seams | 218 of 240 | 90.8% | 93.1% | 58.9% | 22 | 0 |
+| seams | 217 of 239 | 90.8% | 93.1% | 58.9% | 22 | 0 |
 | state | 486 of 553 | 87.9% | 70.3% | 49.2% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

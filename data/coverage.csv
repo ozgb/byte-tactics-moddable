@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,388,301,6106,3776,2298,960,,23,
+game,*,,389,302,6116,3786,2302,963,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -812,7 +812,7 @@ pathfinding,WriteCells,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteCells@?A0x@@YGXPBUS
 pathfinding,WriteNodes,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteNodes@?A0x@@YGXPBUStateWriter@@PAVPathfinder@@@Z,0,test-only
 pathfinding,WriteRequest,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteRequest@?A0x@@YGXPBUStateWriter@@HHPBUPathRequest@@I@Z,0,demo: hpa
 pathfinding,WriteSearch,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteSearch@?A0x@@YGXPBUStateWriter@@PAUHpaView@?A0x@@@Z,0,demo: hpa
-platform,*,,749,401,8412,3452,3478,975,,86,
+platform,*,,751,403,8434,3474,3492,984,,86,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,
@@ -2227,7 +2227,7 @@ scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCa
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
 scripts,WriteChannel,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteChannel@@YGXPBUStateWriter@@PBUChannel@@H@Z,0,test-only
 scripts,WriteScript,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteScript@@YGXPBUStateWriter@@PAVCobScript@@@Z,0,test-only
-seams,*,,240,218,1872,1743,302,178,,0,
+seams,*,,239,217,1865,1736,302,178,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YGHXZ,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YGHXZ,0,
 seams,CountMissionsNative,src/seams/native.cpp,1,0,0,0,0,0,?CountMissionsNative@@YGHXZ,0,
@@ -2377,7 +2377,7 @@ state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VPlayerFrameInfo@@@@
 state,Ref::operator?C,interfaces/ref.h,1,0,0,0,0,0,??C?$Ref@VUnitRef@@@@QBEPAVUnitRef@@XZ,0,unused-instance
 state,Ref::operator?D,interfaces/ref.h,1,0,0,0,0,0,??D?$Ref@UPlayerInfo@@@@QBEAAUPlayerInfo@@XZ,0,unused-instance
 state,RefOutsideBlock,interfaces/ref.h,1,0,0,0,0,0,?RefOutsideBlock@@YGXPBD@Z,0,error-path
-targeting,*,,21,21,237,228,110,87,,1,
+targeting,*,,21,21,236,227,110,87,,1,
 targeting,IsTargetingUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?IsTargetingUnit@@YGHPAUUnit@@0@Z,1,
 units,*,,121,106,3008,2588,1256,891,,28,
 units,ChebyshevDistance,src/units/unit_script_calls.cpp,0,0,0,0,0,0,?ChebyshevDistance@@YGHUPoint16@@0@Z,1,
@@ -2461,7 +2461,7 @@ weapons,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteDeb
 weapons,WriteExplodedPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteExplodedPieces@@YGXPBUStateWriter@@@Z,0,test-only
 weapons,WriteProjectiles,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteProjectiles@@YGXPBUStateWriter@@@Z,0,test-only
 weapons,WriteUnitSlots,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteUnitSlots@@YGXPBUStateWriter@@@Z,0,test-only
-wind_meteors,*,,15,0,195,0,56,0,,0,
+wind_meteors,*,,16,0,198,0,56,0,,0,
 wind_meteors,AddPoints,src/map/meteors.cpp,1,0,0,0,0,0,?AddPoints@@YG?AUPoint16@@U1@0@Z,0,wasm
 wind_meteors,DisableMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?DisableMeteors@@YGXXZ,0,wasm
 wind_meteors,EmptyShutdownPreCleanup,src/map/meteors.cpp,1,0,0,0,0,0,?EmptyShutdownPreCleanup@@YGXXZ,0,shutdown
@@ -2477,3 +2477,4 @@ wind_meteors,StartShower,src/map/meteors.cpp,1,0,0,0,0,0,?StartShower@@YGXXZ,0,w
 wind_meteors,UpdateMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?UpdateMeteors@@YGXXZ,0,wasm
 wind_meteors,UpdateWindOnStream,src/game/game_state.cpp,1,0,0,0,0,0,?UpdateWindOnStream@@YAXW4RandStream@@@Z,0,wasm
 wind_meteors,WindMeteorsApply,src/map/meteors.cpp,1,0,0,0,0,0,?WindMeteorsApply@@YGXPBUWindMeteorsEventHeader@@I@Z,0,wasm
+wind_meteors,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,1,0,0,0,0,0,?WindMeteorsEmit@@YGXPBUWindMeteorsEventHeader@@I@Z,0,wasm

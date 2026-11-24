@@ -82,7 +82,6 @@ call 0 GetWeaponTargetUnit
   o result null
 call 0 FindWeaponTarget
   r Game.uiOptionFlags 12
-  r Game.poolCount 2501
   r rng.main 0x000005ad
   r rng.load 0x218b8b73
   r rng.seed 0x41bd1988

@@ -287,6 +287,24 @@ class Budgets(unittest.TestCase):
     def test_publishes_refuses_a_wrong_size(self):
         self.assertTrue(any("size 32" in p for p in self.publishes_problems({"80": 32})))
 
+    def test_effect_kinds_take_implicit_values_and_skip_a_trailing_comma(self):
+        text = "enum XEffectKind {\n    X_A = 80,\n    X_B,\n    X_C = 0x60, // the next\n    X_D,\n};\nenum YEventKind { Y_A = 1 };"
+        self.assertEqual(wm.effect_kinds(text), {80, 81, 96, 97})
+        self.assertEqual(wm.effect_kinds("enum ZEffectKind { Z_A, Z_B };"), {0, 1})
+
+    def test_effect_kinds_refuse_a_value_they_cannot_read(self):
+        with self.assertRaises(ValueError):
+            wm.effect_kinds("enum XEffectKind { X_A = OTHER + 1 };")
+
+    def test_publishes_reports_an_unreadable_enum_instead_of_crashing(self):
+        original = wm.header_text
+        wm.header_text = lambda name: "enum WindMeteorsEffectKind { WIND_METEORS_EFFECT_SPAWN = BASE };"
+        try:
+            problems = self.publishes_problems({"80": 36})
+        finally:
+            wm.header_text = original
+        self.assertTrue(any("cannot read the effect kinds" in p for p in problems))
+
     def test_publishes_refuses_a_malformed_table(self):
         self.assertTrue(self.publishes_problems([80]))
         self.assertTrue(self.publishes_problems({"eighty": 36}))

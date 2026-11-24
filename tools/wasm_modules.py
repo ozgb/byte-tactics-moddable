@@ -673,6 +673,23 @@ def check_fuel_manifest(pins):
     return problems
 
 
+def effect_kinds(text):
+    """The values of the EffectKind enums of a header's text; an enumerator without `=` is the one before it plus one, as in C."""
+    values = set()
+    for m in re.finditer(r"\benum \w*EffectKind \{([^{}]*)\};", COMMENT.sub("", text)):
+        value = -1
+        for member in m.group(1).split(","):
+            member = member.strip()
+            if not member:
+                continue
+            name, eq, given = member.partition("=")
+            if not re.fullmatch(r"\w+", name.strip()):
+                raise ValueError(f"enumerator {member!r} is not a name")
+            value = int(given.strip(), 0) if eq else value + 1
+            values.add(value)
+    return values
+
+
 def check_publishes(game):
     """Reasons a module's manifest "publishes" table is not an object from effect kinds of its interface to their payload sizes."""
     import traceschema
@@ -689,8 +706,7 @@ def check_publishes(game):
         try:
             module = traceschema.module_of_header(entry.get("interface", "") + ".h")
             kinds = traceschema.event_kinds(module)
-            effects = {int(v) for m in re.finditer(r"\benum \w*EffectKind \{([^{}]*)\};", COMMENT.sub("", header_text(entry["interface"])))
-                       for member in m.group(1).split(",") for v in [member.split("=")[1]]}
+            effects = effect_kinds(header_text(entry["interface"]))
         except (ValueError, KeyError, OSError) as e:
             problems.append(f"{name}: cannot read the effect kinds of interface {entry.get('interface')!r}: {e}")
             continue

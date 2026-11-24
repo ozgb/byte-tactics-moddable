@@ -140,7 +140,7 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 | `needs-grooming` | the lead (or anyone) | An issue needs a decision the plan doesn't make, or has parts that must land in order ("Issue size"). A comment says what's missing. | the maintainer, after fleshing out or splitting it |
 | `needs-human` | the maintainer, alongside `needs-grooming` | The issue waits on a major architecture decision. A comment asks the question. | the human, after answering it |
 | `needs-human-review` | the maintainer, on a pull request | The maintainer has nothing left to ask for, and the pull request waits on the human's review ("Human review"). | the human, to approve; or the maintainer, when the human approves in a comment |
-| `parked` | the human | The issue is outside #2's "Priority now". Nobody claims, grooms or splits it, and the queue isn't stocked from it. | the human |
+| `parked` | the human | The human keeps the issue out of the queue, whether or not #2's "Priority now" lists it: nobody claims, grooms or splits it, and the queue isn't stocked from it. An unlabelled issue outside "Priority now" is still claimable ("Issue states"). | the human |
 
 ## Issue size
 

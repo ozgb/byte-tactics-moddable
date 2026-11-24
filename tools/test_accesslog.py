@@ -828,16 +828,16 @@ class RunTest(unittest.TestCase):
     def test_equal_and_different_traces(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            header = "bt-digest 8\ntrace_format bt-trace 8\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
-            trace = "\n".join(["bt-trace 8", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
-                               "fpu_control_word 0x1", "1 units 00000000000000aa", "2 units 00000000000000bb", ""])
+            header = "bt-digest 9\ntrace_format bt-trace 9\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
+            trace = "\n".join(["bt-trace 9", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
+                               "fpu_control_word 0x1", "1 units 00000000000000aa", "1 tick 00000000000000a1", "2 units 00000000000000bb", "2 tick 00000000000000b1", ""])
             (tmp / "trace.txt").write_text(trace)
             import tracedigest
             _, rows = tracedigest.parse_trace(tmp / "trace.txt")
             digests = tracedigest.digests(rows)
-            (tmp / "ref.txt").write_text(header + "".join("%d %s\n" % d for d in digests))
+            (tmp / "ref.txt").write_text(header + "".join("%d %s %s\n" % d for d in digests))
             self.assertIsNone(al.trace_difference(tmp / "trace.txt", tmp / "ref.txt"))
-            (tmp / "other.txt").write_text(header + "1 %s\n2 %s\n" % (digests[0][1], "0" * 16))
+            (tmp / "other.txt").write_text(header + "1 %s %s\n2 %s %s\n" % (digests[0][1], digests[0][2], "0" * 16, digests[1][2]))
             self.assertIn("tick 2", al.trace_difference(tmp / "trace.txt", tmp / "other.txt"))
 
     def test_steady_leaves_out_the_presentation_rows(self):

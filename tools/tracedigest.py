@@ -3,20 +3,22 @@
     uv run tools/tracedigest.py trace.txt --commit <sha> --scenario <path> > digest.txt
 
 The digest of a tick is the 64-bit FNV-1a hash of that tick's rows in
-trace order (the phases, then `world`), each hash as 8 little-endian bytes. The output holds the header lines of
-the trace (the trace format, commit, scenario, seeds and fpu_control_word), then
-one `<tick> <digest>` line per tick, the digest in 16 lowercase hex digits.
+trace order (the phases, `world`, then `tick`), each hash as 8 little-endian bytes. The output holds the header
+lines of the trace (the trace format, commit, scenario, seeds and fpu_control_word), then one
+`<tick> <digest> <state>` line per tick, each in 16 lowercase hex digits. The `state` is the hash of the tick's
+`tick` row as the trace writes it: the game state at the end of the tick.
 
-    bt-digest 8
-    trace_format bt-trace 8
+    bt-digest 9
+    trace_format bt-trace 9
     commit <sha>
     scenario reference/scenarios/skirmish2.txt
     game_seed 1
     ...
-    1 0123456789abcdef
+    1 0123456789abcdef 76543210fedcba98
 """
 
 import argparse
+import re
 import struct
 import sys
 from pathlib import Path
@@ -27,6 +29,7 @@ from traceschema import TRACE_FORMAT
 FNV_OFFSET = 0xCBF29CE484222325
 FNV_PRIME = 0x100000001B3
 MASK = (1 << 64) - 1
+HEX16 = re.compile(r"[0-9a-f]{16}")
 HEADER_KEYS = ("commit", "scenario", "game_seed", "crt_seed", "view_seed", "fpu_control_word")
 
 
@@ -43,26 +46,32 @@ class TickHasher:
     def __init__(self) -> None:
         self.current: int | None = None
         self.pending = b""
+        self.state: str | None = None
 
-    def add(self, tick: int, value: str) -> tuple[int, str] | None:
-        done = self.finish() if tick != self.current else None
+    def add(self, tick: int, phase: str, value: str) -> tuple[int, str, str] | None:
+        done = self.finish() if tick != self.current and self.current is not None else None
         if done:
             self.pending = b""
+            self.state = None
         self.current = tick
         self.pending += struct.pack("<Q", int(value, 16))
+        if phase == "tick":
+            self.state = value
         return done
 
-    def finish(self) -> tuple[int, str] | None:
-        """The digest of the tick being hashed, or None before the first row."""
+    def finish(self) -> tuple[int, str, str] | None:
+        """The (tick, digest, state) of the tick being hashed, or None before the first row; Error if it has no `tick` row."""
         if self.current is None:
             return None
-        return self.current, f"{fnv1a64(self.pending):016x}"
+        if self.state is None:
+            raise Error(f"tick {self.current} has no tick row")
+        return self.current, f"{fnv1a64(self.pending):016x}", self.state
 
 
-def digests(rows: list[tuple[int, str, str]]) -> list[tuple[int, str]]:
-    """The (tick, 16 hex digits) of each tick of a trace's (tick, phase, hash) rows."""
+def digests(rows: list[tuple[int, str, str]]) -> list[tuple[int, str, str]]:
+    """The (tick, digest, state) of each tick of a trace's (tick, phase, hash) rows."""
     hasher = TickHasher()
-    out = [done for tick, _phase, value in rows if (done := hasher.add(tick, value))]
+    out = [done for tick, phase, value in rows if (done := hasher.add(tick, phase, value))]
     last = hasher.finish()
     return out + [last] if last else out
 
@@ -77,12 +86,12 @@ class TraceTail:
         self.rows = 0
         self.hasher = TickHasher()
 
-    def feed(self, data: bytes) -> list[tuple[int, str]]:
+    def feed(self, data: bytes) -> list[tuple[int, str, str]]:
         """Take the next bytes of the file; the digests of the ticks they finish (a tick ends when the next one starts)."""
         self.buffer += data
         cut = self.buffer.rfind(b"\n") + 1
         text, self.buffer = self.buffer[:cut].decode(errors="replace"), self.buffer[cut:]
-        done: list[tuple[int, str]] = []
+        done: list[tuple[int, str, str]] = []
         for line in text.splitlines():
             self.lines += 1
             words = line.split()
@@ -92,7 +101,7 @@ class TraceTail:
                     raise Error(f"not a bt-trace {TRACE_FORMAT} file")
             elif row:
                 self.rows += 1
-                finished = self.hasher.add(row[0], row[2])
+                finished = self.hasher.add(*row)
                 if finished:
                     done.append(finished)
             elif self.rows or not words:
@@ -102,26 +111,26 @@ class TraceTail:
         return done
 
 
-def render(header: dict[str, str], per_tick: list[tuple[int, str]]) -> str:
+def render(header: dict[str, str], per_tick: list[tuple[int, str, str]]) -> str:
     """The digest file text for a trace's header and its per-tick digests."""
     lines = [f"bt-digest {TRACE_FORMAT}", f"trace_format bt-trace {TRACE_FORMAT}"]
     lines += [f"{k} {header[k]}" for k in HEADER_KEYS]
-    lines += [f"{tick} {digest}" for tick, digest in per_tick]
+    lines += [f"{tick} {digest} {state}" for tick, digest, state in per_tick]
     return "\n".join(lines) + "\n"
 
 
-def parse_digest(path: Path) -> tuple[dict[str, str], list[tuple[int, str]]]:
-    """The header lines as a dict, and the (tick, digest) lines of a digest file."""
+def parse_digest(path: Path) -> tuple[dict[str, str], list[tuple[int, str, str]]]:
+    """The header lines as a dict, and the (tick, digest, state) lines of a digest file."""
     header: dict[str, str] = {}
-    rows: list[tuple[int, str]] = []
+    rows: list[tuple[int, str, str]] = []
     for n, line in enumerate(path.read_text().splitlines(), 1):
         words = line.split()
         if n == 1:
             if words != ["bt-digest", str(TRACE_FORMAT)]:
                 raise Error(f"{path}: not a bt-digest {TRACE_FORMAT} file")
-        elif len(words) == 2 and words[0].isdigit() and len(words[1]) == 16:
-            rows.append((int(words[0]), words[1]))
-        elif rows or not words:
+        elif len(words) == 3 and words[0].isdigit() and all(HEX16.fullmatch(w) for w in words[1:]):
+            rows.append((int(words[0]), words[1], words[2]))
+        elif rows or not words or words[0].isdigit():
             raise Error(f"{path}:{n}: unexpected line")
         else:
             header[words[0]] = line[len(words[0]):].strip()

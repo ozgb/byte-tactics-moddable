@@ -25,6 +25,10 @@ and what they delivered at a divergence. A dump holds them after every phase
 (the share packets after the last phase only), so the fields of a `world` divergence are read from the last phase's
 lines.
 
+The row `tick` is hashed after the whole step (the tail after `meteors` included): the phase rows' state, then the
+tables of `world`, in one hash. Its dump block is the `tick` block. `--end-of-tick` (two exes, or `--traces`)
+compares only the `tick` rows and reports the first tick whose `tick` row differs, as phase `tick`.
+
 `--traces` compares existing trace files without running, and reports the first
 divergence only. `--dumps` diffs the phase of two existing dump files.
 
@@ -61,7 +65,7 @@ from typing import NamedTuple
 from traceschema import TRACE_FORMAT
 
 ROOT = Path(__file__).resolve().parent.parent
-PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world")
+PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick")
 PHASE_FUNCTIONS = {
     "net": ("HandleNetPackets", 0x453D40),
     "units": ("UpdateAllUnits", 0x48AD30),
@@ -149,6 +153,11 @@ def check_headers(a: dict[str, str], b: dict[str, str], ignore_view_seed: bool =
     bad = [f"{k}: a={a.get(k)} b={b.get(k)}" for k in keys if a.get(k) != b.get(k)]
     if bad:
         raise Error("the traces are not of the same run, " + "; ".join(bad))
+
+
+def end_of_tick_rows(rows: list[tuple[int, str, str]]) -> list[tuple[int, str, str]]:
+    """The `tick` rows of a trace."""
+    return [row for row in rows if row[1] == "tick"]
 
 
 def first_divergence(a: list[tuple[int, str, str]], b: list[tuple[int, str, str]]) -> tuple[int, str] | None:
@@ -348,6 +357,8 @@ def load_maps(ref: str) -> dict[str, TableMap]:
 
 def describe_phase(phase: str) -> str:
     """The function a phase's hash follows, from RunGameSteps (src/ingame/game_dialogs.cpp)."""
+    if phase == "tick":
+        return "none (the end of the tick, hashed after the whole step)"
     if phase not in PHASE_FUNCTIONS:
         return "none (the once-per-tick tables, hashed after UpdateMeteors)"
     name, address = PHASE_FUNCTIONS[phase]
@@ -530,6 +541,8 @@ def compare(args: argparse.Namespace) -> int:
     runs = [play_loading(e, s, args.game_dir, None, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
     (ha, ra), (hb, rb) = (parse_trace(need(r, "trace.txt")) for r in runs)
     check_headers(ha, hb, args.ignore_view_seed)
+    if args.end_of_tick:
+        ra, rb = end_of_tick_rows(ra), end_of_tick_rows(rb)
     div = first_divergence(ra, rb)
     if not div:
         print(f"traces identical ({len(ra)} lines)")
@@ -556,6 +569,8 @@ def main() -> int:
                     help="the side whose dump came from the reference build: its leaf names are translated to the modern ones")
     ap.add_argument("--reference-ref", default=DEFAULT_REFERENCE_REF, metavar="REF",
                     help=f"the git ref whose {SCHEMA_PATH} names the reference's leaves (default {DEFAULT_REFERENCE_REF})")
+    ap.add_argument("--end-of-tick", action="store_true",
+                    help="compare only the `tick` rows: the first tick whose `tick` row differs is the divergence")
     ap.add_argument("--events", action="store_true",
                     help="with two exes: compare their sim event logs (docs/events-log.md) and name the first differing record")
     ap.add_argument("--event-logs", nargs=2, metavar=("A", "B"), help="compare two events.txt files, without running")
@@ -566,6 +581,8 @@ def main() -> int:
     modes = [bool(args.traces), bool(args.dumps), bool(args.exe), bool(args.event_logs)]
     if sum(modes) != 1:
         ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE, or --event-logs A B")
+    if args.end_of_tick and (args.dumps or args.event_logs or args.events):
+        ap.error("--end-of-tick applies to two exes and to --traces")
     if args.events and not args.exe:
         ap.error("--events needs two exes and --scenario")
     if args.exe and (len(args.exe) != 2 or not args.scenario):
@@ -583,6 +600,8 @@ def main() -> int:
         if args.traces:
             (ha, ra), (hb, rb) = (parse_trace(Path(t)) for t in args.traces)
             check_headers(ha, hb, args.ignore_view_seed)
+            if args.end_of_tick:
+                ra, rb = end_of_tick_rows(ra), end_of_tick_rows(rb)
             div = first_divergence(ra, rb)
             if not div:
                 print(f"traces identical ({len(ra)} lines)")

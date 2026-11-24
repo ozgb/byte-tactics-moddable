@@ -7,6 +7,7 @@ import lzma
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import tracerehash as tr
 
@@ -566,6 +567,49 @@ class SharedStateTest(unittest.TestCase):
         for v in (1, 2, 3):
             want.h32(v)
         self.assertEqual(w.hash.h, want.h)
+
+
+class TickRowTest(unittest.TestCase):
+    PHASE = [("gameTick", "0x00000001"), ("rng.parkMiller", "0x00000002"), ("rng.crtHoldrand", "0x00000003"),
+             ("meteors.x", "0x00000004")]
+
+    @staticmethod
+    def block(world):
+        return TickRowTest.PHASE + [("game.x", world)]
+
+    def rows(self, blocks):
+        def meteors(self):
+            self.hash.h32(int(self.take("meteors.x"), 16))
+
+        def game(self):
+            self.hash.h32(int(self.take("game.x"), 16))
+
+        quiet = {name: lambda self: None for name in (
+            "units", "projectiles", "players", "features", "wind", "cells", "visibility", "explored", "spatial",
+            "pathfinder", "move_classes", "orders", "motions", "order_effects", "scripts", "los_radar_index",
+            "factory_index", "unit_resources")}
+        with mock.patch.multiple(tr.Walker, meteors=meteors, game=game, **quiet):
+            return tr.rehash(tr.Schema({"targets": [], "tables": {}}), blocks)
+
+    def test_the_tick_row_is_one_hash_over_the_phase_part_and_the_world_part(self):
+        meteors = self.block("0x00000005")
+        got = {phase: value for _, phase, value in self.rows({(2, "meteors"): meteors, (2, "tick"): meteors})}
+        one = tr.Hasher()
+        for v in (1, 2, 3, 4, 5):
+            one.h32(v)
+        world = tr.Hasher()
+        world.h32(5)
+        self.assertEqual(got["tick"], one.h)
+        self.assertEqual(got["world"], world.h)
+        self.assertNotEqual(got["tick"], got["world"])
+
+    def test_a_changed_world_value_changes_only_the_tick_row(self):
+        meteors = self.block("0x00000005")
+        a = self.rows({(2, "meteors"): meteors, (2, "tick"): meteors})
+        b = self.rows({(2, "meteors"): meteors, (2, "tick"): self.block("0x00000006")})
+        self.assertEqual(a[:2], b[:2])
+        self.assertEqual([r[1] for r in b], ["meteors", "world", "tick"])
+        self.assertNotEqual(a[2], b[2])
 
 
 class ReadTextTest(unittest.TestCase):

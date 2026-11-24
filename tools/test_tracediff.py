@@ -240,6 +240,55 @@ class ReferenceDisplayTest(unittest.TestCase):
             self.assertEqual(calls, expected, side)
 
 
+class TickRowTest(unittest.TestCase):
+    def traces(self, d, a, b):
+        paths = []
+        for name, rows in (("a.txt", a), ("b.txt", b)):
+            path = Path(d) / name
+            path.write_text(f"bt-trace {TRACE_FORMAT}\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\n" + "".join(rows))
+            paths.append(str(path))
+        return paths
+
+    def run_main(self, *argv):
+        out = io.StringIO()
+        with mock.patch("sys.argv", ["tracediff.py", *argv]), contextlib.redirect_stdout(out):
+            return td.main(), out.getvalue()
+
+    def test_tick_rows_parse_and_follow_world(self):
+        self.assertEqual(td.parse_row("3 tick 00000000000000aa"), (3, "tick", "00000000000000aa"))
+        self.assertLess(td.PHASES.index("world"), td.PHASES.index("tick"))
+        self.assertEqual(td.PHASES[-1], "tick")
+
+    def test_a_tick_row_has_its_own_dump_block_and_no_phase_function(self):
+        self.assertNotIn("tick", td.DUMP_PHASE)
+        self.assertEqual(td.DUMP_PHASE["world"], "meteors")
+        self.assertIn("end of the tick", td.describe_phase("tick"))
+
+    def test_a_differing_tick_row_is_a_divergence_without_the_switch(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = self.traces(d, ["1 units 01\n", "1 world 02\n", "1 tick 03\n"], ["1 units 01\n", "1 world 02\n", "1 tick 04\n"])
+            code, out = self.run_main("--traces", a, b)
+        self.assertEqual(code, 1)
+        self.assertIn("tick 1, phase tick", out)
+
+    def test_end_of_tick_ignores_the_phase_rows(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = self.traces(d, ["1 units 01\n", "1 tick 03\n", "2 units 05\n", "2 tick 06\n"],
+                               ["1 units 09\n", "1 tick 03\n", "2 units 05\n", "2 tick 07\n"])
+            code, out = self.run_main("--traces", a, b)
+            self.assertIn("tick 1, phase units", out)
+            code, out = self.run_main("--traces", a, b, "--end-of-tick")
+        self.assertEqual(code, 1)
+        self.assertIn("tick 2, phase tick", out)
+
+    def test_end_of_tick_reports_identical_when_the_tick_rows_agree(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = self.traces(d, ["1 units 01\n", "1 tick 03\n"], ["1 units 02\n", "1 tick 03\n"])
+            code, out = self.run_main("--traces", a, b, "--end-of-tick")
+        self.assertEqual(code, 0)
+        self.assertIn("traces identical", out)
+
+
 class PlayLoadingTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

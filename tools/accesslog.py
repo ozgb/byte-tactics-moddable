@@ -868,8 +868,8 @@ def trace_difference(trace: Path, reference: Path) -> str | None:
     _, want = tracedigest.parse_digest(reference)
     if have == want:
         return None
-    for (tick, digest), (wanted_tick, wanted) in zip(have, want):
-        if (tick, digest) != (wanted_tick, wanted):
+    for (tick, digest, state), (wanted_tick, wanted, wanted_state) in zip(have, want):
+        if (tick, digest, state) != (wanted_tick, wanted, wanted_state):
             return "first difference at tick %d (%s, stored %s)" % (tick, digest, wanted)
     return "%d ticks, stored %d" % (len(have), len(want))
 

@@ -413,7 +413,9 @@ Since format 9 each tick ends with one more row, `tick` (#1037): the state at th
 whole step, the work after `UpdateMeteors` included (the eyeballs that expire, the resource sharing). It is one
 hash from the offset basis over what a phase row hashes (`gameTick`, the two random states, sections 1 to 9) and
 then, with no reset, what the `world` row hashes. The reference writes it after `ExpireEyeballs`, at the end of
-`RunGameSteps`'s step. A re-implementation that keeps the order of its own phases is judged on this row alone
+`RunGameSteps`. The display timer of the shown player (`Player` +0xf8) is hashed as the frame drawn after the
+step leaves it (advanced by 30 when it is below the tick), the value the next tick starts from: the reference advances it in
+that frame and moddable in the step (#170). The harness puts the timer back after the row. A re-implementation that keeps the order of its own phases is judged on this row alone
 (`tools/reference.py --check --end-of-tick` on moddable). A dump tick gets one more block, `tick`, with the
 same lines as the `meteors` block, read at the end of the step.
 

@@ -3424,6 +3424,10 @@ orders,seams,call,ScheduleMapCanPlaceUnitFootprint,4
 orders,seams,call,ScheduleMapPickReclaimable,2
 orders,seams,call,ScheduleTargetingFireAtWill,6
 orders,seams,call,ScheduleTargetingTargetUnit,4
+orders,seams,call,UnitQueryBuffer::Capacity,3
+orders,seams,call,UnitQueryBuffer::Data,3
+orders,seams,call,UnitQueryBuffer::Grow,2
+orders,seams,call,UnitQueryBuffer::Written,2
 orders,seams,indirect,CanLoadNative,2
 orders,seams,indirect,CanReclaimNative,3
 orders,seams,indirect,CanRepairNative,5
@@ -5974,6 +5978,10 @@ targeting,scripts,shared_write,Ref<Unit>::offset,1
 targeting,scripts,shared_write,Vec3::x,7
 targeting,scripts,shared_write,Vec3::y,7
 targeting,scripts,shared_write,Vec3::z,7
+targeting,seams,call,UnitQueryBuffer::Capacity,1
+targeting,seams,call,UnitQueryBuffer::Data,1
+targeting,seams,call,UnitQueryBuffer::Grow,1
+targeting,seams,call,UnitQueryBuffer::Written,1
 targeting,seams,indirect,GetSweetSpotNative,1
 targeting,seams,indirect,GetWeaponRangeNative,1
 targeting,seams,shared_write,Ref<Unit>::offset,9
@@ -6329,7 +6337,7 @@ units,orders,indirect,OrdersSaveOrders,1
 units,orders,shared_write,Angles16::heading,5
 units,orders,shared_write,Fixed::value,8
 units,orders,shared_write,Game::defs,9
-units,orders,shared_write,Game::poolCount,4
+units,orders,shared_write,Game::poolCount,1
 units,orders,shared_write,Game::unitDefCount,4
 units,orders,shared_write,Game::units,4
 units,orders,shared_write,Game::unitsEnd,2
@@ -6643,7 +6651,6 @@ units,seams,shared_write,Vec3::x,1
 units,seams,shared_write,Vec3::y,1
 units,seams,shared_write,Vec3::z,1
 units,targeting,indirect,SavedTargetPair,1
-units,targeting,shared_write,Game::poolCount,1
 units,targeting,shared_write,Game::units,2
 units,targeting,shared_write,Ref<Unit>::offset,2
 units,targeting,shared_write,Unit::activateFlags,1

@@ -358,6 +358,7 @@ game,harness,call,HarnessAwaitLoadAndEndFrame,1
 game,harness,call,HarnessBeforeStep,1
 game,harness,call,HarnessCrtSeed,2
 game,harness,call,HarnessDispatchInput,1
+game,harness,call,HarnessEndOfTick,1
 game,harness,call,HarnessGameSeed,1
 game,harness,call,HarnessInit,1
 game,harness,call,HarnessLoadBegins,1
@@ -2043,7 +2044,7 @@ platform,game,shared_write,Game::animplayCursors,1
 platform,game,shared_write,_MEMORYSTATUS::dwLength,1
 platform,harness,call,HarnessInputTime,1
 platform,harness,call,HarnessTestMode,1
-platform,harness,shared_write,g_randomSeed,1
+platform,harness,shared_write,g_randomSeed,2
 platform,los_radar,call,DestroyLine,1
 platform,los_radar,call,DestroyPoint,1
 platform,los_radar,call,StoreDwordIfDst,1
@@ -2589,7 +2590,7 @@ presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::mapFlags,1
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,18
+presentation,harness,shared_write,g_game,19
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,CalcRadarViewportRect,1
 presentation,los_radar,call,GetMapCell,1

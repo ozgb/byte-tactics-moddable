@@ -9,14 +9,11 @@
 #include "../../interfaces/ref.h"
 #include "../../interfaces/sim_events.h"
 
-// Returns nonzero when the harness runs in test mode.
 int HarnessTestMode();
-// Puts the program in test mode.
 void EnterHarnessTestMode();
 
 struct Vec3;
 struct Vec3f;
-// A path search entry: a value and the key the heap orders it by.
 struct HeapEntry {
     HeapEntry() {}
     HeapEntry(const HeapEntry& o) : value(o.value), key(o.key) {}
@@ -26,189 +23,112 @@ struct HeapEntry {
 
 struct PathPoint;
 struct PathGoalArea;
-// Whether a cell is in a goal area.
 int __stdcall PathGoalContains(const PathGoalArea* goal, int x, int y);
-// The estimated distance from a cell to a goal area, the heuristic of a search.
 int __stdcall PathGoalDistance(const PathGoalArea* goal, int x, int y);
-// Writes up to max of the cells of a goal area that a search may mark as its goals and returns how many it has; with a null out it only counts them.
 int __stdcall PathGoalCells(const PathGoalArea* goal, PathPoint* out, int max);
 struct PathfindingEventHeader;
-// In test mode, records a pathfinding event as the engine delivers it, its payload of size bytes, with its waypoints, for the trace's path results.
 void __stdcall HarnessPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* points, int capacity);
 struct EconomyEventHeader;
-// In test mode, records an economy event as economy consumes or answers it, or an effect as economy publishes it, its payload of size bytes, with its outcome, for the dump's economy events.
 void __stdcall HarnessEconomyEvent(const EconomyEventHeader* event, unsigned int size, int outcome);
 struct FeaturesEventHeader;
-// In test mode, records a features event as features consumes or answers it, or an effect as features publishes it, its payload of size bytes, with its outcome, for the dump's features events.
 void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader* event, unsigned int size, int outcome);
 struct TargetingEventHeader;
-// In test mode, records a targeting event as targeting consumes it, or an effect as targeting publishes it, its payload of size bytes, with its outcome, for the dump's targeting events.
 void __stdcall HarnessTargetingEvent(const TargetingEventHeader* event, unsigned int size, int outcome);
 struct LosRadarEventHeader;
-// In test mode, records a los_radar event as los_radar consumes it, its payload of size bytes, with its outcome, for the dump's los_radar events.
 void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader* event, unsigned int size, int outcome);
 struct MapEventHeader;
-// In test mode, records a map event as map consumes it, or an effect as map publishes it, its payload of size bytes, with its outcome, for the dump's map events.
 void __stdcall HarnessMapEvent(const MapEventHeader* event, unsigned int size, int outcome);
 struct PlayersEventHeader;
-// In test mode, records a players event as players consumes it, or an effect as players publishes it, its payload of size bytes, with its outcome, for the dump's players events.
 void __stdcall HarnessPlayersEvent(const PlayersEventHeader* event, unsigned int size, int outcome);
 struct AiEventHeader;
-// In test mode, records an ai event as ai consumes it, or an effect as ai publishes it, its payload of size bytes, with its outcome, for the dump's ai events.
 void __stdcall HarnessAiEvent(const AiEventHeader* event, unsigned int size, int outcome);
 struct WeaponsEventHeader;
-// In test mode, records a weapons event as weapons consumes it, or an effect as weapons publishes it, its payload of size bytes, with its outcome, for the dump's weapons events.
 void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader* event, unsigned int size, int outcome);
 struct OrdersEventHeader;
-// In test mode, records an orders event as orders consumes it, or an effect as orders publishes it, its payload of size bytes, with its outcome, for the dump's orders events.
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader* event, unsigned int size, int outcome);
 struct MovementEventHeader;
-// In test mode, records a movement event as movement consumes it, or an effect as movement publishes it, its payload of size bytes, with its outcome, for the dump's movement events.
 void __stdcall HarnessMovementEvent(const MovementEventHeader* event, unsigned int size, int outcome);
 struct UnitsEventHeader;
-// In test mode, records a units event as units consumes it, its payload of size bytes, with its outcome, for the dump's units events.
 void __stdcall HarnessUnitsEvent(const UnitsEventHeader* event, unsigned int size, int outcome);
 struct ScriptsEventHeader;
-// In test mode, records a scripts event as scripts consumes it, its payload of size bytes, with its outcome, for the dump's scripts events.
 void __stdcall HarnessScriptsEvent(const ScriptsEventHeader* event, unsigned int size, int outcome);
-// The modules that own an outbox or an inbox in the scheduler's router.
 enum SchedModule {
-    // The engine itself, outside any module.
     SCHED_ENGINE = 0,
-    // Economy (interfaces/economy.h).
     SCHED_ECONOMY = 1,
-    // Units.
     SCHED_UNITS = 2,
-    // Orders.
     SCHED_ORDERS = 3,
-    // Players.
     SCHED_PLAYERS = 4,
-    // Features.
     SCHED_FEATURES = 5,
-    // Weapons.
     SCHED_WEAPONS = 6,
-    // Map.
     SCHED_MAP = 7,
-    // Wind and meteors (interfaces/wind_meteors.h).
     SCHED_WIND_METEORS = 8,
-    // Targeting (interfaces/targeting.h).
     SCHED_TARGETING = 9,
-    // AI.
     SCHED_AI = 10,
-    // Line of sight and radar (interfaces/los_radar.h).
     SCHED_LOS_RADAR = 11,
-    // Pathfinding (interfaces/pathfinding.h).
     SCHED_PATHFINDING = 12,
-    // Scripts (interfaces/scripts.h).
     SCHED_SCRIPTS = 13,
-    // Movement (interfaces/movement.h).
     SCHED_MOVEMENT = 14,
-    // The number of modules.
     SCHED_MODULE_COUNT = 15
 };
-// Publishes an event, plain data whose first int is its kind, of size bytes (at least 4, or a fatal error), to a module's outbox; the router copies it to the inbox of each subscriber of that kind, with its size, which the subscriber receives as the event's size, and the subscriber consumes it when it next runs, at a synchronous call into it, or at the next phase boundary (at once outside a tick); a subscriber whose inbox is full (1024 events) has it delivered first, before the event is queued.
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
 struct EconomySpend;
-// Calls economy's synchronous Spend slot for a spend after delivering economy's pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
-// Calls economy's RequestGranted query for a unit (an EconUnit, its block offset) and the resources it asks for, as of economy's last run: economy's pending inbox is not delivered first.
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
-// Runs economy's UpdateMetalExtraction for a unit (an EconUnit, its block offset) after delivering economy's pending inbox; its effects are published to economy's outbox.
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
-// Delivers units' pending inbox at once, as the units pass does before a unit's tail; units calls it where the network has run movement's UpdateMotion for a unit outside that pass, before it reads what the queued effects write.
 void __stdcall ScheduleUnitsDeliver();
-// In test mode, records a wind_meteors event as wind_meteors consumes it, or an effect as it publishes it, for the dump's wind_meteors events: size bytes of plain data whose first int is its kind.
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
 
 struct FeaturesPlace;
-// Calls features' synchronous Place slot for a placement after delivering features' pending inbox, records it, and returns its outcome, visible at once.
 int __stdcall ScheduleFeaturesPlace(const FeaturesPlace* place);
 
 struct Unit;
-// Calls targeting's GetWeaponTargetUnit query after delivering targeting's pending inbox, and returns its answer.
 Unit* __stdcall ScheduleTargetingTargetUnit(Unit* unit, int weapon);
-// Calls targeting's synchronous GetWeaponTargetPos slot after delivering targeting's pending inbox, and returns its answer.
 int __stdcall ScheduleTargetingTargetPos(Unit* unit, Vec3* pos, int weapon);
-// Calls targeting's synchronous FindWeaponTarget slot after delivering targeting's pending inbox, and returns the unit it picked, or null.
 Unit* __stdcall ScheduleTargetingFind(Unit* unit, unsigned char weapon, int useRange);
-// Calls targeting's synchronous FindBestTargetIfFireAtWill slot after delivering targeting's pending inbox, and returns the unit it picked, or null.
 Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit);
 
 class UnitDef;
 struct Player;
 struct Point16;
-// Calls map's synchronous CanBuildAt slot after delivering map's pending inbox, and returns its answer; the placement record it fills is visible at once.
 int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);
-// Calls map's synchronous CanPlaceUnitFootprint slot after delivering map's pending inbox, and returns its answer; the placement record it fills is visible at once.
 int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);
-// Calls map's synchronous PickRandomReclaimableResourcesInRadius slot after delivering map's pending inbox, and returns its answer.
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
 
-// Returns the heading of the horizontal vector from one position to another.
 int __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
-// Returns the vector from one position to another.
 Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to);
-// Returns the cross product of two vectors.
 Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b);
-// Returns a vector scaled to length one.
 Vec3f __stdcall NormalizeVector(Vec3f v);
-// Rotates a position by three angles and stores the result in out.
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
-// Returns the checksum of a byte range.
 int __stdcall ComputeChecksum(unsigned char* data, int len);
 
-// Allocates a block of the game heap, naming the call site for the debug tables.
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
-// Frees a block of the game heap.
 void __cdecl GameFreeThunk(void* p);
-// Copies a string into a new block of the game heap, or returns null for null.
 char* __cdecl GameStrdup(const char* s);
-// Makes the pages of a block of the game heap read-only.
 void __cdecl ProtectBlockReadOnly(void* p);
-// Makes the pages of a block of the game heap writable.
 void __cdecl ProtectBlockReadWrite(void* p);
-// Copies one dword unless the source is null.
 void __stdcall CopyDwordIfNonNull(int* dest, int* src);
-// Arranges a range of path search entries into a heap.
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int* distanceTag, HeapEntry* valueTag);
-// Moves the top of a heap of path search entries to dest and re-heaps the rest with val.
 void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest, HeapEntry val, int* distanceTag);
 
-// Hands out size bytes of the capture arena for a snapshot, stores their offset and returns them, or returns null when the arena is full.
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
 
-// Returns the net id of the player in a slot, or -1 for an empty slot.
 int __stdcall GetSlotDpid(unsigned char index);
-// Returns the slot of the player with a net id, or 10 when there is none.
 unsigned char __stdcall FindSlotByDpid(int id);
-// Returns the slot of the host, or 10 when there is none.
 unsigned char FindHostSlot();
 
-// Returns the translation of a key.
 char* __stdcall Translate(const char* key);
-// Returns the index of a translation key.
 int __stdcall FindTranslation(const char* name);
-// Skips n lines of text and returns the rest.
 char* __stdcall SkipTextLines(char* text, int n);
-// Writes formatted text to a host file and returns its length, or -1 on failure.
 int FilePrintf(void* file, const char* fmt, ...);
-// Loads a whole data file into the game heap, counting the load progress.
 char* __stdcall LoadFileWithProgress(const char* path);
-// Loads a 3DO model of the data directory and binds its textures.
 void* __stdcall LoadObject3d(const char* name);
-// Returns non-zero when the data files are read from archives.
 int __stdcall UsesDataArchives(void);
-// Returns the address of the preferred language name, or 0 when none is set.
 int __stdcall GetPreferredLanguage(void);
-// Writes the settings of the game to the host.
 void __stdcall SaveSettings();
-// Loads a GAF animation file of the data directory, once.
 void* __stdcall LoadAnimGaf(char* name);
 
-// Records an event for presentation with up to twelve arguments (a second record continues past six); a full queue drops it and counts it, and in test mode ends the program.
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
 
-// The arguments of one console command.
 class CommandArgs {
 public:
     char* args[0x14];
@@ -216,24 +136,15 @@ public:
     char bufferTail[2];
     int count;
 
-    // Returns the argument at an index, or the default when there is none.
     char* GetArg(int index, char* default_val);
-    // Returns the argument at an index as an integer, or the default when there is none.
     int GetIntArg(int index, int default_val);
-    // Returns the number of arguments, the command name included.
     int Count();
-    // Returns the argument at an index as a float, or the default when there is none.
     float GetFloatArg(int index, float default_val);
-    // Clears the arguments and returns the list.
     CommandArgs* InitArgs();
-    // Splits the text up to end into arguments.
     void Tokenize(char* text, char* end);
-    // Removes the first n arguments.
     void ShiftArgs(int n);
-    // Replaces the numbered placeholders of the arguments with those of another list.
     void SubstituteArgs(CommandArgs* other);
 
-    // Returns the argument at an index unparsed, or def when there is none.
     char* GetArgPtr(int index, char* def)
     {
         if (index < 0 || index >= count) return def;
@@ -241,10 +152,8 @@ public:
     }
 };
 
-// Runs the commands of a text and returns the number run.
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask);
 
-// Writes values of up to 32 bits into a growing buffer of words, low bits first.
 class BitWriter {
 public:
     int index;
@@ -253,31 +162,22 @@ public:
     unsigned int* data;
     unsigned int buffer[0x100];
 
-    // Starts an empty stream over the built-in buffer.
     BitWriter();
-    // Frees the grown buffer, if the stream outgrew the built-in one.
     void FreeBuffer();
-    // Doubles the capacity of the buffer.
     void GrowBuffer();
-    // Appends the low bits of a value.
     void WriteBits(int value, int bits);
-    // Overwrites one byte of the stream.
     void SetByteAt(int offset, unsigned char value);
 };
 
-// Reads values of up to 32 bits from a buffer of words, low bits first.
 class BitReader {
 public:
     unsigned int* data;
     int index;
     int bit;
 
-    // Reads bits as an unsigned value.
     int ReadBits(int bits);
-    // Reads bits as a signed value, extending the sign.
     int ReadSignedBits(int bits);
 
-    // Reads one bit.
     int ReadBit()
     {
         int r = (data[index] & (1 << bit)) != 0;
@@ -290,7 +190,6 @@ public:
 };
 
 #pragma pack(push, 8)
-// A reference-counted string whose text follows a count word.
 class StringRef {
 public:
     union {
@@ -299,35 +198,22 @@ public:
         char* ptr;
     };
 
-    // Builds an empty string.
     StringRef();
-    // Shares the text of another string.
     StringRef(const StringRef& other);
-    // Copies a null-terminated text.
     StringRef(const char* text);
-    // Copies the first len characters of a text.
     StringRef(const char* text, int len);
-    // Releases the reference.
     ~StringRef() { ReleaseRef(); }
-    // Shares the text of another string.
     StringRef& operator=(const StringRef& other)
     {
         Assign(&other);
         return *this;
     }
-    // Drops the reference and frees the text when it was the last.
     void ReleaseRef();
-    // Shares the text of another string and returns this.
     StringRef* Assign(const StringRef* other);
-    // Appends the text of another string and returns this.
     StringRef* Append(const StringRef& other);
-    // Converts the text to lower case and returns this.
     StringRef* MakeLower();
-    // Converts the text to upper case and returns this.
     StringRef* MakeUpper();
-    // Replaces the text with a copy of a null-terminated text and returns this.
     StringRef* AssignText(const char* text);
-    // Returns the text, copying it first when it is shared.
     char* GetUnique()
     {
         int len = (int)strlen(data);
@@ -345,35 +231,28 @@ public:
         }
         return data;
     }
-    // Returns nonzero when the text is empty.
     int IsEmpty() const;
-    // Returns the characters from start up to end as a new string.
     StringRef SubString(int start, int end) const;
 };
 
 class TdfRecord;
 
-// One key and value pair of a TDF record.
 struct TdfField {
     StringRef key;
     StringRef value;
 
-    // Builds a field from a key and a value.
     TdfField(const StringRef& a, const StringRef& b);
     // FUNCTION: 0x4c54a0 ??0TdfField@@QAE@ABU0@@Z
     TdfField(const TdfField& other)
         : key(other.key), value(other.value)
     {
     }
-    // Releases the key and the value.
     ~TdfField();
-    // Assigns the key and value of a field from those of another field, which other points at as two string references, and returns the field.
     void* AssignPair(int* other);
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-// The child record list of a TDF record (a VC5 vector).
 struct TdfRecordList {
     char allocatorPad[4];
     TdfRecord** first;
@@ -381,7 +260,6 @@ struct TdfRecordList {
     TdfRecord** end;
 };
 
-// The field list of a TDF record (a VC5 vector).
 struct TdfFieldList {
     char allocatorPad[4];
     TdfField* first;
@@ -389,13 +267,11 @@ struct TdfFieldList {
     TdfField* end;
 };
 
-// The fields of a TDF record.
 struct TdfEntries {
     char less;
     TdfFieldList v;
 };
 
-// One bracketed record of a TDF file: its fields and its child records.
 class TdfRecord {
 public:
     char* name;
@@ -403,85 +279,51 @@ public:
     TdfEntries entries;
     int text;
 
-    // Parses a record and its children from text, setting nextblock past it.
     TdfRecord(char* name, char* text, char** nextblock, const char* filename);
-    // Frees the record and its children.
     ~TdfRecord();
 
-    // Returns the text between start and end without surrounding blanks.
     StringRef MakeTrimmedString(char* start, char* end);
-    // Returns the child record with the given name, or null.
     TdfRecord* FindChild(const char* key);
-    // Returns the child record at an index.
     TdfRecord* GetChild(int index);
-    // Adds the text between start and end to the file checksum.
     void ComputeRecordChecksum(char* start, char* end);
-    // Returns the sub-record with the given name, or null.
     TdfRecord* FindSubRecord(const char* name);
-    // Returns the record name.
     int GetRecordName();
-    // Returns the name of the field at an index.
     char* GetFieldName(int index);
-    // Returns the address of the value of a field, or 0 when it is missing.
     int FindFieldValue(char* name);
-    // Reads a field as a fixed-point number into dst.
     int* GetFieldFixed(int* dst, char* key, int def);
-    // Reads a field as an integer, or def when it is missing.
     int GetFieldInt(const char* name, int def);
-    // Reads a field as a double, or def when it is missing.
     double GetFieldDouble(const char* name, double def);
-    // Copies a field to dst, or def when it is missing.
     int GetFieldString(char* dst, char* key, int size, char* def);
-    // Copies the record name to dest.
     void CopyRecordName(char* dest, int count);
-    // Returns the number of sub-records.
     int GetSubRecordCount();
-    // Returns the sub-record at an index.
     TdfRecord* GetSubRecord(int index);
-    // Returns the number of fields.
     int GetFieldCount();
 };
 #pragma pack(pop)
 
-// A parsed TDF data file with a current record selected.
 class TdfFile {
 public:
     TdfRecord* root;
     TdfRecord* current;
     int flags;
 
-    // Builds an empty file.
     TdfFile();
-    // Unloads the file.
     ~TdfFile();
-    // Copies a field of the current record to dst, or def when it is missing.
     int GetString(char* dst, char* key, int size, char* def)
     {
         return current->GetFieldString(dst, key, size, def);
     }
-    // Reads an integer field of the current record.
     int GetInt(char* key, int def) { return current->GetFieldInt(key, def); }
-    // Reads a double field of the current record.
     double GetDouble(char* key, double def) { return current->GetFieldDouble(key, def); }
-    // Returns the value of a field of the current record.
     char* GetValue(char* key) { return (char*)current->FindFieldValue(key); }
-    // Loads and parses the file at a path.
     int LoadFile(const char* path);
-    // Removes the comments from TDF text in place.
     void StripComments(char* p);
-    // Parses TDF text already in memory.
     void LoadBuffer(char* data, int size, int flag, char* path);
-    // Frees the parsed records.
     void Unload();
-    // Selects the record with the given name as the current one.
     int SelectRecord(const char* name);
-    // Selects the record at an index as the current one.
     int SelectRecordAt(int index);
-    // Selects the root record again.
     void ResetCurrentRecord();
-    // Returns the index of the current record.
     int GetCurrentRecord();
-    // Sets the index of the current record.
     void SetCurrentRecord(int val);
 };
 static_assert(sizeof(TdfFile) == sizeof(TdfFileLayout), "TdfFile");
@@ -489,7 +331,6 @@ static_assert(offsetof(TdfFile, root) == offsetof(TdfFileLayout, root), "TdfFile
 static_assert(offsetof(TdfFile, current) == offsetof(TdfFileLayout, current), "TdfFile::current");
 static_assert(offsetof(TdfFile, flags) == offsetof(TdfFileLayout, flags), "TdfFile::flags");
 
-// Reads a field of the current record in the language of the player, or in the default language, into dst; returns non-zero when found.
 int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, int size, char* def);
 struct Handle;
 struct GafEntry;
@@ -499,52 +340,29 @@ struct GafArchive;
 struct Object3do;
 struct CobScriptHeader;
 
-// Returns the frame at an index of a GAF frame table.
 GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);
-// Returns the current frame of a GAF sequence player.
 GafFrame* __stdcall GetGafSequenceFrame(Handle* player);
-// Starts a GAF sequence player on a GAF entry, at a frame index.
 void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);
-// Steps a GAF sequence player to its next frame and returns nonzero when it wrapped.
 int __stdcall StepGafSequence(Handle* player);
-// Returns the entry of a GAF file with a name, or null when there is none.
 GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name);
-// Loads a GAF file by path.
 GafArchive* __stdcall LoadGaf(const char* path);
-// Loads a 3DO model by path.
 void* __stdcall Load3do(char* path);
-// Mirrors the pieces of a 3DO model.
 void __stdcall MirrorObject(Object3do* model);
-// Binds the textures of a named model to its pieces.
 void __stdcall BindModelTextures(Object3do* model, const char* name);
-// Returns the height of a 3DO model.
 int __stdcall GetObjectHeight(Object3do* model);
-// Loads a COB script by path.
 CobScriptHeader* __stdcall LoadCobScript(char* path);
-// Frees a COB script.
 void __stdcall FreeCobScript(CobScriptHeader* script);
-// Returns the checksum of a COB script.
 int __stdcall GetCobChecksum(CobScriptHeader* script);
-// Allocates a blank picture frame with a name.
 GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
-// Builds the picture of a lens flare.
 void* __stdcall BuildLensFrame(int w, int h, int lens);
-// Cuts the extension off a file name in place and returns the name.
 char* __stdcall StripExtension(char* name);
-// Loads the sound of a file under a name.
 int __stdcall LoadSoundByName(char* name, const char* file);
 struct ModelState;
-// Drops the pictures cached for a model state, before the state is freed.
 void __stdcall ReleaseUnitPictures(ModelState* state);
-// Draws the generated picture of a TED map from its data into the radar frame.
 void __stdcall BuildTedRadarFrame(unsigned short* data);
-// Builds the cache of unit pictures, sized from the screen and the memory of the machine.
 void __stdcall InitUnitPictureCache(void);
-// Frees the cache of unit pictures.
 void __stdcall FreeUnitPictureCache(void);
-// Fills the list of maps and missions the player can pick, and returns the count.
 int __stdcall LoadMapList(void** out, int multiplayer, int unused);
-// Frees the cached map and mission descriptions.
 void FreeOtaEnumCache();
 
 #endif

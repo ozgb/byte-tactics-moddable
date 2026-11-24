@@ -2597,6 +2597,31 @@ void ReplayAddValueSized(ReplayText& t, unsigned kind, const void* p, unsigned s
     ReplayAddValue(t, kind, copy, table);
 }
 
+void ReplayAddEffect(ReplayText& t, unsigned table, const void* p, unsigned size, ReplayObjectTable& objects)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return;
+    }
+    if (table >= RET_COUNT) {
+        ReplayFail("an effect is published by a subsystem that has no events table");
+        return;
+    }
+    unsigned char copy[REPLAY_EVENT_MAX];
+    memset(copy, 0, sizeof copy);
+    memcpy(copy, p, size < sizeof copy ? size : sizeof copy);
+    ReplayAddValue(t, ReplayEventObject(table, *(int*)copy), copy, objects);
+}
+
+unsigned ReplaySubsystemEvents(const char* subsystem)
+{
+    for (unsigned i = 0; i < kReplaySubsystemCount; i++) {
+        if (strcmp(kReplaySubsystems[i].name, subsystem) == 0)
+            return kReplaySubsystems[i].events;
+    }
+    return RET_COUNT;
+}
+
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table)
 {
     t.AddChar('[');

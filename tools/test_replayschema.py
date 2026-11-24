@@ -1510,9 +1510,25 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn("ReplayAddArgs(t, (const CommandArgs*)a[2].v.p);", text)
         self.assertIn("t.AddText(s_nested);\n        s_nested.Clear();", text)
 
+    def emit(self):
+        return [x for x in annotations()["services"] if x["name"] == "Emit"][0]
+
+    def test_an_effect_argument_is_written_as_the_value_of_its_kind_in_both_directions(self):
+        spec = self.emit()
+        self.assertEqual(spec["args"][0], {"mode": "effect", "param": "effect", "size": "size"})
+        self.assertIn("ReplayAddEffect(t, kReplaySubsystems[s_sub].events, a[0].v.p, (unsigned)a[1].v.i, Table());", rs.render_service_end([spec]))
+        self.assertIn("ReplayAddEffect(t, ReplaySubsystemEvents(g_subsystem), effect, (unsigned int)size, g_objects);", rs.render_service_answers([spec]))
+
+    def test_an_effect_argument_needs_a_size_that_names_an_int_argument(self):
+        ann = annotations()
+        emit = [s for s in ann["services"] if s["name"] == "Emit"][0]
+        self.assertEqual(rs.check_service_specs(ann["services"], ann), [])
+        emit["args"][0]["size"] = "effect"
+        self.assertTrue(any("needs a `size` that names an int argument" in e for e in rs.check_service_specs(ann["services"], ann)))
+
     def test_a_value_argument_is_written_as_the_tuple_of_its_fields_in_both_directions(self):
-        spec = [x for x in annotations()["services"] if x["name"] == "WindMeteorsEmit"][0]
-        self.assertEqual(spec["args"][0], {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn", "size": "size"})
+        spec = self.emit()
+        spec["args"][0] = {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn", "size": "size"}
         self.assertIn("ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, a[0].v.p, (unsigned)a[1].v.i, Table());", rs.render_service_end([spec]))
         self.assertIn("ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, effect, (unsigned int)size, g_objects);", rs.render_service_answers([spec]))
         del spec["args"][0]["size"]
@@ -1521,8 +1537,8 @@ class ReentrantServices(unittest.TestCase):
 
     def test_a_value_argument_needs_a_value_kind(self):
         ann = annotations()
-        wm = [s for s in ann["services"] if s["name"] == "WindMeteorsEmit"][0]
-        self.assertEqual(wm["args"][0]["mode"], "value")
+        wm = [s for s in ann["services"] if s["name"] == "Emit"][0]
+        wm["args"][0] = {"mode": "value", "param": "effect", "kind": "WindMeteorsSpawn", "size": "size"}
         self.assertEqual(rs.check_service_specs(ann["services"], ann), [])
         wm["args"][0]["size"] = "effect"
         self.assertTrue(any("names no int argument" in e for e in rs.check_service_specs(ann["services"], ann)))

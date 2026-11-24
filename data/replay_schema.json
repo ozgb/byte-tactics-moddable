@@ -3643,7 +3643,7 @@
      "BuildDataPath",
      "TdfFile",
      "TdfRecord",
-     "WindMeteorsEmit"
+     "Emit"
     ],
     "slots": {
      "UpdateWind": {
@@ -3948,7 +3948,8 @@
      "scripts.GetSweetSpot"
     ],
     "services": [
-     "RandomInt"
+     "RandomInt",
+     "Emit"
     ],
     "slots": {
      "Apply": {
@@ -5418,14 +5419,13 @@
     "args": []
    },
    {
-    "name": "WindMeteorsEmit",
-    "id": "RI_WIND_METEORS_EMIT",
-    "declaration": "void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);",
+    "name": "Emit",
+    "id": "RI_EMIT",
+    "declaration": "void __stdcall Emit(const void* effect, unsigned int size);",
     "args": [
      {
-      "mode": "value",
+      "mode": "effect",
       "param": "effect",
-      "kind": "WindMeteorsSpawn",
       "size": "size"
      },
      {

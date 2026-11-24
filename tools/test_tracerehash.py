@@ -3,6 +3,7 @@
     uv run tools/test_tracerehash.py
 """
 
+import json
 import lzma
 import tempfile
 import unittest
@@ -610,6 +611,42 @@ class TickRowTest(unittest.TestCase):
         self.assertEqual(a[:2], b[:2])
         self.assertEqual([r[1] for r in b], ["meteors", "world", "tick"])
         self.assertNotEqual(a[2], b[2])
+
+
+class TailWriteTest(unittest.TestCase):
+    """A write in the tail of the step (after `meteors`) is seen by the `tick` row of its own tick and by no other row."""
+
+    FIXTURE = Path(__file__).resolve().parent / "testdata/tracerehash/orders-build-patrol-24"
+
+    @classmethod
+    def setUpClass(cls):
+        schema_path = Path(__file__).resolve().parent.parent / "data/trace_schema.json"
+        cls.schema = tr.Schema(json.loads(schema_path.read_text()))
+        cls.blocks = tr.parse_dump(tr.read_text(f"{cls.FIXTURE}.dump.txt.xz"), cls.schema.data["trace_format"])
+        cls.trace = tr.parse_trace_rows(tr.read_text(f"{cls.FIXTURE}.trace.txt"))
+
+    def rows_with_tick_block(self, change):
+        blocks = dict(self.blocks)
+        blocks[(24, "tick")] = [change(path, value) for path, value in self.blocks[(24, "tick")]]
+        return {phase: f"{value:016x}" for _, phase, value in tr.rehash(self.schema, blocks)}
+
+    def assert_only_the_tick_row_changes(self, got):
+        for phase in ("units", "meteors", "world"):
+            self.assertEqual(got[phase], self.trace[(24, phase)])
+        self.assertNotEqual(got["tick"], self.trace[(24, "tick")])
+
+    def test_the_unchanged_dump_gives_the_stored_tick_row(self):
+        self.assertEqual(self.rows_with_tick_block(lambda path, value: (path, value))["tick"], self.trace[(24, "tick")])
+
+    def test_an_expired_eyeball_changes_the_tick_row(self):
+        cleared = next(path for path, value in self.blocks[(24, "tick")]
+                       if path.startswith("visibility[") and value.startswith("hex:") and value.strip("hex:0"))
+        got = self.rows_with_tick_block(lambda path, value: (path, "hex:" + "00" * ((len(value) - 4) // 2)) if path == cleared else (path, value))
+        self.assert_only_the_tick_row_changes(got)
+
+    def test_a_shared_resource_changes_the_tick_row(self):
+        got = self.rows_with_tick_block(lambda path, value: (path, "0x00000000") if path == "players[0].metal" else (path, value))
+        self.assert_only_the_tick_row_changes(got)
 
 
 class ReadTextTest(unittest.TestCase):

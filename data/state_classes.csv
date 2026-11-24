@@ -1989,8 +1989,8 @@ kChunkHeader,,static,sim,platform,"sim: a phase reads it, nothing in game logic 
 kDebris@src/weapons/weapons_apply.cpp,,static,,const,none: only code outside every walk touches it,,,,,,2:WriteDebrisAndPieces|WriteStateFields,"Field table of weapons's WriteState records (src/weapons/weapons_apply.cpp); constant, read only for the dump."
 kDx,,static,sim,const,"sim: a phase reads it, nothing in game logic or presentation writes it",,4,,,,2:AppendLocalPath|LStep,Constant direction table of the demo pathfinder (src/ai/pathfind_hpa.cpp).
 kDy,,static,sim,const,"sim: a phase reads it, nothing in game logic or presentation writes it",,4,,,,2:AppendLocalPath|LStep,Constant direction table of the demo pathfinder (src/ai/pathfind_hpa.cpp).
-kEffectCapacity,,static,,,none: only code outside every walk touches it,,,,,,1:EmitImport,
-kEffectHooks,,static,,,none: only code outside every walk touches it,,,,,,1:EmitImport,
+kEffectCapacity,,static,,platform,none: only code outside every walk touches it,,,,,,1:EmitImport,"WASM loader and module glue (lib/wasmloader, src/wasm): host plumbing for the module, outside the sim block"
+kEffectHooks,,static,,platform,none: only code outside every walk touches it,,,,,,1:EmitImport,"WASM loader and module glue (lib/wasmloader, src/wasm): host plumbing for the module, outside the sim block"
 kExplodedPiece@src/weapons/weapons_apply.cpp,,static,,const,none: only code outside every walk touches it,,,,,,2:WriteExplodedPieces|WriteStateFields,"Field table of weapons's WriteState records (src/weapons/weapons_apply.cpp); constant, read only for the dump."
 kEyeCapacity,,static,sim,const,"sim: a phase reads it, nothing in game logic or presentation writes it",,0|1|2|4|5|7|8,r,,,3:AddEyeball|LoadTntMap|LosRadarWriteState,Capacity of the eyeball table (src/map/eye.h); constant.
 kFace@src/weapons/weapons_apply.cpp,,static,,const,none: only code outside every walk touches it,,,,,,2:WriteDebrisAndPieces|WriteStateFields,"Field table of weapons's WriteState records (src/weapons/weapons_apply.cpp); constant, read only for the dump."
@@ -2021,7 +2021,7 @@ kNoArgs@ScriptsOnMovementStartScript,,static,sim,const,"sim: a phase reads it, n
 kOrderFields@src/orders/orders_slots.cpp,,static,,const,none: only code outside every walk touches it,,,,,1:WriteChain?,1:WriteChain,"Field table of orders's WriteState records (src/orders/orders_slots.cpp); constant, read only for the dump."
 kOrderPosYTable@src/harness/trace_schema.h,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,,3:DumpElement|VisitElement|VisitOrders,Test harness trace table (src/harness/trace_schema.h).
 kOrderTable@src/harness/trace_schema.h,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,,3:DumpElement|VisitElement|VisitOrders,
-kOutboxes,,static,,,none: only code outside every walk touches it,,,,,,1:OutboxOf,
+kOutboxes,,static,,platform,none: only code outside every walk touches it,,,,,,1:OutboxOf,"WASM loader and module glue (lib/wasmloader, src/wasm): host plumbing for the module, outside the sim block"
 kPackedGoal@src/movement/movement_apply.cpp,,static,,const,none: only code outside every walk touches it,,,,,,2:WriteGoal|WriteStateFields,"Field table of movement's WriteState records (src/movement/movement_apply.cpp); constant, read only for the dump."
 kPageShift,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,,3:Probe|ScanLanes|SummarizeSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
 kPageWords,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,,2:BlockScanEnable|SummarizeSpans,"Block scan tool state (src/harness/block_scan.cpp, src/state/block.cpp)."
@@ -2261,7 +2261,7 @@ s_orderUsed@src/harness/harness.cpp,,static,platform,platform,platform: only the
 s_orderUsedCount@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,2:NumberUnitHeap|RegisterOrder?,1:NumberUnitHeap,Test harness state (src/harness/harness.cpp).
 s_orders@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,4:CheckOrders?|IssueScriptedOrder?|ParseSelector,8:CheckOrders|FindDefIndex|FindNth,Test harness state (src/harness/harness.cpp).
 s_orders@src/seams/native.cpp,,static,,platform,none: only code outside every walk touches it,,,,,1:InstallNativeSeams,1:InstallNativeSeams,"Engine configuration: a seam table filled once by InstallNativeSeams, outside the game state block."
-s_outbox,,static,,,none: only code outside every walk touches it,,,,,1:WindMeteorsBind,2:EmitImport|WindMeteorsBind,
+s_outbox,,static,,platform,none: only code outside every walk touches it,,,,,1:WindMeteorsBind,2:EmitImport|WindMeteorsBind,"WASM loader and module glue (lib/wasmloader, src/wasm): host plumbing for the module, outside the sim block"
 s_passRow@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,,,,,1:VisitPassMaps,1:VisitPassMaps,Test harness state (src/harness/harness.cpp); read and written only by the trace writer.
 s_pathResults@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,4,4,,yes,4:HarnessPathEvent?|PathResultsAdd|HarnessPhase?,2:PathResultsAdd|VisitPathResults,
 s_pathResultsLost@src/harness/harness.cpp,,static,platform,platform,platform: only the debug library or the test harness touches it,4,,,yes,1:HarnessPathEvent,1:VisitPathResults,

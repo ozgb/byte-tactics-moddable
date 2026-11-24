@@ -10842,11 +10842,11 @@ address,function,file,kind,target
 0x437d60,SetMeteorParams,src/map/meteors.cpp,global_write,g_meteorShowerDuration
 0x437d60,SetMeteorParams,src/map/meteors.cpp,global_write,g_meteorSpawnInterval
 0x437d60,SetMeteorParams,src/map/meteors.cpp,global_write,g_meteorSpawnMagnitude
+0x437de0,UpdateMeteors,src/map/meteors.cpp,call,EmitFrom
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,GameRand
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,ScaledCos
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,ScaledSin
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,StartShower
-0x437de0,UpdateMeteors,src/map/meteors.cpp,call,WindMeteorsEmit
 0x437de0,UpdateMeteors,src/map/meteors.cpp,call,get
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_escape,Game::weapons
 0x437de0,UpdateMeteors,src/map/meteors.cpp,field_read,Game::ticks
@@ -63683,8 +63683,6 @@ address,function,file,kind,target
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_importDepth
 ,WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,global_read,s_importThread
-,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,call,EmitFrom
-,WindMeteorsEmit,src/seams/wind_meteors_world.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,function,
 ,WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,global_read,s_fatalPending
 ,WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,call,FuelLeft

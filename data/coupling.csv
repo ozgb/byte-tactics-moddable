@@ -5206,7 +5206,6 @@ seams,files,shared_write,FilesSeam::OpenRead,1
 seams,files,shared_write,FilesSeam::Read,1
 seams,files,shared_write,FilesSeam::Seek,1
 seams,files,shared_write,Seams::files,58
-seams,game,call,EmitFrom,1
 seams,game,call,OrdersHeaderOf,6
 seams,game,call,SchedDeliver,12
 seams,game,call,SchedInboxHolds,1
@@ -6983,6 +6982,7 @@ wind_meteors,features,shared_write,Vec3::z,9
 wind_meteors,files,call,HapiBank::GetIntegerItem,1
 wind_meteors,files,call,HapiBank::OpenAccount,2
 wind_meteors,files,call,HapiBank::SetIntegerItem,1
+wind_meteors,game,call,EmitFrom,1
 wind_meteors,game,call,GameRand,4
 wind_meteors,game,shared_write,Point16::x,1
 wind_meteors,game,shared_write,Point16::y,1
@@ -7055,7 +7055,6 @@ wind_meteors,presentation,shared_write,Vec3::z,42
 wind_meteors,scripts,shared_write,Vec3::x,7
 wind_meteors,scripts,shared_write,Vec3::y,7
 wind_meteors,scripts,shared_write,Vec3::z,7
-wind_meteors,seams,call,WindMeteorsEmit,1
 wind_meteors,seams,indirect,FindWeaponByNameNative,1
 wind_meteors,seams,shared_write,Game::windStrength,1
 wind_meteors,seams,shared_write,Point16::x,3

@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5821 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5820 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -38,7 +38,7 @@ The subsystems and the issue each maps to:
 | [harness](#the-remaining-subsystems) | 857 | none yet |
 | [presentation](#the-remaining-subsystems) | 1430 | none yet |
 | [platform](#the-remaining-subsystems) | 825 | none yet |
-| [seams](#the-remaining-subsystems) | 233 | none yet |
+| [seams](#the-remaining-subsystems) | 232 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The eleven subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -75,8 +75,8 @@ Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live 
 
 - platform (10): `BuildDataPath`, `FatalError`, `RandomInt`, `TdfFile::LoadFile`, and 6 more
 - files (3): `HapiBank::OpenAccount`, `HapiBank::GetIntegerItem`, `HapiBank::SetIntegerItem`
-- seams (2): `FindWeaponByNameNative`, `WindMeteorsEmit`
-- game (1): `GameRand`
+- game (2): `EmitFrom`, `GameRand`
+- seams (1): `FindWeaponByNameNative`
 - weapons (1): `FindWeaponByName`
 
 **Sim writes.** 36 items in all, 31 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
@@ -93,7 +93,7 @@ Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live 
 - Needs from seams: 17 functions in platform, files, weapons, game, seams.
 - Owns: 26 named sim items that only this subsystem writes, for example `g_meteorActive`, `g_meteorNextStrikeTime`, `g_meteorNextHitTime`, `g_meteorOrigin`, `g_meteorStrikeEndTime`.
 - Shares: 5 named sim item that other subsystems also write, for example `Game::windCounter`.
-- Pilot fit (#9): Most of its imports are platform (TDF parsing, `RandomInt`, `FatalError`, the `HapiBank` account store). The only sim seam is weapons (`FindWeaponByName`); a meteor that falls reaches weapons as a SPAWN effect through the scheduler (`WindMeteorsEmit`).
+- Pilot fit (#9): Most of its imports are platform (TDF parsing, `RandomInt`, `FatalError`, the `HapiBank` account store). The only sim seam is weapons (`FindWeaponByName`); a meteor that falls reaches weapons as a SPAWN effect through the scheduler (`EmitFrom`).
 - The wind output is in `Game` fields (`windSpeed`, `windDirection`, `windFraction`, `windVelX`, `windZ`) that only this module writes but units, economy, features and presentation read. The meteor schedule is in `g_meteor*` statics, which must move into the state block (#7).
 
 **Open questions.**
@@ -399,8 +399,7 @@ Coverage: 100.0% of functions (21 of 21), 96.2% of lines, 79.1% of branches; 0 l
 
 - seams (6): `GetSweetSpotNative`, `GetWeaponRangeNative`, `UnitQueryBuffer::Capacity`, `UnitQueryBuffer::Data`, `UnitQueryBuffer::Grow`, `UnitQueryBuffer::Written`
 - platform (2): `RandomInt`, `UnitTypeSet::Contains`
-- game (1): `SchedPublish`
-- harness (1): `HarnessTargetingEvent`
+- game (1): `EmitFrom`
 - los_radar (1): `GetVisibleEnemiesInRadius`
 - map (1): `GetGroundHeight`
 - weapons (1): `WeaponCanReachUnit`
@@ -666,7 +665,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **platform** (825 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 309 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (119), `operator delete` (80), then `Translate` (77) and `GameAllocIgnoreTag` (77). It imports 181 functions: game 85, presentation 46.
 
-**seams** (233 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 198 functions are called from outside. It imports 153 functions.
+**seams** (232 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 197 functions are called from outside. It imports 152 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 

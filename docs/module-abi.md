@@ -599,7 +599,7 @@ inbox, with the outcome `Apply` returns, and each synchronous call into the modu
 the calling module's outbox and records it in one call, so a module built from a spec has nothing else to call, and the dump's events
 come out whole. The host takes the outbox from the calling module's manifest entry, never from an argument, so a module
 cannot publish as another; an event kind cannot name the outbox, since kinds repeat across interfaces. The engine's native
-modules publish and record their effects with the engine-only `EmitFrom`, which no module imports. A module that takes over
+modules publish and record their effects through an engine-only call that names the outbox, which no module can import. A module that takes over
 another subsystem imports `Emit` and its manifest entry gets a `publishes` table, with no host change. No trace row hashes
 these records. A replay carries a publishing service's call as an `i services.<Name>` line (for `Emit`, with the effect's
 value and its size), and the gate judges an effect through what its subscribers do with it. The `services` list of a subsystem in the replay schema (`annotations.subsystems.<name>.services` of

@@ -61,25 +61,36 @@ tell the human.
 
 ## 2. Pick an issue
 
-Take an open, groomed sub-issue of #2 with no open blockers and no assignee:
+Take the first available issue `tools/available.py` lists. It prints #2's
+"Priority now" in its order, then every other open issue that isn't
+`parked`, oldest first (#2, "What is claimable"), each marked available or
+with the reasons it isn't: closed, claimed, blocked by #N, `needs-grooming`,
+`needs-human`, a tracker, or a parent with open sub-issues (a parent is never
+available).
 
 ```sh
-gh api --paginate repos/ozgb/byte-tactics-moddable/issues/2/sub_issues \
-  --jq '.[] | select(.state=="open" and (.assignees | length) == 0 and ([.labels[].name] | (index("needs-grooming") or index("parked")) | not)) | .number'
-gh api repos/ozgb/byte-tactics-moddable/issues/<N>/dependencies/blocked_by \
-  --jq '[.[] | select(.state=="open") | .number]'      # must print []
+uv run tools/available.py               # the list, ending "First available: #N"
+uv run tools/available.py --lane 1043   # only sub-issues of these parents, at any depth (default $BT_LEAD_LANE)
+uv run tools/available.py --check <N>   # one issue; exit 0 when it is available
 ```
 
-Claim it, then work in your own copy:
+Claim it, then work in your own copy. Your lead name is `$BT_LEAD_NAME`, or
+`lead` when it is unset (`docs/team.md`, "More than one lead"):
 
 ```sh
+uv run tools/available.py --check <N>   # again, just before claiming: stop unless it exits 0
 gh issue edit <N> --add-assignee @me
-gh issue comment <N> --body "Claimed by <tool> / <model>. Branch issue-<N>."
+gh issue comment <N> --body "Lead: Claimed by <tool> / <model>, lead <name>. Branch issue-<N>."
+uv run tools/available.py --holder <N>  # exit 0 when your claim is the earliest standing one
 cd "$(tools/worktree.sh <N>)"
 ```
 
+When `--holder` names another lead, its claim came first: comment
+`Lead: Released, lead <name>.` and stop, but leave the assignee, which is
+that lead's too (every lead is the same account).
+
 Keep scratch files in `build/scratch/<N>/`. If you stop before finishing,
-comment `Released` on the issue and unassign yourself.
+comment `Lead: Released, lead <name>.` on the issue and unassign yourself.
 
 ## 3. Do the issue
 
@@ -180,6 +191,7 @@ The body:
 Closes #<N>
 
 Model: <tool> / <model>
+Lead: <name>
 
 Checks:
 - <each check the issue names>: <result>
@@ -191,9 +203,11 @@ Left out:
 - what the issue asked for that you did not do, and why (or "none")
 ```
 
-`Closes #<N>` is what unblocks the issues waiting on yours. Open one pull
-request per issue, or one for several issues that share files and a gate,
-with a `Closes` line for each.
+`Lead: <name>` is your lead name, as in your claim: it is how a lead finds
+its own pull requests (`tools/available.py --prs`). `Closes #<N>` is what
+unblocks the issues waiting on yours. Open one pull request per issue, or one
+for several issues that share files and a gate, with a `Closes` line for
+each.
 
 ## Comments in code
 

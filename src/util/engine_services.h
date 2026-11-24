@@ -71,6 +71,7 @@ enum SchedModule {
     SCHED_MODULE_COUNT = 15
 };
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
+void __stdcall EmitFrom(int outbox, const void* effect, unsigned int size);
 struct EconomySpend;
 int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);

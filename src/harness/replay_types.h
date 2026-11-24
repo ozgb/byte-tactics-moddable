@@ -168,6 +168,7 @@ struct ReplaySubsystem {
     unsigned char complete;
     unsigned firstSlot;
     unsigned slotCount;
+    unsigned events;
 };
 
 #endif

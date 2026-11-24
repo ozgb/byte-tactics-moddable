@@ -78,7 +78,7 @@ ROUTE_REASON = "route table entry"
 VISITOR_REASON = "visitor passed at "
 ROUTE_ROW = re.compile(r"\{SCHED_(\w+), \w+, SCHED_(\w+), (\w+), ([01])\}")
 ROUTES = "src/game/routes.cpp"
-OUTBOX_ARG = re.compile(r"Publish\w*\(\s*SCHED_(\w+)")
+OUTBOX_ARG = re.compile(r"(?:Publish\w*|EmitFrom)\(\s*SCHED_(\w+)")
 ENGINE = {"presentation", "harness", "network", "files"}
 
 
@@ -742,12 +742,12 @@ class Program:
         return any(p == target or (owner and p.rpartition("::")[0] == owner) or p in names for p in passers)
 
     def routes_to(self, sub: str, fn: str, handler: str) -> bool:
-        """Whether code of `sub` can run the route table handler from `fn`: SchedPublish runs the handlers of the
+        """Whether code of `sub` can run the route table handler from `fn`: SchedPublish and EmitFrom run the handlers of the
         events the subsystem publishes, SchedDeliver those queued for the subscribers it publishes to."""
-        if sub not in SIMS or fn not in ("SchedPublish", "SchedDeliver") or handler not in self.handlers:
+        if sub not in SIMS or fn not in ("SchedPublish", "EmitFrom", "SchedDeliver") or handler not in self.handlers:
             return True
         mine = self.outboxes.get(sub, set()) | {sub}
-        if fn == "SchedPublish":
+        if fn in ("SchedPublish", "EmitFrom"):
             return any(p in mine and h == handler for p, _, h, _ in self.routes)
         subscribers = {s for p, s, _, _ in self.routes if p in mine}
         return any(s in subscribers and h == handler and not sync for _, s, h, sync in self.routes)

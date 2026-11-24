@@ -4,7 +4,7 @@
 #include "rand_stream.h"
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
-#define SERVICES_VERSION_MAJOR 3
+#define SERVICES_VERSION_MAJOR 4
 // Minor version of the services interface, changed when a declaration is added.
 #define SERVICES_VERSION_MINOR 0
 
@@ -54,8 +54,7 @@ int __stdcall HapiBank_SetIntegerItem(HapiBank* bank, const char* name, int valu
 // Reads an integer item of the open account, or def when it is missing.
 int __stdcall HapiBank_GetIntegerItem(HapiBank* bank, const char* name, int def);
 
-struct WindMeteorsEventHeader;
-// Publishes an effect of wind_meteors (interfaces/wind_meteors.h), its payload of size bytes, to its outbox, from which the engine's router copies it to each subscriber of its kind, and records it for the dump's wind_meteors events; called by wind_meteors from its runs.
-void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
+// Publishes an effect, its payload of size bytes, to the calling module's outbox, from which the engine's router copies it to each subscriber of its kind; a kind outside the caller's publishes table, or a size other than its payload's, is refused.
+void __stdcall Emit(const void* effect, unsigned int size);
 
 #endif

@@ -4,11 +4,10 @@
 #include "../util/engine_services.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/wind_meteors.h"
+#include "../map/meteors.h"
 #include "../util/vec3.h"
 #include "../weapons/weapon_def.h"
 #include "../game/game.h"
-#include "../harness/replay.h"
-#include "../harness/replay_services.h"
 #include "../game/weapons_events.h"
 #include "weapons_world.h"
 #include "wind_meteors_world.h"
@@ -24,11 +23,7 @@ void WindMeteorsInbox(const void* event, unsigned int size)
 
 void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
 {
-    ReplayImport call(RI_WIND_METEORS_EMIT);
-    call.Ptr(effect);
-    call.Int(size);
-    HarnessWindMeteorsEvent(effect, size);
-    SchedPublish(SCHED_WIND_METEORS, effect, size);
+    EmitFrom(SCHED_WIND_METEORS, effect, size);
 }
 
 void WeaponsOnMeteorSpawn(const void* event, unsigned int size)

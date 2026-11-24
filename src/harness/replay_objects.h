@@ -80,6 +80,8 @@ void ReplayAddValue(ReplayText& t, unsigned kind, const void* p, ReplayObjectTab
 void ReplayAddValueOrNull(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);
 void ReplayAddValueSized(ReplayText& t, unsigned kind, const void* p, unsigned size, ReplayObjectTable& table);
 bool ReplayParseValue(unsigned kind, const char* text, void* p, ReplayObjectTable& table, ReplayAllocFn alloc);
+void ReplayAddEffect(ReplayText& t, unsigned table, const void* p, unsigned size, ReplayObjectTable& objects);
+unsigned ReplaySubsystemEvents(const char* subsystem);
 void ReplayAddValueList(ReplayText& t, unsigned kind, const void* p, unsigned count, ReplayObjectTable& table);
 bool ReplayNextListValue(const char** cursor, char* piece, unsigned size);
 void ReplayAddInOut(ReplayText& t, unsigned kind, const void* p, ReplayObjectTable& table);

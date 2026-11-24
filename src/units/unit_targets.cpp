@@ -288,8 +288,7 @@ static void PublishCleared(Unit* unit, int weapon)
     effect.kind = TARGETING_EFFECT_CLEARED;
     effect.unit = Ref<Unit>(unit).offset;
     effect.weapon = weapon;
-    HarnessTargetingEvent(&effect, sizeof(effect), 1);
-    SchedPublish(SCHED_TARGETING, &effect, sizeof(effect));
+    EmitFrom(SCHED_TARGETING, &effect, sizeof(effect));
 }
 
 static Unit* UnitOfHandle(unsigned int handle)

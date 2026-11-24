@@ -2919,7 +2919,7 @@ call 25754 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25754 Apply
@@ -3563,7 +3563,7 @@ call 25755 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25755 Apply
@@ -4872,7 +4872,7 @@ call 25758 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25758 Apply
@@ -5223,7 +5223,7 @@ call 25759 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25759 Apply
@@ -5888,7 +5888,7 @@ call 25761 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25761 Apply
@@ -7198,7 +7198,7 @@ call 25765 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25765 Apply
@@ -7879,7 +7879,7 @@ call 25767 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25767 Apply
@@ -8953,7 +8953,7 @@ call 25770 Apply
   a event.unit Unit#751
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#751,0) 12
   w Unit#751.weapon0TargetX 0
   o result 1
 call 25770 Apply

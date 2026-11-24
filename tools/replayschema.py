@@ -2170,7 +2170,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     first = 0
     for sub, spec in subsystems.items():
         n = len(spec["slots"])
-        L.append('    { "%s", %d, %d, %d, %d, %d },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n))
+        L.append('    { "%s", %d, %d, %d, %d, %d, %s },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT"))
         first += n
     L += ["};", "static const unsigned kReplaySubsystemCount = SUB_COUNT;", "", "#endif", ""]
     return "\n".join(L)
@@ -3005,7 +3005,7 @@ def render_service_ids(services: list[dict]) -> str:
     return "\n".join(L)
 
 
-SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated", "textn", "commandargs", "value"}
+SERVICE_ARG_MODES = {"stream", "int", "double", "text", "handle", "skip", "bytes", "object", "ints", "allocated", "textn", "commandargs", "value", "effect"}
 SERVICE_RESULTS = {"int", "double", "text", "snapshot", "handle", "object", "alloc", "arg"}
 HANDLE_KINDS = ("file", "rec", "bank")
 
@@ -3071,6 +3071,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s needs a `kind` that is a value kind of the schema" % (where, a["param"]))
             elif m == "value" and "size" in a and params.get(a["size"], {}).get("mode") != "int":
                 errors.append("%s: the argument %s has a `size` that names no int argument" % (where, a["param"]))
+            elif m == "effect" and params.get(a.get("size"), {}).get("mode") != "int":
+                errors.append("%s: the argument %s needs a `size` that names an int argument" % (where, a["param"]))
             if "reach" in a:
                 if m != "object":
                     errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
@@ -3164,6 +3166,8 @@ def service_input_lines(s: dict, ctx: str) -> list[str]:
             L.append("ReplayAddValueSized(t, ROK_%s, %s, %s, g_objects);" % (upper(a["kind"]), v, service_param_expr(s, a["size"], ctx)))
         elif m == "value":
             L.append("ReplayAddValueOrNull(t, ROK_%s, %s, g_objects);" % (upper(a["kind"]), v))
+        elif m == "effect":
+            L.append("ReplayAddEffect(t, ReplaySubsystemEvents(g_subsystem), %s, %s, g_objects);" % (v, service_param_expr(s, a["size"], ctx)))
     return L
 
 
@@ -3207,6 +3211,8 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        ReplayAddValueSized(t, ROK_%s, a[%d].v.p, (unsigned)a[%d].v.i, Table());" % (upper(a["kind"]), i, index[a["size"]]))
             elif m == "value":
                 L.append("        ReplayAddValueOrNull(t, ROK_%s, a[%d].v.p, Table());" % (upper(a["kind"]), i))
+            elif m == "effect":
+                L.append("        ReplayAddEffect(t, kReplaySubsystems[s_sub].events, a[%d].v.p, (unsigned)a[%d].v.i, Table());" % (i, index[a["size"]]))
         res = s.get("result")
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         outs_after = [(i, a) for i, a in enumerate(s["args"]) if a.get("reach")]

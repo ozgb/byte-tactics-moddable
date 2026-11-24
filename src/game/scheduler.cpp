@@ -103,6 +103,18 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     }
 }
 
+void __stdcall EmitFrom(int outbox, const void* effect, unsigned int size)
+{
+    ReplayImport call(RI_EMIT);
+    call.Ptr(effect);
+    call.Int((int)size);
+    if (outbox == SCHED_WIND_METEORS)
+        HarnessWindMeteorsEvent(effect, size);
+    else if (outbox == SCHED_TARGETING)
+        HarnessTargetingEvent(static_cast<const TargetingEventHeader*>(effect), size, 1);
+    SchedPublish(outbox, effect, size);
+}
+
 static int SchedPending()
 {
     for (int module = 0; module < SCHED_MODULE_COUNT; module++)

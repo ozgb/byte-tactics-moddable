@@ -4273,7 +4273,7 @@ call 11 Apply
   a event.unit Unit#1
   a event.weapon 2
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,2) 12
   w Unit#1.weapon2TargetX 0
   w Unit#1.weapon2TargetZ -32768
   o result 1
@@ -16505,7 +16505,7 @@ call 42 Apply
   a event.unit Unit#33
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#33,0) 12
   w Unit#33.weapon0TargetX 0
   o result 1
 call 42 Apply
@@ -16998,7 +16998,7 @@ call 43 Apply
   a event.unit Unit#32
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#32,0) 12
   w Unit#32.weapon0TargetX 0
   o result 1
 call 43 Apply
@@ -17200,7 +17200,7 @@ call 43 Apply
   a event.unit Unit#46
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#46,0) 12
   w Unit#46.weapon0TargetX 0
   o result 1
 call 43 Apply
@@ -17277,7 +17277,7 @@ call 43 Apply
   a event.unit Unit#49
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#49,0) 12
   w Unit#49.weapon0TargetX 0
   o result 1
 call 43 Apply
@@ -17831,7 +17831,7 @@ call 44 Apply
   a event.unit Unit#52
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#52,0) 12
   w Unit#52.weapon0TargetX 0
   o result 1
 call 44 Apply
@@ -17897,7 +17897,7 @@ call 44 Apply
   a event.unit Unit#55
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#55,0) 12
   w Unit#55.weapon0TargetX 0
   o result 1
 call 44 Apply
@@ -18716,7 +18716,7 @@ call 46 Apply
   a event.unit Unit#35
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#35,0) 12
   w Unit#35.weapon0TargetX 0
   o result 1
 call 46 Apply
@@ -18890,7 +18890,7 @@ call 46 Apply
   a event.unit Unit#47
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#47,0) 12
   w Unit#47.weapon0TargetX 0
   o result 1
 call 46 Apply
@@ -19320,7 +19320,7 @@ call 47 Apply
   a event.unit Unit#36
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#36,0) 12
   w Unit#36.weapon0TargetX 0
   o result 1
 call 47 Apply
@@ -22358,7 +22358,7 @@ call 52 Apply
   a event.unit Unit#53
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#53,0) 12
   w Unit#53.weapon0TargetX 0
   o result 1
 call 52 Apply
@@ -22748,7 +22748,7 @@ call 53 Apply
   a event.unit Unit#38
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#38,0) 12
   w Unit#38.weapon0TargetX 0
   o result 1
 call 53 Apply
@@ -22797,7 +22797,7 @@ call 53 Apply
   a event.unit Unit#39
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#39,0) 12
   w Unit#39.weapon0TargetX 0
   o result 1
 call 53 Apply
@@ -22904,7 +22904,7 @@ call 53 Apply
   a event.unit Unit#45
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#45,0) 12
   w Unit#45.weapon0TargetX 0
   o result 1
 call 53 Apply
@@ -23034,7 +23034,7 @@ call 53 Apply
   a event.unit Unit#54
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#54,0) 12
   w Unit#54.weapon0TargetX 0
   o result 1
 call 53 Apply
@@ -24999,7 +24999,7 @@ call 56 Apply
   a event.unit Unit#43
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#43,0) 12
   w Unit#43.weapon0TargetX 0
   o result 1
 call 56 Apply
@@ -25203,7 +25203,7 @@ call 56 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 56 Apply
@@ -26005,7 +26005,7 @@ call 57 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 57 Apply
@@ -26560,7 +26560,7 @@ call 58 Apply
   a event.unit Unit#37
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#37,0) 12
   w Unit#37.weapon0TargetX 0
   o result 1
 call 58 Apply
@@ -26823,7 +26823,7 @@ call 58 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 58 Apply
@@ -27247,7 +27247,7 @@ call 59 Apply
   a event.unit Unit#22
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#22,0) 12
   w Unit#22.weapon0TargetX 0
   o result 1
 call 59 Apply
@@ -27340,7 +27340,7 @@ call 59 Apply
   a event.unit Unit#26
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#26,0) 12
   w Unit#26.weapon0TargetX 0
   o result 1
 call 59 Apply
@@ -27527,7 +27527,7 @@ call 59 Apply
   a event.unit Unit#41
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#41,0) 12
   w Unit#41.weapon0TargetX 0
   o result 1
 call 59 Apply
@@ -27631,7 +27631,7 @@ call 59 Apply
   a event.unit Unit#48
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#48,0) 12
   w Unit#48.weapon0TargetX 0
   o result 1
 call 59 Apply
@@ -28196,7 +28196,7 @@ call 60 Apply
   a event.unit Unit#34
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#34,0) 12
   w Unit#34.weapon0TargetX 0
   o result 1
 call 60 Apply
@@ -28494,7 +28494,7 @@ call 60 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 60 Apply
@@ -28604,7 +28604,7 @@ call 61 Apply
   a event.unit Unit#8
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#8,0) 12
   w Unit#8.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -28707,7 +28707,7 @@ call 61 Apply
   a event.unit Unit#13
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#13,0) 12
   w Unit#13.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -28882,7 +28882,7 @@ call 61 Apply
   a event.unit Unit#24
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#24,0) 12
   w Unit#24.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -28961,7 +28961,7 @@ call 61 Apply
   a event.unit Unit#27
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#27,0) 12
   w Unit#27.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -29045,7 +29045,7 @@ call 61 Apply
   a event.unit Unit#31
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#31,0) 12
   w Unit#31.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -29205,7 +29205,7 @@ call 61 Apply
   a event.unit Unit#44
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#44,0) 12
   w Unit#44.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -29314,7 +29314,7 @@ call 61 Apply
   a event.unit Unit#51
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#51,0) 12
   w Unit#51.weapon0TargetX 0
   o result 1
 call 61 Apply
@@ -29571,7 +29571,7 @@ call 62 Apply
   a event.unit Unit#9
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#9,0) 12
   w Unit#9.weapon0TargetX 0
   o result 1
 call 62 Apply
@@ -29696,7 +29696,7 @@ call 62 Apply
   a event.unit Unit#16
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#16,0) 12
   w Unit#16.weapon0TargetX 0
   o result 1
 call 62 Apply
@@ -30034,7 +30034,7 @@ call 62 Apply
   a event.unit Unit#42
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#42,0) 12
   w Unit#42.weapon0TargetX 0
   o result 1
 call 62 Apply
@@ -30702,7 +30702,7 @@ call 63 Apply
   a event.unit Unit#40
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#40,0) 12
   w Unit#40.weapon0TargetX 0
   o result 1
 call 63 Apply
@@ -30983,7 +30983,7 @@ call 64 Apply
   a event.unit Unit#5
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#5,0) 12
   w Unit#5.weapon0TargetX 0
   o result 1
 call 64 Apply
@@ -32562,7 +32562,7 @@ call 66 Apply
   a event.unit Unit#25
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#25,0) 12
   w Unit#25.weapon0TargetX 0
   o result 1
 call 66 Apply
@@ -33221,7 +33221,7 @@ call 67 Apply
   a event.unit Unit#18
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#18,0) 12
   w Unit#18.weapon0TargetX 0
   o result 1
 call 67 Apply
@@ -33833,7 +33833,7 @@ call 68 Apply
   a event.unit Unit#11
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#11,0) 12
   w Unit#11.weapon0TargetX 0
   o result 1
 call 68 Apply
@@ -34451,7 +34451,7 @@ call 69 Apply
   a event.unit Unit#6
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#6,0) 12
   w Unit#6.weapon0TargetX 0
   o result 1
 call 69 Apply
@@ -34616,7 +34616,7 @@ call 69 Apply
   a event.unit Unit#17
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#17,0) 12
   w Unit#17.weapon0TargetX 0
   o result 1
 call 69 Apply
@@ -35620,7 +35620,7 @@ call 70 Apply
   a event.unit Unit#50
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#50,0) 12
   w Unit#50.weapon0TargetX 0
   o result 1
 call 70 Apply
@@ -36098,7 +36098,7 @@ call 71 Apply
   a event.unit Unit#30
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#30,0) 12
   w Unit#30.weapon0TargetX 0
   o result 1
 call 71 Apply
@@ -36178,7 +36178,7 @@ call 71 Apply
   a event.unit Unit#37
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#37,0) 12
   w Unit#37.weapon0TargetX 0
   o result 1
 call 71 Apply
@@ -37183,7 +37183,7 @@ call 72 Apply
   a event.unit Unit#252
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#252,0) 12
   w Unit#252.weapon0TargetX 0
   o result 1
 call 72 Apply
@@ -38030,7 +38030,7 @@ call 74 Apply
   a event.unit Unit#19
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#19,0) 12
   w Unit#19.weapon0TargetX 0
   o result 1
 call 74 Apply
@@ -38481,7 +38481,7 @@ call 74 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 74 Apply
@@ -42186,7 +42186,7 @@ call 80 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 80 Apply
@@ -42794,7 +42794,7 @@ call 81 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 81 Apply
@@ -42835,7 +42835,7 @@ call 82 Apply
   a event.unit Unit#1
   a event.weapon 2
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,2) 12
   w Unit#1.weapon2TargetX 0
   w Unit#1.weapon2TargetZ -32768
   o result 1
@@ -43423,7 +43423,7 @@ call 82 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 82 Apply
@@ -44028,7 +44028,7 @@ call 83 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 83 Apply
@@ -45014,7 +45014,7 @@ call 84 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 84 Apply
@@ -45023,7 +45023,7 @@ call 84 Apply
   a event.unit Unit#251
   a event.weapon 2
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,2) 12
   w Unit#251.weapon2TargetX 0
   o result 1
 call 84 Apply
@@ -45086,7 +45086,7 @@ call 84 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 84 Apply
@@ -52913,7 +52913,7 @@ call 98 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 98 Apply
@@ -56315,7 +56315,7 @@ call 104 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 104 Apply
@@ -56909,7 +56909,7 @@ call 105 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 105 Apply
@@ -57523,7 +57523,7 @@ call 106 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 106 Apply
@@ -58142,7 +58142,7 @@ call 107 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 107 Apply
@@ -58760,7 +58760,7 @@ call 108 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 108 Apply
@@ -60390,7 +60390,7 @@ call 111 Apply
   a event.unit Unit#43
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#43,0) 12
   w Unit#43.weapon0TargetX 0
   o result 1
 call 111 Apply
@@ -61987,7 +61987,7 @@ call 114 Apply
   a event.unit Unit#25
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#25,0) 12
   w Unit#25.weapon0TargetX 0
   o result 1
 call 114 Apply
@@ -66840,7 +66840,7 @@ call 122 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 122 Apply
@@ -70199,7 +70199,7 @@ call 128 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 128 Apply
@@ -70814,7 +70814,7 @@ call 129 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 129 Apply
@@ -71418,7 +71418,7 @@ call 130 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 130 Apply
@@ -71993,7 +71993,7 @@ call 131 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 131 Apply
@@ -72591,7 +72591,7 @@ call 132 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 132 Apply
@@ -80705,7 +80705,7 @@ call 146 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 146 Apply
@@ -84053,7 +84053,7 @@ call 152 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 152 Apply
@@ -84657,7 +84657,7 @@ call 153 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 153 Apply
@@ -85253,7 +85253,7 @@ call 154 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 154 Apply
@@ -85836,7 +85836,7 @@ call 155 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 155 Apply
@@ -86439,7 +86439,7 @@ call 156 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 156 Apply
@@ -94315,7 +94315,7 @@ call 170 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 170 Apply
@@ -97748,7 +97748,7 @@ call 176 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 176 Apply
@@ -98338,7 +98338,7 @@ call 177 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 177 Apply
@@ -98926,7 +98926,7 @@ call 178 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 178 Apply
@@ -99523,7 +99523,7 @@ call 179 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 179 Apply
@@ -100126,7 +100126,7 @@ call 180 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 180 Apply
@@ -105248,7 +105248,7 @@ call 190 Apply
   a event.unit Unit#7
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#7,0) 12
   w Unit#7.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105340,7 +105340,7 @@ call 190 Apply
   a event.unit Unit#16
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#16,0) 12
   w Unit#16.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105358,7 +105358,7 @@ call 190 Apply
   a event.unit Unit#17
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#17,0) 12
   w Unit#17.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105389,7 +105389,7 @@ call 190 Apply
   a event.unit Unit#20
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#20,0) 12
   w Unit#20.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105426,7 +105426,7 @@ call 190 Apply
   a event.unit Unit#23
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#23,0) 12
   w Unit#23.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105445,7 +105445,7 @@ call 190 Apply
   a event.unit Unit#24
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#24,0) 12
   w Unit#24.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105476,7 +105476,7 @@ call 190 Apply
   a event.unit Unit#27
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#27,0) 12
   w Unit#27.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105758,7 +105758,7 @@ call 190 Apply
   a event.unit Unit#253
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#253,0) 12
   w Unit#253.weapon0TargetX 0
   o result 1
 call 190 GetWeaponTargetPos
@@ -105804,7 +105804,7 @@ call 191 Apply
   a event.unit Unit#1
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,0) 12
   w Unit#1.weapon0TargetX 0
   o result 1
 call 191 Apply
@@ -105878,7 +105878,7 @@ call 191 Apply
   a event.unit Unit#10
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#10,0) 12
   w Unit#10.weapon0TargetX 0
   o result 1
 call 191 GetWeaponTargetPos
@@ -106031,7 +106031,7 @@ call 191 Apply
   a event.unit Unit#28
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#28,0) 12
   w Unit#28.weapon0TargetX 0
   o result 1
 call 191 GetWeaponTargetPos
@@ -106144,7 +106144,7 @@ call 191 Apply
   a event.unit Unit#40
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#40,0) 12
   w Unit#40.weapon0TargetX 0
   o result 1
 call 191 GetWeaponTargetPos
@@ -106536,7 +106536,7 @@ call 192 Apply
   a event.unit Unit#26
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#26,0) 12
   w Unit#26.weapon0TargetX 0
   o result 1
 call 192 GetWeaponTargetPos
@@ -106603,7 +106603,7 @@ call 192 Apply
   a event.unit Unit#33
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#33,0) 12
   w Unit#33.weapon0TargetX 0
   o result 1
 call 192 GetWeaponTargetPos
@@ -106763,7 +106763,7 @@ call 192 Apply
   a event.unit Unit#51
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#51,0) 12
   w Unit#51.weapon0TargetX 0
   o result 1
 call 192 GetWeaponTargetPos
@@ -106908,7 +106908,7 @@ call 193 Apply
   a event.unit Unit#8
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#8,0) 12
   w Unit#8.weapon0TargetX 0
   o result 1
 call 193 GetWeaponTargetPos
@@ -107106,7 +107106,7 @@ call 193 Apply
   a event.unit Unit#31
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#31,0) 12
   w Unit#31.weapon0TargetX 0
   o result 1
 call 193 GetWeaponTargetPos
@@ -107199,7 +107199,7 @@ call 193 Apply
   a event.unit Unit#41
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#41,0) 12
   w Unit#41.weapon0TargetX 0
   o result 1
 call 193 GetWeaponTargetPos
@@ -107230,7 +107230,7 @@ call 193 Apply
   a event.unit Unit#44
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#44,0) 12
   w Unit#44.weapon0TargetX 0
   o result 1
 call 193 GetWeaponTargetPos
@@ -107492,7 +107492,7 @@ call 194 Apply
   a event.unit Unit#15
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#15,0) 12
   w Unit#15.weapon0TargetX 0
   o result 1
 call 194 GetWeaponTargetPos
@@ -107783,7 +107783,7 @@ call 194 Apply
   a event.unit Unit#50
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#50,0) 12
   w Unit#50.weapon0TargetX 0
   o result 1
 call 194 GetWeaponTargetPos
@@ -108321,7 +108321,7 @@ call 195 Apply
   a event.unit Unit#32
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#32,0) 12
   w Unit#32.weapon0TargetX 0
   o result 1
 call 195 GetWeaponTargetPos
@@ -108673,7 +108673,7 @@ call 196 Apply
   a event.unit Unit#5
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#5,0) 12
   w Unit#5.weapon0TargetX 0
   o result 1
 call 196 GetWeaponTargetPos
@@ -109092,7 +109092,7 @@ call 196 Apply
   a event.unit Unit#251
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#251,0) 12
   w Unit#251.weapon0TargetX 0
   o result 1
 call 196 Apply
@@ -110025,7 +110025,7 @@ call 198 Apply
   a event.unit Unit#13
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#13,0) 12
   w Unit#13.weapon0TargetX 0
   o result 1
 call 198 GetWeaponTargetPos
@@ -110185,7 +110185,7 @@ call 198 Apply
   a event.unit Unit#34
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#34,0) 12
   w Unit#34.weapon0TargetX 0
   o result 1
 call 198 GetWeaponTargetPos
@@ -110203,7 +110203,7 @@ call 198 Apply
   a event.unit Unit#35
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#35,0) 12
   w Unit#35.weapon0TargetX 0
   o result 1
 call 198 GetWeaponTargetPos
@@ -110643,7 +110643,7 @@ call 199 Apply
   a event.unit Unit#12
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#12,0) 12
   w Unit#12.weapon0TargetX 0
   o result 1
 call 199 GetWeaponTargetPos
@@ -111242,7 +111242,7 @@ call 200 Apply
   a event.unit Unit#18
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#18,0) 12
   w Unit#18.weapon0TargetX 0
   o result 1
 call 200 GetWeaponTargetPos
@@ -111328,7 +111328,7 @@ call 200 Apply
   a event.unit Unit#29
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#29,0) 12
   w Unit#29.weapon0TargetX 0
   o result 1
 call 200 GetWeaponTargetPos
@@ -111478,7 +111478,7 @@ call 200 Apply
   a event.unit Unit#47
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#47,0) 12
   w Unit#47.weapon0TargetX 0
   o result 1
 call 200 GetWeaponTargetPos
@@ -111693,7 +111693,7 @@ call 201 Apply
   a event.unit Unit#9
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#9,0) 12
   w Unit#9.weapon0TargetX 0
   o result 1
 call 201 GetWeaponTargetPos
@@ -111859,7 +111859,7 @@ call 201 Apply
   a event.unit Unit#30
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#30,0) 12
   w Unit#30.weapon0TargetX 0
   o result 1
 call 201 GetWeaponTargetPos
@@ -111959,7 +111959,7 @@ call 201 Apply
   a event.unit Unit#42
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#42,0) 12
   w Unit#42.weapon0TargetX 0
   o result 1
 call 201 GetWeaponTargetPos
@@ -111996,7 +111996,7 @@ call 201 Apply
   a event.unit Unit#46
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#46,0) 12
   w Unit#46.weapon0TargetX 0
   o result 1
 call 201 GetWeaponTargetPos
@@ -112018,7 +112018,7 @@ call 201 Apply
   a event.unit Unit#48
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#48,0) 12
   w Unit#48.weapon0TargetX 0
   o result 1
 call 201 GetWeaponTargetPos
@@ -112394,7 +112394,7 @@ call 202 Apply
   a event.unit Unit#38
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#38,0) 12
   w Unit#38.weapon0TargetX 0
   o result 1
 call 202 GetWeaponTargetPos
@@ -112413,7 +112413,7 @@ call 202 Apply
   a event.unit Unit#39
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#39,0) 12
   w Unit#39.weapon0TargetX 0
   o result 1
 call 202 GetWeaponTargetPos
@@ -112462,7 +112462,7 @@ call 202 Apply
   a event.unit Unit#45
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#45,0) 12
   w Unit#45.weapon0TargetX 0
   o result 1
 call 202 GetWeaponTargetPos
@@ -112742,7 +112742,7 @@ call 203 Apply
   a event.unit Unit#22
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#22,0) 12
   w Unit#22.weapon0TargetX 0
   o result 1
 call 203 GetWeaponTargetPos
@@ -113063,7 +113063,7 @@ call 204 Apply
   a event.unit Unit#6
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#6,0) 12
   w Unit#6.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -113109,7 +113109,7 @@ call 204 Apply
   a event.unit Unit#11
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#11,0) 12
   w Unit#11.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -113413,7 +113413,7 @@ call 204 Apply
   a event.unit Unit#52
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#52,0) 12
   w Unit#52.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -113432,7 +113432,7 @@ call 204 Apply
   a event.unit Unit#53
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#53,0) 12
   w Unit#53.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -113451,7 +113451,7 @@ call 204 Apply
   a event.unit Unit#54
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#54,0) 12
   w Unit#54.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -113469,7 +113469,7 @@ call 204 Apply
   a event.unit Unit#55
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#55,0) 12
   w Unit#55.weapon0TargetX 0
   o result 1
 call 204 GetWeaponTargetPos
@@ -114433,7 +114433,7 @@ call 207 Apply
   a event.unit Unit#14
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#14,0) 12
   w Unit#14.weapon0TargetX 0
   o result 1
 call 207 GetWeaponTargetPos
@@ -114888,7 +114888,7 @@ call 208 Apply
   a event.unit Unit#21
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#21,0) 12
   w Unit#21.weapon0TargetX 0
   o result 1
 call 208 GetWeaponTargetPos
@@ -115073,7 +115073,7 @@ call 208 Apply
   a event.unit Unit#49
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#49,0) 12
   w Unit#49.weapon0TargetX 0
   o result 1
 call 208 GetWeaponTargetPos
@@ -115565,7 +115565,7 @@ call 210 Apply
   a event.unit Unit#1
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,0) 12
   w Unit#1.weapon0TargetX 0
   w Unit#1.weapon0TargetZ -32768
   o result 1
@@ -115779,7 +115779,7 @@ call 210 Apply
   a event.unit Unit#36
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#36,0) 12
   w Unit#36.weapon0TargetX 0
   o result 1
 call 210 GetWeaponTargetPos
@@ -117730,7 +117730,7 @@ call 215 Apply
   a event.unit Unit#252
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#252,0) 12
   w Unit#252.weapon0TargetX 0
   o result 1
 call 215 GetWeaponTargetPos
@@ -119988,7 +119988,7 @@ call 222 Apply
   a event.unit Unit#254
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#254,0) 12
   w Unit#254.weapon0TargetX 0
   o result 1
 call 222 GetWeaponTargetPos
@@ -124993,7 +124993,7 @@ call 235 Apply
   a event.unit Unit#1
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,0) 12
   w Unit#1.weapon0TargetX 0
   w Unit#1.weapon0TargetZ -32768
   o result 1

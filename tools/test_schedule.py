@@ -327,6 +327,10 @@ class Routes(unittest.TestCase):
         source = UNITS.replace("g_seams.orders->Run(u);", "EconomyPublishSpent(SCHED_ECONOMY, u);")
         self.assertEqual(routed(units_source=source), ["OnUnits", "OnEconomy"])
 
+    def test_an_outbox_passed_to_emit_from_is_published_from(self):
+        source = UNITS.replace("g_seams.orders->Run(u);", "EmitFrom(SCHED_ECONOMY, &u, sizeof(u));")
+        self.assertEqual(routed(units_source=source), ["OnUnits", "OnEconomy"])
+
 
 class Problems(unittest.TestCase):
     def test_loops_must_match_the_marks(self):

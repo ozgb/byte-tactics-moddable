@@ -33,7 +33,7 @@ IMPORT("services", "TdfRecord_GetFieldDouble") double service_TdfRecord_GetField
 IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, const char* key, int size, const char* def);
 IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(HapiBank* self, const char* name);
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
-IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
+IMPORT("services", "Emit") void service_Emit(const void* effect, unsigned int size);
 IMPORT("services", "HapiBank_GetIntegerItem") int service_HapiBank_GetIntegerItem(HapiBank* self, const char* name, int def);
 IMPORT("weapons", "FindWeaponByName") WeaponDef* weapons_FindWeaponByName(const char* name);
 }
@@ -56,7 +56,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }
-void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size) { service_WindMeteorsEmit(effect, size); }
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size) { service_Emit(effect, size); }
 
 SimGlobals& SimCreate() { __builtin_trap(); }
 

@@ -20,7 +20,7 @@ in it:
   scheduler delivers wind_meteors' inbox before each run and at every phase boundary.
 - **Queued events in:** ENABLE, DISABLE, PARAMS, START, LIMITS and RESET, published by the engine to its own outbox (`SCHED_ENGINE`).
   wind_meteors' handler (`src/seams/wind_meteors_world.cpp`) passes each to `Apply`.
-- **Effect out:** SPAWN, published to wind_meteors' outbox through the service `WindMeteorsEmit`. Weapons subscribes;
+- **Effect out:** SPAWN, published to wind_meteors' outbox through the service `Emit`, which the host refuses unless SPAWN is in the entry's `publishes` table at 36 bytes and its weapon slot is in the table of weapons. Weapons subscribes;
   its handler is an adapter onto `weapons.SpawnProjectile`. The route is queued.
 - **Query:** `LoadMeteorDefaults`, which any caller may call (section 4).
 - **Set-up, save and load:** `InitMeteors`, `EmptyShutdownPreCleanup`, `SaveMeteors` and `LoadMeteors`, called by the
@@ -70,7 +70,7 @@ packets come out as in 3.1c. Section 8 has the gate's verdict.
 `weapons.FindWeaponByName`, wind_meteors' one query of another subsystem, stays a direct query, made by `InitMeteors`
 at match start.
 
-**Payloads.** Every event and effect starts with `WindMeteorsEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/wind_meteors.h` (version 3.1) that starts with it, or is the header alone. `Apply(event, size)` takes the payload's size and ignores an event smaller than its kind's payload (it returns nothing); `WindMeteorsEmit(effect, size)` publishes an effect and records it.
+**Payloads.** Every event and effect starts with `WindMeteorsEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/wind_meteors.h` (version 3.1) that starts with it, or is the header alone. `Apply(event, size)` takes the payload's size and ignores an event smaller than its kind's payload (it returns nothing); `Emit(effect, size)` publishes an effect and records it.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|

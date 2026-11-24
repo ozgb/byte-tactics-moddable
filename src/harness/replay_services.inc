@@ -363,10 +363,10 @@ void ReplayImportEnd(ReplayImport& c)
     {
         break;
     }
-    case RI_WIND_METEORS_EMIT:
+    case RI_EMIT:
     {
         AddSpace(t);
-        ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, a[0].v.p, (unsigned)a[1].v.i, Table());
+        ReplayAddEffect(t, kReplaySubsystems[s_sub].events, a[0].v.p, (unsigned)a[1].v.i, Table());
         AddSpace(t);
         t.AddInt(a[1].v.i);
         break;

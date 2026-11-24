@@ -371,7 +371,7 @@ class ModuleManifestTest(unittest.TestCase):
         for entry in document["modules"]:
             self.assertFalse(set(oraclekit.MODULE_SOURCE_FIELDS) & set(entry), entry["name"])
         meteors = next(e for e in document["modules"] if e["name"] == "wind_meteors")
-        self.assertEqual(meteors["imports"]["services"]["WindMeteorsEmit"], [["linear", "int"], "void"])
+        self.assertEqual(meteors["imports"]["services"]["Emit"], [["linear", "int"], "void"])
         self.assertEqual(meteors["exports"][:2], ["UpdateWind", "UpdateMeteors"])
         major = re.search(r"#define SERVICES_VERSION_MAJOR (\d+)", (ROOT / oraclekit.SERVICES_HEADER).read_text())
         self.assertEqual(document["majors"]["services"], int(major.group(1)))

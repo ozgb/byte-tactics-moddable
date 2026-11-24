@@ -559,6 +559,29 @@ int wl_module_int(const wl_loader* loader, const char* module, const char* key, 
     return 1;
 }
 
+const char* wl_module_text(const wl_loader* loader, const char* module, const char* key)
+{
+    const wl_json* entry = loader->manifest ? find_entry(loader, module) : NULL;
+    const wl_json* item = wl_json_get(entry, key);
+    return item && item->kind == WL_JSON_STRING ? item->text : NULL;
+}
+
+int wl_module_publishes(const wl_loader* loader, const char* module, int kind, long* size)
+{
+    const wl_json* entry = loader->manifest ? find_entry(loader, module) : NULL;
+    const wl_json* table = wl_json_get(entry, "publishes");
+    const wl_json* item;
+    for (item = table && table->kind == WL_JSON_OBJECT ? table->first : NULL; item; item = item->next) {
+        char* end;
+        long key = strtol(item->key, &end, 10);
+        if (*item->key != '\0' && *end == '\0' && key == kind && item->kind == WL_JSON_NUMBER) {
+            *size = item->number;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int wl_create_memory(wl_loader* loader)
 {
     wl_api* api = &loader->api;

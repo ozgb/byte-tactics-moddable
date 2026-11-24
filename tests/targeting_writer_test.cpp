@@ -57,7 +57,7 @@ extern "C" void HOST_CALL host_fatal(void*, const char* title, const char* text)
     g_failures++;
 }
 
-void __stdcall HarnessTargetingEvent(const TargetingEventHeader*, unsigned int, int) {}
+void __stdcall EmitFrom(int, const void*, unsigned int) {}
 void __stdcall SchedPublish(int, const void*, unsigned int) {}
 void __stdcall FatalError(const char* text)
 {

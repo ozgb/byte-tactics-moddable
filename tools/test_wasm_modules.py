@@ -270,6 +270,47 @@ class Budgets(unittest.TestCase):
         self.assertTrue(wm.check_fuel_manifest(dict(pins, fuel={"rule": "other", "version": 1})))
         self.assertTrue(wm.check_fuel_manifest({"modules": pins["modules"]}))
 
+    def test_the_real_publishes_table_passes(self):
+        game = wm.game_manifest()
+        self.assertEqual(wm.check_publishes(game), [])
+        self.assertEqual(next(m for m in game["modules"] if m["name"] == "wind_meteors")["publishes"], {"80": 36})
+
+    def publishes_problems(self, publishes):
+        game = wm.game_manifest()
+        entry = dict(next(m for m in game["modules"] if m["name"] == "wind_meteors"), publishes=publishes)
+        return wm.check_publishes(dict(game, modules=[entry]))
+
+    def test_publishes_refuses_a_kind_that_is_not_an_effect_kind(self):
+        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"64": 4})))
+        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"999": 36})))
+
+    def test_publishes_refuses_a_wrong_size(self):
+        self.assertTrue(any("size 32" in p for p in self.publishes_problems({"80": 32})))
+
+    def test_effect_kinds_take_implicit_values_and_skip_a_trailing_comma(self):
+        text = "enum XEffectKind {\n    X_A = 80,\n    X_B,\n    X_C = 0x60, // the next\n    X_D,\n};\nenum YEventKind { Y_A = 1 };"
+        self.assertEqual(wm.effect_kinds(text), {80, 81, 96, 97})
+        self.assertEqual(wm.effect_kinds("enum ZEffectKind { Z_A, Z_B };"), {0, 1})
+
+    def test_effect_kinds_refuse_a_value_they_cannot_read(self):
+        with self.assertRaises(ValueError):
+            wm.effect_kinds("enum XEffectKind { X_A = OTHER + 1 };")
+
+    def test_publishes_reports_an_unreadable_enum_instead_of_crashing(self):
+        original = wm.header_text
+        wm.header_text = lambda name: "enum WindMeteorsEffectKind { WIND_METEORS_EFFECT_SPAWN = BASE };"
+        try:
+            problems = self.publishes_problems({"80": 36})
+        finally:
+            wm.header_text = original
+        self.assertTrue(any("cannot read the effect kinds" in p for p in problems))
+
+    def test_publishes_refuses_a_malformed_table(self):
+        self.assertTrue(self.publishes_problems([80]))
+        self.assertTrue(self.publishes_problems({"eighty": 36}))
+        self.assertTrue(self.publishes_problems({"80": "36"}))
+        self.assertTrue(self.publishes_problems({"80": True}))
+
     def test_a_fuel_budget_is_a_positive_int_the_loader_can_read(self):
         base = {"fuel": {"rule": wm.wasm_fuel.RULE, "version": wm.wasm_fuel.VERSION}}
         for bad in (None, 0, -1, 1 << 31, "5"):

@@ -29,7 +29,7 @@
     "rand_stream": 1,
     "ref": 3,
     "scripts": 3,
-    "services": 3,
+    "services": 4,
     "sim_events": 1,
     "state_writer": 1,
     "targeting": 4,
@@ -53,7 +53,7 @@
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
-      "WindMeteorsEmit": [["linear", "int"], "void"]
+      "Emit": [["linear", "int"], "void"]
     },
     "weapons": {
       "FindWeaponByName": [["linear"], "block"]
@@ -77,7 +77,7 @@
       "majors": {
         "wind_meteors": 3,
         "weapons": 4,
-        "services": 3
+        "services": 4
       },
       "fuel_budget": 250,
       "size_budget": 13100,
@@ -117,9 +117,10 @@
           "HapiBank_OpenAccount": [["handle", "linear"], "int"],
           "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
           "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
-          "WindMeteorsEmit": [["linear", "int"], "void"]
+          "Emit": [["linear", "int"], "void"]
         }
-      }
+      },
+      "publishes": {"80": 36}
     }
   ]
 }

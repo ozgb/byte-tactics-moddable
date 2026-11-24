@@ -3197,7 +3197,7 @@ call 73 Apply
   a event.unit Unit#252
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#252,0) 12
   w Unit#252.weapon0TargetX 0
   o result 1
 call 73 Apply
@@ -7529,7 +7529,7 @@ call 140 Apply
   a event.unit Unit#2
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#2,0) 12
   w Unit#2.weapon0TargetX 0
   o result 1
 call 140 Apply
@@ -7538,7 +7538,7 @@ call 140 Apply
   a event.unit Unit#253
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#253,0) 12
   w Unit#253.weapon0TargetX 0
   o result 1
 call 140 GetWeaponTargetPos
@@ -7580,7 +7580,7 @@ call 140 GetWeaponTargetPos
   r Unit#2.motion null
   a unit Unit#252
   a weapon 0
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#252,0) 12
   w Unit#252.weapon0TargetX 0
   o result 0
 call 140 Apply
@@ -8101,7 +8101,7 @@ call 150 Apply
   a event.unit Unit#252
   a event.weapon 0
   a size 12
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#252,0) 12
   w Unit#252.weapon0TargetX 0
   o result 1
 call 151 GetWeaponTargetPos
@@ -8109,7 +8109,7 @@ call 151 GetWeaponTargetPos
   r Unit#252.motion null
   a unit Unit#1
   a weapon 0
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#1,0) 12
   w Unit#1.weapon0TargetX 0
   o result 0
 call 151 GetWeaponTargetPos
@@ -8124,7 +8124,7 @@ call 151 GetWeaponTargetPos
   r UnitMotion#5.velocityZ 7342
   a unit Unit#3
   a weapon 0
-  i services.SchedPublish 9 12
+  i services.Emit (112,Unit#3,0) 12
   w Unit#3.weapon0TargetX 0
   o result 0
 call 151 Apply

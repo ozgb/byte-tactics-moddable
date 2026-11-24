@@ -78,8 +78,11 @@ int HarnessTestMode()
     return 1;
 }
 
-void __stdcall HarnessTargetingEvent(const TargetingEventHeader*, unsigned int, int)
+void __stdcall Emit(const void* effect, unsigned int size);
+
+void __stdcall EmitFrom(int, const void* effect, unsigned int size)
 {
+    Emit(effect, size);
 }
 
 void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader*, unsigned int, int)
@@ -2295,8 +2298,8 @@ bool Mutate(int mutation)
     for (int k = 2; k < g_lineCount; k++)
         spawnImport = spawnImport || strncmp(g_lines[k], anchor, 27) == 0;
     if (!spawnImport) {
-        anchor = "  i services.WindMeteorsEmit";
-        anchorName = "services.WindMeteorsEmit";
+        anchor = "  i services.Emit";
+        anchorName = "services.Emit";
     }
     size_t anchorLength = strlen(anchor);
     int call = -1;

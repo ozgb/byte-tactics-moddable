@@ -47,7 +47,7 @@ statics runs wind_meteors under the pinned wasmtime package with the manifest's 
 memory_pages pages, a Game and a SimGlobals zeroed in the block (with the
 size, wind and meteor fields set so showers start within the run), the module's g_game, g_simGlobals,
 g_extTdf and g_blockBase (block_base) written through its exports, and stubs for every import (GameRand and RandomInt from an LCG,
-WindMeteorsEmit counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
+Emit counting its calls, FindWeaponByName returning the first weapon of the Game, FatalError
 raising). It calls InitMeteors and Apply with an ENABLE and a PARAMS event, then 2000 ticks of UpdateWind and
 UpdateMeteors with Game::ticks incremented, and hashes the module's statics (its data and bss, from
 data_base to the low end of its stack, as linked) after setup and after every tick. A module that keeps
@@ -75,6 +75,12 @@ built with wasm-tools: current, built against those majors, and old, built again
 the manifest's adapters bring to the current signatures with each form (reorder, drop, constant argument, constant
 result, no result). The program loads old, then current, and checks every slot and import of both, and then checks the
 loader's refusals: a changed slot or import without an adapter, and each adapter its kinds rule out.
+
+Publishes. A module entry of wasm/modules.json may have "publishes", an object from each effect kind the module may publish
+through services.Emit (a decimal string, the value of an enumerator of the "interface" header's EffectKind enum) to the size in
+bytes of that kind's payload struct, which is the whole effect, header included. The host's Emit import refuses any kind
+outside the table and any size other than the listed one. check fails when a key is not an effect kind of the interface, when a
+size is not the size of that kind's payload struct, or when the field is not an object of decimal keys to ints.
 
 Interface majors (#566). wasm/modules.json records the major of every interfaces/*.h that has version macros under
 "majors", and for each module the interface its slots belong to ("interface") and the major of each interface it
@@ -667,6 +673,55 @@ def check_fuel_manifest(pins):
     return problems
 
 
+def effect_kinds(text):
+    """The values of the EffectKind enums of a header's text; an enumerator without `=` is the one before it plus one, as in C."""
+    values = set()
+    for m in re.finditer(r"\benum \w*EffectKind \{([^{}]*)\};", COMMENT.sub("", text)):
+        value = -1
+        for member in m.group(1).split(","):
+            member = member.strip()
+            if not member:
+                continue
+            name, eq, given = member.partition("=")
+            if not re.fullmatch(r"\w+", name.strip()):
+                raise ValueError(f"enumerator {member!r} is not a name")
+            value = int(given.strip(), 0) if eq else value + 1
+            values.add(value)
+    return values
+
+
+def check_publishes(game):
+    """Reasons a module's manifest "publishes" table is not an object from effect kinds of its interface to their payload sizes."""
+    import traceschema
+
+    problems = []
+    for entry in game["modules"]:
+        if "publishes" not in entry:
+            continue
+        name = entry["name"]
+        table = entry["publishes"]
+        if not isinstance(table, dict):
+            problems.append(f"{name}: publishes must be an object from effect kinds to payload sizes")
+            continue
+        try:
+            module = traceschema.module_of_header(entry.get("interface", "") + ".h")
+            kinds = traceschema.event_kinds(module)
+            effects = effect_kinds(header_text(entry["interface"]))
+        except (ValueError, KeyError, OSError) as e:
+            problems.append(f"{name}: cannot read the effect kinds of interface {entry.get('interface')!r}: {e}")
+            continue
+        for key, size in table.items():
+            if not isinstance(key, str) or not key.isdigit() or isinstance(size, bool) or not isinstance(size, int):
+                problems.append(f"{name}: publishes {key!r}: {size!r} must be a decimal kind and an integer size")
+            elif int(key) not in effects:
+                problems.append(f"{name}: publishes {key}, which is not an effect kind of interfaces/{entry['interface']}.h")
+            elif int(key) not in kinds:
+                problems.append(f"{name}: publishes {key}, which has no payload struct")
+            elif kinds[int(key)][2] != size:
+                problems.append(f"{name}: publishes {key} with size {size}, but {kinds[int(key)][1]} is {kinds[int(key)][2]} bytes")
+    return problems
+
+
 def kind_wasm(kind):
     """The wasm type a manifest kind has at the boundary."""
     return kind if kind in ("f32", "f64") else "i32"
@@ -887,6 +942,7 @@ def run_check():
 
     game = game_manifest()
     failures += check_fuel_manifest(game)
+    failures += check_publishes(game)
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
     for entry in game["modules"]:
         path = os.path.join(OUT, entry["name"] + ".wasm")
@@ -1018,7 +1074,7 @@ def statics_run(path=None, report=None):
         raise RuntimeError("the module called FatalError")
 
     stubs = {("services", "GameRand"): game_rand, ("services", "RandomInt"): random_int,
-             ("services", "WindMeteorsEmit"): emit,
+             ("services", "Emit"): emit,
              ("weapons", "FindWeaponByName"): lambda _name: game_at + off[("Game", "weapons")],
              ("services", "FatalError"): fatal_error}
 
@@ -1095,11 +1151,11 @@ def statics_run(path=None, report=None):
             print(f"FAIL: the statics {statics[0]:#x}..{statics[1]:#x} of {entry['name']} changed at tick {tick}")
             return 1
     if state["spawns"] == 0:
-        print("FAIL: WindMeteorsEmit was never called, so no meteor ran")
+        print("FAIL: Emit was never called, so no meteor ran")
         return 1
     if report is not None:
         report.update(exports=exports, store=store, spawns=state["spawns"], most=most)
-    print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} WindMeteorsEmit calls, {statics[1] - statics[0]} bytes hashed, ok")
+    print(f"statics: {STATICS_TICKS} ticks, {state['spawns']} Emit calls, {statics[1] - statics[0]} bytes hashed, ok")
     print(f"fuel: the most one tick burned on the stubbed run is {most}, under the fuel_budget {budget} of {entry['name']}")
     return 0
 

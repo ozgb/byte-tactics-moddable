@@ -352,7 +352,7 @@ call 74 UpdateMeteors
   i services.GameRand main = 29515
   i services.GameRand main = 15975
   i services.GameRand main = 16990
-  i services.WindMeteorsEmit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36
+  i services.Emit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36
   w SimGlobals.g_meteorNextStrikeTime 21794
   w SimGlobals.g_meteorActive 1
   w SimGlobals.g_meteorStrikeEndTime 194
@@ -589,7 +589,7 @@ call 148 UpdateWind
 call 148 UpdateMeteors
   i services.GameRand main = 21319
   i services.GameRand main = 9235
-  i services.WindMeteorsEmit (80,227,124660104,88473600,166735792,-139810,-983040,139810,1) 36
+  i services.Emit (80,227,124660104,88473600,166735792,-139810,-983040,139810,1) 36
   w SimGlobals.g_meteorNextHitTime 222
   w rng.main 0xa413ae5a
 call 149 UpdateWind

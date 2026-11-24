@@ -464,12 +464,12 @@ void __stdcall ScheduleUnitsDeliver()
     (void)r;
 }
 
-void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
+void __stdcall Emit(const void* effect, unsigned int size)
 {
     ReplayText t;
-    StartImport(t, RI_WIND_METEORS_EMIT);
+    StartImport(t, RI_EMIT);
     Space(t);
-    ReplayAddValueSized(t, ROK_WINDMETEORSSPAWN, effect, (unsigned int)size, g_objects);
+    ReplayAddEffect(t, ReplaySubsystemEvents(g_subsystem), effect, (unsigned int)size, g_objects);
     Space(t);
     t.AddInt((int)(unsigned int)size);
     const char* r = Enter(t);

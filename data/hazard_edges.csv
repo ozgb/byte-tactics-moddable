@@ -1237,7 +1237,6 @@ VictoryBuildUnitType::IsSatisfied,FindUnitTypeId,"seam slot filled by InstallNat
 VictoryKillAllOfType::OnUnitDied,FindUnitTypeId,"seam slot filled by InstallNativeSeams, UnitsSeam::FindUnitTypeId, src/game/victory.cpp, src/seams/native.cpp"
 VictoryMoveUnitToRadius::IsSatisfied,ClampWorldPosToTerrain,"seam slot filled by InstallNativeSeams, LosRadarSeam::ClampWorldPosToTerrain, VictoryMoveUnitToRadius::IsSatisfied (src/game/victory.cpp), src/seams/native.cpp"
 VisitObjectsInArea,ClaimFootprintVisitor::ClaimFootprint,"only visitor class, VisitObjectsInArea (src/map/terrain.cpp)"
-Patrol,GroundAllyVisitor::CollectGroundAlly,"only visitor class, called by the lambda Patrol passes to ForEachUnitInRange (src/orders/vtol_orders.cpp)"
 UpdateSensorRadarAndCloak,DetectionVisitor::MarkUnitsInRadarOrSonarRadius,"only visitor class, called by the lambda UpdateSensorRadarAndCloak passes to ForEachUnitInRange (src/ingame/info_panel.cpp)"
 UpdateSensorRadarAndCloak,RadarJamVisitor::ApplyRadarJamFlag,"only visitor class, called by the lambda UpdateSensorRadarAndCloak passes to ForEachUnitInRange (src/ingame/info_panel.cpp)"
 UpdateSensorRadarAndCloak,SonarJamVisitor::ApplySonarJamFlag,"only visitor class, called by the lambda UpdateSensorRadarAndCloak passes to ForEachUnitInRange (src/ingame/info_panel.cpp)"

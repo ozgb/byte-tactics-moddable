@@ -188,9 +188,9 @@ address,function,file,kind,target
 0x401cc0,MakeSelectableOrder,src/orders/unit_orders.cpp,function,
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,RandomInt
-0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,operator[]
-0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,size
-0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_read,Game::poolCount
+0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Capacity
+0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Data
+0x401ce0,WaitOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_read,LosRadarSeam::GetVisibleEnemiesInRadius
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_read,Order::radius
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_read,Order::state
@@ -200,7 +200,6 @@ address,function,file,kind,target
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_read,Unit::pos
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,field_write,Order::wait
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,function,
-0x401ce0,WaitOrder,src/orders/unit_orders.cpp,global_read,g_game
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x401ce0,WaitOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(int, const Vec3 *, int, int, Ref<Unit> *, int) __attribute__((stdcall)) [LosRadarSeam::GetVisibleEnemiesInRadius]"
 0x401e00,AttackUTypeOrder,src/orders/unit_orders.cpp,call,AppendOrder
@@ -258,14 +257,17 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,RandomInt
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,ScheduleTargetingTargetUnit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,TargetingPublishSetUnit
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Capacity
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Data
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Grow
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::Written
+0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,WeaponsPublishRelease
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,operator=
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,operator[]
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,call,size
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_escape,Order::link
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Game::poolCount
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,LosRadarSeam::GetVisibleEnemiesInRadius
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::flags
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_read,Order::pos
@@ -287,7 +289,6 @@ address,function,file,kind,target
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_write,Order::wait
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,field_write,Order::waitLimit
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,function,
-0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,global_read,g_game
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,global_read,g_seams
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(Unit *, Unit *, unsigned char) __attribute__((stdcall)) [WeaponsSeam::WeaponCanReachUnit]"
 0x4021f0,GuardNoMoveOrder,src/orders/unit_orders.cpp,indirect_call,"indirect via int (*)(int, const Vec3 *, int, int, Ref<Unit> *, int) __attribute__((stdcall)) [LosRadarSeam::GetVisibleEnemiesInRadius]"
@@ -2296,16 +2297,19 @@ address,function,file,kind,target
 0x40b530,GetFactoriesInRadius,src/units/factory_index.cpp,function,
 0x40b530,GetFactoriesInRadius,src/units/factory_index.cpp,global_read,s_index@src/units/factory_index.cpp
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,RandomInt
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitQueryBuffer::Capacity
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitQueryBuffer::Data
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitQueryBuffer::Grow
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitQueryBuffer::Written
+0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,UnitTypeSet::Contains
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator Unit *
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator->
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator=
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,operator[]
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,call,size
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,deref_read,*unsigned char
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_escape,Unit::pos
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Game::matchFlags
-0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Game::poolCount
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,LosRadarSeam::GetVisibleEnemiesInRadius
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Player::active
 0x40b7b0,FindWeaponTarget,src/units/unit_targets.cpp,field_read,Player::type
@@ -3148,6 +3152,7 @@ address,function,file,kind,target
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,OrdersPublishSetStateBits
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingFireAtWill
+0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
 0x4103e0,VtolSeekAttackOrder,src/orders/vtol_orders.cpp,call,get
@@ -3265,6 +3270,7 @@ address,function,file,kind,target
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,ScheduleTargetingFireAtWill
+0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x410e70,VtolPatrolOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -3450,6 +3456,7 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,TargetingPublishClear
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetPos
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -3526,6 +3533,7 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetPos
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -3663,6 +3671,7 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,RandomInt
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Sum
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,_hypot
@@ -26979,12 +26988,14 @@ address,function,file,kind,target
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,_strcmpi
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,call,get
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,deref_read,*Ref<Unit>
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionSeam::CountMissionUnits
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionSeam::GetMissionUnit
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnitInfo::ident
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,MissionUnitInfo::name
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,field_read,Seams::mission
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,function,
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,global_read,g_seams
+0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::CountMissionUnits]
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(int, MissionUnitInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionUnit]"
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,OrdersPublishAdd
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,UnitsPublishAttachToPiece
@@ -43307,6 +43318,10 @@ address,function,file,kind,target
 ,BucketHolds,src/map/terrain.cpp,field_read,SpatialBucket::head
 ,BucketHolds,src/map/terrain.cpp,field_read,Unit::cargoNext
 ,BucketHolds,src/map/terrain.cpp,function,
+,BufferError,src/wasm/wind_meteors_glue.cpp,call,ImportError
+,BufferError,src/wasm/wind_meteors_glue.cpp,call,ModulesMemory
+,BufferError,src/wasm/wind_meteors_glue.cpp,field_read,ModuleMemory::size
+,BufferError,src/wasm/wind_meteors_glue.cpp,function,
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,call,BuildCompoundAddress
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::data
 ,BuildAddressForModemDialog,src/frontend/multi.cpp,field_write,ConnectionBlob::size
@@ -45613,15 +45628,13 @@ address,function,file,kind,target
 ,FindNth,src/harness/harness.cpp,field_read,UnitSelector::count
 ,FindNth,src/harness/harness.cpp,field_read,UnitSelector::type
 ,FindNth,src/harness/harness.cpp,function,
-,FindPads,src/orders/vtol_orders.cpp,call,empty
-,FindPads,src/orders/vtol_orders.cpp,call,operator[]
-,FindPads,src/orders/vtol_orders.cpp,call,resize
-,FindPads,src/orders/vtol_orders.cpp,call,size
-,FindPads,src/orders/vtol_orders.cpp,field_read,Game::poolCount
+,FindPads,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::Capacity
+,FindPads,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::Data
+,FindPads,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::Grow
+,FindPads,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::Written
 ,FindPads,src/orders/vtol_orders.cpp,field_read,Seams::units
 ,FindPads,src/orders/vtol_orders.cpp,field_read,UnitsSeam::GetFactoriesInRadius
 ,FindPads,src/orders/vtol_orders.cpp,function,
-,FindPads,src/orders/vtol_orders.cpp,global_read,g_game
 ,FindPads,src/orders/vtol_orders.cpp,global_read,g_seams
 ,FindPads,src/orders/vtol_orders.cpp,indirect_call,"indirect via int (*)(int, const Vec3 *, int, Ref<Unit> *, int) __attribute__((stdcall)) [UnitsSeam::GetFactoriesInRadius]"
 ,FindPageStart,src/frontend/campaign_menu.cpp,deref_read,*char
@@ -50324,6 +50337,7 @@ address,function,file,kind,target
 ,Land,src/orders/vtol_orders.cpp,call,FindPads
 ,Land,src/orders/vtol_orders.cpp,call,Order::SetAttachedFx
 ,Land,src/orders/vtol_orders.cpp,call,RandomInt
+,Land,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 ,Land,src/orders/vtol_orders.cpp,call,operator Player *
 ,Land,src/orders/vtol_orders.cpp,call,operator Unit *
 ,Land,src/orders/vtol_orders.cpp,call,operator new
@@ -53094,6 +53108,7 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,call,FindPads
 ,Patrol,src/orders/vtol_orders.cpp,call,ForEachUnitInRange
 ,Patrol,src/orders/vtol_orders.cpp,call,GetOrderType
+,Patrol,src/orders/vtol_orders.cpp,call,GroundAllyVisitor::CollectGroundAlly
 ,Patrol,src/orders/vtol_orders.cpp,call,IsDamaged
 ,Patrol,src/orders/vtol_orders.cpp,call,MovementPublishTargetValue
 ,Patrol,src/orders/vtol_orders.cpp,call,Offset
@@ -53102,6 +53117,7 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,call,RandomInt
 ,Patrol,src/orders/vtol_orders.cpp,call,SearchRange
 ,Patrol,src/orders/vtol_orders.cpp,call,UnitList::~UnitList
+,Patrol,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 ,Patrol,src/orders/vtol_orders.cpp,call,empty
 ,Patrol,src/orders/vtol_orders.cpp,call,operator Player *
 ,Patrol,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -53125,7 +53141,6 @@ address,function,file,kind,target
 ,Patrol,src/orders/vtol_orders.cpp,global_read,g_seams
 ,Patrol,src/orders/vtol_orders.cpp,global_read,kSim
 ,Patrol,src/orders/vtol_orders.cpp,indirect_call,"indirect via unsigned int (*)(unsigned int, const Vec3 *) __attribute__((stdcall)) [MovementSeam::NewPathOrderAt]"
-,Patrol,src/orders/vtol_orders.cpp,indirect_call,virtual GroundAllyVisitor::CollectGroundAlly
 ,PeekFrame,src/network/packets.cpp,call,operator->
 ,PeekFrame,src/network/packets.cpp,call,operator==
 ,PeekFrame,src/network/packets.cpp,field_escape,FrameRing::frames
@@ -61151,6 +61166,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,TdfRecordGetFieldIntImport,src/wasm/wind_meteors_glue.cpp,function,
+,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,BufferError
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,ImportError
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,InMemory
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,call,Linear
@@ -61459,6 +61475,24 @@ address,function,file,kind,target
 ,UnitOfOffset,src/weapons/weapons_apply.cpp,call,get
 ,UnitOfOffset,src/weapons/weapons_apply.cpp,field_write,Ref<Unit>::offset
 ,UnitOfOffset,src/weapons/weapons_apply.cpp,function,
+,UnitQueryBuffer::Capacity,src/seams/unit_query_buffer.h,call,empty
+,UnitQueryBuffer::Capacity,src/seams/unit_query_buffer.h,call,size
+,UnitQueryBuffer::Capacity,src/seams/unit_query_buffer.h,field_read,UnitQueryBuffer::heap
+,UnitQueryBuffer::Capacity,src/seams/unit_query_buffer.h,function,
+,UnitQueryBuffer::Data,src/seams/unit_query_buffer.h,call,empty
+,UnitQueryBuffer::Data,src/seams/unit_query_buffer.h,call,operator[]
+,UnitQueryBuffer::Data,src/seams/unit_query_buffer.h,field_escape,UnitQueryBuffer::local
+,UnitQueryBuffer::Data,src/seams/unit_query_buffer.h,field_read,UnitQueryBuffer::heap
+,UnitQueryBuffer::Data,src/seams/unit_query_buffer.h,function,
+,UnitQueryBuffer::Grow,src/seams/unit_query_buffer.h,call,UnitQueryBuffer::Capacity
+,UnitQueryBuffer::Grow,src/seams/unit_query_buffer.h,call,resize
+,UnitQueryBuffer::Grow,src/seams/unit_query_buffer.h,field_maybe_written,UnitQueryBuffer::heap
+,UnitQueryBuffer::Grow,src/seams/unit_query_buffer.h,function,
+,UnitQueryBuffer::Written,src/seams/unit_query_buffer.h,call,UnitQueryBuffer::Capacity
+,UnitQueryBuffer::Written,src/seams/unit_query_buffer.h,function,
+,UnitQueryBuffer::operator[],src/seams/unit_query_buffer.h,call,UnitQueryBuffer::Data
+,UnitQueryBuffer::operator[],src/seams/unit_query_buffer.h,deref_read,*Ref<Unit>
+,UnitQueryBuffer::operator[],src/seams/unit_query_buffer.h,function,
 ,UnitRef::Get,src/units/unit_ref.h,call,operator Unit *
 ,UnitRef::Get,src/units/unit_ref.h,field_read,UnitRef::owner
 ,UnitRef::Get,src/units/unit_ref.h,function,

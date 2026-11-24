@@ -24,13 +24,13 @@ IMPORT("services", "GameRand") int service_GameRand(RandStream stream);
 IMPORT("services", "RandomInt") int service_RandomInt(int range);
 IMPORT("services", "FatalError") void service_FatalError(const char* message);
 IMPORT("services", "BuildDataPath") char* service_BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
-IMPORT("services", "TdfFile_Construct") void service_TdfFile_Construct(TdfFile* self);
-IMPORT("services", "TdfFile_Destruct") void service_TdfFile_Destruct(TdfFile* self);
-IMPORT("services", "TdfFile_LoadFile") int service_TdfFile_LoadFile(TdfFile* self, const char* path);
-IMPORT("services", "TdfFile_SelectRecord") int service_TdfFile_SelectRecord(TdfFile* self, const char* name);
+IMPORT("services", "TdfFile_Construct") void service_TdfFile_Construct(TdfFileLayout* self);
+IMPORT("services", "TdfFile_Destruct") void service_TdfFile_Destruct(TdfFileLayout* self);
+IMPORT("services", "TdfFile_LoadFile") int service_TdfFile_LoadFile(TdfFileLayout* self, const char* path);
+IMPORT("services", "TdfFile_SelectRecord") int service_TdfFile_SelectRecord(TdfFileLayout* self, const char* name);
 IMPORT("services", "TdfRecord_GetFieldInt") int service_TdfRecord_GetFieldInt(TdfRecord* self, const char* name, int def);
 IMPORT("services", "TdfRecord_GetFieldDouble") double service_TdfRecord_GetFieldDouble(TdfRecord* self, const char* name, double def);
-IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, char* key, int size, char* def);
+IMPORT("services", "TdfRecord_GetFieldString") int service_TdfRecord_GetFieldString(TdfRecord* self, char* dst, const char* key, int size, const char* def);
 IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(HapiBank* self, const char* name);
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
 IMPORT("services", "WindMeteorsEmit") void service_WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
@@ -46,10 +46,10 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
     return service_BuildDataPath(buf, dir, name, ext);
 }
 
-TdfFile::TdfFile() { service_TdfFile_Construct(this); }
-TdfFile::~TdfFile() { service_TdfFile_Destruct(this); }
-int TdfFile::LoadFile(const char* path) { return service_TdfFile_LoadFile(this, path); }
-int TdfFile::SelectRecord(const char* name) { return service_TdfFile_SelectRecord(this, name); }
+TdfFile::TdfFile() { service_TdfFile_Construct((TdfFileLayout*)this); }
+TdfFile::~TdfFile() { service_TdfFile_Destruct((TdfFileLayout*)this); }
+int TdfFile::LoadFile(const char* path) { return service_TdfFile_LoadFile((TdfFileLayout*)this, path); }
+int TdfFile::SelectRecord(const char* name) { return service_TdfFile_SelectRecord((TdfFileLayout*)this, name); }
 int TdfRecord::GetFieldInt(const char* name, int def) { return service_TdfRecord_GetFieldInt(this, name, def); }
 double TdfRecord::GetFieldDouble(const char* name, double def) { return service_TdfRecord_GetFieldDouble(this, name, def); }
 int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)

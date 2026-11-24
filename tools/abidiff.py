@@ -469,16 +469,56 @@ def manifest_imports(manifest: dict | None, interface: str) -> set[str]:
     return {name for m in (manifest or {}).get("modules", []) for name in m.get("imports", {}).get(interface, {})}
 
 
-def check_imports(iface: Interface, manifest: dict | None) -> Result:
-    """Whether a named-entry interface declares exactly what the modules import of it."""
-    declared = {import_name(e) for e in iface.entries}
+HANDLE_CLASS = re.compile(r"^(?://.*only as a handle.*)\n(?:class|struct)\s+(\w+)\s*;", re.M)
+FLOAT_KIND = {"float": "f32", "double": "f64"}
+
+
+def handle_classes(header_text: str) -> set[str]:
+    """The classes a header forward-declares for modules to hold only as a handle: the declaration whose comment line says "only as a handle"."""
+    return set(HANDLE_CLASS.findall(header_text))
+
+
+def kind_of(type_text: str, handles: set[str]) -> str:
+    """The kind (docs/module-abi.md section 7) of a C type: float f32, double f64, void void, a pointer to a handle class
+    handle, any other pointer linear, anything else (integers, bool, enums) int. A result of kind block (a pointer into
+    the block, FindWeaponByName) is not told from linear by the type: the entry-point headers declare none, and the
+    services entries return none."""
+    words = type_text.replace("*", " * ").split()
+    if "*" in words:
+        base = [w for w in words if w not in ("const", "volatile", "struct", "class", "*")]
+        return "handle" if base and base[-1] in handles and words.count("*") == 1 else "linear"
+    bare = [w for w in words if w not in ("const", "volatile")]
+    if bare == ["void"]:
+        return "void"
+    return FLOAT_KIND.get(" ".join(bare), "int")
+
+
+def signature_kinds(sig: Signature, handles: set[str]) -> tuple[list[str], str]:
+    """The manifest's form of a declared entry: the kinds of its parameters and of its result."""
+    params = [] if sig.params == ("void",) else sig.params
+    return [kind_of(p, handles) for p in params], kind_of(sig.ret, handles)
+
+
+def check_imports(iface: Interface, manifest: dict | None, handles: set[str] | None = None) -> Result:
+    """Whether a named-entry interface declares exactly what the modules import of it, each with the parameter and result
+    kinds the manifest's signatures give it."""
+    declared = {import_name(e): sig for e, sig in iface.entries.items()}
     imported = manifest_imports(manifest, iface.name)
-    details = ["declared but imported by no module: %s" % ", ".join(sorted(declared - imported))] if declared - imported else []
-    details += ["imported but not declared: %s" % ", ".join(sorted(imported - declared))] if imported - declared else []
+    details = ["declared but imported by no module: %s" % ", ".join(sorted(set(declared) - imported))] if set(declared) - imported else []
+    details += ["imported but not declared: %s" % ", ".join(sorted(imported - set(declared)))] if imported - set(declared) else []
     name = "%s (imports)" % iface.name
     if details:
         return Result(name, False, "FAIL (the entries differ from the modules' imports)", details)
-    return Result(name, True, "ok (%d entries, each imported)" % len(declared))
+    recorded = (manifest or {}).get("signatures", {}).get(iface.name, {})
+    for entry in sorted(declared):
+        params, ret = signature_kinds(declared[entry], handles or set())
+        have = recorded.get(entry)
+        if have is None or [list(have[0]), have[1]] != [params, ret]:
+            details.append("%s: the header declares (%s) -> %s, the manifest has %s" % (
+                entry, ", ".join(params), ret, "no signature" if have is None else "(%s) -> %s" % (", ".join(have[0]), have[1])))
+    if details:
+        return Result(name, False, "FAIL (the kinds differ from the manifest's signatures)", details)
+    return Result(name, True, "ok (%d entries, each imported with its kinds)" % len(declared))
 
 
 def imports_results(directory: Path, manifest: dict | None) -> list[Result]:
@@ -488,7 +528,7 @@ def imports_results(directory: Path, manifest: dict | None) -> list[Result]:
         for name in sorted(NAMED_ENTRIES):
             header = directory / ("%s.h" % name)
             if header.exists():
-                out.append(check_imports(load_interface(header, Path(tmp) / name), manifest))
+                out.append(check_imports(load_interface(header, Path(tmp) / name), manifest, handle_classes(header.read_text())))
     return out
 
 

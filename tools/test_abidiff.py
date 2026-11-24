@@ -381,10 +381,15 @@ class IncludedRecordsTest(unittest.TestCase):
         self.assertEqual(verdicts["other"].summary, "skipped (no version macros)")
 
 
-def imports_verdict(text: str, imports: list[list[str]]) -> list[abidiff.Result]:
-    """The import check of a services header against modules importing the given names of services."""
-    modules = {"modules": [{"name": "m%d" % i, "imports": {"services": {n: [[], "int"] for n in names}}}
-                           for i, names in enumerate(imports)]}
+KINDS = {"Roll": [["int"], "int"], "Fail": [["linear"], "void"], "Args_Get": [["int"], "int"], "Extra": [[], "void"]}
+
+
+def imports_verdict(text: str, imports: list[list[str]], kinds: dict | None = None) -> list[abidiff.Result]:
+    """The import check of a services header against modules importing the given names of services, with the manifest's kinds."""
+    signatures = dict(KINDS, **(kinds or {}))
+    modules = {"modules": [{"name": "m%d" % i, "imports": {"services": {n: signatures[n] for n in names}}}
+                           for i, names in enumerate(imports)],
+               "signatures": {"services": signatures}}
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "services.h").write_text(text)
         return abidiff.imports_results(Path(tmp), modules)
@@ -396,7 +401,7 @@ class ServicesImportsTest(unittest.TestCase):
     def test_declared_exactly_the_union_of_the_imports_passes(self):
         (result,) = imports_verdict(self.text, [["Roll", "Args_Get"], ["Fail", "Roll"]])
         self.assertTrue(result.ok, result)
-        self.assertEqual((result.name, result.summary), ("services (imports)", "ok (3 entries, each imported)"))
+        self.assertEqual((result.name, result.summary), ("services (imports)", "ok (3 entries, each imported with its kinds)"))
 
     def test_an_entry_no_module_imports_fails(self):
         (result,) = imports_verdict(self.text, [["Roll", "Fail"]])
@@ -408,6 +413,25 @@ class ServicesImportsTest(unittest.TestCase):
         (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get", "Extra"]])
         self.assertFalse(result.ok)
         self.assertEqual(result.details, ["imported but not declared: Extra"])
+
+    def test_one_parameter_of_another_kind_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get"]], {"Fail": [["int"], "void"]})
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["Fail: the header declares (linear) -> void, the manifest has (int) -> void"])
+
+    def test_a_result_of_another_kind_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get"]], {"Roll": [["int"], "void"]})
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["Roll: the header declares (int) -> int, the manifest has (int) -> void"])
+
+    def test_a_class_declared_for_handles_is_a_handle_and_other_pointers_are_linear(self):
+        text = services("", "// A thing, which a module holds only as a handle.\nclass Thing;\nstruct Other;\n"
+                            "double Use(Thing* t, Other* o, const char* s, float f, unsigned char c, bool b);")
+        kinds = {"Use": [["handle", "linear", "linear", "f32", "int", "int"], "f64"]}
+        (result,) = imports_verdict(text, [["Use"]], kinds)
+        self.assertTrue(result.ok, result)
+        (bad,) = imports_verdict(text, [["Use"]], {"Use": [["linear", "linear", "linear", "f32", "int", "int"], "f64"]})
+        self.assertFalse(bad.ok)
 
     def test_no_module_means_nothing_may_be_declared(self):
         (result,) = imports_verdict(self.text, [])

@@ -328,11 +328,11 @@ game's settings through the host, which writes the run's own registry, and no sc
 ## Traces
 
 In test mode the exe writes `trace.txt` in its working directory: a hash of the
-game state after each phase of each tick, then a hash of the world tables, flushed
-every tick. LF line endings.
+game state after each phase of each tick, then a hash of the world tables, then one hash of the whole
+state at the end of the tick, flushed every tick. LF line endings.
 
 ```
-bt-trace 8
+bt-trace 9
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -409,6 +409,14 @@ depend on alignment). Two builds conform when their traces are identical.
 `world` is a row of its own, so the first differing row names the tick, and a divergence in
 it says "the world tables", not a phase function.
 
+Since format 9 each tick ends with one more row, `tick` (#1037): the state at the end of the tick, after the
+whole step, the work after `UpdateMeteors` included (the eyeballs that expire, the resource sharing). It is one
+hash from the offset basis over what a phase row hashes (`gameTick`, the two random states, sections 1 to 9) and
+then, with no reset, what the `world` row hashes. The reference writes it after `ExpireEyeballs`, at the end of
+`RunGameSteps`'s step. A re-implementation that keeps the order of its own phases is judged on this row alone
+(`tools/reference.py --check --end-of-tick` on moddable). A dump tick gets one more block, `tick`, with the
+same lines as the `meteors` block, read at the end of the step.
+
 The stored form of a trace keeps one digest per tick (see The suite).
 
 `tools/playtest.py --testmode` copies `trace.txt` (and `dump.txt`) into the
@@ -420,13 +428,14 @@ directory into the game directory for the header.
 `-testdump <tick>` (`--testdump <tick>` for playtest.py, with `-testmode`) also
 writes `dump.txt`: every hashed field after each phase of that tick, the `world`
 tables included (a dump holds them after every phase, since a hash row exists
-only once a tick; the fields of a `world` row are those after `meteors`). It is
+only once a tick; the fields of a `world` row are those after `meteors`), and a `tick`
+block of the same lines at the end of the step, for the `tick` row. It is
 ignored without `-testmode`; a value that does not parse exits with status 2.
 A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 8
+bt-dump 9
 <tick> <phase> <path> <value>
 ```
 
@@ -492,7 +501,7 @@ The phase function is the one `RunGameSteps` calls just before the phase's hash
 `UpdateAllUnits`, `projectiles` `UpdateProjectiles`, `explosions`
 `UpdateExplosions`, `players` `UpdatePlayers`, `features` `UpdateFeatures`,
 `wind` `UpdateWind` and `meteors` `UpdateMeteors`. The `world` row follows `UpdateMeteors`
-and has no function of its own.
+and has no function of its own, and nor has the `tick` row, at the end of the step.
 
 Traces with different scenario or seeds are refused (exit 2).
 Exit status is 0 for identical traces, 1 for a divergence and 2 for an error.
@@ -555,20 +564,21 @@ seeds) and runs deterministically: two runs give identical traces.
 
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase
 hashes. The digest of a tick is the 64-bit FNV-1a hash of that tick's phase
-hashes in trace order, each as 8 little-endian bytes. In test mode there are 8 rows
-per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `world`).
+hashes in trace order, each as 8 little-endian bytes. In test mode there are 9 rows
+per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `world` and `tick`).
+Since format 9 each line also carries the tick's `tick` row as it is, the end-of-tick state.
 The file:
 
 ```
-bt-digest 8
-trace_format bt-trace 8
+bt-digest 9
+trace_format bt-trace 9
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>
 crt_seed <n>
 view_seed <n>
 fpu_control_word 0x<hex>
-<tick> <digest, 16 lowercase hex digits>
+<tick> <digest, 16 lowercase hex digits> <the tick row, 16 lowercase hex digits>
 ```
 
 `tools/tracedigest.py trace.txt` converts a `trace.txt` to this form.

@@ -128,6 +128,23 @@ void* Linear(unsigned p)
     if (!InMemory((unsigned)a[slot].i32)) \
         return ImportError(import, "pointer argument " #slot " is outside the module memory")
 
+const char* BufferError(const char* import, unsigned p, int size)
+{
+    if (size < 1)
+        return ImportError(import, "the buffer size is below 1");
+    if ((unsigned)size > ModulesMemory()->size - p)
+        return ImportError(import, "the buffer runs past the module memory");
+    return nullptr;
+}
+
+#define NEED_BUFFER(import, slot, sizeSlot) \
+    do { \
+        NEED(import, slot); \
+        const char* bufferError = BufferError(import, (unsigned)a[slot].i32, a[sizeSlot].i32); \
+        if (bufferError != nullptr) \
+            return bufferError; \
+    } while (0)
+
 #define IMPORT(name) const char* __cdecl name(void* user, wasmtime_val_raw_t* a)
 
 IMPORT(GameRandImport)
@@ -240,7 +257,7 @@ IMPORT(TdfRecordGetFieldDoubleImport)
 IMPORT(TdfRecordGetFieldStringImport)
 {
     (void)user;
-    NEED("TdfRecord_GetFieldString", 1);
+    NEED_BUFFER("TdfRecord_GetFieldString", 1, 3);
     NEED("TdfRecord_GetFieldString", 2);
     NEED("TdfRecord_GetFieldString", 4);
     void* record;

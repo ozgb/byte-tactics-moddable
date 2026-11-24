@@ -439,7 +439,7 @@ callee for a result, and the side that receives it does not extend it again. A `
 `short` is sign-extended, an `unsigned char` or an `unsigned short` is zero-extended, and a `bool` is
 0 or 1. A module in another language must keep the same rule: it passes and returns these values
 already extended, and it may rely on what it receives being extended. A `bool` field of a record is
-one byte of the record's layout (`struct Quirks`); it is not an argument kind.
+one byte of the record's layout; it is not an argument kind.
 
 ### 7.1 The pointer rule for Milestone 2
 
@@ -470,9 +470,10 @@ behaviour is the contract the existing module was built against.
   has at most one `scratch` argument. The module reads such an object only through the import that
   takes it; its raw bytes and the offsets inside them are for the engine, which is free to change them.
 - An import's `linear` argument is checked to lie inside the memory (not past its size); an
-  argument outside it is a trap that names the import and the argument index. The check does not
-  look at how many bytes the callee will use, so the module is responsible for passing a buffer big
-  enough.
+  argument outside it is a trap that names the import and the argument index. An import that takes a
+  buffer together with its size checks the whole buffer, from its address to its size, and refuses a
+  size below 1. An import that takes a buffer without a size does not look at how many bytes the callee
+  will use, so the module is responsible for passing a buffer big enough.
 - A `block` result that is not inside the block is a trap.
 
 ### 7.3 A buffer the caller supplies
@@ -762,7 +763,8 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   of <budget> in one tick`.
 - **Hidden state.** `<module> kept state between ticks: its statics changed at tick <tick>`.
 - **An import's refusal** is a trap whose text begins `import <name>: ` and names the cause:
-  `pointer argument <n> is outside the module memory`, `unknown handle <n>`, `null handle`,
+  `pointer argument <n> is outside the module memory`, `the buffer size is below 1`,
+  `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the

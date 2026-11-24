@@ -552,9 +552,11 @@ two payloads a ref to a weapon's aim callback, named by its site (`a event.callb
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
 a member that is a unit ref already.
 
-The `WindMeteorsEmit` service, which wind_meteors calls to publish an effect, is one `value` of the `WindMeteorsSpawn` payload
-(its only effect), followed by the `size` as an `int`. The value is made from the first `size` bytes of the effect, the rest
-zero (the annotation's `size` names the argument), so a shorter effect is never read past its end.
+The `Emit` service, which a module calls to publish an effect, is one `value` followed by the `size` as an `int`
+(`i services.Emit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36`). The value is the payload as the
+value of the payload struct of the effect's kind in the recorded subsystem's event table, chosen by the kind (the effect's first
+`int`). It is made from the first `size` bytes of the effect, the rest zero (the annotation's `size` names the argument), so a
+shorter effect is never read past its end.
 
 ## Polymorphic objects
 

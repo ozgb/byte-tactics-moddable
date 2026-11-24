@@ -288,6 +288,7 @@ A number must be a non-negative integer.
 | `majors` | the major of each interface it uses, section 10 | loader |
 | `slots` | `{slot: [[argument kinds], result kind]}` | loader (adapters); checks |
 | `imports` | `{group: {import: [[argument kinds], result kind]}}` | loader (adapters); checks |
+| `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each kind is an effect of the entry's `interface` header and the size is that kind's payload size | host (the `Emit` import); checks |
 | `fuel_budget` | fuel per tick, section 11 | host; checks |
 | `size_budget` | the most bytes the `.wasm` may be | checks |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
@@ -375,7 +376,7 @@ the fields of that kind, or has no payload struct, in which case the event is th
 header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
 offset. Two kinds share one payload struct only when their fields mean the same.
 
-The publisher passes the payload's size with it: `WindMeteorsEmit(&payload, sizeof payload)`. An event of fewer
+The publisher passes the payload's size with it: `Emit(&payload, sizeof payload)`. An event of fewer
 than 4 bytes has no kind to route by, and is a fatal error. The scheduler copies `size` bytes into a 128-byte inbox entry,
 keeps the size with it, and hands the subscriber the event as a pointer to the header together with the size the publisher
 gave, whether it delivers the event at once or from the inbox. A slot that consumes an event takes the header and that
@@ -589,27 +590,28 @@ manifest.
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
-| `WindMeteorsEmit` | `[linear, int] -> void` | publishes a wind_meteors effect (a `WindMeteorsSpawn`: a meteor's weapon slot, position, velocity and whether it is announced; the second argument is its size in bytes) to the engine's outbox; the host refuses, as an import error, any kind but SPAWN, a size other than SPAWN's payload, and a weapon slot outside the table of weapons; the engine queues the projectile to weapons at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
+| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine queues the effect to its subscribers at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
 (`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30). The engine records each event it delivers to a module's
 inbox, with the outcome `Apply` returns, and each synchronous call into the module (economy's `Spend`, features'
-`Place`) with its answer. An effect is recorded by the service that publishes it: `WindMeteorsEmit` puts the effect in
-the outbox and records it in one call, so a module built from a spec has nothing else to call, and the dump's events
-come out whole. The engine's native modules publish and record their effects with engine services that no module
-imports; a module that takes over another subsystem gets a publishing service of its own, as wind_meteors has, added to
-`interfaces/services.h` and to its manifest's imports together. No trace row hashes these records. A replay carries a
-publishing service's call as an `i services.<Name>` line, and the gate judges an effect through what its subscribers do
-with it. The `services` list of a subsystem in the replay schema (`annotations.subsystems.<name>.services` of
+`Place`) with its answer. An effect is recorded by the service that publishes it: `Emit` puts the effect in
+the calling module's outbox and records it in one call, so a module built from a spec has nothing else to call, and the dump's events
+come out whole. The host takes the outbox from the calling module's manifest entry, never from an argument, so a module
+cannot publish as another; an event kind cannot name the outbox, since kinds repeat across interfaces. The engine's native
+modules publish and record their effects with the engine-only `EmitFrom`, which no module imports. A module that takes over
+another subsystem imports `Emit` and its manifest entry gets a `publishes` table, with no host change. No trace row hashes
+these records. A replay carries a publishing service's call as an `i services.<Name>` line (for `Emit`, with the effect's
+value and its size), and the gate judges an effect through what its subscribers do with it. The `services` list of a subsystem in the replay schema (`annotations.subsystems.<name>.services` of
 `data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
-targeting's names only `RandomInt`, and its recordings still carry the native module's publishing lines.
+targeting's names `RandomInt` and `Emit`, and its recordings carry `i services.Emit` lines.
 
-The services interface is at major 3 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 4 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
 of the dump's events and `WindMeteorsEmit` the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
 units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
 members become free functions under their import names, the strings they only read become const, the size
-of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions.
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces `WindMeteorsEmit` with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports `WindMeteorsEmit`, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
@@ -765,7 +767,7 @@ Every error or trap ends the game, in this version. There is no recovery and no 
 - **An import's refusal** is a trap whose text begins `import <name>: ` and names the cause:
   `pointer argument <n> is outside the module memory`, `the buffer size is below 1`,
   `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
-  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`.
+  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`; `Emit` adds `the effect is outside the module memory`, `kind <n> is not in the publishes table` and `size <n> is not kind <k>'s size`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is not in the table of weapons`).
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
   scratch area`, `slot <name>: called inside an import` (a slot call made while an import runs; the

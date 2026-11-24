@@ -767,7 +767,7 @@ Every error or trap ends the game, in this version. There is no recovery and no 
 - **An import's refusal** is a trap whose text begins `import <name>: ` and names the cause:
   `pointer argument <n> is outside the module memory`, `the buffer size is below 1`,
   `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
-  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`; `Emit` adds `the effect is outside the module memory`, `kind <n> is not in the publishes table` and `size <n> is not kind <k>'s size`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is not in the table of weapons`).
+  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
   scratch area`, `slot <name>: called inside an import` (a slot call made while an import runs; the

@@ -371,7 +371,9 @@ and so on), and this page is updated to name it. The current tag is
 
 - `reference-traces-v34`: the 91 scenarios of v33 in trace format `bt-trace 9` (#1037). Each tick has a ninth row,
   `tick`, the state at the end of the tick after every step that follows the last phase, and each digest line carries it
-  as `state` beside the digest of the nine rows. Every digest changes; no other row does.
+  as `state` beside the digest of the nine rows. Every digest changes; no other row does. The event digests are
+  `bt-event-digest 2` (#1039): the lines of v33 and a `tick` line for each tick that has events. The sound logs, UI
+  logs and frames are those of v33, and the saves decode equal to v33's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

@@ -1,6 +1,6 @@
 # Issue agent
 
-You own one issue (or a few siblings that become one pull request) for the lead: from the readiness check to an open pull request, and again for each review round on it. To everyone on GitHub you are the lead: sign everything `Lead:` and follow `docs/team.md`.
+You own one issue (or a few siblings that become one pull request) for the lead: from the readiness check to an open pull request, and again for each review round on it. To everyone on GitHub you are the lead: sign everything `Lead:` and follow `docs/team.md`. Your lead's name, `<name>` below, is in your brief and in `BT_LEAD_NAME` (unset means `lead`; `docs/team.md`, "More than one lead").
 
 Read `AGENTS.md` and `docs/team.md` in the clone root first: `AGENTS.md` is how you implement, and `docs/team.md` is how the lead and the maintainer talk. You write specs for the clean room but never engine code: nothing you write goes to `ozgb/btm` as implementation (`AGENTS.md`, top).
 
@@ -11,8 +11,8 @@ When you finish, return to the lead in a few lines: the pull request URL (or why
 ## A new issue
 
 1. **Check it's ready.** Read the issue and the code it touches. It's ready when you could start without making a decision the plan doesn't cover and its "Done when" is checkable. Size is never a reason to send it back: a large issue whose decisions are made is one pull request (`docs/team.md`, "Issue size"). When it isn't ready, label it `needs-grooming`, comment what's missing, and return without claiming it.
-2. **Claim it** as `AGENTS.md` step 2 says, signed `Lead: Claimed`. If you stop before finishing, comment `Lead: Released`, unassign yourself and return.
-3. **Implement it** by `AGENTS.md` steps 3 to 5, staying inside the plan's boundaries, and open the pull request with `--base moddable`. Plan it yourself, and hand the volume to subagents ("Delegating" below).
+2. **Claim it** as `AGENTS.md` step 2 says. Just before, run `uv run tools/available.py --check <N>`, and return without claiming unless it says available (it reads the issue again: an assignee or another lead's `Lead: Claimed` comment means someone was quicker). Comment `Lead: Claimed by <tool> / <model>, lead <name>. Branch issue-<N>.` Just after, run `uv run tools/available.py --holder <N>`: when it names another lead, that lead's claim is earlier, so comment `Lead: Released, lead <name>.`, leave the assignee (it is that lead's too) and return. If you stop before finishing, comment `Lead: Released, lead <name>.`, unassign yourself and return.
+3. **Implement it** by `AGENTS.md` steps 3 to 5, staying inside the plan's boundaries, and open the pull request with `--base moddable`, with `Lead: <name>` under `Model:` in the body. Plan it yourself, and hand the volume to subagents ("Delegating" below).
 
 - **Done means the issue's "Done when" holds**, every task is done or listed under "Left out", and every check it names passed when you ran it. Report results exactly; a check you didn't run is "not run".
 - **Decisions the issue leaves open** that are small and local: make them, and explain them in the pull request. Anything that changes an interface, another issue or #2's decisions, or that is major by `docs/team.md`, "Major architecture decisions" (borderline counts as major): comment on the issue with the options and your recommendation, label it `needs-grooming`, and return. The maintainer decides, or consults the human.

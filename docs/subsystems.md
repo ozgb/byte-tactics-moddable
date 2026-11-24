@@ -381,7 +381,7 @@ Coverage: 84.3% of functions (97 of 115), 86.2% of lines, 71.6% of branches; 18 
 
 Issue #16. 15 functions. Target choice and the weapon target setters and getters (`FindWeaponTarget`, `FindBestTargetIfFireAtWill`, `SetWeaponTargetUnit`). It is small because the file rules put the order goal objects in orders; see the notes.
 
-Coverage: 100.0% of functions (21 of 21), 96.2% of lines, 79.6% of branches; 0 live functions no scenario enters, and 1 more is dead (data/coverage.csv).
+Coverage: 100.0% of functions (21 of 21), 96.2% of lines, 79.1% of branches; 0 live functions no scenario enters, and 1 more is dead (data/coverage.csv).
 
 **Entry points.** Phase roots: none. Order handlers (orders) and the AI call it.
 
@@ -547,7 +547,7 @@ Coverage: 94.7% of functions (234 of 247), 85.3% of lines, 65.3% of branches; 13
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (150 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (1). It is called most by game (25 distinct functions) and seams (9). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.6% of functions (106 of 121), 86.1% of lines, 70.9% of branches; 15 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 15 is under **units, functions no scenario enters** below.
+**units** (150 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (1). It is called most by game (25 distinct functions) and seams (9). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.6% of functions (106 of 121), 86.0% of lines, 70.9% of branches; 15 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 15 is under **units, functions no scenario enters** below.
 
 **units, functions no scenario enters** (15 of 121 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 106 are entered, 87.6%), by reason:
 
@@ -772,10 +772,10 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **ai** | 87 of 109 | 79.8% | 75.6% | 72.9% | 22 | 31 |
 | **pathfinding** | 69 of 78 | 88.5% | 82.3% | 69.4% | 9 | 10 |
 | **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
-| **targeting** | 21 of 21 | 100.0% | 96.2% | 79.6% | 0 | 1 |
+| **targeting** | 21 of 21 | 100.0% | 96.2% | 79.1% | 0 | 1 |
 | **los_radar** | 89 of 97 | 91.8% | 88.0% | 74.5% | 8 | 22 |
 | **orders** | 234 of 247 | 94.7% | 85.3% | 65.3% | 13 | 17 |
-| **units** | 106 of 121 | 87.6% | 86.1% | 70.9% | 15 | 28 |
+| **units** | 106 of 121 | 87.6% | 86.0% | 70.9% | 15 | 28 |
 | **players** | 105 of 158 | 66.5% | 67.7% | 61.0% | 53 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |
 | **mission** | 28 of 47 | 59.6% | 74.9% | 62.7% | 19 | 1 |
@@ -784,9 +784,9 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | files | 112 of 142 | 78.9% | 79.6% | 65.1% | 30 | 35 |
 | game | 301 of 388 | 77.6% | 61.8% | 41.8% | 87 | 23 |
 | network | 54 of 297 | 18.2% | 11.1% | 4.1% | 243 | 74 |
-| platform | 400 of 748 | 53.5% | 41.0% | 28.0% | 348 | 86 |
+| platform | 401 of 749 | 53.5% | 41.0% | 28.0% | 348 | 86 |
 | presentation | 568 of 1153 | 49.3% | 36.3% | 29.6% | 585 | 295 |
-| seams | 213 of 235 | 90.6% | 93.1% | 59.2% | 22 | 0 |
+| seams | 218 of 240 | 90.8% | 93.1% | 58.9% | 22 | 0 |
 | state | 486 of 553 | 87.9% | 70.3% | 49.2% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

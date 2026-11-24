@@ -74,6 +74,9 @@ jobs:
       - name: Test the notifier
         run: python3 tools/test_notify.py
 
+      - name: Test the claimable-issues tool
+        run: python3 tools/test_available.py
+
       - name: Test the module judge
         run: python3 tools/test_oraclegate.py
 

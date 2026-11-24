@@ -28,15 +28,17 @@ Work through these in order, from step 0. Reviews come first after your messages
 
 ### 0. Your messages
 
-Read the lead's messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-maintainer`: a pull request ready for review, a question, an issue taken.
+Read the leads' messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-maintainer`: a pull request ready for review, a question, an issue taken. There may be more than one lead (`docs/team.md`, "More than one lead"), and each message's `from` field names the lead that sent it. Your cursor, the id of the last message you read, is the key `bt:cursor:maintainer`:
 
 ```sh
-P="$(cat ~/.local/share/bt-valkey/password)"
-valkey-cli -p 6390 -a "$P" --no-auth-warning XRANGE bt:to-maintainer '(<last id you read>' +
-valkey-cli -p 6390 -a "$P" --no-auth-warning XREVRANGE bt:to-maintainer + - COUNT 10    # at the start of a session
+P="$(cat ~/.local/share/bt-valkey/password)"; V() { valkey-cli -p 6390 -a "$P" --no-auth-warning "$@"; }
+C="$(V GET bt:cursor:maintainer)"
+V XRANGE bt:to-maintainer "($C" +                    # when C is set
+V XREVRANGE bt:to-maintainer + - COUNT 10            # when it is empty
+V SET bt:cursor:maintainer <id>                      # the newest id you read, once you have read them
 ```
 
-Keep the id of the last message you read, and act on each new one in the steps below. To answer, or to tell the lead about a verdict, a merge or a new issue: `valkey-cli -p 6390 -a "$P" --no-auth-warning XADD bt:to-lead '*' from maintainer type <review|merged|decision|issue|note> ref '#N' body 'Maintainer: ...'`. A message doesn't replace GitHub: reviews, labels and decisions still go there.
+Act on each new message in the steps below, and answer the lead named in its `from`. To answer, or to tell the leads about a verdict, a merge or a new issue: `V XADD bt:to-lead '*' from maintainer [to <name>] type <review|merged|decision|issue|note> ref '#N' body 'Maintainer: ...'`. Add `to <name>` when the note concerns one lead's claim or pull request: the name is in its claim comment (`lead <name>`) or its pull request's `Lead: <name>` line, and is `lead` when neither names one. Leave `to` out for a note every lead should read, such as a change to #2. A message doesn't replace GitHub: reviews, labels and decisions still go there.
 
 ### 1. Review pull requests
 
@@ -82,6 +84,6 @@ Skip every issue labelled `parked`. Groom every issue labelled `needs-grooming` 
 - **Split** an issue only along a real boundary ("Issue size"), never for size, and never a sub-issue a second time. Each part gets its own tasks, CI checks and "Done when", and blockers between them; the original stays open as their parent.
 - **Combine** open issues that touch the same files and run the same gate into one, and close the rest as merged into it.
 - **Answer** what the lead asked in its `needs-grooming` comment, then remove the label. When the answer is a major architecture decision, consult the human instead and keep the label until they have answered. Ping them once when you add `needs-human`: `uv run tools/notify.py --title "#<N> needs your decision" --click <issue URL> "<the question, one line>"`.
-- **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the lead holds: groomed, unblocked, unassigned and not labelled `needs-grooming`. When there are fewer, file and groom the next parts of #2's "Priority now", sized by "Issue size"; when it has none left, say so in the report rather than unparking or filing other work. Never split an issue to stock the queue.
+- **Keep the queue stocked.** Keep at least 3 issues available to claim beyond those the leads hold, available as `docs/team.md`, "Issue states", defines it (`uv run tools/available.py` marks each one). When there are fewer, file and groom the next parts of #2's "Priority now", sized by "Issue size"; when it has none left, say so in the report rather than unparking or filing other work. Never split an issue to stock the queue.
 
 **Decide** what the plan leaves open, and consult the human on every major architecture decision. Choose, or recommend, by #2's goals (conformity first, then moddability, then the rest) and its decisions, and the work already merged. Record each decision with its reason on the issue it affects; a decision that shapes more than one issue also goes into #2's decisions. Propose revising one of #2's decisions when merged work shows it doesn't hold, and say what showed it; the human decides.

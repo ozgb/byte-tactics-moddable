@@ -1,15 +1,27 @@
 # How the lead and the maintainer work together
 
-Two Claude sessions run the plan in #2:
+Claude sessions in two roles run the plan in #2:
 
-- the **lead** (`/lead`) implements issues, opens pull requests and gets them to a mergeable state, through one issue agent per issue ("Issue agents" below);
+- a **lead** (`/lead`) implements issues, opens pull requests and gets them to a mergeable state, through one issue agent per issue ("Issue agents" below). There may be more than one, each in its own lane ("More than one lead" below);
 - the **maintainer** (`/maintainer`) reviews and merges pull requests, and keeps the issues true to the plan and to the work already merged.
 
 The plan in #2 sets the goals and the decisions. The human makes every major architecture decision ("Major architecture decisions" below); the maintainer settles anything else the plan leaves open.
 
 They share one GitHub account, and they talk through GitHub: pull request reviews, review comments, issue comments and the labels below. This file is the contract between them. Both roles also follow `AGENTS.md`.
 
-They also send each other quick notes on two Valkey streams, `bt:to-lead` and `bt:to-maintainer` (port 6390, password in `~/.local/share/bt-valkey/password`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. Each role reads its own stream on every pass and answers on the other's: the lead reads `bt:to-lead` (`.claude/skills/lead/SKILL.md`, step 0) and the maintainer reads `bt:to-maintainer` (`.claude/skills/maintainer/SKILL.md`, step 0).
+They also send each other quick notes on two Valkey streams, `bt:to-lead` and `bt:to-maintainer` (port 6390, password in `~/.local/share/bt-valkey/password`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. Each role reads its own stream on every pass and answers on the other's: the leads read `bt:to-lead` (`.claude/skills/lead/SKILL.md`, step 0) and the maintainer reads `bt:to-maintainer` (`.claude/skills/maintainer/SKILL.md`, step 0).
+
+Every note has a `from` field: `maintainer`, or the sending lead's name. A note to one lead also has `to <name>`; a lead acts on the notes with no `to` or with its own name, and skips the rest. Each reader keeps the id of the last note it read in its own key, `bt:cursor:<name>` for a lead and `bt:cursor:maintainer` for the maintainer, read with `GET` and moved with `SET`, so no reader moves another's.
+
+A lead on another machine reaches Valkey through an SSH tunnel to port 6390 of the maintainer's host, with the password file copied to the same path. Both run on the lead's host, outside its sandbox, before the session starts:
+
+```sh
+mkdir -p ~/.local/share/bt-valkey
+scp <maintainer host>:.local/share/bt-valkey/password ~/.local/share/bt-valkey/password
+ssh -N -L 6390:localhost:6390 <maintainer host>
+```
+
+Without the tunnel the notes are missed, not the work: GitHub stays the record, and a lead that can't reach Valkey works from GitHub alone and says so in its report.
 
 ## Directories
 
@@ -20,6 +32,7 @@ cd ~/source/repos/byte-tactics-moddable-lead        && BT_ROLE=lead claude
 cd ~/source/repos/byte-tactics-moddable-maintainer  && BT_ROLE=maintainer claude
 ```
 
+- A second lead runs in a clone of its own, on the same machine or another, with its name and lane in the environment as well ("More than one lead").
 - The clone root stays a clean checkout of `moddable`. Nothing is edited or committed there.
 - The lead works only in `.worktrees/issue-<N>` (`tools/worktree.sh <N>`), one per issue, and gives subagents its absolute path.
 - The maintainer reviews only in `.worktrees/review-<PR>` (`tools/worktree.sh --pr <PR>`).
@@ -28,6 +41,25 @@ cd ~/source/repos/byte-tactics-moddable-maintainer  && BT_ROLE=maintainer claude
 Both roles normally run inside a [bwai sandbox](https://github.com/ozgb/bubblewrap-ai). Its broker decides which commands reach the host, and pushes go through `git-safe push`, which pushes only the current branch and only as a fast-forward: no force-push, no protected branch.
 
 `BT_ROLE` turns on a hook (`tools/role_guard.py`, registered in `.claude/settings.json`) that blocks file edits and history-changing git commands outside the role's own worktrees, for the session and its subagents alike. Sessions without `BT_ROLE` are unaffected.
+
+## More than one lead
+
+Every lead acts as the same GitHub account, so each one names itself:
+
+- **`BT_LEAD_NAME`** names the lead: letters, digits, `-` and `_`, unique among the leads, and never `maintainer` (whose Valkey cursor it would share). Unset, it is `lead`, and a single lead behaves as it always has.
+- **`BT_LEAD_LANE`** is a comma-separated list of parent issues. The lead takes only the issues that are those parents' sub-issues, at any depth. Unset, it takes from all of #2.
+
+```sh
+cd ~/source/repos/byte-tactics-moddable-lead2 && BT_ROLE=lead BT_LEAD_NAME=north BT_LEAD_LANE=1043 claude
+```
+
+The name is in everything a lead leaves on GitHub, and each lead counts and services only what carries its own:
+
+- **Claims:** `Lead: Claimed by <tool> / <model>, lead <name>. Branch issue-<N>.`, and `Lead: Released, lead <name>.` (`AGENTS.md` step 2). A claim without a name is `lead`'s. When two leads claim the same issue, the earlier comment holds it, and the later lead releases without unassigning.
+- **Pull requests:** a `Lead: <name>` line under `Model:` in the body. A pull request without one is `lead`'s.
+- **Valkey:** its own cursor, `from <name>`, and the notes addressed `to` it (above).
+
+`tools/available.py` applies all of it: the list for step 2 (with `--lane`, from `BT_LEAD_LANE`), `--check` and `--holder` around a claim, `--claims` for the lead's own claims and `--prs` for its own pull requests. Its name comes from `BT_LEAD_NAME`, which subagents inherit.
 
 ## Issue agents
 
@@ -108,7 +140,7 @@ Only the maintainer merges. A branch doesn't have to contain `moddable`'s head t
 | `needs-grooming` | the lead (or anyone) | An issue needs a decision the plan doesn't make, or has parts that must land in order ("Issue size"). A comment says what's missing. | the maintainer, after fleshing out or splitting it |
 | `needs-human` | the maintainer, alongside `needs-grooming` | The issue waits on a major architecture decision. A comment asks the question. | the human, after answering it |
 | `needs-human-review` | the maintainer, on a pull request | The maintainer has nothing left to ask for, and the pull request waits on the human's review ("Human review"). | the human, to approve; or the maintainer, when the human approves in a comment |
-| `parked` | the human | The issue is outside #2's "Priority now". Nobody claims, grooms or splits it, and the queue isn't stocked from it. | the human |
+| `parked` | the human | The human keeps the issue out of the queue, whether or not #2's "Priority now" lists it: nobody claims, grooms or splits it, and the queue isn't stocked from it. An unlabelled issue outside "Priority now" is still claimable ("Issue states"). | the human |
 
 ## Issue size
 
@@ -141,8 +173,8 @@ A pull request that makes a major decision the human hasn't made gets a `changes
 
 ## Issue states
 
-- **Available:** open, no assignee, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `needs-grooming` or `parked`.
-- **Claimed:** assigned, with a "Lead: Claimed" comment. The lead holds up to 3 claims at a time, counting each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
+- **Available** (#2, "What is claimable"): open, no assignee and no standing claim, no open blockers (`blocked_by` API, mirrored in the "Blocked by" line), not labelled `parked`, `needs-grooming` or `needs-human`, not a parent with open sub-issues, and not a tracker (#2, #180, #392, #632). A lead takes #2's "Priority now" first, in its order, then the rest, oldest first: `uv run tools/available.py` lists them in that order, with the reason for each one that isn't available.
+- **Claimed:** assigned, with a standing `Lead: Claimed ... lead <name>.` comment ("More than one lead"). Each lead holds up to 3 claims at a time, counting only its own (`tools/available.py --claims`), each from its claim until its pull request merges or it is released. Claims that change the same files, such as the replay schema or the generated `data/` files, still merge one at a time, oldest pull request first.
 - **Done:** closed by the merged pull request's `Closes #N`.
 
 Blockers are kept in two places that must agree: the `blocked_by` dependency API, which tools query, and the "**Blocked by:**" line at the top of the body, which people read. Whoever changes one changes the other.

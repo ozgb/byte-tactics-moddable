@@ -5556,6 +5556,7 @@ WindMeteorsApply,src/map/meteors.cpp,wind_meteors,file:src/map/meteors,
 WindMeteorsBind,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsDataRanges,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsDeferFatal,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
+WindMeteorsEmit,src/seams/wind_meteors_world.cpp,wind_meteors,folder:src/seams/,wind_meteors
 WindMeteorsFatalPending,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsFuelClose,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 WindMeteorsInbox,src/seams/wind_meteors_world.cpp,seams,folder:src/seams/,

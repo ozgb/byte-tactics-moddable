@@ -85,6 +85,11 @@ void __stdcall EmitFrom(int, const void* effect, unsigned int size)
     Emit(effect, size);
 }
 
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
+{
+    EmitFrom(SCHED_WIND_METEORS, effect, size);
+}
+
 void __stdcall HarnessLosRadarEvent(const LosRadarEventHeader*, unsigned int, int)
 {
 }

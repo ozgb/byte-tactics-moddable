@@ -11,7 +11,6 @@
 #include "src/files/files_api.h"
 #include "src/util/tdf.h"
 #include "interfaces/services.h"
-#include "src/util/engine_services.h"
 #include "interfaces/seams.h"
 #include "src/state/sim_globals.h"
 #include "src/map/meteors.h"
@@ -57,7 +56,7 @@ int TdfRecord::GetFieldString(char* dst, char* key, int size, char* def)
 {
     return service_TdfRecord_GetFieldString(this, dst, key, size, def);
 }
-void __stdcall EmitFrom(int, const void* effect, unsigned int size) { service_Emit(effect, size); }
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size) { service_Emit(effect, size); }
 
 SimGlobals& SimCreate() { __builtin_trap(); }
 

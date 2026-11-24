@@ -12,13 +12,13 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5820 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5821 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
 | subsystem | functions | issue |
 |---|---|---|
-| [wind_meteors](#wind_meteors) | 15 | #9 |
+| [wind_meteors](#wind_meteors) | 16 | #9 |
 | [economy](#economy) | 52 | #11 |
 | [features](#features) | 57 | #12 |
 | [ai](#ai) | 132 | #13 |
@@ -48,7 +48,7 @@ How to read a section. **Entry points** are the phase roots the subsystem holds 
 
 ## wind_meteors
 
-Issue #9. 15 functions. `UpdateWind`, `UpdateMeteors`, `Apply` (the inbox of the meteor set-up and console events), the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWindOnStream` in `src/game/game_state.cpp`).
+Issue #9. 16 functions. `UpdateWind`, `UpdateMeteors`, `Apply` (the inbox of the meteor set-up and console events), the meteor parameters and their save and load (`src/map/meteors.cpp`, plus `UpdateWindOnStream` in `src/game/game_state.cpp`).
 
 Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live function no scenario enters, and 0 more are dead (data/coverage.csv).
 
@@ -93,7 +93,7 @@ Coverage: 0.0% of functions (0 of 15), 0.0% of lines, 0.0% of branches; 15 live 
 - Needs from seams: 17 functions in platform, files, weapons, game, seams.
 - Owns: 26 named sim items that only this subsystem writes, for example `g_meteorActive`, `g_meteorNextStrikeTime`, `g_meteorNextHitTime`, `g_meteorOrigin`, `g_meteorStrikeEndTime`.
 - Shares: 5 named sim item that other subsystems also write, for example `Game::windCounter`.
-- Pilot fit (#9): Most of its imports are platform (TDF parsing, `RandomInt`, `FatalError`, the `HapiBank` account store). The only sim seam is weapons (`FindWeaponByName`); a meteor that falls reaches weapons as a SPAWN effect through the scheduler (`EmitFrom`).
+- Pilot fit (#9): Most of its imports are platform (TDF parsing, `RandomInt`, `FatalError`, the `HapiBank` account store). The only sim seam is weapons (`FindWeaponByName`); a meteor that falls reaches weapons as a SPAWN effect through the scheduler (`WindMeteorsEmit`, its own wrapper of `EmitFrom`).
 - The wind output is in `Game` fields (`windSpeed`, `windDirection`, `windFraction`, `windVelX`, `windZ`) that only this module writes but units, economy, features and presentation read. The meteor schedule is in `g_meteor*` statics, which must move into the state block (#7).
 
 **Open questions.**

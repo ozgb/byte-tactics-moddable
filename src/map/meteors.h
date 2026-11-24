@@ -20,5 +20,6 @@ void __stdcall LoadMeteorDefaults(MeteorShowerParams* params);
 void __stdcall StartMeteorShower();
 void __stdcall SaveMeteors(HapiBank* file);
 void __stdcall LoadMeteors(HapiBank* file);
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size);
 
 #endif

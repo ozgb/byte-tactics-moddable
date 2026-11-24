@@ -15,7 +15,6 @@
 
 #include "../util/tdf.h"
 #include "../../interfaces/services.h"
-#include "../util/engine_services.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/wind_meteors.h"
 #include "../state/sim_globals.h"
@@ -149,7 +148,7 @@ void UpdateMeteors()
             effect.vel[1] = vel.y;
             effect.vel[2] = vel.z;
             effect.announce = 1;
-            EmitFrom(SCHED_WIND_METEORS, &effect.h, sizeof(effect));
+            WindMeteorsEmit(&effect.h, sizeof(effect));
         }
         if (g_meteorStrikeEndTime <= (unsigned int)g_game->ticks)
             g_meteorActive = 0;

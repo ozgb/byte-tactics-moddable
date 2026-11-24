@@ -4,6 +4,7 @@
 #include "../util/engine_services.h"
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/wind_meteors.h"
+#include "../map/meteors.h"
 #include "../util/vec3.h"
 #include "../weapons/weapon_def.h"
 #include "../game/game.h"
@@ -18,6 +19,11 @@ void WindMeteorsInbox(const void* event, unsigned int size)
     const WindMeteorsEventHeader* e = static_cast<const WindMeteorsEventHeader*>(event);
     g_seams.wind_meteors->Apply(e, size);
     HarnessWindMeteorsEvent(event, size);
+}
+
+void __stdcall WindMeteorsEmit(const WindMeteorsEventHeader* effect, unsigned int size)
+{
+    EmitFrom(SCHED_WIND_METEORS, effect, size);
 }
 
 void WeaponsOnMeteorSpawn(const void* event, unsigned int size)

@@ -1645,7 +1645,7 @@ harness,files,shared_write,Seams::files,58
 harness,game,call,ApplySlotsToGamePlayers,1
 harness,game,call,ExecuteCommandLine,1
 harness,game,call,FreeSummaryBank,1
-harness,game,call,GameHoldrand,2
+harness,game,call,GameHoldrand,3
 harness,game,call,MatchSetupBlockBytesValid,1
 harness,game,call,MatchSetupCurrent,1
 harness,game,call,MatchSetupRequest,1
@@ -3705,7 +3705,7 @@ platform,harness,shared_write,Vec3::x,3
 platform,harness,shared_write,Vec3::y,1
 platform,harness,shared_write,Vec3::z,3
 platform,harness,shared_write,WindMeteorsSeam::Apply,2
-platform,harness,shared_write,g_randomSeed,1
+platform,harness,shared_write,g_randomSeed,2
 platform,los_radar,indirect,CmdRadar,1
 platform,los_radar,shared_write,Game::loadProgress,1
 platform,los_radar,shared_write,Game::losTable,8

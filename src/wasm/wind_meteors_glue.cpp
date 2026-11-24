@@ -304,25 +304,83 @@ IMPORT(HapiBankGetIntegerItemImport)
     return nullptr;
 }
 
-IMPORT(WindMeteorsEmitImport)
+struct Outbox {
+    const char* subsystem;
+    int outbox;
+};
+
+const Outbox kOutboxes[] = {
+    {"economy", SCHED_ECONOMY},
+    {"units", SCHED_UNITS},
+    {"orders", SCHED_ORDERS},
+    {"players", SCHED_PLAYERS},
+    {"features", SCHED_FEATURES},
+    {"weapons", SCHED_WEAPONS},
+    {"map", SCHED_MAP},
+    {"wind_meteors", SCHED_WIND_METEORS},
+    {"targeting", SCHED_TARGETING},
+    {"ai", SCHED_AI},
+    {"los_radar", SCHED_LOS_RADAR},
+    {"pathfinding", SCHED_PATHFINDING},
+    {"scripts", SCHED_SCRIPTS},
+    {"movement", SCHED_MOVEMENT},
+};
+
+int s_outbox = -1;
+
+int OutboxOf(const char* subsystem)
+{
+    if (subsystem == nullptr)
+        return -1;
+    for (unsigned i = 0; i < sizeof kOutboxes / sizeof kOutboxes[0]; i++)
+        if (strcmp(kOutboxes[i].subsystem, subsystem) == 0)
+            return kOutboxes[i].outbox;
+    return -1;
+}
+
+const char* CheckSpawn(const void* effect)
+{
+    const WindMeteorsSpawn* spawn = static_cast<const WindMeteorsSpawn*>(effect);
+    if (spawn->weapon < -1 || spawn->weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
+        return ImportError("Emit", "the weapon slot is outside the table of weapons");
+    return nullptr;
+}
+
+struct EffectHook {
+    int kind;
+    const char* (*check)(const void* effect);
+};
+
+const EffectHook kEffectHooks[] = {
+    {WIND_METEORS_EFFECT_SPAWN, CheckSpawn},
+};
+
+const unsigned kEffectCapacity = 128;
+
+IMPORT(EmitImport)
 {
     (void)user;
-    NEED("WindMeteorsEmit", 0);
+    NEED("Emit", 0);
     unsigned size = (unsigned)a[1].i32;
-    if (size < sizeof(WindMeteorsEventHeader) || size > sizeof(WindMeteorsSpawn))
-        return ImportError("WindMeteorsEmit", "the size is outside the effects");
-    if (!InMemory((unsigned)a[0].i32 + size - 1))
-        return ImportError("WindMeteorsEmit", "the effect is outside the module memory");
-    WindMeteorsSpawn effect;
-    memset(&effect, 0, sizeof effect);
-    memcpy(&effect, Linear(a[0].i32), size);
-    if (effect.h.kind != WIND_METEORS_EFFECT_SPAWN)
-        return ImportError("WindMeteorsEmit", "the kind is not an effect of wind_meteors");
-    if (size < sizeof(WindMeteorsSpawn))
-        return ImportError("WindMeteorsEmit", "the effect is smaller than its kind");
-    if (effect.weapon < -1 || effect.weapon >= (int)(sizeof(g_game->weapons) / sizeof(g_game->weapons[0])))
-        return ImportError("WindMeteorsEmit", "the weapon slot is outside the table of weapons");
-    WindMeteorsEmit(&effect.h, size);
+    if (size < sizeof(int) || size > kEffectCapacity)
+        return ImportError("Emit", "the size is outside an effect");
+    if (size > ModulesMemory()->size - (unsigned)a[0].i32)
+        return ImportError("Emit", "the effect runs past the module memory");
+    int effect[kEffectCapacity / sizeof(int)];
+    memcpy(effect, Linear(a[0].i32), size);
+    long expected;
+    if (!wl_module_publishes(s_loader, wl_module_name(s_module), effect[0], &expected))
+        return ImportError("Emit", "the kind is not in the module's publishes table");
+    if ((long)size != expected)
+        return ImportError("Emit", "the size is not the payload's size of its kind");
+    for (unsigned i = 0; i < sizeof kEffectHooks / sizeof kEffectHooks[0]; i++) {
+        if (kEffectHooks[i].kind != effect[0])
+            continue;
+        const char* error = kEffectHooks[i].check(effect);
+        if (error != nullptr)
+            return error;
+    }
+    EmitFrom(s_outbox, effect, size);
     return nullptr;
 }
 
@@ -359,7 +417,7 @@ const ImportDef kImports[] = {
     {"services", "HapiBank_OpenAccount", "ii>i", HapiBankOpenAccountImport},
     {"services", "HapiBank_SetIntegerItem", "iii>i", HapiBankSetIntegerItemImport},
     {"services", "HapiBank_GetIntegerItem", "iii>i", HapiBankGetIntegerItemImport},
-    {"services", "WindMeteorsEmit", "ii>", WindMeteorsEmitImport},
+    {"services", "Emit", "ii>", EmitImport},
     {"weapons", "FindWeaponByName", "i>i", FindWeaponByNameImport},
 };
 
@@ -651,6 +709,9 @@ int __stdcall WindMeteorsBind(wl_loader* loader, wl_module* module, unsigned fue
 {
     s_module = module;
     s_fuelBudget = fuelBudget;
+    s_outbox = OutboxOf(wl_module_text(loader, wl_module_name(module), "interface"));
+    if (s_outbox < 0)
+        return 0;
     if (!wl_export_func(loader, module, "__fuel_set", &s_fuelSet) || !wl_export_func(loader, module, "__fuel_get", &s_fuelGet))
         return 0;
     for (int i = 0; i < SLOT_COUNT; i++) {

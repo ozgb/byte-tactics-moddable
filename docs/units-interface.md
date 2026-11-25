@@ -159,7 +159,7 @@ ATTACKED_SPEECH, MARK_DAMAGED).
 | CAPTURE 394 | `UnitsCapture` | `player`, `present`, `hitPoints`, `buildPercent`, `angles[3]`, `stockpiles[3]` |
 | CREATE 395 | `UnitsCreate` | `player` (a byte), `type` (16 bits), `pos[3]` (world coordinates, 16 fractional bits); names no unit; outcome 1 when a unit was made, 0 when none was |
 | KILL_ALL 396 | the header alone | none; names no unit |
-| RELOAD_TYPE 397 | `UnitsReloadType` | `type`: every unit of it is killed, then its definition is loaded again; names no unit |
+| RELOAD_TYPE 397 | `UnitsReloadType` | `type`: every unit of it is killed, then its definition is loaded again; names no unit; the only change to load-time data during play (section 5) |
 
 ## 3. Effects out of units
 
@@ -349,6 +349,16 @@ section 21 again for it (`docs/movement-interface.md`, section 5). Scripts' stat
 `docs/scripts-interface.md`, section 6.
 
 **At load**: `LoadUnits` reads every unit record of the save through `LoadUnit`, which creates the unit (`CreateUnit`), sets its fields and flags from the record, and hands the rest to the owners: LOAD to economy, movement, targeting and los_radar, SET_SQUAD to ai, LOAD_PATH_LOCK_STAMP to map, and the slots `LoadOrders` (orders), `LoadScriptState` (scripts) and `LoadState` (weapons, once per weapon slot); a unit a record names as its child or attacker is loaded first.
+
+**Load-time data.** The unit types (each one's definition, model and COB script), the movement classes and the build
+menus are loaded once, by the load of a match (`docs/schedule.md`, "The load"), and no tick writes them. During play
+one event changes them, and only one: RELOAD_TYPE (`UNITS_RELOAD_TYPE`, 397), which the engine's console publishes
+between ticks (section 2). It is applied whole, in one `Apply`: every unit of the type is killed, then the type's
+definition is read again from its unit file and its COB script is loaded again in place of the old one; its model is
+kept. When the type is 0, or its unit file is gone, the units are killed and nothing is loaded again. No other event,
+slot or step of the tick writes the unit types, so a module may hold them read-only from the end of the load to the
+end of the match, outside that one event. The data stays on the heap, outside the block (#1081); the recording form
+that carries the files the load read is #1094's.
 
 ## 6. Random draws, sim events and the unit loop
 

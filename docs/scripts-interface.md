@@ -276,6 +276,14 @@ Scripts read, and write nothing of, the unit's position, heading, angles, flags,
 
 **At load**: scripts restores each unit's script through the slot `LoadScriptState`, which units' `LoadUnit` (`unit_save.cpp`) calls once per unit after orders, from the unit's `Script<n>` box: the eight thread channels (their callbacks cleared), the active count, the statics and each piece's state. It restores nothing when the box's size or the script's checksum differs from the one the save was written with.
 
+**Load-time data.** The compiled COB script of each unit type, which every unit of the type runs, is loaded with the
+unit types by the load of a match (`docs/schedule.md`, "The load") and is never written by a tick. During play one
+event changes it, and only one: units' RELOAD_TYPE (`UNITS_RELOAD_TYPE`, 397, `docs/units-interface.md`, sections 2
+and 5), published by the engine's console between ticks. It is applied whole, in one `Apply` of units: every unit of
+the type is killed first, and then the type's script is loaded again in place of the old one. No slot or event of
+scripts, and no other event, writes a compiled script. The script stays on the heap, outside the block (#1081); the
+recording form that names it by its unit type and carries the file the load read is #1094's.
+
 ## 7. What is left
 
 The following is left, and no issue is opened for it here:

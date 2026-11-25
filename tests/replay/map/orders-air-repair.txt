@@ -267733,174 +267733,106 @@ call 382 Apply
   w Cell#6081.flags 80
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40627783
-  a pos.y 2736128
-  a pos.z 25302316
+  a pos (40627783,25302316)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40500647
-  a pos.y 2739896
-  a pos.z 24863408
+  a pos (40500647,24863408)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40894464
-  a pos.y 1712128
-  a pos.z 26214400
+  a pos (40894464,26214400)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34594193
-  a pos.y 3526457
-  a pos.z 28615798
+  a pos (34594193,28615798)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34889356
-  a pos.y 3092753
-  a pos.z 28159768
+  a pos (34889356,28159768)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34846210
-  a pos.y 3272043
-  a pos.z 29020874
+  a pos (34846210,29020874)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 35141374
-  a pos.y 2838340
-  a pos.z 28564844
+  a pos (35141374,28564844)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34306691
-  a pos.y 2838340
-  a pos.z 29084142
+  a pos (34306691,29084142)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40807767
-  a pos.y 2993578
-  a pos.z 26180022
+  a pos (40807767,26180022)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40925896
-  a pos.y 2988970
-  a pos.z 26173458
+  a pos (40925896,26173458)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40873979
-  a pos.y 2981290
-  a pos.z 26208420
+  a pos (40873979,26208420)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40860064
-  a pos.y 2970026
-  a pos.z 26241994
+  a pos (40860064,26241994)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40972360
-  a pos.y 2965418
-  a pos.z 26241004
+  a pos (40972360,26241004)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40794535
-  a pos.y 3021738
-  a pos.z 26207472
+  a pos (40794535,26207472)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40998553
-  a pos.y 2986410
-  a pos.z 26253558
+  a pos (40998553,26253558)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40894982
-  a pos.y 2953130
-  a pos.z 26145287
+  a pos (40894982,26145287)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40921867
-  a pos.y 2964906
-  a pos.z 26260100
+  a pos (40921867,26260100)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40802593
-  a pos.y 2976682
-  a pos.z 26199378
+  a pos (40802593,26199378)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40920973
-  a pos.y 3011498
-  a pos.z 26249154
+  a pos (40920973,26249154)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40915576
-  a pos.y 2993066
-  a pos.z 26222566
+  a pos (40915576,26222566)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40900096
-  a pos.y 3021738
-  a pos.z 26249216
+  a pos (40900096,26249216)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40810033
-  a pos.y 2977194
-  a pos.z 26161846
+  a pos (40810033,26161846)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40915604
-  a pos.y 2999722
-  a pos.z 26270378
+  a pos (40915604,26270378)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40875434
-  a pos.y 2989482
-  a pos.z 26236676
+  a pos (40875434,26236676)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 40903274
-  a pos.y 3022250
-  a pos.z 26214408
+  a pos (40903274,26214408)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34005696
-  a pos.y 3328699
-  a pos.z 28623789
+  a pos (34005696,28623789)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 33984624
-  a pos.y 3331259
-  a pos.z 28685747
+  a pos (33984624,28685747)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34051508
-  a pos.y 3370683
-  a pos.z 28720489
+  a pos (34051508,28720489)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34131750
-  a pos.y 3345595
-  a pos.z 28685186
+  a pos (34131750,28685186)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34042294
-  a pos.y 3365051
-  a pos.z 28675641
+  a pos (34042294,28675641)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34096404
-  a pos.y 3369147
-  a pos.z 28711755
+  a pos (34096404,28711755)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34048968
-  a pos.y 3370683
-  a pos.z 28632539
+  a pos (34048968,28632539)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34090872
-  a pos.y 3311803
-  a pos.z 28660381
+  a pos (34090872,28660381)
   o result 1
 call 382 GetCellMeanHeight
-  a pos.x 34098441
-  a pos.y 3356859
-  a pos.z 28686667
+  a pos (34098441,28686667)
   o result 1
 call 382 GetGroundHeight
   a pos (199229440,78643200)
@@ -267969,174 +267901,106 @@ call 382 GetGroundHeight
   a pos (199229440,71172096)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40676935
-  a pos.y 3063808
-  a pos.z 25220396
+  a pos (40676935,25220396)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40779175
-  a pos.y 3329720
-  a pos.z 24584880
+  a pos (40779175,24584880)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40845312
-  a pos.y 2105344
-  a pos.z 26017792
+  a pos (40845312,26017792)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34889105
-  a pos.y 3854137
-  a pos.z 28533878
+  a pos (34889105,28533878)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34922124
-  a pos.y 3158289
-  a pos.z 27864856
+  a pos (34922124,27864856)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34764290
-  a pos.y 3861867
-  a pos.z 29135562
+  a pos (34764290,29135562)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 35174142
-  a pos.y 3231556
-  a pos.z 28892524
+  a pos (35174142,28892524)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34142851
-  a pos.y 3034948
-  a pos.z 29313518
+  a pos (34142851,29313518)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40721070
-  a pos.y 3234681
-  a pos.z 26145644
+  a pos (40721070,26145644)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40957328
-  a pos.y 3225465
-  a pos.z 26132516
+  a pos (40957328,26132516)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40853494
-  a pos.y 3210105
-  a pos.z 26202440
+  a pos (40853494,26202440)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40825664
-  a pos.y 3187577
-  a pos.z 26269588
+  a pos (40825664,26269588)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 41050256
-  a pos.y 3178361
-  a pos.z 26267608
+  a pos (41050256,26267608)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40694606
-  a pos.y 3291001
-  a pos.z 26200544
+  a pos (40694606,26200544)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 41102642
-  a pos.y 3220345
-  a pos.z 26292716
+  a pos (41102642,26292716)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40895500
-  a pos.y 3153785
-  a pos.z 26076174
+  a pos (40895500,26076174)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40949270
-  a pos.y 3177337
-  a pos.z 26305800
+  a pos (40949270,26305800)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40710722
-  a pos.y 3200889
-  a pos.z 26184356
+  a pos (40710722,26184356)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40947482
-  a pos.y 3270521
-  a pos.z 26283908
+  a pos (40947482,26283908)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40936688
-  a pos.y 3233657
-  a pos.z 26230732
+  a pos (40936688,26230732)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40905728
-  a pos.y 3291001
-  a pos.z 26284032
+  a pos (40905728,26284032)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40725602
-  a pos.y 3201913
-  a pos.z 26109292
+  a pos (40725602,26109292)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40936744
-  a pos.y 3246969
-  a pos.z 26326356
+  a pos (40936744,26326356)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40856404
-  a pos.y 3226489
-  a pos.z 26258952
+  a pos (40856404,26258952)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 40912084
-  a pos.y 3292025
-  a pos.z 26214416
+  a pos (40912084,26214416)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 33956720
-  a pos.y 3556490
-  a pos.z 28568511
+  a pos (33956720,28568511)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 33914576
-  a pos.y 3561610
-  a pos.z 28692427
+  a pos (33914576,28692427)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34048344
-  a pos.y 3640458
-  a pos.z 28761911
+  a pos (34048344,28761911)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34208828
-  a pos.y 3590282
-  a pos.z 28691305
+  a pos (34208828,28691305)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34029916
-  a pos.y 3629194
-  a pos.z 28672215
+  a pos (34029916,28672215)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34138136
-  a pos.y 3637386
-  a pos.z 28744443
+  a pos (34138136,28744443)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34043264
-  a pos.y 3640458
-  a pos.z 28586011
+  a pos (34043264,28586011)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34127072
-  a pos.y 3522698
-  a pos.z 28641695
+  a pos (34127072,28641695)
   o result 1
 call 383 GetCellMeanHeight
-  a pos.x 34142210
-  a pos.y 3612810
-  a pos.z 28694267
+  a pos (34142210,28694267)
   o result 1
 call 383 GetGroundHeight
   a pos (199229440,78643200)
@@ -268205,174 +268069,106 @@ call 383 GetGroundHeight
   a pos (199229440,71106560)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40726087
-  a pos.y 3383333
-  a pos.z 25138476
+  a pos (40726087,25138476)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 41057703
-  a pos.y 3911389
-  a pos.z 24306352
+  a pos (41057703,24306352)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40796160
-  a pos.y 2490405
-  a pos.z 25821184
+  a pos (40796160,25821184)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 35184017
-  a pos.y 4173662
-  a pos.z 28451958
+  a pos (35184017,28451958)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34954892
-  a pos.y 3215670
-  a pos.z 27569944
+  a pos (34954892,27569944)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34682370
-  a pos.y 4443536
-  a pos.z 29250250
+  a pos (34682370,29250250)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 35206910
-  a pos.y 3616617
-  a pos.z 29220204
+  a pos (35206910,29220204)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 33979011
-  a pos.y 3223401
-  a pos.z 29542894
+  a pos (33979011,29542894)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40634373
-  a pos.y 3467629
-  a pos.z 26111266
+  a pos (40634373,26111266)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40988760
-  a pos.y 3453805
-  a pos.z 26091574
+  a pos (40988760,26091574)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40833009
-  a pos.y 3430765
-  a pos.z 26196460
+  a pos (40833009,26196460)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40791264
-  a pos.y 3396973
-  a pos.z 26297182
+  a pos (40791264,26297182)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 41128152
-  a pos.y 3383149
-  a pos.z 26294212
+  a pos (41128152,26294212)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40594677
-  a pos.y 3552109
-  a pos.z 26193616
+  a pos (40594677,26193616)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 41206731
-  a pos.y 3446125
-  a pos.z 26331874
+  a pos (41206731,26331874)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40896018
-  a pos.y 3346285
-  a pos.z 26007061
+  a pos (40896018,26007061)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40976673
-  a pos.y 3381613
-  a pos.z 26351500
+  a pos (40976673,26351500)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40618851
-  a pos.y 3416941
-  a pos.z 26169334
+  a pos (40618851,26169334)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40973991
-  a pos.y 3521389
-  a pos.z 26318662
+  a pos (40973991,26318662)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40957800
-  a pos.y 3466093
-  a pos.z 26238898
+  a pos (40957800,26238898)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40911360
-  a pos.y 3552109
-  a pos.z 26318848
+  a pos (40911360,26318848)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40641171
-  a pos.y 3418477
-  a pos.z 26056738
+  a pos (40641171,26056738)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40957884
-  a pos.y 3486061
-  a pos.z 26382334
+  a pos (40957884,26382334)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40837374
-  a pos.y 3455341
-  a pos.z 26281228
+  a pos (40837374,26281228)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 40920894
-  a pos.y 3553645
-  a pos.z 26214424
+  a pos (40920894,26214424)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 33907744
-  a pos.y 3776126
-  a pos.z 28513233
+  a pos (33907744,28513233)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 33844528
-  a pos.y 3783806
-  a pos.z 28699107
+  a pos (33844528,28699107)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34045180
-  a pos.y 3902078
-  a pos.z 28803333
+  a pos (34045180,28803333)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34285906
-  a pos.y 3826814
-  a pos.z 28697424
+  a pos (34285906,28697424)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34017538
-  a pos.y 3885182
-  a pos.z 28668789
+  a pos (34017538,28668789)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34179868
-  a pos.y 3897470
-  a pos.z 28777131
+  a pos (34179868,28777131)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34037560
-  a pos.y 3902078
-  a pos.z 28539483
+  a pos (34037560,28539483)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34163272
-  a pos.y 3725438
-  a pos.z 28623009
+  a pos (34163272,28623009)
   o result 1
 call 384 GetCellMeanHeight
-  a pos.x 34185979
-  a pos.y 3860606
-  a pos.z 28701867
+  a pos (34185979,28701867)
   o result 1
 call 384 GetGroundHeight
   a pos (199098368,78643200)
@@ -268441,174 +268237,106 @@ call 384 GetGroundHeight
   a pos (199098368,71172096)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40775239
-  a pos.y 3694703
-  a pos.z 25056556
+  a pos (40775239,25056556)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41336231
-  a pos.y 4484903
-  a pos.z 24027824
+  a pos (41336231,24027824)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40747008
-  a pos.y 2867311
-  a pos.z 25624576
+  a pos (40747008,25624576)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 35478929
-  a pos.y 4485032
-  a pos.z 28370038
+  a pos (35478929,28370038)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34987660
-  a pos.y 3264896
-  a pos.z 27275032
+  a pos (34987660,27275032)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34600450
-  a pos.y 5017050
-  a pos.z 29364938
+  a pos (34600450,29364938)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 35239678
-  a pos.y 3993523
-  a pos.z 29547884
+  a pos (35239678,29547884)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 33815171
-  a pos.y 3403699
-  a pos.z 29772270
+  a pos (33815171,29772270)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40547676
-  a pos.y 3692422
-  a pos.z 26076888
+  a pos (40547676,26076888)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41020192
-  a pos.y 3673990
-  a pos.z 26050632
+  a pos (41020192,26050632)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40812524
-  a pos.y 3643270
-  a pos.z 26190480
+  a pos (40812524,26190480)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40756864
-  a pos.y 3598214
-  a pos.z 26324776
+  a pos (40756864,26324776)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41206048
-  a pos.y 3579782
-  a pos.z 26320816
+  a pos (41206048,26320816)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40494748
-  a pos.y 3805062
-  a pos.z 26186688
+  a pos (40494748,26186688)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41310820
-  a pos.y 3663750
-  a pos.z 26371032
+  a pos (41310820,26371032)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40896536
-  a pos.y 3530630
-  a pos.z 25937948
+  a pos (40896536,25937948)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41004076
-  a pos.y 3577734
-  a pos.z 26397200
+  a pos (41004076,26397200)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40526980
-  a pos.y 3624838
-  a pos.z 26154312
+  a pos (40526980,26154312)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 41000500
-  a pos.y 3764102
-  a pos.z 26353416
+  a pos (41000500,26353416)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40978912
-  a pos.y 3690374
-  a pos.z 26247064
+  a pos (40978912,26247064)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40916992
-  a pos.y 3805062
-  a pos.z 26353664
+  a pos (40916992,26353664)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40556740
-  a pos.y 3626886
-  a pos.z 26004184
+  a pos (40556740,26004184)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40979024
-  a pos.y 3716998
-  a pos.z 26438312
+  a pos (40979024,26438312)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40818344
-  a pos.y 3676038
-  a pos.z 26303504
+  a pos (40818344,26303504)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 40929704
-  a pos.y 3807110
-  a pos.z 26214432
+  a pos (40929704,26214432)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 33858768
-  a pos.y 3987607
-  a pos.z 28457955
+  a pos (33858768,28457955)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 33774480
-  a pos.y 3997847
-  a pos.z 28705787
+  a pos (33774480,28705787)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34042016
-  a pos.y 4155543
-  a pos.z 28844755
+  a pos (34042016,28844755)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34362984
-  a pos.y 4055191
-  a pos.z 28703543
+  a pos (34362984,28703543)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34005160
-  a pos.y 4133015
-  a pos.z 28665363
+  a pos (34005160,28665363)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34221600
-  a pos.y 4149399
-  a pos.z 28809819
+  a pos (34221600,28809819)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34031856
-  a pos.y 4155543
-  a pos.z 28492955
+  a pos (34031856,28492955)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34199472
-  a pos.y 3920023
-  a pos.z 28604323
+  a pos (34199472,28604323)
   o result 1
 call 385 GetCellMeanHeight
-  a pos.x 34229748
-  a pos.y 4100247
-  a pos.z 28709467
+  a pos (34229748,28709467)
   o result 1
 call 385 GetGroundHeight
   a pos (199098368,78643200)

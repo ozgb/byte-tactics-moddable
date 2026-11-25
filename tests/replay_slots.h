@@ -523,7 +523,8 @@ int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
     ReplayText t;
     StartImport(t, "map.GetCellMeanHeight");
     Space(t);
-    AddStructIn(t, ROK_VEC3, a0);
+    t.Add("pos=");
+    AddVec3Xz(t, a0);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -1539,6 +1540,12 @@ void After_weapons_Apply()
     CompareResult(g_result_weapons_Apply);
 }
 
+void Run_weapons_UpdateExplosions()
+{
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateExplosions();
+}
+
 void Run_weapons_UpdateUnitWeapons()
 {
     Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
@@ -2203,9 +2210,7 @@ int g_result_map_GetCellMeanHeight;
 
 void Run_map_GetCellMeanHeight()
 {
-    Vec3 p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("pos", ROK_VEC3, &p0);
+    Vec3 p0 = ArgScalar<Vec3>("pos");
     SetClosing("result");
     g_result_map_GetCellMeanHeight = g_seams.map->GetCellMeanHeight(&p0);
 }
@@ -2713,6 +2718,10 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateExplosions") == 0) {
+        Run_weapons_UpdateExplosions();
         return true;
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
@@ -3285,6 +3294,10 @@ void BindSeams()
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
         g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.los_radar = &g_import_los_radar;

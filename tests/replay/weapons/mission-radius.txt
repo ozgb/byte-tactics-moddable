@@ -10890,6 +10890,965 @@ call 1640 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1640 UpdateExplosions
+  r Game.count_1491b 11
+  r DebrisPiece#0.state 255
+  r DebrisPiece#1.state 255
+  r DebrisPiece#2.state 255
+  r DebrisPiece#3.state 255
+  r DebrisPiece#4.state 255
+  r DebrisPiece#5.state 255
+  r DebrisPiece#6.state 255
+  r DebrisPiece#7.state 255
+  r DebrisPiece#8.state 255
+  r DebrisPiece#9.state 255
+  r DebrisPiece#10.state 255
+  r DebrisPiece#11.state 255
+  r DebrisPiece#12.state 255
+  r DebrisPiece#13.state 255
+  r DebrisPiece#14.state 255
+  r DebrisPiece#15.state 255
+  r DebrisPiece#16.state 255
+  r DebrisPiece#17.state 255
+  r DebrisPiece#18.state 255
+  r DebrisPiece#19.state 255
+  r DebrisPiece#20.state 255
+  r DebrisPiece#21.state 255
+  r DebrisPiece#22.state 255
+  r DebrisPiece#23.state 255
+  r DebrisPiece#24.state 255
+  r DebrisPiece#25.state 255
+  r DebrisPiece#26.state 255
+  r DebrisPiece#27.state 255
+  r DebrisPiece#28.state 255
+  r DebrisPiece#29.state 255
+  r DebrisPiece#30.state 255
+  r DebrisPiece#31.state 255
+  r DebrisPiece#32.state 255
+  r DebrisPiece#33.state 255
+  r DebrisPiece#34.state 255
+  r DebrisPiece#35.state 255
+  r DebrisPiece#36.state 255
+  r DebrisPiece#37.state 255
+  r DebrisPiece#38.state 255
+  r DebrisPiece#39.state 255
+  r DebrisPiece#40.state 255
+  r DebrisPiece#41.state 255
+  r DebrisPiece#42.state 255
+  r DebrisPiece#43.state 255
+  r DebrisPiece#44.state 255
+  r DebrisPiece#45.state 255
+  r DebrisPiece#46.state 255
+  r DebrisPiece#47.state 255
+  r DebrisPiece#48.state 255
+  r DebrisPiece#49.state 255
+  r DebrisPiece#50.state 255
+  r DebrisPiece#51.state 255
+  r DebrisPiece#52.state 255
+  r DebrisPiece#53.state 255
+  r DebrisPiece#54.state 255
+  r DebrisPiece#55.state 255
+  r DebrisPiece#56.state 255
+  r DebrisPiece#57.state 255
+  r DebrisPiece#58.state 255
+  r DebrisPiece#59.state 255
+  r DebrisPiece#60.state 255
+  r DebrisPiece#61.state 255
+  r DebrisPiece#62.state 255
+  r DebrisPiece#63.state 255
+  r DebrisPiece#64.state 255
+  r DebrisPiece#65.state 255
+  r DebrisPiece#66.state 255
+  r DebrisPiece#67.state 255
+  r DebrisPiece#68.state 255
+  r DebrisPiece#69.state 255
+  r DebrisPiece#70.state 255
+  r DebrisPiece#71.state 255
+  r DebrisPiece#72.state 255
+  r DebrisPiece#73.state 255
+  r DebrisPiece#74.state 255
+  r DebrisPiece#75.state 255
+  r DebrisPiece#76.state 255
+  r DebrisPiece#77.state 255
+  r DebrisPiece#78.state 255
+  r DebrisPiece#79.state 255
+  r DebrisPiece#80.state 255
+  r DebrisPiece#81.state 255
+  r DebrisPiece#82.state 255
+  r DebrisPiece#83.state 255
+  r DebrisPiece#84.state 255
+  r DebrisPiece#85.state 255
+  r DebrisPiece#86.state 255
+  r DebrisPiece#87.state 255
+  r DebrisPiece#88.state 255
+  r DebrisPiece#89.state 255
+  r DebrisPiece#90.state 255
+  r DebrisPiece#91.state 255
+  r DebrisPiece#92.state 255
+  r DebrisPiece#93.state 255
+  r DebrisPiece#94.state 255
+  r DebrisPiece#95.state 255
+  r DebrisPiece#96.state 255
+  r DebrisPiece#97.state 255
+  r DebrisPiece#98.state 255
+  r DebrisPiece#99.state 255
+  r DebrisPiece#100.state 255
+  r DebrisPiece#101.state 255
+  r DebrisPiece#102.state 255
+  r DebrisPiece#103.state 255
+  r DebrisPiece#104.state 255
+  r DebrisPiece#105.state 255
+  r DebrisPiece#106.state 255
+  r DebrisPiece#107.state 255
+  r DebrisPiece#108.state 255
+  r DebrisPiece#109.state 255
+  r DebrisPiece#110.state 255
+  r DebrisPiece#111.state 255
+  r DebrisPiece#112.state 255
+  r DebrisPiece#113.state 255
+  r DebrisPiece#114.state 255
+  r DebrisPiece#115.state 255
+  r DebrisPiece#116.state 255
+  r DebrisPiece#117.state 255
+  r DebrisPiece#118.state 255
+  r DebrisPiece#119.state 255
+  r DebrisPiece#120.state 255
+  r DebrisPiece#121.state 255
+  r DebrisPiece#122.state 255
+  r DebrisPiece#123.state 255
+  r DebrisPiece#124.state 255
+  r DebrisPiece#125.state 255
+  r DebrisPiece#126.state 255
+  r DebrisPiece#127.state 255
+  r DebrisPiece#128.state 255
+  r DebrisPiece#129.state 255
+  r DebrisPiece#130.state 255
+  r DebrisPiece#131.state 255
+  r DebrisPiece#132.state 255
+  r DebrisPiece#133.state 255
+  r DebrisPiece#134.state 255
+  r DebrisPiece#135.state 255
+  r DebrisPiece#136.state 255
+  r DebrisPiece#137.state 255
+  r DebrisPiece#138.state 255
+  r DebrisPiece#139.state 255
+  r DebrisPiece#140.state 255
+  r DebrisPiece#141.state 255
+  r DebrisPiece#142.state 255
+  r DebrisPiece#143.state 255
+  r DebrisPiece#144.state 255
+  r DebrisPiece#145.state 255
+  r DebrisPiece#146.state 255
+  r DebrisPiece#147.state 255
+  r DebrisPiece#148.state 255
+  r DebrisPiece#149.state 255
+  r DebrisPiece#150.state 255
+  r DebrisPiece#151.state 255
+  r DebrisPiece#152.state 255
+  r DebrisPiece#153.state 255
+  r DebrisPiece#154.state 255
+  r DebrisPiece#155.state 255
+  r DebrisPiece#156.state 255
+  r DebrisPiece#157.state 255
+  r DebrisPiece#158.state 255
+  r DebrisPiece#159.state 255
+  r DebrisPiece#160.state 255
+  r DebrisPiece#161.state 255
+  r DebrisPiece#162.state 255
+  r DebrisPiece#163.state 255
+  r DebrisPiece#164.state 255
+  r DebrisPiece#165.state 255
+  r DebrisPiece#166.state 255
+  r DebrisPiece#167.state 255
+  r DebrisPiece#168.state 255
+  r DebrisPiece#169.state 255
+  r DebrisPiece#170.state 255
+  r DebrisPiece#171.state 255
+  r DebrisPiece#172.state 255
+  r DebrisPiece#173.state 255
+  r DebrisPiece#174.state 255
+  r DebrisPiece#175.state 255
+  r DebrisPiece#176.state 255
+  r DebrisPiece#177.state 255
+  r DebrisPiece#178.state 255
+  r DebrisPiece#179.state 255
+  r DebrisPiece#180.state 255
+  r DebrisPiece#181.state 255
+  r DebrisPiece#182.state 255
+  r DebrisPiece#183.state 255
+  r DebrisPiece#184.state 255
+  r DebrisPiece#185.state 255
+  r DebrisPiece#186.state 255
+  r DebrisPiece#187.state 255
+  r DebrisPiece#188.state 255
+  r DebrisPiece#189.state 255
+  r DebrisPiece#190.state 255
+  r DebrisPiece#191.state 255
+  r DebrisPiece#192.state 255
+  r DebrisPiece#193.state 255
+  r DebrisPiece#194.state 255
+  r DebrisPiece#195.state 255
+  r DebrisPiece#196.state 255
+  r DebrisPiece#197.state 255
+  r DebrisPiece#198.state 255
+  r DebrisPiece#199.state 255
+  r DebrisPiece#200.state 255
+  r DebrisPiece#201.state 255
+  r DebrisPiece#202.state 255
+  r DebrisPiece#203.state 255
+  r DebrisPiece#204.state 255
+  r DebrisPiece#205.state 255
+  r DebrisPiece#206.state 255
+  r DebrisPiece#207.state 255
+  r DebrisPiece#208.state 255
+  r DebrisPiece#209.state 255
+  r DebrisPiece#210.state 255
+  r DebrisPiece#211.state 255
+  r DebrisPiece#212.state 255
+  r DebrisPiece#213.state 255
+  r DebrisPiece#214.state 255
+  r DebrisPiece#215.state 255
+  r DebrisPiece#216.state 255
+  r DebrisPiece#217.state 255
+  r DebrisPiece#218.state 255
+  r DebrisPiece#219.state 255
+  r DebrisPiece#220.state 255
+  r DebrisPiece#221.state 255
+  r DebrisPiece#222.state 255
+  r DebrisPiece#223.state 255
+  r DebrisPiece#224.state 255
+  r DebrisPiece#225.state 255
+  r DebrisPiece#226.state 255
+  r DebrisPiece#227.state 255
+  r DebrisPiece#228.state 255
+  r DebrisPiece#229.state 255
+  r DebrisPiece#230.state 255
+  r DebrisPiece#231.state 255
+  r DebrisPiece#232.state 255
+  r DebrisPiece#233.state 255
+  r DebrisPiece#234.state 255
+  r DebrisPiece#235.state 255
+  r DebrisPiece#236.state 255
+  r DebrisPiece#237.state 255
+  r DebrisPiece#238.state 255
+  r DebrisPiece#239.state 255
+  r DebrisPiece#240.state 255
+  r DebrisPiece#241.state 255
+  r DebrisPiece#242.state 255
+  r DebrisPiece#243.state 255
+  r DebrisPiece#244.state 255
+  r DebrisPiece#245.state 255
+  r DebrisPiece#246.state 255
+  r DebrisPiece#247.state 255
+  r DebrisPiece#248.state 255
+  r DebrisPiece#249.state 255
+  r DebrisPiece#250.state 255
+  r DebrisPiece#251.state 255
+  r DebrisPiece#252.state 255
+  r DebrisPiece#253.state 255
+  r DebrisPiece#254.state 255
+  r DebrisPiece#255.state 255
+  r DebrisPiece#256.state 255
+  r DebrisPiece#257.state 255
+  r DebrisPiece#258.state 255
+  r DebrisPiece#259.state 255
+  r DebrisPiece#260.state 255
+  r DebrisPiece#261.state 255
+  r DebrisPiece#262.state 255
+  r DebrisPiece#263.state 255
+  r DebrisPiece#264.state 255
+  r DebrisPiece#265.state 255
+  r DebrisPiece#266.state 255
+  r DebrisPiece#267.state 255
+  r DebrisPiece#268.state 255
+  r DebrisPiece#269.state 255
+  r DebrisPiece#270.state 255
+  r DebrisPiece#271.state 255
+  r DebrisPiece#272.state 255
+  r DebrisPiece#273.state 255
+  r DebrisPiece#274.state 255
+  r DebrisPiece#275.state 255
+  r DebrisPiece#276.state 255
+  r DebrisPiece#277.state 255
+  r DebrisPiece#278.state 255
+  r DebrisPiece#279.state 255
+  r DebrisPiece#280.state 255
+  r DebrisPiece#281.state 255
+  r DebrisPiece#282.state 255
+  r DebrisPiece#283.state 255
+  r DebrisPiece#284.state 255
+  r DebrisPiece#285.state 255
+  r DebrisPiece#286.state 255
+  r DebrisPiece#287.state 255
+  r DebrisPiece#288.state 255
+  r DebrisPiece#289.state 255
+  r DebrisPiece#290.state 255
+  r DebrisPiece#291.state 255
+  r DebrisPiece#292.state 255
+  r DebrisPiece#293.state 255
+  r DebrisPiece#294.state 255
+  r DebrisPiece#295.state 255
+  r DebrisPiece#296.state 255
+  r DebrisPiece#297.state 255
+  r DebrisPiece#298.state 255
+  r DebrisPiece#299.state 255
+  r Debris#0.obj null
+  r Debris#0.posX 92221794
+  r Debris#0.posY 3083880
+  r Debris#0.posZ 54367343
+  r Debris#0.sizeX 0
+  r Debris#0.sizeY 0
+  r Debris#0.sizeZ 0
+  r Debris#0.velX 0
+  r Debris#0.velY 0
+  r Debris#0.velZ 0
+  r Debris#0.spinX 0
+  r Debris#0.spinY 0
+  r Debris#0.spinZ 0
+  r Debris#0.angle_x 0
+  r Debris#0.angle_y 0
+  r Debris#0.angle_z 0
+  r Debris#0.flags 0
+  r Debris#1.obj null
+  r Debris#1.posX 175146243
+  r Debris#1.posY 5086381
+  r Debris#1.posZ 31901213
+  r Debris#1.sizeX 0
+  r Debris#1.sizeY 0
+  r Debris#1.sizeZ 0
+  r Debris#1.velX 0
+  r Debris#1.velY 0
+  r Debris#1.velZ 0
+  r Debris#1.spinX 0
+  r Debris#1.spinY 0
+  r Debris#1.spinZ 0
+  r Debris#1.angle_x 0
+  r Debris#1.angle_y 0
+  r Debris#1.angle_z 0
+  r Debris#1.flags 0
+  r Debris#2.obj null
+  r Debris#2.posX 102937822
+  r Debris#2.posY 3179862
+  r Debris#2.posZ 59667265
+  r Debris#2.sizeX 0
+  r Debris#2.sizeY 0
+  r Debris#2.sizeZ 0
+  r Debris#2.velX 0
+  r Debris#2.velY 0
+  r Debris#2.velZ 0
+  r Debris#2.spinX 0
+  r Debris#2.spinY 0
+  r Debris#2.spinZ 0
+  r Debris#2.angle_x 0
+  r Debris#2.angle_y 0
+  r Debris#2.angle_z 0
+  r Debris#2.flags 0
+  r Debris#3.obj null
+  r Debris#3.posX 149755121
+  r Debris#3.posY 2964060
+  r Debris#3.posZ 54254333
+  r Debris#3.sizeX 0
+  r Debris#3.sizeY 0
+  r Debris#3.sizeZ 0
+  r Debris#3.velX 0
+  r Debris#3.velY 0
+  r Debris#3.velZ 0
+  r Debris#3.spinX 0
+  r Debris#3.spinY 0
+  r Debris#3.spinZ 0
+  r Debris#3.angle_x 0
+  r Debris#3.angle_y 0
+  r Debris#3.angle_z 0
+  r Debris#3.flags 0
+  r Debris#4.obj null
+  r Debris#4.posX 77938329
+  r Debris#4.posY 3130763
+  r Debris#4.posZ 57166094
+  r Debris#4.sizeX 0
+  r Debris#4.sizeY 0
+  r Debris#4.sizeZ 0
+  r Debris#4.velX 0
+  r Debris#4.velY 0
+  r Debris#4.velZ 0
+  r Debris#4.spinX 0
+  r Debris#4.spinY 0
+  r Debris#4.spinZ 0
+  r Debris#4.angle_x 0
+  r Debris#4.angle_y 0
+  r Debris#4.angle_z 0
+  r Debris#4.flags 0
+  r Debris#5.obj null
+  r Debris#5.posX 77199162
+  r Debris#5.posY 2989888
+  r Debris#5.posZ 57344263
+  r Debris#5.sizeX 0
+  r Debris#5.sizeY 0
+  r Debris#5.sizeZ 0
+  r Debris#5.velX 0
+  r Debris#5.velY 0
+  r Debris#5.velZ 0
+  r Debris#5.spinX 0
+  r Debris#5.spinY 0
+  r Debris#5.spinZ 0
+  r Debris#5.angle_x 0
+  r Debris#5.angle_y 0
+  r Debris#5.angle_z 0
+  r Debris#5.flags 0
+  r Debris#6.obj null
+  r Debris#6.posX 107836854
+  r Debris#6.posY 3160322
+  r Debris#6.posZ 56290232
+  r Debris#6.sizeX 0
+  r Debris#6.sizeY 0
+  r Debris#6.sizeZ 0
+  r Debris#6.velX 0
+  r Debris#6.velY 0
+  r Debris#6.velZ 0
+  r Debris#6.spinX 0
+  r Debris#6.spinY 0
+  r Debris#6.spinZ 0
+  r Debris#6.angle_x 0
+  r Debris#6.angle_y 0
+  r Debris#6.angle_z 0
+  r Debris#6.flags 0
+  r Debris#7.obj null
+  r Debris#7.posX 107980793
+  r Debris#7.posY 3085695
+  r Debris#7.posZ 58407217
+  r Debris#7.sizeX 0
+  r Debris#7.sizeY 0
+  r Debris#7.sizeZ 0
+  r Debris#7.velX 0
+  r Debris#7.velY 0
+  r Debris#7.velZ 0
+  r Debris#7.spinX 0
+  r Debris#7.spinY 0
+  r Debris#7.spinZ 0
+  r Debris#7.angle_x 0
+  r Debris#7.angle_y 0
+  r Debris#7.angle_z 0
+  r Debris#7.flags 0
+  r Debris#8.obj null
+  r Debris#8.posX 121832400
+  r Debris#8.posY 3161831
+  r Debris#8.posZ 68271806
+  r Debris#8.sizeX 0
+  r Debris#8.sizeY 0
+  r Debris#8.sizeZ 0
+  r Debris#8.velX 0
+  r Debris#8.velY 0
+  r Debris#8.velZ 0
+  r Debris#8.spinX 0
+  r Debris#8.spinY 0
+  r Debris#8.spinZ 0
+  r Debris#8.angle_x 0
+  r Debris#8.angle_y 0
+  r Debris#8.angle_z 0
+  r Debris#8.flags 0
+  r Debris#9.obj null
+  r Debris#9.posX 107955781
+  r Debris#9.posY 3211362
+  r Debris#9.posZ 56280997
+  r Debris#9.sizeX 0
+  r Debris#9.sizeY 0
+  r Debris#9.sizeZ 0
+  r Debris#9.velX 0
+  r Debris#9.velY 0
+  r Debris#9.velZ 0
+  r Debris#9.spinX 0
+  r Debris#9.spinY 0
+  r Debris#9.spinZ 0
+  r Debris#9.angle_x 0
+  r Debris#9.angle_y 0
+  r Debris#9.angle_z 0
+  r Debris#9.flags 0
+  r Debris#10.obj null
+  r Debris#10.posX 92250247
+  r Debris#10.posY 3079050
+  r Debris#10.posZ 53679034
+  r Debris#10.sizeX 0
+  r Debris#10.sizeY 0
+  r Debris#10.sizeZ 0
+  r Debris#10.velX 0
+  r Debris#10.velY 0
+  r Debris#10.velZ 0
+  r Debris#10.spinX 0
+  r Debris#10.spinY 0
+  r Debris#10.spinZ 0
+  r Debris#10.angle_x 0
+  r Debris#10.angle_y 0
+  r Debris#10.angle_z 0
+  r Debris#10.flags 0
+  r ExplodedSlot#0.piece ExplodedPiece#1
+  r ExplodedSlot#1.piece ExplodedPiece#2
+  r ExplodedSlot#2.piece ExplodedPiece#3
+  r ExplodedSlot#3.piece ExplodedPiece#4
+  r ExplodedSlot#4.piece null
+  r ExplodedSlot#5.piece ExplodedPiece#5
+  r ExplodedSlot#6.piece null
+  r ExplodedSlot#7.piece ExplodedPiece#6
+  r ExplodedSlot#8.piece null
+  r ExplodedSlot#9.piece ExplodedPiece#7
+  r ExplodedSlot#10.piece null
+  r ExplodedSlot#11.piece ExplodedPiece#8
+  r ExplodedSlot#12.piece ExplodedPiece#9
+  r ExplodedSlot#13.piece null
+  r ExplodedSlot#14.piece null
+  r ExplodedSlot#15.piece null
+  r ExplodedSlot#16.piece null
+  r ExplodedSlot#17.piece null
+  r ExplodedSlot#18.piece null
+  r ExplodedSlot#19.piece null
+  r ExplodedSlot#20.piece null
+  r ExplodedSlot#21.piece null
+  r ExplodedSlot#22.piece null
+  r ExplodedSlot#23.piece null
+  r ExplodedSlot#24.piece null
+  r ExplodedSlot#25.piece null
+  r ExplodedSlot#26.piece null
+  r ExplodedSlot#27.piece null
+  r ExplodedSlot#28.piece null
+  r ExplodedSlot#29.piece null
+  r ExplodedSlot#30.piece null
+  r ExplodedSlot#31.piece null
+  r ExplodedSlot#32.piece null
+  r ExplodedSlot#33.piece null
+  r ExplodedSlot#34.piece null
+  r ExplodedSlot#35.piece null
+  r ExplodedSlot#36.piece null
+  r ExplodedSlot#37.piece null
+  r ExplodedSlot#38.piece null
+  r ExplodedSlot#39.piece null
+  r ExplodedSlot#40.piece null
+  r ExplodedSlot#41.piece null
+  r ExplodedSlot#42.piece null
+  r ExplodedSlot#43.piece null
+  r ExplodedSlot#44.piece null
+  r ExplodedSlot#45.piece null
+  r ExplodedSlot#46.piece null
+  r ExplodedSlot#47.piece null
+  r ExplodedSlot#48.piece null
+  r ExplodedSlot#49.piece null
+  r ExplodedSlot#50.piece null
+  r ExplodedSlot#51.piece null
+  r ExplodedSlot#52.piece null
+  r ExplodedSlot#53.piece null
+  r ExplodedSlot#54.piece null
+  r ExplodedSlot#55.piece null
+  r ExplodedSlot#56.piece null
+  r ExplodedSlot#57.piece null
+  r ExplodedSlot#58.piece null
+  r ExplodedSlot#59.piece null
+  r ExplodedSlot#60.piece null
+  r ExplodedSlot#61.piece null
+  r ExplodedSlot#62.piece null
+  r ExplodedSlot#63.piece null
+  r ExplodedSlot#64.piece null
+  r ExplodedSlot#65.piece null
+  r ExplodedSlot#66.piece null
+  r ExplodedSlot#67.piece null
+  r ExplodedSlot#68.piece null
+  r ExplodedSlot#69.piece null
+  r ExplodedSlot#70.piece null
+  r ExplodedSlot#71.piece null
+  r ExplodedSlot#72.piece null
+  r ExplodedSlot#73.piece null
+  r ExplodedSlot#74.piece null
+  r ExplodedSlot#75.piece null
+  r ExplodedSlot#76.piece null
+  r ExplodedSlot#77.piece null
+  r ExplodedSlot#78.piece null
+  r ExplodedSlot#79.piece null
+  r ExplodedSlot#80.piece null
+  r ExplodedSlot#81.piece null
+  r ExplodedSlot#82.piece null
+  r ExplodedSlot#83.piece null
+  r ExplodedSlot#84.piece null
+  r ExplodedSlot#85.piece null
+  r ExplodedSlot#86.piece null
+  r ExplodedSlot#87.piece null
+  r ExplodedSlot#88.piece null
+  r ExplodedSlot#89.piece null
+  r ExplodedSlot#90.piece null
+  r ExplodedSlot#91.piece null
+  r ExplodedSlot#92.piece null
+  r ExplodedSlot#93.piece null
+  r ExplodedSlot#94.piece null
+  r ExplodedSlot#95.piece null
+  r ExplodedSlot#96.piece null
+  r ExplodedSlot#97.piece null
+  r ExplodedSlot#98.piece null
+  r ExplodedSlot#99.piece null
+  r GafSrc1#0.ptr FrameTable#1
+  r GafSrc2#0.ptr FrameTable#2
+  r GafSrc3#0.ptr FrameTable#3
+  r GafLists#0.ptr FrameTable#4
+  r GafLists#1.ptr FrameTable#5
+  r GafLists#2.ptr FrameTable#6
+  r Debris#0.ref1.src FrameTable#7
+  r Debris#0.ref2.src null
+  r Debris#1.ref1.src FrameTable#3
+  r Debris#1.ref2.src null
+  r Debris#2.ref1.src FrameTable#7
+  r Debris#2.ref2.src null
+  r Debris#3.ref1.src FrameTable#1
+  r Debris#3.ref2.src null
+  r Debris#4.ref1.src FrameTable#8
+  r Debris#4.ref2.src FrameTable#4
+  r Debris#5.ref1.src FrameTable#8
+  r Debris#5.ref2.src FrameTable#4
+  r Debris#6.ref1.src FrameTable#7
+  r Debris#6.ref2.src FrameTable#4
+  r Debris#7.ref1.src FrameTable#7
+  r Debris#7.ref2.src FrameTable#4
+  r Debris#8.ref1.src FrameTable#7
+  r Debris#8.ref2.src FrameTable#4
+  r Debris#9.ref1.src FrameTable#7
+  r Debris#9.ref2.src FrameTable#4
+  r Debris#10.ref1.src FrameTable#7
+  r Debris#10.ref2.src FrameTable#4
+  r ExplodedPiece#1.angVelX 1374
+  r ExplodedPiece#1.angVelY 1701
+  r ExplodedPiece#1.angVelZ 1477
+  r ExplodedPiece#1.vel_x -65536
+  r ExplodedPiece#1.vel_y 131094
+  r ExplodedPiece#1.vel_z 229376
+  r ExplodedPiece#1.ticks 810
+  r ExplodedPiece#1.bits 27
+  r ExplodedPiece#1.rec PieceRec#1
+  r ExplodedPiece#2.angVelX 2062
+  r ExplodedPiece#2.angVelY 1487
+  r ExplodedPiece#2.angVelZ 502
+  r ExplodedPiece#2.vel_x 81920
+  r ExplodedPiece#2.vel_y -438320
+  r ExplodedPiece#2.vel_z 180224
+  r ExplodedPiece#2.ticks 724
+  r ExplodedPiece#2.bits 27
+  r ExplodedPiece#2.rec PieceRec#2
+  r ExplodedPiece#3.angVelX 427
+  r ExplodedPiece#3.angVelY 1627
+  r ExplodedPiece#3.angVelZ 70
+  r ExplodedPiece#3.vel_x -147456
+  r ExplodedPiece#3.vel_y -372784
+  r ExplodedPiece#3.vel_z -98304
+  r ExplodedPiece#3.ticks 724
+  r ExplodedPiece#3.bits 27
+  r ExplodedPiece#3.rec PieceRec#3
+  r ExplodedPiece#4.angVelX 1513
+  r ExplodedPiece#4.angVelY 2610
+  r ExplodedPiece#4.angVelZ 1368
+  r ExplodedPiece#4.vel_x 131072
+  r ExplodedPiece#4.vel_y -372784
+  r ExplodedPiece#4.vel_z 131072
+  r ExplodedPiece#4.ticks 724
+  r ExplodedPiece#4.bits 27
+  r ExplodedPiece#4.rec PieceRec#4
+  r ExplodedPiece#5.angVelX 855
+  r ExplodedPiece#5.angVelY 2927
+  r ExplodedPiece#5.angVelZ 1010
+  r ExplodedPiece#5.vel_x 0
+  r ExplodedPiece#5.vel_y 131094
+  r ExplodedPiece#5.vel_z -81920
+  r ExplodedPiece#5.ticks 810
+  r ExplodedPiece#5.bits 27
+  r ExplodedPiece#5.rec PieceRec#5
+  r ExplodedPiece#6.angVelX 2602
+  r ExplodedPiece#6.angVelY 562
+  r ExplodedPiece#6.angVelZ 1053
+  r ExplodedPiece#6.vel_x 311296
+  r ExplodedPiece#6.vel_y -196586
+  r ExplodedPiece#6.vel_z -16384
+  r ExplodedPiece#6.ticks 810
+  r ExplodedPiece#6.bits 27
+  r ExplodedPiece#6.rec PieceRec#6
+  r ExplodedPiece#7.angVelX 2047
+  r ExplodedPiece#7.angVelY 2162
+  r ExplodedPiece#7.angVelZ 709
+  r ExplodedPiece#7.vel_x -245760
+  r ExplodedPiece#7.vel_y -342202
+  r ExplodedPiece#7.vel_z -16384
+  r ExplodedPiece#7.ticks 730
+  r ExplodedPiece#7.bits 27
+  r ExplodedPiece#7.rec PieceRec#7
+  r ExplodedPiece#8.angVelX 1675
+  r ExplodedPiece#8.angVelY 1529
+  r ExplodedPiece#8.angVelZ 387
+  r ExplodedPiece#8.vel_x 212992
+  r ExplodedPiece#8.vel_y -342202
+  r ExplodedPiece#8.vel_z 65536
+  r ExplodedPiece#8.ticks 730
+  r ExplodedPiece#8.bits 27
+  r ExplodedPiece#8.rec PieceRec#8
+  r ExplodedPiece#9.angVelX 1813
+  r ExplodedPiece#9.angVelY 2413
+  r ExplodedPiece#9.angVelZ 2084
+  r ExplodedPiece#9.vel_x -32768
+  r ExplodedPiece#9.vel_y 65558
+  r ExplodedPiece#9.vel_z 131072
+  r ExplodedPiece#9.ticks 810
+  r ExplodedPiece#9.bits 27
+  r ExplodedPiece#9.rec PieceRec#9
+  r PieceRec#1.angle_10 -7412
+  r PieceRec#1.angle_12 22018
+  r PieceRec#1.angle_14 1858
+  r PieceRec#1.posX 128447477
+  r PieceRec#1.posY 36205569
+  r PieceRec#1.posZ 76576042
+  r PieceRec#2.angle_10 -30304
+  r PieceRec#2.angle_12 -432
+  r PieceRec#2.angle_14 22816
+  r PieceRec#2.posX 124465477
+  r PieceRec#2.posY 5760586
+  r PieceRec#2.posZ 100469061
+  r PieceRec#3.angle_10 9616
+  r PieceRec#3.angle_12 24208
+  r PieceRec#3.angle_14 12320
+  r PieceRec#3.posX 85219061
+  r PieceRec#3.posY 17323007
+  r PieceRec#3.posZ 51298730
+  r PieceRec#4.angle_10 4144
+  r PieceRec#4.angle_12 608
+  r PieceRec#4.angle_14 -21376
+  r PieceRec#4.posX 133682956
+  r PieceRec#4.posY 17326909
+  r PieceRec#4.posZ 92386450
+  r PieceRec#5.angle_10 11414
+  r PieceRec#5.angle_12 1286
+  r PieceRec#5.angle_14 25364
+  r PieceRec#5.posX 133544775
+  r PieceRec#5.posY 36261082
+  r PieceRec#5.posZ 48539510
+  r PieceRec#6.angle_10 -27964
+  r PieceRec#6.angle_12 -14956
+  r PieceRec#6.angle_14 29234
+  r PieceRec#6.posX 161583789
+  r PieceRec#6.posY 6769882
+  r PieceRec#6.posZ 53536907
+  r PieceRec#7.angle_10 20310
+  r PieceRec#7.angle_12 -25676
+  r PieceRec#7.angle_14 -10542
+  r PieceRec#7.posX 107156139
+  r PieceRec#7.posY 19486756
+  r PieceRec#7.posZ 46892244
+  r PieceRec#8.angle_10 22043
+  r PieceRec#8.angle_12 -2214
+  r PieceRec#8.angle_14 254
+  r PieceRec#8.posX 186659596
+  r PieceRec#8.posY 19383963
+  r PieceRec#8.posZ 60893038
+  r PieceRec#9.angle_10 31437
+  r PieceRec#9.angle_12 20562
+  r PieceRec#9.angle_14 -9048
+  r PieceRec#9.posX 132109666
+  r PieceRec#9.posY 30245843
+  r PieceRec#9.posZ 67623474
+  i map.GetCellMeanHeight pos=(128447477,76576042) = 3
+  i map.GetCellMeanHeight pos=(124465477,100469061) = 3
+  i map.GetCellMeanHeight pos=(85219061,51298730) = 65
+  i map.GetCellMeanHeight pos=(133682956,92386450) = 3
+  i map.GetCellMeanHeight pos=(133544775,48539510) = 3
+  i map.GetCellMeanHeight pos=(161583789,53536907) = 3
+  i map.GetCellMeanHeight pos=(107156139,46892244) = 3
+  i map.GetCellMeanHeight pos=(186659596,60893038) = 3
+  i map.GetCellMeanHeight pos=(132109666,67623474) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 22
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#3
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 21
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 7
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 11
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 3
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 10
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 7
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 7
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 5
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 5
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 3
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 3
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 2
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#10.ref2 = 0
+  o Debris#10.ref2.index 2
+  o Debris#10.ref2.value 1
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  w Game.count_1491b 10
+  w Debris#0.posX 175146243
+  w Debris#0.posY 5086381
+  w Debris#0.posZ 31901213
+  w Debris#1.posX 102937822
+  w Debris#1.posY 3179862
+  w Debris#1.posZ 59667265
+  w Debris#2.posX 149755121
+  w Debris#2.posY 2964060
+  w Debris#2.posZ 54254333
+  w Debris#3.posX 77938329
+  w Debris#3.posY 3130763
+  w Debris#3.posZ 57166094
+  w Debris#4.posX 77199162
+  w Debris#4.posY 2989888
+  w Debris#4.posZ 57344263
+  w Debris#5.posX 107836854
+  w Debris#5.posY 3160322
+  w Debris#5.posZ 56290232
+  w Debris#6.posX 107980793
+  w Debris#6.posY 3085695
+  w Debris#6.posZ 58407217
+  w Debris#7.posX 121832400
+  w Debris#7.posY 3161831
+  w Debris#7.posZ 68271806
+  w Debris#8.posX 107955781
+  w Debris#8.posY 3211362
+  w Debris#8.posZ 56280997
+  w Debris#9.posX 92250247
+  w Debris#9.posY 3079050
+  w Debris#9.posZ 53679034
+  w Debris#0.ref1.src FrameTable#3
+  w Debris#1.ref1.src FrameTable#7
+  w Debris#2.ref1.src FrameTable#1
+  w Debris#3.ref1.src FrameTable#8
+  w Debris#3.ref2.src FrameTable#4
+  w Debris#5.ref1.src FrameTable#7
+  w ExplodedPiece#1.vel_y 125997
+  w ExplodedPiece#1.ticks 809
+  w ExplodedPiece#2.vel_y -443417
+  w ExplodedPiece#2.ticks 723
+  w ExplodedPiece#3.vel_y -377881
+  w ExplodedPiece#3.ticks 723
+  w ExplodedPiece#4.vel_y -377881
+  w ExplodedPiece#4.ticks 723
+  w ExplodedPiece#5.vel_y 125997
+  w ExplodedPiece#5.ticks 809
+  w ExplodedPiece#6.vel_y -201683
+  w ExplodedPiece#6.ticks 809
+  w ExplodedPiece#7.vel_y -347299
+  w ExplodedPiece#7.ticks 729
+  w ExplodedPiece#8.vel_y -347299
+  w ExplodedPiece#8.ticks 729
+  w ExplodedPiece#9.vel_y 60461
+  w ExplodedPiece#9.ticks 809
+  w PieceRec#1.angle_10 -6038
+  w PieceRec#1.angle_12 23719
+  w PieceRec#1.angle_14 3335
+  w PieceRec#1.posX 128381941
+  w PieceRec#1.posY 36336663
+  w PieceRec#1.posZ 76805418
+  w PieceRec#2.angle_10 -28242
+  w PieceRec#2.angle_12 1055
+  w PieceRec#2.angle_14 23318
+  w PieceRec#2.posX 124547397
+  w PieceRec#2.posY 5322266
+  w PieceRec#2.posZ 100649285
+  w PieceRec#3.angle_10 10043
+  w PieceRec#3.angle_12 25835
+  w PieceRec#3.angle_14 12390
+  w PieceRec#3.posX 85071605
+  w PieceRec#3.posY 16950223
+  w PieceRec#3.posZ 51200426
+  w PieceRec#4.angle_10 5657
+  w PieceRec#4.angle_12 3218
+  w PieceRec#4.angle_14 -20008
+  w PieceRec#4.posX 133814028
+  w PieceRec#4.posY 16954125
+  w PieceRec#4.posZ 92517522
+  w PieceRec#5.angle_10 12269
+  w PieceRec#5.angle_12 4213
+  w PieceRec#5.angle_14 26374
+  w PieceRec#5.posY 36392176
+  w PieceRec#5.posZ 48457590
+  w PieceRec#6.angle_10 -25362
+  w PieceRec#6.angle_12 -14394
+  w PieceRec#6.angle_14 30287
+  w PieceRec#6.posX 161895085
+  w PieceRec#6.posY 6573296
+  w PieceRec#6.posZ 53520523
+  w PieceRec#7.angle_10 22357
+  w PieceRec#7.angle_12 -23514
+  w PieceRec#7.angle_14 -9833
+  w PieceRec#7.posX 106910379
+  w PieceRec#7.posY 19144554
+  w PieceRec#7.posZ 46875860
+  w PieceRec#8.angle_10 23718
+  w PieceRec#8.angle_12 -685
+  w PieceRec#8.angle_14 641
+  w PieceRec#8.posX 186872588
+  w PieceRec#8.posY 19041761
+  w PieceRec#8.posZ 60958574
+  w PieceRec#9.angle_10 -32286
+  w PieceRec#9.angle_12 22975
+  w PieceRec#9.angle_14 -6964
+  w PieceRec#9.posX 132076898
+  w PieceRec#9.posY 30311401
+  w PieceRec#9.posZ 67754546
 call 1640 GetWeaponRange
   a unit Unit#11
   a weapon 0
@@ -11436,6 +12395,205 @@ call 1641 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1641 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128381941,76805418) = 3
+  i map.GetCellMeanHeight pos=(124547397,100649285) = 3
+  i map.GetCellMeanHeight pos=(85071605,51200426) = 65
+  i map.GetCellMeanHeight pos=(133814028,92517522) = 3
+  i map.GetCellMeanHeight pos=(133544775,48457590) = 3
+  i map.GetCellMeanHeight pos=(161895085,53520523) = 3
+  i map.GetCellMeanHeight pos=(106910379,46875860) = 3
+  i map.GetCellMeanHeight pos=(186872588,60958574) = 3
+  i map.GetCellMeanHeight pos=(132076898,67754546) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 21
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 7
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 7
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 11
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 6
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 6
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 3
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 3
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 3
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w Game.count_1491b 9
+  w Debris#0.posX 102937822
+  w Debris#0.posY 3179862
+  w Debris#0.posZ 59667265
+  w Debris#1.posX 149755121
+  w Debris#1.posY 2964060
+  w Debris#1.posZ 54254333
+  w Debris#2.posX 77938329
+  w Debris#2.posY 3130763
+  w Debris#2.posZ 57166094
+  w Debris#3.posX 77199162
+  w Debris#3.posY 2989888
+  w Debris#3.posZ 57344263
+  w Debris#4.posX 107836854
+  w Debris#4.posY 3160322
+  w Debris#4.posZ 56290232
+  w Debris#5.posX 107980793
+  w Debris#5.posY 3085695
+  w Debris#5.posZ 58407217
+  w Debris#6.posX 121832400
+  w Debris#6.posY 3161831
+  w Debris#6.posZ 68271806
+  w Debris#7.posX 107955781
+  w Debris#7.posY 3211362
+  w Debris#7.posZ 56280997
+  w Debris#8.posX 92250247
+  w Debris#8.posY 3079050
+  w Debris#8.posZ 53679034
+  w Debris#0.ref1.src FrameTable#7
+  w Debris#1.ref1.src FrameTable#1
+  w Debris#2.ref1.src FrameTable#8
+  w Debris#2.ref2.src FrameTable#4
+  w Debris#4.ref1.src FrameTable#7
+  w ExplodedPiece#1.vel_y 120900
+  w ExplodedPiece#1.ticks 808
+  w ExplodedPiece#2.vel_y -448514
+  w ExplodedPiece#2.ticks 722
+  w ExplodedPiece#3.vel_y -382978
+  w ExplodedPiece#3.ticks 722
+  w ExplodedPiece#4.vel_y -382978
+  w ExplodedPiece#4.ticks 722
+  w ExplodedPiece#5.vel_y 120900
+  w ExplodedPiece#5.ticks 808
+  w ExplodedPiece#6.vel_y -206780
+  w ExplodedPiece#6.ticks 808
+  w ExplodedPiece#7.vel_y -352396
+  w ExplodedPiece#7.ticks 728
+  w ExplodedPiece#8.vel_y -352396
+  w ExplodedPiece#8.ticks 728
+  w ExplodedPiece#9.vel_y 55364
+  w ExplodedPiece#9.ticks 808
+  w PieceRec#1.angle_10 -4664
+  w PieceRec#1.angle_12 25420
+  w PieceRec#1.angle_14 4812
+  w PieceRec#1.posX 128316405
+  w PieceRec#1.posY 36462660
+  w PieceRec#1.posZ 77034794
+  w PieceRec#2.angle_10 -26180
+  w PieceRec#2.angle_12 2542
+  w PieceRec#2.angle_14 23820
+  w PieceRec#2.posX 124629317
+  w PieceRec#2.posY 4878849
+  w PieceRec#2.posZ 100829509
+  w PieceRec#3.angle_10 10470
+  w PieceRec#3.angle_12 27462
+  w PieceRec#3.angle_14 12460
+  w PieceRec#3.posX 84924149
+  w PieceRec#3.posY 16572342
+  w PieceRec#3.posZ 51102122
+  w PieceRec#4.angle_10 7170
+  w PieceRec#4.angle_12 5828
+  w PieceRec#4.angle_14 -18640
+  w PieceRec#4.posX 133945100
+  w PieceRec#4.posY 16576244
+  w PieceRec#4.posZ 92648594
+  w PieceRec#5.angle_10 13124
+  w PieceRec#5.angle_12 7140
+  w PieceRec#5.angle_14 27384
+  w PieceRec#5.posY 36518173
+  w PieceRec#5.posZ 48375670
+  w PieceRec#6.angle_10 -22760
+  w PieceRec#6.angle_12 -13832
+  w PieceRec#6.angle_14 31340
+  w PieceRec#6.posX 162206381
+  w PieceRec#6.posY 6371613
+  w PieceRec#6.posZ 53504139
+  w PieceRec#7.angle_10 24404
+  w PieceRec#7.angle_12 -21352
+  w PieceRec#7.angle_14 -9124
+  w PieceRec#7.posX 106664619
+  w PieceRec#7.posY 18797255
+  w PieceRec#7.posZ 46859476
+  w PieceRec#8.angle_10 25393
+  w PieceRec#8.angle_12 844
+  w PieceRec#8.angle_14 1028
+  w PieceRec#8.posX 187085580
+  w PieceRec#8.posY 18694462
+  w PieceRec#8.posZ 61024110
+  w PieceRec#9.angle_10 -30473
+  w PieceRec#9.angle_12 25388
+  w PieceRec#9.angle_14 -4880
+  w PieceRec#9.posX 132044130
+  w PieceRec#9.posY 30371862
+  w PieceRec#9.posZ 67885618
 call 1641 GetWeaponRange
   a unit Unit#274
   a weapon 1
@@ -11888,6 +13046,168 @@ call 1642 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1642 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128316405,77034794) = 3
+  i map.GetCellMeanHeight pos=(124629317,100829509) = 3
+  i map.GetCellMeanHeight pos=(84924149,51102122) = 90
+  i map.GetCellMeanHeight pos=(133945100,92648594) = 3
+  i map.GetCellMeanHeight pos=(133544775,48375670) = 3
+  i map.GetCellMeanHeight pos=(162206381,53504139) = 3
+  i map.GetCellMeanHeight pos=(106664619,46859476) = 3
+  i map.GetCellMeanHeight pos=(187085580,61024110) = 3
+  i map.GetCellMeanHeight pos=(132044130,67885618) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 22
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 12
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref2 = 1
+  o Debris#2.ref2.index 12
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src null
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 7
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 8
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 8
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 4
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 4
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 3
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  w Debris#2.ref2.src null
+  w ExplodedPiece#1.vel_y 115803
+  w ExplodedPiece#1.ticks 807
+  w ExplodedPiece#2.vel_y -453611
+  w ExplodedPiece#2.ticks 721
+  w ExplodedPiece#3.vel_y -388075
+  w ExplodedPiece#3.ticks 721
+  w ExplodedPiece#4.vel_y -388075
+  w ExplodedPiece#4.ticks 721
+  w ExplodedPiece#5.vel_y 115803
+  w ExplodedPiece#5.ticks 807
+  w ExplodedPiece#6.vel_y -211877
+  w ExplodedPiece#6.ticks 807
+  w ExplodedPiece#7.vel_y -357493
+  w ExplodedPiece#7.ticks 727
+  w ExplodedPiece#8.vel_y -357493
+  w ExplodedPiece#8.ticks 727
+  w ExplodedPiece#9.vel_y 50267
+  w ExplodedPiece#9.ticks 807
+  w PieceRec#1.angle_10 -3290
+  w PieceRec#1.angle_12 27121
+  w PieceRec#1.angle_14 6289
+  w PieceRec#1.posX 128250869
+  w PieceRec#1.posY 36583560
+  w PieceRec#1.posZ 77264170
+  w PieceRec#2.angle_10 -24118
+  w PieceRec#2.angle_12 4029
+  w PieceRec#2.angle_14 24322
+  w PieceRec#2.posX 124711237
+  w PieceRec#2.posY 4430335
+  w PieceRec#2.posZ 101009733
+  w PieceRec#3.angle_10 10897
+  w PieceRec#3.angle_12 29089
+  w PieceRec#3.angle_14 12530
+  w PieceRec#3.posX 84776693
+  w PieceRec#3.posY 16189364
+  w PieceRec#3.posZ 51003818
+  w PieceRec#4.angle_10 8683
+  w PieceRec#4.angle_12 8438
+  w PieceRec#4.angle_14 -17272
+  w PieceRec#4.posX 134076172
+  w PieceRec#4.posY 16193266
+  w PieceRec#4.posZ 92779666
+  w PieceRec#5.angle_10 13979
+  w PieceRec#5.angle_12 10067
+  w PieceRec#5.angle_14 28394
+  w PieceRec#5.posY 36639073
+  w PieceRec#5.posZ 48293750
+  w PieceRec#6.angle_10 -20158
+  w PieceRec#6.angle_12 -13270
+  w PieceRec#6.angle_14 32393
+  w PieceRec#6.posX 162517677
+  w PieceRec#6.posY 6164833
+  w PieceRec#6.posZ 53487755
+  w PieceRec#7.angle_10 26451
+  w PieceRec#7.angle_12 -19190
+  w PieceRec#7.angle_14 -8415
+  w PieceRec#7.posX 106418859
+  w PieceRec#7.posY 18444859
+  w PieceRec#7.posZ 46843092
+  w PieceRec#8.angle_10 27068
+  w PieceRec#8.angle_12 2373
+  w PieceRec#8.angle_14 1415
+  w PieceRec#8.posX 187298572
+  w PieceRec#8.posY 18342066
+  w PieceRec#8.posZ 61089646
+  w PieceRec#9.angle_10 -28660
+  w PieceRec#9.angle_12 27801
+  w PieceRec#9.angle_14 -2796
+  w PieceRec#9.posX 132011362
+  w PieceRec#9.posY 30427226
+  w PieceRec#9.posZ 68016690
 call 1643 UpdateUnitWeapons
   r Unit#1.posX 95592763
   r Unit#1.posZ 49032034
@@ -12264,6 +13584,163 @@ call 1643 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1643 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128250869,77264170) = 3
+  i map.GetCellMeanHeight pos=(124711237,101009733) = 3
+  i map.GetCellMeanHeight pos=(84776693,51003818) = 90
+  i map.GetCellMeanHeight pos=(134076172,92779666) = 3
+  i map.GetCellMeanHeight pos=(133544775,48293750) = 3
+  i map.GetCellMeanHeight pos=(162517677,53487755) = 3
+  i map.GetCellMeanHeight pos=(106418859,46843092) = 3
+  i map.GetCellMeanHeight pos=(187298572,61089646) = 3
+  i map.GetCellMeanHeight pos=(132011362,68016690) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 22
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 12
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 8
+  o Debris#3.ref1.value 3
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 12
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src null
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 4
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 4
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 4
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 4
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  w Debris#3.ref2.src null
+  w ExplodedPiece#1.vel_y 110706
+  w ExplodedPiece#1.ticks 806
+  w ExplodedPiece#2.vel_y -458708
+  w ExplodedPiece#2.ticks 720
+  w ExplodedPiece#3.vel_y -393172
+  w ExplodedPiece#3.ticks 720
+  w ExplodedPiece#4.vel_y -393172
+  w ExplodedPiece#4.ticks 720
+  w ExplodedPiece#5.vel_y 110706
+  w ExplodedPiece#5.ticks 806
+  w ExplodedPiece#6.vel_y -216974
+  w ExplodedPiece#6.ticks 806
+  w ExplodedPiece#7.vel_y -362590
+  w ExplodedPiece#7.ticks 726
+  w ExplodedPiece#8.vel_y -362590
+  w ExplodedPiece#8.ticks 726
+  w ExplodedPiece#9.vel_y 45170
+  w ExplodedPiece#9.ticks 806
+  w PieceRec#1.angle_10 -1916
+  w PieceRec#1.angle_12 28822
+  w PieceRec#1.angle_14 7766
+  w PieceRec#1.posX 128185333
+  w PieceRec#1.posY 36699363
+  w PieceRec#1.posZ 77493546
+  w PieceRec#2.angle_10 -22056
+  w PieceRec#2.angle_12 5516
+  w PieceRec#2.angle_14 24824
+  w PieceRec#2.posX 124793157
+  w PieceRec#2.posY 3976724
+  w PieceRec#2.posZ 101189957
+  w PieceRec#3.angle_10 11324
+  w PieceRec#3.angle_12 30716
+  w PieceRec#3.angle_14 12600
+  w PieceRec#3.posX 84629237
+  w PieceRec#3.posY 15801289
+  w PieceRec#3.posZ 50905514
+  w PieceRec#4.angle_10 10196
+  w PieceRec#4.angle_12 11048
+  w PieceRec#4.angle_14 -15904
+  w PieceRec#4.posX 134207244
+  w PieceRec#4.posY 15805191
+  w PieceRec#4.posZ 92910738
+  w PieceRec#5.angle_10 14834
+  w PieceRec#5.angle_12 12994
+  w PieceRec#5.angle_14 29404
+  w PieceRec#5.posY 36754876
+  w PieceRec#5.posZ 48211830
+  w PieceRec#6.angle_10 -17556
+  w PieceRec#6.angle_12 -12708
+  w PieceRec#6.angle_14 -32090
+  w PieceRec#6.posX 162828973
+  w PieceRec#6.posY 5952956
+  w PieceRec#6.posZ 53471371
+  w PieceRec#7.angle_10 28498
+  w PieceRec#7.angle_12 -17028
+  w PieceRec#7.angle_14 -7706
+  w PieceRec#7.posX 106173099
+  w PieceRec#7.posY 18087366
+  w PieceRec#7.posZ 46826708
+  w PieceRec#8.angle_10 28743
+  w PieceRec#8.angle_12 3902
+  w PieceRec#8.angle_14 1802
+  w PieceRec#8.posX 187511564
+  w PieceRec#8.posY 17984573
+  w PieceRec#8.posZ 61155182
+  w PieceRec#9.angle_10 -26847
+  w PieceRec#9.angle_12 30214
+  w PieceRec#9.angle_14 -712
+  w PieceRec#9.posX 131978594
+  w PieceRec#9.posY 30477493
+  w PieceRec#9.posZ 68147762
 call 1644 UpdateUnitWeapons
   r Unit#1.posX 95590274
   r Unit#1.posZ 49099491
@@ -12685,6 +14162,205 @@ call 1644 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1644 UpdateExplosions
+  r Game.count_1491b 10
+  r Debris#9.posX 101134049
+  r Debris#9.posY 3121519
+  r Debris#9.posZ 56694649
+  r Debris#9.ref1.src FrameTable#8
+  i map.GetCellMeanHeight pos=(128185333,77493546) = 3
+  i map.GetCellMeanHeight pos=(124793157,101189957) = 3
+  i map.GetCellMeanHeight pos=(84629237,50905514) = 90
+  i map.GetCellMeanHeight pos=(134207244,92910738) = 3
+  i map.GetCellMeanHeight pos=(133544775,48211830) = 3
+  i map.GetCellMeanHeight pos=(162828973,53471371) = 3
+  i map.GetCellMeanHeight pos=(106173099,46826708) = 3
+  i map.GetCellMeanHeight pos=(187511564,61155182) = 3
+  i map.GetCellMeanHeight pos=(131978594,68147762) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 13
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 8
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 9
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 9
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 4
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 4
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 0
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w Game.count_1491b 9
+  w Debris#0.posX 149755121
+  w Debris#0.posY 2964060
+  w Debris#0.posZ 54254333
+  w Debris#1.posX 77938329
+  w Debris#1.posY 3130763
+  w Debris#1.posZ 57166094
+  w Debris#2.posX 77199162
+  w Debris#2.posY 2989888
+  w Debris#2.posZ 57344263
+  w Debris#3.posX 107836854
+  w Debris#3.posY 3160322
+  w Debris#3.posZ 56290232
+  w Debris#4.posX 107980793
+  w Debris#4.posY 3085695
+  w Debris#4.posZ 58407217
+  w Debris#5.posX 121832400
+  w Debris#5.posY 3161831
+  w Debris#5.posZ 68271806
+  w Debris#6.posX 107955781
+  w Debris#6.posY 3211362
+  w Debris#6.posZ 56280997
+  w Debris#7.posX 92250247
+  w Debris#7.posY 3079050
+  w Debris#7.posZ 53679034
+  w Debris#8.posX 101134049
+  w Debris#8.posY 3121519
+  w Debris#8.posZ 56694649
+  w Debris#0.ref1.src FrameTable#1
+  w Debris#1.ref1.src FrameTable#8
+  w Debris#3.ref1.src FrameTable#7
+  w Debris#3.ref2.src FrameTable#4
+  w Debris#8.ref1.src FrameTable#8
+  w ExplodedPiece#1.vel_y 105609
+  w ExplodedPiece#1.ticks 805
+  w ExplodedPiece#2.vel_y -463805
+  w ExplodedPiece#2.ticks 719
+  w ExplodedPiece#3.vel_y -398269
+  w ExplodedPiece#3.ticks 719
+  w ExplodedPiece#4.vel_y -398269
+  w ExplodedPiece#4.ticks 719
+  w ExplodedPiece#5.vel_y 105609
+  w ExplodedPiece#5.ticks 805
+  w ExplodedPiece#6.vel_y -222071
+  w ExplodedPiece#6.ticks 805
+  w ExplodedPiece#7.vel_y -367687
+  w ExplodedPiece#7.ticks 725
+  w ExplodedPiece#8.vel_y -367687
+  w ExplodedPiece#8.ticks 725
+  w ExplodedPiece#9.vel_y 40073
+  w ExplodedPiece#9.ticks 805
+  w PieceRec#1.angle_10 -542
+  w PieceRec#1.angle_12 30523
+  w PieceRec#1.angle_14 9243
+  w PieceRec#1.posX 128119797
+  w PieceRec#1.posY 36810069
+  w PieceRec#1.posZ 77722922
+  w PieceRec#2.angle_10 -19994
+  w PieceRec#2.angle_12 7003
+  w PieceRec#2.angle_14 25326
+  w PieceRec#2.posX 124875077
+  w PieceRec#2.posY 3518016
+  w PieceRec#2.posZ 101370181
+  w PieceRec#3.angle_10 11751
+  w PieceRec#3.angle_12 32343
+  w PieceRec#3.angle_14 12670
+  w PieceRec#3.posX 84481781
+  w PieceRec#3.posY 15408117
+  w PieceRec#3.posZ 50807210
+  w PieceRec#4.angle_10 11709
+  w PieceRec#4.angle_12 13658
+  w PieceRec#4.angle_14 -14536
+  w PieceRec#4.posX 134338316
+  w PieceRec#4.posY 15412019
+  w PieceRec#4.posZ 93041810
+  w PieceRec#5.angle_10 15689
+  w PieceRec#5.angle_12 15921
+  w PieceRec#5.angle_14 30414
+  w PieceRec#5.posY 36865582
+  w PieceRec#5.posZ 48129910
+  w PieceRec#6.angle_10 -14954
+  w PieceRec#6.angle_12 -12146
+  w PieceRec#6.angle_14 -31037
+  w PieceRec#6.posX 163140269
+  w PieceRec#6.posY 5735982
+  w PieceRec#6.posZ 53454987
+  w PieceRec#7.angle_10 30545
+  w PieceRec#7.angle_12 -14866
+  w PieceRec#7.angle_14 -6997
+  w PieceRec#7.posX 105927339
+  w PieceRec#7.posY 17724776
+  w PieceRec#7.posZ 46810324
+  w PieceRec#8.angle_10 30418
+  w PieceRec#8.angle_12 5431
+  w PieceRec#8.angle_14 2189
+  w PieceRec#8.posX 187724556
+  w PieceRec#8.posY 17621983
+  w PieceRec#8.posZ 61220718
+  w PieceRec#9.angle_10 -25034
+  w PieceRec#9.angle_12 32627
+  w PieceRec#9.angle_14 1372
+  w PieceRec#9.posX 131945826
+  w PieceRec#9.posY 30522663
+  w PieceRec#9.posZ 68278834
 call 1645 UpdateUnitWeapons
   r Unit#1.posX 95587761
   r Unit#1.posZ 49167602
@@ -13095,6 +14771,176 @@ call 1645 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1645 UpdateExplosions
+  r Game.count_1491b 10
+  r Debris#9.posX 100488642
+  r Debris#9.posY 2997077
+  r Debris#9.posZ 56583244
+  i map.GetCellMeanHeight pos=(128119797,77722922) = 3
+  i map.GetCellMeanHeight pos=(124875077,101370181) = 3
+  i map.GetCellMeanHeight pos=(84481781,50807210) = 90
+  i map.GetCellMeanHeight pos=(134338316,93041810) = 3
+  i map.GetCellMeanHeight pos=(133544775,48129910) = 3
+  i map.GetCellMeanHeight pos=(163140269,53454987) = 3
+  i map.GetCellMeanHeight pos=(105927339,46810324) = 3
+  i map.GetCellMeanHeight pos=(187724556,61220718) = 3
+  i map.GetCellMeanHeight pos=(131945826,68278834) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 13
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 10
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 10
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 5
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 5
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 0
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 1
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 0
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w ExplodedPiece#1.vel_y 100512
+  w ExplodedPiece#1.ticks 804
+  w ExplodedPiece#2.vel_y -468902
+  w ExplodedPiece#2.ticks 718
+  w ExplodedPiece#3.vel_y -403366
+  w ExplodedPiece#3.ticks 718
+  w ExplodedPiece#4.vel_y -403366
+  w ExplodedPiece#4.ticks 718
+  w ExplodedPiece#5.vel_y 100512
+  w ExplodedPiece#5.ticks 804
+  w ExplodedPiece#6.vel_y -227168
+  w ExplodedPiece#6.ticks 804
+  w ExplodedPiece#7.vel_y -372784
+  w ExplodedPiece#7.ticks 724
+  w ExplodedPiece#8.vel_y -372784
+  w ExplodedPiece#8.ticks 724
+  w ExplodedPiece#9.vel_y 34976
+  w ExplodedPiece#9.ticks 804
+  w PieceRec#1.angle_10 832
+  w PieceRec#1.angle_12 32224
+  w PieceRec#1.angle_14 10720
+  w PieceRec#1.posX 128054261
+  w PieceRec#1.posY 36915678
+  w PieceRec#1.posZ 77952298
+  w PieceRec#2.angle_10 -17932
+  w PieceRec#2.angle_12 8490
+  w PieceRec#2.angle_14 25828
+  w PieceRec#2.posX 124956997
+  w PieceRec#2.posY 3054211
+  w PieceRec#2.posZ 101550405
+  w PieceRec#3.angle_10 12178
+  w PieceRec#3.angle_12 -31566
+  w PieceRec#3.angle_14 12740
+  w PieceRec#3.posX 84334325
+  w PieceRec#3.posY 15009848
+  w PieceRec#3.posZ 50708906
+  w PieceRec#4.angle_10 13222
+  w PieceRec#4.angle_12 16268
+  w PieceRec#4.angle_14 -13168
+  w PieceRec#4.posX 134469388
+  w PieceRec#4.posY 15013750
+  w PieceRec#4.posZ 93172882
+  w PieceRec#5.angle_10 16544
+  w PieceRec#5.angle_12 18848
+  w PieceRec#5.angle_14 31424
+  w PieceRec#5.posY 36971191
+  w PieceRec#5.posZ 48047990
+  w PieceRec#6.angle_10 -12352
+  w PieceRec#6.angle_12 -11584
+  w PieceRec#6.angle_14 -29984
+  w PieceRec#6.posX 163451565
+  w PieceRec#6.posY 5513911
+  w PieceRec#6.posZ 53438603
+  w PieceRec#7.angle_10 32592
+  w PieceRec#7.angle_12 -12704
+  w PieceRec#7.angle_14 -6288
+  w PieceRec#7.posX 105681579
+  w PieceRec#7.posY 17357089
+  w PieceRec#7.posZ 46793940
+  w PieceRec#8.angle_10 32093
+  w PieceRec#8.angle_12 6960
+  w PieceRec#8.angle_14 2576
+  w PieceRec#8.posX 187937548
+  w PieceRec#8.posY 17254296
+  w PieceRec#8.posZ 61286254
+  w PieceRec#9.angle_10 -23221
+  w PieceRec#9.angle_12 -30496
+  w PieceRec#9.angle_14 3456
+  w PieceRec#9.posX 131913058
+  w PieceRec#9.posY 30562736
+  w PieceRec#9.posZ 68409906
 call 1646 UpdateUnitWeapons
   r Game.projectileCount 4
   r Unit#1.posX 95585224
@@ -13580,6 +15426,181 @@ call 1646 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1646 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128054261,77952298) = 3
+  i mission.GetMissionParams = (2,0,4000,70,f32:0x41a00000,0,0,0,100,f32:0x42480000,f32:0x00000000,f32:0x447a0000,f32:0x447a0000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x447a0000,f32:0x447a0000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000,f32:0x00000000)
+  i services.InitGafSequence Debris#10.ref1 FrameTable#1 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 3
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  i map.GetCellMeanHeight pos=(84334325,50708906) = 90
+  i map.GetCellMeanHeight pos=(134469388,93172882) = 3
+  i map.GetCellMeanHeight pos=(133544775,48047990) = 3
+  i map.GetCellMeanHeight pos=(163451565,53438603) = 3
+  i map.GetCellMeanHeight pos=(105681579,46793940) = 3
+  i map.GetCellMeanHeight pos=(187937548,61286254) = 3
+  i map.GetCellMeanHeight pos=(131913058,68409906) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 13
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 9
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 10
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 10
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 3
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 1
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 1
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 1
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 2
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  w Game.count_1491b 11
+  w Debris#10.posX 124956997
+  w Debris#10.posY 3054211
+  w Debris#10.posZ 101550405
+  w ExplodedSlot#1.piece null
+  w Debris#10.ref1.src FrameTable#1
+  w Debris#10.ref2.src null
+  w ExplodedPiece#1.vel_y 95415
+  w ExplodedPiece#1.ticks 803
+  w ExplodedPiece#3.vel_y -408463
+  w ExplodedPiece#3.ticks 717
+  w ExplodedPiece#4.vel_y -408463
+  w ExplodedPiece#4.ticks 717
+  w ExplodedPiece#5.vel_y 95415
+  w ExplodedPiece#5.ticks 803
+  w ExplodedPiece#6.vel_y -232265
+  w ExplodedPiece#6.ticks 803
+  w ExplodedPiece#7.vel_y -377881
+  w ExplodedPiece#7.ticks 723
+  w ExplodedPiece#8.vel_y -377881
+  w ExplodedPiece#8.ticks 723
+  w ExplodedPiece#9.vel_y 29879
+  w ExplodedPiece#9.ticks 803
+  w PieceRec#1.angle_10 2206
+  w PieceRec#1.angle_12 -31611
+  w PieceRec#1.angle_14 12197
+  w PieceRec#1.posX 127988725
+  w PieceRec#1.posY 37016190
+  w PieceRec#1.posZ 78181674
+  w PieceRec#3.angle_10 12605
+  w PieceRec#3.angle_12 -29939
+  w PieceRec#3.angle_14 12810
+  w PieceRec#3.posX 84186869
+  w PieceRec#3.posY 14606482
+  w PieceRec#3.posZ 50610602
+  w PieceRec#4.angle_10 14735
+  w PieceRec#4.angle_12 18878
+  w PieceRec#4.angle_14 -11800
+  w PieceRec#4.posX 134600460
+  w PieceRec#4.posY 14610384
+  w PieceRec#4.posZ 93303954
+  w PieceRec#5.angle_10 17399
+  w PieceRec#5.angle_12 21775
+  w PieceRec#5.angle_14 32434
+  w PieceRec#5.posY 37071703
+  w PieceRec#5.posZ 47966070
+  w PieceRec#6.angle_10 -9750
+  w PieceRec#6.angle_12 -11022
+  w PieceRec#6.angle_14 -28931
+  w PieceRec#6.posX 163762861
+  w PieceRec#6.posY 5286743
+  w PieceRec#6.posZ 53422219
+  w PieceRec#7.angle_10 -30897
+  w PieceRec#7.angle_12 -10542
+  w PieceRec#7.angle_14 -5579
+  w PieceRec#7.posX 105435819
+  w PieceRec#7.posY 16984305
+  w PieceRec#7.posZ 46777556
+  w PieceRec#8.angle_10 -31768
+  w PieceRec#8.angle_12 8489
+  w PieceRec#8.angle_14 2963
+  w PieceRec#8.posX 188150540
+  w PieceRec#8.posY 16881512
+  w PieceRec#8.posZ 61351790
+  w PieceRec#9.angle_10 -21408
+  w PieceRec#9.angle_12 -28083
+  w PieceRec#9.angle_14 5540
+  w PieceRec#9.posX 131880290
+  w PieceRec#9.posY 30597712
+  w PieceRec#9.posZ 68540978
 call 1647 UpdateUnitWeapons
   r Projectile#0.positionX 98073966
   r Projectile#0.positionY 3512969
@@ -13973,6 +15994,205 @@ call 1647 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1647 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127988725,78181674) = 3
+  i map.GetCellMeanHeight pos=(84186869,50610602) = 90
+  i map.GetCellMeanHeight pos=(134600460,93303954) = 3
+  i map.GetCellMeanHeight pos=(133544775,47966070) = 3
+  i map.GetCellMeanHeight pos=(163762861,53422219) = 3
+  i map.GetCellMeanHeight pos=(105435819,46777556) = 3
+  i map.GetCellMeanHeight pos=(188150540,61351790) = 3
+  i map.GetCellMeanHeight pos=(131880290,68540978) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 14
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 9
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 9
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 9
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 6
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 6
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 3
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 1
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  w Game.count_1491b 10
+  w Debris#0.posX 77938329
+  w Debris#0.posY 3130763
+  w Debris#0.posZ 57166094
+  w Debris#1.posX 77199162
+  w Debris#1.posY 2989888
+  w Debris#1.posZ 57344263
+  w Debris#2.posX 107836854
+  w Debris#2.posY 3160322
+  w Debris#2.posZ 56290232
+  w Debris#3.posX 107980793
+  w Debris#3.posY 3085695
+  w Debris#3.posZ 58407217
+  w Debris#4.posX 121832400
+  w Debris#4.posY 3161831
+  w Debris#4.posZ 68271806
+  w Debris#5.posX 107955781
+  w Debris#5.posY 3211362
+  w Debris#5.posZ 56280997
+  w Debris#6.posX 92250247
+  w Debris#6.posY 3079050
+  w Debris#6.posZ 53679034
+  w Debris#7.posX 101134049
+  w Debris#7.posY 3121519
+  w Debris#7.posZ 56694649
+  w Debris#8.posX 100488642
+  w Debris#8.posY 2997077
+  w Debris#8.posZ 56583244
+  w Debris#9.posX 124956997
+  w Debris#9.posY 3054211
+  w Debris#9.posZ 101550405
+  w Debris#0.ref1.src FrameTable#8
+  w Debris#2.ref1.src FrameTable#7
+  w Debris#2.ref2.src FrameTable#4
+  w Debris#7.ref1.src FrameTable#8
+  w Debris#9.ref1.src FrameTable#1
+  w Debris#9.ref2.src null
+  w ExplodedPiece#1.vel_y 90318
+  w ExplodedPiece#1.ticks 802
+  w ExplodedPiece#3.vel_y -413560
+  w ExplodedPiece#3.ticks 716
+  w ExplodedPiece#4.vel_y -413560
+  w ExplodedPiece#4.ticks 716
+  w ExplodedPiece#5.vel_y 90318
+  w ExplodedPiece#5.ticks 802
+  w ExplodedPiece#6.vel_y -237362
+  w ExplodedPiece#6.ticks 802
+  w ExplodedPiece#7.vel_y -382978
+  w ExplodedPiece#7.ticks 722
+  w ExplodedPiece#8.vel_y -382978
+  w ExplodedPiece#8.ticks 722
+  w ExplodedPiece#9.vel_y 24782
+  w ExplodedPiece#9.ticks 802
+  w PieceRec#1.angle_10 3580
+  w PieceRec#1.angle_12 -29910
+  w PieceRec#1.angle_14 13674
+  w PieceRec#1.posX 127923189
+  w PieceRec#1.posY 37111605
+  w PieceRec#1.posZ 78411050
+  w PieceRec#3.angle_10 13032
+  w PieceRec#3.angle_12 -28312
+  w PieceRec#3.angle_14 12880
+  w PieceRec#3.posX 84039413
+  w PieceRec#3.posY 14198019
+  w PieceRec#3.posZ 50512298
+  w PieceRec#4.angle_10 16248
+  w PieceRec#4.angle_12 21488
+  w PieceRec#4.angle_14 -10432
+  w PieceRec#4.posX 134731532
+  w PieceRec#4.posY 14201921
+  w PieceRec#4.posZ 93435026
+  w PieceRec#5.angle_10 18254
+  w PieceRec#5.angle_12 24702
+  w PieceRec#5.angle_14 -32092
+  w PieceRec#5.posY 37167118
+  w PieceRec#5.posZ 47884150
+  w PieceRec#6.angle_10 -7148
+  w PieceRec#6.angle_12 -10460
+  w PieceRec#6.angle_14 -27878
+  w PieceRec#6.posX 164074157
+  w PieceRec#6.posY 5054478
+  w PieceRec#6.posZ 53405835
+  w PieceRec#7.angle_10 -28850
+  w PieceRec#7.angle_12 -8380
+  w PieceRec#7.angle_14 -4870
+  w PieceRec#7.posX 105190059
+  w PieceRec#7.posY 16606424
+  w PieceRec#7.posZ 46761172
+  w PieceRec#8.angle_10 -30093
+  w PieceRec#8.angle_12 10018
+  w PieceRec#8.angle_14 3350
+  w PieceRec#8.posX 188363532
+  w PieceRec#8.posY 16503631
+  w PieceRec#8.posZ 61417326
+  w PieceRec#9.angle_10 -19595
+  w PieceRec#9.angle_12 -25670
+  w PieceRec#9.angle_14 7624
+  w PieceRec#9.posX 131847522
+  w PieceRec#9.posY 30627591
+  w PieceRec#9.posZ 68672050
 call 1648 UpdateUnitWeapons
   r Projectile#0.positionX 97338979
   r Projectile#0.positionY 3338770
@@ -14356,6 +16576,163 @@ call 1648 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1648 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127923189,78411050) = 3
+  i map.GetCellMeanHeight pos=(84039413,50512298) = 90
+  i map.GetCellMeanHeight pos=(134731532,93435026) = 3
+  i map.GetCellMeanHeight pos=(133544775,47884150) = 3
+  i map.GetCellMeanHeight pos=(164074157,53405835) = 3
+  i map.GetCellMeanHeight pos=(105190059,46761172) = 3
+  i map.GetCellMeanHeight pos=(188363532,61417326) = 3
+  i map.GetCellMeanHeight pos=(131847522,68672050) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 3
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 11
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref2 = 0
+  o Debris#2.ref2.index 11
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 7
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 1
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 2
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 3
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  w ExplodedPiece#1.vel_y 85221
+  w ExplodedPiece#1.ticks 801
+  w ExplodedPiece#3.vel_y -418657
+  w ExplodedPiece#3.ticks 715
+  w ExplodedPiece#4.vel_y -418657
+  w ExplodedPiece#4.ticks 715
+  w ExplodedPiece#5.vel_y 85221
+  w ExplodedPiece#5.ticks 801
+  w ExplodedPiece#6.vel_y -242459
+  w ExplodedPiece#6.ticks 801
+  w ExplodedPiece#7.vel_y -388075
+  w ExplodedPiece#7.ticks 721
+  w ExplodedPiece#8.vel_y -388075
+  w ExplodedPiece#8.ticks 721
+  w ExplodedPiece#9.vel_y 19685
+  w ExplodedPiece#9.ticks 801
+  w PieceRec#1.angle_10 4954
+  w PieceRec#1.angle_12 -28209
+  w PieceRec#1.angle_14 15151
+  w PieceRec#1.posX 127857653
+  w PieceRec#1.posY 37201923
+  w PieceRec#1.posZ 78640426
+  w PieceRec#3.angle_10 13459
+  w PieceRec#3.angle_12 -26685
+  w PieceRec#3.angle_14 12950
+  w PieceRec#3.posX 83891957
+  w PieceRec#3.posY 13784459
+  w PieceRec#3.posZ 50413994
+  w PieceRec#4.angle_10 17761
+  w PieceRec#4.angle_12 24098
+  w PieceRec#4.angle_14 -9064
+  w PieceRec#4.posX 134862604
+  w PieceRec#4.posY 13788361
+  w PieceRec#4.posZ 93566098
+  w PieceRec#5.angle_10 19109
+  w PieceRec#5.angle_12 27629
+  w PieceRec#5.angle_14 -31082
+  w PieceRec#5.posY 37257436
+  w PieceRec#5.posZ 47802230
+  w PieceRec#6.angle_10 -4546
+  w PieceRec#6.angle_12 -9898
+  w PieceRec#6.angle_14 -26825
+  w PieceRec#6.posX 164385453
+  w PieceRec#6.posY 4817116
+  w PieceRec#6.posZ 53389451
+  w PieceRec#7.angle_10 -26803
+  w PieceRec#7.angle_12 -6218
+  w PieceRec#7.angle_14 -4161
+  w PieceRec#7.posX 104944299
+  w PieceRec#7.posY 16223446
+  w PieceRec#7.posZ 46744788
+  w PieceRec#8.angle_10 -28418
+  w PieceRec#8.angle_12 11547
+  w PieceRec#8.angle_14 3737
+  w PieceRec#8.posX 188576524
+  w PieceRec#8.posY 16120653
+  w PieceRec#8.posZ 61482862
+  w PieceRec#9.angle_10 -17782
+  w PieceRec#9.angle_12 -23257
+  w PieceRec#9.angle_14 9708
+  w PieceRec#9.posX 131814754
+  w PieceRec#9.posY 30652373
+  w PieceRec#9.posZ 68803122
 call 1649 UpdateUnitWeapons
   r Projectile#0.positionX 96603992
   r Projectile#0.positionY 3159474
@@ -14737,6 +17114,209 @@ call 1649 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1649 UpdateExplosions
+  r Game.count_1491b 12
+  r Debris#10.posX 95869005
+  r Debris#10.posY 2975081
+  r Debris#10.posZ 60366344
+  r Debris#11.obj null
+  r Debris#11.posX 92722915
+  r Debris#11.posY 3587103
+  r Debris#11.posZ 52047165
+  r Debris#11.sizeX 0
+  r Debris#11.sizeY 0
+  r Debris#11.sizeZ 0
+  r Debris#11.velX 0
+  r Debris#11.velY 0
+  r Debris#11.velZ 0
+  r Debris#11.spinX 0
+  r Debris#11.spinY 0
+  r Debris#11.spinZ 0
+  r Debris#11.angle_x 0
+  r Debris#11.angle_y 0
+  r Debris#11.angle_z 0
+  r Debris#11.flags 0
+  r Debris#10.ref1.src FrameTable#8
+  r Debris#10.ref2.src FrameTable#4
+  r Debris#11.ref1.src FrameTable#7
+  r Debris#11.ref2.src FrameTable#4
+  i map.GetCellMeanHeight pos=(127857653,78640426) = 3
+  i map.GetCellMeanHeight pos=(83891957,50413994) = 90
+  i map.GetCellMeanHeight pos=(134862604,93566098) = 3
+  i map.GetCellMeanHeight pos=(133544775,47802230) = 3
+  i map.GetCellMeanHeight pos=(164385453,53389451) = 3
+  i map.GetCellMeanHeight pos=(104944299,46744788) = 3
+  i map.GetCellMeanHeight pos=(188576524,61482862) = 3
+  i map.GetCellMeanHeight pos=(131814754,68803122) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 10
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref2 = 1
+  o Debris#2.ref2.index 12
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src null
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 7
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 2
+  o Debris#7.ref1.value 3
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 3
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 2
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#10.ref2 = 0
+  o Debris#10.ref2.index 0
+  o Debris#10.ref2.value 1
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#11.ref1 = 0
+  o Debris#11.ref1.index 0
+  o Debris#11.ref1.value 1
+  o Debris#11.ref1.kind 0
+  o Debris#11.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#11.ref2 = 0
+  o Debris#11.ref2.index 0
+  o Debris#11.ref2.value 1
+  o Debris#11.ref2.kind 0
+  o Debris#11.ref2.src FrameTable#4
+  w Debris#2.ref2.src null
+  w ExplodedPiece#1.vel_y 80124
+  w ExplodedPiece#1.ticks 800
+  w ExplodedPiece#3.vel_y -423754
+  w ExplodedPiece#3.ticks 714
+  w ExplodedPiece#4.vel_y -423754
+  w ExplodedPiece#4.ticks 714
+  w ExplodedPiece#5.vel_y 80124
+  w ExplodedPiece#5.ticks 800
+  w ExplodedPiece#6.vel_y -247556
+  w ExplodedPiece#6.ticks 800
+  w ExplodedPiece#7.vel_y -393172
+  w ExplodedPiece#7.ticks 720
+  w ExplodedPiece#8.vel_y -393172
+  w ExplodedPiece#8.ticks 720
+  w ExplodedPiece#9.vel_y 14588
+  w ExplodedPiece#9.ticks 800
+  w PieceRec#1.angle_10 6328
+  w PieceRec#1.angle_12 -26508
+  w PieceRec#1.angle_14 16628
+  w PieceRec#1.posX 127792117
+  w PieceRec#1.posY 37287144
+  w PieceRec#1.posZ 78869802
+  w PieceRec#3.angle_10 13886
+  w PieceRec#3.angle_12 -25058
+  w PieceRec#3.angle_14 13020
+  w PieceRec#3.posX 83744501
+  w PieceRec#3.posY 13365802
+  w PieceRec#3.posZ 50315690
+  w PieceRec#4.angle_10 19274
+  w PieceRec#4.angle_12 26708
+  w PieceRec#4.angle_14 -7696
+  w PieceRec#4.posX 134993676
+  w PieceRec#4.posY 13369704
+  w PieceRec#4.posZ 93697170
+  w PieceRec#5.angle_10 19964
+  w PieceRec#5.angle_12 30556
+  w PieceRec#5.angle_14 -30072
+  w PieceRec#5.posY 37342657
+  w PieceRec#5.posZ 47720310
+  w PieceRec#6.angle_10 -1944
+  w PieceRec#6.angle_12 -9336
+  w PieceRec#6.angle_14 -25772
+  w PieceRec#6.posX 164696749
+  w PieceRec#6.posY 4574657
+  w PieceRec#6.posZ 53373067
+  w PieceRec#7.angle_10 -24756
+  w PieceRec#7.angle_12 -4056
+  w PieceRec#7.angle_14 -3452
+  w PieceRec#7.posX 104698539
+  w PieceRec#7.posY 15835371
+  w PieceRec#7.posZ 46728404
+  w PieceRec#8.angle_10 -26743
+  w PieceRec#8.angle_12 13076
+  w PieceRec#8.angle_14 4124
+  w PieceRec#8.posX 188789516
+  w PieceRec#8.posY 15732578
+  w PieceRec#8.posZ 61548398
+  w PieceRec#9.angle_10 -15969
+  w PieceRec#9.angle_12 -20844
+  w PieceRec#9.angle_14 11792
+  w PieceRec#9.posX 131781986
+  w PieceRec#9.posY 30672058
+  w PieceRec#9.posZ 68934194
 call 1650 UpdateUnitWeapons
   r Game.projectileCount 3
   r Unit#1.health 3358
@@ -15209,3 +17789,176 @@ call 1650 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1650 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127792117,78869802) = 3
+  i map.GetCellMeanHeight pos=(83744501,50315690) = 76
+  i map.GetCellMeanHeight pos=(134993676,93697170) = 3
+  i map.GetCellMeanHeight pos=(133544775,47720310) = 3
+  i map.GetCellMeanHeight pos=(164696749,53373067) = 3
+  i map.GetCellMeanHeight pos=(104698539,46728404) = 3
+  i map.GetCellMeanHeight pos=(188789516,61548398) = 3
+  i map.GetCellMeanHeight pos=(131781986,68934194) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 10
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 12
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 12
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src null
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 2
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 3
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 2
+  o Debris#8.ref1.value 3
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 1
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#10.ref2 = 1
+  o Debris#10.ref2.index 1
+  o Debris#10.ref2.value 2
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#11.ref1 = 1
+  o Debris#11.ref1.index 1
+  o Debris#11.ref1.value 2
+  o Debris#11.ref1.kind 0
+  o Debris#11.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#11.ref2 = 1
+  o Debris#11.ref2.index 1
+  o Debris#11.ref2.value 2
+  o Debris#11.ref2.kind 0
+  o Debris#11.ref2.src FrameTable#4
+  w Debris#3.ref2.src null
+  w ExplodedPiece#1.vel_y 75027
+  w ExplodedPiece#1.ticks 799
+  w ExplodedPiece#3.vel_y -428851
+  w ExplodedPiece#3.ticks 713
+  w ExplodedPiece#4.vel_y -428851
+  w ExplodedPiece#4.ticks 713
+  w ExplodedPiece#5.vel_y 75027
+  w ExplodedPiece#5.ticks 799
+  w ExplodedPiece#6.vel_y -252653
+  w ExplodedPiece#6.ticks 799
+  w ExplodedPiece#7.vel_y -398269
+  w ExplodedPiece#7.ticks 719
+  w ExplodedPiece#8.vel_y -398269
+  w ExplodedPiece#8.ticks 719
+  w ExplodedPiece#9.vel_y 9491
+  w ExplodedPiece#9.ticks 799
+  w PieceRec#1.angle_10 7702
+  w PieceRec#1.angle_12 -24807
+  w PieceRec#1.angle_14 18105
+  w PieceRec#1.posX 127726581
+  w PieceRec#1.posY 37367268
+  w PieceRec#1.posZ 79099178
+  w PieceRec#3.angle_10 14313
+  w PieceRec#3.angle_12 -23431
+  w PieceRec#3.angle_14 13090
+  w PieceRec#3.posX 83597045
+  w PieceRec#3.posY 12942048
+  w PieceRec#3.posZ 50217386
+  w PieceRec#4.angle_10 20787
+  w PieceRec#4.angle_12 29318
+  w PieceRec#4.angle_14 -6328
+  w PieceRec#4.posX 135124748
+  w PieceRec#4.posY 12945950
+  w PieceRec#4.posZ 93828242
+  w PieceRec#5.angle_10 20819
+  w PieceRec#5.angle_12 -32053
+  w PieceRec#5.angle_14 -29062
+  w PieceRec#5.posY 37422781
+  w PieceRec#5.posZ 47638390
+  w PieceRec#6.angle_10 658
+  w PieceRec#6.angle_12 -8774
+  w PieceRec#6.angle_14 -24719
+  w PieceRec#6.posX 165008045
+  w PieceRec#6.posY 4327101
+  w PieceRec#6.posZ 53356683
+  w PieceRec#7.angle_10 -22709
+  w PieceRec#7.angle_12 -1894
+  w PieceRec#7.angle_14 -2743
+  w PieceRec#7.posX 104452779
+  w PieceRec#7.posY 15442199
+  w PieceRec#7.posZ 46712020
+  w PieceRec#8.angle_10 -25068
+  w PieceRec#8.angle_12 14605
+  w PieceRec#8.angle_14 4511
+  w PieceRec#8.posX 189002508
+  w PieceRec#8.posY 15339406
+  w PieceRec#8.posZ 61613934
+  w PieceRec#9.angle_10 -14156
+  w PieceRec#9.angle_12 -18431
+  w PieceRec#9.angle_14 13876
+  w PieceRec#9.posX 131749218
+  w PieceRec#9.posY 30686646
+  w PieceRec#9.posZ 69065266

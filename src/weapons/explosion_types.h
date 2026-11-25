@@ -90,13 +90,18 @@ struct ExplodedPiece {
     int vel_z;
     int ticks;
     int scale;
-    unsigned int b0 : 1;
-    unsigned int b1 : 1;
-    unsigned int b2 : 1;
-    unsigned int b3 : 1;
-    unsigned int b4 : 1;
-    unsigned int b5 : 1;
-    unsigned int rest : 26;
+    union {
+        unsigned int bits;
+        struct {
+            unsigned int b0 : 1;
+            unsigned int b1 : 1;
+            unsigned int b2 : 1;
+            unsigned int b3 : 1;
+            unsigned int b4 : 1;
+            unsigned int b5 : 1;
+            unsigned int rest : 26;
+        };
+    };
     Ref<PieceRec> rec;
 };
 

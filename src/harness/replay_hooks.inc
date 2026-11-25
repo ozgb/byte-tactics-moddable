@@ -784,7 +784,7 @@ void __stdcall RecPathfindingWriteState(const StateWriter* a0)
 
 int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_DETONATE || a0->kind == WEAPONS_REMOVE_PROJECTILES || a0->kind == WEAPONS_EXPLODE_PIECE || a0->kind == WEAPONS_AREA_DAMAGE || a0->kind == WEAPONS_SPAWN))
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_DETONATE || a0->kind == WEAPONS_AREA_DAMAGE || a0->kind == WEAPONS_EXPLODE_PIECE || a0->kind == WEAPONS_SPAWN || a0->kind == WEAPONS_REMOVE_PROJECTILES))
         return s_inner_weapons->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_WEAPONS, a0, a1);
@@ -798,6 +798,17 @@ int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+void __stdcall RecWeaponsUpdateExplosions()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_UPDATEEXPLOSIONS, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+    }
+    s_inner_weapons->UpdateExplosions();
+    if (scope.Open()) {
+    }
 }
 
 void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
@@ -1805,12 +1816,12 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_MAP_GETCELLMEANHEIGHT, SUB_MAP, roots);
     if (scope.Open()) {
-        ArgStruct(s_call, "a", "pos", ROK_VEC3, a0);
+        ArgVec3Xz(s_call, "pos", a0);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i map.GetCellMeanHeight");
-        ImportStructIn(line, ROK_VEC3, a0);
+        ImportVec3Xz(line, "pos", a0);
     }
     int result = s_inner_map->GetCellMeanHeight(a0);
     if (scope.Import()) {
@@ -5183,6 +5194,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_MAP_GETGROUNDHEIGHT)
             return true;
+        if (slot == RSL_MISSION_GETMISSIONPARAMS)
+            return true;
         if (slot == RSL_NETWORK_SENDPROJECTILEDETONATED)
             return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
@@ -5518,6 +5531,8 @@ void HookSeams(const bool* on)
     if (on[SUB_WEAPONS])
         s_rec_weapons.Apply = RecWeaponsApply;
     if (on[SUB_WEAPONS])
+        s_rec_weapons.UpdateExplosions = RecWeaponsUpdateExplosions;
+    if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
     if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
@@ -5753,7 +5768,7 @@ void HookSeams(const bool* on)
         s_rec_mission.CountStartPositions = RecMissionCountStartPositions;
     if (on[SUB_MISSION])
         s_rec_mission.HasMissionName = RecMissionHasMissionName;
-    if (on[SUB_MISSION] || on[SUB_AI] || on[SUB_ORDERS] || on[SUB_UNITS] || on[SUB_PLAYERS])
+    if (on[SUB_MISSION] || on[SUB_AI] || on[SUB_WEAPONS] || on[SUB_ORDERS] || on[SUB_UNITS] || on[SUB_PLAYERS])
         s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
     if (on[SUB_MISSION])
         s_rec_mission.CountMissionUnits = RecMissionCountMissionUnits;

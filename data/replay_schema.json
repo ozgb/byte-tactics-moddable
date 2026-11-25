@@ -87,7 +87,8 @@
     "elem": "u8",
     "ref": true,
     "length": "grid1.count*2"
-   }
+   },
+   "count_1491b": "i32"
   },
   "sim_fields": {
    "g_meteorNextStrikeTime": [
@@ -302,7 +303,9 @@
    "pack1:../ai/group.h",
    "pack1:../ai/squad_manager.h",
    "pack1:../ai/squad_timer.h",
-   "../units/squad.h"
+   "../units/squad.h",
+   "../weapons/debris.h",
+   "../weapons/explosion_types.h"
   ],
   "objects": {
    "Player": {
@@ -2725,6 +2728,14 @@
      {
       "kind": "Spot",
       "member": "shadow"
+     },
+     {
+      "kind": "Debris",
+      "member": "ref1"
+     },
+     {
+      "kind": "Debris",
+      "member": "ref2"
      }
     ],
     "fields": [
@@ -2748,7 +2759,8 @@
       "kind": "ptr",
       "target": "FrameTable",
       "aliases": [
-       "Spot::animIndex"
+       "Spot::animIndex",
+       "GafRef::src"
       ]
      }
     ]
@@ -5384,6 +5396,372 @@
        "mode": "value",
        "kind": "LosLine"
       }
+     }
+    ]
+   },
+   "DebrisPiece": {
+    "type": "DebrisPiece",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "slots",
+     "count": 300
+    },
+    "fields": [
+     {
+      "name": "state",
+      "kind": "u8"
+     }
+    ]
+   },
+   "Debris": {
+    "type": "Debris",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "debris",
+     "count": "count_1491b",
+     "capacity": 300
+    },
+    "fields": [
+     {
+      "name": "obj",
+      "kind": "ref",
+      "target": "DebrisPiece",
+      "member": "field_0",
+      "aliases": [
+       "DebrisView::obj"
+      ]
+     },
+     {
+      "name": "ref1",
+      "kind": "embed",
+      "target": "Handle",
+      "aliases": [
+       "DebrisView::ref1"
+      ]
+     },
+     {
+      "name": "ref2",
+      "kind": "embed",
+      "target": "Handle",
+      "aliases": [
+       "DebrisView::ref2"
+      ]
+     },
+     {
+      "name": "posX",
+      "kind": "i32",
+      "member": "pos.x",
+      "aliases": [
+       "Debris::pos",
+       "DebrisView::pos"
+      ]
+     },
+     {
+      "name": "posY",
+      "kind": "i32",
+      "member": "pos.y",
+      "aliases": [
+       "Debris::pos",
+       "DebrisView::pos"
+      ]
+     },
+     {
+      "name": "posZ",
+      "kind": "i32",
+      "member": "pos.z",
+      "aliases": [
+       "Debris::pos",
+       "DebrisView::pos"
+      ]
+     },
+     {
+      "name": "sizeX",
+      "kind": "i32",
+      "member": "size.x",
+      "aliases": [
+       "Debris::size",
+       "DebrisView::size"
+      ]
+     },
+     {
+      "name": "sizeY",
+      "kind": "i32",
+      "member": "size.y",
+      "aliases": [
+       "Debris::size",
+       "DebrisView::size"
+      ]
+     },
+     {
+      "name": "sizeZ",
+      "kind": "i32",
+      "member": "size.z",
+      "aliases": [
+       "Debris::size",
+       "DebrisView::size"
+      ]
+     },
+     {
+      "name": "velX",
+      "kind": "i32",
+      "member": "vel.x",
+      "aliases": [
+       "Debris::vel",
+       "DebrisView::vel"
+      ]
+     },
+     {
+      "name": "velY",
+      "kind": "i32",
+      "member": "vel.y",
+      "aliases": [
+       "Debris::vel",
+       "DebrisView::vel"
+      ]
+     },
+     {
+      "name": "velZ",
+      "kind": "i32",
+      "member": "vel.z",
+      "aliases": [
+       "Debris::vel",
+       "DebrisView::vel"
+      ]
+     },
+     {
+      "name": "spinX",
+      "kind": "i32",
+      "member": "spin.x",
+      "aliases": [
+       "Debris::spin",
+       "DebrisView::spin"
+      ]
+     },
+     {
+      "name": "spinY",
+      "kind": "i32",
+      "member": "spin.y",
+      "aliases": [
+       "Debris::spin",
+       "DebrisView::spin"
+      ]
+     },
+     {
+      "name": "spinZ",
+      "kind": "i32",
+      "member": "spin.z",
+      "aliases": [
+       "Debris::spin",
+       "DebrisView::spin"
+      ]
+     },
+     {
+      "name": "angle_x",
+      "kind": "i16",
+      "aliases": [
+       "DebrisView::angle_x"
+      ]
+     },
+     {
+      "name": "angle_y",
+      "kind": "i16",
+      "aliases": [
+       "DebrisView::angle_y"
+      ]
+     },
+     {
+      "name": "angle_z",
+      "kind": "i16",
+      "aliases": [
+       "DebrisView::angle_z"
+      ]
+     },
+     {
+      "name": "flags",
+      "kind": "u16",
+      "aliases": [
+       "DebrisView::flag"
+      ]
+     }
+    ]
+   },
+   "ExplodedSlot": {
+    "type": "Ref<ExplodedPiece>",
+    "scope": "state",
+    "table": {
+     "base": "sim",
+     "member": "g_explodedPieces",
+     "count": 100
+    },
+    "fields": [
+     {
+      "name": "piece",
+      "kind": "ref",
+      "target": "ExplodedPiece",
+      "member": "offset"
+     }
+    ]
+   },
+   "PieceRec": {
+    "type": "PieceRec",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "angle_10",
+      "kind": "i16"
+     },
+     {
+      "name": "angle_12",
+      "kind": "i16"
+     },
+     {
+      "name": "angle_14",
+      "kind": "i16"
+     },
+     {
+      "name": "posX",
+      "kind": "i32",
+      "member": "pos.x",
+      "aliases": [
+       "PieceRec::pos"
+      ]
+     },
+     {
+      "name": "posY",
+      "kind": "i32",
+      "member": "pos.y",
+      "aliases": [
+       "PieceRec::pos"
+      ]
+     },
+     {
+      "name": "posZ",
+      "kind": "i32",
+      "member": "pos.z",
+      "aliases": [
+       "PieceRec::pos"
+      ]
+     }
+    ]
+   },
+   "ExplodedPiece": {
+    "type": "ExplodedPiece",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "angVelX",
+      "kind": "i32"
+     },
+     {
+      "name": "angVelY",
+      "kind": "i32"
+     },
+     {
+      "name": "angVelZ",
+      "kind": "i32"
+     },
+     {
+      "name": "vel_x",
+      "kind": "i32"
+     },
+     {
+      "name": "vel_y",
+      "kind": "i32"
+     },
+     {
+      "name": "vel_z",
+      "kind": "i32"
+     },
+     {
+      "name": "ticks",
+      "kind": "i32"
+     },
+     {
+      "name": "scale",
+      "kind": "i32"
+     },
+     {
+      "name": "bits",
+      "kind": "u32",
+      "aliases": [
+       "ExplodedPiece::b0",
+       "ExplodedPiece::b1",
+       "ExplodedPiece::b2",
+       "ExplodedPiece::b3",
+       "ExplodedPiece::b4",
+       "ExplodedPiece::b5"
+      ]
+     },
+     {
+      "name": "rec",
+      "kind": "ref",
+      "target": "PieceRec"
+     }
+    ]
+   },
+   "GafSrc1": {
+    "type": "StringRef",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "src1",
+     "count": 1
+    },
+    "fields": [
+     {
+      "name": "ptr",
+      "kind": "ptr",
+      "target": "FrameTable"
+     }
+    ]
+   },
+   "GafSrc2": {
+    "type": "StringRef",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "src2",
+     "count": 1
+    },
+    "fields": [
+     {
+      "name": "ptr",
+      "kind": "ptr",
+      "target": "FrameTable"
+     }
+    ]
+   },
+   "GafSrc3": {
+    "type": "StringRef",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "src3",
+     "count": 1
+    },
+    "fields": [
+     {
+      "name": "ptr",
+      "kind": "ptr",
+      "target": "FrameTable"
+     }
+    ]
+   },
+   "GafLists": {
+    "type": "StringRef",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "lists",
+     "count": 3
+    },
+    "fields": [
+     {
+      "name": "ptr",
+      "kind": "ptr",
+      "target": "FrameTable"
      }
     ]
    }
@@ -8517,6 +8895,334 @@
      "UpdateSensorRadarAndCloak"
     ],
     "note": "every unit is a root of the call, which walks the pool from the first slot to unitsEnd"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Game::count_1491b",
+    "rule": "all-of",
+    "object": "Debris",
+    "reads": [
+     "Game.count_1491b"
+    ],
+    "writes": [
+     "Game.count_1491b"
+    ],
+    "note": "the explosion array: the count is read and written through its address, and every live element is a root of the call"
+   },
+   {
+    "kind": "field_escape",
+    "target": "DebrisView::pos",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions"
+    ],
+    "reads": [
+     "Debris.posX",
+     "Debris.posY",
+     "Debris.posZ"
+    ],
+    "writes": [
+     "Debris.posX",
+     "Debris.posY",
+     "Debris.posZ"
+    ],
+    "note": "the position of an explosion is a Vec3 member"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions"
+    ],
+    "reads": [
+     "Debris.velY"
+    ],
+    "writes": [
+     "Debris.velY"
+    ],
+    "note": "the vertical velocity of an explosion is changed through its address"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "AddExplosionEffect"
+    ],
+    "reads": [],
+    "note": "a position given by address and never kept"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions"
+    ],
+    "reads": [
+     "Game.count_1491b",
+     "Debris.velY"
+    ],
+    "note": "the count of the explosion array and the vertical velocity of an explosion"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "all-of",
+    "functions": [
+     "AddExplosionEffect"
+    ],
+    "object": "GafLists",
+    "reads": [
+     "Game.count_1491b",
+     "GafLists.ptr"
+    ],
+    "note": "the count of the explosion array, and the calculated explosion that an index picks"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions"
+    ],
+    "writes": [
+     "Game.count_1491b",
+     "Debris.velY"
+    ],
+    "note": "the count of the explosion array and the vertical velocity of an explosion"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "AddExplosionEffect"
+    ],
+    "writes": [
+     "Game.count_1491b"
+    ],
+    "note": "the count of the explosion array"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*short",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions"
+    ],
+    "reads": [
+     "Debris.posY",
+     "Debris.velY"
+    ],
+    "note": "the whole part of a position of an explosion"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*short",
+    "rule": "fields",
+    "functions": [
+     "AddExplosionEffect"
+    ],
+    "reads": [],
+    "note": "the whole part of a position given by address"
+   },
+   {
+    "kind": "global_read",
+    "target": "g_explodedPieces",
+    "rule": "all-of",
+    "object": "ExplodedSlot",
+    "reads": [
+     "ExplodedSlot.piece"
+    ],
+    "note": "the exploded pieces: every slot is a root of the call"
+   },
+   {
+    "kind": "global_write",
+    "target": "g_explodedPieces",
+    "rule": "all-of",
+    "object": "ExplodedSlot",
+    "writes": [
+     "ExplodedSlot.piece"
+    ],
+    "note": "a finished piece clears its slot"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::src1",
+    "rule": "all-of",
+    "object": "GafSrc1",
+    "reads": [
+     "GafSrc1.ptr"
+    ],
+    "note": "the load-time animation entry: a pointer the module passes to the animation service"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::src2",
+    "rule": "all-of",
+    "object": "GafSrc2",
+    "reads": [
+     "GafSrc2.ptr"
+    ],
+    "note": "the load-time animation entry: a pointer the module passes to the animation service"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::src3",
+    "rule": "all-of",
+    "object": "GafSrc3",
+    "reads": [
+     "GafSrc3.ptr"
+    ],
+    "note": "the load-time animation entry: a pointer the module passes to the animation service"
+   },
+   {
+    "kind": "field_write",
+    "target": "GafRef::src",
+    "rule": "fields",
+    "reads": [
+     "Handle.src"
+    ],
+    "note": "a field the module writes only some of the time"
+   },
+   {
+    "kind": "field_write",
+    "target": "DebrisView::obj",
+    "rule": "fields",
+    "reads": [
+     "Debris.obj"
+    ],
+    "note": "a field the module writes only some of the time"
+   },
+   {
+    "kind": "field_write",
+    "target": "DebrisView::pos",
+    "rule": "fields",
+    "reads": [
+     "Debris.posX",
+     "Debris.posY",
+     "Debris.posZ"
+    ],
+    "note": "a field the module writes only some of the time"
+   },
+   {
+    "kind": "field_write",
+    "target": "DebrisPiece::state",
+    "rule": "all-of",
+    "object": "DebrisPiece",
+    "reads": [
+     "DebrisPiece.state"
+    ],
+    "note": "the explosion pieces: a piece is freed when its debris lands and leaves the array, so every piece is a root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Vec3::x",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posX",
+     "Debris.sizeX",
+     "Debris.velX",
+     "Debris.spinX",
+     "PieceRec.posX"
+    ],
+    "note": "a component of a position, size, velocity or spin of an explosion or an exploded piece"
+   },
+   {
+    "kind": "field_write",
+    "target": "Vec3::x",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posX",
+     "PieceRec.posX"
+    ],
+    "writes": [
+     "Debris.posX",
+     "PieceRec.posX"
+    ],
+    "note": "a component of a position or velocity of an explosion or an exploded piece"
+   },
+   {
+    "kind": "field_read",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posY",
+     "Debris.sizeY",
+     "Debris.velY",
+     "Debris.spinY",
+     "PieceRec.posY"
+    ],
+    "note": "a component of a position, size, velocity or spin of an explosion or an exploded piece"
+   },
+   {
+    "kind": "field_write",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posY",
+     "PieceRec.posY",
+     "Debris.velY"
+    ],
+    "writes": [
+     "Debris.posY",
+     "PieceRec.posY",
+     "Debris.velY"
+    ],
+    "note": "a component of a position or velocity of an explosion or an exploded piece"
+   },
+   {
+    "kind": "field_read",
+    "target": "Vec3::z",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posZ",
+     "Debris.sizeZ",
+     "Debris.velZ",
+     "Debris.spinZ",
+     "PieceRec.posZ"
+    ],
+    "note": "a component of a position, size, velocity or spin of an explosion or an exploded piece"
+   },
+   {
+    "kind": "field_write",
+    "target": "Vec3::z",
+    "rule": "fields",
+    "functions": [
+     "UpdateExplosions",
+     "UpdateExplodedPiece"
+    ],
+    "reads": [
+     "Debris.posZ",
+     "PieceRec.posZ"
+    ],
+    "writes": [
+     "Debris.posZ",
+     "PieceRec.posZ"
+    ],
+    "note": "a component of a position or velocity of an explosion or an exploded piece"
    }
   ],
   "subsystems": {
@@ -8614,6 +9320,7 @@
      "los_radar.SoundHeardMask",
      "map.GetCellMeanHeight",
      "map.GetGroundHeight",
+     "mission.GetMissionParams",
      "network.SendProjectileDetonated",
      "network.SendScriptCallByName",
      "network.SendUnitDamage",
@@ -8724,11 +9431,14 @@
      },
      "UpdateProjectiles": {
       "record": false,
-      "reason": "no form for the explosion array of Game: AddExplosionEffect, which DetonateProjectile calls, appends to Game.debris"
+      "reason": "the projectile walk reads the cells and units a shot hits by their id (ApplyAreaDamage, CheckProjectileCollision), and the schema has no form that reaches them without every unit and cell as a root"
      },
      "UpdateExplosions": {
-      "record": false,
-      "reason": "no form for the explosion array of Game and for the exploded pieces: debris and g_explodedPieces hold a model of each piece"
+      "functions": [
+       "UpdateExplosions",
+       "AddExplosionEffect",
+       "UpdateExplodedPiece"
+      ]
      },
      "FindWeaponByName": {
       "result": {
@@ -8768,11 +9478,11 @@
          "WeaponsStartScript.callback": "WeaponAimCobCb"
         },
         "unrecorded": {
-         "WEAPONS_DETONATE": "#711",
-         "WEAPONS_REMOVE_PROJECTILES": "#711",
-         "WEAPONS_EXPLODE_PIECE": "#711",
-         "WEAPONS_AREA_DAMAGE": "#711",
-         "WEAPONS_SPAWN": "#711"
+         "WEAPONS_DETONATE": "DetonateProjectile reads the unit and the cell a shot hits by their id, which the walk reaches only with every unit and cell as a root",
+         "WEAPONS_AREA_DAMAGE": "ApplyAreaDamage reads the cells and units of the blast by their id, which the walk reaches only with every unit and cell as a root",
+         "WEAPONS_EXPLODE_PIECE": "StartExplodePiece allocates the exploded piece in g_debrisMemCache, a block of chunks the schema has no form for, and reads the model of the unit",
+         "WEAPONS_SPAWN": "not recorded yet: InitProjectile and the projectile table writes need their rules",
+         "WEAPONS_REMOVE_PROJECTILES": "not recorded yet: CompactProjectiles copies whole projectiles and needs its rules"
         }
        }
       },
@@ -11242,9 +11952,9 @@
       ],
       "args": {
        "pos": {
-        "mode": "struct",
-        "kind": "Vec3",
-        "dir": "in"
+        "mode": "vec3",
+        "label": "pos",
+        "axes": "xz"
        }
       }
      },
@@ -13142,6 +13852,7 @@
   {"name": "Game.grid1.height", "base": "game", "size": 4, "kind": "u32"},
   {"name": "Game.grid1.count", "base": "game", "size": 4, "kind": "u32"},
   {"name": "Game.grid1.cells", "base": "game", "size": 4, "kind": "array", "array": 4},
+  {"name": "Game.count_1491b", "base": "game", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorNextStrikeTime", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorWeaponName", "base": "sim", "size": 32, "kind": "string"},
   {"name": "SimGlobals.g_meteorSpawnMagnitude", "base": "sim", "size": 4, "kind": "i32"},
@@ -13210,7 +13921,7 @@
   {"name": "FrameTable", "type": "FrameTable", "scope": "state", "table": null, "inside": null, "fields": [{"name": "count", "kind": "u16"}]},
   {"name": "GafFrame", "type": "GafFrame", "scope": "state", "table": null, "inside": null, "fields": [{"name": "width", "kind": "u16"}, {"name": "height", "kind": "u16"}, {"name": "xOffset", "kind": "i16"}, {"name": "yOffset", "kind": "i16"}, {"name": "transparency", "kind": "u8"}]},
   {"name": "Object3do", "type": "Object3do", "scope": "state", "table": null, "inside": null, "fields": [{"name": "vertexCount", "kind": "i32"}, {"name": "box_x", "kind": "i32"}, {"name": "box_y", "kind": "i32"}, {"name": "box_z", "kind": "i32"}]},
-  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex"]}]},
+  {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}, {"kind": "Debris", "member": "ref1"}, {"kind": "Debris", "member": "ref2"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex", "GafRef::src"]}]},
   {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 401, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12", "FeatureMarkView::ffe"]}]},
   {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "delta": true, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state", "Ref<SpotState>::offset"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 416, "condMask": 1, "condField": 401, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
   {"name": "Pool", "type": "Pool", "scope": "state", "table": {"base": "game", "member": "pool", "count": 1}, "inside": null, "fields": [{"name": "entries", "kind": "ref", "target": "Spot"}, {"name": "featureUnit", "kind": "ref", "target": "alloc"}, {"name": "usedHead", "kind": "i32"}, {"name": "restHead", "kind": "i32"}, {"name": "freeHead", "kind": "i32"}]},
@@ -13272,6 +13983,15 @@
   {"name": "LosStep", "type": "LosStep", "scope": "value", "table": null, "inside": null, "fields": [{"name": "a", "kind": "u16"}, {"name": "b", "kind": "u16"}]},
   {"name": "LosLine", "type": "LosLine", "scope": "value", "table": null, "inside": null, "fields": [{"name": "steps", "kind": "vector", "base": true, "elem": {"mode": "value", "kind": "LosStep"}, "vector": 13}]},
   {"name": "LosTable", "type": "LosTable", "scope": "value", "table": null, "inside": null, "fields": [{"name": "lines", "kind": "vector", "base": true, "elem": {"mode": "value", "kind": "LosLine"}, "vector": 14}]},
+  {"name": "DebrisPiece", "type": "DebrisPiece", "scope": "state", "table": {"base": "game", "member": "slots", "count": 300}, "inside": null, "fields": [{"name": "state", "kind": "u8"}]},
+  {"name": "Debris", "type": "Debris", "scope": "state", "table": {"base": "game", "member": "debris", "count": "count_1491b", "capacity": 300}, "inside": null, "fields": [{"name": "obj", "kind": "ref", "target": "DebrisPiece", "member": "field_0", "aliases": ["DebrisView::obj"]}, {"name": "ref1", "kind": "embed", "target": "Handle", "aliases": ["DebrisView::ref1"]}, {"name": "ref2", "kind": "embed", "target": "Handle", "aliases": ["DebrisView::ref2"]}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "sizeX", "kind": "i32", "member": "size.x", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "sizeY", "kind": "i32", "member": "size.y", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "sizeZ", "kind": "i32", "member": "size.z", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "spinX", "kind": "i32", "member": "spin.x", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "spinY", "kind": "i32", "member": "spin.y", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "spinZ", "kind": "i32", "member": "spin.z", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "angle_x", "kind": "i16", "aliases": ["DebrisView::angle_x"]}, {"name": "angle_y", "kind": "i16", "aliases": ["DebrisView::angle_y"]}, {"name": "angle_z", "kind": "i16", "aliases": ["DebrisView::angle_z"]}, {"name": "flags", "kind": "u16", "aliases": ["DebrisView::flag"]}]},
+  {"name": "ExplodedSlot", "type": "Ref<ExplodedPiece>", "scope": "state", "table": {"base": "sim", "member": "g_explodedPieces", "count": 100}, "inside": null, "fields": [{"name": "piece", "kind": "ref", "target": "ExplodedPiece", "member": "offset"}]},
+  {"name": "PieceRec", "type": "PieceRec", "scope": "state", "table": null, "inside": null, "fields": [{"name": "angle_10", "kind": "i16"}, {"name": "angle_12", "kind": "i16"}, {"name": "angle_14", "kind": "i16"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["PieceRec::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["PieceRec::pos"]}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["PieceRec::pos"]}]},
+  {"name": "ExplodedPiece", "type": "ExplodedPiece", "scope": "state", "table": null, "inside": null, "fields": [{"name": "angVelX", "kind": "i32"}, {"name": "angVelY", "kind": "i32"}, {"name": "angVelZ", "kind": "i32"}, {"name": "vel_x", "kind": "i32"}, {"name": "vel_y", "kind": "i32"}, {"name": "vel_z", "kind": "i32"}, {"name": "ticks", "kind": "i32"}, {"name": "scale", "kind": "i32"}, {"name": "bits", "kind": "u32", "aliases": ["ExplodedPiece::b0", "ExplodedPiece::b1", "ExplodedPiece::b2", "ExplodedPiece::b3", "ExplodedPiece::b4", "ExplodedPiece::b5"]}, {"name": "rec", "kind": "ref", "target": "PieceRec"}]},
+  {"name": "GafSrc1", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "src1", "count": 1}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
+  {"name": "GafSrc2", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "src2", "count": 1}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
+  {"name": "GafSrc3", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "src3", "count": 1}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
+  {"name": "GafLists", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "lists", "count": 3}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
   {"name": "WindMeteorsLimits", "type": "WindMeteorsLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "min", "kind": "i32"}, {"name": "max", "kind": "i32"}]},
@@ -13494,9 +14214,10 @@
    }
   },
   "weapons": {
-   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [4, 0], "status": "complete", "imports": ["features.GetFootprintCentre", "los_radar.GetMapCell", "los_radar.GetMapCellAtPosition", "los_radar.IsPointVisible", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "network.SendProjectileDetonated", "network.SendScriptCallByName", "network.SendUnitDamage", "network.SendWeaponFire", "network.SendWeaponFireAt", "scripts.GetAimFromPosition", "scripts.GetPieceOffset", "scripts.GetPiecePosition", "scripts.QueryScript"], "issue": 712, "unrecorded": {"UpdateProjectiles": {"reason": "no form for the explosion array of Game: AddExplosionEffect, which DetonateProjectile calls, appends to Game.debris", "native": "UpdateProjectiles"}, "UpdateExplosions": {"reason": "no form for the explosion array of Game and for the exploded pieces: debris and g_explodedPieces hold a model of each piece", "native": "UpdateExplosions"}, "AllocWeaponArray": {"reason": "load class", "native": "AllocWeaponArray"}, "FreeWeaponArray": {"reason": "load class", "native": "FreeWeaponArray"}, "LoadWeaponTypes": {"reason": "load class", "native": "LoadWeaponTypes"}, "FreeWeaponTypes": {"reason": "load class", "native": "FreeWeaponTypes"}, "InitExplosions": {"reason": "load class", "native": "InitExplosions"}, "FreeExplosions": {"reason": "load class", "native": "FreeExplosions"}, "LoadState": {"reason": "load class", "native": "LoadWeaponsStateSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteWeaponsStateSlot"}, "SaveState": {"reason": "a query of a saved game, outside the tick", "native": "SaveWeaponsStateSlot"}}},
+   "header": {"interface": "interfaces/weapons.h", "struct": "WeaponsSeam", "version": [4, 0], "status": "complete", "imports": ["features.GetFootprintCentre", "los_radar.GetMapCell", "los_radar.GetMapCellAtPosition", "los_radar.IsPointVisible", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "mission.GetMissionParams", "network.SendProjectileDetonated", "network.SendScriptCallByName", "network.SendUnitDamage", "network.SendWeaponFire", "network.SendWeaponFireAt", "scripts.GetAimFromPosition", "scripts.GetPieceOffset", "scripts.GetPiecePosition", "scripts.QueryScript"], "issue": 712, "unrecorded": {"UpdateProjectiles": {"reason": "the projectile walk reads the cells and units a shot hits by their id (ApplyAreaDamage, CheckProjectileCollision), and the schema has no form that reaches them without every unit and cell as a root", "native": "UpdateProjectiles"}, "AllocWeaponArray": {"reason": "load class", "native": "AllocWeaponArray"}, "FreeWeaponArray": {"reason": "load class", "native": "FreeWeaponArray"}, "LoadWeaponTypes": {"reason": "load class", "native": "LoadWeaponTypes"}, "FreeWeaponTypes": {"reason": "load class", "native": "FreeWeaponTypes"}, "InitExplosions": {"reason": "load class", "native": "InitExplosions"}, "FreeExplosions": {"reason": "load class", "native": "FreeExplosions"}, "LoadState": {"reason": "load class", "native": "LoadWeaponsStateSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteWeaponsStateSlot"}, "SaveState": {"reason": "a query of a saved game, outside the tick", "native": "SaveWeaponsStateSlot"}}},
    "slots": {
-    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["WeaponsApply", "Valid", "KnownKind", "UnitOfOffset", "DamageUnit", "ApplyUnitDamage", "UnitFromId", "Unit::ClaimWeapons", "Unit::ReleaseWeapons", "InitUnitWeaponSlots", "GetWeaponPiecePosition", "QueryWeaponPiece", "WeaponAimCobCb::OnAimCobReturn"], "reads": ["Game.localPlayer"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.script", "Unit.id", "Unit.killCount", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.aimCob", "Unit.flags", "Unit.health", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "UnitDef.damagemodifier", "UnitDef.weapons1", "UnitDef.weapons2", "UnitDef.flags1", "UnitDef.maxHealth", "UnitDef.weapons0", "weapondef.index", "weapondef.reloadTime", "WeaponAimCobCb.nAimCobDone"], "objectWrites": ["Unit.weapon0Flags", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "WeaponAimCobCb.nAimCobDone"], "allOf": [], "args": [{"name": "event", "type": "WeaponsEventHeader*", "line": "event", "mode": "event", "events": "weapons", "size": "size", "refs": {"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}, "unrecorded": {"WEAPONS_DETONATE": "#711", "WEAPONS_REMOVE_PROJECTILES": "#711", "WEAPONS_EXPLODE_PIECE": "#711", "WEAPONS_AREA_DAMAGE": "#711", "WEAPONS_SPAWN": "#711"}, "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyWeaponsSlot"},
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["WeaponsApply", "Valid", "KnownKind", "UnitOfOffset", "DamageUnit", "ApplyUnitDamage", "UnitFromId", "Unit::ClaimWeapons", "Unit::ReleaseWeapons", "InitUnitWeaponSlots", "GetWeaponPiecePosition", "QueryWeaponPiece", "WeaponAimCobCb::OnAimCobReturn"], "reads": ["Game.localPlayer"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.script", "Unit.id", "Unit.killCount", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.aimCob", "Unit.flags", "Unit.health", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "UnitDef.damagemodifier", "UnitDef.weapons1", "UnitDef.weapons2", "UnitDef.flags1", "UnitDef.maxHealth", "UnitDef.weapons0", "weapondef.index", "weapondef.reloadTime", "WeaponAimCobCb.nAimCobDone"], "objectWrites": ["Unit.weapon0Flags", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "WeaponAimCobCb.nAimCobDone"], "allOf": [], "args": [{"name": "event", "type": "WeaponsEventHeader*", "line": "event", "mode": "event", "events": "weapons", "size": "size", "refs": {"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}, "unrecorded": {"WEAPONS_DETONATE": "DetonateProjectile reads the unit and the cell a shot hits by their id, which the walk reaches only with every unit and cell as a root", "WEAPONS_AREA_DAMAGE": "ApplyAreaDamage reads the cells and units of the blast by their id, which the walk reaches only with every unit and cell as a root", "WEAPONS_EXPLODE_PIECE": "StartExplodePiece allocates the exploded piece in g_debrisMemCache, a block of chunks the schema has no form for, and reads the model of the unit", "WEAPONS_SPAWN": "not recorded yet: InitProjectile and the projectile table writes need their rules", "WEAPONS_REMOVE_PROJECTILES": "not recorded yet: CompactProjectiles copies whole projectiles and needs its rules"}, "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyWeaponsSlot"},
+    "UpdateExplosions": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateExplosions", "AddExplosionEffect", "UpdateExplodedPiece"], "reads": ["Game.seaLevel", "Game.gravity", "Game.count_1491b"], "writes": ["Game.count_1491b"], "objectReads": ["Handle.src", "DebrisPiece.state", "Debris.obj", "Debris.ref1", "Debris.ref2", "Debris.posX", "Debris.posY", "Debris.posZ", "Debris.sizeX", "Debris.sizeY", "Debris.sizeZ", "Debris.velX", "Debris.velY", "Debris.velZ", "Debris.spinX", "Debris.spinY", "Debris.spinZ", "Debris.angle_x", "Debris.angle_y", "Debris.angle_z", "Debris.flags", "ExplodedSlot.piece", "PieceRec.angle_10", "PieceRec.angle_12", "PieceRec.angle_14", "PieceRec.posX", "PieceRec.posY", "PieceRec.posZ", "ExplodedPiece.angVelX", "ExplodedPiece.angVelY", "ExplodedPiece.angVelZ", "ExplodedPiece.vel_x", "ExplodedPiece.vel_y", "ExplodedPiece.vel_z", "ExplodedPiece.ticks", "ExplodedPiece.bits", "ExplodedPiece.rec", "GafSrc1.ptr", "GafSrc2.ptr", "GafSrc3.ptr", "GafLists.ptr"], "objectWrites": ["Handle.src", "DebrisPiece.state", "Debris.obj", "Debris.ref1", "Debris.ref2", "Debris.posX", "Debris.posY", "Debris.posZ", "Debris.velY", "Debris.angle_x", "Debris.angle_y", "Debris.angle_z", "ExplodedSlot.piece", "PieceRec.angle_10", "PieceRec.angle_12", "PieceRec.angle_14", "PieceRec.posX", "PieceRec.posY", "PieceRec.posZ", "ExplodedPiece.vel_x", "ExplodedPiece.vel_y", "ExplodedPiece.vel_z", "ExplodedPiece.ticks"], "allOf": ["DebrisPiece", "Debris", "ExplodedSlot", "GafSrc1", "GafSrc2", "GafSrc3", "GafLists"], "args": [], "result": null, "native": "UpdateExplosions"},
     "UpdateUnitWeapons": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitWeapons", "CalcAimAngles", "RecordBuildMenuUpdate", "SolveLaunchAngle", "SubtractVec3", "WeaponCanReachPos", "RecordUnitEvent", "ReachPosLineOfFire"], "reads": ["Game.ticks", "Game.flags_2a44", "Game.seaLevel", "Game.gravity", "Game.projectileCount", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.projectileCount", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.energy", "Player.metal", "Unit.script", "Unit.id", "Unit.killCount", "Unit.owner", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.heading", "Unit.pitch", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon0MuzzleDelta", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon1MuzzleDelta", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon2MuzzleDelta", "Unit.aimCob", "Unit.flags", "Unit.health", "Unit.def", "Unit.playerIndex", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "UnitDef.modelMaxYHigh", "UnitDef.maxHealth", "weapondef.flags", "weapondef.speed", "weapondef.acceleration", "weapondef.accuracy", "weapondef.burst", "weapondef.coverage", "weapondef.energyPerShot", "weapondef.metalPerShot", "weapondef.pitch", "weapondef.lifetime", "weapondef.pitchTolerance", "weapondef.range", "weapondef.reloadTime", "weapondef.sound", "weapondef.startSpeed", "weapondef.tolerance", "UnitMotion.speed", "Projectile.speed", "Projectile.spawnTick", "Projectile.attacker", "Projectile.active", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ", "Projectile.startX", "Projectile.startY", "Projectile.startZ", "Projectile.directionX", "Projectile.directionY", "Projectile.directionZ", "Projectile.targetX", "Projectile.targetY", "Projectile.targetZ", "Projectile.anglesHeading", "Projectile.anglesPitch", "Projectile.range", "Projectile.time", "Projectile.nextSmokeTick", "Projectile.targetUnit", "Projectile.interceptedProjectile", "Projectile.piece", "Projectile.flags", "WeaponAimCobCb.nAimCobDone", "WeaponFire.fire"], "objectWrites": ["Unit.weapon0Flags", "Unit.weapon2Flags", "Unit.weapon0ReloadTimer", "Unit.weapon0FireHeading", "Unit.weapon0FirePitch", "Unit.weapon0Stockpile", "Unit.weapon1ReloadTimer", "Unit.weapon1FireHeading", "Unit.weapon1FirePitch", "Unit.weapon1Stockpile", "Unit.weapon2ReloadTimer", "Unit.weapon2FireHeading", "Unit.weapon2FirePitch", "Unit.weapon2Stockpile", "Unit.weapon1Flags", "Projectile.speed", "Projectile.spawnTick", "Projectile.attacker", "Projectile.active", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ", "Projectile.startX", "Projectile.startY", "Projectile.startZ", "Projectile.directionX", "Projectile.directionY", "Projectile.directionZ", "Projectile.targetX", "Projectile.targetY", "Projectile.targetZ", "Projectile.anglesHeading", "Projectile.anglesPitch", "Projectile.range", "Projectile.time", "Projectile.nextSmokeTick", "Projectile.targetUnit", "Projectile.interceptedProjectile", "Projectile.piece", "Projectile.flags", "WeaponAimCobCb.nAimCobDone"], "allOf": ["Projectile", "WeaponFire"], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitWeapons"},
     "FindWeaponByName": {"conv": "__stdcall", "ret": "WeaponDef*", "functions": ["FindWeaponByName"], "reads": [], "writes": [], "objectReads": ["WeaponName.name"], "objectWrites": [], "allOf": ["WeaponName"], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "WeaponDef*", "mode": "weapon", "reach": ["flags"]}, "native": "FindWeaponByNameSlot"},
     "GetWeaponRange": {"conv": "__stdcall", "ret": "int", "functions": ["GetWeaponRange"], "reads": [], "writes": [], "objectReads": ["Unit.weapon2Def", "Unit.weapon0Def", "Unit.weapon1Def", "weapondef.range"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetWeaponRangeSlot"},
@@ -13584,7 +14305,7 @@
    "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [9, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}, {"name": "skip", "type": "int", "line": "skip", "mode": "scalar"}, {"name": "ids", "type": "unsigned short*", "line": "ids", "mode": "bytes-out", "length": "capacity", "elem": "u16", "resultElem": "u16", "lengthIndex": 4}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick", "native": "PathLockStamp"}}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "PassMap::Refresh", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.cobStateFlags", "Unit.cargo", "Unit.spatialBucket", "Unit.flags", "Unit.cargoNext", "Unit.carrier", "Unit.def", "Unit.player", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells", "PassMap.lastTick", "Feature.flags16"], "objectWrites": ["Unit.cobStateFlags", "Unit.spatialBucket", "Unit.flags", "Unit.cargoNext", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "PassMap.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "PassMap", "Feature"], "args": [{"name": "event", "type": "MapEventHeader*", "line": "event", "mode": "event", "events": "map", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
-    "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
+    "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},
     "CanBuildAt": {"conv": "__stdcall", "ret": "int", "functions": ["CanBuildAt", "CellFeatureBlocks", "GetCellFeatureDef", "GetCellHeight", "CellAt", "InsideExplored", "IsExploredAtHeight", "IsSeenAtHeight", "VisibilityWord"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "writes": ["SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.cell", "Unit.footprint", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.maxslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "UnitDef.footprintx", "Cell.metal", "Cell.unit", "Cell.height", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Cell", "Feature"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "cell", "type": "Point16*", "line": "cell", "mode": "value", "kind": "Point16", "byPointer": true}, {"name": "type", "type": "short", "line": "type", "mode": "scalar"}, {"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanBuildAtSlot"},
     "CanPlaceUnitFootprint": {"conv": "__stdcall", "ret": "int", "functions": ["CanPlaceUnitFootprint", "CanBuildAt", "CellFeatureBlocks", "GetCellFeatureDef", "GetCellHeight", "CellAt", "InsideExplored", "IsExploredAtHeight", "IsSeenAtHeight", "VisibilityWord", "SteepCell"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "writes": ["SimGlobals.g_lastPlaceHeight", "SimGlobals.g_lastPlaceMetalSum"], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.cell", "Unit.footprint", "UnitDef.footprintz", "UnitDef.yardmap", "UnitDef.draft", "UnitDef.maxslope", "UnitDef.maxwaterslope", "UnitDef.maxwaterdepth", "UnitDef.minwaterdepth", "UnitDef.mobile", "UnitDef.footprintx", "Cell.metal", "Cell.unit", "Cell.height", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Feature.flags16"], "objectWrites": [], "allOf": ["Cell", "Feature"], "args": [{"name": "unit", "type": "UnitDef*", "line": "unit", "mode": "object", "kind": "UnitDef"}, {"name": "otherTypeId", "type": "unsigned short", "line": "otherTypeId", "mode": "scalar"}, {"name": "cell", "type": "Point16*", "line": "cell", "mode": "value", "kind": "Point16", "byPointer": true}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanPlaceUnitFootprintSlot"},
     "BuildAllPassMaps": {"conv": "__stdcall", "ret": "void", "functions": ["BuildAllPassMaps", "PassMap::Build", "GetPassMapCellValue", "setcell"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.poolCount"], "writes": ["Game.progress_38d73"], "objectReads": ["Unit.motion", "Cell.unit", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells", "PassMap.lastTick", "Feature.flags16"], "objectWrites": ["PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells"], "allOf": ["Unit", "Cell", "PassMap", "Feature"], "args": [{"name": "limits", "type": "MapMoveLimits*", "line": "limits", "mode": "structs", "kind": "MapMoveLimits", "count": "count", "countIndex": 1}, {"name": "count", "type": "int", "line": "count", "mode": "scalar"}], "result": null, "native": "BuildAllPassMaps"},

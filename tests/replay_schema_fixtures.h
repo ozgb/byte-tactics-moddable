@@ -5838,27 +5838,27 @@ static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 266, 267 
 static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 266, 267 };
 static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 44 };
 static const unsigned char kReplayMovementApplyReads[] = { 0, 17, 23, 24, 27, 28 };
-static const unsigned short kReplayMovementApplyObjReads[] = { 42, 43, 64, 66, 71, 97, 100, 101, 103, 136, 169, 180, 181, 184, 217, 232, 238, 241, 266, 312, 313, 314, 316, 317, 318, 319, 322, 324, 325, 326, 327, 328, 329, 331, 332, 333, 339, 342, 734, 830, 831, 832, 833, 834, 835, 836, 837, 840, 844, 846, 847, 848, 850, 851, 852, 853, 854, 857, 858, 866, 867, 890 };
+static const unsigned short kReplayMovementApplyObjReads[] = { 42, 43, 64, 66, 71, 97, 100, 101, 103, 136, 169, 180, 181, 184, 217, 232, 233, 237, 238, 239, 241, 266, 312, 313, 314, 316, 317, 318, 319, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 339, 342, 734, 830, 831, 832, 833, 834, 835, 836, 837, 840, 844, 846, 847, 848, 850, 851, 852, 853, 854, 857, 858, 866, 867, 875, 890 };
 static const unsigned short kReplayMovementApplyObjWrites[] = { 100, 233, 237, 238, 239, 241, 323, 324, 325, 327, 331, 332, 333, 840, 847, 850, 851, 852, 853, 857, 866, 875 };
 static const unsigned char kReplayMovementUpdateMotionReads[] = { 0, 17, 23, 24, 27, 28 };
-static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 0, 22, 42, 43, 45, 64, 65, 66, 71, 89, 91, 97, 98, 100, 101, 102, 103, 125, 136, 164, 169, 178, 179, 180, 181, 182, 183, 184, 217, 232, 233, 237, 238, 239, 241, 266, 267, 312, 313, 314, 316, 317, 318, 319, 322, 324, 325, 326, 327, 328, 329, 331, 332, 333, 339, 342, 734, 830, 831, 832, 833, 834, 835, 836, 837, 840, 844, 846, 847, 848, 849, 850, 851, 852, 853, 854, 856, 857, 858, 859, 862, 865, 866, 867, 868, 871, 874, 875, 890 };
+static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 0, 22, 42, 43, 45, 64, 65, 66, 71, 89, 91, 97, 98, 100, 101, 102, 103, 125, 136, 164, 169, 178, 179, 180, 181, 182, 183, 184, 217, 232, 233, 237, 238, 239, 240, 241, 266, 267, 312, 313, 314, 316, 317, 318, 319, 322, 324, 325, 326, 327, 328, 329, 331, 332, 333, 339, 342, 734, 830, 831, 832, 833, 834, 835, 836, 837, 840, 844, 846, 847, 848, 849, 850, 851, 852, 853, 854, 856, 857, 858, 859, 862, 865, 866, 867, 868, 871, 874, 875, 890 };
 static const unsigned short kReplayMovementUpdateMotionObjWrites[] = { 233, 237, 238, 239, 240, 241, 331, 332, 333, 837, 840, 847, 849, 850, 851, 852, 853, 857, 859, 862, 865, 866, 868, 871, 874, 875 };
 static const unsigned short kReplayMovementHasNetStateObjReads[] = { 100, 232, 238, 848, 852, 854, 858, 867, 875 };
-static const unsigned short kReplayMovementNewPathOrderAtObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewPathOrderAtObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewPathOrderAtObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewPathOrderToUnitObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewPathOrderToUnitObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewPathOrderToUnitObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewPathOrderToUnitAtObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewAirManeuverOrderObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewAirManeuverOrderObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewAirManeuverOrderObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewApproachRadiusObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewApproachRadiusObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewApproachRadiusObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewRingApproachObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewRingApproachObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewRingApproachObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
-static const unsigned short kReplayMovementNewPointMarkerObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 327, 329, 342, 734, 735, 736, 836 };
+static const unsigned short kReplayMovementNewPointMarkerObjReads[] = { 42, 43, 59, 97, 104, 105, 136, 197, 323, 327, 329, 342, 734, 735, 736, 836 };
 static const unsigned short kReplayMovementNewPointMarkerObjWrites[] = { 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 734, 735, 736, 830, 831, 832, 833, 834, 835, 836, 837, 840, 843, 844, 845, 846, 890 };
 static const unsigned short kReplayMovementUnitTargetObjReads[] = { 100, 232 };
 static const unsigned short kReplayMissionGetGameTypeAllOf[] = { ROK_MISSION };
@@ -6042,17 +6042,17 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "LoadScriptState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_MOVEMENT, kReplayMovementApplyReads, 6, nullptr, 0, kReplayMovementApplyObjReads, 62, kReplayMovementApplyObjWrites, 22, nullptr, 0 },
-    { "UpdateMotion", SUB_MOVEMENT, kReplayMovementUpdateMotionReads, 6, nullptr, 0, kReplayMovementUpdateMotionObjReads, 89, kReplayMovementUpdateMotionObjWrites, 26, nullptr, 0 },
+    { "Apply", SUB_MOVEMENT, kReplayMovementApplyReads, 6, nullptr, 0, kReplayMovementApplyObjReads, 67, kReplayMovementApplyObjWrites, 22, nullptr, 0 },
+    { "UpdateMotion", SUB_MOVEMENT, kReplayMovementUpdateMotionReads, 6, nullptr, 0, kReplayMovementUpdateMotionObjReads, 90, kReplayMovementUpdateMotionObjWrites, 26, nullptr, 0 },
     { "HasNetState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementHasNetStateObjReads, 9, nullptr, 0, nullptr, 0 },
-    { "NewPathOrderAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderAtObjReads, 15, kReplayMovementNewPathOrderAtObjWrites, 38, nullptr, 0 },
-    { "NewPathOrderToUnit", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitObjReads, 15, kReplayMovementNewPathOrderToUnitObjWrites, 38, nullptr, 0 },
-    { "NewPathOrderToUnitAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitAtObjReads, 15, kReplayMovementNewPathOrderToUnitAtObjWrites, 38, nullptr, 0 },
-    { "NewPathOrderToUnitAtAngle", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitAtAngleObjReads, 15, kReplayMovementNewPathOrderToUnitAtAngleObjWrites, 38, nullptr, 0 },
-    { "NewAirManeuverOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewAirManeuverOrderObjReads, 15, kReplayMovementNewAirManeuverOrderObjWrites, 38, nullptr, 0 },
-    { "NewApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewApproachRadiusObjReads, 15, kReplayMovementNewApproachRadiusObjWrites, 38, nullptr, 0 },
-    { "NewRingApproach", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewRingApproachObjReads, 15, kReplayMovementNewRingApproachObjWrites, 38, nullptr, 0 },
-    { "NewPointMarker", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPointMarkerObjReads, 15, kReplayMovementNewPointMarkerObjWrites, 38, nullptr, 0 },
+    { "NewPathOrderAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderAtObjReads, 16, kReplayMovementNewPathOrderAtObjWrites, 38, nullptr, 0 },
+    { "NewPathOrderToUnit", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitObjReads, 16, kReplayMovementNewPathOrderToUnitObjWrites, 38, nullptr, 0 },
+    { "NewPathOrderToUnitAt", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitAtObjReads, 16, kReplayMovementNewPathOrderToUnitAtObjWrites, 38, nullptr, 0 },
+    { "NewPathOrderToUnitAtAngle", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPathOrderToUnitAtAngleObjReads, 16, kReplayMovementNewPathOrderToUnitAtAngleObjWrites, 38, nullptr, 0 },
+    { "NewAirManeuverOrder", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewAirManeuverOrderObjReads, 16, kReplayMovementNewAirManeuverOrderObjWrites, 38, nullptr, 0 },
+    { "NewApproachRadius", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewApproachRadiusObjReads, 16, kReplayMovementNewApproachRadiusObjWrites, 38, nullptr, 0 },
+    { "NewRingApproach", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewRingApproachObjReads, 16, kReplayMovementNewRingApproachObjWrites, 38, nullptr, 0 },
+    { "NewPointMarker", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementNewPointMarkerObjReads, 16, kReplayMovementNewPointMarkerObjWrites, 38, nullptr, 0 },
     { "TargetType", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, kReplayMovementUnitTargetObjReads, 2, nullptr, 0, nullptr, 0 },
     { "GetGameType", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetGameTypeObjReads, 1, nullptr, 0, kReplayMissionGetGameTypeAllOf, 1 },

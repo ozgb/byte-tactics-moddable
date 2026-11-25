@@ -1,0 +1,351 @@
+bt-replay 2
+subsystem movement 5.0
+call 4408 UpdateMotion
+  r Game.seaLevel 0
+  r Game.width_142a3 28
+  r Game.height_142a7 13
+  r Game.overflowBucket OverflowBucket#1
+  r Game.gravity 8155
+  r Unit#1.cell (39,35)
+  r Unit#1.footprint (2,2)
+  r Unit#1.id 1
+  r Unit#1.spatialBucket SpatialBucket#117
+  r Unit#1.transportPiece 255
+  r Unit#1.heading -32671
+  r Unit#1.list Order#1
+  r Unit#1.flags 0x90e20320
+  r Unit#1.carrier Unit#3
+  r Unit#1.def UnitDef#34
+  r Unit#1.player Player#0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 41945692
+  r Unit#1.posY 107263
+  r Unit#1.posZ 37833406
+  r SpatialBucket#117.bytes x:010700000000
+  r Order#1.flags_42 36
+  r Order#1.unit Unit#1
+  r Unit#3.cell (38,34)
+  r Unit#3.footprint (4,4)
+  r Unit#3.id 3
+  r Unit#3.spatialBucket SpatialBucket#116
+  r Unit#3.transportPiece 255
+  r Unit#3.heading -32671
+  r Unit#3.list Order#2
+  r Unit#3.flags 0x10242321
+  r Unit#3.carrier null
+  r Unit#3.def UnitDef#122
+  r Unit#3.player Player#0
+  r Unit#3.motion UnitMotion#2
+  r Unit#3.posX 41945692
+  r Unit#3.posY 107263
+  r Unit#3.posZ 37833406
+  r UnitDef#34.draft 0
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.maxvelocity 78643
+  r UnitDef#34.altitude 0
+  r UnitDef#34.brakerate 19660
+  r UnitDef#34.acceleration 9830
+  r UnitDef#34.bankscale 65536
+  r UnitDef#34.pitchscale 0
+  r UnitDef#34.moverate1 157286
+  r UnitDef#34.moverate2 157286
+  r UnitDef#34.turnrate 1044
+  r Player#0.active 1
+  r Player#0.type 1
+  r UnitMotion#1.obj AiSearchGoal#1
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.speed 0
+  r UnitMotion#1.flags 0
+  r UnitMotion#1.turn 0
+  r UnitMotion#1.lastMoveTick 4003
+  r UnitMotion#1.p2X 0
+  r SpatialBucket#116.bytes x:010100000000
+  r Order#2.flags_42 5121
+  r Order#2.unit Unit#3
+  r UnitDef#122.draft 4
+  r UnitDef#122.flags1 0x008090a9
+  r UnitDef#122.maxvelocity 117964
+  r UnitDef#122.altitude 0
+  r UnitDef#122.brakerate 117
+  r UnitDef#122.acceleration 262
+  r UnitDef#122.bankscale 65536
+  r UnitDef#122.pitchscale 0
+  r UnitDef#122.moverate1 235928
+  r UnitDef#122.moverate2 235928
+  r UnitDef#122.turnrate 128
+  r UnitMotion#2.obj AiSearchGoal#2
+  r UnitMotion#2.velocityX 0
+  r UnitMotion#2.speed 0
+  r UnitMotion#2.flags 1
+  r UnitMotion#2.turn 0
+  r UnitMotion#2.lastMoveTick 4017
+  r UnitMotion#2.p2X 0
+  r AiSearchGoal#1.target null
+  r AiSearchGoal#1.owner Unit#1
+  r AiSearchGoal#1.points x:5002c001b002c001b002c001b002c001b002c001b002c0010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#1.count 2
+  r AiSearchGoal#1.repathClaimTick 0
+  r AiSearchGoal#1.flags 8
+  r AiSearchGoal#2.target null
+  r AiSearchGoal#2.owner Unit#3
+  r AiSearchGoal#2.points x:8002400280024002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#2.count 1
+  r AiSearchGoal#2.repathClaimTick 0
+  r AiSearchGoal#2.flags 8
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4408 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4408 UpdateMotion
+  r Unit#251.cell (193,65)
+  r Unit#251.footprint (2,2)
+  r Unit#251.id 251
+  r Unit#251.spatialBucket SpatialBucket#248
+  r Unit#251.transportPiece 255
+  r Unit#251.heading 32734
+  r Unit#251.list Order#3
+  r Unit#251.flags 0x90e40021
+  r Unit#251.carrier null
+  r Unit#251.def UnitDef#167
+  r Unit#251.player Player#1
+  r Unit#251.motion UnitMotion#3
+  r Unit#251.posX 203423724
+  r Unit#251.posY 65536
+  r Unit#251.posZ 68777819
+  r SpatialBucket#248.bytes x:010100000000
+  r Order#3.flags_42 147456
+  r Order#3.unit Unit#251
+  r UnitDef#167.draft 0
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.maxvelocity 70123
+  r UnitDef#167.altitude 0
+  r UnitDef#167.brakerate 20971
+  r UnitDef#167.acceleration 10485
+  r UnitDef#167.bankscale 65536
+  r UnitDef#167.pitchscale 0
+  r UnitDef#167.moverate1 140246
+  r UnitDef#167.moverate2 140246
+  r UnitDef#167.turnrate 1030
+  r Player#1.active 1
+  r Player#1.type 2
+  r UnitMotion#3.obj AiSearchGoal#3
+  r UnitMotion#3.velocityX 0
+  r UnitMotion#3.speed 0
+  r UnitMotion#3.flags 1
+  r UnitMotion#3.turn 0
+  r UnitMotion#3.lastMoveTick 4063
+  r UnitMotion#3.p2X 0
+  r AiSearchGoal#3.target null
+  r AiSearchGoal#3.owner Unit#251
+  r AiSearchGoal#3.points x:200c8003200c2004200c2004400c600300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#3.count 2
+  r AiSearchGoal#3.repathClaimTick 0
+  r AiSearchGoal#3.flags 8
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 4409 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4409 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4409 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 4410 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4410 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4410 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 4410 UnitTarget
+  a unit Unit#251
+  o result null
+call 4411 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4411 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4411 NewPointMarker
+  r Order#4.unit Unit#251
+  r Unit#251.weapon2Def weapondef#23
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r weapondef#23.range 240
+  r weapondef#21.range 200
+  r weapondef#0.range 16
+  a order Order#4
+  a pos (197,44)
+  a size (5,5)
+  i services.SimAlloc 24 = alloc#1
+  w PointMarker#1.source Order#4
+  w PointMarker#1.x1 195
+  w PointMarker#1.x2 202
+  w PointMarker#1.y1 42
+  w PointMarker#1.y2 49
+  o result PointMarker#1
+call 4411 Apply
+  r Unit#251.list Order#4
+  r Order#4.flags_42 1062153
+  a event.kind 326
+  a event.unit Unit#251
+  a event.target PointMarker#1
+  a size 12
+  i pathfinding.Cancel AiSearchGoal#3
+  i pathfinding.Submit (Unit#251,60,3,(0,0),0,0,195,202,42,49,AiSearchGoal#3,PointMarker#1,0,(0,0))
+  w AiSearchGoal#3.target PointMarker#1
+  w AiSearchGoal#3.flags 11
+  o result 1
+call 4411 UpdateMotion
+  r AiSearchGoal#3.points x:1f0c1904700c2003200c2004400c600300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 1028
+  w UnitMotion#3.speed 10485
+  w UnitMotion#3.turn 1030
+  w UnitMotion#3.lastMoveTick 4411
+call 4412 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4412 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4412 UpdateMotion
+  r Unit#251.heading -31772
+  r Unit#251.flags 0x90e40025
+  r Unit#251.posX 203424752
+  r Unit#251.posZ 68788254
+  r AiSearchGoal#3.points x:200c2004200c6003600c2003400c600300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#3.count 3
+  r AiSearchGoal#3.repathClaimTick 4411
+  r AiSearchGoal#3.flags 9
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 4091
+  w UnitMotion#3.speed 20970
+  w UnitMotion#3.lastMoveTick 4412
+call 4413 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4413 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4413 UpdateMotion
+  r Unit#251.heading -30742
+  r Unit#251.posX 203428843
+  r Unit#251.posZ 68808822
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 9131
+  w UnitMotion#3.speed 31455
+  w UnitMotion#3.lastMoveTick 4413
+call 4414 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4414 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4414 UpdateMotion
+  r Unit#251.heading -29712
+  r Unit#251.posX 203437974
+  r Unit#251.posZ 68838922
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 16050
+  w UnitMotion#3.speed 41940
+  w UnitMotion#3.lastMoveTick 4414
+call 4415 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4415 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4415 UpdateMotion
+  r Unit#251.heading -28682
+  r Unit#251.posX 203454024
+  r Unit#251.posZ 68877667
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 24715
+  w UnitMotion#3.speed 52425
+  w UnitMotion#3.lastMoveTick 4415
+call 4416 UpdateMotion
+  a unit Unit#1
+  i scripts.GetPiecePosition Unit#3 -1 = (41945692,107263,37833406)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#3 -1 = (19,32865,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 4416 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 4416 UpdateMotion
+  r Unit#251.heading -27652
+  r Unit#251.posX 203478739
+  r Unit#251.posZ 68923904
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#3.velocityX 34949
+  w UnitMotion#3.speed 62910
+  w UnitMotion#3.lastMoveTick 4416

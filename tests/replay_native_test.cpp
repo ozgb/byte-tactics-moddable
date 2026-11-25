@@ -151,6 +151,8 @@ Seams g_seams;
 const TurnCostTable g_turnCosts = { { 0, 40, 60, 80, 100, 80, 60, 40 } };
 signed char g_dirDeltaX[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 signed char g_dirDeltaZ[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+signed char g_rangeByPitchTable[11] __asm__("_g_rangeByPitchTable") = { 25, 55, 70, 85, 100, 100, 75, 50, 25, 20, 15 };
+__asm__(".globl \"?g_slopeSpeedFactor@@3PACA\"\n\t.set \"?g_slopeSpeedFactor@@3PACA\", _g_rangeByPitchTable+5");
 
 SimGlobals& SimCreate()
 {

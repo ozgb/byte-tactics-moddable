@@ -1,0 +1,2329 @@
+bt-replay 2
+subsystem movement 5.0
+call 668 UpdateMotion
+  r Game.seaLevel 0
+  r Game.width_142a3 28
+  r Game.height_142a7 13
+  r Game.overflowBucket OverflowBucket#1
+  r Game.gravity 8155
+  r Unit#1.cell (34,14)
+  r Unit#1.footprint (2,2)
+  r Unit#1.id 1
+  r Unit#1.spatialBucket SpatialBucket#32
+  r Unit#1.transportPiece 255
+  r Unit#1.heading 0
+  r Unit#1.list Order#1
+  r Unit#1.flags 0x90c00021
+  r Unit#1.carrier null
+  r Unit#1.def UnitDef#34
+  r Unit#1.player Player#0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 36700160
+  r Unit#1.posY 65536
+  r Unit#1.posZ 15728640
+  r SpatialBucket#32.bytes x:010100000000
+  r Order#1.flags_42 147456
+  r Order#1.unit Unit#1
+  r UnitDef#34.draft 0
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.maxvelocity 78643
+  r UnitDef#34.altitude 0
+  r UnitDef#34.brakerate 19660
+  r UnitDef#34.acceleration 9830
+  r UnitDef#34.bankscale 65536
+  r UnitDef#34.pitchscale 0
+  r UnitDef#34.moverate1 157286
+  r UnitDef#34.moverate2 157286
+  r UnitDef#34.turnrate 1044
+  r Player#0.active 1
+  r Player#0.type 1
+  r UnitMotion#1.obj AiSearchGoal#1
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.speed 0
+  r UnitMotion#1.flags 1
+  r UnitMotion#1.turn 0
+  r UnitMotion#1.lastMoveTick 0
+  r UnitMotion#1.p2X 0
+  r AiSearchGoal#1.target null
+  r AiSearchGoal#1.owner Unit#1
+  r AiSearchGoal#1.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#1.count 0
+  r AiSearchGoal#1.repathClaimTick 0
+  r AiSearchGoal#1.flags 8
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 668 UpdateMotion
+  r Unit#4.cell (30,23)
+  r Unit#4.footprint (2,2)
+  r Unit#4.id 4
+  r Unit#4.spatialBucket SpatialBucket#87
+  r Unit#4.transportPiece 255
+  r Unit#4.heading -32705
+  r Unit#4.list Order#2
+  r Unit#4.flags 0x10e40026
+  r Unit#4.carrier null
+  r Unit#4.def UnitDef#29
+  r Unit#4.player Player#0
+  r Unit#4.motion UnitMotion#2
+  r Unit#4.posX 32095105
+  r Unit#4.posY 7208960
+  r Unit#4.posZ 24740797
+  r SpatialBucket#87.bytes x:010100000000
+  r Order#2.flags_42 512
+  r Order#2.unit Unit#4
+  r UnitDef#29.draft 0
+  r UnitDef#29.flags1 0x008088c9
+  r UnitDef#29.maxvelocity 452198
+  r UnitDef#29.altitude 70
+  r UnitDef#29.brakerate 98304
+  r UnitDef#29.acceleration 3932
+  r UnitDef#29.bankscale 98304
+  r UnitDef#29.pitchscale 0
+  r UnitDef#29.moverate1 904396
+  r UnitDef#29.moverate2 904396
+  r UnitDef#29.turnrate 90
+  r UnitMotion#2.obj LiteGoal#1
+  r UnitMotion#2.velocityX -72348
+  r UnitMotion#2.speed 120035
+  r UnitMotion#2.flags 2
+  r UnitMotion#2.turn 0
+  r UnitMotion#2.lastMoveTick 667
+  r UnitMotion#2.p2X 11467
+  r LiteGoal#1.target PathOrder#1
+  r LiteGoal#1.owner Unit#4
+  r LiteGoal#1.posX 30408704
+  r LiteGoal#1.velX 0
+  r LiteGoal#1.heading -32705
+  r LiteGoal#1.netDirtyFlags 1
+  r PathOrder#1.source Order#2
+  r PathOrder#1.altitude 0
+  r PathOrder#1.heading 0
+  r PathOrder#1.followOffset 0
+  r PathOrder#1.flags 21
+  r PathOrder#1.piece 1
+  r PathOrder#1.unit Unit#4
+  r PathOrder#1.posX 30408704
+  r PathOrder#1.posY 1376256
+  r PathOrder#1.posZ 22020096
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -71451
+  w UnitMotion#2.speed 120027
+  w UnitMotion#2.lastMoveTick 668
+  w UnitMotion#2.p2X 11790
+call 668 UpdateMotion
+  r Unit#251.cell (210,87)
+  r Unit#251.footprint (2,2)
+  r Unit#251.id 251
+  r Unit#251.spatialBucket SpatialBucket#334
+  r Unit#251.transportPiece 255
+  r Unit#251.heading 0
+  r Unit#251.list Order#3
+  r Unit#251.flags 0x90e00321
+  r Unit#251.carrier null
+  r Unit#251.def UnitDef#167
+  r Unit#251.player Player#1
+  r Unit#251.motion UnitMotion#3
+  r Unit#251.posX 221249536
+  r Unit#251.posY 65536
+  r Unit#251.posZ 92274688
+  r SpatialBucket#334.bytes x:010100000000
+  r Order#3.flags_42 147456
+  r Order#3.unit Unit#251
+  r UnitDef#167.draft 0
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.maxvelocity 70123
+  r UnitDef#167.altitude 0
+  r UnitDef#167.brakerate 20971
+  r UnitDef#167.acceleration 10485
+  r UnitDef#167.bankscale 65536
+  r UnitDef#167.pitchscale 0
+  r UnitDef#167.moverate1 140246
+  r UnitDef#167.moverate2 140246
+  r UnitDef#167.turnrate 1030
+  r Player#1.active 1
+  r Player#1.type 1
+  r UnitMotion#3.obj AiSearchGoal#2
+  r UnitMotion#3.velocityX 0
+  r UnitMotion#3.speed 0
+  r UnitMotion#3.flags 1
+  r UnitMotion#3.turn 0
+  r UnitMotion#3.lastMoveTick 0
+  r UnitMotion#3.p2X 0
+  r AiSearchGoal#2.target null
+  r AiSearchGoal#2.owner Unit#251
+  r AiSearchGoal#2.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#2.count 0
+  r AiSearchGoal#2.repathClaimTick 0
+  r AiSearchGoal#2.flags 8
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 669 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 669 UpdateMotion
+  r Unit#4.posX 32023654
+  r Unit#4.posY 7143424
+  r Unit#4.posZ 24670042
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#29 4 (29,22) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 0
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -70526
+  w UnitMotion#2.speed 120019
+  w UnitMotion#2.lastMoveTick 669
+  w UnitMotion#2.p2X 12125
+call 669 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 670 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 670 NewPathOrderToUnitAtAngle
+  r Unit#2.cell (27,19)
+  r Unit#2.footprint (4,4)
+  r Unit#2.weapon2Def weapondef#0
+  r Unit#2.def UnitDef#18
+  r Unit#2.weapon0Def weapondef#0
+  r Unit#2.weapon1Def weapondef#0
+  r Unit#4.cell (29,22)
+  r Unit#4.weapon2Def weapondef#0
+  r Unit#4.weapon0Def weapondef#0
+  r Unit#4.weapon1Def weapondef#0
+  r weapondef#0.range 16
+  r UnitDef#18.flags1 0x008402ca
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#1
+  i units.UnitRefInit PathOrderAttach#1 Unit#2 null
+  w PathOrder#2.source Order#2
+  w PathOrder#2.approachRadius 0
+  w PathOrder#2.altitude 0
+  w PathOrder#2.heading 0
+  w PathOrder#2.followOffset 0
+  w PathOrder#2.flags 5
+  w PathOrder#2.piece 1
+  w PathOrder#2.unit Unit#4
+  w PathOrder#2.posX 31953128
+  w PathOrder#2.posY 7077888
+  w PathOrder#2.posZ 24598377
+  o result PathOrder#2
+call 670 Apply
+  r Unit#4.spatialBucket SpatialBucket#59
+  r Unit#4.posX 31953128
+  r Unit#4.posZ 24598377
+  r SpatialBucket#59.bytes x:010100000000
+  r PathOrder#1.approachRadius 48
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a event.value 0
+  a size 16
+  w PathOrder#2.flags 13
+  o result 1
+call 670 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 670 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  i units.UnitRefUnlink PathOrder#1.ref
+  i services.SimFree alloc#?
+  o result 1
+call 670 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  w LiteGoal#1.target PathOrder#2
+  o result 1
+call 670 UpdateMotion
+  r Unit#4.posY 7077888
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -69569
+  w UnitMotion#2.speed 120010
+  w UnitMotion#2.lastMoveTick 670
+  w UnitMotion#2.p2X 12475
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
+call 670 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 671 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 671 UpdateMotion
+  r Unit#4.posX 31883559
+  r Unit#4.posY 7012352
+  r Unit#4.posZ 24525798
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -68580
+  w UnitMotion#2.speed 120001
+  w UnitMotion#2.lastMoveTick 671
+  w UnitMotion#2.p2X 12840
+call 671 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 672 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 672 UpdateMotion
+  r Unit#4.posX 31814979
+  r Unit#4.posY 6946816
+  r Unit#4.posZ 24452298
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -67556
+  w UnitMotion#2.speed 119992
+  w UnitMotion#2.lastMoveTick 672
+  w UnitMotion#2.p2X 13221
+call 672 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 673 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 673 UpdateMotion
+  r Unit#4.posX 31747423
+  r Unit#4.posY 6881280
+  r Unit#4.posZ 24377871
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -66494
+  w UnitMotion#2.speed 119982
+  w UnitMotion#2.lastMoveTick 673
+  w UnitMotion#2.p2X 13621
+call 673 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 674 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 674 UpdateMotion
+  r Unit#4.posX 31680929
+  r Unit#4.posY 6815744
+  r Unit#4.posZ 24302510
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -65391
+  w UnitMotion#2.speed 119970
+  w UnitMotion#2.lastMoveTick 674
+  w UnitMotion#2.p2X 14042
+call 674 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 675 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 675 UpdateMotion
+  r Unit#4.posX 31615538
+  r Unit#4.posY 6750208
+  r Unit#4.posZ 24226208
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -64245
+  w UnitMotion#2.speed 119959
+  w UnitMotion#2.lastMoveTick 675
+  w UnitMotion#2.p2X 14485
+call 675 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 676 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 676 UpdateMotion
+  r Unit#4.posX 31551293
+  r Unit#4.posY 6684672
+  r Unit#4.posZ 24148956
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -63050
+  w UnitMotion#2.speed 119945
+  w UnitMotion#2.lastMoveTick 676
+  w UnitMotion#2.p2X 14955
+call 676 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 677 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 677 UpdateMotion
+  r Unit#4.posX 31488243
+  r Unit#4.posY 6619136
+  r Unit#4.posZ 24070747
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -61803
+  w UnitMotion#2.speed 119932
+  w UnitMotion#2.lastMoveTick 677
+  w UnitMotion#2.p2X 15454
+call 677 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 678 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 678 UpdateMotion
+  r Unit#4.posX 31426440
+  r Unit#4.posY 6553600
+  r Unit#4.posZ 23991568
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -60496
+  w UnitMotion#2.speed 119914
+  w UnitMotion#2.lastMoveTick 678
+  w UnitMotion#2.p2X 15988
+call 678 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 679 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 679 UpdateMotion
+  r Unit#4.posX 31365944
+  r Unit#4.posY 6488064
+  r Unit#4.posZ 23911413
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -59126
+  w UnitMotion#2.speed 119899
+  w UnitMotion#2.lastMoveTick 679
+  w UnitMotion#2.p2X 16558
+call 679 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 680 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 680 UpdateMotion
+  r Unit#4.posX 31306818
+  r Unit#4.posY 6422528
+  r Unit#4.posZ 23830265
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -57680
+  w UnitMotion#2.speed 119876
+  w UnitMotion#2.lastMoveTick 680
+  w UnitMotion#2.p2X 17176
+call 680 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 681 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 681 UpdateMotion
+  r Unit#4.posX 31249138
+  r Unit#4.posY 6356992
+  r Unit#4.posZ 23748116
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -56149
+  w UnitMotion#2.speed 119852
+  w UnitMotion#2.lastMoveTick 681
+  w UnitMotion#2.p2X 17848
+call 681 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 682 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 682 UpdateMotion
+  r Unit#4.posX 31192989
+  r Unit#4.posY 6291456
+  r Unit#4.posZ 23664948
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#29 4 (29,21) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 0
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -54517
+  w UnitMotion#2.speed 119821
+  w UnitMotion#2.lastMoveTick 682
+  w UnitMotion#2.p2X 18587
+call 682 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 683 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 683 UpdateMotion
+  r Unit#4.cell (29,21)
+  r Unit#4.posX 31138472
+  r Unit#4.posY 6225920
+  r Unit#4.posZ 23580745
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -52763
+  w UnitMotion#2.speed 119782
+  w UnitMotion#2.lastMoveTick 683
+  w UnitMotion#2.p2X 19411
+call 683 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 684 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 684 UpdateMotion
+  r Unit#4.posX 31085709
+  r Unit#4.posY 6160384
+  r Unit#4.posZ 23495487
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -50857
+  w UnitMotion#2.speed 119729
+  w UnitMotion#2.lastMoveTick 684
+  w UnitMotion#2.p2X 20346
+call 684 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 685 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 685 NewPathOrderToUnitAtAngle
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#2
+  i units.UnitRefInit PathOrder#1.ref Unit#2 null
+  w PathOrder#1.approachRadius 0
+  w PathOrder#1.flags 5
+  w PathOrder#1.posX 31034852
+  w PathOrder#1.posY 6094848
+  w PathOrder#1.posZ 23409152
+  o result PathOrder#1
+call 685 Apply
+  r Unit#4.posX 31034852
+  r Unit#4.posZ 23409152
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a event.value 0
+  a size 16
+  w PathOrder#1.flags 13
+  o result 1
+call 685 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 685 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  i units.UnitRefUnlink PathOrder#2.ref
+  i services.SimFree alloc#1
+  o result 1
+call 685 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  w LiteGoal#1.target PathOrder#1
+  o result 1
+call 685 UpdateMotion
+  r Unit#4.posY 6094848
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -48749
+  w UnitMotion#2.speed 119650
+  w UnitMotion#2.lastMoveTick 685
+  w UnitMotion#2.p2X 21436
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
+call 685 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 686 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 686 UpdateMotion
+  r Unit#4.posX 30986103
+  r Unit#4.posY 6029312
+  r Unit#4.posZ 23321717
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -46348
+  w UnitMotion#2.speed 119517
+  w UnitMotion#2.lastMoveTick 686
+  w UnitMotion#2.p2X 22765
+call 686 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 687 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 687 UpdateMotion
+  r Unit#4.posX 30939755
+  r Unit#4.posY 5963776
+  r Unit#4.posZ 23233166
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#29 4 (28,21) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 0
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -43442
+  w UnitMotion#2.speed 119217
+  w UnitMotion#2.lastMoveTick 687
+  w UnitMotion#2.p2X 24532
+call 687 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 688 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 688 UpdateMotion
+  r Unit#4.cell (28,21)
+  r Unit#4.posX 30896313
+  r Unit#4.posY 5898240
+  r Unit#4.posZ 23143552
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -39396
+  w UnitMotion#2.speed 117987
+  w UnitMotion#2.lastMoveTick 688
+  w UnitMotion#2.p2X 27351
+call 688 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 689 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 689 UpdateMotion
+  r Unit#4.posX 30856917
+  r Unit#4.posY 5832704
+  r Unit#4.posZ 23053696
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -37448
+  w UnitMotion#2.speed 114693
+  w UnitMotion#2.lastMoveTick 689
+  w UnitMotion#2.p2X 27931
+call 689 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 690 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 690 UpdateMotion
+  r Unit#4.posX 30819469
+  r Unit#4.posY 5767168
+  r Unit#4.posZ 22967340
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -35849
+  w UnitMotion#2.speed 111420
+  w UnitMotion#2.lastMoveTick 690
+  w UnitMotion#2.p2X 28133
+call 690 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 691 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 691 UpdateMotion
+  r Unit#4.posX 30783620
+  r Unit#4.posY 5701632
+  r Unit#4.posZ 22884670
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -34249
+  w UnitMotion#2.speed 108193
+  w UnitMotion#2.lastMoveTick 691
+  w UnitMotion#2.p2X 28326
+call 691 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 692 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 692 UpdateMotion
+  r Unit#4.posX 30749371
+  r Unit#4.posY 5636096
+  r Unit#4.posZ 22805690
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -32648
+  w UnitMotion#2.speed 105018
+  w UnitMotion#2.lastMoveTick 692
+  w UnitMotion#2.p2X 28510
+call 692 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 693 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 693 UpdateMotion
+  r Unit#4.posX 30716723
+  r Unit#4.posY 5570560
+  r Unit#4.posZ 22730404
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -31044
+  w UnitMotion#2.speed 101899
+  w UnitMotion#2.lastMoveTick 693
+  w UnitMotion#2.p2X 28688
+call 693 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 694 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 694 UpdateMotion
+  r Unit#4.posX 30685679
+  r Unit#4.posY 5505024
+  r Unit#4.posZ 22658816
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -29438
+  w UnitMotion#2.speed 98842
+  w UnitMotion#2.lastMoveTick 694
+  w UnitMotion#2.p2X 28859
+call 694 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 695 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 695 UpdateMotion
+  r Unit#4.posX 30656241
+  r Unit#4.posY 5439488
+  r Unit#4.posZ 22590931
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#29 4 (28,20) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 0
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -27830
+  w UnitMotion#2.speed 95854
+  w UnitMotion#2.lastMoveTick 695
+  w UnitMotion#2.p2X 29023
+call 695 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 696 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 696 UpdateMotion
+  r Unit#4.cell (28,20)
+  r Unit#4.posX 30628411
+  r Unit#4.posY 5373952
+  r Unit#4.posZ 22526755
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -26219
+  w UnitMotion#2.speed 92940
+  w UnitMotion#2.lastMoveTick 696
+  w UnitMotion#2.p2X 29182
+call 696 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 697 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 697 UpdateMotion
+  r Unit#4.posX 30602192
+  r Unit#4.posY 5308416
+  r Unit#4.posZ 22466294
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -24428
+  w UnitMotion#2.speed 89804
+  w UnitMotion#2.lastMoveTick 697
+  w UnitMotion#2.p2X 29513
+call 697 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 698 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 698 UpdateMotion
+  r Unit#4.posX 30577764
+  r Unit#4.posY 5242880
+  r Unit#4.posZ 22409964
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -22652
+  w UnitMotion#2.speed 86812
+  w UnitMotion#2.lastMoveTick 698
+  w UnitMotion#2.p2X 29813
+call 698 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 699 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 699 UpdateMotion
+  r Unit#4.posX 30555112
+  r Unit#4.posY 5177344
+  r Unit#4.posZ 22357730
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -20892
+  w UnitMotion#2.speed 83977
+  w UnitMotion#2.lastMoveTick 699
+  w UnitMotion#2.p2X 30082
+call 699 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 700 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 700 NewPathOrderToUnitAtAngle
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#1
+  i units.UnitRefInit PathOrder#2.ref Unit#2 null
+  w PathOrder#2.flags 5
+  w PathOrder#2.posX 30534220
+  w PathOrder#2.posY 5111808
+  w PathOrder#2.posZ 22309556
+  o result PathOrder#2
+call 700 Apply
+  r Unit#4.posX 30534220
+  r Unit#4.posZ 22309556
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a event.value 0
+  a size 16
+  w PathOrder#2.flags 13
+  o result 1
+call 700 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 700 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  i units.UnitRefUnlink PathOrder#1.ref
+  i services.SimFree alloc#2
+  o result 1
+call 700 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  w LiteGoal#1.target PathOrder#2
+  o result 1
+call 700 UpdateMotion
+  r Unit#4.posY 5111808
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -19146
+  w UnitMotion#2.speed 81306
+  w UnitMotion#2.lastMoveTick 700
+  w UnitMotion#2.p2X 30323
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
+call 700 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 701 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 701 UpdateMotion
+  r Unit#4.posX 30515074
+  r Unit#4.posY 5046272
+  r Unit#4.posZ 22265407
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -17416
+  w UnitMotion#2.speed 78810
+  w UnitMotion#2.lastMoveTick 701
+  w UnitMotion#2.p2X 30536
+call 701 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 702 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 702 UpdateMotion
+  r Unit#4.posX 30497658
+  r Unit#4.posY 4980736
+  r Unit#4.posZ 22225248
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -15701
+  w UnitMotion#2.speed 76499
+  w UnitMotion#2.lastMoveTick 702
+  w UnitMotion#2.p2X 30724
+call 702 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 703 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 703 UpdateMotion
+  r Unit#4.posX 30481957
+  r Unit#4.posY 4915200
+  r Unit#4.posZ 22189044
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -14001
+  w UnitMotion#2.speed 74385
+  w UnitMotion#2.lastMoveTick 703
+  w UnitMotion#2.p2X 30887
+call 703 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 704 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 704 UpdateMotion
+  r Unit#4.posX 30467956
+  r Unit#4.posY 4849664
+  r Unit#4.posZ 22156761
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -12315
+  w UnitMotion#2.speed 72477
+  w UnitMotion#2.lastMoveTick 704
+  w UnitMotion#2.p2X 31028
+call 704 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 705 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 705 UpdateMotion
+  r Unit#4.posX 30455641
+  r Unit#4.posY 4784128
+  r Unit#4.posZ 22128365
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -10644
+  w UnitMotion#2.speed 70785
+  w UnitMotion#2.lastMoveTick 705
+  w UnitMotion#2.p2X 31147
+call 705 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 706 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 706 UpdateMotion
+  r Unit#4.posX 30444997
+  r Unit#4.posY 4718592
+  r Unit#4.posZ 22103822
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -8987
+  w UnitMotion#2.speed 69319
+  w UnitMotion#2.lastMoveTick 706
+  w UnitMotion#2.p2X 31246
+call 706 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 707 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 707 UpdateMotion
+  r Unit#4.posX 30436010
+  r Unit#4.posY 4653056
+  r Unit#4.posZ 22083099
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -7345
+  w UnitMotion#2.speed 68086
+  w UnitMotion#2.lastMoveTick 707
+  w UnitMotion#2.p2X 31325
+call 707 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 708 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 708 UpdateMotion
+  r Unit#4.posX 30428665
+  r Unit#4.posY 4587520
+  r Unit#4.posZ 22066162
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -5717
+  w UnitMotion#2.speed 67092
+  w UnitMotion#2.lastMoveTick 708
+  w UnitMotion#2.p2X 31386
+call 708 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 709 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 709 UpdateMotion
+  r Unit#4.posX 30422948
+  r Unit#4.posY 4521984
+  r Unit#4.posZ 22052979
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -4103
+  w UnitMotion#2.speed 66342
+  w UnitMotion#2.lastMoveTick 709
+  w UnitMotion#2.p2X 31430
+call 709 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 710 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 710 UpdateMotion
+  r Unit#4.posX 30418845
+  r Unit#4.posY 4456448
+  r Unit#4.posZ 22043517
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -2503
+  w UnitMotion#2.speed 65837
+  w UnitMotion#2.lastMoveTick 710
+  w UnitMotion#2.p2X 31458
+call 710 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 711 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 711 UpdateMotion
+  r Unit#4.posX 30416342
+  r Unit#4.posY 4390912
+  r Unit#4.posZ 22037743
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -936
+  w UnitMotion#2.speed 65578
+  w UnitMotion#2.lastMoveTick 711
+  w UnitMotion#2.p2X 31452
+call 711 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 712 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 712 UpdateMotion
+  r Unit#4.posX 30415406
+  r Unit#4.posY 4325376
+  r Unit#4.posZ 22035581
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -821
+  w UnitMotion#2.speed 65568
+  w UnitMotion#2.lastMoveTick 712
+  w UnitMotion#2.p2X 29994
+call 712 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 713 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 713 UpdateMotion
+  r Unit#4.posX 30414585
+  r Unit#4.posY 4259840
+  r Unit#4.posZ 22033684
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -721
+  w UnitMotion#2.speed 65561
+  w UnitMotion#2.lastMoveTick 713
+  w UnitMotion#2.p2X 28594
+call 713 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 714 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 714 UpdateMotion
+  r Unit#4.posX 30413864
+  r Unit#4.posY 4194304
+  r Unit#4.posZ 22032019
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -632
+  w UnitMotion#2.speed 65555
+  w UnitMotion#2.lastMoveTick 714
+  w UnitMotion#2.p2X 27253
+call 714 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 715 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 715 NewPathOrderToUnitAtAngle
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#2
+  i units.UnitRefInit PathOrder#1.ref Unit#2 null
+  w PathOrder#1.flags 5
+  w PathOrder#1.posX 30413232
+  w PathOrder#1.posY 4128768
+  w PathOrder#1.posZ 22030558
+  o result PathOrder#1
+call 715 Apply
+  r Unit#4.posX 30413232
+  r Unit#4.posZ 22030558
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a event.value 0
+  a size 16
+  w PathOrder#1.flags 13
+  o result 1
+call 715 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 715 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  i units.UnitRefUnlink PathOrder#2.ref
+  i services.SimFree alloc#1
+  o result 1
+call 715 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  w LiteGoal#1.target PathOrder#1
+  o result 1
+call 715 UpdateMotion
+  r Unit#4.posY 4128768
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -555
+  w UnitMotion#2.speed 65550
+  w UnitMotion#2.lastMoveTick 715
+  w UnitMotion#2.p2X 25967
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
+call 715 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 716 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 716 UpdateMotion
+  r Unit#4.posX 30412677
+  r Unit#4.posY 4063232
+  r Unit#4.posZ 22029276
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -487
+  w UnitMotion#2.speed 65547
+  w UnitMotion#2.lastMoveTick 716
+  w UnitMotion#2.p2X 24736
+call 716 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 717 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 717 UpdateMotion
+  r Unit#4.posX 30412190
+  r Unit#4.posY 3997696
+  r Unit#4.posZ 22028151
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -427
+  w UnitMotion#2.speed 65544
+  w UnitMotion#2.lastMoveTick 717
+  w UnitMotion#2.p2X 23559
+call 717 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 718 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 718 UpdateMotion
+  r Unit#4.posX 30411763
+  r Unit#4.posY 3932160
+  r Unit#4.posZ 22027164
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -375
+  w UnitMotion#2.speed 65542
+  w UnitMotion#2.lastMoveTick 718
+  w UnitMotion#2.p2X 22432
+call 718 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 719 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 719 UpdateMotion
+  r Unit#4.posX 30411388
+  r Unit#4.posY 3866624
+  r Unit#4.posZ 22026298
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -329
+  w UnitMotion#2.speed 65541
+  w UnitMotion#2.lastMoveTick 719
+  w UnitMotion#2.p2X 21356
+call 719 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 720 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 720 UpdateMotion
+  r Unit#4.posX 30411059
+  r Unit#4.posY 3801088
+  r Unit#4.posZ 22025538
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -289
+  w UnitMotion#2.speed 65540
+  w UnitMotion#2.lastMoveTick 720
+  w UnitMotion#2.p2X 20328
+call 720 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 721 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 721 UpdateMotion
+  r Unit#4.posX 30410770
+  r Unit#4.posY 3735552
+  r Unit#4.posZ 22024871
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -254
+  w UnitMotion#2.speed 65539
+  w UnitMotion#2.lastMoveTick 721
+  w UnitMotion#2.p2X 19346
+call 721 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 722 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 722 UpdateMotion
+  r Unit#4.posX 30410516
+  r Unit#4.posY 3670016
+  r Unit#4.posZ 22024286
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -222
+  w UnitMotion#2.speed 65538
+  w UnitMotion#2.lastMoveTick 722
+  w UnitMotion#2.p2X 18410
+call 722 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 723 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 723 UpdateMotion
+  r Unit#4.posX 30410294
+  r Unit#4.posY 3604480
+  r Unit#4.posZ 22023772
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -195
+  w UnitMotion#2.speed 65537
+  w UnitMotion#2.lastMoveTick 723
+  w UnitMotion#2.p2X 17516
+call 723 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 724 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 724 UpdateMotion
+  r Unit#4.posX 30410099
+  r Unit#4.posY 3538944
+  r Unit#4.posZ 22023321
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -171
+  w UnitMotion#2.lastMoveTick 724
+  w UnitMotion#2.p2X 16664
+call 724 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 725 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 725 UpdateMotion
+  r Unit#4.posX 30409928
+  r Unit#4.posY 3473408
+  r Unit#4.posZ 22022926
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -150
+  w UnitMotion#2.lastMoveTick 725
+  w UnitMotion#2.p2X 15851
+call 725 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 726 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 726 UpdateMotion
+  r Unit#4.posX 30409778
+  r Unit#4.posY 3407872
+  r Unit#4.posZ 22022579
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -132
+  w UnitMotion#2.speed 65536
+  w UnitMotion#2.lastMoveTick 726
+  w UnitMotion#2.p2X 15076
+call 726 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 727 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 727 UpdateMotion
+  r Unit#4.posX 30409646
+  r Unit#4.posY 3342336
+  r Unit#4.posZ 22022274
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -116
+  w UnitMotion#2.lastMoveTick 727
+  w UnitMotion#2.p2X 14338
+call 727 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 728 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 728 UpdateMotion
+  r Unit#4.posX 30409530
+  r Unit#4.posY 3276800
+  r Unit#4.posZ 22022007
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -102
+  w UnitMotion#2.lastMoveTick 728
+  w UnitMotion#2.p2X 13635
+call 728 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 729 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 729 UpdateMotion
+  r Unit#4.posX 30409428
+  r Unit#4.posY 3211264
+  r Unit#4.posZ 22021772
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -89
+  w UnitMotion#2.lastMoveTick 729
+  w UnitMotion#2.p2X 12966
+call 729 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 730 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 730 NewPathOrderToUnitAtAngle
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#1
+  i units.UnitRefInit PathOrder#2.ref Unit#2 null
+  w PathOrder#2.flags 5
+  w PathOrder#2.posX 30409339
+  w PathOrder#2.posY 3145728
+  w PathOrder#2.posZ 22021566
+  o result PathOrder#2
+call 730 Apply
+  r Unit#4.posX 30409339
+  r Unit#4.posZ 22021566
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a event.value 0
+  a size 16
+  w PathOrder#2.flags 13
+  o result 1
+call 730 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 730 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  i units.UnitRefUnlink PathOrder#1.ref
+  i services.SimFree alloc#2
+  o result 1
+call 730 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  w LiteGoal#1.target PathOrder#2
+  o result 1
+call 730 UpdateMotion
+  r Unit#4.posY 3145728
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -78
+  w UnitMotion#2.lastMoveTick 730
+  w UnitMotion#2.p2X 12328
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
+call 730 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 731 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 731 UpdateMotion
+  r Unit#4.posX 30409261
+  r Unit#4.posY 3080192
+  r Unit#4.posZ 22021385
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -69
+  w UnitMotion#2.lastMoveTick 731
+  w UnitMotion#2.p2X 11720
+call 731 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 732 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 732 UpdateMotion
+  r Unit#4.posX 30409192
+  r Unit#4.posY 3014656
+  r Unit#4.posZ 22021227
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -60
+  w UnitMotion#2.lastMoveTick 732
+  w UnitMotion#2.p2X 11142
+call 732 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 733 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 733 UpdateMotion
+  r Unit#4.posX 30409132
+  r Unit#4.posY 2949120
+  r Unit#4.posZ 22021088
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -53
+  w UnitMotion#2.lastMoveTick 733
+  w UnitMotion#2.p2X 10591
+call 733 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 734 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 734 UpdateMotion
+  r Unit#4.posX 30409079
+  r Unit#4.posY 2883584
+  r Unit#4.posZ 22020966
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -46
+  w UnitMotion#2.lastMoveTick 734
+  w UnitMotion#2.p2X 10068
+call 734 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 735 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 735 UpdateMotion
+  r Unit#4.posX 30409033
+  r Unit#4.posY 2818048
+  r Unit#4.posZ 22020859
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -41
+  w UnitMotion#2.lastMoveTick 735
+  w UnitMotion#2.p2X 9569
+call 735 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 736 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 736 UpdateMotion
+  r Unit#4.posX 30408992
+  r Unit#4.posY 2752512
+  r Unit#4.posZ 22020765
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -36
+  w UnitMotion#2.lastMoveTick 736
+  w UnitMotion#2.p2X 9095
+call 736 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 737 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 737 UpdateMotion
+  r Unit#4.posX 30408956
+  r Unit#4.posY 2686976
+  r Unit#4.posZ 22020683
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -31
+  w UnitMotion#2.lastMoveTick 737
+  w UnitMotion#2.p2X 8645
+call 737 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 738 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 738 UpdateMotion
+  r Unit#4.posX 30408925
+  r Unit#4.posY 2621440
+  r Unit#4.posZ 22020611
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -28
+  w UnitMotion#2.lastMoveTick 738
+  w UnitMotion#2.p2X 8215
+call 738 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 739 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 739 UpdateMotion
+  r Unit#4.posX 30408897
+  r Unit#4.posY 2555904
+  r Unit#4.posZ 22020547
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -24
+  w UnitMotion#2.lastMoveTick 739
+  w UnitMotion#2.p2X 7808
+call 739 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 740 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 740 UpdateMotion
+  r Unit#4.posX 30408873
+  r Unit#4.posY 2490368
+  r Unit#4.posZ 22020491
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -21
+  w UnitMotion#2.lastMoveTick 740
+  w UnitMotion#2.p2X 7420
+call 740 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 741 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 741 UpdateMotion
+  r Unit#4.posX 30408852
+  r Unit#4.posY 2424832
+  r Unit#4.posZ 22020442
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -19
+  w UnitMotion#2.lastMoveTick 741
+  w UnitMotion#2.p2X 7050
+call 741 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 742 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 742 UpdateMotion
+  r Unit#4.posX 30408833
+  r Unit#4.posY 2359296
+  r Unit#4.posZ 22020399
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -16
+  w UnitMotion#2.lastMoveTick 742
+  w UnitMotion#2.p2X 6700
+call 742 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 743 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 743 UpdateMotion
+  r Unit#4.posX 30408817
+  r Unit#4.posY 2293760
+  r Unit#4.posZ 22020361
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -14
+  w UnitMotion#2.lastMoveTick 743
+  w UnitMotion#2.p2X 6366
+call 743 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 744 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 744 UpdateMotion
+  r Unit#4.posX 30408803
+  r Unit#4.posY 2228224
+  r Unit#4.posZ 22020328
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -13
+  w UnitMotion#2.lastMoveTick 744
+  w UnitMotion#2.p2X 6048
+call 744 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 745 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 745 NewPathOrderToUnitAtAngle
+  a order Order#2
+  a unit Unit#2
+  a angle 1
+  i services.SimAlloc 54 = alloc#2
+  i units.UnitRefInit PathOrder#1.ref Unit#2 null
+  w PathOrder#1.flags 5
+  w PathOrder#1.posX 30408790
+  w PathOrder#1.posY 2162688
+  w PathOrder#1.posZ 22020299
+  o result PathOrder#1
+call 745 Apply
+  r Unit#4.posX 30408790
+  r Unit#4.posZ 22020299
+  a event.kind 329
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a event.value 0
+  a size 16
+  w PathOrder#1.flags 13
+  o result 1
+call 745 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 745 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#2
+  a size 12
+  i units.UnitRefUnlink PathOrder#2.ref
+  i services.SimFree alloc#1
+  o result 1
+call 745 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  w LiteGoal#1.target PathOrder#1
+  o result 1
+call 745 UpdateMotion
+  r Unit#4.posY 2162688
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -11
+  w UnitMotion#2.lastMoveTick 745
+  w UnitMotion#2.p2X 5747
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
+call 745 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 746 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 746 UpdateMotion
+  r Unit#4.posX 30408779
+  r Unit#4.posY 2097152
+  r Unit#4.posZ 22020274
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -10
+  w UnitMotion#2.lastMoveTick 746
+  w UnitMotion#2.p2X 5460
+call 746 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 747 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 747 UpdateMotion
+  r Unit#4.posX 30408769
+  r Unit#4.posY 2031616
+  r Unit#4.posZ 22020252
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -8
+  w UnitMotion#2.lastMoveTick 747
+  w UnitMotion#2.p2X 5188
+call 747 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 748 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 748 UpdateMotion
+  r Unit#4.posX 30408761
+  r Unit#4.posY 1966080
+  r Unit#4.posZ 22020232
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -7
+  w UnitMotion#2.lastMoveTick 748
+  w UnitMotion#2.p2X 4929
+call 748 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 749 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 749 UpdateMotion
+  r Unit#4.posX 30408754
+  r Unit#4.posY 1900544
+  r Unit#4.posZ 22020215
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 749
+  w UnitMotion#2.p2X 4682
+call 749 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 750 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 750 UpdateMotion
+  r Unit#4.posX 30408747
+  r Unit#4.posY 1835008
+  r Unit#4.posZ 22020200
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -6
+  w UnitMotion#2.lastMoveTick 750
+  w UnitMotion#2.p2X 4448
+call 750 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 751 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 751 UpdateMotion
+  r Unit#4.posX 30408741
+  r Unit#4.posY 1769472
+  r Unit#4.posZ 22020187
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -5
+  w UnitMotion#2.lastMoveTick 751
+  w UnitMotion#2.p2X 4226
+call 751 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 752 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 752 UpdateMotion
+  r Unit#4.posX 30408736
+  r Unit#4.posY 1703936
+  r Unit#4.posZ 22020175
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -4
+  w UnitMotion#2.lastMoveTick 752
+  w UnitMotion#2.p2X 4015
+call 752 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 753 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 753 UpdateMotion
+  r Unit#4.posX 30408732
+  r Unit#4.posY 1638400
+  r Unit#4.posZ 22020165
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 753
+  w UnitMotion#2.p2X 3814
+call 753 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 754 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 754 UpdateMotion
+  r Unit#4.posX 30408728
+  r Unit#4.posY 1572864
+  r Unit#4.posZ 22020156
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX -3
+  w UnitMotion#2.lastMoveTick 754
+  w UnitMotion#2.p2X 3624
+call 754 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 755 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 755 UpdateMotion
+  r Unit#4.posX 30408725
+  r Unit#4.posY 1507328
+  r Unit#4.posZ 22020148
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 755
+  w UnitMotion#2.p2X 3442
+call 755 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 756 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 756 UpdateMotion
+  r Unit#4.posX 30408722
+  r Unit#4.posY 1441792
+  r Unit#4.posZ 22020141
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 756
+  w UnitMotion#2.p2X 3269
+call 756 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 757 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 757 Apply
+  r Unit#4.posX 30408719
+  r Unit#4.posZ 22020135
+  a event.kind 323
+  a event.unit Unit#4
+  a event.mode 0
+  a size 12
+  w UnitMotion#2.flags 0
+  o result 1
+call 757 Apply
+  a event.kind 326
+  a event.unit Unit#4
+  a event.target null
+  a size 12
+  i services.SchedPublish 14 16
+  w LiteGoal#1.target null
+  o result 1
+call 757 Apply
+  a event.kind 327
+  a event.unit Unit#4
+  a event.target PathOrder#1
+  a size 12
+  i units.UnitRefUnlink PathOrder#1.ref
+  i services.SimFree alloc#2
+  o result 1
+call 757 UnitTarget
+  a unit Unit#4
+  o result null
+call 757 UpdateMotion
+  r Unit#4.transportPiece 1
+  r Unit#4.list Order#4
+  r Unit#4.carrier Unit#2
+  r Unit#4.posY 1376256
+  r Order#4.flags_42 16777732
+  r Order#4.unit Unit#4
+  r Unit#2.id 2
+  r Unit#2.spatialBucket SpatialBucket#59
+  r Unit#2.transportPiece 255
+  r Unit#2.heading -32705
+  r Unit#2.list null
+  r Unit#2.flags 0x70280021
+  r Unit#2.carrier null
+  r Unit#2.player Player#0
+  r Unit#2.motion null
+  r Unit#2.posX 30408704
+  r Unit#2.posY 65536
+  r Unit#2.posZ 22020096
+  r UnitDef#18.draft 0
+  r UnitDef#18.maxvelocity 0
+  r UnitDef#18.altitude 0
+  r UnitDef#18.brakerate 0
+  r UnitDef#18.acceleration 0
+  r UnitDef#18.bankscale 65536
+  r UnitDef#18.pitchscale 0
+  r UnitDef#18.moverate1 0
+  r UnitDef#18.moverate2 0
+  r UnitDef#18.turnrate 0
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#2 1 = (0,32831,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  w UnitMotion#2.velocityX 0
+  w UnitMotion#2.speed 0
+call 757 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 758 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 758 UpdateMotion
+  r Unit#4.flags 0x10e40020
+  r Unit#4.posX 30408704
+  r Unit#4.posZ 22020096
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#2 1 = (0,32831,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 758 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 759 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 759 UpdateMotion
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#2 1 = (0,32831,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 759 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8
+call 760 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 760 UpdateMotion
+  a unit Unit#4
+  i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
+  i services.SchedPublish 14 24
+  i scripts.GetPieceAngles Unit#2 1 = (0,32831,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 760 UpdateMotion
+  a unit Unit#251
+  i services.SchedPublish 14 8

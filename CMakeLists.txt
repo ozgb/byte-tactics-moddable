@@ -377,9 +377,9 @@ target_compile_options(replay_native_test_objects PRIVATE ${GAME_COMPILE_OPTIONS
 foreach(variant native inject)
   add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/replay_${variant}_test.exe"
-    COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/replay_${variant}_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /opt:ref /force:unresolved
+    COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/replay_${variant}_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /opt:ref /force:unresolved "@${CMAKE_SOURCE_DIR}/tests/replay_vtable_aliases.rsp"
             $<TARGET_OBJECTS:replay_native_test_objects> ${REPLAY_${variant}_OBJECTS} $<TARGET_FILE:bitexact> $<TARGET_FILE:wasmloader> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-    DEPENDS replay_native_test_objects ${REPLAY_${variant}_TARGETS} bitexact wasmloader $<TARGET_OBJECTS:replay_native_test_objects> ${REPLAY_${variant}_OBJECTS} "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+    DEPENDS "${CMAKE_SOURCE_DIR}/tests/replay_vtable_aliases.rsp" replay_native_test_objects ${REPLAY_${variant}_TARGETS} bitexact wasmloader $<TARGET_OBJECTS:replay_native_test_objects> ${REPLAY_${variant}_OBJECTS} "${CMAKE_BINARY_DIR}/KERNEL32.lib"
     VERBATIM COMMAND_EXPAND_LISTS)
 endforeach()
 add_custom_target(replay_native_test DEPENDS "${CMAKE_BINARY_DIR}/replay_native_test.exe" "${CMAKE_BINARY_DIR}/replay_inject_test.exe")

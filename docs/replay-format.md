@@ -1034,7 +1034,8 @@ handler. The imports made inside an import are not recorded, so the recorder wri
   o rng.seed 0x53116dcd
 ```
 
-`RandomInt` and `GameRand` have no such line: the replayer advances the word as the game does.
+`RandomInt` and `GameRand` have no such line: the replayer advances the word as the game does. Besides weapons' recordings,
+players' `console-units` and `mission-capture` have one such line each.
 
 ## The schema and its annotations
 

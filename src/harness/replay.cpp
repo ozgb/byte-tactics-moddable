@@ -21,6 +21,7 @@
 #include "replay_values.h"
 #include "replay_objects.h"
 #include "replay_callbacks.h"
+#include "replay_services.h"
 #include "replay.h"
 
 namespace {

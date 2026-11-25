@@ -28011,6 +28011,7 @@ call 150 Apply
   a event.player 1
   a size 12
   i services.SchedPublish 4 12
+  o rng.seed 0x11be71a6
   i services.SchedPublish 4 12
   o result 1
 call 150 Apply

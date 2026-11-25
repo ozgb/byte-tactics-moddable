@@ -706,6 +706,12 @@ jobs:
           uv run tools/test_simeventsdoc.py
           uv run tools/simeventsdoc.py --check
 
+      - name: Check data/crt_semantics.csv covers the C semantics calls
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          python3 tools/test_crtsemantics.py
+          python3 tools/crtsemantics.py --check
+
       - name: Check no calling convention declares a member function
         if: steps.changed.outputs.run == 'true'
         run: |

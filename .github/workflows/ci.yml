@@ -105,6 +105,11 @@ jobs:
       - name: Test the oracle kit export
         run: python3 tools/test_oraclekit.py
 
+      - name: Commands as events
+        run: |
+          python3 tools/test_commands.py
+          python3 tools/commands.py --check
+
       - name: Test the files gate and its fixtures
         run: python3 tools/test_filesgate.py
 

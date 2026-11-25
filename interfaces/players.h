@@ -11,17 +11,17 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 5
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 0
+#define PLAYERS_VERSION_MINOR 1
 
 // The fields every players event and effect starts with.
 struct PlayersEventHeader {
     // A PlayersEventKind or a PlayersEffectKind.
     int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS and TRANSFER name none), as economy's events give a unit.
+    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS, TRANSFER, SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS name none), as economy's events give a unit.
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1.
+// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1; SET_STORE names a player above 9 or a resource other than 0 and 1; SET_TYPE names a player above 9; END_GAME names a victory other than 0 and 1.
 enum PlayersEventKind {
     // Hands unit to a player (PlayersGiveUnit): the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of the ownership record when it is present); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it. Hooks: UnitTransfer.
     PLAYERS_GIVE_UNIT = 192,
@@ -32,7 +32,15 @@ enum PlayersEventKind {
     // Tells the victory and defeat conditions that unit died; the header alone; outcome 1.
     PLAYERS_UNIT_DIED = 195,
     // Moves an amount of a resource from one player to another (PlayersTransfer): when it is announced it is clamped to what the giver has, spent from the giver's store and sent to the other machines; outcome 1, or 0 when either player is 10 or the amount is 0.
-    PLAYERS_TRANSFER = 196
+    PLAYERS_TRANSFER = 196,
+    // Sets a player's store of a resource, or adds to it (PlayersSetStore); outcome 1.
+    PLAYERS_SET_STORE = 197,
+    // Sets a player's type as the player's setter does: the type is stored, and the kind of the player's info follows it unless the type is 3 (PlayersSetType); outcome 1.
+    PLAYERS_SET_TYPE = 198,
+    // Ends the match with a victory or a defeat for the viewing side: the victory is recorded and the end-of-game bits of the game are raised (PlayersEndGame); outcome 1.
+    PLAYERS_END_GAME = 199,
+    // Stops the victory and defeat conditions of the mission from being checked; the header alone; outcome 1.
+    PLAYERS_DEACTIVATE_CONDITIONS = 200
 };
 
 // The kinds of effect players publishes to its outbox, for the modules that subscribe to them.
@@ -91,6 +99,38 @@ struct PlayersTransfer {
     float amount;
     // 1 when the transfer is announced (clamped, spent and sent to the other machines), 0 when it only credits the receiver.
     int announce;
+};
+
+// The payload of SET_STORE.
+struct PlayersSetStore {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // The player whose store changes, 0 to 9.
+    int player;
+    // The resource: 0 energy, 1 metal.
+    int resource;
+    // Nonzero to add amount to the store, 0 to set the store to amount.
+    int add;
+    // The amount.
+    float amount;
+};
+
+// The payload of SET_TYPE.
+struct PlayersSetType {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // The player whose type changes, 0 to 9.
+    int player;
+    // The new type, truncated to a byte.
+    int type;
+};
+
+// The payload of END_GAME.
+struct PlayersEndGame {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // 1 for a victory, 0 for a defeat.
+    int victory;
 };
 
 // The payload of KILL_UNIT.

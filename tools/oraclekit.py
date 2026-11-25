@@ -170,6 +170,7 @@ CONTENTS = [
     ("file", "tools/eventdigest.py", "makes the digest of a sim event log and compares it with a stored one, standard library only (needs tools/tracerehash.py and docs/sim-events.md)"),
     ("file", "docs/reference-traces.md", "how the reference traces are made"),
     ("file", "docs/scenario-format.md", "the scenario format and the test-mode run"),
+    ("file", "docs/commands.md", "the commands of a tick as events, and the scenarios of the core's verdict"),
     ("dir", "interfaces", "the subsystem interface headers"),
     ("file", "docs/module-abi.md", "the module ABI"),
     ("file", FUEL_PASS, "the fuel pass of ABI 11, standard library and wasm-tools only"),

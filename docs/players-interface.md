@@ -1,6 +1,6 @@
 # The players interface
 
-Players sits behind `interfaces/players.h` (version 5.0; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument), the sixth module on the scheduler after economy
+Players sits behind `interfaces/players.h` (version 5.1; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument; 5.1 adds the console's kinds SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS), the sixth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`) and map (`docs/map-interface.md`) (#967). It is the players as the
 simulation sees them: each player's update (its resources' bookkeeping, the commander's respawn, the end of the game),
@@ -25,7 +25,11 @@ to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 168 a
 
 Players' place in it:
 - **Events into players:** GIVE_UNIT, KILL_UNITS, UNIT_CREATED, UNIT_DIED and TRANSFER, published by units, orders
-  and the engine (the network, the console and the in-game dialogs), and TRANSFER from economy's SHARE effect.
+  and the engine (the network, the console and the in-game dialogs), and TRANSFER from economy's SHARE effect. Since 5.1
+  the engine's console also publishes SET_STORE (`atm`, `nometal`, `noenergy`), SET_TYPE (`ai`), END_GAME (`iwin`,
+  `ilose`) and DEACTIVATE_CONDITIONS (`kill`), each from `SCHED_ENGINE` through a synchronous route; they replace the
+  console's direct writes to the `Player` record and the game's end-of-match bits, and its calls to `Player::SetType`
+  and to the conditions' `DeactivateConditions` slot.
   Players' handler (`PlayersInbox`, `src/seams/players_world.cpp`) passes each to `Apply`, and records it with its
   outcome in the trace's dump (section 5). Economy's SHARE reaches it through `PlayersOnEconomyShare`, which builds a
   TRANSFER and hands it to the same handler; it moved from players' files into the same glue, as it is the engine's
@@ -99,8 +103,8 @@ one: 1 for UNIT_CREATED, UNIT_DIED and KILL_UNITS; for GIVE_UNIT, 1 when players
 CAPTURE_UNIT) and 0 when the unit was already the receiver's, dead, dying, or the receiver could not take it (the
 outcome is players' decision: units can still refuse a local copy at its unit limit, and the unit then stays with its
 old owner); for TRANSFER, 1, or 0 when either player is
-slot 10 or the amount is 0. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
-player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a GIVE_UNIT, UNIT_CREATED or
+slot 10 or the amount is 0; 1 for SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
+player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a SET_STORE or SET_TYPE for a player above 9, a SET_STORE for a resource other than 0 or 1, an END_GAME for a victory other than 0 or 1, a GIVE_UNIT, UNIT_CREATED or
 UNIT_DIED with no conditions (3.1c's GIVE_UNIT had no such check and crashed there, so no
 trace depends on it), and an
 unknown kind, with outcome 0 and no change. KILL_UNITS takes slot 10, the
@@ -171,6 +175,10 @@ objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
 | KILL_UNITS 193 | `PlayersKillUnits` | `player`: whose units are killed, 0 to 10 |
 | UNIT_CREATED 194, UNIT_DIED 195 | the header alone | none |
 | TRANSFER 196 | `PlayersTransfer` | `from`, `to` (the players), `resource` (0 energy, 1 metal), `amount`, `announce` (1 when clamped, spent and sent to the other machines, 0 when it only credits the receiver) |
+| SET_STORE 197 | `PlayersSetStore` | `player` (0 to 9), `resource` (0 energy, 1 metal), `add` (nonzero adds `amount` to the store, 0 sets it), `amount` |
+| SET_TYPE 198 | `PlayersSetType` | `player` (0 to 9), `type` (stored as a byte; the kind of the player's info follows it unless it is 3) |
+| END_GAME 199 | `PlayersEndGame` | `victory` (1 raises the victory bit, 0 the defeat bit, and both raise the end bit) |
+| DEACTIVATE_CONDITIONS 200 | the header alone | none |
 | KILL_UNIT 208 | `PlayersKillUnit` | `selfDestruct`: 0 by 30000 damage the unit deals itself, 1 by self-destruct |
 | SEND_UNIT 209 | `PlayersSendUnit` | `player`: the player it goes to |
 | CAPTURE_UNIT 210 | `PlayersCaptureUnit` | `player` (the player the copy is made for), `record` (a `PlayersOwnershipRecord`) |

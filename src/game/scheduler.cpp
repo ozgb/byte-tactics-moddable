@@ -69,6 +69,13 @@ void __stdcall ScheduleUnitsDeliver()
     SchedDeliver(SCHED_UNITS);
 }
 
+static int s_publishDepth = 0;
+
+struct PublishDepth {
+    PublishDepth() { s_publishDepth++; }
+    ~PublishDepth() { s_publishDepth--; }
+};
+
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
 {
     ReplayImport call(RI_SCHED_PUBLISH);
@@ -79,6 +86,9 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
         FatalError((char*)"an event is larger than an inbox entry");
     if (size < sizeof(int))
         FatalError((char*)"an event is smaller than its kind");
+    if (outbox == SCHED_ENGINE && s_publishDepth == 0)
+        HarnessCommandEvent(event, size);
+    PublishDepth depth;
     int kind = *static_cast<const int*>(event);
     int count;
     const SchedRoute* routes = SchedRoutes(&count);

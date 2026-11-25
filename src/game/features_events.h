@@ -45,6 +45,35 @@ inline void FeaturesPublishRemove(int outbox, int cellIndex, int width)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void FeaturesPublishPlaceAt(int outbox, int x, int z, int feature)
+{
+    FeaturesPlace event;
+    memset(&event, 0, sizeof(event));
+    event.h = FeaturesHeaderOf(FEATURES_PLACE);
+    event.x = x;
+    event.z = z;
+    event.feature = feature;
+    event.owner = 10;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void FeaturesPublishRemoveAt(int outbox, int x, int z, int force)
+{
+    FeaturesRemove event;
+    memset(&event, 0, sizeof(event));
+    event.h = FeaturesHeaderOf(FEATURES_REMOVE);
+    event.x = x;
+    event.z = z;
+    event.force = force;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void FeaturesPublishRemoveAll(int outbox)
+{
+    FeaturesEventHeader event = FeaturesHeaderOf(FEATURES_REMOVE_ALL);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void FeaturesPublishDamage(int outbox, int x, int z, int weapon)
 {
     FeaturesDamage event;

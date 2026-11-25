@@ -13,6 +13,12 @@ inline unsigned int PlayersEventSize(int kind)
         return sizeof(PlayersKillUnits);
     case PLAYERS_TRANSFER:
         return sizeof(PlayersTransfer);
+    case PLAYERS_SET_STORE:
+        return sizeof(PlayersSetStore);
+    case PLAYERS_SET_TYPE:
+        return sizeof(PlayersSetType);
+    case PLAYERS_END_GAME:
+        return sizeof(PlayersEndGame);
     case PLAYERS_EFFECT_KILL_UNIT:
         return sizeof(PlayersKillUnit);
     case PLAYERS_EFFECT_SEND_UNIT:

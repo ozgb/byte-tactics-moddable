@@ -183,6 +183,10 @@ void __stdcall CmdMem(int)
 {
 }
 
+#include "../../interfaces/seams.h"
+#include "players_events.h"
+#include "features_events.h"
+
 // FUNCTION: 0x416280
 void __stdcall CmdAI(CommandArgs* args)
 {
@@ -193,9 +197,9 @@ void __stdcall CmdAI(CommandArgs* args)
             && p->index != 10) {
             Player* q = &g_game->players[i];
             if (q->active != 0 && q->type == 1)
-                q->SetType(2);
+                PlayersPublishSetType(SCHED_ENGINE, i, 2);
             else
-                q->SetType(1);
+                PlayersPublishSetType(SCHED_ENGINE, i, 1);
         }
     }
 }
@@ -224,21 +228,23 @@ void __stdcall CmdDPrint(int)
 // FUNCTION: 0x416390
 void __stdcall CmdBurnAll(int arg1)
 {
-    RemoveAllFeatures();
+    FeaturesPublishRemoveAll(SCHED_ENGINE);
 }
 
 #include "../../interfaces/seams.h"
 #include "los_radar_events.h"
 #include "players_events.h"
 #include "ai_events.h"
+#include "map_events.h"
+#include "units_events.h"
+#include "features_events.h"
 #include "../units/unit_type_set.h"
 
 // FUNCTION: 0x4163a0
 void __stdcall CmdBurnOne(void* args)
 {
     if (g_game->cellFeature < 0xfffb) {
-        void* target = g_seams.los_radar->GetMapCell(g_game->point.x, g_game->point.y);
-        RemoveFeature((Cell *)target, 1);
+        FeaturesPublishRemoveAt(SCHED_ENGINE, g_game->point.x, g_game->point.y, 1);
     }
 }
 
@@ -247,8 +253,7 @@ void __stdcall CmdFeature(CommandArgs* args)
 {
     unsigned short id = FindFeatureType(args->GetArg(1, g_emptyText));
     if (id != 0xffff) {
-        void* target = g_seams.los_radar->GetMapCell(g_game->point.x, g_game->point.y);
-        PlaceFeature(target, id, 0, 0, 10);
+        FeaturesPublishPlaceAt(SCHED_ENGINE, g_game->point.x, g_game->point.y, id);
     }
 }
 
@@ -265,7 +270,7 @@ void __stdcall CmdSelectable(int unused)
 {
     for (Unit* u = &g_game->units[1]; u <= g_game->unitsEnd; u++) {
         if (u->flags & 0x10000000) {
-            u->flags |= 0x20;
+            UnitsPublishSetFlags(SCHED_ENGINE, u, 0, 0x20);
         }
     }
 }
@@ -274,11 +279,11 @@ void __stdcall CmdSelectable(int unused)
 void __stdcall CmdKill(CommandArgs* args)
 {
     if (args->count == 1) {
-        g_seams.units->KillAllUnits();
+        UnitsPublishKillAll(SCHED_ENGINE);
     } else {
         PlayersPublishKillUnits(SCHED_ENGINE, (unsigned char)(args->GetIntArg(1, 0)));
     }
-    g_seams.players->DeactivateConditions(g_game->list_391ed);
+    PlayersPublishDeactivateConditions(SCHED_ENGINE);
 }
 
 // FUNCTION: 0x416500
@@ -448,24 +453,20 @@ void __stdcall CmdIWin(CommandArgs* args)
         PlayersPublishKillUnits(SCHED_ENGINE, (unsigned char)(0));
     else
         PlayersPublishKillUnits(SCHED_ENGINE, (unsigned char)(1));
-    g_game->endGameVictory = 1;
-    g_game->bits.flag5 = 1;
-    g_game->bits.flag2 = 1;
+    PlayersPublishEndGame(SCHED_ENGINE, 1);
 }
 
 // FUNCTION: 0x416a30
 void __stdcall CmdILose(CommandArgs* args)
 {
     PlayersPublishKillUnits(SCHED_ENGINE, (unsigned char)(g_game->players[g_game->localPlayer].info->side));
-    g_game->endGameVictory = 0;
-    g_game->bits.flag6 = 1;
-    g_game->bits.flag2 = 1;
+    PlayersPublishEndGame(SCHED_ENGINE, 0);
 }
 
 // FUNCTION: 0x416a90
 void __stdcall CmdSeaLevel(CommandArgs* args)
 {
-    g_game->seaLevel = args->GetIntArg(1, 0);
+    MapPublishSetSeaLevel(SCHED_ENGINE, args->GetIntArg(1, 0));
 }
 
 // FUNCTION: 0x416ab0
@@ -612,8 +613,8 @@ void __stdcall CmdRadar(int unused)
 // FUNCTION: 0x4170c0
 void __stdcall CmdATM(CommandArgs* args)
 {
-    g_game->players[g_game->playerIndex].energy += 1000.0f;
-    g_game->players[g_game->playerIndex].metal += 1000.0f;
+    PlayersPublishSetStore(SCHED_ENGINE, g_game->playerIndex, 0, 1, 1000.0f);
+    PlayersPublishSetStore(SCHED_ENGINE, g_game->playerIndex, 1, 1, 1000.0f);
 }
 
 // FUNCTION: 0x417130
@@ -635,7 +636,7 @@ void __stdcall CmdNoMetal(CommandArgs* args)
         Player* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
             && p->index != 10) {
-            g_game->players[i].metal = args->GetIntArg(2, 0);
+            PlayersPublishSetStore(SCHED_ENGINE, i, 1, 0, (float)args->GetIntArg(2, 0));
         }
     }
 }
@@ -652,7 +653,7 @@ void __stdcall CmdNoEnergy(CommandArgs* args)
         Player* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
             && p->index != 10) {
-            g_game->players[i].energy = args->GetIntArg(2, 0);
+            PlayersPublishSetStore(SCHED_ENGINE, i, 0, 0, (float)args->GetIntArg(2, 0));
         }
     }
 }
@@ -718,8 +719,7 @@ void __stdcall CmdReload(CommandArgs* args)
     if (args->count > 1) {
         short id = g_seams.units->FindUnitTypeId(args->GetArg(1, g_emptyText));
         if (id) {
-            g_seams.units->KillUnitsOfType(id);
-            g_seams.units->ReloadUnitType(id);
+            UnitsPublishReloadType(SCHED_ENGINE, id);
         }
     }
 }
@@ -870,7 +870,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         if (MatchWildcard(def->unitname,args->GetArg(0,g_emptyText))) {
             if (count) pos.x-=def->modelMinX;
             g_seams.map->SnapWorldPosToFootprint(def,&pos);
-            g_seams.units->CreateUnit(args->GetIntArg(1,0),i,&pos,1,1,0);
+            UnitsPublishCreate(SCHED_ENGINE,args->GetIntArg(1,0),i,(const int*)&pos);
             pos.x+=def->modelMaxX+0x200000;
             if (pos.x >= (g_game->mapWidth<<16)) { pos.x=0xa00000; pos.z+=0xa00000; }
             ++count;

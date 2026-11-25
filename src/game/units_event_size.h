@@ -55,6 +55,10 @@ inline unsigned int UnitsEventSize(int kind)
         return sizeof(UnitsSend);
     case UNITS_CAPTURE:
         return sizeof(UnitsCapture);
+    case UNITS_CREATE:
+        return sizeof(UnitsCreate);
+    case UNITS_RELOAD_TYPE:
+        return sizeof(UnitsReloadType);
     default:
         return sizeof(UnitsEventHeader);
     }

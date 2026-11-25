@@ -1,6 +1,6 @@
 # The units interface
 
-Units sits behind `interfaces/units.h` (version 7.0; 7.0 passes `CreateUnit`'s position by pointer and names its `finished` and `id`, writes the units of `GetFactoriesInRadius` to a caller buffer, has `FindMissionUnit` take the caller's table of the mission units' units and return the match after a given unit, in place of a vector, makes `CanLoad`, `CanReclaim`, `CanRepair` and `UnitRefUnlink` stdcall instead of thiscall with no unused register argument, and makes the read-only strings const), the seam over the unit record (`Unit`, 0x118 bytes,
+Units sits behind `interfaces/units.h` (version 7.1; 7.1 adds the console's kinds CREATE, KILL_ALL and RELOAD_TYPE; 7.0 passes `CreateUnit`'s position by pointer and names its `finished` and `id`, writes the units of `GetFactoriesInRadius` to a caller buffer, has `FindMissionUnit` take the caller's table of the mission units' units and return the match after a given unit, in place of a vector, makes `CanLoad`, `CanReclaim`, `CanRepair` and `UnitRefUnlink` stdcall instead of thiscall with no unused register argument, and makes the read-only strings const), the seam over the unit record (`Unit`, 0x118 bytes,
 `src/units/unit.h`) that every simulation module reads, and since #986 it is on the scheduler with scripts
 (`interfaces/scripts.h`, version 3.0; `docs/scripts-interface.md`). 3.1c's code is its default implementation. This
 page is the inventory the interface was cut from, written from the code as it now is:
@@ -18,7 +18,7 @@ The model is the human's of 2026-11-12, as `docs/economy-interface.md`, section 
 last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's order, inboxes consumed before each
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data with one payload per kind (#1009). This issue
-changes none of its rules. Event kinds are unique across interfaces: units uses 352 to 367 and 384 to 394, two blocks
+changes none of its rules. Event kinds are unique across interfaces: units uses 352 to 367 and 384 to 397, two blocks
 (its 27 kinds do not fit in the 16 of one block's lower half, and units has no effects of its own, so the second
 block's lower half takes the rest), and scripts 416 to 419 (its range is 416 to 447); weapons, orders and movement use
 256 to 351 (`docs/movement-interface.md`, section 1).
@@ -124,7 +124,7 @@ The `TODO(#986)` markers that named these answers in `src/orders/unit_orders.cpp
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 50) and returned to no
 one: 1 for every kind, 0 for the events it refuses, and CAPTURE's 0 when no copy could be made. `Apply` refuses, with
 outcome 0 and no change, an event smaller than its kind's payload, an unknown kind, an event naming a null unit (all
-but UNLINK, which names a reference) and an UNLINK naming no reference.
+but UNLINK, which names a reference, and CREATE, KILL_ALL and RELOAD_TYPE, which name none) and an UNLINK naming no reference. Since 7.1 the engine's console (the unit-name command, `kill`, `reload`, `selectable`) and the harness's scripted spawns publish CREATE, KILL_ALL, RELOAD_TYPE and SET_FLAGS from `SCHED_ENGINE`, in place of direct calls to the slots and direct writes to the unit record.
 
 **Payloads.** Every event starts with `UnitsEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0
 for none). Each kind has the payload of `interfaces/units.h` that starts with it, or is the header alone (SFX_OCCUPY,
@@ -157,6 +157,9 @@ ATTACKED_SPEECH, MARK_DAMAGED).
 | KILL 392 | `UnitsKill` | `selfDestruct` |
 | SEND 393 | `UnitsSend` | `player` |
 | CAPTURE 394 | `UnitsCapture` | `player`, `present`, `hitPoints`, `buildPercent`, `angles[3]`, `stockpiles[3]` |
+| CREATE 395 | `UnitsCreate` | `player` (a byte), `type` (16 bits), `pos[3]` (world coordinates, 16 fractional bits); names no unit; outcome 1 when a unit was made, 0 when none was |
+| KILL_ALL 396 | the header alone | none; names no unit |
+| RELOAD_TYPE 397 | `UnitsReloadType` | `type`: every unit of it is killed, then its definition is loaded again; names no unit |
 
 ## 3. Effects out of units
 

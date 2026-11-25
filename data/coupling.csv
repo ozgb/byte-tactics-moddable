@@ -153,15 +153,14 @@ economy,features,shared_write,Ref<Unit>::offset,1
 economy,game,call,IsPlaying,1
 economy,game,call,LosRadarPublishShareMapping,1
 economy,game,call,LosRadarPublishShareRadar,1
+economy,game,call,PlayersPublishSetStore,2
 economy,game,call,RecordMessage,4
 economy,game,call,SimBlockTrack,1
 economy,game,shared_write,EconomyEventHeader::kind,1
 economy,game,shared_write,EconomyEventHeader::player,1
 economy,game,shared_write,EconomyEventHeader::unit,1
-economy,game,shared_write,Player::energy,1
 economy,game,shared_write,Player::energyStorageBonus,1
 economy,game,shared_write,Player::energyWasted,1
-economy,game,shared_write,Player::metal,1
 economy,game,shared_write,Player::metalStorageBonus,1
 economy,game,shared_write,Player::metalWasted,1
 economy,game,shared_write,Player::totalEnergyProduced,1
@@ -192,13 +191,13 @@ economy,orders,shared_write,Player::metal,1
 economy,orders,shared_write,Player::metalCapacity,2
 economy,orders,shared_write,Ref<Unit>::offset,1
 economy,platform,call,CommandArgs::GetIntArg,4
-economy,players,shared_write,Player::energy,5
+economy,players,shared_write,Player::energy,6
 economy,players,shared_write,Player::energyCapacity,1
 economy,players,shared_write,Player::energyIncome,1
 economy,players,shared_write,Player::energyStorageBonus,3
 economy,players,shared_write,Player::energyUsage,1
 economy,players,shared_write,Player::energyWasted,2
-economy,players,shared_write,Player::metal,5
+economy,players,shared_write,Player::metal,6
 economy,players,shared_write,Player::metalCapacity,1
 economy,players,shared_write,Player::metalIncome,1
 economy,players,shared_write,Player::metalStorageBonus,3
@@ -281,6 +280,9 @@ features,files,call,HapiBank::WriteBox,1
 features,game,call,EconHandleOf,1
 features,game,call,EconPublish,1
 features,game,call,FeaturesHeaderOf,4
+features,game,call,FeaturesPublishPlaceAt,1
+features,game,call,FeaturesPublishRemoveAll,1
+features,game,call,FeaturesPublishRemoveAt,1
 features,game,call,GameRand,1
 features,game,call,RecordSoundAtName,1
 features,game,call,RecordTimedSubParticles,1
@@ -544,8 +546,6 @@ game,ai,shared_write,Game::mapWidth,1
 game,ai,shared_write,Game::maxUnitsSetting,1
 game,ai,shared_write,Game::ticks,12
 game,ai,shared_write,Player::allied,3
-game,ai,shared_write,Player::energy,1
-game,ai,shared_write,Player::metal,1
 game,ai,shared_write,Point16::x,8
 game,ai,shared_write,Point16::y,8
 game,ai,shared_write,Unit::flags,7
@@ -570,9 +570,7 @@ game,economy,shared_write,EconomySpend::energy,1
 game,economy,shared_write,EconomySpend::metal,1
 game,economy,shared_write,EconomySpend::resources,1
 game,economy,shared_write,Game::localPlayer,7
-game,economy,shared_write,Player::energy,5
 game,economy,shared_write,Player::energyStorageBonus,2
-game,economy,shared_write,Player::metal,5
 game,economy,shared_write,Player::metalStorageBonus,2
 game,features,indirect,AnimateFeatureType,1
 game,features,indirect,FeatureTypeCount,1
@@ -600,7 +598,6 @@ game,features,shared_write,FeaturesRemove::x,1
 game,features,shared_write,FeaturesRemove::z,1
 game,features,shared_write,Fixed::whole,2
 game,features,shared_write,Game::playerIndex,1
-game,features,shared_write,Game::seaLevel,1
 game,features,shared_write,Game::ticks,1
 game,features,shared_write,Point16::x,12
 game,features,shared_write,Point16::y,12
@@ -633,6 +630,7 @@ game,files,call,RemoveFile,1
 game,harness,call,HarnessAfterStep,1
 game,harness,call,HarnessAwaitLoadAndEndFrame,1
 game,harness,call,HarnessBeforeStep,1
+game,harness,call,HarnessCommandEvent,1
 game,harness,call,HarnessCrtSeed,2
 game,harness,call,HarnessExit,1
 game,harness,call,HarnessGameSeed,1
@@ -696,7 +694,6 @@ game,los_radar,shared_write,Game::mapHeight,1
 game,los_radar,shared_write,Game::mapWidth,1
 game,los_radar,shared_write,Game::numPlayers,1
 game,los_radar,shared_write,Game::playerIndex,14
-game,los_radar,shared_write,Game::seaLevel,10
 game,los_radar,shared_write,Game::ticks,6
 game,los_radar,shared_write,Grid::cells,2
 game,los_radar,shared_write,Grid::height,3
@@ -731,11 +728,12 @@ game,map,indirect,SnapWorldPosToFootprint,2
 game,map,shared_write,Fixed::whole,5
 game,map,shared_write,Game::mapFlags,1
 game,map,shared_write,Game::playerIndex,1
-game,map,shared_write,Game::seaLevel,7
 game,map,shared_write,Game::ticks,3
 game,map,shared_write,Grid::cells,1
 game,map,shared_write,Grid::height,1
 game,map,shared_write,Grid::width,1
+game,map,shared_write,MapEventHeader::kind,2
+game,map,shared_write,MapSetSeaLevel::level,1
 game,map,shared_write,Point16::x,17
 game,map,shared_write,Point16::y,17
 game,map,shared_write,Unit::flags,5
@@ -754,7 +752,6 @@ game,mission,shared_write,Vec3::z,2
 game,movement,indirect,MovementApplyPathEvent,1
 game,movement,indirect,MovementUpdateMotion,1
 game,movement,shared_write,Angles16::heading,6
-game,movement,shared_write,Game::seaLevel,5
 game,movement,shared_write,Game::ticks,3
 game,movement,shared_write,MovementEventHeader::kind,2
 game,movement,shared_write,MovementEventHeader::unit,1
@@ -786,7 +783,6 @@ game,network,call,IsOnlineConfigLoaded,1
 game,network,call,Onl_LoadConfigFile,1
 game,network,call,OnlineUnload,1
 game,network,call,PacketManager::SendAllQueued,4
-game,network,call,Player::SetType,1
 game,network,call,ReleasePacketData,1
 game,network,call,RemoveLocalPlayers,1
 game,network,call,ReportGameEvent,2
@@ -816,8 +812,6 @@ game,network,shared_write,Game::version,2
 game,network,shared_write,Game::versionMinor,2
 game,network,shared_write,LoadingFlags::value,1
 game,network,shared_write,Player::allied,4
-game,network,shared_write,Player::energy,1
-game,network,shared_write,Player::metal,1
 game,network,shared_write,Player::rejectReason,10
 game,network,shared_write,Player::unitsCreated,4
 game,network,shared_write,PlayerInfo::color,7
@@ -838,15 +832,12 @@ game,orders,shared_write,Game::localPlayer,2
 game,orders,shared_write,Game::mapHeight,6
 game,orders,shared_write,Game::mapWidth,6
 game,orders,shared_write,Game::playerIndex,1
-game,orders,shared_write,Game::seaLevel,3
 game,orders,shared_write,Game::ticks,18
 game,orders,shared_write,OrdersEventHeader::kind,1
 game,orders,shared_write,OrdersEventHeader::unit,1
 game,orders,shared_write,OrdersQueueBuild::count,1
 game,orders,shared_write,OrdersStop::all,1
 game,orders,shared_write,Player::allied,10
-game,orders,shared_write,Player::energy,2
-game,orders,shared_write,Player::metal,1
 game,orders,shared_write,Point16::x,26
 game,orders,shared_write,Point16::y,22
 game,orders,shared_write,Unit::flags,24
@@ -978,6 +969,7 @@ game,platform,call,host_window_place,2
 game,platform,call,operator delete,6
 game,platform,call,operator new,5
 game,platform,shared_write,Fixed::whole,1
+game,platform,shared_write,Game::logos,1
 game,platform,shared_write,Game::ticks,2
 game,platform,shared_write,Point16::x,7
 game,platform,shared_write,Point16::y,7
@@ -1008,17 +1000,14 @@ game,players,indirect,UpdatePlayersOnStream,1
 game,players,shared_write,Game::commanderDeath,3
 game,players,shared_write,Game::displayContext,1
 game,players,shared_write,Game::endGameFlags,2
-game,players,shared_write,Game::endGameVictory,2
+game,players,shared_write,Game::endGameVictory,3
 game,players,shared_write,Game::localPlayer,10
 game,players,shared_write,Game::mapFlags,1
 game,players,shared_write,Game::playerIndex,3
-game,players,shared_write,Game::seaLevel,1
 game,players,shared_write,Game::ticks,4
 game,players,shared_write,Player::allied,7
 game,players,shared_write,Player::displayTimer,3
-game,players,shared_write,Player::energy,5
 game,players,shared_write,Player::energyStorageBonus,3
-game,players,shared_write,Player::metal,5
 game,players,shared_write,Player::metalStorageBonus,3
 game,players,shared_write,Player::rejectReason,2
 game,players,shared_write,Player::syncTick,1
@@ -1026,8 +1015,15 @@ game,players,shared_write,Player::unitsCreated,5
 game,players,shared_write,PlayerInfo::color,3
 game,players,shared_write,PlayerInfo::flags_9b,3
 game,players,shared_write,PlayerInfo::side,5
+game,players,shared_write,PlayersEndGame::victory,1
 game,players,shared_write,PlayersEventHeader::kind,1
 game,players,shared_write,PlayersKillUnits::player,1
+game,players,shared_write,PlayersSetStore::add,1
+game,players,shared_write,PlayersSetStore::amount,1
+game,players,shared_write,PlayersSetStore::player,1
+game,players,shared_write,PlayersSetStore::resource,1
+game,players,shared_write,PlayersSetType::player,1
+game,players,shared_write,PlayersSetType::type,1
 game,players,shared_write,PlayersTransfer::amount,1
 game,players,shared_write,PlayersTransfer::announce,1
 game,players,shared_write,PlayersTransfer::from,1
@@ -1281,7 +1277,6 @@ game,presentation,shared_write,Game::maxUnitsSetting,2
 game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
 game,presentation,shared_write,Game::playerIndex,23
-game,presentation,shared_write,Game::seaLevel,4
 game,presentation,shared_write,Game::ticks,37
 game,presentation,shared_write,Game::uiOptionFlags,2
 game,presentation,shared_write,Game::version,3
@@ -1290,8 +1285,6 @@ game,presentation,shared_write,MapViewFlags::bit1,2
 game,presentation,shared_write,MapViewFlags::bit2,2
 game,presentation,shared_write,Player::allied,6
 game,presentation,shared_write,Player::displayTimer,1
-game,presentation,shared_write,Player::energy,4
-game,presentation,shared_write,Player::metal,4
 game,presentation,shared_write,Player::rejectReason,2
 game,presentation,shared_write,Player::unitsCreated,11
 game,presentation,shared_write,PlayerInfo::color,15
@@ -1314,7 +1307,6 @@ game,presentation,shared_write,Vec3::y,43
 game,presentation,shared_write,Vec3::z,42
 game,scripts,shared_write,Angles16::heading,3
 game,scripts,shared_write,Game::playerIndex,1
-game,scripts,shared_write,Game::seaLevel,1
 game,scripts,shared_write,ScriptsEventHeader::kind,1
 game,scripts,shared_write,ScriptsEventHeader::unit,1
 game,scripts,shared_write,Unit::flags,3
@@ -1480,7 +1472,6 @@ game,seams,shared_write,WeaponsEventHeader::unit,13
 game,seams,shared_write,WeaponsHealth::dying,1
 game,seams,shared_write,WeaponsHealth::health,1
 game,seams,shared_write,WeaponsParalyze::ticks,1
-game,targeting,shared_write,Game::seaLevel,1
 game,targeting,shared_write,Unit::flags,1
 game,targeting,shared_write,UnitDef::flags1,1
 game,targeting,shared_write,Vec3::x,3
@@ -1520,7 +1511,6 @@ game,units,shared_write,Game::localPlayer,1
 game,units,shared_write,Game::mapFlags,1
 game,units,shared_write,Game::maxUnitsSetting,2
 game,units,shared_write,Game::playerIndex,2
-game,units,shared_write,Game::seaLevel,8
 game,units,shared_write,Game::ticks,3
 game,units,shared_write,Game::version,1
 game,units,shared_write,Game::versionMinor,1
@@ -1533,8 +1523,12 @@ game,units,shared_write,Point16::y,8
 game,units,shared_write,Unit::flags,22
 game,units,shared_write,Unit::health,12
 game,units,shared_write,UnitDef::flags1,16
+game,units,shared_write,UnitsCreate::player,1
+game,units,shared_write,UnitsCreate::pos,1
+game,units,shared_write,UnitsCreate::type,1
 game,units,shared_write,UnitsEventHeader::kind,1
 game,units,shared_write,UnitsEventHeader::unit,1
+game,units,shared_write,UnitsReloadType::type,1
 game,units,shared_write,Vec3::x,7
 game,units,shared_write,Vec3::y,7
 game,units,shared_write,Vec3::z,7
@@ -1551,10 +1545,7 @@ game,weapons,shared_write,Angles16::heading,10
 game,weapons,shared_write,Fixed::whole,6
 game,weapons,shared_write,Game::flags_2a44,4
 game,weapons,shared_write,Game::localPlayer,3
-game,weapons,shared_write,Game::seaLevel,9
 game,weapons,shared_write,Game::ticks,10
-game,weapons,shared_write,Player::energy,1
-game,weapons,shared_write,Player::metal,1
 game,weapons,shared_write,PlayerInfo::color,1
 game,weapons,shared_write,Unit::flags,6
 game,weapons,shared_write,Unit::health,3
@@ -1636,7 +1627,7 @@ harness,economy,shared_write,Player::type,2
 harness,economy,shared_write,PlayerInfo::shareMetal,1
 harness,economy,shared_write,Seams::network,3
 harness,features,shared_write,Game::playerIndex,1
-harness,features,shared_write,LosRadarSeam::GetMapCell,14
+harness,features,shared_write,LosRadarSeam::GetMapCell,12
 harness,features,shared_write,MapSeam::GetCellMeanHeight,1
 harness,features,shared_write,MapSeam::GetGroundHeight,2
 harness,features,shared_write,MissionSeam::GetGameType,2
@@ -1645,12 +1636,13 @@ harness,features,shared_write,NetworkSeam::SendFeatureHit,1
 harness,features,shared_write,NetworkSeam::SendFeatureKilled,1
 harness,features,shared_write,NetworkSeam::SendFeatureReclaimed,1
 harness,features,shared_write,ScriptsSeam::ObjectStateSize,1
-harness,features,shared_write,Seams::los_radar,14
+harness,features,shared_write,Seams::los_radar,12
 harness,features,shared_write,Seams::map,3
 harness,features,shared_write,Seams::mission,3
 harness,features,shared_write,Seams::network,3
 harness,features,shared_write,Seams::scripts,1
 harness,features,shared_write,Seams::weapons,1
+harness,features,shared_write,WeaponsSeam::FindWeaponByName,1
 harness,files,call,HapiBank::GetIntegerItem,1
 harness,files,call,HapiBank::GetStringItem,1
 harness,files,call,HapiBank::OpenAccount,1
@@ -1658,7 +1650,9 @@ harness,files,call,MakeDirectoryPath,2
 harness,files,shared_write,FilesSeam::Close,1
 harness,files,shared_write,FilesSeam::FindFirst,1
 harness,files,shared_write,FilesSeam::FindNext,1
+harness,files,shared_write,FilesSeam::IsInArchive,1
 harness,files,shared_write,FilesSeam::Length,1
+harness,files,shared_write,FilesSeam::LengthByName,1
 harness,files,shared_write,FilesSeam::ListDirectory,1
 harness,files,shared_write,FilesSeam::Load,1
 harness,files,shared_write,FilesSeam::LoadOpenFile,1
@@ -1689,6 +1683,7 @@ harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
 harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
+harness,game,call,SchedRoutes,1
 harness,game,call,SimBlockAttach,1
 harness,game,call,SimBlockBase,25
 harness,game,call,SimBlockForEach,1
@@ -1696,6 +1691,7 @@ harness,game,call,SimBlockNew,1
 harness,game,call,SimBlockSize,1
 harness,game,call,SimBlockTrack,1
 harness,game,call,SimOwns,1
+harness,game,call,UnitsPublishCreate,1
 harness,game,shared_write,AiSeam::UpdatePlayerAI,1
 harness,game,shared_write,AiSeam::UpdateSquads,1
 harness,game,shared_write,EconomySeam::UpdatePlayerEconomy,1
@@ -1750,12 +1746,12 @@ harness,game,shared_write,Seams::movement,2
 harness,game,shared_write,Seams::network,1
 harness,game,shared_write,Seams::orders,4
 harness,game,shared_write,Seams::pathfinding,4
-harness,game,shared_write,Seams::players,11
+harness,game,shared_write,Seams::players,10
 harness,game,shared_write,Seams::scripts,1
-harness,game,shared_write,Seams::units,18
+harness,game,shared_write,Seams::units,16
 harness,game,shared_write,Seams::weapons,5
 harness,game,shared_write,Seams::wind_meteors,6
-harness,game,shared_write,UnitsSeam::CreateUnit,4
+harness,game,shared_write,UnitsSeam::CreateUnit,3
 harness,game,shared_write,UnitsSeam::FindUnitTypeId,4
 harness,game,shared_write,UnitsSeam::UpdateUnitBody,1
 harness,game,shared_write,UnitsSeam::UpdateUnitHead,1
@@ -1818,7 +1814,6 @@ harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
 harness,orders,call,Add,91
-harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,indirect,OrdersWriteState,1
 harness,orders,shared_write,FeaturesSeam::FindFeatureAtPos,3
@@ -1912,6 +1907,7 @@ harness,platform,call,operator new,3
 harness,platform,shared_write,Player::type,2
 harness,platform,shared_write,Seams::weapons,1
 harness,platform,shared_write,Seams::wind_meteors,2
+harness,platform,shared_write,WeaponsSeam::FindWeaponByName,1
 harness,platform,shared_write,WindMeteorsSeam::Apply,1
 harness,platform,shared_write,g_quirks,1
 harness,players,call,ResetPlayerSlots,1
@@ -1931,7 +1927,7 @@ harness,players,shared_write,Player::energyCapacity,1
 harness,players,shared_write,Player::metalCapacity,1
 harness,players,shared_write,Player::shareEnergy,1
 harness,players,shared_write,Player::shareMetal,1
-harness,players,shared_write,Player::type,14
+harness,players,shared_write,Player::type,15
 harness,players,shared_write,PlayerInfo::energy,2
 harness,players,shared_write,PlayerInfo::metal,2
 harness,players,shared_write,Seams::ai,4
@@ -2007,7 +2003,9 @@ harness,seams,shared_write,FeaturesSeam::UpdateFeatureSpot,1
 harness,seams,shared_write,FilesSeam::Close,1
 harness,seams,shared_write,FilesSeam::FindFirst,1
 harness,seams,shared_write,FilesSeam::FindNext,1
+harness,seams,shared_write,FilesSeam::IsInArchive,1
 harness,seams,shared_write,FilesSeam::Length,1
+harness,seams,shared_write,FilesSeam::LengthByName,1
 harness,seams,shared_write,FilesSeam::ListDirectory,1
 harness,seams,shared_write,FilesSeam::Load,1
 harness,seams,shared_write,FilesSeam::LoadOpenFile,1
@@ -2157,6 +2155,7 @@ harness,seams,shared_write,UnitsSeam::UpdateUnitBody,1
 harness,seams,shared_write,UnitsSeam::UpdateUnitHead,1
 harness,seams,shared_write,WeaponsSeam::Apply,2
 harness,seams,shared_write,WeaponsSeam::FindTargetableProjectile,1
+harness,seams,shared_write,WeaponsSeam::FindWeaponByName,1
 harness,seams,shared_write,WeaponsSeam::GetWeaponRange,1
 harness,seams,shared_write,WeaponsSeam::UpdateUnitWeapons,1
 harness,seams,shared_write,WeaponsSeam::WeaponCanReachUnit,1
@@ -2207,6 +2206,7 @@ harness,units,shared_write,Seams::orders,4
 harness,units,shared_write,Seams::scripts,5
 harness,units,shared_write,Seams::targeting,1
 harness,units,shared_write,Seams::weapons,3
+harness,units,shared_write,WeaponsSeam::FindWeaponByName,1
 harness,units,shared_write,g_quirks,2
 harness,weapons,indirect,WeaponsWriteState,1
 harness,weapons,shared_write,FeaturesSeam::GetFootprintCentre,1
@@ -2234,6 +2234,7 @@ harness,weapons,shared_write,Seams::network,10
 harness,weapons,shared_write,Seams::scripts,7
 harness,weapons,shared_write,g_quirks,1
 harness,wind_meteors,shared_write,Seams::weapons,1
+harness,wind_meteors,shared_write,WeaponsSeam::FindWeaponByName,1
 los_radar,ai,shared_write,Cell::feature,1
 los_radar,ai,shared_write,Game::mapHeight,1
 los_radar,ai,shared_write,Game::mapWidth,1
@@ -2473,6 +2474,7 @@ map,features,indirect,GetCellFeature,1
 map,features,shared_write,Cell::flags,10
 map,features,shared_write,Cell::metal,1
 map,features,shared_write,Cell::unit,1
+map,features,shared_write,Game::seaLevel,1
 map,features,shared_write,Point16::x,12
 map,features,shared_write,Point16::y,12
 map,features,shared_write,Ref<Unit>::offset,1
@@ -2490,6 +2492,7 @@ map,game,call,SimAlloc,3
 map,game,shared_write,Grid::cells,1
 map,game,shared_write,Grid::height,1
 map,game,shared_write,Grid::width,1
+map,game,shared_write,MapEventHeader::kind,1
 map,game,shared_write,Point16::x,1
 map,game,shared_write,Point16::y,1
 map,game,shared_write,Ref<Unit>::offset,7
@@ -2511,6 +2514,7 @@ map,harness,shared_write,g_lastPlaceMetalSum,1
 map,harness,shared_write,g_passMaps,2
 map,los_radar,indirect,GetMapCell,1
 map,los_radar,indirect,GetMapCellAtPosition,1
+map,los_radar,shared_write,Game::seaLevel,10
 map,los_radar,shared_write,Grid::cells,2
 map,los_radar,shared_write,Grid::height,3
 map,los_radar,shared_write,Grid::width,3
@@ -2527,6 +2531,7 @@ map,mission,shared_write,Vec3::y,2
 map,mission,shared_write,Vec3::z,2
 map,movement,shared_write,Fixed::value,1
 map,movement,shared_write,Game::overflowBucket,2
+map,movement,shared_write,Game::seaLevel,5
 map,movement,shared_write,Point16::x,20
 map,movement,shared_write,Point16::y,20
 map,movement,shared_write,Ref<Unit>::offset,3
@@ -2538,6 +2543,7 @@ map,movement,shared_write,Vec3::z,33
 map,network,shared_write,Unit::flags,3
 map,orders,shared_write,Fixed::value,8
 map,orders,shared_write,Game::overflowBucket,7
+map,orders,shared_write,Game::seaLevel,3
 map,orders,shared_write,Point16::x,26
 map,orders,shared_write,Point16::y,22
 map,orders,shared_write,Ref<Unit>::offset,1
@@ -2561,6 +2567,7 @@ map,platform,shared_write,Point16::y,7
 map,platform,shared_write,Vec3::x,22
 map,platform,shared_write,Vec3::y,14
 map,platform,shared_write,Vec3::z,22
+map,players,shared_write,Game::seaLevel,1
 map,players,shared_write,Point16::x,3
 map,players,shared_write,Point16::y,3
 map,players,shared_write,Ref<Unit>::offset,1
@@ -2570,6 +2577,7 @@ map,players,shared_write,Vec3::y,3
 map,players,shared_write,Vec3::z,3
 map,presentation,shared_write,Cell::flags,2
 map,presentation,shared_write,Fixed::value,7
+map,presentation,shared_write,Game::seaLevel,4
 map,presentation,shared_write,Point16::x,5
 map,presentation,shared_write,Point16::y,5
 map,presentation,shared_write,Ref<Unit>::offset,1
@@ -2578,6 +2586,7 @@ map,presentation,shared_write,Vec3::x,43
 map,presentation,shared_write,Vec3::y,43
 map,presentation,shared_write,Vec3::z,42
 map,presentation,shared_write,g_lastPlaceHeight,1
+map,scripts,shared_write,Game::seaLevel,1
 map,scripts,shared_write,Ref<Unit>::offset,1
 map,scripts,shared_write,Unit::bit2,1
 map,scripts,shared_write,Unit::cargoNext,1
@@ -2594,12 +2603,14 @@ map,seams,shared_write,Vec3::x,1
 map,seams,shared_write,Vec3::y,1
 map,seams,shared_write,Vec3::z,1
 map,seams,shared_write,g_passMaps,4
+map,targeting,shared_write,Game::seaLevel,1
 map,targeting,shared_write,Ref<Unit>::offset,2
 map,targeting,shared_write,Unit::flags,1
 map,targeting,shared_write,Vec3::x,3
 map,targeting,shared_write,Vec3::y,2
 map,targeting,shared_write,Vec3::z,3
 map,units,shared_write,Fixed::value,4
+map,units,shared_write,Game::seaLevel,8
 map,units,shared_write,Point16::x,8
 map,units,shared_write,Point16::y,8
 map,units,shared_write,Ref<Unit>::offset,2
@@ -2613,6 +2624,7 @@ map,weapons,shared_write,Cell::flags,1
 map,weapons,shared_write,Cell::unit,2
 map,weapons,shared_write,Cell::unit2,2
 map,weapons,shared_write,Fixed::value,7
+map,weapons,shared_write,Game::seaLevel,9
 map,weapons,shared_write,Ref<Unit>::offset,1
 map,weapons,shared_write,Unit::flags,6
 map,weapons,shared_write,Vec3::x,27
@@ -2630,6 +2642,7 @@ mission,ai,shared_write,Vec3::z,15
 mission,features,shared_write,MissionFeatureInfo::name,1
 mission,features,shared_write,MissionFeatureInfo::x,1
 mission,features,shared_write,MissionFeatureInfo::y,1
+mission,features,shared_write,TdfFile::current,2
 mission,features,shared_write,Vec3::x,8
 mission,features,shared_write,Vec3::y,7
 mission,features,shared_write,Vec3::z,9
@@ -2642,7 +2655,7 @@ mission,files,call,HAPI_readfromfile,1
 mission,game,call,GetPreferredLanguage,2
 mission,game,call,PublishWindMeteors,1
 mission,game,call,SimAllocTagged,2
-mission,game,shared_write,Game::list_391ed,4
+mission,game,shared_write,Game::list_391ed,3
 mission,game,shared_write,MissionParams::killMul,1
 mission,game,shared_write,MissionParams::timeMul,1
 mission,game,shared_write,MissionUnitInfo::angle,1
@@ -2654,9 +2667,11 @@ mission,game,shared_write,MissionUnitInfo::player,1
 mission,game,shared_write,MissionUnitInfo::x,1
 mission,game,shared_write,MissionUnitInfo::y,1
 mission,game,shared_write,MissionUnitInfo::z,1
+mission,game,shared_write,TdfFile::current,4
 mission,game,shared_write,Vec3::x,4
 mission,game,shared_write,Vec3::y,2
 mission,game,shared_write,Vec3::z,4
+mission,harness,shared_write,TdfFile::current,1
 mission,harness,shared_write,Vec3::x,3
 mission,harness,shared_write,Vec3::y,1
 mission,harness,shared_write,Vec3::z,3
@@ -2666,6 +2681,7 @@ mission,los_radar,shared_write,MissionParams::maxWindSpeed,1
 mission,los_radar,shared_write,MissionParams::minWindSpeed,1
 mission,los_radar,shared_write,MissionParams::surfaceMetal,1
 mission,los_radar,shared_write,MissionParams::tidalStrength,1
+mission,los_radar,shared_write,TdfFile::current,3
 mission,los_radar,shared_write,Vec3::x,16
 mission,los_radar,shared_write,Vec3::y,13
 mission,los_radar,shared_write,Vec3::z,16
@@ -2705,6 +2721,7 @@ mission,platform,call,Translate,2
 mission,platform,call,host_message,2
 mission,platform,call,operator delete,3
 mission,platform,call,operator new,1
+mission,platform,shared_write,TdfFile::current,20
 mission,platform,shared_write,Vec3::x,22
 mission,platform,shared_write,Vec3::y,14
 mission,platform,shared_write,Vec3::z,22
@@ -2727,6 +2744,7 @@ mission,presentation,shared_write,MissionParams::killMul,1
 mission,presentation,shared_write,MissionParams::maxWindSpeed,2
 mission,presentation,shared_write,MissionParams::minWindSpeed,2
 mission,presentation,shared_write,MissionParams::timeMul,1
+mission,presentation,shared_write,TdfFile::current,8
 mission,presentation,shared_write,Vec3::x,43
 mission,presentation,shared_write,Vec3::y,43
 mission,presentation,shared_write,Vec3::z,42
@@ -2744,11 +2762,13 @@ mission,units,shared_write,MissionParams::waterDamage,1
 mission,units,shared_write,MissionParams::waterDoesDamage,1
 mission,units,shared_write,MissionUnitInfo::ident,1
 mission,units,shared_write,MissionUnitInfo::name,1
+mission,units,shared_write,TdfFile::current,4
 mission,units,shared_write,Vec3::x,7
 mission,units,shared_write,Vec3::y,7
 mission,units,shared_write,Vec3::z,7
 mission,weapons,shared_write,MissionParams::lavaWorld,3
 mission,weapons,shared_write,MissionParams::noSeaLevelTrigger,3
+mission,weapons,shared_write,TdfFile::current,1
 mission,weapons,shared_write,Vec3::x,27
 mission,weapons,shared_write,Vec3::y,28
 mission,weapons,shared_write,Vec3::z,28
@@ -2757,6 +2777,7 @@ mission,wind_meteors,shared_write,MeteorShowerParams::density,2
 mission,wind_meteors,shared_write,MeteorShowerParams::duration,2
 mission,wind_meteors,shared_write,MeteorShowerParams::interval,2
 mission,wind_meteors,shared_write,MeteorShowerParams::radius,2
+mission,wind_meteors,shared_write,TdfFile::current,1
 mission,wind_meteors,shared_write,Vec3::x,1
 mission,wind_meteors,shared_write,Vec3::y,1
 mission,wind_meteors,shared_write,Vec3::z,1
@@ -2970,7 +2991,7 @@ network,game,call,SetGameSpeed,1
 network,game,call,SimAllocTagged,1
 network,game,call,WeaponsPublishRemoteDamage,1
 network,game,shared_write,Game::endGameFlags,2
-network,game,shared_write,Game::endGameVictory,8
+network,game,shared_write,Game::endGameVictory,6
 network,game,shared_write,Game::flags_2a44,2
 network,game,shared_write,Game::netGameFlags,2
 network,game,shared_write,Game::numPlayers,6
@@ -3107,7 +3128,7 @@ network,players,call,MissionConditions::CheckVictory,1
 network,players,call,ResetPlayerSlots,1
 network,players,call,SetupPlayerSlot,1
 network,players,shared_write,Game::endGameFlags,2
-network,players,shared_write,Game::endGameVictory,2
+network,players,shared_write,Game::endGameVictory,3
 network,players,shared_write,Game::head,1
 network,players,shared_write,Game::tail,1
 network,players,shared_write,Player::active,10
@@ -3123,7 +3144,7 @@ network,players,shared_write,Player::exploredSize,1
 network,players,shared_write,Player::exploredWidth,1
 network,players,shared_write,Player::id,2
 network,players,shared_write,Player::index,8
-network,players,shared_write,Player::info,8
+network,players,shared_write,Player::info,9
 network,players,shared_write,Player::keepaliveFlags,1
 network,players,shared_write,Player::kills,3
 network,players,shared_write,Player::lobbyDataSynced,2
@@ -3138,9 +3159,9 @@ network,players,shared_write,Player::totalEnergyConsumed,2
 network,players,shared_write,Player::totalEnergyProduced,2
 network,players,shared_write,Player::totalMetalConsumed,2
 network,players,shared_write,Player::totalMetalProduced,2
-network,players,shared_write,Player::type,14
+network,players,shared_write,Player::type,15
 network,players,shared_write,PlayerInfo::color,3
-network,players,shared_write,PlayerInfo::kind,3
+network,players,shared_write,PlayerInfo::kind,4
 network,presentation,call,BeginTextEdit,2
 network,presentation,call,CenterCameraOnPoint,1
 network,presentation,call,ClearSelectedGadget,1
@@ -3610,6 +3631,7 @@ platform,features,indirect,CmdFeature,1
 platform,features,shared_write,Fixed::whole,2
 platform,features,shared_write,Point16::x,12
 platform,features,shared_write,Point16::y,12
+platform,features,shared_write,TdfFile::current,2
 platform,features,shared_write,Vec3::x,8
 platform,features,shared_write,Vec3::y,7
 platform,features,shared_write,Vec3::z,9
@@ -3735,6 +3757,7 @@ platform,game,shared_write,Game::data_148eb,1
 platform,game,shared_write,Point16::x,1
 platform,game,shared_write,Point16::y,1
 platform,game,shared_write,Seams::wind_meteors,6
+platform,game,shared_write,TdfFile::current,4
 platform,game,shared_write,Vec3::x,4
 platform,game,shared_write,Vec3::y,2
 platform,game,shared_write,Vec3::z,4
@@ -3747,6 +3770,8 @@ platform,harness,call,ReplayImport::~ReplayImport,33
 platform,harness,shared_write,Point16::x,1
 platform,harness,shared_write,Point16::y,1
 platform,harness,shared_write,Seams::wind_meteors,1
+platform,harness,shared_write,TdfFile::current,1
+platform,harness,shared_write,TdfFile::root,1
 platform,harness,shared_write,Vec3::x,3
 platform,harness,shared_write,Vec3::y,1
 platform,harness,shared_write,Vec3::z,3
@@ -3757,6 +3782,7 @@ platform,los_radar,shared_write,Game::loadProgress,1
 platform,los_radar,shared_write,Game::losTable,8
 platform,los_radar,shared_write,Point16::x,5
 platform,los_radar,shared_write,Point16::y,5
+platform,los_radar,shared_write,TdfFile::current,3
 platform,los_radar,shared_write,Vec3::x,16
 platform,los_radar,shared_write,Vec3::y,13
 platform,los_radar,shared_write,Vec3::z,16
@@ -3769,6 +3795,7 @@ platform,map,shared_write,Vec3::y,3
 platform,map,shared_write,Vec3::z,11
 platform,mission,shared_write,Seams::wind_meteors,1
 platform,mission,shared_write,StringRef::data,1
+platform,mission,shared_write,TdfFile::current,3
 platform,mission,shared_write,Vec3::x,2
 platform,mission,shared_write,Vec3::y,2
 platform,mission,shared_write,Vec3::z,2
@@ -3855,6 +3882,8 @@ platform,presentation,shared_write,Fixed::whole,7
 platform,presentation,shared_write,Point16::x,5
 platform,presentation,shared_write,Point16::y,5
 platform,presentation,shared_write,StringRef::data,5
+platform,presentation,shared_write,TdfFile::current,8
+platform,presentation,shared_write,TdfFile::root,1
 platform,presentation,shared_write,Vec3::x,43
 platform,presentation,shared_write,Vec3::y,43
 platform,presentation,shared_write,Vec3::z,42
@@ -3883,6 +3912,8 @@ platform,units,shared_write,Fixed::value,4
 platform,units,shared_write,Point16::x,8
 platform,units,shared_write,Point16::y,8
 platform,units,shared_write,StringRef::data,4
+platform,units,shared_write,TdfFile::current,4
+platform,units,shared_write,TdfFile::flags,1
 platform,units,shared_write,UnitDef::scriptChecksum,1
 platform,units,shared_write,Vec3::x,7
 platform,units,shared_write,Vec3::y,7
@@ -3898,6 +3929,8 @@ platform,weapons,shared_write,ReachPosVec3::z,2
 platform,weapons,shared_write,ReachUnitVec3::x,2
 platform,weapons,shared_write,ReachUnitVec3::z,2
 platform,weapons,shared_write,StringRef::ptr,5
+platform,weapons,shared_write,TdfFile::current,1
+platform,weapons,shared_write,TdfFile::flags,1
 platform,weapons,shared_write,Vec3::x,27
 platform,weapons,shared_write,Vec3::y,28
 platform,weapons,shared_write,Vec3::z,28
@@ -3906,6 +3939,7 @@ platform,weapons,shared_write,Vec3f::y,1
 platform,weapons,shared_write,Vec3f::z,1
 platform,wind_meteors,shared_write,Point16::x,5
 platform,wind_meteors,shared_write,Point16::y,5
+platform,wind_meteors,shared_write,TdfFile::current,1
 platform,wind_meteors,shared_write,Vec3::x,1
 platform,wind_meteors,shared_write,Vec3::y,1
 platform,wind_meteors,shared_write,Vec3::z,1
@@ -3945,7 +3979,7 @@ players,ai,shared_write,Vec3::z,15
 players,economy,shared_write,Game::localPlayer,7
 players,economy,shared_write,Player::active,2
 players,economy,shared_write,Player::econ,2
-players,economy,shared_write,Player::energy,5
+players,economy,shared_write,Player::energy,4
 players,economy,shared_write,Player::energyCapacity,3
 players,economy,shared_write,Player::energyIncome,1
 players,economy,shared_write,Player::energyStorageBonus,2
@@ -3953,7 +3987,7 @@ players,economy,shared_write,Player::energyUsage,1
 players,economy,shared_write,Player::energyWasted,1
 players,economy,shared_write,Player::index,3
 players,economy,shared_write,Player::info,2
-players,economy,shared_write,Player::metal,5
+players,economy,shared_write,Player::metal,4
 players,economy,shared_write,Player::metalCapacity,3
 players,economy,shared_write,Player::metalIncome,1
 players,economy,shared_write,Player::metalStorageBonus,2
@@ -3997,7 +4031,7 @@ players,game,call,SchedPlayersPhase,2
 players,game,call,SimAlloc,1
 players,game,call,SimBlockTrack,1
 players,game,shared_write,Game::endGameFlags,2
-players,game,shared_write,Game::endGameVictory,8
+players,game,shared_write,Game::endGameVictory,6
 players,game,shared_write,Game::localPlayer,16
 players,game,shared_write,Game::mapFlags,1
 players,game,shared_write,Game::playerIndex,9
@@ -4006,7 +4040,6 @@ players,game,shared_write,Player::allied,2
 players,game,shared_write,Player::commanderKills,1
 players,game,shared_write,Player::commanderLosses,1
 players,game,shared_write,Player::displayTimer,1
-players,game,shared_write,Player::energy,1
 players,game,shared_write,Player::energyStorageBonus,1
 players,game,shared_write,Player::energyWasted,1
 players,game,shared_write,Player::id,2
@@ -4014,7 +4047,6 @@ players,game,shared_write,Player::index,10
 players,game,shared_write,Player::info,9
 players,game,shared_write,Player::kills,1
 players,game,shared_write,Player::losses,1
-players,game,shared_write,Player::metal,1
 players,game,shared_write,Player::metalStorageBonus,1
 players,game,shared_write,Player::metalWasted,1
 players,game,shared_write,Player::rejectReason,2
@@ -4350,9 +4382,9 @@ presentation,ai,shared_write,Vec3::z,15
 presentation,economy,indirect,EconomyUnitAccount,1
 presentation,economy,shared_write,Game::netGameFlags,5
 presentation,economy,shared_write,Player::active,2
-presentation,economy,shared_write,Player::energy,5
+presentation,economy,shared_write,Player::energy,4
 presentation,economy,shared_write,Player::index,3
-presentation,economy,shared_write,Player::metal,5
+presentation,economy,shared_write,Player::metal,4
 presentation,features,shared_write,Cell::flags,10
 presentation,features,shared_write,Fixed::whole,2
 presentation,features,shared_write,GafFrame::height,1
@@ -4445,7 +4477,7 @@ presentation,game,shared_write,GafSequencePlayer::value,1
 presentation,game,shared_write,Game::commanderDeath,3
 presentation,game,shared_write,Game::difficulty,4
 presentation,game,shared_write,Game::effectiveGameSpeed,6
-presentation,game,shared_write,Game::endGameVictory,8
+presentation,game,shared_write,Game::endGameVictory,6
 presentation,game,shared_write,Game::gameSpeed,9
 presentation,game,shared_write,Game::interfaceType,4
 presentation,game,shared_write,Game::mapFlags,1
@@ -4458,10 +4490,8 @@ presentation,game,shared_write,OnlineReportPlayer::allies,1
 presentation,game,shared_write,OnlineReportScoreBoard::scores,1
 presentation,game,shared_write,Player::active,11
 presentation,game,shared_write,Player::allied,2
-presentation,game,shared_write,Player::energy,1
 presentation,game,shared_write,Player::id,2
 presentation,game,shared_write,Player::index,10
-presentation,game,shared_write,Player::metal,1
 presentation,game,shared_write,Player::rejectReason,2
 presentation,game,shared_write,PlayerInfo::bit6,2
 presentation,game,shared_write,PlayerInfo::color,4
@@ -4861,17 +4891,17 @@ presentation,platform,shared_write,Vec3f::y,4
 presentation,platform,shared_write,Vec3f::z,4
 presentation,players,call,ResetPlayerSlots,1
 presentation,players,shared_write,Game::commanderDeath,3
-presentation,players,shared_write,Game::endGameVictory,2
+presentation,players,shared_write,Game::endGameVictory,3
 presentation,players,shared_write,Game::head,1
 presentation,players,shared_write,Game::mapFlags,1
 presentation,players,shared_write,Player::active,10
 presentation,players,shared_write,Player::alliance,2
 presentation,players,shared_write,Player::allied,7
 presentation,players,shared_write,Player::alliedBy,3
-presentation,players,shared_write,Player::energy,5
+presentation,players,shared_write,Player::energy,6
 presentation,players,shared_write,Player::id,2
 presentation,players,shared_write,Player::index,8
-presentation,players,shared_write,Player::metal,5
+presentation,players,shared_write,Player::metal,6
 presentation,players,shared_write,Player::rank,1
 presentation,players,shared_write,Player::rejectReason,2
 presentation,players,shared_write,PlayerInfo::bit5,2
@@ -4956,6 +4986,8 @@ presentation,units,shared_write,Angles16::heading,10
 presentation,units,shared_write,Angles16::pitch,7
 presentation,units,shared_write,Fixed::value,4
 presentation,units,shared_write,Game::commanderDeath,2
+presentation,units,shared_write,Game::entries_37e13,1
+presentation,units,shared_write,Game::entry_count,1
 presentation,units,shared_write,Game::mapFlags,1
 presentation,units,shared_write,MissionType::index,1
 presentation,units,shared_write,Player::active,6
@@ -5200,7 +5232,7 @@ seams,economy,shared_write,Seams::network,3
 seams,features,call,GetFootprintCentre,1
 seams,features,indirect,ApplyEvent,1
 seams,features,indirect,PlaceEvent,1
-seams,features,shared_write,LosRadarSeam::GetMapCell,14
+seams,features,shared_write,LosRadarSeam::GetMapCell,12
 seams,features,shared_write,MapSeam::GetCellMeanHeight,1
 seams,features,shared_write,MapSeam::GetGroundHeight,2
 seams,features,shared_write,MissionSeam::GetGameType,2
@@ -5212,7 +5244,7 @@ seams,features,shared_write,Point16::x,12
 seams,features,shared_write,Point16::y,12
 seams,features,shared_write,Ref<Unit>::offset,1
 seams,features,shared_write,ScriptsSeam::ObjectStateSize,1
-seams,features,shared_write,Seams::los_radar,14
+seams,features,shared_write,Seams::los_radar,12
 seams,features,shared_write,Seams::map,3
 seams,features,shared_write,Seams::mission,3
 seams,features,shared_write,Seams::network,3
@@ -5221,6 +5253,7 @@ seams,features,shared_write,Seams::weapons,1
 seams,features,shared_write,Vec3::x,8
 seams,features,shared_write,Vec3::y,7
 seams,features,shared_write,Vec3::z,9
+seams,features,shared_write,WeaponsSeam::FindWeaponByName,1
 seams,files,call,AccountBank::CloseBank,1
 seams,files,call,AccountBank::GetBoxSize,1
 seams,files,call,AccountBank::GetDoubleItem,1
@@ -5245,7 +5278,9 @@ seams,files,call,ListDirectory,1
 seams,files,shared_write,FilesSeam::Close,1
 seams,files,shared_write,FilesSeam::FindFirst,1
 seams,files,shared_write,FilesSeam::FindNext,1
+seams,files,shared_write,FilesSeam::IsInArchive,1
 seams,files,shared_write,FilesSeam::Length,1
+seams,files,shared_write,FilesSeam::LengthByName,1
 seams,files,shared_write,FilesSeam::ListDirectory,1
 seams,files,shared_write,FilesSeam::Load,1
 seams,files,shared_write,FilesSeam::LoadOpenFile,1
@@ -5302,7 +5337,7 @@ seams,game,shared_write,OrdersStop::all,1
 seams,game,shared_write,OrdersStop::h,1
 seams,game,shared_write,PathfindingSeam::Poll,1
 seams,game,shared_write,PathfindingSeam::Step,1
-seams,game,shared_write,PlayersEventHeader::kind,2
+seams,game,shared_write,PlayersEventHeader::kind,6
 seams,game,shared_write,PlayersSeam::UpdateBlink,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerBody,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerHead,1
@@ -5330,13 +5365,13 @@ seams,game,shared_write,Seams::network,1
 seams,game,shared_write,Seams::orders,4
 seams,game,shared_write,Seams::pathfinding,4
 seams,game,shared_write,Seams::pathworld,1
-seams,game,shared_write,Seams::players,11
+seams,game,shared_write,Seams::players,10
 seams,game,shared_write,Seams::scripts,1
-seams,game,shared_write,Seams::units,18
+seams,game,shared_write,Seams::units,16
 seams,game,shared_write,Seams::weapons,5
 seams,game,shared_write,Seams::wind_meteors,6
 seams,game,shared_write,UnitsEventHeader::unit,1
-seams,game,shared_write,UnitsSeam::CreateUnit,4
+seams,game,shared_write,UnitsSeam::CreateUnit,3
 seams,game,shared_write,UnitsSeam::FindUnitTypeId,4
 seams,game,shared_write,UnitsSeam::RefreshFactoryIndex,1
 seams,game,shared_write,UnitsSeam::UpdateAllUnits,1
@@ -5387,7 +5422,9 @@ seams,harness,shared_write,FeaturesSeam::UpdateFeatureSpot,2
 seams,harness,shared_write,FilesSeam::Close,2
 seams,harness,shared_write,FilesSeam::FindFirst,2
 seams,harness,shared_write,FilesSeam::FindNext,2
+seams,harness,shared_write,FilesSeam::IsInArchive,2
 seams,harness,shared_write,FilesSeam::Length,2
+seams,harness,shared_write,FilesSeam::LengthByName,2
 seams,harness,shared_write,FilesSeam::ListDirectory,2
 seams,harness,shared_write,FilesSeam::Load,2
 seams,harness,shared_write,FilesSeam::LoadOpenFile,2
@@ -5510,7 +5547,7 @@ seams,harness,shared_write,Seams::pathfinding,3
 seams,harness,shared_write,Seams::players,2
 seams,harness,shared_write,Seams::scripts,2
 seams,harness,shared_write,Seams::targeting,1
-seams,harness,shared_write,Seams::units,3
+seams,harness,shared_write,Seams::units,2
 seams,harness,shared_write,Seams::weapons,2
 seams,harness,shared_write,Seams::wind_meteors,1
 seams,harness,shared_write,TargetingSeam::Apply,2
@@ -5524,7 +5561,7 @@ seams,harness,shared_write,UnitsSeam::AddRepairProgress,2
 seams,harness,shared_write,UnitsSeam::CanLoad,2
 seams,harness,shared_write,UnitsSeam::CanReclaim,2
 seams,harness,shared_write,UnitsSeam::CanRepair,2
-seams,harness,shared_write,UnitsSeam::CreateUnit,3
+seams,harness,shared_write,UnitsSeam::CreateUnit,2
 seams,harness,shared_write,UnitsSeam::FindUnitTypeId,2
 seams,harness,shared_write,UnitsSeam::GetFactoriesInRadius,2
 seams,harness,shared_write,UnitsSeam::UnitRefGet,2
@@ -5536,6 +5573,7 @@ seams,harness,shared_write,Vec3::y,1
 seams,harness,shared_write,Vec3::z,3
 seams,harness,shared_write,WeaponsSeam::Apply,2
 seams,harness,shared_write,WeaponsSeam::FindTargetableProjectile,2
+seams,harness,shared_write,WeaponsSeam::FindWeaponByName,2
 seams,harness,shared_write,WeaponsSeam::GetWeaponRange,2
 seams,harness,shared_write,WeaponsSeam::UpdateUnitWeapons,2
 seams,harness,shared_write,WeaponsSeam::WeaponCanReachUnit,2
@@ -5739,6 +5777,7 @@ seams,platform,shared_write,Seams::wind_meteors,2
 seams,platform,shared_write,Vec3::x,22
 seams,platform,shared_write,Vec3::y,14
 seams,platform,shared_write,Vec3::z,22
+seams,platform,shared_write,WeaponsSeam::FindWeaponByName,1
 seams,platform,shared_write,WindMeteorsSeam::Apply,1
 seams,players,indirect,PlayersApply,1
 seams,players,shared_write,FeaturesSeam::FindFeatureAtPos,1
@@ -5846,6 +5885,7 @@ seams,units,call,Unit::CanRepair,1
 seams,units,call,UnitRef::Unlink,1
 seams,units,call,UnitTypeSet::AddTypeOrCategory,1
 seams,units,indirect,UnitsApply,1
+seams,units,shared_write,FeaturesSeam::FindOrLoadFeatureType,1
 seams,units,shared_write,LosRadarSeam::GetMapCell,1
 seams,units,shared_write,MapSeam::GetGroundHeight,3
 seams,units,shared_write,MissionSeam::GetGameType,2
@@ -5925,6 +5965,7 @@ seams,units,shared_write,UnitsUnlink::ref,1
 seams,units,shared_write,Vec3::x,7
 seams,units,shared_write,Vec3::y,7
 seams,units,shared_write,Vec3::z,7
+seams,units,shared_write,WeaponsSeam::FindWeaponByName,1
 seams,weapons,call,FindWeaponByName,1
 seams,weapons,call,GetWeaponRange,1
 seams,weapons,indirect,WeaponCanReachUnit,1
@@ -5964,6 +6005,7 @@ seams,wind_meteors,shared_write,Seams::weapons,1
 seams,wind_meteors,shared_write,Vec3::x,1
 seams,wind_meteors,shared_write,Vec3::y,1
 seams,wind_meteors,shared_write,Vec3::z,1
+seams,wind_meteors,shared_write,WeaponsSeam::FindWeaponByName,1
 targeting,ai,shared_write,Ref<Unit>::offset,3
 targeting,ai,shared_write,Vec3::x,15
 targeting,ai,shared_write,Vec3::y,12
@@ -6082,6 +6124,7 @@ units,ai,shared_write,UnitDef::makesMetal,4
 units,ai,shared_write,UnitDef::metalCost,3
 units,ai,shared_write,UnitDef::minwaterdepth,3
 units,ai,shared_write,UnitDef::mobile,1
+units,ai,shared_write,UnitDef::name,1
 units,ai,shared_write,UnitDef::radardistance,1
 units,ai,shared_write,UnitDef::sonardistance,1
 units,ai,shared_write,UnitDef::unitname,1
@@ -6162,8 +6205,8 @@ units,game,call,WeaponsPublishRelease,1
 units,game,call,WeaponsPublishRemoveProjectiles,1
 units,game,call,WeaponsPublishSetStockpiles,1
 units,game,shared_write,Angles16::heading,1
-units,game,shared_write,FeaturesPlace::feature,1
-units,game,shared_write,FeaturesPlace::owner,1
+units,game,shared_write,FeaturesPlace::feature,2
+units,game,shared_write,FeaturesPlace::owner,2
 units,game,shared_write,Game::defs,2
 units,game,shared_write,Game::f14353,1
 units,game,shared_write,Game::poolCount,1
@@ -6228,13 +6271,16 @@ units,los_radar,shared_write,Unit::workTime,1
 units,los_radar,shared_write,Unit::yWhole,2
 units,los_radar,shared_write,UnitDef::flags1,1
 units,los_radar,shared_write,UnitDef::flags2,1
+units,los_radar,shared_write,UnitDef::mincloakdistance,1
 units,los_radar,shared_write,UnitDef::modelMaxY,2
 units,los_radar,shared_write,UnitDef::modelMinX,1
 units,los_radar,shared_write,UnitDef::modelMinZ,1
 units,los_radar,shared_write,UnitDef::modelSizeY,1
 units,los_radar,shared_write,UnitDef::radardistance,1
+units,los_radar,shared_write,UnitDef::radardistancejam,1
 units,los_radar,shared_write,UnitDef::range,4
 units,los_radar,shared_write,UnitDef::sonardistance,1
+units,los_radar,shared_write,UnitDef::sonardistancejam,1
 units,los_radar,shared_write,Vec3::x,16
 units,los_radar,shared_write,Vec3::y,13
 units,los_radar,shared_write,Vec3::z,16
@@ -6601,15 +6647,18 @@ units,presentation,shared_write,Unit::yWhole,3
 units,presentation,shared_write,UnitDef::attackrunlength,1
 units,presentation,shared_write,UnitDef::buildMenuPageCount,6
 units,presentation,shared_write,UnitDef::buildRange,1
+units,presentation,shared_write,UnitDef::description,1
 units,presentation,shared_write,UnitDef::energyCost,3
 units,presentation,shared_write,UnitDef::explodeas,1
 units,presentation,shared_write,UnitDef::fbiChecksum,3
 units,presentation,shared_write,UnitDef::flags1,6
 units,presentation,shared_write,UnitDef::flags2,4
 units,presentation,shared_write,UnitDef::flying,1
+units,presentation,shared_write,UnitDef::id,1
 units,presentation,shared_write,UnitDef::ids,1
 units,presentation,shared_write,UnitDef::maxHealth,2
 units,presentation,shared_write,UnitDef::metalCost,3
+units,presentation,shared_write,UnitDef::mincloakdistance,1
 units,presentation,shared_write,UnitDef::mobile,1
 units,presentation,shared_write,UnitDef::modelMaxX,2
 units,presentation,shared_write,UnitDef::modelMaxZ,1
@@ -6617,9 +6666,14 @@ units,presentation,shared_write,UnitDef::modelMinX,2
 units,presentation,shared_write,UnitDef::modelMinY,1
 units,presentation,shared_write,UnitDef::modelMinZ,1
 units,presentation,shared_write,UnitDef::modelSizeY,1
+units,presentation,shared_write,UnitDef::movementclass,1
+units,presentation,shared_write,UnitDef::name,3
 units,presentation,shared_write,UnitDef::radardistance,1
+units,presentation,shared_write,UnitDef::radardistancejam,1
 units,presentation,shared_write,UnitDef::range,1
 units,presentation,shared_write,UnitDef::sonardistance,1
+units,presentation,shared_write,UnitDef::sonardistancejam,1
+units,presentation,shared_write,UnitDef::soundcategory,1
 units,presentation,shared_write,UnitDef::unitname,7
 units,presentation,shared_write,UnitTypeSet::bits,1
 units,presentation,shared_write,Vec3::x,43
@@ -6666,6 +6720,7 @@ units,seams,shared_write,Game::units,1
 units,seams,shared_write,Game::unitsPerPlayer,1
 units,seams,shared_write,MovementClass::footprintX,1
 units,seams,shared_write,MovementClass::footprintZ,1
+units,seams,shared_write,MovementClass::name,1
 units,seams,shared_write,Player::flags,1
 units,seams,shared_write,Player::unitCount,1
 units,seams,shared_write,Player::unitsCreated,1

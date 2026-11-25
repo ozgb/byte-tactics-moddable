@@ -1150,6 +1150,9 @@ int __stdcall ApplyEvent(const FeaturesEventHeader* e, unsigned int size)
         const FeaturesDamage* p = reinterpret_cast<const FeaturesDamage*>(e);
         return DamageFeature(CellAt(p->x, p->z), p->x, p->z, &g_game->weapons[p->weapon]);
     }
+    case FEATURES_REMOVE_ALL:
+        RemoveAllFeatures();
+        return 1;
     case FEATURES_RECLAIM: {
         if (size < sizeof(FeaturesReclaim))
             return 0;

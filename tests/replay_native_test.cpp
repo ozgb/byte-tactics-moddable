@@ -5776,8 +5776,10 @@ void GoalSelfTest()
     twinHolder->id = 3;
     twinHolder->goal = twin;
     roots[0] = twinHolder;
-    recorder.Record(kinds, roots, 1, sets);
-    char* third = strdup(recorder.text.Data());
+    Recorder twinRecorder;
+    twinRecorder.Record(kinds, roots, 1, sets);
+    char* third = strdup(twinRecorder.text.Data());
+    printf("%s", third);
     Check(ReplayFailure() == nullptr && strstr(third, "  r FixtureGoalHolder#1.goal FixtureTwin#1\n") != nullptr, "a class with a second vtable is named as its kind by its first");
     ResetBlock();
     RestoreText(third, sets);

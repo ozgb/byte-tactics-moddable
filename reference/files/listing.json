@@ -11,11 +11,11 @@
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193], ["units", 17, 0], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["Mixed", 17, 0], ["data", 17, 0], ["twin", 17, 0], ["twin", 17, 0], ["blk", 17, 0], ["blk", 1, 21], ["a/b.txt", 1, 25], ["gamedata", 17, 0], ["units", 17, 0], ["data", 17, 0], ["units", 17, 0], ["units", 17, 0], ["units", 17, 0], ["notes", 17, 0], ["UNITS", 17, 0], ["units", 17, 0], ["units", 17, 0]]],
-   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193]]],
+   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["anims", 16, 0], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["objects3d", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["scripts", 16, 0], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193], ["units", 17, 0], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["Mixed", 17, 0], ["data", 17, 0], ["twin", 17, 0], ["twin", 17, 0], ["blk", 17, 0], ["blk", 1, 21], ["a/b.txt", 1, 25], ["gamedata", 17, 0], ["units", 17, 0], ["data", 17, 0], ["units", 17, 0], ["units", 17, 0], ["units", 17, 0], ["notes", 17, 0], ["UNITS", 17, 0], ["units", 17, 0], ["units", 17, 0]]],
+   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["anims", 16, 0], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["objects3d", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["scripts", 16, 0], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193]]],
    ["find", [["units", 17, 0], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["Mixed", 17, 0], ["data", 17, 0], ["twin", 17, 0], ["twin", 17, 0], ["blk", 17, 0], ["blk", 1, 21], ["a/b.txt", 1, 25], ["gamedata", 17, 0]]],
    ["find", [["units", 17, 0], ["units", 17, 0], ["units", 17, 0], ["notes", 17, 0], ["UNITS", 17, 0], ["units", 17, 0], ["units", 17, 0]]],
-   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193], ["units", 17, 0], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["Mixed", 17, 0], ["data", 17, 0], ["twin", 17, 0], ["twin", 17, 0], ["blk", 17, 0], ["blk", 1, 21], ["a/b.txt", 1, 25], ["gamedata", 17, 0], ["units", 17, 0], ["data", 17, 0], ["units", 17, 0], ["units", 17, 0], ["units", 17, 0], ["notes", 17, 0], ["UNITS", 17, 0], ["units", 17, 0], ["units", 17, 0]]],
+   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["anims", 16, 0], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["objects3d", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["scripts", 16, 0], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193], ["units", 17, 0], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["Mixed", 17, 0], ["data", 17, 0], ["twin", 17, 0], ["twin", 17, 0], ["blk", 17, 0], ["blk", 1, 21], ["a/b.txt", 1, 25], ["gamedata", 17, 0], ["units", 17, 0], ["data", 17, 0], ["units", 17, 0], ["units", 17, 0], ["units", 17, 0], ["notes", 17, 0], ["UNITS", 17, 0], ["units", 17, 0], ["units", 17, 0]]],
    ["find", [["readme.txt", 0, 24], ["dup.txt", 1, 31], ["dup.txt", 1, 32], ["a/b.txt", 1, 25]]]
   ]},
  {"name": "units", "fixture": "base",
@@ -67,8 +67,8 @@
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["count", 35],
-   ["count", 20],
+   ["count", 38],
+   ["count", 23],
    ["count", 13],
    ["count", 11],
    ["count", 0]
@@ -83,8 +83,8 @@
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["list", ["a.ccx", "b.ccx", "c.hpi", "D.HPI", "data", "ex.hpi", "e_x.hpi", "gamedata", "notes", "readme.txt", "rev31.gp3", "rev32.gp3", "units", "x.hpi", "z.ufo", "units", "dup.txt", "dup.txt", "Mixed", "data", "twin", "twin", "blk", "blk", "a/b.txt", "gamedata", "units", "data", "units", "units", "units", "notes", "UNITS", "units", "units"]],
-   ["list", ["data", "gamedata", "notes", "units", "units", "Mixed", "data", "twin", "twin", "blk", "gamedata", "units", "data", "units", "units", "units", "notes", "UNITS", "units", "units"]],
+   ["list", ["a.ccx", "anims", "b.ccx", "c.hpi", "D.HPI", "data", "ex.hpi", "e_x.hpi", "gamedata", "notes", "objects3d", "readme.txt", "rev31.gp3", "rev32.gp3", "scripts", "units", "x.hpi", "z.ufo", "units", "dup.txt", "dup.txt", "Mixed", "data", "twin", "twin", "blk", "blk", "a/b.txt", "gamedata", "units", "data", "units", "units", "units", "notes", "UNITS", "units", "units"]],
+   ["list", ["anims", "data", "gamedata", "notes", "objects3d", "scripts", "units", "units", "Mixed", "data", "twin", "twin", "blk", "gamedata", "units", "data", "units", "units", "units", "notes", "UNITS", "units", "units"]],
    ["list", ["arm.fbi", "armx.fbi", "arm_x.fbi", "Loose.fbi", "Shadow.TXT", "core.fbi", "only_ccx.fbi", "lz.fbi", "b.fbi", "ufo.fbi", "c.fbi", "D.FBI", "fold.fbi"]],
    ["list", ["loose.bin", "big.bin", "big2.bin", "exact.bin", "enc.bin", "mixed.bin", "stored.bin", "empty.bin", "keyed.bin", "keyed_stored.bin"]]
   ]},
@@ -114,8 +114,8 @@
    ["tree", "units", "*", "-1", "1"]
   ],
   "results": [
-   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193]]],
-   ["count", 15],
+   ["find", [[".", 16, 0], ["..", 16, 0], ["a.ccx", 0, 36884], ["anims", 16, 0], ["b.ccx", 0, 199], ["c.hpi", 0, 316], ["D.HPI", 0, 136], ["data", 16, 0], ["ex.hpi", 0, 143], ["e_x.hpi", 0, 144], ["gamedata", 16, 0], ["notes", 16, 0], ["objects3d", 16, 0], ["readme.txt", 0, 24], ["rev31.gp3", 0, 310435], ["rev32.gp3", 0, 119], ["scripts", 16, 0], ["units", 16, 0], ["x.hpi", 0, 16], ["z.ufo", 0, 193]]],
+   ["count", 18],
    ["tree", ["units\\arm.fbi", "units\\armx.fbi", "units\\arm_x.fbi", "units\\Loose.fbi", "units\\Shadow.TXT"]]
   ]},
  {"name": "wildcards", "fixture": "base",

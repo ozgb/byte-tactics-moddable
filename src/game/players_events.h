@@ -43,6 +43,45 @@ inline void PlayersPublishKillUnits(int outbox, int player)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void PlayersPublishSetStore(int outbox, int player, int resource, int add, float amount)
+{
+    PlayersSetStore event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_SET_STORE;
+    event.player = player;
+    event.resource = resource;
+    event.add = add;
+    event.amount = amount;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void PlayersPublishSetType(int outbox, int player, int type)
+{
+    PlayersSetType event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_SET_TYPE;
+    event.player = player;
+    event.type = type;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void PlayersPublishEndGame(int outbox, int victory)
+{
+    PlayersEndGame event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_END_GAME;
+    event.victory = victory;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void PlayersPublishDeactivateConditions(int outbox)
+{
+    PlayersEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = PLAYERS_DEACTIVATE_CONDITIONS;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class U>
 inline void PlayersPublishGiveUnit(int outbox, U* unit, int player, const OwnershipTransferPacket* record)
 {

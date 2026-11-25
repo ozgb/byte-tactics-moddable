@@ -249,6 +249,105 @@ seeds) and runs deterministically: two runs give identical traces.
 | ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
 | ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
 
+## The scenarios of the core's verdict
+
+A core is judged on the scenarios marked `judged`; the others are `left out` for the reason given.
+`docs/commands.md`, section 7, holds the same table, and `tools/commands.py --check` keeps the two equal.
+
+| Scenario | Verdict | Reason |
+| --- | --- | --- |
+| ai-antinuke-intercept | judged | - |
+| allied-victory | judged | - |
+| combat-deaths | judged | - |
+| commander-death | judged | - |
+| conditions-dark-side | judged | - |
+| conditions-shore-to-shore | judged | - |
+| console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-features | left out | console commands that are not events: `treedeath` |
+| console-ilose | judged | - |
+| console-iwin | judged | - |
+| console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
+| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search`, `edge` |
+| duel-coast-to-coast | judged | - |
+| duel-great-divide | judged | - |
+| duel-pass-dark | judged | - |
+| duel-shore-to-shore | judged | - |
+| edges-economy-targeting | judged | - |
+| edges-targeting-lead | left out | console commands that are not events: `shootall` |
+| eight-full-moon | judged | - |
+| eight-greenhaven | judged | - |
+| eight-pincushion-teams | judged | - |
+| hailstorm-los-off | judged | - |
+| load-midgame | left out | saves or loads a game: save and load are not in the core spec |
+| load-targets | left out | saves or loads a game: save and load are not in the core spec |
+| long-great-divide-2p | judged | - |
+| long-greenhaven-8p | judged | - |
+| los-off-mapped-ai | judged | - |
+| meteors-earthquake | judged | - |
+| meteors-hailstorm | judged | - |
+| mission-build-unit | judged | - |
+| mission-capture | judged | - |
+| mission-defeat | judged | - |
+| mission-defeat-all-units | judged | - |
+| mission-defeat-of-type | judged | - |
+| mission-defeat-passes-x | judged | - |
+| mission-kill-mobile | judged | - |
+| mission-kill-of-type | judged | - |
+| mission-passes-x | judged | - |
+| mission-passes-z | judged | - |
+| mission-radius | judged | - |
+| mission-timer | judged | - |
+| mission-victory | judged | - |
+| orders-air | judged | - |
+| orders-air-fights | judged | - |
+| orders-air-repair | judged | - |
+| orders-attack-nomove | judged | - |
+| orders-attack-nomove-range | judged | - |
+| orders-build-patrol | judged | - |
+| orders-factory | judged | - |
+| orders-guard-attacked | judged | - |
+| orders-guard-reclaim | judged | - |
+| orders-immediate | judged | - |
+| orders-move-attack | judged | - |
+| orders-tier2-core | judged | - |
+| orders-tier2-spider | judged | - |
+| orders-tier2-vader | judged | - |
+| orders-weapon-build | judged | - |
+| quad-fox-holes | judged | - |
+| quad-king-of-the-hill | judged | - |
+| quad-lava-highground | judged | - |
+| quad-two-continents | judged | - |
+| save-midgame | left out | saves or loads a game: save and load are not in the core spec |
+| save-targets | left out | saves or loads a game: save and load are not in the core spec |
+| sensors-floating-teeth | judged | - |
+| sensors-floating-teeth-los-off | judged | - |
+| sensors-los-off | judged | - |
+| sensors-sonar-jam | judged | - |
+| share-all | judged | - |
+| share-energy | judged | - |
+| share-metal | judged | - |
+| six-hundred-isles | judged | - |
+| six-painted-desert | judged | - |
+| six-yerrot-mountains | judged | - |
+| skirmish2 | judged | - |
+| skirmish4 | judged | - |
+| skirmish4-long | judged | - |
+| ten-lava-run | judged | - |
+| ten-ring-atoll | judged | - |
+| trio-anteer-strait | judged | - |
+| trio-dark-side | judged | - |
+| trio-etorrep-glacier | judged | - |
+| ui-build-menu | left out | has `input` lines: it needs the presentation |
+| ui-build-place | left out | has `input` lines: it needs the presentation |
+| ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-drag-select | left out | has `input` lines: it needs the presentation |
+| ui-groups | left out | has `input` lines: it needs the presentation |
+| ui-keys | left out | has `input` lines: it needs the presentation |
+| ui-left-click-orders | left out | has `input` lines: it needs the presentation |
+| ui-right-click | left out | has `input` lines: it needs the presentation |
+| units-transport | judged | - |
+| units-transport-ship | judged | - |
+
 ## Stored traces and digests
 
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase

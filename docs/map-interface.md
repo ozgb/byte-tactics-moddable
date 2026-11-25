@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 9.0; 9.0 passes the cell of `CanBuildAt` and `CanPlaceUnitFootprint` by pointer), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 9.1; 9.0 passes the cell of `CanBuildAt` and `CanPlaceUnitFootprint` by pointer; 9.1 adds the console's kind SET_SEA_LEVEL), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -28,7 +28,9 @@ REFRESH_PASS_MAP, which map 5.0 removed).
 Map's place in it:
 - **Events into map:** ADD_UNIT, REMOVE_UNIT, CLEAR_UNIT, RECLAIM_FOOTPRINT, SET_YARD, BUCKET_UNLINK, BUCKET_PREPEND
   and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name; and since 7.1
-  LOAD_PATH_LOCK_STAMP, published by units while a saved game loads.
+  LOAD_PATH_LOCK_STAMP, published by units while a saved game loads; and since 9.1 SET_SEA_LEVEL,
+  published by the engine's console (`sealevel`) from `SCHED_ENGINE` through a route that follows the tick's
+  rule (queued inside it, delivered at once outside it), in place of its direct write to the game's sea level.
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
   `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
   it moved from map's files into the same glue, as it is the engine's adapter.
@@ -220,6 +222,7 @@ same update (the `immediate` rows of section 4), and would only move the write.
 | SET_YARD 164 | `MapSetYard` | `open`: 1 to open the yard, 0 to close it |
 | PASS_MAPS 168 | `MapPassMaps` | `cell[2]` (the rectangle's first cell), `size[2]` (width and height in cells) |
 | LOAD_PATH_LOCK_STAMP 169 | `MapPathLockStamp` | `stamp`: the path lock stamp (a tick) a saved game keeps |
+| SET_SEA_LEVEL 170 | `MapSetSeaLevel` | `level`: the sea level, truncated to a byte; names no unit, outcome 1 |
 | CELLS_CHANGED 176 | `MapCellsChanged` | `rect[4]` (left, top, right, bottom), `classes` (a bit for each movement class whose pass maps changed), `cause` (a `PathChange`) |
 
 ## 4. Views

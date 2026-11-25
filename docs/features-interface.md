@@ -1,6 +1,6 @@
 # The features interface
 
-Features sits behind `interfaces/features.h` (version 5.0; 5.0 passes the cell of `GetFootprintCentre` by pointer and writes the centre to an out argument, and makes `FindOrLoadFeatureType`'s name const), the second module on the scheduler after economy
+Features sits behind `interfaces/features.h` (version 5.1; 5.1 adds REMOVE_ALL; 5.0 passes the cell of `GetFootprintCentre` by pointer and writes the centre to an out argument, and makes `FindOrLoadFeatureType`'s name const), the second module on the scheduler after economy
 (`docs/economy-interface.md`), and the first with random draws to keep in order (#954). 3.1c's feature code is its
 default implementation. This page is the inventory the interface was cut from:
 - what other subsystems did to features' state in 3.1c, and what each became;
@@ -18,7 +18,7 @@ data. This issue changes none of its rules. Event kinds are unique across interf
 events of several interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51.
 
 Features' place in it:
-- **Events into features:** PLACE, REMOVE, DAMAGE and RECLAIM, published by units, orders, weapons and the map
+- **Events into features:** PLACE, REMOVE, DAMAGE and RECLAIM, and since 5.1 REMOVE_ALL, published by units, orders, weapons and the map
   loader. Features' handler (`FeaturesInbox`, `src/seams/features_world.cpp`) passes each to `Apply`. Each was
   queued first, and the gate made four routes synchronous (section 8): DAMAGE from weapons, RECLAIM from orders,
   PLACE from units (a corpse), and features' own AREA_DAMAGE to weapons. REMOVE from orders is synchronous by #952's
@@ -55,7 +55,7 @@ That call is the synchronous `Place`, and the velocity is the event's flag SINK,
 
 **Refused intents.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 36) and
 returned to no one: PLACE 1 when the feature took a spot, REMOVE 1 when a feature was removed, DAMAGE 1 when it killed
-the feature, RECLAIM 1 when the unit reclaimed it.
+the feature, RECLAIM 1 when the unit reclaimed it, REMOVE_ALL 1. The console publishes PLACE (`feature`), REMOVE (`burnone`, with `force` 1) and REMOVE_ALL (`burnall`) from `SCHED_ENGINE`, through routes that follow the tick's rule.
 
 Across the 88 scenarios of `reference-traces-v28`, on the routes of section 8 (an instrumented build of this change,
 equal to the reference in every scenario):
@@ -105,6 +105,7 @@ subsystem outside an interface. A reclaim in a multiplayer game still sends its 
 | REMOVE 33 | `FeaturesRemove` | `x`, `z`, `force` (1 to remove even a feature that refuses removal) |
 | DAMAGE 34 | `FeaturesDamage` | `x`, `z` (the cell the feature's footprint starts at), `weapon` |
 | RECLAIM 35 | `FeaturesReclaim` | `unit` (the reclaiming unit, a block offset), `pos[3]` (the feature's position) |
+| REMOVE_ALL 36 | the header alone | none; outcome 1 |
 | FREE_STATE 48 | `FeaturesFreeState` | `state`: the piece state to free, a block offset |
 | INIT_STATE 49 | `FeaturesInitState` | `state` (the piece state, a block offset), `feature` (the type whose model it is built for) |
 | PASS_MAPS 50 | `FeaturesPassMaps` | `x`, `z` (the footprint's first cell), `width`, `height` |

@@ -41,6 +41,15 @@ inline void MapPublishPathLockStamp(int outbox, U* unit, int stamp)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void MapPublishSetSeaLevel(int outbox, int level)
+{
+    MapSetSeaLevel event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_SET_SEA_LEVEL;
+    event.level = level;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class C, class S>
 inline MapPassMaps MapPassMapsOf(C cell, S size)
 {

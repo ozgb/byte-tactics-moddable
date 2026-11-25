@@ -78,6 +78,7 @@ int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int reso
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
 void __stdcall ScheduleUnitsDeliver();
 void __stdcall HarnessWindMeteorsEvent(const void* record, unsigned int size);
+void __stdcall HarnessCommandEvent(const void* event, unsigned int size);
 
 struct FeaturesPlace;
 int __stdcall ScheduleFeaturesPlace(const FeaturesPlace* place);

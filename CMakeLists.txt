@@ -402,6 +402,7 @@ add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
 
 if(ZLIB_SOURCES)
   add_library(files_adapter_objects OBJECT src/files/hpi.cpp src/files/sqsh.cpp src/game/cd_check.cpp src/util/tdf.cpp
+    src/graphics/gaf.cpp src/graphics/blit.cpp src/graphics/pcx.cpp src/util/int_map.cpp
     src/host/win32/files.cpp src/host/win32/threads.cpp src/host/win32/memory.cpp src/host/win32/time.cpp link/data.cpp
     tests/files_adapter.cpp)
   target_include_directories(files_adapter_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")

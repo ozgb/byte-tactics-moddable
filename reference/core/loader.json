@@ -1,0 +1,542 @@
+{"format": 1, "group": "loader", "vectors": [
+ {"name": "manifest_not_json",
+  "calls": [
+   ["manifest", "loader/not_json.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_not_object",
+  "calls": [
+   ["manifest", "loader/not_object.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_missing_field",
+  "calls": [
+   ["manifest", "loader/missing_field.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_negative",
+  "calls": [
+   ["manifest", "loader/negative.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_not_number",
+  "calls": [
+   ["manifest", "loader/not_number.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_zero_pages",
+  "calls": [
+   ["manifest", "loader/zero_pages.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_zero_window",
+  "calls": [
+   ["manifest", "loader/zero_window.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_pages_too_many",
+  "calls": [
+   ["manifest", "loader/pages_too_many.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_scratch_shape",
+  "calls": [
+   ["manifest", "loader/scratch_shape.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_block_half",
+  "calls": [
+   ["manifest", "loader/block_half.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_layout_block",
+  "calls": [
+   ["manifest", "loader/layout_block.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "manifest_layout_block_max",
+  "calls": [
+   ["manifest", "loader/layout_block_max.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "manifest_layout_scratch_memory",
+  "calls": [
+   ["manifest", "loader/layout_scratch_memory.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "manifest_layout_scratch_block",
+  "calls": [
+   ["manifest", "loader/layout_scratch_block.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "manifest_no_modules",
+  "calls": [
+   ["manifest", "loader/no_modules.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": []}]
+  ]},
+ {"name": "manifest_modules_missing",
+  "calls": [
+   ["manifest", "loader/modules_missing.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": []}]
+  ]},
+ {"name": "manifest_no_name",
+  "calls": [
+   ["manifest", "loader/no_name.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": []}]
+  ]},
+ {"name": "manifest_duplicate",
+  "calls": [
+   ["manifest", "loader/duplicate.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_no_data_base",
+  "calls": [
+   ["manifest", "loader/no_data_base.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_no_table_base",
+  "calls": [
+   ["manifest", "loader/no_table_base.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_exports_not_list",
+  "calls": [
+   ["manifest", "loader/exports_not_list.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_data_not_names",
+  "calls": [
+   ["manifest", "loader/data_not_names.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_window_memory",
+  "calls": [
+   ["manifest", "loader/window_memory.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window", "modules": ["b"]}]
+  ]},
+ {"name": "manifest_window_table",
+  "calls": [
+   ["manifest", "loader/window_table.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window", "modules": ["b"]}]
+  ]},
+ {"name": "manifest_reaches_block",
+  "calls": [
+   ["manifest", "loader/reaches_block.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window_reaches", "modules": ["b"]}]
+  ]},
+ {"name": "manifest_reaches_scratch",
+  "calls": [
+   ["manifest", "loader/reaches_scratch.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window_reaches", "modules": ["b"]}]
+  ]},
+ {"name": "manifest_overlap",
+  "calls": [
+   ["manifest", "loader/overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "overlap", "modules": ["a", "b"]}]
+  ]},
+ {"name": "manifest_overlap_table",
+  "calls": [
+   ["manifest", "loader/overlap_table.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "overlap", "modules": ["a", "b"]}]
+  ]},
+ {"name": "manifest_ok",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null]
+  ]},
+ {"name": "not_in_manifest",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "zz", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "not_in_manifest", "modules": ["zz"]}]
+  ]},
+ {"name": "loaded_twice",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["load", {"error": "loaded_twice", "modules": ["a"]}]
+  ]},
+ {"name": "no_memory",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["load", {"error": "no_memory", "modules": ["a"]}]
+  ]},
+ {"name": "compile",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/compile.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "compile", "modules": ["a"]}]
+  ]},
+ {"name": "instantiate_bad_import",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/bad_import.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "instantiate_bad_type",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/bad_type.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "instantiate_bad_min",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/bad_min.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "instantiate_bad_max",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/bad_max.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "instantiate_bad_table",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/bad_table.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "export_func",
+  "calls": [
+   ["manifest", "loader/export_func.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "export", "modules": ["a"]}]
+  ]},
+ {"name": "export_global",
+  "calls": [
+   ["manifest", "loader/export_global.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "export", "modules": ["a"]}]
+  ]},
+ {"name": "export_data_func",
+  "calls": [
+   ["manifest", "loader/export_data_func.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "export", "modules": ["a"]}]
+  ]},
+ {"name": "export_data",
+  "calls": [
+   ["manifest", "loader/export_data.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "export", "modules": ["a"]}]
+  ]},
+ {"name": "trap_unreachable",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_unreachable"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "unreachable", "modules": ["a"]}]
+  ]},
+ {"name": "trap_memory",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_memory"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "memory_access", "modules": ["a"]}]
+  ]},
+ {"name": "trap_divide",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_divide", "7", "2"],
+   ["call", "a", "trap_divide", "7", "0"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"result": 3}],
+   ["call", {"error": "divide", "modules": ["a"]}]
+  ]},
+ {"name": "trap_overflow",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_overflow"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "divide", "modules": ["a"]}]
+  ]},
+ {"name": "trap_table_empty",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_table", "5"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "table", "modules": ["a"]}]
+  ]},
+ {"name": "trap_table_type",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_table", "1"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "table", "modules": ["a"]}]
+  ]},
+ {"name": "trap_table_range",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_table", "100"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "table", "modules": ["a"]}]
+  ]},
+ {"name": "trap_stack",
+  "calls": [
+   ["manifest", "loader/traps.json"],
+   ["memory"],
+   ["load", "a", "loader/traps.wasm"],
+   ["call", "a", "ok"],
+   ["call", "a", "trap_stack"],
+   ["call", "a", "ok"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 5}],
+   ["call", {"error": "stack", "modules": ["a"]}]
+  ]},
+ {"name": "clean",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["load", "b", "loader/other.wasm"],
+   ["word", "4112"],
+   ["word", "8208"],
+   ["word", "8196"],
+   ["call", "a", "add", "40", "2"],
+   ["call", "a", "add", "-5", "2"],
+   ["call", "a", "add", "2147483647", "1"],
+   ["call", "a", "store", "8196", "99"],
+   ["word", "8196"],
+   ["call", "a", "load", "8196"],
+   ["call", "a", "noop"],
+   ["call", "b", "add", "1", "2"],
+   ["call", "b", "load", "8208"],
+   ["tick"],
+   ["call", "a", "load", "4112"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["load", null],
+   ["word", 7],
+   ["word", 11],
+   ["word", 0],
+   ["call", {"result": 42}],
+   ["call", {"result": -3}],
+   ["call", {"result": -2147483648}],
+   ["call", {"result": null}],
+   ["word", 99],
+   ["call", {"result": 99}],
+   ["call", {"result": null}],
+   ["call", {"result": 3}],
+   ["call", {"result": 11}],
+   ["tick", null],
+   ["call", {"result": 7}]
+  ]},
+ {"name": "window_zeroed",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["call", "a", "store", "8200", "1234"],
+   ["word", "8200"],
+   ["load", "b", "loader/other.wasm"],
+   ["word", "8200"],
+   ["word", "8208"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": null}],
+   ["word", 1234],
+   ["load", null],
+   ["word", 0],
+   ["word", 11]
+  ]}
+]}

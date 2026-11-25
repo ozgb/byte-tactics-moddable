@@ -183,6 +183,9 @@ CONTENTS = [
     ("file", "docs/files-gate.md", "the files gate: the commands a data loader answers and the files it writes"),
     ("file", "tools/filesfixtures.py", "builds the fixture game directories of the files gate, standard library only"),
     ("dir", "reference/files", "the files gate's vectors and the digests of its fixtures"),
+    ("file", "docs/core-gate.md", "the core gate: the calls an engine core answers in each group, and how a core is judged"),
+    ("file", "tools/corefixtures.py", "builds the WebAssembly fixtures of the core gate's loader and fuel groups, standard library and wasm-tools only"),
+    ("dir", "reference/core", "the core gate's vectors and their inputs"),
 ]
 
 ROLES = {

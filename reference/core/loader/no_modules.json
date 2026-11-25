@@ -1,0 +1,14 @@
+{
+ "memory_pages": 4,
+ "table_size": 16,
+ "window": 4096,
+ "table_slots": 4,
+ "stack_size": 1024,
+ "block_base": 196608,
+ "block_size": 65536,
+ "scratch": [
+  131072,
+  65536
+ ],
+ "modules": []
+}

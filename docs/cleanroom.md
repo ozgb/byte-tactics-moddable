@@ -113,6 +113,14 @@ command by `--secret-env` and never written to disk (see Credentials).
   run that writes no usable result (or one over 1 MiB, or not a JSON object) answers with an `error` and no log text.
   The result is the one of `docs/module-abi.md` section 15: `verdict` `equal` when every scenario and recording is
   equal.
+  A core request is `/srv/outbox/ID/core` (an x86_64 Linux executable), `/srv/outbox/ID/module.wasm` (its
+  wind_meteors module) and `ready`. The broker opens the files the same way and checks that the core has the ELF magic and
+  is at most 256 MiB, and that the module has the wasm magic. A request with both `core` and `subsystem` is refused. It
+  runs `tools/coregate.py CORE --module MODULE --sandbox IMAGE --out DIR` in `SESSION/gate/ID/` on the host, where `IMAGE`
+  is the broker's `--core-image` (`serve` and `once`; `launch.py` passes the session's image). The core runs only inside a microVM of that image that
+  `tools/cleanroom/coresandbox.py` starts: no network, one host directory mounted read-write at the same path, and the
+  same share rules as a session mount. Only `out/result.json` crosses, as `inbox/ID.json` with `"gate": "coregate"`.
+  Without `--core-image` a core request is answered with an `error` saying the core gate is not configured.
 
 ## Credentials
 

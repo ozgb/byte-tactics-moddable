@@ -1,0 +1,32 @@
+[
+ {
+  "name": "console-features",
+  "calls": [
+   [
+    "replay",
+    "host/console-features.txt",
+    "module.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "meteors-earthquake",
+  "calls": [
+   [
+    "replay",
+    "host/meteors-earthquake.txt",
+    "module.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "meteors-hailstorm",
+  "calls": [
+   [
+    "replay",
+    "host/meteors-hailstorm.txt",
+    "module.wasm"
+   ]
+  ]
+ }
+]

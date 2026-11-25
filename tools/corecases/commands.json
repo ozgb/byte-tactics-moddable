@@ -1,0 +1,83 @@
+[
+ {
+  "name": "orders-attack-nomove",
+  "calls": [
+   [
+    "deliver",
+    "commands/orders-attack-nomove.txt"
+   ]
+  ]
+ },
+ {
+  "name": "edges-economy-targeting",
+  "calls": [
+   [
+    "deliver",
+    "commands/edges-economy-targeting.txt"
+   ]
+  ]
+ },
+ {
+  "name": "sensors-sonar-jam",
+  "calls": [
+   [
+    "deliver",
+    "commands/sensors-sonar-jam.txt"
+   ]
+  ]
+ },
+ {
+  "name": "console-iwin",
+  "calls": [
+   [
+    "deliver",
+    "commands/console-iwin.txt"
+   ]
+  ]
+ },
+ {
+  "name": "orders-immediate",
+  "calls": [
+   [
+    "deliver",
+    "commands/orders-immediate.txt"
+   ]
+  ]
+ },
+ {
+  "name": "share-metal",
+  "calls": [
+   [
+    "deliver",
+    "commands/share-metal.txt"
+   ]
+  ]
+ },
+ {
+  "name": "edges-economy-targeting-reversed",
+  "calls": [
+   [
+    "deliver",
+    "commands/edges-economy-targeting-reversed.txt"
+   ]
+  ]
+ },
+ {
+  "name": "orders-immediate-reversed",
+  "calls": [
+   [
+    "deliver",
+    "commands/orders-immediate-reversed.txt"
+   ]
+  ]
+ },
+ {
+  "name": "console-iwin-reversed",
+  "calls": [
+   [
+    "deliver",
+    "commands/console-iwin-reversed.txt"
+   ]
+  ]
+ }
+]

@@ -333,11 +333,13 @@ def remove_canary(name, runner=run):
     return runner(exec_in(name, ["test", "!", "-e", CANARY_DIR])).returncode
 
 
-def broker_argv(session, game_dir=None):
-    """Return the argv that starts broker.py for this session, with --game-dir when given."""
+def broker_argv(session, game_dir=None, core_image=None):
+    """Return the argv that starts broker.py for this session, with --game-dir and --core-image when given."""
     argv = [sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]
     if game_dir:
         argv += ["--game-dir", str(game_dir)]
+    if core_image:
+        argv += ["--core-image", str(core_image)]
     return argv
 
 
@@ -389,7 +391,7 @@ def start_session(args):
         procs.append(proxy)
         if not wait_for(sock):
             raise RuntimeError("the proxy did not start")
-        procs.append(subprocess.Popen(broker_argv(session, args.game_dir)))
+        procs.append(subprocess.Popen(broker_argv(session, args.game_dir, image)))
         if run(argv).returncode:
             raise RuntimeError("machine create failed")
         created = True

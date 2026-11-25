@@ -2897,10 +2897,10 @@ class CStrings(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
 
-    def test_the_real_schema_has_it_only_for_the_mission_names_and_the_order_table(self):
+    def test_the_real_schema_has_it_only_for_the_mission_names_the_order_table_and_damage_tables(self):
         real = json.loads(rs.JSON_OUT.read_text())["annotations"]["objects"]
         users = {k for k, v in real.items() if any(f["kind"] == "cstring" for f in v["fields"])}
-        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo", "OrderEntry"})
+        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo", "OrderEntry", "DamageTableEntry"})
 
     def test_a_walk_never_follows_a_string(self):
         for kind in ("cstring", "cstringref", "cstrings"):
@@ -3181,7 +3181,7 @@ class EventForms(unittest.TestCase):
         body = hooks[hooks.index("RecWeaponsApply"):]
         body = body[:body.index("\n}\n")]
         unrecorded = rs.load_annotations()["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
-        self.assertEqual(set(unrecorded), {"WEAPONS_DETONATE", "WEAPONS_EXPLODE_PIECE", "WEAPONS_AREA_DAMAGE", "WEAPONS_SPAWN", "WEAPONS_REMOVE_PROJECTILES"})
+        self.assertEqual(set(unrecorded), {"WEAPONS_EXPLODE_PIECE"})
         guard = body.index("if (a0 != nullptr && a1 >= sizeof(*a0) && (")
         self.assertLess(guard, body.index("ReplayRoots roots;"))
         for name in unrecorded:

@@ -485,7 +485,7 @@ class Instance:
         self.base.mkdir(parents=True, exist_ok=True)
         link_prefix(template, self.prefix)
         copy_game(game_src, self.game)
-        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", *self.run.recordings()):
+        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", "commands.txt", *self.run.recordings()):
             (self.game / stale).unlink(missing_ok=True)
         shutil.rmtree(self.game / "frames", ignore_errors=True)
         for dest, _ in self.run.put:
@@ -817,7 +817,7 @@ class Instance:
                     self.run.notes.append(f"{name}: {self.run.out / name}")
         if not self.run.testmode:
             return
-        for name in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", CRASH_FILE):
+        for name in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", "commands.txt", CRASH_FILE):
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")

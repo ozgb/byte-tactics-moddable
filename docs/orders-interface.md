@@ -1,6 +1,6 @@
 # The orders interface
 
-Orders sits behind `interfaces/orders.h` (version 6.0; 6.0 returns the order kind of `GetOrderType` and `MissionTypeFromName` as its index, an `int`), the ninth module on the scheduler after economy
+Orders sits behind `interfaces/orders.h` (version 6.1; 6.1 adds CANCEL; 6.0 returns the order kind of `GetOrderType` and `MissionTypeFromName` as its index, an `int`), the ninth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`), players (`docs/players-interface.md`), ai
 (`docs/ai-interface.md`) and weapons (`docs/weapons-interface.md`), and the tenth with movement
@@ -36,7 +36,7 @@ Two rulings of the human shape this change:
   3.0 take pointers out of their events and slots: a unit, an order, a target or a reference is its block offset.
 
 Orders' place in it:
-- **Events into orders:** ADD, QUEUE_BUILD, STOP, BE_CARRIED, STATUS_FLAGS, ATTACKED, PARALYZE and COMMAND, published by
+- **Events into orders:** ADD, QUEUE_BUILD, STOP, BE_CARRIED, STATUS_FLAGS, ATTACKED, PARALYZE, COMMAND and, since 6.1, CANCEL, published by
   units, ai, weapons, movement and the engine (the UI, the console and the harness). Orders' handler (`OrdersInbox`,
   `src/seams/orders_world.cpp`) passes each to `Apply` and records it with its outcome in the trace's dump (section
   5). Ai's effects ADD_ORDER, QUEUE_BUILD and STOP, weapons' ATTACKED and PARALYZE and movement's ORDER_FLAGS reach it
@@ -135,6 +135,7 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | STATUS_FLAGS 292 | `OrdersStatusFlags` | `order` (a block offset), `flags` |
 | ATTACKED 293 | `OrdersAttacked` | `attacker` (a block offset, 0 for none) |
 | PARALYZE 294 | `OrdersParalyze` | `ticks` |
+| CANCEL 296 | `OrdersCancel` | `type`: the order type (a byte) whose first order in the unit's list is deleted; outcome 1, or 0 when the unit has none |
 
 ## 3. Effects out of orders
 

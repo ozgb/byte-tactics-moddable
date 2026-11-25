@@ -24,6 +24,7 @@
 #include "unit_ref.h"
 #include "sfx_occupy.h"
 #include "units.h"
+#include "unit_types.h"
 #include "units_seam.h"
 
 #include "../../link/globals.h"
@@ -39,7 +40,7 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 static int KnownKind(int kind)
 {
-    return (kind >= UNITS_SET_STATE_BITS && kind <= UNITS_CHANGE_CELL) || (kind >= UNITS_SET_MOVED && kind <= UNITS_CAPTURE);
+    return (kind >= UNITS_SET_STATE_BITS && kind <= UNITS_CHANGE_CELL) || (kind >= UNITS_SET_MOVED && kind <= UNITS_RELOAD_TYPE);
 }
 
 static void UnitsApplyAttackedSpeech(Unit* unit)
@@ -134,6 +135,25 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
             return 0;
         ref.get()->Unlink();
         return 1;
+    }
+    switch (e->kind) {
+    case UNITS_CREATE: {
+        const UnitsCreate* p = reinterpret_cast<const UnitsCreate*>(e);
+        Vec3 pos;
+        pos.x = p->pos[0];
+        pos.y = p->pos[1];
+        pos.z = p->pos[2];
+        return CreateUnit((unsigned char)p->player, (unsigned short)p->type, pos, 1, 1, 0) != nullptr;
+    }
+    case UNITS_KILL_ALL:
+        KillAllUnits();
+        return 1;
+    case UNITS_RELOAD_TYPE: {
+        const UnitsReloadType* p = reinterpret_cast<const UnitsReloadType*>(e);
+        KillUnitsOfType((short)p->type);
+        ReloadUnitType((unsigned short)p->type);
+        return 1;
+    }
     }
     Unit* unit = UnitOfOffset(e->unit);
     if (unit == nullptr)

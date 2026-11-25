@@ -16,7 +16,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 7
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 0
+#define UNITS_VERSION_MINOR 1
 
 // The fields every units event starts with.
 struct UnitsEventHeader {
@@ -26,7 +26,7 @@ struct UnitsEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 394); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference), names a player outside 0 to 9 (SEND, CAPTURE), or its kind is unknown.
+// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 397); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference, and CREATE, KILL_ALL and RELOAD_TYPE, which name none), names a player outside 0 to 9 (SEND, CAPTURE), or its kind is unknown.
 enum UnitsEventKind {
     // unit's state bits under a mask are set or cleared, which starts the scripts that announce the change (UnitsSetStateBits); outcome 1.
     UNITS_SET_STATE_BITS = 352,
@@ -81,7 +81,13 @@ enum UnitsEventKind {
     // unit is sent to another player (UnitsSend); outcome 1.
     UNITS_SEND = 393,
     // unit is captured by another player, who gets a copy of it (UnitsCapture); outcome 1, or 0 when no copy could be made. Hooks: UnitCreated.
-    UNITS_CAPTURE = 394
+    UNITS_CAPTURE = 394,
+    // A unit of a type is created for a player at a position, finished and placed as the console creates it (UnitsCreate); outcome 1 when a unit was made, 0 when none was.
+    UNITS_CREATE = 395,
+    // Every unit that exists is killed, one by one in the order of the unit table; the header alone; outcome 1.
+    UNITS_KILL_ALL = 396,
+    // Every unit of a type is killed and the definition of the type is loaded again (UnitsReloadType); outcome 1.
+    UNITS_RELOAD_TYPE = 397
 };
 
 // The payload of SET_STATE_BITS.
@@ -316,6 +322,26 @@ struct UnitsKill {
     UnitsEventHeader h;
     // 1 when the unit self-destructs, 0 when its player kills it.
     int selfDestruct;
+};
+
+// The payload of CREATE.
+struct UnitsCreate {
+    // The kind; the unit is 0.
+    UnitsEventHeader h;
+    // The index of the player who owns the unit, truncated to a byte.
+    int player;
+    // The unit type, by its number in the match's table of unit types, truncated to 16 bits.
+    int type;
+    // The position, in world coordinates with 16 fractional bits: x, y and z.
+    int pos[3];
+};
+
+// The payload of RELOAD_TYPE.
+struct UnitsReloadType {
+    // The kind; the unit is 0.
+    UnitsEventHeader h;
+    // The unit type, by its number in the match's table of unit types.
+    int type;
 };
 
 // The payload of SEND.

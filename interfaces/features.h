@@ -11,7 +11,7 @@ class HapiBank;
 // Major version of the features interface, changed when a slot is removed or its signature changes.
 #define FEATURES_VERSION_MAJOR 5
 // Minor version of the features interface, changed when a slot is added.
-#define FEATURES_VERSION_MINOR 0
+#define FEATURES_VERSION_MINOR 1
 
 // The field every features event and effect starts with.
 struct FeaturesEventHeader {
@@ -28,7 +28,9 @@ enum FeaturesEventKind {
     // A weapon hits the feature whose footprint starts at a cell, which may kill it or set it alight (FeaturesDamage); outcome 1 when the feature was killed.
     FEATURES_DAMAGE = 34,
     // A unit reclaims the feature at a position (FeaturesReclaim); outcome 1 when it did, and the feature's energy and metal go to the unit's account as income.
-    FEATURES_RECLAIM = 35
+    FEATURES_RECLAIM = 35,
+    // Removes every feature of the map, even those that refuse removal; the header alone; outcome 1.
+    FEATURES_REMOVE_ALL = 36
 };
 
 // The kinds of effect features publishes to its outbox, for the modules that subscribe to them.

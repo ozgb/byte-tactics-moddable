@@ -24,6 +24,7 @@ struct UnitDef;
 #include "../../interfaces/seams.h"
 
 #include "../network/player.h"
+#include "../network/player_info.h"
 
 #include "game.h"
 #include "los_helpers.h"
@@ -120,6 +121,43 @@ int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
             return TransferEnergy((unsigned char)e->from, (unsigned char)e->to, e->amount, e->announce);
         return 0;
     }
+    case PLAYERS_SET_STORE: {
+        const PlayersSetStore* e = reinterpret_cast<const PlayersSetStore*>(event);
+        if ((unsigned)e->player > 9 || (e->resource != 0 && e->resource != 1))
+            return 0;
+        Player* p = &g_game->players[e->player];
+        float* store = e->resource == 0 ? &p->energy : &p->metal;
+        if (e->add)
+            *store += e->amount;
+        else
+            *store = e->amount;
+        return 1;
+    }
+    case PLAYERS_SET_TYPE: {
+        const PlayersSetType* e = reinterpret_cast<const PlayersSetType*>(event);
+        if ((unsigned)e->player > 9)
+            return 0;
+        Player* p = &g_game->players[e->player];
+        p->type = (unsigned char)e->type;
+        if (e->type != 3)
+            p->info->kind = (char)e->type;
+        return 1;
+    }
+    case PLAYERS_END_GAME: {
+        const PlayersEndGame* e = reinterpret_cast<const PlayersEndGame*>(event);
+        if (e->victory != 0 && e->victory != 1)
+            return 0;
+        g_game->endGameVictory = e->victory;
+        if (e->victory == 1)
+            g_game->bits.flag5 = 1;
+        else
+            g_game->bits.flag6 = 1;
+        g_game->bits.flag2 = 1;
+        return 1;
+    }
+    case PLAYERS_DEACTIVATE_CONDITIONS:
+        g_game->list_391ed->Deactivate();
+        return 1;
     }
     return 0;
 }

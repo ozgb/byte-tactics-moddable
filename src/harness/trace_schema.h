@@ -1433,6 +1433,11 @@ static const TraceField kEventFeaturesReclaim[] = {
     { "pos", offsetof(FeaturesReclaim, pos), 12, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(FeaturesEventHeader) == 4, "FeaturesEventHeader");
+static const TraceField kEventFeaturesRemoveAll[] = {
+    { "kind", offsetof(FeaturesEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(FeaturesFreeState) == 8, "FeaturesFreeState");
 static const TraceField kEventFeaturesEffectFreeState[] = {
     { "kind", offsetof(FeaturesFreeState, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1467,12 +1472,13 @@ static const TraceEventKind kFeaturesKinds[] = {
     { 33, "FEATURES_REMOVE", sizeof(FeaturesRemove), kEventFeaturesRemove, 5 },
     { 34, "FEATURES_DAMAGE", sizeof(FeaturesDamage), kEventFeaturesDamage, 5 },
     { 35, "FEATURES_RECLAIM", sizeof(FeaturesReclaim), kEventFeaturesReclaim, 4 },
+    { 36, "FEATURES_REMOVE_ALL", sizeof(FeaturesEventHeader), kEventFeaturesRemoveAll, 2 },
     { 48, "FEATURES_EFFECT_FREE_STATE", sizeof(FeaturesFreeState), kEventFeaturesEffectFreeState, 3 },
     { 49, "FEATURES_EFFECT_INIT_STATE", sizeof(FeaturesInitState), kEventFeaturesEffectInitState, 4 },
     { 50, "FEATURES_EFFECT_PASS_MAPS", sizeof(FeaturesPassMaps), kEventFeaturesEffectPassMaps, 6 },
     { 51, "FEATURES_EFFECT_AREA_DAMAGE", sizeof(FeaturesAreaDamage), kEventFeaturesEffectAreaDamage, 4 },
 };
-static const TraceEventModule kFeaturesEvents = { "features", 36, kFeaturesKinds, 8 };
+static const TraceEventModule kFeaturesEvents = { "features", 36, kFeaturesKinds, 9 };
 
 static_assert(sizeof(WindMeteorsEventHeader) == 4, "WindMeteorsEventHeader");
 static const TraceField kEventWindMeteorsEnable[] = {
@@ -1722,6 +1728,13 @@ static const TraceField kEventMapLoadPathLockStamp[] = {
     { "stamp", offsetof(MapPathLockStamp, stamp), 4, TF_SCALAR, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(MapSetSeaLevel) == 12, "MapSetSeaLevel");
+static const TraceField kEventMapSetSeaLevel[] = {
+    { "kind", offsetof(MapSetSeaLevel, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapSetSeaLevel, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "level", offsetof(MapSetSeaLevel, level), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(MapCellsChanged) == 32, "MapCellsChanged");
 static const TraceField kEventMapEffectCellsChanged[] = {
     { "kind", offsetof(MapCellsChanged, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1741,9 +1754,10 @@ static const TraceEventKind kMapKinds[] = {
     { 166, "MAP_BUCKET_PREPEND", sizeof(MapEventHeader), kEventMapBucketPrepend, 3 },
     { 168, "MAP_PASS_MAPS", sizeof(MapPassMaps), kEventMapPassMaps, 5 },
     { 169, "MAP_LOAD_PATH_LOCK_STAMP", sizeof(MapPathLockStamp), kEventMapLoadPathLockStamp, 4 },
+    { 170, "MAP_SET_SEA_LEVEL", sizeof(MapSetSeaLevel), kEventMapSetSeaLevel, 4 },
     { 176, "MAP_EFFECT_CELLS_CHANGED", sizeof(MapCellsChanged), kEventMapEffectCellsChanged, 6 },
 };
-static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 10 };
+static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 11 };
 
 static_assert(sizeof(PlayersGiveUnit) == 48, "PlayersGiveUnit");
 static const TraceField kEventPlayersGiveUnit[] = {
@@ -1787,6 +1801,37 @@ static const TraceField kEventPlayersTransfer[] = {
     { "announce", offsetof(PlayersTransfer, announce), 4, TF_SCALAR, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(PlayersSetStore) == 24, "PlayersSetStore");
+static const TraceField kEventPlayersSetStore[] = {
+    { "kind", offsetof(PlayersSetStore, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersSetStore, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersSetStore, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "resource", offsetof(PlayersSetStore, resource), 4, TF_SCALAR, TT_NONE, 0 },
+    { "add", offsetof(PlayersSetStore, add), 4, TF_SCALAR, TT_NONE, 0 },
+    { "amount", offsetof(PlayersSetStore, amount), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersSetType) == 16, "PlayersSetType");
+static const TraceField kEventPlayersSetType[] = {
+    { "kind", offsetof(PlayersSetType, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersSetType, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersSetType, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "type", offsetof(PlayersSetType, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersEndGame) == 12, "PlayersEndGame");
+static const TraceField kEventPlayersEndGame[] = {
+    { "kind", offsetof(PlayersEndGame, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersEndGame, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "victory", offsetof(PlayersEndGame, victory), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersEventHeader) == 8, "PlayersEventHeader");
+static const TraceField kEventPlayersDeactivateConditions[] = {
+    { "kind", offsetof(PlayersEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(PlayersKillUnit) == 12, "PlayersKillUnit");
 static const TraceField kEventPlayersEffectKillUnit[] = {
     { "kind", offsetof(PlayersKillUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1819,11 +1864,15 @@ static const TraceEventKind kPlayersKinds[] = {
     { 194, "PLAYERS_UNIT_CREATED", sizeof(PlayersEventHeader), kEventPlayersUnitCreated, 3 },
     { 195, "PLAYERS_UNIT_DIED", sizeof(PlayersEventHeader), kEventPlayersUnitDied, 3 },
     { 196, "PLAYERS_TRANSFER", sizeof(PlayersTransfer), kEventPlayersTransfer, 8 },
+    { 197, "PLAYERS_SET_STORE", sizeof(PlayersSetStore), kEventPlayersSetStore, 7 },
+    { 198, "PLAYERS_SET_TYPE", sizeof(PlayersSetType), kEventPlayersSetType, 5 },
+    { 199, "PLAYERS_END_GAME", sizeof(PlayersEndGame), kEventPlayersEndGame, 4 },
+    { 200, "PLAYERS_DEACTIVATE_CONDITIONS", sizeof(PlayersEventHeader), kEventPlayersDeactivateConditions, 3 },
     { 208, "PLAYERS_EFFECT_KILL_UNIT", sizeof(PlayersKillUnit), kEventPlayersEffectKillUnit, 4 },
     { 209, "PLAYERS_EFFECT_SEND_UNIT", sizeof(PlayersSendUnit), kEventPlayersEffectSendUnit, 4 },
     { 210, "PLAYERS_EFFECT_CAPTURE_UNIT", sizeof(PlayersCaptureUnit), kEventPlayersEffectCaptureUnit, 9 },
 };
-static const TraceEventModule kPlayersEvents = { "playersEvents", 41, kPlayersKinds, 8 };
+static const TraceEventModule kPlayersEvents = { "playersEvents", 41, kPlayersKinds, 12 };
 
 static_assert(sizeof(AiReactToAttack) == 16, "AiReactToAttack");
 static const TraceField kEventAiReactToAttack[] = {
@@ -2209,6 +2258,13 @@ static const TraceField kEventOrdersCommand[] = {
     { "params", offsetof(OrdersAdd, params), 8, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(OrdersCancel) == 12, "OrdersCancel");
+static const TraceField kEventOrdersCancel[] = {
+    { "kind", offsetof(OrdersCancel, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(OrdersCancel, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "order", offsetof(OrdersCancel, order), 4, TF_HANDLE, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(OrdersSetStateBits) == 16, "OrdersSetStateBits");
 static const TraceField kEventOrdersEffectSetStateBits[] = {
     { "kind", offsetof(OrdersSetStateBits, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -2334,6 +2390,7 @@ static const TraceEventKind kOrdersKinds[] = {
     { 293, "ORDERS_ATTACKED", sizeof(OrdersAttacked), kEventOrdersAttacked, 4 },
     { 294, "ORDERS_PARALYZE", sizeof(OrdersParalyze), kEventOrdersParalyze, 4 },
     { 295, "ORDERS_COMMAND", sizeof(OrdersAdd), kEventOrdersCommand, 9 },
+    { 296, "ORDERS_CANCEL", sizeof(OrdersCancel), kEventOrdersCancel, 4 },
     { 304, "ORDERS_EFFECT_SET_STATE_BITS", sizeof(OrdersSetStateBits), kEventOrdersEffectSetStateBits, 5 },
     { 305, "ORDERS_EFFECT_SET_POSITION", sizeof(OrdersSetPosition), kEventOrdersEffectSetPosition, 5 },
     { 306, "ORDERS_EFFECT_ATTACH_TO_PIECE", sizeof(OrdersAttachToPiece), kEventOrdersEffectAttachToPiece, 6 },
@@ -2349,7 +2406,7 @@ static const TraceEventKind kOrdersKinds[] = {
     { 316, "ORDERS_EFFECT_SET_ANGLES", sizeof(OrdersSetAngles), kEventOrdersEffectSetAngles, 6 },
     { 317, "ORDERS_EFFECT_SET_BUILD_STATE", sizeof(OrdersSetBuildState), kEventOrdersEffectSetBuildState, 5 },
 };
-static const TraceEventModule kOrdersEvents = { "ordersEvents", 48, kOrdersKinds, 22 };
+static const TraceEventModule kOrdersEvents = { "ordersEvents", 48, kOrdersKinds, 23 };
 
 static_assert(sizeof(MovementEventHeader) == 8, "MovementEventHeader");
 static const TraceField kEventMovementNew[] = {
@@ -2757,6 +2814,28 @@ static const TraceField kEventUnitsCapture[] = {
     { "stockpiles", offsetof(UnitsCapture, stockpiles), 12, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(UnitsCreate) == 28, "UnitsCreate");
+static const TraceField kEventUnitsCreate[] = {
+    { "kind", offsetof(UnitsCreate, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsCreate, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(UnitsCreate, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "type", offsetof(UnitsCreate, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "pos", offsetof(UnitsCreate, pos), 12, TF_BYTES, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsEventHeader) == 8, "UnitsEventHeader");
+static const TraceField kEventUnitsKillAll[] = {
+    { "kind", offsetof(UnitsEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(UnitsReloadType) == 12, "UnitsReloadType");
+static const TraceField kEventUnitsReloadType[] = {
+    { "kind", offsetof(UnitsReloadType, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(UnitsReloadType, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "type", offsetof(UnitsReloadType, type), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static const TraceEventKind kUnitsKinds[] = {
     { 352, "UNITS_SET_STATE_BITS", sizeof(UnitsSetStateBits), kEventUnitsSetStateBits, 5 },
     { 353, "UNITS_SET_FLAGS", sizeof(UnitsSetFlags), kEventUnitsSetFlags, 5 },
@@ -2785,8 +2864,11 @@ static const TraceEventKind kUnitsKinds[] = {
     { 392, "UNITS_KILL", sizeof(UnitsKill), kEventUnitsKill, 4 },
     { 393, "UNITS_SEND", sizeof(UnitsSend), kEventUnitsSend, 4 },
     { 394, "UNITS_CAPTURE", sizeof(UnitsCapture), kEventUnitsCapture, 9 },
+    { 395, "UNITS_CREATE", sizeof(UnitsCreate), kEventUnitsCreate, 6 },
+    { 396, "UNITS_KILL_ALL", sizeof(UnitsEventHeader), kEventUnitsKillAll, 3 },
+    { 397, "UNITS_RELOAD_TYPE", sizeof(UnitsReloadType), kEventUnitsReloadType, 4 },
 };
-static const TraceEventModule kUnitsEvents = { "unitsEvents", 50, kUnitsKinds, 27 };
+static const TraceEventModule kUnitsEvents = { "unitsEvents", 50, kUnitsKinds, 30 };
 
 static_assert(sizeof(ScriptsStart) == 76, "ScriptsStart");
 static const TraceField kEventScriptsStart[] = {

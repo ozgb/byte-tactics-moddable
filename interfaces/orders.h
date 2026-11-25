@@ -9,7 +9,7 @@ struct StateWriter;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 6
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 0
+#define ORDERS_VERSION_MINOR 1
 
 // Order flag: the order has a target unit.
 #define ORDER_FLAG_TARGET 0x200
@@ -49,7 +49,9 @@ enum OrdersEventKind {
     // unit is paralysed for more ticks (OrdersParalyze): when its first order is a paralysis, that order lasts longer, else a paralysis order is added after its orders; outcome 1.
     ORDERS_PARALYZE = 294,
     // The player commands unit (OrdersAdd): with queue 1, an order of the same type against the same target, at the same position give or take 16 world units, is deleted from unit's orders when it has one, and is otherwise added as ADD adds it; outcome 1. Hooks: AllowCommand.
-    ORDERS_COMMAND = 295
+    ORDERS_COMMAND = 295,
+    // unit's first order of an order type is deleted (OrdersCancel); outcome 1, or 0 when it has none.
+    ORDERS_CANCEL = 296
 };
 
 // The kinds of effect orders publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
@@ -118,6 +120,14 @@ struct OrdersStop {
     OrdersEventHeader h;
     // 1 to delete every order, 0 only the ones not marked to stay.
     int all;
+};
+
+// The payload of CANCEL.
+struct OrdersCancel {
+    // The kind and the unit.
+    OrdersEventHeader h;
+    // The order type, as GetOrderType returns it, truncated to a byte.
+    int order;
 };
 
 // The payload of STATUS_FLAGS.

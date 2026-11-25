@@ -1475,6 +1475,9 @@ int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size)
         RefreshAllPassMaps(MapPoint(e->cell), MapPoint(e->size));
         return 1;
     }
+    case MAP_SET_SEA_LEVEL:
+        g_game->seaLevel = reinterpret_cast<const MapSetSeaLevel*>(event)->level;
+        return 1;
     }
     Unit* unit = MapUnitOfHandle(event->unit);
     if (!unit)

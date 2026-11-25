@@ -49,6 +49,16 @@ inline void OrdersPublishAdd(int outbox, int kind, Unit* unit, int type, int que
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+template <class U>
+inline void OrdersPublishCancel(int outbox, U* unit, int order)
+{
+    OrdersCancel event;
+    memset(&event, 0, sizeof(event));
+    event.h = OrdersHeaderOf(ORDERS_CANCEL, unit);
+    event.order = order;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void OrdersPublishQueueBuild(int outbox, Unit* unit, const char* name, int count)
 {
     OrdersQueueBuild event;

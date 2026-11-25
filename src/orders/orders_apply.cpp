@@ -29,6 +29,9 @@
 
 #include "../../link/globals.h"
 
+Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind);
+void __stdcall DeleteOrder(Unit* owner, Order* node);
+
 static const float kZeroFloat = 0.0f;
 
 static Unit* UnitOfOffset(unsigned int offset)
@@ -40,7 +43,7 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 static int KnownKind(int kind)
 {
-    return kind >= ORDERS_ADD && kind <= ORDERS_COMMAND;
+    return kind >= ORDERS_ADD && kind <= ORDERS_CANCEL;
 }
 
 static void Attacked(Unit* unit, unsigned int attackerOffset)
@@ -125,6 +128,13 @@ int __stdcall OrdersApply(const OrdersEventHeader* e, unsigned int size)
         name[sizeof(name) - 1] = 0;
         QueueBuildOrder(name, unit, p->count);
         break;
+    }
+    case ORDERS_CANCEL: {
+        Order* order = FindOrderByType(unit, (unsigned char)reinterpret_cast<const OrdersCancel*>(e)->order);
+        if (order == nullptr)
+            return 0;
+        DeleteOrder(unit, order);
+        return 1;
     }
     case ORDERS_STOP:
         DeleteOrders(unit, reinterpret_cast<const OrdersStop*>(e)->all);

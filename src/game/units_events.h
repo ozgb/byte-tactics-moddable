@@ -1,6 +1,8 @@
 #ifndef GAME_UNITS_EVENTS_H
 #define GAME_UNITS_EVENTS_H
 
+#include <string.h>
+
 #include "../../interfaces/units.h"
 #include "../../interfaces/ref.h"
 #include "../util/engine_services.h"
@@ -39,6 +41,45 @@ inline void UnitsPublishAttachToPiece(int outbox, U* unit, U* target, int piece,
     event.target = Ref<U>(target).offset;
     event.piece = piece;
     event.mode = mode;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void UnitsPublishCreate(int outbox, int player, int type, const int* pos)
+{
+    UnitsCreate event;
+    memset(&event, 0, sizeof(event));
+    event.h = UnitsHeaderOf(UNITS_CREATE);
+    event.player = player;
+    event.type = type;
+    event.pos[0] = pos[0];
+    event.pos[1] = pos[1];
+    event.pos[2] = pos[2];
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void UnitsPublishKillAll(int outbox)
+{
+    UnitsEventHeader event = UnitsHeaderOf(UNITS_KILL_ALL);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void UnitsPublishReloadType(int outbox, int type)
+{
+    UnitsReloadType event;
+    memset(&event, 0, sizeof(event));
+    event.h = UnitsHeaderOf(UNITS_RELOAD_TYPE);
+    event.type = type;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+template <class U>
+inline void UnitsPublishSetFlags(int outbox, U* unit, unsigned int clear, unsigned int set)
+{
+    UnitsSetFlags event;
+    memset(&event, 0, sizeof(event));
+    event.h = UnitsHeaderOf(UNITS_SET_FLAGS, unit);
+    event.clear = clear;
+    event.set = set;
     SchedPublish(outbox, &event, sizeof(event));
 }
 

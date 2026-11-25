@@ -234,6 +234,7 @@ enum ReplayObjectKindId {
     ROK_MAPSETYARD,
     ROK_MAPPASSMAPS,
     ROK_MAPPATHLOCKSTAMP,
+    ROK_MAPSETSEALEVEL,
     ROK_MAPCELLSCHANGED,
     ROK_WEAPONSEVENTHEADER,
     ROK_WEAPONSDAMAGE,
@@ -261,6 +262,7 @@ enum ReplayObjectKindId {
     ROK_ORDERSSTATUSFLAGS,
     ROK_ORDERSATTACKED,
     ROK_ORDERSPARALYZE,
+    ROK_ORDERSCANCEL,
     ROK_ORDERSSETSTATEBITS,
     ROK_ORDERSSETPOSITION,
     ROK_ORDERSATTACHTOPIECE,
@@ -317,6 +319,8 @@ enum ReplayObjectKindId {
     ROK_UNITSKILL,
     ROK_UNITSSEND,
     ROK_UNITSCAPTURE,
+    ROK_UNITSCREATE,
+    ROK_UNITSRELOADTYPE,
     ROK_SCRIPTSEVENTHEADER,
     ROK_SCRIPTSSTART,
     ROK_SCRIPTSDETACHPIECE,
@@ -560,6 +564,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 166, ROK_MAPEVENTHEADER },
     { 168, ROK_MAPPASSMAPS },
     { 169, ROK_MAPPATHLOCKSTAMP },
+    { 170, ROK_MAPSETSEALEVEL },
     { 176, ROK_MAPCELLSCHANGED },
     { 256, ROK_WEAPONSDAMAGE },
     { 257, ROK_WEAPONSDAMAGE },
@@ -594,6 +599,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 293, ROK_ORDERSATTACKED },
     { 294, ROK_ORDERSPARALYZE },
     { 295, ROK_ORDERSADD },
+    { 296, ROK_ORDERSCANCEL },
     { 304, ROK_ORDERSSETSTATEBITS },
     { 305, ROK_ORDERSSETPOSITION },
     { 306, ROK_ORDERSATTACHTOPIECE },
@@ -658,6 +664,9 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 392, ROK_UNITSKILL },
     { 393, ROK_UNITSSEND },
     { 394, ROK_UNITSCAPTURE },
+    { 395, ROK_UNITSCREATE },
+    { 396, ROK_UNITSEVENTHEADER },
+    { 397, ROK_UNITSRELOADTYPE },
     { 416, ROK_SCRIPTSSTART },
     { 417, ROK_SCRIPTSDETACHPIECE },
     { 418, ROK_SCRIPTSSTATE },
@@ -667,12 +676,12 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 7 },
     { ROK_TARGETINGEVENTHEADER, 7, 6 },
     { ROK_LOSRADAREVENTHEADER, 13, 11 },
-    { ROK_MAPEVENTHEADER, 24, 10 },
-    { ROK_WEAPONSEVENTHEADER, 34, 25 },
-    { ROK_ORDERSEVENTHEADER, 59, 22 },
-    { ROK_MOVEMENTEVENTHEADER, 81, 23 },
-    { ROK_UNITSEVENTHEADER, 104, 27 },
-    { ROK_SCRIPTSEVENTHEADER, 131, 4 },
+    { ROK_MAPEVENTHEADER, 24, 11 },
+    { ROK_WEAPONSEVENTHEADER, 35, 25 },
+    { ROK_ORDERSEVENTHEADER, 60, 23 },
+    { ROK_MOVEMENTEVENTHEADER, 83, 23 },
+    { ROK_UNITSEVENTHEADER, 106, 30 },
+    { ROK_SCRIPTSEVENTHEADER, 136, 4 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -693,6 +702,7 @@ static_assert(sizeof(MapEventHeader) <= REPLAY_EVENT_MAX, "MapEventHeader fits t
 static_assert(sizeof(MapSetYard) <= REPLAY_EVENT_MAX, "MapSetYard fits the event buffer");
 static_assert(sizeof(MapPassMaps) <= REPLAY_EVENT_MAX, "MapPassMaps fits the event buffer");
 static_assert(sizeof(MapPathLockStamp) <= REPLAY_EVENT_MAX, "MapPathLockStamp fits the event buffer");
+static_assert(sizeof(MapSetSeaLevel) <= REPLAY_EVENT_MAX, "MapSetSeaLevel fits the event buffer");
 static_assert(sizeof(MapCellsChanged) <= REPLAY_EVENT_MAX, "MapCellsChanged fits the event buffer");
 static_assert(sizeof(WeaponsDamage) <= REPLAY_EVENT_MAX, "WeaponsDamage fits the event buffer");
 static_assert(sizeof(WeaponsDetonate) <= REPLAY_EVENT_MAX, "WeaponsDetonate fits the event buffer");
@@ -720,6 +730,7 @@ static_assert(sizeof(OrdersEventHeader) <= REPLAY_EVENT_MAX, "OrdersEventHeader 
 static_assert(sizeof(OrdersStatusFlags) <= REPLAY_EVENT_MAX, "OrdersStatusFlags fits the event buffer");
 static_assert(sizeof(OrdersAttacked) <= REPLAY_EVENT_MAX, "OrdersAttacked fits the event buffer");
 static_assert(sizeof(OrdersParalyze) <= REPLAY_EVENT_MAX, "OrdersParalyze fits the event buffer");
+static_assert(sizeof(OrdersCancel) <= REPLAY_EVENT_MAX, "OrdersCancel fits the event buffer");
 static_assert(sizeof(OrdersSetStateBits) <= REPLAY_EVENT_MAX, "OrdersSetStateBits fits the event buffer");
 static_assert(sizeof(OrdersSetPosition) <= REPLAY_EVENT_MAX, "OrdersSetPosition fits the event buffer");
 static_assert(sizeof(OrdersAttachToPiece) <= REPLAY_EVENT_MAX, "OrdersAttachToPiece fits the event buffer");
@@ -776,6 +787,8 @@ static_assert(sizeof(UnitsSetHealth) <= REPLAY_EVENT_MAX, "UnitsSetHealth fits t
 static_assert(sizeof(UnitsKill) <= REPLAY_EVENT_MAX, "UnitsKill fits the event buffer");
 static_assert(sizeof(UnitsSend) <= REPLAY_EVENT_MAX, "UnitsSend fits the event buffer");
 static_assert(sizeof(UnitsCapture) <= REPLAY_EVENT_MAX, "UnitsCapture fits the event buffer");
+static_assert(sizeof(UnitsCreate) <= REPLAY_EVENT_MAX, "UnitsCreate fits the event buffer");
+static_assert(sizeof(UnitsReloadType) <= REPLAY_EVENT_MAX, "UnitsReloadType fits the event buffer");
 static_assert(sizeof(ScriptsStart) <= REPLAY_EVENT_MAX, "ScriptsStart fits the event buffer");
 static_assert(sizeof(ScriptsDetachPiece) <= REPLAY_EVENT_MAX, "ScriptsDetachPiece fits the event buffer");
 static_assert(sizeof(ScriptsState) <= REPLAY_EVENT_MAX, "ScriptsState fits the event buffer");
@@ -851,6 +864,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MapSetYard", sizeof(MapSetYard), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapPathLockStamp", sizeof(MapPathLockStamp), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapSetSeaLevel", sizeof(MapSetSeaLevel), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsEventHeader", sizeof(WeaponsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsDamage", sizeof(WeaponsDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -878,6 +892,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "OrdersStatusFlags", sizeof(OrdersStatusFlags), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersAttacked", sizeof(OrdersAttacked), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersParalyze", sizeof(OrdersParalyze), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "OrdersCancel", sizeof(OrdersCancel), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersSetStateBits", sizeof(OrdersSetStateBits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersSetPosition", sizeof(OrdersSetPosition), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersAttachToPiece", sizeof(OrdersAttachToPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -934,12 +949,14 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "UnitsKill", sizeof(UnitsKill), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "UnitsSend", sizeof(UnitsSend), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "UnitsCapture", sizeof(UnitsCapture), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsCreate", sizeof(UnitsCreate), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "UnitsReloadType", sizeof(UnitsReloadType), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsEventHeader", sizeof(ScriptsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsStart", sizeof(ScriptsStart), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsDetachPiece", sizeof(ScriptsDetachPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "ScriptsState", sizeof(ScriptsState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 148;
+static const unsigned kReplayObjectKindCount = 152;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -1378,6 +1395,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(MapPathLockStamp, h.kind), sizeof(((MapPathLockStamp*)nullptr)->h.kind), ROK_MAPPATHLOCKSTAMP, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapPathLockStamp, h.unit), sizeof(((MapPathLockStamp*)nullptr)->h.unit), ROK_MAPPATHLOCKSTAMP, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "stamp", offsetof(MapPathLockStamp, stamp), sizeof(((MapPathLockStamp*)nullptr)->stamp), ROK_MAPPATHLOCKSTAMP, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(MapSetSeaLevel, h.kind), sizeof(((MapSetSeaLevel*)nullptr)->h.kind), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(MapSetSeaLevel, h.unit), sizeof(((MapSetSeaLevel*)nullptr)->h.unit), ROK_MAPSETSEALEVEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "level", offsetof(MapSetSeaLevel, level), sizeof(((MapSetSeaLevel*)nullptr)->level), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MapCellsChanged, h.kind), sizeof(((MapCellsChanged*)nullptr)->h.kind), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapCellsChanged, h.unit), sizeof(((MapCellsChanged*)nullptr)->h.unit), ROK_MAPCELLSCHANGED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "rect0", offsetof(MapCellsChanged, rect[0]), sizeof(((MapCellsChanged*)nullptr)->rect[0]), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1502,6 +1522,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(OrdersParalyze, h.kind), sizeof(((OrdersParalyze*)nullptr)->h.kind), ROK_ORDERSPARALYZE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersParalyze, h.unit), sizeof(((OrdersParalyze*)nullptr)->h.unit), ROK_ORDERSPARALYZE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "ticks", offsetof(OrdersParalyze, ticks), sizeof(((OrdersParalyze*)nullptr)->ticks), ROK_ORDERSPARALYZE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(OrdersCancel, h.kind), sizeof(((OrdersCancel*)nullptr)->h.kind), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(OrdersCancel, h.unit), sizeof(((OrdersCancel*)nullptr)->h.unit), ROK_ORDERSCANCEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "order", offsetof(OrdersCancel, order), sizeof(((OrdersCancel*)nullptr)->order), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(OrdersSetStateBits, h.kind), sizeof(((OrdersSetStateBits*)nullptr)->h.kind), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersSetStateBits, h.unit), sizeof(((OrdersSetStateBits*)nullptr)->h.unit), ROK_ORDERSSETSTATEBITS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "mask", offsetof(OrdersSetStateBits, mask), sizeof(((OrdersSetStateBits*)nullptr)->mask), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1751,6 +1774,16 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "stockpiles0", offsetof(UnitsCapture, stockpiles[0]), sizeof(((UnitsCapture*)nullptr)->stockpiles[0]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "stockpiles1", offsetof(UnitsCapture, stockpiles[1]), sizeof(((UnitsCapture*)nullptr)->stockpiles[1]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "stockpiles2", offsetof(UnitsCapture, stockpiles[2]), sizeof(((UnitsCapture*)nullptr)->stockpiles[2]), ROK_UNITSCAPTURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsCreate, h.kind), sizeof(((UnitsCreate*)nullptr)->h.kind), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsCreate, h.unit), sizeof(((UnitsCreate*)nullptr)->h.unit), ROK_UNITSCREATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "player", offsetof(UnitsCreate, player), sizeof(((UnitsCreate*)nullptr)->player), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(UnitsCreate, type), sizeof(((UnitsCreate*)nullptr)->type), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(UnitsCreate, pos[0]), sizeof(((UnitsCreate*)nullptr)->pos[0]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(UnitsCreate, pos[1]), sizeof(((UnitsCreate*)nullptr)->pos[1]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(UnitsCreate, pos[2]), sizeof(((UnitsCreate*)nullptr)->pos[2]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(UnitsReloadType, h.kind), sizeof(((UnitsReloadType*)nullptr)->h.kind), ROK_UNITSRELOADTYPE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(UnitsReloadType, h.unit), sizeof(((UnitsReloadType*)nullptr)->h.unit), ROK_UNITSRELOADTYPE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "type", offsetof(UnitsReloadType, type), sizeof(((UnitsReloadType*)nullptr)->type), ROK_UNITSRELOADTYPE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(ScriptsEventHeader, kind), sizeof(((ScriptsEventHeader*)nullptr)->kind), ROK_SCRIPTSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(ScriptsEventHeader, unit), sizeof(((ScriptsEventHeader*)nullptr)->unit), ROK_SCRIPTSEVENTHEADER, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "kind", offsetof(ScriptsStart, h.kind), sizeof(((ScriptsStart*)nullptr)->h.kind), ROK_SCRIPTSSTART, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1774,8 +1807,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "state", offsetof(ScriptsState, state), sizeof(((ScriptsState*)nullptr)->state), ROK_SCRIPTSSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "feature", offsetof(ScriptsState, feature), sizeof(((ScriptsState*)nullptr)->feature), ROK_SCRIPTSSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 805;
-static const unsigned kReplayWalkableFieldCount = 161;
+static const unsigned kReplayObjectFieldCount = 821;
+static const unsigned kReplayWalkableFieldCount = 165;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 167, 168, 169, 37, 36, 0, 24, 50, 170, 37, 35, 38, 45, 51, 53, 108 };
 
@@ -2184,6 +2217,9 @@ static_assert(sizeof(((MapPassMaps*)nullptr)->size[1]) == 4, "MapPassMaps::size1
 static_assert(sizeof(((MapPathLockStamp*)nullptr)->h.kind) == 4, "MapPathLockStamp::kind has the size the schema says");
 static_assert(sizeof(((MapPathLockStamp*)nullptr)->h.unit) == 4, "MapPathLockStamp::unit has the size the schema says");
 static_assert(sizeof(((MapPathLockStamp*)nullptr)->stamp) == 4, "MapPathLockStamp::stamp has the size the schema says");
+static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.kind) == 4, "MapSetSeaLevel::kind has the size the schema says");
+static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.unit) == 4, "MapSetSeaLevel::unit has the size the schema says");
+static_assert(sizeof(((MapSetSeaLevel*)nullptr)->level) == 4, "MapSetSeaLevel::level has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.kind) == 4, "MapCellsChanged::kind has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.unit) == 4, "MapCellsChanged::unit has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[0]) == 4, "MapCellsChanged::rect0 has the size the schema says");
@@ -2307,6 +2343,9 @@ static_assert(sizeof(((OrdersAttacked*)nullptr)->attacker) == 4, "OrdersAttacked
 static_assert(sizeof(((OrdersParalyze*)nullptr)->h.kind) == 4, "OrdersParalyze::kind has the size the schema says");
 static_assert(sizeof(((OrdersParalyze*)nullptr)->h.unit) == 4, "OrdersParalyze::unit has the size the schema says");
 static_assert(sizeof(((OrdersParalyze*)nullptr)->ticks) == 4, "OrdersParalyze::ticks has the size the schema says");
+static_assert(sizeof(((OrdersCancel*)nullptr)->h.kind) == 4, "OrdersCancel::kind has the size the schema says");
+static_assert(sizeof(((OrdersCancel*)nullptr)->h.unit) == 4, "OrdersCancel::unit has the size the schema says");
+static_assert(sizeof(((OrdersCancel*)nullptr)->order) == 4, "OrdersCancel::order has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.kind) == 4, "OrdersSetStateBits::kind has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.unit) == 4, "OrdersSetStateBits::unit has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->mask) == 4, "OrdersSetStateBits::mask has the size the schema says");
@@ -2555,6 +2594,16 @@ static_assert(sizeof(((UnitsCapture*)nullptr)->angles[2]) == 4, "UnitsCapture::a
 static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[0]) == 4, "UnitsCapture::stockpiles0 has the size the schema says");
 static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[1]) == 4, "UnitsCapture::stockpiles1 has the size the schema says");
 static_assert(sizeof(((UnitsCapture*)nullptr)->stockpiles[2]) == 4, "UnitsCapture::stockpiles2 has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->h.kind) == 4, "UnitsCreate::kind has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->h.unit) == 4, "UnitsCreate::unit has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->player) == 4, "UnitsCreate::player has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->type) == 4, "UnitsCreate::type has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->pos[0]) == 4, "UnitsCreate::pos0 has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->pos[1]) == 4, "UnitsCreate::pos1 has the size the schema says");
+static_assert(sizeof(((UnitsCreate*)nullptr)->pos[2]) == 4, "UnitsCreate::pos2 has the size the schema says");
+static_assert(sizeof(((UnitsReloadType*)nullptr)->h.kind) == 4, "UnitsReloadType::kind has the size the schema says");
+static_assert(sizeof(((UnitsReloadType*)nullptr)->h.unit) == 4, "UnitsReloadType::unit has the size the schema says");
+static_assert(sizeof(((UnitsReloadType*)nullptr)->type) == 4, "UnitsReloadType::type has the size the schema says");
 static_assert(sizeof(((ScriptsEventHeader*)nullptr)->kind) == 4, "ScriptsEventHeader::kind has the size the schema says");
 static_assert(sizeof(((ScriptsEventHeader*)nullptr)->unit) == 4, "ScriptsEventHeader::unit has the size the schema says");
 static_assert(sizeof(((ScriptsStart*)nullptr)->h.kind) == 4, "ScriptsStart::kind has the size the schema says");
@@ -3135,6 +3184,7 @@ static const unsigned char kReplayPlayersUpdatePlayerTailAllOf[] = { ROK_PLAYER 
 static const unsigned char kReplayPlayersUpdatePlayerTailReads[] = { 22 };
 static const unsigned char kReplayMapApplyAllOf[] = { ROK_UNIT, ROK_SPATIALBUCKET, ROK_CELL, ROK_PASSMAP, ROK_FEATURE };
 static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27 };
+static const unsigned char kReplayMapApplyWrites[] = { 17 };
 static const unsigned short kReplayMapApplyObjReads[] = { 0, 24, 35, 36, 37, 41, 42, 44, 50, 51, 52, 53, 69, 70, 71, 72, 73, 116, 153, 154, 156, 157, 159, 160, 161, 162, 163, 164, 165, 166, 170, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 308 };
 static const unsigned short kReplayMapApplyObjWrites[] = { 37, 69, 71, 73, 153, 154, 156, 157, 164, 170, 223 };
 static const unsigned char kReplayMapGetCellMeanHeightAllOf[] = { ROK_CELL };
@@ -3374,7 +3424,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "Init", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_MAP, kReplayMapApplyReads, 9, nullptr, 0, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
+    { "Apply", SUB_MAP, kReplayMapApplyReads, 9, kReplayMapApplyWrites, 1, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
     { "GetCellMeanHeight", SUB_MAP, kReplayMapGetCellMeanHeightReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightObjReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightAllOf, 1 },
     { "CanBuildAt", SUB_MAP, kReplayMapCanBuildAtReads, 9, kReplayMapCanBuildAtWrites, 2, kReplayMapCanBuildAtObjReads, 22, nullptr, 0, kReplayMapCanBuildAtAllOf, 2 },
     { "CanPlaceUnitFootprint", SUB_MAP, kReplayMapCanPlaceUnitFootprintReads, 9, kReplayMapCanPlaceUnitFootprintWrites, 2, kReplayMapCanPlaceUnitFootprintObjReads, 24, nullptr, 0, kReplayMapCanPlaceUnitFootprintAllOf, 2 },
@@ -3516,16 +3566,16 @@ static const unsigned kReplaySlotCount = RSL_COUNT;
 static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 3, 1, 1, 0, 8, RET_WIND_METEORS },
     { "economy", 5, 0, 0, 8, 12, RET_COUNT },
-    { "features", 5, 0, 0, 20, 22, RET_COUNT },
+    { "features", 5, 1, 0, 20, 22, RET_COUNT },
     { "ai", 6, 0, 0, 42, 15, RET_COUNT },
     { "pathfinding", 4, 0, 0, 57, 9, RET_COUNT },
     { "weapons", 4, 0, 1, 66, 6, RET_WEAPONS },
     { "targeting", 4, 0, 1, 72, 7, RET_TARGETING },
     { "los_radar", 5, 0, 0, 79, 27, RET_LOS_RADAR },
-    { "orders", 6, 0, 0, 106, 11, RET_ORDERS },
-    { "units", 7, 0, 0, 117, 44, RET_UNITS },
-    { "players", 5, 0, 0, 161, 28, RET_COUNT },
-    { "map", 9, 0, 1, 189, 11, RET_MAP },
+    { "orders", 6, 1, 0, 106, 11, RET_ORDERS },
+    { "units", 7, 1, 0, 117, 44, RET_UNITS },
+    { "players", 5, 1, 0, 161, 28, RET_COUNT },
+    { "map", 9, 1, 1, 189, 11, RET_MAP },
     { "scripts", 3, 0, 0, 200, 24, RET_SCRIPTS },
     { "movement", 5, 0, 0, 224, 20, RET_MOVEMENT },
     { "mission", 2, 0, 0, 244, 0, RET_COUNT },

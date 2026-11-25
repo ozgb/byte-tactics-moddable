@@ -20,6 +20,8 @@ inline unsigned int OrdersEventSize(int kind)
         return sizeof(OrdersAttacked);
     case ORDERS_PARALYZE:
         return sizeof(OrdersParalyze);
+    case ORDERS_CANCEL:
+        return sizeof(OrdersCancel);
     case ORDERS_EFFECT_SET_STATE_BITS:
         return sizeof(OrdersSetStateBits);
     case ORDERS_EFFECT_SET_POSITION:

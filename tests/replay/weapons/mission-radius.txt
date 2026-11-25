@@ -8,26 +8,15 @@ call 1640 UpdateUnitWeapons
   r rng.main 0x689ea36f
   r rng.load 0x5a8e46ab
   r rng.seed 0x174dba90
-  r Unit#1.health 3390
-  r Unit#1.def UnitDef#20
-  r Unit#1.flags 0x50240325
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
-  r Unit#1.playerIndex 0
   r Unit#1.owner Player#0
-  r Unit#1.motion UnitMotion#1
-  r Unit#1.posX 95600083
-  r Unit#1.posY 3080192
-  r Unit#1.posZ 48833591
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ -32768
-  r Unit#1.weapon0Def weapondef#0
   r Unit#1.weapon0Flags 16
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ -32768
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ -32768
   r Unit#1.weapon2Def weapondef#0
@@ -49,6 +38,17 @@ call 1640 UpdateUnitWeapons
   r Unit#1.weapon2FirePitch 0
   r Unit#1.weapon2Stockpile 0
   r Unit#1.weapon2MuzzleDelta 0
+  r Unit#1.flags 0x50240325
+  r Unit#1.health 3390
+  r Unit#1.def UnitDef#20
+  r Unit#1.playerIndex 0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 95600083
+  r Unit#1.posY 3080192
+  r Unit#1.posZ 48833591
+  r Unit#1.weapon0Def weapondef#0
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
   r Projectile#0.speed 990613
   r Projectile#0.spawnTick 1591
   r Projectile#0.attacker Unit#4
@@ -8405,11 +8405,8 @@ call 1640 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#20.maxHealth 3390
-  r UnitDef#20.modelMaxYHigh 58
   r Player#0.energy f32:0x447a0000
   r Player#0.metal f32:0x447a0000
-  r UnitMotion#1.speed 64886
   r weapondef#0.flags 0x00000000
   r weapondef#0.speed 0
   r weapondef#0.acceleration 0
@@ -8429,26 +8426,18 @@ call 1640 UpdateUnitWeapons
   r Unit#1.weapons[0].aimCob.nAimCobDone 0
   r Unit#1.weapons[1].aimCob.nAimCobDone 0
   r Unit#1.weapons[2].aimCob.nAimCobDone 0
-  r Unit#4.health 3942
-  r Unit#4.def UnitDef#25
-  r Unit#4.flags 0x90240321
+  r UnitDef#20.modelMaxYHigh 58
+  r UnitDef#20.maxHealth 3390
+  r UnitMotion#1.speed 64886
   r Unit#4.script CobScript#2
   r Unit#4.id 4
   r Unit#4.killCount 0
-  r Unit#4.playerIndex 0
   r Unit#4.owner Player#0
-  r Unit#4.motion UnitMotion#2
-  r Unit#4.posX 141557760
-  r Unit#4.posY 3080192
-  r Unit#4.posZ 51380224
   r Unit#4.weapon0TargetX 275
   r Unit#4.weapon0TargetZ -32768
-  r Unit#4.weapon0Def weapondef#66
   r Unit#4.weapon0Flags 19
   r Unit#4.weapon1TargetX 0
   r Unit#4.weapon1TargetZ -32768
-  r Unit#4.weapon1Def weapondef#35
-  r Unit#4.weapon1Flags 22
   r Unit#4.weapon2TargetX 0
   r Unit#4.weapon2TargetZ -32768
   r Unit#4.weapon2Def weapondef#0
@@ -8470,6 +8459,17 @@ call 1640 UpdateUnitWeapons
   r Unit#4.weapon2FirePitch 0
   r Unit#4.weapon2Stockpile 0
   r Unit#4.weapon2MuzzleDelta 0
+  r Unit#4.flags 0x90240321
+  r Unit#4.health 3942
+  r Unit#4.def UnitDef#25
+  r Unit#4.playerIndex 0
+  r Unit#4.motion UnitMotion#2
+  r Unit#4.posX 141557760
+  r Unit#4.posY 3080192
+  r Unit#4.posZ 51380224
+  r Unit#4.weapon0Def weapondef#66
+  r Unit#4.weapon1Def weapondef#35
+  r Unit#4.weapon1Flags 22
   r weapondef#66.flags 0x00080202
   r weapondef#66.speed 764586
   r weapondef#66.acceleration 0
@@ -8486,26 +8486,15 @@ call 1640 UpdateUnitWeapons
   r weapondef#66.sound 92
   r weapondef#66.startSpeed 0
   r weapondef#66.tolerance 0
-  r Unit#275.health 242
-  r Unit#275.def UnitDef#140
-  r Unit#275.flags 0x90240305
   r Unit#275.script CobScript#3
   r Unit#275.id 275
   r Unit#275.killCount 0
-  r Unit#275.playerIndex 1
   r Unit#275.owner Player#1
-  r Unit#275.motion UnitMotion#3
-  r Unit#275.posX 108181794
-  r Unit#275.posY 3080192
-  r Unit#275.posZ 57621272
   r Unit#275.weapon0TargetX 14
   r Unit#275.weapon0TargetZ -32768
-  r Unit#275.weapon0Def weapondef#90
   r Unit#275.weapon0Flags 19
   r Unit#275.weapon1TargetX 14
   r Unit#275.weapon1TargetZ -32768
-  r Unit#275.weapon1Def weapondef#101
-  r Unit#275.weapon1Flags 23
   r Unit#275.weapon2TargetX 0
   r Unit#275.weapon2TargetZ -32768
   r Unit#275.weapon2Def weapondef#0
@@ -8527,26 +8516,26 @@ call 1640 UpdateUnitWeapons
   r Unit#275.weapon2FirePitch 0
   r Unit#275.weapon2Stockpile 0
   r Unit#275.weapon2MuzzleDelta 0
-  r Unit#5.health 2808
-  r Unit#5.def UnitDef#67
-  r Unit#5.flags 0x90240321
+  r Unit#275.flags 0x90240305
+  r Unit#275.health 242
+  r Unit#275.def UnitDef#140
+  r Unit#275.playerIndex 1
+  r Unit#275.motion UnitMotion#3
+  r Unit#275.posX 108181794
+  r Unit#275.posY 3080192
+  r Unit#275.posZ 57621272
+  r Unit#275.weapon0Def weapondef#90
+  r Unit#275.weapon1Def weapondef#101
+  r Unit#275.weapon1Flags 23
   r Unit#5.script CobScript#4
   r Unit#5.id 5
   r Unit#5.killCount 1
-  r Unit#5.playerIndex 0
   r Unit#5.owner Player#0
-  r Unit#5.motion UnitMotion#4
-  r Unit#5.posX 117440512
-  r Unit#5.posY 3080192
-  r Unit#5.posZ 60817408
   r Unit#5.weapon0TargetX 275
   r Unit#5.weapon0TargetZ -32768
-  r Unit#5.weapon0Def weapondef#64
   r Unit#5.weapon0Flags 3
   r Unit#5.weapon1TargetX 275
   r Unit#5.weapon1TargetZ -32768
-  r Unit#5.weapon1Def weapondef#35
-  r Unit#5.weapon1Flags 22
   r Unit#5.weapon2TargetX 0
   r Unit#5.weapon2TargetZ -32768
   r Unit#5.weapon2Def weapondef#0
@@ -8568,6 +8557,17 @@ call 1640 UpdateUnitWeapons
   r Unit#5.weapon2FirePitch 0
   r Unit#5.weapon2Stockpile 0
   r Unit#5.weapon2MuzzleDelta 0
+  r Unit#5.flags 0x90240321
+  r Unit#5.health 2808
+  r Unit#5.def UnitDef#67
+  r Unit#5.playerIndex 0
+  r Unit#5.motion UnitMotion#4
+  r Unit#5.posX 117440512
+  r Unit#5.posY 3080192
+  r Unit#5.posZ 60817408
+  r Unit#5.weapon0Def weapondef#64
+  r Unit#5.weapon1Def weapondef#35
+  r Unit#5.weapon1Flags 22
   r weapondef#64.flags 0x00080202
   r weapondef#64.speed 655360
   r weapondef#64.acceleration 0
@@ -8584,26 +8584,15 @@ call 1640 UpdateUnitWeapons
   r weapondef#64.sound 90
   r weapondef#64.startSpeed 0
   r weapondef#64.tolerance 0
-  r Unit#6.health 2806
-  r Unit#6.def UnitDef#67
-  r Unit#6.flags 0x90240321
   r Unit#6.script CobScript#5
   r Unit#6.id 6
   r Unit#6.killCount 0
-  r Unit#6.playerIndex 0
   r Unit#6.owner Player#0
-  r Unit#6.motion UnitMotion#5
-  r Unit#6.posX 131060434
-  r Unit#6.posY 3080192
-  r Unit#6.posZ 61159377
   r Unit#6.weapon0TargetX 275
   r Unit#6.weapon0TargetZ -32768
-  r Unit#6.weapon0Def weapondef#64
   r Unit#6.weapon0Flags 19
   r Unit#6.weapon1TargetX 275
   r Unit#6.weapon1TargetZ -32768
-  r Unit#6.weapon1Def weapondef#35
-  r Unit#6.weapon1Flags 22
   r Unit#6.weapon2TargetX 0
   r Unit#6.weapon2TargetZ -32768
   r Unit#6.weapon2Def weapondef#0
@@ -8625,26 +8614,26 @@ call 1640 UpdateUnitWeapons
   r Unit#6.weapon2FirePitch 0
   r Unit#6.weapon2Stockpile 0
   r Unit#6.weapon2MuzzleDelta 0
-  r Unit#14.health 560
-  r Unit#14.def UnitDef#62
-  r Unit#14.flags 0x90240321
+  r Unit#6.flags 0x90240321
+  r Unit#6.health 2806
+  r Unit#6.def UnitDef#67
+  r Unit#6.playerIndex 0
+  r Unit#6.motion UnitMotion#5
+  r Unit#6.posX 131060434
+  r Unit#6.posY 3080192
+  r Unit#6.posZ 61159377
+  r Unit#6.weapon0Def weapondef#64
+  r Unit#6.weapon1Def weapondef#35
+  r Unit#6.weapon1Flags 22
   r Unit#14.script CobScript#6
   r Unit#14.id 14
   r Unit#14.killCount 0
-  r Unit#14.playerIndex 0
   r Unit#14.owner Player#0
-  r Unit#14.motion UnitMotion#6
-  r Unit#14.posX 113246208
-  r Unit#14.posY 3080192
-  r Unit#14.posZ 49283072
   r Unit#14.weapon0TargetX 0
   r Unit#14.weapon0TargetZ -32768
-  r Unit#14.weapon0Def weapondef#89
   r Unit#14.weapon0Flags 18
   r Unit#14.weapon1TargetX 275
   r Unit#14.weapon1TargetZ -32768
-  r Unit#14.weapon1Def weapondef#100
-  r Unit#14.weapon1Flags 23
   r Unit#14.weapon2TargetX 0
   r Unit#14.weapon2TargetZ -32768
   r Unit#14.weapon2Def weapondef#0
@@ -8666,6 +8655,17 @@ call 1640 UpdateUnitWeapons
   r Unit#14.weapon2FirePitch 0
   r Unit#14.weapon2Stockpile 0
   r Unit#14.weapon2MuzzleDelta 0
+  r Unit#14.flags 0x90240321
+  r Unit#14.health 560
+  r Unit#14.def UnitDef#62
+  r Unit#14.playerIndex 0
+  r Unit#14.motion UnitMotion#6
+  r Unit#14.posX 113246208
+  r Unit#14.posY 3080192
+  r Unit#14.posZ 49283072
+  r Unit#14.weapon0Def weapondef#89
+  r Unit#14.weapon1Def weapondef#100
+  r Unit#14.weapon1Flags 23
   r weapondef#100.flags 0x001c3201
   r weapondef#100.speed 1419946
   r weapondef#100.acceleration 7354
@@ -8682,26 +8682,15 @@ call 1640 UpdateUnitWeapons
   r weapondef#100.sound 78
   r weapondef#100.startSpeed 983040
   r weapondef#100.tolerance 9000
-  r Unit#2.health 2870
-  r Unit#2.def UnitDef#67
-  r Unit#2.flags 0x90240321
   r Unit#2.script CobScript#7
   r Unit#2.id 2
   r Unit#2.killCount 1
-  r Unit#2.playerIndex 0
   r Unit#2.owner Player#0
-  r Unit#2.motion UnitMotion#7
-  r Unit#2.posX 136314880
-  r Unit#2.posY 3080192
-  r Unit#2.posZ 19922944
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ -32768
-  r Unit#2.weapon0Def weapondef#64
   r Unit#2.weapon0Flags 18
   r Unit#2.weapon1TargetX 0
   r Unit#2.weapon1TargetZ -32768
-  r Unit#2.weapon1Def weapondef#35
-  r Unit#2.weapon1Flags 22
   r Unit#2.weapon2TargetX 0
   r Unit#2.weapon2TargetZ -32768
   r Unit#2.weapon2Def weapondef#0
@@ -8723,26 +8712,26 @@ call 1640 UpdateUnitWeapons
   r Unit#2.weapon2FirePitch 0
   r Unit#2.weapon2Stockpile 0
   r Unit#2.weapon2MuzzleDelta 0
-  r Unit#271.health -6
-  r Unit#271.def UnitDef#0
-  r Unit#271.flags 0x80244305
+  r Unit#2.flags 0x90240321
+  r Unit#2.health 2870
+  r Unit#2.def UnitDef#67
+  r Unit#2.playerIndex 0
+  r Unit#2.motion UnitMotion#7
+  r Unit#2.posX 136314880
+  r Unit#2.posY 3080192
+  r Unit#2.posZ 19922944
+  r Unit#2.weapon0Def weapondef#64
+  r Unit#2.weapon1Def weapondef#35
+  r Unit#2.weapon1Flags 22
   r Unit#271.script null
   r Unit#271.id 271
   r Unit#271.killCount 0
-  r Unit#271.playerIndex 1
   r Unit#271.owner Player#1
-  r Unit#271.motion null
-  r Unit#271.posX 135061640
-  r Unit#271.posY 3080192
-  r Unit#271.posZ 56317239
   r Unit#271.weapon0TargetX 0
   r Unit#271.weapon0TargetZ -32768
-  r Unit#271.weapon0Def weapondef#90
   r Unit#271.weapon0Flags 19
   r Unit#271.weapon1TargetX 15
   r Unit#271.weapon1TargetZ -32768
-  r Unit#271.weapon1Def weapondef#101
-  r Unit#271.weapon1Flags 23
   r Unit#271.weapon2TargetX 0
   r Unit#271.weapon2TargetZ -32768
   r Unit#271.weapon2Def weapondef#0
@@ -8764,26 +8753,26 @@ call 1640 UpdateUnitWeapons
   r Unit#271.weapon2FirePitch 0
   r Unit#271.weapon2Stockpile 0
   r Unit#271.weapon2MuzzleDelta 0
-  r Unit#274.health 189
-  r Unit#274.def UnitDef#140
-  r Unit#274.flags 0x90240301
+  r Unit#271.flags 0x80244305
+  r Unit#271.health -6
+  r Unit#271.def UnitDef#0
+  r Unit#271.playerIndex 1
+  r Unit#271.motion null
+  r Unit#271.posX 135061640
+  r Unit#271.posY 3080192
+  r Unit#271.posZ 56317239
+  r Unit#271.weapon0Def weapondef#90
+  r Unit#271.weapon1Def weapondef#101
+  r Unit#271.weapon1Flags 23
   r Unit#274.script CobScript#8
   r Unit#274.id 274
   r Unit#274.killCount 0
-  r Unit#274.playerIndex 1
   r Unit#274.owner Player#1
-  r Unit#274.motion UnitMotion#8
-  r Unit#274.posX 90701823
-  r Unit#274.posY 3080192
-  r Unit#274.posZ 54001665
   r Unit#274.weapon0TargetX 9
   r Unit#274.weapon0TargetZ -32768
-  r Unit#274.weapon0Def weapondef#90
   r Unit#274.weapon0Flags 3
   r Unit#274.weapon1TargetX 8
   r Unit#274.weapon1TargetZ -32768
-  r Unit#274.weapon1Def weapondef#101
-  r Unit#274.weapon1Flags 23
   r Unit#274.weapon2TargetX 0
   r Unit#274.weapon2TargetZ -32768
   r Unit#274.weapon2Def weapondef#0
@@ -8805,6 +8794,17 @@ call 1640 UpdateUnitWeapons
   r Unit#274.weapon2FirePitch 0
   r Unit#274.weapon2Stockpile 0
   r Unit#274.weapon2MuzzleDelta 0
+  r Unit#274.flags 0x90240301
+  r Unit#274.health 189
+  r Unit#274.def UnitDef#140
+  r Unit#274.playerIndex 1
+  r Unit#274.motion UnitMotion#8
+  r Unit#274.posX 90701823
+  r Unit#274.posY 3080192
+  r Unit#274.posZ 54001665
+  r Unit#274.weapon0Def weapondef#90
+  r Unit#274.weapon1Def weapondef#101
+  r Unit#274.weapon1Flags 23
   r weapondef#90.flags 0x00080809
   r weapondef#90.speed 873813
   r weapondef#90.acceleration 0
@@ -8821,26 +8821,15 @@ call 1640 UpdateUnitWeapons
   r weapondef#90.sound 57
   r weapondef#90.startSpeed 0
   r weapondef#90.tolerance 0
-  r Unit#9.health 2669
-  r Unit#9.def UnitDef#67
-  r Unit#9.flags 0x90240325
   r Unit#9.script CobScript#9
   r Unit#9.id 9
   r Unit#9.killCount 1
-  r Unit#9.playerIndex 0
   r Unit#9.owner Player#0
-  r Unit#9.motion UnitMotion#9
-  r Unit#9.posX 94465116
-  r Unit#9.posY 3080192
-  r Unit#9.posZ 58710001
   r Unit#9.weapon0TargetX 274
   r Unit#9.weapon0TargetZ -32768
-  r Unit#9.weapon0Def weapondef#64
   r Unit#9.weapon0Flags 19
   r Unit#9.weapon1TargetX 274
   r Unit#9.weapon1TargetZ -32768
-  r Unit#9.weapon1Def weapondef#35
-  r Unit#9.weapon1Flags 22
   r Unit#9.weapon2TargetX 0
   r Unit#9.weapon2TargetZ -32768
   r Unit#9.weapon2Def weapondef#0
@@ -8862,26 +8851,26 @@ call 1640 UpdateUnitWeapons
   r Unit#9.weapon2FirePitch 0
   r Unit#9.weapon2Stockpile 0
   r Unit#9.weapon2MuzzleDelta 0
-  r Unit#13.health 400
-  r Unit#13.def UnitDef#62
-  r Unit#13.flags 0x90240321
+  r Unit#9.flags 0x90240325
+  r Unit#9.health 2669
+  r Unit#9.def UnitDef#67
+  r Unit#9.playerIndex 0
+  r Unit#9.motion UnitMotion#9
+  r Unit#9.posX 94465116
+  r Unit#9.posY 3080192
+  r Unit#9.posZ 58710001
+  r Unit#9.weapon0Def weapondef#64
+  r Unit#9.weapon1Def weapondef#35
+  r Unit#9.weapon1Flags 22
   r Unit#13.script CobScript#10
   r Unit#13.id 13
   r Unit#13.killCount 0
-  r Unit#13.playerIndex 0
   r Unit#13.owner Player#0
-  r Unit#13.motion UnitMotion#10
-  r Unit#13.posX 123731968
-  r Unit#13.posY 3080192
-  r Unit#13.posZ 69206016
   r Unit#13.weapon0TargetX 0
   r Unit#13.weapon0TargetZ -32768
-  r Unit#13.weapon0Def weapondef#89
   r Unit#13.weapon0Flags 18
   r Unit#13.weapon1TargetX 275
   r Unit#13.weapon1TargetZ -32768
-  r Unit#13.weapon1Def weapondef#100
-  r Unit#13.weapon1Flags 23
   r Unit#13.weapon2TargetX 0
   r Unit#13.weapon2TargetZ -32768
   r Unit#13.weapon2Def weapondef#0
@@ -8903,26 +8892,26 @@ call 1640 UpdateUnitWeapons
   r Unit#13.weapon2FirePitch 0
   r Unit#13.weapon2Stockpile 0
   r Unit#13.weapon2MuzzleDelta 0
-  r Unit#272.health -69
-  r Unit#272.def UnitDef#0
-  r Unit#272.flags 0x80244305
+  r Unit#13.flags 0x90240321
+  r Unit#13.health 400
+  r Unit#13.def UnitDef#62
+  r Unit#13.playerIndex 0
+  r Unit#13.motion UnitMotion#10
+  r Unit#13.posX 123731968
+  r Unit#13.posY 3080192
+  r Unit#13.posZ 69206016
+  r Unit#13.weapon0Def weapondef#89
+  r Unit#13.weapon1Def weapondef#100
+  r Unit#13.weapon1Flags 23
   r Unit#272.script null
   r Unit#272.id 272
   r Unit#272.killCount 0
-  r Unit#272.playerIndex 1
   r Unit#272.owner Player#1
-  r Unit#272.motion null
-  r Unit#272.posX 107593039
-  r Unit#272.posY 3080192
-  r Unit#272.posZ 62775624
   r Unit#272.weapon0TargetX 0
   r Unit#272.weapon0TargetZ -32768
-  r Unit#272.weapon0Def weapondef#90
   r Unit#272.weapon0Flags 19
   r Unit#272.weapon1TargetX 5
   r Unit#272.weapon1TargetZ -32768
-  r Unit#272.weapon1Def weapondef#101
-  r Unit#272.weapon1Flags 23
   r Unit#272.weapon2TargetX 0
   r Unit#272.weapon2TargetZ -32768
   r Unit#272.weapon2Def weapondef#0
@@ -8944,26 +8933,26 @@ call 1640 UpdateUnitWeapons
   r Unit#272.weapon2FirePitch 0
   r Unit#272.weapon2Stockpile 0
   r Unit#272.weapon2MuzzleDelta 0
-  r Unit#270.health -144
-  r Unit#270.def UnitDef#0
-  r Unit#270.flags 0x80244301
+  r Unit#272.flags 0x80244305
+  r Unit#272.health -69
+  r Unit#272.def UnitDef#0
+  r Unit#272.playerIndex 1
+  r Unit#272.motion null
+  r Unit#272.posX 107593039
+  r Unit#272.posY 3080192
+  r Unit#272.posZ 62775624
+  r Unit#272.weapon0Def weapondef#90
+  r Unit#272.weapon1Def weapondef#101
+  r Unit#272.weapon1Flags 23
   r Unit#270.script null
   r Unit#270.id 270
   r Unit#270.killCount 0
-  r Unit#270.playerIndex 1
   r Unit#270.owner Player#1
-  r Unit#270.motion null
-  r Unit#270.posX 150471674
-  r Unit#270.posY 3080192
-  r Unit#270.posZ 50866575
   r Unit#270.weapon0TargetX 0
   r Unit#270.weapon0TargetZ -32768
-  r Unit#270.weapon0Def weapondef#90
   r Unit#270.weapon0Flags 19
   r Unit#270.weapon1TargetX 2
   r Unit#270.weapon1TargetZ -32768
-  r Unit#270.weapon1Def weapondef#101
-  r Unit#270.weapon1Flags 23
   r Unit#270.weapon2TargetX 0
   r Unit#270.weapon2TargetZ -32768
   r Unit#270.weapon2Def weapondef#0
@@ -8985,6 +8974,17 @@ call 1640 UpdateUnitWeapons
   r Unit#270.weapon2FirePitch 0
   r Unit#270.weapon2Stockpile 0
   r Unit#270.weapon2MuzzleDelta 0
+  r Unit#270.flags 0x80244301
+  r Unit#270.health -144
+  r Unit#270.def UnitDef#0
+  r Unit#270.playerIndex 1
+  r Unit#270.motion null
+  r Unit#270.posX 150471674
+  r Unit#270.posY 3080192
+  r Unit#270.posZ 50866575
+  r Unit#270.weapon0Def weapondef#90
+  r Unit#270.weapon1Def weapondef#101
+  r Unit#270.weapon1Flags 23
   r weapondef#101.flags 0x001c3201
   r weapondef#101.speed 1419946
   r weapondef#101.acceleration 7573
@@ -9001,26 +9001,15 @@ call 1640 UpdateUnitWeapons
   r weapondef#101.sound 78
   r weapondef#101.startSpeed 983040
   r weapondef#101.tolerance 9000
-  r Unit#12.health 2870
-  r Unit#12.def UnitDef#67
-  r Unit#12.flags 0x90240321
   r Unit#12.script CobScript#11
   r Unit#12.id 12
   r Unit#12.killCount 0
-  r Unit#12.playerIndex 0
   r Unit#12.owner Player#0
-  r Unit#12.motion UnitMotion#11
-  r Unit#12.posX 136314880
-  r Unit#12.posY 3080192
-  r Unit#12.posZ 11534336
   r Unit#12.weapon0TargetX 0
   r Unit#12.weapon0TargetZ -32768
-  r Unit#12.weapon0Def weapondef#64
   r Unit#12.weapon0Flags 18
   r Unit#12.weapon1TargetX 0
   r Unit#12.weapon1TargetZ -32768
-  r Unit#12.weapon1Def weapondef#35
-  r Unit#12.weapon1Flags 22
   r Unit#12.weapon2TargetX 0
   r Unit#12.weapon2TargetZ -32768
   r Unit#12.weapon2Def weapondef#0
@@ -9042,26 +9031,26 @@ call 1640 UpdateUnitWeapons
   r Unit#12.weapon2FirePitch 0
   r Unit#12.weapon2Stockpile 0
   r Unit#12.weapon2MuzzleDelta 0
-  r Unit#273.health -63
-  r Unit#273.def UnitDef#0
-  r Unit#273.flags 0x80244301
+  r Unit#12.flags 0x90240321
+  r Unit#12.health 2870
+  r Unit#12.def UnitDef#67
+  r Unit#12.playerIndex 0
+  r Unit#12.motion UnitMotion#11
+  r Unit#12.posX 136314880
+  r Unit#12.posY 3080192
+  r Unit#12.posZ 11534336
+  r Unit#12.weapon0Def weapondef#64
+  r Unit#12.weapon1Def weapondef#35
+  r Unit#12.weapon1Flags 22
   r Unit#273.script null
   r Unit#273.id 273
   r Unit#273.killCount 0
-  r Unit#273.playerIndex 1
   r Unit#273.owner Player#1
-  r Unit#273.motion null
-  r Unit#273.posX 110098583
-  r Unit#273.posY 3080192
-  r Unit#273.posZ 68156267
   r Unit#273.weapon0TargetX 0
   r Unit#273.weapon0TargetZ -32768
-  r Unit#273.weapon0Def weapondef#90
   r Unit#273.weapon0Flags 19
   r Unit#273.weapon1TargetX 9
   r Unit#273.weapon1TargetZ -32768
-  r Unit#273.weapon1Def weapondef#101
-  r Unit#273.weapon1Flags 23
   r Unit#273.weapon2TargetX 0
   r Unit#273.weapon2TargetZ -32768
   r Unit#273.weapon2Def weapondef#0
@@ -9083,6 +9072,17 @@ call 1640 UpdateUnitWeapons
   r Unit#273.weapon2FirePitch 0
   r Unit#273.weapon2Stockpile 0
   r Unit#273.weapon2MuzzleDelta 0
+  r Unit#273.flags 0x80244301
+  r Unit#273.health -63
+  r Unit#273.def UnitDef#0
+  r Unit#273.playerIndex 1
+  r Unit#273.motion null
+  r Unit#273.posX 110098583
+  r Unit#273.posY 3080192
+  r Unit#273.posZ 68156267
+  r Unit#273.weapon0Def weapondef#90
+  r Unit#273.weapon1Def weapondef#101
+  r Unit#273.weapon1Flags 23
   r weapondef#35.flags 0x00b13001
   r weapondef#35.speed 240298
   r weapondef#35.acceleration 1092
@@ -9099,32 +9099,35 @@ call 1640 UpdateUnitWeapons
   r weapondef#35.sound 48
   r weapondef#35.startSpeed 218453
   r weapondef#35.tolerance 32767
-  r UnitDef#25.maxHealth 4050
-  r UnitDef#25.modelMaxYHigh 35
-  r UnitMotion#2.speed 0
   r Unit#4.weapons[0].aimCob.nAimCobDone 1
   r Unit#4.weapons[1].aimCob.nAimCobDone 0
   r Unit#4.weapons[2].aimCob.nAimCobDone 0
-  r UnitDef#140.maxHealth 570
-  r UnitDef#140.modelMaxYHigh 12
+  r UnitDef#25.modelMaxYHigh 35
+  r UnitDef#25.maxHealth 4050
+  r UnitMotion#2.speed 0
   r Player#1.energy f32:0x4205df1c
   r Player#1.metal f32:0x447a0000
-  r UnitMotion#3.speed 170480
   r Unit#275.weapons[0].aimCob.nAimCobDone 0
   r Unit#275.weapons[1].aimCob.nAimCobDone 1
   r Unit#275.weapons[2].aimCob.nAimCobDone 0
-  r UnitDef#67.maxHealth 2870
-  r UnitDef#67.modelMaxYHigh 38
-  r UnitMotion#4.speed 0
+  r UnitDef#140.modelMaxYHigh 12
+  r UnitDef#140.maxHealth 570
+  r UnitMotion#3.speed 170480
   r Unit#5.weapons[0].aimCob.nAimCobDone 1
   r Unit#5.weapons[1].aimCob.nAimCobDone 0
   r Unit#5.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#5.speed 0
+  r UnitDef#67.modelMaxYHigh 38
+  r UnitDef#67.maxHealth 2870
+  r UnitMotion#4.speed 0
   r Unit#6.weapons[0].aimCob.nAimCobDone 1
   r Unit#6.weapons[1].aimCob.nAimCobDone 0
   r Unit#6.weapons[2].aimCob.nAimCobDone 0
-  r UnitDef#62.maxHealth 560
+  r UnitMotion#5.speed 0
+  r Unit#14.weapons[0].aimCob.nAimCobDone 0
+  r Unit#14.weapons[1].aimCob.nAimCobDone 1
+  r Unit#14.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#62.modelMaxYHigh 14
+  r UnitDef#62.maxHealth 560
   r UnitMotion#6.speed 0
   r weapondef#89.flags 0x00080809
   r weapondef#89.speed 873813
@@ -9142,40 +9145,37 @@ call 1640 UpdateUnitWeapons
   r weapondef#89.sound 57
   r weapondef#89.startSpeed 0
   r weapondef#89.tolerance 0
-  r Unit#14.weapons[0].aimCob.nAimCobDone 0
-  r Unit#14.weapons[1].aimCob.nAimCobDone 1
-  r Unit#14.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#7.speed 0
   r Unit#2.weapons[0].aimCob.nAimCobDone 1
   r Unit#2.weapons[1].aimCob.nAimCobDone 0
   r Unit#2.weapons[2].aimCob.nAimCobDone 0
-  r UnitDef#0.maxHealth 0
-  r UnitDef#0.modelMaxYHigh 0
+  r UnitMotion#7.speed 0
   r Unit#271.weapons[0].aimCob.nAimCobDone 0
   r Unit#271.weapons[1].aimCob.nAimCobDone 1
   r Unit#271.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#8.speed 0
+  r UnitDef#0.modelMaxYHigh 0
+  r UnitDef#0.maxHealth 0
   r Unit#274.weapons[0].aimCob.nAimCobDone 0
   r Unit#274.weapons[1].aimCob.nAimCobDone 1
   r Unit#274.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#9.speed 51015
+  r UnitMotion#8.speed 0
   r Unit#9.weapons[0].aimCob.nAimCobDone 0
   r Unit#9.weapons[1].aimCob.nAimCobDone 0
   r Unit#9.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#10.speed 0
+  r UnitMotion#9.speed 51015
   r Unit#13.weapons[0].aimCob.nAimCobDone 0
   r Unit#13.weapons[1].aimCob.nAimCobDone 1
   r Unit#13.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#10.speed 0
   r Unit#272.weapons[0].aimCob.nAimCobDone 0
   r Unit#272.weapons[1].aimCob.nAimCobDone 1
   r Unit#272.weapons[2].aimCob.nAimCobDone 0
   r Unit#270.weapons[0].aimCob.nAimCobDone 1
   r Unit#270.weapons[1].aimCob.nAimCobDone 1
   r Unit#270.weapons[2].aimCob.nAimCobDone 0
-  r UnitMotion#11.speed 0
   r Unit#12.weapons[0].aimCob.nAimCobDone 1
   r Unit#12.weapons[1].aimCob.nAimCobDone 0
   r Unit#12.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#11.speed 0
   r Unit#273.weapons[0].aimCob.nAimCobDone 1
   r Unit#273.weapons[1].aimCob.nAimCobDone 1
   r Unit#273.weapons[2].aimCob.nAimCobDone 0
@@ -9191,26 +9191,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#3.health 5720
-  r Unit#3.def UnitDef#15
-  r Unit#3.flags 0x90240321
   r Unit#3.script CobScript#12
   r Unit#3.id 3
   r Unit#3.killCount 0
-  r Unit#3.playerIndex 0
   r Unit#3.owner Player#0
-  r Unit#3.motion UnitMotion#12
-  r Unit#3.posX 122683392
-  r Unit#3.posY 3080192
-  r Unit#3.posZ 49283072
   r Unit#3.weapon0TargetX 275
   r Unit#3.weapon0TargetZ -32768
-  r Unit#3.weapon0Def weapondef#68
   r Unit#3.weapon0Flags 19
   r Unit#3.weapon1TargetX 275
   r Unit#3.weapon1TargetZ -32768
-  r Unit#3.weapon1Def weapondef#68
-  r Unit#3.weapon1Flags 23
   r Unit#3.weapon2TargetX 0
   r Unit#3.weapon2TargetZ -32768
   r Unit#3.weapon2Def weapondef#0
@@ -9232,8 +9221,22 @@ call 1640 UpdateUnitWeapons
   r Unit#3.weapon2FirePitch 0
   r Unit#3.weapon2Stockpile 0
   r Unit#3.weapon2MuzzleDelta 0
-  r UnitDef#15.maxHealth 5720
+  r Unit#3.flags 0x90240321
+  r Unit#3.health 5720
+  r Unit#3.def UnitDef#15
+  r Unit#3.playerIndex 0
+  r Unit#3.motion UnitMotion#12
+  r Unit#3.posX 122683392
+  r Unit#3.posY 3080192
+  r Unit#3.posZ 49283072
+  r Unit#3.weapon0Def weapondef#68
+  r Unit#3.weapon1Def weapondef#68
+  r Unit#3.weapon1Flags 23
+  r Unit#3.weapons[0].aimCob.nAimCobDone 0
+  r Unit#3.weapons[1].aimCob.nAimCobDone 1
+  r Unit#3.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#15.modelMaxYHigh 55
+  r UnitDef#15.maxHealth 5720
   r UnitMotion#12.speed 0
   r weapondef#68.flags 0x00080202
   r weapondef#68.speed 764586
@@ -9251,9 +9254,6 @@ call 1640 UpdateUnitWeapons
   r weapondef#68.sound 92
   r weapondef#68.startSpeed 0
   r weapondef#68.tolerance 0
-  r Unit#3.weapons[0].aimCob.nAimCobDone 0
-  r Unit#3.weapons[1].aimCob.nAimCobDone 1
-  r Unit#3.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 108181794
@@ -9349,26 +9349,15 @@ call 1640 UpdateUnitWeapons
   w Projectile#3.nextSmokeTick 1640
   w Projectile#3.piece 3
 call 1640 UpdateUnitWeapons
-  r Unit#7.health 290
-  r Unit#7.def UnitDef#75
-  r Unit#7.flags 0x90240321
   r Unit#7.script CobScript#13
   r Unit#7.id 7
   r Unit#7.killCount 0
-  r Unit#7.playerIndex 0
   r Unit#7.owner Player#0
-  r Unit#7.motion UnitMotion#13
-  r Unit#7.posX 120586240
-  r Unit#7.posY 196608
-  r Unit#7.posZ 32505856
   r Unit#7.weapon0TargetX 0
   r Unit#7.weapon0TargetZ -32768
-  r Unit#7.weapon0Def weapondef#12
   r Unit#7.weapon0Flags 18
   r Unit#7.weapon1TargetX 0
   r Unit#7.weapon1TargetZ -32768
-  r Unit#7.weapon1Def weapondef#0
-  r Unit#7.weapon1Flags 20
   r Unit#7.weapon2TargetX 0
   r Unit#7.weapon2TargetZ -32768
   r Unit#7.weapon2Def weapondef#0
@@ -9390,8 +9379,22 @@ call 1640 UpdateUnitWeapons
   r Unit#7.weapon2FirePitch 0
   r Unit#7.weapon2Stockpile 0
   r Unit#7.weapon2MuzzleDelta 0
-  r UnitDef#75.maxHealth 290
+  r Unit#7.flags 0x90240321
+  r Unit#7.health 290
+  r Unit#7.def UnitDef#75
+  r Unit#7.playerIndex 0
+  r Unit#7.motion UnitMotion#13
+  r Unit#7.posX 120586240
+  r Unit#7.posY 196608
+  r Unit#7.posZ 32505856
+  r Unit#7.weapon0Def weapondef#12
+  r Unit#7.weapon1Def weapondef#0
+  r Unit#7.weapon1Flags 20
+  r Unit#7.weapons[0].aimCob.nAimCobDone 0
+  r Unit#7.weapons[1].aimCob.nAimCobDone 0
+  r Unit#7.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#75.modelMaxYHigh 15
+  r UnitDef#75.maxHealth 290
   r UnitMotion#13.speed 0
   r weapondef#12.flags 0x00b13001
   r weapondef#12.speed 218453
@@ -9409,35 +9412,21 @@ call 1640 UpdateUnitWeapons
   r weapondef#12.sound 48
   r weapondef#12.startSpeed 218453
   r weapondef#12.tolerance 32767
-  r Unit#7.weapons[0].aimCob.nAimCobDone 0
-  r Unit#7.weapons[1].aimCob.nAimCobDone 0
-  r Unit#7.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#7
   i services.ScheduleTargetingTargetPos Unit#7 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#8.health 3982
-  r Unit#8.def UnitDef#25
-  r Unit#8.flags 0x90240325
   r Unit#8.script CobScript#14
   r Unit#8.id 8
   r Unit#8.killCount 0
-  r Unit#8.playerIndex 0
   r Unit#8.owner Player#0
-  r Unit#8.motion UnitMotion#14
-  r Unit#8.posX 103841409
-  r Unit#8.posY 3080192
-  r Unit#8.posZ 51598959
   r Unit#8.weapon0TargetX 274
   r Unit#8.weapon0TargetZ -32768
-  r Unit#8.weapon0Def weapondef#66
   r Unit#8.weapon0Flags 3
   r Unit#8.weapon1TargetX 275
   r Unit#8.weapon1TargetZ -32768
-  r Unit#8.weapon1Def weapondef#35
-  r Unit#8.weapon1Flags 22
   r Unit#8.weapon2TargetX 0
   r Unit#8.weapon2TargetZ -32768
   r Unit#8.weapon2Def weapondef#0
@@ -9459,10 +9448,21 @@ call 1640 UpdateUnitWeapons
   r Unit#8.weapon2FirePitch 0
   r Unit#8.weapon2Stockpile 0
   r Unit#8.weapon2MuzzleDelta 0
-  r UnitMotion#14.speed 11132
+  r Unit#8.flags 0x90240325
+  r Unit#8.health 3982
+  r Unit#8.def UnitDef#25
+  r Unit#8.playerIndex 0
+  r Unit#8.motion UnitMotion#14
+  r Unit#8.posX 103841409
+  r Unit#8.posY 3080192
+  r Unit#8.posZ 51598959
+  r Unit#8.weapon0Def weapondef#66
+  r Unit#8.weapon1Def weapondef#35
+  r Unit#8.weapon1Flags 22
   r Unit#8.weapons[0].aimCob.nAimCobDone 1
   r Unit#8.weapons[1].aimCob.nAimCobDone 0
   r Unit#8.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#14.speed 11132
   a unit Unit#8
   i services.ScheduleTargetingTargetPos Unit#8 0 = 1
   o x 90701823
@@ -9487,26 +9487,15 @@ call 1640 UpdateUnitWeapons
   o z 54001665
   w Unit#9.weapon1ReloadTimer 32
 call 1640 UpdateUnitWeapons
-  r Unit#10.health 290
-  r Unit#10.def UnitDef#75
-  r Unit#10.flags 0x90240321
   r Unit#10.script CobScript#15
   r Unit#10.id 10
   r Unit#10.killCount 0
-  r Unit#10.playerIndex 0
   r Unit#10.owner Player#0
-  r Unit#10.motion UnitMotion#15
-  r Unit#10.posX 127926272
-  r Unit#10.posY 196608
-  r Unit#10.posZ 32505856
   r Unit#10.weapon0TargetX 0
   r Unit#10.weapon0TargetZ -32768
-  r Unit#10.weapon0Def weapondef#12
   r Unit#10.weapon0Flags 18
   r Unit#10.weapon1TargetX 0
   r Unit#10.weapon1TargetZ -32768
-  r Unit#10.weapon1Def weapondef#0
-  r Unit#10.weapon1Flags 20
   r Unit#10.weapon2TargetX 0
   r Unit#10.weapon2TargetZ -32768
   r Unit#10.weapon2Def weapondef#0
@@ -9528,10 +9517,21 @@ call 1640 UpdateUnitWeapons
   r Unit#10.weapon2FirePitch 0
   r Unit#10.weapon2Stockpile 0
   r Unit#10.weapon2MuzzleDelta 0
-  r UnitMotion#15.speed 0
+  r Unit#10.flags 0x90240321
+  r Unit#10.health 290
+  r Unit#10.def UnitDef#75
+  r Unit#10.playerIndex 0
+  r Unit#10.motion UnitMotion#15
+  r Unit#10.posX 127926272
+  r Unit#10.posY 196608
+  r Unit#10.posZ 32505856
+  r Unit#10.weapon0Def weapondef#12
+  r Unit#10.weapon1Def weapondef#0
+  r Unit#10.weapon1Flags 20
   r Unit#10.weapons[0].aimCob.nAimCobDone 0
   r Unit#10.weapons[1].aimCob.nAimCobDone 0
   r Unit#10.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#15.speed 0
   r Unit#9.posX 94469421
   r Unit#9.posZ 58759981
   r UnitMotion#9.speed 50164
@@ -9541,26 +9541,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#11.health 2870
-  r Unit#11.def UnitDef#67
-  r Unit#11.flags 0x90240321
   r Unit#11.script CobScript#16
   r Unit#11.id 11
   r Unit#11.killCount 0
-  r Unit#11.playerIndex 0
   r Unit#11.owner Player#0
-  r Unit#11.motion UnitMotion#16
-  r Unit#11.posX 117440512
-  r Unit#11.posY 3080192
-  r Unit#11.posZ 11534336
   r Unit#11.weapon0TargetX 0
   r Unit#11.weapon0TargetZ -32768
-  r Unit#11.weapon0Def weapondef#64
   r Unit#11.weapon0Flags 18
   r Unit#11.weapon1TargetX 0
   r Unit#11.weapon1TargetZ -32768
-  r Unit#11.weapon1Def weapondef#35
-  r Unit#11.weapon1Flags 22
   r Unit#11.weapon2TargetX 0
   r Unit#11.weapon2TargetZ -32768
   r Unit#11.weapon2Def weapondef#0
@@ -9582,10 +9571,21 @@ call 1640 UpdateUnitWeapons
   r Unit#11.weapon2FirePitch 0
   r Unit#11.weapon2Stockpile 0
   r Unit#11.weapon2MuzzleDelta 0
-  r UnitMotion#16.speed 0
+  r Unit#11.flags 0x90240321
+  r Unit#11.health 2870
+  r Unit#11.def UnitDef#67
+  r Unit#11.playerIndex 0
+  r Unit#11.motion UnitMotion#16
+  r Unit#11.posX 117440512
+  r Unit#11.posY 3080192
+  r Unit#11.posZ 11534336
+  r Unit#11.weapon0Def weapondef#64
+  r Unit#11.weapon1Def weapondef#35
+  r Unit#11.weapon1Flags 22
   r Unit#11.weapons[0].aimCob.nAimCobDone 0
   r Unit#11.weapons[1].aimCob.nAimCobDone 0
   r Unit#11.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#16.speed 0
   a unit Unit#11
   i services.ScheduleTargetingTargetPos Unit#11 0 = 0
   o x 0
@@ -9628,26 +9628,15 @@ call 1640 UpdateUnitWeapons
   o z 57621272
   w Unit#14.weapon1ReloadTimer 58
 call 1640 UpdateUnitWeapons
-  r Unit#15.health 528
-  r Unit#15.def UnitDef#62
-  r Unit#15.flags 0x90240321
   r Unit#15.script CobScript#17
   r Unit#15.id 15
   r Unit#15.killCount 1
-  r Unit#15.playerIndex 0
   r Unit#15.owner Player#0
-  r Unit#15.motion UnitMotion#17
-  r Unit#15.posX 132120576
-  r Unit#15.posY 3080192
-  r Unit#15.posZ 49283072
   r Unit#15.weapon0TargetX 0
   r Unit#15.weapon0TargetZ -32768
-  r Unit#15.weapon0Def weapondef#89
   r Unit#15.weapon0Flags 18
   r Unit#15.weapon1TargetX 275
   r Unit#15.weapon1TargetZ -32768
-  r Unit#15.weapon1Def weapondef#100
-  r Unit#15.weapon1Flags 23
   r Unit#15.weapon2TargetX 0
   r Unit#15.weapon2TargetZ -32768
   r Unit#15.weapon2Def weapondef#0
@@ -9669,10 +9658,21 @@ call 1640 UpdateUnitWeapons
   r Unit#15.weapon2FirePitch 0
   r Unit#15.weapon2Stockpile 0
   r Unit#15.weapon2MuzzleDelta 0
-  r UnitMotion#17.speed 0
+  r Unit#15.flags 0x90240321
+  r Unit#15.health 528
+  r Unit#15.def UnitDef#62
+  r Unit#15.playerIndex 0
+  r Unit#15.motion UnitMotion#17
+  r Unit#15.posX 132120576
+  r Unit#15.posY 3080192
+  r Unit#15.posZ 49283072
+  r Unit#15.weapon0Def weapondef#89
+  r Unit#15.weapon1Def weapondef#100
+  r Unit#15.weapon1Flags 23
   r Unit#15.weapons[0].aimCob.nAimCobDone 1
   r Unit#15.weapons[1].aimCob.nAimCobDone 1
   r Unit#15.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#17.speed 0
   a unit Unit#15
   i services.ScheduleTargetingTargetPos Unit#15 0 = 0
   o x 0
@@ -9684,26 +9684,15 @@ call 1640 UpdateUnitWeapons
   o z 57621272
   w Unit#15.weapon1ReloadTimer 36
 call 1640 UpdateUnitWeapons
-  r Unit#16.health 560
-  r Unit#16.def UnitDef#62
-  r Unit#16.flags 0x90240321
   r Unit#16.script CobScript#18
   r Unit#16.id 16
   r Unit#16.killCount 0
-  r Unit#16.playerIndex 0
   r Unit#16.owner Player#0
-  r Unit#16.motion UnitMotion#18
-  r Unit#16.posX 108003328
-  r Unit#16.posY 3080192
-  r Unit#16.posZ 15728640
   r Unit#16.weapon0TargetX 0
   r Unit#16.weapon0TargetZ -32768
-  r Unit#16.weapon0Def weapondef#89
   r Unit#16.weapon0Flags 18
   r Unit#16.weapon1TargetX 0
   r Unit#16.weapon1TargetZ -32768
-  r Unit#16.weapon1Def weapondef#100
-  r Unit#16.weapon1Flags 22
   r Unit#16.weapon2TargetX 0
   r Unit#16.weapon2TargetZ -32768
   r Unit#16.weapon2Def weapondef#0
@@ -9725,10 +9714,21 @@ call 1640 UpdateUnitWeapons
   r Unit#16.weapon2FirePitch 0
   r Unit#16.weapon2Stockpile 0
   r Unit#16.weapon2MuzzleDelta 0
-  r UnitMotion#18.speed 0
+  r Unit#16.flags 0x90240321
+  r Unit#16.health 560
+  r Unit#16.def UnitDef#62
+  r Unit#16.playerIndex 0
+  r Unit#16.motion UnitMotion#18
+  r Unit#16.posX 108003328
+  r Unit#16.posY 3080192
+  r Unit#16.posZ 15728640
+  r Unit#16.weapon0Def weapondef#89
+  r Unit#16.weapon1Def weapondef#100
+  r Unit#16.weapon1Flags 22
   r Unit#16.weapons[0].aimCob.nAimCobDone 0
   r Unit#16.weapons[1].aimCob.nAimCobDone 0
   r Unit#16.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#18.speed 0
   a unit Unit#16
   i services.ScheduleTargetingTargetPos Unit#16 0 = 0
   o x 0
@@ -9739,26 +9739,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#17.health 560
-  r Unit#17.def UnitDef#62
-  r Unit#17.flags 0x90240321
   r Unit#17.script CobScript#19
   r Unit#17.id 17
   r Unit#17.killCount 0
-  r Unit#17.playerIndex 0
   r Unit#17.owner Player#0
-  r Unit#17.motion UnitMotion#19
-  r Unit#17.posX 146800640
-  r Unit#17.posY 3080192
-  r Unit#17.posZ 15728640
   r Unit#17.weapon0TargetX 0
   r Unit#17.weapon0TargetZ -32768
-  r Unit#17.weapon0Def weapondef#89
   r Unit#17.weapon0Flags 18
   r Unit#17.weapon1TargetX 0
   r Unit#17.weapon1TargetZ -32768
-  r Unit#17.weapon1Def weapondef#100
-  r Unit#17.weapon1Flags 22
   r Unit#17.weapon2TargetX 0
   r Unit#17.weapon2TargetZ -32768
   r Unit#17.weapon2Def weapondef#0
@@ -9780,10 +9769,21 @@ call 1640 UpdateUnitWeapons
   r Unit#17.weapon2FirePitch 0
   r Unit#17.weapon2Stockpile 0
   r Unit#17.weapon2MuzzleDelta 0
-  r UnitMotion#19.speed 0
+  r Unit#17.flags 0x90240321
+  r Unit#17.health 560
+  r Unit#17.def UnitDef#62
+  r Unit#17.playerIndex 0
+  r Unit#17.motion UnitMotion#19
+  r Unit#17.posX 146800640
+  r Unit#17.posY 3080192
+  r Unit#17.posZ 15728640
+  r Unit#17.weapon0Def weapondef#89
+  r Unit#17.weapon1Def weapondef#100
+  r Unit#17.weapon1Flags 22
   r Unit#17.weapons[0].aimCob.nAimCobDone 0
   r Unit#17.weapons[1].aimCob.nAimCobDone 1
   r Unit#17.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#19.speed 0
   a unit Unit#17
   i services.ScheduleTargetingTargetPos Unit#17 0 = 0
   o x 0
@@ -9794,26 +9794,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#251.health 52
-  r Unit#251.def UnitDef#153
-  r Unit#251.flags 0x30280021
   r Unit#251.script CobScript#20
   r Unit#251.id 251
   r Unit#251.killCount 0
-  r Unit#251.playerIndex 1
   r Unit#251.owner Player#1
-  r Unit#251.motion null
-  r Unit#251.posX 106954752
-  r Unit#251.posY 2293760
-  r Unit#251.posZ 196083712
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ -32768
-  r Unit#251.weapon0Def weapondef#0
   r Unit#251.weapon0Flags 16
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ -32768
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ -32768
   r Unit#251.weapon2Def weapondef#0
@@ -9835,33 +9824,33 @@ call 1640 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 0
-  r UnitDef#153.maxHealth 52
-  r UnitDef#153.modelMaxYHigh 33
+  r Unit#251.flags 0x30280021
+  r Unit#251.health 52
+  r Unit#251.def UnitDef#153
+  r Unit#251.playerIndex 1
+  r Unit#251.motion null
+  r Unit#251.posX 106954752
+  r Unit#251.posY 2293760
+  r Unit#251.posZ 196083712
+  r Unit#251.weapon0Def weapondef#0
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
   r Unit#251.weapons[0].aimCob.nAimCobDone 0
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#153.modelMaxYHigh 33
+  r UnitDef#153.maxHealth 52
   a unit Unit#251
 call 1640 UpdateUnitWeapons
-  r Unit#252.health 52
-  r Unit#252.def UnitDef#153
-  r Unit#252.flags 0x30280021
   r Unit#252.script CobScript#21
   r Unit#252.id 252
   r Unit#252.killCount 0
-  r Unit#252.playerIndex 1
   r Unit#252.owner Player#1
-  r Unit#252.motion null
-  r Unit#252.posX 165675008
-  r Unit#252.posY 2293760
-  r Unit#252.posZ 181403648
   r Unit#252.weapon0TargetX 0
   r Unit#252.weapon0TargetZ -32768
-  r Unit#252.weapon0Def weapondef#0
   r Unit#252.weapon0Flags 16
   r Unit#252.weapon1TargetX 0
   r Unit#252.weapon1TargetZ -32768
-  r Unit#252.weapon1Def weapondef#0
-  r Unit#252.weapon1Flags 20
   r Unit#252.weapon2TargetX 0
   r Unit#252.weapon2TargetZ -32768
   r Unit#252.weapon2Def weapondef#0
@@ -9883,31 +9872,31 @@ call 1640 UpdateUnitWeapons
   r Unit#252.weapon2FirePitch 0
   r Unit#252.weapon2Stockpile 0
   r Unit#252.weapon2MuzzleDelta 0
+  r Unit#252.flags 0x30280021
+  r Unit#252.health 52
+  r Unit#252.def UnitDef#153
+  r Unit#252.playerIndex 1
+  r Unit#252.motion null
+  r Unit#252.posX 165675008
+  r Unit#252.posY 2293760
+  r Unit#252.posZ 181403648
+  r Unit#252.weapon0Def weapondef#0
+  r Unit#252.weapon1Def weapondef#0
+  r Unit#252.weapon1Flags 20
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0
   r Unit#252.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#252
 call 1640 UpdateUnitWeapons
-  r Unit#253.health 52
-  r Unit#253.def UnitDef#153
-  r Unit#253.flags 0x30280021
   r Unit#253.script CobScript#22
   r Unit#253.id 253
   r Unit#253.killCount 0
-  r Unit#253.playerIndex 1
   r Unit#253.owner Player#1
-  r Unit#253.motion null
-  r Unit#253.posX 62914560
-  r Unit#253.posY 2293760
-  r Unit#253.posZ 169869312
   r Unit#253.weapon0TargetX 0
   r Unit#253.weapon0TargetZ -32768
-  r Unit#253.weapon0Def weapondef#0
   r Unit#253.weapon0Flags 16
   r Unit#253.weapon1TargetX 0
   r Unit#253.weapon1TargetZ -32768
-  r Unit#253.weapon1Def weapondef#0
-  r Unit#253.weapon1Flags 20
   r Unit#253.weapon2TargetX 0
   r Unit#253.weapon2TargetZ -32768
   r Unit#253.weapon2Def weapondef#0
@@ -9929,31 +9918,31 @@ call 1640 UpdateUnitWeapons
   r Unit#253.weapon2FirePitch 0
   r Unit#253.weapon2Stockpile 0
   r Unit#253.weapon2MuzzleDelta 0
+  r Unit#253.flags 0x30280021
+  r Unit#253.health 52
+  r Unit#253.def UnitDef#153
+  r Unit#253.playerIndex 1
+  r Unit#253.motion null
+  r Unit#253.posX 62914560
+  r Unit#253.posY 2293760
+  r Unit#253.posZ 169869312
+  r Unit#253.weapon0Def weapondef#0
+  r Unit#253.weapon1Def weapondef#0
+  r Unit#253.weapon1Flags 20
   r Unit#253.weapons[0].aimCob.nAimCobDone 0
   r Unit#253.weapons[1].aimCob.nAimCobDone 0
   r Unit#253.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#253
 call 1640 UpdateUnitWeapons
-  r Unit#254.health 52
-  r Unit#254.def UnitDef#153
-  r Unit#254.flags 0x30280121
   r Unit#254.script CobScript#23
   r Unit#254.id 254
   r Unit#254.killCount 0
-  r Unit#254.playerIndex 1
   r Unit#254.owner Player#1
-  r Unit#254.motion null
-  r Unit#254.posX 115343360
-  r Unit#254.posY 2293760
-  r Unit#254.posZ 87031808
   r Unit#254.weapon0TargetX 0
   r Unit#254.weapon0TargetZ -32768
-  r Unit#254.weapon0Def weapondef#0
   r Unit#254.weapon0Flags 16
   r Unit#254.weapon1TargetX 0
   r Unit#254.weapon1TargetZ -32768
-  r Unit#254.weapon1Def weapondef#0
-  r Unit#254.weapon1Flags 20
   r Unit#254.weapon2TargetX 0
   r Unit#254.weapon2TargetZ -32768
   r Unit#254.weapon2Def weapondef#0
@@ -9975,31 +9964,31 @@ call 1640 UpdateUnitWeapons
   r Unit#254.weapon2FirePitch 0
   r Unit#254.weapon2Stockpile 0
   r Unit#254.weapon2MuzzleDelta 0
+  r Unit#254.flags 0x30280121
+  r Unit#254.health 52
+  r Unit#254.def UnitDef#153
+  r Unit#254.playerIndex 1
+  r Unit#254.motion null
+  r Unit#254.posX 115343360
+  r Unit#254.posY 2293760
+  r Unit#254.posZ 87031808
+  r Unit#254.weapon0Def weapondef#0
+  r Unit#254.weapon1Def weapondef#0
+  r Unit#254.weapon1Flags 20
   r Unit#254.weapons[0].aimCob.nAimCobDone 0
   r Unit#254.weapons[1].aimCob.nAimCobDone 0
   r Unit#254.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#254
 call 1640 UpdateUnitWeapons
-  r Unit#255.health 52
-  r Unit#255.def UnitDef#153
-  r Unit#255.flags 0x30280021
   r Unit#255.script CobScript#24
   r Unit#255.id 255
   r Unit#255.killCount 0
-  r Unit#255.playerIndex 1
   r Unit#255.owner Player#1
-  r Unit#255.motion null
-  r Unit#255.posX 178257920
-  r Unit#255.posY 2293760
-  r Unit#255.posZ 188743680
   r Unit#255.weapon0TargetX 0
   r Unit#255.weapon0TargetZ -32768
-  r Unit#255.weapon0Def weapondef#0
   r Unit#255.weapon0Flags 16
   r Unit#255.weapon1TargetX 0
   r Unit#255.weapon1TargetZ -32768
-  r Unit#255.weapon1Def weapondef#0
-  r Unit#255.weapon1Flags 20
   r Unit#255.weapon2TargetX 0
   r Unit#255.weapon2TargetZ -32768
   r Unit#255.weapon2Def weapondef#0
@@ -10021,31 +10010,31 @@ call 1640 UpdateUnitWeapons
   r Unit#255.weapon2FirePitch 0
   r Unit#255.weapon2Stockpile 0
   r Unit#255.weapon2MuzzleDelta 0
+  r Unit#255.flags 0x30280021
+  r Unit#255.health 52
+  r Unit#255.def UnitDef#153
+  r Unit#255.playerIndex 1
+  r Unit#255.motion null
+  r Unit#255.posX 178257920
+  r Unit#255.posY 2293760
+  r Unit#255.posZ 188743680
+  r Unit#255.weapon0Def weapondef#0
+  r Unit#255.weapon1Def weapondef#0
+  r Unit#255.weapon1Flags 20
   r Unit#255.weapons[0].aimCob.nAimCobDone 0
   r Unit#255.weapons[1].aimCob.nAimCobDone 0
   r Unit#255.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#255
 call 1640 UpdateUnitWeapons
-  r Unit#256.health 52
-  r Unit#256.def UnitDef#153
-  r Unit#256.flags 0x30280021
   r Unit#256.script CobScript#25
   r Unit#256.id 256
   r Unit#256.killCount 0
-  r Unit#256.playerIndex 1
   r Unit#256.owner Player#1
-  r Unit#256.motion null
-  r Unit#256.posX 85983232
-  r Unit#256.posY 2293760
-  r Unit#256.posZ 249561088
   r Unit#256.weapon0TargetX 0
   r Unit#256.weapon0TargetZ -32768
-  r Unit#256.weapon0Def weapondef#0
   r Unit#256.weapon0Flags 16
   r Unit#256.weapon1TargetX 0
   r Unit#256.weapon1TargetZ -32768
-  r Unit#256.weapon1Def weapondef#0
-  r Unit#256.weapon1Flags 20
   r Unit#256.weapon2TargetX 0
   r Unit#256.weapon2TargetZ -32768
   r Unit#256.weapon2Def weapondef#0
@@ -10067,31 +10056,31 @@ call 1640 UpdateUnitWeapons
   r Unit#256.weapon2FirePitch 0
   r Unit#256.weapon2Stockpile 0
   r Unit#256.weapon2MuzzleDelta 0
+  r Unit#256.flags 0x30280021
+  r Unit#256.health 52
+  r Unit#256.def UnitDef#153
+  r Unit#256.playerIndex 1
+  r Unit#256.motion null
+  r Unit#256.posX 85983232
+  r Unit#256.posY 2293760
+  r Unit#256.posZ 249561088
+  r Unit#256.weapon0Def weapondef#0
+  r Unit#256.weapon1Def weapondef#0
+  r Unit#256.weapon1Flags 20
   r Unit#256.weapons[0].aimCob.nAimCobDone 0
   r Unit#256.weapons[1].aimCob.nAimCobDone 0
   r Unit#256.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#256
 call 1640 UpdateUnitWeapons
-  r Unit#257.health 52
-  r Unit#257.def UnitDef#153
-  r Unit#257.flags 0x30280021
   r Unit#257.script CobScript#26
   r Unit#257.id 257
   r Unit#257.killCount 0
-  r Unit#257.playerIndex 1
   r Unit#257.owner Player#1
-  r Unit#257.motion null
-  r Unit#257.posX 14680064
-  r Unit#257.posY 2293760
-  r Unit#257.posZ 245366784
   r Unit#257.weapon0TargetX 0
   r Unit#257.weapon0TargetZ -32768
-  r Unit#257.weapon0Def weapondef#0
   r Unit#257.weapon0Flags 16
   r Unit#257.weapon1TargetX 0
   r Unit#257.weapon1TargetZ -32768
-  r Unit#257.weapon1Def weapondef#0
-  r Unit#257.weapon1Flags 20
   r Unit#257.weapon2TargetX 0
   r Unit#257.weapon2TargetZ -32768
   r Unit#257.weapon2Def weapondef#0
@@ -10113,31 +10102,31 @@ call 1640 UpdateUnitWeapons
   r Unit#257.weapon2FirePitch 0
   r Unit#257.weapon2Stockpile 0
   r Unit#257.weapon2MuzzleDelta 0
+  r Unit#257.flags 0x30280021
+  r Unit#257.health 52
+  r Unit#257.def UnitDef#153
+  r Unit#257.playerIndex 1
+  r Unit#257.motion null
+  r Unit#257.posX 14680064
+  r Unit#257.posY 2293760
+  r Unit#257.posZ 245366784
+  r Unit#257.weapon0Def weapondef#0
+  r Unit#257.weapon1Def weapondef#0
+  r Unit#257.weapon1Flags 20
   r Unit#257.weapons[0].aimCob.nAimCobDone 0
   r Unit#257.weapons[1].aimCob.nAimCobDone 0
   r Unit#257.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#257
 call 1640 UpdateUnitWeapons
-  r Unit#258.health 52
-  r Unit#258.def UnitDef#153
-  r Unit#258.flags 0x30280021
   r Unit#258.script CobScript#27
   r Unit#258.id 258
   r Unit#258.killCount 0
-  r Unit#258.playerIndex 1
   r Unit#258.owner Player#1
-  r Unit#258.motion null
-  r Unit#258.posX 15728640
-  r Unit#258.posY 2293760
-  r Unit#258.posZ 179306496
   r Unit#258.weapon0TargetX 0
   r Unit#258.weapon0TargetZ -32768
-  r Unit#258.weapon0Def weapondef#0
   r Unit#258.weapon0Flags 16
   r Unit#258.weapon1TargetX 0
   r Unit#258.weapon1TargetZ -32768
-  r Unit#258.weapon1Def weapondef#0
-  r Unit#258.weapon1Flags 20
   r Unit#258.weapon2TargetX 0
   r Unit#258.weapon2TargetZ -32768
   r Unit#258.weapon2Def weapondef#0
@@ -10159,31 +10148,31 @@ call 1640 UpdateUnitWeapons
   r Unit#258.weapon2FirePitch 0
   r Unit#258.weapon2Stockpile 0
   r Unit#258.weapon2MuzzleDelta 0
+  r Unit#258.flags 0x30280021
+  r Unit#258.health 52
+  r Unit#258.def UnitDef#153
+  r Unit#258.playerIndex 1
+  r Unit#258.motion null
+  r Unit#258.posX 15728640
+  r Unit#258.posY 2293760
+  r Unit#258.posZ 179306496
+  r Unit#258.weapon0Def weapondef#0
+  r Unit#258.weapon1Def weapondef#0
+  r Unit#258.weapon1Flags 20
   r Unit#258.weapons[0].aimCob.nAimCobDone 0
   r Unit#258.weapons[1].aimCob.nAimCobDone 0
   r Unit#258.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#258
 call 1640 UpdateUnitWeapons
-  r Unit#259.health 52
-  r Unit#259.def UnitDef#153
-  r Unit#259.flags 0x30280021
   r Unit#259.script CobScript#28
   r Unit#259.id 259
   r Unit#259.killCount 0
-  r Unit#259.playerIndex 1
   r Unit#259.owner Player#1
-  r Unit#259.motion null
-  r Unit#259.posX 13631488
-  r Unit#259.posY 2293760
-  r Unit#259.posZ 137363456
   r Unit#259.weapon0TargetX 0
   r Unit#259.weapon0TargetZ -32768
-  r Unit#259.weapon0Def weapondef#0
   r Unit#259.weapon0Flags 16
   r Unit#259.weapon1TargetX 0
   r Unit#259.weapon1TargetZ -32768
-  r Unit#259.weapon1Def weapondef#0
-  r Unit#259.weapon1Flags 20
   r Unit#259.weapon2TargetX 0
   r Unit#259.weapon2TargetZ -32768
   r Unit#259.weapon2Def weapondef#0
@@ -10205,31 +10194,31 @@ call 1640 UpdateUnitWeapons
   r Unit#259.weapon2FirePitch 0
   r Unit#259.weapon2Stockpile 0
   r Unit#259.weapon2MuzzleDelta 0
+  r Unit#259.flags 0x30280021
+  r Unit#259.health 52
+  r Unit#259.def UnitDef#153
+  r Unit#259.playerIndex 1
+  r Unit#259.motion null
+  r Unit#259.posX 13631488
+  r Unit#259.posY 2293760
+  r Unit#259.posZ 137363456
+  r Unit#259.weapon0Def weapondef#0
+  r Unit#259.weapon1Def weapondef#0
+  r Unit#259.weapon1Flags 20
   r Unit#259.weapons[0].aimCob.nAimCobDone 0
   r Unit#259.weapons[1].aimCob.nAimCobDone 0
   r Unit#259.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#259
 call 1640 UpdateUnitWeapons
-  r Unit#260.health 276
-  r Unit#260.def UnitDef#151
-  r Unit#260.flags 0x90240005
   r Unit#260.script CobScript#29
   r Unit#260.id 260
   r Unit#260.killCount 0
-  r Unit#260.playerIndex 1
   r Unit#260.owner Player#1
-  r Unit#260.motion UnitMotion#20
-  r Unit#260.posX 97040687
-  r Unit#260.posY 196608
-  r Unit#260.posZ 119095606
   r Unit#260.weapon0TargetX 0
   r Unit#260.weapon0TargetZ -32768
-  r Unit#260.weapon0Def weapondef#13
   r Unit#260.weapon0Flags 18
   r Unit#260.weapon1TargetX 0
   r Unit#260.weapon1TargetZ -32768
-  r Unit#260.weapon1Def weapondef#0
-  r Unit#260.weapon1Flags 20
   r Unit#260.weapon2TargetX 0
   r Unit#260.weapon2TargetZ -32768
   r Unit#260.weapon2Def weapondef#0
@@ -10251,8 +10240,22 @@ call 1640 UpdateUnitWeapons
   r Unit#260.weapon2FirePitch 0
   r Unit#260.weapon2Stockpile 0
   r Unit#260.weapon2MuzzleDelta 0
-  r UnitDef#151.maxHealth 276
+  r Unit#260.flags 0x90240005
+  r Unit#260.health 276
+  r Unit#260.def UnitDef#151
+  r Unit#260.playerIndex 1
+  r Unit#260.motion UnitMotion#20
+  r Unit#260.posX 97040687
+  r Unit#260.posY 196608
+  r Unit#260.posZ 119095606
+  r Unit#260.weapon0Def weapondef#13
+  r Unit#260.weapon1Def weapondef#0
+  r Unit#260.weapon1Flags 20
+  r Unit#260.weapons[0].aimCob.nAimCobDone 0
+  r Unit#260.weapons[1].aimCob.nAimCobDone 0
+  r Unit#260.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#151.modelMaxYHigh 14
+  r UnitDef#151.maxHealth 276
   r UnitMotion#20.speed 81920
   r weapondef#13.flags 0x00b13001
   r weapondef#13.speed 218453
@@ -10270,35 +10273,21 @@ call 1640 UpdateUnitWeapons
   r weapondef#13.sound 51
   r weapondef#13.startSpeed 218453
   r weapondef#13.tolerance 32767
-  r Unit#260.weapons[0].aimCob.nAimCobDone 0
-  r Unit#260.weapons[1].aimCob.nAimCobDone 0
-  r Unit#260.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#260
   i services.ScheduleTargetingTargetPos Unit#260 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#261.health 590
-  r Unit#261.def UnitDef#157
-  r Unit#261.flags 0x90240005
   r Unit#261.script CobScript#30
   r Unit#261.id 261
   r Unit#261.killCount 0
-  r Unit#261.playerIndex 1
   r Unit#261.owner Player#1
-  r Unit#261.motion UnitMotion#21
-  r Unit#261.posX 164041333
-  r Unit#261.posY 196608
-  r Unit#261.posZ 148658911
   r Unit#261.weapon0TargetX 0
   r Unit#261.weapon0TargetZ -32768
-  r Unit#261.weapon0Def weapondef#11
   r Unit#261.weapon0Flags 18
   r Unit#261.weapon1TargetX 0
   r Unit#261.weapon1TargetZ -32768
-  r Unit#261.weapon1Def weapondef#0
-  r Unit#261.weapon1Flags 20
   r Unit#261.weapon2TargetX 0
   r Unit#261.weapon2TargetZ -32768
   r Unit#261.weapon2Def weapondef#0
@@ -10320,8 +10309,22 @@ call 1640 UpdateUnitWeapons
   r Unit#261.weapon2FirePitch 0
   r Unit#261.weapon2Stockpile 0
   r Unit#261.weapon2MuzzleDelta 0
-  r UnitDef#157.maxHealth 590
+  r Unit#261.flags 0x90240005
+  r Unit#261.health 590
+  r Unit#261.def UnitDef#157
+  r Unit#261.playerIndex 1
+  r Unit#261.motion UnitMotion#21
+  r Unit#261.posX 164041333
+  r Unit#261.posY 196608
+  r Unit#261.posZ 148658911
+  r Unit#261.weapon0Def weapondef#11
+  r Unit#261.weapon1Def weapondef#0
+  r Unit#261.weapon1Flags 20
+  r Unit#261.weapons[0].aimCob.nAimCobDone 0
+  r Unit#261.weapons[1].aimCob.nAimCobDone 0
+  r Unit#261.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#157.modelMaxYHigh 15
+  r UnitDef#157.maxHealth 590
   r UnitMotion#21.speed 67174
   r weapondef#11.flags 0x00b13001
   r weapondef#11.speed 218453
@@ -10339,35 +10342,21 @@ call 1640 UpdateUnitWeapons
   r weapondef#11.sound 51
   r weapondef#11.startSpeed 218453
   r weapondef#11.tolerance 32767
-  r Unit#261.weapons[0].aimCob.nAimCobDone 0
-  r Unit#261.weapons[1].aimCob.nAimCobDone 0
-  r Unit#261.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#262.health 590
-  r Unit#262.def UnitDef#157
-  r Unit#262.flags 0x90240005
   r Unit#262.script CobScript#31
   r Unit#262.id 262
   r Unit#262.killCount 0
-  r Unit#262.playerIndex 1
   r Unit#262.owner Player#1
-  r Unit#262.motion UnitMotion#22
-  r Unit#262.posX 127449640
-  r Unit#262.posY 196608
-  r Unit#262.posZ 139372923
   r Unit#262.weapon0TargetX 0
   r Unit#262.weapon0TargetZ -32768
-  r Unit#262.weapon0Def weapondef#11
   r Unit#262.weapon0Flags 18
   r Unit#262.weapon1TargetX 0
   r Unit#262.weapon1TargetZ -32768
-  r Unit#262.weapon1Def weapondef#0
-  r Unit#262.weapon1Flags 20
   r Unit#262.weapon2TargetX 0
   r Unit#262.weapon2TargetZ -32768
   r Unit#262.weapon2Def weapondef#0
@@ -10389,36 +10378,36 @@ call 1640 UpdateUnitWeapons
   r Unit#262.weapon2FirePitch 0
   r Unit#262.weapon2Stockpile 0
   r Unit#262.weapon2MuzzleDelta 0
-  r UnitMotion#22.speed 67174
+  r Unit#262.flags 0x90240005
+  r Unit#262.health 590
+  r Unit#262.def UnitDef#157
+  r Unit#262.playerIndex 1
+  r Unit#262.motion UnitMotion#22
+  r Unit#262.posX 127449640
+  r Unit#262.posY 196608
+  r Unit#262.posZ 139372923
+  r Unit#262.weapon0Def weapondef#11
+  r Unit#262.weapon1Def weapondef#0
+  r Unit#262.weapon1Flags 20
   r Unit#262.weapons[0].aimCob.nAimCobDone 0
   r Unit#262.weapons[1].aimCob.nAimCobDone 0
   r Unit#262.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#22.speed 67174
   a unit Unit#262
   i services.ScheduleTargetingTargetPos Unit#262 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#263.health 590
-  r Unit#263.def UnitDef#157
-  r Unit#263.flags 0x90240005
   r Unit#263.script CobScript#32
   r Unit#263.id 263
   r Unit#263.killCount 0
-  r Unit#263.playerIndex 1
   r Unit#263.owner Player#1
-  r Unit#263.motion UnitMotion#23
-  r Unit#263.posX 62374146
-  r Unit#263.posY 196608
-  r Unit#263.posZ 117142152
   r Unit#263.weapon0TargetX 0
   r Unit#263.weapon0TargetZ -32768
-  r Unit#263.weapon0Def weapondef#11
   r Unit#263.weapon0Flags 18
   r Unit#263.weapon1TargetX 0
   r Unit#263.weapon1TargetZ -32768
-  r Unit#263.weapon1Def weapondef#0
-  r Unit#263.weapon1Flags 20
   r Unit#263.weapon2TargetX 0
   r Unit#263.weapon2TargetZ -32768
   r Unit#263.weapon2Def weapondef#0
@@ -10440,36 +10429,36 @@ call 1640 UpdateUnitWeapons
   r Unit#263.weapon2FirePitch 0
   r Unit#263.weapon2Stockpile 0
   r Unit#263.weapon2MuzzleDelta 0
-  r UnitMotion#23.speed 67174
+  r Unit#263.flags 0x90240005
+  r Unit#263.health 590
+  r Unit#263.def UnitDef#157
+  r Unit#263.playerIndex 1
+  r Unit#263.motion UnitMotion#23
+  r Unit#263.posX 62374146
+  r Unit#263.posY 196608
+  r Unit#263.posZ 117142152
+  r Unit#263.weapon0Def weapondef#11
+  r Unit#263.weapon1Def weapondef#0
+  r Unit#263.weapon1Flags 20
   r Unit#263.weapons[0].aimCob.nAimCobDone 0
   r Unit#263.weapons[1].aimCob.nAimCobDone 0
   r Unit#263.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#23.speed 67174
   a unit Unit#263
   i services.ScheduleTargetingTargetPos Unit#263 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#264.health 590
-  r Unit#264.def UnitDef#157
-  r Unit#264.flags 0x90240005
   r Unit#264.script CobScript#33
   r Unit#264.id 264
   r Unit#264.killCount 0
-  r Unit#264.playerIndex 1
   r Unit#264.owner Player#1
-  r Unit#264.motion UnitMotion#24
-  r Unit#264.posX 75884725
-  r Unit#264.posY 196608
-  r Unit#264.posZ 118168992
   r Unit#264.weapon0TargetX 0
   r Unit#264.weapon0TargetZ -32768
-  r Unit#264.weapon0Def weapondef#11
   r Unit#264.weapon0Flags 18
   r Unit#264.weapon1TargetX 0
   r Unit#264.weapon1TargetZ -32768
-  r Unit#264.weapon1Def weapondef#0
-  r Unit#264.weapon1Flags 20
   r Unit#264.weapon2TargetX 0
   r Unit#264.weapon2TargetZ -32768
   r Unit#264.weapon2Def weapondef#0
@@ -10491,36 +10480,36 @@ call 1640 UpdateUnitWeapons
   r Unit#264.weapon2FirePitch 0
   r Unit#264.weapon2Stockpile 0
   r Unit#264.weapon2MuzzleDelta 0
-  r UnitMotion#24.speed 67174
+  r Unit#264.flags 0x90240005
+  r Unit#264.health 590
+  r Unit#264.def UnitDef#157
+  r Unit#264.playerIndex 1
+  r Unit#264.motion UnitMotion#24
+  r Unit#264.posX 75884725
+  r Unit#264.posY 196608
+  r Unit#264.posZ 118168992
+  r Unit#264.weapon0Def weapondef#11
+  r Unit#264.weapon1Def weapondef#0
+  r Unit#264.weapon1Flags 20
   r Unit#264.weapons[0].aimCob.nAimCobDone 0
   r Unit#264.weapons[1].aimCob.nAimCobDone 0
   r Unit#264.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#24.speed 67174
   a unit Unit#264
   i services.ScheduleTargetingTargetPos Unit#264 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#265.health 590
-  r Unit#265.def UnitDef#157
-  r Unit#265.flags 0x90240005
   r Unit#265.script CobScript#34
   r Unit#265.id 265
   r Unit#265.killCount 0
-  r Unit#265.playerIndex 1
   r Unit#265.owner Player#1
-  r Unit#265.motion UnitMotion#25
-  r Unit#265.posX 58186913
-  r Unit#265.posY 196608
-  r Unit#265.posZ 132654983
   r Unit#265.weapon0TargetX 0
   r Unit#265.weapon0TargetZ -32768
-  r Unit#265.weapon0Def weapondef#11
   r Unit#265.weapon0Flags 18
   r Unit#265.weapon1TargetX 0
   r Unit#265.weapon1TargetZ -32768
-  r Unit#265.weapon1Def weapondef#0
-  r Unit#265.weapon1Flags 20
   r Unit#265.weapon2TargetX 0
   r Unit#265.weapon2TargetZ -32768
   r Unit#265.weapon2Def weapondef#0
@@ -10542,36 +10531,36 @@ call 1640 UpdateUnitWeapons
   r Unit#265.weapon2FirePitch 0
   r Unit#265.weapon2Stockpile 0
   r Unit#265.weapon2MuzzleDelta 0
-  r UnitMotion#25.speed 67174
+  r Unit#265.flags 0x90240005
+  r Unit#265.health 590
+  r Unit#265.def UnitDef#157
+  r Unit#265.playerIndex 1
+  r Unit#265.motion UnitMotion#25
+  r Unit#265.posX 58186913
+  r Unit#265.posY 196608
+  r Unit#265.posZ 132654983
+  r Unit#265.weapon0Def weapondef#11
+  r Unit#265.weapon1Def weapondef#0
+  r Unit#265.weapon1Flags 20
   r Unit#265.weapons[0].aimCob.nAimCobDone 0
   r Unit#265.weapons[1].aimCob.nAimCobDone 0
   r Unit#265.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#25.speed 67174
   a unit Unit#265
   i services.ScheduleTargetingTargetPos Unit#265 0 = 0
   o x 0
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#266.health 1250
-  r Unit#266.def UnitDef#138
-  r Unit#266.flags 0x90240105
   r Unit#266.script CobScript#35
   r Unit#266.id 266
   r Unit#266.killCount 0
-  r Unit#266.playerIndex 1
   r Unit#266.owner Player#1
-  r Unit#266.motion UnitMotion#26
-  r Unit#266.posX 158334969
-  r Unit#266.posY 3080192
-  r Unit#266.posZ 140506781
   r Unit#266.weapon0TargetX 13
   r Unit#266.weapon0TargetZ -32768
-  r Unit#266.weapon0Def weapondef#130
   r Unit#266.weapon0Flags 19
   r Unit#266.weapon1TargetX 0
   r Unit#266.weapon1TargetZ -32768
-  r Unit#266.weapon1Def weapondef#102
-  r Unit#266.weapon1Flags 22
   r Unit#266.weapon2TargetX 0
   r Unit#266.weapon2TargetZ -32768
   r Unit#266.weapon2Def weapondef#0
@@ -10593,8 +10582,22 @@ call 1640 UpdateUnitWeapons
   r Unit#266.weapon2FirePitch 0
   r Unit#266.weapon2Stockpile 0
   r Unit#266.weapon2MuzzleDelta 0
-  r UnitDef#138.maxHealth 1250
+  r Unit#266.flags 0x90240105
+  r Unit#266.health 1250
+  r Unit#266.def UnitDef#138
+  r Unit#266.playerIndex 1
+  r Unit#266.motion UnitMotion#26
+  r Unit#266.posX 158334969
+  r Unit#266.posY 3080192
+  r Unit#266.posZ 140506781
+  r Unit#266.weapon0Def weapondef#130
+  r Unit#266.weapon1Def weapondef#102
+  r Unit#266.weapon1Flags 22
+  r Unit#266.weapons[0].aimCob.nAimCobDone 0
+  r Unit#266.weapons[1].aimCob.nAimCobDone 0
+  r Unit#266.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#138.modelMaxYHigh 34
+  r UnitDef#138.maxHealth 1250
   r UnitMotion#26.speed 58982
   r weapondef#130.flags 0x09141211
   r weapondef#130.speed 873813
@@ -10628,9 +10631,6 @@ call 1640 UpdateUnitWeapons
   r weapondef#102.sound 73
   r weapondef#102.startSpeed 873813
   r weapondef#102.tolerance 8000
-  r Unit#266.weapons[0].aimCob.nAimCobDone 0
-  r Unit#266.weapons[1].aimCob.nAimCobDone 0
-  r Unit#266.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#266
   i services.ScheduleTargetingTargetPos Unit#266 0 = 1
   o x 123748351
@@ -10642,26 +10642,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#267.health 1250
-  r Unit#267.def UnitDef#138
-  r Unit#267.flags 0x90240005
   r Unit#267.script CobScript#36
   r Unit#267.id 267
   r Unit#267.killCount 0
-  r Unit#267.playerIndex 1
   r Unit#267.owner Player#1
-  r Unit#267.motion UnitMotion#27
-  r Unit#267.posX 177199597
-  r Unit#267.posY 3080192
-  r Unit#267.posZ 135611872
   r Unit#267.weapon0TargetX 0
   r Unit#267.weapon0TargetZ -32768
-  r Unit#267.weapon0Def weapondef#130
   r Unit#267.weapon0Flags 18
   r Unit#267.weapon1TargetX 0
   r Unit#267.weapon1TargetZ -32768
-  r Unit#267.weapon1Def weapondef#102
-  r Unit#267.weapon1Flags 22
   r Unit#267.weapon2TargetX 0
   r Unit#267.weapon2TargetZ -32768
   r Unit#267.weapon2Def weapondef#0
@@ -10683,10 +10672,21 @@ call 1640 UpdateUnitWeapons
   r Unit#267.weapon2FirePitch 0
   r Unit#267.weapon2Stockpile 0
   r Unit#267.weapon2MuzzleDelta 0
-  r UnitMotion#27.speed 58982
+  r Unit#267.flags 0x90240005
+  r Unit#267.health 1250
+  r Unit#267.def UnitDef#138
+  r Unit#267.playerIndex 1
+  r Unit#267.motion UnitMotion#27
+  r Unit#267.posX 177199597
+  r Unit#267.posY 3080192
+  r Unit#267.posZ 135611872
+  r Unit#267.weapon0Def weapondef#130
+  r Unit#267.weapon1Def weapondef#102
+  r Unit#267.weapon1Flags 22
   r Unit#267.weapons[0].aimCob.nAimCobDone 0
   r Unit#267.weapons[1].aimCob.nAimCobDone 0
   r Unit#267.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#27.speed 58982
   a unit Unit#267
   i services.ScheduleTargetingTargetPos Unit#267 0 = 0
   o x 0
@@ -10697,26 +10697,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#268.health 1250
-  r Unit#268.def UnitDef#138
-  r Unit#268.flags 0x90240005
   r Unit#268.script CobScript#37
   r Unit#268.id 268
   r Unit#268.killCount 0
-  r Unit#268.playerIndex 1
   r Unit#268.owner Player#1
-  r Unit#268.motion UnitMotion#28
-  r Unit#268.posX 182893277
-  r Unit#268.posY 3080192
-  r Unit#268.posZ 141273898
   r Unit#268.weapon0TargetX 0
   r Unit#268.weapon0TargetZ -32768
-  r Unit#268.weapon0Def weapondef#130
   r Unit#268.weapon0Flags 18
   r Unit#268.weapon1TargetX 0
   r Unit#268.weapon1TargetZ -32768
-  r Unit#268.weapon1Def weapondef#102
-  r Unit#268.weapon1Flags 22
   r Unit#268.weapon2TargetX 0
   r Unit#268.weapon2TargetZ -32768
   r Unit#268.weapon2Def weapondef#0
@@ -10738,10 +10727,21 @@ call 1640 UpdateUnitWeapons
   r Unit#268.weapon2FirePitch 0
   r Unit#268.weapon2Stockpile 0
   r Unit#268.weapon2MuzzleDelta 0
-  r UnitMotion#28.speed 31887
+  r Unit#268.flags 0x90240005
+  r Unit#268.health 1250
+  r Unit#268.def UnitDef#138
+  r Unit#268.playerIndex 1
+  r Unit#268.motion UnitMotion#28
+  r Unit#268.posX 182893277
+  r Unit#268.posY 3080192
+  r Unit#268.posZ 141273898
+  r Unit#268.weapon0Def weapondef#130
+  r Unit#268.weapon1Def weapondef#102
+  r Unit#268.weapon1Flags 22
   r Unit#268.weapons[0].aimCob.nAimCobDone 0
   r Unit#268.weapons[1].aimCob.nAimCobDone 0
   r Unit#268.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#28.speed 31887
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
   o x 0
@@ -10752,26 +10752,15 @@ call 1640 UpdateUnitWeapons
   o y 0
   o z 0
 call 1640 UpdateUnitWeapons
-  r Unit#269.health 1250
-  r Unit#269.def UnitDef#138
-  r Unit#269.flags 0x90240105
   r Unit#269.script CobScript#38
   r Unit#269.id 269
   r Unit#269.killCount 0
-  r Unit#269.playerIndex 1
   r Unit#269.owner Player#1
-  r Unit#269.motion UnitMotion#29
-  r Unit#269.posX 143658252
-  r Unit#269.posY 3080192
-  r Unit#269.posZ 143364324
   r Unit#269.weapon0TargetX 13
   r Unit#269.weapon0TargetZ -32768
-  r Unit#269.weapon0Def weapondef#130
   r Unit#269.weapon0Flags 19
   r Unit#269.weapon1TargetX 0
   r Unit#269.weapon1TargetZ -32768
-  r Unit#269.weapon1Def weapondef#102
-  r Unit#269.weapon1Flags 22
   r Unit#269.weapon2TargetX 0
   r Unit#269.weapon2TargetZ -32768
   r Unit#269.weapon2Def weapondef#0
@@ -10793,10 +10782,21 @@ call 1640 UpdateUnitWeapons
   r Unit#269.weapon2FirePitch 0
   r Unit#269.weapon2Stockpile 0
   r Unit#269.weapon2MuzzleDelta 0
-  r UnitMotion#29.speed 58982
+  r Unit#269.flags 0x90240105
+  r Unit#269.health 1250
+  r Unit#269.def UnitDef#138
+  r Unit#269.playerIndex 1
+  r Unit#269.motion UnitMotion#29
+  r Unit#269.posX 143658252
+  r Unit#269.posY 3080192
+  r Unit#269.posZ 143364324
+  r Unit#269.weapon0Def weapondef#130
+  r Unit#269.weapon1Def weapondef#102
+  r Unit#269.weapon1Flags 22
   r Unit#269.weapons[0].aimCob.nAimCobDone 0
   r Unit#269.weapons[1].aimCob.nAimCobDone 0
   r Unit#269.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#29.speed 58982
   a unit Unit#269
   i services.ScheduleTargetingTargetPos Unit#269 0 = 1
   o x 123748351
@@ -10832,26 +10832,15 @@ call 1640 UpdateUnitWeapons
   o z 50225151
   w Unit#275.weapon1ReloadTimer 50
 call 1640 UpdateUnitWeapons
-  r Unit#276.health 1250
-  r Unit#276.def UnitDef#138
-  r Unit#276.flags 0x90240001
   r Unit#276.script CobScript#39
   r Unit#276.id 276
   r Unit#276.killCount 0
-  r Unit#276.playerIndex 1
   r Unit#276.owner Player#1
-  r Unit#276.motion UnitMotion#30
-  r Unit#276.posX 105906176
-  r Unit#276.posY 3080192
-  r Unit#276.posZ 262144000
   r Unit#276.weapon0TargetX 0
   r Unit#276.weapon0TargetZ -32768
-  r Unit#276.weapon0Def weapondef#130
   r Unit#276.weapon0Flags 18
   r Unit#276.weapon1TargetX 0
   r Unit#276.weapon1TargetZ -32768
-  r Unit#276.weapon1Def weapondef#102
-  r Unit#276.weapon1Flags 22
   r Unit#276.weapon2TargetX 0
   r Unit#276.weapon2TargetZ -32768
   r Unit#276.weapon2Def weapondef#0
@@ -10873,13 +10862,24 @@ call 1640 UpdateUnitWeapons
   r Unit#276.weapon2FirePitch 0
   r Unit#276.weapon2Stockpile 0
   r Unit#276.weapon2MuzzleDelta 0
-  r UnitMotion#30.speed 0
+  r Unit#276.flags 0x90240001
+  r Unit#276.health 1250
+  r Unit#276.def UnitDef#138
+  r Unit#276.playerIndex 1
+  r Unit#276.motion UnitMotion#30
+  r Unit#276.posX 105906176
+  r Unit#276.posY 3080192
+  r Unit#276.posZ 262144000
+  r Unit#276.weapon0Def weapondef#130
+  r Unit#276.weapon1Def weapondef#102
+  r Unit#276.weapon1Flags 22
   r Unit#276.weapons[0].aimCob.nAimCobDone 0
   r Unit#276.weapons[1].aimCob.nAimCobDone 0
   r Unit#276.weapons[2].aimCob.nAimCobDone 0
+  r UnitMotion#30.speed 0
+  r Unit#275.heading -21382
   r Unit#275.posX 108331965
   r Unit#275.posZ 57699187
-  r Unit#275.heading -21382
   r UnitMotion#3.speed 169170
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -10890,6 +10890,965 @@ call 1640 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1640 UpdateExplosions
+  r Game.count_1491b 11
+  r DebrisPiece#0.state 255
+  r DebrisPiece#1.state 255
+  r DebrisPiece#2.state 255
+  r DebrisPiece#3.state 255
+  r DebrisPiece#4.state 255
+  r DebrisPiece#5.state 255
+  r DebrisPiece#6.state 255
+  r DebrisPiece#7.state 255
+  r DebrisPiece#8.state 255
+  r DebrisPiece#9.state 255
+  r DebrisPiece#10.state 255
+  r DebrisPiece#11.state 255
+  r DebrisPiece#12.state 255
+  r DebrisPiece#13.state 255
+  r DebrisPiece#14.state 255
+  r DebrisPiece#15.state 255
+  r DebrisPiece#16.state 255
+  r DebrisPiece#17.state 255
+  r DebrisPiece#18.state 255
+  r DebrisPiece#19.state 255
+  r DebrisPiece#20.state 255
+  r DebrisPiece#21.state 255
+  r DebrisPiece#22.state 255
+  r DebrisPiece#23.state 255
+  r DebrisPiece#24.state 255
+  r DebrisPiece#25.state 255
+  r DebrisPiece#26.state 255
+  r DebrisPiece#27.state 255
+  r DebrisPiece#28.state 255
+  r DebrisPiece#29.state 255
+  r DebrisPiece#30.state 255
+  r DebrisPiece#31.state 255
+  r DebrisPiece#32.state 255
+  r DebrisPiece#33.state 255
+  r DebrisPiece#34.state 255
+  r DebrisPiece#35.state 255
+  r DebrisPiece#36.state 255
+  r DebrisPiece#37.state 255
+  r DebrisPiece#38.state 255
+  r DebrisPiece#39.state 255
+  r DebrisPiece#40.state 255
+  r DebrisPiece#41.state 255
+  r DebrisPiece#42.state 255
+  r DebrisPiece#43.state 255
+  r DebrisPiece#44.state 255
+  r DebrisPiece#45.state 255
+  r DebrisPiece#46.state 255
+  r DebrisPiece#47.state 255
+  r DebrisPiece#48.state 255
+  r DebrisPiece#49.state 255
+  r DebrisPiece#50.state 255
+  r DebrisPiece#51.state 255
+  r DebrisPiece#52.state 255
+  r DebrisPiece#53.state 255
+  r DebrisPiece#54.state 255
+  r DebrisPiece#55.state 255
+  r DebrisPiece#56.state 255
+  r DebrisPiece#57.state 255
+  r DebrisPiece#58.state 255
+  r DebrisPiece#59.state 255
+  r DebrisPiece#60.state 255
+  r DebrisPiece#61.state 255
+  r DebrisPiece#62.state 255
+  r DebrisPiece#63.state 255
+  r DebrisPiece#64.state 255
+  r DebrisPiece#65.state 255
+  r DebrisPiece#66.state 255
+  r DebrisPiece#67.state 255
+  r DebrisPiece#68.state 255
+  r DebrisPiece#69.state 255
+  r DebrisPiece#70.state 255
+  r DebrisPiece#71.state 255
+  r DebrisPiece#72.state 255
+  r DebrisPiece#73.state 255
+  r DebrisPiece#74.state 255
+  r DebrisPiece#75.state 255
+  r DebrisPiece#76.state 255
+  r DebrisPiece#77.state 255
+  r DebrisPiece#78.state 255
+  r DebrisPiece#79.state 255
+  r DebrisPiece#80.state 255
+  r DebrisPiece#81.state 255
+  r DebrisPiece#82.state 255
+  r DebrisPiece#83.state 255
+  r DebrisPiece#84.state 255
+  r DebrisPiece#85.state 255
+  r DebrisPiece#86.state 255
+  r DebrisPiece#87.state 255
+  r DebrisPiece#88.state 255
+  r DebrisPiece#89.state 255
+  r DebrisPiece#90.state 255
+  r DebrisPiece#91.state 255
+  r DebrisPiece#92.state 255
+  r DebrisPiece#93.state 255
+  r DebrisPiece#94.state 255
+  r DebrisPiece#95.state 255
+  r DebrisPiece#96.state 255
+  r DebrisPiece#97.state 255
+  r DebrisPiece#98.state 255
+  r DebrisPiece#99.state 255
+  r DebrisPiece#100.state 255
+  r DebrisPiece#101.state 255
+  r DebrisPiece#102.state 255
+  r DebrisPiece#103.state 255
+  r DebrisPiece#104.state 255
+  r DebrisPiece#105.state 255
+  r DebrisPiece#106.state 255
+  r DebrisPiece#107.state 255
+  r DebrisPiece#108.state 255
+  r DebrisPiece#109.state 255
+  r DebrisPiece#110.state 255
+  r DebrisPiece#111.state 255
+  r DebrisPiece#112.state 255
+  r DebrisPiece#113.state 255
+  r DebrisPiece#114.state 255
+  r DebrisPiece#115.state 255
+  r DebrisPiece#116.state 255
+  r DebrisPiece#117.state 255
+  r DebrisPiece#118.state 255
+  r DebrisPiece#119.state 255
+  r DebrisPiece#120.state 255
+  r DebrisPiece#121.state 255
+  r DebrisPiece#122.state 255
+  r DebrisPiece#123.state 255
+  r DebrisPiece#124.state 255
+  r DebrisPiece#125.state 255
+  r DebrisPiece#126.state 255
+  r DebrisPiece#127.state 255
+  r DebrisPiece#128.state 255
+  r DebrisPiece#129.state 255
+  r DebrisPiece#130.state 255
+  r DebrisPiece#131.state 255
+  r DebrisPiece#132.state 255
+  r DebrisPiece#133.state 255
+  r DebrisPiece#134.state 255
+  r DebrisPiece#135.state 255
+  r DebrisPiece#136.state 255
+  r DebrisPiece#137.state 255
+  r DebrisPiece#138.state 255
+  r DebrisPiece#139.state 255
+  r DebrisPiece#140.state 255
+  r DebrisPiece#141.state 255
+  r DebrisPiece#142.state 255
+  r DebrisPiece#143.state 255
+  r DebrisPiece#144.state 255
+  r DebrisPiece#145.state 255
+  r DebrisPiece#146.state 255
+  r DebrisPiece#147.state 255
+  r DebrisPiece#148.state 255
+  r DebrisPiece#149.state 255
+  r DebrisPiece#150.state 255
+  r DebrisPiece#151.state 255
+  r DebrisPiece#152.state 255
+  r DebrisPiece#153.state 255
+  r DebrisPiece#154.state 255
+  r DebrisPiece#155.state 255
+  r DebrisPiece#156.state 255
+  r DebrisPiece#157.state 255
+  r DebrisPiece#158.state 255
+  r DebrisPiece#159.state 255
+  r DebrisPiece#160.state 255
+  r DebrisPiece#161.state 255
+  r DebrisPiece#162.state 255
+  r DebrisPiece#163.state 255
+  r DebrisPiece#164.state 255
+  r DebrisPiece#165.state 255
+  r DebrisPiece#166.state 255
+  r DebrisPiece#167.state 255
+  r DebrisPiece#168.state 255
+  r DebrisPiece#169.state 255
+  r DebrisPiece#170.state 255
+  r DebrisPiece#171.state 255
+  r DebrisPiece#172.state 255
+  r DebrisPiece#173.state 255
+  r DebrisPiece#174.state 255
+  r DebrisPiece#175.state 255
+  r DebrisPiece#176.state 255
+  r DebrisPiece#177.state 255
+  r DebrisPiece#178.state 255
+  r DebrisPiece#179.state 255
+  r DebrisPiece#180.state 255
+  r DebrisPiece#181.state 255
+  r DebrisPiece#182.state 255
+  r DebrisPiece#183.state 255
+  r DebrisPiece#184.state 255
+  r DebrisPiece#185.state 255
+  r DebrisPiece#186.state 255
+  r DebrisPiece#187.state 255
+  r DebrisPiece#188.state 255
+  r DebrisPiece#189.state 255
+  r DebrisPiece#190.state 255
+  r DebrisPiece#191.state 255
+  r DebrisPiece#192.state 255
+  r DebrisPiece#193.state 255
+  r DebrisPiece#194.state 255
+  r DebrisPiece#195.state 255
+  r DebrisPiece#196.state 255
+  r DebrisPiece#197.state 255
+  r DebrisPiece#198.state 255
+  r DebrisPiece#199.state 255
+  r DebrisPiece#200.state 255
+  r DebrisPiece#201.state 255
+  r DebrisPiece#202.state 255
+  r DebrisPiece#203.state 255
+  r DebrisPiece#204.state 255
+  r DebrisPiece#205.state 255
+  r DebrisPiece#206.state 255
+  r DebrisPiece#207.state 255
+  r DebrisPiece#208.state 255
+  r DebrisPiece#209.state 255
+  r DebrisPiece#210.state 255
+  r DebrisPiece#211.state 255
+  r DebrisPiece#212.state 255
+  r DebrisPiece#213.state 255
+  r DebrisPiece#214.state 255
+  r DebrisPiece#215.state 255
+  r DebrisPiece#216.state 255
+  r DebrisPiece#217.state 255
+  r DebrisPiece#218.state 255
+  r DebrisPiece#219.state 255
+  r DebrisPiece#220.state 255
+  r DebrisPiece#221.state 255
+  r DebrisPiece#222.state 255
+  r DebrisPiece#223.state 255
+  r DebrisPiece#224.state 255
+  r DebrisPiece#225.state 255
+  r DebrisPiece#226.state 255
+  r DebrisPiece#227.state 255
+  r DebrisPiece#228.state 255
+  r DebrisPiece#229.state 255
+  r DebrisPiece#230.state 255
+  r DebrisPiece#231.state 255
+  r DebrisPiece#232.state 255
+  r DebrisPiece#233.state 255
+  r DebrisPiece#234.state 255
+  r DebrisPiece#235.state 255
+  r DebrisPiece#236.state 255
+  r DebrisPiece#237.state 255
+  r DebrisPiece#238.state 255
+  r DebrisPiece#239.state 255
+  r DebrisPiece#240.state 255
+  r DebrisPiece#241.state 255
+  r DebrisPiece#242.state 255
+  r DebrisPiece#243.state 255
+  r DebrisPiece#244.state 255
+  r DebrisPiece#245.state 255
+  r DebrisPiece#246.state 255
+  r DebrisPiece#247.state 255
+  r DebrisPiece#248.state 255
+  r DebrisPiece#249.state 255
+  r DebrisPiece#250.state 255
+  r DebrisPiece#251.state 255
+  r DebrisPiece#252.state 255
+  r DebrisPiece#253.state 255
+  r DebrisPiece#254.state 255
+  r DebrisPiece#255.state 255
+  r DebrisPiece#256.state 255
+  r DebrisPiece#257.state 255
+  r DebrisPiece#258.state 255
+  r DebrisPiece#259.state 255
+  r DebrisPiece#260.state 255
+  r DebrisPiece#261.state 255
+  r DebrisPiece#262.state 255
+  r DebrisPiece#263.state 255
+  r DebrisPiece#264.state 255
+  r DebrisPiece#265.state 255
+  r DebrisPiece#266.state 255
+  r DebrisPiece#267.state 255
+  r DebrisPiece#268.state 255
+  r DebrisPiece#269.state 255
+  r DebrisPiece#270.state 255
+  r DebrisPiece#271.state 255
+  r DebrisPiece#272.state 255
+  r DebrisPiece#273.state 255
+  r DebrisPiece#274.state 255
+  r DebrisPiece#275.state 255
+  r DebrisPiece#276.state 255
+  r DebrisPiece#277.state 255
+  r DebrisPiece#278.state 255
+  r DebrisPiece#279.state 255
+  r DebrisPiece#280.state 255
+  r DebrisPiece#281.state 255
+  r DebrisPiece#282.state 255
+  r DebrisPiece#283.state 255
+  r DebrisPiece#284.state 255
+  r DebrisPiece#285.state 255
+  r DebrisPiece#286.state 255
+  r DebrisPiece#287.state 255
+  r DebrisPiece#288.state 255
+  r DebrisPiece#289.state 255
+  r DebrisPiece#290.state 255
+  r DebrisPiece#291.state 255
+  r DebrisPiece#292.state 255
+  r DebrisPiece#293.state 255
+  r DebrisPiece#294.state 255
+  r DebrisPiece#295.state 255
+  r DebrisPiece#296.state 255
+  r DebrisPiece#297.state 255
+  r DebrisPiece#298.state 255
+  r DebrisPiece#299.state 255
+  r Debris#0.obj null
+  r Debris#0.posX 92221794
+  r Debris#0.posY 3083880
+  r Debris#0.posZ 54367343
+  r Debris#0.sizeX 0
+  r Debris#0.sizeY 0
+  r Debris#0.sizeZ 0
+  r Debris#0.velX 0
+  r Debris#0.velY 0
+  r Debris#0.velZ 0
+  r Debris#0.spinX 0
+  r Debris#0.spinY 0
+  r Debris#0.spinZ 0
+  r Debris#0.angle_x 0
+  r Debris#0.angle_y 0
+  r Debris#0.angle_z 0
+  r Debris#0.flags 0
+  r Debris#1.obj null
+  r Debris#1.posX 175146243
+  r Debris#1.posY 5086381
+  r Debris#1.posZ 31901213
+  r Debris#1.sizeX 0
+  r Debris#1.sizeY 0
+  r Debris#1.sizeZ 0
+  r Debris#1.velX 0
+  r Debris#1.velY 0
+  r Debris#1.velZ 0
+  r Debris#1.spinX 0
+  r Debris#1.spinY 0
+  r Debris#1.spinZ 0
+  r Debris#1.angle_x 0
+  r Debris#1.angle_y 0
+  r Debris#1.angle_z 0
+  r Debris#1.flags 0
+  r Debris#2.obj null
+  r Debris#2.posX 102937822
+  r Debris#2.posY 3179862
+  r Debris#2.posZ 59667265
+  r Debris#2.sizeX 0
+  r Debris#2.sizeY 0
+  r Debris#2.sizeZ 0
+  r Debris#2.velX 0
+  r Debris#2.velY 0
+  r Debris#2.velZ 0
+  r Debris#2.spinX 0
+  r Debris#2.spinY 0
+  r Debris#2.spinZ 0
+  r Debris#2.angle_x 0
+  r Debris#2.angle_y 0
+  r Debris#2.angle_z 0
+  r Debris#2.flags 0
+  r Debris#3.obj null
+  r Debris#3.posX 149755121
+  r Debris#3.posY 2964060
+  r Debris#3.posZ 54254333
+  r Debris#3.sizeX 0
+  r Debris#3.sizeY 0
+  r Debris#3.sizeZ 0
+  r Debris#3.velX 0
+  r Debris#3.velY 0
+  r Debris#3.velZ 0
+  r Debris#3.spinX 0
+  r Debris#3.spinY 0
+  r Debris#3.spinZ 0
+  r Debris#3.angle_x 0
+  r Debris#3.angle_y 0
+  r Debris#3.angle_z 0
+  r Debris#3.flags 0
+  r Debris#4.obj null
+  r Debris#4.posX 77938329
+  r Debris#4.posY 3130763
+  r Debris#4.posZ 57166094
+  r Debris#4.sizeX 0
+  r Debris#4.sizeY 0
+  r Debris#4.sizeZ 0
+  r Debris#4.velX 0
+  r Debris#4.velY 0
+  r Debris#4.velZ 0
+  r Debris#4.spinX 0
+  r Debris#4.spinY 0
+  r Debris#4.spinZ 0
+  r Debris#4.angle_x 0
+  r Debris#4.angle_y 0
+  r Debris#4.angle_z 0
+  r Debris#4.flags 0
+  r Debris#5.obj null
+  r Debris#5.posX 77199162
+  r Debris#5.posY 2989888
+  r Debris#5.posZ 57344263
+  r Debris#5.sizeX 0
+  r Debris#5.sizeY 0
+  r Debris#5.sizeZ 0
+  r Debris#5.velX 0
+  r Debris#5.velY 0
+  r Debris#5.velZ 0
+  r Debris#5.spinX 0
+  r Debris#5.spinY 0
+  r Debris#5.spinZ 0
+  r Debris#5.angle_x 0
+  r Debris#5.angle_y 0
+  r Debris#5.angle_z 0
+  r Debris#5.flags 0
+  r Debris#6.obj null
+  r Debris#6.posX 107836854
+  r Debris#6.posY 3160322
+  r Debris#6.posZ 56290232
+  r Debris#6.sizeX 0
+  r Debris#6.sizeY 0
+  r Debris#6.sizeZ 0
+  r Debris#6.velX 0
+  r Debris#6.velY 0
+  r Debris#6.velZ 0
+  r Debris#6.spinX 0
+  r Debris#6.spinY 0
+  r Debris#6.spinZ 0
+  r Debris#6.angle_x 0
+  r Debris#6.angle_y 0
+  r Debris#6.angle_z 0
+  r Debris#6.flags 0
+  r Debris#7.obj null
+  r Debris#7.posX 107980793
+  r Debris#7.posY 3085695
+  r Debris#7.posZ 58407217
+  r Debris#7.sizeX 0
+  r Debris#7.sizeY 0
+  r Debris#7.sizeZ 0
+  r Debris#7.velX 0
+  r Debris#7.velY 0
+  r Debris#7.velZ 0
+  r Debris#7.spinX 0
+  r Debris#7.spinY 0
+  r Debris#7.spinZ 0
+  r Debris#7.angle_x 0
+  r Debris#7.angle_y 0
+  r Debris#7.angle_z 0
+  r Debris#7.flags 0
+  r Debris#8.obj null
+  r Debris#8.posX 121832400
+  r Debris#8.posY 3161831
+  r Debris#8.posZ 68271806
+  r Debris#8.sizeX 0
+  r Debris#8.sizeY 0
+  r Debris#8.sizeZ 0
+  r Debris#8.velX 0
+  r Debris#8.velY 0
+  r Debris#8.velZ 0
+  r Debris#8.spinX 0
+  r Debris#8.spinY 0
+  r Debris#8.spinZ 0
+  r Debris#8.angle_x 0
+  r Debris#8.angle_y 0
+  r Debris#8.angle_z 0
+  r Debris#8.flags 0
+  r Debris#9.obj null
+  r Debris#9.posX 107955781
+  r Debris#9.posY 3211362
+  r Debris#9.posZ 56280997
+  r Debris#9.sizeX 0
+  r Debris#9.sizeY 0
+  r Debris#9.sizeZ 0
+  r Debris#9.velX 0
+  r Debris#9.velY 0
+  r Debris#9.velZ 0
+  r Debris#9.spinX 0
+  r Debris#9.spinY 0
+  r Debris#9.spinZ 0
+  r Debris#9.angle_x 0
+  r Debris#9.angle_y 0
+  r Debris#9.angle_z 0
+  r Debris#9.flags 0
+  r Debris#10.obj null
+  r Debris#10.posX 92250247
+  r Debris#10.posY 3079050
+  r Debris#10.posZ 53679034
+  r Debris#10.sizeX 0
+  r Debris#10.sizeY 0
+  r Debris#10.sizeZ 0
+  r Debris#10.velX 0
+  r Debris#10.velY 0
+  r Debris#10.velZ 0
+  r Debris#10.spinX 0
+  r Debris#10.spinY 0
+  r Debris#10.spinZ 0
+  r Debris#10.angle_x 0
+  r Debris#10.angle_y 0
+  r Debris#10.angle_z 0
+  r Debris#10.flags 0
+  r ExplodedSlot#0.piece ExplodedPiece#1
+  r ExplodedSlot#1.piece ExplodedPiece#2
+  r ExplodedSlot#2.piece ExplodedPiece#3
+  r ExplodedSlot#3.piece ExplodedPiece#4
+  r ExplodedSlot#4.piece null
+  r ExplodedSlot#5.piece ExplodedPiece#5
+  r ExplodedSlot#6.piece null
+  r ExplodedSlot#7.piece ExplodedPiece#6
+  r ExplodedSlot#8.piece null
+  r ExplodedSlot#9.piece ExplodedPiece#7
+  r ExplodedSlot#10.piece null
+  r ExplodedSlot#11.piece ExplodedPiece#8
+  r ExplodedSlot#12.piece ExplodedPiece#9
+  r ExplodedSlot#13.piece null
+  r ExplodedSlot#14.piece null
+  r ExplodedSlot#15.piece null
+  r ExplodedSlot#16.piece null
+  r ExplodedSlot#17.piece null
+  r ExplodedSlot#18.piece null
+  r ExplodedSlot#19.piece null
+  r ExplodedSlot#20.piece null
+  r ExplodedSlot#21.piece null
+  r ExplodedSlot#22.piece null
+  r ExplodedSlot#23.piece null
+  r ExplodedSlot#24.piece null
+  r ExplodedSlot#25.piece null
+  r ExplodedSlot#26.piece null
+  r ExplodedSlot#27.piece null
+  r ExplodedSlot#28.piece null
+  r ExplodedSlot#29.piece null
+  r ExplodedSlot#30.piece null
+  r ExplodedSlot#31.piece null
+  r ExplodedSlot#32.piece null
+  r ExplodedSlot#33.piece null
+  r ExplodedSlot#34.piece null
+  r ExplodedSlot#35.piece null
+  r ExplodedSlot#36.piece null
+  r ExplodedSlot#37.piece null
+  r ExplodedSlot#38.piece null
+  r ExplodedSlot#39.piece null
+  r ExplodedSlot#40.piece null
+  r ExplodedSlot#41.piece null
+  r ExplodedSlot#42.piece null
+  r ExplodedSlot#43.piece null
+  r ExplodedSlot#44.piece null
+  r ExplodedSlot#45.piece null
+  r ExplodedSlot#46.piece null
+  r ExplodedSlot#47.piece null
+  r ExplodedSlot#48.piece null
+  r ExplodedSlot#49.piece null
+  r ExplodedSlot#50.piece null
+  r ExplodedSlot#51.piece null
+  r ExplodedSlot#52.piece null
+  r ExplodedSlot#53.piece null
+  r ExplodedSlot#54.piece null
+  r ExplodedSlot#55.piece null
+  r ExplodedSlot#56.piece null
+  r ExplodedSlot#57.piece null
+  r ExplodedSlot#58.piece null
+  r ExplodedSlot#59.piece null
+  r ExplodedSlot#60.piece null
+  r ExplodedSlot#61.piece null
+  r ExplodedSlot#62.piece null
+  r ExplodedSlot#63.piece null
+  r ExplodedSlot#64.piece null
+  r ExplodedSlot#65.piece null
+  r ExplodedSlot#66.piece null
+  r ExplodedSlot#67.piece null
+  r ExplodedSlot#68.piece null
+  r ExplodedSlot#69.piece null
+  r ExplodedSlot#70.piece null
+  r ExplodedSlot#71.piece null
+  r ExplodedSlot#72.piece null
+  r ExplodedSlot#73.piece null
+  r ExplodedSlot#74.piece null
+  r ExplodedSlot#75.piece null
+  r ExplodedSlot#76.piece null
+  r ExplodedSlot#77.piece null
+  r ExplodedSlot#78.piece null
+  r ExplodedSlot#79.piece null
+  r ExplodedSlot#80.piece null
+  r ExplodedSlot#81.piece null
+  r ExplodedSlot#82.piece null
+  r ExplodedSlot#83.piece null
+  r ExplodedSlot#84.piece null
+  r ExplodedSlot#85.piece null
+  r ExplodedSlot#86.piece null
+  r ExplodedSlot#87.piece null
+  r ExplodedSlot#88.piece null
+  r ExplodedSlot#89.piece null
+  r ExplodedSlot#90.piece null
+  r ExplodedSlot#91.piece null
+  r ExplodedSlot#92.piece null
+  r ExplodedSlot#93.piece null
+  r ExplodedSlot#94.piece null
+  r ExplodedSlot#95.piece null
+  r ExplodedSlot#96.piece null
+  r ExplodedSlot#97.piece null
+  r ExplodedSlot#98.piece null
+  r ExplodedSlot#99.piece null
+  r GafSrc1#0.ptr FrameTable#1
+  r GafSrc2#0.ptr FrameTable#2
+  r GafSrc3#0.ptr FrameTable#3
+  r GafLists#0.ptr FrameTable#4
+  r GafLists#1.ptr FrameTable#5
+  r GafLists#2.ptr FrameTable#6
+  r Debris#0.ref1.src FrameTable#7
+  r Debris#0.ref2.src null
+  r Debris#1.ref1.src FrameTable#3
+  r Debris#1.ref2.src null
+  r Debris#2.ref1.src FrameTable#7
+  r Debris#2.ref2.src null
+  r Debris#3.ref1.src FrameTable#1
+  r Debris#3.ref2.src null
+  r Debris#4.ref1.src FrameTable#8
+  r Debris#4.ref2.src FrameTable#4
+  r Debris#5.ref1.src FrameTable#8
+  r Debris#5.ref2.src FrameTable#4
+  r Debris#6.ref1.src FrameTable#7
+  r Debris#6.ref2.src FrameTable#4
+  r Debris#7.ref1.src FrameTable#7
+  r Debris#7.ref2.src FrameTable#4
+  r Debris#8.ref1.src FrameTable#7
+  r Debris#8.ref2.src FrameTable#4
+  r Debris#9.ref1.src FrameTable#7
+  r Debris#9.ref2.src FrameTable#4
+  r Debris#10.ref1.src FrameTable#7
+  r Debris#10.ref2.src FrameTable#4
+  r ExplodedPiece#1.angVelX 1374
+  r ExplodedPiece#1.angVelY 1701
+  r ExplodedPiece#1.angVelZ 1477
+  r ExplodedPiece#1.vel_x -65536
+  r ExplodedPiece#1.vel_y 131094
+  r ExplodedPiece#1.vel_z 229376
+  r ExplodedPiece#1.ticks 810
+  r ExplodedPiece#1.bits 27
+  r ExplodedPiece#1.rec PieceRec#1
+  r ExplodedPiece#2.angVelX 2062
+  r ExplodedPiece#2.angVelY 1487
+  r ExplodedPiece#2.angVelZ 502
+  r ExplodedPiece#2.vel_x 81920
+  r ExplodedPiece#2.vel_y -438320
+  r ExplodedPiece#2.vel_z 180224
+  r ExplodedPiece#2.ticks 724
+  r ExplodedPiece#2.bits 27
+  r ExplodedPiece#2.rec PieceRec#2
+  r ExplodedPiece#3.angVelX 427
+  r ExplodedPiece#3.angVelY 1627
+  r ExplodedPiece#3.angVelZ 70
+  r ExplodedPiece#3.vel_x -147456
+  r ExplodedPiece#3.vel_y -372784
+  r ExplodedPiece#3.vel_z -98304
+  r ExplodedPiece#3.ticks 724
+  r ExplodedPiece#3.bits 27
+  r ExplodedPiece#3.rec PieceRec#3
+  r ExplodedPiece#4.angVelX 1513
+  r ExplodedPiece#4.angVelY 2610
+  r ExplodedPiece#4.angVelZ 1368
+  r ExplodedPiece#4.vel_x 131072
+  r ExplodedPiece#4.vel_y -372784
+  r ExplodedPiece#4.vel_z 131072
+  r ExplodedPiece#4.ticks 724
+  r ExplodedPiece#4.bits 27
+  r ExplodedPiece#4.rec PieceRec#4
+  r ExplodedPiece#5.angVelX 855
+  r ExplodedPiece#5.angVelY 2927
+  r ExplodedPiece#5.angVelZ 1010
+  r ExplodedPiece#5.vel_x 0
+  r ExplodedPiece#5.vel_y 131094
+  r ExplodedPiece#5.vel_z -81920
+  r ExplodedPiece#5.ticks 810
+  r ExplodedPiece#5.bits 27
+  r ExplodedPiece#5.rec PieceRec#5
+  r ExplodedPiece#6.angVelX 2602
+  r ExplodedPiece#6.angVelY 562
+  r ExplodedPiece#6.angVelZ 1053
+  r ExplodedPiece#6.vel_x 311296
+  r ExplodedPiece#6.vel_y -196586
+  r ExplodedPiece#6.vel_z -16384
+  r ExplodedPiece#6.ticks 810
+  r ExplodedPiece#6.bits 27
+  r ExplodedPiece#6.rec PieceRec#6
+  r ExplodedPiece#7.angVelX 2047
+  r ExplodedPiece#7.angVelY 2162
+  r ExplodedPiece#7.angVelZ 709
+  r ExplodedPiece#7.vel_x -245760
+  r ExplodedPiece#7.vel_y -342202
+  r ExplodedPiece#7.vel_z -16384
+  r ExplodedPiece#7.ticks 730
+  r ExplodedPiece#7.bits 27
+  r ExplodedPiece#7.rec PieceRec#7
+  r ExplodedPiece#8.angVelX 1675
+  r ExplodedPiece#8.angVelY 1529
+  r ExplodedPiece#8.angVelZ 387
+  r ExplodedPiece#8.vel_x 212992
+  r ExplodedPiece#8.vel_y -342202
+  r ExplodedPiece#8.vel_z 65536
+  r ExplodedPiece#8.ticks 730
+  r ExplodedPiece#8.bits 27
+  r ExplodedPiece#8.rec PieceRec#8
+  r ExplodedPiece#9.angVelX 1813
+  r ExplodedPiece#9.angVelY 2413
+  r ExplodedPiece#9.angVelZ 2084
+  r ExplodedPiece#9.vel_x -32768
+  r ExplodedPiece#9.vel_y 65558
+  r ExplodedPiece#9.vel_z 131072
+  r ExplodedPiece#9.ticks 810
+  r ExplodedPiece#9.bits 27
+  r ExplodedPiece#9.rec PieceRec#9
+  r PieceRec#1.angle_10 -7412
+  r PieceRec#1.angle_12 22018
+  r PieceRec#1.angle_14 1858
+  r PieceRec#1.posX 128447477
+  r PieceRec#1.posY 36205569
+  r PieceRec#1.posZ 76576042
+  r PieceRec#2.angle_10 -30304
+  r PieceRec#2.angle_12 -432
+  r PieceRec#2.angle_14 22816
+  r PieceRec#2.posX 124465477
+  r PieceRec#2.posY 5760586
+  r PieceRec#2.posZ 100469061
+  r PieceRec#3.angle_10 9616
+  r PieceRec#3.angle_12 24208
+  r PieceRec#3.angle_14 12320
+  r PieceRec#3.posX 85219061
+  r PieceRec#3.posY 17323007
+  r PieceRec#3.posZ 51298730
+  r PieceRec#4.angle_10 4144
+  r PieceRec#4.angle_12 608
+  r PieceRec#4.angle_14 -21376
+  r PieceRec#4.posX 133682956
+  r PieceRec#4.posY 17326909
+  r PieceRec#4.posZ 92386450
+  r PieceRec#5.angle_10 11414
+  r PieceRec#5.angle_12 1286
+  r PieceRec#5.angle_14 25364
+  r PieceRec#5.posX 133544775
+  r PieceRec#5.posY 36261082
+  r PieceRec#5.posZ 48539510
+  r PieceRec#6.angle_10 -27964
+  r PieceRec#6.angle_12 -14956
+  r PieceRec#6.angle_14 29234
+  r PieceRec#6.posX 161583789
+  r PieceRec#6.posY 6769882
+  r PieceRec#6.posZ 53536907
+  r PieceRec#7.angle_10 20310
+  r PieceRec#7.angle_12 -25676
+  r PieceRec#7.angle_14 -10542
+  r PieceRec#7.posX 107156139
+  r PieceRec#7.posY 19486756
+  r PieceRec#7.posZ 46892244
+  r PieceRec#8.angle_10 22043
+  r PieceRec#8.angle_12 -2214
+  r PieceRec#8.angle_14 254
+  r PieceRec#8.posX 186659596
+  r PieceRec#8.posY 19383963
+  r PieceRec#8.posZ 60893038
+  r PieceRec#9.angle_10 31437
+  r PieceRec#9.angle_12 20562
+  r PieceRec#9.angle_14 -9048
+  r PieceRec#9.posX 132109666
+  r PieceRec#9.posY 30245843
+  r PieceRec#9.posZ 67623474
+  i map.GetCellMeanHeight pos=(128447477,76576042) = 3
+  i map.GetCellMeanHeight pos=(124465477,100469061) = 3
+  i map.GetCellMeanHeight pos=(85219061,51298730) = 65
+  i map.GetCellMeanHeight pos=(133682956,92386450) = 3
+  i map.GetCellMeanHeight pos=(133544775,48539510) = 3
+  i map.GetCellMeanHeight pos=(161583789,53536907) = 3
+  i map.GetCellMeanHeight pos=(107156139,46892244) = 3
+  i map.GetCellMeanHeight pos=(186659596,60893038) = 3
+  i map.GetCellMeanHeight pos=(132109666,67623474) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 22
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#3
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 21
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 7
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 11
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 3
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 10
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 7
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 7
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 5
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 5
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 3
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 3
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 2
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#10.ref2 = 0
+  o Debris#10.ref2.index 2
+  o Debris#10.ref2.value 1
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  w Game.count_1491b 10
+  w Debris#0.posX 175146243
+  w Debris#0.posY 5086381
+  w Debris#0.posZ 31901213
+  w Debris#1.posX 102937822
+  w Debris#1.posY 3179862
+  w Debris#1.posZ 59667265
+  w Debris#2.posX 149755121
+  w Debris#2.posY 2964060
+  w Debris#2.posZ 54254333
+  w Debris#3.posX 77938329
+  w Debris#3.posY 3130763
+  w Debris#3.posZ 57166094
+  w Debris#4.posX 77199162
+  w Debris#4.posY 2989888
+  w Debris#4.posZ 57344263
+  w Debris#5.posX 107836854
+  w Debris#5.posY 3160322
+  w Debris#5.posZ 56290232
+  w Debris#6.posX 107980793
+  w Debris#6.posY 3085695
+  w Debris#6.posZ 58407217
+  w Debris#7.posX 121832400
+  w Debris#7.posY 3161831
+  w Debris#7.posZ 68271806
+  w Debris#8.posX 107955781
+  w Debris#8.posY 3211362
+  w Debris#8.posZ 56280997
+  w Debris#9.posX 92250247
+  w Debris#9.posY 3079050
+  w Debris#9.posZ 53679034
+  w Debris#0.ref1.src FrameTable#3
+  w Debris#1.ref1.src FrameTable#7
+  w Debris#2.ref1.src FrameTable#1
+  w Debris#3.ref1.src FrameTable#8
+  w Debris#3.ref2.src FrameTable#4
+  w Debris#5.ref1.src FrameTable#7
+  w ExplodedPiece#1.vel_y 125997
+  w ExplodedPiece#1.ticks 809
+  w ExplodedPiece#2.vel_y -443417
+  w ExplodedPiece#2.ticks 723
+  w ExplodedPiece#3.vel_y -377881
+  w ExplodedPiece#3.ticks 723
+  w ExplodedPiece#4.vel_y -377881
+  w ExplodedPiece#4.ticks 723
+  w ExplodedPiece#5.vel_y 125997
+  w ExplodedPiece#5.ticks 809
+  w ExplodedPiece#6.vel_y -201683
+  w ExplodedPiece#6.ticks 809
+  w ExplodedPiece#7.vel_y -347299
+  w ExplodedPiece#7.ticks 729
+  w ExplodedPiece#8.vel_y -347299
+  w ExplodedPiece#8.ticks 729
+  w ExplodedPiece#9.vel_y 60461
+  w ExplodedPiece#9.ticks 809
+  w PieceRec#1.angle_10 -6038
+  w PieceRec#1.angle_12 23719
+  w PieceRec#1.angle_14 3335
+  w PieceRec#1.posX 128381941
+  w PieceRec#1.posY 36336663
+  w PieceRec#1.posZ 76805418
+  w PieceRec#2.angle_10 -28242
+  w PieceRec#2.angle_12 1055
+  w PieceRec#2.angle_14 23318
+  w PieceRec#2.posX 124547397
+  w PieceRec#2.posY 5322266
+  w PieceRec#2.posZ 100649285
+  w PieceRec#3.angle_10 10043
+  w PieceRec#3.angle_12 25835
+  w PieceRec#3.angle_14 12390
+  w PieceRec#3.posX 85071605
+  w PieceRec#3.posY 16950223
+  w PieceRec#3.posZ 51200426
+  w PieceRec#4.angle_10 5657
+  w PieceRec#4.angle_12 3218
+  w PieceRec#4.angle_14 -20008
+  w PieceRec#4.posX 133814028
+  w PieceRec#4.posY 16954125
+  w PieceRec#4.posZ 92517522
+  w PieceRec#5.angle_10 12269
+  w PieceRec#5.angle_12 4213
+  w PieceRec#5.angle_14 26374
+  w PieceRec#5.posY 36392176
+  w PieceRec#5.posZ 48457590
+  w PieceRec#6.angle_10 -25362
+  w PieceRec#6.angle_12 -14394
+  w PieceRec#6.angle_14 30287
+  w PieceRec#6.posX 161895085
+  w PieceRec#6.posY 6573296
+  w PieceRec#6.posZ 53520523
+  w PieceRec#7.angle_10 22357
+  w PieceRec#7.angle_12 -23514
+  w PieceRec#7.angle_14 -9833
+  w PieceRec#7.posX 106910379
+  w PieceRec#7.posY 19144554
+  w PieceRec#7.posZ 46875860
+  w PieceRec#8.angle_10 23718
+  w PieceRec#8.angle_12 -685
+  w PieceRec#8.angle_14 641
+  w PieceRec#8.posX 186872588
+  w PieceRec#8.posY 19041761
+  w PieceRec#8.posZ 60958574
+  w PieceRec#9.angle_10 -32286
+  w PieceRec#9.angle_12 22975
+  w PieceRec#9.angle_14 -6964
+  w PieceRec#9.posX 132076898
+  w PieceRec#9.posY 30311401
+  w PieceRec#9.posZ 67754546
 call 1640 GetWeaponRange
   a unit Unit#11
   a weapon 0
@@ -11024,9 +11983,9 @@ call 1640 GetWeaponRange
   o result 700
 call 1641 UpdateUnitWeapons
   r rng.seed 0x2d50171a
+  r Unit#1.heading 32411
   r Unit#1.posX 95597667
   r Unit#1.posZ 48899084
-  r Unit#1.heading 32411
   r Projectile#0.positionX 102483888
   r Projectile#0.positionY 4451126
   r Projectile#0.positionZ 58943732
@@ -11076,9 +12035,9 @@ call 1641 UpdateUnitWeapons
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53474 282 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
   w Unit#3.weapon0Flags 18
-  w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -12062
   w Unit#3.weapon1FirePitch 282
+  w Unit#3.weapon1Flags 23
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
 call 1641 UpdateUnitWeapons
   a unit Unit#4
@@ -11219,17 +12178,17 @@ call 1641 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 1641 Apply
-  r Unit#14.player Player#0
   r Unit#14.activateFlags 0
+  r Unit#14.player Player#0
+  r weapondef#0.index 0
   r UnitDef#62.damagemodifier 65536
-  r UnitDef#62.weapons0 weapondef#89
   r UnitDef#62.weapons1 weapondef#100
   r UnitDef#62.weapons2 weapondef#0
+  r UnitDef#62.weapons0 weapondef#89
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#89.index 89
   r weapondef#100.index 100
-  r weapondef#0.index 0
   a event.kind 260
   a event.unit Unit#14
   a event.weapon 0
@@ -11303,9 +12262,9 @@ call 1641 UpdateUnitWeapons
   o y 0
   o z 0
 call 1641 UpdateUnitWeapons
+  r Unit#261.heading -121
   r Unit#261.posX 164042161
   r Unit#261.posZ 148591745
-  r Unit#261.heading -121
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -11365,9 +12324,9 @@ call 1641 UpdateUnitWeapons
   o y 0
   o z 0
 call 1641 UpdateUnitWeapons
+  r Unit#268.heading 7737
   r Unit#268.posX 182871462
   r Unit#268.posZ 141249827
-  r Unit#268.heading 7737
   r UnitMotion#28.speed 32486
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -11423,9 +12382,9 @@ call 1641 Apply
   w Unit#275.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 1641 UpdateUnitWeapons
+  r Unit#275.heading -21901
   r Unit#275.posX 108476998
   r Unit#275.posZ 57783711
-  r Unit#275.heading -21901
   r UnitMotion#3.speed 167860
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -11436,6 +12395,205 @@ call 1641 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1641 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128381941,76805418) = 3
+  i map.GetCellMeanHeight pos=(124547397,100649285) = 3
+  i map.GetCellMeanHeight pos=(85071605,51200426) = 65
+  i map.GetCellMeanHeight pos=(133814028,92517522) = 3
+  i map.GetCellMeanHeight pos=(133544775,48457590) = 3
+  i map.GetCellMeanHeight pos=(161895085,53520523) = 3
+  i map.GetCellMeanHeight pos=(106910379,46875860) = 3
+  i map.GetCellMeanHeight pos=(186872588,60958574) = 3
+  i map.GetCellMeanHeight pos=(132076898,67754546) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 21
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 7
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 7
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 11
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 6
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 6
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 3
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 3
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 3
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w Game.count_1491b 9
+  w Debris#0.posX 102937822
+  w Debris#0.posY 3179862
+  w Debris#0.posZ 59667265
+  w Debris#1.posX 149755121
+  w Debris#1.posY 2964060
+  w Debris#1.posZ 54254333
+  w Debris#2.posX 77938329
+  w Debris#2.posY 3130763
+  w Debris#2.posZ 57166094
+  w Debris#3.posX 77199162
+  w Debris#3.posY 2989888
+  w Debris#3.posZ 57344263
+  w Debris#4.posX 107836854
+  w Debris#4.posY 3160322
+  w Debris#4.posZ 56290232
+  w Debris#5.posX 107980793
+  w Debris#5.posY 3085695
+  w Debris#5.posZ 58407217
+  w Debris#6.posX 121832400
+  w Debris#6.posY 3161831
+  w Debris#6.posZ 68271806
+  w Debris#7.posX 107955781
+  w Debris#7.posY 3211362
+  w Debris#7.posZ 56280997
+  w Debris#8.posX 92250247
+  w Debris#8.posY 3079050
+  w Debris#8.posZ 53679034
+  w Debris#0.ref1.src FrameTable#7
+  w Debris#1.ref1.src FrameTable#1
+  w Debris#2.ref1.src FrameTable#8
+  w Debris#2.ref2.src FrameTable#4
+  w Debris#4.ref1.src FrameTable#7
+  w ExplodedPiece#1.vel_y 120900
+  w ExplodedPiece#1.ticks 808
+  w ExplodedPiece#2.vel_y -448514
+  w ExplodedPiece#2.ticks 722
+  w ExplodedPiece#3.vel_y -382978
+  w ExplodedPiece#3.ticks 722
+  w ExplodedPiece#4.vel_y -382978
+  w ExplodedPiece#4.ticks 722
+  w ExplodedPiece#5.vel_y 120900
+  w ExplodedPiece#5.ticks 808
+  w ExplodedPiece#6.vel_y -206780
+  w ExplodedPiece#6.ticks 808
+  w ExplodedPiece#7.vel_y -352396
+  w ExplodedPiece#7.ticks 728
+  w ExplodedPiece#8.vel_y -352396
+  w ExplodedPiece#8.ticks 728
+  w ExplodedPiece#9.vel_y 55364
+  w ExplodedPiece#9.ticks 808
+  w PieceRec#1.angle_10 -4664
+  w PieceRec#1.angle_12 25420
+  w PieceRec#1.angle_14 4812
+  w PieceRec#1.posX 128316405
+  w PieceRec#1.posY 36462660
+  w PieceRec#1.posZ 77034794
+  w PieceRec#2.angle_10 -26180
+  w PieceRec#2.angle_12 2542
+  w PieceRec#2.angle_14 23820
+  w PieceRec#2.posX 124629317
+  w PieceRec#2.posY 4878849
+  w PieceRec#2.posZ 100829509
+  w PieceRec#3.angle_10 10470
+  w PieceRec#3.angle_12 27462
+  w PieceRec#3.angle_14 12460
+  w PieceRec#3.posX 84924149
+  w PieceRec#3.posY 16572342
+  w PieceRec#3.posZ 51102122
+  w PieceRec#4.angle_10 7170
+  w PieceRec#4.angle_12 5828
+  w PieceRec#4.angle_14 -18640
+  w PieceRec#4.posX 133945100
+  w PieceRec#4.posY 16576244
+  w PieceRec#4.posZ 92648594
+  w PieceRec#5.angle_10 13124
+  w PieceRec#5.angle_12 7140
+  w PieceRec#5.angle_14 27384
+  w PieceRec#5.posY 36518173
+  w PieceRec#5.posZ 48375670
+  w PieceRec#6.angle_10 -22760
+  w PieceRec#6.angle_12 -13832
+  w PieceRec#6.angle_14 31340
+  w PieceRec#6.posX 162206381
+  w PieceRec#6.posY 6371613
+  w PieceRec#6.posZ 53504139
+  w PieceRec#7.angle_10 24404
+  w PieceRec#7.angle_12 -21352
+  w PieceRec#7.angle_14 -9124
+  w PieceRec#7.posX 106664619
+  w PieceRec#7.posY 18797255
+  w PieceRec#7.posZ 46859476
+  w PieceRec#8.angle_10 25393
+  w PieceRec#8.angle_12 844
+  w PieceRec#8.angle_14 1028
+  w PieceRec#8.posX 187085580
+  w PieceRec#8.posY 18694462
+  w PieceRec#8.posZ 61024110
+  w PieceRec#9.angle_10 -30473
+  w PieceRec#9.angle_12 25388
+  w PieceRec#9.angle_14 -4880
+  w PieceRec#9.posX 132044130
+  w PieceRec#9.posY 30371862
+  w PieceRec#9.posZ 67885618
 call 1641 GetWeaponRange
   a unit Unit#274
   a weapon 1
@@ -11760,9 +12918,9 @@ call 1642 UpdateUnitWeapons
   o y 0
   o z 0
 call 1642 UpdateUnitWeapons
+  r Unit#261.heading -119
   r Unit#261.posX 164042989
   r Unit#261.posZ 148524579
-  r Unit#261.heading -119
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -11822,9 +12980,9 @@ call 1642 UpdateUnitWeapons
   o y 0
   o z 0
 call 1642 UpdateUnitWeapons
+  r Unit#268.heading 7740
   r Unit#268.posX 182849245
   r Unit#268.posZ 141225312
-  r Unit#268.heading 7740
   r UnitMotion#28.speed 33085
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -11875,9 +13033,9 @@ call 1642 UpdateUnitWeapons
   w Unit#275.weapon0Flags 18
   w Unit#275.weapon1ReloadTimer 48
 call 1642 UpdateUnitWeapons
+  r Unit#275.heading -22420
   r Unit#275.posX 108616610
   r Unit#275.posZ 57874529
-  r Unit#275.heading -22420
   r UnitMotion#3.speed 166550
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -11888,10 +13046,172 @@ call 1642 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1642 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128316405,77034794) = 3
+  i map.GetCellMeanHeight pos=(124629317,100829509) = 3
+  i map.GetCellMeanHeight pos=(84924149,51102122) = 90
+  i map.GetCellMeanHeight pos=(133945100,92648594) = 3
+  i map.GetCellMeanHeight pos=(133544775,48375670) = 3
+  i map.GetCellMeanHeight pos=(162206381,53504139) = 3
+  i map.GetCellMeanHeight pos=(106664619,46859476) = 3
+  i map.GetCellMeanHeight pos=(187085580,61024110) = 3
+  i map.GetCellMeanHeight pos=(132044130,67885618) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 22
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 12
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref2 = 1
+  o Debris#2.ref2.index 12
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src null
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 7
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 8
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 8
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 4
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 4
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 3
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  w Debris#2.ref2.src null
+  w ExplodedPiece#1.vel_y 115803
+  w ExplodedPiece#1.ticks 807
+  w ExplodedPiece#2.vel_y -453611
+  w ExplodedPiece#2.ticks 721
+  w ExplodedPiece#3.vel_y -388075
+  w ExplodedPiece#3.ticks 721
+  w ExplodedPiece#4.vel_y -388075
+  w ExplodedPiece#4.ticks 721
+  w ExplodedPiece#5.vel_y 115803
+  w ExplodedPiece#5.ticks 807
+  w ExplodedPiece#6.vel_y -211877
+  w ExplodedPiece#6.ticks 807
+  w ExplodedPiece#7.vel_y -357493
+  w ExplodedPiece#7.ticks 727
+  w ExplodedPiece#8.vel_y -357493
+  w ExplodedPiece#8.ticks 727
+  w ExplodedPiece#9.vel_y 50267
+  w ExplodedPiece#9.ticks 807
+  w PieceRec#1.angle_10 -3290
+  w PieceRec#1.angle_12 27121
+  w PieceRec#1.angle_14 6289
+  w PieceRec#1.posX 128250869
+  w PieceRec#1.posY 36583560
+  w PieceRec#1.posZ 77264170
+  w PieceRec#2.angle_10 -24118
+  w PieceRec#2.angle_12 4029
+  w PieceRec#2.angle_14 24322
+  w PieceRec#2.posX 124711237
+  w PieceRec#2.posY 4430335
+  w PieceRec#2.posZ 101009733
+  w PieceRec#3.angle_10 10897
+  w PieceRec#3.angle_12 29089
+  w PieceRec#3.angle_14 12530
+  w PieceRec#3.posX 84776693
+  w PieceRec#3.posY 16189364
+  w PieceRec#3.posZ 51003818
+  w PieceRec#4.angle_10 8683
+  w PieceRec#4.angle_12 8438
+  w PieceRec#4.angle_14 -17272
+  w PieceRec#4.posX 134076172
+  w PieceRec#4.posY 16193266
+  w PieceRec#4.posZ 92779666
+  w PieceRec#5.angle_10 13979
+  w PieceRec#5.angle_12 10067
+  w PieceRec#5.angle_14 28394
+  w PieceRec#5.posY 36639073
+  w PieceRec#5.posZ 48293750
+  w PieceRec#6.angle_10 -20158
+  w PieceRec#6.angle_12 -13270
+  w PieceRec#6.angle_14 32393
+  w PieceRec#6.posX 162517677
+  w PieceRec#6.posY 6164833
+  w PieceRec#6.posZ 53487755
+  w PieceRec#7.angle_10 26451
+  w PieceRec#7.angle_12 -19190
+  w PieceRec#7.angle_14 -8415
+  w PieceRec#7.posX 106418859
+  w PieceRec#7.posY 18444859
+  w PieceRec#7.posZ 46843092
+  w PieceRec#8.angle_10 27068
+  w PieceRec#8.angle_12 2373
+  w PieceRec#8.angle_14 1415
+  w PieceRec#8.posX 187298572
+  w PieceRec#8.posY 18342066
+  w PieceRec#8.posZ 61089646
+  w PieceRec#9.angle_10 -28660
+  w PieceRec#9.angle_12 27801
+  w PieceRec#9.angle_14 -2796
+  w PieceRec#9.posX 132011362
+  w PieceRec#9.posY 30427226
+  w PieceRec#9.posZ 68016690
 call 1643 UpdateUnitWeapons
+  r Unit#1.heading 32420
   r Unit#1.posX 95592763
   r Unit#1.posZ 49032034
-  r Unit#1.heading 32420
   r Projectile#0.positionX 101013914
   r Projectile#0.positionY 4158795
   r Projectile#0.positionZ 59259868
@@ -12123,9 +13443,9 @@ call 1643 UpdateUnitWeapons
   o y 0
   o z 0
 call 1643 UpdateUnitWeapons
+  r Unit#261.heading -118
   r Unit#261.posX 164043817
   r Unit#261.posZ 148457413
-  r Unit#261.heading -118
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -12185,9 +13505,9 @@ call 1643 UpdateUnitWeapons
   o y 0
   o z 0
 call 1643 UpdateUnitWeapons
+  r Unit#268.heading 7743
   r Unit#268.posX 182826626
   r Unit#268.posZ 141200353
-  r Unit#268.heading 7743
   r UnitMotion#28.speed 33684
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -12251,9 +13571,9 @@ call 1643 UpdateUnitWeapons
   w Unit#275.weapon1ReloadTimer 47
   w Unit#275.weapons[0].aimCob.nAimCobDone 0
 call 1643 UpdateUnitWeapons
+  r Unit#275.heading -22939
   r Unit#275.posX 108750525
   r Unit#275.posZ 57971329
-  r Unit#275.heading -22939
   r UnitMotion#3.speed 165240
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -12264,10 +13584,167 @@ call 1643 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1643 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128250869,77264170) = 3
+  i map.GetCellMeanHeight pos=(124711237,101009733) = 3
+  i map.GetCellMeanHeight pos=(84776693,51003818) = 90
+  i map.GetCellMeanHeight pos=(134076172,92779666) = 3
+  i map.GetCellMeanHeight pos=(133544775,48293750) = 3
+  i map.GetCellMeanHeight pos=(162517677,53487755) = 3
+  i map.GetCellMeanHeight pos=(106418859,46843092) = 3
+  i map.GetCellMeanHeight pos=(187298572,61089646) = 3
+  i map.GetCellMeanHeight pos=(132011362,68016690) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 22
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 12
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 8
+  o Debris#3.ref1.value 3
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 12
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src null
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 4
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 4
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 4
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 4
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  w Debris#3.ref2.src null
+  w ExplodedPiece#1.vel_y 110706
+  w ExplodedPiece#1.ticks 806
+  w ExplodedPiece#2.vel_y -458708
+  w ExplodedPiece#2.ticks 720
+  w ExplodedPiece#3.vel_y -393172
+  w ExplodedPiece#3.ticks 720
+  w ExplodedPiece#4.vel_y -393172
+  w ExplodedPiece#4.ticks 720
+  w ExplodedPiece#5.vel_y 110706
+  w ExplodedPiece#5.ticks 806
+  w ExplodedPiece#6.vel_y -216974
+  w ExplodedPiece#6.ticks 806
+  w ExplodedPiece#7.vel_y -362590
+  w ExplodedPiece#7.ticks 726
+  w ExplodedPiece#8.vel_y -362590
+  w ExplodedPiece#8.ticks 726
+  w ExplodedPiece#9.vel_y 45170
+  w ExplodedPiece#9.ticks 806
+  w PieceRec#1.angle_10 -1916
+  w PieceRec#1.angle_12 28822
+  w PieceRec#1.angle_14 7766
+  w PieceRec#1.posX 128185333
+  w PieceRec#1.posY 36699363
+  w PieceRec#1.posZ 77493546
+  w PieceRec#2.angle_10 -22056
+  w PieceRec#2.angle_12 5516
+  w PieceRec#2.angle_14 24824
+  w PieceRec#2.posX 124793157
+  w PieceRec#2.posY 3976724
+  w PieceRec#2.posZ 101189957
+  w PieceRec#3.angle_10 11324
+  w PieceRec#3.angle_12 30716
+  w PieceRec#3.angle_14 12600
+  w PieceRec#3.posX 84629237
+  w PieceRec#3.posY 15801289
+  w PieceRec#3.posZ 50905514
+  w PieceRec#4.angle_10 10196
+  w PieceRec#4.angle_12 11048
+  w PieceRec#4.angle_14 -15904
+  w PieceRec#4.posX 134207244
+  w PieceRec#4.posY 15805191
+  w PieceRec#4.posZ 92910738
+  w PieceRec#5.angle_10 14834
+  w PieceRec#5.angle_12 12994
+  w PieceRec#5.angle_14 29404
+  w PieceRec#5.posY 36754876
+  w PieceRec#5.posZ 48211830
+  w PieceRec#6.angle_10 -17556
+  w PieceRec#6.angle_12 -12708
+  w PieceRec#6.angle_14 -32090
+  w PieceRec#6.posX 162828973
+  w PieceRec#6.posY 5952956
+  w PieceRec#6.posZ 53471371
+  w PieceRec#7.angle_10 28498
+  w PieceRec#7.angle_12 -17028
+  w PieceRec#7.angle_14 -7706
+  w PieceRec#7.posX 106173099
+  w PieceRec#7.posY 18087366
+  w PieceRec#7.posZ 46826708
+  w PieceRec#8.angle_10 28743
+  w PieceRec#8.angle_12 3902
+  w PieceRec#8.angle_14 1802
+  w PieceRec#8.posX 187511564
+  w PieceRec#8.posY 17984573
+  w PieceRec#8.posZ 61155182
+  w PieceRec#9.angle_10 -26847
+  w PieceRec#9.angle_12 30214
+  w PieceRec#9.angle_14 -712
+  w PieceRec#9.posX 131978594
+  w PieceRec#9.posY 30477493
+  w PieceRec#9.posZ 68147762
 call 1644 UpdateUnitWeapons
+  r Unit#1.heading 32425
   r Unit#1.posX 95590274
   r Unit#1.posZ 49099491
-  r Unit#1.heading 32425
   r Projectile#0.positionX 100278927
   r Projectile#0.positionY 4004984
   r Projectile#0.positionZ 59417936
@@ -12497,9 +13974,9 @@ call 1644 UpdateUnitWeapons
   o y 0
   o z 0
 call 1644 UpdateUnitWeapons
+  r Unit#261.heading -116
   r Unit#261.posX 164044645
   r Unit#261.posZ 148390247
-  r Unit#261.heading -116
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -12512,12 +13989,12 @@ call 1644 WeaponCanReachUnit
   a weapon 0
   o result 0
 call 1644 Apply
-  r Unit#261.player Player#1
   r Unit#261.activateFlags 1
+  r Unit#261.player Player#1
   r UnitDef#157.damagemodifier 65536
-  r UnitDef#157.weapons0 weapondef#11
   r UnitDef#157.weapons1 weapondef#0
   r UnitDef#157.weapons2 weapondef#0
+  r UnitDef#157.weapons0 weapondef#11
   r Player#1.active 1
   r Player#1.type 2
   r weapondef#11.index 11
@@ -12580,9 +14057,9 @@ call 1644 UpdateUnitWeapons
   o y 0
   o z 0
 call 1644 UpdateUnitWeapons
+  r Unit#268.heading 7747
   r Unit#268.posX 182803605
   r Unit#268.posZ 141174950
-  r Unit#268.heading 7747
   r UnitMotion#28.speed 34283
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -12672,9 +14149,9 @@ call 1644 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 46
 call 1644 UpdateUnitWeapons
+  r Unit#275.heading -23458
   r Unit#275.posX 108877255
   r Unit#275.posZ 58075326
-  r Unit#275.heading -23458
   r UnitMotion#3.speed 163930
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -12685,10 +14162,209 @@ call 1644 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1644 UpdateExplosions
+  r Game.count_1491b 10
+  r Debris#9.posX 101134049
+  r Debris#9.posY 3121519
+  r Debris#9.posZ 56694649
+  r Debris#9.ref1.src FrameTable#8
+  i map.GetCellMeanHeight pos=(128185333,77493546) = 3
+  i map.GetCellMeanHeight pos=(124793157,101189957) = 3
+  i map.GetCellMeanHeight pos=(84629237,50905514) = 90
+  i map.GetCellMeanHeight pos=(134207244,92910738) = 3
+  i map.GetCellMeanHeight pos=(133544775,48211830) = 3
+  i map.GetCellMeanHeight pos=(162828973,53471371) = 3
+  i map.GetCellMeanHeight pos=(106173099,46826708) = 3
+  i map.GetCellMeanHeight pos=(187511564,61155182) = 3
+  i map.GetCellMeanHeight pos=(131978594,68147762) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 23
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 13
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 8
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 9
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 9
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 4
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 4
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 0
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w Game.count_1491b 9
+  w Debris#0.posX 149755121
+  w Debris#0.posY 2964060
+  w Debris#0.posZ 54254333
+  w Debris#1.posX 77938329
+  w Debris#1.posY 3130763
+  w Debris#1.posZ 57166094
+  w Debris#2.posX 77199162
+  w Debris#2.posY 2989888
+  w Debris#2.posZ 57344263
+  w Debris#3.posX 107836854
+  w Debris#3.posY 3160322
+  w Debris#3.posZ 56290232
+  w Debris#4.posX 107980793
+  w Debris#4.posY 3085695
+  w Debris#4.posZ 58407217
+  w Debris#5.posX 121832400
+  w Debris#5.posY 3161831
+  w Debris#5.posZ 68271806
+  w Debris#6.posX 107955781
+  w Debris#6.posY 3211362
+  w Debris#6.posZ 56280997
+  w Debris#7.posX 92250247
+  w Debris#7.posY 3079050
+  w Debris#7.posZ 53679034
+  w Debris#8.posX 101134049
+  w Debris#8.posY 3121519
+  w Debris#8.posZ 56694649
+  w Debris#0.ref1.src FrameTable#1
+  w Debris#1.ref1.src FrameTable#8
+  w Debris#3.ref1.src FrameTable#7
+  w Debris#3.ref2.src FrameTable#4
+  w Debris#8.ref1.src FrameTable#8
+  w ExplodedPiece#1.vel_y 105609
+  w ExplodedPiece#1.ticks 805
+  w ExplodedPiece#2.vel_y -463805
+  w ExplodedPiece#2.ticks 719
+  w ExplodedPiece#3.vel_y -398269
+  w ExplodedPiece#3.ticks 719
+  w ExplodedPiece#4.vel_y -398269
+  w ExplodedPiece#4.ticks 719
+  w ExplodedPiece#5.vel_y 105609
+  w ExplodedPiece#5.ticks 805
+  w ExplodedPiece#6.vel_y -222071
+  w ExplodedPiece#6.ticks 805
+  w ExplodedPiece#7.vel_y -367687
+  w ExplodedPiece#7.ticks 725
+  w ExplodedPiece#8.vel_y -367687
+  w ExplodedPiece#8.ticks 725
+  w ExplodedPiece#9.vel_y 40073
+  w ExplodedPiece#9.ticks 805
+  w PieceRec#1.angle_10 -542
+  w PieceRec#1.angle_12 30523
+  w PieceRec#1.angle_14 9243
+  w PieceRec#1.posX 128119797
+  w PieceRec#1.posY 36810069
+  w PieceRec#1.posZ 77722922
+  w PieceRec#2.angle_10 -19994
+  w PieceRec#2.angle_12 7003
+  w PieceRec#2.angle_14 25326
+  w PieceRec#2.posX 124875077
+  w PieceRec#2.posY 3518016
+  w PieceRec#2.posZ 101370181
+  w PieceRec#3.angle_10 11751
+  w PieceRec#3.angle_12 32343
+  w PieceRec#3.angle_14 12670
+  w PieceRec#3.posX 84481781
+  w PieceRec#3.posY 15408117
+  w PieceRec#3.posZ 50807210
+  w PieceRec#4.angle_10 11709
+  w PieceRec#4.angle_12 13658
+  w PieceRec#4.angle_14 -14536
+  w PieceRec#4.posX 134338316
+  w PieceRec#4.posY 15412019
+  w PieceRec#4.posZ 93041810
+  w PieceRec#5.angle_10 15689
+  w PieceRec#5.angle_12 15921
+  w PieceRec#5.angle_14 30414
+  w PieceRec#5.posY 36865582
+  w PieceRec#5.posZ 48129910
+  w PieceRec#6.angle_10 -14954
+  w PieceRec#6.angle_12 -12146
+  w PieceRec#6.angle_14 -31037
+  w PieceRec#6.posX 163140269
+  w PieceRec#6.posY 5735982
+  w PieceRec#6.posZ 53454987
+  w PieceRec#7.angle_10 30545
+  w PieceRec#7.angle_12 -14866
+  w PieceRec#7.angle_14 -6997
+  w PieceRec#7.posX 105927339
+  w PieceRec#7.posY 17724776
+  w PieceRec#7.posZ 46810324
+  w PieceRec#8.angle_10 30418
+  w PieceRec#8.angle_12 5431
+  w PieceRec#8.angle_14 2189
+  w PieceRec#8.posX 187724556
+  w PieceRec#8.posY 17621983
+  w PieceRec#8.posZ 61220718
+  w PieceRec#9.angle_10 -25034
+  w PieceRec#9.angle_12 32627
+  w PieceRec#9.angle_14 1372
+  w PieceRec#9.posX 131945826
+  w PieceRec#9.posY 30522663
+  w PieceRec#9.posZ 68278834
 call 1645 UpdateUnitWeapons
+  r Unit#1.heading 32430
   r Unit#1.posX 95587761
   r Unit#1.posZ 49167602
-  r Unit#1.heading 32430
   r Projectile#0.positionX 99543940
   r Projectile#0.positionY 3846076
   r Projectile#0.positionZ 59576004
@@ -12739,9 +14415,9 @@ call 1645 UpdateUnitWeapons
   i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 53860 315 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
-  w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11676
   w Unit#3.weapon1FirePitch 315
+  w Unit#3.weapon1Flags 23
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
 call 1645 Apply
   a event.kind 263
@@ -12762,12 +14438,12 @@ call 1645 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 1645 Apply
-  r Unit#3.player Player#0
   r Unit#3.activateFlags 0
+  r Unit#3.player Player#0
   r UnitDef#15.damagemodifier 65536
-  r UnitDef#15.weapons0 weapondef#68
   r UnitDef#15.weapons1 weapondef#68
   r UnitDef#15.weapons2 weapondef#0
+  r UnitDef#15.weapons0 weapondef#68
   r weapondef#68.index 68
   a event.kind 260
   a event.unit Unit#3
@@ -12959,9 +14635,9 @@ call 1645 UpdateUnitWeapons
   o y 0
   o z 0
 call 1645 UpdateUnitWeapons
+  r Unit#261.heading -114
   r Unit#261.posX 164045473
   r Unit#261.posZ 148323081
-  r Unit#261.heading -114
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -13021,9 +14697,9 @@ call 1645 UpdateUnitWeapons
   o y 0
   o z 0
 call 1645 UpdateUnitWeapons
+  r Unit#268.heading 7750
   r Unit#268.posX 182780181
   r Unit#268.posZ 141149104
-  r Unit#268.heading 7750
   r UnitMotion#28.speed 34882
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -13082,9 +14758,9 @@ call 1645 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 45
 call 1645 UpdateUnitWeapons
+  r Unit#275.heading -23977
   r Unit#275.posX 108997751
   r Unit#275.posZ 58184527
-  r Unit#275.heading -23977
   r UnitMotion#3.speed 162620
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -13095,11 +14771,181 @@ call 1645 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1645 UpdateExplosions
+  r Game.count_1491b 10
+  r Debris#9.posX 100488642
+  r Debris#9.posY 2997077
+  r Debris#9.posZ 56583244
+  i map.GetCellMeanHeight pos=(128119797,77722922) = 3
+  i map.GetCellMeanHeight pos=(124875077,101370181) = 3
+  i map.GetCellMeanHeight pos=(84481781,50807210) = 90
+  i map.GetCellMeanHeight pos=(134338316,93041810) = 3
+  i map.GetCellMeanHeight pos=(133544775,48129910) = 3
+  i map.GetCellMeanHeight pos=(163140269,53454987) = 3
+  i map.GetCellMeanHeight pos=(105927339,46810324) = 3
+  i map.GetCellMeanHeight pos=(187724556,61220718) = 3
+  i map.GetCellMeanHeight pos=(131945826,68278834) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 13
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 8
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 10
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 10
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 5
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 5
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 0
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 1
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 0
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  w ExplodedPiece#1.vel_y 100512
+  w ExplodedPiece#1.ticks 804
+  w ExplodedPiece#2.vel_y -468902
+  w ExplodedPiece#2.ticks 718
+  w ExplodedPiece#3.vel_y -403366
+  w ExplodedPiece#3.ticks 718
+  w ExplodedPiece#4.vel_y -403366
+  w ExplodedPiece#4.ticks 718
+  w ExplodedPiece#5.vel_y 100512
+  w ExplodedPiece#5.ticks 804
+  w ExplodedPiece#6.vel_y -227168
+  w ExplodedPiece#6.ticks 804
+  w ExplodedPiece#7.vel_y -372784
+  w ExplodedPiece#7.ticks 724
+  w ExplodedPiece#8.vel_y -372784
+  w ExplodedPiece#8.ticks 724
+  w ExplodedPiece#9.vel_y 34976
+  w ExplodedPiece#9.ticks 804
+  w PieceRec#1.angle_10 832
+  w PieceRec#1.angle_12 32224
+  w PieceRec#1.angle_14 10720
+  w PieceRec#1.posX 128054261
+  w PieceRec#1.posY 36915678
+  w PieceRec#1.posZ 77952298
+  w PieceRec#2.angle_10 -17932
+  w PieceRec#2.angle_12 8490
+  w PieceRec#2.angle_14 25828
+  w PieceRec#2.posX 124956997
+  w PieceRec#2.posY 3054211
+  w PieceRec#2.posZ 101550405
+  w PieceRec#3.angle_10 12178
+  w PieceRec#3.angle_12 -31566
+  w PieceRec#3.angle_14 12740
+  w PieceRec#3.posX 84334325
+  w PieceRec#3.posY 15009848
+  w PieceRec#3.posZ 50708906
+  w PieceRec#4.angle_10 13222
+  w PieceRec#4.angle_12 16268
+  w PieceRec#4.angle_14 -13168
+  w PieceRec#4.posX 134469388
+  w PieceRec#4.posY 15013750
+  w PieceRec#4.posZ 93172882
+  w PieceRec#5.angle_10 16544
+  w PieceRec#5.angle_12 18848
+  w PieceRec#5.angle_14 31424
+  w PieceRec#5.posY 36971191
+  w PieceRec#5.posZ 48047990
+  w PieceRec#6.angle_10 -12352
+  w PieceRec#6.angle_12 -11584
+  w PieceRec#6.angle_14 -29984
+  w PieceRec#6.posX 163451565
+  w PieceRec#6.posY 5513911
+  w PieceRec#6.posZ 53438603
+  w PieceRec#7.angle_10 32592
+  w PieceRec#7.angle_12 -12704
+  w PieceRec#7.angle_14 -6288
+  w PieceRec#7.posX 105681579
+  w PieceRec#7.posY 17357089
+  w PieceRec#7.posZ 46793940
+  w PieceRec#8.angle_10 32093
+  w PieceRec#8.angle_12 6960
+  w PieceRec#8.angle_14 2576
+  w PieceRec#8.posX 187937548
+  w PieceRec#8.posY 17254296
+  w PieceRec#8.posZ 61286254
+  w PieceRec#9.angle_10 -23221
+  w PieceRec#9.angle_12 -30496
+  w PieceRec#9.angle_14 3456
+  w PieceRec#9.posX 131913058
+  w PieceRec#9.posY 30562736
+  w PieceRec#9.posZ 68409906
 call 1646 UpdateUnitWeapons
   r Game.projectileCount 4
+  r Unit#1.heading 32435
   r Unit#1.posX 95585224
   r Unit#1.posZ 49236368
-  r Unit#1.heading 32435
   r Projectile#0.positionX 98808953
   r Projectile#0.positionY 3682071
   r Projectile#0.positionZ 59734072
@@ -13234,12 +15080,12 @@ call 1646 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 1646 Apply
-  r Unit#5.player Player#0
   r Unit#5.activateFlags 1
+  r Unit#5.player Player#0
   r UnitDef#67.damagemodifier 65536
-  r UnitDef#67.weapons0 weapondef#64
   r UnitDef#67.weapons1 weapondef#35
   r UnitDef#67.weapons2 weapondef#0
+  r UnitDef#67.weapons0 weapondef#64
   r weapondef#64.index 64
   r weapondef#35.index 35
   a event.kind 260
@@ -13404,9 +15250,9 @@ call 1646 UpdateUnitWeapons
   o y 0
   o z 0
 call 1646 UpdateUnitWeapons
+  r Unit#261.heading -113
   r Unit#261.posX 164046301
   r Unit#261.posZ 148255915
-  r Unit#261.heading -113
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -13466,9 +15312,9 @@ call 1646 UpdateUnitWeapons
   o y 0
   o z 0
 call 1646 UpdateUnitWeapons
+  r Unit#268.heading 7753
   r Unit#268.posX 182756355
   r Unit#268.posZ 141122814
-  r Unit#268.heading 7753
   r UnitMotion#28.speed 35481
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -13522,10 +15368,10 @@ call 1646 UpdateUnitWeapons
   i services.ScheduleEconomySpend = 1
   w Game.projectileCount 5
   w rng.seed 0x31edc697
-  w Unit#274.weapon1Flags 22
   w Unit#274.weapon1ReloadTimer 85
   w Unit#274.weapon1FireHeading -10874
   w Unit#274.weapon1FirePitch 392
+  w Unit#274.weapon1Flags 22
   w Projectile#4.speed 983040
   w Projectile#4.spawnTick 1646
   w Projectile#4.attacker Unit#274
@@ -13551,9 +15397,9 @@ call 1646 UpdateUnitWeapons
   w Projectile#4.piece 4
   w Unit#274.weapons[1].aimCob.nAimCobDone 0
 call 1646 UpdateUnitWeapons
+  r Unit#1.heading 32440
   r Unit#1.posX 95582663
   r Unit#1.posZ 49305788
-  r Unit#1.heading 32440
   r UnitMotion#1.speed 69471
   a unit Unit#275
   i services.ScheduleTargetingTargetPos Unit#275 0 = 1
@@ -13567,9 +15413,9 @@ call 1646 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 44
 call 1646 UpdateUnitWeapons
+  r Unit#275.heading -24496
   r Unit#275.posX 109111822
   r Unit#275.posZ 58298598
-  r Unit#275.heading -24496
   r UnitMotion#3.speed 161310
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -13580,6 +15426,181 @@ call 1646 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1646 UpdateExplosions
+  i map.GetCellMeanHeight pos=(128054261,77952298) = 3
+  i mission.GetMissionParams = (2,0,4000,70,f32:0x41a00000,0,0,0,100,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
+  i services.InitGafSequence Debris#10.ref1 FrameTable#1 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 3
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  i map.GetCellMeanHeight pos=(84334325,50708906) = 90
+  i map.GetCellMeanHeight pos=(134469388,93172882) = 3
+  i map.GetCellMeanHeight pos=(133544775,48047990) = 3
+  i map.GetCellMeanHeight pos=(163451565,53438603) = 3
+  i map.GetCellMeanHeight pos=(105681579,46793940) = 3
+  i map.GetCellMeanHeight pos=(187937548,61286254) = 3
+  i map.GetCellMeanHeight pos=(131913058,68409906) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 13
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 9
+  o Debris#2.ref1.value 3
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 10
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 10
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 5
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 5
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 3
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 1
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 0
+  o Debris#9.ref1.value 1
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 1
+  o Debris#9.ref2.index 1
+  o Debris#9.ref2.value 2
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 2
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  w Game.count_1491b 11
+  w Debris#10.posX 124956997
+  w Debris#10.posY 3054211
+  w Debris#10.posZ 101550405
+  w ExplodedSlot#1.piece null
+  w Debris#10.ref1.src FrameTable#1
+  w Debris#10.ref2.src null
+  w ExplodedPiece#1.vel_y 95415
+  w ExplodedPiece#1.ticks 803
+  w ExplodedPiece#3.vel_y -408463
+  w ExplodedPiece#3.ticks 717
+  w ExplodedPiece#4.vel_y -408463
+  w ExplodedPiece#4.ticks 717
+  w ExplodedPiece#5.vel_y 95415
+  w ExplodedPiece#5.ticks 803
+  w ExplodedPiece#6.vel_y -232265
+  w ExplodedPiece#6.ticks 803
+  w ExplodedPiece#7.vel_y -377881
+  w ExplodedPiece#7.ticks 723
+  w ExplodedPiece#8.vel_y -377881
+  w ExplodedPiece#8.ticks 723
+  w ExplodedPiece#9.vel_y 29879
+  w ExplodedPiece#9.ticks 803
+  w PieceRec#1.angle_10 2206
+  w PieceRec#1.angle_12 -31611
+  w PieceRec#1.angle_14 12197
+  w PieceRec#1.posX 127988725
+  w PieceRec#1.posY 37016190
+  w PieceRec#1.posZ 78181674
+  w PieceRec#3.angle_10 12605
+  w PieceRec#3.angle_12 -29939
+  w PieceRec#3.angle_14 12810
+  w PieceRec#3.posX 84186869
+  w PieceRec#3.posY 14606482
+  w PieceRec#3.posZ 50610602
+  w PieceRec#4.angle_10 14735
+  w PieceRec#4.angle_12 18878
+  w PieceRec#4.angle_14 -11800
+  w PieceRec#4.posX 134600460
+  w PieceRec#4.posY 14610384
+  w PieceRec#4.posZ 93303954
+  w PieceRec#5.angle_10 17399
+  w PieceRec#5.angle_12 21775
+  w PieceRec#5.angle_14 32434
+  w PieceRec#5.posY 37071703
+  w PieceRec#5.posZ 47966070
+  w PieceRec#6.angle_10 -9750
+  w PieceRec#6.angle_12 -11022
+  w PieceRec#6.angle_14 -28931
+  w PieceRec#6.posX 163762861
+  w PieceRec#6.posY 5286743
+  w PieceRec#6.posZ 53422219
+  w PieceRec#7.angle_10 -30897
+  w PieceRec#7.angle_12 -10542
+  w PieceRec#7.angle_14 -5579
+  w PieceRec#7.posX 105435819
+  w PieceRec#7.posY 16984305
+  w PieceRec#7.posZ 46777556
+  w PieceRec#8.angle_10 -31768
+  w PieceRec#8.angle_12 8489
+  w PieceRec#8.angle_14 2963
+  w PieceRec#8.posX 188150540
+  w PieceRec#8.posY 16881512
+  w PieceRec#8.posZ 61351790
+  w PieceRec#9.angle_10 -21408
+  w PieceRec#9.angle_12 -28083
+  w PieceRec#9.angle_14 5540
+  w PieceRec#9.posX 131880290
+  w PieceRec#9.posY 30597712
+  w PieceRec#9.posZ 68540978
 call 1647 UpdateUnitWeapons
   r Projectile#0.positionX 98073966
   r Projectile#0.positionY 3512969
@@ -13609,9 +15630,9 @@ call 1647 UpdateUnitWeapons
   r Projectile#4.anglesPitch 73
   a unit Unit#1
 call 1647 UpdateUnitWeapons
+  r Unit#1.heading 32444
   r Unit#1.posX 95580078
   r Unit#1.posZ 49375863
-  r Unit#1.heading 32444
   r UnitMotion#1.speed 70126
   a unit Unit#2
   i services.ScheduleTargetingTargetPos Unit#2 0 = 0
@@ -13833,9 +15854,9 @@ call 1647 UpdateUnitWeapons
   o y 0
   o z 0
 call 1647 UpdateUnitWeapons
+  r Unit#261.heading -111
   r Unit#261.posX 164047129
   r Unit#261.posZ 148188749
-  r Unit#261.heading -111
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -13895,9 +15916,9 @@ call 1647 UpdateUnitWeapons
   o y 0
   o z 0
 call 1647 UpdateUnitWeapons
+  r Unit#268.heading 7757
   r Unit#268.posX 182732127
   r Unit#268.posZ 141096080
-  r Unit#268.heading 7757
   r UnitMotion#28.speed 36080
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -13935,10 +15956,10 @@ call 1647 UpdateUnitWeapons
   o out (89769800,3932159,54722482)
   i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#274 "AimSecondary" 2 65416 1182 0 0 = 0
-  w Unit#274.weapon1Flags 23
   w Unit#274.weapon1ReloadTimer 84
   w Unit#274.weapon1FireHeading -120
   w Unit#274.weapon1FirePitch 1182
+  w Unit#274.weapon1Flags 23
 call 1647 Apply
   a event.kind 263
   a event.unit null
@@ -13960,9 +15981,9 @@ call 1647 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 43
 call 1647 UpdateUnitWeapons
+  r Unit#275.heading -25015
   r Unit#275.posX 109219263
   r Unit#275.posZ 58417153
-  r Unit#275.heading -25015
   r UnitMotion#3.speed 160000
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -13973,6 +15994,205 @@ call 1647 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1647 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127988725,78181674) = 3
+  i map.GetCellMeanHeight pos=(84186869,50610602) = 90
+  i map.GetCellMeanHeight pos=(134600460,93303954) = 3
+  i map.GetCellMeanHeight pos=(133544775,47966070) = 3
+  i map.GetCellMeanHeight pos=(163762861,53422219) = 3
+  i map.GetCellMeanHeight pos=(105435819,46777556) = 3
+  i map.GetCellMeanHeight pos=(188150540,61351790) = 3
+  i map.GetCellMeanHeight pos=(131880290,68540978) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 14
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src null
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 9
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 9
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 9
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 6
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 6
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 3
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#9.ref2 = 0
+  o Debris#9.ref2.index 1
+  o Debris#9.ref2.value 1
+  o Debris#9.ref2.kind 0
+  o Debris#9.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#1
+  w Game.count_1491b 10
+  w Debris#0.posX 77938329
+  w Debris#0.posY 3130763
+  w Debris#0.posZ 57166094
+  w Debris#1.posX 77199162
+  w Debris#1.posY 2989888
+  w Debris#1.posZ 57344263
+  w Debris#2.posX 107836854
+  w Debris#2.posY 3160322
+  w Debris#2.posZ 56290232
+  w Debris#3.posX 107980793
+  w Debris#3.posY 3085695
+  w Debris#3.posZ 58407217
+  w Debris#4.posX 121832400
+  w Debris#4.posY 3161831
+  w Debris#4.posZ 68271806
+  w Debris#5.posX 107955781
+  w Debris#5.posY 3211362
+  w Debris#5.posZ 56280997
+  w Debris#6.posX 92250247
+  w Debris#6.posY 3079050
+  w Debris#6.posZ 53679034
+  w Debris#7.posX 101134049
+  w Debris#7.posY 3121519
+  w Debris#7.posZ 56694649
+  w Debris#8.posX 100488642
+  w Debris#8.posY 2997077
+  w Debris#8.posZ 56583244
+  w Debris#9.posX 124956997
+  w Debris#9.posY 3054211
+  w Debris#9.posZ 101550405
+  w Debris#0.ref1.src FrameTable#8
+  w Debris#2.ref1.src FrameTable#7
+  w Debris#2.ref2.src FrameTable#4
+  w Debris#7.ref1.src FrameTable#8
+  w Debris#9.ref1.src FrameTable#1
+  w Debris#9.ref2.src null
+  w ExplodedPiece#1.vel_y 90318
+  w ExplodedPiece#1.ticks 802
+  w ExplodedPiece#3.vel_y -413560
+  w ExplodedPiece#3.ticks 716
+  w ExplodedPiece#4.vel_y -413560
+  w ExplodedPiece#4.ticks 716
+  w ExplodedPiece#5.vel_y 90318
+  w ExplodedPiece#5.ticks 802
+  w ExplodedPiece#6.vel_y -237362
+  w ExplodedPiece#6.ticks 802
+  w ExplodedPiece#7.vel_y -382978
+  w ExplodedPiece#7.ticks 722
+  w ExplodedPiece#8.vel_y -382978
+  w ExplodedPiece#8.ticks 722
+  w ExplodedPiece#9.vel_y 24782
+  w ExplodedPiece#9.ticks 802
+  w PieceRec#1.angle_10 3580
+  w PieceRec#1.angle_12 -29910
+  w PieceRec#1.angle_14 13674
+  w PieceRec#1.posX 127923189
+  w PieceRec#1.posY 37111605
+  w PieceRec#1.posZ 78411050
+  w PieceRec#3.angle_10 13032
+  w PieceRec#3.angle_12 -28312
+  w PieceRec#3.angle_14 12880
+  w PieceRec#3.posX 84039413
+  w PieceRec#3.posY 14198019
+  w PieceRec#3.posZ 50512298
+  w PieceRec#4.angle_10 16248
+  w PieceRec#4.angle_12 21488
+  w PieceRec#4.angle_14 -10432
+  w PieceRec#4.posX 134731532
+  w PieceRec#4.posY 14201921
+  w PieceRec#4.posZ 93435026
+  w PieceRec#5.angle_10 18254
+  w PieceRec#5.angle_12 24702
+  w PieceRec#5.angle_14 -32092
+  w PieceRec#5.posY 37167118
+  w PieceRec#5.posZ 47884150
+  w PieceRec#6.angle_10 -7148
+  w PieceRec#6.angle_12 -10460
+  w PieceRec#6.angle_14 -27878
+  w PieceRec#6.posX 164074157
+  w PieceRec#6.posY 5054478
+  w PieceRec#6.posZ 53405835
+  w PieceRec#7.angle_10 -28850
+  w PieceRec#7.angle_12 -8380
+  w PieceRec#7.angle_14 -4870
+  w PieceRec#7.posX 105190059
+  w PieceRec#7.posY 16606424
+  w PieceRec#7.posZ 46761172
+  w PieceRec#8.angle_10 -30093
+  w PieceRec#8.angle_12 10018
+  w PieceRec#8.angle_14 3350
+  w PieceRec#8.posX 188363532
+  w PieceRec#8.posY 16503631
+  w PieceRec#8.posZ 61417326
+  w PieceRec#9.angle_10 -19595
+  w PieceRec#9.angle_12 -25670
+  w PieceRec#9.angle_14 7624
+  w PieceRec#9.posX 131847522
+  w PieceRec#9.posY 30627591
+  w PieceRec#9.posZ 68672050
 call 1648 UpdateUnitWeapons
   r Projectile#0.positionX 97338979
   r Projectile#0.positionY 3338770
@@ -14003,9 +16223,9 @@ call 1648 UpdateUnitWeapons
   r Projectile#4.nextSmokeTick 1649
   a unit Unit#1
 call 1648 UpdateUnitWeapons
+  r Unit#1.heading 32445
   r Unit#1.posX 95577469
   r Unit#1.posZ 49446592
-  r Unit#1.heading 32445
   r UnitMotion#1.speed 70781
   a unit Unit#2
   i services.ScheduleTargetingTargetPos Unit#2 0 = 0
@@ -14218,9 +16438,9 @@ call 1648 UpdateUnitWeapons
   o y 0
   o z 0
 call 1648 UpdateUnitWeapons
+  r Unit#261.heading -109
   r Unit#261.posX 164047957
   r Unit#261.posZ 148121583
-  r Unit#261.heading -109
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -14239,8 +16459,8 @@ call 1648 WeaponCanReachUnit
   a weapon 0
   o result 0
 call 1648 Apply
-  r Unit#262.player Player#1
   r Unit#262.activateFlags 1
+  r Unit#262.player Player#1
   a event.kind 259
   a event.unit Unit#262
   a event.weapon 3
@@ -14293,9 +16513,9 @@ call 1648 UpdateUnitWeapons
   o y 0
   o z 0
 call 1648 UpdateUnitWeapons
+  r Unit#268.heading 7760
   r Unit#268.posX 182707497
   r Unit#268.posZ 141068902
-  r Unit#268.heading 7760
   r UnitMotion#28.speed 36679
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -14343,9 +16563,9 @@ call 1648 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 42
 call 1648 UpdateUnitWeapons
+  r Unit#275.heading -25534
   r Unit#275.posX 109319936
   r Unit#275.posZ 58539832
-  r Unit#275.heading -25534
   r UnitMotion#3.speed 158690
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -14356,6 +16576,163 @@ call 1648 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1648 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127923189,78411050) = 3
+  i map.GetCellMeanHeight pos=(84039413,50512298) = 90
+  i map.GetCellMeanHeight pos=(134731532,93435026) = 3
+  i map.GetCellMeanHeight pos=(133544775,47884150) = 3
+  i map.GetCellMeanHeight pos=(164074157,53405835) = 3
+  i map.GetCellMeanHeight pos=(105190059,46761172) = 3
+  i map.GetCellMeanHeight pos=(188363532,61417326) = 3
+  i map.GetCellMeanHeight pos=(131847522,68672050) = 3
+  i services.StepGafSequence Debris#0.ref1 = 1
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 3
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 9
+  o Debris#1.ref1.value 1
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 11
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref2 = 0
+  o Debris#2.ref2.index 11
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 2
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 9
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 9
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 7
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 6
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 6
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 1
+  o Debris#7.ref1.value 1
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 2
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 2
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 1
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 3
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  w ExplodedPiece#1.vel_y 85221
+  w ExplodedPiece#1.ticks 801
+  w ExplodedPiece#3.vel_y -418657
+  w ExplodedPiece#3.ticks 715
+  w ExplodedPiece#4.vel_y -418657
+  w ExplodedPiece#4.ticks 715
+  w ExplodedPiece#5.vel_y 85221
+  w ExplodedPiece#5.ticks 801
+  w ExplodedPiece#6.vel_y -242459
+  w ExplodedPiece#6.ticks 801
+  w ExplodedPiece#7.vel_y -388075
+  w ExplodedPiece#7.ticks 721
+  w ExplodedPiece#8.vel_y -388075
+  w ExplodedPiece#8.ticks 721
+  w ExplodedPiece#9.vel_y 19685
+  w ExplodedPiece#9.ticks 801
+  w PieceRec#1.angle_10 4954
+  w PieceRec#1.angle_12 -28209
+  w PieceRec#1.angle_14 15151
+  w PieceRec#1.posX 127857653
+  w PieceRec#1.posY 37201923
+  w PieceRec#1.posZ 78640426
+  w PieceRec#3.angle_10 13459
+  w PieceRec#3.angle_12 -26685
+  w PieceRec#3.angle_14 12950
+  w PieceRec#3.posX 83891957
+  w PieceRec#3.posY 13784459
+  w PieceRec#3.posZ 50413994
+  w PieceRec#4.angle_10 17761
+  w PieceRec#4.angle_12 24098
+  w PieceRec#4.angle_14 -9064
+  w PieceRec#4.posX 134862604
+  w PieceRec#4.posY 13788361
+  w PieceRec#4.posZ 93566098
+  w PieceRec#5.angle_10 19109
+  w PieceRec#5.angle_12 27629
+  w PieceRec#5.angle_14 -31082
+  w PieceRec#5.posY 37257436
+  w PieceRec#5.posZ 47802230
+  w PieceRec#6.angle_10 -4546
+  w PieceRec#6.angle_12 -9898
+  w PieceRec#6.angle_14 -26825
+  w PieceRec#6.posX 164385453
+  w PieceRec#6.posY 4817116
+  w PieceRec#6.posZ 53389451
+  w PieceRec#7.angle_10 -26803
+  w PieceRec#7.angle_12 -6218
+  w PieceRec#7.angle_14 -4161
+  w PieceRec#7.posX 104944299
+  w PieceRec#7.posY 16223446
+  w PieceRec#7.posZ 46744788
+  w PieceRec#8.angle_10 -28418
+  w PieceRec#8.angle_12 11547
+  w PieceRec#8.angle_14 3737
+  w PieceRec#8.posX 188576524
+  w PieceRec#8.posY 16120653
+  w PieceRec#8.posZ 61482862
+  w PieceRec#9.angle_10 -17782
+  w PieceRec#9.angle_12 -23257
+  w PieceRec#9.angle_14 9708
+  w PieceRec#9.posX 131814754
+  w PieceRec#9.posY 30652373
+  w PieceRec#9.posZ 68803122
 call 1649 UpdateUnitWeapons
   r Projectile#0.positionX 96603992
   r Projectile#0.positionY 3159474
@@ -14387,9 +16764,9 @@ call 1649 UpdateUnitWeapons
   r Projectile#4.anglesPitch -1283
   a unit Unit#1
 call 1649 UpdateUnitWeapons
+  r Unit#1.heading 32446
   r Unit#1.posX 95574835
   r Unit#1.posZ 49517976
-  r Unit#1.heading 32446
   r UnitMotion#1.speed 71436
   a unit Unit#2
   i services.ScheduleTargetingTargetPos Unit#2 0 = 0
@@ -14592,9 +16969,9 @@ call 1649 UpdateUnitWeapons
   o y 0
   o z 0
 call 1649 UpdateUnitWeapons
+  r Unit#261.heading -108
   r Unit#261.posX 164048785
   r Unit#261.posZ 148054417
-  r Unit#261.heading -108
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -14649,12 +17026,12 @@ call 1649 WeaponCanReachUnit
   a weapon 0
   o result 0
 call 1649 Apply
-  r Unit#266.player Player#1
   r Unit#266.activateFlags 1
+  r Unit#266.player Player#1
   r UnitDef#138.damagemodifier 65536
-  r UnitDef#138.weapons0 weapondef#130
   r UnitDef#138.weapons1 weapondef#102
   r UnitDef#138.weapons2 weapondef#0
+  r UnitDef#138.weapons0 weapondef#130
   r weapondef#130.index 130
   r weapondef#102.index 102
   a event.kind 259
@@ -14674,9 +17051,9 @@ call 1649 UpdateUnitWeapons
   o y 0
   o z 0
 call 1649 UpdateUnitWeapons
+  r Unit#268.heading 7764
   r Unit#268.posX 182682464
   r Unit#268.posZ 141041280
-  r Unit#268.heading 7764
   r UnitMotion#28.speed 37278
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -14724,9 +17101,9 @@ call 1649 UpdateUnitWeapons
   o z 60792290
   w Unit#275.weapon1ReloadTimer 41
 call 1649 UpdateUnitWeapons
+  r Unit#275.heading -26053
   r Unit#275.posX 109413688
   r Unit#275.posZ 58666243
-  r Unit#275.heading -26053
   r UnitMotion#3.speed 157380
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -14737,6 +17114,209 @@ call 1649 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1649 UpdateExplosions
+  r Game.count_1491b 12
+  r Debris#10.posX 95869005
+  r Debris#10.posY 2975081
+  r Debris#10.posZ 60366344
+  r Debris#11.obj null
+  r Debris#11.posX 92722915
+  r Debris#11.posY 3587103
+  r Debris#11.posZ 52047165
+  r Debris#11.sizeX 0
+  r Debris#11.sizeY 0
+  r Debris#11.sizeZ 0
+  r Debris#11.velX 0
+  r Debris#11.velY 0
+  r Debris#11.velZ 0
+  r Debris#11.spinX 0
+  r Debris#11.spinY 0
+  r Debris#11.spinZ 0
+  r Debris#11.angle_x 0
+  r Debris#11.angle_y 0
+  r Debris#11.angle_z 0
+  r Debris#11.flags 0
+  r Debris#10.ref1.src FrameTable#8
+  r Debris#10.ref2.src FrameTable#4
+  r Debris#11.ref1.src FrameTable#7
+  r Debris#11.ref2.src FrameTable#4
+  i map.GetCellMeanHeight pos=(127857653,78640426) = 3
+  i map.GetCellMeanHeight pos=(83891957,50413994) = 90
+  i map.GetCellMeanHeight pos=(134862604,93566098) = 3
+  i map.GetCellMeanHeight pos=(133544775,47802230) = 3
+  i map.GetCellMeanHeight pos=(164385453,53389451) = 3
+  i map.GetCellMeanHeight pos=(104944299,46744788) = 3
+  i map.GetCellMeanHeight pos=(188576524,61482862) = 3
+  i map.GetCellMeanHeight pos=(131814754,68803122) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 2
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 1
+  o Debris#1.ref1.index 10
+  o Debris#1.ref1.value 3
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 1
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 2
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#2.ref2 = 1
+  o Debris#2.ref2.index 12
+  o Debris#2.ref2.value 1
+  o Debris#2.ref2.kind 0
+  o Debris#2.ref2.src null
+  i services.StepGafSequence Debris#3.ref1 = 0
+  o Debris#3.ref1.index 11
+  o Debris#3.ref1.value 1
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 0
+  o Debris#3.ref2.index 11
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#4.ref1 = 1
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 2
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 1
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 2
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 0
+  o Debris#5.ref1.index 7
+  o Debris#5.ref1.value 1
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 0
+  o Debris#5.ref2.index 7
+  o Debris#5.ref2.value 1
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 1
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 2
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 1
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 2
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 1
+  o Debris#7.ref1.index 2
+  o Debris#7.ref1.value 3
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 1
+  o Debris#7.ref2.index 3
+  o Debris#7.ref2.value 2
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 0
+  o Debris#8.ref1.index 1
+  o Debris#8.ref1.value 1
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 0
+  o Debris#8.ref2.index 2
+  o Debris#8.ref2.value 1
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 2
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 2
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#10.ref2 = 0
+  o Debris#10.ref2.index 0
+  o Debris#10.ref2.value 1
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#11.ref1 = 0
+  o Debris#11.ref1.index 0
+  o Debris#11.ref1.value 1
+  o Debris#11.ref1.kind 0
+  o Debris#11.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#11.ref2 = 0
+  o Debris#11.ref2.index 0
+  o Debris#11.ref2.value 1
+  o Debris#11.ref2.kind 0
+  o Debris#11.ref2.src FrameTable#4
+  w Debris#2.ref2.src null
+  w ExplodedPiece#1.vel_y 80124
+  w ExplodedPiece#1.ticks 800
+  w ExplodedPiece#3.vel_y -423754
+  w ExplodedPiece#3.ticks 714
+  w ExplodedPiece#4.vel_y -423754
+  w ExplodedPiece#4.ticks 714
+  w ExplodedPiece#5.vel_y 80124
+  w ExplodedPiece#5.ticks 800
+  w ExplodedPiece#6.vel_y -247556
+  w ExplodedPiece#6.ticks 800
+  w ExplodedPiece#7.vel_y -393172
+  w ExplodedPiece#7.ticks 720
+  w ExplodedPiece#8.vel_y -393172
+  w ExplodedPiece#8.ticks 720
+  w ExplodedPiece#9.vel_y 14588
+  w ExplodedPiece#9.ticks 800
+  w PieceRec#1.angle_10 6328
+  w PieceRec#1.angle_12 -26508
+  w PieceRec#1.angle_14 16628
+  w PieceRec#1.posX 127792117
+  w PieceRec#1.posY 37287144
+  w PieceRec#1.posZ 78869802
+  w PieceRec#3.angle_10 13886
+  w PieceRec#3.angle_12 -25058
+  w PieceRec#3.angle_14 13020
+  w PieceRec#3.posX 83744501
+  w PieceRec#3.posY 13365802
+  w PieceRec#3.posZ 50315690
+  w PieceRec#4.angle_10 19274
+  w PieceRec#4.angle_12 26708
+  w PieceRec#4.angle_14 -7696
+  w PieceRec#4.posX 134993676
+  w PieceRec#4.posY 13369704
+  w PieceRec#4.posZ 93697170
+  w PieceRec#5.angle_10 19964
+  w PieceRec#5.angle_12 30556
+  w PieceRec#5.angle_14 -30072
+  w PieceRec#5.posY 37342657
+  w PieceRec#5.posZ 47720310
+  w PieceRec#6.angle_10 -1944
+  w PieceRec#6.angle_12 -9336
+  w PieceRec#6.angle_14 -25772
+  w PieceRec#6.posX 164696749
+  w PieceRec#6.posY 4574657
+  w PieceRec#6.posZ 53373067
+  w PieceRec#7.angle_10 -24756
+  w PieceRec#7.angle_12 -4056
+  w PieceRec#7.angle_14 -3452
+  w PieceRec#7.posX 104698539
+  w PieceRec#7.posY 15835371
+  w PieceRec#7.posZ 46728404
+  w PieceRec#8.angle_10 -26743
+  w PieceRec#8.angle_12 13076
+  w PieceRec#8.angle_14 4124
+  w PieceRec#8.posX 188789516
+  w PieceRec#8.posY 15732578
+  w PieceRec#8.posZ 61548398
+  w PieceRec#9.angle_10 -15969
+  w PieceRec#9.angle_12 -20844
+  w PieceRec#9.angle_14 11792
+  w PieceRec#9.posX 131781986
+  w PieceRec#9.posY 30672058
+  w PieceRec#9.posZ 68934194
 call 1650 UpdateUnitWeapons
   r Game.projectileCount 3
   r Unit#1.health 3358
@@ -14849,9 +17429,9 @@ call 1650 UpdateUnitWeapons
   i services.SchedPublish 6 44
   i network.SendScriptCallByName Unit#3 "AimSecondary" 2 54377 332 0 0 = 0
   i services.ScheduleTargetingTargetUnit Unit#3 1 = Unit#275
-  w Unit#3.weapon1Flags 23
   w Unit#3.weapon1FireHeading -11159
   w Unit#3.weapon1FirePitch 332
+  w Unit#3.weapon1Flags 23
   w Unit#3.weapons[1].aimCob.nAimCobDone 0
 call 1650 Apply
   a event.kind 263
@@ -14932,8 +17512,8 @@ call 1650 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 1650 Apply
-  r Unit#9.player Player#0
   r Unit#9.activateFlags 1
+  r Unit#9.player Player#0
   a event.kind 260
   a event.unit Unit#9
   a event.weapon 0
@@ -14950,9 +17530,9 @@ call 1650 Apply
   o result 1
 call 1650 UpdateUnitWeapons
   r rng.seed 0x7188fd1c
+  r Unit#9.weapon0TargetX 274
   r Unit#9.posX 94508456
   r Unit#9.posZ 59213150
-  r Unit#9.weapon0TargetX 274
   r UnitMotion#9.speed 41654
   a unit Unit#10
   i services.ScheduleTargetingTargetPos Unit#10 0 = 0
@@ -15068,9 +17648,9 @@ call 1650 UpdateUnitWeapons
   o y 0
   o z 0
 call 1650 UpdateUnitWeapons
+  r Unit#261.heading -106
   r Unit#261.posX 164049613
   r Unit#261.posZ 147987251
-  r Unit#261.heading -106
   a unit Unit#261
   i services.ScheduleTargetingTargetPos Unit#261 0 = 0
   o x 0
@@ -15113,8 +17693,8 @@ call 1650 WeaponCanReachUnit
   a weapon 0
   o result 0
 call 1650 Apply
-  r Unit#265.player Player#1
   r Unit#265.activateFlags 1
+  r Unit#265.player Player#1
   a event.kind 259
   a event.unit Unit#265
   a event.weapon 3
@@ -15144,10 +17724,10 @@ call 1650 UpdateUnitWeapons
   o y 0
   o z 0
 call 1650 UpdateUnitWeapons
+  r Unit#268.heading 7768
   r Unit#268.flags 0x90240001
   r Unit#268.posX 182657029
   r Unit#268.posZ 141033473
-  r Unit#268.heading 7768
   r UnitMotion#28.speed 29491
   a unit Unit#268
   i services.ScheduleTargetingTargetPos Unit#268 0 = 0
@@ -15196,9 +17776,9 @@ call 1650 UpdateUnitWeapons
   w Unit#275.weapon1ReloadTimer 40
 call 1650 UpdateUnitWeapons
   r rng.seed 0x4fa5c44e
+  r Unit#275.heading -26572
   r Unit#275.posX 109500391
   r Unit#275.posZ 58796003
-  r Unit#275.heading -26572
   r UnitMotion#3.speed 156070
   a unit Unit#276
   i services.ScheduleTargetingTargetPos Unit#276 0 = 0
@@ -15209,3 +17789,176 @@ call 1650 UpdateUnitWeapons
   o x 0
   o y 0
   o z 0
+call 1650 UpdateExplosions
+  i map.GetCellMeanHeight pos=(127792117,78869802) = 3
+  i map.GetCellMeanHeight pos=(83744501,50315690) = 76
+  i map.GetCellMeanHeight pos=(134993676,93697170) = 3
+  i map.GetCellMeanHeight pos=(133544775,47720310) = 3
+  i map.GetCellMeanHeight pos=(164696749,53373067) = 3
+  i map.GetCellMeanHeight pos=(104698539,46728404) = 3
+  i map.GetCellMeanHeight pos=(188789516,61548398) = 3
+  i map.GetCellMeanHeight pos=(131781986,68934194) = 3
+  i services.StepGafSequence Debris#0.ref1 = 0
+  o Debris#0.ref1.index 10
+  o Debris#0.ref1.value 1
+  o Debris#0.ref1.kind 0
+  o Debris#0.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#1.ref1 = 0
+  o Debris#1.ref1.index 10
+  o Debris#1.ref1.value 2
+  o Debris#1.ref1.kind 0
+  o Debris#1.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#2.ref1 = 0
+  o Debris#2.ref1.index 12
+  o Debris#2.ref1.value 1
+  o Debris#2.ref1.kind 0
+  o Debris#2.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref1 = 1
+  o Debris#3.ref1.index 12
+  o Debris#3.ref1.value 2
+  o Debris#3.ref1.kind 0
+  o Debris#3.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#3.ref2 = 1
+  o Debris#3.ref2.index 12
+  o Debris#3.ref2.value 1
+  o Debris#3.ref2.kind 0
+  o Debris#3.ref2.src null
+  i services.StepGafSequence Debris#4.ref1 = 0
+  o Debris#4.ref1.index 10
+  o Debris#4.ref1.value 1
+  o Debris#4.ref1.kind 0
+  o Debris#4.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#4.ref2 = 0
+  o Debris#4.ref2.index 10
+  o Debris#4.ref2.value 1
+  o Debris#4.ref2.kind 0
+  o Debris#4.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#5.ref1 = 1
+  o Debris#5.ref1.index 8
+  o Debris#5.ref1.value 2
+  o Debris#5.ref1.kind 0
+  o Debris#5.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#5.ref2 = 1
+  o Debris#5.ref2.index 8
+  o Debris#5.ref2.value 2
+  o Debris#5.ref2.kind 0
+  o Debris#5.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#6.ref1 = 0
+  o Debris#6.ref1.index 7
+  o Debris#6.ref1.value 1
+  o Debris#6.ref1.kind 0
+  o Debris#6.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#6.ref2 = 0
+  o Debris#6.ref2.index 7
+  o Debris#6.ref2.value 1
+  o Debris#6.ref2.kind 0
+  o Debris#6.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#7.ref1 = 0
+  o Debris#7.ref1.index 2
+  o Debris#7.ref1.value 2
+  o Debris#7.ref1.kind 0
+  o Debris#7.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#7.ref2 = 0
+  o Debris#7.ref2.index 3
+  o Debris#7.ref2.value 1
+  o Debris#7.ref2.kind 0
+  o Debris#7.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#8.ref1 = 1
+  o Debris#8.ref1.index 2
+  o Debris#8.ref1.value 3
+  o Debris#8.ref1.kind 0
+  o Debris#8.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#8.ref2 = 1
+  o Debris#8.ref2.index 3
+  o Debris#8.ref2.value 2
+  o Debris#8.ref2.kind 0
+  o Debris#8.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#9.ref1 = 0
+  o Debris#9.ref1.index 1
+  o Debris#9.ref1.value 1
+  o Debris#9.ref1.kind 0
+  o Debris#9.ref1.src FrameTable#1
+  i services.StepGafSequence Debris#10.ref1 = 0
+  o Debris#10.ref1.index 0
+  o Debris#10.ref1.value 1
+  o Debris#10.ref1.kind 0
+  o Debris#10.ref1.src FrameTable#8
+  i services.StepGafSequence Debris#10.ref2 = 1
+  o Debris#10.ref2.index 1
+  o Debris#10.ref2.value 2
+  o Debris#10.ref2.kind 0
+  o Debris#10.ref2.src FrameTable#4
+  i services.StepGafSequence Debris#11.ref1 = 1
+  o Debris#11.ref1.index 1
+  o Debris#11.ref1.value 2
+  o Debris#11.ref1.kind 0
+  o Debris#11.ref1.src FrameTable#7
+  i services.StepGafSequence Debris#11.ref2 = 1
+  o Debris#11.ref2.index 1
+  o Debris#11.ref2.value 2
+  o Debris#11.ref2.kind 0
+  o Debris#11.ref2.src FrameTable#4
+  w Debris#3.ref2.src null
+  w ExplodedPiece#1.vel_y 75027
+  w ExplodedPiece#1.ticks 799
+  w ExplodedPiece#3.vel_y -428851
+  w ExplodedPiece#3.ticks 713
+  w ExplodedPiece#4.vel_y -428851
+  w ExplodedPiece#4.ticks 713
+  w ExplodedPiece#5.vel_y 75027
+  w ExplodedPiece#5.ticks 799
+  w ExplodedPiece#6.vel_y -252653
+  w ExplodedPiece#6.ticks 799
+  w ExplodedPiece#7.vel_y -398269
+  w ExplodedPiece#7.ticks 719
+  w ExplodedPiece#8.vel_y -398269
+  w ExplodedPiece#8.ticks 719
+  w ExplodedPiece#9.vel_y 9491
+  w ExplodedPiece#9.ticks 799
+  w PieceRec#1.angle_10 7702
+  w PieceRec#1.angle_12 -24807
+  w PieceRec#1.angle_14 18105
+  w PieceRec#1.posX 127726581
+  w PieceRec#1.posY 37367268
+  w PieceRec#1.posZ 79099178
+  w PieceRec#3.angle_10 14313
+  w PieceRec#3.angle_12 -23431
+  w PieceRec#3.angle_14 13090
+  w PieceRec#3.posX 83597045
+  w PieceRec#3.posY 12942048
+  w PieceRec#3.posZ 50217386
+  w PieceRec#4.angle_10 20787
+  w PieceRec#4.angle_12 29318
+  w PieceRec#4.angle_14 -6328
+  w PieceRec#4.posX 135124748
+  w PieceRec#4.posY 12945950
+  w PieceRec#4.posZ 93828242
+  w PieceRec#5.angle_10 20819
+  w PieceRec#5.angle_12 -32053
+  w PieceRec#5.angle_14 -29062
+  w PieceRec#5.posY 37422781
+  w PieceRec#5.posZ 47638390
+  w PieceRec#6.angle_10 658
+  w PieceRec#6.angle_12 -8774
+  w PieceRec#6.angle_14 -24719
+  w PieceRec#6.posX 165008045
+  w PieceRec#6.posY 4327101
+  w PieceRec#6.posZ 53356683
+  w PieceRec#7.angle_10 -22709
+  w PieceRec#7.angle_12 -1894
+  w PieceRec#7.angle_14 -2743
+  w PieceRec#7.posX 104452779
+  w PieceRec#7.posY 15442199
+  w PieceRec#7.posZ 46712020
+  w PieceRec#8.angle_10 -25068
+  w PieceRec#8.angle_12 14605
+  w PieceRec#8.angle_14 4511
+  w PieceRec#8.posX 189002508
+  w PieceRec#8.posY 15339406
+  w PieceRec#8.posZ 61613934
+  w PieceRec#9.angle_10 -14156
+  w PieceRec#9.angle_12 -18431
+  w PieceRec#9.angle_14 13876
+  w PieceRec#9.posX 131749218
+  w PieceRec#9.posY 30686646
+  w PieceRec#9.posZ 69065266

@@ -1,5 +1,5 @@
 item,reader,function,container,every,after
-Debris::field_0,presentation,DrawExplosions,debris,0,3
+Debris::obj,presentation,DrawExplosions,debris,0,3
 Debris::pos,presentation,DrawExplosions,debris,0,3
 Debris::ref1,presentation,ClipRects,debris,0,3
 Debris::ref1,presentation,DrawExplosions,debris,0,3

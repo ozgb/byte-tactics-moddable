@@ -254,8 +254,8 @@ written in one call, record 44 first.
   They stay in the allocation `LoadTntMap` makes, and `WriteState` dumps them in record 44 (`eyes.count` and, per
   eyeball, `player`, `x`, `flagA`, `flagB`, `pos`, `expires` and `screenPos`).
 - **The per-player unit index** (3.1) is los_radar's: per player, the visible enemy list (`visible`), the known list
-  (`known`, enemy units with flag 0x100) and `hasSpecial`, in a record allocated in the sim block behind a tracked
-  pointer (`src/map/line_of_sight_index.cpp`). It left ai's `PlayerAI`, where 3.1c kept it. `CreateUnitIndex` and
+  (`known`, enemy units with flag 0x100) and `hasSpecial`, in a record allocated in the sim block behind the sim global
+  `g_losUnitIndex`, a `Ref` (`src/map/line_of_sight_index.cpp`). It left ai's `PlayerAI`, where 3.1c kept it. `CreateUnitIndex` and
   `FreeUnitIndex` make and free it, and every 30 ticks, from the index's own `lastTick`, `RefreshUnitIndex` refills it
   in the players phase right before ai's `UpdatePlayerAI`. 3.1c filled it, with the factory list (now units'), in one
   walk of the units; the walks are now separate, but each list holds the same units in the same order, and no draw

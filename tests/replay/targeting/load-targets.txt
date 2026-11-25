@@ -5,16 +5,16 @@ call 150 Apply
   r Unit#1.netDirtyFlags 0
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ 0
-  r Unit#1.weapon0Def null
   r Unit#1.weapon0Flags 0
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ 0
-  r Unit#1.weapon1Def null
-  r Unit#1.weapon1Flags 0
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ 0
   r Unit#1.weapon2Def null
   r Unit#1.weapon2Flags 0
+  r Unit#1.weapon0Def null
+  r Unit#1.weapon1Def null
+  r Unit#1.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#1
   a event.weapon 0
@@ -36,12 +36,12 @@ call 150 Apply
   w Unit#1.weapon2TargetZ -32768
   o result 1
 call 150 Apply
-  r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2Def weapondef#22
   r Unit#1.weapon2Flags 26
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
   a event.kind 100
   a event.unit Unit#1
   a event.weapon 0
@@ -70,16 +70,16 @@ call 150 Apply
   r Unit#2.netDirtyFlags 0
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ 0
-  r Unit#2.weapon0Def null
   r Unit#2.weapon0Flags 0
   r Unit#2.weapon1TargetX 0
   r Unit#2.weapon1TargetZ 0
-  r Unit#2.weapon1Def null
-  r Unit#2.weapon1Flags 0
   r Unit#2.weapon2TargetX 0
   r Unit#2.weapon2TargetZ 0
   r Unit#2.weapon2Def null
   r Unit#2.weapon2Flags 0
+  r Unit#2.weapon0Def null
+  r Unit#2.weapon1Def null
+  r Unit#2.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#2
   a event.weapon 0
@@ -105,16 +105,16 @@ call 150 Apply
   r Unit#251.netDirtyFlags 0
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ 0
-  r Unit#251.weapon0Def null
   r Unit#251.weapon0Flags 0
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ 0
-  r Unit#251.weapon1Def null
-  r Unit#251.weapon1Flags 0
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ 0
   r Unit#251.weapon2Def null
   r Unit#251.weapon2Flags 0
+  r Unit#251.weapon0Def null
+  r Unit#251.weapon1Def null
+  r Unit#251.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#251
   a event.weapon 0
@@ -136,12 +136,12 @@ call 150 Apply
   w Unit#251.weapon2TargetZ -32768
   o result 1
 call 150 Apply
-  r Unit#251.weapon0Def weapondef#21
   r Unit#251.weapon0Flags 18
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2Def weapondef#23
   r Unit#251.weapon2Flags 26
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
   a event.kind 100
   a event.unit Unit#251
   a event.weapon 0
@@ -167,12 +167,12 @@ call 150 Apply
   o result 1
 call 150 Apply
   r Unit#2.netDirtyFlags 17408
-  r Unit#2.weapon0Def weapondef#80
   r Unit#2.weapon0Flags 18
-  r Unit#2.weapon1Def weapondef#0
-  r Unit#2.weapon1Flags 20
   r Unit#2.weapon2Def weapondef#0
   r Unit#2.weapon2Flags 24
+  r Unit#2.weapon0Def weapondef#80
+  r Unit#2.weapon1Def weapondef#0
+  r Unit#2.weapon1Flags 20
   a event.kind 100
   a event.unit Unit#2
   a event.weapon 0
@@ -203,16 +203,16 @@ call 150 Apply
   r Unit#3.netDirtyFlags 0
   r Unit#3.weapon0TargetX 0
   r Unit#3.weapon0TargetZ 0
-  r Unit#3.weapon0Def null
   r Unit#3.weapon0Flags 0
   r Unit#3.weapon1TargetX 0
   r Unit#3.weapon1TargetZ 0
-  r Unit#3.weapon1Def null
-  r Unit#3.weapon1Flags 0
   r Unit#3.weapon2TargetX 0
   r Unit#3.weapon2TargetZ 0
   r Unit#3.weapon2Def null
   r Unit#3.weapon2Flags 0
+  r Unit#3.weapon0Def null
+  r Unit#3.weapon1Def null
+  r Unit#3.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#3
   a event.weapon 0
@@ -235,12 +235,12 @@ call 150 Apply
   o result 1
 call 150 Apply
   r Unit#3.netDirtyFlags 8192
-  r Unit#3.weapon0Def weapondef#80
   r Unit#3.weapon0Flags 18
-  r Unit#3.weapon1Def weapondef#0
-  r Unit#3.weapon1Flags 20
   r Unit#3.weapon2Def weapondef#0
   r Unit#3.weapon2Flags 24
+  r Unit#3.weapon0Def weapondef#80
+  r Unit#3.weapon1Def weapondef#0
+  r Unit#3.weapon1Flags 20
   a event.kind 100
   a event.unit Unit#3
   a event.weapon 0
@@ -278,26 +278,26 @@ call 150 FindWeaponTarget
   r rng.main 0x00000001
   r rng.load 0x8cfb47a7
   r rng.seed 0x3006dc84
-  r Unit#1.def UnitDef#34
-  r Unit#1.player Player#0
-  r Unit#1.flags 0x90e00321
   r Unit#1.activateFlags 1
   r Unit#1.unitDefIndex 34
+  r Unit#1.flags 0x90e00321
+  r Unit#1.def UnitDef#34
+  r Unit#1.player Player#0
   r Unit#1.playerIndex 0
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
   r Unit#1.posZ 15728640
-  r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.range 290
+  r weapondef#22.flags 0x04480a09
   r UnitDef#34.categories UnitTypeSet#1
   r UnitDef#34.weaponCategories0 UnitTypeSet#1
   r UnitDef#34.weaponCategories1 UnitTypeSet#2
   r UnitDef#34.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.flags 0x00080809
   r weapondef#0.flags 0x00000000
-  r weapondef#22.flags 0x04480a09
   r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
   r UnitTypeSet#2.bits x:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
@@ -317,12 +317,12 @@ call 151 GetWeaponTargetPos
   r Game.seaLevel 0
   r Unit#1.killCount 0
   r Unit#1.motion UnitMotion#1
+  r weapondef#22.speed 436906
   r UnitMotion#1.velocityX 0
   r UnitMotion#1.velocityY 0
   r UnitMotion#1.velocityZ 0
   r weapondef#20.speed 873813
   r weapondef#0.speed 0
-  r weapondef#22.speed 436906
   a unit Unit#1
   a weapon 0
   o result 0
@@ -372,10 +372,10 @@ call 151 GetWeaponTargetPos
   r Unit#251.posX 221249536
   r Unit#251.posY 65536
   r Unit#251.posZ 92274688
-  r weapondef#21.flags 0x00080809
-  r weapondef#21.speed 873813
   r weapondef#23.flags 0x04480a09
   r weapondef#23.speed 436906
+  r weapondef#21.flags 0x00080809
+  r weapondef#21.speed 873813
   a unit Unit#251
   a weapon 0
   o result 0

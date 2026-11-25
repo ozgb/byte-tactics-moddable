@@ -173,7 +173,7 @@ int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int reso
     if (HarnessTestMode() && (SchedInboxHolds(SCHED_ECONOMY, ECONOMY_RESET, unitWord, unit) || SchedInboxHolds(SCHED_ECONOMY, ECONOMY_LOAD, unitWord, unit)))
         FatalError((char*)"RequestGranted: a RESET or LOAD of the asking unit is pending in economy's inbox");
     ReplayImport call(RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
-    call.Int((int)unit);
+    call.Ptr(UnitOf(unit));
     call.Int((int)resources);
     return call.Result(g_seams.economy->RequestGranted(unit, resources));
 }

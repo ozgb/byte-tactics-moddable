@@ -258,6 +258,10 @@ void __stdcall ApplyAttachUnit(OrderView* order)
     }
 }
 
+#ifndef BT_REPLAY_INJECT_PERCENT_SCALE
+#define BT_REPLAY_INJECT_PERCENT_SCALE 100
+#endif
+
 // FUNCTION: 0x48ad30
 void __stdcall UpdateUnitHead(Unit* u)
 {
@@ -281,7 +285,7 @@ int __stdcall UpdateUnitBody(Unit* u)
         }
     }
     if ((unsigned int)g_game->ticks % 30 == 0) {
-        int v = u->health * 100 / u->def->maxHealth;
+        int v = u->health * BT_REPLAY_INJECT_PERCENT_SCALE / u->def->maxHealth;
         if (v < 0) {
             v = 0;
         }

@@ -30,7 +30,7 @@ struct PercentByte {
 };
 
 struct UnitTypeInt {
-    int unknown_0;
+    int value;
 };
 
 struct CenterPos {

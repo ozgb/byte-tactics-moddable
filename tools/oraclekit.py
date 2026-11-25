@@ -23,17 +23,20 @@ generated file or the fuel pass that still names a source (SOURCE_NAME).
 `kit_name` in tools/oraclekit/code_tables.csv (table, entry, kit_name): the order type's name for `orderNotify`, the bit of
 `WeaponDef.flags` that selects the handler for `weaponFire`. The export is refused when an entry has no row or a row no entry.
 The copy also leaves out what only the replayer and its checks read, all of which names source globals, types and functions:
-the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind, the
-`aliases`, `reachFirst` and `reachCount` of each field and slot argument, and each slot's `allOf`. A service, or a callback
+the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable`, `vtable_symbol`, `vtable_secondary` or `vptr` of each kind, the
+`aliases`, `reachFirst` and `reachCount` of each field and slot argument, and each slot's `allOf` and `native` (the function a
+native build calls). A service, or a callback
 interface, whose name (or a method's) is a source identifier that no interface header, `layout.json`, the module manifest or a
-recording declares is left out too: no recording of the kit calls it. The schema then may name only what those files declare
+recording declares is left out too: no recording of the kit calls it, and so is a `game_aliases` entry whose key is one. A
+kept service's declaration names a pointer to an undeclared type as `void*`, which its argument's `mode` describes. The schema then may name only what those files declare
 (`schema_hits`): a field named by its member path (`velY` for `vel.y`) counts as declared by it, and any other source identifier
 in a key or a string of the schema is a hit, with its path in the schema.
 
 `layout.json` carries no `layout_refs`: they name the decompilation's functions, files and globals, and the globals
 are not records of the state block. After the files are written, `leak_check` runs tools/speclint.py's address,
 identifier and token-run rules over every text file of the kit and the export fails on a hit. The fenced-block rule
-is not applied: the kit documents use `sh` and `json` fences for commands and schema examples. Two more rules apply to every
+is not applied: the kit documents use `sh` and `json` fences for commands and schema examples, and neither is the token-run
+rule to a run of only numbers and punctuation in a recording, which is game state the run wrote. Two more rules apply to every
 text file: one that names a source file (SOURCE_FILE: a path under a source directory, or a `.cpp`, `.c`, `.h`, `.hpp` or `.inc`
 file other than an interface header of the kit and a `<system.h>` include; in a Python file only the directories and `.cpp`,
 `.hpp` and `.inc`) is a hit, and so is one that names a function the source defines and no interface header, `layout.json`,
@@ -121,11 +124,12 @@ SOURCE_FILE_PY = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|hpp|inc
 SCHEMA = "data/replay_schema.json"
 CODE_TABLES_SOURCE = "tools/oraclekit/code_tables.csv"
 CODE_TABLE_COLUMNS = ["table", "entry", "kit_name"]
-SLOT_SOURCE_FIELDS = ("functions", "through", "allOf")
+SLOT_SOURCE_FIELDS = ("functions", "through", "allOf", "native")
 SERVICE_SOURCE_FIELDS = ("header", "pre", "effect", "id")
 SCHEMA_CHECK_ANNOTATIONS = ("exempt", "exempt_types", "rules")
-KIND_SOURCE_FIELDS = ("vtable", "vptr")
+KIND_SOURCE_FIELDS = ("vtable", "vtable_symbol", "vtable_secondary", "vptr")
 FIELD_SOURCE_FIELDS = ("aliases", "reachFirst", "reachCount")
+UNDECLARED_POINTER = re.compile(r"\b(\w+)\s*\*")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
                 "reference_traces": re.compile(r"^reference-traces-v(\d+)$")}
@@ -754,8 +758,14 @@ def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[s
             del callbacks[name]
         else:
             callbacks[name].pop("header", None)
+    if "game_aliases" in annotations:
+        annotations["game_aliases"] = {k: v for k, v in annotations["game_aliases"].items() if not speclint.identifiers(k) & undeclared}
     if "services" in annotations:
         annotations["services"] = [s for s in annotations["services"] if s.get("name") not in undeclared]
+        for service in annotations["services"]:
+            if "declaration" in service:
+                service["declaration"] = UNDECLARED_POINTER.sub(
+                    lambda m: "void*" if m.group(1) in undeclared else m.group(0), service["declaration"])
         if services_header is not None:
             annotations["services"] = kit_services(annotations["services"], services_header)
     for service in annotations.get("services", []):
@@ -1104,6 +1114,8 @@ def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_
             hits += function_hits(path, text, undeclared, literals)
         for number, message in speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit):
             if message.startswith("fenced block"):
+                continue
+            if path.startswith(DECLARING_DIRS) and message.startswith("a run of") and not re.search(r"[A-Za-z_]", message.split(": ", 1)[1]):
                 continue
             if path.startswith(DECLARED_DIRS) and path not in GENERATED and not message.startswith("address or marker"):
                 continue

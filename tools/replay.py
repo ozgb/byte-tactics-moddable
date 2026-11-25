@@ -52,9 +52,9 @@ def scenario_path(name: str) -> Path:
 
 
 def schema_versions() -> dict[str, str]:
-    """Subsystem -> its interface version as the header of a recording writes it."""
+    """Subsystem -> its interface version as the header of a recording writes it; a world view is never recorded."""
     model = json.loads(SCHEMA.read_text())
-    return {name: "%d.%d" % tuple(spec["header"]["version"]) for name, spec in model["subsystems"].items()}
+    return {name: "%d.%d" % tuple(spec["header"]["version"]) for name, spec in model["subsystems"].items() if not spec["header"].get("world")}
 
 
 def default_subsystems() -> list[str]:
@@ -178,6 +178,7 @@ def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool
     try:
         if saver is not None:
             saver_path = scenario.parent / f"{saver}.txt"
+            (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
             scratch = Path(tempfile.mkdtemp(prefix="save-", dir=ROOT / "build/scratch"))
             run = tracediff.play(exe, saver_path, game_dir, None, timeout, env=env, collect=tracediff.SAVE_FILES)
             try:

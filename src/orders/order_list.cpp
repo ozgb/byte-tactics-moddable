@@ -758,9 +758,13 @@ static void InsertCommand(Unit* p, unsigned char type)
     InsertOrderBefore(p, child, (child->flags_42 & ORDER_FLAG_SECOND_LIST) ? p->list2 : p->list);
 }
 
+#ifndef BT_REPLAY_INJECT_WAKE_BASE
+#define BT_REPLAY_INJECT_WAKE_BASE 0x1e
+#endif
+
 static void DelayOrderWake(Order* node, int n)
 {
-    unsigned int when = RandomInt(n) + 0x1e;
+    unsigned int when = RandomInt(n) + BT_REPLAY_INJECT_WAKE_BASE;
     node->flags |= 1;
     node->wakeFrame = (unsigned int)g_game->ticks + when;
 }

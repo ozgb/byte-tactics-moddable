@@ -407,41 +407,6 @@ static const char* __stdcall GetNumPlayersNative()
     return TheMission()->GetNumPlayers();
 }
 
-static void __stdcall DeactivateConditionsNative(MissionConditions* self)
-{
-    self->Deactivate();
-}
-
-static void __stdcall LoadConditionsNative(MissionConditions* self, HapiBank* file)
-{
-    self->LoadConditions(file);
-}
-
-static void __stdcall SaveConditionsNative(MissionConditions* self, HapiBank* file)
-{
-    self->SaveConditions(file);
-}
-
-static void __stdcall RegisterConditionsNative(MissionConditions* self, TdfFile* mission)
-{
-    self->RegisterConditions((ConditionParams*)mission);
-}
-
-static void __stdcall FreeConditionsNative(MissionConditions* self)
-{
-    self->FreeConditions();
-}
-
-static void __stdcall DeleteConditionsNative(MissionConditions* self)
-{
-    delete self;
-}
-
-static MissionConditions* __stdcall NewConditionsNative(void)
-{
-    return new (kSim) MissionConditions;
-}
-
 static int __stdcall CanLoadNative(Unit* self, Unit* target)
 {
     return self->CanLoad(target);

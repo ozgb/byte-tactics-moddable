@@ -8,7 +8,7 @@ BuildMenuPage::entries,presentation,unknown,,all-players,6
 Debris::angle_x,platform,ui-action,,per-player-filter,8
 Debris::angle_y,platform,ui-action,,per-player-filter,8
 Debris::angle_z,platform,ui-action,,per-player-filter,8
-Debris::field_0,presentation,ui-action,,per-player-filter,22
+Debris::obj,presentation,ui-action,,per-player-filter,22
 Debris::pos,presentation,ui-action,,per-player-filter,43
 Debris::ref1,presentation,ui-action,,per-player-filter,22
 Debris::ref2,presentation,ui-action,,per-player-filter,22

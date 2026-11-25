@@ -4,22 +4,24 @@ call 740 GetWeaponTargetPos
   r Game.seaLevel 0
   r Unit#1.unitDefIndex 34
   r Unit#1.killCount 0
-  r Unit#1.motion UnitMotion#1
-  r Unit#1.posX 43650856
-  r Unit#1.posY 65536
-  r Unit#1.posZ 22023259
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ -32768
-  r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ -32768
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ -32768
   r Unit#1.weapon2Def weapondef#22
   r Unit#1.weapon2Flags 26
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 43650856
+  r Unit#1.posY 65536
+  r Unit#1.posZ 22023259
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
+  r weapondef#22.flags 0x04480a09
+  r weapondef#22.speed 436906
   r UnitMotion#1.velocityX 0
   r UnitMotion#1.velocityY 0
   r UnitMotion#1.velocityZ 0
@@ -27,8 +29,6 @@ call 740 GetWeaponTargetPos
   r weapondef#20.speed 873813
   r weapondef#0.flags 0x00000000
   r weapondef#0.speed 0
-  r weapondef#22.flags 0x04480a09
-  r weapondef#22.speed 436906
   a unit Unit#1
   a weapon 0
   o result 0
@@ -39,22 +39,22 @@ call 740 GetWeaponTargetPos
 call 740 GetWeaponTargetPos
   r Unit#3.unitDefIndex 71
   r Unit#3.killCount 0
-  r Unit#3.motion null
-  r Unit#3.posX 46137344
-  r Unit#3.posY 65536
-  r Unit#3.posZ 19922944
   r Unit#3.weapon0TargetX 0
   r Unit#3.weapon0TargetZ -32768
-  r Unit#3.weapon0Def weapondef#80
   r Unit#3.weapon0Flags 2
   r Unit#3.weapon1TargetX 0
   r Unit#3.weapon1TargetZ -32768
-  r Unit#3.weapon1Def weapondef#0
-  r Unit#3.weapon1Flags 20
   r Unit#3.weapon2TargetX 0
   r Unit#3.weapon2TargetZ -32768
   r Unit#3.weapon2Def weapondef#0
   r Unit#3.weapon2Flags 24
+  r Unit#3.motion null
+  r Unit#3.posX 46137344
+  r Unit#3.posY 65536
+  r Unit#3.posZ 19922944
+  r Unit#3.weapon0Def weapondef#80
+  r Unit#3.weapon1Def weapondef#0
+  r Unit#3.weapon1Flags 20
   r weapondef#80.flags 0x00080809
   r weapondef#80.speed 1966080
   a unit Unit#3
@@ -63,29 +63,29 @@ call 740 GetWeaponTargetPos
 call 740 GetWeaponTargetPos
   r Unit#251.unitDefIndex 167
   r Unit#251.killCount 0
-  r Unit#251.motion UnitMotion#2
-  r Unit#251.posX 198625775
-  r Unit#251.posY 65536
-  r Unit#251.posZ 86369770
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ -32768
-  r Unit#251.weapon0Def weapondef#21
   r Unit#251.weapon0Flags 2
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ -32768
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ -32768
   r Unit#251.weapon2Def weapondef#23
   r Unit#251.weapon2Flags 10
+  r Unit#251.motion UnitMotion#2
+  r Unit#251.posX 198625775
+  r Unit#251.posY 65536
+  r Unit#251.posZ 86369770
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
+  r weapondef#23.flags 0x04480a09
+  r weapondef#23.speed 436906
   r UnitMotion#2.velocityX 0
   r UnitMotion#2.velocityY 0
   r UnitMotion#2.velocityZ 0
   r weapondef#21.flags 0x00080809
   r weapondef#21.speed 873813
-  r weapondef#23.flags 0x04480a09
-  r weapondef#23.speed 436906
   a unit Unit#251
   a weapon 0
   o result 0
@@ -126,17 +126,17 @@ call 742 FindBestTargetIfFireAtWill
   r rng.main 0xea405842
   r rng.load 0x5cbf709b
   r rng.seed 0x4624ad09
+  r Unit#1.activateFlags 1
+  r Unit#1.flags 0x90e80321
   r Unit#1.def UnitDef#34
   r Unit#1.player Player#0
-  r Unit#1.flags 0x90e80321
-  r Unit#1.activateFlags 1
   r Unit#1.playerIndex 0
-  r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.range 290
   r UnitDef#34.categories UnitTypeSet#1
   r UnitDef#34.weaponCategories0 UnitTypeSet#1
   r UnitDef#34.weaponCategories1 UnitTypeSet#2
   r UnitDef#34.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
   r Player#0.active 1
   r Player#0.type 1
   r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000

@@ -1120,12 +1120,16 @@ void SquadManager::TickTimers()
     }
 }
 
+#ifndef BT_REPLAY_INJECT_SQUAD_PERIOD
+#define BT_REPLAY_INJECT_SQUAD_PERIOD 30
+#endif
+
 // FUNCTION: 0x408c40
 void SquadManager::TickIfActive()
 {
     if (player->active != 0 && player->type == 2) {
         if (--countdown <= 0) {
-            countdown = 30;
+            countdown = BT_REPLAY_INJECT_SQUAD_PERIOD;
             AssignSquads();
         }
         for (int i = 0; i < 10; i++) {
@@ -1208,11 +1212,11 @@ PlayerAI::PlayerAI(unsigned char p)
     }
     {
         UnitTypeInt g;
-        g.unknown_0 = 0;
+        g.value = 0;
         vec_bd.Resize(n, g);
-        g.unknown_0 = 0;
+        g.value = 0;
         values.Resize(n, g);
-        g.unknown_0 = 0;
+        g.value = 0;
         locked.Resize(n, g);
     }
     InitUnitTables();
@@ -1231,9 +1235,9 @@ void PlayerAI::InitUnitTables()
             weights[i] += 20;
         counts[i] = 0;
         vec_ad[i].value = 100;
-        vec_bd[i].unknown_0 = 0;
-        values[i].unknown_0 = -1;
-        locked[i].unknown_0 = 0;
+        vec_bd[i].value = 0;
+        values[i].value = -1;
+        locked[i].value = 0;
     }
 }
 
@@ -1392,10 +1396,10 @@ void __stdcall SetUnitLimits(int player, unsigned int* mask, int value, int lock
 {
     PlayerAI* p = g_playerAI[player];
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
-        if ((mask[i >> 5] & (1 << (i & 0x1f))) && p->locked[i].unknown_0 == 0) {
-            p->values[i].unknown_0 = value;
+        if ((mask[i >> 5] & (1 << (i & 0x1f))) && p->locked[i].value == 0) {
+            p->values[i].value = value;
             if (lock)
-                p->locked[i].unknown_0 = 1;
+                p->locked[i].value = 1;
         }
     }
 }
@@ -1422,7 +1426,7 @@ void __stdcall ParseDownloadableAiWeightScripts(int player)
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* def = &g_game->defs[i];
         if (((Flags241*)&def->flags1)->downloadable) {
-            if (p->vec_bd[i].unknown_0 != 1) {
+            if (p->vec_bd[i].value != 1) {
                 int len = strlen(def->aiWeight);
                 if (len != 0) {
                     CommandArgs vars;
@@ -1442,7 +1446,7 @@ void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player)
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* def = &g_game->defs[i];
         if (((Flags241*)&def->flags1)->downloadable) {
-            if (p->locked[i].unknown_0 != 1) {
+            if (p->locked[i].value != 1) {
                 int len = strlen(def->aiWeight);
                 if (len != 0) {
                     CommandArgs vars;
@@ -1782,8 +1786,8 @@ void __stdcall DumpPlayerAI(int player, void* file)
     FilePrintf(file,"<limit> - <base:baseML:baseEL> : <end result - before economy-based tweaks> - <unit name>\r\n");
     for (unsigned short i=1;i<g_game->unitDefCount;++i) {
         UnitDef* type=&g_game->defs[i];
-        if (ai->values[i].unknown_0<0) FilePrintf(file,"n/a ");
-        else FilePrintf(file,"%4d",ai->values[i].unknown_0);
+        if (ai->values[i].value<0) FilePrintf(file,"n/a ");
+        else FilePrintf(file,"%4d",ai->values[i].value);
         sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->vec_65[i].a,ai->vec_65[i].b,ai->vec_65[i].c,ai->vec_ad[i].value,type->unitname,type->name);
         FilePrintf(file,buffer);
     }

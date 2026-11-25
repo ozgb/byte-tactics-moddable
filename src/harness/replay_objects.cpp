@@ -276,6 +276,17 @@ bool ReplayKindFits(unsigned declared, unsigned actual)
     return false;
 }
 
+void ReplayStoreVtables(unsigned kind, void* object)
+{
+    if (ReplayVtable(kind) == nullptr)
+        return;
+    *(const void**)object = ReplayVtable(kind);
+    ReplayExtraVtable extra[4];
+    unsigned count = ReplayExtraVtables(kind, extra);
+    for (unsigned i = 0; i < count; i++)
+        *(const void**)((char*)object + extra[i].offset) = extra[i].vtable;
+}
+
 unsigned ReplayConcreteKind(unsigned kind, const void* p)
 {
     const ReplayObjectKind& base = kReplayObjectKinds[kind];
@@ -436,6 +447,14 @@ void ReplayAddWeapon(ReplayText& t, const void* p)
     }
 }
 
+void ReplayEnsureAllOfTables(const unsigned short* kinds, unsigned count, ReplayAllocFn alloc)
+{
+    for (unsigned i = 0; i < count; i++) {
+        if (kReplayObjectKinds[kinds[i]].table != 0 && kReplayTables[kReplayObjectKinds[kinds[i]].table - 1].capped)
+            EnsureTable(kinds[i], alloc);
+    }
+}
+
 void* ReplayParseWeapon(const char* value)
 {
     if (strncmp(value, "weapondef#", 10) != 0)
@@ -535,8 +554,16 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, const char*
             ArrayLine(out, tag, key, head);
             out.AddChar('\n');
         }
+        bool sparse = strcmp(key, "region") == 0;
         for (unsigned start = 0; start < count; start += perLine) {
             unsigned n = count - start < perLine ? count - start : perLine;
+            if (sparse && strspn(hex + start * elem * 2, "0") >= n * elem * 2) {
+                if (start == 0) {
+                    ArrayLine(out, tag, key, head);
+                    out.AddChar('\n');
+                }
+                continue;
+            }
             ArrayLine(out, tag, key, start == 0 ? head : "");
             if (start == 0)
                 out.AddChar(' ');
@@ -1137,8 +1164,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         if (p == nullptr && ordinal != 0 && alloc != nullptr) {
             p = alloc(kReplayObjectKinds[kind].size);
             memset(p, 0, kReplayObjectKinds[kind].size);
-            if (ReplayVtable(kind) != nullptr)
-                *(const void**)p = ReplayVtable(kind);
+            ReplayStoreVtables(kind, p);
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
@@ -1162,8 +1188,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
             return nullptr;
     }
     p = first + element * site->stride;
-    if (ReplayVtable(site->kind) != nullptr)
-        *(const void**)p = ReplayVtable(site->kind);
+    ReplayStoreVtables(site->kind, p);
     FixSelf(site->kind, p);
     return p;
 }
@@ -1240,6 +1265,8 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         break;
     }
     case RK_STRING:
+        if (value[0] != '"')
+            return false;
         memset(at, 0, f.size);
         DecodeQuoted(value, at, f.size);
         break;
@@ -1366,14 +1393,14 @@ bool InWalkFields(const unsigned short* fields, unsigned count, unsigned field)
     return false;
 }
 
-void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned char kind, void* object, const unsigned short* limit, unsigned limitCount)
+void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* object, const unsigned short* limit, unsigned limitCount)
 {
     if (object == nullptr || kReplayObjectKinds[kind].scope == RS_VALUE)
         return;
     unsigned actual = ReplayConcreteKind(kind, object);
     if (actual == kReplayObjectKindCount)
         return;
-    kind = (unsigned char)actual;
+    kind = (unsigned short)actual;
     unsigned slot = PointerHash(object) % REPLAY_REACH_HASH;
     for (; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
         if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)
@@ -1395,7 +1422,7 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned c
     reach.count++;
 }
 
-void VisitRange(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned char kind, void* begin, void* end, const unsigned short* limit, unsigned limitCount)
+void VisitRange(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* begin, void* end, const unsigned short* limit, unsigned limitCount)
 {
     unsigned stride = kReplayObjectKinds[kind].size;
     unsigned char* b = (unsigned char*)begin;
@@ -1543,7 +1570,7 @@ bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex)
     return false;
 }
 
-void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount,
+void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit, unsigned rootLimitCount)
 {
     reach.count = 0;
@@ -1561,8 +1588,13 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         unsigned count = pass == 0 ? sets.readCount : sets.writeCount;
         for (unsigned i = 0; i < count; i++) {
             const ReplayField& f = kReplayFields[set[i]];
-            if (f.kind == RK_REF && f.base == RB_GAME)
-                Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)((const unsigned char*)g_game + f.offset)), nullptr, 0);
+            if (f.kind == RK_REF && (f.base == RB_GAME || f.base == RB_SIM)) {
+                const unsigned char* base = f.base == RB_GAME ? (const unsigned char*)g_game : (const unsigned char*)g_simGlobals;
+                if (base != nullptr)
+                    Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)(base + f.offset)), nullptr, 0);
+            }
+            if (f.kind == RK_PTR && f.base == RB_GAME)
+                Visit(reach, table, assign, f.target, *(void* const*)((const unsigned char*)g_game + f.offset), nullptr, 0);
             if (f.kind == RK_VECTOR && f.base != RB_RNG && kReplayVectors[f.array - 1].mode == RV_OBJECT) {
                 const unsigned char* root = f.base == RB_GAME ? (const unsigned char*)g_game : (const unsigned char*)g_simGlobals;
                 VectorView view = root == nullptr ? VectorView() : ViewOf(ReplayFieldView(f), root);
@@ -1574,12 +1606,29 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
     for (unsigned a = 0; a < sets.allOfCount; a++) {
         unsigned kind = sets.allOf[a];
         if (kReplayObjectKinds[kind].delta != 0) {
-            if (reach.deltaCount == sizeof reach.deltaKind) {
+            if (reach.deltaCount == sizeof reach.deltaKind / sizeof reach.deltaKind[0]) {
                 ReplayFail("a slot is all-of over more delta kinds than the walk holds");
                 continue;
             }
-            reach.deltaKind[reach.deltaCount++] = (unsigned char)kind;
+            reach.deltaKind[reach.deltaCount++] = (unsigned short)kind;
             ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred);
+            continue;
+        }
+        if (kReplayObjectKinds[kind].table == RT_ORDER) {
+            const ReplayObjectKind& k = kReplayObjectKinds[kind];
+            for (unsigned i = 0; i < k.insideCount; i++) {
+                const ReplayInsideSite& site = kReplayInsideSites[k.insideFirst + i];
+                if (!site.ref)
+                    continue;
+                unsigned owners = ContainerCount(table, site.container);
+                for (unsigned o = 0; o < owners; o++) {
+                    const unsigned char* owner = (const unsigned char*)table.Pointer(site.container, o + 1);
+                    unsigned char* first = owner == nullptr ? nullptr : BlockAt(*(const unsigned*)(owner + site.offset));
+                    unsigned room = owner == nullptr ? 0 : SiteRoom(site, owner);
+                    for (unsigned e = 0; first != nullptr && e < room; e++)
+                        Visit(reach, table, assign, (unsigned short)kind, first + e * site.stride, nullptr, 0);
+                }
+            }
             continue;
         }
         unsigned char* base;
@@ -1587,7 +1636,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         unsigned stride;
         if (TableSpan(kind, &base, &count, &stride)) {
             for (unsigned i = 0; i < count; i++)
-                Visit(reach, table, assign, (unsigned char)kind, base + i * stride, nullptr, 0);
+                Visit(reach, table, assign, (unsigned short)kind, base + i * stride, nullptr, 0);
         }
     }
     unsigned at = 0;

@@ -50,6 +50,9 @@
 #include "../ai/ai_idle.h"
 #include "../state/block_vector.h"
 #include "../game/match_setup.h"
+#include "../game/scheduler.h"
+#include "../game/units_events.h"
+#include "../game/orders_events.h"
 #include "share_packets.h"
 
 enum { MAX_PLAYERS = 10 };
@@ -116,6 +119,7 @@ static int s_blockScan = 0;
 static char s_commit[64] = "-";
 static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
+static FILE* s_commands = nullptr;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
@@ -1820,6 +1824,9 @@ void HarnessAfterStep()
     char msg[64];
     if (s_trace != NULL)
         fclose(s_trace);
+    if (s_commands != nullptr)
+        fclose(s_commands);
+    s_commands = nullptr;
     if (s_dump != NULL)
         fclose(s_dump);
     if (s_sound != nullptr)
@@ -3874,7 +3881,7 @@ static void IssueScriptedOrder(const ScriptedOrder* o)
             Order* existing = FindOrderByType((Unit*)u, order.index);
             if (existing) {
                 found = 1;
-                DeleteOrder((Unit*)u, existing);
+                OrdersPublishCancel(SCHED_ENGINE, (Unit*)u, order.index);
             }
         }
         if (found == 0)
@@ -3924,7 +3931,7 @@ static void IssueScriptedSpawn(const ScriptedSpawn* sp)
     WorldPosition(sp->x, sp->z, (int*)&pos);
     UnitDef* def = (UnitDef*)((unsigned char*)GameRef(GAME_DEFS) + defIndex * UNITDEF_STRIDE);
     g_seams.map->SnapWorldPosToFootprint(def, &pos);
-    g_seams.units->CreateUnit((unsigned char)sp->slot, (unsigned short)defIndex, &pos, 1, 1, 0);
+    UnitsPublishCreate(SCHED_ENGINE, (unsigned char)sp->slot, defIndex, (const int*)&pos);
 }
 
 void __stdcall ExecuteCommandLine(char* commandLine, int mask);
@@ -4020,6 +4027,66 @@ static void ReachQuirkGuard()
     Fail("quirks_reach: no unit of player 0 at the reach tick\n");
 }
 
+enum { COMMAND_TEXT_BYTES = 65536 };
+static char s_commandText[COMMAND_TEXT_BYTES];
+static unsigned s_commandLength = 0;
+static unsigned s_commandEvents = 0;
+static bool s_commandOpen = false;
+
+static const int kCommandSubscribers[ES_COUNT] = {
+    SCHED_ECONOMY, SCHED_WIND_METEORS, SCHED_FEATURES, SCHED_TARGETING, SCHED_LOS_RADAR, SCHED_MAP, SCHED_PLAYERS,
+    SCHED_AI, SCHED_WEAPONS, SCHED_ORDERS, SCHED_MOVEMENT, SCHED_UNITS, SCHED_SCRIPTS,
+};
+
+static const TraceEventModule* CommandEventModule(int kind)
+{
+    int count;
+    const SchedRoute* routes = SchedRoutes(&count);
+    for (int i = 0; i < count; i++) {
+        if (routes[i].outbox != SCHED_ENGINE || routes[i].kind != kind)
+            continue;
+        for (int s = 0; s < ES_COUNT; s++)
+            if (FindEventKind(s_eventSections[s].module, kind) != nullptr && kCommandSubscribers[s] == routes[i].subscriber)
+                return s_eventSections[s].module;
+    }
+    return nullptr;
+}
+
+void __stdcall HarnessCommandEvent(const void* event, unsigned int size)
+{
+    if (!s_commandOpen)
+        return;
+    int kind = *(const int*)event;
+    const TraceEventModule* module = CommandEventModule(kind);
+    const TraceEventKind* found = module ? FindEventKind(module, kind) : nullptr;
+    char name[64];
+    if (found != nullptr)
+        sprintf(name, "%s", found->name);
+    else
+        sprintf(name, "KIND_%d", kind);
+    unsigned need = (unsigned)strlen(name) + 2 + size * 2;
+    if (s_commandLength + need >= COMMAND_TEXT_BYTES)
+        Fail("testmode: a scripted command published more events than commands.txt can hold\n");
+    s_commandLength += (unsigned)sprintf(s_commandText + s_commandLength, " %s ", name);
+    for (unsigned i = 0; i < size; i++)
+        s_commandLength += (unsigned)sprintf(s_commandText + s_commandLength, "%02x", ((const unsigned char*)event)[i]);
+    s_commandEvents++;
+}
+
+static void CommandBegin()
+{
+    s_commandLength = 0;
+    s_commandEvents = 0;
+    s_commandText[0] = 0;
+    s_commandOpen = true;
+}
+
+static void CommandEnd(unsigned tick, const char* key, int lineNo)
+{
+    s_commandOpen = false;
+    fprintf(s_commands, "%u %s %d %u%s\n", tick, key, lineNo, s_commandEvents, s_commandText);
+}
+
 void HarnessBeforeStep()
 {
     if (!HarnessTestMode())
@@ -4045,18 +4112,27 @@ void HarnessBeforeStep()
         Fail(msg);
     }
     for (int i = 0; i < s_spawnCount; i++) {
-        if (s_spawns[i].tick == tick)
-            IssueScriptedSpawn(&s_spawns[i]);
+        if (s_spawns[i].tick != tick)
+            continue;
+        CommandBegin();
+        IssueScriptedSpawn(&s_spawns[i]);
+        CommandEnd(tick, "spawn", s_spawns[i].lineNo);
     }
     s_uiMute = 1;
     for (int i = 0; i < s_orderCount; i++) {
-        if (s_orders[i].tick == tick)
-            IssueScriptedOrder(&s_orders[i]);
+        if (s_orders[i].tick != tick)
+            continue;
+        CommandBegin();
+        IssueScriptedOrder(&s_orders[i]);
+        CommandEnd(tick, "order", s_orders[i].lineNo);
     }
     s_uiMute = 0;
     for (int i = 0; i < s_consoleCount; i++) {
-        if (s_consoles[i].tick == tick)
-            RunScriptedConsole(&s_consoles[i]);
+        if (s_consoles[i].tick != tick)
+            continue;
+        CommandBegin();
+        RunScriptedConsole(&s_consoles[i]);
+        CommandEnd(tick, "console", s_consoles[i].lineNo);
     }
     for (int i = 0; i < s_inputCount; i++) {
         if (s_inputs[i].tick == tick)
@@ -4467,6 +4543,10 @@ static void OpenTrace(unsigned controlWord)
     s_trace = fopen("trace.txt", "wb");
     if (s_trace == NULL)
         Fail("testmode: cannot write trace.txt\n");
+    s_commands = fopen("commands.txt", "wb");
+    if (s_commands == nullptr)
+        Fail("testmode: cannot write commands.txt\n");
+    fputs("bt-commands 1\n", s_commands);
     s_sound = fopen("sound.txt", "wb");
     if (s_sound == nullptr)
         Fail("testmode: cannot write sound.txt\n");

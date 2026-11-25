@@ -12,6 +12,7 @@
 #include "../util/vec3.h"
 
 #include "../orders/mission_type.h"
+#include "../util/ftol.h"
 
 struct ConsoleCommandTable;
 
@@ -1008,7 +1009,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
     float energyCharge = type->energyCost * step;
     float metalCharge = type->metalCost * step;
 #endif
-    int hp = (int)(prev * type->maxHealth) - (int)(next * type->maxHealth);
+    int hp = bx_ftol(prev * type->maxHealth) - bx_ftol(next * type->maxHealth);
     if (amount < 0.0f) {
         float refund = -metalCharge;
         EconPublish(SCHED_UNITS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
@@ -1045,8 +1046,8 @@ int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
     if (unit->health >= max)
         return 0;
 #ifdef __clang__
-    int n1 = (int)(((double)max * f - 1.0f) / v + 1.0f);
-    int n2 = (int)(((double)s->energyCost * f - 1.0f) / v + 1.0f);
+    int n1 = bx_ftol(((double)max * f - 1.0f) / v + 1.0f);
+    int n2 = bx_ftol(((double)s->energyCost * f - 1.0f) / v + 1.0f);
 #else
     int n1 = (int)((max * f - 1.0f) / v + 1.0f);
     int n2 = (int)((s->energyCost * f - 1.0f) / v + 1.0f);

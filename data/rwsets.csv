@@ -93,6 +93,7 @@ address,function,file,kind,target
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,call,UseEnergy
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,call,UseEnergyD
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,call,X87EqTest40
+0x401360,EconomyUpdatePlayer,src/game/economy.cpp,call,bx_ftol
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,field_escape,Game::players
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,field_maybe_written,EconAccount::energy
 0x401360,EconomyUpdatePlayer,src/game/economy.cpp,field_maybe_written,EconAccount::metal
@@ -352,6 +353,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishDamage
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,get
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator UnitDef *
@@ -417,6 +419,7 @@ address,function,file,kind,target
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,WeaponsPublishAddStockpile
+0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,operator WeaponDef *
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::progress
@@ -577,8 +580,9 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,WeaponsPublishRelease
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Whole
-0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,abs
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator bool
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator->
@@ -657,7 +661,8 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell16
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,_hypot
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator bool
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator->
@@ -721,12 +726,13 @@ address,function,file,kind,target
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,bx_sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator bool
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator+
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator->
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator=
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,deref_read,*Vec3
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMaxX
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMinX
@@ -770,7 +776,8 @@ address,function,file,kind,target
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,UnitDef::MetalCost
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
-0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,_hypot
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,get
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,operator bool
@@ -899,6 +906,7 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator bool
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator->
@@ -961,6 +969,7 @@ address,function,file,kind,target
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Cell *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator FeatureSpot *
@@ -1064,7 +1073,8 @@ address,function,file,kind,target
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Whole
-0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,_hypot
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator bool
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator->
@@ -1357,6 +1367,7 @@ address,function,file,kind,target
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,OrdersPublishStartScript
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,WaitIfCobBusy
+0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator bool
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator!=
@@ -1612,6 +1623,7 @@ address,function,file,kind,target
 0x407ae0,SquadScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_game
 0x407ae0,SquadScoutTimer::OnTimer,src/ai/ai_player.cpp,global_read,g_quirks
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,MakeVec3
+0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,bx_ftol
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,call,operator=
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,field_read,Game::baseX
 0x407e70,SpatialTimer::SpatialTimer,src/ai/ai_player.cpp,field_read,Game::baseY
@@ -1958,6 +1970,7 @@ address,function,file,kind,target
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,EnergyUseOf
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,RateUnitTypeForWeights
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,UnitDef::HasField1ce
+0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,bx_ftol
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,operator UnitDef *
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,operator->
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,call,operator[]
@@ -1994,6 +2007,7 @@ address,function,file,kind,target
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,function,
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,global_read,g_game
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,BlockVector::Begin
+0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,bx_ftol
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator[]
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,deref_read,*int
@@ -2172,6 +2186,7 @@ address,function,file,kind,target
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,BlockVector::End
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,Unit::PlayerIndex
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,Unit::Ready
+0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,bx_ftol
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,fill
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,get
 0x40aa40,PlayerAI::RefreshUnitLists,src/ai/player_ai.cpp,call,operator Unit *
@@ -2353,6 +2368,7 @@ address,function,file,kind,target
 0x40bab0,GetMirroredBasePosition,src/ai/ai_player.cpp,global_read,g_playerAI
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,IsCountBelowAiLimit
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,Max
+0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,bx_ftol
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,operator UnitDef *
 0x40bb00,GetBuildRating,src/ai/ai_player.cpp,call,operator[]
@@ -3459,7 +3475,9 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,get
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator UnitDef *
@@ -3468,7 +3486,6 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator->
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator=
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator[]
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_escape,Order::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_escape,Unit::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_maybe_written,Order::pos
@@ -3536,7 +3553,8 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,get
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -3603,7 +3621,8 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,get
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator UnitMotion *
@@ -3674,7 +3693,8 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,get
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Player *
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3912,6 +3932,7 @@ address,function,file,kind,target
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordReverseNanoParticles
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
+0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,bx_ftol
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator Feature *
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -4028,7 +4049,8 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -4433,6 +4455,7 @@ address,function,file,kind,target
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,SimSetSearchSteps
 0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_atof_msvc5
+0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_ftol
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,CommandArgs::count
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,PathfindingSeam::SetSearchScale
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,Seams::pathfinding
@@ -4552,6 +4575,7 @@ address,function,file,kind,target
 0x416d80,CmdMapping,src/game/console_commands.cpp,function,
 0x416d80,CmdMapping,src/game/console_commands.cpp,global_read,g_game
 0x416db0,CmdContour,src/game/console_commands.cpp,call,CommandArgs::GetFloatArg
+0x416db0,CmdContour,src/game/console_commands.cpp,call,bx_ftol
 0x416db0,CmdContour,src/game/console_commands.cpp,function,
 0x416db0,CmdContour,src/game/console_commands.cpp,global_write,g_contourOffset
 0x416db0,CmdContour,src/game/console_commands.cpp,global_write,g_contourSpacing
@@ -5496,6 +5520,7 @@ address,function,file,kind,target
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconRequestEnergyAndMetal
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,FinishConstruction
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,WeaponsPublishDamage
+0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,bx_ftol
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,get
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_read,*unsigned char
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_write,*unsigned char
@@ -5521,6 +5546,7 @@ address,function,file,kind,target
 0x41bcd0,ApplyUnfinishedBuildDecay,src/ingame/control_panel.cpp,function,
 0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,call,EconRequestEnergy
 0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,call,WeaponsPublishDamage
+0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,call,bx_ftol
 0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,call,get
 0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,field_read,Unit::def
 0x41bd10,AddRepairProgress,src/ingame/control_panel.cpp,field_read,Unit::health
@@ -6642,6 +6668,7 @@ address,function,file,kind,target
 0x420cb0,BuildCalcedExplosion,src/weapons/explosions.cpp,function,
 0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,call,AllocFrame
 0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,call,GameRand
+0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,call,bx_ftol
 0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,call,bx_sqrt
 0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,deref_write,*unsigned char
 0x420d20,BuildExplosionFrame,src/weapons/explosions.cpp,field_read,GafFrame::pixelsOrLayers
@@ -6896,6 +6923,7 @@ address,function,file,kind,target
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,PosPlus
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,RandomInt
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,VectorFromTo
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,bx_ftol
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,get
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator DebrisPiece *
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,operator Face *
@@ -7040,6 +7068,7 @@ address,function,file,kind,target
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,field_write,Game::scanIndex
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,function,
 0x421f20,InitFeatureAnimPool,src/map/features.cpp,global_read,g_game
+0x422040,StampFeatureMetal,src/map/features.cpp,call,bx_ftol
 0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Cell *
 0x422040,StampFeatureMetal,src/map/features.cpp,call,operator Feature *
 0x422040,StampFeatureMetal,src/map/features.cpp,deref_escape,*Feature
@@ -7130,6 +7159,7 @@ address,function,file,kind,target
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldInt
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldString
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,_strcmpi
+0x4224b0,LoadFeatureType,src/map/features.cpp,call,bx_ftol
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,operator Feature *
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,operator=
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,sprintf
@@ -8699,6 +8729,7 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,TdfFile::~TdfFile
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,Translate
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,UsesDataArchives
+0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,bx_ftol
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,floor
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,get
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,host_message
@@ -9084,6 +9115,7 @@ address,function,file,kind,target
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,UnitDef::AddToCategories
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,_strcmpi
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,atoi
+0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,bx_ftol
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,get
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator MovementClass *
 0x42bf40,LoadUnitFbi,src/units/unit_types.cpp,call,operator char *
@@ -9449,6 +9481,7 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetFieldString
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,TdfRecord::GetRecordName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,_strcmpi
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,bx_ftol
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator DamageTable *
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator bool
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator new
@@ -10801,6 +10834,7 @@ address,function,file,kind,target
 0x437d40,EnableMeteors,src/map/meteors.cpp,global_write,g_meteorsEnabled
 0x437d50,DisableMeteors,src/map/meteors.cpp,function,
 0x437d50,DisableMeteors,src/map/meteors.cpp,global_write,g_meteorsEnabled
+0x437d60,SetMeteorParams,src/map/meteors.cpp,call,bx_ftol
 0x437d60,SetMeteorParams,src/map/meteors.cpp,call,strcpy
 0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::density
 0x437d60,SetMeteorParams,src/map/meteors.cpp,field_read,MeteorShowerParams::duration
@@ -10958,6 +10992,7 @@ address,function,file,kind,target
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,global_read,g_seams
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [ScriptsSeam::FindScript]"
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(Unit *, short, char, int, int, int, int) __attribute__((stdcall)) [NetworkSeam::SendScriptCall]"
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,bx_ftol
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,get
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,operator->
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,<anon>::q
@@ -11138,6 +11173,7 @@ address,function,file,kind,target
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,call,DrawString
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,call,GetGroundHeight
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,call,Offset
+0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,call,bx_ftol
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,call,operator-
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,deref_read,*Pos
 0x438ea0,DrawRangeCircle,src/ingame/markers.cpp,field_read,Fixed::whole
@@ -11252,6 +11288,7 @@ address,function,file,kind,target
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,DrawLine
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,ScaledCos
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,ScaledSin
+0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,bx_ftol
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator!=
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator->
 0x4399f0,DrawOrderRangeRing,src/ingame/markers.cpp,call,operator=
@@ -11902,6 +11939,7 @@ address,function,file,kind,target
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,PosMinus
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,UnitMotion::UpdateVelocityFromHeading
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,abs
+0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,bx_ftol
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,bx_hypot
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,get
 0x43cd20,UnitMotion::SteerGroundUnit,src/movement/motion.cpp,call,operator->
@@ -11957,6 +11995,7 @@ address,function,file,kind,target
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,UnitMotion::ApplyBankAndPitch
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,Vec3Length
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,Vec3Scale
+0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,bx_ftol
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,bx_hypot
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,bx_sqrt
 0x43d290,UnitMotion::SteerAircraft,src/movement/motion.cpp,call,get
@@ -15724,6 +15763,7 @@ address,function,file,kind,target
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,OrderFx::AddFlags
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,OrderFx::ContainsCell
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,SubmitRepath
+0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,bx_ftol
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,bx_hypot
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,operator Order *
 0x44f2a0,AiSearchGoal::SetPathOrder,src/movement/order_targets.cpp,call,operator bool
@@ -17602,6 +17642,7 @@ address,function,file,kind,target
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,CMemoryCache::RecolorByShade
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,Scale
+0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,call,bx_ftol
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,GafFrame::scratch
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,Game::ticks
 0x458dd0,CMemoryCache::ShadeByIntensity,src/graphics/model_render.cpp,field_read,UnitDrawView::buildLeft
@@ -17780,6 +17821,7 @@ address,function,file,kind,target
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,ModelState::OwnerView
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,NormalizeVector
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,VectorFromToInt
+0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,bx_ftol
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,get
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,memset
 0x459c70,UnitTable::DrawLitPieces,src/graphics/model_render.cpp,call,operator Vec3 *
@@ -20176,6 +20218,7 @@ address,function,file,kind,target
 0x464060,DrawMessages,src/network/net_chat.cpp,call,GetFontHeight
 0x464060,DrawMessages,src/network/net_chat.cpp,call,SetFont
 0x464060,DrawMessages,src/network/net_chat.cpp,call,SetTextColors
+0x464060,DrawMessages,src/network/net_chat.cpp,call,bx_ftol
 0x464060,DrawMessages,src/network/net_chat.cpp,deref_read,*ChatHudEntry
 0x464060,DrawMessages,src/network/net_chat.cpp,field_escape,Game::entries
 0x464060,DrawMessages,src/network/net_chat.cpp,field_maybe_written,Game::players_1b63
@@ -20499,6 +20542,7 @@ address,function,file,kind,target
 0x465ac0,IsUnitVisibleToPlayer,src/game/players.cpp,global_read,g_game
 0x465e30,InitPlayerResources,src/game/players.cpp,call,FindHostSlot
 0x465e30,InitPlayerResources,src/game/players.cpp,call,SetStartingStorageBonus
+0x465e30,InitPlayerResources,src/game/players.cpp,call,bx_ftol
 0x465e30,InitPlayerResources,src/game/players.cpp,call,operator->
 0x465e30,InitPlayerResources,src/game/players.cpp,field_escape,Game::players
 0x465e30,InitPlayerResources,src/game/players.cpp,field_read,Game::options
@@ -21371,6 +21415,7 @@ address,function,file,kind,target
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,SetTextColors
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,Translate
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,_strcmpi
+0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,bx_ftol
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,get
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,memcmp
 0x46a860,DrawUnitInfoPanel,src/ingame/info_panel.cpp,call,memcpy
@@ -21612,6 +21657,7 @@ address,function,file,kind,target
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,global_write,g_onlineReportScoreBoards
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,global_write,g_onlineReportScores
 0x46c190,ShutdownScoreTables,src/frontend/reporter.cpp,indirect_call,indirect via void (*)() __attribute__((cdecl)) [g_riTerminate]
+0x46c2a0,FillScoreTables,src/game/statistics.cpp,call,bx_ftol
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,call,operator->
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,deref_read,*OnlineReportPlayer
 0x46c2a0,FillScoreTables,src/game/statistics.cpp,deref_read,*OnlineReportScore
@@ -25147,6 +25193,7 @@ address,function,file,kind,target
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,AngleOfVector
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,GetPiecePosition
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,GetUnit
+0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,bx_ftol
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,bx_hypot
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,operator Unit *
 0x480770,UnitScript::GetUnitValue,src/scripts/unit_script.cpp,call,operator->
@@ -25834,6 +25881,7 @@ address,function,file,kind,target
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,PublishWindMeteorsLimits
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,SimAllocTagged
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,UpdateCellHeightRange
+0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,bx_ftol
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,get
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,memcpy
 0x483610,LoadTntMap,src/map/line_of_sight.cpp,call,memset
@@ -26970,6 +27018,7 @@ address,function,file,kind,target
 0x487af0,FindMissionUnit,src/units/unit_save.cpp,indirect_call,"indirect via int (*)(int, MissionUnitInfo *) __attribute__((stdcall)) [MissionSeam::GetMissionUnit]"
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,OrdersPublishAdd
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,UnitsPublishAttachToPiece
+0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,bx_ftol
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,bx_sscanf
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,isspace
 0x487bf0,RunInitialMission,src/units/unit_commands.cpp,call,operator!=
@@ -27455,6 +27504,7 @@ address,function,file,kind,target
 0x48a190,GetWeaponTargetUnit,src/units/unit_targets.cpp,global_read,g_game
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,PublishCleared
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,ScaleBodyOffset
+0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,bx_ftol
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,bx_sqrt
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,get
 0x48a1e0,GetWeaponTargetPos,src/units/unit_targets.cpp,call,operator Unit *
@@ -27676,6 +27726,7 @@ address,function,file,kind,target
 0x48b090,Unit::SetStateBits,src/units/unit.cpp,indirect_call,indirect via void (*)(Unit *) __attribute__((stdcall)) [NetworkSeam::SendActivateFlags]
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::GrowBuffer
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,BitWriter::WriteBits
+0x48b200,WriteUnitState,src/units/unit_position.cpp,call,bx_ftol
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,operator bool
 0x48b200,WriteUnitState,src/units/unit_position.cpp,call,operator->
 0x48b200,WriteUnitState,src/units/unit_position.cpp,deref_read,*unsigned int
@@ -28153,6 +28204,7 @@ address,function,file,kind,target
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,Order
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,OrderModeTakesTarget
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,OrdersPublishAdd
+0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,bx_ftol
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,get
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,operator Unit *
 0x48cf30,IssueOrderToSelection,src/ingame/selection.cpp,call,operator->
@@ -29014,6 +29066,7 @@ address,function,file,kind,target
 0x490650,PackedGoal::ExportGoalPose,src/movement/packed_goal.cpp,function,
 0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,GetHeadingBetween
 0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,OrderFx::AddFlags
+0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,bx_ftol
 0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,bx_hypot
 0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,get
 0x490690,PackedGoal::TickTowardGoal,src/movement/packed_goal.cpp,call,operator OrderFx *
@@ -31495,6 +31548,7 @@ address,function,file,kind,target
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,AngleOfVector
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,DamageUnit
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,FindDamageValue
+0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,bx_ftol
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator DamageTable *
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator Unit *
 0x499cd0,ApplyWeaponDamage,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -31595,6 +31649,7 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,UnitFromId
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,VectorLength
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,WeaponsPublishHit
+0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,bx_ftol
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,bx_sqrt
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,get
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,call,memset
@@ -31665,12 +31720,14 @@ address,function,file,kind,target
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(Unit *, Projectile *) __attribute__((stdcall)) [NetworkSeam::SendProjectileDetonated]"
 0x49a120,ApplyAreaDamage,src/weapons/weapons.cpp,indirect_call,"indirect via void (*)(const Point16 *, Feature *, Vec3 *) __attribute__((stdcall)) [FeaturesSeam::GetFootprintCentre]"
+0x49a850,VectorLength,src/weapons/weapons.cpp,call,bx_ftol
 0x49a850,VectorLength,src/weapons/weapons.cpp,call,bx_sqrt
 0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3::x
 0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3::y
 0x49a850,VectorLength,src/weapons/weapons.cpp,field_read,Vec3::z
 0x49a850,VectorLength,src/weapons/weapons.cpp,function,
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_acos
+0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_ftol
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_hypot
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,call,bx_sqrt
 0x49a890,SolveLaunchAngle,src/weapons/weapons.cpp,field_read,Game::gravity
@@ -31855,6 +31912,7 @@ address,function,file,kind,target
 0x49b3e0,GetProjectileAimPoint,src/weapons/weapons.cpp,indirect_call,indirect via int (*)(Vec3 *) __attribute__((stdcall)) [MapSeam::GetGroundHeight]
 0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,call,AngleOfVector
 0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,call,abs
+0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,call,bx_ftol
 0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,call,bx_hypot
 0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,call,operator WeaponDef *
 0x49b520,TurnUnitTowardsPoint,src/weapons/weapons.cpp,field_read,<anon>::burnBlow
@@ -32007,6 +32065,7 @@ address,function,file,kind,target
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,HarnessViewRand
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,PointInRect
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,abs
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,bx_ftol
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,bx_sqrt
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,get
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32137,6 +32196,7 @@ address,function,file,kind,target
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,WeaponsFireScript
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,WeaponsPublishStartScript
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,WeaponsPublishStartScriptWithArgs
+0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,bx_ftol
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,bx_hypot
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,operator Projectile *
 0x49c9c0,FireLineOfSightProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32233,6 +32293,7 @@ address,function,file,kind,target
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,WeaponsFireScript
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,WeaponsPublishStartScript
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,WeaponsPublishStartScriptWithArgs
+0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,bx_ftol
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,bx_hypot
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,operator Projectile *
 0x49cde0,FireBallisticProjectile,src/weapons/weapons.cpp,call,operator WeaponDef *
@@ -32444,6 +32505,7 @@ address,function,file,kind,target
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,field_read,WeaponDef::tolerance
 0x49d880,AimWithinTolerance,src/weapons/weapons.cpp,function,
 0x49d910,CalcAimAngles,src/weapons/weapons.cpp,call,AngleOfVector
+0x49d910,CalcAimAngles,src/weapons/weapons.cpp,call,bx_ftol
 0x49d910,CalcAimAngles,src/weapons/weapons.cpp,call,bx_hypot
 0x49d910,CalcAimAngles,src/weapons/weapons.cpp,deref_write,*short
 0x49d910,CalcAimAngles,src/weapons/weapons.cpp,field_read,Fixed::whole
@@ -32461,6 +32523,7 @@ address,function,file,kind,target
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,AngleOfVector
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,FireLineOfSightProjectile
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
+0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,bx_ftol
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,call,bx_hypot
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_maybe_written,Unit::pos
 0x49d9c0,FireLineOfSightWeapon,src/weapons/weapons.cpp,field_read,Fixed::whole
@@ -32484,6 +32547,7 @@ address,function,file,kind,target
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,FindTargetableProjectile
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,FireVLaunchProjectile
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
+0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,bx_ftol
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,bx_hypot
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,call,operator->
 0x49db70,FireVLaunchWeapon,src/weapons/weapons.cpp,field_read,<anon>::halves
@@ -32573,6 +32637,7 @@ address,function,file,kind,target
 0x49e010,SetWeaponFireHandler,src/weapons/weapons.cpp,function,
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,GetWeaponPiecePosition
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,WeaponsPublishStartScriptWithArgs
+0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,bx_ftol
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator->
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,call,operator=
 0x49e070,InitUnitWeaponSlots,src/weapons/weapons.cpp,field_escape,Unit::weapons
@@ -33422,6 +33487,7 @@ address,function,file,kind,target
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,call,SetFont
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,call,SetTextColors
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,call,_itoa
+0x4a2580,DrawSliderBar,src/gui/gui.cpp,call,bx_ftol
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,call,strcpy
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,deref_escape,*Gadget
 0x4a2580,DrawSliderBar,src/gui/gui.cpp,deref_read,*char
@@ -33457,6 +33523,7 @@ address,function,file,kind,target
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,call,DrawSliderBar
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,call,DrawTextInput
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,call,SkipTextLines
+0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,call,bx_ftol
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,call,strcpy
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,deref_read,*char
 0x4a2be0,SyncAssocGadgets,src/gui/gui.cpp,deref_read,*int
@@ -33472,6 +33539,7 @@ address,function,file,kind,target
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,call,GetFontHeight
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,call,GetGafFrame
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,call,SetFont
+0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,call,bx_ftol
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,deref_escape,*Gadget
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,deref_read,*unsigned short
 0x4a2e40,SetListBoxScrollByName,src/gui/gui.cpp,field_read,<anon>::count
@@ -33655,6 +33723,7 @@ address,function,file,kind,target
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,GetDrawSliderRowsHeight
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,GetFontHeight
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,SetFont
+0x4a3ef0,DrawSlider,src/gui/gui.cpp,call,bx_ftol
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,deref_escape,*Gadget
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::count
 0x4a3ef0,DrawSlider,src/gui/gui.cpp,field_read,<anon>::full
@@ -33759,6 +33828,7 @@ address,function,file,kind,target
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,MeasureProgressBarText
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,UnlockScreen
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,_itoa
+0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,call,bx_ftol
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,<anon>::showText
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,<anon>::surface
 0x4a4660,DrawProgressBarGadget,src/gui/gui.cpp,field_read,<anon>::total
@@ -37522,6 +37592,7 @@ address,function,file,kind,target
 0x4b90a0,DrawFrameDepth,src/graphics/gaf.cpp,field_read,GafFrame::yOffset
 0x4b90a0,DrawFrameDepth,src/graphics/gaf.cpp,function,
 0x4b91b0,BuildLensFrame,src/graphics/gaf.cpp,call,AllocDepthFrame
+0x4b91b0,BuildLensFrame,src/graphics/gaf.cpp,call,bx_ftol
 0x4b91b0,BuildLensFrame,src/graphics/gaf.cpp,call,bx_sqrt
 0x4b91b0,BuildLensFrame,src/graphics/gaf.cpp,deref_write,*unsigned short
 0x4b91b0,BuildLensFrame,src/graphics/gaf.cpp,field_read,GafFrame::pixelsOrLayers
@@ -37713,6 +37784,7 @@ address,function,file,kind,target
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,GetDisplay
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,Lock
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,Unlock
+0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,bx_ftol
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,host_palette_create
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,host_palette_set
 0x4ba200,SetPaletteColors,src/graphics/palette.cpp,call,operator=
@@ -39413,6 +39485,7 @@ address,function,file,kind,target
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,call,Rows
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,call,begin
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,call,bx_atof_msvc5
+0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,call,bx_ftol
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,call,end
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,deref_read,*char
 0x4c4800,TdfRecord::GetFieldFixed,src/util/tdf.cpp,deref_write,*int
@@ -42366,6 +42439,7 @@ address,function,file,kind,target
 ,AddCondition,src/game/victory.cpp,function,
 ,AddDoubleBits,src/harness/replay.cpp,call,ReplayValue
 ,AddDoubleBits,src/harness/replay.cpp,function,
+,AddFixed,src/movement/motion.cpp,call,bx_ftol
 ,AddFixed,src/movement/motion.cpp,function,
 ,AddFloatBits,src/harness/replay.cpp,call,ReplayValue
 ,AddFloatBits,src/harness/replay.cpp,function,
@@ -42842,6 +42916,7 @@ address,function,file,kind,target
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,call,ToScratch
 ,ApplyThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,Approach,src/ingame/control_panel.cpp,function,
+,Approach,src/ingame/info_panel.cpp,call,bx_ftol
 ,Approach,src/ingame/info_panel.cpp,function,
 ,ApproachRadius::GetGoalArea,src/movement/order_targets.cpp,call,memset
 ,ApproachRadius::GetGoalArea,src/movement/order_targets.cpp,field_read,ApproachRadius::radius
@@ -44054,6 +44129,7 @@ address,function,file,kind,target
 ,CompareOut,src/harness/block_scan.cpp,function,
 ,CompareSpans,src/harness/block_scan.cpp,field_read,Span::start
 ,CompareSpans,src/harness/block_scan.cpp,function,
+,ComputeEnergyRating,src/ai/energy_rating.h,call,bx_ftol
 ,ComputeEnergyRating,src/ai/energy_rating.h,function,
 ,ComputeEnergyRating,src/ai/energy_rating.h,indirect_call,indirect via double (*)(UnitDef *) __attribute__((stdcall)) [getEnergyUse]
 ,ComputeMapChecksumNative,src/seams/native.cpp,call,Mission::ComputeMapChecksum
@@ -44714,6 +44790,7 @@ address,function,file,kind,target
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,SetFont
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,SetTextColors
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,abs
+,DrawResourcePanel,src/ingame/info_panel.cpp,call,bx_ftol
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,fabs
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,operator->
 ,DrawResourcePanel,src/ingame/info_panel.cpp,call,operator=
@@ -50401,12 +50478,14 @@ address,function,file,kind,target
 ,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::shift
 ,LayoutFor,src/ai/pathfind_hpa.cpp,field_write,Layout::size
 ,LayoutFor,src/ai/pathfind_hpa.cpp,function,
+,Length,src/weapons/weapons.cpp,call,bx_ftol
 ,Length,src/weapons/weapons.cpp,call,bx_sqrt
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::x
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::y
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::z
 ,Length,src/weapons/weapons.cpp,field_write,Fixed::value
 ,Length,src/weapons/weapons.cpp,function,
+,LengthFloat,src/graphics/particles.cpp,call,bx_ftol
 ,LengthFloat,src/graphics/particles.cpp,call,bx_sqrt
 ,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::x
 ,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::y
@@ -51230,6 +51309,7 @@ address,function,file,kind,target
 ,Motion,src/movement/order_targets.cpp,call,operator UnitMotion *
 ,Motion,src/movement/order_targets.cpp,field_read,Unit::motion
 ,Motion,src/movement/order_targets.cpp,function,
+,MovableVec3::Length,src/ai/ai_player.cpp,call,bx_ftol
 ,MovableVec3::Length,src/ai/ai_player.cpp,call,bx_sqrt
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::x
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::y
@@ -61483,6 +61563,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,function,
+,TeleportEndpoint::Length,src/graphics/particles.cpp,call,bx_ftol
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,call,bx_sqrt
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,field_read,TeleportEndpoint::x
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,field_read,TeleportEndpoint::y
@@ -61517,6 +61598,7 @@ address,function,file,kind,target
 ,ThrustParticles::ThrustParticles,src/graphics/particles.cpp,function,
 ,TickProgressBarGadget,src/gui/gui.cpp,call,DrawProgressBarGadget
 ,TickProgressBarGadget,src/gui/gui.cpp,call,GetTicks
+,TickProgressBarGadget,src/gui/gui.cpp,call,bx_ftol
 ,TickProgressBarGadget,src/gui/gui.cpp,deref_escape,*Gadget
 ,TickProgressBarGadget,src/gui/gui.cpp,field_read,<anon>::active
 ,TickProgressBarGadget,src/gui/gui.cpp,field_read,<anon>::interval
@@ -62866,16 +62948,19 @@ address,function,file,kind,target
 ,Vec3FromInts::Vec3FromInts,src/orders/order_list.cpp,field_write,Vec3::y
 ,Vec3FromInts::Vec3FromInts,src/orders/order_list.cpp,field_write,Vec3::z
 ,Vec3FromInts::Vec3FromInts,src/orders/order_list.cpp,function,
+,Vec3Length,src/ai/ai_player.cpp,call,bx_ftol
 ,Vec3Length,src/ai/ai_player.cpp,call,bx_sqrt
 ,Vec3Length,src/ai/ai_player.cpp,field_read,Vec3::x
 ,Vec3Length,src/ai/ai_player.cpp,field_read,Vec3::y
 ,Vec3Length,src/ai/ai_player.cpp,field_read,Vec3::z
 ,Vec3Length,src/ai/ai_player.cpp,function,
+,Vec3Length,src/ingame/markers.cpp,call,bx_ftol
 ,Vec3Length,src/ingame/markers.cpp,call,bx_sqrt
 ,Vec3Length,src/ingame/markers.cpp,field_read,Vec3::x
 ,Vec3Length,src/ingame/markers.cpp,field_read,Vec3::y
 ,Vec3Length,src/ingame/markers.cpp,field_read,Vec3::z
 ,Vec3Length,src/ingame/markers.cpp,function,
+,Vec3Length,src/movement/motion.cpp,call,bx_ftol
 ,Vec3Length,src/movement/motion.cpp,call,bx_sqrt
 ,Vec3Length,src/movement/motion.cpp,field_read,Vec3::x
 ,Vec3Length,src/movement/motion.cpp,field_read,Vec3::y
@@ -63613,6 +63698,7 @@ address,function,file,kind,target
 ,WakeParticleWholePos::Visible,src/graphics/particles.cpp,function,
 ,WakeParticleWholePos::Visible,src/graphics/particles.cpp,global_read,g_game
 ,WakeParticles::WakeParticles,src/graphics/particles.cpp,function,
+,WakeVector::Length,src/graphics/particles.cpp,call,bx_ftol
 ,WakeVector::Length,src/graphics/particles.cpp,call,bx_sqrt
 ,WakeVector::Length,src/graphics/particles.cpp,field_read,WakeVector::x
 ,WakeVector::Length,src/graphics/particles.cpp,field_read,WakeVector::y

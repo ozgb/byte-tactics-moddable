@@ -16,6 +16,7 @@
 
 #include "../units/unit_def.h"
 #include "../network/player.h"
+#include "../util/ftol.h"
 
 #pragma pack(push, 1)
 struct UnitDefDetectionFlags {
@@ -864,8 +865,8 @@ struct Resources {
 
 static inline float Approach(float fcur, float ftarget)
 {
-    int cur = (int)fcur;
-    int d = (int)ftarget - cur;
+    int cur = bx_ftol(fcur);
+    int d = bx_ftol(ftarget) - cur;
     if (d < 0) {
         d /= 8;
         if (d == 0)
@@ -899,50 +900,50 @@ static void DrawResourcePanel(Surface* ctx, Player* pl, Resources* res)
     Rect* r = &sideDef->energyBar;
     bar = *r;
     if (pl->energyCapacity > 0.0f) {
-        bar.right = (int)((double)(bar.right - bar.left) * res->metal / pl->energyCapacity + bar.left);
+        bar.right = bx_ftol((double)(bar.right - bar.left) * res->metal / pl->energyCapacity + bar.left);
         FillRectangle(ctx, &bar, sideDef->energyColor);
         if (pl->shareEnergy > 0.0f && pl->energy > pl->shareEnergy) {
             box = *r;
-            box.left = (int)((double)(box.right - box.left) * pl->shareEnergy / pl->energyCapacity + box.left);
+            box.left = bx_ftol((double)(box.right - box.left) * pl->shareEnergy / pl->energyCapacity + box.left);
             box.right = box.left + 2;
             FillRectangle(ctx, &box, pal[0xc]);
         }
     }
-    sprintf(text, "%d", (int)res->metal);
+    sprintf(text, "%d", bx_ftol(res->metal));
     DrawString(ctx, (unsigned char*)text, sideDef->energyNum.left, sideDef->energyNum.top, -1);
     DrawString(ctx, (unsigned char*)"0", sideDef->energy0.left, sideDef->energy0.top, -1);
-    sprintf(text, "%d", (int)pl->energyCapacity);
+    sprintf(text, "%d", bx_ftol(pl->energyCapacity));
     int w = GetTextWidth(sideDef->font, (unsigned char*)text);
     DrawString(ctx, (unsigned char*)text, sideDef->energyMax.left - w, sideDef->energyMax.top, -1);
     if (res->metalIncome > 99999.0f)
-        sprintf(text, "%dK", (int)res->metalIncome / 1000);
+        sprintf(text, "%dK", bx_ftol(res->metalIncome) / 1000);
     else
-        sprintf(text, "%d", (int)res->metalIncome);
+        sprintf(text, "%d", bx_ftol(res->metalIncome));
     SetTextColors(pal[0xa], GetTextKeyColor());
     DrawString(ctx, (unsigned char*)text, sideDef->energyProduced.left, sideDef->energyProduced.top, -1);
     if (res->metalUse < -99999.0f)
-        sprintf(text, "%dK", (int)res->metalUse / 1000);
+        sprintf(text, "%dK", bx_ftol(res->metalUse) / 1000);
     else
-        sprintf(text, "%d", abs((int)res->metalUse));
+        sprintf(text, "%d", abs(bx_ftol(res->metalUse)));
     SetTextColors(pal[0xc], GetTextKeyColor());
     DrawString(ctx, (unsigned char*)text, sideDef->energyConsumed.left, sideDef->energyConsumed.top, -1);
     r = &sideDef->metalBar;
     bar = *r;
     if (pl->metalCapacity > 0.0f) {
-        bar.right = (int)((double)(bar.right - bar.left) * res->energy / pl->metalCapacity + bar.left);
+        bar.right = bx_ftol((double)(bar.right - bar.left) * res->energy / pl->metalCapacity + bar.left);
         FillRectangle(ctx, &bar, sideDef->metalColor);
         if (pl->shareMetal > 0.0f && pl->metal > pl->shareMetal) {
             box = *r;
-            box.left = (int)((double)(box.right - box.left) * pl->shareMetal / pl->metalCapacity + box.left);
+            box.left = bx_ftol((double)(box.right - box.left) * pl->shareMetal / pl->metalCapacity + box.left);
             box.right = box.left + 2;
             FillRectangle(ctx, &box, pal[0xc]);
         }
     }
     SetTextColors(pal[0xf], GetTextKeyColor());
-    sprintf(text, "%d", (int)res->energy);
+    sprintf(text, "%d", bx_ftol(res->energy));
     DrawString(ctx, (unsigned char*)text, sideDef->metalNum.left, sideDef->metalNum.top, -1);
     DrawString(ctx, (unsigned char*)"0", sideDef->metal0.left, sideDef->metal0.top, -1);
-    sprintf(text, "%d", (int)pl->metalCapacity);
+    sprintf(text, "%d", bx_ftol(pl->metalCapacity));
     w = GetTextWidth(sideDef->font, (unsigned char*)text);
     DrawString(ctx, (unsigned char*)text, sideDef->metalMax.left - w, sideDef->metalMax.top, -1);
     sprintf(text, "%.1f", res->energyIncome);
@@ -1593,8 +1594,8 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         if (type != 0) {
             UnitDef* entry = g_game->defs + type;
             if (_strcmpi(text, "CORBUILD") != 0) {
-                sprintf(text, "%s  M:%d E:%d", entry->name, (int)entry->metalCost,
-                        (int)entry->energyCost);
+                sprintf(text, "%s  M:%d E:%d", entry->name, bx_ftol(entry->metalCost),
+                        bx_ftol(entry->energyCost));
                 DrawString((Surface*)surface, (unsigned char*)text, panel->nameBlock.left,
                              panel->nameBlock.top + yOffset, -1);
                 DrawString((Surface*)surface, (unsigned char*)entry->description, panel->description.left,
@@ -1711,12 +1712,12 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         if ((feature->flagsHigh & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
             char mText[16];
             if (feature->metal != 0.0f)
-                sprintf(mText, " M:%d", (int)feature->metal);
+                sprintf(mText, " M:%d", bx_ftol(feature->metal));
             else
                 mText[0] = 0;
             char eText[16];
             if (feature->energy != 0.0f)
-                sprintf(eText, " E:%d", (int)feature->energy);
+                sprintf(eText, " E:%d", bx_ftol(feature->energy));
             else
                 eText[0] = 0;
             char* name = g_game->endGameFlags_3923b.b1 ? feature->name : feature->description;

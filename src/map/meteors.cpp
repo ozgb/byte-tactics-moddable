@@ -23,6 +23,7 @@
 
 
 #include "../../link/globals.h"
+#include "../util/ftol.h"
 typedef char SimView_g_meteorWeaponName[];
 #undef g_meteorWeaponName
 #define g_meteorWeaponName (*reinterpret_cast<SimView_g_meteorWeaponName*>(&Sim().g_meteorWeaponName))
@@ -69,9 +70,9 @@ void __stdcall SetMeteorParams(const MeteorShowerParams* p)
 {
     strcpy(g_meteorWeaponName, p->weapon);
     g_meteorSpawnMagnitude = p->radius;
-    g_meteorSpawnInterval = (int)(30.0 / p->density);
-    g_meteorShowerDuration = (int)(p->duration * 30.0);
-    g_meteorScheduleGap = (int)(p->interval * BT_REPLAY_INJECT_GAP_SCALE);
+    g_meteorSpawnInterval = bx_ftol(30.0 / p->density);
+    g_meteorShowerDuration = bx_ftol(p->duration * 30.0);
+    g_meteorScheduleGap = bx_ftol(p->interval * BT_REPLAY_INJECT_GAP_SCALE);
 }
 
 static inline Point16 MakePoint(int x, int y)

@@ -17,6 +17,7 @@
 #pragma pack(pop)
 
 #include "../../link/globals.h"
+#include "../util/ftol.h"
 
 int __cdecl AngleOfVector(int a, int b);
 #include "../../interfaces/seams.h"
@@ -95,12 +96,12 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         int lo = a << 16;
         if (lo < 0)
             hi += 0x10000;
-        return (int)_hypot((double)hi, (double)lo);
+        return bx_ftol(_hypot((double)hi, (double)lo));
     }
     case 14:
         return AngleOfVector(a, b) & 0xffff;
     case 15:
-        return (int)_hypot((double)a, (double)b);
+        return bx_ftol(_hypot((double)a, (double)b));
     case 16: {
         Vec3 v;
         v.x = a & 0xffff0000;
@@ -114,7 +115,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         if (unit->buildLeft == 0.0f)
             result = 0;
         else
-            result = 1 - (int)(unit->buildLeft * -99.0f);
+            result = 1 - bx_ftol(unit->buildLeft * -99.0f);
         return result;
     }
     case 18:

@@ -1,6 +1,7 @@
 #include "../../interfaces/seams.h"
 #include "../../interfaces/orders.h"
 #include "../util/engine_services.h"
+#include "../util/ftol.h"
 #include "../movement/ai_search_goal.h"
 #include "../movement/air_maneuver_order.h"
 #include "../units/unit_def.h"
@@ -148,7 +149,7 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
     } p;
     p.w.lo = a->def->buildRate * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
     p.w.hi = 0;
-    int r = (int)((double)p.q / (v * 300.0f));
+    int r = bx_ftol((double)p.q / (v * 300.0f));
     if (r <= 1) {
         r = 1;
     }

@@ -91579,6 +91579,7 @@ call 0 RegionSize
   o result 12505
 call 0 Init
   a map (2501)
+  a region 4305768
   a size 12505
   w region [12505]
 call 0 CreateUnitIndex

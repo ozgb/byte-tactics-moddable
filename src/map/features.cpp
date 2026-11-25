@@ -18,6 +18,7 @@
 #include "feature.h"
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 static inline int Vec3NonZero(Vec3* v)
 {
@@ -228,7 +229,7 @@ void StampFeatureMetal(void)
                     for (int x = x0; x < x0 + f->footprintX; x++) {
                         Cell* cc = g_seams.los_radar->GetMapCell(x, y);
                         if (cc != 0)
-                            cc->metal = (char)f->metal;
+                            cc->metal = (char)bx_ftol(f->metal);
                     }
                 }
             }
@@ -443,7 +444,7 @@ int __stdcall LoadFeatureType(const char* name)
         def->nodrawundergray = 1;
     if (_strcmpi(name, "Fortification_Core") == 0)
         def->nodrawundergray = 1;
-    def->burnTime = (short)(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
+    def->burnTime = (short)bx_ftol(entry->current->GetFieldDouble("sparktime", 0.0) * 30.0);
     entry->current->GetFieldString(seqname, "burnweapon", 0x100, g_emptyText);
     def->burnweapon = (char*)g_seams.weapons->FindWeaponByName(seqname);
     def->anim.index = 0;

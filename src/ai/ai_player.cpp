@@ -23,13 +23,14 @@
 #include "../orders/order.h"
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
     double fx = v->x;
     double fy = v->y;
     double fz = v->z;
-    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+    return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
 }
 
 static inline void Vec3Scale(Vec3* v, int s)
@@ -164,7 +165,7 @@ struct MovableVec3 {
         double fx = x;
         double fy = y;
         double fz = z;
-        return (int)sqrt(fx * fx + fy * fy + fz * fz);
+        return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     }
     void Scale(int s)
     {
@@ -812,12 +813,12 @@ void SquadScoutTimer::OnTimer()
 SpatialTimer::SpatialTimer(SquadManager* p, void* q)
     : SquadTimer(p, (Group*)q)
 {
-    int x = (int)(g_game->baseX / 2 * 65536.0);
-    best = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
-    x = (int)(g_game->baseX / 2 * 65536.0);
-    probe = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
-    x = (int)(g_game->baseX / 2 * 65536.0);
-    step = MakeVec3(x, 0, (int)(g_game->baseY / 2 * 65536.0));
+    int x = bx_ftol(g_game->baseX / 2 * 65536.0);
+    best = MakeVec3(x, 0, bx_ftol(g_game->baseY / 2 * 65536.0));
+    x = bx_ftol(g_game->baseX / 2 * 65536.0);
+    probe = MakeVec3(x, 0, bx_ftol(g_game->baseY / 2 * 65536.0));
+    x = bx_ftol(g_game->baseX / 2 * 65536.0);
+    step = MakeVec3(x, 0, bx_ftol(g_game->baseY / 2 * 65536.0));
     bestRating = 0;
 }
 
@@ -1348,7 +1349,7 @@ void PlayerAI::ComputeBaseWeights()
             a += 15;
         if (def->radardistance)
             a += 5;
-        int x = (int)(a + min(max(def->energymake, 0.0f), 30.0f));
+        int x = bx_ftol(a + min(max(def->energymake, 0.0f), 30.0f));
         if (n == 0)
             x *= 4;
         if (n == 1)
@@ -1368,7 +1369,7 @@ void PlayerAI::ComputeBaseWeights()
         e->a = x;
         e->c = ComputeEnergyRating(def->energyCost, EnergyUseOf, def);
 #ifdef __clang__
-        e->b = (char)max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0)));
+        e->b = (char)bx_ftol(max(0.0f, min(100.0f, (double)(float)((double)def->metalCost * -0.02f + (def->makesMetal ? 25 : 0)) + (def->extractsMetal != 0.0f ? 100 : 0))));
 #else
         e->b = (char)max(0.0f, min(100.0f, (float)(def->metalCost * -0.02f) + (def->makesMetal ? 25 : 0) + (def->extractsMetal != 0.0f ? 100 : 0)));
 #endif
@@ -1383,7 +1384,7 @@ void __stdcall ScaleUnitWeights(int player, unsigned int* mask, float scale, int
         if (mask[i >> 5] & (1 << (i & 0x1f))) {
             int off = i * 4;
             if (*(int*)(off + (int)p->vec_bd.Begin()) == 0) {
-                p->vec_ad[i].value = (unsigned char)__min(__max((int)(p->vec_ad[i].value * scale), 0), 100);
+                p->vec_ad[i].value = (unsigned char)__min(__max(bx_ftol(p->vec_ad[i].value * scale), 0), 100);
                 if (lock)
                     *(int*)(off + (int)p->vec_bd.Begin()) = 1;
             }
@@ -1669,10 +1670,10 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     if(p->energy<50.0f) return 0;
     if(p->metal<25.0f) return 0;
     if(g_seams.mission->GetGameType()==1 && (g_game->defs[type].flags1&0x20)) return 0;
-    int energyCap=min(1000,(int)p->energyCapacity);
-    int metalCap=min(500,(int)p->metalCapacity);
-    int energy=(int)Max(0.0f,(energyCap-p->energy)*0.125f);
-    int metal=(int)Max(0.0f,(metalCap-p->metal)*0.25f);
+    int energyCap=min(1000,bx_ftol(p->energyCapacity));
+    int metalCap=min(500,bx_ftol(p->metalCapacity));
+    int energy=bx_ftol(Max(0.0f,(energyCap-p->energy)*0.125f));
+    int metal=bx_ftol(Max(0.0f,(metalCap-p->metal)*0.25f));
     if((p->energyIncome - p->energyUsage)<1.0f) energy+=20;
     if((p->metalIncome - p->metalUsage)<1.0f) metal+=20;
     if(p->energyIncome<50.0f) energy+=100;

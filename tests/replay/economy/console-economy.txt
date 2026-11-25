@@ -9,8 +9,6 @@ call 0 Init
   w region [120048]
 call 30 UpdatePlayerEconomy
   r region 66:c841 90:803f 12066:8c41 12070:803f 12088:3333333f
-  r Player#0.energy f32:0x44fa0000
-  r Player#0.metal f32:0x42480000
   r Player#0.energyIncome f32:0x41c80000
   r Player#0.energyUsage f32:0x00000000
   r Player#0.energyCapacity f32:0x447a0000
@@ -26,8 +24,8 @@ call 30 UpdatePlayerEconomy
   r Player#0.energyStorageBonus f32:0x447a0000
   r Player#0.metalStorageBonus f32:0x447a0000
   r Player#0.econ UnitResources#1
-  r Player#1.energy f32:0x41a00000
-  r Player#1.metal f32:0x447a0000
+  r Player#0.energy f32:0x44fa0000
+  r Player#0.metal f32:0x42480000
   r Player#1.energyIncome f32:0x418c0000
   r Player#1.energyUsage f32:0x3f800000
   r Player#1.energyCapacity f32:0x447a0000
@@ -43,8 +41,8 @@ call 30 UpdatePlayerEconomy
   r Player#1.energyStorageBonus f32:0x447a0000
   r Player#1.metalStorageBonus f32:0x447a0000
   r Player#1.econ UnitResources#2
-  r Player#2.energy f32:0x447a0000
-  r Player#2.metal f32:0x447a0000
+  r Player#1.energy f32:0x41a00000
+  r Player#1.metal f32:0x447a0000
   r Player#2.energyIncome f32:0x00000000
   r Player#2.energyUsage f32:0x00000000
   r Player#2.energyCapacity f32:0x00000000
@@ -60,8 +58,8 @@ call 30 UpdatePlayerEconomy
   r Player#2.energyStorageBonus f32:0x00000000
   r Player#2.metalStorageBonus f32:0x00000000
   r Player#2.econ null
-  r Player#3.energy f32:0x447a0000
-  r Player#3.metal f32:0x447a0000
+  r Player#2.energy f32:0x447a0000
+  r Player#2.metal f32:0x447a0000
   r Player#3.energyIncome f32:0x00000000
   r Player#3.energyUsage f32:0x00000000
   r Player#3.energyCapacity f32:0x00000000
@@ -77,8 +75,8 @@ call 30 UpdatePlayerEconomy
   r Player#3.energyStorageBonus f32:0x00000000
   r Player#3.metalStorageBonus f32:0x00000000
   r Player#3.econ null
-  r Player#4.energy f32:0x447a0000
-  r Player#4.metal f32:0x447a0000
+  r Player#3.energy f32:0x447a0000
+  r Player#3.metal f32:0x447a0000
   r Player#4.energyIncome f32:0x00000000
   r Player#4.energyUsage f32:0x00000000
   r Player#4.energyCapacity f32:0x00000000
@@ -94,8 +92,8 @@ call 30 UpdatePlayerEconomy
   r Player#4.energyStorageBonus f32:0x00000000
   r Player#4.metalStorageBonus f32:0x00000000
   r Player#4.econ null
-  r Player#5.energy f32:0x447a0000
-  r Player#5.metal f32:0x447a0000
+  r Player#4.energy f32:0x447a0000
+  r Player#4.metal f32:0x447a0000
   r Player#5.energyIncome f32:0x00000000
   r Player#5.energyUsage f32:0x00000000
   r Player#5.energyCapacity f32:0x00000000
@@ -111,8 +109,8 @@ call 30 UpdatePlayerEconomy
   r Player#5.energyStorageBonus f32:0x00000000
   r Player#5.metalStorageBonus f32:0x00000000
   r Player#5.econ null
-  r Player#6.energy f32:0x447a0000
-  r Player#6.metal f32:0x447a0000
+  r Player#5.energy f32:0x447a0000
+  r Player#5.metal f32:0x447a0000
   r Player#6.energyIncome f32:0x00000000
   r Player#6.energyUsage f32:0x00000000
   r Player#6.energyCapacity f32:0x00000000
@@ -128,8 +126,8 @@ call 30 UpdatePlayerEconomy
   r Player#6.energyStorageBonus f32:0x00000000
   r Player#6.metalStorageBonus f32:0x00000000
   r Player#6.econ null
-  r Player#7.energy f32:0x447a0000
-  r Player#7.metal f32:0x447a0000
+  r Player#6.energy f32:0x447a0000
+  r Player#6.metal f32:0x447a0000
   r Player#7.energyIncome f32:0x00000000
   r Player#7.energyUsage f32:0x00000000
   r Player#7.energyCapacity f32:0x00000000
@@ -145,8 +143,8 @@ call 30 UpdatePlayerEconomy
   r Player#7.energyStorageBonus f32:0x00000000
   r Player#7.metalStorageBonus f32:0x00000000
   r Player#7.econ null
-  r Player#8.energy f32:0x447a0000
-  r Player#8.metal f32:0x447a0000
+  r Player#7.energy f32:0x447a0000
+  r Player#7.metal f32:0x447a0000
   r Player#8.energyIncome f32:0x00000000
   r Player#8.energyUsage f32:0x00000000
   r Player#8.energyCapacity f32:0x00000000
@@ -162,8 +160,8 @@ call 30 UpdatePlayerEconomy
   r Player#8.energyStorageBonus f32:0x00000000
   r Player#8.metalStorageBonus f32:0x00000000
   r Player#8.econ null
-  r Player#9.energy f32:0x447a0000
-  r Player#9.metal f32:0x447a0000
+  r Player#8.energy f32:0x447a0000
+  r Player#8.metal f32:0x447a0000
   r Player#9.energyIncome f32:0x00000000
   r Player#9.energyUsage f32:0x00000000
   r Player#9.energyCapacity f32:0x00000000
@@ -179,6 +177,8 @@ call 30 UpdatePlayerEconomy
   r Player#9.energyStorageBonus f32:0x00000000
   r Player#9.metalStorageBonus f32:0x00000000
   r Player#9.econ null
+  r Player#9.energy f32:0x447a0000
+  r Player#9.metal f32:0x447a0000
   r UnitResources#1.energyMake f32:0x00000000
   r UnitResources#1.energyUse f32:0x00000000
   r UnitResources#1.energyUsePaid f32:0x00000000
@@ -1713,11 +1713,11 @@ call 30 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.energy f32:0x447a0000
-  w Player#0.metal f32:0x424c0000
   w Player#0.totalEnergyProduced f64:0x4049000000000000
   w Player#0.totalMetalProduced f64:0x4000000000000000
   w Player#0.energyWasted f64:0x4090680000000000
+  w Player#0.energy f32:0x447a0000
+  w Player#0.metal f32:0x424c0000
 call 30 UpdatePlayerEconomy
   a player 1
   i econworld.PlayerInfo 1 = (1,2,1,0,0,0,0,1,1)
@@ -3230,11 +3230,11 @@ call 30 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#500 = 0
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
-  w Player#1.energy f32:0x42120000
   w Player#1.totalEnergyProduced f64:0x4041800000000000
   w Player#1.totalMetalProduced f64:0x3ff6666660000000
   w Player#1.totalEnergyConsumed f64:0x4000000000000000
   w Player#1.metalWasted f64:0x3ff6668000000000
+  w Player#1.energy f32:0x42120000
 call 40 Spend
   a spend (3,0,null,2,f32:0x00000000,f32:0x424c0000)
   o result 1
@@ -4792,14 +4792,14 @@ call 60 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.energy f32:0x44674000
-  w Player#0.metal f32:0x3f800000
   w Player#0.energyUsage f32:0x42c80000
   w Player#0.metalUsage f32:0x424c0000
   w Player#0.totalEnergyProduced f64:0x4052c00000000000
   w Player#0.totalMetalProduced f64:0x4008000000000000
   w Player#0.totalEnergyConsumed f64:0x4059000000000000
   w Player#0.totalMetalConsumed f64:0x4049800000000000
+  w Player#0.energy f32:0x44674000
+  w Player#0.metal f32:0x3f800000
   w UnitResources#1.energyUse f32:0x00000000
   w UnitResources#1.energyUsePrev f32:0x42c80000
   w UnitResources#1.metalUse f32:0x00000000
@@ -6316,13 +6316,13 @@ call 60 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#500 = 0
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
-  w Player#1.energy f32:0x42f60000
   w Player#1.energyIncome f32:0x42af0000
   w Player#1.metalIncome f32:0x4211999a
   w Player#1.totalEnergyProduced f64:0x405ea00000000000
   w Player#1.totalMetalProduced f64:0x4042e66673000000
   w Player#1.totalEnergyConsumed f64:0x4008000000000000
   w Player#1.metalWasted f64:0x4042e66800000000
+  w Player#1.energy f32:0x42f60000
   w UnitResources#2.energyMake f32:0x00000000
   w UnitResources#2.energyMakePrev f32:0x428c0000
   w UnitResources#2.metalMake f32:0x00000000
@@ -7838,12 +7838,12 @@ call 90 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.energy f32:0x446d8000
-  w Player#0.metal f32:0x40000000
   w Player#0.energyUsage f32:0x00000000
   w Player#0.metalUsage f32:0x00000000
   w Player#0.totalEnergyProduced f64:0x4059000000000000
   w Player#0.totalMetalProduced f64:0x4010000000000000
+  w Player#0.energy f32:0x446d8000
+  w Player#0.metal f32:0x40000000
   w UnitResources#1.energyUsePrev f32:0x00000000
   w UnitResources#1.metalUsePrev f32:0x00000000
 call 90 UpdatePlayerEconomy
@@ -9358,13 +9358,13 @@ call 90 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#500 = 0
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
-  w Player#1.energy f32:0x430b8000
   w Player#1.energyIncome f32:0x418c0000
   w Player#1.metalIncome f32:0x3f333333
   w Player#1.totalEnergyProduced f64:0x4061800000000000
   w Player#1.totalMetalProduced f64:0x404340000c800000
   w Player#1.totalEnergyConsumed f64:0x4010000000000000
   w Player#1.metalWasted f64:0x4043400200000000
+  w Player#1.energy f32:0x430b8000
   w UnitResources#2.energyMakePrev f32:0x00000000
   w UnitResources#2.metalMakePrev f32:0x00000000
 call 100 Spend
@@ -10894,11 +10894,11 @@ call 120 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.energy f32:0x4473c000
-  w Player#0.metal f32:0x42ce0000
   w Player#0.metalIncome f32:0x42ca0000
   w Player#0.totalEnergyProduced f64:0x405f400000000000
   w Player#0.totalMetalProduced f64:0x405a400000000000
+  w Player#0.energy f32:0x4473c000
+  w Player#0.metal f32:0x42ce0000
   w UnitResources#1.metalMake f32:0x00000000
   w UnitResources#1.metalMakePrev f32:0x42c80000
 call 120 UpdatePlayerEconomy
@@ -12413,13 +12413,13 @@ call 120 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#500 = 0
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
-  w Player#1.energy f32:0x431c0000
-  w Player#1.metal f32:0x44612ccd
   w Player#1.metalUsage f32:0x42c80000
   w Player#1.totalEnergyProduced f64:0x4063b00000000000
   w Player#1.totalMetalProduced f64:0x40439999a6000000
   w Player#1.totalEnergyConsumed f64:0x4014000000000000
   w Player#1.totalMetalConsumed f64:0x4059000000000000
+  w Player#1.energy f32:0x431c0000
+  w Player#1.metal f32:0x44612ccd
   w UnitResources#2.metalUse f32:0x00000000
   w UnitResources#2.metalUsePrev f32:0x42c80000
 call 128 Apply
@@ -13946,11 +13946,11 @@ call 150 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.energy f32:0x447a0000
-  w Player#0.metal f32:0x42d00000
   w Player#0.metalIncome f32:0x3f800000
   w Player#0.totalEnergyProduced f64:0x4062c00000000000
   w Player#0.totalMetalProduced f64:0x405a800000000000
+  w Player#0.energy f32:0x447a0000
+  w Player#0.metal f32:0x42d00000
   w UnitResources#1.metalMakePrev f32:0x00000000
 call 150 UpdatePlayerEconomy
   a player 1
@@ -15470,12 +15470,12 @@ call 150 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#500 = 0
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
-  w Player#1.energy f32:0x432c8000
-  w Player#1.metal f32:0x4461599a
   w Player#1.metalUsage f32:0x00000000
   w Player#1.totalEnergyProduced f64:0x4065e00000000000
   w Player#1.totalMetalProduced f64:0x4043f3333f800000
   w Player#1.totalEnergyConsumed f64:0x4018000000000000
+  w Player#1.energy f32:0x432c8000
+  w Player#1.metal f32:0x4461599a
   w UnitResources#2.metalUsePrev f32:0x00000000
 call 169 RequestGranted
   a unit Unit#251
@@ -17180,10 +17180,10 @@ call 180 UpdatePlayerEconomy
   i econworld.UnitInfo Unit#250 = 0
   o uinfo (0,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#250 = Unit#251
-  w Player#0.metal f32:0x42d20000
   w Player#0.totalEnergyProduced f64:0x4065e00000000000
   w Player#0.totalMetalProduced f64:0x405ac00000000000
   w Player#0.energyWasted f64:0x4090cc0000000000
+  w Player#0.metal f32:0x42d20000
 call 180 UpdatePlayerEconomy
   a player 1
   i econworld.PlayerInfo 1 = (1,2,1,0,0,0,0,1,1)
@@ -18703,14 +18703,14 @@ call 180 UpdatePlayerEconomy
   o uinfo (1,0,0,0,0,0,0,0,f32:0x00000000,f32:0x00000000,0,0,0,0,0)
   i econworld.NextUnit Unit#500 = Unit#501
   w region 12052:0000000000000000 12068:10f42042 12076:0000000000000000 12092:051be040
-  w Player#1.energy f32:0x4315c2fc
-  w Player#1.metal f32:0x445fc631
   w Player#1.energyUsage f32:0x4220f410
   w Player#1.metalUsage f32:0x40e01b05
   w Player#1.totalEnergyProduced f64:0x4068100000000000
   w Player#1.totalMetalProduced f64:0x40444cccd9000000
   w Player#1.totalEnergyConsumed f64:0x40471e8200000000
   w Player#1.totalMetalConsumed f64:0x405ac0360a000000
+  w Player#1.energy f32:0x4315c2fc
+  w Player#1.metal f32:0x445fc631
 call 181 RequestGranted
   a unit Unit#251
   a resources 3

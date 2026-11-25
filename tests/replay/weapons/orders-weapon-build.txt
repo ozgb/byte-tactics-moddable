@@ -8,26 +8,15 @@ call 700 UpdateUnitWeapons
   r rng.main 0x10e367d4
   r rng.load 0x4cb6cfba
   r rng.seed 0x65020525
-  r Unit#1.health 3000
-  r Unit#1.def UnitDef#34
-  r Unit#1.flags 0x90e00321
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
-  r Unit#1.playerIndex 0
   r Unit#1.owner Player#0
-  r Unit#1.motion UnitMotion#1
-  r Unit#1.posX 36700160
-  r Unit#1.posY 65536
-  r Unit#1.posZ 15728640
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ -32768
-  r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ -32768
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ -32768
   r Unit#1.weapon2Def weapondef#22
@@ -49,6 +38,17 @@ call 700 UpdateUnitWeapons
   r Unit#1.weapon2FirePitch 0
   r Unit#1.weapon2Stockpile 0
   r Unit#1.weapon2MuzzleDelta 0
+  r Unit#1.flags 0x90e00321
+  r Unit#1.health 3000
+  r Unit#1.def UnitDef#34
+  r Unit#1.playerIndex 0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 36700160
+  r Unit#1.posY 65536
+  r Unit#1.posZ 15728640
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
   r Projectile#0.speed 0
   r Projectile#0.spawnTick 0
   r Projectile#0.attacker null
@@ -8405,10 +8405,29 @@ call 700 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#34.maxHealth 3000
-  r UnitDef#34.modelMaxYHigh 39
   r Player#0.energy f32:0x47654c00
   r Player#0.metal f32:0x46ea4200
+  r weapondef#22.flags 0x04480a09
+  r weapondef#22.speed 436906
+  r weapondef#22.acceleration 0
+  r weapondef#22.accuracy 0
+  r weapondef#22.burst 0
+  r weapondef#22.coverage 0
+  r weapondef#22.energyPerShot f32:0x43c80000
+  r weapondef#22.metalPerShot f32:0x00000000
+  r weapondef#22.pitch f32:0xbe490fdb
+  r weapondef#22.lifetime 120
+  r weapondef#22.pitchTolerance 0
+  r weapondef#22.range 240
+  r weapondef#22.reloadTime 36
+  r weapondef#22.sound 59
+  r weapondef#22.startSpeed 0
+  r weapondef#22.tolerance 0
+  r Unit#1.weapons[0].aimCob.nAimCobDone 0
+  r Unit#1.weapons[1].aimCob.nAimCobDone 0
+  r Unit#1.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#34.modelMaxYHigh 39
+  r UnitDef#34.maxHealth 3000
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
   r weapondef#20.speed 873813
@@ -8442,25 +8461,6 @@ call 700 UpdateUnitWeapons
   r weapondef#0.sound 65535
   r weapondef#0.startSpeed 0
   r weapondef#0.tolerance 0
-  r weapondef#22.flags 0x04480a09
-  r weapondef#22.speed 436906
-  r weapondef#22.acceleration 0
-  r weapondef#22.accuracy 0
-  r weapondef#22.burst 0
-  r weapondef#22.coverage 0
-  r weapondef#22.energyPerShot f32:0x43c80000
-  r weapondef#22.metalPerShot f32:0x00000000
-  r weapondef#22.pitch f32:0xbe490fdb
-  r weapondef#22.lifetime 120
-  r weapondef#22.pitchTolerance 0
-  r weapondef#22.range 240
-  r weapondef#22.reloadTime 36
-  r weapondef#22.sound 59
-  r weapondef#22.startSpeed 0
-  r weapondef#22.tolerance 0
-  r Unit#1.weapons[0].aimCob.nAimCobDone 0
-  r Unit#1.weapons[1].aimCob.nAimCobDone 0
-  r Unit#1.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8471,26 +8471,15 @@ call 700 UpdateUnitWeapons
   o y 0
   o z 0
 call 700 UpdateUnitWeapons
-  r Unit#2.health 780
-  r Unit#2.def UnitDef#10
-  r Unit#2.flags 0xb0e80321
   r Unit#2.script CobScript#2
   r Unit#2.id 2
   r Unit#2.killCount 0
-  r Unit#2.playerIndex 0
   r Unit#2.owner Player#0
-  r Unit#2.motion null
-  r Unit#2.posX 41943040
-  r Unit#2.posY 65536
-  r Unit#2.posZ 16777216
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ -32768
-  r Unit#2.weapon0Def weapondef#30
   r Unit#2.weapon0Flags 18
   r Unit#2.weapon1TargetX 0
   r Unit#2.weapon1TargetZ -32768
-  r Unit#2.weapon1Def weapondef#0
-  r Unit#2.weapon1Flags 20
   r Unit#2.weapon2TargetX 0
   r Unit#2.weapon2TargetZ -32768
   r Unit#2.weapon2Def weapondef#0
@@ -8512,8 +8501,22 @@ call 700 UpdateUnitWeapons
   r Unit#2.weapon2FirePitch 0
   r Unit#2.weapon2Stockpile 0
   r Unit#2.weapon2MuzzleDelta 0
-  r UnitDef#10.maxHealth 780
+  r Unit#2.flags 0xb0e80321
+  r Unit#2.health 780
+  r Unit#2.def UnitDef#10
+  r Unit#2.playerIndex 0
+  r Unit#2.motion null
+  r Unit#2.posX 41943040
+  r Unit#2.posY 65536
+  r Unit#2.posZ 16777216
+  r Unit#2.weapon0Def weapondef#30
+  r Unit#2.weapon1Def weapondef#0
+  r Unit#2.weapon1Flags 20
+  r Unit#2.weapons[0].aimCob.nAimCobDone 0
+  r Unit#2.weapons[1].aimCob.nAimCobDone 0
+  r Unit#2.weapons[2].aimCob.nAimCobDone 0
   r UnitDef#10.modelMaxYHigh 46
+  r UnitDef#10.maxHealth 780
   r weapondef#30.flags 0x59143211
   r weapondef#30.speed 1747626
   r weapondef#30.acceleration 4369
@@ -8530,35 +8533,21 @@ call 700 UpdateUnitWeapons
   r weapondef#30.sound 69
   r weapondef#30.startSpeed 0
   r weapondef#30.tolerance 4000
-  r Unit#2.weapons[0].aimCob.nAimCobDone 0
-  r Unit#2.weapons[1].aimCob.nAimCobDone 0
-  r Unit#2.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#2
   i services.ScheduleTargetingTargetPos Unit#2 0 = 0
   o x 0
   o y 0
   o z 0
 call 700 UpdateUnitWeapons
-  r Unit#251.health 3000
-  r Unit#251.def UnitDef#167
-  r Unit#251.flags 0x90e40025
   r Unit#251.script CobScript#3
   r Unit#251.id 251
   r Unit#251.killCount 0
-  r Unit#251.playerIndex 1
   r Unit#251.owner Player#1
-  r Unit#251.motion UnitMotion#2
-  r Unit#251.posX 199814850
-  r Unit#251.posY 65536
-  r Unit#251.posZ 87033569
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ -32768
-  r Unit#251.weapon0Def weapondef#21
   r Unit#251.weapon0Flags 18
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ -32768
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ -32768
   r Unit#251.weapon2Def weapondef#23
@@ -8580,27 +8569,19 @@ call 700 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 1495040
-  r UnitDef#167.maxHealth 3000
-  r UnitDef#167.modelMaxYHigh 38
+  r Unit#251.flags 0x90e40025
+  r Unit#251.health 3000
+  r Unit#251.def UnitDef#167
+  r Unit#251.playerIndex 1
+  r Unit#251.motion UnitMotion#2
+  r Unit#251.posX 199814850
+  r Unit#251.posY 65536
+  r Unit#251.posZ 87033569
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
   r Player#1.energy f32:0x447a0000
   r Player#1.metal f32:0x447a0000
-  r UnitMotion#2.speed 70123
-  r weapondef#21.flags 0x00080809
-  r weapondef#21.speed 873813
-  r weapondef#21.acceleration 0
-  r weapondef#21.accuracy 0
-  r weapondef#21.burst 0
-  r weapondef#21.coverage 0
-  r weapondef#21.energyPerShot f32:0x00000000
-  r weapondef#21.metalPerShot f32:0x00000000
-  r weapondef#21.pitch f32:0xbe490fdb
-  r weapondef#21.lifetime 0
-  r weapondef#21.pitchTolerance 0
-  r weapondef#21.range 200
-  r weapondef#21.reloadTime 30
-  r weapondef#21.sound 57
-  r weapondef#21.startSpeed 0
-  r weapondef#21.tolerance 0
   r weapondef#23.flags 0x04480a09
   r weapondef#23.speed 436906
   r weapondef#23.acceleration 0
@@ -8620,6 +8601,25 @@ call 700 UpdateUnitWeapons
   r Unit#251.weapons[0].aimCob.nAimCobDone 0
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#167.modelMaxYHigh 38
+  r UnitDef#167.maxHealth 3000
+  r UnitMotion#2.speed 70123
+  r weapondef#21.flags 0x00080809
+  r weapondef#21.speed 873813
+  r weapondef#21.acceleration 0
+  r weapondef#21.accuracy 0
+  r weapondef#21.burst 0
+  r weapondef#21.coverage 0
+  r weapondef#21.energyPerShot f32:0x00000000
+  r weapondef#21.metalPerShot f32:0x00000000
+  r weapondef#21.pitch f32:0xbe490fdb
+  r weapondef#21.lifetime 0
+  r weapondef#21.pitchTolerance 0
+  r weapondef#21.range 200
+  r weapondef#21.reloadTime 30
+  r weapondef#21.sound 57
+  r weapondef#21.startSpeed 0
+  r weapondef#21.tolerance 0
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9055,8 +9055,8 @@ call 701 UpdateUnitWeapons
   o y 0
   o z 0
 call 701 UpdateUnitWeapons
-  r Unit#251.posX 199744727
   r Unit#251.heading 16353
+  r Unit#251.posX 199744727
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9084,9 +9084,9 @@ call 702 UpdateUnitWeapons
   o y 0
   o z 0
 call 702 UpdateUnitWeapons
+  r Unit#251.heading 16348
   r Unit#251.posX 199674613
   r Unit#251.posZ 87032704
-  r Unit#251.heading 16348
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9114,8 +9114,8 @@ call 703 UpdateUnitWeapons
   o y 0
   o z 0
 call 703 UpdateUnitWeapons
-  r Unit#251.posX 199604490
   r Unit#251.heading 16363
+  r Unit#251.posX 199604490
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9143,9 +9143,9 @@ call 704 UpdateUnitWeapons
   o y 0
   o z 0
 call 704 UpdateUnitWeapons
+  r Unit#251.heading 15333
   r Unit#251.posX 199534701
   r Unit#251.posZ 87025830
-  r Unit#251.heading 15333
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9173,9 +9173,9 @@ call 705 UpdateUnitWeapons
   o y 0
   o z 0
 call 705 UpdateUnitWeapons
+  r Unit#251.heading 14303
   r Unit#251.posX 199466102
   r Unit#251.posZ 87011304
-  r Unit#251.heading 14303
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9203,9 +9203,9 @@ call 706 UpdateUnitWeapons
   o y 0
   o z 0
 call 706 UpdateUnitWeapons
+  r Unit#251.heading 13273
   r Unit#251.posX 199399257
   r Unit#251.posZ 86990127
-  r Unit#251.heading 13273
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9233,9 +9233,9 @@ call 707 UpdateUnitWeapons
   o y 0
   o z 0
 call 707 UpdateUnitWeapons
+  r Unit#251.heading 12243
   r Unit#251.posX 199334809
   r Unit#251.posZ 86962496
-  r Unit#251.heading 12243
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9263,9 +9263,9 @@ call 708 UpdateUnitWeapons
   o y 0
   o z 0
 call 708 UpdateUnitWeapons
+  r Unit#251.heading 11213
   r Unit#251.posX 199273374
   r Unit#251.posZ 86928684
-  r Unit#251.heading 11213
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9293,9 +9293,9 @@ call 709 UpdateUnitWeapons
   o y 0
   o z 0
 call 709 UpdateUnitWeapons
+  r Unit#251.heading 10183
   r Unit#251.posX 199215552
   r Unit#251.posZ 86889017
-  r Unit#251.heading 10183
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9323,9 +9323,9 @@ call 710 UpdateUnitWeapons
   o y 0
   o z 0
 call 710 UpdateUnitWeapons
+  r Unit#251.heading 9153
   r Unit#251.posX 199161898
   r Unit#251.posZ 86843872
-  r Unit#251.heading 9153
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9353,9 +9353,9 @@ call 711 UpdateUnitWeapons
   o y 0
   o z 0
 call 711 UpdateUnitWeapons
+  r Unit#251.heading 8873
   r Unit#251.posX 199109366
   r Unit#251.posZ 86797417
-  r Unit#251.heading 8873
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9383,9 +9383,9 @@ call 712 UpdateUnitWeapons
   o y 0
   o z 0
 call 712 UpdateUnitWeapons
+  r Unit#251.heading 8875
   r Unit#251.posX 199056834
   r Unit#251.posZ 86750962
-  r Unit#251.heading 8875
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9413,9 +9413,9 @@ call 713 UpdateUnitWeapons
   o y 0
   o z 0
 call 713 UpdateUnitWeapons
+  r Unit#251.heading 8878
   r Unit#251.posX 199004302
   r Unit#251.posZ 86704507
-  r Unit#251.heading 8878
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9444,9 +9444,9 @@ call 714 UpdateUnitWeapons
   o y 0
   o z 0
 call 714 UpdateUnitWeapons
+  r Unit#251.heading 8881
   r Unit#251.posX 198951770
   r Unit#251.posZ 86658052
-  r Unit#251.heading 8881
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9474,9 +9474,9 @@ call 715 UpdateUnitWeapons
   o y 0
   o z 0
 call 715 UpdateUnitWeapons
+  r Unit#251.heading 8884
   r Unit#251.posX 198899238
   r Unit#251.posZ 86611597
-  r Unit#251.heading 8884
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9504,9 +9504,9 @@ call 716 UpdateUnitWeapons
   o y 0
   o z 0
 call 716 UpdateUnitWeapons
+  r Unit#251.heading 8888
   r Unit#251.posX 198846706
   r Unit#251.posZ 86565142
-  r Unit#251.heading 8888
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9534,9 +9534,9 @@ call 717 UpdateUnitWeapons
   o y 0
   o z 0
 call 717 UpdateUnitWeapons
+  r Unit#251.heading 8893
   r Unit#251.posX 198794174
   r Unit#251.posZ 86518687
-  r Unit#251.heading 8893
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9564,9 +9564,9 @@ call 718 UpdateUnitWeapons
   o y 0
   o z 0
 call 718 UpdateUnitWeapons
+  r Unit#251.heading 8898
   r Unit#251.posX 198741642
   r Unit#251.posZ 86472232
-  r Unit#251.heading 8898
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9594,9 +9594,9 @@ call 719 UpdateUnitWeapons
   o y 0
   o z 0
 call 719 UpdateUnitWeapons
+  r Unit#251.heading 8904
   r Unit#251.posX 198689110
   r Unit#251.posZ 86425777
-  r Unit#251.heading 8904
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -9638,18 +9638,18 @@ call 720 UpdateUnitWeapons
   o z 0
 call 720 Apply
   r Game.localPlayer 0
-  r Unit#251.player Player#1
   r Unit#251.activateFlags 1
-  r UnitDef#167.flags1 0x0495c0c8
+  r Unit#251.player Player#1
+  r weapondef#23.index 23
   r UnitDef#167.damagemodifier 65536
-  r UnitDef#167.weapons0 weapondef#21
   r UnitDef#167.weapons1 weapondef#0
   r UnitDef#167.weapons2 weapondef#23
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.weapons0 weapondef#21
   r Player#1.active 1
   r Player#1.type 2
   r weapondef#21.index 21
   r weapondef#0.index 0
-  r weapondef#23.index 23
   a event.kind 260
   a event.unit Unit#251
   a event.weapon 3
@@ -9660,26 +9660,15 @@ call 720 Apply
   w Unit#251.weapon2Flags 10
   o result 1
 call 720 Apply
-  r Unit#252.health 0
-  r Unit#252.def UnitDef#208
-  r Unit#252.player Player#1
-  r Unit#252.flags 0x30010021
   r Unit#252.activateFlags 0
   r Unit#252.script null
   r Unit#252.id 252
   r Unit#252.killCount 0
-  r Unit#252.playerIndex 1
-  r Unit#252.posX 195559424
-  r Unit#252.posY 65536
-  r Unit#252.posZ 83361792
   r Unit#252.weapon0TargetX 0
   r Unit#252.weapon0TargetZ 0
-  r Unit#252.weapon0Def null
   r Unit#252.weapon0Flags 0
   r Unit#252.weapon1TargetX 0
   r Unit#252.weapon1TargetZ 0
-  r Unit#252.weapon1Def null
-  r Unit#252.weapon1Flags 0
   r Unit#252.weapon2TargetX 0
   r Unit#252.weapon2TargetZ 0
   r Unit#252.weapon2Def null
@@ -9699,15 +9688,26 @@ call 720 Apply
   r Unit#252.weapon2FirePitch 0
   r Unit#252.weapon2Stockpile 0
   r Unit#252.weapon2MuzzleDelta 0
-  r UnitDef#208.flags1 0x0084008a
-  r UnitDef#208.damagemodifier 65536
-  r UnitDef#208.maxHealth 175
-  r UnitDef#208.weapons0 weapondef#0
-  r UnitDef#208.weapons1 weapondef#0
-  r UnitDef#208.weapons2 weapondef#0
+  r Unit#252.flags 0x30010021
+  r Unit#252.health 0
+  r Unit#252.def UnitDef#208
+  r Unit#252.player Player#1
+  r Unit#252.playerIndex 1
+  r Unit#252.posX 195559424
+  r Unit#252.posY 65536
+  r Unit#252.posZ 83361792
+  r Unit#252.weapon0Def null
+  r Unit#252.weapon1Def null
+  r Unit#252.weapon1Flags 0
   r Unit#252.weapons[0].aimCob.nAimCobDone 0
   r Unit#252.weapons[1].aimCob.nAimCobDone 0
   r Unit#252.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#208.damagemodifier 65536
+  r UnitDef#208.weapons1 weapondef#0
+  r UnitDef#208.weapons2 weapondef#0
+  r UnitDef#208.flags1 0x0084008a
+  r UnitDef#208.maxHealth 175
+  r UnitDef#208.weapons0 weapondef#0
   a event.kind 259
   a event.unit Unit#252
   a event.weapon 0
@@ -9726,8 +9726,8 @@ call 720 Apply
   a size 12
   o result 1
 call 720 Apply
-  r Unit#252.flags 0x30290021
   r Unit#252.script CobScript#4
+  r Unit#252.flags 0x30290021
   a event.kind 261
   a event.unit Unit#252
   a size 8
@@ -9747,20 +9747,20 @@ call 720 Apply
   i scripts.GetAimFromPosition Unit#252 2
   o out (195559424,65536,83361792)
   i services.SchedPublish 6 44
-  w Unit#252.weapon0Def weapondef#0
   w Unit#252.weapon0Flags 16
-  w Unit#252.weapon1Def weapondef#0
-  w Unit#252.weapon1Flags 20
   w Unit#252.weapon2Def weapondef#0
   w Unit#252.weapon2Flags 24
+  w Unit#252.weapon0Def weapondef#0
+  w Unit#252.weapon1Def weapondef#0
+  w Unit#252.weapon1Flags 20
   o result 1
 call 720 UpdateUnitWeapons
   r rng.seed 0x5e0f5cdb
-  r Unit#252.flags 0x30280021
   r Unit#252.owner Player#1
-  r Unit#252.motion null
   r Unit#252.heading -32382
   r Unit#252.pitch 0
+  r Unit#252.flags 0x30280021
+  r Unit#252.motion null
   r UnitDef#208.modelMaxYHigh 22
   a unit Unit#252
 call 720 Apply
@@ -11078,8 +11078,8 @@ call 764 UpdateUnitWeapons
   o y 0
   o z 0
 call 764 UpdateUnitWeapons
-  r Unit#252.health 1
   r Unit#252.flags 0x30282021
+  r Unit#252.health 1
   a unit Unit#252
 call 764 UpdateExplosions
 call 765 UpdateUnitWeapons

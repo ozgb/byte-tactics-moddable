@@ -8,26 +8,26 @@ call 0 Init
   a size 120048
   w region [120048]
 call 900 Apply
-  r Player#0.index 0
   r Player#0.econ UnitResources#1
-  r Player#1.index 1
+  r Player#0.index 0
   r Player#1.econ UnitResources#2
-  r Player#2.index 2
+  r Player#1.index 1
   r Player#2.econ null
-  r Player#3.index 3
+  r Player#2.index 2
   r Player#3.econ null
-  r Player#4.index 10
+  r Player#3.index 3
   r Player#4.econ null
-  r Player#5.index 10
+  r Player#4.index 10
   r Player#5.econ null
-  r Player#6.index 10
+  r Player#5.index 10
   r Player#6.econ null
-  r Player#7.index 10
+  r Player#6.index 10
   r Player#7.econ null
-  r Player#8.index 10
+  r Player#7.index 10
   r Player#8.econ null
-  r Player#9.index 10
+  r Player#8.index 10
   r Player#9.econ null
+  r Player#9.index 10
   r UnitResources#1.energyMake f32:0x00000000
   r UnitResources#1.energyUse f32:0x00000000
   r UnitResources#1.energyUsePaid f32:0x00000000

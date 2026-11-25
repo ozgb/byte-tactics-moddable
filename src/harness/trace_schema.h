@@ -281,7 +281,7 @@ static const TraceField kDebrisFields[] = {
     { "angle_x", 0x4c, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "angle_y", 0x4e, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "angle_z", 0x50, 2, TF_SCALAR, TT_NONE, 0x0 },
-    { "flag", 0x52, 2, TF_SCALAR, TT_NONE, 0x0 },
+    { "flags", 0x52, 2, TF_SCALAR, TT_NONE, 0x0 },
 };
 
 static const TraceField kDebrisPlan[] = {

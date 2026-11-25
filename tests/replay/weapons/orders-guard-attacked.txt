@@ -8,26 +8,15 @@ call 1 UpdateUnitWeapons
   r rng.main 0x0000058a
   r rng.load 0xdaf77e88
   r rng.seed 0x7996f52e
-  r Unit#1.health 3000
-  r Unit#1.def UnitDef#34
-  r Unit#1.flags 0x90e00321
   r Unit#1.script CobScript#1
   r Unit#1.id 1
   r Unit#1.killCount 0
-  r Unit#1.playerIndex 0
   r Unit#1.owner Player#0
-  r Unit#1.motion UnitMotion#1
-  r Unit#1.posX 36700160
-  r Unit#1.posY 65536
-  r Unit#1.posZ 15728640
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ -32768
-  r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ -32768
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ -32768
   r Unit#1.weapon2Def weapondef#22
@@ -49,6 +38,17 @@ call 1 UpdateUnitWeapons
   r Unit#1.weapon2FirePitch 0
   r Unit#1.weapon2Stockpile 0
   r Unit#1.weapon2MuzzleDelta 0
+  r Unit#1.flags 0x90e00321
+  r Unit#1.health 3000
+  r Unit#1.def UnitDef#34
+  r Unit#1.playerIndex 0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 36700160
+  r Unit#1.posY 65536
+  r Unit#1.posZ 15728640
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
   r Projectile#0.speed 0
   r Projectile#0.spawnTick 0
   r Projectile#0.attacker null
@@ -8405,10 +8405,29 @@ call 1 UpdateUnitWeapons
   r WeaponFire#253.fire null
   r WeaponFire#254.fire null
   r WeaponFire#255.fire null
-  r UnitDef#34.maxHealth 3000
-  r UnitDef#34.modelMaxYHigh 39
   r Player#0.energy f32:0x476a6000
   r Player#0.metal f32:0x46ea6000
+  r weapondef#22.flags 0x04480a09
+  r weapondef#22.speed 436906
+  r weapondef#22.acceleration 0
+  r weapondef#22.accuracy 0
+  r weapondef#22.burst 0
+  r weapondef#22.coverage 0
+  r weapondef#22.energyPerShot f32:0x43c80000
+  r weapondef#22.metalPerShot f32:0x00000000
+  r weapondef#22.pitch f32:0xbe490fdb
+  r weapondef#22.lifetime 120
+  r weapondef#22.pitchTolerance 0
+  r weapondef#22.range 240
+  r weapondef#22.reloadTime 36
+  r weapondef#22.sound 59
+  r weapondef#22.startSpeed 0
+  r weapondef#22.tolerance 0
+  r Unit#1.weapons[0].aimCob.nAimCobDone 0
+  r Unit#1.weapons[1].aimCob.nAimCobDone 0
+  r Unit#1.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#34.modelMaxYHigh 39
+  r UnitDef#34.maxHealth 3000
   r UnitMotion#1.speed 0
   r weapondef#20.flags 0x00080809
   r weapondef#20.speed 873813
@@ -8442,25 +8461,6 @@ call 1 UpdateUnitWeapons
   r weapondef#0.sound 65535
   r weapondef#0.startSpeed 0
   r weapondef#0.tolerance 0
-  r weapondef#22.flags 0x04480a09
-  r weapondef#22.speed 436906
-  r weapondef#22.acceleration 0
-  r weapondef#22.accuracy 0
-  r weapondef#22.burst 0
-  r weapondef#22.coverage 0
-  r weapondef#22.energyPerShot f32:0x43c80000
-  r weapondef#22.metalPerShot f32:0x00000000
-  r weapondef#22.pitch f32:0xbe490fdb
-  r weapondef#22.lifetime 120
-  r weapondef#22.pitchTolerance 0
-  r weapondef#22.range 240
-  r weapondef#22.reloadTime 36
-  r weapondef#22.sound 59
-  r weapondef#22.startSpeed 0
-  r weapondef#22.tolerance 0
-  r Unit#1.weapons[0].aimCob.nAimCobDone 0
-  r Unit#1.weapons[1].aimCob.nAimCobDone 0
-  r Unit#1.weapons[2].aimCob.nAimCobDone 0
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -8471,26 +8471,15 @@ call 1 UpdateUnitWeapons
   o y 0
   o z 0
 call 1 UpdateUnitWeapons
-  r Unit#251.health 3000
-  r Unit#251.def UnitDef#167
-  r Unit#251.flags 0x90e00021
   r Unit#251.script CobScript#2
   r Unit#251.id 251
   r Unit#251.killCount 0
-  r Unit#251.playerIndex 1
   r Unit#251.owner Player#1
-  r Unit#251.motion UnitMotion#2
-  r Unit#251.posX 221249536
-  r Unit#251.posY 65536
-  r Unit#251.posZ 92274688
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ -32768
-  r Unit#251.weapon0Def weapondef#21
   r Unit#251.weapon0Flags 18
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ -32768
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ -32768
   r Unit#251.weapon2Def weapondef#23
@@ -8512,27 +8501,19 @@ call 1 UpdateUnitWeapons
   r Unit#251.weapon2FirePitch 0
   r Unit#251.weapon2Stockpile 0
   r Unit#251.weapon2MuzzleDelta 1495040
-  r UnitDef#167.maxHealth 3000
-  r UnitDef#167.modelMaxYHigh 38
+  r Unit#251.flags 0x90e00021
+  r Unit#251.health 3000
+  r Unit#251.def UnitDef#167
+  r Unit#251.playerIndex 1
+  r Unit#251.motion UnitMotion#2
+  r Unit#251.posX 221249536
+  r Unit#251.posY 65536
+  r Unit#251.posZ 92274688
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
   r Player#1.energy f32:0x447a0000
   r Player#1.metal f32:0x447a0000
-  r UnitMotion#2.speed 0
-  r weapondef#21.flags 0x00080809
-  r weapondef#21.speed 873813
-  r weapondef#21.acceleration 0
-  r weapondef#21.accuracy 0
-  r weapondef#21.burst 0
-  r weapondef#21.coverage 0
-  r weapondef#21.energyPerShot f32:0x00000000
-  r weapondef#21.metalPerShot f32:0x00000000
-  r weapondef#21.pitch f32:0xbe490fdb
-  r weapondef#21.lifetime 0
-  r weapondef#21.pitchTolerance 0
-  r weapondef#21.range 200
-  r weapondef#21.reloadTime 30
-  r weapondef#21.sound 57
-  r weapondef#21.startSpeed 0
-  r weapondef#21.tolerance 0
   r weapondef#23.flags 0x04480a09
   r weapondef#23.speed 436906
   r weapondef#23.acceleration 0
@@ -8552,6 +8533,25 @@ call 1 UpdateUnitWeapons
   r Unit#251.weapons[0].aimCob.nAimCobDone 0
   r Unit#251.weapons[1].aimCob.nAimCobDone 0
   r Unit#251.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#167.modelMaxYHigh 38
+  r UnitDef#167.maxHealth 3000
+  r UnitMotion#2.speed 0
+  r weapondef#21.flags 0x00080809
+  r weapondef#21.speed 873813
+  r weapondef#21.acceleration 0
+  r weapondef#21.accuracy 0
+  r weapondef#21.burst 0
+  r weapondef#21.coverage 0
+  r weapondef#21.energyPerShot f32:0x00000000
+  r weapondef#21.metalPerShot f32:0x00000000
+  r weapondef#21.pitch f32:0xbe490fdb
+  r weapondef#21.lifetime 0
+  r weapondef#21.pitchTolerance 0
+  r weapondef#21.range 200
+  r weapondef#21.reloadTime 30
+  r weapondef#21.sound 57
+  r weapondef#21.startSpeed 0
+  r weapondef#21.tolerance 0
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
   o x 0
@@ -8983,18 +8983,18 @@ call 2 UpdateUnitWeapons
   o z 0
 call 2 Apply
   r Game.localPlayer 0
-  r Unit#1.player Player#0
   r Unit#1.activateFlags 1
-  r UnitDef#34.flags1 0x0495c0c8
+  r Unit#1.player Player#0
+  r weapondef#22.index 22
   r UnitDef#34.damagemodifier 65536
-  r UnitDef#34.weapons0 weapondef#20
   r UnitDef#34.weapons1 weapondef#0
   r UnitDef#34.weapons2 weapondef#22
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.weapons0 weapondef#20
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.index 20
   r weapondef#0.index 0
-  r weapondef#22.index 22
   a event.kind 259
   a event.unit Unit#1
   a event.weapon 3
@@ -9011,17 +9011,17 @@ call 2 UpdateUnitWeapons
   o y 0
   o z 0
 call 2 Apply
-  r Unit#251.player Player#1
   r Unit#251.activateFlags 1
-  r UnitDef#167.flags1 0x0495c0c8
+  r Unit#251.player Player#1
+  r weapondef#23.index 23
   r UnitDef#167.damagemodifier 65536
-  r UnitDef#167.weapons0 weapondef#21
   r UnitDef#167.weapons1 weapondef#0
   r UnitDef#167.weapons2 weapondef#23
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.weapons0 weapondef#21
   r Player#1.active 1
   r Player#1.type 2
   r weapondef#21.index 21
-  r weapondef#23.index 23
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -9178,26 +9178,15 @@ call 9 UpdateUnitWeapons
   o z 0
 call 9 UpdateExplosions
 call 10 Apply
-  r Unit#2.health 250
-  r Unit#2.def UnitDef#95
-  r Unit#2.player Player#0
-  r Unit#2.flags 0x90010221
   r Unit#2.activateFlags 0
   r Unit#2.script null
   r Unit#2.id 2
   r Unit#2.killCount 0
-  r Unit#2.playerIndex 0
-  r Unit#2.posX 212336640
-  r Unit#2.posY 65536
-  r Unit#2.posZ 87162880
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ -32768
-  r Unit#2.weapon0Def null
   r Unit#2.weapon0Flags 0
   r Unit#2.weapon1TargetX 0
   r Unit#2.weapon1TargetZ 0
-  r Unit#2.weapon1Def null
-  r Unit#2.weapon1Flags 0
   r Unit#2.weapon2TargetX 0
   r Unit#2.weapon2TargetZ 0
   r Unit#2.weapon2Def null
@@ -9217,15 +9206,26 @@ call 10 Apply
   r Unit#2.weapon2FirePitch 0
   r Unit#2.weapon2Stockpile 0
   r Unit#2.weapon2MuzzleDelta 0
-  r UnitDef#95.flags1 0x00918089
-  r UnitDef#95.damagemodifier 65536
-  r UnitDef#95.maxHealth 250
-  r UnitDef#95.weapons0 weapondef#16
-  r UnitDef#95.weapons1 weapondef#0
-  r UnitDef#95.weapons2 weapondef#0
+  r Unit#2.flags 0x90010221
+  r Unit#2.health 250
+  r Unit#2.def UnitDef#95
+  r Unit#2.player Player#0
+  r Unit#2.playerIndex 0
+  r Unit#2.posX 212336640
+  r Unit#2.posY 65536
+  r Unit#2.posZ 87162880
+  r Unit#2.weapon0Def null
+  r Unit#2.weapon1Def null
+  r Unit#2.weapon1Flags 0
   r Unit#2.weapons[0].aimCob.nAimCobDone 0
   r Unit#2.weapons[1].aimCob.nAimCobDone 0
   r Unit#2.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#95.damagemodifier 65536
+  r UnitDef#95.weapons1 weapondef#0
+  r UnitDef#95.weapons2 weapondef#0
+  r UnitDef#95.flags1 0x00918089
+  r UnitDef#95.maxHealth 250
+  r UnitDef#95.weapons0 weapondef#16
   r weapondef#16.index 16
   r weapondef#16.reloadTime 12
   a event.kind 259
@@ -9248,8 +9248,8 @@ call 10 Apply
   a size 12
   o result 1
 call 10 Apply
-  r Unit#2.flags 0x90250221
   r Unit#2.script CobScript#3
+  r Unit#2.flags 0x90250221
   a event.kind 261
   a event.unit Unit#2
   a size 8
@@ -9269,35 +9269,24 @@ call 10 Apply
   i scripts.GetAimFromPosition Unit#2 2
   o out (212336640,967967,87162880)
   i services.SchedPublish 6 44
-  w Unit#2.weapon0Def weapondef#16
   w Unit#2.weapon0Flags 18
-  w Unit#2.weapon1Def weapondef#0
-  w Unit#2.weapon1Flags 20
   w Unit#2.weapon2Def weapondef#0
   w Unit#2.weapon2Flags 24
   w Unit#2.weapon0MuzzleDelta 1149542
+  w Unit#2.weapon0Def weapondef#16
+  w Unit#2.weapon1Def weapondef#0
+  w Unit#2.weapon1Flags 20
   o result 1
 call 10 Apply
-  r Unit#3.health 250
-  r Unit#3.def UnitDef#95
-  r Unit#3.player Player#0
-  r Unit#3.flags 0x90010221
   r Unit#3.activateFlags 0
   r Unit#3.script null
   r Unit#3.id 3
   r Unit#3.killCount 0
-  r Unit#3.playerIndex 0
-  r Unit#3.posX 204472320
-  r Unit#3.posY 65536
-  r Unit#3.posZ 81920000
   r Unit#3.weapon0TargetX 0
   r Unit#3.weapon0TargetZ -32768
-  r Unit#3.weapon0Def null
   r Unit#3.weapon0Flags 0
   r Unit#3.weapon1TargetX 0
   r Unit#3.weapon1TargetZ 0
-  r Unit#3.weapon1Def null
-  r Unit#3.weapon1Flags 0
   r Unit#3.weapon2TargetX 0
   r Unit#3.weapon2TargetZ 0
   r Unit#3.weapon2Def null
@@ -9317,6 +9306,17 @@ call 10 Apply
   r Unit#3.weapon2FirePitch 0
   r Unit#3.weapon2Stockpile 0
   r Unit#3.weapon2MuzzleDelta 0
+  r Unit#3.flags 0x90010221
+  r Unit#3.health 250
+  r Unit#3.def UnitDef#95
+  r Unit#3.player Player#0
+  r Unit#3.playerIndex 0
+  r Unit#3.posX 204472320
+  r Unit#3.posY 65536
+  r Unit#3.posZ 81920000
+  r Unit#3.weapon0Def null
+  r Unit#3.weapon1Def null
+  r Unit#3.weapon1Flags 0
   r Unit#3.weapons[0].aimCob.nAimCobDone 0
   r Unit#3.weapons[1].aimCob.nAimCobDone 0
   r Unit#3.weapons[2].aimCob.nAimCobDone 0
@@ -9340,8 +9340,8 @@ call 10 Apply
   a size 12
   o result 1
 call 10 Apply
-  r Unit#3.flags 0x90250221
   r Unit#3.script CobScript#4
+  r Unit#3.flags 0x90250221
   a event.kind 261
   a event.unit Unit#3
   a size 8
@@ -9361,35 +9361,24 @@ call 10 Apply
   i scripts.GetAimFromPosition Unit#3 2
   o out (204472320,967967,81920000)
   i services.SchedPublish 6 44
-  w Unit#3.weapon0Def weapondef#16
   w Unit#3.weapon0Flags 18
-  w Unit#3.weapon1Def weapondef#0
-  w Unit#3.weapon1Flags 20
   w Unit#3.weapon2Def weapondef#0
   w Unit#3.weapon2Flags 24
   w Unit#3.weapon0MuzzleDelta 1149542
+  w Unit#3.weapon0Def weapondef#16
+  w Unit#3.weapon1Def weapondef#0
+  w Unit#3.weapon1Flags 20
   o result 1
 call 10 Apply
-  r Unit#4.health 250
-  r Unit#4.def UnitDef#95
-  r Unit#4.player Player#0
-  r Unit#4.flags 0x90010221
   r Unit#4.activateFlags 0
   r Unit#4.script null
   r Unit#4.id 4
   r Unit#4.killCount 0
-  r Unit#4.playerIndex 0
-  r Unit#4.posX 201850880
-  r Unit#4.posY 65536
-  r Unit#4.posZ 81920000
   r Unit#4.weapon0TargetX 0
   r Unit#4.weapon0TargetZ -32768
-  r Unit#4.weapon0Def null
   r Unit#4.weapon0Flags 0
   r Unit#4.weapon1TargetX 0
   r Unit#4.weapon1TargetZ 0
-  r Unit#4.weapon1Def null
-  r Unit#4.weapon1Flags 0
   r Unit#4.weapon2TargetX 0
   r Unit#4.weapon2TargetZ 0
   r Unit#4.weapon2Def null
@@ -9409,6 +9398,17 @@ call 10 Apply
   r Unit#4.weapon2FirePitch 0
   r Unit#4.weapon2Stockpile 0
   r Unit#4.weapon2MuzzleDelta 0
+  r Unit#4.flags 0x90010221
+  r Unit#4.health 250
+  r Unit#4.def UnitDef#95
+  r Unit#4.player Player#0
+  r Unit#4.playerIndex 0
+  r Unit#4.posX 201850880
+  r Unit#4.posY 65536
+  r Unit#4.posZ 81920000
+  r Unit#4.weapon0Def null
+  r Unit#4.weapon1Def null
+  r Unit#4.weapon1Flags 0
   r Unit#4.weapons[0].aimCob.nAimCobDone 0
   r Unit#4.weapons[1].aimCob.nAimCobDone 0
   r Unit#4.weapons[2].aimCob.nAimCobDone 0
@@ -9432,8 +9432,8 @@ call 10 Apply
   a size 12
   o result 1
 call 10 Apply
-  r Unit#4.flags 0x90250221
   r Unit#4.script CobScript#5
+  r Unit#4.flags 0x90250221
   a event.kind 261
   a event.unit Unit#4
   a size 8
@@ -9453,35 +9453,24 @@ call 10 Apply
   i scripts.GetAimFromPosition Unit#4 2
   o out (201850880,967967,81920000)
   i services.SchedPublish 6 44
-  w Unit#4.weapon0Def weapondef#16
   w Unit#4.weapon0Flags 18
-  w Unit#4.weapon1Def weapondef#0
-  w Unit#4.weapon1Flags 20
   w Unit#4.weapon2Def weapondef#0
   w Unit#4.weapon2Flags 24
   w Unit#4.weapon0MuzzleDelta 1149542
+  w Unit#4.weapon0Def weapondef#16
+  w Unit#4.weapon1Def weapondef#0
+  w Unit#4.weapon1Flags 20
   o result 1
 call 10 Apply
-  r Unit#5.health 196
-  r Unit#5.def UnitDef#51
-  r Unit#5.player Player#0
-  r Unit#5.flags 0x90010221
   r Unit#5.activateFlags 0
   r Unit#5.script null
   r Unit#5.id 5
   r Unit#5.killCount 0
-  r Unit#5.playerIndex 0
-  r Unit#5.posX 196608000
-  r Unit#5.posY 65536
-  r Unit#5.posZ 85196800
   r Unit#5.weapon0TargetX 0
   r Unit#5.weapon0TargetZ -32768
-  r Unit#5.weapon0Def null
   r Unit#5.weapon0Flags 0
   r Unit#5.weapon1TargetX 0
   r Unit#5.weapon1TargetZ 0
-  r Unit#5.weapon1Def null
-  r Unit#5.weapon1Flags 0
   r Unit#5.weapon2TargetX 0
   r Unit#5.weapon2TargetZ 0
   r Unit#5.weapon2Def null
@@ -9501,15 +9490,26 @@ call 10 Apply
   r Unit#5.weapon2FirePitch 0
   r Unit#5.weapon2Stockpile 0
   r Unit#5.weapon2MuzzleDelta 0
-  r UnitDef#51.flags1 0x00818889
-  r UnitDef#51.damagemodifier 65536
-  r UnitDef#51.maxHealth 196
-  r UnitDef#51.weapons0 weapondef#108
-  r UnitDef#51.weapons1 weapondef#0
-  r UnitDef#51.weapons2 weapondef#0
+  r Unit#5.flags 0x90010221
+  r Unit#5.health 196
+  r Unit#5.def UnitDef#51
+  r Unit#5.player Player#0
+  r Unit#5.playerIndex 0
+  r Unit#5.posX 196608000
+  r Unit#5.posY 65536
+  r Unit#5.posZ 85196800
+  r Unit#5.weapon0Def null
+  r Unit#5.weapon1Def null
+  r Unit#5.weapon1Flags 0
   r Unit#5.weapons[0].aimCob.nAimCobDone 0
   r Unit#5.weapons[1].aimCob.nAimCobDone 0
   r Unit#5.weapons[2].aimCob.nAimCobDone 0
+  r UnitDef#51.damagemodifier 65536
+  r UnitDef#51.weapons1 weapondef#0
+  r UnitDef#51.weapons2 weapondef#0
+  r UnitDef#51.flags1 0x00818889
+  r UnitDef#51.maxHealth 196
+  r UnitDef#51.weapons0 weapondef#108
   r weapondef#108.index 108
   r weapondef#108.reloadTime 90
   a event.kind 259
@@ -9532,8 +9532,8 @@ call 10 Apply
   a size 12
   o result 1
 call 10 Apply
-  r Unit#5.flags 0x90250221
   r Unit#5.script CobScript#6
+  r Unit#5.flags 0x90250221
   a event.kind 261
   a event.unit Unit#5
   a size 8
@@ -9553,12 +9553,12 @@ call 10 Apply
   i scripts.GetAimFromPosition Unit#5 2
   o out (197482250,233963,84708557)
   i services.SchedPublish 6 44
-  w Unit#5.weapon0Def weapondef#108
   w Unit#5.weapon0Flags 18
-  w Unit#5.weapon1Def weapondef#0
-  w Unit#5.weapon1Flags 20
   w Unit#5.weapon2Def weapondef#0
   w Unit#5.weapon2Flags 24
+  w Unit#5.weapon0Def weapondef#108
+  w Unit#5.weapon1Def weapondef#0
+  w Unit#5.weapon1Flags 20
   o result 1
 call 10 UpdateUnitWeapons
   r rng.seed 0x0b16dff0
@@ -9572,11 +9572,11 @@ call 10 UpdateUnitWeapons
   o y 0
   o z 0
 call 10 UpdateUnitWeapons
-  r Unit#2.flags 0x90240221
   r Unit#2.owner Player#0
-  r Unit#2.motion UnitMotion#3
   r Unit#2.heading 0
   r Unit#2.pitch 0
+  r Unit#2.flags 0x90240221
+  r Unit#2.motion UnitMotion#3
   r UnitDef#95.modelMaxYHigh 26
   r UnitMotion#3.speed 0
   r weapondef#16.flags 0x00080a01
@@ -9600,11 +9600,11 @@ call 10 UpdateUnitWeapons
   o y 0
   o z 0
 call 10 UpdateUnitWeapons
-  r Unit#3.flags 0x90240221
   r Unit#3.owner Player#0
-  r Unit#3.motion UnitMotion#4
   r Unit#3.heading 0
   r Unit#3.pitch 0
+  r Unit#3.flags 0x90240221
+  r Unit#3.motion UnitMotion#4
   r UnitMotion#4.speed 0
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -9612,11 +9612,11 @@ call 10 UpdateUnitWeapons
   o y 0
   o z 0
 call 10 UpdateUnitWeapons
-  r Unit#4.flags 0x90240221
   r Unit#4.owner Player#0
-  r Unit#4.motion UnitMotion#5
   r Unit#4.heading 0
   r Unit#4.pitch 0
+  r Unit#4.flags 0x90240221
+  r Unit#4.motion UnitMotion#5
   r UnitMotion#5.speed 0
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -9624,11 +9624,11 @@ call 10 UpdateUnitWeapons
   o y 0
   o z 0
 call 10 UpdateUnitWeapons
-  r Unit#5.flags 0x90240221
   r Unit#5.owner Player#0
-  r Unit#5.motion UnitMotion#6
   r Unit#5.heading 0
   r Unit#5.pitch 0
+  r Unit#5.flags 0x90240221
+  r Unit#5.motion UnitMotion#6
   r UnitDef#51.modelMaxYHigh 10
   r UnitMotion#6.speed 0
   r weapondef#108.flags 0x00143201
@@ -10302,10 +10302,10 @@ call 23 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 23 UpdateUnitWeapons
+  r Unit#3.heading -1120
   r Unit#3.flags 0x90240225
   r Unit#3.posX 204473042
   r Unit#3.posZ 81913487
-  r Unit#3.heading -1120
   r UnitMotion#4.speed 6553
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10360,9 +10360,9 @@ call 24 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 24 UpdateUnitWeapons
+  r Unit#3.heading -2240
   r Unit#3.posX 204475914
   r Unit#3.posZ 81900699
-  r Unit#3.heading -2240
   r UnitMotion#4.speed 13106
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10418,9 +10418,9 @@ call 25 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 25 UpdateUnitWeapons
+  r Unit#3.heading -3360
   r Unit#3.posX 204482081
   r Unit#3.posZ 81882031
-  r Unit#3.heading -3360
   r UnitMotion#4.speed 19659
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10428,10 +10428,10 @@ call 25 UpdateUnitWeapons
   o y 0
   o z 0
 call 25 UpdateUnitWeapons
+  r Unit#4.heading -1120
   r Unit#4.flags 0x90240225
   r Unit#4.posX 201851602
   r Unit#4.posZ 81913487
-  r Unit#4.heading -1120
   r UnitMotion#5.speed 6553
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10473,9 +10473,9 @@ call 26 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 26 UpdateUnitWeapons
+  r Unit#3.heading -4480
   r Unit#3.posX 204492995
   r Unit#3.posZ 81858200
-  r Unit#3.heading -4480
   r UnitMotion#4.speed 26212
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10483,9 +10483,9 @@ call 26 UpdateUnitWeapons
   o y 0
   o z 0
 call 26 UpdateUnitWeapons
+  r Unit#4.heading -2240
   r Unit#4.posX 201854474
   r Unit#4.posZ 81900699
-  r Unit#4.heading -2240
   r UnitMotion#5.speed 13106
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10527,9 +10527,9 @@ call 27 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 27 UpdateUnitWeapons
+  r Unit#3.heading -5600
   r Unit#3.posX 204509841
   r Unit#3.posZ 81830095
-  r Unit#3.heading -5600
   r UnitMotion#4.speed 32765
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10537,9 +10537,9 @@ call 27 UpdateUnitWeapons
   o y 0
   o z 0
 call 27 UpdateUnitWeapons
+  r Unit#4.heading -3360
   r Unit#4.posX 201860641
   r Unit#4.posZ 81882031
-  r Unit#4.heading -3360
   r UnitMotion#5.speed 19659
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10593,9 +10593,9 @@ call 28 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 28 UpdateUnitWeapons
+  r Unit#3.heading -6720
   r Unit#3.posX 204533647
   r Unit#3.posZ 81798807
-  r Unit#3.heading -6720
   r UnitMotion#4.speed 39318
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10603,9 +10603,9 @@ call 28 UpdateUnitWeapons
   o y 0
   o z 0
 call 28 UpdateUnitWeapons
+  r Unit#4.heading -4480
   r Unit#4.posX 201871555
   r Unit#4.posZ 81858200
-  r Unit#4.heading -4480
   r UnitMotion#5.speed 26212
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10655,9 +10655,9 @@ call 29 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 29 UpdateUnitWeapons
+  r Unit#3.heading -7840
   r Unit#3.posX 204564864
   r Unit#3.posZ 81765199
-  r Unit#3.heading -7840
   r UnitMotion#4.speed 45871
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10665,9 +10665,9 @@ call 29 UpdateUnitWeapons
   o y 0
   o z 0
 call 29 UpdateUnitWeapons
+  r Unit#4.heading -5600
   r Unit#4.posX 201888401
   r Unit#4.posZ 81830095
-  r Unit#4.heading -5600
   r UnitMotion#5.speed 32765
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10709,9 +10709,9 @@ call 30 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 30 UpdateUnitWeapons
+  r Unit#3.heading -8960
   r Unit#3.posX 204604560
   r Unit#3.posZ 81730956
-  r Unit#3.heading -8960
   r UnitMotion#4.speed 52424
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10719,9 +10719,9 @@ call 30 UpdateUnitWeapons
   o y 0
   o z 0
 call 30 UpdateUnitWeapons
+  r Unit#4.heading -6720
   r Unit#4.posX 201912207
   r Unit#4.posZ 81798807
-  r Unit#4.heading -6720
   r UnitMotion#5.speed 39318
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10766,10 +10766,10 @@ call 31 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 31 UpdateUnitWeapons
+  r Unit#3.heading -10080
   r Unit#3.flags 0x90240325
   r Unit#3.posX 204653192
   r Unit#3.posZ 81697594
-  r Unit#3.heading -10080
   r UnitMotion#4.speed 58977
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10777,10 +10777,10 @@ call 31 UpdateUnitWeapons
   o y 0
   o z 0
 call 31 UpdateUnitWeapons
+  r Unit#4.heading -7840
   r Unit#4.flags 0x90240325
   r Unit#4.posX 201943424
   r Unit#4.posZ 81765199
-  r Unit#4.heading -7840
   r UnitMotion#5.speed 45871
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10824,9 +10824,9 @@ call 32 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 32 UpdateUnitWeapons
+  r Unit#3.heading -11200
   r Unit#3.posX 204710987
   r Unit#3.posZ 81666701
-  r Unit#3.heading -11200
   r UnitMotion#4.speed 65530
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10834,9 +10834,9 @@ call 32 UpdateUnitWeapons
   o y 0
   o z 0
 call 32 UpdateUnitWeapons
+  r Unit#4.heading -8960
   r Unit#4.posX 201983120
   r Unit#4.posZ 81730956
-  r Unit#4.heading -8960
   r UnitMotion#5.speed 52424
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10878,9 +10878,9 @@ call 33 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 33 UpdateUnitWeapons
+  r Unit#3.heading -12320
   r Unit#3.posX 204777579
   r Unit#3.posZ 81639116
-  r Unit#3.heading -12320
   r UnitMotion#4.speed 72083
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10888,9 +10888,9 @@ call 33 UpdateUnitWeapons
   o y 0
   o z 0
 call 33 UpdateUnitWeapons
+  r Unit#4.heading -10080
   r Unit#4.posX 202031752
   r Unit#4.posZ 81697594
-  r Unit#4.heading -10080
   r UnitMotion#5.speed 58977
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10932,9 +10932,9 @@ call 34 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 34 UpdateUnitWeapons
+  r Unit#3.heading -13440
   r Unit#3.posX 204853105
   r Unit#3.posZ 81617211
-  r Unit#3.heading -13440
   r UnitMotion#4.speed 78636
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10942,9 +10942,9 @@ call 34 UpdateUnitWeapons
   o y 0
   o z 0
 call 34 UpdateUnitWeapons
+  r Unit#4.heading -11200
   r Unit#4.posX 202089547
   r Unit#4.posZ 81666701
-  r Unit#4.heading -11200
   r UnitMotion#5.speed 65530
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -10986,9 +10986,9 @@ call 35 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 35 UpdateUnitWeapons
+  r Unit#3.heading -14560
   r Unit#3.posX 204937036
   r Unit#3.posZ 81602642
-  r Unit#3.heading -14560
   r UnitMotion#4.speed 85189
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -10996,9 +10996,9 @@ call 35 UpdateUnitWeapons
   o y 0
   o z 0
 call 35 UpdateUnitWeapons
+  r Unit#4.heading -12320
   r Unit#4.posX 202156139
   r Unit#4.posZ 81639116
-  r Unit#4.heading -12320
   r UnitMotion#5.speed 72083
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11040,9 +11040,9 @@ call 36 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 36 UpdateUnitWeapons
+  r Unit#3.heading -15680
   r Unit#3.posX 205028610
   r Unit#3.posZ 81597020
-  r Unit#3.heading -15680
   r UnitMotion#4.speed 91742
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11050,9 +11050,9 @@ call 36 UpdateUnitWeapons
   o y 0
   o z 0
 call 36 UpdateUnitWeapons
+  r Unit#4.heading -13440
   r Unit#4.posX 202231665
   r Unit#4.posZ 81617211
-  r Unit#4.heading -13440
   r UnitMotion#5.speed 78636
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11095,9 +11095,9 @@ call 37 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 37 UpdateUnitWeapons
+  r Unit#3.heading -16800
   r Unit#3.posX 205126833
   r Unit#3.posZ 81600644
-  r Unit#3.heading -16800
   r UnitMotion#4.speed 98295
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11105,9 +11105,9 @@ call 37 UpdateUnitWeapons
   o y 0
   o z 0
 call 37 UpdateUnitWeapons
+  r Unit#4.heading -14560
   r Unit#4.posX 202315596
   r Unit#4.posZ 81602642
-  r Unit#4.heading -14560
   r UnitMotion#5.speed 85189
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11149,9 +11149,9 @@ call 38 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 38 UpdateUnitWeapons
+  r Unit#3.heading -17920
   r Unit#3.posX 205230542
   r Unit#3.posZ 81616028
-  r Unit#3.heading -17920
   r UnitMotion#4.speed 104848
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11159,9 +11159,9 @@ call 38 UpdateUnitWeapons
   o y 0
   o z 0
 call 38 UpdateUnitWeapons
+  r Unit#4.heading -15680
   r Unit#4.posX 202407170
   r Unit#4.posZ 81597020
-  r Unit#4.heading -15680
   r UnitMotion#5.speed 91742
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11203,9 +11203,9 @@ call 39 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 39 UpdateUnitWeapons
+  r Unit#3.heading -19040
   r Unit#3.posX 205338258
   r Unit#3.posZ 81644422
-  r Unit#3.heading -19040
   r UnitMotion#4.speed 111401
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11213,9 +11213,9 @@ call 39 UpdateUnitWeapons
   o y 0
   o z 0
 call 39 UpdateUnitWeapons
+  r Unit#4.heading -16800
   r Unit#4.posX 202505393
   r Unit#4.posZ 81600644
-  r Unit#4.heading -16800
   r UnitMotion#5.speed 98295
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11257,9 +11257,9 @@ call 40 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 40 UpdateUnitWeapons
+  r Unit#3.heading -20160
   r Unit#3.posX 205448307
   r Unit#3.posZ 81686869
-  r Unit#3.heading -20160
   r UnitMotion#4.speed 117954
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11267,9 +11267,9 @@ call 40 UpdateUnitWeapons
   o y 0
   o z 0
 call 40 UpdateUnitWeapons
+  r Unit#4.heading -16902
   r Unit#4.posX 202610113
   r Unit#4.posZ 81605789
-  r Unit#4.heading -16902
   r UnitMotion#5.speed 104848
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11311,9 +11311,9 @@ call 41 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 41 UpdateUnitWeapons
+  r Unit#3.heading -21240
   r Unit#3.posX 205553671
   r Unit#3.posZ 81739904
-  r Unit#3.heading -21240
   r UnitMotion#4.speed 117964
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -11321,9 +11321,9 @@ call 41 UpdateUnitWeapons
   o y 0
   o z 0
 call 41 UpdateUnitWeapons
+  r Unit#4.heading -16889
   r Unit#4.posX 202721378
   r Unit#4.posZ 81611256
-  r Unit#4.heading -16889
   r UnitMotion#5.speed 111401
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11365,18 +11365,18 @@ call 42 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 42 UpdateUnitWeapons
+  r Unit#3.heading -21215
   r Unit#3.posX 205659035
   r Unit#3.posZ 81792939
-  r Unit#3.heading -21215
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 42 UpdateUnitWeapons
+  r Unit#4.heading -16876
   r Unit#4.posX 202839188
   r Unit#4.posZ 81617044
-  r Unit#4.heading -16876
   r UnitMotion#5.speed 117954
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11418,18 +11418,18 @@ call 43 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 43 UpdateUnitWeapons
+  r Unit#3.heading -21190
   r Unit#3.posX 205764399
   r Unit#3.posZ 81845974
-  r Unit#3.heading -21190
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 43 UpdateUnitWeapons
+  r Unit#4.heading -16862
   r Unit#4.posX 202957008
   r Unit#4.posZ 81622833
-  r Unit#4.heading -16862
   r UnitMotion#5.speed 117964
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -11471,18 +11471,18 @@ call 44 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 44 UpdateUnitWeapons
+  r Unit#3.heading -21165
   r Unit#3.posX 205869763
   r Unit#3.posZ 81899009
-  r Unit#3.heading -21165
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 44 UpdateUnitWeapons
+  r Unit#4.heading -16849
   r Unit#4.posX 203074828
   r Unit#4.posZ 81628622
-  r Unit#4.heading -16849
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11523,18 +11523,18 @@ call 45 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 45 UpdateUnitWeapons
+  r Unit#3.heading -21140
   r Unit#3.posX 205975775
   r Unit#3.posZ 81950748
-  r Unit#3.heading -21140
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 45 UpdateUnitWeapons
+  r Unit#4.heading -16835
   r Unit#4.posX 203192648
   r Unit#4.posZ 81634411
-  r Unit#4.heading -16835
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11575,18 +11575,18 @@ call 46 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 46 UpdateUnitWeapons
+  r Unit#3.heading -21118
   r Unit#3.posX 206081787
   r Unit#3.posZ 82002487
-  r Unit#3.heading -21118
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 46 UpdateUnitWeapons
+  r Unit#4.heading -16821
   r Unit#4.posX 203310468
   r Unit#4.posZ 81640200
-  r Unit#4.heading -16821
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11627,18 +11627,18 @@ call 47 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 47 UpdateUnitWeapons
+  r Unit#3.heading -21096
   r Unit#3.posX 206187799
   r Unit#3.posZ 82054226
-  r Unit#3.heading -21096
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 47 UpdateUnitWeapons
+  r Unit#4.heading -16807
   r Unit#4.posX 203428288
   r Unit#4.posZ 81645989
-  r Unit#4.heading -16807
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11679,18 +11679,18 @@ call 48 UpdateUnitWeapons
   o z 92083651
   i services.ScheduleTargetingTargetUnit Unit#2 0 = Unit#251
 call 48 UpdateUnitWeapons
+  r Unit#3.heading -21073
   r Unit#3.posX 206293811
   r Unit#3.posZ 82105965
-  r Unit#3.heading -21073
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 48 UpdateUnitWeapons
+  r Unit#4.heading -16793
   r Unit#4.posX 203546166
   r Unit#4.posZ 81650338
-  r Unit#4.heading -16793
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11739,18 +11739,18 @@ call 49 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 49 UpdateUnitWeapons
+  r Unit#3.heading -21051
   r Unit#3.posX 206399823
   r Unit#3.posZ 82157704
-  r Unit#3.heading -21051
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 49 UpdateUnitWeapons
+  r Unit#4.heading -16782
   r Unit#4.posX 203664044
   r Unit#4.posZ 81654687
-  r Unit#4.heading -16782
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11834,18 +11834,18 @@ call 50 UpdateUnitWeapons
   w Projectile#0.piece 3
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 50 UpdateUnitWeapons
+  r Unit#3.heading -21029
   r Unit#3.posX 206505835
   r Unit#3.posZ 82209443
-  r Unit#3.heading -21029
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 50 UpdateUnitWeapons
+  r Unit#4.heading -16771
   r Unit#4.posX 203781922
   r Unit#4.posZ 81659036
-  r Unit#4.heading -16771
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11892,18 +11892,18 @@ call 51 UpdateUnitWeapons
   w Unit#2.weapon0ReloadTimer 11
   w Unit#2.weapon0FireHeading -21357
 call 51 UpdateUnitWeapons
+  r Unit#3.heading -21007
   r Unit#3.posX 206612466
   r Unit#3.posZ 82259886
-  r Unit#3.heading -21007
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 51 UpdateUnitWeapons
+  r Unit#4.heading -16760
   r Unit#4.posX 203899800
   r Unit#4.posZ 81663385
-  r Unit#4.heading -16760
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11944,18 +11944,18 @@ call 52 UpdateUnitWeapons
   o z 92083651
   w Unit#2.weapon0ReloadTimer 10
 call 52 UpdateUnitWeapons
+  r Unit#3.heading -20987
   r Unit#3.posX 206719097
   r Unit#3.posZ 82310329
-  r Unit#3.heading -20987
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 52 UpdateUnitWeapons
+  r Unit#4.heading -16749
   r Unit#4.posX 204017678
   r Unit#4.posZ 81667734
-  r Unit#4.heading -16749
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -11996,18 +11996,18 @@ call 53 UpdateUnitWeapons
   o z 92083651
   w Unit#2.weapon0ReloadTimer 9
 call 53 UpdateUnitWeapons
+  r Unit#3.heading -20427
   r Unit#3.posX 206828075
   r Unit#3.posZ 82355473
-  r Unit#3.heading -20427
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 53 UpdateUnitWeapons
+  r Unit#4.heading -16738
   r Unit#4.posX 204135556
   r Unit#4.posZ 81672083
-  r Unit#4.heading -16738
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -12079,18 +12079,18 @@ call 54 UpdateUnitWeapons
   o z 92083651
   w Unit#2.weapon0ReloadTimer 8
 call 54 UpdateUnitWeapons
+  r Unit#3.heading -20428
   r Unit#3.posX 206937053
   r Unit#3.posZ 82400617
-  r Unit#3.heading -20428
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 54 UpdateUnitWeapons
+  r Unit#4.heading -16727
   r Unit#4.posX 204253434
   r Unit#4.posZ 81676432
-  r Unit#4.heading -16727
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -12134,18 +12134,18 @@ call 55 UpdateUnitWeapons
   o z 92083651
   w Unit#2.weapon0ReloadTimer 7
 call 55 UpdateUnitWeapons
+  r Unit#3.heading -20429
   r Unit#3.posX 207046031
   r Unit#3.posZ 82445761
-  r Unit#3.heading -20429
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 55 UpdateUnitWeapons
+  r Unit#4.heading -16475
   r Unit#4.posX 204371384
   r Unit#4.posZ 81677886
-  r Unit#4.heading -16475
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -12230,9 +12230,9 @@ call 56 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 56 UpdateUnitWeapons
+  r Unit#3.heading -20430
   r Unit#3.posX 207155009
   r Unit#3.posZ 82490905
-  r Unit#3.heading -20430
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12329,9 +12329,9 @@ call 57 UpdateUnitWeapons
   o z 92089318
   w Unit#2.weapon0ReloadTimer 5
 call 57 UpdateUnitWeapons
+  r Unit#3.heading -20431
   r Unit#3.posX 207263987
   r Unit#3.posZ 82536049
-  r Unit#3.heading -20431
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12388,9 +12388,9 @@ call 58 UpdateUnitWeapons
   o z 92100117
   w Unit#2.weapon0ReloadTimer 4
 call 58 UpdateUnitWeapons
+  r Unit#3.heading -20432
   r Unit#3.posX 207372965
   r Unit#3.posZ 82581193
-  r Unit#3.heading -20432
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12447,9 +12447,9 @@ call 59 UpdateUnitWeapons
   o z 92115720
   w Unit#2.weapon0ReloadTimer 3
 call 59 UpdateUnitWeapons
+  r Unit#3.heading -20433
   r Unit#3.posX 207481943
   r Unit#3.posZ 82626337
-  r Unit#3.heading -20433
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12555,9 +12555,9 @@ call 60 UpdateUnitWeapons
   o z 92135654
   w Unit#2.weapon0ReloadTimer 2
 call 60 UpdateUnitWeapons
+  r Unit#3.heading -20434
   r Unit#3.posX 207590921
   r Unit#3.posZ 82671481
-  r Unit#3.heading -20434
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12628,9 +12628,9 @@ call 61 UpdateUnitWeapons
   o z 92159312
   w Unit#2.weapon0ReloadTimer 1
 call 61 UpdateUnitWeapons
+  r Unit#3.heading -20435
   r Unit#3.posX 207699899
   r Unit#3.posZ 82716625
-  r Unit#3.heading -20435
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -12645,9 +12645,9 @@ call 61 UpdateUnitWeapons
   o y 0
   o z 0
 call 61 UpdateUnitWeapons
+  r Unit#5.heading -512
   r Unit#5.flags 0x90240326
   r Unit#5.posY 131072
-  r Unit#5.heading -512
   r UnitMotion#6.speed 65536
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -12773,17 +12773,17 @@ call 62 UpdateUnitWeapons
   o y 0
   o z 0
 call 62 UpdateUnitWeapons
+  r Unit#4.heading -16588
   r Unit#4.posX 205197019
   r Unit#4.posZ 81689504
-  r Unit#4.heading -16588
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 62 UpdateUnitWeapons
-  r Unit#5.posY 196608
   r Unit#5.heading -1024
+  r Unit#5.posY 196608
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -12835,26 +12835,26 @@ call 63 UpdateUnitWeapons
   w Unit#2.weapon0ReloadTimer 11
   w Unit#2.weapon0FireHeading -21958
 call 63 UpdateUnitWeapons
+  r Unit#3.heading -18195
   r Unit#3.posX 207929419
   r Unit#3.posZ 82769660
-  r Unit#3.heading -18195
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 63 UpdateUnitWeapons
+  r Unit#4.heading -16582
   r Unit#4.posX 205314954
   r Unit#4.posZ 81692398
-  r Unit#4.heading -16582
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 63 UpdateUnitWeapons
-  r Unit#5.posY 262144
   r Unit#5.heading -1536
+  r Unit#5.posY 262144
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -12899,26 +12899,26 @@ call 64 UpdateUnitWeapons
   o z 92169661
   w Unit#2.weapon0ReloadTimer 10
 call 64 UpdateUnitWeapons
+  r Unit#3.heading -17075
   r Unit#3.posX 208047066
   r Unit#3.posZ 82778343
-  r Unit#3.heading -17075
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 64 UpdateUnitWeapons
+  r Unit#4.heading -16576
   r Unit#4.posX 205432889
   r Unit#4.posZ 81695292
-  r Unit#4.heading -16576
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 64 UpdateUnitWeapons
-  r Unit#5.posY 327680
   r Unit#5.heading -2048
+  r Unit#5.posY 327680
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -12963,26 +12963,26 @@ call 65 UpdateUnitWeapons
   o z 92161856
   w Unit#2.weapon0ReloadTimer 9
 call 65 UpdateUnitWeapons
+  r Unit#3.heading -16548
   r Unit#3.posX 208165001
   r Unit#3.posZ 82781237
-  r Unit#3.heading -16548
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 65 UpdateUnitWeapons
+  r Unit#4.heading -16570
   r Unit#4.posX 205550824
   r Unit#4.posZ 81698186
-  r Unit#4.heading -16570
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 65 UpdateUnitWeapons
-  r Unit#5.posY 393216
   r Unit#5.heading -2560
+  r Unit#5.posY 393216
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13058,26 +13058,26 @@ call 66 UpdateUnitWeapons
   o z 92154316
   w Unit#2.weapon0ReloadTimer 8
 call 66 UpdateUnitWeapons
+  r Unit#3.heading -16545
   r Unit#3.posX 208282936
   r Unit#3.posZ 82784131
-  r Unit#3.heading -16545
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 66 UpdateUnitWeapons
+  r Unit#4.heading -16565
   r Unit#4.posX 205668759
   r Unit#4.posZ 81701080
-  r Unit#4.heading -16565
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 66 UpdateUnitWeapons
-  r Unit#5.posY 458752
   r Unit#5.heading -3072
+  r Unit#5.posY 458752
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13184,8 +13184,8 @@ call 67 UpdateUnitWeapons
   r Projectile#4.positionX 213916117
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 87481509
-  r Unit#251.health 2992
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2992
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13203,26 +13203,26 @@ call 67 UpdateUnitWeapons
   o z 92147060
   w Unit#2.weapon0ReloadTimer 7
 call 67 UpdateUnitWeapons
+  r Unit#3.heading -16542
   r Unit#3.posX 208400886
   r Unit#3.posZ 82785585
-  r Unit#3.heading -16542
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 67 UpdateUnitWeapons
+  r Unit#4.heading -16559
   r Unit#4.posX 205786694
   r Unit#4.posZ 81703974
-  r Unit#4.heading -16559
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 67 UpdateUnitWeapons
-  r Unit#5.posY 524288
   r Unit#5.heading -3584
+  r Unit#5.posY 524288
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13307,26 +13307,26 @@ call 68 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 68 UpdateUnitWeapons
+  r Unit#3.heading -16543
   r Unit#3.posX 208518836
   r Unit#3.posZ 82787039
-  r Unit#3.heading -16543
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 68 UpdateUnitWeapons
+  r Unit#4.heading -16553
   r Unit#4.posX 205904629
   r Unit#4.posZ 81706868
-  r Unit#4.heading -16553
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 68 UpdateUnitWeapons
-  r Unit#5.posY 589824
   r Unit#5.heading -4096
+  r Unit#5.posY 589824
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13398,26 +13398,26 @@ call 69 UpdateUnitWeapons
   o z 92164429
   w Unit#2.weapon0ReloadTimer 5
 call 69 UpdateUnitWeapons
+  r Unit#3.heading -16544
   r Unit#3.posX 208636786
   r Unit#3.posZ 82788493
-  r Unit#3.heading -16544
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 69 UpdateUnitWeapons
+  r Unit#4.heading -16547
   r Unit#4.posX 206022564
   r Unit#4.posZ 81709762
-  r Unit#4.heading -16547
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 69 UpdateUnitWeapons
-  r Unit#5.posY 655360
   r Unit#5.heading -4608
+  r Unit#5.posY 655360
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13535,8 +13535,8 @@ call 70 UpdateUnitWeapons
   r Projectile#4.positionX 213898280
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 87508226
-  r Unit#251.health 2984
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2984
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13554,26 +13554,26 @@ call 70 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 4
 call 70 UpdateUnitWeapons
+  r Unit#3.heading -16545
   r Unit#3.posX 208754721
   r Unit#3.posZ 82791387
-  r Unit#3.heading -16545
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 70 UpdateUnitWeapons
+  r Unit#4.heading -16542
   r Unit#4.posX 206140514
   r Unit#4.posZ 81711216
-  r Unit#4.heading -16542
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 70 UpdateUnitWeapons
-  r Unit#5.posY 720896
   r Unit#5.heading -5120
+  r Unit#5.posY 720896
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13660,26 +13660,26 @@ call 71 UpdateUnitWeapons
   o z 92180531
   w Unit#2.weapon0ReloadTimer 3
 call 71 UpdateUnitWeapons
+  r Unit#3.heading -16541
   r Unit#3.posX 208872671
   r Unit#3.posZ 82792841
-  r Unit#3.heading -16541
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 71 UpdateUnitWeapons
+  r Unit#4.heading -16539
   r Unit#4.posX 206258464
   r Unit#4.posZ 81712670
-  r Unit#4.heading -16539
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 71 UpdateUnitWeapons
-  r Unit#5.posY 786432
   r Unit#5.heading -5632
+  r Unit#5.posY 786432
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13769,26 +13769,26 @@ call 72 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 2
 call 72 UpdateUnitWeapons
+  r Unit#3.heading -16542
   r Unit#3.posX 208990621
   r Unit#3.posZ 82794295
-  r Unit#3.heading -16542
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 72 UpdateUnitWeapons
+  r Unit#4.heading -16536
   r Unit#4.posX 206376414
   r Unit#4.posZ 81714124
-  r Unit#4.heading -16536
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 72 UpdateUnitWeapons
-  r Unit#5.posY 851968
   r Unit#5.heading -6144
+  r Unit#5.posY 851968
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -13916,8 +13916,8 @@ call 73 UpdateUnitWeapons
   r Projectile#3.positionX 213898280
   r Projectile#3.positionY 1380136
   r Projectile#3.positionZ 87508226
-  r Unit#251.health 2977
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2977
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -13935,26 +13935,26 @@ call 73 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 1
 call 73 UpdateUnitWeapons
+  r Unit#3.heading -16544
   r Unit#3.posX 209108571
   r Unit#3.posZ 82795749
-  r Unit#3.heading -16544
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 73 UpdateUnitWeapons
+  r Unit#4.heading -16533
   r Unit#4.posX 206494364
   r Unit#4.posZ 81715578
-  r Unit#4.heading -16533
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 73 UpdateUnitWeapons
-  r Unit#5.posY 917504
   r Unit#5.heading -6656
+  r Unit#5.posY 917504
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14086,26 +14086,26 @@ call 74 UpdateUnitWeapons
   w Projectile#3.piece 3
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 74 UpdateUnitWeapons
+  r Unit#3.heading -16545
   r Unit#3.posX 209226506
   r Unit#3.posZ 82798643
-  r Unit#3.heading -16545
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 74 UpdateUnitWeapons
+  r Unit#4.heading -16530
   r Unit#4.posX 206612314
   r Unit#4.posZ 81717032
-  r Unit#4.heading -16530
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 74 UpdateUnitWeapons
-  r Unit#5.posY 983040
   r Unit#5.heading -7168
+  r Unit#5.posY 983040
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14191,26 +14191,26 @@ call 75 UpdateUnitWeapons
   w Unit#2.weapon0ReloadTimer 11
   w Unit#2.weapon0FireHeading -21381
 call 75 UpdateUnitWeapons
+  r Unit#3.heading -16541
   r Unit#3.posX 209344456
   r Unit#3.posZ 82800097
-  r Unit#3.heading -16541
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 75 UpdateUnitWeapons
+  r Unit#4.heading -16528
   r Unit#4.posX 206730264
   r Unit#4.posZ 81718486
-  r Unit#4.heading -16528
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 75 UpdateUnitWeapons
-  r Unit#5.posY 1048576
   r Unit#5.heading -7680
+  r Unit#5.posY 1048576
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14285,26 +14285,26 @@ call 76 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 10
 call 76 UpdateUnitWeapons
+  r Unit#3.heading -16542
   r Unit#3.posX 209462406
   r Unit#3.posZ 82801551
-  r Unit#3.heading -16542
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 76 UpdateUnitWeapons
+  r Unit#4.heading -16529
   r Unit#4.posX 206848214
   r Unit#4.posZ 81719940
-  r Unit#4.heading -16529
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 76 UpdateUnitWeapons
-  r Unit#5.posY 1114112
   r Unit#5.heading -8192
+  r Unit#5.posY 1114112
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14387,9 +14387,9 @@ call 77 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 9
 call 77 UpdateUnitWeapons
+  r Unit#3.heading -16544
   r Unit#3.posX 209580356
   r Unit#3.posZ 82803005
-  r Unit#3.heading -16544
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -14404,8 +14404,8 @@ call 77 UpdateUnitWeapons
   o y 0
   o z 0
 call 77 UpdateUnitWeapons
-  r Unit#5.posY 1179648
   r Unit#5.heading -8704
+  r Unit#5.posY 1179648
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14561,9 +14561,9 @@ call 78 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 8
 call 78 UpdateUnitWeapons
+  r Unit#3.heading -16545
   r Unit#3.posX 209698291
   r Unit#3.posZ 82805899
-  r Unit#3.heading -16545
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -14578,8 +14578,8 @@ call 78 UpdateUnitWeapons
   o y 0
   o z 0
 call 78 UpdateUnitWeapons
-  r Unit#5.posY 1245184
   r Unit#5.heading -9216
+  r Unit#5.posY 1245184
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14760,8 +14760,8 @@ call 79 UpdateUnitWeapons
   r Projectile#5.positionX 213437932
   r Projectile#5.positionY 1380136
   r Projectile#5.positionZ 88343127
-  r Unit#251.health 2969
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2969
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -14779,26 +14779,26 @@ call 79 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 7
 call 79 UpdateUnitWeapons
+  r Unit#3.heading -16540
   r Unit#3.posX 209816241
   r Unit#3.posZ 82807353
-  r Unit#3.heading -16540
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 79 UpdateUnitWeapons
+  r Unit#4.heading -16530
   r Unit#4.posX 207202064
   r Unit#4.posZ 81724302
-  r Unit#4.heading -16530
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 79 UpdateUnitWeapons
-  r Unit#5.posY 1310720
   r Unit#5.heading -9728
+  r Unit#5.posY 1310720
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -14920,9 +14920,9 @@ call 80 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 80 UpdateUnitWeapons
+  r Unit#3.heading -16542
   r Unit#3.posX 209934191
   r Unit#3.posZ 82808807
-  r Unit#3.heading -16542
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -14937,8 +14937,8 @@ call 80 UpdateUnitWeapons
   o y 0
   o z 0
 call 80 UpdateUnitWeapons
-  r Unit#5.posY 1376256
   r Unit#5.heading -10240
+  r Unit#5.posY 1376256
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -15058,26 +15058,26 @@ call 81 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 5
 call 81 UpdateUnitWeapons
+  r Unit#3.heading -16543
   r Unit#3.posX 210052141
   r Unit#3.posZ 82810261
-  r Unit#3.heading -16543
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 81 UpdateUnitWeapons
+  r Unit#4.heading -16531
   r Unit#4.posX 207437964
   r Unit#4.posZ 81727210
-  r Unit#4.heading -16531
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 81 UpdateUnitWeapons
-  r Unit#5.posY 1441792
   r Unit#5.heading -10752
+  r Unit#5.posY 1441792
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -15263,8 +15263,8 @@ call 82 UpdateUnitWeapons
   r Projectile#5.positionX 213447850
   r Projectile#5.positionY 1380136
   r Projectile#5.positionZ 88321129
-  r Unit#251.health 2962
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2962
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -15282,9 +15282,9 @@ call 82 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 4
 call 82 UpdateUnitWeapons
+  r Unit#3.heading -16545
   r Unit#3.posX 210170076
   r Unit#3.posZ 82813155
-  r Unit#3.heading -16545
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -15299,8 +15299,8 @@ call 82 UpdateUnitWeapons
   o y 0
   o z 0
 call 82 UpdateUnitWeapons
-  r Unit#5.posY 1507328
   r Unit#5.heading -11264
+  r Unit#5.posY 1507328
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -15425,26 +15425,26 @@ call 83 UpdateUnitWeapons
   o z 92180486
   w Unit#2.weapon0ReloadTimer 3
 call 83 UpdateUnitWeapons
+  r Unit#3.heading -16539
   r Unit#3.posX 210288026
   r Unit#3.posZ 82814609
-  r Unit#3.heading -16539
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 83 UpdateUnitWeapons
+  r Unit#4.heading -16532
   r Unit#4.posX 207673864
   r Unit#4.posZ 81730118
-  r Unit#4.heading -16532
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 83 UpdateUnitWeapons
-  r Unit#5.posY 1572864
   r Unit#5.heading -11776
+  r Unit#5.posY 1572864
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -15621,9 +15621,9 @@ call 84 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 2
 call 84 UpdateUnitWeapons
+  r Unit#3.heading -16541
   r Unit#3.posX 210405976
   r Unit#3.posZ 82816063
-  r Unit#3.heading -16541
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -15638,8 +15638,8 @@ call 84 UpdateUnitWeapons
   o y 0
   o z 0
 call 84 UpdateUnitWeapons
-  r Unit#5.posY 1638400
   r Unit#5.heading -12288
+  r Unit#5.posY 1638400
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -15821,8 +15821,8 @@ call 85 UpdateUnitWeapons
   r Projectile#4.positionX 213444651
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 88328489
-  r Unit#251.health 2954
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2954
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -15840,26 +15840,26 @@ call 85 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 1
 call 85 UpdateUnitWeapons
+  r Unit#3.heading -16543
   r Unit#3.posX 210523926
   r Unit#3.posZ 82817517
-  r Unit#3.heading -16543
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 85 UpdateUnitWeapons
+  r Unit#4.heading -16533
   r Unit#4.posX 207909764
   r Unit#4.posZ 81733026
-  r Unit#4.heading -16533
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 85 UpdateUnitWeapons
-  r Unit#5.posY 1703936
   r Unit#5.heading -12800
+  r Unit#5.posY 1703936
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16028,9 +16028,9 @@ call 86 UpdateUnitWeapons
   w Projectile#4.piece 4
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 86 UpdateUnitWeapons
+  r Unit#3.heading -16546
   r Unit#3.posX 210641861
   r Unit#3.posZ 82820411
-  r Unit#3.heading -16546
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -16045,8 +16045,8 @@ call 86 UpdateUnitWeapons
   o y 0
   o z 0
 call 86 UpdateUnitWeapons
-  r Unit#5.posY 1769472
   r Unit#5.heading -13312
+  r Unit#5.posY 1769472
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16240,9 +16240,9 @@ call 87 UpdateUnitWeapons
   w Unit#2.weapon0ReloadTimer 11
   w Unit#2.weapon0FireHeading -21963
 call 87 UpdateUnitWeapons
+  r Unit#3.heading -16536
   r Unit#3.posX 210759811
   r Unit#3.posZ 82821865
-  r Unit#3.heading -16536
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -16270,9 +16270,9 @@ call 87 Apply
   o result 1
 call 87 UpdateUnitWeapons
   r rng.seed 0x0db96ccc
+  r Unit#4.heading -16534
   r Unit#4.posX 208145664
   r Unit#4.posZ 81735934
-  r Unit#4.heading -16534
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -16300,8 +16300,8 @@ call 87 Apply
   o result 1
 call 87 UpdateUnitWeapons
   r rng.seed 0x0895cc1e
-  r Unit#5.posY 1835008
   r Unit#5.heading -13824
+  r Unit#5.posY 1835008
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16416,26 +16416,26 @@ call 88 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 10
 call 88 UpdateUnitWeapons
+  r Unit#3.heading -16539
   r Unit#3.posX 210877761
   r Unit#3.posZ 82823319
-  r Unit#3.heading -16539
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 88 UpdateUnitWeapons
+  r Unit#4.heading -17654
   r Unit#4.posX 208262735
   r Unit#4.posZ 81750377
-  r Unit#4.heading -17654
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 88 UpdateUnitWeapons
-  r Unit#5.posY 1900544
   r Unit#5.heading -14336
+  r Unit#5.posY 1900544
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16569,26 +16569,26 @@ call 89 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 9
 call 89 UpdateUnitWeapons
+  r Unit#3.heading -16542
   r Unit#3.posX 210995711
   r Unit#3.posZ 82824773
-  r Unit#3.heading -16542
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 89 UpdateUnitWeapons
+  r Unit#4.heading -16545
   r Unit#4.posX 208380670
   r Unit#4.posZ 81753271
-  r Unit#4.heading -16545
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 89 UpdateUnitWeapons
-  r Unit#5.posY 1966080
   r Unit#5.heading -14848
+  r Unit#5.posY 1966080
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16717,26 +16717,26 @@ call 90 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 8
 call 90 UpdateUnitWeapons
+  r Unit#3.heading -16547
   r Unit#3.posX 211113646
   r Unit#3.posZ 82827667
-  r Unit#3.heading -16547
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 90 UpdateUnitWeapons
+  r Unit#4.heading -16540
   r Unit#4.posX 208498620
   r Unit#4.posZ 81754725
-  r Unit#4.heading -16540
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 90 UpdateUnitWeapons
-  r Unit#5.posY 2031616
   r Unit#5.heading -15360
+  r Unit#5.posY 2031616
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -16907,8 +16907,8 @@ call 91 UpdateUnitWeapons
   r Projectile#4.positionX 213916133
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 87482001
-  r Unit#251.health 2947
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2947
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -16926,26 +16926,26 @@ call 91 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 7
 call 91 UpdateUnitWeapons
+  r Unit#3.heading -16531
   r Unit#3.posX 211231596
   r Unit#3.posZ 82829121
-  r Unit#3.heading -16531
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 91 UpdateUnitWeapons
+  r Unit#4.heading -16541
   r Unit#4.posX 208616570
   r Unit#4.posZ 81756179
-  r Unit#4.heading -16541
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 91 UpdateUnitWeapons
-  r Unit#5.posY 2097152
   r Unit#5.heading -15872
+  r Unit#5.posY 2097152
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -17096,26 +17096,26 @@ call 92 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 92 UpdateUnitWeapons
+  r Unit#3.heading -16535
   r Unit#3.posX 211349546
   r Unit#3.posZ 82830575
-  r Unit#3.heading -16535
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 92 UpdateUnitWeapons
+  r Unit#4.heading -16543
   r Unit#4.posX 208734520
   r Unit#4.posZ 81757633
-  r Unit#4.heading -16543
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 92 UpdateUnitWeapons
-  r Unit#5.posY 2162688
   r Unit#5.heading -16384
+  r Unit#5.posY 2162688
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -17256,26 +17256,26 @@ call 93 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 5
 call 93 UpdateUnitWeapons
+  r Unit#3.heading -16540
   r Unit#3.posX 211467496
   r Unit#3.posZ 82832029
-  r Unit#3.heading -16540
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 93 UpdateUnitWeapons
+  r Unit#4.heading -16545
   r Unit#4.posX 208852455
   r Unit#4.posZ 81760527
-  r Unit#4.heading -16545
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 93 UpdateUnitWeapons
-  r Unit#5.posY 2228224
   r Unit#5.heading -16896
+  r Unit#5.posY 2228224
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -17452,8 +17452,8 @@ call 94 UpdateUnitWeapons
   r Projectile#4.positionX 213911814
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 87488720
-  r Unit#251.health 2939
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2939
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -17471,26 +17471,26 @@ call 94 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 4
 call 94 UpdateUnitWeapons
+  r Unit#3.heading -16550
   r Unit#3.posX 211585431
   r Unit#3.posZ 82834923
-  r Unit#3.heading -16550
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 94 UpdateUnitWeapons
+  r Unit#4.heading -16539
   r Unit#4.posX 208970405
   r Unit#4.posZ 81761981
-  r Unit#4.heading -16539
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 94 UpdateUnitWeapons
-  r Unit#5.posY 2293760
   r Unit#5.heading -17408
+  r Unit#5.posY 2293760
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -17638,26 +17638,26 @@ call 95 UpdateUnitWeapons
   o z 92180531
   w Unit#2.weapon0ReloadTimer 3
 call 95 UpdateUnitWeapons
+  r Unit#3.heading -17670
   r Unit#3.posX 211702502
   r Unit#3.posZ 82849366
-  r Unit#3.heading -17670
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 95 UpdateUnitWeapons
+  r Unit#4.heading -16541
   r Unit#4.posX 209088355
   r Unit#4.posZ 81763435
-  r Unit#4.heading -16541
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 95 UpdateUnitWeapons
-  r Unit#5.posY 2359296
   r Unit#5.heading -17920
+  r Unit#5.posY 2359296
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -17828,26 +17828,26 @@ call 96 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 2
 call 96 UpdateUnitWeapons
+  r Unit#3.heading -18790
   r Unit#3.posX 211817269
   r Unit#3.posZ 82876625
-  r Unit#3.heading -18790
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 96 UpdateUnitWeapons
+  r Unit#4.heading -16543
   r Unit#4.posX 209206305
   r Unit#4.posZ 81764889
-  r Unit#4.heading -16543
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 96 UpdateUnitWeapons
-  r Unit#5.posY 2424832
   r Unit#5.heading -18432
+  r Unit#5.posY 2424832
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18009,8 +18009,8 @@ call 97 UpdateUnitWeapons
   r Projectile#3.positionX 213924612
   r Projectile#3.positionY 1380136
   r Projectile#3.positionZ 87468323
-  r Unit#251.health 2932
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2932
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -18028,26 +18028,26 @@ call 97 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 1
 call 97 UpdateUnitWeapons
+  r Unit#3.heading -19910
   r Unit#3.posX 211928335
   r Unit#3.posZ 82916369
-  r Unit#3.heading -19910
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 97 UpdateUnitWeapons
+  r Unit#4.heading -16545
   r Unit#4.posX 209324240
   r Unit#4.posZ 81767783
-  r Unit#4.heading -16545
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 97 UpdateUnitWeapons
-  r Unit#5.posY 2490368
   r Unit#5.heading -18944
+  r Unit#5.posY 2490368
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18235,26 +18235,26 @@ call 98 UpdateUnitWeapons
   w Projectile#3.piece 3
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 98 UpdateUnitWeapons
+  r Unit#3.heading -21030
   r Unit#3.posX 212034347
   r Unit#3.posZ 82968108
-  r Unit#3.heading -21030
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 98 UpdateUnitWeapons
+  r Unit#4.heading -16537
   r Unit#4.posX 209442190
   r Unit#4.posZ 81769237
-  r Unit#4.heading -16537
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 98 UpdateUnitWeapons
-  r Unit#5.posY 2555904
   r Unit#5.heading -19456
+  r Unit#5.posY 2555904
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18409,26 +18409,26 @@ call 99 UpdateUnitWeapons
   w Unit#2.weapon0FireHeading -21381
   w Unit#2.weapon0FirePitch 0
 call 99 UpdateUnitWeapons
+  r Unit#3.heading -22150
   r Unit#3.posX 212134772
   r Unit#3.posZ 83029984
-  r Unit#3.heading -22150
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 99 UpdateUnitWeapons
+  r Unit#4.heading -16539
   r Unit#4.posX 209560140
   r Unit#4.posZ 81770691
-  r Unit#4.heading -16539
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 99 UpdateUnitWeapons
-  r Unit#5.posY 2621440
   r Unit#5.heading -19968
+  r Unit#5.posY 2621440
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18548,26 +18548,26 @@ call 100 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 10
 call 100 UpdateUnitWeapons
+  r Unit#3.heading -23270
   r Unit#3.posX 212227767
   r Unit#3.posZ 83102560
-  r Unit#3.heading -23270
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 100 UpdateUnitWeapons
+  r Unit#4.heading -16542
   r Unit#4.posX 209678090
   r Unit#4.posZ 81772145
-  r Unit#4.heading -16542
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 100 UpdateUnitWeapons
-  r Unit#5.posY 2686976
   r Unit#5.heading -20480
+  r Unit#5.posY 2686976
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18695,26 +18695,26 @@ call 101 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 9
 call 101 UpdateUnitWeapons
+  r Unit#3.heading -24390
   r Unit#3.posX 212312194
   r Unit#3.posZ 83184942
-  r Unit#3.heading -24390
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 101 UpdateUnitWeapons
+  r Unit#4.heading -16545
   r Unit#4.posX 209796025
   r Unit#4.posZ 81775039
-  r Unit#4.heading -16545
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 101 UpdateUnitWeapons
-  r Unit#5.posY 2752512
   r Unit#5.heading -20992
+  r Unit#5.posY 2752512
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -18871,10 +18871,10 @@ call 102 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 8
 call 102 UpdateUnitWeapons
+  r Unit#3.heading -24790
   r Unit#3.flags 0x90240321
   r Unit#3.posX 212336639
   r Unit#3.posZ 83270377
-  r Unit#3.heading -24790
   r UnitMotion#4.speed 58982
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -18882,17 +18882,17 @@ call 102 UpdateUnitWeapons
   o y 0
   o z 0
 call 102 UpdateUnitWeapons
+  r Unit#4.heading -16534
   r Unit#4.posX 209913975
   r Unit#4.posZ 81776493
-  r Unit#4.heading -16534
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 102 UpdateUnitWeapons
-  r Unit#5.posY 2818048
   r Unit#5.heading -21504
+  r Unit#5.posY 2818048
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19046,8 +19046,8 @@ call 103 UpdateUnitWeapons
   r Projectile#4.positionX 213437932
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 88343127
-  r Unit#251.health 2924
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2924
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -19065,25 +19065,25 @@ call 103 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 7
 call 103 UpdateUnitWeapons
-  r Unit#3.posZ 83317280
   r Unit#3.heading -24705
+  r Unit#3.posZ 83317280
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 103 UpdateUnitWeapons
+  r Unit#4.heading -16537
   r Unit#4.posX 210031925
   r Unit#4.posZ 81777947
-  r Unit#4.heading -16537
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 103 UpdateUnitWeapons
-  r Unit#5.posY 2883584
   r Unit#5.heading -22016
+  r Unit#5.posY 2883584
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19234,10 +19234,10 @@ call 104 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 104 UpdateUnitWeapons
+  r Unit#3.heading -24722
   r Unit#3.flags 0x90240325
   r Unit#3.posX 212382406
   r Unit#3.posZ 83364183
-  r Unit#3.heading -24722
   r UnitMotion#4.speed 65535
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -19245,17 +19245,17 @@ call 104 UpdateUnitWeapons
   o y 0
   o z 0
 call 104 UpdateUnitWeapons
+  r Unit#4.heading -16540
   r Unit#4.posX 210149875
   r Unit#4.posZ 81779401
-  r Unit#4.heading -16540
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 104 UpdateUnitWeapons
-  r Unit#5.posY 2949120
   r Unit#5.heading -22528
+  r Unit#5.posY 2949120
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19416,17 +19416,17 @@ call 105 UpdateUnitWeapons
   o y 0
   o z 0
 call 105 UpdateUnitWeapons
+  r Unit#4.heading -16546
   r Unit#4.posX 210267810
   r Unit#4.posZ 81782295
-  r Unit#4.heading -16546
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 105 UpdateUnitWeapons
-  r Unit#5.posY 3014656
   r Unit#5.heading -23040
+  r Unit#5.posY 3014656
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19586,8 +19586,8 @@ call 106 UpdateUnitWeapons
   r Projectile#4.positionX 213434492
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 88350326
-  r Unit#251.health 2917
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2917
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -19605,9 +19605,9 @@ call 106 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 4
 call 106 UpdateUnitWeapons
+  r Unit#3.heading -24723
   r Unit#3.posX 212487670
   r Unit#3.posZ 83472059
-  r Unit#3.heading -24723
   r UnitMotion#4.speed 78641
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -19615,17 +19615,17 @@ call 106 UpdateUnitWeapons
   o y 0
   o z 0
 call 106 UpdateUnitWeapons
+  r Unit#4.heading -16523
   r Unit#4.posX 210385760
   r Unit#4.posZ 81783749
-  r Unit#4.heading -16523
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 106 UpdateUnitWeapons
-  r Unit#5.posY 3080192
   r Unit#5.heading -23552
+  r Unit#5.posY 3080192
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19782,17 +19782,17 @@ call 107 UpdateUnitWeapons
   o y 0
   o z 0
 call 107 UpdateUnitWeapons
+  r Unit#4.heading -16527
   r Unit#4.posX 210503710
   r Unit#4.posZ 81785203
-  r Unit#4.heading -16527
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 107 UpdateUnitWeapons
-  r Unit#5.posY 3145728
   r Unit#5.heading -24064
+  r Unit#5.posY 3145728
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -19964,9 +19964,9 @@ call 108 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 2
 call 108 UpdateUnitWeapons
+  r Unit#3.heading -24724
   r Unit#3.posX 212611239
   r Unit#3.posZ 83598695
-  r Unit#3.heading -24724
   r UnitMotion#4.speed 91747
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -19974,17 +19974,17 @@ call 108 UpdateUnitWeapons
   o y 0
   o z 0
 call 108 UpdateUnitWeapons
+  r Unit#4.heading -17647
   r Unit#4.posX 210620781
   r Unit#4.posZ 81799646
-  r Unit#4.heading -17647
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 108 UpdateUnitWeapons
-  r Unit#5.posY 3211264
   r Unit#5.heading -24576
+  r Unit#5.posY 3211264
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -20135,8 +20135,8 @@ call 109 UpdateUnitWeapons
   r Projectile#3.positionX 213447850
   r Projectile#3.positionY 1380136
   r Projectile#3.positionZ 88321129
-  r Unit#251.health 2909
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2909
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -20154,9 +20154,9 @@ call 109 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 1
 call 109 UpdateUnitWeapons
+  r Unit#3.heading -24725
   r Unit#3.posX 212679888
   r Unit#3.posZ 83669048
-  r Unit#3.heading -24725
   r UnitMotion#4.speed 98300
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -20164,17 +20164,17 @@ call 109 UpdateUnitWeapons
   o y 0
   o z 0
 call 109 UpdateUnitWeapons
+  r Unit#4.heading -18767
   r Unit#4.posX 210735548
   r Unit#4.posZ 81826905
-  r Unit#4.heading -18767
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 109 UpdateUnitWeapons
-  r Unit#5.posY 3276800
   r Unit#5.heading -25088
+  r Unit#5.posY 3276800
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -20362,9 +20362,9 @@ call 110 UpdateUnitWeapons
   w Projectile#3.piece 4
   w Unit#2.weapons[0].aimCob.nAimCobDone 0
 call 110 UpdateUnitWeapons
+  r Unit#3.heading -24726
   r Unit#3.posX 212753114
   r Unit#3.posZ 83744091
-  r Unit#3.heading -24726
   r UnitMotion#4.speed 104853
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -20372,17 +20372,17 @@ call 110 UpdateUnitWeapons
   o y 0
   o z 0
 call 110 UpdateUnitWeapons
+  r Unit#4.heading -19887
   r Unit#4.posX 210846614
   r Unit#4.posZ 81866649
-  r Unit#4.heading -19887
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 110 UpdateUnitWeapons
-  r Unit#5.posY 3342336
   r Unit#5.heading -25600
+  r Unit#5.posY 3342336
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -20532,9 +20532,9 @@ call 111 UpdateUnitWeapons
   w Unit#2.weapon0FireHeading -21963
   w Unit#2.weapon0FirePitch 0
 call 111 UpdateUnitWeapons
+  r Unit#3.heading -24728
   r Unit#3.posX 212830916
   r Unit#3.posZ 83823824
-  r Unit#3.heading -24728
   r UnitMotion#4.speed 111406
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -20542,17 +20542,17 @@ call 111 UpdateUnitWeapons
   o y 0
   o z 0
 call 111 UpdateUnitWeapons
+  r Unit#4.heading -21007
   r Unit#4.posX 210953245
   r Unit#4.posZ 81917092
-  r Unit#4.heading -21007
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 111 UpdateUnitWeapons
-  r Unit#5.posY 3407872
   r Unit#5.heading -26112
+  r Unit#5.posY 3407872
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -20679,9 +20679,9 @@ call 112 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 10
 call 112 UpdateUnitWeapons
+  r Unit#3.heading -24730
   r Unit#3.posX 212913294
   r Unit#3.posZ 83908247
-  r Unit#3.heading -24730
   r UnitMotion#4.speed 117959
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -20689,17 +20689,17 @@ call 112 UpdateUnitWeapons
   o y 0
   o z 0
 call 112 UpdateUnitWeapons
+  r Unit#4.heading -22127
   r Unit#4.posX 211053670
   r Unit#4.posZ 81978968
-  r Unit#4.heading -22127
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 112 UpdateUnitWeapons
-  r Unit#5.posY 3473408
   r Unit#5.heading -26624
+  r Unit#5.posY 3473408
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -20833,9 +20833,9 @@ call 113 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 9
 call 113 UpdateUnitWeapons
+  r Unit#3.heading -24732
   r Unit#3.posX 212995676
   r Unit#3.posZ 83992674
-  r Unit#3.heading -24732
   r UnitMotion#4.speed 117964
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
@@ -20843,17 +20843,17 @@ call 113 UpdateUnitWeapons
   o y 0
   o z 0
 call 113 UpdateUnitWeapons
+  r Unit#4.heading -23247
   r Unit#4.posX 211146665
   r Unit#4.posZ 82051544
-  r Unit#4.heading -23247
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 113 UpdateUnitWeapons
-  r Unit#5.posY 3538944
   r Unit#5.heading -27136
+  r Unit#5.posY 3538944
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -21055,26 +21055,26 @@ call 114 UpdateUnitWeapons
   o z 92188824
   w Unit#2.weapon0ReloadTimer 8
 call 114 UpdateUnitWeapons
+  r Unit#3.heading -24734
   r Unit#3.posX 213078058
   r Unit#3.posZ 84077101
-  r Unit#3.heading -24734
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 114 UpdateUnitWeapons
+  r Unit#4.heading -24367
   r Unit#4.posX 211231092
   r Unit#4.posZ 82133926
-  r Unit#4.heading -24367
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 114 UpdateUnitWeapons
-  r Unit#5.posY 3604480
   r Unit#5.heading -27648
+  r Unit#5.posY 3604480
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -21270,8 +21270,8 @@ call 115 UpdateUnitWeapons
   r Projectile#5.positionX 213916133
   r Projectile#5.positionY 1380136
   r Projectile#5.positionZ 87482001
-  r Unit#251.health 2902
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2902
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -21289,26 +21289,26 @@ call 115 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 7
 call 115 UpdateUnitWeapons
+  r Unit#3.heading -24737
   r Unit#3.posX 213159403
   r Unit#3.posZ 84162536
-  r Unit#3.heading -24737
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 115 UpdateUnitWeapons
+  r Unit#4.heading -24809
   r Unit#4.posX 211312437
   r Unit#4.posZ 82219361
-  r Unit#4.heading -24809
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 115 UpdateUnitWeapons
-  r Unit#5.posY 3670016
   r Unit#5.heading -28160
+  r Unit#5.posY 3670016
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
   o x 0
@@ -21503,28 +21503,28 @@ call 116 Apply
   w Unit#2.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 116 UpdateUnitWeapons
+  r Unit#3.heading -24727
   r Unit#3.posX 213241785
   r Unit#3.posZ 84246963
-  r Unit#3.heading -24727
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
   o y 0
   o z 0
 call 116 UpdateUnitWeapons
+  r Unit#4.heading -24808
   r Unit#4.posX 211393782
   r Unit#4.posZ 82304796
-  r Unit#4.heading -24808
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 116 UpdateUnitWeapons
+  r Unit#5.heading -27648
   r Unit#5.posX 196630826
   r Unit#5.posY 3735552
   r Unit#5.posZ 85194552
-  r Unit#5.heading -27648
   r UnitMotion#6.speed 69433
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -21656,9 +21656,9 @@ call 117 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 5
 call 117 UpdateUnitWeapons
+  r Unit#3.heading -24730
   r Unit#3.posX 213324167
   r Unit#3.posZ 84331390
-  r Unit#3.heading -24730
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 0
   o x 0
@@ -21684,10 +21684,10 @@ call 117 Apply
   a size 12
   o result 1
 call 117 UpdateUnitWeapons
+  r Unit#4.heading -24807
   r Unit#4.flags 0x90240321
   r Unit#4.posX 211475127
   r Unit#4.posZ 82313215
-  r Unit#4.heading -24807
   r UnitMotion#5.speed 58982
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -21706,10 +21706,10 @@ call 117 Apply
   a size 12
   o result 1
 call 117 UpdateUnitWeapons
+  r Unit#5.heading -27136
   r Unit#5.posX 196675679
   r Unit#5.posY 3801088
   r Unit#5.posZ 85190134
-  r Unit#5.heading -27136
   r UnitMotion#6.speed 79537
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -21899,8 +21899,8 @@ call 118 UpdateUnitWeapons
   r Projectile#5.positionX 213916133
   r Projectile#5.positionY 1380136
   r Projectile#5.positionZ 87482001
-  r Unit#251.health 2894
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2894
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -21918,10 +21918,10 @@ call 118 UpdateUnitWeapons
   o z 92188871
   w Unit#2.weapon0ReloadTimer 4
 call 118 UpdateUnitWeapons
-  r Unit#3.posX 213406549
-  r Unit#3.posZ 84415817
   r Unit#3.weapon0TargetX 251
   r Unit#3.heading -24733
+  r Unit#3.posX 213406549
+  r Unit#3.posZ 84415817
   a unit Unit#3
   i services.ScheduleTargetingTargetPos Unit#3 0 = 1
   o x 221385488
@@ -21936,10 +21936,10 @@ call 118 UpdateUnitWeapons
   w Unit#3.weapon0FireHeading 570
   w Unit#3.weapon0FirePitch 61
 call 118 UpdateUnitWeapons
+  r Unit#4.heading -24962
   r Unit#4.flags 0x90240325
   r Unit#4.posX 211519726
   r Unit#4.posZ 82361230
-  r Unit#4.heading -24962
   r UnitMotion#5.speed 65535
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -21947,10 +21947,10 @@ call 118 UpdateUnitWeapons
   o y 0
   o z 0
 call 118 UpdateUnitWeapons
+  r Unit#5.heading -26624
   r Unit#5.posX 196741788
   r Unit#5.posY 3866624
   r Unit#5.posZ 85183622
-  r Unit#5.heading -26624
   r UnitMotion#6.speed 93315
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -22131,10 +22131,10 @@ call 119 UpdateUnitWeapons
   o y 0
   o z 0
 call 119 UpdateUnitWeapons
+  r Unit#5.heading -26112
   r Unit#5.posX 196828409
   r Unit#5.posY 3932160
   r Unit#5.posZ 85175089
-  r Unit#5.heading -26112
   r UnitMotion#6.speed 108954
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -22348,10 +22348,10 @@ call 120 UpdateUnitWeapons
   o y 0
   o z 0
 call 120 UpdateUnitWeapons
+  r Unit#5.heading -25600
   r Unit#5.posX 196934825
   r Unit#5.posY 3997696
   r Unit#5.posZ 85164606
-  r Unit#5.heading -25600
   r UnitMotion#6.speed 125416
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -22534,8 +22534,8 @@ call 121 UpdateUnitWeapons
   r Projectile#4.positionX 213916133
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 87482001
-  r Unit#251.health 2887
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2887
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -22572,10 +22572,10 @@ call 121 UpdateUnitWeapons
   o y 0
   o z 0
 call 121 UpdateUnitWeapons
+  r Unit#5.heading -25088
   r Unit#5.posX 197060343
   r Unit#5.posY 4063232
   r Unit#5.posZ 85152241
-  r Unit#5.heading -25088
   r UnitMotion#6.speed 142135
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -22779,10 +22779,10 @@ call 122 UpdateUnitWeapons
   o y 0
   o z 0
 call 122 UpdateUnitWeapons
+  r Unit#5.heading -24576
   r Unit#5.posX 197204295
   r Unit#5.posY 4128768
   r Unit#5.posZ 85138060
-  r Unit#5.heading -24576
   r UnitMotion#6.speed 158802
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23005,10 +23005,10 @@ call 123 UpdateUnitWeapons
   o y 0
   o z 0
 call 123 UpdateUnitWeapons
+  r Unit#5.heading -24064
   r Unit#5.posX 197366036
   r Unit#5.posY 4194304
   r Unit#5.posZ 85122127
-  r Unit#5.heading -24064
   r UnitMotion#6.speed 175239
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23148,10 +23148,10 @@ call 124 UpdateUnitWeapons
   o y 0
   o z 0
 call 124 UpdateUnitWeapons
+  r Unit#5.heading -23552
   r Unit#5.posX 197544943
   r Unit#5.posY 4259840
   r Unit#5.posZ 85104503
-  r Unit#5.heading -23552
   r UnitMotion#6.speed 191345
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23299,10 +23299,10 @@ call 125 UpdateUnitWeapons
   o y 0
   o z 0
 call 125 UpdateUnitWeapons
+  r Unit#5.heading -23040
   r Unit#5.posX 197740416
   r Unit#5.posY 4325376
   r Unit#5.posZ 85085247
-  r Unit#5.heading -23040
   r UnitMotion#6.speed 207063
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23471,10 +23471,10 @@ call 126 UpdateUnitWeapons
   o y 0
   o z 0
 call 126 UpdateUnitWeapons
+  r Unit#5.heading -22528
   r Unit#5.posX 197951875
   r Unit#5.posY 4390912
   r Unit#5.posZ 85064417
-  r Unit#5.heading -22528
   r UnitMotion#6.speed 222359
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23626,8 +23626,8 @@ call 127 UpdateUnitWeapons
   r Projectile#4.positionX 213437932
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 88343127
-  r Unit#251.health 2879
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2879
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -23664,10 +23664,10 @@ call 127 UpdateUnitWeapons
   o y 0
   o z 0
 call 127 UpdateUnitWeapons
+  r Unit#5.heading -22016
   r Unit#5.posX 198178761
   r Unit#5.posY 4456448
   r Unit#5.posZ 85042068
-  r Unit#5.heading -22016
   r UnitMotion#6.speed 237216
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -23836,10 +23836,10 @@ call 128 UpdateUnitWeapons
   o y 0
   o z 0
 call 128 UpdateUnitWeapons
+  r Unit#5.heading -21504
   r Unit#5.posX 198420534
   r Unit#5.posY 4521984
   r Unit#5.posZ 85018253
-  r Unit#5.heading -21504
   r UnitMotion#6.speed 251627
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -24007,10 +24007,10 @@ call 129 UpdateUnitWeapons
   o y 0
   o z 0
 call 129 UpdateUnitWeapons
+  r Unit#5.heading -20992
   r Unit#5.posX 198676673
   r Unit#5.posY 4587520
   r Unit#5.posZ 84993023
-  r Unit#5.heading -20992
   r UnitMotion#6.speed 265591
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -24170,8 +24170,8 @@ call 130 UpdateUnitWeapons
   r Projectile#4.positionX 213447850
   r Projectile#4.positionY 1380136
   r Projectile#4.positionZ 88321129
-  r Unit#251.health 2872
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2872
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -24206,10 +24206,10 @@ call 130 UpdateUnitWeapons
   o y 0
   o z 0
 call 130 UpdateUnitWeapons
+  r Unit#5.heading -20480
   r Unit#5.posX 198946676
   r Unit#5.posY 4653917
   r Unit#5.posZ 84966428
-  r Unit#5.heading -20480
   r UnitMotion#6.speed 279316
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -24365,18 +24365,18 @@ call 131 UpdateUnitWeapons
   o z 92180486
   i services.ScheduleTargetingTargetUnit Unit#3 0 = Unit#251
 call 131 UpdateUnitWeapons
-  r Unit#4.posZ 83311921
   r Unit#4.heading -24891
+  r Unit#4.posZ 83311921
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 131 UpdateUnitWeapons
+  r Unit#5.heading -19968
   r Unit#5.posX 199230058
   r Unit#5.posY 4723746
   r Unit#5.posZ 84938516
-  r Unit#5.heading -19968
   r UnitMotion#6.speed 293190
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -24563,18 +24563,18 @@ call 132 Apply
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 132 UpdateUnitWeapons
-  r Unit#4.posZ 83359384
   r Unit#4.heading -24739
+  r Unit#4.posZ 83359384
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 132 UpdateUnitWeapons
+  r Unit#5.heading -19456
   r Unit#5.posX 199526350
   r Unit#5.posY 4797043
   r Unit#5.posZ 84909333
-  r Unit#5.heading -19456
   r UnitMotion#6.speed 306615
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -24724,8 +24724,8 @@ call 133 UpdateUnitWeapons
   r Projectile#3.positionX 213434492
   r Projectile#3.positionY 1380136
   r Projectile#3.positionZ 88350326
-  r Unit#251.health 2864
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2864
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -24789,18 +24789,18 @@ call 133 UpdateUnitWeapons
   w Projectile#3.nextSmokeTick 133
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 133 UpdateUnitWeapons
-  r Unit#4.posZ 83361791
   r Unit#4.heading -24584
+  r Unit#4.posZ 83361791
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 133 UpdateUnitWeapons
+  r Unit#5.heading -18944
   r Unit#5.posX 199835101
   r Unit#5.posY 4873696
   r Unit#5.posZ 84878923
-  r Unit#5.heading -18944
   r UnitMotion#6.speed 319574
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25009,10 +25009,10 @@ call 134 UpdateUnitWeapons
   o y 0
   o z 0
 call 134 UpdateUnitWeapons
+  r Unit#5.heading -18432
   r Unit#5.posX 200155875
   r Unit#5.posY 4953589
   r Unit#5.posZ 84847329
-  r Unit#5.heading -18432
   r UnitMotion#6.speed 332079
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25179,10 +25179,10 @@ call 135 UpdateUnitWeapons
   o y 0
   o z 0
 call 135 UpdateUnitWeapons
+  r Unit#5.heading -17920
   r Unit#5.posX 200488251
   r Unit#5.posY 5036608
   r Unit#5.posZ 84814593
-  r Unit#5.heading -17920
   r UnitMotion#6.speed 344147
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25316,10 +25316,10 @@ call 136 UpdateUnitWeapons
   o y 0
   o z 0
 call 136 UpdateUnitWeapons
+  r Unit#5.heading -17408
   r Unit#5.posX 200831823
   r Unit#5.posY 5122644
   r Unit#5.posZ 84780754
-  r Unit#5.heading -17408
   r UnitMotion#6.speed 355793
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25500,10 +25500,10 @@ call 137 UpdateUnitWeapons
   o y 0
   o z 0
 call 137 UpdateUnitWeapons
+  r Unit#5.heading -16896
   r Unit#5.posX 201186199
   r Unit#5.posY 5211592
   r Unit#5.posZ 84745851
-  r Unit#5.heading -16896
   r UnitMotion#6.speed 367031
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25684,10 +25684,10 @@ call 138 UpdateUnitWeapons
   o y 0
   o z 0
 call 138 UpdateUnitWeapons
+  r Unit#5.heading -16384
   r Unit#5.posX 201551001
   r Unit#5.posY 5303349
   r Unit#5.posZ 84709922
-  r Unit#5.heading -16384
   r UnitMotion#6.speed 377876
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 0
@@ -25946,9 +25946,9 @@ call 139 UpdateUnitWeapons
   r Projectile#6.positionX 213916133
   r Projectile#6.positionY 1380136
   r Projectile#6.positionZ 87482001
-  r Unit#251.health 2857
   r Unit#251.weapon0TargetX 3
   r Unit#251.weapon2TargetX 3
+  r Unit#251.health 2857
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -25987,11 +25987,11 @@ call 139 UpdateUnitWeapons
   o y 0
   o z 0
 call 139 UpdateUnitWeapons
+  r Unit#5.weapon0TargetX 251
+  r Unit#5.heading -16896
   r Unit#5.posX 201921824
   r Unit#5.posY 5397818
   r Unit#5.posZ 84688410
-  r Unit#5.weapon0TargetX 251
-  r Unit#5.heading -16896
   r UnitMotion#6.speed 383271
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -26039,10 +26039,10 @@ call 139 UpdateUnitWeapons
   w Projectile#6.piece 0
 call 139 UpdateUnitWeapons
   r rng.seed 0x7bd95fcb
+  r Unit#5.heading -17408
   r Unit#5.posX 202300956
   r Unit#5.posY 5493635
   r Unit#5.posZ 84676198
-  r Unit#5.heading -17408
   r UnitMotion#6.speed 391243
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -26259,10 +26259,10 @@ call 140 UpdateUnitWeapons
   o z 92161898
   w Unit#5.weapon0ReloadTimer 89
 call 140 UpdateUnitWeapons
+  r Unit#5.heading -17920
   r Unit#5.posX 202687442
   r Unit#5.posY 5591445
   r Unit#5.posZ 84674457
-  r Unit#5.heading -17920
   r UnitMotion#6.speed 398674
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -26442,10 +26442,10 @@ call 141 UpdateUnitWeapons
   o z 92154356
   w Unit#5.weapon0ReloadTimer 88
 call 141 UpdateUnitWeapons
+  r Unit#5.heading -18432
   r Unit#5.posX 203081040
   r Unit#5.posY 5691113
   r Unit#5.posZ 84682790
-  r Unit#5.heading -18432
   r UnitMotion#6.speed 406106
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -26704,8 +26704,8 @@ call 142 UpdateUnitWeapons
   r Projectile#8.positionX 213911814
   r Projectile#8.positionY 1380136
   r Projectile#8.positionZ 87488720
-  r Unit#251.health 2849
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2849
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -26743,10 +26743,10 @@ call 142 UpdateUnitWeapons
   o z 92147099
   w Unit#5.weapon0ReloadTimer 87
 call 142 UpdateUnitWeapons
+  r Unit#5.heading -18944
   r Unit#5.posX 203481515
   r Unit#5.posY 5792639
   r Unit#5.posZ 84700816
-  r Unit#5.heading -18944
   r UnitMotion#6.speed 413536
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -27058,10 +27058,10 @@ call 143 UpdateUnitWeapons
   o z 92140147
   w Unit#5.weapon0ReloadTimer 86
 call 143 UpdateUnitWeapons
+  r Unit#5.heading -19456
   r Unit#5.posX 203888640
   r Unit#5.posY 5896023
   r Unit#5.posZ 84728168
-  r Unit#5.heading -19456
   r UnitMotion#6.speed 420936
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -27373,10 +27373,10 @@ call 144 UpdateUnitWeapons
   o z 92164472
   w Unit#5.weapon0ReloadTimer 85
 call 144 UpdateUnitWeapons
+  r Unit#5.heading -19968
   r Unit#5.posX 204302169
   r Unit#5.posY 6001257
   r Unit#5.posZ 84764612
-  r Unit#5.heading -19968
   r UnitMotion#6.speed 428262
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -27637,8 +27637,8 @@ call 145 UpdateUnitWeapons
   r Projectile#7.positionX 213902855
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 87502079
-  r Unit#251.health 2842
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2842
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -27715,10 +27715,10 @@ call 145 UpdateUnitWeapons
   o z 92188871
   w Unit#5.weapon0ReloadTimer 84
 call 145 UpdateUnitWeapons
+  r Unit#5.heading -20412
   r Unit#5.posX 204721517
   r Unit#5.posY 6108322
   r Unit#5.posZ 84811503
-  r Unit#5.heading -20412
   r UnitMotion#6.speed 435332
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -27902,10 +27902,10 @@ call 146 UpdateUnitWeapons
   o z 92180531
   w Unit#5.weapon0ReloadTimer 83
 call 146 UpdateUnitWeapons
+  r Unit#5.heading -20422
   r Unit#5.posX 205145937
   r Unit#5.posY 6217155
   r Unit#5.posZ 84870365
-  r Unit#5.heading -20422
   r UnitMotion#6.speed 442087
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -28127,10 +28127,10 @@ call 147 UpdateUnitWeapons
   o z 92188871
   w Unit#5.weapon0ReloadTimer 82
 call 147 UpdateUnitWeapons
+  r Unit#5.heading -20431
   r Unit#5.posX 205574916
   r Unit#5.posY 6327676
   r Unit#5.posZ 84941879
-  r Unit#5.heading -20431
   r UnitMotion#6.speed 448722
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -28282,10 +28282,10 @@ call 148 UpdateUnitWeapons
   o z 92188871
   w Unit#5.weapon0ReloadTimer 81
 call 148 UpdateUnitWeapons
+  r Unit#5.heading -20440
   r Unit#5.posX 206008033
   r Unit#5.posY 6439856
   r Unit#5.posZ 85026318
-  r Unit#5.heading -20440
   r UnitMotion#6.speed 455307
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -28468,10 +28468,10 @@ call 149 UpdateUnitWeapons
   o z 92188871
   w Unit#5.weapon0ReloadTimer 80
 call 149 UpdateUnitWeapons
+  r Unit#5.heading -20448
   r Unit#5.posX 206444957
   r Unit#5.posY 6553682
   r Unit#5.posZ 85123603
-  r Unit#5.heading -20448
   r UnitMotion#6.speed 461869
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -28846,8 +28846,8 @@ call 150 UpdateUnitWeapons
   r Projectile#10.positionX 219315703
   r Projectile#10.positionY 1940800
   r Projectile#10.positionZ 92036418
-  r Unit#251.health 2834
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2834
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -28885,10 +28885,10 @@ call 150 UpdateUnitWeapons
   o z 92188871
   w Unit#5.weapon0ReloadTimer 79
 call 150 UpdateUnitWeapons
+  r Unit#5.heading -20454
   r Unit#5.posX 206885453
   r Unit#5.posY 6669149
   r Unit#5.posZ 85233360
-  r Unit#5.heading -20454
   r UnitMotion#6.speed 468418
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -29247,8 +29247,8 @@ call 151 UpdateUnitWeapons
   r Projectile#10.nextSmokeTick 147
   r Projectile#10.targetUnit Unit#251
   r Projectile#10.piece 3
-  r Unit#251.health 2826
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2826
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -29294,10 +29294,10 @@ call 151 UpdateUnitWeapons
   o z 92180531
   w Unit#5.weapon0ReloadTimer 78
 call 151 UpdateUnitWeapons
+  r Unit#5.heading -20460
   r Unit#5.posX 207329376
   r Unit#5.posY 6786253
   r Unit#5.posZ 85354979
-  r Unit#5.heading -20460
   r UnitMotion#6.speed 474944
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -29520,10 +29520,10 @@ call 152 UpdateUnitWeapons
   o z 92172405
   w Unit#5.weapon0ReloadTimer 77
 call 152 UpdateUnitWeapons
+  r Unit#5.heading -20465
   r Unit#5.posX 207776661
   r Unit#5.posY 6904989
   r Unit#5.posZ 85487675
-  r Unit#5.heading -20465
   r UnitMotion#6.speed 481425
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -29708,10 +29708,10 @@ call 153 UpdateUnitWeapons
   o z 92188824
   w Unit#5.weapon0ReloadTimer 76
 call 153 UpdateUnitWeapons
+  r Unit#5.heading -20470
   r Unit#5.posX 208227309
   r Unit#5.posY 7025345
   r Unit#5.posZ 85630548
-  r Unit#5.heading -20470
   r UnitMotion#6.speed 487833
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -29739,8 +29739,8 @@ call 153 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 153 Apply
-  r Unit#251.health 2819
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2819
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -30068,10 +30068,10 @@ call 154 UpdateUnitWeapons
   o z 92188824
   w Unit#5.weapon0ReloadTimer 75
 call 154 UpdateUnitWeapons
+  r Unit#5.heading -20473
   r Unit#5.posX 208681366
   r Unit#5.posY 7147303
   r Unit#5.posZ 85782637
-  r Unit#5.heading -20473
   r UnitMotion#6.speed 494138
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -30388,10 +30388,10 @@ call 155 UpdateUnitWeapons
   o z 92180486
   w Unit#5.weapon0ReloadTimer 74
 call 155 UpdateUnitWeapons
+  r Unit#5.heading -20476
   r Unit#5.posX 209138915
   r Unit#5.posY 7270837
   r Unit#5.posZ 85942969
-  r Unit#5.heading -20476
   r UnitMotion#6.speed 500317
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -30588,10 +30588,10 @@ call 156 UpdateUnitWeapons
   o z 92188824
   w Unit#5.weapon0ReloadTimer 73
 call 156 UpdateUnitWeapons
+  r Unit#5.heading -20479
   r Unit#5.posX 209600048
   r Unit#5.posY 7274496
   r Unit#5.posZ 86110599
-  r Unit#5.heading -20479
   r UnitMotion#6.speed 490669
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -30619,8 +30619,8 @@ call 156 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 156 Apply
-  r Unit#251.health 2803
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2803
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -30975,9 +30975,9 @@ call 157 UpdateUnitWeapons
   o z 92188824
   w Unit#5.weapon0ReloadTimer 72
 call 157 UpdateUnitWeapons
+  r Unit#5.heading -20481
   r Unit#5.posX 210064862
   r Unit#5.posZ 86284638
-  r Unit#5.heading -20481
   r UnitMotion#6.speed 496328
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 0
@@ -31186,9 +31186,9 @@ call 158 UpdateUnitWeapons
   o z 92180486
   w Unit#5.weapon0ReloadTimer 71
 call 158 UpdateUnitWeapons
+  r Unit#5.heading -20482
   r Unit#5.posX 210533442
   r Unit#5.posZ 86464275
-  r Unit#5.heading -20482
   r UnitMotion#6.speed 501833
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -31524,9 +31524,9 @@ call 159 UpdateUnitWeapons
   o z 92188824
   w Unit#5.weapon0ReloadTimer 70
 call 159 UpdateUnitWeapons
+  r Unit#5.heading -20484
   r Unit#5.posX 211005857
   r Unit#5.posZ 86648788
-  r Unit#5.heading -20484
   r UnitMotion#6.speed 507169
   a unit Unit#251
   i services.ScheduleTargetingTargetPos Unit#251 0 = 1
@@ -31806,8 +31806,8 @@ call 160 UpdateUnitWeapons
   r Projectile#6.range 9804646
   r Projectile#6.time 175
   r Projectile#6.nextSmokeTick 157
-  r Unit#251.health 2751
   r Unit#251.weapon0TargetX 5
+  r Unit#251.health 2751
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -32086,9 +32086,9 @@ call 161 UpdateUnitWeapons
   o y 0
   o z 0
 call 161 UpdateUnitWeapons
+  r Unit#5.heading -20485
   r Unit#5.posX 211482149
   r Unit#5.posZ 86837544
-  r Unit#5.heading -20485
   r UnitMotion#6.speed 512330
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -32689,9 +32689,9 @@ call 163 UpdateUnitWeapons
   o y 0
   o z 0
 call 163 UpdateUnitWeapons
+  r Unit#5.heading -20486
   r Unit#5.posX 212446403
   r Unit#5.posZ 87225696
-  r Unit#5.heading -20486
   r UnitMotion#6.speed 522131
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -33012,8 +33012,8 @@ call 164 UpdateUnitWeapons
   r Projectile#9.range 9517364
   r Projectile#9.time 193
   r Projectile#9.nextSmokeTick 160
-  r Unit#251.health 2736
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2736
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -33044,10 +33044,10 @@ call 164 UpdateUnitWeapons
   o y 0
   o z 0
 call 164 UpdateUnitWeapons
+  r Unit#5.heading -20487
   r Unit#5.flags 0x9024032a
   r Unit#5.posX 212934337
   r Unit#5.posZ 87424250
-  r Unit#5.heading -20487
   r UnitMotion#6.speed 526785
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -33583,8 +33583,8 @@ call 166 UpdateUnitWeapons
   r Projectile#8.positionX 214469732
   r Projectile#8.positionY 1372056
   r Projectile#8.positionZ 87832204
-  r Unit#251.health 2728
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2728
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -34017,9 +34017,9 @@ call 167 UpdateUnitWeapons
   r Projectile#9.directionX 540334
   r Projectile#9.directionZ 370675
   r Projectile#9.time 196
-  r Unit#251.health 2720
   r Unit#251.weapon0TargetX 4
   r Unit#251.weapon2TargetX 3
+  r Unit#251.health 2720
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -34444,8 +34444,8 @@ call 168 UpdateUnitWeapons
   r Projectile#7.positionX 213902842
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 87501685
-  r Unit#251.health 2712
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2712
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -34759,9 +34759,9 @@ call 169 UpdateUnitWeapons
   o y 0
   o z 0
 call 169 UpdateUnitWeapons
+  r Unit#5.heading -20488
   r Unit#5.posX 215429786
   r Unit#5.posZ 88450536
-  r Unit#5.heading -20488
   r UnitMotion#6.speed 547727
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -35058,8 +35058,8 @@ call 170 UpdateUnitWeapons
   r Projectile#8.time 199
   r Projectile#8.nextSmokeTick 160
   r Projectile#8.piece 4
-  r Unit#251.health 2705
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2705
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -36179,8 +36179,8 @@ call 174 UpdateUnitWeapons
   r Projectile#7.positionX 215195470
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 85496681
-  r Unit#251.health 2697
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2697
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -37065,8 +37065,8 @@ call 177 UpdateUnitWeapons
   r Projectile#8.positionX 215171153
   r Projectile#8.positionY 1380136
   r Projectile#8.positionZ 85517718
-  r Unit#251.health 2690
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2690
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -37480,8 +37480,8 @@ call 178 UpdateUnitWeapons
   r Projectile#8.time 207
   r Projectile#8.nextSmokeTick 174
   r Projectile#8.piece 3
-  r Unit#251.health 2682
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2682
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -37953,8 +37953,8 @@ call 179 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 179 Apply
-  r Unit#251.health 2674
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2674
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -38544,8 +38544,8 @@ call 181 UpdateUnitWeapons
   r Projectile#6.directionX 592328
   r Projectile#6.directionZ 280206
   r Projectile#6.time 210
-  r Unit#251.flags 0x90e41121
   r Unit#251.weapon0TargetX 2
+  r Unit#251.flags 0x90e41121
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -39209,8 +39209,8 @@ call 183 UpdateUnitWeapons
   r Projectile#6.range 9742012
   r Projectile#6.time 199
   r Projectile#6.nextSmokeTick 181
-  r Unit#251.health 2658
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2658
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -40167,8 +40167,8 @@ call 186 UpdateUnitWeapons
   r Projectile#7.positionX 214508829
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 86204483
-  r Unit#251.health 2651
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2651
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -40737,9 +40737,9 @@ call 188 UpdateUnitWeapons
   o y 0
   o z 0
 call 188 UpdateUnitWeapons
+  r Unit#5.heading -20489
   r Unit#5.posX 225584218
   r Unit#5.posZ 92656700
-  r Unit#5.heading -20489
   r UnitMotion#6.speed 600552
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -41243,8 +41243,8 @@ call 190 UpdateUnitWeapons
   r Projectile#7.time 206
   r Projectile#7.nextSmokeTick 188
   r Projectile#7.piece 4
-  r Unit#251.health 2643
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2643
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -41618,8 +41618,8 @@ call 191 UpdateUnitWeapons
   r Projectile#8.time 220
   r Projectile#8.nextSmokeTick 181
   r Projectile#8.piece 3
-  r Unit#251.health 2635
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2635
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -41950,8 +41950,8 @@ call 192 UpdateUnitWeapons
   r Projectile#7.positionX 213362468
   r Projectile#7.positionZ 87129732
   r Projectile#7.time 221
-  r Unit#251.health 2627
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2627
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -42574,8 +42574,8 @@ call 194 UpdateUnitWeapons
   r Projectile#6.range 9720003
   r Projectile#6.time 211
   r Projectile#6.nextSmokeTick 193
-  r Unit#251.health 2620
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2620
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -43499,8 +43499,8 @@ call 197 UpdateUnitWeapons
   r Projectile#8.time 226
   r Projectile#8.nextSmokeTick 193
   r Projectile#8.piece 4
-  r Unit#251.health 2612
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2612
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -43807,8 +43807,8 @@ call 198 UpdateUnitWeapons
   r Projectile#8.range 9474334
   r Projectile#8.time 227
   r Projectile#8.nextSmokeTick 188
-  r Unit#251.health 2604
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2604
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -44623,8 +44623,8 @@ call 201 UpdateUnitWeapons
   r Projectile#7.positionX 215189573
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 85501945
-  r Unit#251.health 2597
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2597
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -45498,8 +45498,8 @@ call 204 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 204 Apply
-  r Unit#251.health 2589
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2589
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -46649,8 +46649,8 @@ call 208 UpdateUnitWeapons
   r Projectile#7.positionX 214031899
   r Projectile#7.positionY 1372056
   r Projectile#7.positionZ 88622404
-  r Unit#251.health 2573
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2573
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -46689,9 +46689,9 @@ call 208 UpdateUnitWeapons
   o y 0
   o z 0
 call 208 UpdateUnitWeapons
+  r Unit#5.heading -20490
   r Unit#5.posX 236979984
   r Unit#5.posZ 97378862
-  r Unit#5.heading -20490
   r UnitMotion#6.speed 628325
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -47270,8 +47270,8 @@ call 210 UpdateUnitWeapons
   r Projectile#8.positionX 214508926
   r Projectile#8.positionY 1380136
   r Projectile#8.positionZ 86204459
-  r Unit#251.health 2566
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2566
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -47607,9 +47607,9 @@ call 211 UpdateUnitWeapons
   r Projectile#7.positionX 215005105
   r Projectile#7.positionY 1372056
   r Projectile#7.positionZ 86632487
-  r Unit#251.health 2558
-  r Unit#251.flags 0x90e40121
   r Unit#251.weapon0TargetX 0
+  r Unit#251.flags 0x90e40121
+  r Unit#251.health 2558
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -48269,8 +48269,8 @@ call 213 UpdateUnitWeapons
   r Projectile#7.positionX 214514126
   r Projectile#7.positionY 1380136
   r Projectile#7.positionZ 86198299
-  r Unit#251.health 2550
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2550
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -49050,10 +49050,10 @@ call 216 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 1
 call 216 UpdateUnitWeapons
+  r Unit#4.heading 32000
   r Unit#4.flags 0x90240325
   r Unit#4.posX 212331815
   r Unit#4.posZ 83427150
-  r Unit#4.heading 32000
   r UnitMotion#5.speed 65535
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -49333,8 +49333,8 @@ call 217 UpdateUnitWeapons
   r Projectile#6.time 234
   r Projectile#6.nextSmokeTick 216
   r Projectile#6.piece 4
-  r Unit#251.health 2543
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2543
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -49399,9 +49399,9 @@ call 217 UpdateUnitWeapons
   w Projectile#7.nextSmokeTick 217
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 217 UpdateUnitWeapons
+  r Unit#4.heading 30880
   r Unit#4.posX 212318624
   r Unit#4.posZ 83498024
-  r Unit#4.heading 30880
   r UnitMotion#5.speed 72088
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -49621,9 +49621,9 @@ call 218 UpdateUnitWeapons
   w Unit#3.weapon0ReloadTimer 11
   w Unit#3.weapon0FireHeading 25
 call 218 UpdateUnitWeapons
+  r Unit#4.heading 29760
   r Unit#4.posX 212295796
   r Unit#4.posZ 83573276
-  r Unit#4.heading 29760
   r UnitMotion#5.speed 78641
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -49931,8 +49931,8 @@ call 219 UpdateUnitWeapons
   r Projectile#6.range 9751246
   r Projectile#6.time 235
   r Projectile#6.nextSmokeTick 217
-  r Unit#251.health 2535
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2535
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -49957,9 +49957,9 @@ call 219 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 10
 call 219 UpdateUnitWeapons
+  r Unit#4.heading 28640
   r Unit#4.posX 212263193
   r Unit#4.posZ 83651981
-  r Unit#4.heading 28640
   r UnitMotion#5.speed 85194
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -50229,9 +50229,9 @@ call 220 UpdateUnitWeapons
   o z 92142214
   w Unit#3.weapon0ReloadTimer 9
 call 220 UpdateUnitWeapons
+  r Unit#4.heading 27520
   r Unit#4.posX 212218955
   r Unit#4.posZ 83732360
-  r Unit#4.heading 27520
   r UnitMotion#5.speed 91747
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -50474,9 +50474,9 @@ call 221 UpdateUnitWeapons
   o z 92166830
   w Unit#3.weapon0ReloadTimer 8
 call 221 UpdateUnitWeapons
+  r Unit#4.heading 26400
   r Unit#4.posX 212162353
   r Unit#4.posZ 83812733
-  r Unit#4.heading 26400
   r UnitMotion#5.speed 98300
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -50520,8 +50520,8 @@ call 221 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 221 Apply
-  r Unit#251.health 2527
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2527
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -50779,9 +50779,9 @@ call 222 UpdateUnitWeapons
   o z 92188871
   w Unit#3.weapon0ReloadTimer 7
 call 222 UpdateUnitWeapons
+  r Unit#4.heading 25280
   r Unit#4.posX 212092890
   r Unit#4.posZ 83891283
-  r Unit#4.heading 25280
   r UnitMotion#5.speed 104853
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -51057,9 +51057,9 @@ call 223 Apply
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 223 UpdateUnitWeapons
+  r Unit#4.heading 24160
   r Unit#4.posX 212011267
   r Unit#4.posZ 83967099
-  r Unit#4.heading 24160
   r UnitMotion#5.speed 111406
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -51067,9 +51067,9 @@ call 223 UpdateUnitWeapons
   o y 0
   o z 0
 call 223 UpdateUnitWeapons
+  r Unit#5.heading -20491
   r Unit#5.posX 245775530
   r Unit#5.posZ 101023644
-  r Unit#5.heading -20491
   r UnitMotion#6.speed 639405
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -51273,9 +51273,9 @@ call 224 UpdateUnitWeapons
   o z 92154397
   w Unit#3.weapon0ReloadTimer 5
 call 224 UpdateUnitWeapons
+  r Unit#4.heading 23040
   r Unit#4.posX 211916520
   r Unit#4.posZ 84037368
-  r Unit#4.heading 23040
   r UnitMotion#5.speed 117959
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -51330,8 +51330,8 @@ call 224 WeaponCanReachUnit
   a weapon 0
   o result 1
 call 224 Apply
-  r Unit#251.health 2512
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2512
   a event.kind 259
   a event.unit Unit#251
   a event.weapon 3
@@ -51593,9 +51593,9 @@ call 225 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 4
 call 225 UpdateUnitWeapons
+  r Unit#4.heading 21920
   r Unit#4.posX 211814597
   r Unit#4.posZ 84096768
-  r Unit#4.heading 21920
   r UnitMotion#5.speed 117964
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
@@ -51932,9 +51932,9 @@ call 226 UpdateUnitWeapons
   o z 92142214
   w Unit#3.weapon0ReloadTimer 3
 call 226 UpdateUnitWeapons
+  r Unit#4.heading 20800
   r Unit#4.posX 211706756
   r Unit#4.posZ 84144576
-  r Unit#4.heading 20800
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -52253,9 +52253,9 @@ call 227 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 2
 call 227 UpdateUnitWeapons
+  r Unit#4.heading 20323
   r Unit#4.posX 211597230
   r Unit#4.posZ 84188381
-  r Unit#4.heading 20323
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -52456,9 +52456,9 @@ call 228 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 1
 call 228 UpdateUnitWeapons
+  r Unit#4.heading 20322
   r Unit#4.posX 211487704
   r Unit#4.posZ 84232186
-  r Unit#4.heading 20322
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -52727,8 +52727,8 @@ call 229 UpdateUnitWeapons
   r Projectile#6.positionX 215670692
   r Projectile#6.positionY 1372056
   r Projectile#6.positionZ 85949106
-  r Unit#251.health 2496
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2496
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -52787,9 +52787,9 @@ call 229 UpdateUnitWeapons
   w Projectile#6.piece 3
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 229 UpdateUnitWeapons
+  r Unit#4.heading 20320
   r Unit#4.posX 211378178
   r Unit#4.posZ 84275991
-  r Unit#4.heading 20320
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -53093,9 +53093,9 @@ call 230 UpdateUnitWeapons
   w Unit#3.weapon0ReloadTimer 11
   w Unit#3.weapon0FireHeading 594
 call 230 UpdateUnitWeapons
+  r Unit#4.heading 20317
   r Unit#4.posX 211268120
   r Unit#4.posZ 84318442
-  r Unit#4.heading 20317
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -53306,9 +53306,9 @@ call 231 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 10
 call 231 UpdateUnitWeapons
+  r Unit#4.heading 20324
   r Unit#4.posX 211158594
   r Unit#4.posZ 84362247
-  r Unit#4.heading 20324
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -53500,9 +53500,9 @@ call 232 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 9
 call 232 UpdateUnitWeapons
+  r Unit#4.heading 20322
   r Unit#4.posX 211049068
   r Unit#4.posZ 84406052
-  r Unit#4.heading 20322
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -53826,8 +53826,8 @@ call 233 UpdateUnitWeapons
   r Projectile#8.time 262
   r Projectile#8.nextSmokeTick 229
   r Projectile#8.piece 3
-  r Unit#251.health 2489
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2489
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -53852,9 +53852,9 @@ call 233 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 8
 call 233 UpdateUnitWeapons
+  r Unit#4.heading 20319
   r Unit#4.posX 210939010
   r Unit#4.posZ 84448503
-  r Unit#4.heading 20319
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -54222,8 +54222,8 @@ call 234 UpdateUnitWeapons
   r Projectile#8.range 9459205
   r Projectile#8.time 263
   r Projectile#8.nextSmokeTick 230
-  r Unit#251.health 2481
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2481
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -54248,9 +54248,9 @@ call 234 UpdateUnitWeapons
   o z 92142214
   w Unit#3.weapon0ReloadTimer 7
 call 234 UpdateUnitWeapons
+  r Unit#4.heading 20328
   r Unit#4.posX 210829484
   r Unit#4.posZ 84492308
-  r Unit#4.heading 20328
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -54471,18 +54471,18 @@ call 235 Apply
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 235 UpdateUnitWeapons
+  r Unit#4.heading 20326
   r Unit#4.posX 210719958
   r Unit#4.posZ 84536113
-  r Unit#4.heading 20326
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 235 UpdateUnitWeapons
+  r Unit#5.heading -20492
   r Unit#5.posX 252898635
   r Unit#5.posZ 103975491
-  r Unit#5.heading -20492
   r UnitMotion#6.speed 644841
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -54786,8 +54786,8 @@ call 236 UpdateUnitWeapons
   r Projectile#8.range 9752522
   r Projectile#8.time 265
   r Projectile#8.nextSmokeTick 229
-  r Unit#251.health 2473
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2473
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -54820,9 +54820,9 @@ call 236 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 5
 call 236 UpdateUnitWeapons
+  r Unit#4.heading 20323
   r Unit#4.posX 210610432
   r Unit#4.posZ 84579918
-  r Unit#4.heading 20323
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -55190,8 +55190,8 @@ call 237 UpdateUnitWeapons
   r Projectile#8.range 9459205
   r Projectile#8.time 266
   r Projectile#8.nextSmokeTick 230
-  r Unit#251.health 2465
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2465
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -55216,9 +55216,9 @@ call 237 UpdateUnitWeapons
   o z 92142214
   w Unit#3.weapon0ReloadTimer 4
 call 237 UpdateUnitWeapons
+  r Unit#4.heading 20319
   r Unit#4.posX 210500374
   r Unit#4.posZ 84622369
-  r Unit#4.heading 20319
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -55448,9 +55448,9 @@ call 238 UpdateUnitWeapons
   o z 92135486
   w Unit#3.weapon0ReloadTimer 3
 call 238 UpdateUnitWeapons
+  r Unit#4.heading 20332
   r Unit#4.posX 210390848
   r Unit#4.posZ 84666174
-  r Unit#4.heading 20332
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -55751,8 +55751,8 @@ call 239 UpdateUnitWeapons
   r Projectile#8.range 9752522
   r Projectile#8.time 268
   r Projectile#8.nextSmokeTick 229
-  r Unit#251.health 2457
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2457
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -55777,9 +55777,9 @@ call 239 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 2
 call 239 UpdateUnitWeapons
+  r Unit#4.heading 20329
   r Unit#4.posX 210281322
   r Unit#4.posZ 84709979
-  r Unit#4.heading 20329
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -56120,9 +56120,9 @@ call 240 UpdateUnitWeapons
   o z 92142214
   w Unit#3.weapon0ReloadTimer 1
 call 240 UpdateUnitWeapons
+  r Unit#4.heading 20325
   r Unit#4.posX 210171796
   r Unit#4.posZ 84753784
-  r Unit#4.heading 20325
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -56414,8 +56414,8 @@ call 241 UpdateUnitWeapons
   r Projectile#6.positionX 213432532
   r Projectile#6.positionY 1380136
   r Projectile#6.positionZ 88356596
-  r Unit#251.health 2450
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2450
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -56478,9 +56478,9 @@ call 241 UpdateUnitWeapons
   w Projectile#6.piece 4
   w Unit#3.weapons[0].aimCob.nAimCobDone 0
 call 241 UpdateUnitWeapons
+  r Unit#4.heading 20318
   r Unit#4.posX 210061738
   r Unit#4.posZ 84796235
-  r Unit#4.heading 20318
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -56741,9 +56741,9 @@ call 242 UpdateUnitWeapons
   w Unit#3.weapon0ReloadTimer 11
   w Unit#3.weapon0FireHeading 26
 call 242 UpdateUnitWeapons
+  r Unit#4.heading 20348
   r Unit#4.posX 209952212
   r Unit#4.posZ 84840040
-  r Unit#4.heading 20348
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -56941,9 +56941,9 @@ call 243 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 10
 call 243 UpdateUnitWeapons
+  r Unit#4.heading 21468
   r Unit#4.posX 209847496
   r Unit#4.posZ 84894371
-  r Unit#4.heading 21468
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -57174,9 +57174,9 @@ call 244 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 9
 call 244 UpdateUnitWeapons
+  r Unit#4.heading 22588
   r Unit#4.posX 209749418
   r Unit#4.posZ 84959905
-  r Unit#4.heading 22588
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -57406,18 +57406,18 @@ call 245 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 8
 call 245 UpdateUnitWeapons
+  r Unit#4.heading 23708
   r Unit#4.posX 209659159
   r Unit#4.posZ 85035850
-  r Unit#4.heading 23708
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
   o y 0
   o z 0
 call 245 UpdateUnitWeapons
+  r Unit#5.heading -20493
   r Unit#5.posX 258872124
   r Unit#5.posZ 106451038
-  r Unit#5.heading -20493
   r UnitMotion#6.speed 647901
   a unit Unit#5
   i services.ScheduleTargetingTargetPos Unit#5 0 = 1
@@ -57812,8 +57812,8 @@ call 246 UpdateUnitWeapons
   r Projectile#9.positionX 219453075
   r Projectile#9.positionY 1942439
   r Projectile#9.positionZ 91537698
-  r Unit#251.health 2442
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2442
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -57838,9 +57838,9 @@ call 246 UpdateUnitWeapons
   o z 92149261
   w Unit#3.weapon0ReloadTimer 7
 call 246 UpdateUnitWeapons
+  r Unit#4.heading 24828
   r Unit#4.posX 209577814
   r Unit#4.posZ 85121285
-  r Unit#4.heading 24828
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -58177,8 +58177,8 @@ call 247 UpdateUnitWeapons
   r Projectile#8.positionY 1846119
   r Projectile#8.positionZ 90880083
   r Projectile#8.flags 1
-  r Unit#251.health 2434
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2434
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -58211,9 +58211,9 @@ call 247 Apply
   w Unit#3.weapons[0].aimCob.nAimCobDone 1
   o result 1
 call 247 UpdateUnitWeapons
+  r Unit#4.heading 25948
   r Unit#4.posX 209505238
   r Unit#4.posZ 85214280
-  r Unit#4.heading 25948
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -58525,9 +58525,9 @@ call 248 UpdateUnitWeapons
   o z 92135486
   w Unit#3.weapon0ReloadTimer 5
 call 248 UpdateUnitWeapons
+  r Unit#4.heading 27068
   r Unit#4.posX 209443362
   r Unit#4.posZ 85314705
-  r Unit#4.heading 27068
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -58877,8 +58877,8 @@ call 249 UpdateUnitWeapons
   r Projectile#9.positionX 213916080
   r Projectile#9.positionY 1380136
   r Projectile#9.positionZ 87480329
-  r Unit#251.health 2427
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2427
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -58903,9 +58903,9 @@ call 249 UpdateUnitWeapons
   o z 92159118
   w Unit#3.weapon0ReloadTimer 4
 call 249 UpdateUnitWeapons
+  r Unit#4.heading 28188
   r Unit#4.posX 209392919
   r Unit#4.posZ 85421336
-  r Unit#4.heading 28188
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0
@@ -59256,8 +59256,8 @@ call 250 UpdateUnitWeapons
   r Projectile#8.positionX 214469692
   r Projectile#8.positionY 1372056
   r Projectile#8.positionZ 87830926
-  r Unit#251.health 2419
   r Unit#251.weapon0TargetX 0
+  r Unit#251.health 2419
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0
@@ -59290,9 +59290,9 @@ call 250 UpdateUnitWeapons
   o z 92151677
   w Unit#3.weapon0ReloadTimer 3
 call 250 UpdateUnitWeapons
+  r Unit#4.heading 29308
   r Unit#4.posX 209354543
   r Unit#4.posZ 85532878
-  r Unit#4.heading 29308
   a unit Unit#4
   i services.ScheduleTargetingTargetPos Unit#4 0 = 0
   o x 0

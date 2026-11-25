@@ -576,21 +576,21 @@ call 1 UpdateUnitHead
   w Game.f14353 1
 call 1 UpdateUnitBody
   r Game.seaLevel 0
-  r Unit#1.health 3000
-  r Unit#1.buildLeft f32:0x00000000
-  r Unit#1.player Player#0
+  r Unit#1.postTransferHoldoff 0
   r Unit#1.flags 0x90e00321
-  r Unit#1.posY 65536
   r Unit#1.carrier null
   r Unit#1.healthPercent 0
   r Unit#1.prevHealthPercent 0
   r Unit#1.recentlyDamagedTimer 0
-  r Unit#1.postTransferHoldoff 0
+  r Unit#1.health 3000
+  r Unit#1.buildLeft f32:0x00000000
+  r Unit#1.player Player#0
+  r Unit#1.posY 65536
   r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.maxHealth 3000
   r UnitDef#34.buildtime 95897
   r UnitDef#34.energyCost f32:0x47054d00
   r UnitDef#34.healtimeUnsigned 27
+  r UnitDef#34.maxHealth 3000
   r Player#0.active 1
   r Player#0.type 1
   a unit Unit#1
@@ -602,21 +602,21 @@ call 1 UpdateUnitHead
   a unit Unit#251
   w Game.f14353 2
 call 1 UpdateUnitBody
-  r Unit#251.health 3000
-  r Unit#251.buildLeft f32:0x00000000
-  r Unit#251.player Player#1
+  r Unit#251.postTransferHoldoff 0
   r Unit#251.flags 0x90e00021
-  r Unit#251.posY 65536
   r Unit#251.carrier null
   r Unit#251.healthPercent 0
   r Unit#251.prevHealthPercent 0
   r Unit#251.recentlyDamagedTimer 0
-  r Unit#251.postTransferHoldoff 0
+  r Unit#251.health 3000
+  r Unit#251.buildLeft f32:0x00000000
+  r Unit#251.player Player#1
+  r Unit#251.posY 65536
   r UnitDef#167.flags1 0x0495c0c8
-  r UnitDef#167.maxHealth 3000
   r UnitDef#167.buildtime 97852
   r UnitDef#167.energyCost f32:0x470bfe00
   r UnitDef#167.healtimeUnsigned 27
+  r UnitDef#167.maxHealth 3000
   r Player#1.active 1
   r Player#1.type 2
   a unit Unit#251
@@ -790,21 +790,21 @@ call 12 UpdateUnitHead
   a unit Unit#2
   w Game.f14353 2
 call 12 UpdateUnitBody
-  r Unit#2.health 250
-  r Unit#2.buildLeft f32:0x00000000
-  r Unit#2.player Player#0
+  r Unit#2.postTransferHoldoff 0
   r Unit#2.flags 0x90240221
-  r Unit#2.posY 65536
   r Unit#2.carrier null
   r Unit#2.healthPercent 0
   r Unit#2.prevHealthPercent 0
   r Unit#2.recentlyDamagedTimer 0
-  r Unit#2.postTransferHoldoff 0
+  r Unit#2.health 250
+  r Unit#2.buildLeft f32:0x00000000
+  r Unit#2.player Player#0
+  r Unit#2.posY 65536
   r UnitDef#95.flags1 0x00918089
-  r UnitDef#95.maxHealth 250
   r UnitDef#95.buildtime 1452
   r UnitDef#95.energyCost f32:0x442e4000
   r UnitDef#95.healtimeUnsigned 0
+  r UnitDef#95.maxHealth 250
   a unit Unit#2
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1
@@ -866,21 +866,21 @@ call 14 UpdateUnitHead
   a unit Unit#252
   w Game.f14353 4
 call 14 UpdateUnitBody
-  r Unit#252.health 265
-  r Unit#252.buildLeft f32:0x00000000
-  r Unit#252.player Player#1
+  r Unit#252.postTransferHoldoff 0
   r Unit#252.flags 0x98240021
-  r Unit#252.posY 65536
   r Unit#252.carrier null
   r Unit#252.healthPercent 0
   r Unit#252.prevHealthPercent 0
   r Unit#252.recentlyDamagedTimer 0
-  r Unit#252.postTransferHoldoff 0
+  r Unit#252.health 265
+  r Unit#252.buildLeft f32:0x00000000
+  r Unit#252.player Player#1
+  r Unit#252.posY 65536
   r UnitDef#144.flags1 0x00918089
-  r UnitDef#144.maxHealth 265
   r UnitDef#144.buildtime 1523
   r UnitDef#144.energyCost f32:0x442e0000
   r UnitDef#144.healtimeUnsigned 0
+  r UnitDef#144.maxHealth 265
   a unit Unit#252
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1
@@ -1638,21 +1638,21 @@ call 40 UpdateUnitHead
   a unit Unit#3
   w Game.f14353 3
 call 40 UpdateUnitBody
-  r Unit#3.health 75
-  r Unit#3.buildLeft f32:0x00000000
-  r Unit#3.player Player#0
+  r Unit#3.postTransferHoldoff 0
   r Unit#3.flags 0x98240221
-  r Unit#3.posY 65536
   r Unit#3.carrier null
   r Unit#3.healthPercent 0
   r Unit#3.prevHealthPercent 0
   r Unit#3.recentlyDamagedTimer 0
-  r Unit#3.postTransferHoldoff 0
+  r Unit#3.health 75
+  r Unit#3.buildLeft f32:0x00000000
+  r Unit#3.player Player#0
+  r Unit#3.posY 65536
   r UnitDef#54.flags1 0x009180a9
-  r UnitDef#54.maxHealth 75
   r UnitDef#54.buildtime 2013
   r UnitDef#54.energyCost f32:0x44320000
   r UnitDef#54.healtimeUnsigned 0
+  r UnitDef#54.maxHealth 75
   a unit Unit#3
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1
@@ -2804,8 +2804,8 @@ call 72 UpdateUnitHead
   a unit Unit#2
   w Game.f14353 2
 call 72 UpdateUnitBody
-  r Unit#2.health 190
   r Unit#2.recentlyDamagedTimer 240
+  r Unit#2.health 190
   a unit Unit#2
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   w Unit#2.recentlyDamagedTimer 239
@@ -4619,16 +4619,16 @@ call 120 UpdateUnitHead
   a unit Unit#253
   w Game.f14353 6
 call 120 UpdateUnitBody
-  r Unit#253.health 250
-  r Unit#253.buildLeft f32:0x00000000
-  r Unit#253.player Player#1
+  r Unit#253.postTransferHoldoff 0
   r Unit#253.flags 0x98240021
-  r Unit#253.posY 65536
   r Unit#253.carrier null
   r Unit#253.healthPercent 0
   r Unit#253.prevHealthPercent 0
   r Unit#253.recentlyDamagedTimer 0
-  r Unit#253.postTransferHoldoff 0
+  r Unit#253.health 250
+  r Unit#253.buildLeft f32:0x00000000
+  r Unit#253.player Player#1
+  r Unit#253.posY 65536
   a unit Unit#253
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   w Unit#253.healthPercent 100
@@ -5785,9 +5785,9 @@ call 150 UpdateUnitHead
   a unit Unit#251
   w Game.f14353 3
 call 150 UpdateUnitBody
-  r Unit#251.health -27000
   r Unit#251.flags 0x90e44021
   r Unit#251.recentlyDamagedTimer 240
+  r Unit#251.health -27000
   a unit Unit#251
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   w Unit#251.recentlyDamagedTimer 239
@@ -5796,9 +5796,9 @@ call 150 UpdateUnitHead
   a unit Unit#252
   w Game.f14353 4
 call 150 UpdateUnitBody
-  r Unit#252.health -29735
   r Unit#252.flags 0x94284121
   r Unit#252.recentlyDamagedTimer 240
+  r Unit#252.health -29735
   a unit Unit#252
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   w Unit#252.recentlyDamagedTimer 239
@@ -5815,9 +5815,9 @@ call 151 UpdateUnitHead
   a unit Unit#3
   w Game.f14353 2
 call 151 UpdateUnitBody
-  r Unit#3.health -125
   r Unit#3.flags 0x9c244325
   r Unit#3.recentlyDamagedTimer 240
+  r Unit#3.health -125
   a unit Unit#3
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   w Unit#3.recentlyDamagedTimer 239
@@ -5899,11 +5899,11 @@ call 160 UpdateUnitHead
   a unit Unit#251
   w Game.f14353 2
 call 160 UpdateUnitBody
-  r Unit#251.health 250
   r Unit#251.flags 0x90240021
   r Unit#251.healthPercent 0
   r Unit#251.prevHealthPercent 0
   r Unit#251.recentlyDamagedTimer 0
+  r Unit#251.health 250
   a unit Unit#251
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1

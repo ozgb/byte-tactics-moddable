@@ -11,21 +11,21 @@ call 848 UpdateUnitHead
   w Game.f14353 1
 call 848 UpdateUnitBody
   r Game.seaLevel 0
-  r Unit#1.health 3000
-  r Unit#1.buildLeft f32:0x00000000
-  r Unit#1.player Player#0
+  r Unit#1.postTransferHoldoff 0
   r Unit#1.flags 0x90c00021
-  r Unit#1.posY 65536
   r Unit#1.carrier null
   r Unit#1.healthPercent 100
   r Unit#1.prevHealthPercent 100
   r Unit#1.recentlyDamagedTimer 0
-  r Unit#1.postTransferHoldoff 0
+  r Unit#1.health 3000
+  r Unit#1.buildLeft f32:0x00000000
+  r Unit#1.player Player#0
+  r Unit#1.posY 65536
   r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.maxHealth 3000
   r UnitDef#34.buildtime 95897
   r UnitDef#34.energyCost f32:0x47054d00
   r UnitDef#34.healtimeUnsigned 27
+  r UnitDef#34.maxHealth 3000
   r Player#0.active 1
   r Player#0.type 1
   a unit Unit#1
@@ -37,21 +37,21 @@ call 848 UpdateUnitHead
   a unit Unit#2
   w Game.f14353 2
 call 848 UpdateUnitBody
-  r Unit#2.health 629
-  r Unit#2.buildLeft f32:0x00000000
-  r Unit#2.player Player#0
+  r Unit#2.postTransferHoldoff 0
   r Unit#2.flags 0x70280021
-  r Unit#2.posY 65536
   r Unit#2.carrier null
   r Unit#2.healthPercent 92
   r Unit#2.prevHealthPercent 92
   r Unit#2.recentlyDamagedTimer 0
-  r Unit#2.postTransferHoldoff 0
+  r Unit#2.health 629
+  r Unit#2.buildLeft f32:0x00000000
+  r Unit#2.player Player#0
+  r Unit#2.posY 65536
   r UnitDef#18.flags1 0x008402ca
-  r UnitDef#18.maxHealth 680
   r UnitDef#18.buildtime 21953
   r UnitDef#18.energyCost f32:0x4604f800
   r UnitDef#18.healtimeUnsigned 0
+  r UnitDef#18.maxHealth 680
   a unit Unit#2
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1
@@ -61,21 +61,21 @@ call 848 UpdateUnitHead
   a unit Unit#4
   w Game.f14353 3
 call 848 UpdateUnitBody
-  r Unit#4.health 276
-  r Unit#4.buildLeft f32:0x00000000
-  r Unit#4.player Player#0
+  r Unit#4.postTransferHoldoff 0
   r Unit#4.flags 0x10e40020
-  r Unit#4.posY 1376256
   r Unit#4.carrier Unit#2
   r Unit#4.healthPercent 95
   r Unit#4.prevHealthPercent 85
   r Unit#4.recentlyDamagedTimer 0
-  r Unit#4.postTransferHoldoff 0
+  r Unit#4.health 276
+  r Unit#4.buildLeft f32:0x00000000
+  r Unit#4.player Player#0
+  r Unit#4.posY 1376256
   r UnitDef#29.flags1 0x008088c9
-  r UnitDef#29.maxHealth 280
   r UnitDef#29.buildtime 8844
   r UnitDef#29.energyCost f32:0x45870000
   r UnitDef#29.healtimeUnsigned 0
+  r UnitDef#29.maxHealth 280
   a unit Unit#4
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1
@@ -83,7 +83,7 @@ call 848 AddRepairProgress
   a builder Unit#2
   a unit Unit#4
   a amount f32:0x40c00000
-  i services.ScheduleEconomyRequestGranted 1 = 1
+  i services.ScheduleEconomyRequestGranted Unit#2 1 = 1
   i services.SchedPublish 2 24
   i services.SchedPublish 2 24
   o result 1
@@ -93,21 +93,21 @@ call 848 UpdateUnitHead
   a unit Unit#251
   w Game.f14353 4
 call 848 UpdateUnitBody
-  r Unit#251.health 3000
-  r Unit#251.buildLeft f32:0x00000000
-  r Unit#251.player Player#1
+  r Unit#251.postTransferHoldoff 0
   r Unit#251.flags 0x90e00321
-  r Unit#251.posY 65536
   r Unit#251.carrier null
   r Unit#251.healthPercent 100
   r Unit#251.prevHealthPercent 100
   r Unit#251.recentlyDamagedTimer 0
-  r Unit#251.postTransferHoldoff 0
+  r Unit#251.health 3000
+  r Unit#251.buildLeft f32:0x00000000
+  r Unit#251.player Player#1
+  r Unit#251.posY 65536
   r UnitDef#167.flags1 0x0495c0c8
-  r UnitDef#167.maxHealth 3000
   r UnitDef#167.buildtime 97852
   r UnitDef#167.energyCost f32:0x470bfe00
   r UnitDef#167.healtimeUnsigned 27
+  r UnitDef#167.maxHealth 3000
   r Player#1.active 1
   r Player#1.type 1
   a unit Unit#251
@@ -140,7 +140,7 @@ call 849 AddRepairProgress
   a builder Unit#2
   a unit Unit#4
   a amount f32:0x40c00000
-  i services.ScheduleEconomyRequestGranted 1 = 1
+  i services.ScheduleEconomyRequestGranted Unit#2 1 = 1
   i services.SchedPublish 2 24
   i services.SchedPublish 2 24
   o result 1
@@ -178,7 +178,7 @@ call 850 AddRepairProgress
   a builder Unit#2
   a unit Unit#4
   a amount f32:0x40c00000
-  i services.ScheduleEconomyRequestGranted 1 = 1
+  i services.ScheduleEconomyRequestGranted Unit#2 1 = 1
   i services.SchedPublish 2 24
   i services.SchedPublish 2 24
   o result 1
@@ -216,7 +216,7 @@ call 851 AddRepairProgress
   a builder Unit#2
   a unit Unit#4
   a amount f32:0x40c00000
-  i services.ScheduleEconomyRequestGranted 1 = 1
+  i services.ScheduleEconomyRequestGranted Unit#2 1 = 1
   i services.SchedPublish 2 24
   i services.SchedPublish 2 24
   o result 1
@@ -291,8 +291,8 @@ call 853 UpdateUnitHead
   w Game.f14353 3
 call 853 UpdateUnitBody
   r Unit#4.flags 0x10e40026
-  r Unit#4.posY 1441792
   r Unit#4.carrier null
+  r Unit#4.posY 1441792
   a unit Unit#4
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   o result 1

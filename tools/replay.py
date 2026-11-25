@@ -178,6 +178,7 @@ def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool
     try:
         if saver is not None:
             saver_path = scenario.parent / f"{saver}.txt"
+            (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
             scratch = Path(tempfile.mkdtemp(prefix="save-", dir=ROOT / "build/scratch"))
             run = tracediff.play(exe, saver_path, game_dir, None, timeout, env=env, collect=tracediff.SAVE_FILES)
             try:

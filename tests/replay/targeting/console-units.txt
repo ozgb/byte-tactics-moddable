@@ -5,16 +5,16 @@ call 0 Apply
   r Unit#1.netDirtyFlags 0
   r Unit#1.weapon0TargetX 0
   r Unit#1.weapon0TargetZ 0
-  r Unit#1.weapon0Def null
   r Unit#1.weapon0Flags 0
   r Unit#1.weapon1TargetX 0
   r Unit#1.weapon1TargetZ 0
-  r Unit#1.weapon1Def null
-  r Unit#1.weapon1Flags 0
   r Unit#1.weapon2TargetX 0
   r Unit#1.weapon2TargetZ 0
   r Unit#1.weapon2Def null
   r Unit#1.weapon2Flags 0
+  r Unit#1.weapon0Def null
+  r Unit#1.weapon1Def null
+  r Unit#1.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#1
   a event.weapon 0
@@ -40,16 +40,16 @@ call 0 Apply
   r Unit#251.netDirtyFlags 0
   r Unit#251.weapon0TargetX 0
   r Unit#251.weapon0TargetZ 0
-  r Unit#251.weapon0Def null
   r Unit#251.weapon0Flags 0
   r Unit#251.weapon1TargetX 0
   r Unit#251.weapon1TargetZ 0
-  r Unit#251.weapon1Def null
-  r Unit#251.weapon1Flags 0
   r Unit#251.weapon2TargetX 0
   r Unit#251.weapon2TargetZ 0
   r Unit#251.weapon2Def null
   r Unit#251.weapon2Flags 0
+  r Unit#251.weapon0Def null
+  r Unit#251.weapon1Def null
+  r Unit#251.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#251
   a event.weapon 0
@@ -71,12 +71,12 @@ call 0 Apply
   w Unit#251.weapon2TargetZ -32768
   o result 1
 call 0 GetWeaponTargetUnit
-  r Unit#1.weapon0Def weapondef#20
   r Unit#1.weapon0Flags 18
-  r Unit#1.weapon1Def weapondef#0
-  r Unit#1.weapon1Flags 20
   r Unit#1.weapon2Def weapondef#22
   r Unit#1.weapon2Flags 26
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r Unit#1.weapon1Flags 20
   a unit Unit#1
   a weapon 0
   o result null
@@ -85,26 +85,26 @@ call 0 FindWeaponTarget
   r rng.main 0x000005ad
   r rng.load 0x218b8b73
   r rng.seed 0x41bd1988
-  r Unit#1.def UnitDef#34
-  r Unit#1.player Player#0
-  r Unit#1.flags 0x90e00221
   r Unit#1.activateFlags 1
   r Unit#1.unitDefIndex 34
+  r Unit#1.flags 0x90e00221
+  r Unit#1.def UnitDef#34
+  r Unit#1.player Player#0
   r Unit#1.playerIndex 0
   r Unit#1.posX 36700160
   r Unit#1.posY 65536
   r Unit#1.posZ 15728640
-  r UnitDef#34.flags1 0x0495c0c8
-  r UnitDef#34.range 290
+  r weapondef#22.flags 0x04480a09
   r UnitDef#34.categories UnitTypeSet#1
   r UnitDef#34.weaponCategories0 UnitTypeSet#1
   r UnitDef#34.weaponCategories1 UnitTypeSet#2
   r UnitDef#34.weaponCategories2 UnitTypeSet#2
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.range 290
   r Player#0.active 1
   r Player#0.type 1
   r weapondef#20.flags 0x00080809
   r weapondef#0.flags 0x00000000
-  r weapondef#22.flags 0x04480a09
   r UnitTypeSet#1.bits x:0800a0244000088020000028000d00080008101002088000c000000000a0020010c0010000000000000000000000000000000000000000000000000000000000
   r UnitTypeSet#2.bits x:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
@@ -121,36 +121,36 @@ call 0 Apply
   a size 12
   o result 0
 call 0 GetWeaponTargetUnit
-  r Unit#251.weapon0Def weapondef#21
   r Unit#251.weapon0Flags 18
-  r Unit#251.weapon1Def weapondef#0
-  r Unit#251.weapon1Flags 20
   r Unit#251.weapon2Def weapondef#23
   r Unit#251.weapon2Flags 26
+  r Unit#251.weapon0Def weapondef#21
+  r Unit#251.weapon1Def weapondef#0
+  r Unit#251.weapon1Flags 20
   a unit Unit#251
   a weapon 0
   o result null
 call 0 FindWeaponTarget
   r rng.seed 0x1b2382a5
-  r Unit#251.def UnitDef#167
-  r Unit#251.player Player#1
-  r Unit#251.flags 0x90e00021
   r Unit#251.activateFlags 1
   r Unit#251.unitDefIndex 167
+  r Unit#251.flags 0x90e00021
+  r Unit#251.def UnitDef#167
+  r Unit#251.player Player#1
   r Unit#251.playerIndex 1
   r Unit#251.posX 221249536
   r Unit#251.posY 65536
   r Unit#251.posZ 92274688
-  r UnitDef#167.flags1 0x0495c0c8
-  r UnitDef#167.range 290
+  r weapondef#23.flags 0x04480a09
   r UnitDef#167.categories UnitTypeSet#1
   r UnitDef#167.weaponCategories0 UnitTypeSet#1
   r UnitDef#167.weaponCategories1 UnitTypeSet#2
   r UnitDef#167.weaponCategories2 UnitTypeSet#2
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.range 290
   r Player#1.active 1
   r Player#1.type 2
   r weapondef#21.flags 0x00080809
-  r weapondef#23.flags 0x04480a09
   a unit Unit#251
   a weapon 0
   a useRange 1
@@ -186,12 +186,12 @@ call 1 GetWeaponTargetPos
   r Game.seaLevel 0
   r Unit#1.killCount 0
   r Unit#1.motion UnitMotion#1
+  r weapondef#22.speed 436906
   r UnitMotion#1.velocityX 0
   r UnitMotion#1.velocityY 0
   r UnitMotion#1.velocityZ 0
   r weapondef#20.speed 873813
   r weapondef#0.speed 0
-  r weapondef#22.speed 436906
   a unit Unit#1
   a weapon 0
   o result 0
@@ -202,11 +202,11 @@ call 1 GetWeaponTargetPos
 call 1 GetWeaponTargetPos
   r Unit#251.killCount 0
   r Unit#251.motion UnitMotion#2
+  r weapondef#23.speed 436906
   r UnitMotion#2.velocityX 0
   r UnitMotion#2.velocityY 0
   r UnitMotion#2.velocityZ 0
   r weapondef#21.speed 873813
-  r weapondef#23.speed 436906
   a unit Unit#251
   a weapon 0
   o result 0
@@ -394,16 +394,16 @@ call 12 Apply
   r Unit#2.netDirtyFlags 0
   r Unit#2.weapon0TargetX 0
   r Unit#2.weapon0TargetZ 0
-  r Unit#2.weapon0Def null
   r Unit#2.weapon0Flags 0
   r Unit#2.weapon1TargetX 0
   r Unit#2.weapon1TargetZ 0
-  r Unit#2.weapon1Def null
-  r Unit#2.weapon1Flags 0
   r Unit#2.weapon2TargetX 0
   r Unit#2.weapon2TargetZ 0
   r Unit#2.weapon2Def null
   r Unit#2.weapon2Flags 0
+  r Unit#2.weapon0Def null
+  r Unit#2.weapon1Def null
+  r Unit#2.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#2
   a event.weapon 0
@@ -435,16 +435,16 @@ call 12 GetWeaponTargetPos
 call 12 GetWeaponTargetPos
   r Unit#2.unitDefIndex 95
   r Unit#2.killCount 0
+  r Unit#2.weapon0Flags 18
+  r Unit#2.weapon2Def weapondef#0
+  r Unit#2.weapon2Flags 24
   r Unit#2.motion UnitMotion#3
   r Unit#2.posX 41943040
   r Unit#2.posY 65536
   r Unit#2.posZ 17039360
   r Unit#2.weapon0Def weapondef#16
-  r Unit#2.weapon0Flags 18
   r Unit#2.weapon1Def weapondef#0
   r Unit#2.weapon1Flags 20
-  r Unit#2.weapon2Def weapondef#0
-  r Unit#2.weapon2Flags 24
   r UnitMotion#3.velocityX 0
   r UnitMotion#3.velocityY 0
   r UnitMotion#3.velocityZ 0
@@ -486,16 +486,16 @@ call 14 Apply
   r Unit#252.netDirtyFlags 0
   r Unit#252.weapon0TargetX 0
   r Unit#252.weapon0TargetZ 0
-  r Unit#252.weapon0Def null
   r Unit#252.weapon0Flags 0
   r Unit#252.weapon1TargetX 0
   r Unit#252.weapon1TargetZ 0
-  r Unit#252.weapon1Def null
-  r Unit#252.weapon1Flags 0
   r Unit#252.weapon2TargetX 0
   r Unit#252.weapon2TargetZ 0
   r Unit#252.weapon2Def null
   r Unit#252.weapon2Flags 0
+  r Unit#252.weapon0Def null
+  r Unit#252.weapon1Def null
+  r Unit#252.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#252
   a event.weapon 0
@@ -530,17 +530,17 @@ call 14 GetWeaponTargetPos
   o result 0
 call 14 FindBestTargetIfFireAtWill
   r rng.seed 0x12cdcb89
+  r Unit#2.activateFlags 0
+  r Unit#2.flags 0x94240221
   r Unit#2.def UnitDef#95
   r Unit#2.player Player#0
-  r Unit#2.flags 0x94240221
-  r Unit#2.activateFlags 0
   r Unit#2.playerIndex 0
-  r UnitDef#95.flags1 0x00918089
-  r UnitDef#95.range 280
   r UnitDef#95.categories UnitTypeSet#1
   r UnitDef#95.weaponCategories0 UnitTypeSet#1
   r UnitDef#95.weaponCategories1 UnitTypeSet#2
   r UnitDef#95.weaponCategories2 UnitTypeSet#2
+  r UnitDef#95.flags1 0x00918089
+  r UnitDef#95.range 280
   a unit Unit#2
   i los_radar.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 280 0
   o out []
@@ -556,16 +556,16 @@ call 14 GetWeaponTargetPos
 call 14 GetWeaponTargetPos
   r Unit#252.unitDefIndex 144
   r Unit#252.killCount 0
+  r Unit#252.weapon0Flags 18
+  r Unit#252.weapon2Def weapondef#0
+  r Unit#252.weapon2Flags 24
   r Unit#252.motion UnitMotion#4
   r Unit#252.posX 41943040
   r Unit#252.posY 65536
   r Unit#252.posZ 17039360
   r Unit#252.weapon0Def weapondef#88
-  r Unit#252.weapon0Flags 18
   r Unit#252.weapon1Def weapondef#0
   r Unit#252.weapon1Flags 20
-  r Unit#252.weapon2Def weapondef#0
-  r Unit#252.weapon2Flags 24
   r UnitMotion#4.velocityX 0
   r UnitMotion#4.velocityY 0
   r UnitMotion#4.velocityZ 0
@@ -625,17 +625,17 @@ call 16 GetWeaponTargetPos
 call 16 FindBestTargetIfFireAtWill
   r rng.main 0x51dbed40
   r rng.seed 0x04ed9904
+  r Unit#252.activateFlags 0
+  r Unit#252.flags 0x98240021
   r Unit#252.def UnitDef#144
   r Unit#252.player Player#1
-  r Unit#252.flags 0x98240021
-  r Unit#252.activateFlags 0
   r Unit#252.playerIndex 1
-  r UnitDef#144.flags1 0x00918089
-  r UnitDef#144.range 275
   r UnitDef#144.categories UnitTypeSet#2
   r UnitDef#144.weaponCategories0 UnitTypeSet#2
   r UnitDef#144.weaponCategories1 UnitTypeSet#2
   r UnitDef#144.weaponCategories2 UnitTypeSet#2
+  r UnitDef#144.flags1 0x00918089
+  r UnitDef#144.range 275
   a unit Unit#252
   i los_radar.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 275 0
   o out []
@@ -1295,16 +1295,16 @@ call 40 Apply
   r Unit#3.netDirtyFlags 0
   r Unit#3.weapon0TargetX 0
   r Unit#3.weapon0TargetZ 0
-  r Unit#3.weapon0Def null
   r Unit#3.weapon0Flags 0
   r Unit#3.weapon1TargetX 0
   r Unit#3.weapon1TargetZ 0
-  r Unit#3.weapon1Def null
-  r Unit#3.weapon1Flags 0
   r Unit#3.weapon2TargetX 0
   r Unit#3.weapon2TargetZ 0
   r Unit#3.weapon2Def null
   r Unit#3.weapon2Flags 0
+  r Unit#3.weapon0Def null
+  r Unit#3.weapon1Def null
+  r Unit#3.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#3
   a event.weapon 0
@@ -1340,16 +1340,16 @@ call 40 GetWeaponTargetPos
 call 40 GetWeaponTargetPos
   r Unit#3.unitDefIndex 54
   r Unit#3.killCount 0
+  r Unit#3.weapon0Flags 18
+  r Unit#3.weapon2Def weapondef#0
+  r Unit#3.weapon2Flags 24
   r Unit#3.motion UnitMotion#5
   r Unit#3.posX 41943040
   r Unit#3.posY 65536
   r Unit#3.posZ 17039360
   r Unit#3.weapon0Def weapondef#111
-  r Unit#3.weapon0Flags 18
   r Unit#3.weapon1Def weapondef#0
   r Unit#3.weapon1Flags 20
-  r Unit#3.weapon2Def weapondef#0
-  r Unit#3.weapon2Flags 24
   r UnitMotion#5.velocityX 0
   r UnitMotion#5.velocityY 0
   r UnitMotion#5.velocityZ 0
@@ -1416,17 +1416,17 @@ call 42 GetWeaponTargetPos
   o result 0
 call 42 FindBestTargetIfFireAtWill
   r rng.seed 0x356db357
+  r Unit#3.activateFlags 0
+  r Unit#3.flags 0x98240221
   r Unit#3.def UnitDef#54
   r Unit#3.player Player#0
-  r Unit#3.flags 0x98240221
-  r Unit#3.activateFlags 0
   r Unit#3.playerIndex 0
-  r UnitDef#54.flags1 0x009180a9
-  r UnitDef#54.range 263
   r UnitDef#54.categories UnitTypeSet#1
   r UnitDef#54.weaponCategories0 UnitTypeSet#1
   r UnitDef#54.weaponCategories1 UnitTypeSet#2
   r UnitDef#54.weaponCategories2 UnitTypeSet#2
+  r UnitDef#54.flags1 0x009180a9
+  r UnitDef#54.range 263
   a unit Unit#3
   i los_radar.GetVisibleEnemiesInRadius 0 pos=(41943040,65536,17039360) 263 0
   o out [Unit#252]
@@ -5936,16 +5936,16 @@ call 120 Apply
   r Unit#253.netDirtyFlags 0
   r Unit#253.weapon0TargetX 0
   r Unit#253.weapon0TargetZ 0
-  r Unit#253.weapon0Def null
   r Unit#253.weapon0Flags 0
   r Unit#253.weapon1TargetX 0
   r Unit#253.weapon1TargetZ 0
-  r Unit#253.weapon1Def null
-  r Unit#253.weapon1Flags 0
   r Unit#253.weapon2TargetX 0
   r Unit#253.weapon2TargetZ 0
   r Unit#253.weapon2Def null
   r Unit#253.weapon2Flags 0
+  r Unit#253.weapon0Def null
+  r Unit#253.weapon1Def null
+  r Unit#253.weapon1Flags 0
   a event.kind 99
   a event.unit Unit#253
   a event.weapon 0
@@ -6026,16 +6026,16 @@ call 120 GetWeaponTargetUnit
 call 120 GetWeaponTargetPos
   r Unit#253.unitDefIndex 95
   r Unit#253.killCount 0
+  r Unit#253.weapon0Flags 18
+  r Unit#253.weapon2Def weapondef#0
+  r Unit#253.weapon2Flags 24
   r Unit#253.motion UnitMotion#6
   r Unit#253.posX 41943040
   r Unit#253.posY 65536
   r Unit#253.posZ 17039360
   r Unit#253.weapon0Def weapondef#16
-  r Unit#253.weapon0Flags 18
   r Unit#253.weapon1Def weapondef#0
   r Unit#253.weapon1Flags 20
-  r Unit#253.weapon2Def weapondef#0
-  r Unit#253.weapon2Flags 24
   r UnitMotion#6.velocityX 0
   r UnitMotion#6.velocityY 0
   r UnitMotion#6.velocityZ 0
@@ -6174,10 +6174,10 @@ call 122 GetWeaponTargetPos
   o result 0
 call 122 FindBestTargetIfFireAtWill
   r rng.seed 0x03cb41f2
+  r Unit#253.activateFlags 0
+  r Unit#253.flags 0x98240121
   r Unit#253.def UnitDef#95
   r Unit#253.player Player#1
-  r Unit#253.flags 0x98240121
-  r Unit#253.activateFlags 0
   r Unit#253.playerIndex 1
   a unit Unit#253
   i los_radar.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 280 0
@@ -8226,12 +8226,12 @@ call 160 GetWeaponTargetPos
   o result 0
 call 160 GetWeaponTargetPos
   r Unit#251.unitDefIndex 95
+  r Unit#251.weapon2Def weapondef#0
+  r Unit#251.weapon2Flags 24
   r Unit#251.motion UnitMotion#7
   r Unit#251.posX 41943040
   r Unit#251.posZ 17039360
   r Unit#251.weapon0Def weapondef#16
-  r Unit#251.weapon2Def weapondef#0
-  r Unit#251.weapon2Flags 24
   r UnitMotion#7.velocityX 0
   r UnitMotion#7.velocityY 0
   r UnitMotion#7.velocityZ 0
@@ -8270,9 +8270,9 @@ call 162 GetWeaponTargetPos
   o result 0
 call 162 FindBestTargetIfFireAtWill
   r rng.seed 0x63c07e89
-  r Unit#251.def UnitDef#95
-  r Unit#251.flags 0x90240021
   r Unit#251.activateFlags 0
+  r Unit#251.flags 0x90240021
+  r Unit#251.def UnitDef#95
   a unit Unit#251
   i los_radar.GetVisibleEnemiesInRadius 1 pos=(41943040,65536,17039360) 280 0
   o out []

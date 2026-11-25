@@ -15,8 +15,10 @@ such as the walk over the units in range) is walked as written, so the seam call
 caller uses its value and whether what it runs writes state; each `immediate` row of data/dependencies.csv is placed
 at the first write step before a read step (Splits). LOOPS and TICK_STEPS describe the loops and the tick's engine
 steps in behavioural terms; --check also fails when a pass, loop or engine step has no description or a description
-has no pass, loop or step, and when an immediate row cannot be placed. The page goes into the oracle kit, so it
-names entry points and subsystems only, never another function or a source file.
+has no pass, loop or step, and when an immediate row cannot be placed. The Routes section is the scheduler's route
+table (src/game/routes.cpp) in its order, each row as publisher, kind, subscriber and whether it is synchronous, with
+the inbox order of the scheduler's modules. The page goes into the oracle kit, so it names entry points, subsystems
+and the event kinds of the interface headers only, never another function or a source file.
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ import argparse
 import csv
 import os
 import re
+import textwrap
 import sys
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
@@ -78,6 +81,9 @@ ROUTE_REASON = "route table entry"
 VISITOR_REASON = "visitor passed at "
 ROUTE_ROW = re.compile(r"\{SCHED_(\w+), \w+, SCHED_(\w+), (\w+), ([01])\}")
 ROUTES = "src/game/routes.cpp"
+ROUTE_KIND_ROW = re.compile(r"\{SCHED_(\w+), (\w+), SCHED_(\w+), \w+, ([01])\}")
+SCHED_MODULES = ROOT / "src" / "util" / "engine_services.h"
+SCHED_MODULE = re.compile(r"\bSCHED_(\w+) = (\d+),")
 OUTBOX_ARG = re.compile(r"(?:Publish\w*|EmitFrom)\(\s*SCHED_(\w+)")
 ENGINE = {"presentation", "harness", "network", "files"}
 
@@ -507,6 +513,7 @@ class Program:
                     self.methods.add("%s::%s" % (tables[table], slot))
         self.handlers = {r["target"] for r in edges if r["reason"].startswith(ROUTE_REASON)}
         self.routes = [(p.lower(), s.lower(), h, sync == "1") for p, s, h, sync in ROUTE_ROW.findall(sources.get(ROUTES, ""))]
+        self.route_source = sources.get(ROUTES, "")
         self.outboxes = outboxes(self.fns, sources)
         self.passers: dict[tuple[str, str], set[str]] = defaultdict(set)
         self.visitor_hits = 0
@@ -1563,6 +1570,37 @@ class Page:
         return out
 
 
+def route_rows(source: str) -> list[list[str]]:
+    """The route table of the scheduler, a row per route in its order: publisher, kind, subscriber, delivery."""
+    return [[p.lower(), code(kind), s.lower(), "synchronous" if sync == "1" else "queued"]
+            for p, kind, s, sync in ROUTE_KIND_ROW.findall(source)]
+
+
+def routes_section(source: str, modules: str) -> list[str]:
+    """The Routes section: the rules of delivery and the route table."""
+    order = [name.lower() for name, _ in sorted(SCHED_MODULE.findall(modules), key=lambda m: int(m[1]))]
+    inboxes = ("An inbox is delivered in the order it was filled: at the end of each phase and of the tick, the inboxes in "
+               "the order %s, and again from the first while any of them holds an effect (the `Apply (once)` steps of The "
+               "tick); before each step of the subscriber that the lists above show after a delivery to it; and before a "
+               "synchronous delivery to the same subscriber. No inbox holds an effect when the tick ends." % ", ".join(order))
+    return [
+        "## Routes", "",
+        "Which subsystem receives each effect a subsystem publishes, and when. A subsystem publishes an effect to its own",
+        "outbox (`engine` is the engine's: the console, the load of a match, the network, the harness), and the effect goes",
+        "to each row below with that outbox and the effect's kind, in the order of the rows; an outbox and kind with no",
+        "row go to no subsystem. What a subscriber does with an effect is stated by its interface (its header in",
+        "`interfaces/` and its interface page).",
+        "",
+        "- **synchronous:** the effect is delivered before the publish returns: first what the subscriber's inbox holds,",
+        "  then the effect.",
+        "- **queued:** published inside the tick, the effect is copied to the subscriber's inbox, which holds 1024 effects",
+        "  and is delivered first when a publish finds it full. Published outside the tick (between two ticks, or before",
+        "  the first), it is delivered at once, as a synchronous route's is.",
+        "",
+    ] + textwrap.wrap(inboxes, 117) + [""] \
+        + table(["publisher", "kind", "subscriber", "delivery"], route_rows(source)) + [""]
+
+
 def render(page: Page) -> str:
     """docs/schedule.md."""
     lines = [
@@ -1685,7 +1723,8 @@ def render(page: Page) -> str:
               "receives (`made / received`, counting each caller and entry point once per class), then the immediate edges",
               "it writes and reads, and how many of its edges fall inside one entity's update.", ""]
     lines += table(["subsystem"] + CLASSES + ["edges written", "edges read", "inside an entity"], page.summary_rows())
-    lines += ["", "## Limits", "", LIMITS.rstrip("\n")]
+    lines += [""] + routes_section(page.program.route_source, SCHED_MODULES.read_text())
+    lines += ["## Limits", "", LIMITS.rstrip("\n")]
     return "\n".join(lines) + "\n"
 
 

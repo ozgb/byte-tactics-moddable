@@ -536,5 +536,49 @@
     "10"
    ]
   ]
+ },
+ {
+  "name": "unbudgeted",
+  "calls": [
+   [
+    "manifest",
+    "fuel/unbudgeted.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "m",
+    "fuel/metered.wasm"
+   ],
+   [
+    "fuel",
+    "m"
+   ],
+   [
+    "tick"
+   ],
+   [
+    "call",
+    "m",
+    "spin",
+    "10"
+   ],
+   [
+    "fuel",
+    "m"
+   ],
+   [
+    "call",
+    "m",
+    "spin",
+    "10"
+   ],
+   [
+    "fuel",
+    "m"
+   ]
+  ]
  }
 ]

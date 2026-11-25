@@ -122,7 +122,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 8. |
+| `trace_format` | The format number, 9 (section 12). |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
@@ -797,6 +797,13 @@ script(i, s):
     for q in 0 .. pieceCount-1: HT(PieceTransform, object_state + 0x22 + q*0x36)   # dump: units[i].script.transforms[q].<field>
 ```
 
+The presence byte is 1 for every live unit whose script state is not null, whatever its piece count: a script with no
+pieces (no table, a piece count above 512, a null piece list or a null object state) hashes `H32(i)`, `H8(1)` and no
+transform. The dump has no line for `i` or the presence byte. A reader of a dump takes the presence from record 55: the
+unit has a script state exactly when record 55 has its `scriptsState.units[i]` lines (section 8.39), which scripts writes
+for every script state, pieces or none, so a unit with a `scriptsState.units[i].scale` line and no `transforms` lines
+hashes `H8(1)` and nothing more.
+
 Since format 8 section 23 hashes only the piece transforms, which weapons reads directly. The script's own words, the 8
 channels, the statics and the piece records are only scripts', and record 55 (section 8.39) reports them. The
 description below is the layout of what record 55 writes, with the prefix `scriptsState.units[i]` (so the channel prefix is
@@ -843,7 +850,7 @@ the top word, so `sp + 1` words are live.
 
 Since format 6 los_radar writes this section itself, through the `StateWriter` of its `WriteState` seam slot, and the
 harness hashes the records of sections 24 and 25 into the row (a record of any other section is only dumped). The harness calls
-los_radar's `WriteState` and then units' at the start of the player records of the world row, in every phase.
+los_radar's `WriteState` and then units' after section 23 and before section 27 of the world row (the order of section 6), in every phase.
 
 ```
 for i in 0 .. 9 whose index entry is live:       # the player has an AI record: the simulation global of 10 refs is not null

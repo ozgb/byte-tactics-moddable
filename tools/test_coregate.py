@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -232,6 +233,45 @@ class Fake(unittest.TestCase):
                     mock.patch("sys.stderr"):
                 coregate.main()
             self.assertEqual(e.exception.code, 2, argv)
+
+
+ECHO = """
+import json, sys
+group, calls_path, out_path = sys.argv[1:4]
+closing = ("o params.", "o result ")
+with open(out_path, "w") as out:
+    for call in [l.rstrip("\\n").split("\\t") for l in open(calls_path, newline="")]:
+        entries = []
+        for line in open(call[1]).read().split("\\n"):
+            if line.startswith("call "):
+                entries.append([])
+            elif line.startswith("  w ") or line.startswith(closing, 2):
+                entries[-1].append(line[2:])
+        out.write("replay\\t" + json.dumps(entries) + "\\n")
+"""
+
+
+class Echo(unittest.TestCase):
+    """A core that echoes a recording's own `w` and closing `o` lines, hosting no module, fails the host group."""
+
+    def test_echo_of_the_full_recording_would_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            script, calls, out = Path(tmp) / "echo.py", Path(tmp) / "calls", Path(tmp) / "out"
+            script.write_text(ECHO)
+            for v in coregate.stored(["host"])["host"]["vectors"]:
+                full = coregate.ROOT / "tests" / "replay" / "wind_meteors" / Path(v["calls"][0][1]).name
+                calls.write_text(coregate.calls_text([["replay", str(full), "module.wasm"]]))
+                subprocess.run([sys.executable, str(script), "host", str(calls), str(out)], check=True)
+                self.assertEqual(json.loads(out.read_text().split("\t", 1)[1]), v["results"][0][1], v["name"])
+
+    def test_echo_of_the_gate_inputs_differs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            script = Path(tmp) / "echo.py"
+            script.write_text(ECHO)
+            result = coregate.judge(lambda inputs: [sys.executable, str(script)], coregate.ROOT / "tools" / "coregate.py",
+                                    ("host",))
+        self.assertEqual(result["groups"]["host"]["status"], "differs")
+        self.assertTrue(all(v["status"] == "differs" for v in result["vectors"].values()))
 
 
 @unittest.skipUnless(ENGINE and shutil.which("wine"), "needs the modern build's adapters and wine")

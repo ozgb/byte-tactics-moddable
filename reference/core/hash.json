@@ -5,5 +5,33 @@
   ],
   "results": [
    ["rows", [[200, "units", "b9da8a7f2d638968"], [200, "projectiles", "b9da8a7f2d638968"], [200, "explosions", "b9da8a7f2d638968"], [200, "players", "6e4a5c1aa81d062a"], [200, "features", "6e4a5c1aa81d062a"], [200, "wind", "6e4a5c1aa81d062a"], [200, "meteors", "6e4a5c1aa81d062a"], [200, "world", "7a39d8e373d8008a"], [200, "tick", "040f6b1ab612b06b"]]]
+  ]},
+ {"name": "orders-attack-nomove-1",
+  "calls": [
+   ["rows", "hash/orders-attack-nomove-1.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[1, "units", "1c1278268bd3ab1a"], [1, "projectiles", "1c1278268bd3ab1a"], [1, "explosions", "1c1278268bd3ab1a"], [1, "players", "1c1278268bd3ab1a"], [1, "features", "1c1278268bd3ab1a"], [1, "wind", "1aff9c5afacc98a3"], [1, "meteors", "1aff9c5afacc98a3"], [1, "world", "ce5b430a06563f5c"], [1, "tick", "f72101fb75b1dc44"]]]
+  ]},
+ {"name": "orders-air-fights-700",
+  "calls": [
+   ["rows", "hash/orders-air-fights-700.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[700, "units", "c9ec78de15dfecbc"], [700, "projectiles", "c9ec78de15dfecbc"], [700, "explosions", "c9ec78de15dfecbc"], [700, "players", "c9ec78de15dfecbc"], [700, "features", "c9ec78de15dfecbc"], [700, "wind", "c9ec78de15dfecbc"], [700, "meteors", "c9ec78de15dfecbc"], [700, "world", "21ee5f58010ebd57"], [700, "tick", "7c49fefb3a37890a"]]]
+  ]},
+ {"name": "orders-guard-attacked-300",
+  "calls": [
+   ["rows", "hash/orders-guard-attacked-300.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[300, "units", "2df926ba47806a11"], [300, "projectiles", "2f2403282bc22850"], [300, "explosions", "2f2403282bc22850"], [300, "players", "86f91a9b24267c87"], [300, "features", "bbfa9abdf003b7cb"], [300, "wind", "bbfa9abdf003b7cb"], [300, "meteors", "bbfa9abdf003b7cb"], [300, "world", "7169786bf254f43c"], [300, "tick", "fad81e4502b91a6a"]]]
+  ]},
+ {"name": "meteors-earthquake-102",
+  "calls": [
+   ["rows", "hash/meteors-earthquake-102.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[102, "units", "45b489503deaeac2"], [102, "projectiles", "bbc98ef850c769e6"], [102, "explosions", "bbc98ef850c769e6"], [102, "players", "bbc98ef850c769e6"], [102, "features", "bbc98ef850c769e6"], [102, "wind", "bbc98ef850c769e6"], [102, "meteors", "bbc98ef850c769e6"], [102, "world", "ee8de3585ebce0fd"], [102, "tick", "af66428152d4a926"]]]
   ]}
 ]}

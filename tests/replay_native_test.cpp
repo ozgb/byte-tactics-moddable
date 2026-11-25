@@ -242,7 +242,7 @@ extern void (* const g_fixtureAttachVtable[2])() = { nullptr, nullptr };
 
 namespace {
 
-enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
+enum { MAX_LINES = 1 << 22, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 int g_failures;
@@ -663,6 +663,15 @@ bool ClosingLine(const char* line)
     return false;
 }
 
+const ReplayField* RngField(const char* name)
+{
+    for (unsigned i = 0; i < kReplayFieldCount; i++) {
+        if (kReplayFields[i].base == RB_RNG && strcmp(kReplayFields[i].name, name) == 0)
+            return &kReplayFields[i];
+    }
+    return nullptr;
+}
+
 const char* Enter(const ReplayText& actual)
 {
     int index = g_importIndex++;
@@ -701,6 +710,11 @@ const char* Enter(const ReplayText& actual)
             }
         }
         g_cursor++;
+    }
+    for (int i = 0; i < g_outCount; i++) {
+        const ReplayField* f = RngField(g_outNames[i]);
+        if (f != nullptr)
+            RestoreField(*f, g_outValues[i]);
     }
     unsigned n = (unsigned)strlen(actual.Data());
     if (strncmp(recorded, actual.Data(), n) == 0 && (recorded[n] == '\0' || strncmp(recorded + n, " = ", 3) == 0))
@@ -5460,6 +5474,63 @@ void UnconditionedUnitIdSelfTest()
     free(text);
 }
 
+void IdReachSelfTest()
+{
+    printf("a slot's own reach list for a unit id\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    pool[5].health = 4;
+    pool[5].flags = 0x21;
+    lanes[1].unit = 5;
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "level"), FieldIndex(ROK_FIXTURELANE, "occupant"), FieldIndex(ROK_UNIT, "health"),
+                                 FieldIndex(ROK_UNIT, "flags") };
+    unsigned short every[1] = { ROK_FIXTURELANE };
+    ReplaySlotSets plain = { "plain", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, plain);
+    char* text = strdup(recorder.text.Data());
+    Check(strstr(text, "  r Unit#5.health 4\n") != nullptr && strstr(text, "Unit#5.flags") == nullptr, "without a slot reach the field's own reach applies");
+    free(text);
+
+    unsigned short own[1] = { FieldIndex(ROK_UNIT, "flags") };
+    ReplayIdReach byId[1] = { { FieldIndex(ROK_FIXTURELANE, "occupant"), own, 1 } };
+    ReplaySlotSets sets = { "by id", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1, byId, 1 };
+    Recorder slot;
+    slot.Record(nullptr, nullptr, 0, sets);
+    text = strdup(slot.text.Data());
+    Check(strstr(text, "  r Unit#5.flags 0x00000021\n") != nullptr && strstr(text, "Unit#5.health") == nullptr, "the slot's reach list replaces the field's own");
+    Check(ReplayFailure() == nullptr, "and the walk does not fail");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Unit* rebuilt = (Unit*)ReplayResolveObject("Unit#5", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->flags == 0x21 && rebuilt->health == 0, "the replayer restores the fields of the slot's reach only");
+    if (rebuilt == nullptr || g_game->p1cd5.get() == nullptr) {
+        free(text);
+        return;
+    }
+    g_game->poolCount = 8;
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the restored unit compares equal");
+    rebuilt->health = 3;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "a field outside the slot's reach is not compared");
+    rebuilt->flags = 0x20;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#5.flags") == 0, "a field of the slot's reach is compared");
+    free(text);
+}
+
 void RecordGameFields(Recorder& recorder, const ReplaySlotSets& sets)
 {
     ReplayText value;
@@ -7173,6 +7244,7 @@ int SelfTest(const char* file)
     DeltaTableSelfTest();
     DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
+    IdReachSelfTest();
     GameRefSelfTest();
     GamePtrSelfTest();
     ExecuteCommandSelfTest();

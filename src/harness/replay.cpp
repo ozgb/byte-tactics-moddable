@@ -151,6 +151,45 @@ const unsigned char* BlockBase(const ReplayField& f)
     return f.base == RB_SIM ? (const unsigned char*)g_simGlobals : nullptr;
 }
 
+bool RngReadable(const ReplayField& f)
+{
+    return SimBlockBase() != nullptr && (f.offset != 2 || g_simGlobals != nullptr);
+}
+
+unsigned RngValue(const ReplayField& f)
+{
+    return f.offset == 2 ? RandomSeed() : GameHoldrand((RandStream)f.offset);
+}
+
+unsigned s_rngAt[3];
+
+void MarkRng()
+{
+    for (unsigned i = 0; i < kReplayFieldCount; i++) {
+        const ReplayField& f = kReplayFields[i];
+        if (f.base == RB_RNG && RngReadable(f))
+            s_rngAt[f.offset] = RngValue(f);
+    }
+}
+
+void ImportRng(ReplayText& t, int id)
+{
+    if (id == RI_RANDOM_INT || id == RI_GAME_RAND) {
+        MarkRng();
+        return;
+    }
+    for (unsigned i = 0; i < kReplayFieldCount; i++) {
+        const ReplayField& f = kReplayFields[i];
+        if (f.base != RB_RNG || !RngReadable(f) || RngValue(f) == s_rngAt[f.offset])
+            continue;
+        s_rngAt[f.offset] = RngValue(f);
+        t.Add("\n  o ");
+        t.Add(f.name);
+        t.AddChar(' ');
+        t.AddHex32(s_rngAt[f.offset]);
+    }
+}
+
 void CaptureSet(const unsigned char* set, unsigned count, char tag)
 {
     Recording& r = *s_rec[s_sub];
@@ -211,6 +250,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
         r.known.Set("Game.ticks", s_field.Data());
     }
     const ReplaySlotSets& sets = kReplaySlots[slot];
+    MarkRng();
     CaptureSet(sets.reads, sets.readCount, 'r');
     CaptureObjectSet(sets, true);
     ReplayOwner() = host_thread_id();
@@ -357,6 +397,12 @@ void EventRoots(ReplayRoots& roots, unsigned table, const void* p, unsigned size
     unsigned object = ReplayEventObject(table, *(int*)copy);
     for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
         const ReplayObjectField& f = kReplayObjectFields[i];
+        if (f.object == object && f.kind == RK_I32 && f.target == ROK_WEAPONDEF) {
+            void* weapon = ReplayWeaponAt(*(int*)(copy + f.offset));
+            if (weapon != nullptr)
+                roots.Add(ROK_WEAPONDEF, weapon);
+            continue;
+        }
         if (f.object != object || f.kind != RK_REF)
             continue;
         unsigned offset = *(unsigned*)(copy + f.offset);

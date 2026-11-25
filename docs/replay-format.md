@@ -248,6 +248,27 @@ and its field is not written as a line. A `unitid` field with no `when` holds an
 the unit that stands on it (`r Unit#5.health 4`), and an id of 0, or one past the unit pool, leads nowhere. The bytes themselves are
 recorded by a field of an integer kind over the same `member` (`unit`).
 
+### A unit reached by its id, per slot
+
+The `reach` of a `unitid` field is the field's, shared by every slot whose walk crosses it. A slot that reads more of the unit than that
+names its own reach with `by_id` in its annotation, a list of entries that each give `fields` (`unitid` fields, `Kind.field`), a `reach`
+and its `depth`, checked as a field's `reach` is against the field's target:
+
+```json
+"by_id": [{"fields": ["Cell.occupant", "Cell.occupant2"], "reach": ["Unit.flags", "Unit.health", "Unit.def", "UnitDef.maxHealth"], "depth": 2}]
+```
+
+In that slot's walk a unit reached through one of the `fields` records the slot's `reach` instead of the field's, and the walk follows only
+its pointers; every other slot keeps the field's. So a slot reaches the units of every cell of the map by their id without reaching all of
+each one: weapons' collision and area damage read the cells around a shot, every cell a root of the call (`all-of`), and the units that stand
+on them by id, and their `reach` leaves out `Unit.aimCob` (the three aim callbacks of each unit) that a walk of every unit would hold. A unit
+that the walk reaches through an argument or a `ref` is recorded with the slot's sets in full, as before, wherever its id comes in the walk:
+in a slot with `by_id` the units named by the elements of a table recorded as changed elements (`all-of`) are visited only after the rest
+of the walk, so a unit that a shot names (`Projectile.attacker`) keeps every field the slot reads. A unit reached only by its id keeps the
+limit, so a `reach` names every field of such a unit the slot reads. The generated JSON
+gives the slot a `byId` list of `{"fields", "reach", "depth"}`. `replayschema.py --check` fails for an entry with no `fields`, a field that
+is no `unitid` field or is named twice in the slot, an unknown key, and a `reach` that a field's `reach` would refuse.
+
 ```json
 {"name": "scale", "kind": "f32", "member": "linked.scale", "when": {"field": "flags", "mask": 1, "equals": 1}},
 {"name": "moved", "kind": "i32", "member": "ground.moved", "when": {"via": "player", "kind": "Player", "field": "flags", "mask": 4, "equals": 4}}
@@ -559,8 +580,7 @@ a payload field beyond `size` reads as 0 (an event shorter than its payload is r
 the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.
 
 `"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
-`WEAPONS_DETONATE`, `WEAPONS_EXPLODE_PIECE`, `WEAPONS_AREA_DAMAGE`, `WEAPONS_SPAWN` and `WEAPONS_REMOVE_PROJECTILES`
-(see "Not recorded"). The recorder passes an event of such a kind (one at least as long
+`WEAPONS_EXPLODE_PIECE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
@@ -568,6 +588,11 @@ recorded call as `r` lines. `replayschema.py --check` fails for a name that is n
 two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
 a member that is a unit ref already.
+`"weapons"` lists the payload members (`Struct.member`) that hold the number of a weapon, an `int`:
+`["WeaponsAreaDamage.weapon", "WeaponsSpawn.weapon"]`. The line keeps the number (`a event.weapon 225`), and the recorder makes
+`weapondef#225` a root of the call, so the slot's reads of that weapon are recorded as `r` lines, as a weapon argument's are (a
+number outside the table, such as the -1 of a spawn with no weapon, adds no root). The check fails for a member that is no `int`
+of a struct of the module's interface header, and for one named twice.
 
 The `Emit` service, which a module calls to publish an effect, is one `value` followed by the `size` as an `int`
 (`i services.Emit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36`). The value is the payload as the
@@ -997,6 +1022,20 @@ Their line also carries the unit type, the cell and, for `ScheduleMapCanBuildAt`
   o SimGlobals.g_lastPlaceMetalSum 2007
 ```
 
+### A random draw inside an import
+
+An import can draw from the random streams although the module made no draw: `SchedPublish` runs the handlers of a synchronous route
+before it returns, and the attacked effect of a shot that hits a computer player's unit draws its next action (`RandomInt`) in ai's
+handler. The imports made inside an import are not recorded, so the recorder writes an `o` line after the import for each stream word
+(`rng.main`, `rng.load`, `rng.seed`) that changed during it, and the replayer sets the word from it before the module goes on:
+
+```
+  i services.SchedPublish 6 16
+  o rng.seed 0x53116dcd
+```
+
+`RandomInt` and `GameRand` have no such line: the replayer advances the word as the game does.
+
 ## The schema and its annotations
 
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
@@ -1335,10 +1374,8 @@ weapons:
 - `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
 - The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
 - `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
-- `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded`, so the self-destructs of `combat-deaths` reach the recording only through what they change. DETONATE and AREA_DAMAGE (the detonation and the area damage) read the unit and the cells a shot hits by their id: a unit is reached only as a root of the walk, and every unit with its three aim callbacks, and every cell, are too many roots for a call (the walk holds 8192 objects, and a walk of every unit of the pool takes minutes to replay). EXPLODE_PIECE allocates the piece in the debris chunk cache, a block of chunks in the block that the schema has no form for, and reads the model of the unit. SPAWN and REMOVE_PROJECTILES need only the rules of the projectile table (starting a projectile, compacting the table) and are not recorded yet.
+- `Apply` of EXPLODE_PIECE: the slot leaves it `unrecorded`, so the exploded pieces of `combat-deaths` reach the recording only through what they change. It allocates the piece in the debris chunk cache, a block of chunks in the block that the schema has no form for, and reads the model of the unit (#1081). DETONATE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES are recorded: the detonation and the area damage reach the cells around a shot as roots and their units by id (A unit reached by its id, per slot).
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
-- The burst of a weapon: a burst is counted down by `UpdateProjectiles` (unrecorded), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
-- `UpdateProjectiles`: `unrecorded`, for the reason of DETONATE and AREA_DAMAGE above (its collision, the detonation and the area damage read units and cells by id). `UpdateExplosions` is recorded, and so is adding an explosion effect, which `UpdateProjectiles` and `Apply` also call: what they add to `Game.debris` reaches the recording as `r Debris#N` lines.
 
 economy:
 
@@ -1396,6 +1433,9 @@ The subsystem is read from the recording's header; the module sources of a subsy
 CI replays the recordings of a subsystem once it has an entry in `tests/replay_subsystems.json` (its injected change,
 the recording that change is checked on, and for a WASM module its variant), and `tools/ci_replays.sh` fails naming
 a `tests/replay/` directory with no entry, or an entry with no directory.
+An entry's `inject` is one change (`define`, `recording`, `expect`, `field`) or a list of them: `replay_inject_test.exe` is
+built with every define of every entry, and CI checks each change on its own recording, so each change's recording diverges at that
+change first.
 
 ```sh
 wine build/modern/replay_native_test.exe tests/replay/wind_meteors/*.txt
@@ -1520,21 +1560,24 @@ The recordings of mission 2.0, which the modern build runs as native code in eve
 - `console-ilose` (a skirmish of 100 ticks, 452 calls): 261 `GetMissionParams` (the value `o result (...)` of `MissionParams`), 182 `GetGameType`, 2 `GetStartPosition` (`o out.x` and `out.z`, a `Vec3` out), 2 `GetNameSlot`, 2 `GetMissionName` (a `text` result), `CountStartPositions` (10 rules walked) and `CountMissionFeatures`.
 - `long/mission-build-unit` (a campaign mission, 400 ticks, 26,804 calls, 7.3 MB; beside the set and not replayed in CI, which `console-ilose` alone makes; the only recording that reaches `GetMissionUnit`, `CountMissionUnits` and `GetMissionFeature`, whose calls are 13,000 `GetMissionParams` lines of 248 bytes in any campaign mission): 25,604 `GetMissionParams`, 635 `GetGameType`, 547 `GetMissionUnit` (`o out.name`, `out.ident` and `out.initialMission` are strings behind `cstring` fields), 4 `CountMissionUnits`, 4 `CountMissionFeatures` and 3 `GetMissionFeature`.
 
-`replay_inject_test.exe` is also built with the reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`), and the divergence is reported at call 344 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15):
+`replay_inject_test.exe` is also built with two injections of weapons. The reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`) is reported at call 393 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15). The spawn-tick injection of 1 (a projectile that a SPAWN event starts is started one tick late) is reported at call 8 of `console-features`, its first SPAWN, and at `Projectile#0.spawnTick` (recorded 70, replayed 71); no unit of that window reloads, so the reload injection does not come first:
 
 ```sh
-wine build/modern/replay_inject_test.exe --expect 344 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
+wine build/modern/replay_inject_test.exe --expect 393 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
+wine build/modern/replay_inject_test.exe --expect 8 Projectile#0.spawnTick tests/replay/weapons/console-features.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold weapons' slots but `UpdateProjectiles`, and the `Apply` of every kind but the five it leaves unrecorded ("Event arguments", "Not recorded"): the damage, claims, releases, slot set-ups and aim answers that reach weapons as events. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold every slot of weapons, and the `Apply` of every kind but EXPLODE_PIECE, which it leaves unrecorded ("Event arguments", "Not recorded"): the damage, claims, releases, slot set-ups, aim answers, detonations, area damage, spawns and removals that reach weapons as events. `UpdateProjectiles` and the detonation and area damage reach every cell of the map (`all-of` over `Game.cells`, a table recorded as changed elements), so each file starts with a first record of every cell, most of its size: 22,222 cells and about 21 MB for `mission-timer`, and 262,144 cells and 58 MB for `long-greenhaven-8p`. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
 
-- `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 104 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
-- `console-ilose`, the whole run of 100 ticks (1,869 calls, 359 KB): the load-time `FindWeaponByName` (1,790 calls: the first call names every weapon of the array, `r WeaponName#N.name "..."`, and each returns its weapon, `o result weapondef#N` with `o weapondef#N.flags`, or null), a few `UpdateUnitWeapons` and `GetWeaponRange`.
+- `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 33 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
+- `console-ilose`, the whole run of 100 ticks (1,930 calls; `Apply`: 1 DAMAGE, 9 RELEASE, 2 INIT_SLOTS, 1 DETONATE and 1 REMOVE_PROJECTILES): the load-time `FindWeaponByName` (1,790 calls: the first call names every weapon of the array, `r WeaponName#N.name "..."`, and each returns its weapon, `o result weapondef#N` with `o weapondef#N.flags`, or null), a few `UpdateUnitWeapons` and `GetWeaponRange`.
 - `orders-air-fights`, ticks 100 to 260 (`Apply`: 5 RELEASE, 9 CLAIM, 1 INIT_SLOTS and 22 AIM_DONE): fighters shoot at each other (the line-of-sight handler, `WeaponCanReachUnit`).
 - `orders-weapon-build`, ticks 700 to 780 (`Apply`: 3 RELEASE, 2 CLAIM and 1 INIT_SLOTS): an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
-- `combat-deaths`, ticks 850 to 1000 (`Apply`: 7 DAMAGE and 7 RELEASE): a solar plant and a laser tower self-destruct; the window holds the `UpdateUnitWeapons` of the units around them. It also holds the 151 `UpdateExplosions` calls of the window, which are the ones that show the explosions: the explosion array `Game.debris` (`r Debris#4.velY 237482`, the elements named by their index up to `Game.count_1491b`, with `Debris#N.ref1` and `ref2` the animation cursors that `services.InitGafSequence` starts and `services.StepGafSequence` steps), the pieces the units threw (`r ExplodedSlot#0.piece ExplodedPiece#1`, a ref of `g_explodedPieces`, and `PieceRec#1` behind it), the animation sources the module passes to the service (`r GafSrc1#0.ptr FrameTable#7`, a pointer that the replayer stores as the address of its own empty copy), and the height under each piece and each debris (`i map.GetCellMeanHeight pos=(x,z)`, 2,542 calls).
+- `combat-deaths`, ticks 850 to 1000 (`Apply`: 7 DAMAGE, 7 RELEASE, 1 DETONATE and 2 REMOVE_PROJECTILES): a solar plant and a laser tower self-destruct (the DETONATE of the self-destruct weapon, and the REMOVE_PROJECTILES of a dead unit's shots); the window holds the `UpdateUnitWeapons` of the units around them. It also holds the 151 `UpdateExplosions` calls of the window, which are the ones that show the explosions: the explosion array `Game.debris` (`r Debris#4.velY 237482`, every one of the 300 elements named by its index, not only those up to `Game.count_1491b`: the slot moves the elements after one it removes down by one, so an effect it added past the count in the same call, which keeps the velocity and spin its element held before, ends below the count, with `Debris#N.ref1` and `ref2` the animation cursors that `services.InitGafSequence` starts and `services.StepGafSequence` steps), the pieces the units threw (`r ExplodedSlot#0.piece ExplodedPiece#1`, a ref of `g_explodedPieces`, and `PieceRec#1` behind it), the animation sources the module passes to the service (`r GafSrc1#0.ptr FrameTable#7`, a pointer that the replayer stores as the address of its own empty copy), and the height under each piece and each debris (`i map.GetCellMeanHeight pos=(x,z)`, 2,542 calls).
 - `mission-radius`, ticks 1640 to 1650 (`Apply`: 4 RELEASE, 10 CLAIM and 11 AIM_DONE): a missile ship fires its vertical-launch weapon at tick 1644 (`Unit#269`, `weapondef#130`, whose `WeaponFire#130.fire` is `weaponFire[1]`). The shot reads its target (`targeting.GetWeaponTargetPos`, `targeting.GetWeaponTargetUnit`), queries the fire script (`scripts.QueryScript` `QueryPrimary`, `scripts.GetPieceOffset`) and starts it and the unit's rock script as START_SCRIPT effects (`services.SchedPublish`), records the sound and smoke events, pays (`economy.SpendEnergyAndMetal`) and writes the new `Projectile#4`. The window also holds a turret shot and a line-of-sight shot.
 - `long-greenhaven-8p`, tick 30518 only: a bomber drops a bomb (`Unit#1783`, `weapondef#5`, whose `WeaponFire#5.fire` is `weaponFire[3]`), the first dropped shot of the suite: it reads its target and the weapon piece, records the sound event, pays and writes `Projectile#2` with the bomber's heading. One tick of the eight-player match is 287 calls.
+- `mission-timer`, ticks 261 and 262 (`Apply`: 2 AREA_DAMAGE): a burning feature spreads its fire (features' area-damage effect, `a event.weapon 245`), and the area damage reads `weapondef#245` (a root of the call, "Event arguments"), the cells around the point and the units on them by id.
+- `console-features`, ticks 69 to 86 (`Apply`: 2 SPAWN): two meteors (wind_meteors' spawn), each a projectile started at the point with the velocity of the event and the weapon its number names (`a event.weapon 225`, `weapondef#225` a root).
 
 `Game.projectiles` is a table of 300 projectiles (the 300 of the game's `projectileCount < 300` guard), every element a root of `UpdateUnitWeapons` and `FindTargetableProjectile`, so a shot made at index `projectileCount` finds its element and the first call records all 300 with every field the slot reads (about 8,000 lines). `Game.tracked` and `Game.value_142f3`, which a new projectile writes and reads for the camera, are `exempt`.
 The recorder's walker holds as many fields as the schema has walkable object fields (references, embedded objects, unit ids, weapons and vectors of objects), a count the generated schema states, so no slot set can overflow it.

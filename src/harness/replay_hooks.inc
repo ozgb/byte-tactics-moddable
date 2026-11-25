@@ -784,7 +784,7 @@ void __stdcall RecPathfindingWriteState(const StateWriter* a0)
 
 int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_DETONATE || a0->kind == WEAPONS_AREA_DAMAGE || a0->kind == WEAPONS_EXPLODE_PIECE || a0->kind == WEAPONS_SPAWN || a0->kind == WEAPONS_REMOVE_PROJECTILES))
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_EXPLODE_PIECE))
         return s_inner_weapons->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_WEAPONS, a0, a1);
@@ -798,6 +798,17 @@ int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
+}
+
+void __stdcall RecWeaponsUpdateProjectiles()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_UPDATEPROJECTILES, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+    }
+    s_inner_weapons->UpdateProjectiles();
+    if (scope.Open()) {
+    }
 }
 
 void __stdcall RecWeaponsUpdateExplosions()
@@ -4466,7 +4477,7 @@ int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a
     }
     int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
-        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 11, 7);
+        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 41, 7);
         FinishImport(line);
     }
     if (scope.Open()) {
@@ -5547,6 +5558,8 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.WriteState = RecPathfindingWriteState;
     if (on[SUB_WEAPONS])
         s_rec_weapons.Apply = RecWeaponsApply;
+    if (on[SUB_WEAPONS])
+        s_rec_weapons.UpdateProjectiles = RecWeaponsUpdateProjectiles;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateExplosions = RecWeaponsUpdateExplosions;
     if (on[SUB_WEAPONS])

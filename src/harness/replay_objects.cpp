@@ -455,6 +455,11 @@ void ReplayEnsureAllOfTables(const unsigned short* kinds, unsigned count, Replay
     }
 }
 
+void* ReplayWeaponAt(int index)
+{
+    return index >= 0 && index < 256 && g_game != nullptr ? &g_game->weapons[index] : nullptr;
+}
+
 void* ReplayParseWeapon(const char* value)
 {
     if (strncmp(value, "weapondef#", 10) != 0)
@@ -1437,6 +1442,7 @@ void VisitRange(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsig
 }
 
 struct Deferred {
+    const ReplaySlotSets* sets;
     unsigned count;
     unsigned done;
     void* object[MAX_DEFERRED];
@@ -1511,12 +1517,25 @@ void Expand(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned 
 void VisitDeferred(ReplayReach& reach, ReplayObjectTable& table, bool assign, Deferred& deferred)
 {
     for (; deferred.done < deferred.count; deferred.done++) {
-        const ReplayObjectField& field = kReplayObjectFields[deferred.field[deferred.done]];
-        Visit(reach, table, assign, field.target, deferred.object[deferred.done], kReplayReachFields + field.reachFirst, field.reachCount);
+        unsigned index = deferred.field[deferred.done];
+        const ReplayObjectField& field = kReplayObjectFields[index];
+        const unsigned short* limit = kReplayReachFields + field.reachFirst;
+        unsigned limitCount = field.reachCount;
+        for (unsigned i = 0; deferred.sets != nullptr && i < deferred.sets->idReachCount; i++) {
+            if (deferred.sets->idReach[i].field == index) {
+                limit = deferred.sets->idReach[i].reach;
+                limitCount = deferred.sets->idReach[i].reachCount;
+                break;
+            }
+        }
+        Visit(reach, table, assign, field.target, deferred.object[deferred.done], limit, limitCount);
     }
+    deferred.count = 0;
+    deferred.done = 0;
 }
 
-void ExpandDeltaTable(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
+void ExpandDeltaTable(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, const unsigned short* fields, unsigned fieldCount, Deferred& deferred,
+                      bool visitIds)
 {
     unsigned char* base;
     unsigned count;
@@ -1525,7 +1544,12 @@ void ExpandDeltaTable(ReplayReach& reach, ReplayObjectTable& table, bool assign,
         return;
     for (unsigned i = 0; i < count; i++) {
         ExpandObject(reach, table, assign, kind, base + i * stride, nullptr, 0, fields, fieldCount, deferred);
-        VisitDeferred(reach, table, assign, deferred);
+        if (visitIds) {
+            VisitDeferred(reach, table, assign, deferred);
+        } else {
+            deferred.count = 0;
+            deferred.done = 0;
+        }
     }
 }
 
@@ -1579,6 +1603,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
     unsigned short fields[MAX_WALK_FIELDS];
     unsigned fieldCount = WalkFields(sets, fields);
     static Deferred deferred;
+    deferred.sets = &sets;
     deferred.count = 0;
     deferred.done = 0;
     for (unsigned i = 0; i < rootCount; i++)
@@ -1611,7 +1636,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
                 continue;
             }
             reach.deltaKind[reach.deltaCount++] = (unsigned short)kind;
-            ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred);
+            ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred, sets.idReachCount == 0);
             continue;
         }
         if (kReplayObjectKinds[kind].table == RT_ORDER) {
@@ -1640,12 +1665,19 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         }
     }
     unsigned at = 0;
+    bool idsLeft = sets.idReachCount != 0 && reach.deltaCount != 0;
     for (;;) {
         for (; at < reach.count; at++)
             Expand(reach, table, assign, at, fields, fieldCount, deferred);
-        if (deferred.done == deferred.count)
+        if (deferred.done != deferred.count) {
+            VisitDeferred(reach, table, assign, deferred);
+            continue;
+        }
+        if (!idsLeft)
             break;
-        VisitDeferred(reach, table, assign, deferred);
+        idsLeft = false;
+        for (unsigned d = 0; d < reach.deltaCount; d++)
+            ExpandDeltaTable(reach, table, assign, reach.deltaKind[d], fields, fieldCount, deferred, true);
     }
 }
 

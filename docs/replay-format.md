@@ -586,6 +586,33 @@ the table does not list is recorded as the header. Exactly `size` bytes of the e
 a payload field beyond `size` reads as 0 (an event shorter than its payload is recorded, and the slot answers it with outcome 0);
 the replayer builds a zeroed buffer, restores the lines, and passes the buffer with the recorded `size`.
 
+**The payload in memory.** A replayer builds the bytes the slot reads from the `a event.*` lines alone, so that a core and the
+in-repo engine give a module the same event:
+
+1. It takes the payload struct of the kind on the `a event.kind` line, from the module's interface header (the header struct alone
+   for a kind with no payload struct, or for a kind the table does not list), and a buffer of 256 bytes, every byte 0.
+2. The struct's layout is its declaration order, every field at the next offset with no padding: a payload holds only 4-byte
+   fields (`int`, `unsigned int`, `float`), arrays of them and arrays of `char` (section 6.1 of `docs/module-abi.md`), so a field's
+   offset is the sum of the sizes before it. The header comes first, at offset 0, with `kind` at offset 0. A member that is
+   itself a struct (the `params` of `WindMeteorsParams`, a `MeteorShowerParams`) is laid out in place, and its fields' lines
+   are named without it (`a event.weapon`, not `a event.params.weapon`).
+3. Each `a event.<member>` line writes its value at its member's offset, as the value of that member's type (section "Values"):
+   a decimal integer as its 32 bits, little-endian; `f32:0x...` as those 32 bits; a string into a `char` array as its bytes, then a
+   0, with the rest of the array left 0 (a string as long as the array has no 0); `name0`, `name1`, ... to the elements of the array
+   `name` in order; an object name (`Unit#1`, or the site of a `refs` member, `Unit#2.weapons[0].aimCob`) as the block offset
+   (`docs/module-abi.md`, section 7.1) of the object the replayer placed for that name, and `null` as 0; a weapon number (the
+   `weapons` members below) as the integer it is. A member with no line stays 0.
+4. It passes the buffer as the slot's `linear` event argument and the value of the `a size` line as its second argument. The
+   event is the first `size` bytes of the buffer: a slot reads none past them (it refuses a `size` below its kind's payload,
+   `docs/module-abi.md`, section 6.1). The event's address is the replayer's choice (the in-repo host copies the event to the
+   scratch area, section 7.2 there), and a module never depends on it.
+
+For example, the lines `a event.kind 66`, `a event.weapon "Meteor"`, `a event.radius 300`, `a event.density f32:0x40000000`,
+`a event.duration f32:0x40a00000`, `a event.interval f32:0x42700000` and `a size 52` of wind_meteors make `WindMeteorsParams`:
+`kind` 66 at 0, the 32 bytes of `weapon` at 4 (`Meteor`, then 26 zero bytes), `radius` at 36, `density` at 40, `duration` at 44 and
+`interval` at 48, 52 bytes in all, in hex
+`42000000` `4d6574656f72` followed by 26 `00` bytes, `2c010000` `00000040` `0000a040` `00007042`.
+
 `"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
 `WEAPONS_EXPLODE_PIECE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next

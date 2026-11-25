@@ -266,7 +266,7 @@ manifest per run.
 | `window` | bytes of every module window, more than 0 | loader, required |
 | `table_slots` | table entries of every module range | loader, required |
 | `stack_size` | bytes of every module stack | host and checks (the loader accepts it) |
-| `block_base`, `block_size`, `block_max` | the state block: `block_base` and `block_size` both or neither; `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
+| `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
 | `modules` | a non-empty list of module entries | loader, required |
@@ -319,7 +319,8 @@ check uses (section 14).
 ### 5.2 Refusals
 
 Each refusal is an error that names the manifest or the module (and, for overlaps, both modules). The game ends on any of
-them at start-up (section 13).
+them at start-up (section 13). When a manifest has more than one fault, the loader reports the first in the order
+`docs/core-gate.md`, "loader and fuel", states.
 
 - A manifest that is not valid JSON or not an object; a required field missing; a number that is
   not a non-negative integer; `memory_pages` or `window` zero, or `memory_pages` over 65536; a
@@ -334,7 +335,8 @@ them at start-up (section 13).
 - A module not in the manifest, loaded twice, or loaded before the memory exists.
 - A module that does not compile, or does not instantiate: an import the host did not define, an
   import whose type differs from the host's (the host's types are `i` for i32, `f` for f32 and `d` for f64),
-  an import of the memory or table with a minimum above the real size or a maximum below it.
+  an import of the memory or table with a minimum above the real size or a maximum below it, or a trap in its
+  start function.
 - A name in `exports` that is not a function export, or a name in `data` that is not an i32 global
   export.
 - An interface-major problem (section 10).

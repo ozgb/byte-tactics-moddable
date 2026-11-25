@@ -538,5 +538,245 @@
    ["load", null],
    ["word", 0],
    ["word", 11]
+  ]},
+ {"name": "pair_manifest_layout",
+  "calls": [
+   ["manifest", "loader/pair_manifest_layout.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_manifest_module_entry",
+  "calls": [
+   ["manifest", "loader/pair_manifest_module_entry.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_manifest_window",
+  "calls": [
+   ["manifest", "loader/pair_manifest_window.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_manifest_window_reaches",
+  "calls": [
+   ["manifest", "loader/pair_manifest_window_reaches.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_manifest_overlap",
+  "calls": [
+   ["manifest", "loader/pair_manifest_overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_layout_module_entry",
+  "calls": [
+   ["manifest", "loader/pair_layout_module_entry.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "pair_layout_window",
+  "calls": [
+   ["manifest", "loader/pair_layout_window.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "pair_layout_window_reaches",
+  "calls": [
+   ["manifest", "loader/pair_layout_window_reaches.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "pair_layout_overlap",
+  "calls": [
+   ["manifest", "loader/pair_layout_overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "pair_module_entry_window",
+  "calls": [
+   ["manifest", "loader/pair_module_entry_window.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["b"]}]
+  ]},
+ {"name": "pair_module_entry_window_reaches",
+  "calls": [
+   ["manifest", "loader/pair_module_entry_window_reaches.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["b"]}]
+  ]},
+ {"name": "pair_module_entry_overlap",
+  "calls": [
+   ["manifest", "loader/pair_module_entry_overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["b"]}]
+  ]},
+ {"name": "pair_window_window_reaches",
+  "calls": [
+   ["manifest", "loader/pair_window_window_reaches.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window", "modules": ["a"]}]
+  ]},
+ {"name": "pair_window_overlap",
+  "calls": [
+   ["manifest", "loader/pair_window_overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window", "modules": ["a"]}]
+  ]},
+ {"name": "pair_window_reaches_overlap",
+  "calls": [
+   ["manifest", "loader/pair_window_reaches_overlap.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "window_reaches", "modules": ["a"]}]
+  ]},
+ {"name": "pair_layout_manifest_entry",
+  "calls": [
+   ["manifest", "loader/pair_layout_manifest_entry.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "layout", "modules": []}]
+  ]},
+ {"name": "pair_manifest_entry_module_entry",
+  "calls": [
+   ["manifest", "loader/pair_manifest_entry_module_entry.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "pair_module_entry_manifest_entry",
+  "calls": [
+   ["manifest", "loader/pair_module_entry_manifest_entry.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "module_entry", "modules": ["a"]}]
+  ]},
+ {"name": "manifest_data_base_negative",
+  "calls": [
+   ["manifest", "loader/data_base_negative.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_data_base_fraction",
+  "calls": [
+   ["manifest", "loader/data_base_fraction.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_no_exports",
+  "calls": [
+   ["manifest", "loader/no_exports.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["call", "a", "add", "1", "2"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 3}]
+  ]},
+ {"name": "manifest_no_data",
+  "calls": [
+   ["manifest", "loader/no_data.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["call", "a", "add", "1", "2"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": 3}]
+  ]},
+ {"name": "load_major_newer",
+  "calls": [
+   ["manifest", "loader/major_newer.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "call_missing_export",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"],
+   ["call", "a", "absent"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"error": "export", "modules": ["a"]}]
+  ]},
+ {"name": "trap_start",
+  "calls": [
+   ["manifest", "loader/base.json"],
+   ["memory"],
+   ["load", "a", "loader/start_trap.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "instantiate", "modules": ["a"]}]
+  ]},
+ {"name": "trap_float_overflow",
+  "calls": [
+   ["manifest", "loader/traps_float.json"],
+   ["memory"],
+   ["load", "a", "loader/traps_float.wasm"],
+   ["call", "a", "trap_big"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"error": "divide", "modules": ["a"]}]
+  ]},
+ {"name": "trap_float_nan",
+  "calls": [
+   ["manifest", "loader/traps_float.json"],
+   ["memory"],
+   ["load", "a", "loader/traps_float.wasm"],
+   ["call", "a", "trap_nan"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"error": "divide", "modules": ["a"]}]
+  ]},
+ {"name": "trap_float_unsigned_negative",
+  "calls": [
+   ["manifest", "loader/traps_float.json"],
+   ["memory"],
+   ["load", "a", "loader/traps_float.wasm"],
+   ["call", "a", "trap_neg", "-1"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"error": "divide", "modules": ["a"]}]
   ]}
 ]}

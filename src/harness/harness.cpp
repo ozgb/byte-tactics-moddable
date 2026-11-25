@@ -5,7 +5,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <float.h>
-#include <time.h>
 #include <stdarg.h>
 #include "../../interfaces/host.h"
 #include "../util/engine_services.h"
@@ -1630,7 +1629,7 @@ void HarnessInit(char* cmdLine)
         p++;
     }
     if (flag == NULL) {
-        s_viewState = (unsigned)time(0);
+        s_viewState = host_wall_seconds();
         ParseRecordSwitch(cmdLine);
         ResolveQuirks();
         ReplayInstall();

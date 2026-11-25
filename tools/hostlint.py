@@ -1,4 +1,5 @@
-"""Fail when a file includes a platform, host or presentation header that data/host_exceptions.csv does not list.
+"""Fail when a file includes a platform, host or presentation header that data/host_exceptions.csv does not list,
+or calls a C runtime function that only the host may call.
 
     python3 tools/hostlint.py                  # check the repository
     python3 tools/hostlint.py --open-issues    # also check that each row's issue is open
@@ -20,8 +21,12 @@ Each quoted or angle include of a game-logic file is resolved against the includ
 directory, include/ and the repository root (the directories the build searches), and a
 resolved host or presentation header is listed by its path from the root, for example
 src/sound/sound.h. A game-logic file that includes one without a row fails, and so does a
-data/game_logic.csv row naming a file that does not exist. Prints one line per problem and
-exits 1 if there are any. Standard library only.
+data/game_logic.csv row naming a file that does not exist.
+
+The host-only calls: a call of _mkdir, mkdir, time or raise in any source file outside src/host/
+fails, outside comments and string literals, with no exception list. Each has a host entry
+(HOST_ONLY_CALLS names it). Prints one line per problem and exits 1 if there are any.
+Standard library only.
 """
 
 import argparse
@@ -46,6 +51,14 @@ FILES_DIR = "src/files"
 GAME_LOGIC = "data/game_logic.csv"
 INCLUDE_DIRS = ("include", "")
 INCLUDE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.MULTILINE)
+HOST_ONLY_CALLS = {
+    "_mkdir": "host_dir_create",
+    "mkdir": "host_dir_create",
+    "time": "host_wall_seconds",
+    "raise": "host_exit",
+}
+CALL = re.compile(r"(?<![\w.>:])(?:(?:std)?::)?(" + "|".join(HOST_ONLY_CALLS) + r")\s*\(")
+COMMENT_OR_STRING = re.compile(r'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'', re.DOTALL)
 PLATFORM = re.compile(
     r"^(windows|shlobj|imagehlp|mmsystem|winsock2?|ddraw|dsound|dplay|dplobby|dinput|dxguid|d3d\w*)\.h$"
     r"|^sdl\d*(\.h$|/)",
@@ -53,8 +66,8 @@ PLATFORM = re.compile(
 )
 
 
-def platform_includes(root):
-    """Yield (relative path, header) for each platform include outside the host, headers lowercased."""
+def sources_outside_host(root):
+    """Yield (relative path, text) for each source file outside the host, in sorted order."""
     for dirpath, dirnames, filenames in os.walk(root):
         rel_dir = os.path.relpath(dirpath, root).replace(os.sep, "/")
         rel_dir = "" if rel_dir == "." else rel_dir
@@ -64,9 +77,26 @@ def platform_includes(root):
                 continue
             path = (rel_dir + "/" + name).lstrip("/")
             with open(os.path.join(root, path), encoding="latin-1") as f:
-                text = f.read()
-            for header in sorted({m.group(1).lower() for m in INCLUDE.finditer(text) if PLATFORM.match(m.group(1))}):
-                yield path, header
+                yield path, f.read()
+
+
+def platform_includes(root):
+    """Yield (relative path, header) for each platform include outside the host, headers lowercased."""
+    for path, text in sources_outside_host(root):
+        for header in sorted({m.group(1).lower() for m in INCLUDE.finditer(text) if PLATFORM.match(m.group(1))}):
+            yield path, header
+
+
+def blank(match):
+    return re.sub(r"[^\n]", " ", match.group(0))
+
+
+def host_only_calls(root):
+    """Yield (relative path, line, name) for each call of a HOST_ONLY_CALLS function outside the host."""
+    for path, text in sources_outside_host(root):
+        code = COMMENT_OR_STRING.sub(blank, text)
+        for m in CALL.finditer(code):
+            yield path, code.count("\n", 0, m.start()) + 1, m.group(1)
 
 
 def game_logic_files(root):
@@ -141,6 +171,8 @@ def lint(root, open_issues=False, gh="gh"):
     found |= set(boundary_includes(root, logic))
     for file, header in sorted(found - listed):
         problems.append(f"{file}: includes {header} and is not in {EXCEPTIONS}")
+    for file, line, name in host_only_calls(root):
+        problems.append(f"{file}:{line}: calls {name}, which only {HOST_DIR}/ may call: use {HOST_ONLY_CALLS[name]}")
     for file, header, _ in rows:
         if (file, header) not in found:
             reason = "no longer includes it" if os.path.exists(os.path.join(root, file)) else "no longer exists"

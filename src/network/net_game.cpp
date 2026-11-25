@@ -3682,7 +3682,7 @@ int InitLobbiedConnection()
                     strcpy(username, "TotalA");
             }
 
-            time_t now = time(0);
+            time_t now = host_wall_seconds();
             struct tm* local = localtime(&now);
             int len = strlen(username);
             if (15 - len >= 7)

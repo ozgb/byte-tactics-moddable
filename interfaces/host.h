@@ -14,7 +14,7 @@ extern "C" {
 // Major version of the host interface, changed when a function is removed or its signature changes.
 #define HOST_VERSION_MAJOR 3
 // Minor version of the host interface, changed when a function is added.
-#define HOST_VERSION_MINOR 0
+#define HOST_VERSION_MINOR 1
 
 // Timeout for host_event_wait that never expires.
 #define HOST_WAIT_FOREVER 0xffffffffu
@@ -55,6 +55,8 @@ extern "C" {
 unsigned int HOST_CALL host_time_ms(void);
 // Returns the high-resolution counter, a monotonic tick count of the host's own unit.
 unsigned long long HOST_CALL host_time_counter(void);
+// Returns the wall clock in whole seconds since 1970-01-01 00:00 UTC, truncated to 32 bits.
+unsigned int HOST_CALL host_wall_seconds(void);
 // Blocks the calling thread for at least the given milliseconds.
 void HOST_CALL host_sleep_ms(unsigned int ms);
 
@@ -436,6 +438,8 @@ void* HOST_CALL host_dir_first(const char* pattern, struct host_dir_entry* entry
 int HOST_CALL host_dir_next(void* dir, struct host_dir_entry* entry);
 // Ends the listing and frees its handle.
 void HOST_CALL host_dir_close(void* dir);
+// Creates the directory at path (relative to the game directory or absolute) and returns 0 when the directory exists afterwards, or -1 when it does not.
+int HOST_CALL host_dir_create(const char* path);
 // Writes the path of the game's executable, a full path with its file name, into buf of size bytes and returns its length, or 0 on failure.
 unsigned int HOST_CALL host_file_exe_path(char* buf, unsigned int size);
 // Writes the full path of name (relative to the current directory or absolute) into buf of size bytes and returns its length, or 0 on failure; when buf is too small it returns the size needed, which is larger than size.

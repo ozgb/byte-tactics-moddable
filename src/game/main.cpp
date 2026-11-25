@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <time.h>
 #include <new>
 #include <ctype.h>
 #include <malloc.h>
@@ -73,8 +71,7 @@ void OutOfMemoryHandler()
     host_message(NULL, "Total Annihilation", "Out of memory!\r\nYour hard disk may be full\r\n",
                  HOST_MESSAGE_ERROR | HOST_MESSAGE_SYSTEM_MODAL | HOST_MESSAGE_TOPMOST);
     NopAbortHook();
-    raise(SIGABRT);
-    _exit(3);
+    host_exit(3);
 }
 
 #include "../sound/sound.h"
@@ -147,7 +144,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     CreateGameObject();
     if (host_instance_running(g_appName))
         return -1;
-    GameSrand(RAND_STREAM_MAIN, HarnessCrtSeed(time(0)));
+    GameSrand(RAND_STREAM_MAIN, HarnessCrtSeed(host_wall_seconds()));
     if (ParseCommandLine(lpCmdLine, g_appName) == 0)
         return 1;
     InitDisplayDefaults(&g_displayContext);

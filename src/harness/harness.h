@@ -2,6 +2,7 @@
 #define HARNESS_H
 
 struct Unit;
+struct OrdersGroupCommand;
 
 void __stdcall HarnessInit(char* cmdLine);
 void __stdcall HarnessExit();
@@ -28,6 +29,7 @@ void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, 
 void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count);
 void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit);
 void __stdcall HarnessUiGroup(const char* what, int group);
+void __stdcall HarnessUiCommand(const OrdersGroupCommand* command);
 struct tagPALETTEENTRY;
 void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const tagPALETTEENTRY* entries);
 

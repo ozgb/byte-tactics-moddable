@@ -78,9 +78,9 @@ void __stdcall CollectSelectedUnits(void* param);
 void __stdcall BroadcastPacket(int id, void* packet, int size);
 #include "../frontend/options.h"
 #include "../harness/harness.h"
+#include "../game/orders_events.h"
 #include "../graphics/pcx.h"
 int __stdcall FindOrderByType(int unit, MissionType kind);
-void __stdcall DeleteOrder(int unit, int arg);
 void __cdecl operator delete(void* p);
 
 // FUNCTION: 0x495860
@@ -521,7 +521,7 @@ void HandleGameKey(void)
             if (r != 0) {
                 found = 1;
                 HarnessUiCancel(order.index, (Unit*)*it);
-                DeleteOrder(*it, r);
+                OrdersPublishCancel(SCHED_ENGINE, (Unit*)*it, order.index);
             }
         }
         if (found == 0)

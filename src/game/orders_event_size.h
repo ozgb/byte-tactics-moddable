@@ -22,6 +22,9 @@ inline unsigned int OrdersEventSize(int kind)
         return sizeof(OrdersParalyze);
     case ORDERS_CANCEL:
         return sizeof(OrdersCancel);
+    case ORDERS_GROUP_COMMAND:
+    case ORDERS_GROUP_BUILD:
+        return sizeof(OrdersGroupCommand);
     case ORDERS_EFFECT_SET_STATE_BITS:
         return sizeof(OrdersSetStateBits);
     case ORDERS_EFFECT_SET_POSITION:

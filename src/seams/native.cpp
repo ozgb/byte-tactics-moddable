@@ -917,6 +917,7 @@ void InstallNativeSeams()
     s_orders.LoadOrders = OrdersLoadOrders;
     s_orders.SaveOrders = OrdersSaveOrders;
     s_orders.WriteState = OrdersWriteState;
+    s_orders.ExpandGroupCommand = OrdersExpandGroupCommand;
     s_movement.Apply = MovementApply;
     s_movement.UpdateMotion = MovementUpdateMotion;
     s_movement.ApplyPathEvent = MovementApplyPathEvent;

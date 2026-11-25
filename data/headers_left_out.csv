@@ -37,7 +37,6 @@ DPAID_INet,mismatch,variable declared with a view type that differs from its def
 DPAID_Modem,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 DPAID_Phone,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
 DPAID_ServiceProvider,mismatch,variable declared with a view type that differs from its definition; no casts at variable uses
-DeleteOrder,mismatch,pointer/int cast: definition's type is likely wrong
 DrawButton,mismatch,fixing it changes the generated code of a caller
 DrawFrame,mismatch,"static risk rule: a convention, parameter count, or non-pointer type differs, not proven neutral"
 DrawFrameBlended,mismatch,pointer/int cast: definition's type is likely wrong

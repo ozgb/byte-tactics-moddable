@@ -9,7 +9,7 @@ struct StateWriter;
 // Major version of the orders interface, changed when a slot is removed or its signature changes.
 #define ORDERS_VERSION_MAJOR 6
 // Minor version of the orders interface, changed when a slot is added.
-#define ORDERS_VERSION_MINOR 1
+#define ORDERS_VERSION_MINOR 2
 
 // Order flag: the order has a target unit.
 #define ORDER_FLAG_TARGET 0x200
@@ -51,7 +51,11 @@ enum OrdersEventKind {
     // The player commands unit (OrdersAdd): with queue 1, an order of the same type against the same target, at the same position give or take 16 world units, is deleted from unit's orders when it has one, and is otherwise added as ADD adds it; outcome 1. Hooks: AllowCommand.
     ORDERS_COMMAND = 295,
     // unit's first order of an order type is deleted (OrdersCancel); outcome 1, or 0 when it has none.
-    ORDERS_CANCEL = 296
+    ORDERS_CANCEL = 296,
+    // The player commands a group of its units with one click (OrdersGroupCommand): ExpandGroupCommand consumes it and publishes a COMMAND for each unit that takes the order; outcome the count of COMMANDs.
+    ORDERS_GROUP_COMMAND = 297,
+    // The player orders a group of its units to build a unit type at a site (OrdersGroupCommand): ExpandGroupCommand consumes it and publishes a COMMAND for each builder; outcome the count of COMMANDs.
+    ORDERS_GROUP_BUILD = 298
 };
 
 // The kinds of effect orders publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
@@ -128,6 +132,31 @@ struct OrdersCancel {
     OrdersEventHeader h;
     // The order type, as GetOrderType returns it, truncated to a byte.
     int type;
+};
+
+// The most units a group command names, the bits of OrdersGroupCommand.units: bit i stands for the unit i records after the header's unit.
+#define ORDERS_GROUP_UNITS 512
+
+// The payload of GROUP_COMMAND and GROUP_BUILD.
+struct OrdersGroupCommand {
+    // The kind, and the first unit of the commanding player's range of the unit array.
+    OrdersEventHeader h;
+    // The relation mode GetOrderType takes for each unit, or 0 when type is the order's type for every unit; 0 for GROUP_BUILD.
+    int mode;
+    // The order's type, as GetOrderType returns it, when mode is 0; else 0.
+    int type;
+    // 0 to replace each unit's orders that are not marked to stay, 1 to queue the order behind them.
+    int queue;
+    // The unit under the cursor, as its block offset (0 for none).
+    unsigned int target;
+    // 1 when pos holds the order's position.
+    int hasPos;
+    // The position clicked, in world coordinates with 16 fractional bits: x, y and z; for GROUP_BUILD, the build site.
+    int pos[3];
+    // The order's two arguments; for GROUP_BUILD, the unit type number to build and 0.
+    int params[2];
+    // The units commanded, a bit set in the order of the unit array.
+    unsigned int units[16];
 };
 
 // The payload of STATUS_FLAGS.
@@ -348,6 +377,8 @@ struct OrdersSeam {
     int (__stdcall* SaveOrders)(Unit* unit, HapiBank* file);
     // Writes orders' state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Consumes a GROUP_COMMAND or GROUP_BUILD of size bytes by publishing a COMMAND for each unit it orders, and returns the count; the default is 3.1c's rule, and a mod may replace it (a formation). Hooks: none.
+    int (__stdcall* ExpandGroupCommand)(const OrdersGroupCommand* command, unsigned int size);
 };
 
 #endif

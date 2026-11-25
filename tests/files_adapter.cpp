@@ -722,7 +722,7 @@ static void Piece(Text& t, Object3do* p)
         if (i)
             t.Char(',');
         t.Add("{\"colour\":");
-        t.Int(f->unknown_0);
+        t.Int(*(int*)f);
         t.Add(",\"vertices\":[");
         for (int k = 0; k < f->count; k++) {
             if (k)

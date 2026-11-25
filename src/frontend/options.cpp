@@ -381,6 +381,7 @@ void __stdcall DrawFrameQuad(void* surf, void* entry, FlipQuad* dst, FlipQuad* s
 #include "frontend.h"
 #include "../game/settings.h"
 #include "../game/players_events.h"
+#include "../util/engine_services.h"
 
 // FUNCTION: 0x45b800
 void __stdcall SetDirectConnectAddress(char* param_1)

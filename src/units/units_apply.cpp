@@ -172,7 +172,7 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
     case UNITS_FORGET_ATTACKER:
         unit->lastAttackerSlot = 10;
         unit->panel.flag_110 = 1;
-        unit->attacker = 0;
+        unit->attacker = nullptr;
         break;
     case UNITS_SET_NET_DIRTY: {
         const UnitsSetNetDirty* p = reinterpret_cast<const UnitsSetNetDirty*>(e);

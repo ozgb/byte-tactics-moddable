@@ -119,15 +119,15 @@ The runs add no evidence on paths the suite does not reach. The control (tests/d
 
 ## Presentation reads
 
-The sim state that presentation reads between ticks (data/presentation_reads.csv, 471 rows), by pattern and visibility. Rows of `ui-action` are an upper bound (see the limits).
+The sim state that presentation reads between ticks (data/presentation_reads.csv, 469 rows), by pattern and visibility. Rows of `ui-action` are an upper bound (see the limits).
 
 | pattern | all-players | own | per-player-filter | all |
 |---|---|---|---|---|
 | after-event | 2 | 4 | 5 | 11 |
 | every-frame | 43 | 10 | 85 | 138 |
-| ui-action | 92 | 41 | 85 | 218 |
-| unknown | 47 | 16 | 41 | 104 |
-| all | 184 | 71 | 216 | 471 |
+| ui-action | 81 | 38 | 76 | 195 |
+| unknown | 56 | 19 | 50 | 125 |
+| all | 182 | 71 | 216 | 469 |
 
 ## Presentation feeds
 

@@ -25,19 +25,19 @@ struct DisplayLogScope {
 };
 
 struct DisplayLogMute {
-    explicit DisplayLogMute(int on) : on_(on)
+    explicit DisplayLogMute(int otherThread) : muted(otherThread)
     {
-        if (on_ != 0)
+        if (muted != 0)
             DlEnter();
     }
     ~DisplayLogMute()
     {
-        if (on_ != 0)
+        if (muted != 0)
             DlLeave();
     }
     DisplayLogMute(const DisplayLogMute&) = delete;
     DisplayLogMute& operator=(const DisplayLogMute&) = delete;
-    int on_;
+    int muted;
 };
 
 enum DisplaySpriteKind {

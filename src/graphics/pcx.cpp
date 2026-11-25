@@ -563,6 +563,7 @@ void __stdcall RelocateObject(int delta, Object_004cb2f0* node)
 
 extern void* __stdcall HAPI_LoadFile(void*, int);
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x4cb560
 void* __stdcall Load3do(char* param)
 {
@@ -571,6 +572,7 @@ void* __stdcall Load3do(char* param)
         return 0;
     }
     RelocateObject((int)result, (Object_004cb2f0*)result);
+    DlNote(DL_3DO, param, result);
     return result;
 }
 
@@ -635,6 +637,7 @@ void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* lo,
     AddObjectBounds(obj, &offset, lo, hi, arg);
 }
 
+extern int dlpad4cb6a0_0, dlpad4cb6a0_1, dlpad4cb6a0_2, dlpad4cb6a0_3, dlpad4cb6a0_4, dlpad4cb6a0_5, dlpad4cb6a0_6, dlpad4cb6a0_7, dlpad4cb6a0_8, dlpad4cb6a0_9, dlpad4cb6a0_10;
 // Expands a bounding box (lo, hi) with the vertices of an object and, if arg is
 // set, of its two children, translated by offset.
 // FUNCTION: 0x4cb6a0

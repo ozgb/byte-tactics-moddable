@@ -1205,10 +1205,12 @@ void ClampCameraTarget(void);
 // (DrawFrameQuad), whose texture is either the direct pointer at +0x10 or, when
 // bit 1 is set, the entry GetGafSequenceFrame looks up from the reference at +0x10.
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x46bae0
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                             Object_0046bae0* obj, short* angles)
 {
+    DlScope displayScope(DL_PROJECTILE, surface, offset, obj, angles);
     Vec3* v = obj->verts;
     Vec3* scratch = g_game->tempXformPts;
     Point* points = g_game->tempProjectedPts;

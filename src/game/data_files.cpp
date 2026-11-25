@@ -203,6 +203,7 @@ void* __stdcall LoadBitmapByName(const char* name, int palette)
 
 void* __stdcall HAPI_LoadFile(char* path, int* outSize);
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x4292e0
 void* __stdcall LoadFontByName(const char* name)
 {
@@ -212,6 +213,7 @@ void* __stdcall LoadFontByName(const char* name)
     if (font == 0) {
         FatalError(path);
     }
+    DlNote(DL_FONT, font, name);
     return font;
 }
 

@@ -412,9 +412,11 @@ int __stdcall GetHandleSize(int param_1)
     return *(int*)(param_1 - 4);
 }
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x458810
 void CMemoryCache::DrawObjectState(List_458810* list, Vec3_458810* result)
 {
+    DlScope displayScope(DL_MODEL, result, list);
     int rebuild = 0;
     int x = g_game->scrollX << 16;
     int z = g_game->scrollY << 16;

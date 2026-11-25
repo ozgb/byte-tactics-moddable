@@ -140,6 +140,7 @@ static inline void LoadSideRect(TdfFile* parser, int* out, char* name, char* sid
     parser->SetCurrentRecord(saved);
 }
 
+#include "../harness/display_hook.h"
 // Loads gamedata\sidedata.tdf. For every SIDE<n> section, n counting from 0
 // until the section is missing, it reads the side's name, name prefix,
 // commander name and font file (LoadFontByName's body inlined), its two colours
@@ -198,6 +199,7 @@ void __stdcall LoadSideData(void)
             font = HAPI_LoadFile(fontPath, 0);
             if (font == 0)
                 FatalError(fontPath);
+            DlNote(DL_FONT, font, name);
             s->font = font;
         }
         s->energyColor = parser.current->GetFieldInt("energycolor", 0);

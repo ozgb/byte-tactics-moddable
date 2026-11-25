@@ -77,6 +77,7 @@
 #include "../state/sim_globals.h"
 #include "../state/block.h"
 #include "replay_types.h"
+#include "replay_services.h"
 
 #define REPLAY_FORMAT 2
 
@@ -1472,6 +1473,19 @@ static const ReplayAllocTag kReplayAllocTags[] = {
     { "Object State", ROK_MODELSTATE, 88 },
 };
 static const unsigned kReplayAllocTagCount = 2;
+
+static const ReplayLoadHolder kReplayLoadHolders[] = {
+    { RL_COB, ROK_UNITDEF, RLH_MEMBER, offsetof(UnitDef, data) },
+    { RL_MODEL, ROK_UNITDEF, RLH_GAME, 82807 },
+};
+
+static const ReplayLoadKind kReplayLoads[] = {
+    { "cob", 0, 1 },
+    { "model", 1, 1 },
+};
+static const unsigned kReplayLoadCount = 2;
+
+static_assert(sizeof(((UnitDef*)nullptr)->data) == sizeof(void*), "UnitDef::data holds the pointer of a cob load");
 
 static const ReplayObjectField kReplayObjectFields[] = {
     { "active", offsetof(Player, active), sizeof(((Player*)nullptr)->active), ROK_PLAYER, RK_I32, 0, 0, 0, {}, 0, 0 },

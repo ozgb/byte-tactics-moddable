@@ -491,6 +491,34 @@ void ArgWeapon(ReplayText& t, const char* name, const void* p)
     t.AddChar('\n');
 }
 
+void ArgLoad(ReplayText& t, const char* name, unsigned load, const void* p)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddLoadName(t, Table(), load, p);
+    t.AddChar('\n');
+}
+
+void ArgLoadResult(ReplayText& t, unsigned load, const void* p)
+{
+    t.Add("  o result ");
+    ReplayAddLoadName(t, Table(), load, p);
+    t.AddChar('\n');
+}
+
+void ImportLoad(ReplayText& t, unsigned load, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddLoadName(t, Table(), load, p);
+}
+
+void ImportResultLoad(ReplayText& t, unsigned load, const void* p)
+{
+    t.Add(" = ");
+    ReplayAddLoadName(t, Table(), load, p);
+}
+
 void ArgVec3(ReplayText& t, const char* name, const Vec3* v)
 {
     ArgValue(t, name, v);
@@ -936,6 +964,13 @@ void AddResult(ReplayText& t, const ReplayArg& r)
 
 #include "replay_services.inc"
 
+static void RecordLoad(unsigned load, const char* name, const void* data)
+{
+    int size = g_seams.files->LengthByName(name);
+    if (size > 0)
+        ReplayLoadNote(load, name, data, (unsigned)size);
+}
+
 int ReplayConfigure(const char* value, char* error, int size)
 {
     char subsystem[32];
@@ -962,6 +997,7 @@ int ReplayConfigure(const char* value, char* error, int size)
         return 0;
     }
     ReplayEndHook() = ReplayImportEnd;
+    ReplayLoadHook() = RecordLoad;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
     s_rec[sub]->first = first;
@@ -1001,7 +1037,11 @@ int ReplayWrite(char* error, int size)
         char head[160];
         sprintf(head, "bt-replay %d\nsubsystem %s %d.%d%s\n", REPLAY_FORMAT, kReplaySubsystems[i].name, (int)kReplaySubsystems[i].major,
                 (int)kReplaySubsystems[i].minor, kReplaySubsystems[i].complete ? "" : " incomplete");
-        bool written = fputs(head, file) >= 0 && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
+        ReplayText loads;
+        ReplayAddLoadLines(s_rec[i]->table, loads);
+        bool written = fputs(head, file) >= 0 && fwrite(loads.Data(), 1, loads.Size(), file) == loads.Size()
+            && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
+        loads.Free();
         if (fclose(file) != 0 || !written)
             ok = 0;
     }

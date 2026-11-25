@@ -22,6 +22,7 @@ void ReplayFail(const char* message);
 
 typedef bool (*ReplayAnswerFn)(ReplayImport& call);
 typedef void (*ReplayEndFn)(ReplayImport& call);
+typedef void (*ReplayLoadFn)(unsigned load, const char* name, const void* data);
 
 struct ReplayGate {
     int calls;
@@ -30,6 +31,7 @@ struct ReplayGate {
     bool busy;
     ReplayAnswerFn answer;
     ReplayEndFn end;
+    ReplayLoadFn loaded;
 };
 
 ReplayGate& ReplayGateRef();
@@ -62,6 +64,17 @@ inline bool& ReplayAnswerBusy()
 inline ReplayEndFn& ReplayEndHook()
 {
     return ReplayGateRef().end;
+}
+
+inline ReplayLoadFn& ReplayLoadHook()
+{
+    return ReplayGateRef().loaded;
+}
+
+inline void ReplayLoaded(unsigned load, const char* name, const void* data)
+{
+    if (ReplayLoadHook() != nullptr)
+        ReplayLoadHook()(load, name, data);
 }
 
 inline bool ReplayOwned()
@@ -117,6 +130,7 @@ struct ReplayImport {
         return answered;
     }
     void* AnsweredPointer() const { return const_cast<void*>(result.v.p); }
+    int AnsweredInt() const { return result.v.i; }
     void Return(int value)
     {
         result.kind = 0;

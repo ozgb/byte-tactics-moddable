@@ -55,6 +55,9 @@ Text, LF line endings. The header is two lines: `bt-replay 2` and `subsystem win
 version). A subsystem whose annotations are not complete yet (`status` in the schema is `pending`) writes
 `incomplete` after the version, and the replayer refuses such a file. The file name carries the scenario.
 
+Between the header and the first call there may be load lines, which carry the files the recording's pointers to load-time data lead
+to (see Load inputs).
+
 A call is a line `call <ticks> <Slot>`, where `ticks` is `Game.ticks` when the call starts (`-` before the
 game record exists) and `Slot` is a slot of the interface. Calls are in the order they start. A slot called by
 another slot of the same subsystem (UpdateWind calls its helper for a stream in a native build) is part of the outer
@@ -486,6 +489,7 @@ that reads the member (`field_read Game::src1`, `global_read g_explodedPieces`) 
 | string | double quotes, C escapes, up to the first NUL |
 | string behind a pointer (`cstring`) | the same, or `null` for a null pointer |
 | pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Feature#5.anim`, or `null` |
+| pointer to load-time data | `UnitDef#12`, `UnitDef#12+448`, or `null` (see Load inputs) |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
 
@@ -989,6 +993,88 @@ and a return that records the buffer. When a module links the radar source, the 
 through a function with the signature of the capture allocator, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
 a snapshot the stub did not allocate and a buffer of another size.
 
+## Load inputs
+
+Some data the game loads from a file stays on the heap, outside the state block, and the code only reads it afterwards: the compiled script of a unit type
+(`ScriptTable`, which its loader relocates in place) and its 3D model (`Object3do`, which its loader relocates and mirrors). A recording
+does not carry that data. It carries the inputs of the load, the name and the bytes of each file, and the replayer gives them to the same loaders before the first
+call, so the data it replays against is what the game had. The loaders and the seams do not change for it: the code that holds the data keeps a plain pointer.
+
+A pointer to such data is written as what identifies it, never as its bytes: the holder of the file and an offset into it. A holder is the unit type whose
+script or model it is, written `UnitDef#12` (the unit type is the index of the `UnitDef` in `Game.defs`).
+
+### The load kinds
+
+`annotations.loads` lists the load kinds. Each names the type of the data, the functions that load it and its holders:
+
+```json
+"loads": {
+ "cob": {"type": "ScriptTable", "loader": ["..."], "holders": [{"kind": "UnitDef", "member": "data"}]},
+ "model": {"type": "Object3do", "loader": ["...", "..."], "holders": [{"kind": "UnitDef", "game": "types"}]}
+}
+```
+
+A holder is a state kind with a table in `Game` or `SimGlobals`, and element N of its table is the holder `Kind#N`. It holds its pointer either in a `member` of the
+element (`UnitDef.data`, which holds the script), or in element N of the array that the `Game` member `game` leads to (`Game.types[N]`, which holds the model of unit
+type N). A load kind may have several holders (a later issue adds the models of feature types), and a holder needs no format change: the line names its kind. The
+`loader` lists the functions of the source that load and prepare the data, in the order they run (the oracle kit's copy of the schema leaves it out); the replayer calls them. The type of a load kind needs no rule: a field row of the
+type (`field_read ScriptTable::code`, `Object3do::sibling`) of a complete subsystem is not an untracked target, because the replayer has the real bytes.
+
+### The load lines
+
+A recording lists each load that any of its lines named, between its two header lines and its first call, in the order the lines of the calls first named them:
+
+```
+bt-replay 2
+subsystem scripts 2.0
+load cob UnitDef#12 "scripts\\ARMCOM.COB" [4812]
+  x 0:0b0000000300000001000000...
+  x 512:00ab...
+load model UnitDef#12 "objects3d\\armcom.3do" [9120]
+  x 0:...
+call 1 SetCob
+```
+
+A load line is `load <load kind> <holder> "<file name>" [<size>]`: the file is the one the loader was given (the name as the game wrote it, with C escapes), `size` is its
+length in bytes. The lines `  x <offset>:<hex>` that follow carry the bytes of the file as it was read, before the loader relocated it in place, in chunks of at most 512 bytes,
+each at its offset in the file. A chunk of 512 bytes that is all zero is left out (as an all-zero run of a region is), so a byte that no line names is 0. A file that the
+lines of no call named is not listed. A holder holds one file in a recording: a unit type whose script was reloaded to a file with other bytes fails the recording.
+
+The recorder keeps, for every file a loader of the schema read while any recording is configured, its address, size, name and bytes, and a later load at the same address
+replaces the earlier entry. The loaders hand the file to the recorder between reading it and relocating it, and do nothing else when no recording is configured. A line
+that names a pointer is mapped when it is written: the file whose bytes hold the pointer, the holder whose pointer is the start of the file, and the offset.
+
+### A pointer to load-time data
+
+A pointer into a loaded file is written `<holder>` when it is the start of the file, `<holder>+<offset>` (decimal bytes) when it is not, and `null` for a null pointer. It is a
+node inside a model (`UnitDef#12+448`) as well as the model. Three places carry it, each with a form that names the load kind:
+
+| Where | Annotation | Written |
+|---|---|---|
+| a slot argument, or an import's | `{"mode": "load", "load": "cob"}` | `a data UnitDef#12`, and ` UnitDef#12+448` in an import line |
+| a slot result, or an import's | `{"mode": "load", "load": "cob"}` | `o result UnitDef#12`, and ` = UnitDef#12` in an import line |
+| a field of an object | `{"name": "table", "kind": "load", "load": "cob"}` | `r CobScript#3.table UnitDef#12`, `w ...` as any field |
+
+The mode needs a C type that is a pointer; the argument may be `void*` or the type of the load. A field of kind `load` is a member that holds the pointer (`CobScript.table`;
+later `ModelPiece.object` and `PieceRec.desc`, which lead to nodes inside a model). The replayer restores such a field, passes such an argument and answers such an import
+with the address in its own copy of the file, `base + offset`, where `base` is what the loader returned for the holder's line. It compares a result and a field by their
+text, so a difference is reported as the field or the result names it:
+
+```
+FixtureLane#0.script: recorded FixtureLane#2+4, replayed FixtureLane#2+8
+```
+
+A pointer that leads into no file of the loader's kind is `?` in a replay (it differs from every recorded name), and fails a recording with `a pointer into no cob load`; one into a
+file that no holder holds fails it with `no holder holds the cob load of <file>`, naming the file, since the recording could not name it.
+
+### Replaying a load line
+
+The replayer reads the load lines before the first call. For each, it registers the bytes under the file name, calls the loaders of the load kind, the game's own, with the reads of the file
+(its length, and its contents in a new buffer) answered from the registered bytes, and keeps the address the loader returned as the file of the load kind
+and the holder. The imports the loader makes (a checksum of the script) are not part of any call and are answered without a line. A line, argument or result that names a holder
+that no load line gave, or an offset past the end of a file, stops the replay at that line: `a load that no load line names`. A field whose line does is restored, and the field is
+refused (`a value that cannot be restored`) when its text is no name.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for the member `windCounter` of `Game`,
@@ -1078,7 +1164,7 @@ players' `console-units` and `mission-capture` have one such line each.
 `fields`, `objects` and `subsystems` (one entry per simulation subsystem, with its slots and their read and write
 sets). The annotations hold what no header says. The copy in the oracle kit leaves out the fields that name the source: the
 `includes`, the `functions` and `through` of each slot, the `header` of each code table and callback, and the `header`, `pre`
-and `effect` of each service (the replayer's own code); its code tables name their entries as Code pointers says. It also leaves
+and `effect` of each service (the replayer's own code), and the `loader` of each load kind; its code tables name their entries as Code pointers says. It also leaves
 out what only the recorder, the replayer and `replayschema.py --check` read, which names the source's globals, types and
 functions: the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind,
 the `aliases` of each field, the indices that tie a field or a slot argument to the replayer's table of reached fields, and the
@@ -1116,7 +1202,8 @@ from the layout), and the export refuses a copy that names any other source name
 - `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
   a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
   a mask and a value that can never meet.
-- Field kinds that point rather than hold a value. `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
+- Field kinds that point rather than hold a value. `load` is a pointer to load-time data (`{"name": "table", "kind": "load", "load": "cob"}`): it is written, restored and compared as the
+  name of the file's holder and the offset into the file (see Load inputs, "A pointer to load-time data"). `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
   a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
   as a line, and the unit it leads to records only the fields of its `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
@@ -1132,6 +1219,10 @@ from the layout), and the export refuses a copy that names any other source name
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
   The same goes for a field the module writes only some of the time (the `workTime` of a unit, the fields of a new projectile): a field in the write set and not in
   the read set would show a change made outside the seam, such as the move of a projectile by `UpdateProjectiles`, as a `w` line the module never made. A rule on the `field_write` row of the field with `reads` naming it puts the field in the read set.
+- `loads` (an object, see Load inputs): the kinds of load-time data, each `{"type", "loader", "holders"}`, and the field kind `load` that holds a pointer to
+  such data. `replayschema.py --check` fails for a loader that is no function, a holder that is no state kind with a table, a `game` that is no `Ref` member of
+  `Game`, a `load` that names no entry, and a load field or argument on a type it cannot hold. The types of a load kind are exempt from the field-row check
+  below (`field_read ScriptTable::count` needs no rule and is no untracked target), because the replayer has the real bytes.
 - `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
   union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
   is none of these is an error naming the row (`field_read OpenHeap.count`): the type of a kind or of a value kind, an alias of a kind's field
@@ -1167,6 +1258,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length; with `"resultElem": "u16"` the result counts elements of that size, as `UnitsInRange`'s count of ids does, and the bytes are `result * 2`). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
+| `load` (`load`) | a pointer to load-time data, `{"mode": "load", "load": "cob"}`, as an argument or a result of a slot or an import | `a data UnitDef#12`, `a data UnitDef#12+448` or `a data null`, in an import line ` UnitDef#12`, and `o result UnitDef#12` or ` = UnitDef#12` for a result (see Load inputs, "A pointer to load-time data") |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
@@ -1324,7 +1416,8 @@ A service whose definition is in a source that the replayer links (`SimAlloc`, t
 defined by the replayer. The hook in the real function asks `call.Answered()`, which is true only while the replayer runs a slot, and the
 generated answer takes the place of the function: it checks the `i` line the module would have written, makes the real allocation and names the
 block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
-allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
+allocations are never answered. The services of a 3D model (its load and its height) are linked the same way, since the replayer links the source of the model loader to run the load lines (see Load inputs):
+inside a slot they answer from the recording's `i` lines, and the replayer's own call of the model loader for a load line is no import. A service in a source nothing links keeps the definition the tool writes.
 
 A service that runs a command text through the command slots is re-entrant (`"nested": true`). The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
 as the calls of a callback are:
@@ -1494,7 +1587,9 @@ second object, with a changed result reported at `import 0 fixture.Scan.c[0]`) a
 that gets a third: the module's calls on them replay equal, and a different, a missing, an extra and a misplaced call are each reported at `callback#3.Complete`). Three
 more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`
 and freed by the test with `operator delete`), pointers into an object's own members (a `FixtureEye` moved by assignment between calls, and a `FixtureHeap` whose `top` is an index into its
-own `pool`, which the module grows), and a write to a `Game` field through a pointer, reported at the field. With a
+own `pool`, which the module grows), a write to a `Game` field through a pointer, reported at the field, and load inputs (the real loaders of a script and a model run on a synthetic script and model
+that the test registers as files, a pointer into them is written as `UnitDef#N` or `UnitDef#N+offset` by the recorder's mapping, a `FixtureLane` whose `script` field and slot arguments and result are
+load pointers replays equal, a changed offset, a changed holder and a pointer into no load are each reported at `FixtureLane#0.script` or `result`, and a load that no load line names is refused). With a
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 

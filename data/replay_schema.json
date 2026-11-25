@@ -14802,6 +14802,33 @@
     "kind": "ModelState",
     "size": 88
    }
+  },
+  "loads": {
+   "cob": {
+    "type": "ScriptTable",
+    "loader": [
+     "LoadCobScript"
+    ],
+    "holders": [
+     {
+      "kind": "UnitDef",
+      "member": "data"
+     }
+    ]
+   },
+   "model": {
+    "type": "Object3do",
+    "loader": [
+     "Load3do",
+     "MirrorObject"
+    ],
+    "holders": [
+     {
+      "kind": "UnitDef",
+      "game": "types"
+     }
+    ]
+   }
   }
  },
  "fields": [
@@ -15341,7 +15368,7 @@
    }
   },
   "scripts": {
-   "header": {"interface": "interfaces/scripts.h", "struct": "ScriptsSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 19, "ruleless": 3, "unresolvedSlots": ["Apply", "DeleteScript", "WriteState"], "unannotatedArgs": ["Apply(event)", "StartScriptWithArgsByIndex(callback)", "GetNanoPiecePosition(out)", "UpdateObjectState(unit)", "SetCob(data)", "CreatePlayerObjectState(data)", "SetObjectState(script)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/scripts.h", "struct": "ScriptsSeam", "version": [3, 0], "status": "pending", "imports": [], "pending": {"untracked": 16, "ruleless": 3, "unresolvedSlots": ["Apply", "DeleteScript", "WriteState"], "unannotatedArgs": ["Apply(event)", "StartScriptWithArgsByIndex(callback)", "GetNanoPiecePosition(out)", "UpdateObjectState(unit)", "SetCob(data)", "CreatePlayerObjectState(data)", "SetObjectState(script)", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "ScriptsEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "StartScriptWithArgsByIndex": {"conv": "__stdcall", "ret": "int", "functions": ["CobScript::StartScriptWithArgsByIndex"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "script", "type": "CobScript*", "line": "script", "mode": "object", "kind": "CobScript"}, {"name": "index", "type": "int", "line": "index", "mode": "scalar"}, {"name": "callback", "type": "Callback*", "line": "callback", "mode": "pending"}, {"name": "update", "type": "int", "line": "update", "mode": "scalar"}, {"name": "count", "type": "int", "line": "count", "mode": "scalar"}, {"name": "a", "type": "int", "line": "a", "mode": "scalar"}, {"name": "b", "type": "int", "line": "b", "mode": "scalar"}, {"name": "c", "type": "int", "line": "c", "mode": "scalar"}, {"name": "d", "type": "int", "line": "d", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "StartScriptWithArgsByIndex"},

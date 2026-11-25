@@ -61,6 +61,8 @@ struct FixtureLane {
     int level;
     unsigned short unit;
     unsigned short flags;
+    void* script;
+    void* shape;
 };
 
 struct FixtureSpan {

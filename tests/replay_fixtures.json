@@ -270,6 +270,16 @@
       "FixtureCell.metal"
      ],
      "depth": 1
+    },
+    {
+     "name": "script",
+     "kind": "load",
+     "load": "fixture_script"
+    },
+    {
+     "name": "shape",
+     "kind": "load",
+     "load": "fixture_shape"
     }
    ]
   },
@@ -1142,6 +1152,46 @@
      "flags"
     ]
    }
+  },
+  "Attach": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "script"
+    },
+    {
+     "type": "void*",
+     "name": "shape"
+    }
+   ],
+   "args": {
+    "script": {
+     "mode": "load",
+     "load": "fixture_script"
+    },
+    "shape": {
+     "mode": "load",
+     "load": "fixture_shape"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Lookup": {
+   "ret": "void*",
+   "params": [
+    {
+     "type": "int",
+     "name": "lane"
+    }
+   ],
+   "args": {},
+   "result": {
+    "mode": "load",
+    "load": "fixture_script"
+   }
   }
  },
  "inside": {
@@ -1156,5 +1206,31 @@
    }
   ]
  },
- "sim_fields": {}
+ "sim_fields": {},
+ "loads": {
+  "fixture_script": {
+   "type": "FixtureFile",
+   "loader": [
+    "LoadCobScript"
+   ],
+   "holders": [
+    {
+     "kind": "FixtureLane",
+     "member": "script"
+    }
+   ]
+  },
+  "fixture_shape": {
+   "type": "FixtureFile",
+   "loader": [
+    "Load3do"
+   ],
+   "holders": [
+    {
+     "kind": "FixtureLane",
+     "game": "types"
+    }
+   ]
+  }
+ }
 }

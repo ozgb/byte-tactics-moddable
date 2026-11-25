@@ -74,6 +74,7 @@
 #include "../src/state/sim_globals.h"
 #include "../src/state/block.h"
 #include "../src/harness/replay_types.h"
+#include "../src/harness/replay_services.h"
 
 #define REPLAY_FORMAT 2
 
@@ -1598,6 +1599,29 @@ static const ReplayAllocTag kReplayAllocTags[] = {
     { "Object State", ROK_MODELSTATE, 88 },
 };
 static const unsigned kReplayAllocTagCount = 2;
+
+enum {
+    RL_FIXTURE_SCRIPT = 2,
+    RL_FIXTURE_SHAPE = 3,
+};
+
+static const ReplayLoadHolder kReplayLoadHolders[] = {
+    { RL_COB, ROK_UNITDEF, RLH_MEMBER, offsetof(UnitDef, data) },
+    { RL_MODEL, ROK_UNITDEF, RLH_GAME, 82807 },
+    { RL_FIXTURE_SCRIPT, ROK_FIXTURELANE, RLH_MEMBER, offsetof(FixtureLane, script) },
+    { RL_FIXTURE_SHAPE, ROK_FIXTURELANE, RLH_GAME, 82807 },
+};
+
+static const ReplayLoadKind kReplayLoads[] = {
+    { "cob", 0, 1 },
+    { "model", 1, 1 },
+    { "fixture_script", 2, 1 },
+    { "fixture_shape", 3, 1 },
+};
+static const unsigned kReplayLoadCount = 4;
+
+static_assert(sizeof(((UnitDef*)nullptr)->data) == sizeof(void*), "UnitDef::data holds the pointer of a cob load");
+static_assert(sizeof(((FixtureLane*)nullptr)->script) == sizeof(void*), "FixtureLane::script holds the pointer of a fixture_script load");
 
 static const ReplayObjectField kReplayObjectFields[] = {
     { "active", offsetof(Player, active), sizeof(((Player*)nullptr)->active), ROK_PLAYER, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3182,6 +3206,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "flags", offsetof(FixtureLane, flags), sizeof(((FixtureLane*)nullptr)->flags), ROK_FIXTURELANE, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "occupant", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_UNIT, 0, 0, {}, 11, 1 },
     { "cell", offsetof(FixtureLane, unit), sizeof(((FixtureLane*)nullptr)->unit), ROK_FIXTURELANE, RK_UNITID, ROK_FIXTURECELL, 0, 0, {}, 12, 1 },
+    { "script", offsetof(FixtureLane, script), sizeof(void*), ROK_FIXTURELANE, RK_LOAD, RL_FIXTURE_SCRIPT, 0, 0, {}, 0, 0 },
+    { "shape", offsetof(FixtureLane, shape), sizeof(void*), ROK_FIXTURELANE, RK_LOAD, RL_FIXTURE_SHAPE, 0, 0, {}, 0, 0 },
     { "ticks", offsetof(FixtureTimer, ticks), sizeof(((FixtureTimer*)nullptr)->ticks), ROK_FIXTURETIMER, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "period", offsetof(FixtureTimer, period), sizeof(((FixtureTimer*)nullptr)->period), ROK_FIXTURETIMER, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "ticks", offsetof(FixtureAssault, ticks), sizeof(((FixtureAssault*)nullptr)->ticks), ROK_FIXTUREASSAULT, RK_U16, 0, 0, 0, {}, 0, 0 },
@@ -3260,7 +3286,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "id", offsetof(FixtureGoalHolder, id), sizeof(((FixtureGoalHolder*)nullptr)->id), ROK_FIXTUREGOALHOLDER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "goal", offsetof(FixtureGoalHolder, goal), sizeof(((FixtureGoalHolder*)nullptr)->goal), ROK_FIXTUREGOALHOLDER, RK_REF, ROK_FIXTUREGOALBASE, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1659;
+static const unsigned kReplayObjectFieldCount = 1661;
 static const unsigned kReplayWalkableFieldCount = 266;
 
 static const unsigned short kReplayReachFields[] = { 46, 100, 246, 247, 248, 89, 98, 0, 22, 100, 249, 95, 1571, 39, 42, 43, 44, 45, 47, 66, 89, 95, 97, 98, 99, 101, 102, 103, 104, 105, 59, 131, 136, 146, 150, 160, 174, 161, 162, 145, 163, 0, 22, 89, 97, 39, 46, 101, 103, 136 };
@@ -4849,6 +4875,8 @@ static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::unit has
 static_assert(sizeof(((FixtureLane*)nullptr)->flags) == 2, "FixtureLane::flags has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::occupant has the size the schema says");
 static_assert(sizeof(((FixtureLane*)nullptr)->unit) == 2, "FixtureLane::cell has the size the schema says");
+static_assert(__is_pointer(decltype(((FixtureLane*)nullptr)->script)), "FixtureLane::script is a raw pointer");
+static_assert(__is_pointer(decltype(((FixtureLane*)nullptr)->shape)), "FixtureLane::shape is a raw pointer");
 static_assert(sizeof(((FixtureTimer*)nullptr)->ticks) == 2, "FixtureTimer::ticks has the size the schema says");
 static_assert(sizeof(((FixtureTimer*)nullptr)->period) == 2, "FixtureTimer::period has the size the schema says");
 static_assert(sizeof(((FixtureAssault*)nullptr)->ticks) == 2, "FixtureAssault::ticks has the size the schema says");

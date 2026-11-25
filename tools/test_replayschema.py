@@ -2991,6 +2991,120 @@ class Blobs(unittest.TestCase):
         self.has(ann, "FixtureProgram.entries: the target Unit of a blob has a table")
 
 
+class LoadForms(unittest.TestCase):
+    """Load-time data a recording carries as the inputs of its load: the `loads` annotation, the pointer modes and the field kind that name a load."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureLane"]["fields"] if f["name"] == name)
+
+    def test_the_real_loads_have_holders_and_ids(self):
+        files, errors, model = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        self.assertEqual([(l["name"], [h["kind"] for h in l["holders"]]) for l in model["loads"]], [("cob", ["UnitDef"]), ("model", ["UnitDef"])])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("{ RL_COB, ROK_UNITDEF, RLH_MEMBER, offsetof(UnitDef, data) },", text)
+        self.assertRegex(text, r"\{ RL_MODEL, ROK_UNITDEF, RLH_GAME, \d+ \},")
+        self.assertIn('{ "cob", 0, 1 },\n    { "model", 1, 1 },', text)
+        self.assertIn('static_assert(sizeof(((UnitDef*)nullptr)->data) == sizeof(void*)', text)
+        self.assertIn("enum ReplayLoadId {\n    RL_COB,\n    RL_MODEL,\n    RL_COUNT\n};", files[rs.SERVICES_H])
+
+    def test_a_load_kind_of_the_tests_comes_after_the_real_ones(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        self.assertEqual([l["name"] for l in model["loads"]], ["cob", "model", "fixture_script", "fixture_shape"])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("    RL_FIXTURE_SCRIPT = 2,\n    RL_FIXTURE_SHAPE = 3,", text)
+        self.assertIn("{ RL_FIXTURE_SCRIPT, ROK_FIXTURELANE, RLH_MEMBER, offsetof(FixtureLane, script) },", text)
+        self.assertIn("RL_FIXTURE_SHAPE, ROK_FIXTURELANE, RLH_GAME,", text)
+
+    def test_a_load_field_is_a_pointer_that_names_its_load(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.FIXTURE_SCHEMA_H].split("\n") if l.startswith('    { "script", offsetof(FixtureLane, script)')][0]
+        self.assertIn("sizeof(void*), ROK_FIXTURELANE, RK_LOAD, RL_FIXTURE_SCRIPT,", row)
+        self.assertIn('static_assert(__is_pointer(decltype(((FixtureLane*)nullptr)->script)), "FixtureLane::script is a raw pointer");', files[rs.FIXTURE_SCHEMA_H])
+
+    def test_a_load_argument_and_result_are_recorded_and_replayed_by_their_name(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        self.assertIn('ArgLoad(s_call, "script", RL_FIXTURE_SCRIPT, a0);', hooks)
+        self.assertIn("ImportLoad(line, RL_FIXTURE_SHAPE, a1);", hooks)
+        self.assertIn("ArgLoadResult(s_tail, RL_FIXTURE_SCRIPT, result);", hooks)
+        self.assertIn("ImportResultLoad(line, RL_FIXTURE_SCRIPT, result);", hooks)
+        shapes = files[rs.SHAPES_SLOTS]
+        self.assertIn("ReplayAddLoadName(t, g_objects, RL_FIXTURE_SCRIPT, a0, false);", shapes)
+        self.assertIn("return (void*)ParseLoadResult(RL_FIXTURE_SCRIPT, r);", shapes)
+        self.assertIn('void* p0 = (void*)ArgLoad("script", RL_FIXTURE_SCRIPT);', shapes)
+        self.assertIn("CompareLoadResult(RL_FIXTURE_SCRIPT, g_result_fixture_Lookup);", shapes)
+
+    def test_the_types_of_a_load_kind_need_no_rule(self):
+        model, errors = build([row("UpdateUnitWeapons", "field_read", "ScriptTable::count"), row("UpdateUnitWeapons", "field_read", "Object3do::sibling")])
+        self.assertEqual([e for e in errors if "ScriptTable" in e or "Object3do" in e], [])
+        ann = annotations()
+        ann["loads"] = {}
+        model, errors = build([row("UpdateUnitWeapons", "field_read", "ScriptTable::count"), row("UpdateUnitWeapons", "field_read", "Object3do::sibling")], ann)
+        self.assertTrue(any("field_read ScriptTable::count" in e for e in errors), errors)
+        self.assertTrue(any("Object3do::sibling" in e for e in errors), errors)
+
+    def test_a_load_kind_is_checked(self):
+        ann = annotations()
+        ann["loads"]["cob"]["loader"] = ["LoadCobScript", "NoSuchLoader"]
+        self.has(ann, "load cob: the loader NoSuchLoader is no function")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = []
+        self.has(ann, "load cob: `holders` lists at least one holder")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "Handle", "member": "data"}]
+        self.has(ann, "load cob: the holder kind Handle is no state kind with a table")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "FixtureView", "member": "data"}]
+        self.has(ann, "load cob: the holder kind FixtureView is no state kind with a table")
+        ann = annotations()
+        ann["loads"]["model"]["holders"] = [{"kind": "UnitDef", "game": "unitDefCount"}]
+        errors = self.generated(ann)[1]
+        self.assertEqual(errors, [])
+        ann["loads"]["model"]["holders"] = [{"kind": "UnitDef", "game": "noSuchMember"}]
+        self.has(ann, "load model: the holder's `game` noSuchMember is no Ref member of Game")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "UnitDef", "member": "data", "game": "types"}]
+        self.has(ann, "load cob: a holder is {\"kind\", \"member\"} or {\"kind\", \"game\"}")
+        ann = annotations()
+        ann["loads"]["cob"]["unit"] = 1
+        self.has(ann, "load cob: a load kind is {\"type\", \"loader\", \"holders\"}")
+        ann = annotations()
+        ann["loads"]["Cob"] = ann["loads"].pop("cob")
+        self.has(ann, "load Cob: the name of a load kind is lower case")
+
+    def test_a_load_field_is_checked(self):
+        ann = annotations()
+        self.field(ann, "script")["load"] = "nowhere"
+        self.has(ann, "FixtureLane.script: the `load` nowhere is no entry of `loads`")
+        ann = annotations()
+        self.field(ann, "script")["target"] = "Unit"
+        self.has(ann, "FixtureLane.script: a load field is {\"name\", \"kind\", \"load\"}")
+        ann = annotations()
+        self.field(ann, "level")["load"] = "cob"
+        self.has(ann, "FixtureLane.level: only a field of kind load has a `load`")
+
+    def test_a_load_argument_is_checked(self):
+        def has(change, text):
+            fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+            change(fixtures["fixtures"])
+            errors = rs.generate(rs.read_rows(), annotations(), fixtures=fixtures)[1]
+            self.assertTrue(any(text in e for e in errors), (text, errors))
+
+        has(lambda f: f["Attach"]["args"]["script"].update(load="nowhere"), "names the load nowhere, which is no entry of `loads`")
+        has(lambda f: f["Attach"]["params"][0].update(type="int"), "is int, and a load is a pointer")
+        has(lambda f: f["Lookup"]["result"].update(load="nowhere"), "the result names the load nowhere")
+        has(lambda f: f["Lookup"]["args"].update(lane={"mode": "scalar", "load": "cob"}), "has the mode scalar and a `load` key, which only the mode load takes")
+
+
 class NestedVectors(unittest.TestCase):
     """A value kind may have vector fields, so a vector holds vectors to any depth; a kind that derives from BlockVector is its own vector."""
 

@@ -13,7 +13,16 @@ struct ModelState;
 struct Object3do;
 struct DebrisPiece;
 struct Display;
-struct tagPALETTEENTRY;
+
+inline int DisplayLogWants()
+{
+    return DlWants();
+}
+
+struct DisplayLogScope {
+    DisplayLogScope() { DlEnter(); }
+    ~DisplayLogScope() { DlLeave(); }
+};
 
 enum DisplaySpriteKind {
     DISPLAY_SPRITE,

@@ -463,14 +463,14 @@ void DlRegisterFrame(const void* block, const unsigned char* pixels, int width, 
     AddRegion(block, pixels, width, height, width, 0, name);
 }
 
-struct Piece {
+struct DlPiece {
     const void* object;
     int model;
     int name;
     int live;
 };
 
-static Piece s_pieces[kMaxPieces];
+static DlPiece s_pieces[kMaxPieces];
 static int s_pieceCount = 0;
 static int s_pieceHash[kPieceHashSize];
 
@@ -500,7 +500,7 @@ void DlRegisterModelPiece(const void* object, const char* stem, const char* piec
     s_pieces[found].live = 1;
 }
 
-static const Piece* FindPiece(const void* object)
+static const DlPiece* FindPiece(const void* object)
 {
     unsigned slot = PtrHash(object) & (kPieceHashSize - 1);
     for (;;) {
@@ -515,14 +515,14 @@ static const Piece* FindPiece(const void* object)
 
 const char* DlModelName(const void* object, int* known)
 {
-    const Piece* p = FindPiece(object);
+    const DlPiece* p = FindPiece(object);
     *known = p != nullptr;
     return p != nullptr ? s_nameBytes + p->model : "-";
 }
 
 const char* DlPieceName(const void* object)
 {
-    const Piece* p = FindPiece(object);
+    const DlPiece* p = FindPiece(object);
     return p != nullptr ? s_nameBytes + p->name : "-";
 }
 
@@ -659,7 +659,7 @@ struct Bucket {
     int head;
 };
 
-struct Node {
+struct DlNode {
     int x0;
     int y0;
     int x1;
@@ -685,7 +685,7 @@ static TargetSlot s_targets[kMaxTargets];
 static int s_targetCount = 0;
 static Bucket s_buckets[kMaxBuckets];
 static int s_bucketUsed = 0;
-static Node s_nodes[kMaxNodes];
+static DlNode s_nodes[kMaxNodes];
 static int s_nodeUsed = 0;
 
 struct Item {
@@ -734,7 +734,7 @@ static int NewNode(int x0, int y0, int x1, int y1, int layer, int next)
 {
     if (s_nodeUsed >= kMaxNodes)
         Fail("grid nodes", "65536");
-    Node* n = &s_nodes[s_nodeUsed];
+    DlNode* n = &s_nodes[s_nodeUsed];
     n->x0 = x0;
     n->y0 = y0;
     n->x1 = x1;
@@ -744,7 +744,7 @@ static int NewNode(int x0, int y0, int x1, int y1, int layer, int next)
     return s_nodeUsed++;
 }
 
-static int Overlaps(const Node* n, int x0, int y0, int x1, int y1)
+static int Overlaps(const DlNode* n, int x0, int y0, int x1, int y1)
 {
     return n->x0 < x1 && x0 < n->x1 && n->y0 < y1 && y0 < n->y1;
 }

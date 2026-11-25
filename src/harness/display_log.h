@@ -28,16 +28,6 @@ void DlLeave();
 int DlOffsetX();
 int DlOffsetY();
 
-inline int DisplayLogWants()
-{
-    return DlWants();
-}
-
-struct DisplayLogScope {
-    DisplayLogScope() { DlEnter(); }
-    ~DisplayLogScope() { DlLeave(); }
-};
-
 void DlOpen(int listAll);
 void DlClose();
 void DlFlush();

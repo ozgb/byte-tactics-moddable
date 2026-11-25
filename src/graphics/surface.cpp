@@ -861,7 +861,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
                             FrameQuad* dst, FrameQuad* src)
 {
     if (DisplayLogWants())
-        DisplayLogQuad(surf, bmp, dst != 0 ? dst->p : 0, src != 0 ? src->p : 0);
+        DisplayLogQuad(surf, bmp, dst != nullptr ? dst->p : nullptr, src != nullptr ? src->p : nullptr);
     DisplayLogScope displayScope;
     if (bmp == 0)
         return;

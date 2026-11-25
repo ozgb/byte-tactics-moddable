@@ -17,8 +17,9 @@ void kit_u32(bx_u32 value);
 void kit_f64(double value);
 void kit_str(const char *s);
 void kit_bytes(const void *data, size_t size);
+void kit_dropped(const char *entry);
 void kit_end(void);
-void kit_close(void);
+int kit_close(void);
 
 #ifdef __cplusplus
 }
@@ -34,8 +35,9 @@ void kit_close(void);
 #define kit_f64(value) ((void)0)
 #define kit_str(s) ((void)0)
 #define kit_bytes(data, size) ((void)0)
+#define kit_dropped(entry) ((void)0)
 #define kit_end() ((void)0)
-#define kit_close() ((void)0)
+#define kit_close() 0
 
 #endif
 

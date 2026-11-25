@@ -519,7 +519,7 @@ class TargetingForms(unittest.TestCase):
 
 
 class UnannotatedTypes(unittest.TestCase):
-    ROW = row("UpdateUnitWeapons", "field_read", "OpenHeap::count")
+    ROW = row("UpdateUnitWeapons", "field_read", "UnlistedType::count")
 
     def pending(self, rows, ann=None):
         _, errors = build(rows, ann)
@@ -529,39 +529,39 @@ class UnannotatedTypes(unittest.TestCase):
         errors = self.pending([self.ROW])
         self.assertEqual(len(errors), 1, errors)
         self.assertIn("weapons is complete but has pending types", errors[0])
-        self.assertIn("field_read OpenHeap::count", errors[0])
+        self.assertIn("field_read UnlistedType::count", errors[0])
 
     def test_a_pending_subsystem_is_not_asked(self):
         assignment = rs.read_assignment()
         sub, slot = [(m, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "ai", "orders")
                      for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
-        _, errors = build([row(slot, "field_read", "OpenHeap::count")])
-        self.assertEqual([e for e in errors if "OpenHeap" in e], [])
+        _, errors = build([row(slot, "field_read", "UnlistedType::count")])
+        self.assertEqual([e for e in errors if "UnlistedType" in e], [])
 
     def test_an_exempt_type_resolves_it(self):
         ann = annotations()
-        ann["exempt_types"] = {"OpenHeap": "a local heap of the search"}
+        ann["exempt_types"] = {"UnlistedType": "a local heap of the search"}
         self.assertEqual(self.pending([self.ROW], ann), [])
 
     def test_an_exempt_type_needs_a_reason(self):
         ann = annotations()
-        ann["exempt_types"] = {"OpenHeap": ""}
+        ann["exempt_types"] = {"UnlistedType": ""}
         _, errors = build([self.ROW], ann)
-        self.assertTrue(any("exempt_types: OpenHeap needs a reason" in e for e in errors), errors)
+        self.assertTrue(any("exempt_types: UnlistedType needs a reason" in e for e in errors), errors)
 
     def test_an_exempt_target_resolves_it(self):
         ann = annotations()
-        ann["exempt"]["OpenHeap::count"] = "a local"
+        ann["exempt"]["UnlistedType::count"] = "a local"
         self.assertEqual(self.pending([self.ROW], ann), [])
 
     def test_an_alias_of_a_kind_field_resolves_it(self):
         ann = annotations()
-        ann["objects"]["Player"]["fields"][0].setdefault("aliases", []).append("OpenHeap::count")
+        ann["objects"]["Player"]["fields"][0].setdefault("aliases", []).append("UnlistedType::count")
         self.assertEqual(self.pending([self.ROW], ann), [])
 
     def test_a_hand_rule_resolves_it(self):
         ann = annotations()
-        ann["rules"].append({"kind": "field_read", "target": "OpenHeap::count", "rule": "fields", "reads": ["Player.active"], "note": "x"})
+        ann["rules"].append({"kind": "field_read", "target": "UnlistedType::count", "rule": "fields", "reads": ["Player.active"], "note": "x"})
         self.assertEqual(self.pending([self.ROW], ann), [])
 
     def test_a_type_of_a_kind_is_not_asked(self):
@@ -2196,6 +2196,66 @@ class ArgumentShapes(unittest.TestCase):
         errors = self.errors(params, {"ids": {"mode": "bytes-out", "length": "capacity", "resultElem": "nope"}}, "int", {"mode": "scalar"})
         self.assertTrue(any("`resultElem` of" in e for e in errors), errors)
 
+    def test_a_slot_records_its_bytes_out_after_the_call(self):
+        params = [("void*", "out"), ("unsigned int", "size")]
+        args = {"out": {"mode": "bytes-out", "length": "size"}}
+        s, _ = self.slot(params, args, "int", {"mode": "scalar"})
+        self.assertEqual(self.errors(params, args, "int", {"mode": "scalar"}), [])
+        wrapper = "\n".join(rs.wrapper("pathfinding", {}, "Poll", s, {}, False))
+        self.assertIn('ArgOutBytes(s_tail, "out", a0, (int)result, a1);', wrapper)
+        self.assertNotIn("ArgPending", wrapper)
+        runner = "\n".join(rs.runner("pathfinding", "Poll", s))
+        self.assertIn('CompareBytes("out", g_bytes_pathfinding_Poll_0, (int)g_result_pathfinding_Poll, g_bytes_pathfinding_Poll_0_length);', runner)
+
+    def test_a_scratch_buffer_is_passed_and_never_recorded(self):
+        params = [("int*", "points"), ("int", "capacity")]
+        args = {"points": {"mode": "scratch", "capacity": "capacity"}}
+        s, _ = self.slot(params, args, "int", {"mode": "scalar"})
+        self.assertEqual(self.errors(params, args, "int", {"mode": "scalar"}), [])
+        wrapper = "\n".join(rs.wrapper("pathfinding", {}, "Poll", s, {}, False))
+        self.assertNotIn('"points"', wrapper)
+        runner = "\n".join(rs.runner("pathfinding", "Poll", s))
+        self.assertIn('ScratchHolder p0;', runner)
+        self.assertIn('p0.Reserve(sizeof(int) * (size_t)ArgScalar<int>("capacity"));', runner)
+
+    def test_a_scratch_buffer_needs_a_capacity_after_it(self):
+        params = [("int", "capacity"), ("int*", "points")]
+        errors = self.errors(params, {"points": {"mode": "scratch", "capacity": "capacity"}})
+        self.assertTrue(any("needs a `capacity` that names an integer argument after it" in e for e in errors), errors)
+        errors = self.errors([("int*", "points")], {"points": {"mode": "scratch"}})
+        self.assertTrue(any("needs a `capacity`" in e for e in errors), errors)
+        errors = self.errors([("void*", "points"), ("int", "capacity")], {"points": {"mode": "scratch", "capacity": "capacity"}})
+        self.assertTrue(any("not void*" in e for e in errors), errors)
+
+    def test_a_scalar_out_is_written_after_the_import_line_and_written_back_by_the_stub(self):
+        params = [("int*", "width"), ("int*", "height")]
+        args = {"width": {"mode": "scalar", "dir": "out"}, "height": {"mode": "scalar", "dir": "out"}}
+        s, _ = self.slot(params, args)
+        self.assertEqual(self.errors(params, args), [])
+        wrapper = "\n".join(rs.wrapper("pathworld", {}, "SeenSize", s, {}, True))
+        self.assertIn('ImportOutScalar(line, "width", a0);', wrapper)
+        self.assertIn('ImportOutScalar(line, "height", a1);', wrapper)
+        self.assertNotIn("ImportValue", wrapper)
+        stub = "\n".join(rs.import_stub("pathworld", "SeenSize", s))
+        self.assertIn('ApplyOutScalar(a0, "width");', stub)
+        self.assertNotIn("ReplayValue", stub)
+
+    def test_a_scalar_out_is_a_pointer_to_a_scalar_that_only_goes_out(self):
+        errors = self.errors([("int", "width")], {"width": {"mode": "scalar", "dir": "out"}})
+        self.assertTrue(any("is a pointer to one of" in e for e in errors), errors)
+        errors = self.errors([("int*", "width")], {"width": {"mode": "scalar", "dir": "inout"}})
+        self.assertTrue(any("only out is allowed on a scalar" in e for e in errors), errors)
+
+    def test_a_scalar_out_is_refused_on_a_recorded_slot_and_a_scratch_buffer_on_an_imported_one(self):
+        ann = annotations()
+        ann["subsystems"]["pathworld"]["slots"]["SeenSize"] = {"args": {"width": {"mode": "scalar", "dir": "out"}, "height": {"mode": "scalar", "dir": "out"}}, "functions": ["WorldTick"]}
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("a scalar out value is recorded for an import, and this slot is recorded" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["pathworld"]["slots"]["SeenSize"] = {"record": False, "reason": "x", "args": {"width": {"mode": "scratch", "capacity": "height"}, "height": {"mode": "scalar", "dir": "out"}}}
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("a scratch buffer is for a recorded slot, and this slot is imported" in e for e in errors), errors)
+
     def test_a_length_that_is_an_argument_is_what_it_was(self):
         s, _ = self.slot([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"})
         self.assertEqual(self.errors([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"}), [])
@@ -3258,7 +3318,7 @@ class Committed(unittest.TestCase):
         files, _, model = rs.generate(rs.read_rows())
         written = json.loads(files[rs.JSON_OUT])
         self.assertEqual(sorted(written["subsystems"]), sorted(m[0] for m in rs.seam_members() + rs.world_members()))
-        self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network", "econworld"})
+        self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network", "econworld", "pathworld"})
 
     def test_every_manifest_slot_has_sets(self):
         manifest = json.loads((rs.ROOT / "wasm/modules.json").read_text())

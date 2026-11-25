@@ -16,9 +16,9 @@ inline unsigned ReplayRefOffset(const void* p)
 }
 
 #ifdef BT_REPLAY_FIXTURES
-enum { REPLAY_OBJECT_KINDS = 320 };
+enum { REPLAY_OBJECT_KINDS = 352 };
 #else
-enum { REPLAY_OBJECT_KINDS = 256 };
+enum { REPLAY_OBJECT_KINDS = 288 };
 #endif
 
 enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3, REPLAY_KEY_BYTES = 512 };

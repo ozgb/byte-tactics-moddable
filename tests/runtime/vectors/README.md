@@ -66,8 +66,8 @@ their original order.
 - `float_text` (0 edge, 3742 random of 2000000): the float the C runtime's scanf conversion `%f` stores for a text, as the float's 32-bit pattern; it is not always the correctly rounded float
 - `double_text` (131 edge, 3072 random of 1100000): the double the C runtime's atof returns for a text: leading white space skipped, any trailing text ignored, overflow to infinity, underflow to zero or a denormal
 - `rand` (8 edge, 1 random of 1492): the first 10000 values of the C runtime's rand after srand(seed), as 10000 little endian i32 (40000 bytes)
-- `shuffle` (526 edge, 25 random of 6094): the ints 1, 4, 7, ... (3 * index + 1) for size elements after the C++ library's random_shuffle with rand seeded by `seed`, as `size` little endian i32 behind a u32 byte count, then the next four values of rand
-- `load_sequence` (64 edge, 1250 random of 2336): the load sequence: srand(seed), the 391606 rand draws the explosion setup makes, then a random_shuffle of the first `size` (3 to 10) of the ints 0 to 9, as 10 little endian i32, then the next four values of rand
+- `shuffle` (526 edge, 25 random of 6094): the ints 1, 4, 7, ... (3 * index + 1) for size elements after the C++ library's shuffle of a range, drawing from rand seeded by `seed`, as `size` little endian i32 behind a u32 byte count, then the next four values of rand
+- `load_sequence` (64 edge, 1250 random of 2336): the load sequence: srand(seed), the 391606 rand draws the explosion setup makes, then the same shuffle of the first `size` (3 to 10) of the ints 0 to 9, as 10 little endian i32, then the next four values of rand
 - `atoi` (2460 edge, 4243 random of 6000): atoi of a string: white space of every kind, signs, leading zeros, trailing text, values around and past the int range and 2^32, high bytes
 - `ftol` (134 edge, 6666 random of 8000): the conversion of a double to an int by the compiled code of the original program (a call to its _ftol); the result is the one the original gave, including for values out of range and for NaN
 - `isalnum` (257 edge, 0 random of 0): isalnum of an int from -1 to 255, the raw result; the results for -128 to -2 are dropped

@@ -1,0 +1,35 @@
+{"format": 1, "group": "cob", "vectors": [
+ {"name": "scripts", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["cob", "scripts\\armfix.cob"],
+   ["cob", "SCRIPTS\\ARMFIX.COB"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["cob", {"version": 4, "scripts": [["Create", 0], ["Activate", 4], ["Deactivate", 7]], "pieces": ["base", "turret", "barrel"], "statics": 5, "pairs": [[9, 178]], "code": [268570625, 0, 1, -65536, 268505088, 2, 2147483647, 268845056, -1, 3, 268509184]}],
+   ["cob", {"version": 4, "scripts": [["Create", 0], ["Activate", 4], ["Deactivate", 7]], "pieces": ["base", "turret", "barrel"], "statics": 5, "pairs": [[9, 178]], "code": [268570625, 0, 1, -65536, 268505088, 2, 2147483647, 268845056, -1, 3, 268509184]}]
+  ]},
+ {"name": "none", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["cob", "scripts\\none.cob"],
+   ["cob", "scripts\\negative.cob"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["cob", {"version": 4, "scripts": [], "pieces": [], "statics": 0, "pairs": [], "code": []}],
+   ["cob", {"version": 4, "scripts": [], "pieces": [], "statics": -2, "pairs": [], "code": []}]
+  ]},
+ {"name": "missing", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["cob", "scripts\\nothing.cob"],
+   ["cob", "data\\empty.bin"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["cob", null],
+   ["cob", null]
+  ]}
+]}

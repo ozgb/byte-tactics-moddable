@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import struct
 import sys
 import tempfile
 import unittest
@@ -65,6 +66,128 @@ def expand(src: bytes) -> bytes:
         if mask & 0x100:
             mask, flags = 1, src[i]
             i += 1
+
+
+def c_string(data: bytes, at: int) -> str:
+    return data[at:data.index(b"\0", at)].decode("latin-1")
+
+
+def read_cob(data: bytes) -> dict:
+    """The COB reading of docs/files-gate.md, from the file's bytes."""
+    w = struct.unpack_from("<11i", data, 0)
+    word = lambda at: struct.unpack_from("<i", data, at)[0]
+    return {"version": w[0],
+            "scripts": [[c_string(data, word(w[7] + 4 * i)), word(w[6] + 4 * i)] for i in range(w[1])],
+            "pieces": [c_string(data, word(w[8] + 4 * i)) for i in range(w[2])],
+            "statics": w[4],
+            "pairs": [[word(w[10] + 8 * i), word(w[10] + 8 * i + 4)] for i in range(w[5])],
+            "code": [word(w[9] + 4 * i) for i in range(w[3])]}
+
+
+def gaf_pixels(data: bytes, at: int, width: int, height: int) -> list:
+    """A compressed frame's rows, decoded as docs/files-gate.md ("GAF") states."""
+    rows = []
+    for _ in range(height):
+        (size,) = struct.unpack_from("<H", data, at)
+        row, i = [None] * width, at + 2
+        x = 0
+        while size and x < width:
+            b = data[i]
+            i += 1
+            if b & 1:
+                x += b >> 1
+            elif b & 2:
+                for _ in range((b >> 2) + 1):
+                    if x < width:
+                        row[x] = data[i]
+                    x += 1
+                i += 1
+            else:
+                for k in range((b >> 2) + 1):
+                    if x < width:
+                        row[x] = data[i + k]
+                    x += 1
+                i += (b >> 2) + 1
+        rows.append(row)
+        at += 2 + size
+    return rows
+
+
+def read_gaf_frame(data: bytes, at: int, duration: int | None) -> dict:
+    w, h, x, y, transparent, compressed, layers, blend, _, ptr, _ = struct.unpack_from("<HHhhBBBBIII", data, at)
+    out = {"width": w, "height": h, "x": x, "y": y, "transparent": transparent, "compressed": compressed,
+           "blend": blend}
+    if duration is not None:
+        out["duration"] = duration
+    if layers:
+        out["frames"] = [read_gaf_frame(data, struct.unpack_from("<I", data, ptr + 4 * k)[0], None)
+                         for k in range(layers)]
+    elif compressed:
+        out["pixels"] = gaf_pixels(data, ptr, w, h)
+    else:
+        out["pixels"] = [list(data[ptr + r * w:ptr + (r + 1) * w]) for r in range(h)]
+    return out
+
+
+def read_gaf(data: bytes) -> list:
+    """The GAF reading of docs/files-gate.md, from the file's bytes."""
+    (count,) = struct.unpack_from("<h", data, 4)
+    entries = []
+    for i in range(count):
+        (at,) = struct.unpack_from("<I", data, 12 + 4 * i)
+        (frames,) = struct.unpack_from("<H", data, at)
+        entries.append({"name": c_string(data, at + 8), "loop": data[at + 2], "frames": [
+            read_gaf_frame(data, struct.unpack_from("<I", data, at + 40 + 8 * j)[0],
+                           struct.unpack_from("<H", data, at + 44 + 8 * j)[0]) for j in range(frames)]})
+    return entries
+
+
+def read_3do(data: bytes, at: int = 0) -> list:
+    """The 3DO reading of docs/files-gate.md, from the file's bytes: the pieces from `at` and its siblings."""
+    out = []
+    while True:
+        _, nv, nprim, selection, x, y, z, name, _, verts, prims, sibling, child = struct.unpack_from("<13i", data, at)
+        vertices = [list(struct.unpack_from("<3i", data, verts + 12 * i)) for i in range(nv)]
+        primitives = []
+        for i in range(nprim):
+            colour, n, _, idx, tex = struct.unpack_from("<5i", data, prims + 32 * i)
+            primitives.append({"colour": colour, "vertices": list(struct.unpack_from("<%dH" % n, data, idx)),
+                               "texture": c_string(data, tex) if tex else None})
+        if selection != -1 and primitives:
+            primitives[0], primitives[selection] = primitives[selection], primitives[0]
+            selection = 0
+
+        def height(p):
+            total = sum(vertices[v][1] for v in p["vertices"])
+            return abs(total) // len(p["vertices"]) * (1 if total >= 0 else -1)
+
+        swapped = True
+        while swapped:
+            swapped = False
+            for i in range(1, len(primitives) - 1):
+                if height(primitives[i]) > height(primitives[i + 1]):
+                    primitives[i], primitives[i + 1] = primitives[i + 1], primitives[i]
+                    swapped = True
+        out.append({"name": c_string(data, name) if name else None, "offset": [x, y, z], "vertices": vertices,
+                    "selection": selection, "primitives": primitives,
+                    "children": read_3do(data, child) if child else []})
+        if not sibling:
+            return out
+        at = sibling
+
+
+def loose(top: Path, name: str) -> bytes:
+    """The bytes of the loose file `name` names under `top`, its case folded; empty when there is none."""
+    at = top
+    for part in name.split("\\"):
+        found = [p for p in at.iterdir() if p.name.lower() == part.lower()] if at.is_dir() else []
+        if not found:
+            return b""
+        at = found[0]
+    return at.read_bytes() if at.is_file() else b""
+
+
+READERS = {"cob": read_cob, "gaf": read_gaf, "3do": read_3do}
 
 
 def replayer(tmp: Path, fault: str = "pass") -> list[str]:
@@ -158,6 +281,25 @@ class Vectors(unittest.TestCase):
         self.assertEqual(filesgate.parse_out('read\t[1, "ab"]\n'), [["read", [1, "ab"]]])
 
 
+class Readings(unittest.TestCase):
+    def test_the_doc_readings_give_the_stored_vectors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            filesfixtures.build(Path(tmp))
+            for group, read in READERS.items():
+                for v in json.loads((filesgate.VECTORS / (group + ".json")).read_text())["vectors"]:
+                    for call, (op, value) in zip(v["calls"], v["results"]):
+                        if op != group:
+                            continue
+                        data = loose(Path(tmp) / v["fixture"], call[1])
+                        with self.subTest(vector=v["name"], call=call):
+                            self.assertEqual(read(data) if data else None, value)
+
+    def test_a_compressed_row_round_trips(self):
+        for row in ([None, None, 5, 5, 5, 7], [1, 2, 3, 3, 4], [None] * 200, [9] * 70, list(range(80))):
+            raw = filesfixtures.gaf_row(row)
+            self.assertEqual(gaf_pixels(struct.pack("<H", len(raw)) + raw, 0, len(row), 1), [row])
+
+
 class Judge(unittest.TestCase):
     def test_a_loader_that_answers_the_vectors_is_equal(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -190,6 +332,9 @@ FAULTS = {
     "read": ("reading", "reading/loose", "read\t1\t100"),
     "mountall": ("malformed", "malformed/mount", "mount"),
     "tdforder": ("formats", "formats/tdf", "tdf\tgamedata\\sample.tdf"),
+    "cobswap": ("cob", "cob/scripts", "cob\tscripts\\armfix.cob"),
+    "gafshort": ("gaf", "gaf/anims", "gaf\tanims\\fixture.gaf"),
+    "3doparent": ("3do", "3do/model", "3do\tobjects3d\\fixture.3do"),
 }
 
 

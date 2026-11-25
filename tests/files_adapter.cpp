@@ -14,6 +14,12 @@
 #include "../src/files/file_handle.h"
 #include "../src/files/hpi.h"
 #include "../src/graphics/display.h"
+#include "../src/graphics/surface.h"
+#include "../src/graphics/gaf_frame.h"
+#include "../src/graphics/object3do.h"
+#include "../src/graphics/piece_frame.h"
+#include "../src/graphics/pcx.h"
+#include "../src/util/vec3.h"
 #include "../src/harness/replay.h"
 #include "../src/state/sim_globals.h"
 #include "../src/game/cd_check.h"
@@ -137,6 +143,33 @@ StringRef* StringRef::AssignText(const char* text)
     Assign(&copy);
     return this;
 }
+
+void* __stdcall LoadGaf(char* name);
+void __stdcall FreeCobScript(int key);
+extern "C" void __cdecl BlitCompressedLit(unsigned char* pixels, int pitch, void* drect, void* runs, void* srect,
+                                          unsigned char* table);
+
+struct BlitSourceView;
+
+int __stdcall LockScreen(Surface*) { abort(); }
+int __stdcall UnlockScreen(Surface*) { abort(); }
+Rect* Surface::GetClipRect(Rect*) { abort(); }
+void __stdcall ResetClipRect(int*) { abort(); }
+void __stdcall UnlockAllScreens(void) { abort(); }
+void __stdcall FreeSurface(Surface*) { abort(); }
+void __stdcall CopySurfaceRect(Surface*, Surface*, Rect*, Point*) { abort(); }
+PcxBitmap* __stdcall AllocSurface(char*, int, int) { abort(); }
+void __stdcall ReleaseDirectDraw(Display*) { abort(); }
+void HOST_CALL host_window_set_topmost(int) { abort(); }
+void __cdecl BlitRect(Surface*, Surface*, Rect*, Rect*) { abort(); }
+void __cdecl BlitRectKeyed(Surface*, Surface*, Rect*, Rect*, int) { abort(); }
+void __cdecl BlitRectShadow(Surface*, Surface*, Rect*, Rect*, int, unsigned char*) { abort(); }
+void __cdecl BlitRectRemapDest(Surface*, Surface*, Rect*, Rect*, int, unsigned char*) { abort(); }
+void __cdecl BlitRectBlended(Surface*, BlitSourceView*, Rect*, Rect*, int, unsigned char*) { abort(); }
+void __cdecl BlitCompressed(unsigned char*, int, Rect*, void*, Rect*) { abort(); }
+void __cdecl BlitCompressedShadow(unsigned char*, int, Rect*, void*, Rect*, unsigned char*) { abort(); }
+void __cdecl BlitCompressedBlended(unsigned char*, int, Rect*, GafFrame**, Rect*, unsigned char*) { abort(); }
+void __cdecl BlitCompressedLit(unsigned char*, int, Rect*, GafFrame**, Rect*, unsigned char*) { abort(); }
 
 static void Emit(const char* text)
 {
@@ -483,6 +516,257 @@ static void Record(Text& t, TdfRecord* r)
     t.Add("]}");
 }
 
+static void NameOrNull(Text& t, const char* s)
+{
+    if (s)
+        t.Str(s);
+    else
+        t.Null();
+}
+
+static void OpCob(Text& t, const char* name)
+{
+    int* w = (int*)LoadCobScript((char*)name);
+    if (!w) {
+        t.Null();
+        return;
+    }
+    t.Add("{\"version\":");
+    t.Int(w[0]);
+    t.Add(",\"scripts\":[");
+    for (int i = 0; i < w[1]; i++) {
+        int k = Fault("cobswap") && w[1] >= 2 && i < 2 ? 1 - i : i;
+        if (i)
+            t.Char(',');
+        t.Char('[');
+        t.Str(((char**)w[7])[k]);
+        t.Char(',');
+        t.Int(((int*)w[6])[i]);
+        t.Char(']');
+    }
+    t.Add("],\"pieces\":[");
+    for (int i = 0; i < w[2]; i++) {
+        if (i)
+            t.Char(',');
+        t.Str(((char**)w[8])[i]);
+    }
+    t.Add("],\"statics\":");
+    t.Int(w[4]);
+    t.Add(",\"pairs\":[");
+    for (int i = 0; i < w[5]; i++) {
+        if (i)
+            t.Char(',');
+        t.Char('[');
+        t.Int(((int*)w[10])[2 * i]);
+        t.Char(',');
+        t.Int(((int*)w[10])[2 * i + 1] - (int)w);
+        t.Char(']');
+    }
+    t.Add("],\"code\":[");
+    for (int i = 0; i < w[3]; i++) {
+        if (i)
+            t.Char(',');
+        t.Int(((int*)w[9])[i]);
+    }
+    t.Add("]}");
+    FreeCobScript((int)w);
+}
+
+static bool s_shortened;
+
+static void Pixels(Text& t, GafFrame* f)
+{
+    int w = f->width, h = f->height;
+    std::vector<int> px(w * h);
+    if (f->compressed) {
+        static unsigned char identity[256];
+        for (int i = 0; i < 256; i++)
+            identity[i] = (unsigned char)i;
+        std::vector<unsigned char> low(w * h + 1, 0x00), high(w * h + 1, 0xff);
+        Rect r = {0, 0, w - 1, h - 1};
+        BlitCompressedLit(&low[0], w, &r, f->pixelsOrLayers, &r, identity);
+        BlitCompressedLit(&high[0], w, &r, f->pixelsOrLayers, &r, identity);
+        for (int i = 0; i < w * h; i++)
+            px[i] = low[i] == high[i] ? low[i] : -1;
+        if (Fault("gafshort") && !s_shortened) {
+            int i = 0;
+            while (i < w * h && px[i] < 0)
+                i++;
+            while (i + 1 < w * h && px[i + 1] >= 0 && (i + 1) % w)
+                i++;
+            if (i < w * h) {
+                px[i] = -1;
+                s_shortened = true;
+            }
+        }
+    } else {
+        for (int i = 0; i < w * h; i++)
+            px[i] = f->pixelsOrLayers[i];
+    }
+    t.Char('[');
+    for (int y = 0; y < h; y++) {
+        if (y)
+            t.Char(',');
+        t.Char('[');
+        for (int x = 0; x < w; x++) {
+            if (x)
+                t.Char(',');
+            if (px[y * w + x] < 0)
+                t.Null();
+            else
+                t.Int(px[y * w + x]);
+        }
+        t.Char(']');
+    }
+    t.Char(']');
+}
+
+static bool Frame(Text& t, GafFrame* f, int duration, bool top)
+{
+    t.Add("{\"width\":");
+    t.Int(f->width);
+    t.Add(",\"height\":");
+    t.Int(f->height);
+    t.Add(",\"x\":");
+    t.Int(f->xOffset);
+    t.Add(",\"y\":");
+    t.Int(f->yOffset);
+    t.Add(",\"transparent\":");
+    t.Int(f->transparency);
+    t.Add(",\"compressed\":");
+    t.Int(f->compressed);
+    t.Add(",\"blend\":");
+    t.Int(f->blend);
+    if (top) {
+        t.Add(",\"duration\":");
+        t.Int(duration);
+    }
+    if (f->layers > 0) {
+        if (!top)
+            return false;
+        t.Add(",\"frames\":[");
+        for (int i = 0; i < f->layers; i++) {
+            if (i)
+                t.Char(',');
+            if (!Frame(t, ((GafFrame**)f->pixelsOrLayers)[i], 0, false))
+                return false;
+        }
+        t.Char(']');
+    } else {
+        t.Add(",\"pixels\":");
+        Pixels(t, f);
+    }
+    t.Char('}');
+    return true;
+}
+
+static bool OpGaf(Text& t, const char* name)
+{
+    int* base = (int*)LoadGaf((char*)name);
+    if (!base) {
+        t.Null();
+        return true;
+    }
+    bool ok = true;
+    t.Char('[');
+    for (int i = 0; i < (short)base[1] && ok; i++) {
+        unsigned char* e = (unsigned char*)base[3 + i];
+        if (i)
+            t.Char(',');
+        t.Add("{\"name\":");
+        t.Str((const char*)e + 8);
+        t.Add(",\"loop\":");
+        t.Int(e[2]);
+        t.Add(",\"frames\":[");
+        for (int j = 0; j < *(unsigned short*)e && ok; j++) {
+            if (j)
+                t.Char(',');
+            ok = Frame(t, *(GafFrame**)(e + 0x28 + 8 * j), *(unsigned short*)(e + 0x2c + 8 * j), true);
+        }
+        t.Add("]}");
+    }
+    t.Char(']');
+    free(base);
+    return ok;
+}
+
+static void Pieces(Text& t, Object3do* p);
+
+static void Piece(Text& t, Object3do* p)
+{
+    t.Add("{\"name\":");
+    NameOrNull(t, p->name);
+    t.Add(",\"offset\":[");
+    t.Int(p->box_x);
+    t.Char(',');
+    t.Int(p->box_y);
+    t.Char(',');
+    t.Int(p->box_z);
+    t.Add("],\"vertices\":[");
+    for (int i = 0; i < p->vertexCount; i++) {
+        if (i)
+            t.Char(',');
+        t.Char('[');
+        t.Int(p->vertices[i].x);
+        t.Char(',');
+        t.Int(p->vertices[i].y);
+        t.Char(',');
+        t.Int(p->vertices[i].z);
+        t.Char(']');
+    }
+    t.Add("],\"selection\":");
+    t.Int(p->firstFace);
+    t.Add(",\"primitives\":[");
+    for (int i = 0; i < p->faceCount; i++) {
+        PieceFrame* f = &p->faces[i];
+        if (i)
+            t.Char(',');
+        t.Add("{\"colour\":");
+        t.Int(*(int*)f);
+        t.Add(",\"vertices\":[");
+        for (int k = 0; k < f->count; k++) {
+            if (k)
+                t.Char(',');
+            t.Int(f->indices[k]);
+        }
+        t.Add("],\"texture\":");
+        NameOrNull(t, (const char*)f->ptr_10);
+        t.Char('}');
+    }
+    t.Add("],\"children\":");
+    Pieces(t, p->child);
+    t.Char('}');
+}
+
+static void Pieces(Text& t, Object3do* p)
+{
+    t.Char('[');
+    for (bool first = true; p; p = p->sibling, first = false) {
+        if (!first)
+            t.Char(',');
+        Piece(t, p);
+    }
+    t.Char(']');
+}
+
+static void Op3do(Text& t, const char* name)
+{
+    Object3do* root = (Object3do*)Load3do((char*)name);
+    if (!root) {
+        t.Null();
+        return;
+    }
+    Object3do* a = root->child;
+    if (Fault("3doparent") && a && a->child) {
+        Object3do* b = a->child;
+        a->child = b->sibling;
+        b->sibling = a->sibling;
+        a->sibling = b;
+    }
+    Pieces(t, root);
+    free(root);
+}
+
 static int Run(const char* op, char** a, int n)
 {
     Text t;
@@ -586,6 +870,13 @@ static int Run(const char* op, char** a, int n)
         else
             t.Null();
         file.Unload();
+    } else if (strcmp(op, "cob") == 0 && n >= 1) {
+        OpCob(t, a[0]);
+    } else if (strcmp(op, "gaf") == 0 && n >= 1) {
+        if (!OpGaf(t, a[0]))
+            return 0;
+    } else if (strcmp(op, "3do") == 0 && n >= 1) {
+        Op3do(t, a[0]);
     } else {
         return 0;
     }

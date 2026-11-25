@@ -4,6 +4,7 @@
 #include "display_game.h"
 #include "display_log.h"
 #include "harness.h"
+#include "../../interfaces/host.h"
 #include "../game/game.h"
 #include "../network/player.h"
 #include "../network/player_info.h"
@@ -815,5 +816,8 @@ void DisplayLogFrameEnd(Display* d)
         return;
     }
     PictureOf(d->cursorSprite, &cursor);
-    HarnessDisplayFrame(palette, &cursor, d->mouseEvent.x, d->mouseEvent.y);
+    int x = 0;
+    int y = 0;
+    host_cursor_get(&x, &y);
+    HarnessDisplayFrame(palette, &cursor, x, y);
 }

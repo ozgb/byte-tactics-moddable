@@ -24,6 +24,22 @@ struct DisplayLogScope {
     ~DisplayLogScope() { DlLeave(); }
 };
 
+struct DisplayLogMute {
+    explicit DisplayLogMute(int on) : on_(on)
+    {
+        if (on_ != 0)
+            DlEnter();
+    }
+    ~DisplayLogMute()
+    {
+        if (on_ != 0)
+            DlLeave();
+    }
+    DisplayLogMute(const DisplayLogMute&) = delete;
+    DisplayLogMute& operator=(const DisplayLogMute&) = delete;
+    int on_;
+};
+
 enum DisplaySpriteKind {
     DISPLAY_SPRITE,
     DISPLAY_SPRITE_OPAQUE,

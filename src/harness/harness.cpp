@@ -130,6 +130,7 @@ static const char* const s_recordPhaseNames[9] = { "net", "units", "projectiles"
                                                    "wind", "meteors", "sharing" };
 static int s_recordPhase = -1;
 static const char* s_eventPhases[SIM_EVENT_CAPACITY];
+static unsigned char s_eventOtherThread[SIM_EVENT_CAPACITY];
 static FILE* s_ui = nullptr;
 static char s_uiBuffer[4096];
 static int s_uiMute = 0;
@@ -4423,6 +4424,12 @@ void __stdcall HarnessSimEventSlot(unsigned slot)
         s_eventPhases[slot % SIM_EVENT_CAPACITY] = s_recordPhaseNames[s_recordPhase];
     else
         s_eventPhases[slot % SIM_EVENT_CAPACITY] = g_game->ticks == 0 ? "load" : "outside";
+    s_eventOtherThread[slot % SIM_EVENT_CAPACITY] = (unsigned char)DlOnOtherThread();
+}
+
+int HarnessSimEventOtherThread(unsigned slot)
+{
+    return s_eventOtherThread[slot % SIM_EVENT_CAPACITY];
 }
 
 const char* HarnessSimEventPhase(unsigned slot)

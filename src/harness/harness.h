@@ -23,6 +23,7 @@ void __stdcall HarnessSharePacket(const void* packet, int size);
 bool HarnessEventLogOpen();
 void __stdcall HarnessSimEventSlot(unsigned slot);
 const char* HarnessSimEventPhase(unsigned slot);
+int HarnessSimEventOtherThread(unsigned slot);
 void HarnessEventText(const char* text);
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, const Unit* target, const int* pos, int typeId, int amount);

@@ -23,6 +23,7 @@ struct DlPicture {
 
 int DlWants();
 int DlIsOn();
+int DlOnOtherThread();
 void DlEnter();
 void DlLockRegistries();
 void DlUnlockRegistries();

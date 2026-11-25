@@ -54,6 +54,11 @@ int DlIsOn()
     return g_dlOn;
 }
 
+int DlOnOtherThread()
+{
+    return g_dlOn != 0 && !OnOwner();
+}
+
 void DlEnter()
 {
     if (g_dlOn != 0 && OnOwner())

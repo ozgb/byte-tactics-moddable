@@ -1094,6 +1094,13 @@ class Polymorphic(unittest.TestCase):
             ann["objects"]["FixtureTwin"].update(change)
             self.assertTrue(any("FixtureTwin: `vtable_secondary` is a list of the base classes" in e for e in self.errors(ann)), (change, self.errors(ann)))
 
+    def test_a_second_vtable_list_fits_the_array_of_replay_store_vtables(self):
+        ann = annotations()
+        ann["objects"]["FixtureTwin"]["vtable_secondary"] = ["FixtureScanBase", "B1", "B2", "B3", "B4"]
+        self.assertIn("FixtureTwin: `vtable_secondary` lists 5 bases, more than the 4 that ReplayStoreVtables stores", self.errors(ann))
+        source = (rs.ROOT / "src/harness/replay_objects.cpp").read_text()
+        self.assertIn("ReplayExtraVtable extra[%d];" % rs.MAX_SECONDARY_VTABLES, source)
+
     def test_a_vtable_symbol_is_the_mangled_vtable_of_the_type_and_its_global_is_its_own(self):
         for change, message in (({"vtable_symbol": "g_goal"}, "FixtureGoalA: `vtable_symbol` is the mangled name"),
                                 ({"vtable_symbol": "??_7FixtureGoalB@@6B@"}, "FixtureGoalA: `vtable_symbol` ??_7FixtureGoalB@@6B@ is not the vtable of the type FixtureGoalA"),

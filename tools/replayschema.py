@@ -522,6 +522,7 @@ def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
 VTABLE_NAME = re.compile(r"^[A-Za-z_]\w*$")
 VTABLE_SYMBOL = re.compile(r"^\?\?_7[A-Za-z_]\w*@@6B(?:[A-Za-z_]\w*@@)?@$")
 BASE_NAME = re.compile(r"^[A-Za-z_]\w*$")
+MAX_SECONDARY_VTABLES = 4
 
 
 def has_vtable(spec: dict) -> bool:
@@ -574,6 +575,8 @@ def check_polymorphic(ann: dict) -> list[str]:
         if secondary is not None and ("vtable_symbol" not in spec or not isinstance(secondary, list) or not secondary
                                       or not all(isinstance(b, str) and BASE_NAME.match(b) for b in secondary) or len(set(secondary)) != len(secondary)):
             errors.append("%s: `vtable_secondary` is a list of the base classes that hold a vtable of their own, on a kind with a `vtable_symbol`" % name)
+        elif secondary is not None and len(secondary) > MAX_SECONDARY_VTABLES:
+            errors.append("%s: `vtable_secondary` lists %d bases, more than the %d that ReplayStoreVtables stores" % (name, len(secondary), MAX_SECONDARY_VTABLES))
         if vtable_name(spec) in seen:
             errors.append("%s: the vtable %s is also the vtable of %s" % (name, vtable_name(spec), seen[vtable_name(spec)]))
         else:

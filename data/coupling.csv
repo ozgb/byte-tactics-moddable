@@ -1696,7 +1696,7 @@ harness,game,call,ReplayGateRef,6
 harness,game,call,SaveGameFile,1
 harness,game,call,SchedRoutes,1
 harness,game,call,SimBlockAttach,1
-harness,game,call,SimBlockBase,26
+harness,game,call,SimBlockBase,27
 harness,game,call,SimBlockForEach,1
 harness,game,call,SimBlockNew,1
 harness,game,call,SimBlockSize,1

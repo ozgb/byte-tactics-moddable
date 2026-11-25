@@ -18,6 +18,12 @@ records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--tier` restricts `--check` to the
 scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier checks that they cover enough).
 
+`--check --end-of-tick` judges each scenario on the `state` column of the digest files alone, the hash of the `tick` row (the whole
+judged state at the end of the tick), not on the digest of all the rows of the tick. It is the verdict for a re-implementation that keeps the
+end-of-tick contract with its own order inside the tick (#1037). Each scenario's line then ends with ` [digest differs from tick T]` when its
+digest column differs, which does not fail it, and `K of M scenarios equal on every row` follows the total.
+The sim event digests (`bt-event-digest 2`) are then compared on their `tick` lines alone, and the first differing record is named under the same rule (tools/tracediff.py `--events --end-of-tick`).
+
 `--check --both-modes` plays every scenario once in WASM and once with `-modules=native` in one pool (each line names its
 mode, the sound logs and block pointer scans are kept apart per mode) and passes only when both modes equal the stored traces.
 An exe with accesslog.attr beside it (an access-log build, tools/accesslog.py) is played without the block pointer scan, and
@@ -168,7 +174,7 @@ KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "ref
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
              "tools/blockpointers.py", "tools/eventdigest.py", "tools/tracerehash.py")
-KEY_DATA = ("data/block_pointers.csv",)
+KEY_DATA = ("data/block_pointers.csv", "docs/sim-events.md")
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
 WATCH_SECONDS = 0.5
@@ -281,11 +287,15 @@ def scenario_frames(scenario: Path) -> list[int]:
     return []
 
 
-def difference(want: tuple[dict[str, str], list[tuple[int, str]]], header: dict[str, str],
-               digests: list[tuple[int, str]]) -> str | None:
-    """Why a run differs from the stored (header, digests), or None when it equals them."""
+DIGEST = 1
+STATE = 2
+
+
+def difference(want: tuple[dict[str, str], list[tuple[int, str, str]]], header: dict[str, str],
+               digests: list[tuple[int, str, str]], column: int = DIGEST) -> str | None:
+    """Why a run differs from the stored (header, digests) in `column` (DIGEST or STATE), or None when it equals them."""
     want_header, want_digests = want
-    diff = first_difference(want_digests, digests)
+    diff = first_difference(want_digests, digests, column)
     seeds = [k for k in ("game_seed", "crt_seed", "view_seed") if want_header.get(k) != header[k]]
     if seeds:
         diff = diff or "the scenario's seeds differ from the stored trace: " + ", ".join(seeds)
@@ -775,8 +785,10 @@ class Found:
 class Watch:
     """Compares each running scenario's trace.txt, as it grows, with the stored digests, and stops every run at the first difference."""
 
-    def __init__(self, expected: dict[str, tuple], locate: Callable[[int, float], Path | None] | None = None):
+    def __init__(self, expected: dict[str, tuple], locate: Callable[[int, float], Path | None] | None = None,
+                 column: int = DIGEST):
         self.expected = expected
+        self.column = column
         self.locate = locate or game_trace
         self.lock = threading.Lock()
         self.halted = threading.Event()
@@ -820,10 +832,11 @@ class Watch:
         for got in run.tail.feed(data):
             index = run.seen
             run.seen += 1
-            if want[index:index + 1] != [got]:
-                diff = first_difference(want[index:index + 1], [got])
+            diff = first_difference(want[index:index + 1], [got], self.column)
+            if diff:
                 self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name),
-                          trace=run.path, digest=(*want[index], got[1]) if index < len(want) else None)
+                          trace=run.path,
+                          digest=(want[index][0], want[index][self.column], got[self.column]) if index < len(want) else None)
                 return
 
     def halt(self, name: str, diff: str, ticks: int, elapsed: float, kept: Path | None, early: bool = False,
@@ -854,13 +867,13 @@ class Watch:
         timer.start()
 
 
-def recheck(found: Found) -> str | None:
-    """After a halt, what the kept trace.txt holds at the tick that the watch found different: a line to print, or None when the file agrees with the watch."""
+def recheck(found: Found, column: int = DIGEST) -> str | None:
+    """After a halt, what the kept trace.txt holds at the tick that the watch found different in `column`: a line to print, or None when the file agrees with the watch."""
     if found.early or not found.kept or not found.stored:
         return None
     try:
         data = (found.kept / "trace.txt").read_bytes()
-        done = dict(tracedigest.TraceTail().feed(data))
+        done = {row[0]: row[column] for row in tracedigest.TraceTail().feed(data)}
     except (OSError, tracedigest.Error):
         return f"recheck: cannot read {found.kept.name}/trace.txt"
     if found.tick not in done:
@@ -877,11 +890,11 @@ def scenario_saves(scenario: Path) -> bool:
 
 
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
-                  want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
+                  want: tuple[dict[str, str], list[tuple[int, str, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
                   scan_every: int = 1, retry_any: bool = False, save_to: Path | None = None,
                   load_from: Path | None = None, watch: "Watch | None" = None,
-                  mode: str | None = None) -> tuple[dict[str, str], list[tuple[int, str]], float, Path | None]:
+                  mode: str | None = None, column: int = DIGEST) -> tuple[dict[str, str], list[tuple[int, str, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
@@ -903,6 +916,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
 
     With `watch`, the run's process is registered there (see Watch), and a run that differs at its end halts the watch.
+    `column` (DIGEST or STATE) is the column of the digests that decides whether the run differs.
 
     With `mode` ("wasm" or "native"), the run's modules run in that mode whatever BT_NATIVE_MODULES says, and its
     sound log, frames, save, scan and fuel are stored under tag(scenario, mode).
@@ -972,7 +986,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         if scans is not None:
             scanned = run / "blockptrs.txt"
             scans[key] = scanned.read_text() if scanned.is_file() else None
-        diff = difference(want, header, digests) if want is not None else None
+        diff = difference(want, header, digests, column) if want is not None else None
         if keep_always or diff:
             kept = keep_run(run, scenario.stem, ("-alloff" if keep_always else "") + (f"-{mode}" if mode else ""))
         if watch is not None and diff:
@@ -1002,7 +1016,8 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
              expected: dict[str, tuple] | None = None, poison: bool = False,
              failed: dict[str, str] | None = None, keep_always: bool = False,
              scans: dict[str, str | None] | None = None, scan_every: int = 1,
-             retry_any: bool = False, watch: Watch | None = None, modes: tuple[str | None, ...] = (None,)) -> dict[str, tuple]:
+             retry_any: bool = False, watch: Watch | None = None, modes: tuple[str | None, ...] = (None,),
+             column: int = DIGEST) -> dict[str, tuple]:
     """Every scenario's play_scenario result, `parallel` at a time and longest first; exits 1 if one fails to run.
 
     With `modes` of more than the default (None), each scenario is played once per mode in the same pool, and the
@@ -1017,6 +1032,7 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     names them by its pid; a test-mode run is headless, with no X display or audio sink), so runs share nothing but the template prefix,
     which they only hardlink. With `expected`, a scenario that differs keeps its trace (see play_scenario).
     With `watch`, scenarios not yet started are skipped once the watch halts, and the runs it stopped are not failures.
+    `column` is passed on to play_scenario.
 
     The longest scenarios start first; a scenario with a `load` line starts as soon as the scenario it names has finished
     (ahead of the scenarios not yet started), in its mode and with any `parallel`: the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
@@ -1061,7 +1077,8 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
                                              save_to=saves / key if key in loads.values() else None,
                                              load_from=saves / saver if saver else None,
                                              **({"watch": watch} if watch is not None else {}),
-                                             **({"mode": mode} if mode is not None else {}))
+                                             **({"mode": mode} if mode is not None else {}),
+                                             **({"column": column} if column != DIGEST else {}))
         except (tracediff.Error, OSError) as e:
             if watch is not None and watch.halted.is_set():
                 return
@@ -1193,15 +1210,31 @@ def with_roundtrip(scenarios: dict[str, Path], spec: str, directory: Path) -> di
     return copies
 
 
-def first_difference(stored: list[tuple[int, str]], got: list[tuple[int, str]]) -> str | None:
-    """A description of the first tick at which the digests differ, or None."""
+def first_difference(stored: list[tuple[int, str, str]], got: list[tuple[int, str, str]], column: int = DIGEST) -> str | None:
+    """A description of the first tick at which `column` (DIGEST or STATE) differs, or None."""
     for a, b in zip(stored, got):
-        if a != b:
-            return f"tick {a[0]}: stored {a[1]}, got {b[1]}"
+        if (a[0], a[column]) != (b[0], b[column]):
+            return f"tick {a[0]}: stored {a[column]}, got {b[column]}"
     if len(stored) != len(got):
         longer, which = (stored, "stored") if len(stored) > len(got) else (got, "got")
         return f"tick {longer[min(len(stored), len(got))][0]}: only the {which} trace has it"
     return None
+
+
+def digest_note(stored: list[tuple[int, str, str]], got: list[tuple[int, str, str]]) -> str:
+    """` [digest differs from tick T]` for the first tick at which the digest column differs (or the traces' lengths), else the empty string."""
+    for a, b in zip(stored, got):
+        if (a[0], a[DIGEST]) != (b[0], b[DIGEST]):
+            return f" [digest differs from tick {a[0]}]"
+    if len(stored) != len(got):
+        longer = stored if len(stored) > len(got) else got
+        return f" [digest differs from tick {longer[min(len(stored), len(got))][0]}]"
+    return ""
+
+
+def every_row_line(equal: int, total: int) -> str:
+    """The line that follows the total of an --end-of-tick check: how many scenarios have their digest column equal as well."""
+    return f"{equal} of {total} scenarios equal on every row"
 
 
 def sound_difference(stored: str, got: str) -> str | None:
@@ -1249,10 +1282,11 @@ def event_digest(log: Path) -> str | None:
         return f"unreadable: {e}\n"
 
 
-def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path) -> tuple[list[str], list[str]]:
+def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
+                  end_of_tick: bool = False) -> tuple[list[str], list[str]]:
     """(the scenarios whose sim event digest differs from reference/events/, the report lines): stored digests missing are only counted.
 
-    `logs` hold each run's digest text (eventdigest.digest_text)."""
+    `logs` hold each run's digest text (eventdigest.digest_text). With `end_of_tick` the digests are compared on their `tick` lines alone."""
     differing: list[str] = []
     lines: list[str] = []
     unstored: list[str] = []
@@ -1263,7 +1297,7 @@ def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], direc
             unstored.append(name)
             continue
         got = logs.get(name)
-        diff = eventdigest.digest_difference(stored.read_text(), got) if got is not None else f"the run wrote no {EVENTS_FILE}"
+        diff = eventdigest.digest_difference(stored.read_text(), got, end_of_tick) if got is not None else f"the run wrote no {EVENTS_FILE}"
         if diff:
             differing.append(name)
             lines.append(f"DIFF {name} {diff}")
@@ -1420,8 +1454,10 @@ def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], dire
 
 def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
-                 save_blockptrs: Path | None = None, roundtrip: str | None = None, both_modes: bool = False) -> None:
+                 save_blockptrs: Path | None = None, roundtrip: str | None = None, both_modes: bool = False,
+                 end_of_tick: bool = False) -> None:
     scenarios = scenario_files()
+    column = STATE if end_of_tick else DIGEST
     modes = default_modes(both_modes)
     stored = {p.stem: p for p in sorted(TRACES.glob("*.txt"))} if TRACES.is_dir() else {}
     if tier:
@@ -1455,7 +1491,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     failed: dict[str, str] = {}
     instrumented = (exe.parent / "accesslog.attr").is_file()
     scans: dict[str, str | None] | None = {} if quirks is None and not instrumented else None
-    watch = Watch(expected) if quirks is None else None
+    watch = Watch(expected, column=column) if quirks is None else None
     watching = threading.Event()
 
     def monitor() -> None:
@@ -1469,7 +1505,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     try:
         results = play_all(exe, played, game_dir, parallel, expected, poison, failed if quirks is not None else None,
                            scans=scans, scan_every=GATE_SCAN_EVERY, **({"watch": watch} if watch is not None else {}),
-                           **({"modes": modes} if both_modes else {}))
+                           **({"modes": modes} if both_modes else {}),
+                           **({"column": column} if column != DIGEST else {}))
         if quirks is not None:
             differing = [n for n in scenarios if n in results and n not in failed and difference(expected[n], *results[n][:2])]
             if differing:
@@ -1483,7 +1520,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
         trace = f" [trace: {shown(found.trace)}]" if found.trace else ""
         print(found.diff if found.early else f"DIFF {found.name} ({found.ticks} ticks, {clock(found.elapsed)}) {found.diff}{trace}{where}")
-        note = recheck(found)
+        note = recheck(found, column)
         if note:
             print(note)
         print(f"stopped: {len(scenarios) * len(modes) - len(results)} scenarios not finished")
@@ -1492,24 +1529,29 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             sys.exit(1)
         if mode_of(found.name) == "native":
             os.environ["BT_NATIVE_MODULES"] = "1"
-        report_divergence(untag(found.name), expected, exe, scenarios, poison, game_dir)
+        report_divergence(untag(found.name), expected, exe, scenarios, poison, game_dir, end_of_tick)
     if quirks is not None:
         report_quirks(scenarios, expected, results, failed, quirks, wall, off_results, off_failed)
         return
     bad: list[str] = []
+    every_row = 0
     for mode in modes:
         for name in scenarios:
             key = tag(name, mode)
             header, digests, elapsed, kept = results[key]
-            diff = difference(expected[name], header, digests)
+            diff = difference(expected[name], header, digests, column)
+            note = digest_note(expected[name][1], digests) if end_of_tick else ""
+            every_row += end_of_tick and not note
             where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
             logged = SOUND_LOGS.get(key)
             sounds = f", {max(len(logged.splitlines()) - 1, 0)} sound lines" if logged is not None else ""
-            print(f"{'DIFF' if diff else 'ok':4} {key} ({len(digests)} ticks, {clock(elapsed)}{sounds})" + (f" {diff}{where}" if diff else ""))
+            print(f"{'DIFF' if diff else 'ok':4} {key} ({len(digests)} ticks, {clock(elapsed)}{sounds})" + (f" {diff}{where}" if diff else "") + note)
             if diff:
                 bad.append(key)
     total = len(scenarios) * len(modes)
     print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
+    if end_of_tick:
+        print(every_row_line(every_row, total))
     sound_bad = ui_bad = events_bad = frame_bad = save_bad = 0
     pointers = 0
     first_events: tuple[str, str] | None = None
@@ -1519,7 +1561,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print("\n".join(label + line for line in sound_lines))
         ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
         print("\n".join(label + line for line in ui_lines))
-        events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS)
+        events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS, end_of_tick)
         print("\n".join(label + line for line in events_lines))
         frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
         print("\n".join(label + line for line in frame_lines))
@@ -1539,7 +1581,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
     if not bad:
         if first_events is not None:
-            report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir)
+            report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
         if pointers or sound_bad or ui_bad or events_bad or frame_bad or save_bad:
             sys.exit(1)
         if tier:
@@ -1548,24 +1590,24 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
 
     if mode_of(bad[0]) == "native":
         os.environ["BT_NATIVE_MODULES"] = "1"
-    report_divergence(untag(bad[0]), expected, exe, scenarios, poison, game_dir)
+    report_divergence(untag(bad[0]), expected, exe, scenarios, poison, game_dir, end_of_tick)
 
 
 def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path], poison: bool,
-                      game_dir: str | None) -> None:
-    """Run tracediff on the scenario `name` against the reference build of its stored trace, then exit 1."""
+                      game_dir: str | None, end_of_tick: bool = False) -> None:
+    """Run tracediff on the scenario `name` against the reference build of its stored trace (on the `tick` rows alone with `end_of_tick`), then exit 1."""
     sha = expected[name][0].get("commit", "unknown")
     print(f"\ntracediff for {name}: a = the reference at {sha}, b = {exe}", flush=True)
     if resolve_quiet(sha) is None:
         fail(f"{name}: the trace's commit {sha} is not in this repository")
     ref_dir = build_cached(sha)
-    subprocess.run(tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir))
+    subprocess.run(tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir, end_of_tick))
     sys.exit(1)
 
 
 def report_event_records(name: str, mode: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path],
-                         poison: bool, game_dir: str | None) -> None:
-    """Play the reference build of the scenario's stored trace and the exe on `name`, and print the first record of their event logs that differs."""
+                         poison: bool, game_dir: str | None, end_of_tick: bool = False) -> None:
+    """Play the reference build of the scenario's stored trace and the exe on `name`, and print the first record of their event logs that differs (under the end-of-tick rule of docs/events-log.md with `end_of_tick`)."""
     sha = expected[name][0].get("commit", "unknown")
     print(f"\nevent records for {name}: a = the reference at {sha}, b = {exe} ({mode})", flush=True)
     if resolve_quiet(sha) is None:
@@ -1573,7 +1615,7 @@ def report_event_records(name: str, mode: str, expected: dict[str, tuple], exe: 
     ref_dir = build_cached(sha)
     if mode == "native":
         os.environ["BT_NATIVE_MODULES"] = "1"
-    cmd = tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir) + ["--events"]
+    cmd = tracediff_command(ref_dir / "TotalA.exe", exe, scenarios[name], poison, game_dir, end_of_tick) + ["--events"]
     subprocess.run(cmd)
 
 
@@ -1611,9 +1653,12 @@ def report_block_pointers(exe: Path, scans: dict[str, str | None], save: Path | 
     return len(problems)
 
 
-def tracediff_command(ref_exe: Path, exe: Path, scenario: Path, poison: bool, game_dir: str | None) -> list[str]:
+def tracediff_command(ref_exe: Path, exe: Path, scenario: Path, poison: bool, game_dir: str | None,
+                      end_of_tick: bool = False) -> list[str]:
     cmd = [sys.executable, str(ROOT / "tools/tracediff.py"), str(ref_exe), str(exe),
            "--scenario", str(scenario), "--reference", "a"]
+    if end_of_tick:
+        cmd.append("--end-of-tick")
     if poison:
         cmd.append("--poison-b")
     if game_dir:
@@ -1830,6 +1875,8 @@ def main() -> None:
                     help="--check: play every scenario with `quirks SPEC` added and report which equal the stored traces and which differ, with the first tick and phase (a differing scenario is rerun with all flags off; a difference is not a failure; no reference build); not the gate")
     ap.add_argument("--roundtrip", metavar="T[,T...]|auto",
                     help="--check: play every scenario with a `roundtrip T` line per tick, which copies the sim block at the end of tick T, moves it to another base (or scrambles and restores it in place when the modules run in WASM) and continues; the traces must still equal the stored ones; `auto` picks early, middle and last tick minus one from each scenario's ticks")
+    ap.add_argument("--end-of-tick", action="store_true",
+                    help="--check: judge each scenario on the end-of-tick state alone (the `tick` row), and report the digest of all the rows without failing on it; the verdict for a re-implementation that keeps the end-of-tick contract with its own order inside the tick (#1037)")
     ap.add_argument("--exe", metavar="PATH", help="--check: the exe to check (build/modern/TotalA.exe)")
     ap.add_argument("--save-blockptrs", metavar="DIR", type=Path,
                     help="--check: write each scenario's blockptrs.txt to DIR/<scenario>.txt (input of blockpointers.py --from)")
@@ -1877,6 +1924,10 @@ def main() -> None:
         ap.error("--roundtrip cannot be combined with --quirks, --poison or --save-blockptrs")
     if args.roundtrip is not None:
         roundtrip_ticks(args.roundtrip, 100)
+    if args.end_of_tick and not args.check:
+        ap.error("--end-of-tick needs --check; it cannot be used with --traces")
+    if args.end_of_tick and args.quirks is not None:
+        ap.error("--end-of-tick cannot be combined with --quirks")
     if args.exe and not args.check:
         ap.error("--exe needs --check")
     if args.traces:
@@ -1891,7 +1942,7 @@ def main() -> None:
     if not args.no_cache and not args.save_blockptrs:
         key = gate_key(exe, {"tier": args.tier, "mode": "both" if args.both_modes else "native" if args.native_modules else "wasm",
                              "steps_per_frame": args.steps_per_frame, "quirks": args.quirks, "roundtrip": args.roundtrip,
-                             "poison": args.poison}, ROOT)
+                             "poison": args.poison, "end_of_tick": args.end_of_tick}, ROOT)
         stored = cached_pass(key)
         if stored is not None:
             report_cached(stored)
@@ -1908,7 +1959,7 @@ def main() -> None:
         sys.stdout = tee
         try:
             check_traces(exe, args.game_dir, args.parallel, args.tier, args.poison, args.steps_per_frame,
-                         args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes)
+                         args.quirks, args.save_blockptrs, args.roundtrip, args.both_modes, args.end_of_tick)
         finally:
             sys.stdout = tee.stream
         if key is not None:

@@ -6,6 +6,7 @@ The sim events are how the game logic tells the presentation what happened in a 
 
 - **Phases.** A tick runs the phases `net` (0, network packets), `units` (1), `projectiles` (2), `explosions` (3), `players` (4), `features` (5), `wind` (6) and `meteors` (7), in this order, and then the resource sharing of network play (8) at the end of the step. Two more labels are used: `match load` (the code that builds the match state) and `outside the steps` (code that records the event and that no phase and no match load reaches in the call graph: console commands, interface actions, match shutdown, and code nothing calls).
 - **"Can be emitted in".** The `Phases:` line of a kind lists the phases from which a path of calls reaches a record of that kind. It means a path exists in the static call graph of the game logic, not that a scenario has shown it. The event log of the reference scenarios will show which kinds the scenarios reach. A tool checks each `Phases:` line against the call graph.
+- **Order.** The `Order:` line of a kind says whether the place of its records among the other records of a tick counts, that is, whether the presentation's result differs when two of them swap places. It is one of three forms. ``Order: `a`, `b`: reason.`` lists the kinds whose order against this kind counts, the kind's own name among them when the order of its own records counts. `Order: same: reason.` means the order of the kind's own records counts and nothing else. `Order: none: reason.` means no order counts. `every` in place of the list would mean the order against every kind counts; no kind needs it. The order against a kind counts when either kind's line names the other. A kind that is ordered against another kind is also ordered against itself, and its line names itself: the digest of `docs/events-log.md` keeps the order of the records of a kind in every projection that holds the kind, so it cannot keep the order against others and leave the order of the kind's own records out. The reason names what the presentation does with the kind: a draw from the view random stream, a line in the message log, a sound buffer, the speech queue, a particle list, the selection, the focus unit, the stack of screens or the radar picture. Where the order is in doubt, it counts. `docs/events-log.md` says how the digest of an event log uses these lines.
 - **Units** are referred to by their index in the unit table of the state block, never by address. A unit index in an argument is only meaningful while that unit exists; the presentation checks whether it is still alive.
 - **Players** are referred to by their index (0 to 9 for the ten player slots). The value 10 means no player. Where a kind says network id, the argument is the player's network identifier, not a slot.
 - **Positions** are three consecutive arguments, x, y and z, each a signed 32-bit value stored in an unsigned argument, in the same fixed-point world coordinates as unit positions in the state block (16 fractional bits; y is height). Where a kind lists a position as "(3)", it takes three arguments.
@@ -74,6 +75,8 @@ Value 0. Marks an empty record. It is never recorded and has no arguments, no fl
 
 Phases: none.
 
+Order: none: it is never recorded.
+
 ### SIM_EVENT_UNIT_SPEECH
 
 Value 1.
@@ -108,6 +111,8 @@ No call site records slot 0 or slot 1 (select, which the interface handles).
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_took_lead`, `player_left`, `smoke`, `white_smoke`, `black_smoke`, `remove_unit_speech`, `message`: a full speech queue (8 lines) plays and drops its last line, which draws from the view random stream and puts a line in the message log, the queue keeps one line per kind in priority order, and the removal of a unit's lines changes what it holds.
+
 The presentation says the line only for a unit of the local player, and drops it when the unit has died by then or, with flag bit 0, is on screen. The line enters a queue that keeps one line per kind, ordered by priority.
 
 ### SIM_EVENT_SOUND
@@ -124,6 +129,8 @@ Flags: none.
 Recorded when a victory condition of the mission is first satisfied, once for each condition (sound name 0). The conditions are: the enemy commander is killed, all enemy units are destroyed, all mobile enemy units are killed, a unit of the given type is built, a unit of the given type is captured, all units of a type are killed, a unit of a type is killed, a unit reaches a radius, a unit of a type passes a given x, a unit of a type passes a given z.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `sound`, `forces_destroyed`, `player_left`, `build_queue_sound`, `sound_at`, `sound_at_name`: each sound takes one of the 8 sound buffers and a ninth stops the oldest, and the announcements of `forces_destroyed` and `player_left` play a sound too.
 
 The presentation plays the sound by name.
 
@@ -151,6 +158,8 @@ There is no air resurrect. The flow runs from the origin to the box.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
+
 The presentation draws a beam of particles flowing from the origin to the box.
 
 ### SIM_EVENT_REVERSE_NANO_PARTICLES
@@ -173,6 +182,8 @@ Recorded by these orders. The origin is the nanolathe point of the builder. For 
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
+
 The presentation draws a beam of particles flowing from the box to the origin.
 
 ### SIM_EVENT_TELEPORT_PARTICLES
@@ -191,6 +202,8 @@ Flags: none.
 Recorded when a teleport order runs (once, in its only step), once for each slot of the unit table other than the teleporter whose position lies inside the box of the teleporter: the teleporter's position plus the minimum model extents of its definition (low corner) and plus the maximum extents (high corner), compared on x, y and z, inclusive. The scan does not test whether the slot holds a living unit, so a free slot whose stale position lies in the box records too. The event is recorded just before that slot's position is set to the end position.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation draws sparks flying from the start to the end.
 
@@ -212,6 +225,8 @@ Recorded when a unit's script emits effect 0 (lifetime 6) or effect 1 (lifetime 
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `thrust_particles`, `bubbles`: a thrust plume draws no random numbers, but it shares particle list 7 with the bubbles and with other thrust plumes, and the list is drawn in the order of its entries.
+
 The presentation streams a jet plume from the start to the end.
 
 ### SIM_EVENT_WAKE_PARTICLES
@@ -230,6 +245,8 @@ Flags: none.
 Recorded when a unit's script emits effect 2 (period 16), 3 (period 8), 4 (period 16, positions swapped) or 5 (period 8, positions swapped) from a piece. The positions are the piece's two offsets from the unit's position. The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation trails a wake from the start to the end.
 
@@ -250,6 +267,8 @@ Recorded when a unit's script emits effect 0x103 from a piece. The start is the 
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `thrust_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: bubbles draw from the view random stream when they are created, in record order, and share particle list 7 with the thrust plumes, which are drawn in the order of the list.
+
 The presentation raises bubbles from the start to the end.
 
 ### SIM_EVENT_WEAPON_SMOKE
@@ -266,6 +285,8 @@ Flags: none.
 Recorded when a unit fires a line-of-sight, vertical-launch or ballistic weapon whose definition has the start smoke property. It is recorded once the projectile slot has been allocated (the projectile table holds fewer than 300 projectiles; with no free slot the shot is not fired and nothing is recorded) and after the fire script and the recoil script have been started. The position is the firing position the fire step was given. Projectiles dropped by an air unit, projectiles created by the motion of another projectile, meteors and projectiles created from a received network fire packet do not record it.
 
 Phases: net (0), units (1), match load.
+
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation puffs smoke at the position.
 
@@ -284,6 +305,8 @@ Recorded when a feature whose definition has a geothermal vent is placed on the 
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
+
 The presentation starts a timed plume of particles rising over the vent.
 
 ### SIM_EVENT_SCREEN_SHAKE
@@ -301,6 +324,8 @@ Flags: none.
 Recorded once for each detonation of a projectile, with the shake magnitude of the weapon definition as both offsets and its shake duration as the strength, whatever the values (they may be 0). A detonation records nothing when the network game option that disables the sea level trigger is set, the impact cell is below sea level and no unit was hit.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: same: the shake strength is a truncating average of the new value and the old one, so the order of its own records changes the result, and nothing else reads the shake at a drain.
 
 The presentation adds the shake to the screen's shake, unless the player turned screen shake off.
 
@@ -325,6 +350,8 @@ Both tests use the local player, so the event differs between machines.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: none: it only adds an amount to the disc activity meter, and sums commute.
+
 The presentation counts the amount in the disc activity meter, which picks the music, when either player is the local player.
 
 ### SIM_EVENT_FORCES_DESTROYED
@@ -340,6 +367,8 @@ Flags: none.
 Recorded when a unit dies and it was the last unit of its player, in a skirmish (game type 2).
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `sound`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_took_lead`, `player_left`, `build_queue_sound`, `smoke`, `white_smoke`, `black_smoke`, `sound_at`, `sound_at_name`, `message`: it draws from the view random stream, puts a line in the message log (30 lines, the oldest dropped) and plays a sound that takes one of the 8 sound buffers.
 
 The presentation prints the message that the side's forces are destroyed, in the side's name, with one of three texts chosen from the view random stream.
 
@@ -364,6 +393,8 @@ Recorded when a unit's death is credited and its last attacker slot is not 10. A
 Arguments are then the last attacker slot and the unit's player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: none: it only sets the kill and loss flash counters to a fixed value, and those sets commute.
 
 The presentation flashes the kill and the loss on the score panel, when the player's options show the score panel.
 
@@ -390,6 +421,8 @@ Repair, reclaim and capture orders never record it.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `selection_orders_dirty`, `deselect_if_ineligible`, `focus_commander`: it reads whether the unit is selected, which a deselection or a focus on the commander changes. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
+
 The presentation redraws the orders panel if the unit is selected and belongs to the local player.
 
 ### SIM_EVENT_BUILD_MENU_UPDATE
@@ -414,6 +447,8 @@ Recorded for the builder in these cases:
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `build_menu_update`, `deselect_if_ineligible`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`: it writes into the top screen of the GUI layer stack if the unit is the focus unit, so a change of the focus unit or of the layer stack before it changes the result. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
+
 The presentation writes the queued build counts into the build menu if the unit is the one it shows.
 
 ### SIM_EVENT_DESELECT_IF_INELIGIBLE
@@ -429,6 +464,8 @@ Flags: none.
 Recorded at the end of an attach order, after the unit's carrier and motion mode have been set, when the unit exists, does not have unit flag 0x20000000 (a structure), carries no cargo of its own, and the order's target is either none (the unit is detached) or an existing unit other than the unit that is itself not carried. Attaching and detaching both record it.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `selection_orders_dirty`, `build_menu_update`, `deselect_if_ineligible`, `focus_commander`, `radar_units`: it clears the unit's selection, which the records that read the selection (the orders panel mark, the radar picture, the focus on the commander) see, and it clears the focus unit that the build menu update tests. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
 
 The presentation removes the unit from the selection when it can no longer be selected (unfinished, in transit, or carried by a transport that may not carry it).
 
@@ -446,6 +483,8 @@ Recorded when construction of a unit is finished (see `SIM_EVENT_BUILD_MENU_UPDA
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `gui_changed_if_screen`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`: it tests which screen is on top of the GUI layer stack, which every record that opens or closes screens changes. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
+
 The presentation marks the GUI as changed when that screen is on top.
 
 ### SIM_EVENT_FOCUS_COMMANDER
@@ -462,6 +501,8 @@ Recorded in the players phase, in the 30-tick update of the local player, when t
 
 Phases: players (4), match load.
 
+Order: `selection_orders_dirty`, `build_menu_update`, `deselect_if_ineligible`, `gui_changed_if_screen`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`, `radar_units`: it clears and sets the selection, closes the screens above the game screen and resets the focus unit, and the records that read or change those see the result. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
+
 The presentation centres the camera on the commander of the viewed player and, with the flag set, selects it and closes the open screens.
 
 ### SIM_EVENT_POP_TO_GAME_LAYOUT
@@ -477,6 +518,8 @@ Flags: none.
 Recorded when the commander of a human or computer-controlled player is killed in a match whose commander-death setting is "Game Ends" or "Deathmatch" (not 0), just before all that player's units are killed.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `build_menu_update`, `gui_changed_if_screen`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`: it closes the screens above the game screen and resets the focus unit, so its order against the records that open screens or test the top screen counts. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
 
 The presentation closes the screens above the game screen, unless a dialog is open and the flag is 0.
 
@@ -495,6 +538,8 @@ Recorded when a credited death (as for `SIM_EVENT_SCORE_FLASH`, with the last at
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `forces_destroyed`, `player_took_lead`, `player_left`, `message`: its line goes into the message log, which holds 30 lines and drops the oldest, and so do the lines of `forces_destroyed`, `player_left` and a `unit_speech` line that finds the queue full.
+
 The presentation prints the message that the player has taken the lead, in the player's name and with the kills.
 
 ### SIM_EVENT_PLAYER_LEFT
@@ -510,6 +555,8 @@ Flags: none.
 Recorded when a unit dies and it was the last unit of its player, in a multiplayer game (game type 3).
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `sound`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_took_lead`, `player_left`, `build_queue_sound`, `smoke`, `white_smoke`, `black_smoke`, `sound_at`, `sound_at_name`, `message`: it draws from the view random stream, puts a line in the message log (30 lines, the oldest dropped) and plays a sound that takes one of the 8 sound buffers.
 
 The presentation prints that the player left the game, in the player's name, with one of eight texts chosen from the view random stream, unless the local player was rejected or no slot has the id.
 
@@ -528,6 +575,8 @@ Recorded when a computer-controlled player queues a build order on a factory tha
 
 Phases: players (4), match load, outside the steps.
 
+Order: `sound`, `forces_destroyed`, `player_left`, `build_queue_sound`, `sound_at`, `sound_at_name`: each sound takes one of the 8 sound buffers and a ninth stops the oldest, and the announcements of `forces_destroyed` and `player_left` play a sound too.
+
 The presentation plays the add sound of the build menu when the player is the one shown, and the subtract sound when the change is not positive.
 
 ### SIM_EVENT_WATCH_PROMPT
@@ -544,6 +593,8 @@ Recorded on the same path as `SIM_EVENT_FOCUS_COMMANDER` (the local player's 30-
 
 Phases: players (4), match load.
 
+Order: `build_menu_update`, `gui_changed_if_screen`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`: it opens a screen on the GUI layer stack, so its order against the records that close screens, open other screens or test the top screen counts. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
+
 The presentation asks the local player whether to keep watching, when the player is the local player.
 
 ### SIM_EVENT_WATCH_MODE_NOTICE
@@ -559,6 +610,8 @@ Flags: none.
 Recorded on the same path as `SIM_EVENT_WATCH_PROMPT`, when an AI player is active (instead of the prompt) and at least one combat player remains.
 
 Phases: players (4), match load.
+
+Order: `build_menu_update`, `gui_changed_if_screen`, `focus_commander`, `pop_to_game_layout`, `watch_prompt`, `watch_mode_notice`: it opens a screen on the GUI layer stack, so its order against the records that close screens, open other screens or test the top screen counts. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
 
 The presentation tells the local player that hosting AI players that are still alive keeps the match going, when the player is the local player.
 
@@ -581,6 +634,8 @@ Recorded in two cases.
 - An explosion effect: when fewer than 300 explosion effects exist, the caller's flag is 0, and the whole part of the effect's y is above the sea level. The flag is 0 for an impact on a cell that is not below sea level, for explosions that a unit script makes from a piece, and for two debris paths; it is 1 for an impact on a cell below sea level, for the splash of a projectile crossing the sea level and for the other debris paths. Period 7, lifetime 15.
 
 Phases: net (0), units (1), projectiles (2), explosions (3), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation starts a smoke plume. The smoke picks its animation frames from the view random stream.
 
@@ -605,6 +660,8 @@ Recorded in these cases:
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
+
 The presentation puffs white smoke at the position.
 
 ### SIM_EVENT_BLACK_SMOKE
@@ -621,6 +678,8 @@ Flags: none.
 Recorded when a unit's script emits effect 0x102 from a piece, at the piece's position (the unit's position plus the piece's position, with z subtracted). The script effect is dropped, with nothing recorded, unless the unit is visible to the player being viewed (the sim's player index for the viewing machine); this depends on the local machine's viewed player.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `nano_particles`, `reverse_nano_particles`, `teleport_particles`, `wake_particles`, `bubbles`, `weapon_smoke`, `timed_sub_particles`, `forces_destroyed`, `player_left`, `smoke`, `white_smoke`, `black_smoke`: each plume draws from the view random stream when it is created, in record order, and the stored frames depend on the draws, as do the announcements of `forces_destroyed` and `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation puffs black smoke at the position.
 
@@ -646,6 +705,8 @@ The set of players who hear it (argument 4) is decided when it is recorded. It i
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `sound`, `forces_destroyed`, `player_left`, `build_queue_sound`, `sound_at`, `sound_at_name`: each sound takes one of the 8 sound buffers and a ninth stops the oldest, and the announcements of `forces_destroyed` and `player_left` play a sound too.
+
 The presentation plays the sound at the position, when the sound settings allow it and the local player is in the set. With 3D sound off, a sound off screen plays quieter.
 
 ### SIM_EVENT_SOUND_AT_NAME
@@ -664,6 +725,8 @@ Recorded when a feature starts burning (sound name 1), at the position of the fe
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `sound`, `forces_destroyed`, `player_left`, `build_queue_sound`, `sound_at`, `sound_at_name`: each sound takes one of the 8 sound buffers and a ninth stops the oldest, and the announcements of `forces_destroyed` and `player_left` play a sound too.
+
 The presentation plays the named sound at the position with the checks of `SIM_EVENT_SOUND_AT`.
 
 ### SIM_EVENT_REMOVE_UNIT_SPEECH
@@ -679,6 +742,8 @@ Flags: none.
 Recorded when a death is applied to a unit that exists, after the dead unit's orders are deleted.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `unit_speech`, `remove_unit_speech`: it removes the unit's lines from the speech queue, so its order against the records that add lines counts. Its own records are ordered as well, because the digest cannot order a kind against others without ordering its own records.
 
 The presentation drops the unit's pending lines from the speech queue.
 
@@ -696,6 +761,8 @@ Flags: none.
 Recorded by a console command run by the local player, only in a network game (the net game flag 1 set): the toggles of sharing metal, energy, mapping, line of sight and radar (texts 0 to 4), with the new state, and the commands that set the thresholds for sharing metal and energy (texts 5 and 6), with the first argument of the command as given. The command that toggles all sharing records four events: metal, energy, mapping and radar (not line of sight). The radar toggle's value is the player's share-radar flag bit (64), tested after the toggle.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load, outside the steps.
+
+Order: `unit_speech`, `forces_destroyed`, `player_took_lead`, `player_left`, `message`: its line goes into the message log, which holds 30 lines and drops the oldest, and so do the lines of `forces_destroyed`, `player_left` and a `unit_speech` line that finds the queue full.
 
 The presentation puts the line in the message log: the text with ON or OFF for a toggle, or with the number.
 
@@ -721,6 +788,8 @@ The units and projectiles shown depend on the viewed player, so they differ betw
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
 
+Order: `deselect_if_ineligible`, `focus_commander`, `radar_units`, `radar_mapped`: the picture is drawn from the radar surface that the explored-cell records write, a later picture replaces an earlier one, and the picture shows which units are selected.
+
 The presentation draws the radar picture from the snapshot.
 
 ### SIM_EVENT_RADAR_MAPPED
@@ -738,6 +807,8 @@ Recorded only when the map-changed flag is set, which clears it. A snapshot is a
 The snapshot is 12 bytes: the width and the height of the full map and the cell count (u32 each; the cell count is half the width times half the height, each rounded down), then one byte for each of those cells in order: 0 (hidden) when the viewed player's bit in the cell's visibility mask is clear, otherwise 1 (explored) when the viewed player's explored entry for the cell is non-zero, otherwise 2 (in sight now). The viewed player differs between machines.
 
 Phases: net (0), units (1), projectiles (2), players (4), features (5), meteors (7), resource sharing (8), match load.
+
+Order: `radar_units`, `radar_mapped`: a later explored-cell update replaces an earlier one, and the picture of the units is drawn from the surface it writes.
 
 The presentation marks the cells on the radar picture as explored or hidden.
 

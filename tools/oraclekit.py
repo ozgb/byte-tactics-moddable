@@ -131,7 +131,7 @@ CONTENTS = [
     ("file", "docs/frame-dump.md", "the frame dump format"),
     ("file", "docs/ui-log.md", "the UI log format"),
     ("file", "docs/events-log.md", "the sim event log format and its digest"),
-    ("file", "tools/eventdigest.py", "makes the digest of a sim event log and compares it with a stored one, standard library only (needs tools/tracerehash.py)"),
+    ("file", "tools/eventdigest.py", "makes the digest of a sim event log and compares it with a stored one, standard library only (needs tools/tracerehash.py and docs/sim-events.md)"),
     ("file", "docs/reference-traces.md", "how the reference traces are made"),
     ("file", "docs/scenario-format.md", "the scenario format and the test-mode run"),
     ("dir", "interfaces", "the subsystem interface headers"),

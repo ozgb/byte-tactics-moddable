@@ -2,7 +2,8 @@
 
     uv run tools/tracerehash.py dump.txt [--schema data/trace_schema.json] [--trace trace.txt]
 
-Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick. With
+Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick, and the `tick` row of a tick
+whose dump has a `tick` block: the phase rows' hash continued, without a reset, over the world tables. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. Sections 24 and 25 are the records los_radar and units write through the state writer (`losRadarIndex[i].*`, `unitsFactories[i].*`). The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
@@ -21,7 +22,7 @@ OFFSET_BASIS = 0xCBF29CE484222325
 PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1
 END = 0xFFFFFFFF
-PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors")
+PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tick")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
 DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[",
                "windMeteors.", "windMeteors[", "targeting.", "targeting[", "los_radar.", "los_radar[", "map.", "map[",
@@ -315,8 +316,9 @@ class Walker:
                 found.append(int(m.group(1)))
         return found
 
-    def world_row(self, tick: int = 0) -> int:
-        self.hash.reset()
+    def world_row(self, tick: int = 0, reset: bool = True) -> int:
+        if reset:
+            self.hash.reset()
         self.live = self.records(r"unitsState\.units\[(\d+)\]\.head")
         self.scripted = set(self.records(r"scriptsState\.units\[(\d+)\]\.scale"))
         self.game()
@@ -653,16 +655,20 @@ class Walker:
 
 
 def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]]) -> list[tuple[int, str, int]]:
-    """The (tick, phase, hash) rows a dump gives, phases in order, `world` after `meteors`."""
+    """The (tick, phase, hash) rows a dump gives, phases in order, `world` after `meteors`, `tick` after that."""
     rows = []
     for tick in sorted({t for t, _ in blocks}):
         for phase in PHASES:
             if (tick, phase) not in blocks:
                 continue
             walker = Walker(schema, blocks[(tick, phase)])
-            rows.append((tick, phase, walker.phase_row(tick)))
+            if phase != "tick":
+                rows.append((tick, phase, walker.phase_row(tick)))
             if phase == "meteors":
                 rows.append((tick, "world", walker.world_row(tick)))
+            if phase == "tick":
+                walker.phase_row(tick)
+                rows.append((tick, "tick", walker.world_row(tick, reset=False)))
     return rows
 
 

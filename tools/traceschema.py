@@ -37,7 +37,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 8
+TRACE_FORMAT = 9
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",

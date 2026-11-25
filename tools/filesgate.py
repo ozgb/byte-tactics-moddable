@@ -124,7 +124,7 @@ CASES: dict[str, list[tuple[str, str, list[list[str]]]]] = {
         ("unmounted", "base", [["find", "*", "-1", "1"], ["count", "*", "0"], ["tree", "units", "*", "-1", "1"]]),
         ("wildcards", "base", matchcalls([
             ("abc", "*"), ("abc", "a?c"), ("abc", "A*"), ("abc", "*c*"), ("abc", ""), ("", "*"), ("", ""),
-            ("a.b.c", "*.*"), ("abc", "ab"), ("ab", "abc"), ("aXbXc", "*x*x*"), ("x", "**"), ("abc", "abc*"),
+            ("x.y.z", "*.*"), ("abc", "ab"), ("ab", "abc"), ("aXbXc", "*x*x*"), ("x", "**"), ("abc", "abc*"),
             ("ABC", "abc"), ("abc", "?"), ("abc", "???"), ("abc", "*?"), ("a", "*a*a"), ("aaaa", "*a*a"),
             ("units.fbi", "*.FBI"), ("a" * 150, "*a" * 60), ("a" * 150 + "b", "*" * 120 + "b"),
             ("ab*", "ab*"), ("ab?", "ab?"), ("dir\\file", "*\\*")])),

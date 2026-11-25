@@ -127,7 +127,7 @@
    ["match", "abc", ""],
    ["match", "", "*"],
    ["match", "", ""],
-   ["match", "a.b.c", "*.*"],
+   ["match", "x.y.z", "*.*"],
    ["match", "abc", "ab"],
    ["match", "ab", "abc"],
    ["match", "aXbXc", "*x*x*"],

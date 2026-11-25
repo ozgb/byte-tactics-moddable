@@ -1153,6 +1153,73 @@
     "poly": "FixtureGoalBase",
     "ref": true
    }
+  },
+  "Drain": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "out"
+    },
+    {
+     "type": "unsigned int",
+     "name": "size"
+    }
+   ],
+   "args": {
+    "out": {
+     "mode": "bytes-out",
+     "length": "size"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Gather": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "int*",
+     "name": "points"
+    },
+    {
+     "type": "int",
+     "name": "capacity"
+    }
+   ],
+   "args": {
+    "points": {
+     "mode": "scratch",
+     "capacity": "capacity"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Dims": {
+   "ret": "void",
+   "params": [
+    {
+     "type": "int*",
+     "name": "width"
+    },
+    {
+     "type": "int*",
+     "name": "height"
+    }
+   ],
+   "args": {
+    "width": {
+     "mode": "scalar",
+     "dir": "out"
+    },
+    "height": {
+     "mode": "scalar",
+     "dir": "out"
+    }
+   }
   }
  },
  "inside": {

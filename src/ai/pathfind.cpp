@@ -19,10 +19,14 @@ static inline bool operator<(const HeapEntry& a, const HeapEntry& b)
 #include "../util/engine_services.h"
 #include "../../interfaces/state_writer.h"
 
+#ifndef BT_REPLAY_INJECT_STEP_BUDGET
+#define BT_REPLAY_INJECT_STEP_BUDGET 0x535
+#endif
+
 static int StepsFor(const PathWorldView* world)
 {
     unsigned int limit = world->SearchStepLimit();
-    return limit != 0 ? (int)limit : 0x535;
+    return limit != 0 ? (int)limit : BT_REPLAY_INJECT_STEP_BUDGET;
 }
 
 // FUNCTION: 0x40d5e0

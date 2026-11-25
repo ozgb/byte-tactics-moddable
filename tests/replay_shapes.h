@@ -135,6 +135,41 @@ unsigned int __stdcall Imp_fixture_MakeGoal()
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
 
+int __stdcall Imp_fixture_Drain(void* a0, unsigned int a1)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Drain");
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    ApplyBytes(a0, a1, "out");
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_fixture_Gather(int* a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Gather");
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_fixture_Dims(int* a0, int* a1)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Dims");
+    const char* r = Enter(t);
+    ApplyOutScalar(a0, "width");
+    ApplyOutScalar(a1, "height");
+    (void)r;
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -269,4 +304,40 @@ void Run_fixture_MakeGoal()
 void After_fixture_MakeGoal()
 {
     CompareObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
+}
+
+unsigned char* g_bytes_fixture_Drain_0;
+int g_bytes_fixture_Drain_0_length;
+int g_result_fixture_Drain;
+
+void Run_fixture_Drain()
+{
+    g_bytes_fixture_Drain_0_length = ArgScalar<int>("size");
+    free(g_bytes_fixture_Drain_0);
+    g_bytes_fixture_Drain_0 = (unsigned char*)calloc(g_bytes_fixture_Drain_0_length > 0 ? g_bytes_fixture_Drain_0_length : 1, 1);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("out ", "result");
+    g_result_fixture_Drain = Native_fixture_Drain((void*)g_bytes_fixture_Drain_0, p1);
+}
+
+void After_fixture_Drain()
+{
+    CompareBytes("out", g_bytes_fixture_Drain_0, (int)g_result_fixture_Drain, g_bytes_fixture_Drain_0_length);
+    CompareResult(g_result_fixture_Drain);
+}
+
+int g_result_fixture_Gather;
+
+void Run_fixture_Gather()
+{
+    ScratchHolder p0;
+    p0.Reserve(sizeof(int) * (size_t)ArgScalar<int>("capacity"));
+    int p1 = ArgScalar<int>("capacity");
+    SetClosing("result");
+    g_result_fixture_Gather = Native_fixture_Gather((int*)p0.data, p1);
+}
+
+void After_fixture_Gather()
+{
+    CompareResult(g_result_fixture_Gather);
 }

@@ -1383,14 +1383,14 @@ bool InWalkFields(const unsigned short* fields, unsigned count, unsigned field)
     return false;
 }
 
-void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned char kind, void* object, const unsigned short* limit, unsigned limitCount)
+void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* object, const unsigned short* limit, unsigned limitCount)
 {
     if (object == nullptr || kReplayObjectKinds[kind].scope == RS_VALUE)
         return;
     unsigned actual = ReplayConcreteKind(kind, object);
     if (actual == kReplayObjectKindCount)
         return;
-    kind = (unsigned char)actual;
+    kind = (unsigned short)actual;
     unsigned slot = PointerHash(object) % REPLAY_REACH_HASH;
     for (; reach.slots[slot] >= 0; slot = (slot + 1) % REPLAY_REACH_HASH) {
         if (reach.object[reach.slots[slot]] == object && reach.kind[reach.slots[slot]] == kind)
@@ -1560,7 +1560,7 @@ bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex)
     return false;
 }
 
-void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount,
+void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit, unsigned rootLimitCount)
 {
     reach.count = 0;
@@ -1594,11 +1594,11 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
     for (unsigned a = 0; a < sets.allOfCount; a++) {
         unsigned kind = sets.allOf[a];
         if (kReplayObjectKinds[kind].delta != 0) {
-            if (reach.deltaCount == sizeof reach.deltaKind) {
+            if (reach.deltaCount == sizeof reach.deltaKind / sizeof reach.deltaKind[0]) {
                 ReplayFail("a slot is all-of over more delta kinds than the walk holds");
                 continue;
             }
-            reach.deltaKind[reach.deltaCount++] = (unsigned char)kind;
+            reach.deltaKind[reach.deltaCount++] = (unsigned short)kind;
             ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred);
             continue;
         }
@@ -1614,7 +1614,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
                     unsigned char* first = owner == nullptr ? nullptr : BlockAt(*(const unsigned*)(owner + site.offset));
                     unsigned room = owner == nullptr ? 0 : SiteRoom(site, owner);
                     for (unsigned e = 0; first != nullptr && e < room; e++)
-                        Visit(reach, table, assign, (unsigned char)kind, first + e * site.stride, nullptr, 0);
+                        Visit(reach, table, assign, (unsigned short)kind, first + e * site.stride, nullptr, 0);
                 }
             }
             continue;
@@ -1624,7 +1624,7 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         unsigned stride;
         if (TableSpan(kind, &base, &count, &stride)) {
             for (unsigned i = 0; i < count; i++)
-                Visit(reach, table, assign, (unsigned char)kind, base + i * stride, nullptr, 0);
+                Visit(reach, table, assign, (unsigned short)kind, base + i * stride, nullptr, 0);
         }
     }
     unsigned at = 0;

@@ -2167,7 +2167,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         inside_first, inside_count = site_at[o["name"]]
         L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
-          "static const unsigned char kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
+          "static const unsigned short kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
     L += ["    RCB_%s," % upper(c["name"]) for c in model["callbacks"]]
     L += ["    RCB_COUNT", "};", ""]
@@ -2281,7 +2281,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         for slot, s in spec["slots"].items():
             base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
             if s["allOf"]:
-                L.append("static const unsigned char %sAllOf[] = { %s };" % (base, ", ".join("ROK_" + upper(k) for k in s["allOf"])))
+                L.append("static const unsigned short %sAllOf[] = { %s };" % (base, ", ".join("ROK_" + upper(k) for k in s["allOf"])))
             for tag, names, kindname, idx in (("Reads", s["reads"], "unsigned char", [fields_index(fields, n) for n in s["reads"]]),
                                               ("Writes", s["writes"], "unsigned char", [fields_index(fields, n) for n in s["writes"]]),
                                               ("ObjReads", s["objectReads"], "unsigned short", s["objectReads"]),

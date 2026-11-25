@@ -30,7 +30,7 @@ struct ReplayArraySpec {
 
 struct ReplayVectorSpec {
     unsigned char mode;
-    unsigned char kind;
+    unsigned short kind;
     unsigned size;
 };
 
@@ -62,7 +62,7 @@ struct ReplayField {
     unsigned char base;
     unsigned char kind;
     unsigned short array;
-    unsigned char target;
+    unsigned short target;
 };
 
 struct ReplayElemSpec {
@@ -71,8 +71,8 @@ struct ReplayElemSpec {
 };
 
 struct ReplayInsideSite {
-    unsigned char kind;
-    unsigned char container;
+    unsigned short kind;
+    unsigned short container;
     unsigned offset;
     const char* member;
     unsigned stride;
@@ -100,7 +100,7 @@ struct ReplayObjectKind {
 
 struct ReplayEventKind {
     int kind;
-    unsigned char object;
+    unsigned short object;
 };
 
 struct ReplayEventTable {
@@ -118,7 +118,7 @@ struct ReplayCallbackType {
 
 struct ReplayAllocTag {
     const char* tag;
-    unsigned char kind;
+    unsigned short kind;
     unsigned size;
 };
 
@@ -131,7 +131,7 @@ struct ReplayCodeTable {
 struct ReplayCondition {
     unsigned short field;
     unsigned short via;
-    unsigned char kind;
+    unsigned short kind;
     unsigned mask;
     int value;
 };
@@ -140,9 +140,9 @@ struct ReplayObjectField {
     const char* name;
     unsigned offset;
     unsigned size;
-    unsigned char object;
+    unsigned short object;
     unsigned char kind;
-    unsigned char target;
+    unsigned short target;
     unsigned short rangeEnd;
     unsigned short rangeBegin;
     ReplayCondition when;
@@ -162,7 +162,7 @@ struct ReplaySlotSets {
     unsigned objReadCount;
     const unsigned short* objWrites;
     unsigned objWriteCount;
-    const unsigned char* allOf;
+    const unsigned short* allOf;
     unsigned allOfCount;
 };
 

@@ -41,7 +41,7 @@ struct Recording {
 
 struct ReplayRoots {
     constexpr ReplayRoots() : count(0), kind(), object() {}
-    template <class T> void Add(unsigned char objectKind, T* p)
+    template <class T> void Add(unsigned short objectKind, T* p)
     {
         if (count < REPLAY_MAX_ROOTS && p != nullptr) {
             kind[count] = objectKind;
@@ -49,7 +49,7 @@ struct ReplayRoots {
         }
     }
     unsigned count;
-    unsigned char kind[REPLAY_MAX_ROOTS];
+    unsigned short kind[REPLAY_MAX_ROOTS];
     void* object[REPLAY_MAX_ROOTS];
 };
 
@@ -714,7 +714,7 @@ void ImportOutUnits(ReplayText& t, const char* name, const std::vector<Unit*, st
     t.AddChar(']');
     if (n == 0)
         return;
-    std::vector<unsigned char> kinds(n, (unsigned char)ROK_UNIT);
+    std::vector<unsigned short> kinds(n, (unsigned short)ROK_UNIT);
     std::vector<void*> objects(n);
     for (unsigned i = 0; i < n; i++)
         objects[i] = (*units)[i];

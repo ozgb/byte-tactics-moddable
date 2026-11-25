@@ -286,7 +286,7 @@ int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
 const char* g_closing[8];
-unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
+unsigned short g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
 const ReplaySlotSets* g_sets;
@@ -865,7 +865,7 @@ void* ArgObject(const char* name, unsigned kind)
     unsigned found = 0;
     void* p = value == nullptr ? nullptr : ReplayResolveObject(value, &found, g_objects, AllocObject);
     if (p != nullptr && found == kind && g_rootCount < REPLAY_MAX_ROOTS) {
-        g_rootKinds[g_rootCount] = (unsigned char)kind;
+        g_rootKinds[g_rootCount] = (unsigned short)kind;
         g_rootObjects[g_rootCount++] = p;
     }
     return p;
@@ -2899,7 +2899,7 @@ void RecordGraph(ReplayText& text, ReplayKnown& known, void* player, const Repla
 {
     ReplayObjectTable* table = new ReplayObjectTable;
     ReplayReach* reach = new ReplayReach;
-    unsigned char kind = ROK_PLAYER;
+    unsigned short kind = ROK_PLAYER;
     ReplayWalk(*reach, *table, true, sets, &kind, &player, 1);
     ReplayCaptureObjects(text, known, *table, *reach, sets.objReads, sets.objReadCount, 'r');
     delete reach;
@@ -3069,7 +3069,7 @@ struct Recorder {
         delete table;
         text.Free();
     }
-    void Record(const unsigned char* kinds, void* const* roots, unsigned count, const ReplaySlotSets& sets)
+    void Record(const unsigned short* kinds, void* const* roots, unsigned count, const ReplaySlotSets& sets)
     {
         text.Clear();
         ReplayWalk(*reach, *table, true, sets, kinds, roots, count);
@@ -3163,7 +3163,7 @@ void TableSelfTest()
     movement->footprintX = 3;
     movement->maxSlope = 9;
 
-    unsigned char kinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    unsigned short kinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
     void* roots[2] = { shot, movement };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -3186,12 +3186,12 @@ void TableSelfTest()
     Check(rebuiltClass == &MovementEntries()[5] && rebuiltClass->maxSlope == 9, "an entry of the sim table is restored in place");
 
     Recorder again;
-    unsigned char againKinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    unsigned short againKinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
     void* againRoots[2] = { rebuilt, rebuiltClass };
     again.Record(againKinds, againRoots, 2, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt tables record the same text");
 
-    memcpy(g_rootKinds, againKinds, 2);
+    memcpy(g_rootKinds, againKinds, sizeof againKinds);
     g_rootObjects[0] = rebuilt;
     g_rootObjects[1] = rebuiltClass;
     g_rootCount = 2;
@@ -3230,7 +3230,7 @@ void ArraySelfTest()
     for (int i = 0; i < 8; i++)
         cells[i] = 0x01020304u * (unsigned)(i + 1);
     movement->cells = cells;
-    unsigned char kinds[2] = { ROK_PLAYER, ROK_PASSMAP };
+    unsigned short kinds[2] = { ROK_PLAYER, ROK_PASSMAP };
     void* roots[2] = { player, movement };
 
     Recorder recorder;
@@ -3279,7 +3279,7 @@ void ArraySelfTest()
     Check(rebuilt != nullptr && rebuilt->exploredSize == 40 && rebuilt->explored.get() != nullptr && rebuilt->explored.get()[39] == 9 && rebuilt->explored.get()[40 - 1] == 9, "the last whole write wins");
     Check(rebuiltClass != nullptr && rebuiltClass->cells.get() != nullptr && rebuiltClass->cells.get()[3] == 0xdeadbeefu && rebuiltClass->cells.get()[2] == 0x01020304u * 3, "the delta is applied to the array the replayer kept");
 
-    unsigned char kind = ROK_PLAYER;
+    unsigned short kind = ROK_PLAYER;
     void* root = rebuilt;
     Recorder replayed;
     replayed.Record(&kind, &root, 1, sets);
@@ -3310,7 +3310,7 @@ void ArraySelfTest()
     for (int i = 0; i < 8; i++)
         rows[i] = 0x01010101u * (unsigned)(i + 1);
     partial->cells = rows;
-    unsigned char partialKind = ROK_PASSMAP;
+    unsigned short partialKind = ROK_PASSMAP;
     void* partialRoot = partial;
     Recorder partialRecorder;
     partialRecorder.Record(&partialKind, &partialRoot, 1, sets);
@@ -3340,7 +3340,7 @@ void ArraySelfTest()
     for (int i = 0; i < 1500; i++)
         field[i] = (unsigned char)i;
     wide->explored = field;
-    unsigned char wideKind = ROK_PLAYER;
+    unsigned short wideKind = ROK_PLAYER;
     void* wideRoot = wide;
     Recorder wideRecorder;
     ReplayText wideCalls;
@@ -4255,7 +4255,7 @@ void VectorSelfTest()
     seen->index = 4;
     seen->units.PushBack(first);
     seen->units.PushBack(second);
-    unsigned char kind[2] = { ROK_PLAYERAI, ROK_FIXTURESEEN };
+    unsigned short kind[2] = { ROK_PLAYERAI, ROK_FIXTURESEEN };
     void* root[2] = { ai, seen };
     Recorder recorder;
     recorder.Record(kind, root, 2, sets);
@@ -4700,7 +4700,7 @@ void RawPointerSelfTest()
     cursor->value = 9;
     cursor->kind = 1;
     cursor->src = (GafEntry*)table;
-    unsigned char kinds[1] = { ROK_HANDLE };
+    unsigned short kinds[1] = { ROK_HANDLE };
     void* roots[1] = { cursor };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4729,7 +4729,7 @@ void RawPointerSelfTest()
     Check(rebuilt != nullptr && rebuiltTable != nullptr && rebuilt->index == 2 && rebuilt->value == 9 && rebuilt->kind == 1, "the object is rebuilt");
     Check(rebuilt->src == (GafEntry*)rebuiltTable, "its ptr is the address of the replayer's own copy");
     Recorder again;
-    unsigned char againKinds[1] = { ROK_HANDLE };
+    unsigned short againKinds[1] = { ROK_HANDLE };
     void* againRoots[1] = { rebuilt };
     again.Record(againKinds, againRoots, 1, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt object records the same text");
@@ -4778,7 +4778,7 @@ void MaskedViewSelfTest()
     view->plain.count = 7;
     view->plain.total = 9;
     view->linked.def = Ref<UnitDef>(def);
-    unsigned char kinds[1] = { ROK_FIXTUREVIEW };
+    unsigned short kinds[1] = { ROK_FIXTUREVIEW };
     void* roots[1] = { view };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4852,7 +4852,7 @@ void MaskedViewSelfTest()
     slave->master = Ref<FixtureView>(master);
     slave->ground.moved = 5;
     slave->narrow.low = 11;
-    unsigned char slaveKinds[2] = { ROK_FIXTURESLAVE, ROK_PLAYER };
+    unsigned short slaveKinds[2] = { ROK_FIXTURESLAVE, ROK_PLAYER };
     void* slaveRoots[2] = { slave, player };
     Recorder through;
     through.Record(slaveKinds, slaveRoots, 2, sets);
@@ -4904,7 +4904,7 @@ void FeatureTableSelfTest()
     g_game->features = table;
     g_game->featureCount = 3;
     table[3].anim.index = 2;
-    unsigned char kinds[1] = { ROK_HANDLE };
+    unsigned short kinds[1] = { ROK_HANDLE };
     void* roots[1] = { &table[3].anim };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4928,7 +4928,7 @@ void FeatureTableSelfTest()
     g_game->spots = pool;
     Spot* spots = (Spot*)pool;
     spots[0].feature = 1;
-    unsigned char spotKinds[1] = { ROK_SPOT };
+    unsigned short spotKinds[1] = { ROK_SPOT };
     void* spotRoots[1] = { &spots[0] };
     Recorder spot;
     defs[1].noobject = 1;
@@ -4967,7 +4967,7 @@ void EmbeddedSiteSelfTest()
     holder->shadow.value = 6;
     holder->shadow.kind = 1;
     holder->shadow.src = (GafEntry*)frames;
-    unsigned char kinds[1] = { ROK_FIXTUREHOLDER };
+    unsigned short kinds[1] = { ROK_FIXTUREHOLDER };
     void* roots[1] = { holder };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5053,7 +5053,7 @@ void UnnamedPtrSelfTest()
     view->flags = 1;
     view->linked.table = frames;
     cursor->src = (GafEntry*)frames;
-    unsigned char kinds[2] = { ROK_FIXTUREVIEW, ROK_HANDLE };
+    unsigned short kinds[2] = { ROK_FIXTUREVIEW, ROK_HANDLE };
     void* roots[2] = { view, cursor };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -5104,7 +5104,7 @@ void AllOfListSelfTest()
     g_game->players[2].id = 12;
     lanes[2].level = 9;
     unsigned short fields[2] = { FieldIndex(ROK_PLAYER, "id"), FieldIndex(ROK_FIXTURELANE, "level") };
-    unsigned char both[2] = { ROK_PLAYER, ROK_FIXTURELANE };
+    unsigned short both[2] = { ROK_PLAYER, ROK_FIXTURELANE };
     ReplaySlotSets sets = { "two", 0, nullptr, 0, nullptr, 0, fields, 2, fields, 2, both, 2 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -5160,7 +5160,7 @@ void DeltaTableSelfTest()
     table[500].metal = 9;
     unsigned short fields[5] = { FieldIndex(ROK_FIXTURECELL, "unit"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags"), FieldIndex(ROK_FIXTURECELL, "occupant"),
                                  FieldIndex(ROK_UNIT, "health") };
-    unsigned char every[1] = { ROK_FIXTURECELL };
+    unsigned short every[1] = { ROK_FIXTURECELL };
     ReplaySlotSets sets = { "delta", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -5218,7 +5218,7 @@ void DeltaLimitSelfTest()
     table[40].flags = 7;
     table[41].flags = 3;
     unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "cell"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags") };
-    unsigned char every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
+    unsigned short every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
     ReplaySlotSets sets = { "limit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 2 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -5267,7 +5267,7 @@ void UnconditionedUnitIdSelfTest()
     lanes[1].unit = 5;
     lanes[3].unit = 9;
     unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "level"), FieldIndex(ROK_FIXTURELANE, "occupant"), FieldIndex(ROK_UNIT, "health") };
-    unsigned char every[1] = { ROK_FIXTURELANE };
+    unsigned short every[1] = { ROK_FIXTURELANE };
     ReplaySlotSets sets = { "unit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -5439,7 +5439,7 @@ void PolymorphicSelfTest()
     second->attached = ring;
     second->next = first;
 
-    unsigned char kinds[2] = { ROK_ORDER, ROK_ORDER };
+    unsigned short kinds[2] = { ROK_ORDER, ROK_ORDER };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -5465,12 +5465,12 @@ void PolymorphicSelfTest()
     Check(rebuiltArea->source.get() == rebuiltFirst && rebuiltSecond->next.get() == rebuiltFirst, "and the pointers between the kinds");
 
     Recorder again;
-    unsigned char againKinds[2] = { ROK_ORDER, ROK_ORDER };
+    unsigned short againKinds[2] = { ROK_ORDER, ROK_ORDER };
     void* againRoots[2] = { rebuiltFirst, rebuiltSecond };
     again.Record(againKinds, againRoots, 2, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt objects record the same text");
 
-    memcpy(g_rootKinds, againKinds, 2);
+    memcpy(g_rootKinds, againKinds, sizeof againKinds);
     g_rootObjects[0] = rebuiltFirst;
     g_rootObjects[1] = rebuiltSecond;
     g_rootCount = 2;
@@ -5518,7 +5518,7 @@ void PolymorphicSelfTest()
     unsigned selectable = CodeIndex("orderNotify", (const void*)MakeSelectableOrder);
     unsigned wait = CodeIndex("orderNotify", (const void*)WaitOrder);
     Check(stop != ~0u && selectable != ~0u && wait != ~0u && stop != selectable && selectable != wait, "the table lists the functions by their order of registration");
-    unsigned char entryKind = ROK_ORDERTABLEENTRY;
+    unsigned short entryKind = ROK_ORDERTABLEENTRY;
     void* entryRoot = entry;
     Recorder code;
     code.Record(&entryKind, &entryRoot, 1, sets);
@@ -5598,7 +5598,7 @@ void GoalSelfTest()
     Check(*(const void**)a == ReplayVtable(ROK_FIXTUREGOALA) && *(const void**)b == ReplayVtable(ROK_FIXTUREGOALB), "the vtable of the kind is the one the compiler gave the class");
     Check(ReplayVtable(ROK_FIXTUREGOALA) != ReplayVtable(ROK_FIXTUREGOALB), "and each kind has its own");
 
-    unsigned char kinds[1] = { ROK_FIXTUREGOALHOLDER };
+    unsigned short kinds[1] = { ROK_FIXTUREGOALHOLDER };
     void* roots[1] = { holder };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5678,7 +5678,7 @@ void RefsSelfTest()
     manager->timers[0] = timer;
     manager->timers[2] = assault;
 
-    unsigned char kinds[1] = { ROK_FIXTUREMANAGER };
+    unsigned short kinds[1] = { ROK_FIXTUREMANAGER };
     void* roots[1] = { manager };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5758,7 +5758,7 @@ void BasedTableSelfTest()
     otherUser->tag = 11;
     otherUser->group = &otherGroups[1];
 
-    unsigned char kinds[4] = { ROK_FIXTUREOWNER, ROK_FIXTUREOWNER, ROK_FIXTUREUSER, ROK_FIXTUREUSER };
+    unsigned short kinds[4] = { ROK_FIXTUREOWNER, ROK_FIXTUREOWNER, ROK_FIXTUREUSER, ROK_FIXTUREUSER };
     void* roots[4] = { owner, other, user, otherUser };
     Recorder recorder;
     recorder.Record(kinds, roots, 4, sets);
@@ -5828,7 +5828,7 @@ void ElementSiteSelfTest()
         rig->slots[i].cb.ppVtbl = (void**)ReplayVtable(ROK_FIXTURECB);
     rig->slots[1].cb.done = 6;
     rig->slots[2].cb.done = 1;
-    unsigned char kinds[1] = { ROK_FIXTURERIG };
+    unsigned short kinds[1] = { ROK_FIXTURERIG };
     void* roots[1] = { rig };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5916,7 +5916,7 @@ void EmbedsSelfTest()
     script->channels[2].pc = 7;
     script->channels[2].state = -2;
     script->channels[3].stack = 99;
-    unsigned char kinds[1] = { ROK_FIXTURESCRIPT };
+    unsigned short kinds[1] = { ROK_FIXTURESCRIPT };
     void* roots[1] = { script };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5975,7 +5975,7 @@ void EmbeddedPolymorphicSelfTest()
     first->link.value = 3;
     second->link.owner = second;
     second->link.value = 4;
-    unsigned char kinds[2] = { ROK_FIXTUREORDER, ROK_FIXTUREORDER };
+    unsigned short kinds[2] = { ROK_FIXTUREORDER, ROK_FIXTUREORDER };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -6059,9 +6059,9 @@ void CapacityTableSelfTest()
     eyes[3].pos.y = 6;
     unsigned short fields[7] = { FieldIndex(ROK_FIXTUREEYE, "owner"), FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"),
                                  FieldIndex(ROK_FIXTUREEYE, "flagPtr"), FieldIndex(ROK_FIXTUREEYE, "pos"), FieldIndex(ROK_FIXTUREVIEW, "flags") };
-    unsigned char every[1] = { ROK_FIXTUREEYE };
+    unsigned short every[1] = { ROK_FIXTUREEYE };
     ReplaySlotSets sets = { "capacity", 0, nullptr, 0, nullptr, 0, fields, 7, fields, 7, every, 1 };
-    unsigned char kinds[1] = { ROK_FIXTUREEYE };
+    unsigned short kinds[1] = { ROK_FIXTUREEYE };
     void* roots[1] = { &eyes[3] };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -6120,7 +6120,7 @@ void TrackedCountSelfTest()
     g_game->count_14367 = 3;
     unsigned short fields[1] = { FieldIndex(ROK_FIXTURETALLY, "value") };
     unsigned char reads[1] = { RF_GAME_COUNT_14367 };
-    unsigned char every[1] = { ROK_FIXTURETALLY };
+    unsigned short every[1] = { ROK_FIXTURETALLY };
     ReplaySlotSets tracked = { "tracked", 0, reads, 1, nullptr, 0, fields, 1, fields, 1, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, tracked);
@@ -6158,7 +6158,7 @@ void SelfPointerSelfTest()
     eyes[1].pos.x = 3;
     unsigned short fields[5] = { FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"), FieldIndex(ROK_FIXTUREEYE, "flagPtr"),
                                  FieldIndex(ROK_FIXTUREEYE, "pos") };
-    unsigned char every[1] = { ROK_FIXTUREEYE };
+    unsigned short every[1] = { ROK_FIXTUREEYE };
     ReplaySlotSets sets = { "self", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -6215,7 +6215,7 @@ void SelfPointerSelfTest()
     unsigned short heapFields[6] = { FieldIndex(ROK_FIXTUREHEAP, "capacity"), FieldIndex(ROK_FIXTUREHEAP, "used"), FieldIndex(ROK_FIXTUREHEAP, "pool"), FieldIndex(ROK_FIXTUREHEAP, "top"),
                                      FieldIndex(ROK_FIXTURENODE, "key"), FieldIndex(ROK_FIXTURENODE, "pri") };
     ReplaySlotSets heapSets = { "heap", 0, nullptr, 0, nullptr, 0, heapFields, 6, heapFields, 6 };
-    unsigned char kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
+    unsigned short kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
     void* roots[2] = { heap, &nodes[2] };
     Recorder heapRecorder;
     heapRecorder.Record(kinds, roots, 2, heapSets);
@@ -6308,7 +6308,7 @@ void CStringSelfTest()
     for (int i = 0; i < 8; i++)
         fields[i] = FieldIndex(ROK_FIXTURENAMED, fieldNames[i]);
     ReplaySlotSets sets = { "named", 0, nullptr, 0, nullptr, 0, fields, 8, fields, 8 };
-    unsigned char kind = ROK_FIXTURENAMED;
+    unsigned short kind = ROK_FIXTURENAMED;
     void* root = named;
     Recorder recorder;
     recorder.Record(&kind, &root, 1, sets);
@@ -6407,7 +6407,7 @@ void BlobSelfTest()
     for (int i = 0; i < 6; i++)
         fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
     ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 6, fields, 6 };
-    unsigned char kind = ROK_FIXTUREPROGRAM;
+    unsigned short kind = ROK_FIXTUREPROGRAM;
     void* root = program;
     Recorder recorder;
     ReplayText calls;
@@ -6497,7 +6497,7 @@ void SharedBlobSelfTest()
     for (int i = 0; i < 3; i++)
         fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
     ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
-    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
+    unsigned short kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -6560,7 +6560,7 @@ void EmptyTargetSelfTest()
     memcpy(fields, programFields, sizeof programFields);
     memcpy(fields + 3, namedFields, sizeof namedFields);
     ReplaySlotSets sets = { "empty", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5 };
-    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
+    unsigned short kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
     void* roots[2] = { program, named };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -6649,7 +6649,7 @@ void NestedVectorSelfTest()
     for (int i = 0; i < 3; i++)
         fields[i] = FieldIndex(ROK_FIXTURENEST, fieldNames[i]);
     ReplaySlotSets sets = { "nest", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
-    unsigned char kind = ROK_FIXTURENEST;
+    unsigned short kind = ROK_FIXTURENEST;
     void* root = nest;
     Recorder recorder;
     ReplayText calls;

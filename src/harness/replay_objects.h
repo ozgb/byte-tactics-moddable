@@ -16,9 +16,9 @@ inline unsigned ReplayRefOffset(const void* p)
 }
 
 #ifdef BT_REPLAY_FIXTURES
-enum { REPLAY_OBJECT_KINDS = 256 };
+enum { REPLAY_OBJECT_KINDS = 320 };
 #else
-enum { REPLAY_OBJECT_KINDS = 224 };
+enum { REPLAY_OBJECT_KINDS = 256 };
 #endif
 
 enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3, REPLAY_KEY_BYTES = 512 };
@@ -49,8 +49,8 @@ private:
 struct ReplayReach {
     unsigned count;
     unsigned deltaCount;
-    unsigned char deltaKind[8];
-    unsigned char kind[REPLAY_MAX_OBJECTS];
+    unsigned short deltaKind[8];
+    unsigned short kind[REPLAY_MAX_OBJECTS];
     void* object[REPLAY_MAX_OBJECTS];
     const unsigned short* limit[REPLAY_MAX_OBJECTS];
     unsigned short limitCount[REPLAY_MAX_OBJECTS];
@@ -182,7 +182,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
 const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name);
 int ReplayFindObjectKind(const char* name, unsigned length);
 void* ReplayResolveObject(const char* text, unsigned* kind, ReplayObjectTable& table, ReplayAllocFn alloc);
-void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned char* rootKinds, void* const* roots, unsigned rootCount,
+void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit = nullptr, unsigned rootLimitCount = 0);
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);
 unsigned ReplayDeltaCount(const ReplayReach& reach);

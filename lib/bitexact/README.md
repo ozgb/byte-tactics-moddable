@@ -123,9 +123,12 @@ full list, per function, is `data/crt_calls.csv` (`uv run tools/crtcalls.py`
 rewrites it). A game-logic function is one reachable from the eight phase calls
 of `RunGameSteps` (HandleNetPackets, UpdateAllUnits, UpdateProjectiles,
 UpdateExplosions, UpdatePlayers, UpdateFeatures, UpdateWind, UpdateMeteors) or
-from `LoadMatch`, or is `AssignStartPositions` (0x4568c0), which is a root by
-explicit listing (`EXTRA_ROOTS` in the tool) because only frame handlers call
-it. Everything else is presentation. Counts are game-logic
+from `LoadMatch`, or is a root by explicit listing (`EXTRA_ROOTS` in the tool):
+`AssignStartPositions` (0x4568c0), which only frame handlers call;
+`RegisterAllOrderTypes` (0x43c050), which fills the order table that `RunOrders`
+calls the order handlers and AI commands through; `LoadUnitInfo` (0x42a8d0), which
+loads the unit definitions from the menu; and the functions only the
+`wind_meteors` and `weapons` seams call. Everything else is presentation. Counts are game-logic
 functions, then call or instruction sites. `sqrt` never appears as a call:
 the compiler emits `fsqrt` inline.
 
@@ -133,9 +136,9 @@ the compiler emits `fsqrt` inline.
 - `fpatan (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (trig.c)
 - `fsincos (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (trig.c)
 - `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_FUN_004b715a`'s), stored as a double. A plain-double series port differs in 40 to 46% of 500,000 arguments in [-1, 1] (`x 0.5`: want 1.0471975511965976, got 1.0471975511965974). `bx_acos` (`trig.c`) takes `s = sqrt((1 + x) * (1 - x))` in doubles, computes `atan2(s, x)` in double-double (the table reduction of `bx_FUN_004b715a` with double-double arithmetic and an 11-term series, about 2^-100 accurate), rounds it to a 64-bit mantissa and then to 53 bits. It differs in 7 of 500,000 arguments, all of the same kind: the exact angle lies just above a 53-bit midpoint (the low 11 bits of its 64-bit mantissa are 0x401) and the CPU's `fpatan` returned a value at or below it, that is it is not correctly rounded to 64 bits there. This is a property of the host CPU (the tests ran on the development machine), so `tools/bitexact.py` allows up to 50 such cases in 500,000 and fails above that.
-- `_ftol`: 62 functions, 151 sites: #73
-- `_hypot`: 14 functions, 18 sites: routed to `bx_hypot`
-- `fsqrt`: 14 functions, 20 sites: #73
+- `_ftol`: 84 functions, 192 sites: #73
+- `_hypot`: 23 functions, 39 sites: routed to `bx_hypot`
+- `fsqrt`: 18 functions, 24 sites: #73
 - `atof`: 4 functions, 4 sites: #73 (decimal text to double in the TDF and command readers, x87 intermediates)
 - `FUN_004e81b0`: 4 functions, 6 sites: already exact: C++ library, integer and pointer logic
 - `FUN_004e8320`: 4 functions, 6 sites: already exact: C++ library, integer and pointer logic
@@ -169,12 +172,12 @@ the compiler emits `fsqrt` inline.
 - `fseek`: 6 functions, 11 sites: already exact: file system access, no arithmetic (host interface, #24)
 - `ftell`: 5 functions, 8 sites: already exact: file system access, no arithmetic (host interface, #24)
 - `fwrite`: 4 functions, 15 sites: already exact: file system access, no arithmetic (host interface, #24)
-- `_alldiv`: 29 functions, 52 sites: already exact: integer 64-bit helpers
-- `_allmul`: 35 functions, 93 sites: already exact: integer 64-bit helpers
-- `_allshl`: 10 functions, 15 sites: already exact: integer 64-bit helpers
-- `_allshr`: 28 functions, 82 sites: already exact: integer 64-bit helpers
+- `_alldiv`: 32 functions, 61 sites: already exact: integer 64-bit helpers
+- `_allmul`: 39 functions, 101 sites: already exact: integer 64-bit helpers
+- `_allshl`: 12 functions, 17 sites: already exact: integer 64-bit helpers
+- `_allshr`: 32 functions, 90 sites: already exact: integer 64-bit helpers
 - `_itoa`: 3 functions, 3 sites: already exact: integer and byte string logic
-- `_strcmpi`: 65 functions, 94 sites: already exact: integer and byte string logic
+- `_strcmpi`: 73 functions, 109 sites: already exact: integer and byte string logic
 - `_strlwr`: 3 functions, 3 sites: already exact: integer and byte string logic
 - `_strnicmp`: 6 functions, 10 sites: already exact: integer and byte string logic
 - `atoi`: 8 functions, 17 sites: already exact: integer and byte string logic
@@ -184,10 +187,10 @@ the compiler emits `fsqrt` inline.
 - `memmove`: 7 functions, 7 sites: already exact: integer and byte string logic
 - `strchr`: 4 functions, 7 sites: already exact: integer and byte string logic
 - `strcspn`: 1 function, 1 site: already exact: integer and byte string logic
-- `strncmp`: 20 functions, 36 sites: already exact: integer and byte string logic
+- `strncmp`: 21 functions, 37 sites: already exact: integer and byte string logic
 - `strncpy`: 28 functions, 40 sites: already exact: integer and byte string logic
 - `strrchr`: 3 functions, 5 sites: already exact: integer and byte string logic
-- `strstr`: 4 functions, 5 sites: already exact: integer and byte string logic
+- `strstr`: 5 functions, 6 sites: already exact: integer and byte string logic
 - `strtok`: 2 functions, 11 sites: already exact: integer and byte string logic
 - `tolower`: 3 functions, 6 sites: already exact: integer and byte string logic
 - `toupper`: 4 functions, 6 sites: already exact: integer and byte string logic
@@ -197,6 +200,7 @@ the compiler emits `fsqrt` inline.
 - `deflate_slow`: 1 function, 6 sites: already exact: integer compression
 - `deflate_stored`: 1 function, 1 site: already exact: integer compression
 - `_controlfp`: 1 function, 3 sites: already exact: masks exceptions only, see FPU state
+- `floor`: 1 function, 2 sites: already exact: rounding toward minus infinity is exact
 - `_exit`: 1 function, 1 site: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
 - `asctime`: 1 function, 2 sites: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
 - `atexit`: 8 functions, 8 sites: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
@@ -208,9 +212,9 @@ the compiler emits `fsqrt` inline.
 - `_chkstk`: 16 functions, 16 sites: already exact: stack probe
 - `fprintf`: 2 functions, 21 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
 - `printf`: 2 functions, 6 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
-- `sprintf`: 68 functions, 190 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
+- `sprintf`: 71 functions, 193 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
 - `sscanf`: 4 functions, 21 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
-- `_purecall`: 18 functions, 56 sites: already exact: vtable filler, never called
+- `_purecall`: 24 functions, 66 sites: already exact: vtable filler, never called
 - `time`: 2 functions, 2 sites: the #72 port (LoadMatch's seed input: the host supplies the seed; the other site is the crash report text)
 - `rand`: 9 functions, 22 sites: the #72 port (the LoadMatch seeding and std::random_shuffle also draw through rand)
 - `srand`: 1 function, 1 site: the #72 port (the LoadMatch seeding and std::random_shuffle also draw through rand)
@@ -250,17 +254,18 @@ operation, not at each C expression. Values spilled to memory as `float` or
 - Reachability follows direct calls and jumps, every function whose address a
   function takes, and for each data symbol a reachable function references (a
   vtable, an order handler table such as `g_groundOrders`), every function
-  pointer in the exe's data up to the next symbol.
+  pointer in the exe's data up to the next symbol, at any byte offset (the
+  order tables hold 25-byte records).
 - Indirect calls through registers or memory that none of that resolves are
-  not followed: 229 through memory and 109 through registers in game-logic
+  not followed: 273 through memory and 129 through registers in game-logic
   functions, mostly virtual calls and callbacks whose target table is filled at
   run time. A function reached only that way is classed presentation, so its
   rows may be missing from the game-logic list.
 - Tables over-approximate: a function referencing a table reaches every
   entry. `LoadMatch` reaches `InitCommands`, which registers the console and
-  cheat command tables, so 302 of the 1613 game-logic functions are reached
-  only that way (marked `via console commands only` in the notes); 581 of the
-  722 game-logic rows remain without them.
+  cheat command tables, so 290 of the 1792 game-logic functions are reached
+  only that way (marked `via console commands only` in the notes); 660 of the
+  790 game-logic rows remain without them.
   Debug and crash-report code reached through the out-of-memory handler is
   likewise counted as game logic.
 - Format strings of `sprintf`, `sscanf`, `printf` and `fprintf` are not
@@ -337,7 +342,7 @@ Not in the file: 19 single-operation float expressions converted by `_ftol` (`(i
 - `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_FUN_004b715a`'s). A plain-double series port differs in 45.7% of 500,000 arguments in [-1, 1] (`x 0.889465`: want 0.47462316414879513, got 0.47462316414879507). Left for phase 2 or #5: it needs the double-double arctangent of trig.c.
 - `atof`: for decimal text of up to 15 digits with a decimal point (the form of TDF values), the result equals the correctly rounded double, computed as `(double)digits / 10^k` (the integer is exact in a double and 10^k is exact up to 10^15, one division): 0 mismatches in 1,000,000 cases of 1 to 9 digits and 1,000,000 of 10 to 15 digits. Longer text and exponents were not tested. No library function yet, since the port covers only that form.
 - `sscanf("%f")` into a float: 4,089 of 1,000,000 cases (0.41%) differ from the correctly rounded double rounded to float, for example `"-93690462"`: sscanf gives -93690456, the candidate -93690464. The cause is in LIBCMT, not in the digits: `_atoflt` runs `___strgtold12` (up to 25 digits kept, a 96-bit integer of digits made by multiply by 10 and add, scaled by products from the table of powers of ten 10^(+-1..7 * 8^k) with `___ld12mul`'s 5 by 5 limb product), then `__ld12cvt` rounds to 24 bits with `_RoundMan`, whose test for the bits after the round bit (`_ZeroTail(man, 25)`) leaves out bit 25 itself, so when the round bit and the next bit are set and the rest is zero it rounds down. `bx_strtof_msvc5` (`strtof.c`) is a port of that chain, the tables generated by `tools/bitexact_tables.py` and checked against the exe (`bx_pow10_pos`, `bx_pow10_neg`); 0 mismatches against `sscanf` in 2,000,000 texts (integers, decimals with up to 40 digits, leading and trailing zeros, exponents out to e+-50, signs).
-- `atan2` and `floor` are not called by game logic (data/crt_calls.csv), so they are not tested.
+- `atan2` is not called by game logic (data/crt_calls.csv), so it is not tested. `floor` is (`LoadUnitInfo`, on a unit's `Version`): rounding toward minus infinity is exact.
 
 ### Format strings
 

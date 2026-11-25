@@ -4603,7 +4603,7 @@ presentation,harness,call,DisplayLogShard,1
 presentation,harness,call,DisplayLogSprite,8
 presentation,harness,call,DisplayLogTerrain,1
 presentation,harness,call,DisplayLogText,1
-presentation,harness,call,DisplayLogWants,30
+presentation,harness,call,DisplayLogWants,31
 presentation,harness,call,HarnessEventLogOpen,1
 presentation,harness,call,HarnessEventText,1
 presentation,harness,call,HarnessFrameDrawn,1

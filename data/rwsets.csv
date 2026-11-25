@@ -32064,6 +32064,7 @@ address,function,file,kind,target
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,global_read,g_seams
 0x49b720,UpdateProjectiles,src/weapons/weapons.cpp,indirect_call,indirect via Cell *(*)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,DisplayLogNoAngles
+0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,DisplayLogWants
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,DrawFrame
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,DrawFrameBlended
 0x49be60,DrawProjectiles,src/weapons/weapons.cpp,call,DrawLens

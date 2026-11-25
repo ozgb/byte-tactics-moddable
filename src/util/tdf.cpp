@@ -36,6 +36,7 @@ inline void _Destroy(TdfField* p)
 #include "../debug/debug_lib.h"
 #include "math.h"
 #include "../graphics/display.h"
+#include "../util/ftol.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b)
 {
@@ -537,7 +538,7 @@ int* TdfRecord::GetFieldFixed(int* dst, char* key, int def)
     }
     char* value = p ? *p : 0;
     if (value) {
-        *dst = (int)(atof(value) * 65536.0);
+        *dst = bx_ftol(atof(value) * 65536.0);
         return dst;
     }
     *dst = def;

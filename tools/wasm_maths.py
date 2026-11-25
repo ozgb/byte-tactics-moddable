@@ -22,10 +22,12 @@ hashes every result with SHA-256. It is built twice from the same source: for th
 for i686 (x87 code, -mno-sse, as the game's files are; lib/bitexact compiled with SSE2 doubles, as the game
 links it) against MSVC 5's headers and LIBCMT.LIB, run under Wine with the FPU at 53-bit precision, round to
 nearest (_control87 0x9001F); and for the module with clang --target=wasm32 and wasm-ld together with
-lib/bitexact and its generated tables, run under the pinned wasmtime package. The module is built with
--mno-nontrapping-fptoint, so every float to int conversion is LLVM's range-checked lowering, which gives
-0x80000000 for overflow and NaN as x87 _ftol does; the meteor_*_overflow, _negative and _special cases
-check that on every expression of Apply (the PARAMS event).
+lib/bitexact and its generated tables, run under the pinned wasmtime package. Apply converts each float
+expression to int through bx_ftol (lib/bitexact/ftol.c), as 3.1c's _ftol does: the low 32 bits of the
+truncation to 64 bits, so an out-of-range value wraps and NaN, the infinities and magnitudes of 2^63 or
+more give 0; the meteor_*_overflow, _negative and _special cases check that on every expression of Apply
+(the PARAMS event). The module is still built with -mno-nontrapping-fptoint, so a conversion left inline
+would not trap.
 """
 
 import argparse
@@ -47,7 +49,7 @@ LIB = ROOT / "lib/bitexact"
 GUARD = "WASM_MATHS_UNDER_WASMTIME"
 WASMTIME = "50.0.1"
 CLANG = "22.1.8"
-LIB_SOURCES = [LIB / name for name in ("fixed_trig.c", "ext.c", "dd.c", "sqrt.c", "hypot.c", "acos.c", "strtof.c")]
+LIB_SOURCES = [LIB / name for name in ("fixed_trig.c", "ext.c", "dd.c", "sqrt.c", "ftol.c", "hypot.c", "acos.c", "strtof.c")]
 WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing", "-w",
               f"-I{LIB}"]
 

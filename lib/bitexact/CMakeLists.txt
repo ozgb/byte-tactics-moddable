@@ -18,7 +18,7 @@ else()
 endif()
 
 add_library(bitexact_portable STATIC
-  sqrt.c ext.c dd.c rand.c hypot.c acos.c strtof.c qsort.c shuffle.c fixed_trig.c explosions.c
+  sqrt.c ftol.c ext.c dd.c rand.c hypot.c acos.c strtof.c qsort.c shuffle.c fixed_trig.c explosions.c
   "${BITEXACT_ROOT}/cmake/bitexact/sscanf.c"
   "${BX_TABLES_SOURCE}")
 target_include_directories(bitexact_portable PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

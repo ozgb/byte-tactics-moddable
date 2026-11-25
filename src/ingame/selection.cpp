@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../util/ftol.h"
 
 struct Unit;
 #include "../orders/unit_orders.h"
@@ -586,8 +587,8 @@ void __stdcall IssueOrderToSelection(MouseEvent* mouse, unsigned char mode,
     if (!count)
         return;
     int avg[3];
-    avg[0] = (sum_x / count) * 65536.0;
-    avg[2] = (sum_z / count) * 65536.0;
+    avg[0] = bx_ftol((sum_x / count) * 65536.0);
+    avg[2] = bx_ftol((sum_z / count) * 65536.0);
     int range = count * 3000;
     for (u = p->unitsBegin; u <= p->unitsEnd; u++) {
         if (!(((unsigned char)u->flags) & 0x10) || u == except)

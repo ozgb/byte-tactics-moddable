@@ -25,6 +25,7 @@
 
 #include "game.h"
 #include "../util/x87_compare.h"
+#include "../util/ftol.h"
 #pragma pack(pop)
 
 // GLOBAL: 0x511de8
@@ -459,7 +460,7 @@ void __stdcall EconomyUpdatePlayer(int player)
         if (!(pinfo.active && pinfo.controller == 3)) {
             if (ui.cloakOn) {
                 if (!ui.cloakBlocked && ui.workTime <= s_world->Tick()) {
-                    int cost = (int)(ui.moving ? ti.cloakCostMoving : ti.cloakCost);
+                    int cost = bx_ftol(ui.moving ? ti.cloakCostMoving : ti.cloakCost);
                     Player* owner = &g_game->players[ui.player];
 #ifdef __clang__
                     int paid = 0;

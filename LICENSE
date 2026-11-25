@@ -2,8 +2,8 @@ MIT License
 
 This licence covers the files in the tools/ directory, and the files of
 lib/bitexact/ that lib/bitexact/README.md marks computed or published in its
-Provenance table: bitexact.h, internal.h, bx_tables.h, sqrt.c, ext.c, dd.c and
-rand.c. The reconstructed game code in src/ is derived from Total Annihilation
+Provenance table: bitexact.h, internal.h, bx_tables.h, sqrt.c, ftol.c, ext.c,
+dd.c and rand.c. The reconstructed game code in src/ is derived from Total Annihilation
 (Cavedog Entertainment, 1997) and is not offered under this or any other
 licence.
 

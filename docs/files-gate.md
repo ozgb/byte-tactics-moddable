@@ -93,9 +93,9 @@ parse), the loader writes the line `fatal<TAB>null` for that call, answers no fu
 section in the order of the file. `fields` lists the fields of a section in the order it keeps them, each as
 `[name, stored value, looked-up value, integer, fixed, double]`: the value stored with that entry, the value a lookup of
 its name returns, the lookup's value read as a C `atoi` integer, as a 16.16 fixed point number (the `atof` value times
-65536, converted to an integer as MSVC 5's `_ftol` does: the low 32 bits of the 64-bit truncation toward zero), and as
-the `atof` double of MSVC 5's C library (its 64 bits in hex, most significant first). The FBI unit files are TDF files
-and are read the same way.
+65536, converted to an integer as MSVC 5's `_ftol` does: the low 32 bits of the 64-bit truncation toward zero, so `40000`
+gives -1673527296), and as the `atof` double of MSVC 5's C library (its 64 bits in hex, most significant first). The FBI
+unit files are TDF files and are read the same way.
 
 The fields are kept sorted by name without regard to case. A field is placed by a binary search for the first kept field
 whose name is not less than its own, without regard to case. When that field's name is the same, case included, the new

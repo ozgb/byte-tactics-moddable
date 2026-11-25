@@ -8,6 +8,7 @@
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 struct Pos {
     Fixed x;
@@ -32,7 +33,7 @@ static inline int Vec3Length(const Vec3* v)
     double fx = v->x;
     double fy = v->y;
     double fz = v->z;
-    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+    return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
 }
 
 struct View {
@@ -148,7 +149,7 @@ void __stdcall DrawRangeCircle(void* surface, View* view, Pos* pos, int radius,
         int lx = 0;
         int ly = 0;
         double d = radius * TWO_PI;
-        int n = (int)(d * ONE_EIGHTH);
+        int n = bx_ftol(d * ONE_EIGHTH);
         int i = 0;
         int x2;
         int y2;
@@ -413,7 +414,7 @@ void __stdcall DrawOrderRangeRing(void* surface, View* view, Order* order,
         p = *(Pos*)&order->pos;
         height = 0x20;
     }
-    int ry = (int)(height * 0.89);
+    int ry = bx_ftol(height * 0.89);
     int xc = p.x.whole - view->scroll_x + 0x80;
     int yc = p.z.whole - view->scroll_y - (p.y.whole >> 1) + 0x20;
     int x1 = xc + height;

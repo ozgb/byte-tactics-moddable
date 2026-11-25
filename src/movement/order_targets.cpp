@@ -9,6 +9,7 @@
 #include "../util/vec3.h"
 #include <algorithm>
 #include <math.h>
+#include "../util/ftol.h"
 
 extern void* g_approachRadiusVtable[];
 extern void* g_ringApproachVtable[];
@@ -1414,10 +1415,10 @@ void AiSearchGoal::SetPathOrder(void* param)
                 if (count >= 3) {
                     int sx = points[count - 1].x << 16;
                     int sz = points[count - 1].y << 16;
-                    int d1 = (int)_hypot(owner->pos.x - p.x,
-                                         owner->pos.z - p.z);
-                    int d2 = (int)_hypot(sx - p.x,
-                                         sz - p.z);
+                    int d1 = bx_ftol(_hypot(owner->pos.x - p.x,
+                                         owner->pos.z - p.z));
+                    int d2 = bx_ftol(_hypot(sx - p.x,
+                                         sz - p.z));
                     if (d2 * 2 < d1)
                         active = 1;
                 }

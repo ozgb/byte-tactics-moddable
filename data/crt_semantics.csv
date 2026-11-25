@@ -1,6 +1,7 @@
 address,callee,reaches,inputs,verdict
 0x4010b0,sprintf,save,fmt:%04x,spec
 0x401110,sprintf,state,fmt:%04x,spec
+0x406c90,_strcmpi,state,,drop: only fixed ASCII literals are compared
 0x40c250,sprintf,none,,drop: debug dump file only
 0x415fa0,sprintf,trace,fmt:%%;fmt:%3d;fmt:%4d;fmt:%d;negative,spec
 0x416860,_strcmpi,state,,drop: only a fixed ASCII literal is compared
@@ -36,6 +37,8 @@ address,callee,reaches,inputs,verdict
 0x429470,strncpy,state,pad;truncate,spec
 0x429700,_strcmpi,state,high-byte,spec
 0x42a440,_strcmpi,state,,drop: only a fixed ASCII literal is compared
+0x42a8d0,sprintf,state,fmt:%u,spec
+0x42a8d0,strstr,none,,drop: only fixed ASCII literals reach it
 0x42bf40,_strcmpi,state,high-byte,spec
 0x42bf40,atoi,state,empty;overflow;sign;trailing;whitespace,spec
 0x42d2e0,_strcmpi,state,fold-order;high-byte;order,spec
@@ -72,6 +75,9 @@ address,callee,reaches,inputs,verdict
 0x43a420,sprintf,state,fmt:%4d;fmt:%s,spec
 0x43a940,_strcmpi,state,fold-order;order,spec
 0x43a970,sprintf,save,fmt:%4d;fmt:%s,spec
+0x43bc90,_strcmpi,state,fold-order;order,spec
+0x43c020,_strcmpi,state,fold-order;order,spec
+0x43c050,_strcmpi,state,fold-order;order,spec
 0x43dd70,sprintf,save,fmt:%04x,spec
 0x43de30,sprintf,state,fmt:%04x,spec
 0x440420,_strcmpi,state,high-byte,spec
@@ -116,6 +122,7 @@ address,callee,reaches,inputs,verdict
 0x488a50,_strcmpi,state,fold-order;high-byte;order,spec
 0x488b10,_strcmpi,state,fold-order;high-byte;order,spec
 0x488c50,_strcmpi,state,fold-order;high-byte;order,spec
+0x488d30,_strcmpi,state,fold-order;high-byte;order,spec
 0x488e70,sscanf,state,fmt:%n;fmt:%s;high-byte;whitespace,spec
 0x48e010,_strcmpi,state,fold-order;high-byte;order,spec
 0x48e010,sscanf,state,empty;fmt:%[a-zA-Z];fmt:%i;overflow;sign;trailing;whitespace,spec
@@ -181,13 +188,19 @@ address,callee,reaches,inputs,verdict
 0x4adc70,atoi,state,empty;overflow;sign;trailing;whitespace,spec
 0x4adc70,strncpy,trace,pad;truncate,spec
 0x4aeac0,strncpy,trace,pad;truncate,spec
+0x4b3770,_strcmpi,state,,drop: only program-generated ASCII names reach it
+0x4b3770,sprintf,none,,drop: error text only
+0x4b3770,strncmp,state,,drop: only a fixed 8-char literal is compared for equality
 0x4b39c0,strncpy,save,,drop: only a fixed 8-char literal reaches it
+0x4b4270,_strcmpi,state,,drop: only program-generated ASCII names reach it
+0x4b4270,sprintf,none,,drop: error text only
 0x4b4560,_strcmpi,state,,drop: only program-generated ASCII names reach it
 0x4b4910,_strcmpi,state,,drop: only program-generated ASCII names reach it
 0x4b4a80,_strcmpi,state,,drop: only program-generated ASCII names reach it
 0x4b73e0,atoi,state,empty;overflow;sign;trailing,spec
 0x4b7440,isspace,state,high-byte,spec
 0x4b74f0,atoi,state,empty;overflow;sign;trailing,spec
+0x4b7620,_strcmpi,none,,drop: only fixed ASCII literals reach it
 0x4b7760,_strcmpi,none,,drop: only fixed ASCII literals reach it
 0x4b7900,_strcmpi,state,,drop: lookup in a fixed ASCII table; membership does not depend on the order
 0x4b8d40,_strcmpi,state,high-byte,spec

@@ -7,6 +7,10 @@
    "kind": "ref",
    "target": "FixtureView"
   },
+  "gaf_1480f": {
+   "kind": "ptr",
+   "target": "FixtureView"
+  },
   "hotRadarCount": "i32",
   "count_14367": "i32"
  },

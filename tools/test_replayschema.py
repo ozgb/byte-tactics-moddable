@@ -770,6 +770,19 @@ class Tables(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertIn("{ offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 8, 255u }", files[rs.SCHEMA_H])
 
+    def test_a_length_may_name_a_member_of_an_embedded_struct(self):
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["length"] = "settings.field_471*2"
+        files, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertEqual(errors, [])
+        self.assertIn("{ offsetof(Game, settings.field_471), (unsigned char)sizeof(((Game*)nullptr)->settings.field_471), 0 }", files[rs.SCHEMA_H])
+
+    def test_a_dotted_length_member_must_exist(self):
+        ann = annotations()
+        ann["game_fields"]["visibilityMask"]["length"] = "settings.nothing*2"
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("settings.nothing, which is no member of Game" in e for e in errors), errors)
+
 
 class ProductCounts(unittest.TestCase):
     """A table counted by a product of block fields needs those fields in the read set of every slot that reaches it."""
@@ -1982,6 +1995,28 @@ class GameRefs(unittest.TestCase):
         ann["game_fields"]["slowest"]["elem"] = "u8"
         self.assertTrue(any("Game.slowest: a ref field of Game is" in e for e in self.generated(ann)[1]))
 
+    def test_a_ptr_field_of_game_is_a_pointer_row_with_a_target(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "Game.gaf_1480f"')][0]
+        self.assertTrue(row.endswith("RK_PTR, 0, ROK_FIXTUREVIEW },"), row)
+        field = [f for f in model["fields"] if f["name"] == "Game.gaf_1480f"][0]
+        self.assertEqual((field["kind"], field["target"], field["size"]), ("ptr", "FixtureView", 4))
+
+    def test_a_ptr_field_of_game_has_a_state_target_and_no_other_keys(self):
+        ann = annotations()
+        ann["game_fields"]["gaf_1480f"]["target"] = "Unit"
+        self.assertTrue(any("Game.gaf_1480f: the target Unit has a table, sites or kinds" in e for e in self.generated(ann)[1]))
+        ann = annotations()
+        ann["game_fields"]["gaf_1480f"]["blob"] = {"length": "4"}
+        self.assertTrue(any("Game.gaf_1480f: a ptr field of Game is" in e for e in self.generated(ann)[1]))
+
+    def test_a_ptr_field_is_four_bytes(self):
+        ann = annotations()
+        ann["game_fields"]["flags_2a44"] = {"kind": "ptr", "target": "FixtureView"}
+        with self.assertRaises(rs.Error):
+            self.generated(ann)
+
     def test_a_ref_field_is_four_bytes(self):
         ann = annotations()
         ann["game_fields"]["flags_2a44"] = {"kind": "ref", "target": "FixtureView"}
@@ -2088,6 +2123,22 @@ class ArgumentShapes(unittest.TestCase):
         wrapper = "\n".join(rs.wrapper("units", {}, "Fill", s, {}, True))
         self.assertIn('ImportOutBytes(line, "ids", a0, (int)result, len0);', wrapper)
         self.assertIn('ApplyBytes(a0, len0, "ids");', "\n".join(rs.import_stub("units", "Fill", s)))
+
+    def test_a_result_in_elements_is_scaled_to_bytes(self):
+        params = [("void*", "ids"), ("int", "capacity")]
+        args = {"ids": {"mode": "bytes-out", "length": "capacity", "elem": "u16", "resultElem": "u16"}}
+        s, _ = self.slot(params, args, "int", {"mode": "scalar"})
+        self.assertEqual(self.errors(params, args, "int", {"mode": "scalar"}), [])
+        wrapper = "\n".join(rs.wrapper("map", {}, "Fill", s, {}, True))
+        self.assertIn('ImportOutBytes(line, "ids", a0, (int)result * 2, (a1 * 2));', wrapper)
+
+    def test_a_result_element_is_for_bytes_out_only(self):
+        params = [("void*", "ids"), ("int", "capacity")]
+        for mode in ("bytes-in",):
+            errors = self.errors(params, {"ids": {"mode": mode, "length": "capacity", "resultElem": "u16"}}, "int", {"mode": "scalar"})
+            self.assertTrue(any("`resultElem` of" in e for e in errors), errors)
+        errors = self.errors(params, {"ids": {"mode": "bytes-out", "length": "capacity", "resultElem": "nope"}}, "int", {"mode": "scalar"})
+        self.assertTrue(any("`resultElem` of" in e for e in errors), errors)
 
     def test_a_length_that_is_an_argument_is_what_it_was(self):
         s, _ = self.slot([("void*", "src"), ("int", "len")], {"src": {"mode": "bytes-in", "length": "len"}}, "int", {"mode": "scalar"})

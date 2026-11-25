@@ -461,7 +461,7 @@ themselves. The annotation, for `Player.explored` and `Game.visibilityMask`:
 `elem` is the element type (its size is what counts: the elements are written as the bytes of memory), and `length` is an
 integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, `member+a` or `member+a>>k`, or an integer. The
 addend comes before the shift, as in C: `(count+0xff)>>8` is the `(count + 0xff) >> 8` words that `grid.dirty` holds, where `count>>8` is a word short
-whenever the count is not a multiple of 256. A member is one, two or
+whenever the count is not a multiple of 256. A member of an embedded struct is named by its path, `grid1.count*2` for `Game.grid1.count`. A member is one, two or
 four bytes. The length is read from the object each time the array is written, so the members it names have to be recorded
 (`exploredSize` is a field of `Player`) for the replayer to know the length at the call.
 
@@ -910,9 +910,17 @@ set the walk reaches the object, so its fields in the object sets are recorded, 
   r Game.slowest null
 ```
 
+A member of `Game` that is a raw pointer (not a `Ref`) to one object is `{"kind": "ptr", "target": KIND}` and is written, restored and walked
+the same way (`Game.losTable`, a `FrameTable*` into loaded GAF memory: `r Game.losTable FrameTable#1`, `r FrameTable#1.count 40`). The replayer allocates the empty
+object and stores its address, so a service that is given the table (`GetGafFrame`) names it `FrameTable#1` again.
+
 The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, because only such a kind is named by first sight, and
 `replayschema.py --check` fails otherwise. A pointer to a separate object of a table kind (an overflow bucket that is not in its table) is
 `Kind#?` and cannot be rebuilt, so it needs a kind of its own.
+
+### A field the replayer derives
+
+`Game.unitsEnd` (the last slot of the unit pool, `units + poolCount * sizeof(Unit) - sizeof(Unit)`, set once by the unit module at match load) is no recorded field. The replayer sets it from `Game.units` and `Game.poolCount` before each call, so a slot that reads it names `Game.poolCount` in its `reads` and the annotation `exempt` gives `Game::unitsEnd` the reason.
 
 ## The schema and its annotations
 
@@ -1006,7 +1014,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
-| `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
+| `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length; with `"resultElem": "u16"` the result counts elements of that size, as `UnitsInRange`'s count of ids does, and the bytes are `result * 2`). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |

@@ -6,7 +6,7 @@
 // Major version of the pathfinding interface, changed when a slot is removed or its signature changes.
 #define PATHFINDING_VERSION_MAJOR 4
 // Minor version of the pathfinding interface, changed when a slot is added.
-#define PATHFINDING_VERSION_MINOR 0
+#define PATHFINDING_VERSION_MINOR 1
 
 // A unit, as the block offset of its record (an offset from the block base) that the world view gives; 0 for none.
 typedef unsigned int PathUnit;
@@ -75,6 +75,24 @@ enum PathEventKind {
     PATH_EVENT_PROGRESS = 1,
     // A search ended (PathfindingFinished); the points hold the route.
     PATH_EVENT_FINISHED = 2
+};
+
+// The kinds of event the engine publishes to pathfinding; each is an intent, applied as it is published.
+enum PathfindingEventKind {
+    // Sets the search work per tick, and the search scale when the implementation has one (PathfindingSetSearch).
+    PATHFINDING_SET_SEARCH = 448
+};
+
+// The payload of SET_SEARCH.
+struct PathfindingSetSearch {
+    // The kind, a PathfindingEventKind.
+    int kind;
+    // The most search work per tick, in the implementation's own units of work; 0 leaves it as it is.
+    unsigned int steps;
+    // Nonzero when scale is given.
+    int hasScale;
+    // The search scale, in 16.16 fixed point; passed to SetSearchScale when hasScale is set and the implementation has one.
+    int scale;
 };
 
 // How a search started.

@@ -11,17 +11,17 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 5
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 1
+#define PLAYERS_VERSION_MINOR 2
 
 // The fields every players event and effect starts with.
 struct PlayersEventHeader {
     // A PlayersEventKind or a PlayersEffectKind.
     int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS, TRANSFER, SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS name none), as economy's events give a unit.
+    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS, TRANSFER, SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS, SET_CHEATS and LEAVE_GAME name none), as economy's events give a unit.
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1; SET_STORE names a player above 9 or a resource other than 0 and 1; SET_TYPE names a player above 9; END_GAME names a victory other than 0 and 1.
+// The kinds of event other modules publish to players' inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects an event, which then changes nothing and has outcome 0, when: it is smaller than its payload; GIVE_UNIT names a null unit or a player above 9, or the match has no conditions; KILL_UNITS names a player above 10 (10 is the record past the ten players); UNIT_CREATED and UNIT_DIED name a null unit, or the match has no conditions; TRANSFER names a giver or a player above 10, or a resource other than 0 and 1; SET_STORE names a player above 9 or a resource other than 0 and 1; SET_TYPE names a player above 9; END_GAME names a victory other than 0 and 1; SET_CHEATS names a bit other than the five cheat toggles.
 enum PlayersEventKind {
     // Hands unit to a player (PlayersGiveUnit): the conditions are told of the capture, and units is told to send it to a remote owner or to copy it for a local one (with the fields of the ownership record when it is present); outcome 1 when players published the hand-over (SEND_UNIT or CAPTURE_UNIT), which units can still refuse (a local copy past the unit limit is not made), 0 when the unit was already the player's, dead, dying or the player could not take it. Hooks: UnitTransfer.
     PLAYERS_GIVE_UNIT = 192,
@@ -40,7 +40,11 @@ enum PlayersEventKind {
     // Ends the match with a victory or a defeat for the viewing side: the victory is recorded and the end-of-game bits of the game are raised (PlayersEndGame); outcome 1.
     PLAYERS_END_GAME = 199,
     // Stops the victory and defeat conditions of the mission from being checked; the header alone; outcome 1.
-    PLAYERS_DEACTIVATE_CONDITIONS = 200
+    PLAYERS_DEACTIVATE_CONDITIONS = 200,
+    // Clears and sets bits of the cheat toggles of the game (PlayersSetCheats), the bits that are in clear first; outcome 1, or 0 when a bit is not one of the five toggles (0x788).
+    PLAYERS_SET_CHEATS = 201,
+    // Raises the end-of-game bit that a player leaving the match raises; the header alone; outcome 1.
+    PLAYERS_LEAVE_GAME = 202
 };
 
 // The kinds of effect players publishes to its outbox, for the modules that subscribe to them.
@@ -123,6 +127,16 @@ struct PlayersSetType {
     int player;
     // The new type, truncated to a byte.
     int type;
+};
+
+// The payload of SET_CHEATS.
+struct PlayersSetCheats {
+    // The kind; the unit is 0.
+    PlayersEventHeader h;
+    // The toggle bits to clear, within 0x788.
+    unsigned int clear;
+    // The toggle bits to set, within 0x788.
+    unsigned int set;
 };
 
 // The payload of END_GAME.

@@ -46,7 +46,8 @@ and every later line is one scripted `spawn`, `order` or `console` line, in the 
 - After `count`, one ` <KIND> <hex>` pair for each counted event, in publication order: `KIND` is the enum name of
   the event's kind in its interface header (`PLAYERS_TRANSFER`), and `hex` is the event's payload bytes, all of them
   from its `kind` field on, in lowercase hexadecimal with no separators, each integer in the machine's little-endian
-  byte order.
+  byte order. A kind of a module whose events have no section of the trace is written `KIND_<n>` instead, its number
+  in decimal: PATHFINDING_SET_SEARCH is `KIND_448`.
 - `input` lines get no line. A command that publishes nothing is a line with `count` 0 and no pairs.
 
 ## 3. Reading a console line
@@ -116,16 +117,16 @@ The class is the one of section 3. Command words are compared in any case.
 | `armflea`, `armpw`, `corak` | converted | cheat | UNITS_CREATE |
 | `control` | direct | cheat | none |
 | `view` | direct | skirmish | none |
-| `doubleshot` | direct | skirmish | none |
-| `halfshot` | direct | skirmish | none |
-| `radar` | direct | skirmish | none |
-| `shootall` | direct | always | none |
-| `treedeath` | direct | cheat | none |
-| `los` | direct | skirmish | LOS_RADAR_RECALCULATE |
-| `lostype` | direct | always | LOS_RADAR_RECALCULATE |
-| `mapping` | direct | skirmish | LOS_RADAR_RECALCULATE |
-| `nowisee` | direct | skirmish | LOS_RADAR_RECALCULATE |
-| `search` | direct | cheat | none |
+| `doubleshot` | converted | skirmish | PLAYERS_SET_CHEATS |
+| `halfshot` | converted | skirmish | PLAYERS_SET_CHEATS |
+| `radar` | converted | skirmish | PLAYERS_SET_CHEATS |
+| `shootall` | converted | always | PLAYERS_SET_CHEATS |
+| `treedeath` | converted | cheat | PLAYERS_SET_CHEATS |
+| `los` | converted | skirmish | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
+| `lostype` | converted | always | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
+| `mapping` | converted | skirmish | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
+| `nowisee` | converted | skirmish | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
+| `search` | converted | cheat | PATHFINDING_SET_SEARCH |
 | `sharemetal` | direct | always | none |
 | `shareenergy` | direct | always | none |
 | `shareall` | direct | always | LOS_RADAR_SHARE_MAPPING, LOS_RADAR_SHARE_RADAR |
@@ -196,6 +197,21 @@ Each command below says its guards and then its events, in publication order. "T
   first by the previous unit's width; no scenario has one.) The units module makes the unit finished (outcome 1) or not
   (outcome 0: the type is 0 or not usable in this match, the player holds as many of it as the type allows, or the
   player has no free unit slot). The page does not define a player that does not exist: no scenario names one.
+- **`doubleshot`, `halfshot`, `radar`, `shootall`, `treedeath`.** Each toggles one bit of `uiOptionFlags`: 0x80,
+  0x100, 0x200, 0x400 and 0x8. When the bit is set, PLAYERS_SET_CHEATS with `clear` the bit and `set` 0; else with
+  `clear` 0 and `set` the bit. Always one event. (The tick reads bit 3 when a feature burns, bit 9 when it records the
+  radar picture and bit 10 when a unit picks a target; nothing reads bits 7 and 8, but the trace keeps them, so they
+  are set the same way. The word's other bits, 0, 1, 2, 4 and 6, are the view's or the platform's.)
+- **`los`, `lostype`, `mapping`.** Each toggles one bit of `mapFlags`: `los` bit 1 (0x2, line of sight), `lostype` bit
+  2 (0x4) and `mapping` bit 0 (0x1). LOS_RADAR_SET_MODE with `clear` the bit when it is set and `set` the bit when it
+  is not; then LOS_RADAR_RECALCULATE with `reset` 0 for `los` and `lostype` and 1 for `mapping`.
+- **`nowisee`.** LOS_RADAR_SET_MODE with `clear` 3 and `set` 0, then LOS_RADAR_RECALCULATE with `reset` 1, always.
+- **`search [steps [scale]]`.** Nothing when argument 1 is 0 and the line does not have exactly three words. Else
+  PATHFINDING_SET_SEARCH with `steps` argument 1 as an unsigned number, `hasScale` 1 when the line has exactly three
+  words, else 0, and `scale` argument 2 read as a decimal number (the C `atof`), times 65536, cut to an integer when
+  `hasScale` is 1, else 0. The engine consumes it: when `steps` is not 0 the search steps per tick of the block header
+  (the scenario key `search_steps`) become it, and when `hasScale` is 1 and the pathfinding module has the optional
+  slot `SetSearchScale`, it is called with `scale`.
 
 ### 4.3 Commands that are not events
 
@@ -205,19 +221,14 @@ These are written by the game directly or through a module's own function, not b
 - **`control <player>`.** When argument 1 (cut to a byte) is a player that exists: `localPlayer` and `playerIndex` become
   it.
 - **`view <player>`.** The same test; only `playerIndex` becomes it.
-- **`doubleshot`, `halfshot`, `radar`, `shootall`, `treedeath`.** Each flips one bit of `uiOptionFlags` (0x80, 0x100,
-  0x200, 0x400 and 0x8). The word mixes bits the simulation reads with bits the view reads; the trace keeps these five.
-- **`los`, `lostype`, `mapping`, `nowisee`.** They change `mapFlags`: `los` flips bit 1, `lostype` bit 2, `mapping` bit 0,
-  and `nowisee` clears bits 0 and 1. Then LOS_RADAR_RECALCULATE with `reset` 0 for `los` and `lostype` and 1 for `mapping` and
-  `nowisee`.
+
+  Both fields are the machine's own player and the tick reads them, so a change during play is a change of the
+  perspective the simulation computes for one machine, not a command every player runs. They become events once the
+  fields are split into the simulation's perspective, fixed by the match setup, and the view's player.
 - **`reloadaiprofiles`.** The AI players are reset and their profiles loaded again, which runs the AI script's own
   console lines (`plan`, `weight`, `limit` and the others the script holds), each publishing its AI event as section 4.2
   would. It is not an event because an event whose handling runs console lines would put the console inside the
-  simulation; where the loading of AI profiles belongs is a decision this page does not make.
-- **`search [steps [scale]]`.** When argument 1 is not 0, the search steps per tick of the block header (the scenario
-  key `search_steps`) become it, as an unsigned number. When the line has exactly three words and the pathfinding module
-  has the optional slot `SetSearchScale`, it is called with argument 2 read as a decimal number (the C `atof`), times
-  65536, cut to an integer.
+  simulation; where the loading of AI profiles belongs is a question for the human on #1049.
 - **`sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy`.** They act only when bit 0 of
   `netGameFlags` is set, which no test-mode run does, so in every scenario they do nothing. When it is set:
   `sharemetal` and `shareenergy` flip the local player's metal or energy sharing switch, add a line to the message log
@@ -389,17 +400,17 @@ one of those, and a scenario that uses a console command or an order kind that t
 | conditions-shore-to-shore | judged | - |
 | console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
 | console-edge | judged | - |
-| console-features | left out | console commands that are not events: `treedeath` |
+| console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
-| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search` |
+| console-sight | left out | console commands that are not events: `view`, `reloadaiprofiles` |
+| console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
 | duel-shore-to-shore | judged | - |
 | edges-economy-targeting | judged | - |
-| edges-targeting-lead | left out | console commands that are not events: `shootall` |
+| edges-targeting-lead | judged | - |
 | eight-full-moon | judged | - |
 | eight-greenhaven | judged | - |
 | eight-pincushion-teams | judged | - |
@@ -474,3 +485,25 @@ one of those, and a scenario that uses a console command or an order kind that t
 | ui-right-click | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
+
+## 8. The interface's commands
+
+The interface changes the simulation during play only by publishing events to the engine's outbox, as a command does,
+and the rule of delivery of section 1 holds for them: the interface runs while no tick does, so each event is delivered
+at once. These are the events it publishes, besides the group commands of a click (section 6.2):
+
+- **A click on a unit type of the build menu**, for the unit the menu shows when it is selected: ORDERS_QUEUE_BUILD
+  with that unit, `count` 1 (5 with the shift key) for a left click and minus that for a right click, and `name` the
+  button's name.
+- **The quit dialog**, its first choice when the player asked to leave the game to the desktop: PLAYERS_LEAVE_GAME. The
+  other choices of that dialog leave the battle screen and change nothing the simulation reads.
+- **The dialog a defeated player gets**, its second choice (stop watching): PLAYERS_LEAVE_GAME. The first choice
+  (keep watching) changes nothing the simulation reads.
+- **The debug hotkeys** (with debug mode on, which needs the cheat code): the key that fills every player's stores
+  publishes, for each player that exists in slot order, PLAYERS_SET_STORE with `resource` 0, `add` 0 and `amount` the
+  player's energy capacity, then the same with `resource` 1 and its metal capacity; the key that makes the unit under
+  the cursor forget its attacker publishes UNITS_FORGET_ATTACKER with that unit, when there is one.
+
+The pause request (bit 0 of `otherFlags`) is the driver's: it decides whether ticks run, and the tick reads it only in
+the network's timeout check, which runs on the wall clock. The bit of `mapFlags` that the camera clears (bit 3) says
+whether the drawn fog of war is current: only drawing reads it, and the trace leaves it out. Neither is an event.

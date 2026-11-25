@@ -2,7 +2,7 @@
 
     uv run tools/stateclasses.py                 # writes data/state_classes.csv, keeping class and note
     uv run tools/stateclasses.py --out F         # write F instead (a dry run; class and note kept from the data file)
-    uv run tools/stateclasses.py --check         # fail if anything but class and note differs
+    uv run tools/stateclasses.py --check         # fail if anything but class and note differs, or presentation writes sim state
     uv run tools/stateclasses.py --unclassified  # fail if a row has an empty class
     uv run tools/stateclasses.py --unjoined      # list the globals no row of data/rwsets.csv names
     uv run tools/stateclasses.py --build-dir D   # use D/compile_commands.json (default build/rwsets)
@@ -167,6 +167,14 @@ table the loop walks) is not accessed by it: that escape is dropped. `DAT_000000
 the source names for a read of absolute address 0 (UnitSync::ProcessSync reads it in the
 `direct != 0` branch, a null address in the shipped exe too), is no variable and no row.
 
+Presentation writes. --check also fails on a `global_write` or `field_write` row of data/rwsets.csv
+by a function of data/subsystems.csv's `presentation` in a PRESENTATION_DIRS file whose target is a
+global or a Game field of class sim in data/state_classes.csv (#1049): presentation asks the sim to
+change sim state through an event and writes none itself. A Game field joins the game-region rows
+by name, and a bit field of an anonymous struct (`<anon>::bit0_3923b`) by the address in its name;
+a target that joins nothing, or rows of different classes, is not checked. PRESENTATION_SIM_WRITES
+lists the writes that remain, each with its reason; an entry that matches no write fails as stale.
+
 Limits. Inline assembly is not looked into (an `asm` function may touch more). A call
 through a function pointer or a virtual method only follows the edges of
 data/hazard_edges.csv. A callee's writes through a pointer argument are not looked into.
@@ -198,6 +206,7 @@ from rwsets import ROOT, Analyzer, Walker, is_pointer, record_name, strip, type_
 GLOBALS = ROOT / "data/globals.csv"
 GAME_LOGIC = ROOT / "data/game_logic.csv"
 GAME_HEADER = ROOT / "src" / "game" / "game.h"
+SUBSYSTEMS = ROOT / "data/subsystems.csv"
 GLOBALS_HEADER = (ROOT / "link" / "globals.h").resolve()
 OUT = ROOT / "data/state_classes.csv"
 COLUMNS = ["name", "address", "kind", "proposed", "class", "rule", "phases_write", "phases_read",
@@ -221,6 +230,25 @@ PRESENTATION_ROOTS = ["UpdateCameraFollow", "UpdateParticles", "UpdateBlink", "E
 PRESENTATION_DIRS = ("src/graphics/", "src/sound/", "src/gui/", "src/frontend/", "src/ingame/")
 NON_GAME_DIRS = ("src/debug/", "src/harness/")
 SIM_IN_PRESENTATION_DIRS = ["StepGafSequence"]
+
+ANON_BITS = re.compile(r"^<anon>::bits?\d*_([0-9a-f]+)$")
+PRESENTATION_WRITE_KINDS = ("field_write", "global_write")
+
+MATCH_SETUP = "match setup before the first tick"
+PRESENTATION_SIM_WRITES = [
+    ("HandleNewGameClick", "Game::difficulty", MATCH_SETUP),
+    ("HandleEndMissionClick", "Game::difficulty", MATCH_SETUP),
+    ("HandleEndMissionClick", "<anon>::bit2_3923b", "clears the game-over bit before the next mission starts"),
+    ("HandleFrontendDebugKey", "Game::difficulty", "debug key in the menus, outside a match"),
+    ("HandleBattleRoomClick", "Game::difficulty", MATCH_SETUP),
+    ("HandleRestartDialogClick", "Game::difficulty", MATCH_SETUP),
+    ("HandleSkirmishClick", "Game::difficulty", MATCH_SETUP),
+    ("OpenSkirmishMenu", "Game::difficulty", MATCH_SETUP),
+    ("HandleSkirmishClick", "Game::numPlayers", MATCH_SETUP),
+    ("HandleSelectGameClick", "Game::netGameFlags", MATCH_SETUP),
+    ("OpenBattleRoom", "Game::commanderDeath", MATCH_SETUP),
+    ("HandleDebugHotkey", "<anon>::bit0_3923b", "debug display bit, read only by presentation"),
+]
 
 PLATFORM_TYPE = re.compile(r"\b(HWND|HDC|HANDLE|HINSTANCE|HMODULE|HBITMAP|HPALETTE|HFONT|HICON|HCURSOR|HKEY|"
                            r"HGLOBAL|FILE|_?GUID|CRITICAL_SECTION|CritSec_\w+|LoadedImage|IDirect\w+|"
@@ -1101,6 +1129,52 @@ def const_violations(rows: list[dict]) -> list[str]:
     return out
 
 
+def read_subsystems(path: Path = SUBSYSTEMS) -> dict[tuple[str, str], str]:
+    """The subsystem of each (function, file) of data/subsystems.csv."""
+    with path.open(newline="") as f:
+        return {(r["function"], r["file"]): r["subsystem"] for r in csv.DictReader(f)}
+
+
+def presentation_sim_writes(rwsets_rows: list[list[str]], subsystems: dict[tuple[str, str], str],
+                            classes: list[dict], globals_rows: list[dict]) -> list[tuple[str, str]]:
+    """The (function, target) pairs where presentation code writes a global or Game field of class sim."""
+    by_name = defaultdict(list)
+    by_address = defaultdict(list)
+    for row in classes:
+        if row["kind"] == "game-region":
+            for name in row["name"].split("|"):
+                by_name[name].append(row["class"])
+            by_address[int(row["address"], 16)].append(row["class"])
+    state = {(r["kind"], r["name"]): r["class"] for r in classes}
+    joiner = Items([], globals_rows)
+
+    def target_classes(kind: str, target: str) -> list[str]:
+        if kind == "global_write":
+            return [state.get(joiner.join(target) or ("", ""), "")]
+        m = ANON_BITS.match(target)
+        if m:
+            return by_address.get(int(m.group(1), 16), [])
+        return by_name.get(target[len("Game::"):], []) if target.startswith("Game::") else []
+
+    found = set()
+    for _, function, file, kind, target in rwsets_rows:
+        if kind in PRESENTATION_WRITE_KINDS and file.startswith(PRESENTATION_DIRS) \
+                and subsystems.get((function, file)) == "presentation":
+            classes_of = target_classes(kind, target)
+            if classes_of and all(c == "sim" for c in classes_of):
+                found.add((function, target))
+    return sorted(found)
+
+
+def presentation_write_errors(found: list[tuple[str, str]], allowed=None) -> list[str]:
+    """One line for each write not in PRESENTATION_SIM_WRITES and each entry that matches no write."""
+    allowed = PRESENTATION_SIM_WRITES if allowed is None else allowed
+    listed = {(function, target) for function, target, _ in allowed}
+    errors = ["presentation writes sim state: %s writes %s" % pair for pair in found if pair not in listed]
+    errors += ["stale PRESENTATION_SIM_WRITES entry: %s writes %s" % pair for pair in sorted(listed - set(found))]
+    return errors
+
+
 def differences(have: list[dict], want: list[dict]) -> list[str]:
     """Unified diff lines of the rows with class and note left out."""
     def lines(rows):
@@ -1146,6 +1220,14 @@ def main() -> None:
         if bad:
             print("\n".join(bad))
             print("stateclasses: %d const rows break the const rule (docs/state.md)" % len(bad))
+            sys.exit(1)
+        rwsets_rows, _ = hazards.load_graph()
+        errors = presentation_write_errors(presentation_sim_writes(rwsets_rows, read_subsystems(), old,
+                                                                   read_globals()))
+        if errors:
+            print("\n".join(errors))
+            print("stateclasses: %d presentation writes of sim state (add an event, or list it in "
+                  "PRESENTATION_SIM_WRITES with a reason)" % len(errors))
             sys.exit(1)
         if diff:
             print("\n".join(diff[:40]))

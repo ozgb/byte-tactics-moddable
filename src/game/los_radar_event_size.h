@@ -25,6 +25,8 @@ inline unsigned int LosRadarEventSize(int kind)
         return sizeof(LosRadarShareMap);
     case LOS_RADAR_SIGHT_LOAD:
         return sizeof(LosRadarSightLoad);
+    case LOS_RADAR_SET_MODE:
+        return sizeof(LosRadarSetMode);
     default:
         return sizeof(LosRadarEventHeader);
     }

@@ -109,6 +109,7 @@ Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 #include "../network/net_game.h"
 #include "../units/units.h"
 #include "../game/los_radar_events.h"
+#include "../game/units_events.h"
 void __stdcall CollectSelectedUnits(std::vector<Unit*>* list);
 #include "../units/unit_commands.h"
 #include "game_dialogs.h"
@@ -1151,9 +1152,7 @@ void __stdcall HandleDebugHotkey(int eventType)
     case 0x5d: {
         Unit* u = &g_game->units[g_game->hoverUnitId];
         if (u->unitDefIndex != 0) {
-            u->lastAttackerSlot = 10;
-            u->panel.flag_110 = 1;
-            u->attacker = 0;
+            UnitsPublishForgetAttacker(SCHED_ENGINE, u);
         }
         break;
     }
@@ -1166,8 +1165,8 @@ void __stdcall HandleDebugHotkey(int eventType)
                     unsigned char kind = g_game->players[k].type;
                     if (kind == 1 || kind == 2 || kind == 3) {
                         if (g_game->players[k].index != 10) {
-                            g_game->players[k].energy = g_game->players[k].energyCapacity;
-                            g_game->players[k].metal = g_game->players[k].metalCapacity;
+                            PlayersPublishSetStore(SCHED_ENGINE, k, 0, 0, g_game->players[k].energyCapacity);
+                            PlayersPublishSetStore(SCHED_ENGINE, k, 1, 0, g_game->players[k].metalCapacity);
                         }
                     }
                 }
@@ -1200,7 +1199,7 @@ void __stdcall ContinueWatchingCallback(Gui* gui)
         ClearSelectedGadget(gui);
         return;
     }
-    g_game->bits.flag2 = 1;
+    PlayersPublishLeaveGame(SCHED_ENGINE);
     g_game->endGameVictory = 0;
 }
 

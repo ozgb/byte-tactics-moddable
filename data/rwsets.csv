@@ -4430,8 +4430,8 @@ address,function,file,kind,target
 0x416660,CmdFShadow,src/game/console_commands.cpp,function,
 0x416660,CmdFShadow,src/game/console_commands.cpp,global_read,g_game
 0x416690,CmdLOSType,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
+0x416690,CmdLOSType,src/game/console_commands.cpp,call,LosRadarPublishSetMode
 0x416690,CmdLOSType,src/game/console_commands.cpp,field_read,<anon>::bit2_14281
-0x416690,CmdLOSType,src/game/console_commands.cpp,field_write,<anon>::bit2_14281
 0x416690,CmdLOSType,src/game/console_commands.cpp,function,
 0x416690,CmdLOSType,src/game/console_commands.cpp,global_read,g_game
 0x4166c0,CmdLight,src/game/console_commands.cpp,call,CMemoryCache::FlushCache
@@ -4449,16 +4449,12 @@ address,function,file,kind,target
 0x416730,CmdEdge,src/game/console_commands.cpp,function,
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
-0x416780,CmdSearch,src/game/console_commands.cpp,call,SimSetSearchSteps
+0x416780,CmdSearch,src/game/console_commands.cpp,call,PathfindingPublishSetSearch
 0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_atof_msvc5
 0x416780,CmdSearch,src/game/console_commands.cpp,call,bx_ftol
 0x416780,CmdSearch,src/game/console_commands.cpp,field_read,CommandArgs::count
-0x416780,CmdSearch,src/game/console_commands.cpp,field_read,PathfindingSeam::SetSearchScale
-0x416780,CmdSearch,src/game/console_commands.cpp,field_read,Seams::pathfinding
 0x416780,CmdSearch,src/game/console_commands.cpp,function,
 0x416780,CmdSearch,src/game/console_commands.cpp,global_maybe_written,g_emptyText
-0x416780,CmdSearch,src/game/console_commands.cpp,global_read,g_seams
-0x416780,CmdSearch,src/game/console_commands.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PathfindingSeam::SetSearchScale]
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,call,Sound::PlayCdTrack
 0x4167f0,CmdCDPlay,src/game/console_commands.cpp,field_read,Game::sound
@@ -4559,15 +4555,15 @@ address,function,file,kind,target
 0x416d20,CmdIFace,src/game/console_commands.cpp,function,
 0x416d20,CmdIFace,src/game/console_commands.cpp,global_read,g_game
 0x416d50,CmdLOS,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
+0x416d50,CmdLOS,src/game/console_commands.cpp,call,LosRadarPublishSetMode
 0x416d50,CmdLOS,src/game/console_commands.cpp,call,SaveSettings
 0x416d50,CmdLOS,src/game/console_commands.cpp,field_read,<anon>::bit1_14281
-0x416d50,CmdLOS,src/game/console_commands.cpp,field_write,<anon>::bit1_14281
 0x416d50,CmdLOS,src/game/console_commands.cpp,function,
 0x416d50,CmdLOS,src/game/console_commands.cpp,global_read,g_game
 0x416d80,CmdMapping,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
+0x416d80,CmdMapping,src/game/console_commands.cpp,call,LosRadarPublishSetMode
 0x416d80,CmdMapping,src/game/console_commands.cpp,call,SaveSettings
 0x416d80,CmdMapping,src/game/console_commands.cpp,field_read,<anon>::bit0_14281
-0x416d80,CmdMapping,src/game/console_commands.cpp,field_write,<anon>::bit0_14281
 0x416d80,CmdMapping,src/game/console_commands.cpp,function,
 0x416d80,CmdMapping,src/game/console_commands.cpp,global_read,g_game
 0x416db0,CmdContour,src/game/console_commands.cpp,call,CommandArgs::GetFloatArg
@@ -4579,8 +4575,8 @@ address,function,file,kind,target
 0x416e00,CmdSelBoxes,src/game/console_commands.cpp,field_write,<anon>::b2
 0x416e00,CmdSelBoxes,src/game/console_commands.cpp,function,
 0x416e00,CmdSelBoxes,src/game/console_commands.cpp,global_read,g_game
-0x416e30,CmdTreeDeath,src/game/console_commands.cpp,field_read,<anon>::b3
-0x416e30,CmdTreeDeath,src/game/console_commands.cpp,field_write,<anon>::b3
+0x416e30,CmdTreeDeath,src/game/console_commands.cpp,call,PlayersPublishSetCheats
+0x416e30,CmdTreeDeath,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x416e30,CmdTreeDeath,src/game/console_commands.cpp,function,
 0x416e30,CmdTreeDeath,src/game/console_commands.cpp,global_read,g_game
 0x416e60,CmdNoShake,src/game/console_commands.cpp,field_read,<anon>::b4
@@ -4595,17 +4591,16 @@ address,function,file,kind,target
 0x416e90,CmdNow,src/game/console_commands.cpp,function,
 0x416e90,CmdNow,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x416e90,CmdNow,src/game/console_commands.cpp,global_read,g_game
-0x417030,CmdDoubleShot,src/game/console_commands.cpp,deref_read,*unsigned short
-0x417030,CmdDoubleShot,src/game/console_commands.cpp,deref_write,*unsigned short
-0x417030,CmdDoubleShot,src/game/console_commands.cpp,field_escape,Game::uiOptionFlags
+0x417030,CmdDoubleShot,src/game/console_commands.cpp,call,PlayersPublishSetCheats
+0x417030,CmdDoubleShot,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x417030,CmdDoubleShot,src/game/console_commands.cpp,function,
 0x417030,CmdDoubleShot,src/game/console_commands.cpp,global_read,g_game
-0x417060,CmdHalfShot,src/game/console_commands.cpp,field_read,<anon>::b8
-0x417060,CmdHalfShot,src/game/console_commands.cpp,field_write,<anon>::b8
+0x417060,CmdHalfShot,src/game/console_commands.cpp,call,PlayersPublishSetCheats
+0x417060,CmdHalfShot,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x417060,CmdHalfShot,src/game/console_commands.cpp,function,
 0x417060,CmdHalfShot,src/game/console_commands.cpp,global_read,g_game
-0x417090,CmdRadar,src/game/console_commands.cpp,field_read,<anon>::b9
-0x417090,CmdRadar,src/game/console_commands.cpp,field_write,<anon>::b9
+0x417090,CmdRadar,src/game/console_commands.cpp,call,PlayersPublishSetCheats
+0x417090,CmdRadar,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x417090,CmdRadar,src/game/console_commands.cpp,function,
 0x417090,CmdRadar,src/game/console_commands.cpp,global_read,g_game
 0x4170c0,CmdATM,src/game/console_commands.cpp,call,PlayersPublishSetStore
@@ -4703,10 +4698,8 @@ address,function,file,kind,target
 0x417520,CmdProfile,src/game/console_commands.cpp,function,
 0x417520,CmdProfile,src/game/console_commands.cpp,global_read,g_game
 0x417540,CmdNowISee,src/game/console_commands.cpp,call,LosRadarPublishRecalculate
-0x417540,CmdNowISee,src/game/console_commands.cpp,deref_read,*unsigned short
-0x417540,CmdNowISee,src/game/console_commands.cpp,deref_write,*unsigned short
+0x417540,CmdNowISee,src/game/console_commands.cpp,call,LosRadarPublishSetMode
 0x417540,CmdNowISee,src/game/console_commands.cpp,function,
-0x417540,CmdNowISee,src/game/console_commands.cpp,global_read,g_game
 0x417570,CmdNetStats,src/game/console_commands.cpp,call,SumMessageStats
 0x417570,CmdNetStats,src/game/console_commands.cpp,field_read,Game::ticks
 0x417570,CmdNetStats,src/game/console_commands.cpp,field_write,MessageByteCounter::b
@@ -4978,8 +4971,8 @@ address,function,file,kind,target
 0x418c70,CmdSenderror,src/game/console_commands.cpp,field_write,Game::netSendDropPct
 0x418c70,CmdSenderror,src/game/console_commands.cpp,function,
 0x418c70,CmdSenderror,src/game/console_commands.cpp,global_read,g_game
-0x418ca0,CmdShootAll,src/game/console_commands.cpp,field_read,<anon>::flag10
-0x418ca0,CmdShootAll,src/game/console_commands.cpp,field_write,<anon>::flag10
+0x418ca0,CmdShootAll,src/game/console_commands.cpp,call,PlayersPublishSetCheats
+0x418ca0,CmdShootAll,src/game/console_commands.cpp,field_read,Game::uiOptionFlags
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,function,
 0x418ca0,CmdShootAll,src/game/console_commands.cpp,global_read,g_game
 0x418cd0,CmdShareMetal,src/game/share_commands.cpp,call,RecordMessage
@@ -19370,18 +19363,17 @@ address,function,file,kind,target
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,CloseTopScreen
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,IsGadgetNamed
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,PlaySoundByName
+0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,PlayersPublishLeaveGame
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,PopUntilNamedLayout
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,SetGameMode
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,ShutdownIngameAndQuit
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,ShutdownIngameSystems
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,call,Sound::SetTrackCategory
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_maybe_written,Game::gui
-0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Game::flagsByte_3923b
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Game::sound
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Gui::hotGadgetIndex
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Gui::layer
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_read,Layer::entries
-0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,field_write,Game::flagsByte_3923b
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,function,
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,global_read,g_battleQuitIntent
 0x4605c0,HandleSurrenderChoice,src/frontend/options.cpp,global_read,g_game
@@ -20477,13 +20469,13 @@ address,function,file,kind,target
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,ClearSelectedGadget
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,IsGadgetNamed
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,PlaySoundByName
+0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,PlayersPublishLeaveGame
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,call,ReportGameEvent
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_read,Gui::hotGadgetIndex
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_read,Gui::layer
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_read,Layer::entries
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_read,NetworkSeam::BroadcastPlayerInfo
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_read,Seams::network
-0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_write,<anon>::flag2
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,field_write,Game::endGameVictory
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,function,
 0x464de0,ContinueWatchingCallback,src/ingame/game_dialogs.cpp,global_read,g_game
@@ -30488,9 +30480,10 @@ address,function,file,kind,target
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::UpdatePlayers]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
 0x495490,RunGameSteps,src/ingame/game_dialogs.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [EconomySeam::UpdateResourceSharing]
+0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,PlayersPublishSetStore
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,SetPageFlipping
+0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,UnitsPublishForgetAttacker
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,operator Unit *
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,call,operator=
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,deref_escape,*Unit
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_read,<anon>::bit0_3923b
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_read,Game::debugMode
@@ -30503,12 +30496,7 @@ address,function,file,kind,target
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_read,Player::type
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_read,Unit::unitDefIndex
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,<anon>::bit0_3923b
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,<anon>::flag_110
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,Game::debugMode
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,Player::energy
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,Player::metal
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,Unit::attacker
-0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,field_write,Unit::lastAttackerSlot
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,function,
 0x4956c0,HandleDebugHotkey,src/ingame/game_dialogs.cpp,global_read,g_game
 0x495860,SelectStopOrder,src/ingame/keys.cpp,call,ClearGroupStatus
@@ -42812,6 +42800,7 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,memset
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,call,operator=
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,deref_write,*LosSightCache
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,Game::mapFlags
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarAddEyeball::eyeHeight
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarAddEyeball::lifetime
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarAddEyeball::pos
@@ -42820,6 +42809,8 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarCellHeights::size
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarEventHeader::kind
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarRecalculate::reset
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarSetMode::clear
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarSetMode::set
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarShareMap::from
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarShareMap::to
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarSharePlayer::player
@@ -42827,6 +42818,7 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarSightLoad::frameIdx
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarSightLoad::unit
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_read,LosRadarUnit::unit
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Game::mapFlags
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,LosSightCache::cell
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,LosSightCache::frameIdx
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Point16::x
@@ -42835,6 +42827,7 @@ address,function,file,kind,target
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::y
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,field_write,Vec3::z
 ,ApplyLosRadarEvent,src/map/line_of_sight.cpp,function,
+,ApplyLosRadarEvent,src/map/line_of_sight.cpp,global_read,g_game
 ,ApplyMapEvent,src/map/terrain.cpp,call,AddUnitToMap
 ,ApplyMapEvent,src/map/terrain.cpp,call,BucketHolds
 ,ApplyMapEvent,src/map/terrain.cpp,call,ClearFootprintAndUnlink
@@ -50915,6 +50908,12 @@ address,function,file,kind,target
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,field_write,LosRadarEventHeader::kind
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,field_write,LosRadarRecalculate::reset
 ,LosRadarPublishRecalculate,src/game/los_radar_events.h,function,
+,LosRadarPublishSetMode,src/game/los_radar_events.h,call,SchedPublish
+,LosRadarPublishSetMode,src/game/los_radar_events.h,call,memset
+,LosRadarPublishSetMode,src/game/los_radar_events.h,field_write,LosRadarEventHeader::kind
+,LosRadarPublishSetMode,src/game/los_radar_events.h,field_write,LosRadarSetMode::clear
+,LosRadarPublishSetMode,src/game/los_radar_events.h,field_write,LosRadarSetMode::set
+,LosRadarPublishSetMode,src/game/los_radar_events.h,function,
 ,LosRadarPublishShareMap,src/game/los_radar_events.h,call,SchedPublish
 ,LosRadarPublishShareMap,src/game/los_radar_events.h,call,memset
 ,LosRadarPublishShareMap,src/game/los_radar_events.h,field_write,LosRadarEventHeader::kind
@@ -53322,9 +53321,25 @@ address,function,file,kind,target
 ,PathfindingOnMapCellsChanged,src/game/routes.cpp,function,
 ,PathfindingOnMapCellsChanged,src/game/routes.cpp,global_read,g_seams
 ,PathfindingOnMapCellsChanged,src/game/routes.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
+,PathfindingOnSetSearch,src/game/routes.cpp,call,SimSetSearchSteps
+,PathfindingOnSetSearch,src/game/routes.cpp,field_read,PathfindingSeam::SetSearchScale
+,PathfindingOnSetSearch,src/game/routes.cpp,field_read,PathfindingSetSearch::hasScale
+,PathfindingOnSetSearch,src/game/routes.cpp,field_read,PathfindingSetSearch::scale
+,PathfindingOnSetSearch,src/game/routes.cpp,field_read,PathfindingSetSearch::steps
+,PathfindingOnSetSearch,src/game/routes.cpp,field_read,Seams::pathfinding
+,PathfindingOnSetSearch,src/game/routes.cpp,function,
+,PathfindingOnSetSearch,src/game/routes.cpp,global_read,g_seams
+,PathfindingOnSetSearch,src/game/routes.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [PathfindingSeam::SetSearchScale]
 ,PathfindingPoll,src/ai/pathfind.cpp,call,GetPathfinder
 ,PathfindingPoll,src/ai/pathfind.cpp,call,Pathfinder::Poll
 ,PathfindingPoll,src/ai/pathfind.cpp,function,
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,call,SchedPublish
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,call,memset
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,field_write,PathfindingSetSearch::hasScale
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,field_write,PathfindingSetSearch::kind
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,field_write,PathfindingSetSearch::scale
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,field_write,PathfindingSetSearch::steps
+,PathfindingPublishSetSearch,src/game/pathfinding_events.h,function,
 ,PathfindingRegionSize,src/ai/pathfind.cpp,call,LayoutFor
 ,PathfindingRegionSize,src/ai/pathfind.cpp,field_read,RegionLayout::size
 ,PathfindingRegionSize,src/ai/pathfind.cpp,function,
@@ -53560,12 +53575,15 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,field_escape,Player::metal
 ,PlayersApply,src/game/players_events.cpp,field_maybe_written,Game::players
 ,PlayersApply,src/game/players_events.cpp,field_read,Game::list_391ed
+,PlayersApply,src/game/players_events.cpp,field_read,Game::uiOptionFlags
 ,PlayersApply,src/game/players_events.cpp,field_read,Player::info
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersEndGame::victory
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersEventHeader::kind
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersEventHeader::unit
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersGiveUnit::player
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersKillUnits::player
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersSetCheats::clear
+,PlayersApply,src/game/players_events.cpp,field_read,PlayersSetCheats::set
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersSetStore::add
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersSetStore::amount
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersSetStore::player
@@ -53581,6 +53599,7 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,field_write,<anon>::flag5
 ,PlayersApply,src/game/players_events.cpp,field_write,<anon>::flag6
 ,PlayersApply,src/game/players_events.cpp,field_write,Game::endGameVictory
+,PlayersApply,src/game/players_events.cpp,field_write,Game::uiOptionFlags
 ,PlayersApply,src/game/players_events.cpp,field_write,Player::type
 ,PlayersApply,src/game/players_events.cpp,field_write,PlayerInfo::kind
 ,PlayersApply,src/game/players_events.cpp,field_write,Ref<Unit>::offset
@@ -53627,6 +53646,16 @@ address,function,file,kind,target
 ,PlayersPublishKillUnits,src/game/players_events.h,field_write,PlayersEventHeader::kind
 ,PlayersPublishKillUnits,src/game/players_events.h,field_write,PlayersKillUnits::player
 ,PlayersPublishKillUnits,src/game/players_events.h,function,
+,PlayersPublishLeaveGame,src/game/players_events.h,call,SchedPublish
+,PlayersPublishLeaveGame,src/game/players_events.h,call,memset
+,PlayersPublishLeaveGame,src/game/players_events.h,field_write,PlayersEventHeader::kind
+,PlayersPublishLeaveGame,src/game/players_events.h,function,
+,PlayersPublishSetCheats,src/game/players_events.h,call,SchedPublish
+,PlayersPublishSetCheats,src/game/players_events.h,call,memset
+,PlayersPublishSetCheats,src/game/players_events.h,field_write,PlayersEventHeader::kind
+,PlayersPublishSetCheats,src/game/players_events.h,field_write,PlayersSetCheats::clear
+,PlayersPublishSetCheats,src/game/players_events.h,field_write,PlayersSetCheats::set
+,PlayersPublishSetCheats,src/game/players_events.h,function,
 ,PlayersPublishSetStore,src/game/players_events.h,call,SchedPublish
 ,PlayersPublishSetStore,src/game/players_events.h,call,memset
 ,PlayersPublishSetStore,src/game/players_events.h,field_write,PlayersEventHeader::kind
@@ -62543,6 +62572,7 @@ address,function,file,kind,target
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsSetWorkTime::until
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsTurn::delta
 ,UnitsApply,src/units/units_apply.cpp,field_read,UnitsUnlink::ref
+,UnitsApply,src/units/units_apply.cpp,field_write,<anon>::flag_110
 ,UnitsApply,src/units/units_apply.cpp,field_write,Angles16::bank
 ,UnitsApply,src/units/units_apply.cpp,field_write,Angles16::heading
 ,UnitsApply,src/units/units_apply.cpp,field_write,Angles16::pitch

@@ -648,5 +648,62 @@ class DataTest(unittest.TestCase):
         self.assertIn("(%d rows)" % len(self.rows), doc)
 
 
+class PresentationWritesTest(unittest.TestCase):
+    CLASSES = [{"kind": "game-region", "name": "difficulty", "address": "0x10", "class": "sim"},
+               {"kind": "game-region", "name": "bit0|bit1", "address": "0x20", "class": "view"},
+               {"kind": "game-region", "name": "flags", "address": "0x30", "class": "sim"},
+               {"kind": "game-region", "name": "mixedField", "address": "0x40", "class": "mixed"},
+               {"kind": "global", "name": "g_count", "address": "0x500000", "class": "sim"},
+               {"kind": "global", "name": "g_view", "address": "0x500004", "class": "view"}]
+    GLOBALS = [{"name": "g_count", "address": "0x500000", "type": "int"},
+               {"name": "g_view", "address": "0x500004", "type": "int"}]
+    SUBSYSTEMS = {("Click", "src/gui/a.cpp"): "presentation", ("Tick", "src/gui/a.cpp"): "units",
+                  ("Setup", "src/game/b.cpp"): "presentation"}
+
+    def found(self, *rows):
+        return sc.presentation_sim_writes([["", f, file, kind, target] for f, file, kind, target in rows],
+                                          self.SUBSYSTEMS, self.CLASSES, self.GLOBALS)
+
+    def test_a_presentation_function_writing_a_sim_game_field_or_global_is_found(self):
+        got = self.found(("Click", "src/gui/a.cpp", "field_write", "Game::difficulty"),
+                         ("Click", "src/gui/a.cpp", "global_write", "g_count"))
+        self.assertEqual(got, [("Click", "Game::difficulty"), ("Click", "g_count")])
+
+    def test_view_and_mixed_targets_and_reads_are_not_found(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "Game::bit1"),
+                                    ("Click", "src/gui/a.cpp", "field_write", "Game::mixedField"),
+                                    ("Click", "src/gui/a.cpp", "global_write", "g_view"),
+                                    ("Click", "src/gui/a.cpp", "field_read", "Game::difficulty"),
+                                    ("Click", "src/gui/a.cpp", "global_maybe_written", "g_count")), [])
+
+    def test_only_functions_of_the_presentation_subsystem_in_a_presentation_folder_count(self):
+        self.assertEqual(self.found(("Tick", "src/gui/a.cpp", "field_write", "Game::difficulty"),
+                                    ("Setup", "src/game/b.cpp", "field_write", "Game::difficulty")), [])
+
+    def test_a_bit_field_of_an_anonymous_struct_joins_the_regions_at_its_address(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "<anon>::bit2_30")),
+                         [("Click", "<anon>::bit2_30")])
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "<anon>::bit2_20")), [])
+
+    def test_a_target_that_joins_no_row_is_not_found(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "Game::unknownField"),
+                                    ("Click", "src/gui/a.cpp", "field_write", "Unit::hp")), [])
+
+    def test_a_write_in_the_table_passes_and_one_outside_it_fails(self):
+        allowed = [("Click", "Game::difficulty", "match setup")]
+        self.assertEqual(sc.presentation_write_errors([("Click", "Game::difficulty")], allowed), [])
+        self.assertEqual(sc.presentation_write_errors([("Click", "g_count")], allowed),
+                         ["presentation writes sim state: Click writes g_count",
+                          "stale PRESENTATION_SIM_WRITES entry: Click writes Game::difficulty"])
+
+    def test_an_entry_that_matches_no_write_is_stale(self):
+        errors = sc.presentation_write_errors([], [("Click", "Game::difficulty", "match setup")])
+        self.assertEqual(errors, ["stale PRESENTATION_SIM_WRITES entry: Click writes Game::difficulty"])
+
+    def test_every_entry_of_the_table_has_a_reason(self):
+        for function, target, reason in sc.PRESENTATION_SIM_WRITES:
+            self.assertTrue(reason, "%s %s" % (function, target))
+
+
 if __name__ == "__main__":
     unittest.main()

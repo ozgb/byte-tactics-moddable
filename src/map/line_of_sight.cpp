@@ -1749,6 +1749,13 @@ int __stdcall ApplyLosRadarEvent(const LosRadarEventHeader* event, unsigned int 
         UpdateCellHeightRange(cell, extent);
         return 1;
     }
+    case LOS_RADAR_SET_MODE: {
+        const LosRadarSetMode* e = reinterpret_cast<const LosRadarSetMode*>(event);
+        if ((e->clear | e->set) & ~7u)
+            return 0;
+        g_game->mapFlags = (unsigned short)((g_game->mapFlags & ~e->clear) | e->set);
+        return 1;
+    }
     case LOS_RADAR_RECALCULATE:
         RecalculateLineOfSight(reinterpret_cast<const LosRadarRecalculate*>(event)->reset);
         return 1;

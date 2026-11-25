@@ -80,10 +80,11 @@ STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
-           "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType"}
+           "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType", "PathUnit", "PathClass", "PathHandle"}
 VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16", "EconMapInfo", "PlayersMapInfo", "LosRadarMapInfo", "PathMapInfo", "EconomySpend"}
 ELABORATED = {"EconomySpend"}
-WORLD_VIEWS = {"econworld": ("EconomyWorldView", "economy")}
+WORLD_VIEWS = {"econworld": ("EconomyWorldView", "economy"), "pathworld": ("PathWorldView", "pathfinding")}
+SEAM_WORLD_VIEWS = {"pathworld"}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
 SLOT = re.compile(r"([\w:<>\*\s&,]+?)\s*\(\s*(__\w+)\s*\*\s*(\w+)\s*\)\s*\(([^;]*?)\)\s*;")
 TYPE_WORDS = {"unsigned", "char", "short", "int", "long", "float", "double", "bool"}
@@ -1229,7 +1230,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "region", "world", "effect", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "region", "world", "effect", "scratch", "pending"}
 STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 
@@ -1305,6 +1306,11 @@ def is_named_out(a: dict) -> bool:
 def pointee(a: dict) -> str:
     """The type an argument points at: its type without the trailing star."""
     return arg_type(a)[:-1]
+
+
+def is_scalar_out(a: dict) -> bool:
+    """A pointer to a scalar that an import fills and that is not its result (`{"mode": "scalar", "dir": "out"}`): nothing goes in, and the `o <line> 12` line follows the import line."""
+    return a["mode"] == "scalar" and a.get("dir") == "out"
 
 
 def is_scalar_inout(a: dict) -> bool:
@@ -1448,6 +1454,17 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s needs a `capacity` that names an integer argument" % (where, label))
         elif a["mode"] in ("bytes-in", "bytes-out"):
             check_length(where, a, label, args, errors)
+        elif a["mode"] == "scratch":
+            capacity = a.get("capacity")
+            if capacity not in names or names.index(capacity) <= names.index(a["name"]) or args[names.index(capacity)]["type"] not in INTEGER_ARGS:
+                errors.append("%s: %s needs a `capacity` that names an integer argument after it" % (where, label))
+            if not a["type"].endswith("*") or a["type"] == "void*":
+                errors.append("%s: %s is %s, and a scratch buffer is a pointer to its elements, not void*" % (where, label, a["type"]))
+        elif a["mode"] == "scalar" and "dir" in a:
+            if a["dir"] != "out":
+                errors.append("%s: %s is a scalar with the direction %s, and only out is allowed on a scalar" % (where, label, a["dir"]))
+            if a["type"] not in SCALAR_INOUT:
+                errors.append("%s: %s is %s, and a scalar out value is a pointer to one of %s" % (where, label, a["type"], ", ".join(sorted(SCALAR_INOUT))))
         elif a["mode"] == "structs":
             value_kind(a, label, True)
             if a.get("dir", "in") != "in":
@@ -1897,6 +1914,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], {"mode": "region"} if region is not None and s["name"] == region["shutdown"] else note.get("result"), ann)
             errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
+            errors += ["%s.%s(%s): a scalar out value is recorded for an import, and this slot is recorded" % (sub, s["name"], a["name"])
+                       for a in args if is_scalar_out(a) and not skipped]
+            errors += ["%s.%s(%s): a scratch buffer is for a recorded slot, and this slot is imported" % (sub, s["name"], a["name"])
+                       for a in args if a["mode"] == "scratch" and "%s.%s" % (sub, s["name"]) in imported_any]
             needed = not skipped or "%s.%s" % (sub, s["name"]) in imported_complete
             for a in args:
                 if a["mode"] == "pending" and needed:
@@ -2488,6 +2509,8 @@ def render_hooks(ann: dict, model: dict) -> str:
     for sub, spec in subsystems.items():
         if not spec.get("world"):
             L.append("    g_seams.%s = &s_rec_%s;" % (sub, sub))
+        elif sub in SEAM_WORLD_VIEWS:
+            L.append("    g_seams.%s = const_cast<%s*>(WrapWorld%s(g_seams.%s));" % (sub, spec["struct"], camel(sub), sub))
     L += ["}", ""]
     for sub, spec in subsystems.items():
         if not spec.get("world"):
@@ -2635,6 +2658,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         for i, a in enumerate(s["args"]):
             if a["mode"] == "bytes-out":
                 L.append('        ImportOutBytes(line, "%s", a%d, (int)result%s, %s);' % (a["line"], i, " * %d" % SIZES[a["resultElem"]] if a.get("resultElem") else "", length_parts(a, i)[1]))
+            elif is_scalar_out(a):
+                L.append('        ImportOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif a["mode"] == "vec3" and a.get("dir") == "out":
                 L.append('        ImportOutVec3(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_vec3_out(a):
@@ -2696,6 +2721,8 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
     """Lines of C++ recording argument i. phase: 'a' outer entry, 'i' import line, 'o' outer exit."""
     mode, var, line = a["mode"], arg_var(a, i), a["line"]
     out = phase == "o"
+    if is_scalar_out(a):
+        return []
     if mode == "scalar" or mode == "stream":
         if phase == "a":
             return ['ArgValue(s_call, "%s", %s);' % (line, var)]
@@ -2750,7 +2777,11 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportInOutScalar(line, %s);" % var]
         return ['ArgInOutScalarExit(s_tail, "%s", %s);' % (line, var)]
-    elif mode in ("region", "world"):
+    elif mode == "region":
+        if phase == "a":
+            return ['ArgRegionOffset(s_call, "%s", %s);' % (line, var)]
+        return []
+    elif mode == "world":
         return []
     elif mode == "effect":
         if phase == "i":
@@ -2794,8 +2825,12 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportBytes(line, %s, %s);" % (var, length_parts(a, i)[1])]
     elif mode == "bytes-out":
-        if phase == "a":
-            return ['ArgPending(s_call, "%s");' % line]
+        if phase == "i":
+            return ["ImportPending(line);"]
+        if phase == "o":
+            count = "(int)result" + (" * %d" % SIZES[a["resultElem"]] if a.get("resultElem") else "")
+            return ['ArgOutBytes(s_tail, "%s", %s, %s, %s);' % (line, var, count, length_parts(a, i)[1])]
+    elif mode == "scratch":
         if phase == "i":
             return ["ImportPending(line);"]
     elif mode == "pending":
@@ -2893,7 +2928,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or a["mode"] == "bytes-out" or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2902,7 +2937,7 @@ def render_slots(ann: dict, model: dict) -> str:
         L.append("    g_seams.%s = &g_native_%s;" % (sub, sub))
     for seam, slots in imports.items():
         if seam not in ready:
-            if not subsystems[seam].get("world"):
+            if not subsystems[seam].get("world") or seam in SEAM_WORLD_VIEWS:
                 L.append("    g_seams.%s = &g_import_%s;" % (seam, seam))
             for slot in slots + replays.get(seam, []):
                 L.append("    g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
@@ -2990,7 +3025,9 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L += ["    " + x for x in length_parts(a, i)[0]]
     for i, a in enumerate(s["args"]):
         m, v = a["mode"], arg_var(a, i)
-        if m in ("scalar", "stream"):
+        if is_scalar_out(a):
+            pass
+        elif m in ("scalar", "stream"):
             L.append("    Space(t);\n    ReplayValue(t, %s);" % v)
         elif m == "text":
             L.append("    Space(t);\n    t.AddString((const char*)%s);" % v)
@@ -3033,7 +3070,9 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         if a["mode"] == "callback":
             L.append('    PlayCallbacks_%s(a%d, OBJ_CALLBACK + RCB_%s, "%s.%s");' % (a["callback"], i, upper(a["callback"]), seam, slot))
     for i, a in enumerate(s["args"]):
-        if a["mode"] == "bytes-out":
+        if is_scalar_out(a):
+            L.append('    ApplyOutScalar(a%d, "%s");' % (i, a["line"]))
+        elif a["mode"] == "bytes-out":
             L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
         elif (a["mode"] == "vec3" and a.get("dir") == "out") or is_vec3_out(a):
             L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
@@ -3079,6 +3118,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
     for a in s["args"]:
         if a.get("count") in names:
             a["countIndex"] = names.index(a["count"])
+        if a.get("length") in names:
+            a["lengthIndex"] = names.index(a["length"])
     head = []
     L = ["void Run_%s_%s()" % (sub, slot), "{"]
     call = []
@@ -3144,6 +3185,20 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
                 guard = "if (%s) " % when_guard(a, "g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
                 after.append('    %sCompareStruct("%s", ROK_%s, &%s);' % (guard, line, upper(a["kind"]), g))
                 call.append("&" + g)
+        elif m == "bytes-out":
+            g = "g_bytes_%s_%s_%d" % (sub, slot, i)
+            size = s["args"][a["lengthIndex"]]
+            scale = " * %d" % SIZES[a["elem"]] if a.get("elem") else ""
+            head += ["unsigned char* %s;" % g, "int %s_length;" % g]
+            L.append('    %s_length = ArgScalar<int>("%s")%s;' % (g, size["line"], scale))
+            L.append("    free(%s);\n    %s = (unsigned char*)calloc(%s_length > 0 ? %s_length : 1, 1);" % (g, g, g, g))
+            closing.append(line + " ")
+            after.append('    CompareBytes("%s", %s, (int)g_result_%s_%s%s, %s_length);' % (line, g, sub, slot, " * %d" % SIZES[a["resultElem"]] if a.get("resultElem") else "", g))
+            call.append("(%s)%s" % (t, g))
+        elif m == "scratch":
+            capacity = s["args"][names.index(a["capacity"])]
+            L.append("    ScratchHolder %s;\n    %s.Reserve(sizeof(%s) * (size_t)ArgScalar<int>(\"%s\"));" % (v, v, t[:-1], capacity["line"]))
+            call.append("(%s)%s.data" % (t, v))
         elif m == "event":
             L.append("    unsigned char %s[REPLAY_EVENT_MAX];\n    memset(%s, 0, sizeof %s);" % (v, v, v))
             L.append('    ParseEvent("%s", RET_%s, %s);' % (line, upper(a["events"]), v))
@@ -3188,7 +3243,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             call.append(v)
         elif m == "region":
             size_line = s["args"][i + 1]["line"]
-            L.append('    void* %s = AllocRegion(ArgScalar<unsigned>("%s"));' % (v, size_line))
+            L.append('    void* %s = AllocRegion(ArgScalar<unsigned>("%s"), ArgScalar<unsigned>("%s"));' % (v, line, size_line))
             L.append('    RegionBind(%s, ArgScalar<unsigned>("%s"));' % (v, size_line))
             call.append(v)
         elif m == "world":
@@ -3941,12 +3996,12 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
     return out, errors
 
 
-RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon"}
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon", "bytes-out", "scratch"}
 
 
 def runnable(s: dict) -> bool:
     """The replayer's runner can pass every argument of the slot and compare its result."""
-    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon"))
+    return all(a["mode"] in RUNNER_ARG_MODES and not is_scalar_out(a) and not (a["mode"] == "bytes-out" and STATE_PATH.match(str(a["length"]))) for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon"))
 
 
 def native_name(slot: str) -> str:

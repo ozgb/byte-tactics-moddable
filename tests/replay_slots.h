@@ -725,6 +725,203 @@ double __stdcall Imp_economy_GetEnergyUse(EconType a0)
     return ParseResult<double>(r);
 }
 
+unsigned int __stdcall Imp_pathworld_Tick()
+{
+    ReplayText t;
+    StartImport(t, "pathworld.Tick");
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
+unsigned int __stdcall Imp_pathworld_SearchStepLimit()
+{
+    ReplayText t;
+    StartImport(t, "pathworld.SearchStepLimit");
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
+int __stdcall Imp_pathworld_PlayerCount()
+{
+    ReplayText t;
+    StartImport(t, "pathworld.PlayerCount");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_pathworld_IsPlaying(int a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.IsPlaying");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_pathworld_UnitsPerPlayer()
+{
+    ReplayText t;
+    StartImport(t, "pathworld.UnitsPerPlayer");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+PathUnit __stdcall Imp_pathworld_FirstUnit(int a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.FirstUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<PathUnit>(r);
+}
+
+PathUnit __stdcall Imp_pathworld_LastUnit(int a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.LastUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<PathUnit>(r);
+}
+
+PathUnit __stdcall Imp_pathworld_NextUnit(PathUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.NextUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<PathUnit>(r);
+}
+
+int __stdcall Imp_pathworld_UnitState(PathUnit a0, PathUnitState* a1)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.UnitState");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    ApplyInOut(a1, "out", ROK_PATHUNITSTATE);
+    return ParseResult<int>(r);
+}
+
+PathClass __stdcall Imp_pathworld_MoveClass(int a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.MoveClass");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<PathClass>(r);
+}
+
+int __stdcall Imp_pathworld_InBounds(PathClass a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.InBounds");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_pathworld_Pass(PathClass a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.Pass");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_pathworld_SeenSize(int* a0, int* a1)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.SeenSize");
+    const char* r = Enter(t);
+    ApplyOutScalar(a0, "width");
+    ApplyOutScalar(a1, "height");
+    (void)r;
+}
+
+int __stdcall Imp_pathworld_Seen(int a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.Seen");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_pathworld_LineOfSight(PathClass a0, int a1, int a2, int a3, int a4)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.LineOfSight");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_pathworld_TerrainPass(PathClass a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.TerrainPass");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_pathworld_BeginSearch(PathUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.BeginSearch");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_pathworld_EndSearch(PathUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "pathworld.EndSearch");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
@@ -793,6 +990,7 @@ ScriptsSeam g_import_scripts;
 OrdersSeam g_import_orders;
 PlayersSeam g_import_players;
 EconomySeam g_import_economy;
+PathWorldView g_import_pathworld;
 FeaturesSeam g_import_features;
 UnitsSeam g_import_units;
 WindMeteorsSeam g_native_wind_meteors = {
@@ -862,6 +1060,20 @@ AiSeam g_native_ai = {
     CreateSquadManagerSlot,
     FreeSquadManagerSlot,
     WriteAiStateSlot,
+};
+
+PathfindingSeam g_native_pathfinding = {
+    PathfindingRegionSize,
+    PathfindingInit,
+    PathfindingShutdown,
+    PathfindingSubmit,
+    PathfindingCancel,
+    PathfindingCellsChanged,
+    PathfindingStep,
+    PathfindingPoll,
+    PathfindingWriteState,
+    PathfindingSetBaseScale,
+    PathfindingDebugCell,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -1153,7 +1365,7 @@ void Run_economy_Init()
     EconMapInfo p0 = EconMapInfo();
     ParseValueArg("map", ROK_ECONMAPINFO, &p0);
     EconomyWorldView* p1 = &g_import_econworld;
-    void* p2 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p2 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p2, ArgScalar<unsigned>("size"));
     unsigned int p3 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
@@ -1521,6 +1733,102 @@ void Run_ai_FreeSquadManager()
     Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
     SetClosing(nullptr);
     g_seams.ai->FreeSquadManager(p0);
+}
+
+unsigned int g_result_pathfinding_RegionSize;
+
+void Run_pathfinding_RegionSize()
+{
+    PathMapInfo p0 = PathMapInfo();
+    ParseValueArg("map", ROK_PATHMAPINFO, &p0);
+    SetClosing("result");
+    g_result_pathfinding_RegionSize = g_seams.pathfinding->RegionSize(&p0);
+}
+
+void After_pathfinding_RegionSize()
+{
+    CompareResult(g_result_pathfinding_RegionSize);
+}
+
+void Run_pathfinding_Init()
+{
+    PathMapInfo p0 = PathMapInfo();
+    ParseValueArg("map", ROK_PATHMAPINFO, &p0);
+    void* p1 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
+    RegionBind(p1, ArgScalar<unsigned>("size"));
+    unsigned int p2 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.pathfinding->Init(&p0, p1, p2);
+}
+
+void* g_result_pathfinding_Shutdown;
+
+void Run_pathfinding_Shutdown()
+{
+    SetClosing("result");
+    g_result_pathfinding_Shutdown = g_seams.pathfinding->Shutdown();
+}
+
+void After_pathfinding_Shutdown()
+{
+    CompareRegionResult(g_result_pathfinding_Shutdown);
+}
+
+void Run_pathfinding_Submit()
+{
+    PathRequest p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("request", ROK_PATHREQUEST, &p0);
+    SetClosing(nullptr);
+    g_seams.pathfinding->Submit(&p0);
+}
+
+void Run_pathfinding_Cancel()
+{
+    PathHandle p0 = ArgScalar<PathHandle>("requester");
+    SetClosing(nullptr);
+    g_seams.pathfinding->Cancel(p0);
+}
+
+void Run_pathfinding_CellsChanged()
+{
+    int p0 = ArgScalar<int>("left");
+    int p1 = ArgScalar<int>("top");
+    int p2 = ArgScalar<int>("right");
+    int p3 = ArgScalar<int>("bottom");
+    unsigned int p4 = ArgScalar<unsigned int>("classes");
+    int p5 = ArgScalar<int>("cause");
+    SetClosing(nullptr);
+    g_seams.pathfinding->CellsChanged(p0, p1, p2, p3, p4, p5);
+}
+
+void Run_pathfinding_Step()
+{
+    SetClosing(nullptr);
+    g_seams.pathfinding->Step();
+}
+
+unsigned char* g_bytes_pathfinding_Poll_0;
+int g_bytes_pathfinding_Poll_0_length;
+int g_result_pathfinding_Poll;
+
+void Run_pathfinding_Poll()
+{
+    g_bytes_pathfinding_Poll_0_length = ArgScalar<int>("size");
+    free(g_bytes_pathfinding_Poll_0);
+    g_bytes_pathfinding_Poll_0 = (unsigned char*)calloc(g_bytes_pathfinding_Poll_0_length > 0 ? g_bytes_pathfinding_Poll_0_length : 1, 1);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    ScratchHolder p2;
+    p2.Reserve(sizeof(PathPoint) * (size_t)ArgScalar<int>("capacity"));
+    int p3 = ArgScalar<int>("capacity");
+    SetClosing("out ", "result");
+    g_result_pathfinding_Poll = g_seams.pathfinding->Poll((PathfindingEventHeader*)g_bytes_pathfinding_Poll_0, p1, (PathPoint*)p2.data, p3);
+}
+
+void After_pathfinding_Poll()
+{
+    CompareBytes("out", g_bytes_pathfinding_Poll_0, (int)g_result_pathfinding_Poll, g_bytes_pathfinding_Poll_0_length);
+    CompareResult(g_result_pathfinding_Poll);
 }
 
 int g_result_weapons_Apply;
@@ -1958,7 +2266,7 @@ void Run_los_radar_Init()
 {
     LosRadarMapInfo p0 = LosRadarMapInfo();
     ParseValueArg("map", ROK_LOSRADARMAPINFO, &p0);
-    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p1 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p1, ArgScalar<unsigned>("size"));
     unsigned int p2 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
@@ -2175,7 +2483,7 @@ void Run_players_Init()
 {
     PlayersMapInfo p0 = PlayersMapInfo();
     ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
-    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p1 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p1, ArgScalar<unsigned>("size"));
     unsigned int p2 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
@@ -2722,6 +3030,38 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_ai_FreeSquadManager();
         return true;
     }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_pathfinding_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Init") == 0) {
+        Run_pathfinding_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_pathfinding_Shutdown();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Submit") == 0) {
+        Run_pathfinding_Submit();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Cancel") == 0) {
+        Run_pathfinding_Cancel();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "CellsChanged") == 0) {
+        Run_pathfinding_CellsChanged();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Step") == 0) {
+        Run_pathfinding_Step();
+        return true;
+    }
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Poll") == 0) {
+        Run_pathfinding_Poll();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
         return true;
@@ -3065,6 +3405,12 @@ void RunAfter(const char* subsystem, const char* slot)
         After_features_FindFeatureAtPos();
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "Apply") == 0)
         After_ai_Apply();
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_pathfinding_RegionSize();
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_pathfinding_Shutdown();
+    if (strcmp(subsystem, "pathfinding") == 0 && strcmp(slot, "Poll") == 0)
+        After_pathfinding_Poll();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0)
@@ -3190,6 +3536,7 @@ void BindSeams()
     g_seams.economy = &g_native_economy;
     g_seams.features = &g_native_features;
     g_seams.ai = &g_native_ai;
+    g_seams.pathfinding = &g_native_pathfinding;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.los_radar = &g_native_los_radar;
@@ -3230,8 +3577,6 @@ void BindSeams()
     g_import_network.BroadcastPlayerEconomy = Imp_network_BroadcastPlayerEconomy;
     g_import_network.SendShareEnergy = Imp_network_SendShareEnergy;
     g_import_network.SendShareMetal = Imp_network_SendShareMetal;
-    g_seams.pathfinding = &g_import_pathfinding;
-    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     g_seams.scripts = &g_import_scripts;
     g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
     g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
@@ -3241,6 +3586,25 @@ void BindSeams()
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     g_seams.orders = &g_import_orders;
     g_import_orders.GetOrderType = Imp_orders_GetOrderType;
+    g_seams.pathworld = &g_import_pathworld;
+    g_import_pathworld.Tick = Imp_pathworld_Tick;
+    g_import_pathworld.SearchStepLimit = Imp_pathworld_SearchStepLimit;
+    g_import_pathworld.PlayerCount = Imp_pathworld_PlayerCount;
+    g_import_pathworld.IsPlaying = Imp_pathworld_IsPlaying;
+    g_import_pathworld.UnitsPerPlayer = Imp_pathworld_UnitsPerPlayer;
+    g_import_pathworld.FirstUnit = Imp_pathworld_FirstUnit;
+    g_import_pathworld.LastUnit = Imp_pathworld_LastUnit;
+    g_import_pathworld.NextUnit = Imp_pathworld_NextUnit;
+    g_import_pathworld.UnitState = Imp_pathworld_UnitState;
+    g_import_pathworld.MoveClass = Imp_pathworld_MoveClass;
+    g_import_pathworld.InBounds = Imp_pathworld_InBounds;
+    g_import_pathworld.Pass = Imp_pathworld_Pass;
+    g_import_pathworld.SeenSize = Imp_pathworld_SeenSize;
+    g_import_pathworld.Seen = Imp_pathworld_Seen;
+    g_import_pathworld.LineOfSight = Imp_pathworld_LineOfSight;
+    g_import_pathworld.TerrainPass = Imp_pathworld_TerrainPass;
+    g_import_pathworld.BeginSearch = Imp_pathworld_BeginSearch;
+    g_import_pathworld.EndSearch = Imp_pathworld_EndSearch;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
@@ -3265,6 +3629,8 @@ void BindSeams()
         g_import_mission.GetGameType = Imp_mission_GetGameType;
         g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.pathfinding = &g_import_pathfinding;
+        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     }
     if (strcmp(g_subsystem, "ai") == 0) {
         g_seams.mission = &g_import_mission;
@@ -3375,5 +3741,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_seams.pathfinding = &g_import_pathfinding;
+        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     }
 }

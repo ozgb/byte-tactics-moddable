@@ -1508,6 +1508,205 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | movement | 0 / 0 | 3 / 1 | 3 / 2 | 9 / 12 | 14 | 26 | 40 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |
 
+## Routes
+
+Which subsystem receives each effect a subsystem publishes, and when. A subsystem publishes an effect to its own
+outbox (`engine` is the engine's: the console, the load of a match, the network, the harness), and the effect goes
+to each row below with that outbox and the effect's kind, in the order of the rows; an outbox and kind with no
+row go to no subsystem. What a subscriber does with an effect is stated by its interface (its header in
+`interfaces/` and its interface page).
+
+- **synchronous:** the effect is delivered before the publish returns: first what the subscriber's inbox holds,
+  then the effect.
+- **queued:** published inside the tick, the effect is copied to the subscriber's inbox, which holds 1024 effects
+  and is delivered first when a publish finds it full. Published outside the tick (between two ticks, or before
+  the first), it is delivered at once, as a synchronous route's is.
+
+An inbox is delivered in the order it was filled: at the end of each phase and of the tick, the inboxes in the order
+engine, economy, units, orders, players, features, weapons, map, wind_meteors, targeting, ai, los_radar, pathfinding,
+scripts, movement, and again from the first while any of them holds an effect (the `Apply (once)` steps of The tick);
+before each step of the subscriber that the lists above show after a delivery to it; and before a synchronous
+delivery to the same subscriber. No inbox holds an effect when the tick ends.
+
+| publisher | kind | subscriber | delivery |
+|---|---|---|---|
+| units | `ECONOMY_RESET` | economy | queued |
+| units | `ECONOMY_LOAD` | economy | queued |
+| units | `ECONOMY_REQUEST` | economy | queued |
+| units | `ECONOMY_INCOME` | economy | queued |
+| orders | `ECONOMY_REQUEST` | economy | queued |
+| orders | `ECONOMY_INCOME` | economy | queued |
+| players | `ECONOMY_RESET` | economy | queued |
+| players | `ECONOMY_INCOME` | economy | queued |
+| features | `ECONOMY_INCOME` | economy | queued |
+| economy | `ECONOMY_EFFECT_CLOAK` | units | synchronous |
+| economy | `ECONOMY_EFFECT_EXTRACTOR` | scripts | synchronous |
+| economy | `ECONOMY_EFFECT_SHARE` | players | queued |
+| units | `PLAYERS_KILL_UNITS` | players | synchronous |
+| engine | `PLAYERS_KILL_UNITS` | players | synchronous |
+| units | `PLAYERS_UNIT_CREATED` | players | queued |
+| units | `PLAYERS_UNIT_DIED` | players | synchronous |
+| orders | `PLAYERS_GIVE_UNIT` | players | synchronous |
+| engine | `PLAYERS_GIVE_UNIT` | players | synchronous |
+| engine | `PLAYERS_TRANSFER` | players | synchronous |
+| engine | `PLAYERS_SET_STORE` | players | synchronous |
+| engine | `PLAYERS_SET_TYPE` | players | synchronous |
+| engine | `PLAYERS_END_GAME` | players | synchronous |
+| engine | `PLAYERS_DEACTIVATE_CONDITIONS` | players | synchronous |
+| players | `PLAYERS_EFFECT_KILL_UNIT` | units | synchronous |
+| players | `PLAYERS_EFFECT_SEND_UNIT` | units | synchronous |
+| players | `PLAYERS_EFFECT_CAPTURE_UNIT` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_ATTACKED` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_ATTACKED` | ai | synchronous |
+| weapons | `WEAPONS_EFFECT_ATTACKED` | orders | synchronous |
+| weapons | `WEAPONS_EFFECT_ATTACKED` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_HIT` | units | synchronous |
+| orders | `WEAPONS_DAMAGE` | weapons | synchronous |
+| orders | `WEAPONS_RELEASE` | weapons | synchronous |
+| orders | `WEAPONS_CLAIM` | weapons | synchronous |
+| orders | `WEAPONS_ADD_STOCKPILE` | weapons | synchronous |
+| units | `WEAPONS_DAMAGE` | weapons | synchronous |
+| units | `WEAPONS_DETONATE` | weapons | synchronous |
+| units | `WEAPONS_RELEASE` | weapons | synchronous |
+| units | `WEAPONS_INIT_SLOTS` | weapons | synchronous |
+| units | `WEAPONS_REMOVE_PROJECTILES` | weapons | synchronous |
+| units | `WEAPONS_SET_STOCKPILES` | weapons | synchronous |
+| engine | `WEAPONS_REMOTE_DAMAGE` | weapons | synchronous |
+| scripts | `WEAPONS_AIM_DONE` | weapons | synchronous |
+| scripts | `WEAPONS_EXPLODE_PIECE` | weapons | synchronous |
+| weapons | `WEAPONS_EFFECT_MARK_DAMAGED` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_DAMAGE_RECORD` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_HEALTH` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_PARALYZE` | orders | synchronous |
+| weapons | `WEAPONS_EFFECT_START_SCRIPT` | scripts | synchronous |
+| weapons | `WEAPONS_EFFECT_DETACH_PIECE` | scripts | synchronous |
+| weapons | `WEAPONS_EFFECT_SHOT_FIRED` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_COMMAND_SHOT_FIRED` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_OUT_OF_REACH` | units | synchronous |
+| weapons | `WEAPONS_EFFECT_BUSY` | units | synchronous |
+| units | `AI_SET_SQUAD` | ai | synchronous |
+| engine | `AI_SET_SQUAD` | ai | queued |
+| engine | `AI_PLAN` | ai | queued |
+| engine | `AI_WEIGHT` | ai | queued |
+| engine | `AI_LIMIT` | ai | queued |
+| ai | `AI_EFFECT_ADD_ORDER` | orders | synchronous |
+| ai | `AI_EFFECT_QUEUE_BUILD` | orders | synchronous |
+| ai | `AI_EFFECT_STOP` | orders | synchronous |
+| ai | `AI_EFFECT_ACTIVATE` | units | synchronous |
+| ai | `AI_EFFECT_SET_STATES` | units | synchronous |
+| units | `FEATURES_PLACE` | features | synchronous |
+| orders | `FEATURES_RECLAIM` | features | synchronous |
+| orders | `FEATURES_REMOVE` | features | synchronous |
+| weapons | `FEATURES_DAMAGE` | features | synchronous |
+| engine | `FEATURES_PLACE` | features | queued |
+| engine | `FEATURES_REMOVE` | features | queued |
+| engine | `FEATURES_REMOVE_ALL` | features | queued |
+| features | `FEATURES_EFFECT_FREE_STATE` | scripts | synchronous |
+| features | `FEATURES_EFFECT_INIT_STATE` | scripts | synchronous |
+| features | `FEATURES_EFFECT_PASS_MAPS` | map | synchronous |
+| features | `FEATURES_EFFECT_AREA_DAMAGE` | weapons | synchronous |
+| orders | `TARGETING_SET_UNIT` | targeting | synchronous |
+| orders | `TARGETING_SET_POS` | targeting | synchronous |
+| orders | `TARGETING_CLEAR` | targeting | synchronous |
+| ai | `TARGETING_SET_UNIT` | targeting | synchronous |
+| ai | `TARGETING_SET_POS` | targeting | queued |
+| ai | `TARGETING_CLEAR` | targeting | synchronous |
+| units | `TARGETING_RESET` | targeting | queued |
+| units | `TARGETING_LOAD` | targeting | queued |
+| weapons | `TARGETING_CLEAR` | targeting | synchronous |
+| targeting | `TARGETING_EFFECT_CLEARED` | scripts | synchronous |
+| units | `LOS_RADAR_UPDATE_UNIT` | los_radar | synchronous |
+| movement | `LOS_RADAR_UPDATE_UNIT` | los_radar | synchronous |
+| players | `LOS_RADAR_UPDATE_UNIT` | los_radar | synchronous |
+| units | `LOS_RADAR_REMOVE_UNIT` | los_radar | synchronous |
+| units | `LOS_RADAR_REVEAL_UNIT` | los_radar | synchronous |
+| units | `LOS_RADAR_ADD_EYEBALL` | los_radar | synchronous |
+| units | `LOS_RADAR_SIGHT_RESET` | los_radar | synchronous |
+| units | `LOS_RADAR_SIGHT_LOAD` | los_radar | synchronous |
+| map | `LOS_RADAR_CELL_HEIGHTS` | los_radar | queued |
+| players | `LOS_RADAR_RECALCULATE` | los_radar | synchronous |
+| engine | `LOS_RADAR_RECALCULATE` | los_radar | queued |
+| engine | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
+| engine | `LOS_RADAR_SHARE_RADAR` | los_radar | queued |
+| economy | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
+| economy | `LOS_RADAR_SHARE_RADAR` | los_radar | queued |
+| engine | `LOS_RADAR_SHARE_MAP` | los_radar | synchronous |
+| units | `MAP_ADD_UNIT` | map | synchronous |
+| movement | `MAP_ADD_UNIT` | map | synchronous |
+| units | `MAP_REMOVE_UNIT` | map | synchronous |
+| movement | `MAP_REMOVE_UNIT` | map | synchronous |
+| units | `MAP_CLEAR_UNIT` | map | synchronous |
+| units | `MAP_RECLAIM_FOOTPRINT` | map | synchronous |
+| units | `MAP_LOAD_PATH_LOCK_STAMP` | map | queued |
+| engine | `MAP_SET_SEA_LEVEL` | map | queued |
+| units | `MAP_SET_YARD` | map | synchronous |
+| scripts | `MAP_SET_YARD` | map | synchronous |
+| units | `MAP_BUCKET_UNLINK` | map | synchronous |
+| units | `MAP_BUCKET_PREPEND` | map | synchronous |
+| map | `MAP_EFFECT_CELLS_CHANGED` | pathfinding | synchronous |
+| units | `ORDERS_ADD` | orders | synchronous |
+| engine | `ORDERS_COMMAND` | orders | queued |
+| engine | `ORDERS_GROUP_COMMAND` | orders | queued |
+| engine | `ORDERS_GROUP_BUILD` | orders | queued |
+| orders | `ORDERS_COMMAND` | orders | queued |
+| engine | `ORDERS_QUEUE_BUILD` | orders | queued |
+| engine | `ORDERS_CANCEL` | orders | queued |
+| units | `ORDERS_STOP` | orders | synchronous |
+| units | `ORDERS_BE_CARRIED` | orders | synchronous |
+| units | `ORDERS_STATUS_FLAGS` | orders | synchronous |
+| movement | `MOVEMENT_EFFECT_ORDER_FLAGS` | orders | synchronous |
+| orders | `ORDERS_EFFECT_SET_STATE_BITS` | units | synchronous |
+| orders | `ORDERS_EFFECT_SET_POSITION` | units | synchronous |
+| orders | `ORDERS_EFFECT_ATTACH_TO_PIECE` | units | synchronous |
+| orders | `ORDERS_EFFECT_FINISH_CONSTRUCTION` | units | synchronous |
+| orders | `ORDERS_EFFECT_BUILD_DECAY` | units | synchronous |
+| orders | `ORDERS_EFFECT_REPAIR` | units | synchronous |
+| orders | `ORDERS_EFFECT_UNLINK` | units | synchronous |
+| orders | `ORDERS_EFFECT_BUSY` | units | queued |
+| orders | `ORDERS_EFFECT_SET_FLAGS` | units | queued |
+| orders | `ORDERS_EFFECT_CLEAR_NET_DIRTY` | units | synchronous |
+| orders | `ORDERS_EFFECT_SET_STANCE` | units | synchronous |
+| orders | `ORDERS_EFFECT_SET_ANGLES` | units | synchronous |
+| orders | `ORDERS_EFFECT_SET_BUILD_STATE` | units | synchronous |
+| orders | `ORDERS_EFFECT_START_SCRIPT` | scripts | synchronous |
+| units | `MOVEMENT_NEW` | movement | synchronous |
+| units | `MOVEMENT_DESTROY` | movement | synchronous |
+| units | `MOVEMENT_LOAD` | movement | queued |
+| units | `MOVEMENT_SET_MODE` | movement | synchronous |
+| units | `MOVEMENT_SET_SPEED` | movement | synchronous |
+| orders | `MOVEMENT_SET_TARGET` | movement | synchronous |
+| orders | `MOVEMENT_DESTROY_TARGET` | movement | synchronous |
+| orders | `MOVEMENT_SET_FLIGHT_MODE` | movement | synchronous |
+| orders | `MOVEMENT_SET_ALTITUDE` | movement | queued |
+| orders | `MOVEMENT_SET_APPROACH_RADIUS` | movement | queued |
+| orders | `MOVEMENT_SET_HEADING` | movement | queued |
+| movement | `MOVEMENT_EFFECT_TURN` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_TILT` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_ANGLES` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_MOVE` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_MOVED` | units | queued |
+| movement | `MOVEMENT_EFFECT_CHANGE_CELL` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_MOVE_RATE` | units | queued |
+| movement | `MOVEMENT_EFFECT_SET_POSITION` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_SET_STATE_BITS` | units | synchronous |
+| movement | `MOVEMENT_EFFECT_SFX_OCCUPY` | units | queued |
+| movement | `MOVEMENT_EFFECT_START_SCRIPT` | scripts | synchronous |
+| units | `SCRIPTS_START` | scripts | synchronous |
+| engine | `UNITS_ATTACH_TO_PIECE` | units | queued |
+| engine | `UNITS_SET_FLAGS` | units | queued |
+| engine | `UNITS_CREATE` | units | queued |
+| engine | `UNITS_KILL_ALL` | units | queued |
+| engine | `UNITS_RELOAD_TYPE` | units | queued |
+| scripts | `UNITS_SCRIPT_VALUE` | units | synchronous |
+| scripts | `UNITS_ATTACH_TO_PIECE` | units | synchronous |
+| engine | `WIND_METEORS_ENABLE` | wind_meteors | queued |
+| engine | `WIND_METEORS_DISABLE` | wind_meteors | queued |
+| engine | `WIND_METEORS_PARAMS` | wind_meteors | queued |
+| engine | `WIND_METEORS_START` | wind_meteors | queued |
+| engine | `WIND_METEORS_LIMITS` | wind_meteors | queued |
+| engine | `WIND_METEORS_RESET` | wind_meteors | queued |
+| wind_meteors | `WIND_METEORS_EFFECT_SPAWN` | weapons | queued |
+
 ## Limits
 
 The orders are read from the program, not from a run. That decides what they claim:

@@ -392,6 +392,13 @@ outcome 0 and no change (a `void` `Apply`, as wind_meteors', just ignores it); o
 The module's interface header says which struct belongs to which kind. An effect is routed by its kind, so its subscriber
 reads the payload of the kind it subscribed to, and does nothing with an effect smaller than that payload.
 
+**Where routes are stated.** Which subsystem receives each effect, and whether it is delivered before the publish returns
+(synchronous) or from the subscriber's inbox (queued), is stated in two places and nowhere else: the interface headers,
+whose effect enums name the kinds a module publishes and whose event enums name the kinds its inbox takes, with what each
+does; and `docs/schedule.md`, "Routes", which is the route table itself, a row per publisher, kind and subscriber in the
+order the effect is delivered, with each row's delivery and the rules for when an inbox is delivered. The table is
+generated from the engine and checked in CI, so the two do not drift; it is not a file of its own in the kit.
+
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
   that order, but a host calls by name.)
@@ -596,7 +603,7 @@ manifest.
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
-| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine queues the effect to its subscribers at the next phase boundary, and the recordings carry the effect's fields as the import's argument |
+| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect to its subscribers as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
 (`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30). The engine records each event it delivers to a module's

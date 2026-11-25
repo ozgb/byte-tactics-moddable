@@ -699,5 +699,26 @@ class SeamHelperTemplates(unittest.TestCase):
         self.assertIn("ForEach", [t for _, kind, t, _ in functions["Caller"]["calls"] if kind == "call"])
 
 
+class Routes(unittest.TestCase):
+    """The Routes section lists the route table in its order, by subsystem and kind, never by handler."""
+
+    SOURCE = """static const SchedRoute s_routes[] = {
+    {SCHED_UNITS, ECONOMY_RESET, SCHED_ECONOMY, EconomyInbox, 0},
+    {SCHED_LOS_RADAR, MAP_EFFECT_X, SCHED_WIND_METEORS, WindOnX, 1},
+};"""
+    MODULES = "SCHED_ECONOMY = 1,\n    SCHED_ENGINE = 0,\n    SCHED_UNITS = 2,"
+
+    def test_rows(self) -> None:
+        self.assertEqual(sc.route_rows(self.SOURCE), [["units", "`ECONOMY_RESET`", "economy", "queued"],
+                                                      ["los_radar", "`MAP_EFFECT_X`", "wind_meteors", "synchronous"]])
+
+    def test_section(self) -> None:
+        text = "\n".join(sc.routes_section(self.SOURCE, self.MODULES))
+        self.assertIn("| los_radar | `MAP_EFFECT_X` | wind_meteors | synchronous |", text)
+        self.assertIn("the order engine, economy, units,", " ".join(text.split()))
+        self.assertNotIn("Inbox", text.replace("inbox", ""))
+        self.assertNotIn("WindOnX", text)
+
+
 if __name__ == "__main__":
     unittest.main()

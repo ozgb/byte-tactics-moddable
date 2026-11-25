@@ -27,11 +27,12 @@ switch tables, so data placed in the code section is not read as code.
 
 Each caller is classed `game` when it is reachable from the eight game-logic
 phase calls of RunGameSteps, from LoadMatch, or from a function in
-EXTRA_ROOTS (game-logic functions that only frame handlers call), and `presentation` otherwise.
+EXTRA_ROOTS (game-logic functions that only frame handlers, the menu, start-up or a seam call),
+and `presentation` otherwise.
 Edges are the direct calls and jumps, every function whose address a function
 takes, and for a data symbol that a function references (a vtable, an order
-handler table), every function pointer in the data up to the next symbol, read
-from orig/TotalA.exe. A callee no object defines by name is read from the
+handler table), every function pointer in the data up to the next symbol at any
+byte offset, read from orig/TotalA.exe. A callee no object defines by name is read from the
 original at the same offset of the same function. Indirect calls that none of
 this resolves are counted in the totals and are a limitation.
 
@@ -76,6 +77,14 @@ PHASES = ("HandleNetPackets", "UpdateAllUnits", "UpdateProjectiles", "UpdateExpl
 LOAD_ROOT = "LoadMatch"
 EXTRA_ROOTS: dict[int, str] = {
     0x4568c0: "sets start positions; called from MainLoopTick and LoadingScreenFrame, which aren't roots",
+    0x43c050: "registers the order handlers and AI commands that RunOrders calls through g_missionOrderTableVec; called at start",
+    0x42a8d0: "loads the unit definitions game logic reads; called from MenuFrame through RefreshUnitInfo",
+    0x437cd0: "InitMeteors: LoadMatch calls it through g_seams.wind_meteors, which the walk does not follow",
+    0x437d60: "SetMeteorParams: the map loader calls it through g_seams.wind_meteors",
+    0x438180: "SaveMeteors: the save calls it through g_seams.wind_meteors",
+    0x438250: "LoadMeteors: the load calls it through g_seams.wind_meteors",
+    0x438320: "LoadMeteorDefaults: the map loader calls it through g_seams.wind_meteors",
+    0x49df10: "SpawnProjectile: UpdateMeteors calls it through g_seams.weapons",
 }
 COMPILER_HELPERS = {"__chkstk"}
 STACK_PROBE = "_chkstk"
@@ -173,10 +182,11 @@ def original_target(orig: Original, function: int, offset: int) -> int | None:
 
 
 def table_targets(orig: Original, addr: int, nxt: int, funcs) -> list[int]:
-    """The function pointers in the data at addr, up to the next symbol (at most 16 KiB)."""
+    """The function pointers in the data at addr, up to the next symbol (at most 16 KiB), at any
+    byte offset: the order tables hold 25-byte records, so most of their handlers are unaligned."""
     size = min(nxt, addr + 0x4000) - addr
-    raw = orig.read(addr, size - size % 4)
-    return [v for (v,) in struct.iter_unpack("<I", raw) if v in funcs]
+    raw = orig.read(addr, size)
+    return [v for (v,) in (struct.unpack_from("<I", raw, i) for i in range(len(raw) - 3)) if v in funcs]
 
 
 def analyze() -> SimpleNamespace:

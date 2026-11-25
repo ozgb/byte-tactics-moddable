@@ -487,8 +487,8 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Vec3Add
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,WeaponCanReachUnit
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Whole
-0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,abs
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator=
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,deref_read,*Vec3
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,field_escape,Unit::pos
@@ -551,7 +551,7 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,Unit::ClaimWeapons
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,WaitIfNotInBuildStance
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,WorldToCell
-0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,_hypot
+0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,bx_hypot
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,operator+
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,call,operator=
 0x403a20,MobileBuildOrder,src/orders/unit_orders_403a20.cpp,deref_escape,*UnitDef
@@ -596,9 +596,9 @@ address,function,file,kind,target
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,Unit::ClaimWeapons
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,bx_sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator+
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator=
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_read,Angles16::heading
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_read,Box::hi
@@ -636,7 +636,7 @@ address,function,file,kind,target
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,UnitDef::MaxHealth
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,UnitDef::MetalCost
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
-0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,_hypot
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,operator=
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,field_escape,Unit::pos
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::target
@@ -871,7 +871,7 @@ address,function,file,kind,target
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Unit::ClaimWeapons
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Whole
-0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,_hypot
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator=
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,field_maybe_written,Unit::pos
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,field_read,<anon>::mode
@@ -2972,14 +2972,14 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,SetWeaponTargetPos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,Unit::ClaimWeapons
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,Unit::ReleaseWeapons
-0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,bx_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,bx_sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,empty
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,operator new
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,operator+
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,operator=
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,operator[]
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,size
-0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,call,sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,field_escape,Order::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,field_escape,Unit::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders_411f50.cpp,field_maybe_written,Order::pos
@@ -3037,7 +3037,7 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,SetWeaponTargetUnit
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,Unit::ClaimWeapons
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,Unit::ReleaseWeapons
-0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,_hypot
+0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,bx_hypot
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,empty
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,operator new
 0x412710,AirToGroundOrder,src/orders/vtol_orders_412710.cpp,call,operator+
@@ -3097,7 +3097,7 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Sum
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Unit::ClaimWeapons
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,Unit::ReleaseWeapons
-0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,_hypot
+0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,bx_hypot
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,call,operator new
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_escape,Order::pos
 0x412d40,AirToAirOrder,src/orders/vtol_orders_412d40.cpp,field_escape,Unit::pos
@@ -3155,7 +3155,7 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Unit::ClaimWeapons
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,Unit::ReleaseWeapons
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponCanReachUnit
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,empty
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator new
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator[]
@@ -3431,7 +3431,7 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,QueueUnitSpeech
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,Unit::CanRepair
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator new
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator=
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,deref_write,*Vec3
@@ -49499,7 +49499,7 @@ address,function,file,kind,target
 ,Vec3_004739b0::operator+=,src/graphics/particles_473a00.cpp,field_write,Vec3_004739b0::y
 ,Vec3_004739b0::operator+=,src/graphics/particles_473a00.cpp,field_write,Vec3_004739b0::z
 ,Vec3_004739b0::operator+=,src/graphics/particles_473a00.cpp,function,
-,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,call,sqrt
+,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,call,bx_sqrt
 ,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::x
 ,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::y
 ,Vec3_00473d50::Length,src/graphics/particles_473d50.cpp,field_read,Vec3_00473d50::z

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bitexact.h"
+#include "bx_libcmt.h"
 
 #if !defined(_MSC_VER) && !defined(__cdecl)
 #define __cdecl

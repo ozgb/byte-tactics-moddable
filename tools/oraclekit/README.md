@@ -30,7 +30,10 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `interfaces/sim_events.csv` | the kinds of sim event as a table (below) | `docs/sim-events.md` |
 | `layout.json` | the state block layout (below) | `docs/module-abi.md`, sections 7 to 9 |
 | `docs/schedule.md` | the order of effects: the phases of a tick, each pass's loop and the order of the entry points within an entity, the class of each call one subsystem makes to another, and where a write is read back within one entity's update (the split points) | itself, with `coupling/dependencies.csv` |
+| `docs/files-gate.md`, `tools/filesfixtures.py`, `reference/files/` | the files gate: how a data loader is run and judged, the tool that builds its fixture game directories (standard library only), and the vectors the in-repo engine made on them | `docs/files-gate.md` |
 | `coupling/` | what the subsystems read of each other's state, and what presentation reads (below) | itself |
+| `runtime/` | the plain-maths runtime under the MIT licence: the fixed-point and floating-point maths the game logic calls, its table generator, `runtime/LICENSE` and a header on each file | itself |
+| `runtime/vectors/` | the test vectors of that maths, with their manifest; the format is described in `runtime/vectors/README.md` | `runtime/vectors/README.md` |
 
 ## Presentation is not a module
 

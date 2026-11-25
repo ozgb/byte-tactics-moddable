@@ -242,7 +242,7 @@ extern void (* const g_fixtureAttachVtable[2])() = { nullptr, nullptr };
 
 namespace {
 
-enum { MAX_LINES = 1 << 21, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
+enum { MAX_LINES = 1 << 22, MAX_OUTS = 16384, MAX_RECORDS = 64, TEXT = 512 };
 enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 
 int g_failures;
@@ -663,6 +663,15 @@ bool ClosingLine(const char* line)
     return false;
 }
 
+const ReplayField* RngField(const char* name)
+{
+    for (unsigned i = 0; i < kReplayFieldCount; i++) {
+        if (kReplayFields[i].base == RB_RNG && strcmp(kReplayFields[i].name, name) == 0)
+            return &kReplayFields[i];
+    }
+    return nullptr;
+}
+
 const char* Enter(const ReplayText& actual)
 {
     int index = g_importIndex++;
@@ -701,6 +710,11 @@ const char* Enter(const ReplayText& actual)
             }
         }
         g_cursor++;
+    }
+    for (int i = 0; i < g_outCount; i++) {
+        const ReplayField* f = RngField(g_outNames[i]);
+        if (f != nullptr)
+            RestoreField(*f, g_outValues[i]);
     }
     unsigned n = (unsigned)strlen(actual.Data());
     if (strncmp(recorded, actual.Data(), n) == 0 && (recorded[n] == '\0' || strncmp(recorded + n, " = ", 3) == 0))
@@ -2527,6 +2541,56 @@ bool ObjectLineIsCondition(const char* name)
     return k.field != nullptr && ReplayFieldIsCondition(*k.field);
 }
 
+bool RestoreRunLine(const char* name, const char* values, const char* file, const ReplaySlotSets* sets, const char* line, int pass)
+{
+    const char* plus = strchr(name, '+');
+    const char* hash = strchr(name, '#');
+    if (plus == nullptr || hash == nullptr || hash > plus)
+        return false;
+    char* end;
+    unsigned first = (unsigned)strtoul(hash + 1, &end, 10);
+    if (end != plus)
+        Fatal(file, g_callIndex, "a run line that names no first element", line);
+    unsigned count = (unsigned)strtoul(plus + 1, &end, 10);
+    if (*end != '.' || count < 2)
+        Fatal(file, g_callIndex, "a run line that names no count of elements", line);
+    const char* field = end;
+    char key[96];
+    unsigned prefix = (unsigned)(hash + 1 - name);
+    if (prefix + 10 + strlen(field) >= sizeof key)
+        Fatal(file, g_callIndex, "a run line whose name is too long", line);
+    memcpy(key, name, prefix);
+    sprintf(key + prefix, "%u%s", first, field);
+    if (ObjectLineIsCondition(key) != (pass == 0))
+        return true;
+    unsigned done = 0;
+    for (const char* p = values; *p != '\0';) {
+        char token[48];
+        unsigned n = 0;
+        while (*p != '\0' && *p != ' ' && *p != '*' && n + 1 < sizeof token)
+            token[n++] = *p++;
+        token[n] = '\0';
+        unsigned repeat = 1;
+        if (*p == '*') {
+            repeat = (unsigned)strtoul(p + 1, &end, 10);
+            p = end;
+        }
+        if (*p != '\0' && *p != ' ')
+            Fatal(file, g_callIndex, "a run line with a bad value", line);
+        while (*p == ' ')
+            p++;
+        if (n == 0 || repeat == 0 || done + repeat > count)
+            Fatal(file, g_callIndex, "a run line with more values than its count", line);
+        for (unsigned r = 0; r < repeat; r++, done++) {
+            sprintf(key + prefix, "%u%s", first + done, field);
+            RestoreObjectLine(key, token, file, sets, line);
+        }
+    }
+    if (done != count)
+        Fatal(file, g_callIndex, "a run line with fewer values than its count", line);
+    return true;
+}
+
 std::vector<void*> g_blobSeen;
 
 void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* object, const unsigned short* set, unsigned count, ReplayText& key, ReplayText& value)
@@ -2791,7 +2855,7 @@ void ReplayCall(const char* file, Outcome& out)
                 Fatal(file, g_callIndex, "bad read line", line);
             *space = '\0';
             bool object = strchr(line + 4, '#') != nullptr;
-            if (object && ObjectLineIsCondition(line + 4) == (pass == 0)) {
+            if (object && !RestoreRunLine(line + 4, space + 1, file, sets, line, pass) && ObjectLineIsCondition(line + 4) == (pass == 0)) {
                 RestoreObjectLine(line + 4, space + 1, file, sets, line);
             } else if (!object && pass == 0) {
                 const ReplayField* f = FindBlockField(line + 4);
@@ -3224,7 +3288,7 @@ int RestoreText(const char* text, const ReplaySlotSets& sets)
             *end = '\0';
             char* space = strchr(p + 4, ' ');
             *space = '\0';
-            if (ObjectLineIsCondition(p + 4) == (pass == 0))
+            if (!RestoreRunLine(p + 4, space + 1, "self-test", &sets, p, pass) && ObjectLineIsCondition(p + 4) == (pass == 0))
                 Check(RestoreObjectLine(p + 4, space + 1, "self-test", &sets, p), "a recorded line restores");
             lines += pass == 0 ? 1 : 0;
             p = end;
@@ -5329,8 +5393,10 @@ void DeltaTableSelfTest()
     recorder.Record(nullptr, nullptr, 0, sets);
     char* first = strdup(recorder.text.Data());
     Check(ReplayFailure() == nullptr, "a table of more elements than the walk holds is recorded");
-    Check(CountLines(first, "  r FixtureCell#") == 3 * (int)cells, "the first record writes every field of every element");
-    Check(strstr(first, "  r FixtureCell#8999.flags 0\n") != nullptr && strstr(first, "  r FixtureCell#500.metal 9\n") != nullptr, "the last element and a set one are in it");
+    Check(CountLines(first, "  r FixtureCell#") == 3, "the first record writes every element of a field as one run");
+    Check(strstr(first, "  r FixtureCell#0+9000.unit 0*40 3 0*8959\n") != nullptr && strstr(first, "  r FixtureCell#0+9000.metal 0*500 9 0*8499\n") != nullptr,
+          "a run counts its repeated values");
+    Check(strstr(first, "  r FixtureCell#0+9000.flags 0*9000\n") != nullptr, "a run of one value is one token");
     Check(strstr(first, "  r Unit#3.health 12\n") != nullptr && strstr(first, "Unit#0") == nullptr, "the unit that a cell names is reached, and id 0 is not");
 
     table[12].flags = 258;
@@ -5338,18 +5404,37 @@ void DeltaTableSelfTest()
     recorder.Record(nullptr, nullptr, 0, sets);
     char* second = strdup(recorder.text.Data());
     printf("%s", second);
-    Check(strcmp(second, "  r FixtureCell#12.flags 258\n  r FixtureCell#7000.metal 5\n") == 0, "the next record writes only the two changed fields");
+    Check(strcmp(second, "  r FixtureCell#7000.metal 5\n  r FixtureCell#12.flags 258\n") == 0, "the next record writes only the two changed fields");
     recorder.Record(nullptr, nullptr, 0, sets);
     Check(recorder.text.Size() == 0, "and the one after it nothing");
+
+    table[100].flags = 1;
+    table[101].flags = 1;
+    table[102].flags = 2;
+    table[104].flags = 3;
+    for (unsigned e = 0; e < cells; e++)
+        table[e].metal = (unsigned char)((e * 7 + 1) % 255 + 1);
+    recorder.Record(nullptr, nullptr, 0, sets);
+    char* third = strdup(recorder.text.Data());
+    Check(strstr(third, "  r FixtureCell#100+3.flags 1*2 2\n  r FixtureCell#104.flags 3\n") != nullptr, "changed neighbours are one run, and a lone change keeps its own line");
+    Check(CountLines(third, "  r FixtureCell#") >= 12 && strstr(third, "  r FixtureCell#0+") != nullptr && strstr(third, ".metal 2 9 16 ") != nullptr, "a long run is several lines");
+    for (const char* p = third; *p != '\0'; p = strchr(p, '\n') + 1)
+        Check(strchr(p, '\n') - p < 1100, "and none of them is much longer than a thousand characters");
 
     ResetBlock();
     RestoreText(first, sets);
     RestoreText(second, sets);
+    RestoreText(third, sets);
     FixtureCell* rebuilt = (FixtureCell*)g_game->p1b8a.get();
-    Check(rebuilt != nullptr && rebuilt[7000].metal == 5 && rebuilt[12].flags == 258 && rebuilt[500].metal == 9 && rebuilt[40].unit == 3, "the table is restored from the first record and the delta");
+    bool metal = rebuilt != nullptr;
+    for (unsigned e = 0; metal && e < cells; e++)
+        metal = rebuilt[e].metal == (unsigned char)((e * 7 + 1) % 255 + 1);
+    Check(rebuilt != nullptr && metal && rebuilt[12].flags == 258 && rebuilt[101].flags == 1 && rebuilt[102].flags == 2 && rebuilt[103].flags == 0 && rebuilt[104].flags == 3 && rebuilt[40].unit == 3,
+          "the table is restored from the first record and the deltas");
     if (rebuilt == nullptr) {
         free(first);
         free(second);
+        free(third);
         return;
     }
     g_rootCount = 0;
@@ -5362,6 +5447,7 @@ void DeltaTableSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureCell#8999.metal") == 0, "a changed element is reported at its index and field");
     free(first);
     free(second);
+    free(third);
 }
 
 void DeltaLimitSelfTest()
@@ -5387,9 +5473,9 @@ void DeltaLimitSelfTest()
     recorder.Record(nullptr, nullptr, 0, sets);
     char* text = strdup(recorder.text.Data());
     Check(ReplayFailure() == nullptr, "the walk reaches the table through the lane ids without a failure");
-    Check(strstr(text, "  r FixtureCell#40.metal 9\n") != nullptr, "the limited field of the element a lane names is recorded");
-    Check(strstr(text, "  r FixtureCell#40.flags 7\n") != nullptr, "and so is its other field, which the limit does not list");
-    Check(CountLines(text, "  r FixtureCell#40.") == 2 && CountLines(text, "  r FixtureCell#") == 2 * (int)cells, "each field of each element is written once");
+    Check(strstr(text, "  r FixtureCell#0+9000.metal 0*40 9 0*8959\n") != nullptr, "the limited field of the element a lane names is recorded");
+    Check(strstr(text, "  r FixtureCell#0+9000.flags 0*40 7 3 0*8958\n") != nullptr, "and so is its other field, which the limit does not list");
+    Check(CountLines(text, "  r FixtureCell#") == 2, "each field of each element is written once");
 
     ResetBlock();
     RestoreText(text, sets);
@@ -5457,6 +5543,63 @@ void UnconditionedUnitIdSelfTest()
     BeginCompare();
     CompareObjects(&sets);
     Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#5.health") == 0, "the unit behind an id is compared");
+    free(text);
+}
+
+void IdReachSelfTest()
+{
+    printf("a slot's own reach list for a unit id\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureLane* lanes = (FixtureLane*)SimAlloc(4 * (unsigned)sizeof(FixtureLane));
+    memset((void*)lanes, 0, 4 * sizeof(FixtureLane));
+    g_game->p1cd5 = (SideData*)(void*)lanes;
+    Unit* pool = (Unit*)SimAlloc(8 * (unsigned)sizeof(Unit));
+    g_game->units = pool;
+    g_game->poolCount = 8;
+    pool[5].health = 4;
+    pool[5].flags = 0x21;
+    lanes[1].unit = 5;
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "level"), FieldIndex(ROK_FIXTURELANE, "occupant"), FieldIndex(ROK_UNIT, "health"),
+                                 FieldIndex(ROK_UNIT, "flags") };
+    unsigned short every[1] = { ROK_FIXTURELANE };
+    ReplaySlotSets plain = { "plain", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
+    Recorder recorder;
+    recorder.Record(nullptr, nullptr, 0, plain);
+    char* text = strdup(recorder.text.Data());
+    Check(strstr(text, "  r Unit#5.health 4\n") != nullptr && strstr(text, "Unit#5.flags") == nullptr, "without a slot reach the field's own reach applies");
+    free(text);
+
+    unsigned short own[1] = { FieldIndex(ROK_UNIT, "flags") };
+    ReplayIdReach byId[1] = { { FieldIndex(ROK_FIXTURELANE, "occupant"), own, 1 } };
+    ReplaySlotSets sets = { "by id", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1, byId, 1 };
+    Recorder slot;
+    slot.Record(nullptr, nullptr, 0, sets);
+    text = strdup(slot.text.Data());
+    Check(strstr(text, "  r Unit#5.flags 0x00000021\n") != nullptr && strstr(text, "Unit#5.health") == nullptr, "the slot's reach list replaces the field's own");
+    Check(ReplayFailure() == nullptr, "and the walk does not fail");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    Unit* rebuilt = (Unit*)ReplayResolveObject("Unit#5", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->flags == 0x21 && rebuilt->health == 0, "the replayer restores the fields of the slot's reach only");
+    if (rebuilt == nullptr || g_game->p1cd5.get() == nullptr) {
+        free(text);
+        return;
+    }
+    g_game->poolCount = 8;
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the restored unit compares equal");
+    rebuilt->health = 3;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "a field outside the slot's reach is not compared");
+    rebuilt->flags = 0x20;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "Unit#5.flags") == 0, "a field of the slot's reach is compared");
     free(text);
 }
 
@@ -7173,6 +7316,7 @@ int SelfTest(const char* file)
     DeltaTableSelfTest();
     DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
+    IdReachSelfTest();
     GameRefSelfTest();
     GamePtrSelfTest();
     ExecuteCommandSelfTest();

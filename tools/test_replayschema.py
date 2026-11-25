@@ -1759,14 +1759,16 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_FEATURE, offsetof(Feature, shadowAnim), "shadowAnim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_DEBRIS, offsetof(Debris, ref1), "ref1", 0, 1, 0 },', text)
+        self.assertIn('    { ROK_HANDLE, ROK_DEBRIS, offsetof(Debris, ref2), "ref2", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 15;", text)
+        self.assertIn("kReplayInsideSiteCount = 17;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
         text = files[rs.SCHEMA_H]
-        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 6, 0, 0, 0, 0 },', text)
+        self.assertIn('{ "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 8, 0, 0, 0, 0 },', text)
         self.assertIn('{ "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0, 0 },', text)
 
     def test_the_sites_of_a_kind_are_in_the_model(self):
@@ -1774,6 +1776,7 @@ class InsideSites(unittest.TestCase):
         handle = [o for o in model["objects"] if o["name"] == "Handle"][0]
         self.assertEqual(handle["inside"], [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"},
                                             {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"},
+                                            {"kind": "Debris", "member": "ref1"}, {"kind": "Debris", "member": "ref2"},
                                             {"kind": "FixtureHolder", "member": "anim"}, {"kind": "FixtureHolder", "member": "shadow"}])
         self.assertIsNone([o for o in model["objects"] if o["name"] == "Unit"][0]["inside"])
 

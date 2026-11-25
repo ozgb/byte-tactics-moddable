@@ -149,7 +149,8 @@ int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
     ReplayText t;
     StartImport(t, "map.GetCellMeanHeight");
     Space(t);
-    t.Add("?");
+    t.Add("pos=");
+    AddVec3Xz(t, a0);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -171,6 +172,15 @@ int __stdcall Imp_mission_GetGameType()
     StartImport(t, "mission.GetGameType");
     const char* r = Enter(t);
     return ParseResult<int>(r);
+}
+
+void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetMissionParams");
+    const char* r = Enter(t);
+    *a0 = ParseValueText<MissionParams>(ROK_MISSIONPARAMS, r);
+    (void)r;
 }
 
 void __stdcall Imp_network_SendFeatureBurning(int a0, int a1)
@@ -767,6 +777,12 @@ void After_weapons_Apply()
     CompareResult(g_result_weapons_Apply);
 }
 
+void Run_weapons_UpdateExplosions()
+{
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateExplosions();
+}
+
 void Run_weapons_UpdateUnitWeapons()
 {
     Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
@@ -986,9 +1002,7 @@ int g_result_map_GetCellMeanHeight;
 
 void Run_map_GetCellMeanHeight()
 {
-    Vec3 p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("pos", ROK_VEC3, &p0);
+    Vec3 p0 = ArgScalar<Vec3>("pos");
     SetClosing("result");
     g_result_map_GetCellMeanHeight = g_seams.map->GetCellMeanHeight(&p0);
 }
@@ -1398,6 +1412,10 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_weapons_Apply();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateExplosions") == 0) {
+        Run_weapons_UpdateExplosions();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
         Run_weapons_UpdateUnitWeapons();
         return true;
@@ -1695,6 +1713,7 @@ void BindSeams()
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
         g_seams.mission = &g_import_mission;
         g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     }
     if (strcmp(g_subsystem, "weapons") == 0) {
         g_seams.features = &g_import_features;
@@ -1702,6 +1721,9 @@ void BindSeams()
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.weapons = &g_import_weapons;

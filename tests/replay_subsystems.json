@@ -41,7 +41,7 @@
     "inject": {
       "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",
       "recording": "orders-guard-attacked.txt",
-      "expect": 295,
+      "expect": 344,
       "field": "Unit#2.weapon0ReloadTimer"
     }
   },

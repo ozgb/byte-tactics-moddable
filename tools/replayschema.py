@@ -1862,7 +1862,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 errors += check_product_counts("%s.%s" % (sub, s["name"]), slots[s["name"]], tables, object_fields)
         done = {k: sorted(v) if isinstance(v, set) else v for k, v in pending.items()}
         subsystems[sub] = {
-            "interface": "interfaces/%s.h" % sub, "struct": struct, "version": iface["version"], "status": spec["status"],
+            "interface": "interfaces/%s.h" % (WORLD_VIEWS[sub][1] if sub in WORLD_VIEWS else sub), "struct": struct, "version": iface["version"], "status": spec["status"],
             "imports": spec.get("imports", []), "slots": slots,
         }
         if region is not None:

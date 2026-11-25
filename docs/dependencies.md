@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1219 read-only, 1508 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1219 read-only, 1510 unobserved.
 
 ## Cutting rule
 
@@ -34,11 +34,11 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | los_radar | 6 | 33 | 2 | 140 | 261 | 5 of 14 |
 | orders | 18 | 55 | 9 | 139 | 296 | 4 of 14 |
 | units | 28 | 152 | 6 | 79 | 435 | 3 of 14 |
-| players | 4 | 13 | 1 | 74 | 301 | 10 of 14 |
+| players | 4 | 13 | 1 | 74 | 303 | 10 of 14 |
 | map | 9 | 41 | 1 | 98 | 229 | 4 of 14 |
 | scripts | 16 | 29 | 0 | 29 | 136 | 9 of 14 |
 | movement | 0 | 40 | 2 | 69 | 233 | 7 of 14 |
-| mission | 0 | 0 | 0 | 55 | 104 | 14 of 14 |
+| mission | 0 | 0 | 0 | 55 | 106 | 14 of 14 |
 
 ## Tightly coupled groups
 
@@ -1836,7 +1836,7 @@ The 15 groups with the most rows are shown.
 | immediate | 1 | 12 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 74 |
-| unobserved | 192 | 109 |
+| unobserved | 192 | 111 |
 
 **Ordered** (4).
 
@@ -1886,7 +1886,7 @@ The 15 groups with the most rows are shown.
 | features | 9 | 6 |
 | los_radar | 24 | 7 |
 | map | 14 | 7 |
-| mission | 3 | 9 |
+| mission | 3 | 11 |
 | movement | 6 | 6 |
 | orders | 18 | 6 |
 | pathfinding | 2 | 2 |
@@ -2464,7 +2464,7 @@ The 15 groups with the most rows are shown.
 | immediate | 0 | 0 |
 | deferrable | 0 | 0 |
 | read-only | 0 | 55 |
-| unobserved | 64 | 40 |
+| unobserved | 66 | 40 |
 
 **Ordered** (0).
 
@@ -2494,7 +2494,7 @@ None.
 | map | 3 | 3 |
 | movement | 3 | 3 |
 | orders | 4 | 3 |
-| players | 9 | 3 |
+| players | 11 | 3 |
 | scripts | 3 | 3 |
 | targeting | 3 | 3 |
 | units | 7 | 3 |

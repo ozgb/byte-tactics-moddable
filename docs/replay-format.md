@@ -372,7 +372,7 @@ owner's capacity field must come before the ref field in the owner's list, so th
   r FixtureEye#3.pos (5,6)
 ```
 
-A slot that is all-of over a kind with a capacity gets the whole table allocated before it runs, whether or not a line named an element, since the module may write past the live count (`AddEyeball` writes element `count_14277`).
+A slot that is all-of over a kind with a capacity gets the whole table allocated before it runs, whether or not a line named an element, since the module may write past the live count (adding an eyeball writes element `count_14277`).
 
 The replayer's table is outside the block, so a ref to it is the difference of two addresses, as any ref the module stores. A replay of a module that
 frees such a table frees the replayer's memory, which is why the module's allocator makes it. The replayer calls the exe's `operator new`, so such a table is for native replays; a WASM
@@ -637,15 +637,15 @@ two names joined by `/` when one function serves both, and `Ready` for the first
 bit of `WeaponDef.flags` that selects it (`turret`, else `vLaunch`, else `lineOfSight` or `selfProp`, else `dropped`). A kind of the `index` scope cannot hold a code field (a value kind can: an element of the order table, `OrderEntry.notify`; `WeaponDef.fire` is set when the weapon types load, to one of four functions): a second kind
 of the same C type, `WeaponFire`, is a state kind with a `table` over the array (`{"base": "game", "member": "weapons", "count": 256}`, no `ref`) and `fire` as its only field, and a rule with `"rule": "all-of"` on `WeaponDef::fire` makes every weapon a root of the call, so `WeaponFire#17.fire` is
 the handler of `weapondef#17`. The table is recorded whole at the first call that reads it (256 lines) and by changes after that. A function that is in none of the entries is an error that names the table (the recorder
-writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is an entry through the declaration of `unit_orders.h` that has the type its definition has (an `unsigned char` flags).
+writes `orderNotify[?]`), and an index past the table is refused by the replayer. The ground pickup order (`Ground_Pickup`) is an entry through a declaration that has the type its definition has (an `unsigned char` flags).
 
 ### A class with a compiler-emitted vtable
 
 A class with real virtual methods that the code constructs itself (`AiSearchGoal`, `UnitScript`) has a vtable that the compiler emits, and no
 global of the sources holds it. Its kind names the symbol: `"vtable_symbol": "??_7AiSearchGoal@@6B@"`. The generated
-`replay_vtables.cpp` declares a global for the kind, `extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");`, so it is the
+vtable file of the replayer declares a global for the kind, `extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");`, so it is the
 class's own vtable, in the game and in the replayer's link. A kind may name that global itself with a `vtable` beside the symbol
-(`"vtable": "g_assaultTimerVtable", "vtable_symbol": "??_7AssaultTimer@@6B@"` declares `g_assaultTimerVtable`), and the tool refuses a global that two kinds name. The symbol is the vtable of the kind's `type`, which the tool checks. Everything else is
+(`"vtable": NAME, "vtable_symbol": "??_7AssaultTimer@@6B@"` declares the global NAME), and the tool refuses a global that two kinds name. The symbol is the vtable of the kind's `type`, which the tool checks. Everything else is
 as for a `vtable`: the kind belongs to a base with `kinds` and a `poly` ref (or is the only kind of its class, with no base and no site: `Order`), the recorder writes the concrete kind its vptr names, and the replayer
 allocates the object and stores the class's vtable, so a virtual call on a rebuilt object runs the class's own method. The fields are the
 members the schema lists; a base class's members (the goal's `target` and `owner`) are listed on each concrete kind. A class whose base is also made on its own gets a kind for the base part
@@ -656,7 +656,7 @@ A class with several bases keeps one vtable pointer for each base that has virtu
 (`class DefeatAllUnitsKilled : public MissionCondition, public UnitScanVisitor`). The compiler emits `??_7DefeatAllUnitsKilled@@6BMissionCondition@@@` for the first and
 `??_7DefeatAllUnitsKilled@@6BUnitScanVisitor@@@` for the second, so the kind's `vtable_symbol` is the first and `"vtable_secondary": ["UnitScanVisitor"]` lists the others. The recorder still
 tells the kind by the first vptr. The replayer stores the class's vtable at the start of the object and, for each base of the list, the vtable of that base at the offset of its subobject
-(`static_cast<UnitScanVisitor*>` of the class, computed by `ReplayExtraVtables` of the generated `replay_vtables.cpp`), so the module's call of `visitor->VisitUnit` on the subobject reaches the class's own method.
+(the cast of the class to `UnitScanVisitor*`, computed by the generated vtable file of the replayer), so the module's call of a visitor method on the subobject reaches the class's own method.
 The tool checks that the base is a polymorphic base of the type. The kit's copy of the schema leaves `vtable_secondary` out. The native self-test builds a `FixtureTwin`, which derives from `FixtureGoalBase` and `FixtureScanBase`, and calls a method through its second base.
 
 ## Callbacks
@@ -959,7 +959,7 @@ rows that read the field (`field_read Game::unitsEnd`) makes the walk reach ever
 
 A member of `Game` that is a raw pointer (not a `Ref`) to one object is `{"kind": "ptr", "target": KIND}` and is written, restored and walked
 the same way (`Game.losTable`, a `FrameTable*` into loaded GAF memory: `r Game.losTable FrameTable#1`, `r FrameTable#1.count 40`). The replayer allocates the empty
-object and stores its address, so a service that is given the table (`GetGafFrame`) names it `FrameTable#1` again.
+object and stores its address, so a service that is given the table (the frame lookup) names it `FrameTable#1` again.
 
 ### A field the replayer derives
 
@@ -1027,7 +1027,7 @@ from the layout), and the export refuses a copy that names any other source name
   `all-of` makes every slot of a table kind a root of the call (`Game.players` is walked by index), and a slot may have the rule for
   several kinds. A rule's `reads` and `writes` may also name block fields, `Game.visibilityMask` or `SimGlobals.g_x`, which join the slot's read and write sets: a write
   through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. A `deref_write` of a struct pointer `*T`, where `T` is the type of a
-  state or index kind or a view of one (a type whose members the kind's fields have as `aliases`, `DebrisView` of `Debris`), is a whole-struct assignment and
+  state or index kind or a view of one (a type whose members the kind's fields have as `aliases`, a debris view of `Debris`), is a whole-struct assignment and
   needs no rule: every field of the kind joins the slot's writes, so the compaction of `UpdateExplosions` (`*e = e[1]`) records every field of each `Debris` it moves. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
 - `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Feature",
@@ -1315,11 +1315,11 @@ targeting:
 
 features:
 
-- `Apply` of RECLAIM: the slot leaves it `unrecorded` (#897); a feature reclaim needs a scenario that makes a unit reclaim one, which changes `reference/` and makes the full gate this issue's. `ReclaimFeature` itself, which reads and writes economy's account and units, is reached only through it.
-- `Apply` of REMOVE and `Place`: no recorded window removes a feature by event or places one through the synchronous slot. `PlaceFeature` is reached through `Apply` of PLACE (`orders-air-fights`, a model with a spot), and `RemoveFeature` through the replacement of a dead feature.
-- `StartFeatureBurning` and the burning half of `UpdateFeatureSpot` (the smoke, the spread, `BurnOut`), and `ScanFeatureCell` seeding a feature: no recorded window holds a flamable feature hit by a fire-starting weapon, and no feature of these maps has a seed chance above 0.
-- `FindFeatureAtPos`: called by the reclaim and resurrect orders (`ReclaimOrder`, `ResurrectOrder` and the VTOL reclaim order) and by the players' mining check, none of which a recorded window reaches; its `cell` and `size` are the nullable out form.
-- The network branches of `DamageFeature` (`Game.netGameFlags`-dependent game type 3): the recordings are of games of type 2.
+- `Apply` of RECLAIM: the slot leaves it `unrecorded` (#897); a feature reclaim needs a scenario that makes a unit reclaim one, which changes `reference/` and makes the full gate this issue's. The reclaim itself, which reads and writes economy's account and units, is reached only through it.
+- `Apply` of REMOVE and `Place`: no recorded window removes a feature by event or places one through the synchronous slot. Placing a feature is reached through `Apply` of PLACE (`orders-air-fights`, a model with a spot), and removing one through the replacement of a dead feature.
+- The start of a fire and the burning half of `UpdateFeatureSpot` (the smoke, the spread, the burn-out), and `ScanFeatureCell` seeding a feature: no recorded window holds a flamable feature hit by a fire-starting weapon, and no feature of these maps has a seed chance above 0.
+- `FindFeatureAtPos`: called by the reclaim and resurrect orders (the reclaim, resurrect and VTOL reclaim orders) and by the players' mining check, none of which a recorded window reaches; its `cell` and `size` are the nullable out form.
+- The network branches of the feature damage (`Game.netGameFlags`-dependent game type 3): the recordings are of games of type 2.
 - `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick; `UpdateFeatures` is the scheduler's phase driver, which calls the slots below it, each recorded on its own.
 
 mission:
@@ -1335,10 +1335,10 @@ weapons:
 - `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
 - The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
 - `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
-- `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded`, so the self-destructs of `combat-deaths` reach the recording only through what they change. DETONATE and AREA_DAMAGE (`DetonateProjectile`, `ApplyAreaDamage`) read the unit and the cells a shot hits by their id: a unit is reached only as a root of the walk, and every unit with its three aim callbacks, and every cell, are too many roots for a call (the walk holds 8192 objects, and a walk of every unit of the pool takes minutes to replay). EXPLODE_PIECE allocates the piece in `g_debrisMemCache`, a block of chunks in the block that the schema has no form for, and reads the model of the unit. SPAWN and REMOVE_PROJECTILES need only the rules of the projectile table (`InitProjectile`, `CompactProjectiles`) and are not recorded yet.
+- `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded`, so the self-destructs of `combat-deaths` reach the recording only through what they change. DETONATE and AREA_DAMAGE (the detonation and the area damage) read the unit and the cells a shot hits by their id: a unit is reached only as a root of the walk, and every unit with its three aim callbacks, and every cell, are too many roots for a call (the walk holds 8192 objects, and a walk of every unit of the pool takes minutes to replay). EXPLODE_PIECE allocates the piece in the debris chunk cache, a block of chunks in the block that the schema has no form for, and reads the model of the unit. SPAWN and REMOVE_PROJECTILES need only the rules of the projectile table (starting a projectile, compacting the table) and are not recorded yet.
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (unrecorded), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
-- `UpdateProjectiles`: `unrecorded`, for the reason of DETONATE and AREA_DAMAGE above (its collision, `DetonateProjectile` and `ApplyAreaDamage` read units and cells by id). `UpdateExplosions` is recorded, and so is `AddExplosionEffect`, which `UpdateProjectiles` and `Apply` also call: what they add to `Game.debris` reaches the recording as `r Debris#N` lines.
+- `UpdateProjectiles`: `unrecorded`, for the reason of DETONATE and AREA_DAMAGE above (its collision, the detonation and the area damage read units and cells by id). `UpdateExplosions` is recorded, and so is adding an explosion effect, which `UpdateProjectiles` and `Apply` also call: what they add to `Game.debris` reaches the recording as `r Debris#N` lines.
 
 economy:
 
@@ -1360,10 +1360,10 @@ units:
 
 units is complete with part of its seam recorded: the slots below are `record: false` with the reason in the schema, and each has what it needs written here.
 
-- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds `ApplyUnitDeath`, `InitUnitScript`, `ClearUnitRefs` and `FinishConstruction`, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement).
+- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds the unit's death, the start of its script, the clearing of its references and the end of its construction, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement).
 - `UnitRefUnlink`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefGet` and `UnitRefSetValue`: the reference is an embedded `PathOrderAttach` of an order, a kind that orders annotates.
-- `UpdateUnitTail`: `AlignUnitToGround` reads the unit's 3D model through `Game.types` (`ModelGroundView`, `CornerHeightSample`), which has no form.
-- `CreateFactoryIndex`, `FreeFactoryIndex`, `RefreshFactoryIndex` and `GetFactoriesInRadius`: the factory index is `s_index` in `src/units/factory_index.cpp`, a static outside the block (only the pointer is tracked by `SimBlockTrack`), so no field names it.
+- `UpdateUnitTail`: aligning a unit to the ground reads the unit's 3D model through `Game.types` (a view of the model and a height sample of each corner), which has no form.
+- `CreateFactoryIndex`, `FreeFactoryIndex`, `RefreshFactoryIndex` and `GetFactoriesInRadius`: the factory index is a static of units outside the block (only the pointer is tracked by the block), so no field names it.
 - `FindMissionUnit`: it is called only by the unit commands of a mission when the mission starts, and no scenario reaches it.
 - `UpdateAllUnits` is the scheduler's loop over every unit. It calls `UpdateUnitHead`, `UpdateUnitBody` and `UpdateUnitTail` through the seam, and other subsystems' slots between them, so its recording would hold a call of another recorded subsystem inside it; the head and body slots are recorded one by one.
 - `WriteState`, `SaveUnits`, `GetMovementLimits`, `CreateFactoryIndex` and `FreeFactoryIndex` are queries or set-up outside the tick, and the load slots are load class.
@@ -1381,8 +1381,8 @@ ai:
 
 los_radar:
 
-- `Apply` of SHARE_MAPPING and SHARE_RADAR, and `network.BroadcastPlayerInfo` (`CmdShareMapping`, `CmdShareRadar`): they act only in a network game (outcome 0 otherwise), and no scenario is one.
-- `Apply` of SHARE_MAP (`ShareMapInfo`), CELL_HEIGHTS and SIGHT_LOAD: no recorded scenario publishes them (the first comes from `UpdateResourceSharing` of a network game and the third from a loaded game, which the run-from-tick-0 recordings do not include).
+- `Apply` of SHARE_MAPPING and SHARE_RADAR, and `network.BroadcastPlayerInfo` (the share mapping and share radar commands): they act only in a network game (outcome 0 otherwise), and no scenario is one.
+- `Apply` of SHARE_MAP (the shared map info), CELL_HEIGHTS and SIGHT_LOAD: no recorded scenario publishes them (the first comes from `UpdateResourceSharing` of a network game and the third from a loaded game, which the run-from-tick-0 recordings do not include).
 - The sight circle drawn from a frame of the `vismask` table, `GafFrame::pixelsOrLayers` (`mapFlags` bit 2 clear, `+lostype` off): `console-sight` reaches it and is not recorded, because the pixels of a GAF frame are loaded engine memory that the replayer would have to rebuild as a blob. The recorded scenarios all draw sight from the height-line tables (`Game.grid1`, `SimGlobals.g_losTables`).
 - `GetVisibleEnemiesInRadius` as a slot: its out buffer of units has no form in a slot (`units-buffer` is the form of an import), so the slot is `record: false` and targeting's recordings replay it as an import line.
 - The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers; `UpdateSensorRadarAndCloak` calls `HasReadyUnitInRange` for each unit that can cloak, so both recordings replay it as part of that slot (it reads the `visible` lists of the index and decides `Unit.flags` bit 0x1000 and `Unit.workTime`); the last two run when a match is unloaded.
@@ -1434,13 +1434,13 @@ The recordings of players, every one with `RegionSize` and `Init` first and then
 
 | Recording | Window | Calls | Reaches |
 |---|---|---|---|
-| `skirmish2` | 29 to 32 | Head 40, Body 8, Finish 4, Tail 2 | a skirmish (game type 2): the first period of each player's `UpdatePlayerBody` at tick 30, `CheckVictory` and `CheckDefeat` of the skirmish |
-| `console-units` | 145 to 175 | Head 310, Body 62, Finish 31, `Apply` 9 (KILL_UNITS 3, UNIT_DIED 5, UNIT_CREATED 1), `DeactivateConditions` 2 | `+kill 1` and `+kill`: `KillPlayerUnits` and its `SchedPublish` of the kill effects, the conditions told of the deaths |
-| `mission-capture` | 495 to 502 | Head 80, Body 16, Finish 8, `Apply` 3 (GIVE_UNIT, UNIT_CREATED, UNIT_DIED) | a capture (game type 1): `GiveUnitToPlayer`, `VictoryCaptureUnitType::OnUnitCaptured`, `DefeatAllUnitsKilledOfType::OnUnitDied` with `units.FindUnitTypeId` and the scan of the units |
+| `skirmish2` | 29 to 32 | Head 40, Body 8, Finish 4, Tail 2 | a skirmish (game type 2): the first period of each player's `UpdatePlayerBody` at tick 30, the victory and defeat checks of the skirmish |
+| `console-units` | 145 to 175 | Head 310, Body 62, Finish 31, `Apply` 9 (KILL_UNITS 3, UNIT_DIED 5, UNIT_CREATED 1), `DeactivateConditions` 2 | `+kill 1` and `+kill`: the kill of a player's units and its `SchedPublish` of the kill effects, the conditions told of the deaths |
+| `mission-capture` | 495 to 502 | Head 80, Body 16, Finish 8, `Apply` 3 (GIVE_UNIT, UNIT_CREATED, UNIT_DIED) | a capture (game type 1): the gift of a unit, the capture condition told of the capture, the all-units-of-a-type defeat told of the death with `units.FindUnitTypeId` and the scan of the units |
 | `mission-kill-of-type` | 180 to 190 | Head 110, Body 22, Finish 11, `Apply` 55 (UNIT_DIED) | `VictoryKillAllOfType` and `VictoryKillUnitType` counting the deaths, `units.FindUnitTypeId` 2 |
-| `mission-defeat-all-units` | 335 to 362 | Head 260, Body 52, Finish 26, Tail 2 | the end of a lost mission: `DefeatAllUnitsKilled::IsSatisfied` scans the units, the countdown ends at tick 360 and sets `Game.endGameFlags` |
-| `allied-victory` | 329 to 362 | Head 340, Body 136, Finish 34, Tail 6 | game type 3: `CheckAlliedVictory`, `network.BroadcastPlayerEconomy` at tick 330 and the end of a won game at tick 360 (`Game.endGameVictory`) |
-| `share-all` | 898 to 903 | Head 60, Body 12, Finish 6, Tail 2, `Apply` 2 (TRANSFER) | `TransferMetal` and `TransferEnergy` with `services.ScheduleEconomySpend` and `network.SendShareMetal` and `SendShareEnergy` |
+| `mission-defeat-all-units` | 335 to 362 | Head 260, Body 52, Finish 26, Tail 2 | the end of a lost mission: the all-units-killed defeat scans the units, the countdown ends at tick 360 and sets `Game.endGameFlags` |
+| `allied-victory` | 329 to 362 | Head 340, Body 136, Finish 34, Tail 6 | game type 3: the allied victory check, `network.BroadcastPlayerEconomy` at tick 330 and the end of a won game at tick 360 (`Game.endGameVictory`) |
+| `share-all` | 898 to 903 | Head 60, Body 12, Finish 6, Tail 2, `Apply` 2 (TRANSFER) | the metal and energy transfers with `services.ScheduleEconomySpend` and `network.SendShareMetal` and `SendShareEnergy` |
 
 The injected change of players is the period of a player's `UpdatePlayerBody`, 30 ticks (`0x1e`) in the game and `0x1f` in `replay_inject_test.exe`: the divergence is reported at call 16 of `skirmish2`, at `region` (`byte 4 of 84: recorded 3c, replayed 3d`, the first body of a player at tick 30):
 
@@ -1456,7 +1456,7 @@ out `Vec3`:
 wine build/modern/replay_inject_test.exe --expect 356 pos.x tests/replay/targeting/skirmish4-long.txt
 ```
 
-The recordings of los_radar are whole runs from tick 0 (no window): the unit index (`s_index` of `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window could not restore it. `console-units` (300 ticks: `UpdateUnitLineOfSight` 725, `RecordRadarUnits` 301, `RefreshUnitIndex` 602, `Apply` 26 of UPDATE_UNIT once, REMOVE_UNIT 7, REVEAL_UNIT 7, ADD_EYEBALL 3, RECALCULATE once and SIGHT_RESET 7, `UpdateSensorRadarAndCloak` 11, `RecordRadarMapped` 11, `SoundHeardMask` 21, `GetMapCellAtPosition` 78) holds the eyeballs and the removals of units, and `sensors-sonar-jam` (150 ticks: `Apply` of REVEAL_UNIT 3, RECALCULATE once and SIGHT_RESET 3, `UpdateSensorRadarAndCloak` 6, the jamming and sonar paths of its visitors) the sensors. A radar capture is a snapshot (`services.SimCaptureAlloc`), with the arena offset of the engine after the handle. The injected change is the refresh period of the unit index, 0x3c ticks in place of 0x1e (`BT_REPLAY_INJECT_REFRESH_TICKS`), reported at call 530 of `console-units`, where the index is not rebuilt and its first `services.SimAlloc` is missing:
+The recordings of los_radar are whole runs from tick 0 (no window), so that the unit index, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, is in every one of them from the start. `console-units` (300 ticks: `UpdateUnitLineOfSight` 725, `RecordRadarUnits` 301, `RefreshUnitIndex` 602, `Apply` 26 of UPDATE_UNIT once, REMOVE_UNIT 7, REVEAL_UNIT 7, ADD_EYEBALL 3, RECALCULATE once and SIGHT_RESET 7, `UpdateSensorRadarAndCloak` 11, `RecordRadarMapped` 11, `SoundHeardMask` 21, `GetMapCellAtPosition` 78) holds the eyeballs and the removals of units, and `sensors-sonar-jam` (150 ticks: `Apply` of REVEAL_UNIT 3, RECALCULATE once and SIGHT_RESET 3, `UpdateSensorRadarAndCloak` 6, the jamming and sonar paths of its visitors) the sensors. A radar capture is a snapshot (`services.SimCaptureAlloc`), with the arena offset of the engine after the handle. The injected change is the refresh period of the unit index, 0x3c ticks in place of 0x1e (the refresh injection of the test build), reported at call 530 of `console-units`, where the index is not rebuilt and its first `services.SimAlloc` is missing:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 530 "import 0 services.SimAlloc" tests/replay/los_radar/console-units.txt
@@ -1498,7 +1498,7 @@ The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a
 of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game.overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
 `occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.
 
-`replay_inject_test.exe` is also built with the feature-HP injection of 20000 (the `d >= f->damage` of `DamageFeature`, a feature killed by the damage it has taken, compared with 20000 more), and the divergence is reported at call 404 of `commander-death` and at the first import that differs, `import 1 los_radar.GetMapCell` (a feature that is not killed makes no `KillFeature` call):
+`replay_inject_test.exe` is also built with the feature-HP injection of 20000 (the damage test of the feature damage, a feature killed by the damage it has taken, compared with 20000 more), and the divergence is reported at call 404 of `commander-death` and at the first import that differs, `import 1 los_radar.GetMapCell` (a feature that is not killed makes no kill call):
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 404 "import 1 los_radar.GetMapCell" tests/replay/features/commander-death.txt
@@ -1558,7 +1558,7 @@ wine build/modern/replay_inject_test.exe --expect 25 Unit#1.healthPercent tests/
 
 `services.ScheduleEconomyRequestGranted` names its unit as `Unit#N`, not as its block offset, which differs between the recording and the replay: the argument is `{"mode": "object", "kind": "Unit", "ref": true}`, as a unit of the world view is.
 
-The recordings of ai 6.0, which the modern build runs as native code in every mode: `console-sight` (the whole run, 200 ticks: `CreateSquads`, `CreateSquadManager` and `CreatePlayerAI` of both players at tick 0, `ParseDownloadableAiWeightScripts` and `ReparseAiWeightScriptsIfLimitNotSticky` with the console commands they run, `RebuildFeatureCells`, `ResetAIPlayers` (the console `reloadaiprofiles`), `Apply` of SET_SQUAD, PLAN, WEIGHT and LIMIT, and 402 calls each of `UpdatePlayerAI` and `UpdateSquads`, two players over 201 ticks) and `skirmish2`, ticks 250 to 700 only (the timers of a four-player skirmish: the build timer places factories with `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint`, and the scout, squad scout, spatial and assault timers fire, 902 calls each of both slots over 451 ticks). Each file starts with a first record of every unit (`UpdatePlayerAI` reaches the whole pool) and every unit type, about 1.4 MB, and a call after that holds only what changed. The injected change is `BT_REPLAY_INJECT_SQUAD_PERIOD=45`, the 30 ticks that `SquadManager::TickIfActive` waits before it assigns squads again; it is reported at call 76 of `skirmish2` and at `SquadManager#1.countdown`:
+The recordings of ai 6.0, which the modern build runs as native code in every mode: `console-sight` (the whole run, 200 ticks: `CreateSquads`, `CreateSquadManager` and `CreatePlayerAI` of both players at tick 0, `ParseDownloadableAiWeightScripts` and `ReparseAiWeightScriptsIfLimitNotSticky` with the console commands they run, `RebuildFeatureCells`, `ResetAIPlayers` (the console `reloadaiprofiles`), `Apply` of SET_SQUAD, PLAN, WEIGHT and LIMIT, and 402 calls each of `UpdatePlayerAI` and `UpdateSquads`, two players over 201 ticks) and `skirmish2`, ticks 250 to 700 only (the timers of a four-player skirmish: the build timer places factories with `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint`, and the scout, squad scout, spatial and assault timers fire, 902 calls each of both slots over 451 ticks). Each file starts with a first record of every unit (`UpdatePlayerAI` reaches the whole pool) and every unit type, about 1.4 MB, and a call after that holds only what changed. The injected change is a squad period of 45, the 30 ticks that the squad manager's tick waits before it assigns squads again; it is reported at call 76 of `skirmish2` and at `SquadManager#1.countdown`:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 76 SquadManager#1.countdown tests/replay/ai/skirmish2.txt

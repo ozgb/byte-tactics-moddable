@@ -64699,8 +64699,9 @@ address,function,file,kind,target
 ,host_dir_close,src/host/win32/files.cpp,call,free
 ,host_dir_close,src/host/win32/files.cpp,field_read,HostDir::entries
 ,host_dir_close,src/host/win32/files.cpp,function,
-,host_dir_create,src/host/win32/files.cpp,call,GetFileAttributesA
 ,host_dir_create,src/host/win32/files.cpp,call,_mkdir
+,host_dir_create,src/host/win32/files.cpp,call,_stat
+,host_dir_create,src/host/win32/files.cpp,field_read,_stat::st_mode
 ,host_dir_create,src/host/win32/files.cpp,function,
 ,host_dir_first,src/host/win32/files.cpp,call,FillEntry
 ,host_dir_first,src/host/win32/files.cpp,call,_findclose

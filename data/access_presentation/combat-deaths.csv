@@ -2,7 +2,7 @@ item,reader,function,container,every,after
 Debris::angle_x,platform,RotateByAngles,debris,0,
 Debris::angle_y,platform,RotateByAngles,debris,0,
 Debris::angle_z,platform,RotateByAngles,debris,0,
-Debris::field_0,presentation,DrawExplosions,debris,0,
+Debris::obj,presentation,DrawExplosions,debris,0,
 Debris::pos,presentation,DrawExplosions,debris,0,
 Debris::ref1,presentation,ClipRects,debris,0,
 Debris::ref1,presentation,DrawExplosions,debris,0,

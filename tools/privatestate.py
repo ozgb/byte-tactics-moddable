@@ -167,7 +167,7 @@ WEAPONS_TYPES = ("ExplodedPiece", "DebrisPiece")
 WEAPONS_ALLOCATED = ("ExplodedPiece",)
 
 WEAPONS_ITEMS = ("count_1491b", "debris", "g_explodedPieces", "DebrisCache::cur",
-                 "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
+                 "Debris::obj", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
                  "Unit::field_8", "Unit::type", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b", "Unit::unknown_1c",
                  "Unit::unknown_24", "Unit::unknown_2a", "Unit::unknown_30", "Unit::weapon2AimCob", "Unit::unknown_4c",
                  "Projectile::start", "Projectile::direction", "Projectile::angles", "Projectile::speed", "Projectile::range", "Projectile::spawnTick",
@@ -183,7 +183,7 @@ WEAPONS_ALSO_READ_BY = ACTING_FOR_OWNER + (("Debris::pos", "map"),)
 WEAPONS_WRITE_TYPES = ("Projectile", "Explosion", "ExplodedPiece")
 
 WEAPONS_WRITE_ITEMS = ("projectiles", "projectileCount", "count_1491b", "debris", "g_explodedPieces", "DebrisPiece::state", "DebrisCache::cur",
-                       "Debris::field_0", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
+                       "Debris::obj", "Debris::pos", "Debris::vel", "Debris::spin", "Debris::size", "Debris::angle_x", "Debris::angle_y", "Debris::angle_z",
                        "Unit::field_8", "Unit::type", "Unit::weapon", "Unit::unknown_14", "Unit::field_16", "Unit::field_18", "Unit::unknown_1a", "Unit::f_1b",
                        "Unit::unknown_1c", "Unit::field_1e", "Unit::f_1f", "Unit::unknown_24", "Unit::unknown_2a", "Unit::f2c", "Unit::unknown_30",
                        "Unit::b3a", "Unit::f_3b", "Unit::weapon2AimCob", "Unit::f48", "Unit::unknown_4c", "Unit::b56", "Unit::f_57")

@@ -1786,12 +1786,14 @@ mission,orders,MissionParams::gravity,-,unobserved,0,,
 mission,orders,Vec3::x,-,unobserved,0,,
 mission,orders,Vec3::y,-,unobserved,0,,
 mission,orders,Vec3::z,-,unobserved,0,,
+mission,players,DeleteConditionsNative,-,unobserved,0,,indirect
+mission,players,FreeConditionsNative,-,unobserved,0,,indirect
 mission,players,Game::list_391ed,-,unobserved,0,,
-mission,players,MissionParams::killMul,-,unobserved,0,,
 mission,players,MissionParams::lavaWorld,-,unobserved,0,,
 mission,players,MissionParams::startEnergy,-,unobserved,0,,
 mission,players,MissionParams::startMetal,-,unobserved,0,,
-mission,players,MissionParams::timeMul,-,unobserved,0,,
+mission,players,NewConditionsNative,-,unobserved,0,,indirect
+mission,players,RegisterConditionsNative,-,unobserved,0,,indirect
 mission,players,Vec3::x,-,unobserved,0,,
 mission,players,Vec3::y,-,unobserved,0,,
 mission,players,Vec3::z,-,unobserved,0,,

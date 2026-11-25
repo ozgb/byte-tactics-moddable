@@ -1675,6 +1675,8 @@ int __stdcall RecUnitsUpdateUnitBody(Unit* a0)
 
 int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
 {
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == PLAYERS_SET_STORE))
+        return s_inner_players->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_PLAYERS, a0, a1);
     SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots);

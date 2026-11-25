@@ -91670,6 +91670,7 @@ call 0 Apply
   r Game.playerIndex 0
   r Game.poolCount 2501
   r Game.projectileCount 0
+  r Game.endGameFlags 0
   r Game.unitsEnd Unit#2500
   r Game.count_14277 0
   r Game.flags_142f1 4

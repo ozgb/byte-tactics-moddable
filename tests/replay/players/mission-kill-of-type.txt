@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.0
+subsystem players 5.1
 call 0 RegionSize
   a info (2)
   o result 84
@@ -27694,6 +27694,18 @@ call 180 Apply
   a event.kind 195
   a event.unit Unit#321
   a size 8
+  w Game.endGameFlags 0
+  w Game.endGameVictory 0
+  w PlayerInfo#1.kind 1
+  w PlayerInfo#2.kind 2
+  w PlayerInfo#3.kind 0
+  w PlayerInfo#4.kind 0
+  w PlayerInfo#5.kind 0
+  w PlayerInfo#6.kind 0
+  w PlayerInfo#7.kind 0
+  w PlayerInfo#8.kind 0
+  w PlayerInfo#9.kind 0
+  w PlayerInfo#10.kind 0
   o result 1
 call 180 Apply
   r Unit#322.flags 0x90244001
@@ -27750,8 +27762,6 @@ call 180 UpdatePlayerBody
   r Game.baseX 3104
   r Game.baseY 4160
   r Game.commanderDeath 0
-  r Game.endGameFlags 0
-  r Game.endGameVictory 0
   r rng.main 0x943085a8
   r rng.load 0xe888d03b
   r rng.seed 0x03bcd687
@@ -27827,7 +27837,6 @@ call 180 UpdatePlayerBody
   r Player#9.allied x:0000000000000000000100
   r Player#9.alliedBy x:0000000000000000000100
   r Player#9.rejectReason 0
-  r PlayerInfo#1.kind 1
   r PlayerInfo#1.flags_97_wide 0
   r PlayerInfo#1.flags 18
   r PlayerInfo#1.flags_9d_wide 0
@@ -27837,55 +27846,46 @@ call 180 UpdatePlayerBody
   r Unit#349.flags 0x80244001
   r Unit#349.def UnitDef#0
   r Unit#349.motion null
-  r PlayerInfo#2.kind 2
   r PlayerInfo#2.flags_97_wide 0
   r PlayerInfo#2.flags 0
   r PlayerInfo#2.flags_9d_wide 0
   r PlayerInfo#2.energy 0
   r PlayerInfo#2.metal 0
-  r PlayerInfo#3.kind 0
   r PlayerInfo#3.flags_97_wide 0
   r PlayerInfo#3.flags 0
   r PlayerInfo#3.flags_9d_wide 0
   r PlayerInfo#3.energy 0
   r PlayerInfo#3.metal 0
-  r PlayerInfo#4.kind 0
   r PlayerInfo#4.flags_97_wide 0
   r PlayerInfo#4.flags 0
   r PlayerInfo#4.flags_9d_wide 0
   r PlayerInfo#4.energy 0
   r PlayerInfo#4.metal 0
-  r PlayerInfo#5.kind 0
   r PlayerInfo#5.flags_97_wide 0
   r PlayerInfo#5.flags 0
   r PlayerInfo#5.flags_9d_wide 0
   r PlayerInfo#5.energy 0
   r PlayerInfo#5.metal 0
-  r PlayerInfo#6.kind 0
   r PlayerInfo#6.flags_97_wide 0
   r PlayerInfo#6.flags 0
   r PlayerInfo#6.flags_9d_wide 0
   r PlayerInfo#6.energy 0
   r PlayerInfo#6.metal 0
-  r PlayerInfo#7.kind 0
   r PlayerInfo#7.flags_97_wide 0
   r PlayerInfo#7.flags 0
   r PlayerInfo#7.flags_9d_wide 0
   r PlayerInfo#7.energy 0
   r PlayerInfo#7.metal 0
-  r PlayerInfo#8.kind 0
   r PlayerInfo#8.flags_97_wide 0
   r PlayerInfo#8.flags 0
   r PlayerInfo#8.flags_9d_wide 0
   r PlayerInfo#8.energy 0
   r PlayerInfo#8.metal 0
-  r PlayerInfo#9.kind 0
   r PlayerInfo#9.flags_97_wide 0
   r PlayerInfo#9.flags 0
   r PlayerInfo#9.flags_9d_wide 0
   r PlayerInfo#9.energy 0
   r PlayerInfo#9.metal 0
-  r PlayerInfo#10.kind 0
   r PlayerInfo#10.flags_97_wide 0
   r PlayerInfo#10.flags 0
   r PlayerInfo#10.flags_9d_wide 0

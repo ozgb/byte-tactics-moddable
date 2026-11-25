@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.0
+subsystem players 5.1
 call 0 RegionSize
   a info (2)
   o result 84
@@ -28013,12 +28013,14 @@ call 150 Apply
   i services.SchedPublish 4 12
   i services.SchedPublish 4 12
   o result 1
-call 150 DeactivateConditions
-  a conditions MissionConditions#1
-  w MissionConditions#1.active 0
 call 150 Apply
   r Unit#251.flags 0x90e44021
   r Unit#252.flags 0x94284121
+  a event.kind 200
+  a event.unit null
+  a size 8
+  o result 1
+call 150 Apply
   a event.kind 195
   a event.unit Unit#251
   a size 8
@@ -28044,6 +28046,7 @@ call 150 UpdatePlayerHead
   o result 1
 call 150 UpdatePlayerBody
   r rng.seed 0x37022da1
+  r MissionConditions#1.active 0
   r Player#1.flags 0
   r Player#1.unitCount 0
   r Unit#3.flags 0x9c244325
@@ -28908,19 +28911,22 @@ call 170 Apply
   a event.unit Unit#251
   a size 8
   o result 1
-call 170 DeactivateConditions
-  a conditions MissionConditions#1
+call 170 Apply
+  r Player#1.unitCount 0
+  r Unit#251.unitDefIndex 0
+  r Unit#251.flags 0x80240001
+  r Unit#251.def UnitDef#0
+  r Unit#251.motion null
+  a event.kind 200
+  a event.unit null
+  a size 8
+  o result 1
 call 170 UpdatePlayerHead
   a player 0
   o result 1
 call 170 UpdatePlayerBody
   r Game.mapFlags 7
   r Player#0.flags 0
-  r Player#1.unitCount 0
-  r Unit#251.unitDefIndex 0
-  r Unit#251.flags 0x80240001
-  r Unit#251.def UnitDef#0
-  r Unit#251.motion null
   a player 0
   a stream main
   o result 0

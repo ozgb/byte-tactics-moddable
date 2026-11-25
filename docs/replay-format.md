@@ -1092,6 +1092,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
 | `commandargs` | `["x","y"]` or `null` | the strings of the argument list of a command |
 | `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
+| `effect` (`size`) | `(112,Unit#3,0)` | the effect a module publishes (`services.Emit`): a struct behind a pointer whose kind is its first field, written as the value of the payload struct of that kind in the recorded subsystem's event table, from the first `size` bytes of the effect with the rest zero (see Event arguments); `size` names the int argument that follows it, `i services.Emit (112,Unit#3,0) 12` |
 
 | Result | Written as |
 |---|---|

@@ -488,9 +488,9 @@ Coverage: 91.8% of functions (89 of 97), 88.0% of lines, 74.5% of branches; 8 li
 
 Issue #18. 246 functions. The order state machines, VTOL orders and order lists (`src/orders/*.cpp`). The unit motion (`UnitMotion`) and the goal objects are movement's since #993: orders makes, steers and frees them through `g_seams.movement`.
 
-Coverage: 94.8% of functions (235 of 248), 85.3% of lines, 65.3% of branches; 13 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
+Coverage: 94.8% of functions (239 of 252), 85.5% of lines, 65.5% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (13 of 248 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 235 are entered, 94.8%), by reason:
+**Live functions no scenario enters** (13 of 252 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 239 are entered, 94.8%), by reason:
 
 - Save and load only (1): `OrderKindFromSavedIndex`. `save-midgame` enters the save side of `Order`, and `load-midgame` (#442) enters `LowerBoundOrderTypes`, `OrderTypeNameLess`, `OrderKindFromName`, `ResolveUnitTypeKey`, the load constructor of `Order` and `Order::ReattachFxToUnit`. The move targets' save and load are movement's since #993 (see movement).
 - Info panel, cursor, build menu and shutdown only (2): `ClearOrderTypeTable` and `OrdersClearOrderTypeTable`, the seam's slot that calls it.
@@ -773,7 +773,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
 | **targeting** | 21 of 21 | 100.0% | 96.2% | 79.1% | 0 | 1 |
 | **los_radar** | 89 of 97 | 91.8% | 88.0% | 74.5% | 8 | 22 |
-| **orders** | 235 of 248 | 94.8% | 85.3% | 65.3% | 13 | 17 |
+| **orders** | 239 of 252 | 94.8% | 85.5% | 65.5% | 13 | 18 |
 | **units** | 106 of 121 | 87.6% | 86.1% | 71.1% | 15 | 28 |
 | **players** | 105 of 158 | 66.5% | 68.4% | 61.7% | 53 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |
@@ -781,11 +781,11 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **scripts** | 65 of 87 | 74.7% | 86.5% | 78.2% | 22 | 6 |
 | **movement** | 118 of 177 | 66.7% | 69.4% | 62.2% | 59 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.1% | 30 | 35 |
-| game | 316 of 403 | 78.4% | 62.6% | 42.2% | 87 | 23 |
+| game | 316 of 403 | 78.4% | 62.3% | 42.3% | 87 | 23 |
 | network | 53 of 297 | 17.8% | 11.0% | 4.1% | 244 | 74 |
 | platform | 405 of 753 | 53.8% | 41.3% | 28.2% | 348 | 86 |
-| presentation | 568 of 1153 | 49.3% | 36.3% | 29.6% | 585 | 295 |
-| seams | 216 of 239 | 90.4% | 92.9% | 58.9% | 23 | 0 |
+| presentation | 568 of 1153 | 49.3% | 36.2% | 29.4% | 585 | 295 |
+| seams | 218 of 241 | 90.5% | 93.0% | 59.2% | 23 | 0 |
 | state | 486 of 553 | 87.9% | 70.3% | 49.2% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.

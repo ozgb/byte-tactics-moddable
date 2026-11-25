@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,403,316,6220,3891,2320,980,,23,
+game,*,,403,316,6223,3878,2324,982,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -701,7 +701,7 @@ network,UnitSyncPlayer::operator?4,src/network/unit_sync.cpp,1,0,0,0,0,0,??4Unit
 network,UnitSyncPlayer::~UnitSyncPlayer,src/network/unit_sync_player.cpp,1,0,0,0,0,0,??1UnitSyncPlayer@@QAE@XZ,0,menu
 network,UpdateTimeoutDialog,src/network/net_game.cpp,1,0,0,0,0,0,?UpdateTimeoutDialog@@YGXXZ,0,network
 network,allocator::destroy,src/network/unit_sync.cpp,1,0,0,0,0,0,?destroy@?$allocator@UUnitSyncPacketElem@@@std@@QAEXPAUUnitSyncPacketElem@@@Z,0,menu
-orders,*,,248,235,5138,4383,2888,1886,,17,
+orders,*,,252,239,5240,4482,2948,1932,,18,
 orders,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,src/game/orders_events.h,1,0,0,0,0,0,??$OrdersPublishSetPosition@UVec3@@@@YGXPAUUnit@@ABUVec3@@H@Z,0,unset-case
 orders,Add,src/orders/unit_orders.cpp,0,0,0,0,0,0,?Add@@YG?AUVec3@@ABU1@0@Z,1,
 orders,Angle,src/orders/vtol_orders.cpp,0,0,0,0,0,0,?Angle@@YGFPAUVec3@@0@Z,1,
@@ -714,6 +714,7 @@ orders,EnqueueOrderType,src/orders/order_list.cpp,0,0,0,0,0,0,?EnqueueOrderType@
 orders,GetOrderTargetIfFlagged,src/orders/order_list.cpp,0,0,0,0,0,0,?GetOrderTargetIfFlagged@@YGHPAX@Z,1,
 orders,GetTableEntryByTypeByte,src/orders/order_queue.cpp,0,0,0,0,0,0,?GetTableEntryByTypeByte@@YIHPAE@Z,1,
 orders,HalfNegated,src/orders/unit_orders.cpp,0,0,0,0,0,0,?HalfNegated@@YGMM@Z,1,
+orders,MissionType::GetTableEntry,src/orders/order_queue.cpp,0,0,0,0,0,0,?GetTableEntry@MissionType@@QAEPAUOrderTableEntry@@XZ,1,
 orders,MoveOrderToTail,src/orders/order_list.cpp,0,0,0,0,0,0,?MoveOrderToTail@@YGXPAD0@Z,1,
 orders,OrderBase::OrStatusFlags,src/orders/order_list.cpp,0,0,0,0,0,0,?OrStatusFlags@OrderBase@@UAEXI@Z,1,
 orders,OrderKindFromSavedIndex,src/orders/order_queue.cpp,1,0,0,0,0,0,?OrderKindFromSavedIndex@@YGEE@Z,0,save-load
@@ -1312,7 +1313,7 @@ players,VictoryUnitTypePassesX::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?Save
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,WriteCondition,src/game/players.cpp,1,0,0,0,0,0,?WriteCondition@@YGXPBUStateWriter@@PBDPAVMissionCondition@@@Z,0,test-only
-presentation,*,,1153,568,31622,11463,12038,3562,,295,
+presentation,*,,1153,568,31585,11431,12002,3534,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -2228,7 +2229,7 @@ scripts,UnitScript::IsCarryingUnit,src/scripts/unit_script.cpp,1,0,0,0,0,0,?IsCa
 scripts,UnitScript::PlaySoundNoop,src/scripts/unit_script.cpp,1,0,0,0,0,0,?PlaySoundNoop@UnitScript@@UAEXH@Z,0,unused-opcode
 scripts,WriteChannel,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteChannel@@YGXPBUStateWriter@@PBUChannel@@H@Z,0,test-only
 scripts,WriteScript,src/scripts/scripts_state.cpp,1,0,0,0,0,0,?WriteScript@@YGXPBUStateWriter@@PAVCobScript@@@Z,0,test-only
-seams,*,,239,216,1865,1733,302,178,,0,
+seams,*,,241,218,1881,1749,306,181,,0,
 seams,AdvanceMissionNative,src/seams/native.cpp,1,0,0,0,0,0,?AdvanceMissionNative@@YGHXZ,0,
 seams,ComputeMapChecksumNative,src/seams/native.cpp,1,0,0,0,0,0,?ComputeMapChecksumNative@@YGHXZ,0,
 seams,CountMissionsNative,src/seams/native.cpp,1,0,0,0,0,0,?CountMissionsNative@@YGHXZ,0,

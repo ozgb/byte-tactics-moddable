@@ -1882,7 +1882,8 @@ void __stdcall DrawProjectiles(void* surface)
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     Angles16 rot3;
-                    DisplayLogNoAngles();
+                    if (DisplayLogWants())
+                        DisplayLogNoAngles();
                     DrawModel3doProjected(surface, &sp, type->model, &rot3);
                 } else if (type->shotKind == 4) {
                     if (type->colour < 0xff) {

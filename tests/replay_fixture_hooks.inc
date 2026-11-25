@@ -13,7 +13,10 @@ enum {
     RSL_FIXTURE_STRIKE = RSL_COUNT + 6,
     RSL_FIXTURE_NOTIFY = RSL_COUNT + 7,
     RSL_FIXTURE_LOCATE = RSL_COUNT + 8,
-    RSL_FIXTURE_PICK = RSL_COUNT + 9
+    RSL_FIXTURE_PICK = RSL_COUNT + 9,
+    RSL_FIXTURE_DRAIN = RSL_COUNT + 10,
+    RSL_FIXTURE_GATHER = RSL_COUNT + 11,
+    RSL_FIXTURE_DIMS = RSL_COUNT + 12
 };
 
 struct FixtureSeam {
@@ -27,6 +30,9 @@ struct FixtureSeam {
     int (__stdcall* Notify)(FixtureNotify*, Callback*, int);
     int (__stdcall* Locate)(FixtureAmount*, FixtureAmount*);
     WeaponDef* (__stdcall* Pick)();
+    int (__stdcall* Drain)(void*, unsigned int);
+    int (__stdcall* Gather)(int*, int);
+    void (__stdcall* Dims)(int*, int*);
 };
 
 const FixtureSeam* s_inner_fixture;
@@ -135,7 +141,6 @@ int __stdcall RecFixtureFillIds(void* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_FIXTURE_FILLIDS, SUB_FIXTURE, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "ids");
     }
     const auto* l0_0 = ReplayStep(g_game);
     const auto* l0_1 = l0_0 != nullptr ? ReplayStep(l0_0->slowest) : nullptr;
@@ -152,6 +157,7 @@ int __stdcall RecFixtureFillIds(void* a0)
         FinishImport(line);
     }
     if (scope.Open()) {
+        ArgOutBytes(s_tail, "ids", a0, (int)result, (len0 * 4));
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -282,6 +288,76 @@ WeaponDef* __stdcall RecFixturePick()
     return result;
 }
 
+int __stdcall RecFixtureDrain(void* a0, unsigned int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_DRAIN, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "size", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Drain");
+        ImportPending(line);
+        ImportValue(line, a1);
+    }
+    int result = s_inner_fixture->Drain(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ImportOutBytes(line, "out", a0, (int)result, a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgOutBytes(s_tail, "out", a0, (int)result, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecFixtureGather(int* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_GATHER, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "capacity", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Gather");
+        ImportPending(line);
+        ImportValue(line, a1);
+    }
+    int result = s_inner_fixture->Gather(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecFixtureDims(int* a0, int* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_DIMS, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Dims");
+    }
+    s_inner_fixture->Dims(a0, a1);
+    if (scope.Import()) {
+        ImportOutScalar(line, "width", a0);
+        ImportOutScalar(line, "height", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
 FixtureSeam s_rec_fixture = {
     RecFixtureFillGoals,
     RecFixturePlaceAt,
@@ -293,4 +369,7 @@ FixtureSeam s_rec_fixture = {
     RecFixtureNotify,
     RecFixtureLocate,
     RecFixturePick,
+    RecFixtureDrain,
+    RecFixtureGather,
+    RecFixtureDims,
 };

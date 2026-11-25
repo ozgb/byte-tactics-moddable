@@ -108,5 +108,13 @@
       "expect": 530,
       "field": "import 0 services.SimAlloc"
     }
+  },
+  "pathfinding": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_STEP_BUDGET=0x500",
+      "recording": "skirmish2.txt",
+      "expect": 1,
+      "field": "region"
+    }
   }
 }

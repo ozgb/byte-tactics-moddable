@@ -15,7 +15,10 @@ build/tdf_numbers.txt exists (tools/tdfnumbers.py writes it) and prints how many
 found. A second exe
 (test/crt_test.c, test/stl_shuffle.cpp) links LIBCMT's own rand, srand and
 qsort and MSVC 5's std::random_shuffle beside the rand and qsort ports and
-compares them. While the MSVC 5 exes run they also write what the originals
+compares them. A third exe (test/csem_test.c) records what LIBCMT returns for the string, number and
+format calls game logic makes (atoi, _itoa, the string and character functions, strtok, memmove, sprintf, sscanf and
+the double to int conversion), and the clang half compares the LIBCMT it links with those results (`--kit DIR` also
+writes each case's inputs and the recorded outputs there, one file per entry). While the MSVC 5 exes run they also write what the originals
 returned (build/bitexact/vectors/*.bin). Then the same tests are built with
 clang-cl for i686 (-DBX_REPLAY, the library compiled by clang, no original
 linked in) and run under Wine against those vectors, so the port is compared
@@ -50,6 +53,8 @@ MSVC5 = (ROOT / "toolchain/msvc5-sp3").resolve()
 CLANG_BUILD = BUILD / "clang"
 CRT_PORT_SOURCES = [LIB / "rand.c", LIB / "qsort.c"]
 CRT_TESTS = [LIB / "test/crt_test.c", LIB / "test/stl_shuffle.cpp", VECTORS_SOURCE]
+CSEM_TEST = LIB / "test/csem_test.c"
+KIT_SOURCE = LIB / "test/kit.c"
 CFLAGS = ["/nologo", "/c", "/O2", "/Op", "/MT", "/W3", "/TC", "/Zm1000"]
 LIBS = ["LIBCMT.LIB", "KERNEL32.LIB"]
 
@@ -126,6 +131,11 @@ def build_crt() -> Path | None:
     return link("crt_test.exe", [], [*CRT_PORT_SOURCES, *CRT_TESTS])
 
 
+def build_csem() -> Path | None:
+    BUILD.mkdir(parents=True, exist_ok=True)
+    return link("csem_test.exe", [], [CSEM_TEST, VECTORS_SOURCE])
+
+
 def link(name: str, objects: list[Path], sources: list[Path]) -> Path | None:
     objects = list(objects)
     for src in sources:
@@ -188,10 +198,12 @@ def clang_setup(tools: dict[str, str]) -> list[str] | None:
             "-DBX_REPLAY", f"-I{LIB}"]
 
 
-def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list[Path]) -> Path | None:
+def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list[Path],
+               out_dir: Path = CLANG_BUILD) -> Path | None:
+    out_dir.mkdir(parents=True, exist_ok=True)
     objects = []
     for src in sources:
-        obj = CLANG_BUILD / (src.stem + ".obj")
+        obj = out_dir / (src.stem + ".obj")
         fpu = ["-msse2", "-mfpmath=sse"] if src.parent != LIB / "test" else ["-mno-sse"]
         proc = subprocess.run([tools["clang-cl"], *flags, *fpu, "/c", f"/Fo{obj}", str(src)], capture_output=True,
                               text=True)
@@ -199,7 +211,7 @@ def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list
             print(proc.stdout + proc.stderr, file=sys.stderr)
             return None
         objects.append(obj)
-    exe = CLANG_BUILD / name
+    exe = out_dir / name
     cmd = [tools["lld-link"], "/nologo", "/machine:x86", "/subsystem:console", "/entry:mainCRTStartup", "/fixed:no",
            "/safeseh:no", "/incremental:no", "/nodefaultlib", "/force:multiple", f"/out:{exe}", *map(str, objects),
            str(MSVC5 / "LIB/LIBCMT.LIB"), str(MSVC5 / "LIB/OLDNAMES.LIB"), str(CLANG_BUILD / "KERNEL32.lib")]
@@ -210,9 +222,10 @@ def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list
     return exe
 
 
-def run_clang() -> int:
-    """The tests built with clang-cl for i686 against the vectors the MSVC 5 exes wrote; 2 if they cannot be built."""
-    vectors = {name: VECTORS / f"{name}.bin" for name in ("bitexact", "crt")}
+def run_clang(kit: Path | None = None) -> int:
+    """The tests built with clang-cl for i686 against the vectors the MSVC 5 exes wrote; 2 if they cannot be built.
+    With a kit directory only the csem test runs, built with -DBX_KIT, and writes its cases there."""
+    vectors = {name: VECTORS / f"{name}.bin" for name in ("bitexact", "crt", "csem")}
     for path in vectors.values():
         if not path.exists():
             print(f"bitexact: {path} is missing, run the MSVC 5 half first", file=sys.stderr)
@@ -221,10 +234,20 @@ def run_clang() -> int:
     flags = clang_setup(tools) if tools else None
     if tools is None or flags is None:
         return 2
+    if kit is not None:
+        kit.mkdir(parents=True, exist_ok=True)
+        exe = clang_link(tools, flags + ["-DBX_KIT"], "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE],
+                         CLANG_BUILD / "kit")
+        if exe is None:
+            return 2
+        print(f"clang: {exe.name} (kit)")
+        sys.stdout.flush()
+        return run(exe, vectors["csem"], kit)
     exes = [(clang_link(tools, flags, "bitexact_test.exe",
                         [*PORT_SOURCES, TEST, MATH_TEST, VECTORS_SOURCE]), vectors["bitexact"]),
             (clang_link(tools, flags, "crt_test.exe", [*CRT_PORT_SOURCES, CRT_TESTS[0], VECTORS_SOURCE]),
-             vectors["crt"])]
+             vectors["crt"]),
+            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE]), vectors["csem"])]
     code = 0
     for exe, vec in exes:
         if exe is None:
@@ -239,7 +262,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--compiler", choices=("both", "msvc", "clang"), default="both",
                         help="MSVC 5 builds and writes the vectors, clang replays them (default: both)")
+    parser.add_argument("--kit", type=Path, metavar="DIR",
+                        help="clang half only: run the csem test with -DBX_KIT, writing each case to DIR")
     args = parser.parse_args()
+    if args.kit is not None:
+        args.compiler = "clang"
+        args.kit = args.kit.resolve()
     code = 0
     if args.compiler != "clang":
         VECTORS.mkdir(parents=True, exist_ok=True)
@@ -251,9 +279,13 @@ def main() -> int:
         if crt is None:
             return 2
         code = run(crt, VECTORS / "crt.bin") or code
+        csem = build_csem()
+        if csem is None:
+            return 2
+        code = run(csem, VECTORS / "csem.bin") or code
         print("bitexact (MSVC 5): " + ("OK" if code == 0 else f"FAILED (exit {code})"))
     if args.compiler != "msvc":
-        clang = run_clang()
+        clang = run_clang(args.kit)
         print("bitexact (clang): " + ("OK" if clang == 0 else f"FAILED (exit {clang})"))
         code = clang or code
     return code

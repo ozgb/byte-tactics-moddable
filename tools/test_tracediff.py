@@ -481,5 +481,76 @@ class SaveHelperTest(unittest.TestCase):
         self.assertEqual(str(raised.exception), "loader: load saver: saver wrote no savegame/harness.opt")
 
 
+class DisplayTest(unittest.TestCase):
+    PALETTE = "0123456789abcdef"
+
+    @staticmethod
+    def listing(*items: str, tick: int = 4) -> str:
+        return "bt-display 1\n" + "".join(line + "\n" for line in [f"frame 1 {tick} 1 {DisplayTest.PALETTE}", *items, "cursor - - -"])
+
+    def test_lists_are_compared_with_both_lines(self):
+        one = self.listing("fill screen 0 0 10 10 1", "fill screen 20 20 30 30 2")
+        two = self.listing("fill screen 0 0 10 10 1", "fill screen 20 20 30 30 3")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(td.print_display_difference(one, two), 1)
+            self.assertEqual(td.print_display_difference(one, one), 0)
+        first, second = out.getvalue().splitlines()
+        self.assertIn("frame 1 (tick 4): item at line 4 of A `fill screen 20 20 30 30 2`, line 4 of B `fill screen 20 20 30 30 3`", first)
+        self.assertTrue(second.startswith("display lists identical"))
+
+    def test_end_of_tick_forgives_a_swap_that_does_not_count(self):
+        one = self.listing("fill screen 0 0 10 10 1", "fill screen 20 20 30 30 2")
+        two = self.listing("fill screen 20 20 30 30 2", "fill screen 0 0 10 10 1")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(td.print_display_difference(one, two), 1)
+            self.assertEqual(td.print_display_difference(one, two, True), 0)
+
+    def args(self, **kwargs):
+        base = dict(exe=["a.exe", "b.exe"], scenario=["s.txt"], poison_b=False, reference=None, game_dir=None, end_of_tick=False, display_tick=None)
+        return mock.Mock(**{**base, **kwargs})
+
+    def run_display(self, digests: tuple[str, str], lists: tuple[str, str], **kwargs):
+        calls = []
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = []
+            for i, (digest, text) in enumerate(zip(digests, lists)):
+                run = Path(tmp) / f"run{i}"
+                run.mkdir()
+                (run / "display.txt").write_text(digest)
+                (run / "displaylist.txt").write_text(text)
+                runs.append(run)
+
+            def fake(exe, scenario, game_dir, dump, timeout=None, poison=False, xserver=False, collect=(), testdisplay=None):
+                calls.append(testdisplay)
+                return runs[(len(calls) - 1) % 2]
+
+            out = io.StringIO()
+            with mock.patch.object(td, "play_loading", fake), contextlib.redirect_stdout(out):
+                code = td.compare_display(self.args(**kwargs))
+        return code, calls, out.getvalue()
+
+    def test_the_first_differing_frame_is_replayed_with_its_tick(self):
+        one = self.listing("fill screen 0 0 10 10 1")
+        two = self.listing("fill screen 0 0 10 10 2")
+        code, calls, out = self.run_display((td.displaylog.digest_text(one), td.displaylog.digest_text(two)), (one, two))
+        self.assertEqual(code, 1)
+        self.assertEqual(calls, [None, None, "4", "4"])
+        self.assertIn("display digest line 3 (frame 1, tick 4)", out)
+        self.assertIn("item at line 3 of A", out)
+
+    def test_equal_digests_need_no_second_run(self):
+        one = self.listing("fill screen 0 0 10 10 1")
+        digest = td.displaylog.digest_text(one)
+        code, calls, out = self.run_display((digest, digest), (one, one))
+        self.assertEqual((code, calls), (0, [None, None]))
+        self.assertIn("display digests identical", out)
+
+    def test_a_given_tick_skips_the_digest_runs(self):
+        one = self.listing("fill screen 0 0 10 10 1")
+        code, calls, _ = self.run_display(("", ""), (one, one), display_tick=9)
+        self.assertEqual((code, calls), (0, ["9", "9"]))
+
+
 if __name__ == "__main__":
     unittest.main()

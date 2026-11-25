@@ -24,7 +24,7 @@ from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--
 reference/README.md) and passes when it exits with status 0 within
 `--testmode-timeout` seconds. A `--testmode` run uses the game's headless host: no X server,
 audio sink, screenshots or dialog checks, and only wine needs to be installed. The trace the exe writes (trace.txt, and dump.txt
-with `--testdump <tick>`) is copied to the run's directory. `--put DEST SRC` places a file in the run's game copy
+with `--testdump <tick>`; display.txt and displaylist.txt, with `--testdisplay <tick>|all` adding that frame or every frame to the list) is copied to the run's directory. `--put DEST SRC` places a file in the run's game copy
 before the exe starts, and `--collect PATH` copies a file the game wrote there (the `save` key's
 `savegame/harness.sav`) to the run's directory, both with `--testmode`. Every `--testmode` run passes the game's
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
@@ -485,7 +485,7 @@ class Instance:
         self.base.mkdir(parents=True, exist_ok=True)
         link_prefix(template, self.prefix)
         copy_game(game_src, self.game)
-        for stale in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", "commands.txt", *self.run.recordings()):
+        for stale in ("trace.txt", "sound.txt", "display.txt", "displaylist.txt", "dump.txt", "blockptrs.txt", "commands.txt", *self.run.recordings()):
             (self.game / stale).unlink(missing_ok=True)
         shutil.rmtree(self.game / "frames", ignore_errors=True)
         for dest, _ in self.run.put:
@@ -573,6 +573,8 @@ class Instance:
         args = ["-testmode", "testmode.txt"] if self.run.testmode else []
         if self.run.testmode and self.run.testdump is not None:
             args += ["-testdump", str(self.run.testdump)]
+        if self.run.testmode and self.run.testdisplay is not None:
+            args += ["-testdisplay", self.run.testdisplay]
         if self.run.testmode:
             args += [POISON_SWITCH if self.run.poison else ZERO_FILL_SWITCH]
         if self.run.native_modules and runs_wasm_modules(self.run.exes[min(self.index, len(self.run.exes)) - 1]):
@@ -817,7 +819,7 @@ class Instance:
                     self.run.notes.append(f"{name}: {self.run.out / name}")
         if not self.run.testmode:
             return
-        for name in ("trace.txt", "sound.txt", "dump.txt", "blockptrs.txt", "commands.txt", CRASH_FILE):
+        for name in ("trace.txt", "sound.txt", "display.txt", "displaylist.txt", "dump.txt", "blockptrs.txt", "commands.txt", CRASH_FILE):
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")
@@ -1031,7 +1033,8 @@ class Run:
                  testdump: int | None = None, poison: bool = False, blockscan: int = 0,
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
                  collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
-                 framedump: bool = False, blockscan_verify: bool = False, record: str | None = None):
+                 framedump: bool = False, blockscan_verify: bool = False, record: str | None = None,
+                 testdisplay: str | None = None):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -1044,6 +1047,7 @@ class Run:
         self.window = window
         self.testmode = testmode
         self.testdump = testdump
+        self.testdisplay = testdisplay
         self.poison = poison
         self.blockscan = blockscan
         self.blockscan_verify = blockscan_verify
@@ -1584,6 +1588,8 @@ def main() -> None:
                     help="--testmode: fail when the game runs longer (default 900)")
     ap.add_argument("--testdump", type=int, metavar="TICK",
                     help="--testmode: also run with -testdump TICK, which writes dump.txt")
+    ap.add_argument("--testdisplay", metavar="TICK|all",
+                    help="--testmode: also run with -testdisplay TICK (or all), which writes that frame's items (every frame's) to displaylist.txt")
     ap.add_argument("--poison", action="store_true",
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
     ap.add_argument("--blockscan", action="store_true",
@@ -1671,6 +1677,10 @@ def main() -> None:
             ap.error(f"{path} must be a path inside the game directory")
     if args.testdump is not None and args.testdump < 0:
         ap.error("--testdump takes a tick of 0 or more")
+    if args.testdisplay is not None and not args.testmode:
+        ap.error("--testdisplay needs --testmode")
+    if args.testdisplay is not None and args.testdisplay != "all" and not args.testdisplay.isdigit():
+        ap.error("--testdisplay takes a tick of 0 or more, or all")
     if args.testmode and not Path(args.testmode).is_file():
         ap.error(f"{args.testmode} is not a file")
     tools = (("wine", "Xvfb", "xdpyinfo") if args.xserver else ("wine",)) if args.testmode and not args.scenario else ("Xephyr" if args.window else "Xvfb", "xdotool", "import", "wine", "pactl", "parec")
@@ -1736,7 +1746,8 @@ def main() -> None:
                                 args.poison and sc is testmode, scan_every if sc is testmode else 0,
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
-                                args.native_modules, args.framedump, args.blockscan_verify, args.record))
+                                args.native_modules, args.framedump, args.blockscan_verify, args.record,
+                                args.testdisplay if sc is testmode else None))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

@@ -2139,6 +2139,23 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn("g_seams.features->Find(g_out_features_Find_0_null ? nullptr : &g_out_features_Find_0)", runner)
         self.assertIn('if (g_result_features_Find != 65535 && !g_out_features_Find_0_null) CompareStruct("cell", ROK_FIXTUREAMOUNT, &g_out_features_Find_0);', runner)
 
+    def test_a_text_result_is_recorded_as_the_text_and_compared_as_the_text(self):
+        s, _ = self.slot([], {}, "const char*", {"mode": "text"})
+        self.assertEqual(rs.result_out(s["result"], {}, "o"), ['ArgValue(s_tail, "result", (const char*)result, "o");'])
+        runner = "\n".join(rs.runner("units", "Label", s))
+        self.assertIn("CompareResult((const char*)g_result_units_Label);", runner)
+
+    def test_an_all_of_rule_may_name_a_table_behind_a_ref_field_and_not_a_kind_with_no_table(self):
+        _, errors, model = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual([e for e in errors if "all-of" in e], [])
+        self.assertEqual(model["subsystems"]["mission"]["slots"]["CountStartPositions"]["allOf"], ["Mission", "MissionRule"])
+        ann = annotations()
+        for rule in ann["rules"]:
+            if rule["target"] == "Mission::missionIndex":
+                rule["object"] = "MissionType"
+        errors = rs.generate(rs.read_rows(), ann)[1]
+        self.assertTrue(any("the all-of rule names MissionType, which is no table kind of the schema" in e for e in errors), errors)
+
     def test_a_condition_is_result_not_equal_to_a_number(self):
         for when, ok in (("result != 0", True), ("result != 65535", True), ("result != x", False)):
             ann = annotations()

@@ -3414,6 +3414,176 @@ void __stdcall RecMovementWriteState(const StateWriter* a0)
     }
 }
 
+int __stdcall RecMissionGetGameType()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETGAMETYPE, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetGameType");
+    }
+    int result = s_inner_mission->GetGameType();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+const char* __stdcall RecMissionGetNameSlot(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETNAMESLOT, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    const char* result = s_inner_mission->GetNameSlot(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", (const char*)result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionIndex()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONINDEX, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->GetMissionIndex();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+const char* __stdcall RecMissionGetMissionName()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONNAME, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    const char* result = s_inner_mission->GetMissionName();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", (const char*)result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetStartPosition(Vec3* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETSTARTPOSITION, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "id", a1);
+    }
+    int result = s_inner_mission->GetStartPosition(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_VEC3, a0);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionCountStartPositions()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTSTARTPOSITIONS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountStartPositions();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionHasMissionName()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_HASMISSIONNAME, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->HasMissionName();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecMissionGetMissionParams(MissionParams* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONPARAMS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    s_inner_mission->GetMissionParams(a0);
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONPARAMS, a0);
+    }
+}
+
+int __stdcall RecMissionCountMissionUnits()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTMISSIONUNITS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountMissionUnits();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionUnit(int a0, MissionUnitInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONUNIT, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    int result = s_inner_mission->GetMissionUnit(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_MISSIONUNITINFO, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionCountMissionFeatures()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTMISSIONFEATURES, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountMissionFeatures();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionFeature(int a0, MissionFeatureInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONFEATURE, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    int result = s_inner_mission->GetMissionFeature(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_MISSIONFEATUREINFO, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 FileHandle* __stdcall RecFilesOpenRead(const char* a0)
 {
     ReplayRoots roots;
@@ -4713,27 +4883,6 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
     return result;
 }
 
-int __stdcall RecMissionGetGameType()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MISSION_GETGAMETYPE, SUB_MISSION, roots, false);
-    if (scope.Open()) {
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i mission.GetGameType");
-    }
-    int result = s_inner_mission->GetGameType();
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -5338,6 +5487,30 @@ void HookSeams(const bool* on)
         s_rec_movement.UnitTarget = RecMovementUnitTarget;
     if (on[SUB_MOVEMENT])
         s_rec_movement.WriteState = RecMovementWriteState;
+    if (on[SUB_MISSION] || on[SUB_FEATURES])
+        s_rec_mission.GetGameType = RecMissionGetGameType;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetNameSlot = RecMissionGetNameSlot;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionIndex = RecMissionGetMissionIndex;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionName = RecMissionGetMissionName;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetStartPosition = RecMissionGetStartPosition;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountStartPositions = RecMissionCountStartPositions;
+    if (on[SUB_MISSION])
+        s_rec_mission.HasMissionName = RecMissionHasMissionName;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountMissionUnits = RecMissionCountMissionUnits;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionUnit = RecMissionGetMissionUnit;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountMissionFeatures = RecMissionCountMissionFeatures;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionFeature = RecMissionGetMissionFeature;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])
@@ -5500,8 +5673,6 @@ void HookSeams(const bool* on)
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
     if (on[SUB_WIND_METEORS])
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
-    if (on[SUB_FEATURES])
-        s_rec_mission.GetGameType = RecMissionGetGameType;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

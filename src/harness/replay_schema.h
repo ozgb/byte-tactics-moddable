@@ -215,6 +215,12 @@ enum ReplayObjectKindId {
     ROK_WEAPONAIMCOBCB,
     ROK_WEAPONFIRE,
     ROK_WEAPONHIT,
+    ROK_MISSIONPARAMS,
+    ROK_MISSIONUNITINFO,
+    ROK_MISSIONFEATUREINFO,
+    ROK_MISSIONUNIT,
+    ROK_MISSIONRULE,
+    ROK_MISSIONFEATURE,
     ROK_WINDMETEORSEVENTHEADER,
     ROK_WINDMETEORSPARAMS,
     ROK_WINDMETEORSLIMITS,
@@ -407,6 +413,7 @@ static const ReplayTableSpec kReplayTables[] = {
     { 0, 1, offsetof(Game, features), { { offsetof(Game, featureCount), (unsigned char)sizeof(((Game*)nullptr)->featureCount), 0 }, { 1, 0, 0 } }, 2048 },
     { 0, 1, offsetof(Game, spots), { { 2048, 0, 0 }, { 1, 0, 0 } }, 2048 },
     { 0, 0, offsetof(Game, pool), { { 1, 0, 0 }, { 1, 0, 0 } }, 0 },
+    { 0, 1, offsetof(Game, net), { { 1, 0, 0 }, { 1, 0, 0 } }, 1 },
     { 0, 0, offsetof(Game, weapons), { { 256, 0, 0 }, { 1, 0, 0 } }, 0 },
     { 0, 0, offsetof(Game, weapons), { { 256, 0, 0 }, { 1, 0, 0 } }, 0 },
 };
@@ -440,6 +447,7 @@ static_assert(sizeof(((Game*)nullptr)->featureCount) == 1 || sizeof(((Game*)null
 static_assert(sizeof(((Game*)nullptr)->features) == sizeof(unsigned), "the table of Feature is a Ref");
 static_assert(sizeof(((Game*)nullptr)->spots) == sizeof(unsigned), "the table of Spot is a Ref");
 static_assert(sizeof(((Game*)nullptr)->pool) == 1 * sizeof(Pool), "the table of Pool holds 1 elements");
+static_assert(sizeof(((Game*)nullptr)->net) == sizeof(unsigned), "the table of Mission is a Ref");
 static_assert(sizeof(((Game*)nullptr)->weapons) == 256 * sizeof(WeaponDef), "the table of WeaponFire holds 256 elements");
 static_assert(sizeof(((Game*)nullptr)->weapons) == 256 * sizeof(WeaponDef), "the table of WeaponHit holds 256 elements");
 
@@ -527,6 +535,9 @@ static const ReplaySelfSpec kReplaySelfs[] = {
     { 0, 0 },
 };
 
+static_assert(sizeof(((Mission*)nullptr)->unitCount) == 1 || sizeof(((Mission*)nullptr)->unitCount) == 2 || sizeof(((Mission*)nullptr)->unitCount) == 4, "MissionUnit table: unitCount is a byte, a short or an int");
+static_assert(sizeof(((Mission*)nullptr)->ruleCount) == 1 || sizeof(((Mission*)nullptr)->ruleCount) == 2 || sizeof(((Mission*)nullptr)->ruleCount) == 4, "MissionRule table: ruleCount is a byte, a short or an int");
+static_assert(sizeof(((Mission*)nullptr)->featureCount) == 1 || sizeof(((Mission*)nullptr)->featureCount) == 2 || sizeof(((Mission*)nullptr)->featureCount) == 4, "MissionFeature table: featureCount is a byte, a short or an int");
 enum ReplayEventTableId {
     RET_WIND_METEORS,
     RET_TARGETING,
@@ -818,8 +829,11 @@ static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_HANDLE, ROK_SPOT, offsetof(Spot, anim), "anim", 0, 1, 0 },
     { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },
     { ROK_WEAPONAIMCOBCB, ROK_UNIT, offsetof(Unit, weapons[0].aimCob), "weapons[].aimCob", sizeof(((Unit*)nullptr)->weapons[0]), 3, 0 },
+    { ROK_MISSIONUNIT, ROK_MISSION, offsetof(Mission, units), "units[]", sizeof(MissionUnit), 0, 1, 0, { { offsetof(Mission, unitCount), (unsigned char)sizeof(((Mission*)nullptr)->unitCount), 0 }, { 1, 0, 0 } }, 1 },
+    { ROK_MISSIONRULE, ROK_MISSION, offsetof(Mission, rules), "rules[]", sizeof(MissionRule), 0, 1, 0, { { offsetof(Mission, ruleCount), (unsigned char)sizeof(((Mission*)nullptr)->ruleCount), 0 }, { 1, 0, 0 } }, 1 },
+    { ROK_MISSIONFEATURE, ROK_MISSION, offsetof(Mission, features), "features[]", sizeof(MissionFeature), 0, 1, 0, { { offsetof(Mission, featureCount), (unsigned char)sizeof(((Mission*)nullptr)->featureCount), 0 }, { 1, 0, 0 } }, 1 },
 };
-static const unsigned kReplayInsideSiteCount = 5;
+static const unsigned kReplayInsideSiteCount = 8;
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0, 0 },
@@ -860,10 +874,16 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Spot", sizeof(Spot), RS_STATE, 10, 0, 0, 0, 0, 1, 0 },
     { "Pool", sizeof(Pool), RS_STATE, 11, 0, 0, 0, 0, 0, 0 },
     { "ModelState", sizeof(ModelState), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
-    { "Mission", sizeof(Mission), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "Mission", sizeof(Mission), RS_STATE, 12, 0, 0, 0, 0, 0, 0 },
     { "WeaponAimCobCb", sizeof(WeaponAimCobCb), RS_STATE, RT_ORDER, 4, 1, 0, 0, 0, 1 },
-    { "WeaponFire", sizeof(WeaponDef), RS_STATE, 12, 0, 0, 0, 0, 0, 0 },
-    { "WeaponHit", sizeof(WeaponDef), RS_STATE, 13, 0, 0, 0, 0, 0, 0 },
+    { "WeaponFire", sizeof(WeaponDef), RS_STATE, 13, 0, 0, 0, 0, 0, 0 },
+    { "WeaponHit", sizeof(WeaponDef), RS_STATE, 14, 0, 0, 0, 0, 0, 0 },
+    { "MissionParams", sizeof(MissionParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MissionUnitInfo", sizeof(MissionUnitInfo), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MissionFeatureInfo", sizeof(MissionFeatureInfo), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MissionUnit", sizeof(MissionUnit), RS_STATE, RT_ORDER, 5, 1, 0, 0, 0, 0 },
+    { "MissionRule", sizeof(MissionRule), RS_STATE, RT_ORDER, 6, 1, 0, 0, 0, 0 },
+    { "MissionFeature", sizeof(MissionFeature), RS_STATE, RT_ORDER, 7, 1, 0, 0, 0, 0 },
     { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsLimits", sizeof(WindMeteorsLimits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -981,7 +1001,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 158;
+static const unsigned kReplayObjectKindCount = 164;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -1343,10 +1363,125 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "usedHead", offsetof(Pool, usedHead), sizeof(((Pool*)nullptr)->usedHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "restHead", offsetof(Pool, restHead), sizeof(((Pool*)nullptr)->restHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "freeHead", offsetof(Pool, freeHead), sizeof(((Pool*)nullptr)->freeHead), ROK_POOL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(Mission, type), sizeof(((Mission*)nullptr)->type), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "campaign", offsetof(Mission, campaign), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names0", offsetof(Mission, names[0]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names1", offsetof(Mission, names[1]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names2", offsetof(Mission, names[2]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names3", offsetof(Mission, names[3]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names4", offsetof(Mission, names[4]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names5", offsetof(Mission, names[5]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names6", offsetof(Mission, names[6]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names7", offsetof(Mission, names[7]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "names8", offsetof(Mission, names[8]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "missionName", offsetof(Mission, missionName), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "missionIndex", offsetof(Mission, missionIndex), sizeof(((Mission*)nullptr)->missionIndex), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "surfaceMetal", offsetof(Mission, surfaceMetal), sizeof(((Mission*)nullptr)->surfaceMetal), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "minWindSpeed", offsetof(Mission, minWindSpeed), sizeof(((Mission*)nullptr)->minWindSpeed), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "maxWindSpeed", offsetof(Mission, maxWindSpeed), sizeof(((Mission*)nullptr)->maxWindSpeed), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "gravity", offsetof(Mission, gravity), sizeof(((Mission*)nullptr)->gravity), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "tidalStrength", offsetof(Mission, tidalStrength), sizeof(((Mission*)nullptr)->tidalStrength), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "lavaWorld", offsetof(Mission, lavaWorld), sizeof(((Mission*)nullptr)->lavaWorld), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "noSeaLevelTrigger", offsetof(Mission, noSeaLevelTrigger), sizeof(((Mission*)nullptr)->noSeaLevelTrigger), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "waterDoesDamage", offsetof(Mission, waterDoesDamage), sizeof(((Mission*)nullptr)->waterDoesDamage), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "waterDamage", offsetof(Mission, waterDamage), sizeof(((Mission*)nullptr)->waterDamage), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "killMul", offsetof(Mission, killMul), sizeof(((Mission*)nullptr)->killMul), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "timeMul", offsetof(Mission, timeMul), sizeof(((Mission*)nullptr)->timeMul), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal0", offsetof(Mission, startMetal[0]), sizeof(((Mission*)nullptr)->startMetal[0]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal1", offsetof(Mission, startMetal[1]), sizeof(((Mission*)nullptr)->startMetal[1]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal2", offsetof(Mission, startMetal[2]), sizeof(((Mission*)nullptr)->startMetal[2]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal3", offsetof(Mission, startMetal[3]), sizeof(((Mission*)nullptr)->startMetal[3]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal4", offsetof(Mission, startMetal[4]), sizeof(((Mission*)nullptr)->startMetal[4]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal5", offsetof(Mission, startMetal[5]), sizeof(((Mission*)nullptr)->startMetal[5]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal6", offsetof(Mission, startMetal[6]), sizeof(((Mission*)nullptr)->startMetal[6]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal7", offsetof(Mission, startMetal[7]), sizeof(((Mission*)nullptr)->startMetal[7]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal8", offsetof(Mission, startMetal[8]), sizeof(((Mission*)nullptr)->startMetal[8]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal9", offsetof(Mission, startMetal[9]), sizeof(((Mission*)nullptr)->startMetal[9]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy0", offsetof(Mission, startEnergy[0]), sizeof(((Mission*)nullptr)->startEnergy[0]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy1", offsetof(Mission, startEnergy[1]), sizeof(((Mission*)nullptr)->startEnergy[1]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy2", offsetof(Mission, startEnergy[2]), sizeof(((Mission*)nullptr)->startEnergy[2]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy3", offsetof(Mission, startEnergy[3]), sizeof(((Mission*)nullptr)->startEnergy[3]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy4", offsetof(Mission, startEnergy[4]), sizeof(((Mission*)nullptr)->startEnergy[4]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy5", offsetof(Mission, startEnergy[5]), sizeof(((Mission*)nullptr)->startEnergy[5]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy6", offsetof(Mission, startEnergy[6]), sizeof(((Mission*)nullptr)->startEnergy[6]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy7", offsetof(Mission, startEnergy[7]), sizeof(((Mission*)nullptr)->startEnergy[7]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy8", offsetof(Mission, startEnergy[8]), sizeof(((Mission*)nullptr)->startEnergy[8]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy9", offsetof(Mission, startEnergy[9]), sizeof(((Mission*)nullptr)->startEnergy[9]), ROK_MISSION, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "unitCount", offsetof(Mission, unitCount), sizeof(((Mission*)nullptr)->unitCount), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "units", offsetof(Mission, units), sizeof(((Mission*)nullptr)->units), ROK_MISSION, RK_REF, ROK_MISSIONUNIT, 0, 0, {}, 0, 0 },
+    { "ruleCount", offsetof(Mission, ruleCount), sizeof(((Mission*)nullptr)->ruleCount), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "rules", offsetof(Mission, rules), sizeof(((Mission*)nullptr)->rules), ROK_MISSION, RK_REF, ROK_MISSIONRULE, 0, 0, {}, 0, 0 },
+    { "featureCount", offsetof(Mission, featureCount), sizeof(((Mission*)nullptr)->featureCount), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "features", offsetof(Mission, features), sizeof(((Mission*)nullptr)->features), ROK_MISSION, RK_REF, ROK_MISSIONFEATURE, 0, 0, {}, 0, 0 },
     { "nAimCobDone", offsetof(WeaponAimCobCb, nAimCobDone), sizeof(((WeaponAimCobCb*)nullptr)->nAimCobDone), ROK_WEAPONAIMCOBCB, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "fire", offsetof(WeaponDef, fire), sizeof(((WeaponDef*)nullptr)->fire), ROK_WEAPONFIRE, RK_CODE, 1, 0, 0, {}, 0, 0 },
     { "damage", offsetof(WeaponDef, damage), sizeof(((WeaponDef*)nullptr)->damage), ROK_WEAPONHIT, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "fireStarter", offsetof(WeaponDef, fireStarter), sizeof(((WeaponDef*)nullptr)->fireStarter), ROK_WEAPONHIT, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "surfaceMetal", offsetof(MissionParams, surfaceMetal), sizeof(((MissionParams*)nullptr)->surfaceMetal), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "minWindSpeed", offsetof(MissionParams, minWindSpeed), sizeof(((MissionParams*)nullptr)->minWindSpeed), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "maxWindSpeed", offsetof(MissionParams, maxWindSpeed), sizeof(((MissionParams*)nullptr)->maxWindSpeed), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "gravity", offsetof(MissionParams, gravity), sizeof(((MissionParams*)nullptr)->gravity), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "tidalStrength", offsetof(MissionParams, tidalStrength), sizeof(((MissionParams*)nullptr)->tidalStrength), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "lavaWorld", offsetof(MissionParams, lavaWorld), sizeof(((MissionParams*)nullptr)->lavaWorld), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "noSeaLevelTrigger", offsetof(MissionParams, noSeaLevelTrigger), sizeof(((MissionParams*)nullptr)->noSeaLevelTrigger), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "waterDoesDamage", offsetof(MissionParams, waterDoesDamage), sizeof(((MissionParams*)nullptr)->waterDoesDamage), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "waterDamage", offsetof(MissionParams, waterDamage), sizeof(((MissionParams*)nullptr)->waterDamage), ROK_MISSIONPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "killMul", offsetof(MissionParams, killMul), sizeof(((MissionParams*)nullptr)->killMul), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "timeMul", offsetof(MissionParams, timeMul), sizeof(((MissionParams*)nullptr)->timeMul), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal0", offsetof(MissionParams, startMetal[0]), sizeof(((MissionParams*)nullptr)->startMetal[0]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal1", offsetof(MissionParams, startMetal[1]), sizeof(((MissionParams*)nullptr)->startMetal[1]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal2", offsetof(MissionParams, startMetal[2]), sizeof(((MissionParams*)nullptr)->startMetal[2]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal3", offsetof(MissionParams, startMetal[3]), sizeof(((MissionParams*)nullptr)->startMetal[3]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal4", offsetof(MissionParams, startMetal[4]), sizeof(((MissionParams*)nullptr)->startMetal[4]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal5", offsetof(MissionParams, startMetal[5]), sizeof(((MissionParams*)nullptr)->startMetal[5]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal6", offsetof(MissionParams, startMetal[6]), sizeof(((MissionParams*)nullptr)->startMetal[6]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal7", offsetof(MissionParams, startMetal[7]), sizeof(((MissionParams*)nullptr)->startMetal[7]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal8", offsetof(MissionParams, startMetal[8]), sizeof(((MissionParams*)nullptr)->startMetal[8]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startMetal9", offsetof(MissionParams, startMetal[9]), sizeof(((MissionParams*)nullptr)->startMetal[9]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy0", offsetof(MissionParams, startEnergy[0]), sizeof(((MissionParams*)nullptr)->startEnergy[0]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy1", offsetof(MissionParams, startEnergy[1]), sizeof(((MissionParams*)nullptr)->startEnergy[1]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy2", offsetof(MissionParams, startEnergy[2]), sizeof(((MissionParams*)nullptr)->startEnergy[2]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy3", offsetof(MissionParams, startEnergy[3]), sizeof(((MissionParams*)nullptr)->startEnergy[3]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy4", offsetof(MissionParams, startEnergy[4]), sizeof(((MissionParams*)nullptr)->startEnergy[4]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy5", offsetof(MissionParams, startEnergy[5]), sizeof(((MissionParams*)nullptr)->startEnergy[5]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy6", offsetof(MissionParams, startEnergy[6]), sizeof(((MissionParams*)nullptr)->startEnergy[6]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy7", offsetof(MissionParams, startEnergy[7]), sizeof(((MissionParams*)nullptr)->startEnergy[7]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy8", offsetof(MissionParams, startEnergy[8]), sizeof(((MissionParams*)nullptr)->startEnergy[8]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "startEnergy9", offsetof(MissionParams, startEnergy[9]), sizeof(((MissionParams*)nullptr)->startEnergy[9]), ROK_MISSIONPARAMS, RK_F32, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(MissionUnitInfo, name), sizeof(((MissionUnitInfo*)nullptr)->name), ROK_MISSIONUNITINFO, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "ident", offsetof(MissionUnitInfo, ident), sizeof(((MissionUnitInfo*)nullptr)->ident), ROK_MISSIONUNITINFO, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "initialMission", offsetof(MissionUnitInfo, initialMission), sizeof(((MissionUnitInfo*)nullptr)->initialMission), ROK_MISSIONUNITINFO, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MissionUnitInfo, x), sizeof(((MissionUnitInfo*)nullptr)->x), ROK_MISSIONUNITINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "y", offsetof(MissionUnitInfo, y), sizeof(((MissionUnitInfo*)nullptr)->y), ROK_MISSIONUNITINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "z", offsetof(MissionUnitInfo, z), sizeof(((MissionUnitInfo*)nullptr)->z), ROK_MISSIONUNITINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "angle", offsetof(MissionUnitInfo, angle), sizeof(((MissionUnitInfo*)nullptr)->angle), ROK_MISSIONUNITINFO, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "health", offsetof(MissionUnitInfo, health), sizeof(((MissionUnitInfo*)nullptr)->health), ROK_MISSIONUNITINFO, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "creationCountdown", offsetof(MissionUnitInfo, creationCountdown), sizeof(((MissionUnitInfo*)nullptr)->creationCountdown), ROK_MISSIONUNITINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "buildPriority", offsetof(MissionUnitInfo, buildPriority), sizeof(((MissionUnitInfo*)nullptr)->buildPriority), ROK_MISSIONUNITINFO, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "player", offsetof(MissionUnitInfo, player), sizeof(((MissionUnitInfo*)nullptr)->player), ROK_MISSIONUNITINFO, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "flags", offsetof(MissionUnitInfo, flags), sizeof(((MissionUnitInfo*)nullptr)->flags), ROK_MISSIONUNITINFO, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(MissionFeatureInfo, name), sizeof(((MissionFeatureInfo*)nullptr)->name), ROK_MISSIONFEATUREINFO, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MissionFeatureInfo, x), sizeof(((MissionFeatureInfo*)nullptr)->x), ROK_MISSIONFEATUREINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "y", offsetof(MissionFeatureInfo, y), sizeof(((MissionFeatureInfo*)nullptr)->y), ROK_MISSIONFEATUREINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(MissionUnit, name), sizeof(((MissionUnit*)nullptr)->name), ROK_MISSIONUNIT, RK_CSTRINGREF, 0, 0, 0, {}, 0, 0 },
+    { "ident", offsetof(MissionUnit, ident), sizeof(((MissionUnit*)nullptr)->ident), ROK_MISSIONUNIT, RK_CSTRINGREF, 0, 0, 0, {}, 0, 0 },
+    { "initialMission", offsetof(MissionUnit, initialMission), sizeof(((MissionUnit*)nullptr)->initialMission), ROK_MISSIONUNIT, RK_CSTRINGREF, 0, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MissionUnit, x), sizeof(((MissionUnit*)nullptr)->x), ROK_MISSIONUNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "y", offsetof(MissionUnit, y), sizeof(((MissionUnit*)nullptr)->y), ROK_MISSIONUNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "z", offsetof(MissionUnit, z), sizeof(((MissionUnit*)nullptr)->z), ROK_MISSIONUNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "angle", offsetof(MissionUnit, angle), sizeof(((MissionUnit*)nullptr)->angle), ROK_MISSIONUNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "health", offsetof(MissionUnit, health), sizeof(((MissionUnit*)nullptr)->health), ROK_MISSIONUNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "creationCountdown", offsetof(MissionUnit, creationCountdown), sizeof(((MissionUnit*)nullptr)->creationCountdown), ROK_MISSIONUNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "buildPriority", offsetof(MissionUnit, buildPriority), sizeof(((MissionUnit*)nullptr)->buildPriority), ROK_MISSIONUNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "player", offsetof(MissionUnit, player), sizeof(((MissionUnit*)nullptr)->player), ROK_MISSIONUNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "flags", offsetof(MissionUnit, flags), sizeof(((MissionUnit*)nullptr)->flags), ROK_MISSIONUNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(MissionRule, type), sizeof(((MissionRule*)nullptr)->type), ROK_MISSIONRULE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(MissionRule, id), sizeof(((MissionRule*)nullptr)->id), ROK_MISSIONRULE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MissionRule, x), sizeof(((MissionRule*)nullptr)->x), ROK_MISSIONRULE, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "z", offsetof(MissionRule, z), sizeof(((MissionRule*)nullptr)->z), ROK_MISSIONRULE, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(MissionFeature, name), 128, ROK_MISSIONFEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MissionFeature, x), sizeof(((MissionFeature*)nullptr)->x), ROK_MISSIONFEATURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "y", offsetof(MissionFeature, y), sizeof(((MissionFeature*)nullptr)->y), ROK_MISSIONFEATURE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsEventHeader, kind), sizeof(((WindMeteorsEventHeader*)nullptr)->kind), ROK_WINDMETEORSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsParams, h.kind), sizeof(((WindMeteorsParams*)nullptr)->h.kind), ROK_WINDMETEORSPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "weapon", offsetof(WindMeteorsParams, params.weapon), 32, ROK_WINDMETEORSPARAMS, RK_STRING, 0, 0, 0, {}, 0, 0 },
@@ -1861,8 +1996,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 849;
-static const unsigned kReplayWalkableFieldCount = 162;
+static const unsigned kReplayObjectFieldCount = 964;
+static const unsigned kReplayWalkableFieldCount = 165;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 168, 169, 170, 37, 36, 0, 24, 50, 171, 37, 35, 38, 45, 51, 53, 108 };
 
@@ -2194,10 +2329,113 @@ static_assert(sizeof(((Pool*)nullptr)->featureUnit) == 4, "Pool::featureUnit has
 static_assert(sizeof(((Pool*)nullptr)->usedHead) == 4, "Pool::usedHead has the size the schema says");
 static_assert(sizeof(((Pool*)nullptr)->restHead) == 4, "Pool::restHead has the size the schema says");
 static_assert(sizeof(((Pool*)nullptr)->freeHead) == 4, "Pool::freeHead has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->type) == 4, "Mission::type has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->missionIndex) == 4, "Mission::missionIndex has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->surfaceMetal) == 4, "Mission::surfaceMetal has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->minWindSpeed) == 4, "Mission::minWindSpeed has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->maxWindSpeed) == 4, "Mission::maxWindSpeed has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->gravity) == 4, "Mission::gravity has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->tidalStrength) == 4, "Mission::tidalStrength has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->lavaWorld) == 4, "Mission::lavaWorld has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->noSeaLevelTrigger) == 4, "Mission::noSeaLevelTrigger has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->waterDoesDamage) == 4, "Mission::waterDoesDamage has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->waterDamage) == 4, "Mission::waterDamage has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->killMul) == 4, "Mission::killMul has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->timeMul) == 4, "Mission::timeMul has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[0]) == 4, "Mission::startMetal0 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[1]) == 4, "Mission::startMetal1 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[2]) == 4, "Mission::startMetal2 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[3]) == 4, "Mission::startMetal3 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[4]) == 4, "Mission::startMetal4 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[5]) == 4, "Mission::startMetal5 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[6]) == 4, "Mission::startMetal6 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[7]) == 4, "Mission::startMetal7 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[8]) == 4, "Mission::startMetal8 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startMetal[9]) == 4, "Mission::startMetal9 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[0]) == 4, "Mission::startEnergy0 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[1]) == 4, "Mission::startEnergy1 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[2]) == 4, "Mission::startEnergy2 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[3]) == 4, "Mission::startEnergy3 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[4]) == 4, "Mission::startEnergy4 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[5]) == 4, "Mission::startEnergy5 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[6]) == 4, "Mission::startEnergy6 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[7]) == 4, "Mission::startEnergy7 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[8]) == 4, "Mission::startEnergy8 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->startEnergy[9]) == 4, "Mission::startEnergy9 has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->unitCount) == 4, "Mission::unitCount has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->units) == 4, "Mission::units has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->ruleCount) == 4, "Mission::ruleCount has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->rules) == 4, "Mission::rules has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->featureCount) == 4, "Mission::featureCount has the size the schema says");
+static_assert(sizeof(((Mission*)nullptr)->features) == 4, "Mission::features has the size the schema says");
 static_assert(sizeof(((WeaponAimCobCb*)nullptr)->nAimCobDone) == 4, "WeaponAimCobCb::nAimCobDone has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->fire) == sizeof(void*), "WeaponDef::fire is a code pointer");
 static_assert(sizeof(((WeaponDef*)nullptr)->damage) == 2, "WeaponDef::damage has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->fireStarter) == 1, "WeaponDef::fireStarter has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->surfaceMetal) == 4, "MissionParams::surfaceMetal has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->minWindSpeed) == 4, "MissionParams::minWindSpeed has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->maxWindSpeed) == 4, "MissionParams::maxWindSpeed has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->gravity) == 4, "MissionParams::gravity has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->tidalStrength) == 4, "MissionParams::tidalStrength has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->lavaWorld) == 4, "MissionParams::lavaWorld has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->noSeaLevelTrigger) == 4, "MissionParams::noSeaLevelTrigger has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->waterDoesDamage) == 4, "MissionParams::waterDoesDamage has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->waterDamage) == 4, "MissionParams::waterDamage has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->killMul) == 4, "MissionParams::killMul has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->timeMul) == 4, "MissionParams::timeMul has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[0]) == 4, "MissionParams::startMetal0 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[1]) == 4, "MissionParams::startMetal1 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[2]) == 4, "MissionParams::startMetal2 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[3]) == 4, "MissionParams::startMetal3 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[4]) == 4, "MissionParams::startMetal4 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[5]) == 4, "MissionParams::startMetal5 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[6]) == 4, "MissionParams::startMetal6 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[7]) == 4, "MissionParams::startMetal7 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[8]) == 4, "MissionParams::startMetal8 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startMetal[9]) == 4, "MissionParams::startMetal9 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[0]) == 4, "MissionParams::startEnergy0 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[1]) == 4, "MissionParams::startEnergy1 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[2]) == 4, "MissionParams::startEnergy2 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[3]) == 4, "MissionParams::startEnergy3 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[4]) == 4, "MissionParams::startEnergy4 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[5]) == 4, "MissionParams::startEnergy5 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[6]) == 4, "MissionParams::startEnergy6 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[7]) == 4, "MissionParams::startEnergy7 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[8]) == 4, "MissionParams::startEnergy8 has the size the schema says");
+static_assert(sizeof(((MissionParams*)nullptr)->startEnergy[9]) == 4, "MissionParams::startEnergy9 has the size the schema says");
+static_assert(__is_pointer(decltype(((MissionUnitInfo*)nullptr)->name)) && __is_same(__remove_cv(__remove_pointer(decltype(((MissionUnitInfo*)nullptr)->name))), char), "MissionUnitInfo::name is a char pointer");
+static_assert(__is_pointer(decltype(((MissionUnitInfo*)nullptr)->ident)) && __is_same(__remove_cv(__remove_pointer(decltype(((MissionUnitInfo*)nullptr)->ident))), char), "MissionUnitInfo::ident is a char pointer");
+static_assert(__is_pointer(decltype(((MissionUnitInfo*)nullptr)->initialMission)) && __is_same(__remove_cv(__remove_pointer(decltype(((MissionUnitInfo*)nullptr)->initialMission))), char), "MissionUnitInfo::initialMission is a char pointer");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->x) == 4, "MissionUnitInfo::x has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->y) == 4, "MissionUnitInfo::y has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->z) == 4, "MissionUnitInfo::z has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->angle) == 2, "MissionUnitInfo::angle has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->health) == 2, "MissionUnitInfo::health has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->creationCountdown) == 4, "MissionUnitInfo::creationCountdown has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->buildPriority) == 2, "MissionUnitInfo::buildPriority has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->player) == 1, "MissionUnitInfo::player has the size the schema says");
+static_assert(sizeof(((MissionUnitInfo*)nullptr)->flags) == 1, "MissionUnitInfo::flags has the size the schema says");
+static_assert(__is_pointer(decltype(((MissionFeatureInfo*)nullptr)->name)) && __is_same(__remove_cv(__remove_pointer(decltype(((MissionFeatureInfo*)nullptr)->name))), char), "MissionFeatureInfo::name is a char pointer");
+static_assert(sizeof(((MissionFeatureInfo*)nullptr)->x) == 4, "MissionFeatureInfo::x has the size the schema says");
+static_assert(sizeof(((MissionFeatureInfo*)nullptr)->y) == 4, "MissionFeatureInfo::y has the size the schema says");
+static_assert(__is_same(decltype(((MissionUnit*)nullptr)->name), Ref<char>), "MissionUnit::name is a Ref<char>");
+static_assert(__is_same(decltype(((MissionUnit*)nullptr)->ident), Ref<char>), "MissionUnit::ident is a Ref<char>");
+static_assert(__is_same(decltype(((MissionUnit*)nullptr)->initialMission), Ref<char>), "MissionUnit::initialMission is a Ref<char>");
+static_assert(sizeof(((MissionUnit*)nullptr)->x) == 4, "MissionUnit::x has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->y) == 4, "MissionUnit::y has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->z) == 4, "MissionUnit::z has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->angle) == 2, "MissionUnit::angle has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->health) == 2, "MissionUnit::health has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->creationCountdown) == 4, "MissionUnit::creationCountdown has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->buildPriority) == 2, "MissionUnit::buildPriority has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->player) == 1, "MissionUnit::player has the size the schema says");
+static_assert(sizeof(((MissionUnit*)nullptr)->flags) == 1, "MissionUnit::flags has the size the schema says");
+static_assert(sizeof(((MissionRule*)nullptr)->type) == 4, "MissionRule::type has the size the schema says");
+static_assert(sizeof(((MissionRule*)nullptr)->id) == 4, "MissionRule::id has the size the schema says");
+static_assert(sizeof(((MissionRule*)nullptr)->x) == 2, "MissionRule::x has the size the schema says");
+static_assert(sizeof(((MissionRule*)nullptr)->z) == 2, "MissionRule::z has the size the schema says");
+static_assert(sizeof(((MissionFeature*)nullptr)->x) == 4, "MissionFeature::x has the size the schema says");
+static_assert(sizeof(((MissionFeature*)nullptr)->y) == 4, "MissionFeature::y has the size the schema says");
 static_assert(sizeof(((WindMeteorsEventHeader*)nullptr)->kind) == 4, "WindMeteorsEventHeader::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->h.kind) == 4, "WindMeteorsParams::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.radius) == 4, "WindMeteorsParams::radius has the size the schema says");
@@ -2969,6 +3207,18 @@ enum ReplaySlotId {
     RSL_MOVEMENT_TARGETTYPE,
     RSL_MOVEMENT_UNITTARGET,
     RSL_MOVEMENT_WRITESTATE,
+    RSL_MISSION_GETGAMETYPE,
+    RSL_MISSION_GETNAMESLOT,
+    RSL_MISSION_GETMISSIONINDEX,
+    RSL_MISSION_GETMISSIONNAME,
+    RSL_MISSION_GETSTARTPOSITION,
+    RSL_MISSION_COUNTSTARTPOSITIONS,
+    RSL_MISSION_HASMISSIONNAME,
+    RSL_MISSION_GETMISSIONPARAMS,
+    RSL_MISSION_COUNTMISSIONUNITS,
+    RSL_MISSION_GETMISSIONUNIT,
+    RSL_MISSION_COUNTMISSIONFEATURES,
+    RSL_MISSION_GETMISSIONFEATURE,
     RSL_FILES_OPENREAD,
     RSL_FILES_OPENAPPEND,
     RSL_FILES_CREATE,
@@ -3050,7 +3300,6 @@ enum ReplaySlotId {
     RSL_NETWORK_BROADCASTPLAYERECONOMY,
     RSL_NETWORK_SENDUNITSTATES,
     RSL_WEAPONS_FINDWEAPONBYNAME,
-    RSL_MISSION_GETGAMETYPE,
     RSL_COUNT
 };
 
@@ -3072,7 +3321,7 @@ static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 41, 
 static const unsigned char kReplayFeaturesApplyAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL, ROK_WEAPONHIT };
 static const unsigned char kReplayFeaturesApplyReads[] = { 1, 2, 18, 19, 22, 47, 48, 49 };
 static const unsigned char kReplayFeaturesApplyWrites[] = { 47, 48, 49 };
-static const unsigned short kReplayFeaturesApplyObjReads[] = { 22, 41, 42, 152, 158, 161, 162, 163, 164, 167, 283, 284, 289, 290, 291, 292, 293, 294, 298, 299, 302, 304, 309, 310, 311, 312, 313, 314, 315, 316, 317, 321, 322, 323, 326, 327, 329, 330, 331, 334, 335 };
+static const unsigned short kReplayFeaturesApplyObjReads[] = { 22, 41, 42, 152, 158, 161, 162, 163, 164, 167, 283, 284, 289, 290, 291, 292, 293, 294, 298, 299, 302, 304, 309, 310, 311, 312, 313, 314, 315, 316, 317, 321, 322, 323, 326, 327, 329, 330, 331, 384, 385 };
 static const unsigned short kReplayFeaturesApplyObjWrites[] = { 161, 162, 163, 164, 167, 310, 311, 312, 313, 314, 315, 316, 317, 321, 322, 323, 324, 325, 326, 329, 330, 331 };
 static const unsigned char kReplayFeaturesPlaceAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
 static const unsigned char kReplayFeaturesPlaceReads[] = { 1, 2 };
@@ -3106,13 +3355,13 @@ static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 47, 48, 49 };
 static const unsigned char kReplayAiParseDownloadableAiWeightScriptsAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayWeaponsApplyReads[] = { 29 };
-static const unsigned short kReplayWeaponsApplyObjReads[] = { 0, 24, 33, 35, 36, 37, 38, 43, 44, 46, 47, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 108, 123, 124, 126, 127, 128, 138, 142, 332 };
-static const unsigned short kReplayWeaponsApplyObjWrites[] = { 56, 57, 61, 62, 66, 67, 81, 84, 85, 86, 89, 90, 91, 94, 95, 332 };
+static const unsigned short kReplayWeaponsApplyObjReads[] = { 0, 24, 33, 35, 36, 37, 38, 43, 44, 46, 47, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 108, 123, 124, 126, 127, 128, 138, 142, 382 };
+static const unsigned short kReplayWeaponsApplyObjWrites[] = { 56, 57, 61, 62, 66, 67, 81, 84, 85, 86, 89, 90, 91, 94, 95, 382 };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsAllOf[] = { ROK_PROJECTILE, ROK_WEAPONFIRE };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17, 28, 30, 47, 48, 49 };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 47, 48, 49 };
-static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjReads[] = { 2, 3, 33, 35, 37, 43, 44, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 75, 76, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 124, 125, 129, 130, 131, 132, 133, 134, 135, 136, 137, 139, 140, 141, 142, 143, 144, 145, 172, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 332, 333 };
-static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjWrites[] = { 57, 62, 67, 81, 82, 83, 84, 86, 87, 88, 89, 91, 92, 93, 94, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 332 };
+static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjReads[] = { 2, 3, 33, 35, 37, 43, 44, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 75, 76, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 124, 125, 129, 130, 131, 132, 133, 134, 135, 136, 137, 139, 140, 141, 142, 143, 144, 145, 172, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 382, 383 };
+static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjWrites[] = { 57, 62, 67, 81, 82, 83, 84, 86, 87, 88, 89, 91, 92, 93, 94, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 382 };
 static const unsigned short kReplayWeaponsGetWeaponRangeObjReads[] = { 56, 61, 66, 141 };
 static const unsigned char kReplayWeaponsWeaponCanReachUnitReads[] = { 17, 28 };
 static const unsigned short kReplayWeaponsWeaponCanReachUnitObjReads[] = { 35, 37, 51, 52, 53, 56, 61, 66, 108, 125, 129, 130, 137, 141 };
@@ -3292,6 +3541,30 @@ static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 195, 196 
 static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 195, 196 };
 static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 43 };
 static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 35 };
+static const unsigned char kReplayMissionGetGameTypeAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionGetGameTypeObjReads[] = { 332 };
+static const unsigned char kReplayMissionGetNameSlotAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionGetNameSlotObjReads[] = { 334, 335, 336, 337, 338, 339, 340, 341, 342 };
+static const unsigned char kReplayMissionGetMissionIndexAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionGetMissionIndexObjReads[] = { 344 };
+static const unsigned char kReplayMissionGetMissionNameAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionGetMissionNameObjReads[] = { 343 };
+static const unsigned char kReplayMissionGetStartPositionAllOf[] = { ROK_MISSION, ROK_MISSIONRULE };
+static const unsigned short kReplayMissionGetStartPositionObjReads[] = { 378, 379, 444, 445, 446, 447 };
+static const unsigned char kReplayMissionCountStartPositionsAllOf[] = { ROK_MISSION, ROK_MISSIONRULE };
+static const unsigned short kReplayMissionCountStartPositionsObjReads[] = { 378, 379, 444 };
+static const unsigned char kReplayMissionHasMissionNameAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionHasMissionNameObjReads[] = { 343 };
+static const unsigned char kReplayMissionGetMissionParamsAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionGetMissionParamsObjReads[] = { 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375 };
+static const unsigned char kReplayMissionCountMissionUnitsAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionCountMissionUnitsObjReads[] = { 376 };
+static const unsigned char kReplayMissionGetMissionUnitAllOf[] = { ROK_MISSION, ROK_MISSIONUNIT };
+static const unsigned short kReplayMissionGetMissionUnitObjReads[] = { 376, 377, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443 };
+static const unsigned char kReplayMissionCountMissionFeaturesAllOf[] = { ROK_MISSION };
+static const unsigned short kReplayMissionCountMissionFeaturesObjReads[] = { 380 };
+static const unsigned char kReplayMissionGetMissionFeatureAllOf[] = { ROK_MISSION, ROK_MISSIONFEATURE };
+static const unsigned short kReplayMissionGetMissionFeatureObjReads[] = { 380, 381, 448, 449, 450 };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoReads[] = { 16 };
 static const unsigned short kReplayNetworkBroadcastPlayerInfoObjReads[] = { 1, 22 };
@@ -3537,6 +3810,18 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "TargetType", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "GetGameType", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetGameTypeObjReads, 1, nullptr, 0, kReplayMissionGetGameTypeAllOf, 1 },
+    { "GetNameSlot", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetNameSlotObjReads, 9, nullptr, 0, kReplayMissionGetNameSlotAllOf, 1 },
+    { "GetMissionIndex", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetMissionIndexObjReads, 1, nullptr, 0, kReplayMissionGetMissionIndexAllOf, 1 },
+    { "GetMissionName", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetMissionNameObjReads, 1, nullptr, 0, kReplayMissionGetMissionNameAllOf, 1 },
+    { "GetStartPosition", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetStartPositionObjReads, 6, nullptr, 0, kReplayMissionGetStartPositionAllOf, 2 },
+    { "CountStartPositions", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionCountStartPositionsObjReads, 3, nullptr, 0, kReplayMissionCountStartPositionsAllOf, 2 },
+    { "HasMissionName", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionHasMissionNameObjReads, 1, nullptr, 0, kReplayMissionHasMissionNameAllOf, 1 },
+    { "GetMissionParams", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetMissionParamsObjReads, 31, nullptr, 0, kReplayMissionGetMissionParamsAllOf, 1 },
+    { "CountMissionUnits", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionCountMissionUnitsObjReads, 1, nullptr, 0, kReplayMissionCountMissionUnitsAllOf, 1 },
+    { "GetMissionUnit", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetMissionUnitObjReads, 14, nullptr, 0, kReplayMissionGetMissionUnitAllOf, 2 },
+    { "CountMissionFeatures", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionCountMissionFeaturesObjReads, 1, nullptr, 0, kReplayMissionCountMissionFeaturesAllOf, 1 },
+    { "GetMissionFeature", SUB_MISSION, nullptr, 0, nullptr, 0, kReplayMissionGetMissionFeatureObjReads, 5, nullptr, 0, kReplayMissionGetMissionFeatureAllOf, 2 },
     { "OpenRead", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "OpenAppend", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Create", SUB_FILES, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -3618,7 +3903,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "BroadcastPlayerEconomy", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SendUnitStates", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FindWeaponByName", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetGameType", SUB_MISSION, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
 };
 static const unsigned kReplaySlotCount = RSL_COUNT;
 
@@ -3637,9 +3921,9 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "map", 9, 0, 1, 177, 11, RET_MAP },
     { "scripts", 3, 0, 0, 188, 24, RET_SCRIPTS },
     { "movement", 5, 0, 0, 212, 20, RET_MOVEMENT },
-    { "mission", 2, 0, 0, 232, 0, RET_COUNT },
-    { "files", 3, 0, 0, 232, 58, RET_COUNT },
-    { "network", 2, 0, 0, 290, 22, RET_COUNT },
+    { "mission", 2, 0, 1, 232, 12, RET_COUNT },
+    { "files", 3, 0, 0, 244, 58, RET_COUNT },
+    { "network", 2, 0, 0, 302, 22, RET_COUNT },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

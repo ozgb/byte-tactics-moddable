@@ -52,5 +52,13 @@
       "expect": 404,
       "field": "import 1 los_radar.GetMapCell"
     }
+  },
+  "mission": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_START_SHIFT=15",
+      "recording": "console-ilose.txt",
+      "expect": 237,
+      "field": "out.x"
+    }
   }
 }

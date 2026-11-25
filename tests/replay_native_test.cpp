@@ -1687,6 +1687,171 @@ void __stdcall GetFootprintCentreSlot(const Point16* cell, Feature* def, Vec3* o
     *out = GetFootprintCentre(&at, def);
 }
 
+Mission* TheMission()
+{
+    return g_game->net.get();
+}
+
+int __stdcall GetGameTypeSlot()
+{
+    return TheMission()->GetGameType();
+}
+
+const char* __stdcall GetNameSlotSlot(int index)
+{
+    return TheMission()->GetNameSlot(index);
+}
+
+int __stdcall AdvanceMissionSlot()
+{
+    return TheMission()->AdvanceMission();
+}
+
+const char* __stdcall GetCampaignNameSlot()
+{
+    return TheMission()->GetCampaignName();
+}
+
+int __stdcall GetMissionIndexSlot()
+{
+    return TheMission()->GetMissionIndex();
+}
+
+const char* __stdcall GetMissionNameSlot()
+{
+    return TheMission()->GetMissionName();
+}
+
+int __stdcall GetStartPositionSlot(Vec3* out, int id)
+{
+    return TheMission()->GetStartPosition(out, id);
+}
+
+void __stdcall LoadCampaignSlot(const char* file)
+{
+    TheMission()->LoadCampaign(file);
+}
+
+int __stdcall LoadMissionByNameSlot(const char* name)
+{
+    return TheMission()->LoadMissionByName(name);
+}
+
+int __stdcall MissionExistsSlot(int index)
+{
+    return TheMission()->MissionExists(index);
+}
+
+void __stdcall RefreshMapListSlot(int multiplayer)
+{
+    TheMission()->RefreshMapList(multiplayer);
+}
+
+int __stdcall SelectMissionSlot(int index)
+{
+    return TheMission()->SelectMission(index);
+}
+
+int __stdcall ComputeMapChecksumSlot()
+{
+    return TheMission()->ComputeMapChecksum();
+}
+
+int __stdcall GetTerrainLengthSlot()
+{
+    return TheMission()->GetTerrainLength();
+}
+
+int __stdcall CountMissionsSlot()
+{
+    return TheMission()->CountMissions();
+}
+
+int __stdcall GetCampaignMissionNameSlot(int index, char* out, int size)
+{
+    return TheMission()->GetCampaignMissionName(index, out, size);
+}
+
+int __stdcall CountStartPositionsSlot()
+{
+    return TheMission()->CountStartPositions();
+}
+
+const char* __stdcall GetBriefingSlot()
+{
+    return TheMission()->GetBriefing();
+}
+
+const char* __stdcall GetDescriptionSlot()
+{
+    return TheMission()->GetDescription();
+}
+
+char* __stdcall GetPlanetSlot()
+{
+    return TheMission()->GetPlanet();
+}
+
+int __stdcall GetTerrainSizeTierSlot()
+{
+    return TheMission()->GetTerrainSizeTier();
+}
+
+const char* __stdcall GetTranslatedNameSlot()
+{
+    return TheMission()->GetTranslatedName();
+}
+
+int __stdcall HasMissionNameSlot()
+{
+    return TheMission()->HasMissionName() ? 1 : 0;
+}
+
+int __stdcall SelectSchemaSlot(int type, TdfFile* parser, char* schema)
+{
+    return TheMission()->SelectSchema(type, parser, schema);
+}
+
+void __stdcall GetMissionParamsSlot(MissionParams* out)
+{
+    TheMission()->GetParams(out);
+}
+
+int __stdcall CountMissionUnitsSlot()
+{
+    return TheMission()->CountUnits();
+}
+
+int __stdcall GetMissionUnitSlot(int index, MissionUnitInfo* out)
+{
+    return TheMission()->GetUnit(index, out);
+}
+
+void __stdcall SetMissionUnitPositionSlot(int index, Vec3* pos)
+{
+    TheMission()->SetUnitPosition(index, pos);
+}
+
+int __stdcall CountMissionFeaturesSlot()
+{
+    return TheMission()->CountFeatures();
+}
+
+int __stdcall GetMissionFeatureSlot(int index, MissionFeatureInfo* out)
+{
+    return TheMission()->GetFeature(index, out);
+}
+
+const char* __stdcall GetMemorySlot()
+{
+    return TheMission()->GetMemory();
+}
+
+const char* __stdcall GetNumPlayersSlot()
+{
+    return TheMission()->GetNumPlayers();
+}
+
 void __stdcall UpdateFeaturesSlot(void)
 {
     abort();
@@ -1752,16 +1917,6 @@ void __stdcall SaveWeaponsStateSlot(Unit* unit, int slot, WeaponsSlotState* stat
     WeaponsSaveState(unit, slot, state);
 }
 
-int __fastcall GetGameTypeSlot(Mission* self)
-{
-    return self->GetGameType();
-}
-
-const char* __stdcall GetNameSlotSlot(Mission* mission, int index)
-{
-    return mission->GetNameSlot(index);
-}
-
 void __fastcall SpatialBucketPrependUnitSlot(SpatialBucket* self, int unusedEdx, Unit* unit)
 {
     self->PrependUnit(unit);
@@ -1790,66 +1945,6 @@ void __stdcall RefreshMovedUnitsSlot(int moveClass, Unit* unit)
 void __stdcall RefreshUnitIfStaleSlot(int moveClass, Unit* unit)
 {
     PassMapEntries()[moveClass].RefreshUnitIfStale((UnitPassMapView*)unit);
-}
-
-int __fastcall AdvanceMissionSlot(Mission* self)
-{
-    return self->AdvanceMission();
-}
-
-const char* __fastcall GetCampaignNameSlot(Mission* self)
-{
-    return self->GetCampaignName();
-}
-
-int __fastcall GetMissionIndexSlot(Mission* self)
-{
-    return self->GetMissionIndex();
-}
-
-const char* __fastcall GetMissionNameSlot(Mission* self)
-{
-    return self->GetMissionName();
-}
-
-int __fastcall GetStartPositionSlot(Mission* self, int unusedEdx, Vec3* out, int id)
-{
-    return self->GetStartPosition(out, id);
-}
-
-void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, const char* file)
-{
-    self->LoadCampaign(file);
-}
-
-int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, const char* name)
-{
-    return self->LoadMissionByName(name);
-}
-
-int __fastcall MissionExistsSlot(Mission* self, int unusedEdx, int index)
-{
-    return self->MissionExists(index);
-}
-
-void __fastcall RefreshMapListSlot(Mission* self, int unusedEdx, int multiplayer)
-{
-    self->RefreshMapList(multiplayer);
-}
-
-int __fastcall SelectMissionSlot(Mission* self, int unusedEdx, int index)
-{
-    return self->SelectMission(index);
-}
-
-int __fastcall ComputeMapChecksumSlot(Mission* self)
-{
-    return self->ComputeMapChecksum();
-}
-
-int __fastcall GetTerrainLengthSlot(Mission* self)
-{
-    return self->GetTerrainLength();
 }
 
 #include "replay_slots.h"

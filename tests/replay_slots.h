@@ -506,6 +506,43 @@ MapSeam g_native_map = {
     PathLockStamp,
 };
 
+MissionSeam g_native_mission = {
+    GetGameTypeSlot,
+    GetNameSlotSlot,
+    SetMissionType,
+    FreeOtaEnumCacheAndMission,
+    AdvanceMissionSlot,
+    GetCampaignNameSlot,
+    GetMissionIndexSlot,
+    GetMissionNameSlot,
+    GetStartPositionSlot,
+    LoadCampaignSlot,
+    LoadMissionByNameSlot,
+    MissionExistsSlot,
+    RefreshMapListSlot,
+    SelectMissionSlot,
+    ComputeMapChecksumSlot,
+    GetTerrainLengthSlot,
+    CountMissionsSlot,
+    GetCampaignMissionNameSlot,
+    CountStartPositionsSlot,
+    GetBriefingSlot,
+    GetDescriptionSlot,
+    GetPlanetSlot,
+    GetTerrainSizeTierSlot,
+    GetTranslatedNameSlot,
+    HasMissionNameSlot,
+    SelectSchemaSlot,
+    GetMissionParamsSlot,
+    CountMissionUnitsSlot,
+    GetMissionUnitSlot,
+    SetMissionUnitPositionSlot,
+    CountMissionFeaturesSlot,
+    GetMissionFeatureSlot,
+    GetMemorySlot,
+    GetNumPlayersSlot,
+};
+
 void Run_wind_meteors_UpdateWind()
 {
     RandStream p0 = ArgStream("stream");
@@ -1087,6 +1124,176 @@ void After_map_PassMapInBounds()
     CompareResult(g_result_map_PassMapInBounds);
 }
 
+int g_result_mission_GetGameType;
+
+void Run_mission_GetGameType()
+{
+    SetClosing("result");
+    g_result_mission_GetGameType = g_seams.mission->GetGameType();
+}
+
+void After_mission_GetGameType()
+{
+    CompareResult(g_result_mission_GetGameType);
+}
+
+const char* g_result_mission_GetNameSlot;
+
+void Run_mission_GetNameSlot()
+{
+    int p0 = ArgScalar<int>("index");
+    SetClosing("result");
+    g_result_mission_GetNameSlot = g_seams.mission->GetNameSlot(p0);
+}
+
+void After_mission_GetNameSlot()
+{
+    CompareResult((const char*)g_result_mission_GetNameSlot);
+}
+
+int g_result_mission_GetMissionIndex;
+
+void Run_mission_GetMissionIndex()
+{
+    SetClosing("result");
+    g_result_mission_GetMissionIndex = g_seams.mission->GetMissionIndex();
+}
+
+void After_mission_GetMissionIndex()
+{
+    CompareResult(g_result_mission_GetMissionIndex);
+}
+
+const char* g_result_mission_GetMissionName;
+
+void Run_mission_GetMissionName()
+{
+    SetClosing("result");
+    g_result_mission_GetMissionName = g_seams.mission->GetMissionName();
+}
+
+void After_mission_GetMissionName()
+{
+    CompareResult((const char*)g_result_mission_GetMissionName);
+}
+
+Vec3 g_out_mission_GetStartPosition_0;
+int g_result_mission_GetStartPosition;
+
+void Run_mission_GetStartPosition()
+{
+    memset(&g_out_mission_GetStartPosition_0, 0, sizeof g_out_mission_GetStartPosition_0);
+    int p1 = ArgScalar<int>("id");
+    SetClosing("out.", "result");
+    g_result_mission_GetStartPosition = g_seams.mission->GetStartPosition(&g_out_mission_GetStartPosition_0, p1);
+}
+
+void After_mission_GetStartPosition()
+{
+    if (g_result_mission_GetStartPosition != 0) CompareStruct("out", ROK_VEC3, &g_out_mission_GetStartPosition_0);
+    CompareResult(g_result_mission_GetStartPosition);
+}
+
+int g_result_mission_CountStartPositions;
+
+void Run_mission_CountStartPositions()
+{
+    SetClosing("result");
+    g_result_mission_CountStartPositions = g_seams.mission->CountStartPositions();
+}
+
+void After_mission_CountStartPositions()
+{
+    CompareResult(g_result_mission_CountStartPositions);
+}
+
+int g_result_mission_HasMissionName;
+
+void Run_mission_HasMissionName()
+{
+    SetClosing("result");
+    g_result_mission_HasMissionName = g_seams.mission->HasMissionName();
+}
+
+void After_mission_HasMissionName()
+{
+    CompareResult(g_result_mission_HasMissionName);
+}
+
+MissionParams g_out_mission_GetMissionParams_0;
+
+void Run_mission_GetMissionParams()
+{
+    memset(&g_out_mission_GetMissionParams_0, 0, sizeof g_out_mission_GetMissionParams_0);
+    SetClosing("result");
+    g_seams.mission->GetMissionParams(&g_out_mission_GetMissionParams_0);
+}
+
+void After_mission_GetMissionParams()
+{
+    CompareValueResult(ROK_MISSIONPARAMS, &g_out_mission_GetMissionParams_0);
+}
+
+int g_result_mission_CountMissionUnits;
+
+void Run_mission_CountMissionUnits()
+{
+    SetClosing("result");
+    g_result_mission_CountMissionUnits = g_seams.mission->CountMissionUnits();
+}
+
+void After_mission_CountMissionUnits()
+{
+    CompareResult(g_result_mission_CountMissionUnits);
+}
+
+MissionUnitInfo g_out_mission_GetMissionUnit_1;
+int g_result_mission_GetMissionUnit;
+
+void Run_mission_GetMissionUnit()
+{
+    int p0 = ArgScalar<int>("index");
+    memset(&g_out_mission_GetMissionUnit_1, 0, sizeof g_out_mission_GetMissionUnit_1);
+    SetClosing("out.", "result");
+    g_result_mission_GetMissionUnit = g_seams.mission->GetMissionUnit(p0, &g_out_mission_GetMissionUnit_1);
+}
+
+void After_mission_GetMissionUnit()
+{
+    if (g_result_mission_GetMissionUnit != 0) CompareStruct("out", ROK_MISSIONUNITINFO, &g_out_mission_GetMissionUnit_1);
+    CompareResult(g_result_mission_GetMissionUnit);
+}
+
+int g_result_mission_CountMissionFeatures;
+
+void Run_mission_CountMissionFeatures()
+{
+    SetClosing("result");
+    g_result_mission_CountMissionFeatures = g_seams.mission->CountMissionFeatures();
+}
+
+void After_mission_CountMissionFeatures()
+{
+    CompareResult(g_result_mission_CountMissionFeatures);
+}
+
+MissionFeatureInfo g_out_mission_GetMissionFeature_1;
+int g_result_mission_GetMissionFeature;
+
+void Run_mission_GetMissionFeature()
+{
+    int p0 = ArgScalar<int>("index");
+    memset(&g_out_mission_GetMissionFeature_1, 0, sizeof g_out_mission_GetMissionFeature_1);
+    SetClosing("out.", "result");
+    g_result_mission_GetMissionFeature = g_seams.mission->GetMissionFeature(p0, &g_out_mission_GetMissionFeature_1);
+}
+
+void After_mission_GetMissionFeature()
+{
+    if (g_result_mission_GetMissionFeature != 0) CompareStruct("out", ROK_MISSIONFEATUREINFO, &g_out_mission_GetMissionFeature_1);
+    CompareResult(g_result_mission_GetMissionFeature);
+}
+
 void PlayNestedCalls(const char* import)
 {
     NestedScope scope;
@@ -1268,6 +1475,54 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_map_PassMapInBounds();
         return true;
     }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0) {
+        Run_mission_GetGameType();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0) {
+        Run_mission_GetNameSlot();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionIndex") == 0) {
+        Run_mission_GetMissionIndex();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionName") == 0) {
+        Run_mission_GetMissionName();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetStartPosition") == 0) {
+        Run_mission_GetStartPosition();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountStartPositions") == 0) {
+        Run_mission_CountStartPositions();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "HasMissionName") == 0) {
+        Run_mission_HasMissionName();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionParams") == 0) {
+        Run_mission_GetMissionParams();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionUnits") == 0) {
+        Run_mission_CountMissionUnits();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionUnit") == 0) {
+        Run_mission_GetMissionUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionFeatures") == 0) {
+        Run_mission_CountMissionFeatures();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionFeature") == 0) {
+        Run_mission_GetMissionFeature();
+        return true;
+    }
     return false;
 }
 
@@ -1335,6 +1590,30 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_PassMapGet();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0)
         After_map_PassMapInBounds();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0)
+        After_mission_GetGameType();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0)
+        After_mission_GetNameSlot();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionIndex") == 0)
+        After_mission_GetMissionIndex();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionName") == 0)
+        After_mission_GetMissionName();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetStartPosition") == 0)
+        After_mission_GetStartPosition();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountStartPositions") == 0)
+        After_mission_CountStartPositions();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "HasMissionName") == 0)
+        After_mission_HasMissionName();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionParams") == 0)
+        After_mission_GetMissionParams();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionUnits") == 0)
+        After_mission_CountMissionUnits();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionUnit") == 0)
+        After_mission_GetMissionUnit();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionFeatures") == 0)
+        After_mission_CountMissionFeatures();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionFeature") == 0)
+        After_mission_GetMissionFeature();
 }
 
 WeaponsSeam g_import_weapons;
@@ -1354,6 +1633,7 @@ void BindSeams()
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.map = &g_native_map;
+    g_seams.mission = &g_native_mission;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
@@ -1364,8 +1644,6 @@ void BindSeams()
     g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
-    g_seams.mission = &g_import_mission;
-    g_import_mission.GetGameType = Imp_mission_GetGameType;
     g_seams.network = &g_import_network;
     g_import_network.SendFeatureBurning = Imp_network_SendFeatureBurning;
     g_import_network.SendFeatureHit = Imp_network_SendFeatureHit;
@@ -1394,6 +1672,8 @@ void BindSeams()
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
     }
     if (strcmp(g_subsystem, "weapons") == 0) {
         g_seams.features = &g_import_features;

@@ -960,12 +960,16 @@ int Mission::CountStartPositions()
     return n;
 }
 
+#ifndef BT_REPLAY_INJECT_START_SHIFT
+#define BT_REPLAY_INJECT_START_SHIFT 16
+#endif
+
 // FUNCTION: 0x437320
 int Mission::GetStartPosition(Vec3* out, int id)
 {
     for (int i = 0; i < ruleCount; i++) {
         if (rules[i].type == 1 && rules[i].id == id) {
-            out->x = rules[i].x << 16;
+            out->x = rules[i].x << BT_REPLAY_INJECT_START_SHIFT;
             out->z = rules[i].z << 16;
             out->y = 0;
             return 1;

@@ -399,6 +399,11 @@ def is_based(spec: dict) -> bool:
     return isinstance(spec.get("table"), dict) and isinstance(spec["table"].get("base"), dict)
 
 
+def is_owner_table(spec: dict) -> bool:
+    """A kind whose elements an array behind a ref field of another kind holds (`Mission.rules`): an all-of rule over it makes every element of every owner a root."""
+    return isinstance(spec.get("table", {}).get("base"), dict)
+
+
 def is_global_table(spec: dict) -> bool:
     """A kind named by its index in a table that Game or SimGlobals holds."""
     return bool(spec.get("table")) and not is_based(spec)
@@ -1698,7 +1703,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     else:
                                         into.add(object_index[(k, fname)])
                         if rule["rule"] == "all-of":
-                            if not is_global_table(ann["objects"].get(rule["object"], {})):
+                            if not (is_global_table(ann["objects"].get(rule["object"], {})) or is_owner_table(ann["objects"].get(rule["object"], {}))):
                                 message = "the all-of rule names %s, which is no table kind of the schema" % rule["object"]
                                 if message not in errors:
                                     errors.append(message)
@@ -2416,7 +2421,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
-    if res is not None and res["mode"] in ("scalar", "object", "value"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "text"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -2557,6 +2562,8 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
             return ['ArgObject(s_tail, "result", ROK_%s, result, "o");' % upper(res["kind"])]
         if mode == "value":
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
+        if mode == "text":
+            return ['ArgValue(s_tail, "result", (const char*)result, "o");']
         return []
     lines = []
     if mode == "scalar":
@@ -2621,7 +2628,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "text")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2905,7 +2912,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object", "value"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "text"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
@@ -2919,6 +2926,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), g))
         elif res["mode"] == "scalar":
             after.append("    CompareResult(%s);" % g)
+        elif res["mode"] == "text":
+            after.append("    CompareResult((const char*)%s);" % g)
         elif res["mode"] == "value":
             after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
     L += ["}", ""]

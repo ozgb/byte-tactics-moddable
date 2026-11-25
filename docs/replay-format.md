@@ -168,6 +168,12 @@ text as before.
 
 `replayschema.py --check` fails for an all-of rule whose `object` is not a kind with a `table` of `Game` or `SimGlobals`.
 
+### All-of over a table behind a ref field
+
+A rule with `"rule": "all-of"` may name a kind whose table is behind a ref field of another kind (`MissionRule`, the array `Mission.rules` leads to). The walk then
+reaches every element of every owner it has named, up to the table's count or capacity (`Mission#0.rules[3].type`), and the owner's all-of rule must come first, so the owner
+is a kind before the table's kind in the schema. A slot that loops over such an array by index (`Mission::CountStartPositions`) needs it: a ref field alone leads the walk to the first element.
+
 ### A table recorded as changed elements
 
 A kind with a `table` may also carry `"delta": true`. A slot that is all-of over a delta kind does not put its elements in the walk's
@@ -1020,6 +1026,7 @@ from the layout), and the export refuses a copy that names any other source name
 A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result.
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
+A slot may also return `text` (`const char*`, as an import's result may): it is recorded as `o result "Canal Crossing"`, or `null`, and compared as the text, never the address (`mission.GetMissionName`).
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 
 A `weapon` argument of a slot is recorded as `a weapon weapondef#17`, or `a weapon null`, and the weapon is a root of the slot's walk: the
@@ -1209,6 +1216,13 @@ features:
 - The network branches of `DamageFeature` (`Game.netGameFlags`-dependent game type 3): the recordings are of games of type 2.
 - `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick; `UpdateFeatures` is the scheduler's phase driver, which calls the slots below it, each recorded on its own.
 
+mission:
+
+- `GetMissionIndex` and `HasMissionName` are recorded slots that no committed recording calls (the campaign menus ask for them, not a match). `MissionExists` is `unrecorded`: it reads the campaign file through `TdfFile`.
+- Every slot that loads or frees a mission (`SetMissionType`, `FreeOtaEnumCacheAndMission`, `LoadCampaign`, `LoadMissionByName`, `RefreshMapList`, `SelectMission`, `AdvanceMission`, `SelectSchema`, `SetMissionUnitPosition`) is `load class`; they build the mission's record from the map's files and the TDF parser, which the recording would have to hold as services.
+- `GetCampaignName`, `GetCampaignMissionName`, `CountMissions`, `GetBriefing`, `GetDescription`, `GetPlanet`, `GetTerrainSizeTier`, `GetTranslatedName`, `GetMemory`, `GetNumPlayers`, `GetTerrainLength` and `ComputeMapChecksum` are unrecorded ("a query no match makes: it serves the menus and the map list"): they read the names and the map list of the menus, and no scenario reaches them in a match (`data/coverage.csv`: `menu`, `campaign-menu`, `map-check`).
+- `GetMissionUnit` and `GetMissionFeature` with an index past the count (result 0, the out struct untouched): the callers loop to the count.
+
 weapons:
 
 - A shot of an interceptor (a vertical-launch weapon with the interceptor flag): the scenarios before #975 reach the vertical-launch handler 887 times and fire 32 missiles from it (`mission-radius` and `long-greenhaven-8p`), none with an interceptor weapon; `ai-antinuke-intercept` (#975) fires the suite's one interceptor shot at tick 5696, which no recording holds, so its `FindTargetableProjectile` call and `Projectile.interceptedProjectile` are never reached by a recorded shot. The anti-nuke of `orders-weapon-build` searches (the `FindTargetableProjectile` slot returns null at its 3 calls) and never fires. The vertical-launch shot of a missile is recorded in `mission-radius`.
@@ -1309,6 +1323,17 @@ The recordings of features 5.0, which the modern build runs as native code in ev
 
 - `commander-death`, ticks 181 to 186 (2,637 calls): the death of the commander at tick 182 is 30 DAMAGE events (`Apply`: 29 kill their feature, outcome 1, and one does not), each kill places a spot with the death animation (`services.InitGafSequence`, `los_radar.GetMapCell`, the pool's lists and the cell's flags written), then `UpdateFeatureSpot` (145 calls, `services.StepGafSequence`) walks the used list, and the phase's `FeatureTypeCount`, `AnimateFeatureType` (399 types a tick), `ScanFeatureCell`, `FirstFeatureSpot` and `GetCellFeature` are called every tick.
 - `orders-air-fights`, ticks 708 to 713 (2,435 calls; `Apply`: 2 DAMAGE and 1 PLACE, all outcome 1): DAMAGE at tick 709 that kill features, and a PLACE of a feature with a model (`FEATURES_HAS_POS | FEATURES_HAS_ROT`, a spot with its piece state: `scripts.ObjectStateSize`, `services.SimAllocTagged "Object State"`, and the INIT_STATE and PASS_MAPS effects through `services.SchedPublish`), and 11 `UpdateFeatureSpot` calls.
+
+`replay_inject_test.exe` is also built with the start-shift injection of 15 (the 16 of `rules[i].x << 16` in `Mission::GetStartPosition`), and the divergence is reported at call 237 of `console-ilose` and at `out.x` (recorded 36700160, replayed 18350080):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 237 out.x tests/replay/mission/console-ilose.txt
+```
+
+The recordings of mission 2.0, which the modern build runs as native code in every mode (it has no WASM module yet), both of the whole run, because the load-time queries come before tick 1 and a window cannot start at tick 0. The mission is `Game.net`, one `Mission` with its names, figures and counts as fields, and `rules`, `units` and `features` as the tables behind it:
+
+- `console-ilose` (a skirmish of 100 ticks, 452 calls): 261 `GetMissionParams` (the value `o result (...)` of `MissionParams`), 182 `GetGameType`, 2 `GetStartPosition` (`o out.x` and `out.z`, a `Vec3` out), 2 `GetNameSlot`, 2 `GetMissionName` (a `text` result), `CountStartPositions` (10 rules walked) and `CountMissionFeatures`.
+- `mission-build-unit` (a campaign mission, 400 ticks, 26,804 calls, 10.7 MB): 25,604 `GetMissionParams`, 635 `GetGameType`, 547 `GetMissionUnit` (`o out.name`, `out.ident` and `out.initialMission` are strings behind `cstring` fields), 4 `CountMissionUnits`, 4 `CountMissionFeatures` and 3 `GetMissionFeature`.
 
 `replay_inject_test.exe` is also built with the reload-base injection of 150 (the 120 of `(120 - q) * reloadTime`, the reload of a weapon scaled by the health of the unit, in `UpdateUnitWeapons`), and the divergence is reported at call 295 of `orders-guard-attacked` and at `Unit#2.weapon0ReloadTimer`, the first shot of the recording (recorded 12, replayed 15):
 

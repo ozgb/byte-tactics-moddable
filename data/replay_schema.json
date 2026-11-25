@@ -2477,7 +2477,318 @@
    "Mission": {
     "type": "Mission",
     "scope": "state",
-    "fields": []
+    "table": {
+     "base": "game",
+     "member": "net",
+     "ref": true,
+     "count": 1,
+     "alloc": 1
+    },
+    "fields": [
+     {
+      "name": "type",
+      "kind": "i32"
+     },
+     {
+      "name": "campaign",
+      "kind": "string",
+      "size": 256
+     },
+     {
+      "name": "names0",
+      "kind": "string",
+      "size": 256,
+      "member": "names[0]"
+     },
+     {
+      "name": "names1",
+      "kind": "string",
+      "size": 256,
+      "member": "names[1]"
+     },
+     {
+      "name": "names2",
+      "kind": "string",
+      "size": 256,
+      "member": "names[2]"
+     },
+     {
+      "name": "names3",
+      "kind": "string",
+      "size": 256,
+      "member": "names[3]"
+     },
+     {
+      "name": "names4",
+      "kind": "string",
+      "size": 256,
+      "member": "names[4]"
+     },
+     {
+      "name": "names5",
+      "kind": "string",
+      "size": 256,
+      "member": "names[5]"
+     },
+     {
+      "name": "names6",
+      "kind": "string",
+      "size": 256,
+      "member": "names[6]"
+     },
+     {
+      "name": "names7",
+      "kind": "string",
+      "size": 256,
+      "member": "names[7]"
+     },
+     {
+      "name": "names8",
+      "kind": "string",
+      "size": 256,
+      "member": "names[8]"
+     },
+     {
+      "name": "missionName",
+      "kind": "string",
+      "size": 256
+     },
+     {
+      "name": "missionIndex",
+      "kind": "i32"
+     },
+     {
+      "name": "surfaceMetal",
+      "kind": "i32"
+     },
+     {
+      "name": "minWindSpeed",
+      "kind": "i32"
+     },
+     {
+      "name": "maxWindSpeed",
+      "kind": "i32"
+     },
+     {
+      "name": "gravity",
+      "kind": "i32"
+     },
+     {
+      "name": "tidalStrength",
+      "kind": "f32"
+     },
+     {
+      "name": "lavaWorld",
+      "kind": "i32"
+     },
+     {
+      "name": "noSeaLevelTrigger",
+      "kind": "i32"
+     },
+     {
+      "name": "waterDoesDamage",
+      "kind": "i32"
+     },
+     {
+      "name": "waterDamage",
+      "kind": "i32"
+     },
+     {
+      "name": "killMul",
+      "kind": "f32"
+     },
+     {
+      "name": "timeMul",
+      "kind": "f32"
+     },
+     {
+      "name": "startMetal0",
+      "kind": "f32",
+      "member": "startMetal[0]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal1",
+      "kind": "f32",
+      "member": "startMetal[1]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal2",
+      "kind": "f32",
+      "member": "startMetal[2]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal3",
+      "kind": "f32",
+      "member": "startMetal[3]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal4",
+      "kind": "f32",
+      "member": "startMetal[4]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal5",
+      "kind": "f32",
+      "member": "startMetal[5]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal6",
+      "kind": "f32",
+      "member": "startMetal[6]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal7",
+      "kind": "f32",
+      "member": "startMetal[7]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal8",
+      "kind": "f32",
+      "member": "startMetal[8]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startMetal9",
+      "kind": "f32",
+      "member": "startMetal[9]",
+      "aliases": [
+       "Mission::startMetal"
+      ]
+     },
+     {
+      "name": "startEnergy0",
+      "kind": "f32",
+      "member": "startEnergy[0]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy1",
+      "kind": "f32",
+      "member": "startEnergy[1]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy2",
+      "kind": "f32",
+      "member": "startEnergy[2]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy3",
+      "kind": "f32",
+      "member": "startEnergy[3]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy4",
+      "kind": "f32",
+      "member": "startEnergy[4]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy5",
+      "kind": "f32",
+      "member": "startEnergy[5]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy6",
+      "kind": "f32",
+      "member": "startEnergy[6]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy7",
+      "kind": "f32",
+      "member": "startEnergy[7]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy8",
+      "kind": "f32",
+      "member": "startEnergy[8]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "startEnergy9",
+      "kind": "f32",
+      "member": "startEnergy[9]",
+      "aliases": [
+       "Mission::startEnergy"
+      ]
+     },
+     {
+      "name": "unitCount",
+      "kind": "i32"
+     },
+     {
+      "name": "units",
+      "kind": "ref",
+      "target": "MissionUnit"
+     },
+     {
+      "name": "ruleCount",
+      "kind": "i32"
+     },
+     {
+      "name": "rules",
+      "kind": "ref",
+      "target": "MissionRule"
+     },
+     {
+      "name": "featureCount",
+      "kind": "i32"
+     },
+     {
+      "name": "features",
+      "kind": "ref",
+      "target": "MissionFeature"
+     }
+    ]
    },
    "WeaponAimCobCb": {
     "type": "WeaponAimCobCb",
@@ -2529,6 +2840,357 @@
      {
       "name": "fireStarter",
       "kind": "u8"
+     }
+    ]
+   },
+   "MissionParams": {
+    "type": "MissionParams",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "surfaceMetal",
+      "kind": "i32"
+     },
+     {
+      "name": "minWindSpeed",
+      "kind": "i32"
+     },
+     {
+      "name": "maxWindSpeed",
+      "kind": "i32"
+     },
+     {
+      "name": "gravity",
+      "kind": "i32"
+     },
+     {
+      "name": "tidalStrength",
+      "kind": "f32"
+     },
+     {
+      "name": "lavaWorld",
+      "kind": "i32"
+     },
+     {
+      "name": "noSeaLevelTrigger",
+      "kind": "i32"
+     },
+     {
+      "name": "waterDoesDamage",
+      "kind": "i32"
+     },
+     {
+      "name": "waterDamage",
+      "kind": "i32"
+     },
+     {
+      "name": "killMul",
+      "kind": "f32"
+     },
+     {
+      "name": "timeMul",
+      "kind": "f32"
+     },
+     {
+      "name": "startMetal0",
+      "kind": "f32",
+      "member": "startMetal[0]"
+     },
+     {
+      "name": "startMetal1",
+      "kind": "f32",
+      "member": "startMetal[1]"
+     },
+     {
+      "name": "startMetal2",
+      "kind": "f32",
+      "member": "startMetal[2]"
+     },
+     {
+      "name": "startMetal3",
+      "kind": "f32",
+      "member": "startMetal[3]"
+     },
+     {
+      "name": "startMetal4",
+      "kind": "f32",
+      "member": "startMetal[4]"
+     },
+     {
+      "name": "startMetal5",
+      "kind": "f32",
+      "member": "startMetal[5]"
+     },
+     {
+      "name": "startMetal6",
+      "kind": "f32",
+      "member": "startMetal[6]"
+     },
+     {
+      "name": "startMetal7",
+      "kind": "f32",
+      "member": "startMetal[7]"
+     },
+     {
+      "name": "startMetal8",
+      "kind": "f32",
+      "member": "startMetal[8]"
+     },
+     {
+      "name": "startMetal9",
+      "kind": "f32",
+      "member": "startMetal[9]"
+     },
+     {
+      "name": "startEnergy0",
+      "kind": "f32",
+      "member": "startEnergy[0]"
+     },
+     {
+      "name": "startEnergy1",
+      "kind": "f32",
+      "member": "startEnergy[1]"
+     },
+     {
+      "name": "startEnergy2",
+      "kind": "f32",
+      "member": "startEnergy[2]"
+     },
+     {
+      "name": "startEnergy3",
+      "kind": "f32",
+      "member": "startEnergy[3]"
+     },
+     {
+      "name": "startEnergy4",
+      "kind": "f32",
+      "member": "startEnergy[4]"
+     },
+     {
+      "name": "startEnergy5",
+      "kind": "f32",
+      "member": "startEnergy[5]"
+     },
+     {
+      "name": "startEnergy6",
+      "kind": "f32",
+      "member": "startEnergy[6]"
+     },
+     {
+      "name": "startEnergy7",
+      "kind": "f32",
+      "member": "startEnergy[7]"
+     },
+     {
+      "name": "startEnergy8",
+      "kind": "f32",
+      "member": "startEnergy[8]"
+     },
+     {
+      "name": "startEnergy9",
+      "kind": "f32",
+      "member": "startEnergy[9]"
+     }
+    ]
+   },
+   "MissionUnitInfo": {
+    "type": "MissionUnitInfo",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "name",
+      "kind": "cstring"
+     },
+     {
+      "name": "ident",
+      "kind": "cstring"
+     },
+     {
+      "name": "initialMission",
+      "kind": "cstring"
+     },
+     {
+      "name": "x",
+      "kind": "i32"
+     },
+     {
+      "name": "y",
+      "kind": "i32"
+     },
+     {
+      "name": "z",
+      "kind": "i32"
+     },
+     {
+      "name": "angle",
+      "kind": "i16"
+     },
+     {
+      "name": "health",
+      "kind": "i16"
+     },
+     {
+      "name": "creationCountdown",
+      "kind": "i32"
+     },
+     {
+      "name": "buildPriority",
+      "kind": "i16"
+     },
+     {
+      "name": "player",
+      "kind": "u8"
+     },
+     {
+      "name": "flags",
+      "kind": "u8"
+     }
+    ]
+   },
+   "MissionFeatureInfo": {
+    "type": "MissionFeatureInfo",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "name",
+      "kind": "cstring"
+     },
+     {
+      "name": "x",
+      "kind": "i32"
+     },
+     {
+      "name": "y",
+      "kind": "i32"
+     }
+    ]
+   },
+   "MissionUnit": {
+    "type": "MissionUnit",
+    "scope": "state",
+    "table": {
+     "base": {
+      "object": "Mission",
+      "field": "units"
+     },
+     "count": "unitCount",
+     "capacity": "unitCount"
+    },
+    "fields": [
+     {
+      "name": "name",
+      "kind": "cstring",
+      "ref": true
+     },
+     {
+      "name": "ident",
+      "kind": "cstring",
+      "ref": true
+     },
+     {
+      "name": "initialMission",
+      "kind": "cstring",
+      "ref": true
+     },
+     {
+      "name": "x",
+      "kind": "i32"
+     },
+     {
+      "name": "y",
+      "kind": "i32"
+     },
+     {
+      "name": "z",
+      "kind": "i32"
+     },
+     {
+      "name": "angle",
+      "kind": "i16"
+     },
+     {
+      "name": "health",
+      "kind": "i16"
+     },
+     {
+      "name": "creationCountdown",
+      "kind": "i32"
+     },
+     {
+      "name": "buildPriority",
+      "kind": "i16"
+     },
+     {
+      "name": "player",
+      "kind": "u8"
+     },
+     {
+      "name": "flags",
+      "kind": "u8",
+      "aliases": [
+       "MissionUnit::initialGroup",
+       "MissionUnit::missionCritical",
+       "MissionUnit::aiIgnore",
+       "MissionUnit::aiPriorityTarget",
+       "MissionUnit::immunity"
+      ]
+     }
+    ]
+   },
+   "MissionRule": {
+    "type": "MissionRule",
+    "scope": "state",
+    "table": {
+     "base": {
+      "object": "Mission",
+      "field": "rules"
+     },
+     "count": "ruleCount",
+     "capacity": "ruleCount"
+    },
+    "fields": [
+     {
+      "name": "type",
+      "kind": "i32"
+     },
+     {
+      "name": "id",
+      "kind": "i32"
+     },
+     {
+      "name": "x",
+      "kind": "i16"
+     },
+     {
+      "name": "z",
+      "kind": "i16"
+     }
+    ]
+   },
+   "MissionFeature": {
+    "type": "MissionFeature",
+    "scope": "state",
+    "table": {
+     "base": {
+      "object": "Mission",
+      "field": "features"
+     },
+     "count": "featureCount",
+     "capacity": "featureCount"
+    },
+    "fields": [
+     {
+      "name": "name",
+      "kind": "string",
+      "size": 128
+     },
+     {
+      "name": "x",
+      "kind": "i32"
+     },
+     {
+      "name": "y",
+      "kind": "i32"
      }
     ]
    }
@@ -3692,6 +4354,129 @@
      "DamageFeature"
     ],
     "note": "the weapon of a DAMAGE event is named by its number: every weapon is a root of the call, and the table of views over the weapon array records what a feature takes from it"
+   },
+   {
+    "kind": "field_escape",
+    "target": "MissionFeature::name",
+    "rule": "fields",
+    "reads": [
+     "MissionFeature.name"
+    ],
+    "note": "the name is returned through its address"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "all-of",
+    "object": "Mission",
+    "functions": [
+     "Mission::GetGameType"
+    ],
+    "reads": [
+     "Mission.type"
+    ],
+    "note": "the game type is the first word of the mission, which is the root of the call"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Mission::missionName",
+    "rule": "all-of",
+    "object": "Mission",
+    "reads": [
+     "Mission.missionName"
+    ],
+    "note": "the name is read and returned through its address"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Mission::names",
+    "rule": "all-of",
+    "object": "Mission",
+    "reads": [
+     "Mission.names0",
+     "Mission.names1",
+     "Mission.names2",
+     "Mission.names3",
+     "Mission.names4",
+     "Mission.names5",
+     "Mission.names6",
+     "Mission.names7",
+     "Mission.names8"
+    ],
+    "note": "a name slot is returned through its address"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::missionName",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::missionIndex",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::ruleCount",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::unitCount",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::featureCount",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::surfaceMetal",
+    "rule": "all-of",
+    "object": "Mission",
+    "note": "the mission is the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::rules",
+    "rule": "all-of",
+    "object": "MissionRule",
+    "functions": [
+     "Mission::CountStartPositions",
+     "Mission::GetStartPosition"
+    ],
+    "note": "every element of the mission's array is a root of the call, as the slots walk it by index"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::units",
+    "rule": "all-of",
+    "object": "MissionUnit",
+    "functions": [
+     "Mission::GetUnit"
+    ],
+    "note": "every element of the mission's array is a root of the call, as the slots walk it by index"
+   },
+   {
+    "kind": "field_read",
+    "target": "Mission::features",
+    "rule": "all-of",
+    "object": "MissionFeature",
+    "functions": [
+     "Mission::GetFeature"
+    ],
+    "note": "every element of the mission's array is a root of the call, as the slots walk it by index"
    }
   ],
   "subsystems": {
@@ -4719,177 +5504,209 @@
     ]
    },
    "mission": {
-    "status": "pending",
+    "status": "complete",
     "slots": {
      "GetGameType": {
-      "record": false,
-      "reason": "#660 part 3",
       "native": "GetGameTypeSlot"
      },
      "GetNameSlot": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetNameSlotSlot"
+      "native": "GetNameSlotSlot",
+      "result": {
+       "mode": "text"
+      }
      },
      "SetMissionType": {
       "record": false,
-      "reason": "#660 part 3"
+      "reason": "load class"
      },
      "FreeOtaEnumCacheAndMission": {
       "record": false,
-      "reason": "#660 part 3"
+      "reason": "load class"
      },
      "AdvanceMission": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "AdvanceMissionSlot"
      },
      "GetCampaignName": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetCampaignNameSlot"
      },
      "GetMissionIndex": {
-      "record": false,
-      "reason": "#660 part 3",
       "native": "GetMissionIndexSlot"
      },
      "GetMissionName": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionNameSlot"
+      "native": "GetMissionNameSlot",
+      "result": {
+       "mode": "text"
+      }
      },
      "GetStartPosition": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetStartPositionSlot"
+      "native": "GetStartPositionSlot",
+      "args": {
+       "out": {
+        "mode": "struct",
+        "kind": "Vec3",
+        "dir": "out",
+        "when": "result != 0"
+       }
+      },
+      "functions": [
+       "Mission::GetStartPosition"
+      ]
      },
      "LoadCampaign": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "LoadCampaignSlot"
      },
      "LoadMissionByName": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "LoadMissionByNameSlot"
-     },
-     "MissionExists": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "MissionExistsSlot"
      },
      "RefreshMapList": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "RefreshMapListSlot"
      },
      "SelectMission": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "SelectMissionSlot"
      },
      "ComputeMapChecksum": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "ComputeMapChecksumSlot"
      },
      "GetTerrainLength": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetTerrainLengthSlot"
      },
      "CountMissions": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "CountMissionsSlot"
      },
      "GetCampaignMissionName": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetCampaignMissionNameSlot"
      },
      "CountStartPositions": {
-      "record": false,
-      "reason": "#660 part 3",
       "native": "CountStartPositionsSlot"
      },
      "GetBriefing": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetBriefingSlot"
      },
      "GetDescription": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetDescriptionSlot"
      },
      "GetPlanet": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetPlanetSlot"
      },
      "GetTerrainSizeTier": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetTerrainSizeTierSlot"
      },
      "GetTranslatedName": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetTranslatedNameSlot"
      },
      "HasMissionName": {
-      "record": false,
-      "reason": "#660 part 3",
       "native": "HasMissionNameSlot"
      },
      "SelectSchema": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "SelectSchemaSlot"
      },
      "GetMissionParams": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionParamsSlot"
+      "native": "GetMissionParamsSlot",
+      "functions": [
+       "Mission::GetParams"
+      ],
+      "args": {
+       "out": {
+        "mode": "value",
+        "kind": "MissionParams",
+        "dir": "out"
+       }
+      }
      },
      "CountMissionUnits": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "CountMissionUnitsSlot"
+      "native": "CountMissionUnitsSlot",
+      "functions": [
+       "Mission::CountUnits"
+      ]
      },
      "GetMissionUnit": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionUnitSlot"
+      "native": "GetMissionUnitSlot",
+      "functions": [
+       "Mission::GetUnit"
+      ],
+      "args": {
+       "out": {
+        "mode": "struct",
+        "kind": "MissionUnitInfo",
+        "dir": "out",
+        "when": "result != 0"
+       }
+      }
      },
      "SetMissionUnitPosition": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "load class",
       "native": "SetMissionUnitPositionSlot"
      },
      "CountMissionFeatures": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "CountMissionFeaturesSlot"
+      "native": "CountMissionFeaturesSlot",
+      "functions": [
+       "Mission::CountFeatures"
+      ]
      },
      "GetMissionFeature": {
-      "record": false,
-      "reason": "#660 part 3",
-      "native": "GetMissionFeatureSlot"
+      "native": "GetMissionFeatureSlot",
+      "functions": [
+       "Mission::GetFeature"
+      ],
+      "args": {
+       "out": {
+        "mode": "struct",
+        "kind": "MissionFeatureInfo",
+        "dir": "out",
+        "when": "result != 0"
+       }
+      }
      },
      "GetMemory": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetMemorySlot"
      },
      "GetNumPlayers": {
       "record": false,
-      "reason": "#660 part 3",
+      "reason": "a query no match makes: it serves the menus and the map list",
       "native": "GetNumPlayersSlot"
+     },
+     "MissionExists": {
+      "record": false,
+      "reason": "a campaign query no match makes: it reads the campaign file",
+      "native": "MissionExistsSlot"
      }
-    }
+    },
+    "issue": 1045
    },
    "network": {
     "status": "pending"
@@ -6408,10 +7225,16 @@
   {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "delta": true, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state", "Ref<SpotState>::offset"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
   {"name": "Pool", "type": "Pool", "scope": "state", "table": {"base": "game", "member": "pool", "count": 1}, "inside": null, "fields": [{"name": "entries", "kind": "ref", "target": "Spot"}, {"name": "featureUnit", "kind": "ref", "target": "alloc"}, {"name": "usedHead", "kind": "i32"}, {"name": "restHead", "kind": "i32"}, {"name": "freeHead", "kind": "i32"}]},
   {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []},
-  {"name": "Mission", "type": "Mission", "scope": "state", "table": null, "inside": null, "fields": []},
+  {"name": "Mission", "type": "Mission", "scope": "state", "table": {"base": "game", "member": "net", "ref": true, "count": 1, "alloc": 1}, "inside": null, "fields": [{"name": "type", "kind": "i32"}, {"name": "campaign", "kind": "string", "size": 256}, {"name": "names0", "kind": "string", "size": 256, "member": "names[0]"}, {"name": "names1", "kind": "string", "size": 256, "member": "names[1]"}, {"name": "names2", "kind": "string", "size": 256, "member": "names[2]"}, {"name": "names3", "kind": "string", "size": 256, "member": "names[3]"}, {"name": "names4", "kind": "string", "size": 256, "member": "names[4]"}, {"name": "names5", "kind": "string", "size": 256, "member": "names[5]"}, {"name": "names6", "kind": "string", "size": 256, "member": "names[6]"}, {"name": "names7", "kind": "string", "size": 256, "member": "names[7]"}, {"name": "names8", "kind": "string", "size": 256, "member": "names[8]"}, {"name": "missionName", "kind": "string", "size": 256}, {"name": "missionIndex", "kind": "i32"}, {"name": "surfaceMetal", "kind": "i32"}, {"name": "minWindSpeed", "kind": "i32"}, {"name": "maxWindSpeed", "kind": "i32"}, {"name": "gravity", "kind": "i32"}, {"name": "tidalStrength", "kind": "f32"}, {"name": "lavaWorld", "kind": "i32"}, {"name": "noSeaLevelTrigger", "kind": "i32"}, {"name": "waterDoesDamage", "kind": "i32"}, {"name": "waterDamage", "kind": "i32"}, {"name": "killMul", "kind": "f32"}, {"name": "timeMul", "kind": "f32"}, {"name": "startMetal0", "kind": "f32", "member": "startMetal[0]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal1", "kind": "f32", "member": "startMetal[1]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal2", "kind": "f32", "member": "startMetal[2]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal3", "kind": "f32", "member": "startMetal[3]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal4", "kind": "f32", "member": "startMetal[4]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal5", "kind": "f32", "member": "startMetal[5]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal6", "kind": "f32", "member": "startMetal[6]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal7", "kind": "f32", "member": "startMetal[7]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal8", "kind": "f32", "member": "startMetal[8]", "aliases": ["Mission::startMetal"]}, {"name": "startMetal9", "kind": "f32", "member": "startMetal[9]", "aliases": ["Mission::startMetal"]}, {"name": "startEnergy0", "kind": "f32", "member": "startEnergy[0]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy1", "kind": "f32", "member": "startEnergy[1]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy2", "kind": "f32", "member": "startEnergy[2]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy3", "kind": "f32", "member": "startEnergy[3]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy4", "kind": "f32", "member": "startEnergy[4]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy5", "kind": "f32", "member": "startEnergy[5]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy6", "kind": "f32", "member": "startEnergy[6]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy7", "kind": "f32", "member": "startEnergy[7]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy8", "kind": "f32", "member": "startEnergy[8]", "aliases": ["Mission::startEnergy"]}, {"name": "startEnergy9", "kind": "f32", "member": "startEnergy[9]", "aliases": ["Mission::startEnergy"]}, {"name": "unitCount", "kind": "i32"}, {"name": "units", "kind": "ref", "target": "MissionUnit"}, {"name": "ruleCount", "kind": "i32"}, {"name": "rules", "kind": "ref", "target": "MissionRule"}, {"name": "featureCount", "kind": "i32"}, {"name": "features", "kind": "ref", "target": "MissionFeature"}]},
   {"name": "WeaponAimCobCb", "type": "WeaponAimCobCb", "scope": "state", "table": null, "inside": [{"kind": "Unit", "member": "weapons[].aimCob"}], "vptr": "g_weaponAimCobVtable", "vptr_unset": "a unit's aim callbacks hold 0 until weapons' INIT_SLOTS event stores the global", "fields": [{"name": "nAimCobDone", "kind": "i32"}]},
   {"name": "WeaponFire", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "fire", "kind": "code", "table": "weaponFire", "codeTable": 1}]},
   {"name": "WeaponHit", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "damage", "kind": "u16"}, {"name": "fireStarter", "kind": "u8"}]},
+  {"name": "MissionParams", "type": "MissionParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "surfaceMetal", "kind": "i32"}, {"name": "minWindSpeed", "kind": "i32"}, {"name": "maxWindSpeed", "kind": "i32"}, {"name": "gravity", "kind": "i32"}, {"name": "tidalStrength", "kind": "f32"}, {"name": "lavaWorld", "kind": "i32"}, {"name": "noSeaLevelTrigger", "kind": "i32"}, {"name": "waterDoesDamage", "kind": "i32"}, {"name": "waterDamage", "kind": "i32"}, {"name": "killMul", "kind": "f32"}, {"name": "timeMul", "kind": "f32"}, {"name": "startMetal0", "kind": "f32", "member": "startMetal[0]"}, {"name": "startMetal1", "kind": "f32", "member": "startMetal[1]"}, {"name": "startMetal2", "kind": "f32", "member": "startMetal[2]"}, {"name": "startMetal3", "kind": "f32", "member": "startMetal[3]"}, {"name": "startMetal4", "kind": "f32", "member": "startMetal[4]"}, {"name": "startMetal5", "kind": "f32", "member": "startMetal[5]"}, {"name": "startMetal6", "kind": "f32", "member": "startMetal[6]"}, {"name": "startMetal7", "kind": "f32", "member": "startMetal[7]"}, {"name": "startMetal8", "kind": "f32", "member": "startMetal[8]"}, {"name": "startMetal9", "kind": "f32", "member": "startMetal[9]"}, {"name": "startEnergy0", "kind": "f32", "member": "startEnergy[0]"}, {"name": "startEnergy1", "kind": "f32", "member": "startEnergy[1]"}, {"name": "startEnergy2", "kind": "f32", "member": "startEnergy[2]"}, {"name": "startEnergy3", "kind": "f32", "member": "startEnergy[3]"}, {"name": "startEnergy4", "kind": "f32", "member": "startEnergy[4]"}, {"name": "startEnergy5", "kind": "f32", "member": "startEnergy[5]"}, {"name": "startEnergy6", "kind": "f32", "member": "startEnergy[6]"}, {"name": "startEnergy7", "kind": "f32", "member": "startEnergy[7]"}, {"name": "startEnergy8", "kind": "f32", "member": "startEnergy[8]"}, {"name": "startEnergy9", "kind": "f32", "member": "startEnergy[9]"}]},
+  {"name": "MissionUnitInfo", "type": "MissionUnitInfo", "scope": "value", "table": null, "inside": null, "fields": [{"name": "name", "kind": "cstring"}, {"name": "ident", "kind": "cstring"}, {"name": "initialMission", "kind": "cstring"}, {"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "angle", "kind": "i16"}, {"name": "health", "kind": "i16"}, {"name": "creationCountdown", "kind": "i32"}, {"name": "buildPriority", "kind": "i16"}, {"name": "player", "kind": "u8"}, {"name": "flags", "kind": "u8"}]},
+  {"name": "MissionFeatureInfo", "type": "MissionFeatureInfo", "scope": "value", "table": null, "inside": null, "fields": [{"name": "name", "kind": "cstring"}, {"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}]},
+  {"name": "MissionUnit", "type": "MissionUnit", "scope": "state", "table": {"base": {"object": "Mission", "field": "units"}, "count": "unitCount", "capacity": "unitCount"}, "inside": null, "fields": [{"name": "name", "kind": "cstring", "ref": true}, {"name": "ident", "kind": "cstring", "ref": true}, {"name": "initialMission", "kind": "cstring", "ref": true}, {"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "angle", "kind": "i16"}, {"name": "health", "kind": "i16"}, {"name": "creationCountdown", "kind": "i32"}, {"name": "buildPriority", "kind": "i16"}, {"name": "player", "kind": "u8"}, {"name": "flags", "kind": "u8", "aliases": ["MissionUnit::initialGroup", "MissionUnit::missionCritical", "MissionUnit::aiIgnore", "MissionUnit::aiPriorityTarget", "MissionUnit::immunity"]}]},
+  {"name": "MissionRule", "type": "MissionRule", "scope": "state", "table": {"base": {"object": "Mission", "field": "rules"}, "count": "ruleCount", "capacity": "ruleCount"}, "inside": null, "fields": [{"name": "type", "kind": "i32"}, {"name": "id", "kind": "i32"}, {"name": "x", "kind": "i16"}, {"name": "z", "kind": "i16"}]},
+  {"name": "MissionFeature", "type": "MissionFeature", "scope": "state", "table": {"base": {"object": "Mission", "field": "features"}, "count": "featureCount", "capacity": "featureCount"}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
   {"name": "WindMeteorsLimits", "type": "WindMeteorsLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "min", "kind": "i32"}, {"name": "max", "kind": "i32"}]},
@@ -6833,9 +7656,20 @@
    }
   },
   "mission": {
-   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [2, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}, "GetMissionParams": {"reason": "#660 part 3", "native": "GetMissionParamsSlot"}, "CountMissionUnits": {"reason": "#660 part 3", "native": "CountMissionUnitsSlot"}, "GetMissionUnit": {"reason": "#660 part 3", "native": "GetMissionUnitSlot"}, "SetMissionUnitPosition": {"reason": "#660 part 3", "native": "SetMissionUnitPositionSlot"}, "CountMissionFeatures": {"reason": "#660 part 3", "native": "CountMissionFeaturesSlot"}, "GetMissionFeature": {"reason": "#660 part 3", "native": "GetMissionFeatureSlot"}, "GetMemory": {"reason": "#660 part 3", "native": "GetMemorySlot"}, "GetNumPlayers": {"reason": "#660 part 3", "native": "GetNumPlayersSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
+   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [2, 0], "status": "complete", "imports": [], "issue": 1045, "unrecorded": {"SetMissionType": {"reason": "load class", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "load class", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "load class", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetCampaignNameSlot"}, "LoadCampaign": {"reason": "load class", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "load class", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "a campaign query no match makes: it reads the campaign file", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "load class", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "load class", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "a query no match makes: it serves the menus and the map list", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "a query no match makes: it serves the menus and the map list", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetCampaignMissionNameSlot"}, "GetBriefing": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetTranslatedNameSlot"}, "SelectSchema": {"reason": "load class", "native": "SelectSchemaSlot"}, "SetMissionUnitPosition": {"reason": "load class", "native": "SetMissionUnitPositionSlot"}, "GetMemory": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetMemorySlot"}, "GetNumPlayers": {"reason": "a query no match makes: it serves the menus and the map list", "native": "GetNumPlayersSlot"}}},
    "slots": {
-
+    "GetGameType": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::GetGameType"], "reads": [], "writes": [], "objectReads": ["Mission.type"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "GetGameTypeSlot"},
+    "GetNameSlot": {"conv": "__stdcall", "ret": "const char*", "functions": ["Mission::GetNameSlot"], "reads": [], "writes": [], "objectReads": ["Mission.names0", "Mission.names1", "Mission.names2", "Mission.names3", "Mission.names4", "Mission.names5", "Mission.names6", "Mission.names7", "Mission.names8"], "objectWrites": [], "allOf": ["Mission"], "args": [{"name": "index", "type": "int", "line": "index", "mode": "scalar"}], "result": {"type": "char*", "mode": "text"}, "native": "GetNameSlotSlot"},
+    "GetMissionIndex": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::GetMissionIndex"], "reads": [], "writes": [], "objectReads": ["Mission.missionIndex"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "GetMissionIndexSlot"},
+    "GetMissionName": {"conv": "__stdcall", "ret": "const char*", "functions": ["Mission::GetMissionName"], "reads": [], "writes": [], "objectReads": ["Mission.missionName"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "char*", "mode": "text"}, "native": "GetMissionNameSlot"},
+    "GetStartPosition": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::GetStartPosition"], "reads": [], "writes": [], "objectReads": ["Mission.ruleCount", "Mission.rules", "MissionRule.type", "MissionRule.id", "MissionRule.x", "MissionRule.z"], "objectWrites": [], "allOf": ["Mission", "MissionRule"], "args": [{"name": "out", "type": "Vec3*", "line": "out", "mode": "struct", "kind": "Vec3", "dir": "out", "when": "result != 0"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetStartPositionSlot"},
+    "CountStartPositions": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::CountStartPositions"], "reads": [], "writes": [], "objectReads": ["Mission.ruleCount", "Mission.rules", "MissionRule.type"], "objectWrites": [], "allOf": ["Mission", "MissionRule"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "CountStartPositionsSlot"},
+    "HasMissionName": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::HasMissionName"], "reads": [], "writes": [], "objectReads": ["Mission.missionName"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "HasMissionNameSlot"},
+    "GetMissionParams": {"conv": "__stdcall", "ret": "void", "functions": ["Mission::GetParams"], "reads": [], "writes": [], "objectReads": ["Mission.surfaceMetal", "Mission.minWindSpeed", "Mission.maxWindSpeed", "Mission.gravity", "Mission.tidalStrength", "Mission.lavaWorld", "Mission.noSeaLevelTrigger", "Mission.waterDoesDamage", "Mission.waterDamage", "Mission.killMul", "Mission.timeMul", "Mission.startMetal0", "Mission.startMetal1", "Mission.startMetal2", "Mission.startMetal3", "Mission.startMetal4", "Mission.startMetal5", "Mission.startMetal6", "Mission.startMetal7", "Mission.startMetal8", "Mission.startMetal9", "Mission.startEnergy0", "Mission.startEnergy1", "Mission.startEnergy2", "Mission.startEnergy3", "Mission.startEnergy4", "Mission.startEnergy5", "Mission.startEnergy6", "Mission.startEnergy7", "Mission.startEnergy8", "Mission.startEnergy9"], "objectWrites": [], "allOf": ["Mission"], "args": [{"name": "out", "type": "MissionParams*", "line": "out", "mode": "value", "kind": "MissionParams", "dir": "out"}], "result": null, "native": "GetMissionParamsSlot"},
+    "CountMissionUnits": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::CountUnits"], "reads": [], "writes": [], "objectReads": ["Mission.unitCount"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "CountMissionUnitsSlot"},
+    "GetMissionUnit": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::GetUnit"], "reads": [], "writes": [], "objectReads": ["Mission.unitCount", "Mission.units", "MissionUnit.name", "MissionUnit.ident", "MissionUnit.initialMission", "MissionUnit.x", "MissionUnit.y", "MissionUnit.z", "MissionUnit.angle", "MissionUnit.health", "MissionUnit.creationCountdown", "MissionUnit.buildPriority", "MissionUnit.player", "MissionUnit.flags"], "objectWrites": [], "allOf": ["Mission", "MissionUnit"], "args": [{"name": "index", "type": "int", "line": "index", "mode": "scalar"}, {"name": "out", "type": "MissionUnitInfo*", "line": "out", "mode": "struct", "kind": "MissionUnitInfo", "dir": "out", "when": "result != 0"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetMissionUnitSlot"},
+    "CountMissionFeatures": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::CountFeatures"], "reads": [], "writes": [], "objectReads": ["Mission.featureCount"], "objectWrites": [], "allOf": ["Mission"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "CountMissionFeaturesSlot"},
+    "GetMissionFeature": {"conv": "__stdcall", "ret": "int", "functions": ["Mission::GetFeature"], "reads": [], "writes": [], "objectReads": ["Mission.featureCount", "Mission.features", "MissionFeature.name", "MissionFeature.x", "MissionFeature.y"], "objectWrites": [], "allOf": ["Mission", "MissionFeature"], "args": [{"name": "index", "type": "int", "line": "index", "mode": "scalar"}, {"name": "out", "type": "MissionFeatureInfo*", "line": "out", "mode": "struct", "kind": "MissionFeatureInfo", "dir": "out", "when": "result != 0"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetMissionFeatureSlot"}
    }
   },
   "files": {

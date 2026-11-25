@@ -34856,6 +34856,7 @@ address,function,file,kind,target
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,GetDC
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,GetTickCount
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,HandleVirtualKey
+0x4b5cc0,WindowProc,src/graphics/display.cpp,call,HarnessDropsHostInput
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,HarnessInputTime
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,PostQuitMessage
 0x4b5cc0,WindowProc,src/graphics/display.cpp,call,PushKeyCode
@@ -45388,6 +45389,9 @@ address,function,file,kind,target
 ,HarnessDisplayFrame,src/harness/harness.cpp,global_write,s_displayFrames@src/harness/harness.cpp
 ,HarnessDisplayFrame,src/harness/harness.cpp,global_write,s_displaySteps@src/harness/harness.cpp
 ,HarnessDisplayFrame,src/harness/harness.cpp,global_write,s_displayTickDone@src/harness/harness.cpp
+,HarnessDropsHostInput,src/harness/harness.cpp,function,
+,HarnessDropsHostInput,src/harness/harness.cpp,global_read,s_injecting@src/harness/harness.cpp
+,HarnessDropsHostInput,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessEndOfTick,src/harness/harness.cpp,call,DlClose
 ,HarnessEndOfTick,src/harness/harness.cpp,call,Fail
 ,HarnessEndOfTick,src/harness/harness.cpp,call,GetCurrentProcess
@@ -45495,12 +45499,12 @@ address,function,file,kind,target
 ,HarnessGameSeed,src/harness/harness.cpp,global_read,s_gameSeed@src/harness/harness.cpp
 ,HarnessGameSeed,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessGetCursorPos,src/harness/harness.cpp,call,GetCursorPos
-,HarnessGetCursorPos,src/harness/harness.cpp,call,InputScenario
 ,HarnessGetCursorPos,src/harness/harness.cpp,field_write,POINT::x
 ,HarnessGetCursorPos,src/harness/harness.cpp,field_write,POINT::y
 ,HarnessGetCursorPos,src/harness/harness.cpp,function,
 ,HarnessGetCursorPos,src/harness/harness.cpp,global_read,s_cursorX@src/harness/harness.cpp
 ,HarnessGetCursorPos,src/harness/harness.cpp,global_read,s_cursorY@src/harness/harness.cpp
+,HarnessGetCursorPos,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessInit,src/harness/harness.cpp,call,Fail
 ,HarnessInit,src/harness/harness.cpp,call,GetMemSetValue
 ,HarnessInit,src/harness/harness.cpp,call,GetStdHandle
@@ -45531,10 +45535,10 @@ address,function,file,kind,target
 ,HarnessInputTime,src/harness/harness.cpp,global_read,s_injectMs@src/harness/harness.cpp
 ,HarnessInputTime,src/harness/harness.cpp,global_read,s_injecting@src/harness/harness.cpp
 ,HarnessKeyState,src/harness/harness.cpp,call,GetAsyncKeyState
-,HarnessKeyState,src/harness/harness.cpp,call,InputScenario
 ,HarnessKeyState,src/harness/harness.cpp,function,
 ,HarnessKeyState,src/harness/harness.cpp,global_read,s_keyDown@src/harness/harness.cpp
 ,HarnessKeyState,src/harness/harness.cpp,global_read,s_keyPressed@src/harness/harness.cpp
+,HarnessKeyState,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessKeyState,src/harness/harness.cpp,global_write,s_keyPressed@src/harness/harness.cpp
 ,HarnessLoadBegins,src/harness/harness.cpp,call,CreateEventA
 ,HarnessLoadBegins,src/harness/harness.cpp,function,
@@ -45665,9 +45669,9 @@ address,function,file,kind,target
 ,HarnessRecordPhase,src/harness/harness.cpp,function,
 ,HarnessRecordPhase,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessRecordPhase,src/harness/harness.cpp,global_write,s_eventPhase@src/harness/harness.cpp
-,HarnessSetCursorPos,src/harness/harness.cpp,call,InputScenario
 ,HarnessSetCursorPos,src/harness/harness.cpp,call,SetCursorPos
 ,HarnessSetCursorPos,src/harness/harness.cpp,function,
+,HarnessSetCursorPos,src/harness/harness.cpp,global_read,s_testMode@src/harness/harness.cpp
 ,HarnessSetCursorPos,src/harness/harness.cpp,global_write,s_cursorX@src/harness/harness.cpp
 ,HarnessSetCursorPos,src/harness/harness.cpp,global_write,s_cursorY@src/harness/harness.cpp
 ,HarnessSharePacket,src/harness/harness.cpp,call,HarnessSharing

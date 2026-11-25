@@ -2063,6 +2063,7 @@ platform,game,shared_write,Game::animplayCursorCount,1
 platform,game,shared_write,Game::animplayCursors,1
 platform,game,shared_write,_MEMORYSTATUS::dwLength,1
 platform,harness,call,DlNote,2
+platform,harness,call,HarnessDropsHostInput,1
 platform,harness,call,HarnessInputTime,1
 platform,harness,call,HarnessTestMode,1
 platform,harness,shared_write,g_randomSeed,2

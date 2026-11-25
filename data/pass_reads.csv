@@ -6,8 +6,8 @@ explosions.debris,Debris::angle_y,weapons,UpdateExplosions,other-record,24,missi
 explosions.debris,Debris::angle_y,weapons,UpdateExplosions,same-record,15,orders-tier2-vader@234
 explosions.debris,Debris::angle_z,weapons,UpdateExplosions,other-record,24,mission-build-unit@71
 explosions.debris,Debris::angle_z,weapons,UpdateExplosions,same-record,15,orders-tier2-vader@234
-explosions.debris,Debris::field_0,weapons,UpdateExplosions,other-record,22,edges-economy-targeting@169
-explosions.debris,Debris::field_0,weapons,UpdateExplosions,same-record,20,edges-economy-targeting@169
+explosions.debris,Debris::obj,weapons,UpdateExplosions,other-record,22,edges-economy-targeting@169
+explosions.debris,Debris::obj,weapons,UpdateExplosions,same-record,20,edges-economy-targeting@169
 explosions.debris,Debris::pos,weapons,UpdateExplosions,other-record,24,mission-build-unit@71
 explosions.debris,Debris::pos,weapons,UpdateExplosions,same-record,13,orders-tier2-vader@234
 explosions.debris,Debris::ref1,game,StepGafSequence,other-record,38,edges-economy-targeting@36

@@ -998,7 +998,9 @@ game,players,indirect,UpdateBlink,1
 game,players,indirect,UpdatePlayerBody,1
 game,players,indirect,UpdatePlayerHead,1
 game,players,indirect,UpdatePlayerTail,1
+game,players,indirect,UpdatePlayers,1
 game,players,indirect,UpdatePlayersFinish,1
+game,players,indirect,UpdatePlayersOnStream,1
 game,players,shared_write,Game::commanderDeath,3
 game,players,shared_write,Game::displayContext,1
 game,players,shared_write,Game::endGameFlags,2
@@ -1406,8 +1408,6 @@ game,seams,indirect,UnitsOnWeaponsHealth,2
 game,seams,indirect,UnitsOnWeaponsHit,2
 game,seams,indirect,UnitsOnWeaponsMarkDamaged,2
 game,seams,indirect,UnitsOnWeaponsNotice,2
-game,seams,indirect,UpdatePlayers,1
-game,seams,indirect,UpdatePlayersOnStream,1
 game,seams,indirect,UpdateSquadsNative,1
 game,seams,indirect,WeaponsInbox,2
 game,seams,indirect,WeaponsOnFeaturesAreaDamage,2
@@ -3987,6 +3987,7 @@ players,game,call,LosRadarPublishRecalculate,1
 players,game,call,PlayersEventSize,1
 players,game,call,RecordFocusCommander,1
 players,game,call,RecordSimEvent,3
+players,game,call,SchedPlayersPhase,2
 players,game,call,SimAlloc,1
 players,game,call,SimBlockTrack,1
 players,game,shared_write,Game::endGameFlags,2
@@ -5254,7 +5255,6 @@ seams,files,shared_write,Seams::files,58
 seams,game,call,OrdersHeaderOf,6
 seams,game,call,SchedDeliver,12
 seams,game,call,SchedInboxHolds,1
-seams,game,call,SchedPlayersPhase,2
 seams,game,call,SchedPublish,1
 seams,game,call,ScriptsHeaderOf,3
 seams,game,call,SimSearchSteps,1

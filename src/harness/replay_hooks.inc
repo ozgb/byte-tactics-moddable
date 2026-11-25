@@ -40,7 +40,7 @@ const EconomyWorldView* s_inner_econworld;
 EconomyWorldView s_rec_econworld;
 bool s_hooked[SUB_COUNT];
 
-const EconomyWorldView* WrapWorld_econworld(const EconomyWorldView* inner);
+const EconomyWorldView* WrapWorldEconworld(const EconomyWorldView* inner);
 
 void __cdecl RecWindMeteorsUpdateWind(RandStream a0)
 {
@@ -155,7 +155,7 @@ void __stdcall RecEconomyInit(const EconMapInfo* a0, const EconomyWorldView* a1,
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_INIT, SUB_ECONOMY, roots);
-    a1 = WrapWorld_econworld(a1);
+    a1 = WrapWorldEconworld(a1);
     RegionBind(SUB_ECONOMY, a2, a3);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "map", ROK_ECONMAPINFO, a0);
@@ -5981,7 +5981,7 @@ void HookSeams(const bool* on)
     g_seams.network = &s_rec_network;
 }
 
-const EconomyWorldView* WrapWorld_econworld(const EconomyWorldView* inner)
+const EconomyWorldView* WrapWorldEconworld(const EconomyWorldView* inner)
 {
     if (inner == nullptr || !(s_hooked[SUB_ECONOMY]))
         return inner;

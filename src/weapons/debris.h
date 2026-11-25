@@ -12,7 +12,7 @@ struct DebrisPiece;
 
 #pragma pack(push, 1)
 struct Debris {
-    Ref<DebrisPiece> field_0;
+    Ref<DebrisPiece> obj;
     Handle ref1;
     Handle ref2;
     Vec3 pos;

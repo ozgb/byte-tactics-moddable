@@ -12,8 +12,8 @@ class Squad {
 public:
     union { int field_0; Ref<Player> owner; };
     union { int field_4; int index; };
-    int field_8;
-    int field_c;
+    int spare8;
+    int spareC;
     BlockVector<Ref<Unit> > items;
     Squad(Squad&);
     Squad(Player*, int);

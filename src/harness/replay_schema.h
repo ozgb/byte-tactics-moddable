@@ -736,16 +736,16 @@ enum ReplayFieldIndex {
     RF_SIMGLOBALS_G_LASTPLACEMETALSUM,
     RF_SIMGLOBALS_G_ECONOMYPACKETTICK,
     RF_SIMGLOBALS_G_AICOMMANDSENABLED,
-    RF_SIMGLOBALS_G_PLAYERAI_0_,
-    RF_SIMGLOBALS_G_PLAYERAI_1_,
-    RF_SIMGLOBALS_G_PLAYERAI_2_,
-    RF_SIMGLOBALS_G_PLAYERAI_3_,
-    RF_SIMGLOBALS_G_PLAYERAI_4_,
-    RF_SIMGLOBALS_G_PLAYERAI_5_,
-    RF_SIMGLOBALS_G_PLAYERAI_6_,
-    RF_SIMGLOBALS_G_PLAYERAI_7_,
-    RF_SIMGLOBALS_G_PLAYERAI_8_,
-    RF_SIMGLOBALS_G_PLAYERAI_9_,
+    RF_SIMGLOBALS_G_PLAYERAI_0,
+    RF_SIMGLOBALS_G_PLAYERAI_1,
+    RF_SIMGLOBALS_G_PLAYERAI_2,
+    RF_SIMGLOBALS_G_PLAYERAI_3,
+    RF_SIMGLOBALS_G_PLAYERAI_4,
+    RF_SIMGLOBALS_G_PLAYERAI_5,
+    RF_SIMGLOBALS_G_PLAYERAI_6,
+    RF_SIMGLOBALS_G_PLAYERAI_7,
+    RF_SIMGLOBALS_G_PLAYERAI_8,
+    RF_SIMGLOBALS_G_PLAYERAI_9,
     RF_SIMGLOBALS_G_MISSIONORDERTABLEVEC,
     RF_SIMGLOBALS_G_LOSTABLES,
     RF_RNG_MAIN,
@@ -2076,11 +2076,11 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "b", offsetof(BuildRatingWeights, b), sizeof(((BuildRatingWeights*)nullptr)->b), ROK_BUILDRATINGWEIGHTS, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "c", offsetof(BuildRatingWeights, c), sizeof(((BuildRatingWeights*)nullptr)->c), ROK_BUILDRATINGWEIGHTS, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "value", offsetof(PercentByte, value), sizeof(((PercentByte*)nullptr)->value), ROK_PERCENTBYTE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "unknown_0", offsetof(UnitTypeInt, unknown_0), sizeof(((UnitTypeInt*)nullptr)->unknown_0), ROK_UNITTYPEINT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "value", offsetof(UnitTypeInt, value), sizeof(((UnitTypeInt*)nullptr)->value), ROK_UNITTYPEINT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "owner", offsetof(Squad, owner), sizeof(((Squad*)nullptr)->owner), ROK_SQUAD, RK_REF, ROK_PLAYER, 0, 0, {}, 0, 0 },
     { "index", offsetof(Squad, index), sizeof(((Squad*)nullptr)->index), ROK_SQUAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "field_8", offsetof(Squad, field_8), sizeof(((Squad*)nullptr)->field_8), ROK_SQUAD, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "field_c", offsetof(Squad, field_c), sizeof(((Squad*)nullptr)->field_c), ROK_SQUAD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "spare8", offsetof(Squad, spare8), sizeof(((Squad*)nullptr)->spare8), ROK_SQUAD, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "spareC", offsetof(Squad, spareC), sizeof(((Squad*)nullptr)->spareC), ROK_SQUAD, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "items", offsetof(Squad, items), sizeof(((Squad*)nullptr)->items), ROK_SQUAD, RK_VECTOR, ROK_UNIT, 0, 0, {}, 0, 0, 12 },
     { "player", offsetof(SquadManager, player), sizeof(((SquadManager*)nullptr)->player), ROK_SQUADMANAGER, RK_REF, ROK_PLAYER, 0, 0, {}, 0, 0 },
     { "index", offsetof(SquadManager, index), sizeof(((SquadManager*)nullptr)->index), ROK_SQUADMANAGER, RK_U8, 0, 0, 0, {}, 0, 0 },
@@ -2158,7 +2158,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "steps", 0, sizeof(LosLine), ROK_LOSLINE, RK_VECTOR, 0, 0, 0, {}, 0, 0, 13 },
     { "lines", 0, sizeof(LosTable), ROK_LOSTABLE, RK_VECTOR, 0, 0, 0, {}, 0, 0, 14 },
     { "state", offsetof(DebrisPiece, state), sizeof(((DebrisPiece*)nullptr)->state), ROK_DEBRISPIECE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "obj", offsetof(Debris, field_0), sizeof(((Debris*)nullptr)->field_0), ROK_DEBRIS, RK_REF, ROK_DEBRISPIECE, 0, 0, {}, 0, 0 },
+    { "obj", offsetof(Debris, obj), sizeof(((Debris*)nullptr)->obj), ROK_DEBRIS, RK_REF, ROK_DEBRISPIECE, 0, 0, {}, 0, 0 },
     { "ref1", offsetof(Debris, ref1), sizeof(((Debris*)nullptr)->ref1), ROK_DEBRIS, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
     { "ref2", offsetof(Debris, ref2), sizeof(((Debris*)nullptr)->ref2), ROK_DEBRIS, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
     { "posX", offsetof(Debris, pos.x), sizeof(((Debris*)nullptr)->pos.x), ROK_DEBRIS, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3530,11 +3530,11 @@ static_assert(sizeof(((BuildRatingWeights*)nullptr)->a) == 1, "BuildRatingWeight
 static_assert(sizeof(((BuildRatingWeights*)nullptr)->b) == 1, "BuildRatingWeights::b has the size the schema says");
 static_assert(sizeof(((BuildRatingWeights*)nullptr)->c) == 1, "BuildRatingWeights::c has the size the schema says");
 static_assert(sizeof(((PercentByte*)nullptr)->value) == 1, "PercentByte::value has the size the schema says");
-static_assert(sizeof(((UnitTypeInt*)nullptr)->unknown_0) == 4, "UnitTypeInt::unknown_0 has the size the schema says");
+static_assert(sizeof(((UnitTypeInt*)nullptr)->value) == 4, "UnitTypeInt::value has the size the schema says");
 static_assert(sizeof(((Squad*)nullptr)->owner) == 4, "Squad::owner has the size the schema says");
 static_assert(sizeof(((Squad*)nullptr)->index) == 4, "Squad::index has the size the schema says");
-static_assert(sizeof(((Squad*)nullptr)->field_8) == 4, "Squad::field_8 has the size the schema says");
-static_assert(sizeof(((Squad*)nullptr)->field_c) == 4, "Squad::field_c has the size the schema says");
+static_assert(sizeof(((Squad*)nullptr)->spare8) == 4, "Squad::spare8 has the size the schema says");
+static_assert(sizeof(((Squad*)nullptr)->spareC) == 4, "Squad::spareC has the size the schema says");
 static_assert(sizeof(decltype(((Squad*)nullptr)->items)) == 16, "Squad::items is a block vector");
 static_assert(__is_same(decltype(((Squad*)nullptr)->items)::value_type, Ref<Unit>), "Squad::items holds Ref<Unit>");
 static_assert(sizeof(((SquadManager*)nullptr)->player) == 4, "SquadManager::player has the size the schema says");
@@ -3627,7 +3627,7 @@ static_assert(__is_same(LosLine::value_type, LosStep), "LosLine::steps holds Los
 static_assert(sizeof(LosTable) == 16, "LosTable::lines is a block vector");
 static_assert(__is_same(LosTable::value_type, LosLine), "LosTable::lines holds LosLine");
 static_assert(sizeof(((DebrisPiece*)nullptr)->state) == 1, "DebrisPiece::state has the size the schema says");
-static_assert(sizeof(((Debris*)nullptr)->field_0) == 4, "Debris::obj has the size the schema says");
+static_assert(sizeof(((Debris*)nullptr)->obj) == 4, "Debris::obj has the size the schema says");
 static_assert(sizeof(((Debris*)nullptr)->ref1) == sizeof(Handle), "Debris::ref1 has the size of its kind");
 static_assert(sizeof(((Debris*)nullptr)->ref2) == sizeof(Handle), "Debris::ref2 has the size of its kind");
 static_assert(sizeof(((Debris*)nullptr)->pos.x) == 4, "Debris::posX has the size the schema says");

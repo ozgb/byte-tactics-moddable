@@ -1980,7 +1980,7 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
 
 
 def upper(name: str) -> str:
-    return re.sub(r"[^A-Za-z0-9]", "_", name).upper()
+    return re.sub(r"[^A-Za-z0-9]+", "_", name).strip("_").upper()
 
 
 def camel(name: str) -> str:
@@ -2349,7 +2349,7 @@ def render_hooks(ann: dict, model: dict) -> str:
     L += ["bool s_hooked[SUB_COUNT];", ""]
     for sub, spec in subsystems.items():
         if spec.get("world"):
-            L.append("const %s* WrapWorld_%s(const %s* inner);" % (spec["struct"], sub, spec["struct"]))
+            L.append("const %s* WrapWorld%s(const %s* inner);" % (spec["struct"], camel(sub), spec["struct"]))
     L.append("")
     for sub, slot, s in slot_table(subsystems):
         L += wrapper(sub, subsystems[sub], slot, s, objects, sub + "." + slot in imported, slot in subsystems[sub].get("unrecorded", {}),
@@ -2401,7 +2401,7 @@ def render_hooks(ann: dict, model: dict) -> str:
     for sub, spec in subsystems.items():
         if not spec.get("world"):
             continue
-        L.append("const %s* WrapWorld_%s(const %s* inner)" % (spec["struct"], sub, spec["struct"]))
+        L.append("const %s* WrapWorld%s(const %s* inner)" % (spec["struct"], camel(sub), spec["struct"]))
         L.append("{")
         owners = sorted({o for slot in spec.get("unrecorded", {}) for o in imported.get(sub + "." + slot, [])})
         L.append("    if (inner == nullptr || !(%s))" % " || ".join("s_hooked[SUB_%s]" % upper(o) for o in owners))
@@ -2489,7 +2489,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         if a["mode"] == "region":
             L.append("    RegionBind(SUB_%s, a%d, a%d);" % (upper(sub), i, i + 1))
         elif a["mode"] == "world":
-            L.append("    a%d = WrapWorld_%s(a%d);" % (i, a["seam"], i))
+            L.append("    a%d = WrapWorld%s(a%d);" % (i, camel(a["seam"]), i))
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     held_args = [] if is_import else callback_args
     for i in held_args:
@@ -3640,6 +3640,15 @@ def render_service_answers(services: list[dict], linked: set[str] | None = None)
 VTABLES_CPP = ROOT / "src/harness/replay_vtables.cpp"
 
 
+def declaring_header(name: str) -> str:
+    """The header under src/ that defines class or struct `name`, relative to the root, or "" when none does."""
+    pattern = re.compile(r"^\s*(?:class|struct)\s+%s\b[^;]*$" % re.escape(name), re.M)
+    for path in sorted((ROOT / "src").rglob("*.h")):
+        if pattern.search(path.read_text(errors="replace")):
+            return path.relative_to(ROOT).as_posix()
+    return ""
+
+
 def render_vtables(model: dict, fixtures: bool = False) -> str:
     """The vtable of each concrete kind, by kind id: the externs are here and not in a header."""
     kinds = [o for o in model["objects"] if o.get("vtable") or o.get("vptr")]
@@ -3647,6 +3656,11 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
         L = [GENERATED, '#include "replay_schema_fixtures.h"', '#include "../src/harness/replay_objects.h"', ""]
     else:
         L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
+    base = "tests" if fixtures else "src/harness"
+    secondary = [t for o in kinds if isinstance(o.get("vtable_secondary"), list) for t in [o["type"]] + o["vtable_secondary"]]
+    headers = dict.fromkeys(h for h in map(declaring_header, secondary) if h)
+    if headers:
+        L[-1:-1] = ['#include "%s"' % callback_include(h, base) for h in headers]
     L += ["extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "") for o in kinds]
     L += ["extern void (* const g_vtsec_%s_%s[])() __asm__(\"%s\");" % (o["type"], b, "??_7%s@@6B%s@@@" % (o["type"], b)) for o in kinds for b in o.get("vtable_secondary", [])]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):

@@ -28,7 +28,7 @@ The subsystems and the issue each maps to:
 | [los_radar](#los_radar) | 113 | #17 |
 | [orders](#orders) | 246 | #18 |
 | [units](#the-remaining-subsystems) | 151 | none yet |
-| [players](#the-remaining-subsystems) | 148 | none yet |
+| [players](#the-remaining-subsystems) | 150 | none yet |
 | [map](#the-remaining-subsystems) | 82 | none yet |
 | [mission](#the-remaining-subsystems) | 48 | none yet |
 | [scripts](#the-remaining-subsystems) | 93 | none yet |
@@ -38,7 +38,7 @@ The subsystems and the issue each maps to:
 | [harness](#the-remaining-subsystems) | 831 | none yet |
 | [presentation](#the-remaining-subsystems) | 1430 | none yet |
 | [platform](#the-remaining-subsystems) | 825 | none yet |
-| [seams](#the-remaining-subsystems) | 227 | none yet |
+| [seams](#the-remaining-subsystems) | 225 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The eleven subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -249,7 +249,7 @@ Coverage: 79.8% of functions (87 of 109), 75.6% of lines, 72.9% of branches; 22 
 
 **Sim writes.** 31 items in all, 26 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
-`SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `Squad::index` (sim); `Squad::field_8` (sim); `Squad::field_c` (sim)
+`SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `Squad::index` (sim); `Squad::spare8` (sim); `Squad::spareC` (sim)
 
 **Sim reads.** 128 items only read, 127 named. The most used (`g_game`, the root pointer, left out):
 
@@ -557,7 +557,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Entered by the console: `KillAllUnits`, `KillUnitsOfType` and `ReloadUnitType`, by `console-units` (#445). `Selectable` is entered too since the coverage of #652, by a path not yet traced.
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 
-**players** (148 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 27 functions are called from outside, mostly by game (19) and presentation (1); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 60 functions: platform 12, network 5, seams 8, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 66.5% of functions (105 of 158), 67.7% of lines, 61.0% of branches; 53 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 53 follows this paragraph.
+**players** (150 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 29 functions are called from outside, mostly by game (21) and presentation (1); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 61 functions: platform 12, network 5, seams 8, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 66.5% of functions (105 of 158), 67.7% of lines, 61.0% of branches; 53 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 53 follows this paragraph.
 
 **players, functions no scenario enters** (53 of 158 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 105 are entered, 66.5%), by reason:
 
@@ -665,7 +665,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 
 **platform** (825 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 309 functions are called from outside, by presentation (159 distinct functions), game (103), network (51) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (119), `operator delete` (80), then `Translate` (77) and `GameAllocIgnoreTag` (77). It imports 181 functions: game 85, presentation 46.
 
-**seams** (227 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 192 functions are called from outside. It imports 147 functions.
+**seams** (225 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 190 functions are called from outside. It imports 146 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 

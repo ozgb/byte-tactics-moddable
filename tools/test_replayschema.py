@@ -3359,7 +3359,7 @@ class Regions(unittest.TestCase):
         files, errors, _ = rs.generate(rs.read_rows())
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
-        self.assertIn("a1 = WrapWorld_econworld(a1);", hooks)
+        self.assertIn("a1 = WrapWorldEconworld(a1);", hooks)
         self.assertIn("RegionBind(SUB_ECONOMY, a2, a3);", hooks)
         self.assertIn("if (slot == RSL_ECONOMY_REGIONSIZE || slot == RSL_ECONOMY_INIT)", hooks)
 

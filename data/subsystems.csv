@@ -5394,9 +5394,9 @@ UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 UpdatePlayerAIIdle,src/ai/ai_idle.cpp,ai,file:src/ai/,
 UpdatePlayerBody,src/game/players.cpp,players,file:src/game/players,
 UpdatePlayerTail,src/game/players.cpp,players,file:src/game/players,
-UpdatePlayers,src/seams/native.cpp,seams,folder:src/seams/,seams
+UpdatePlayers,src/seams/native.cpp,players,folder:src/seams/,players
 UpdatePlayersFinish,src/game/players.cpp,players,file:src/game/players,
-UpdatePlayersOnStream,src/seams/native.cpp,seams,folder:src/seams/,seams
+UpdatePlayersOnStream,src/seams/native.cpp,players,folder:src/seams/,players
 UpdateSquadsIdle,src/ai/ai_idle.cpp,ai,file:src/ai/,
 UpdateSquadsNative,src/seams/native.cpp,seams,folder:src/seams/,
 UpdateSubState,src/frontend/frontend.cpp,presentation,presentation,
@@ -5589,7 +5589,7 @@ WorldUnitSlot,src/seams/economy_world.cpp,seams,folder:src/seams/,
 WorldUnitState,src/seams/pathfinding_world.cpp,seams,folder:src/seams/,
 WorldUnitsPerPlayer,src/seams/pathfinding_world.cpp,seams,folder:src/seams/,
 WorldWind,src/seams/economy_world.cpp,seams,folder:src/seams/,
-WrapWorld_econworld,src/harness/replay_hooks.inc,harness,folder:src/harness/,
+WrapWorldEconworld,src/harness/replay_hooks.inc,harness,folder:src/harness/,
 WriteAiRecords,src/ai/ai_player.cpp,ai,file:src/ai/,
 WriteBufferToFile,src/files/files_api.h,files,folder:src/files/,
 WriteCells,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,

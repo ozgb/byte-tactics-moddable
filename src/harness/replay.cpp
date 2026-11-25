@@ -13,6 +13,7 @@
 #include "../../interfaces/rand_stream.h"
 #include "../game/los_helpers.h"
 #include "../state/game_rand.h"
+#include "../state/block.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
 #include "replay_text.h"

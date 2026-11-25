@@ -722,6 +722,6 @@ int IntDynArray::EraseByValue(int value)
 
 // FUNCTION: 0x480160
 Squad::Squad(Player* a, int b)
-    : owner(a), index(b), field_8(0), field_c(0)
+    : owner(a), index(b), spare8(0), spareC(0)
 {
 }

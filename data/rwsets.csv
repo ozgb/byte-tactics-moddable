@@ -42467,6 +42467,7 @@ address,function,file,kind,target
 ,AddSiteMember,src/harness/replay_objects.cpp,function,
 ,AddSnapshot,src/harness/replay.cpp,call,ReplaySnapshots::Add
 ,AddSnapshot,src/harness/replay.cpp,call,ReplayText::Add
+,AddSnapshot,src/harness/replay.cpp,call,ReplayText::AddChar
 ,AddSnapshot,src/harness/replay.cpp,call,ReplayText::AddUnsigned
 ,AddSnapshot,src/harness/replay.cpp,function,
 ,AddSnapshot,src/harness/replay.cpp,global_maybe_written,s_snapshots
@@ -47915,8 +47916,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::CreateUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::ExpireEyeballs
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeMapResources
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeRadar
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::FreeUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetMapCell
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetMapCellAtPosition
@@ -47925,20 +47924,16 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::HasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::Init
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::InitRadar
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::IsPointVisible
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::IsUnitVisibleToPlayer
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::LoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RefreshUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::RegionSize
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::Shutdown
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::SightCache
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::SoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::UpdateUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::BuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::CanBuildAt
@@ -47950,6 +47945,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::UnitsInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::CountMissionFeatures
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::CountMissionUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::CountStartPositions
@@ -48097,6 +48093,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::GetWeaponRange
+,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateExplosions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::UpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::WeaponCanReachUnit
@@ -48205,8 +48202,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarClampWorldPosToTerrain
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarCreateUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarExpireEyeballs
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeMapResources
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeRadar
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarFreeUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetMapCell
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetMapCellAtPosition
@@ -48215,20 +48210,16 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarHasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarInit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarInitRadar
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarIsPointVisible
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarIsUnitVisibleToPlayer
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarLoadTntMap
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarMapped
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRecordRadarUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRefreshUnitIndex
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarRegionSize
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarShutdown
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarSightCache
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarSoundHeardMask
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateSensorRadarAndCloak
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarUpdateUnitLineOfSight
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapBuildAllPassMaps
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapCanBuildAt
@@ -48240,6 +48231,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapUnitsInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionCountMissionFeatures
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionCountMissionUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionCountStartPositions
@@ -48370,6 +48362,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindWeaponByName
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsGetWeaponRange
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateExplosions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsUpdateUnitWeapons
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsWeaponCanReachUnit
@@ -55211,14 +55204,15 @@ address,function,file,kind,target
 ,RecLosRadarApply,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarApply,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const LosRadarEventHeader *, unsigned int) __attribute__((stdcall)) [LosRadarSeam::Apply]"
-,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgPending
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,field_read,LosRadarSeam::ClampWorldPosToTerrain
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,function,
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int, Vec3 *) __attribute__((stdcall)) [LosRadarSeam::ClampWorldPosToTerrain]"
 ,RecLosRadarCreateUnitIndex,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarCreateUnitIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55234,18 +55228,6 @@ address,function,file,kind,target
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,function,
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarExpireEyeballs,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::ExpireEyeballs]
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,field_read,LosRadarSeam::FreeMapResources
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,function,
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarFreeMapResources,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::FreeMapResources]
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,field_read,LosRadarSeam::FreeRadar
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,function,
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarFreeRadar,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::FreeRadar]
 ,RecLosRadarFreeUnitIndex,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarFreeUnitIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarFreeUnitIndex,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55270,10 +55252,10 @@ address,function,file,kind,target
 ,RecLosRadarGetMapCell,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetMapCell,src/harness/replay_hooks.inc,indirect_call,"indirect via Cell *(*const)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ArgPending
+,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,FinishImport
-,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ImportPending
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ImportVec3
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55285,10 +55267,10 @@ address,function,file,kind,target
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,indirect_call,indirect via Cell *(*const)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ArgPending
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,FinishImport
-,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ImportPending
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ImportVec3
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55299,20 +55281,19 @@ address,function,file,kind,target
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,indirect_call,indirect via Cell *(*const)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetOriginCellAtPosition]
-,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgPending
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgValue
-,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,FinishImport
-,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportPending
-,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportResult
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportOutUnitBuffer
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportValue
-,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportVec3
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,field_read,LosRadarSeam::GetSeenUnitsInRadius
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,function,
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_escape,kReplayReachFields@src/harness/replay_schema.h
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_tail
@@ -55344,9 +55325,9 @@ address,function,file,kind,target
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int) __attribute__((stdcall)) [LosRadarSeam::HasReadyUnitInRange]"
-,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgPending
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecLosRadarInit,src/harness/replay_hooks.inc,call,RegionBind
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarInit,src/harness/replay_hooks.inc,field_read,LosRadarSeam::Init
@@ -55354,20 +55335,14 @@ address,function,file,kind,target
 ,RecLosRadarInit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarInit,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarInit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const LosRadarMapInfo *, void *, unsigned int) __attribute__((stdcall)) [LosRadarSeam::Init]"
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,field_read,LosRadarSeam::InitRadar
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,function,
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarInitRadar,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::InitRadar]
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,Add
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ArgPending
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,FinishImport
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ImportObject
-,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ImportPending
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ImportResult
+,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ImportVec3
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarIsPointVisible,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55389,12 +55364,6 @@ address,function,file,kind,target
 ,RecLosRadarIsUnitVisibleToPlayer,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarIsUnitVisibleToPlayer,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarIsUnitVisibleToPlayer,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Player *, Unit *) __attribute__((stdcall)) [LosRadarSeam::IsUnitVisibleToPlayer]"
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,field_read,LosRadarSeam::LoadTntMap
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,function,
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarLoadTntMap,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [LosRadarSeam::LoadTntMap]
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarRecordRadarMapped,src/harness/replay_hooks.inc,field_read,LosRadarSeam::RecordRadarMapped
@@ -55425,22 +55394,14 @@ address,function,file,kind,target
 ,RecLosRadarRegionSize,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarRegionSize,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarRegionSize,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)(const LosRadarMapInfo *) __attribute__((stdcall)) [LosRadarSeam::RegionSize]
+,RecLosRadarShutdown,src/harness/replay_hooks.inc,call,ArgRegionResult
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,field_read,LosRadarSeam::Shutdown
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,function,
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarShutdown,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarShutdown,src/harness/replay_hooks.inc,indirect_call,indirect via void *(*const)() __attribute__((stdcall)) [LosRadarSeam::Shutdown]
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,call,Add
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,call,ArgObject
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,call,ArgPending
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,field_read,LosRadarSeam::SightCache
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,function,
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarSightCache,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, LosSightCache *) __attribute__((stdcall)) [LosRadarSeam::SightCache]"
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarSoundHeardMask,src/harness/replay_hooks.inc,call,FinishImport
@@ -55471,14 +55432,6 @@ address,function,file,kind,target
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarUpdateUnitLineOfSight,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [LosRadarSeam::UpdateUnitLineOfSight]
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,call,ArgPending
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,field_read,LosRadarSeam::WriteState
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,function,
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,global_read,s_call
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
-,RecLosRadarWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [LosRadarSeam::WriteState]
 ,RecMapApply,src/harness/replay_hooks.inc,call,ArgEvent
 ,RecMapApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapApply,src/harness/replay_hooks.inc,call,EventRoots
@@ -55541,11 +55494,11 @@ address,function,file,kind,target
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapCanPlaceUnitFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(UnitDef *, unsigned short, const Point16 *, int) __attribute__((stdcall)) [MapSeam::CanPlaceUnitFootprint]"
-,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgVec3Xz
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,FinishImport
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ImportResult
-,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ImportStructIn
+,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ImportVec3Xz
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55624,6 +55577,25 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgPending
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,FinishImport
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ImportOutBytes
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ImportPending
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ImportResult
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ImportValue
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,field_read,MapSeam::UnitsInRange
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,function,
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const Vec3 *, int, int, unsigned short *, int) __attribute__((stdcall)) [MapSeam::UnitsInRange]"
 ,RecMissionCountMissionFeatures,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMissionCountMissionFeatures,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMissionCountMissionFeatures,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -57180,6 +57152,12 @@ address,function,file,kind,target
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,global_read,s_inner_weapons
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecWeaponsGetWeaponRange,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, unsigned int) __attribute__((stdcall)) [WeaponsSeam::GetWeaponRange]"
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,field_read,WeaponsSeam::UpdateExplosions
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,function,
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,global_read,s_inner_weapons
+,RecWeaponsUpdateExplosions,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [WeaponsSeam::UpdateExplosions]
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsUpdateUnitWeapons,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -58230,6 +58208,13 @@ address,function,file,kind,target
 ,ReplayEndHook,src/harness/replay.h,call,ReplayGateRef
 ,ReplayEndHook,src/harness/replay.h,field_read,ReplayGate::end
 ,ReplayEndHook,src/harness/replay.h,function,
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,call,EnsureTable
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,deref_read,*unsigned short
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::table
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,field_read,ReplayTableSpec::capped
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,function,
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
+,ReplayEnsureAllOfTables,src/harness/replay_objects.cpp,global_read,kReplayTables@src/harness/replay_schema.h
 ,ReplayEventObject,src/harness/replay_objects.cpp,field_read,ReplayEventKind::kind
 ,ReplayEventObject,src/harness/replay_objects.cpp,field_read,ReplayEventKind::object
 ,ReplayEventObject,src/harness/replay_objects.cpp,field_read,ReplayEventTable::count
@@ -58427,6 +58412,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayText::Clear
 ,ReplayImportEnd,src/harness/replay_services.inc,call,Table
 ,ReplayImportEnd,src/harness/replay_services.inc,deref_read,*int
+,ReplayImportEnd,src/harness/replay_services.inc,deref_read,*unsigned int
 ,ReplayImportEnd,src/harness/replay_services.inc,field_escape,ReplayImport::args
 ,ReplayImportEnd,src/harness/replay_services.inc,field_read,<anon>::d
 ,ReplayImportEnd,src/harness/replay_services.inc,field_read,<anon>::i

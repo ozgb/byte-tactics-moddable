@@ -4487,6 +4487,16 @@ void BeginServices(const char* body)
     memset(g_snapshotData, 0, sizeof g_snapshotData);
 }
 
+void StringSelfTest()
+{
+    printf("a string field\n");
+    const ReplayObjectField* f = ReplayFindObjectField(ROK_WINDMETEORSPARAMS, "weapon");
+    WindMeteorsParams params;
+    memset(&params, 0, sizeof params);
+    Check(f != nullptr && ReplayRestoreObjectField(*f, &params, "\"METEOR\"", g_objects, AllocObject) && strcmp(params.params.weapon, "METEOR") == 0, "a quoted string is restored");
+    Check(f != nullptr && !ReplayRestoreObjectField(*f, &params, "x:4d455445", g_objects, AllocObject), "and bytes in its place are refused");
+}
+
 void FilesSelfTest()
 {
     printf("services: files and data\n");
@@ -5494,6 +5504,8 @@ void PolymorphicSelfTest()
     Order* second = (Order*)SimAlloc(sizeof(Order));
     memset((void*)first, 0, sizeof(Order));
     memset((void*)second, 0, sizeof(Order));
+    SetVtable(&first->link, ReplayVtable(ROK_PATHORDERATTACH));
+    SetVtable(&second->link, ReplayVtable(ROK_PATHORDERATTACH));
     ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
     RingApproach* ring = (RingApproach*)SimAlloc(sizeof(RingApproach));
     memset((void*)area, 0, sizeof(ApproachRadius));
@@ -7012,6 +7024,7 @@ int SelfTest(const char* file)
     HeldCallbackSelfTest();
     VectorSelfTest();
     SnapshotSelfTest();
+    StringSelfTest();
     FilesSelfTest();
     CommandsSelfTest();
     SimPlumbingSelfTest();

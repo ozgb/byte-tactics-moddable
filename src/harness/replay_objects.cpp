@@ -1265,6 +1265,8 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         break;
     }
     case RK_STRING:
+        if (value[0] != '"')
+            return false;
         memset(at, 0, f.size);
         DecodeQuoted(value, at, f.size);
         break;

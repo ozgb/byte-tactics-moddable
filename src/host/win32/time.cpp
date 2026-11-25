@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <time.h>
 
 #include "../../../interfaces/host.h"
 
@@ -12,6 +13,11 @@ extern "C" unsigned long long HOST_CALL host_time_counter(void)
     LARGE_INTEGER counter;
     QueryPerformanceCounter(&counter);
     return (unsigned long long)counter.QuadPart;
+}
+
+extern "C" unsigned int HOST_CALL host_wall_seconds(void)
+{
+    return (unsigned int)time(NULL);
 }
 
 // FUNCTION: 0x4b6b50

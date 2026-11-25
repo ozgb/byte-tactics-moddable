@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <direct.h>
 #include <io.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -131,6 +132,14 @@ extern "C" void HOST_CALL host_dir_close(void* dir)
 {
     free(((HostDir*)dir)->entries);
     free(dir);
+}
+
+extern "C" int HOST_CALL host_dir_create(const char* path)
+{
+    if (_mkdir(path) == 0)
+        return 0;
+    DWORD attrib = GetFileAttributesA(path);
+    return attrib != 0xffffffff && (attrib & FILE_ATTRIBUTE_DIRECTORY) ? 0 : -1;
 }
 
 extern "C" unsigned int HOST_CALL host_file_exe_path(char* buf, unsigned int size)

@@ -547,80 +547,46 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 
 #include "../units/squad.h"
 #include "../harness/harness.h"
+#include "../../interfaces/services.h"
 
-struct UnitOrderTypeView;
-struct FixedPosView;
-#include "../orders/order_dispatch.h"
-
-static inline MissionType Order(const char* name) { return MissionType(name); }
+void __stdcall SendGroupCommand(OrdersGroupCommand* command)
+{
+    Player* p = &g_game->players[g_game->localPlayer];
+    Unit* first = p->unitsBegin;
+    command->h.unit = Ref<Unit>(first).offset;
+    for (Unit* u = first; u <= p->unitsEnd; u++) {
+        if (!(((unsigned char)u->flags) & 0x10))
+            continue;
+        int i = (int)(u - first);
+        if (i >= ORDERS_GROUP_UNITS)
+            FatalError("a selection has more units than a group command holds");
+        command->units[i >> 5] |= 1u << (i & 31);
+    }
+    HarnessUiCommand(command);
+    SchedPublish(SCHED_ENGINE, command, sizeof(*command));
+}
 
 // FUNCTION: 0x48cf30
 void __stdcall IssueOrderToSelection(MouseEvent* mouse, unsigned char mode,
                             MissionType kind, int* pos, int typeId, int amount)
 {
-    int flag_a = (mouse->keyFlags >> 2) & 1;
-    Unit* except = 0;
-    int flag_b;
-    if (mode)
-        flag_b = OrderModeTakesTarget(mode);
-    else
-        flag_b = (kind.GetTableEntry()->flags >> 9) & 1;
-    if (flag_b) {
-        if (!g_game->hoverUnitId)
-            except = 0;
-        else
-            except = (Unit*)((char*)g_game->units.get() + 280 * g_game->hoverUnitId);
+    OrdersGroupCommand command;
+    memset(&command, 0, sizeof(command));
+    command.h.kind = ORDERS_GROUP_COMMAND;
+    command.mode = mode;
+    command.type = mode ? 0 : kind.index;
+    command.queue = (mouse->keyFlags >> 2) & 1;
+    if (g_game->hoverUnitId)
+        command.target = Ref<Unit>(&g_game->units[g_game->hoverUnitId]).offset;
+    if (pos) {
+        command.hasPos = 1;
+        command.pos[0] = pos[0];
+        command.pos[1] = pos[1];
+        command.pos[2] = pos[2];
     }
-    Player* p = &g_game->players[g_game->localPlayer];
-    int count = 0;
-    int sum_x = 0;
-    int sum_z = 0;
-    Unit* u;
-    for (u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if ((((unsigned char)u->flags) & 0x10) && u != except) {
-            count++;
-            sum_x += (short)(u->pos.x >> 16);
-            sum_z += (short)(u->pos.z >> 16);
-        }
-    }
-    if (!count)
-        return;
-    int avg[3];
-    avg[0] = (sum_x / count) * 65536.0;
-    avg[2] = (sum_z / count) * 65536.0;
-    int range = count * 3000;
-    for (u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if (!(((unsigned char)u->flags) & 0x10) || u == except)
-            continue;
-        if (mode)
-            kind.index = GetOrderType(mode, u, except, (Vec3*)&g_game->pos_2caa).index;
-        if (!kind.index)
-            continue;
-        MissionType fire = Order("Standing_FireOrder");
-        if (kind.index != fire.index || (u->def->flags2Byte & 2)) {
-            MissionType move = Order("Standing_MoveOrder");
-            if (kind.index != move.index || (u->def->flags2Byte & 1)) {
-                if (pos && (kind.GetTableEntry()->flags & 2)) {
-                    int dz = u->pos.z;
-                    dz -= avg[2];
-                    int dx = u->pos.x;
-                    dx -= avg[0];
-                    if ((int)(((__int64)dx * dx) >> 32)
-                        + (int)(((__int64)dz * dz) >> 32) <= range) {
-                        int here[3];
-                        here[0] = pos[0] + u->pos.x - avg[0];
-                        here[1] = pos[1];
-                        here[2] = pos[2] + u->pos.z - avg[2];
-                        HarnessUiOrder(kind.index, flag_a, u, except, here, typeId, amount);
-                        OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, kind.index, flag_a, except, (Vec3*)here, typeId, amount);
-                        continue;
-                    }
-                }
-                HarnessUiOrder(kind.index, flag_a, u, except, pos, typeId, amount);
-                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, kind.index, flag_a, except, (Vec3*)pos, typeId, amount);
-            }
-        }
-    }
+    command.params[0] = typeId;
+    command.params[1] = amount;
+    SendGroupCommand(&command);
 }
 
 // FUNCTION: 0x48d220

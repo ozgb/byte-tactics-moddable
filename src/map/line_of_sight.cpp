@@ -21,6 +21,7 @@
 #include "../map/tnt_info.h"
 
 #include "grid2.h"
+#include "../util/ftol.h"
 
 struct FogGrid {
     Ref<FogCell> cells;
@@ -720,9 +721,9 @@ void LoadTntMap()
     PublishWindMeteorsLimits(windSpeedMin, windSpeedMax);
     a.n = mission.gravity;
     if (a.n >= 0 && info.version >= 0x2000)
-        mapSettings->rise = (int)((a.n * 65536.0) * 0.0011111111111111111);
+        mapSettings->rise = bx_ftol((a.n * 65536.0) * 0.0011111111111111111);
     else if (info.sea_d != 0)
-        mapSettings->rise = (int)((info.sea_d * 65536.0) * 0.0011111111111111111);
+        mapSettings->rise = bx_ftol((info.sea_d * 65536.0) * 0.0011111111111111111);
     else
         mapSettings->rise = 0x1fdb;
     if (mission.tidalStrength >= 0.0f)

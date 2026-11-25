@@ -184,6 +184,7 @@ struct DamageScaleFlags {
 
 short __cdecl AngleOfVector(int x, int z);
 #include "damage.h"
+#include "../util/ftol.h"
 
 static inline int* FindDamageValue(DamageTable* table, char* name)
 {
@@ -214,7 +215,7 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
         if (p)
             damage = *p;
     }
-    damage = (int)(damage * scale);
+    damage = bx_ftol(damage * scale);
     short angle = AngleOfVector(weapon->position.x - target->pos.x,
                                weapon->position.z - target->pos.z) - target->heading;
     Unit* attacker = weapon->attacker;
@@ -393,7 +394,7 @@ static inline int Length(Vec3* v)
     double x = v->x;
     double y = v->y;
     double z = v->z;
-    return (int)sqrt(x * x + y * y + z * z);
+    return bx_ftol(sqrt(x * x + y * y + z * z));
 }
 
 static inline Unit* UnitFromId(unsigned short id)
@@ -421,7 +422,7 @@ int __stdcall VectorLength(Vec3* v)
     double x = v->x;
     double y = v->y;
     double z = v->z;
-    return (int)sqrt(x * x + y * y + z * z);
+    return bx_ftol(sqrt(x * x + y * y + z * z));
 }
 
 #include <stdio.h>
@@ -466,7 +467,7 @@ short __stdcall SolveLaunchAngle(int x, int height, int z, int speed, float angl
     else
         return 0x8000;
     use = use * 32768.0;
-    return (short)(use / PI);
+    return (short)bx_ftol(use / PI);
 }
 
 void RegisterUnitOrders();
@@ -680,7 +681,7 @@ static Fixed Length(const Vec3& v)
     double fy = v.y;
     double fz = v.z;
     Fixed r;
-    r.value = (int)sqrt(fx * fx + fy * fy + fz * fz);
+    r.value = bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     return r;
 }
 
@@ -719,7 +720,7 @@ int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3* target)
     dy.value = p->position.y - target->y;
     int dz = p->position.z - target->z;
     short a1 = AngleOfVector(dx, dz);
-    int dist = (int)_hypot((double)dx, (double)dz);
+    int dist = bx_ftol(_hypot((double)dx, (double)dz));
     short a2 = AngleOfVector(-dy.whole, (short)(dist >> 16));
 
     short diff1 = a1 - (short)p->angles.heading;
@@ -883,7 +884,7 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     dy.value = p3->y - p4->y;
     int dz = p3->z - p4->z;
     short a1 = AngleOfVector(dx, dz);
-    unsigned int dist = (int)_hypot(dx, dz);
+    unsigned int dist = bx_ftol(_hypot(dx, dz));
     proj->range = (int)dist;
     short a2 = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
     proj->angles.heading = a1;
@@ -997,7 +998,7 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         proj->direction.x = -ScaledSin(shot->fireHeading, scale);
         proj->direction.z = -ScaledCos(shot->fireHeading, scale);
         if (shot->weapon->flags.b.burnBlow) {
-            proj->time = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
+            proj->time = bx_ftol(_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z))) / scale
                        + g_game->ticks;
         } else {
             proj->time = g_game->ticks + shot->weapon->lifetime;
@@ -1329,7 +1330,7 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
     dy.value = p.y - point->y;
     int dz = p.z - point->z;
     *out_heading = (short)(AngleOfVector(dx, dz) - unit->heading);
-    *out_pitch = (short)AngleOfVector(-dy.whole, (short)((int)_hypot((double)dx, (double)dz) >> 16));
+    *out_pitch = (short)AngleOfVector(-dy.whole, (short)(bx_ftol(_hypot((double)dx, (double)dz)) >> 16));
     return 1;
 }
 
@@ -1351,7 +1352,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
     int dz = p.z - point->z;
     aim->fireHeading = (short)AngleOfVector(dx, dz);
     aim->firePitch = (short)AngleOfVector(-dy.whole,
-                                       (short)((int)_hypot((double)dx, (double)dz) >> 16));
+                                       (short)(bx_ftol(_hypot((double)dx, (double)dz)) >> 16));
     if (AimWithinTolerance(unit, aim, unit->heading, unit->pitch)) {
         if (FireLineOfSightProjectile(aim, unit, &p, point, target)) {
             if (g_game->netGameFlags & 1)
@@ -1380,7 +1381,7 @@ int __stdcall FireVLaunchWeapon(Unit* source, UnitWeaponSlot* shot,
         dy.value = pos.y - aim->y;
         int dz = pos.z - aim->z;
         shot->fireHeading = AngleOfVector(dx, dz);
-        int dist = (int)_hypot((double)dx, (double)dz);
+        int dist = bx_ftol(_hypot((double)dx, (double)dz));
         shot->firePitch = AngleOfVector(-(int)dy.halves[1], (short)(dist >> 16));
         int* p;
         if (shot->weapon->flags.b.interceptor) {
@@ -1437,6 +1438,10 @@ int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
 
 void __stdcall InitProjectile(Projectile*, void*, void*, int, int, void*);
 
+#ifndef BT_REPLAY_INJECT_SPAWN_TICK
+#define BT_REPLAY_INJECT_SPAWN_TICK 0
+#endif
+
 // FUNCTION: 0x49df10
 int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
 {
@@ -1448,7 +1453,7 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
     }
     if (!proj)
         return 0;
-    InitProjectile(proj, weapon, a, 0, g_game->ticks, 0);
+    InitProjectile(proj, weapon, a, 0, g_game->ticks + BT_REPLAY_INJECT_SPAWN_TICK, 0);
     proj->direction = *b;
     if (flag) {
         unsigned char team = weapon->index;
@@ -1501,7 +1506,7 @@ void __stdcall InitUnitWeaponSlots(Unit* unit)
         GetWeaponPiecePosition(unit, &a, frame.i, -1);
         Vec3 b;
         g_seams.scripts->GetAimFromPosition(unit, &b, frame.i);
-        s->muzzleAimFromDeltaZ = (a.z - b.z) * 1.25;
+        s->muzzleAimFromDeltaZ = bx_ftol((a.z - b.z) * 1.25);
         if (s->weapon->reloadTime > frame.maxTime)
             frame.maxTime = s->weapon->reloadTime;
     }
@@ -1927,7 +1932,7 @@ void __stdcall DrawProjectiles(void* surface)
                     d.y = pos->y - start->y;
                     d.z = pos->z - start->z;
                     union { int i; short s[2]; } nSeg;
-                    nSeg.i = (int)(((__int64)((int)sqrt(d.x * (double)d.x + (double)d.y * d.y + (double)d.z * d.z)) << 16) / 0x50000);
+                    nSeg.i = (int)(((__int64)(bx_ftol(sqrt(d.x * (double)d.x + (double)d.y * d.y + (double)d.z * d.z))) << 16) / 0x50000);
                     if (0 != nSeg.i) {
                         n64 = nSeg.i;
                         d.x = (int)(((__int64)d.x << 16) / n64);
@@ -2112,7 +2117,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 Vec3 p = *(Vec3*)&centre;
                 Vec3 v = Sub(*pos, p);
                 Fixed dist;
-                dist.value = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
+                dist.value = bx_ftol(sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z));
                 distance = dist.whole;
             }
             if (distance >= radius)

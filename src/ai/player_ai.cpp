@@ -9,6 +9,7 @@
 #pragma pack(push,1)
 #include "../network/player.h"
 #include "../units/unit.h"
+#include "../util/ftol.h"
 inline int Unit::Ready() { return (flags & 0x10000000) && !(flags & 0x4000); }
 inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 
@@ -104,8 +105,8 @@ void PlayerAI::RefreshUnitLists()
         sum.z=roundedCentre[2];
     }
 #endif
-    int ix=(int)(sum.x*65536.0);
-    int iy=(int)(sum.y*65536.0);
-    int iz=(int)(sum.z*65536.0);
+    int ix=bx_ftol(sum.x*65536.0);
+    int iy=bx_ftol(sum.y*65536.0);
+    int iz=bx_ftol(sum.z*65536.0);
     centre=AiVec3(ix,iy,iz);
 }

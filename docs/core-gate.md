@@ -66,8 +66,19 @@ the same relative paths, unpacking each `.xz` file under its name without `.xz`.
 The dump is a `dump.txt` of a test-mode run (`docs/trace-format.md`, section 10), and the schema is the kit's
 `data/trace_schema.json`, which the gate copies to `trace_schema.json`. A dump gives a phase row for each phase block,
 the `world` row after the `meteors` row, and the `tick` row of its `tick` block. The rows of a vector are the ones the
-in-repo engine wrote to `trace.txt` in the run that wrote the dump. The dumps are of ticks after the first, so they
-hold no section 29 to 31.
+in-repo engine wrote to `trace.txt` in the run that wrote the dump. The vectors are named `<scenario>-<tick>`, and
+between them they reach:
+
+| Vector | What it reaches |
+| --- | --- |
+| `edges-economy-targeting-200` | the overflow record (`rec:overflow`), `link:` pointers of the units' order lists, and the pathfinder's `node:` pointers, which sections 16 and 17 dump and no row hashes |
+| `orders-attack-nomove-1` | tick 1, the only tick whose rows hash sections 29 to 31 (the unit types, the weapons and the mission), and live features |
+| `orders-air-fights-700` | non-null `list2` pointers, the overflow record, `link:` pointers, and path-order effects |
+| `orders-guard-attacked-300` | live projectiles, a live feature, the overflow record, `link:` pointers and path-order effects |
+| `meteors-earthquake-102` | many live features (the earthquake's) and a projectile |
+
+No vector reaches a `link:` value of 2^31 or more (a link into a path order, `docs/trace-format.md`): no dump of the
+scenarios that was searched holds one (Known limits).
 
 ### rand
 
@@ -145,9 +156,9 @@ itself). Every error ends the run (section 13), so it is the last line. Only a m
 
 | Class | Section | When |
 | --- | --- | --- |
-| `manifest` | 5.2 | the manifest is not valid JSON or not an object, a required field is missing, a number is not a non-negative integer, `memory_pages` or `window` is 0 or `memory_pages` above 65536, `scratch` is not `[base, size]` |
+| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object, a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a number is not a non-negative integer (a negative or fractional `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `block_base` comes without `block_size`, `scratch` is not `[base, size]`; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter), whose `modules` is empty |
 | `layout` | 5.2 | the block or the scratch area does not fit the memory, the scratch area passes the block base, or `block_max` is below `block_size` |
-| `module_entry` | 5.2 | no modules, a module without a name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` that is not a list of names |
+| `module_entry` | 5.2 | `modules` missing, not a list or empty, an entry that is not an object or has no name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` present and not a list of names |
 | `window` | 5.2 | a module's window does not fit the memory, or its table range does not fit the table |
 | `window_reaches` | 5.2 | a window reaches the block base or the scratch base |
 | `overlap` | 5.2 | two windows overlap, or two table ranges |
@@ -155,11 +166,11 @@ itself). Every error ends the run (section 13), so it is the last line. Only a m
 | `loaded_twice` | 5.2 | a module loaded a second time |
 | `no_memory` | 5.2 | a module loaded before the memory exists |
 | `compile` | 5.2 | the module does not compile |
-| `instantiate` | 5.2 | the module does not instantiate: an import the host did not define, an import of another type, a memory or table import whose limits do not fit |
-| `export` | 5.2 | a name of `exports` that is not a function export, or of `data` that is not an i32 global export |
+| `instantiate` | 5.2 | the module does not instantiate: an import the host did not define, an import of another type, a memory or table import whose limits do not fit, or a trap in its start function (whatever the trap) |
+| `export` | 5.2 | at `load`, a name of `exports` that is not a function export, or of `data` that is not an i32 global export; at `call`, an export the module does not have |
 | `unreachable` | 13 | a trap at `unreachable` |
 | `memory_access` | 13 | an access outside the memory |
-| `divide` | 13 | an integer division by zero, or an integer overflow trap |
+| `divide` | 13 | an integer division by zero, an integer overflow trap, or a float-to-integer conversion of a value out of range or a NaN |
 | `table` | 13 | a call through an empty table entry or one of the wrong type |
 | `stack` | 13 | the engine's stack overflows |
 | `out_of_fuel` | 13 | the module's counter went below zero (section 11) |
@@ -167,18 +178,54 @@ itself). Every error ends the run (section 13), so it is the last line. Only a m
 The host defines no import beyond the memory and the table, so every fixture module imports only those, except the
 ones that refuse to instantiate.
 
+A `block_size` without `block_base` is no block, and is not refused. `exports` and `data` may be left out of an entry: the
+module is then loaded with no slots and no data words, and `call` still reaches any function the module exports, since
+`call` names an export, not a slot of `exports`. A module whose entry has no `fuel_budget` gets no fuel set: `fuel` gives its
+counter's initial value, 9223372036854775807, which its calls lower as they burn fuel (the fuel group's `unbudgeted`).
+
+**Which error comes first.** When a manifest holds more than one fault, the error is the first fault in this order:
+
+1. the manifest as a whole: valid JSON and an object, then the required numbers in the order `memory_pages`,
+   `table_size`, `window`, `table_slots`, then their ranges (`manifest`);
+2. the block, when `block_base` is present: `block_base` and `block_size` (`manifest`), then `block_max`, then whether
+   the block fits the memory (`layout`);
+3. `scratch`: its form (`manifest`), then whether it fits the memory and lies below the block base (`layout`);
+4. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
+   a name, `data_base` and then `table_base` (missing: `module_entry`; negative or fractional: `manifest`), `exports`
+   and then `data`, then a name an earlier entry has (`module_entry`);
+5. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
+   against the block base and then the scratch base (`window_reaches`), then its overlap with each later module, the
+   memory before the table (`overlap`). So a `window` or `window_reaches` fault of a module comes before its overlap
+   with a later one, and an overlap of two modules comes before a `window` fault of a third, later module;
+6. at `load`: a module not in the manifest (`not_in_manifest`), no memory (`no_memory`), a module loaded already
+   (`loaded_twice`), the interface majors (`manifest`), then `compile`, `instantiate` and `export`.
+
+A vector `pair_<a>_<b>` holds a fault of class `a` and one of class `b` in one manifest, and expects `a`, for each pair
+of the classes `manifest`, `layout`, `module_entry`, `window`, `window_reaches` and `overlap` (in the pairs of `window`,
+`window_reaches` and `overlap`, both faults are of the first module). `manifest_entry` in a name is a `manifest` fault
+of an entry (a negative `data_base` or `table_base`), which comes in step 4, after `layout`.
+
+The gate makes no `call` or `fuel` call that names a module not loaded, and no `fuel` call on a module without
+`__fuel_get`: they are not part of the call text, and a core may answer them as it likes.
+
 ### host
 
 | Call | Arguments | Value |
 | --- | --- | --- |
 | `replay` | recording, module | a list with one entry for each `call` line of the recording, in order: the list of the `w` lines, then the closing `o` lines (`docs/replay-format.md`, "Lines"), that the core's replay of that call gives, each a string without its indentation, as `"w SimGlobals.g_meteorScheduleGap 1800"` |
 
-The recording is a copy, in `reference/core/host/`, of a file of `tests/replay/wind_meteors/`, and the module is
-`module.wasm`. The core replays the
-recording as `docs/replay-format.md` states: it restores each `r` line, calls the slot with the `a` lines, answers each
-import from its `i` and `o` lines, and writes, for the call, the fields of the write set that differ from the last known
-value and the closing lines. The expected values are the recording's own lines. A trap or running out of fuel ends the
-run with an error of the loader classes.
+The recording, in `reference/core/host/`, is a file of `tests/replay/wind_meteors/` with what the core must produce taken
+out: every `w` line and every closing `o` line (`docs/replay-format.md`, "Lines") is withheld, and the rest (the `call`
+lines, the `r`, `a`, `i` and `c` lines, and each import's own `o` lines) is kept in order. The module is `module.wasm`.
+The core replays the recording as `docs/replay-format.md` states: it restores each `r` line, builds the slot's arguments
+from the `a` lines (an event payload as "Event arguments", "The payload in memory", states), calls the slot of its
+module, answers each import from its `i` and its own `o` lines, and writes, for the call, the fields of the write set
+whose value after the call differs from the last known value, and the closing lines of what the slot wrote through its
+own arguments and returned. The last known value of a field is as `docs/replay-format.md`, "Lines", defines it, with
+the `w` lines the core wrote in place of the withheld ones. The expected values are the lines the gate withheld, which the in-repo engine writes
+when it runs its own wind_meteors module on the same input, so a core passes only by running the module and reading
+what it wrote: the stored lines are not in its input (`tools/test_coregate.py` checks that a core that echoes the lines
+of a recording fails). A trap or running out of fuel ends the run with an error of the loader classes.
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
 core's submission (below): the clean room's own, which the module gate has judged.
@@ -229,12 +276,42 @@ or `bytes<N>` its bytes as lowercase hex (a `str` without its length). The gate 
 compares what it writes with the record's outputs. A vector that differs names the entry, and its `line` is the first
 record that differs, counted from 1.
 
-For example, a record of `atoi`:
+A call is one line: the entry's name, a tab, and the inputs as one JSON array; the core writes the entry's name, a tab,
+and the outputs as one JSON array. In each example below, the first line is the call and the second what the core
+writes for it.
+
+A record of `atoi` (`str` in, `i32` out):
 
 ```text
 atoi	["202d3132"]
 atoi	[-12]
 ```
+
+A record of `sqrt` (`f64` in and out: 4.0 is the pattern 0x4010000000000000 and 2.0 is 0x4000000000000000, each
+written as the decimal unsigned integer of its 64 bits, never as a JSON number with a fraction):
+
+```text
+sqrt	[4616189618054758400]
+sqrt	[4611686018427387904]
+```
+
+A record of `load_sequence` (`u32`, `i32` in; `bytes40`, `bytes16` out: each `bytes<N>` is one JSON string of exactly
+2N lowercase hex digits, the bytes in memory order, so each 4-byte integer in it is little-endian):
+
+```text
+load_sequence	[0, 3]
+load_sequence	["01000000020000000000000003000000040000000500000006000000070000000800000009000000", "523c0000e84c00005f6e0000c34b0000"]
+```
+
+A record of `rand` (`u32` in; `bytes40000` out, one string of 80000 hex digits, shortened here after its first 32 bytes):
+
+```text
+rand	[0]
+rand	["26000000271e0000f65200008509000097220000152e0000ad2000001d7e0000..."]
+```
+
+A `str` output is written as its bytes in hex too, without its length, as a `str` input is (`itoa` of `[-12, 10]`
+writes `["2d3132"]`).
 
 ### files
 
@@ -335,6 +412,14 @@ could not run (the vectors can't be read, or neither `--sandbox` nor `--trusted`
 - **The limit of 20 words** of a console line changes nothing any command of the `console` group reads (none reads
   past word 5, and none compares the count of words with a number above 6), so no vector can tell it apart.
 - **The radar arena** of `docs/sim-events.md` is not called: its snapshots are written by the logic of los_radar.
+- **A link into a path order** in the hash group: the rule that hashes a `link:` value of 2^31 or more is stated
+  (`docs/trace-format.md`), but no dump of the scenarios searched (each scenario at two points, and the order
+  scenarios at ten to twenty ticks) holds one.
+- **The `node:` pointers** of the pathfinder are in the dumps but in no row (sections 16 and 17 are dumped only), so
+  they change no row and no vector judges them: a core need not read them.
+- **The stack-depth limit:** the `stack` class is judged by `trap_stack`, which recurses without end, so any limit
+  passes it. How deep a module may call before the engine's stack overflows (the host's, not the module's
+  `stack_size`, which nothing guards, `docs/module-abi.md` section 2.2) is not judged.
 - **The services a module imports** (`docs/module-abi.md`, section 9.3), and the import refusals and glue errors of
   section 13, are judged by the `host` group only as far as the recordings call them; the loader's fixture modules import
   nothing but the memory and the table.

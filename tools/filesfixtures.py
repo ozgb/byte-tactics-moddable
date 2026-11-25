@@ -277,6 +277,7 @@ TDF_SAMPLE = b"""// sample: the parser's cases
 \tZeta=  42abc  ;
 \tFloat=0.15;
 \tNeg=-7.5;
+\tBig=40000;
 \tHex=0x10;
 \tEmpty=;
 \tSpaced key = a = b ;

@@ -265,7 +265,7 @@ struct EconomyWorldView {
     void (__stdcall* TypeInfo)(EconType type, EconTypeInfo* out);
     // The metal of a map cell, or -1 when the cell is off the map. Hooks: none.
     int (__stdcall* CellMetal)(int x, int y);
-    // Publishes an effect, its payload of size bytes, to economy's outbox; the router delivers it to its subscribers at the next phase boundary, or before Emit returns for a kind its table marks synchronous. Hooks: none.
+    // Publishes an effect, its payload of size bytes, to economy's outbox; the router delivers it to each subscriber of its kind, before Emit returns on a synchronous route or outside the tick, otherwise from the subscriber's inbox (docs/schedule.md, Routes). Hooks: none.
     void (__stdcall* Emit)(const EconomyEventHeader* effect, unsigned int size);
 };
 

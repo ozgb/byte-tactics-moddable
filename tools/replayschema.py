@@ -214,7 +214,39 @@ def with_events(ann: dict) -> dict:
             ann["objects"][name] = {"type": name, "scope": "value", "generated": "event", "fields": flatten_event_fields(structs, name, refs=refs.get(sub), handles=traceschema.module_of_header(sub + ".h").handles)}
         ann["events"][sub] = {"header": spec["header"], "kinds": {str(k): v or spec["header"] for k, v in sorted(spec["kinds"].items())},
                               "names": dict(spec["names"])}
+    mark_event_weapons(ann)
     return ann
+
+
+def mark_event_weapons(ann: dict) -> None:
+    """Marks the payload members that the `weapons` of an event argument name (`Struct.member`, an int that holds the number of a weapon) with `weaponIndex`."""
+    for spec in ann.get("subsystems", {}).values():
+        for note in spec.get("slots", {}).values():
+            for arg in note.get("args", {}).values():
+                if arg.get("mode") != "event" or not isinstance(arg.get("weapons"), list):
+                    continue
+                for key in arg["weapons"]:
+                    struct, _, member = str(key).partition(".")
+                    for f in ann["objects"].get(struct, {}).get("fields", []) if ann["objects"].get(struct, {}).get("generated") == "event" else []:
+                        if f["name"] == member and f["kind"] == "i32":
+                            f["weaponIndex"] = True
+
+
+def check_event_weapons(where: str, label: str, a: dict) -> list[str]:
+    """Errors for the `weapons` of an event argument: each names an int member of a struct of the module's interface, once."""
+    weapons = a.get("weapons", [])
+    if not isinstance(weapons, list):
+        return ["%s: `weapons` of %s lists the payload members (`Struct.member`) that hold the number of a weapon" % (where, label)]
+    errors = []
+    structs = interface_structs(a["events"])
+    for key in weapons:
+        struct, _, member = str(key).partition(".")
+        ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
+        if ctype != "int":
+            errors.append("%s: `weapons` of %s names %s, which is no int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
+        elif weapons.count(key) > 1:
+            errors.append("%s: `weapons` of %s names %s twice" % (where, label, key))
+    return errors
 
 
 def event_refs(ann: dict) -> dict:
@@ -1012,6 +1044,35 @@ def resolve_reach(where: str, spec: dict, root: str, ann: dict, object_fields: l
     return errors
 
 
+def resolve_by_id(where: str, groups: list, ann: dict, object_fields: list, object_index: dict, table: list) -> tuple[list[dict], list[str]]:
+    """A slot's `by_id`: the reach list it uses, in place of the field's own, for each `unitid` field it names."""
+    errors, out, seen = [], [], set()
+    if not isinstance(groups, list):
+        return [], ["%s: `by_id` is a list of {fields, reach, depth}" % where]
+    for group in groups:
+        names = group.get("fields") if isinstance(group, dict) else None
+        if not names:
+            errors.append("%s: a `by_id` entry needs its `fields`" % where)
+            continue
+        unknown = set(group) - {"fields", "reach", "depth"}
+        if unknown:
+            errors.append("%s: a `by_id` entry has the unknown keys %s" % (where, ", ".join(sorted(unknown))))
+        for name in names:
+            kind, _, field = name.partition(".")
+            if (kind, field) not in object_index or object_fields[object_index[(kind, field)]]["kind"] != "unitid":
+                errors.append("%s: the `by_id` field %s is no unitid field" % (where, name))
+                continue
+            if name in seen:
+                errors.append("%s: the `by_id` field %s is listed twice" % (where, name))
+                continue
+            seen.add(name)
+            spec = {"reach": group.get("reach"), "depth": group.get("depth")}
+            errors += resolve_reach("%s(by_id %s)" % (where, name), spec, object_fields[object_index[(kind, field)]]["target"], ann, object_fields, object_index, table)
+            out.append({"field": name, "fieldIndex": object_index[(kind, field)], "reach": spec["reach"], "depth": spec["depth"],
+                        "reachFirst": spec["reachFirst"], "reachCount": spec["reachCount"]})
+    return out, errors
+
+
 def resolve_field_reaches(ann: dict, object_fields: list, object_index: dict, table: list) -> list[str]:
     errors = []
     for f in object_fields:
@@ -1373,6 +1434,7 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
             if table is not None:
                 errors += check_event_extras(where, label, a, table, kinds)
+                errors += check_event_weapons(where, label, a)
         elif a["mode"] == "effect":
             table = ann.get("events", {}).get(a.get("events"))
             size = a.get("size")
@@ -1874,6 +1936,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             }
             if "playsAs" in note:
                 entry["playsAs"] = note["playsAs"]
+            if note.get("by_id") and not skipped:
+                by_id, by_id_errors = resolve_by_id("%s.%s" % (sub, s["name"]), note["by_id"], ann, object_fields, object_index, reach_table)
+                errors += by_id_errors
+                entry["byId"] = by_id
             if skipped:
                 unrecorded[s["name"]].update(entry)
                 continue
@@ -2250,6 +2316,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         derived = f["kind"] == "vector" and f.get("base") is True
         size_text = str(size) if size else "sizeof(%s)" % t if derived else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
         target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        if f.get("weaponIndex"):
+            target = "ROK_WEAPONDEF"
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
         L.append('    { "%s", %s, %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
@@ -2327,6 +2395,9 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
             if s["allOf"]:
                 L.append("static const unsigned short %sAllOf[] = { %s };" % (base, ", ".join("ROK_" + upper(k) for k in s["allOf"])))
+            if s.get("byId"):
+                L.append("static const ReplayIdReach %sIdReach[] = { %s };" % (base, ", ".join(
+                    "{ %d, kReplayReachFields + %d, %d }" % (b["fieldIndex"], b["reachFirst"], b["reachCount"]) for b in s["byId"])))
             for tag, names, kindname, idx in (("Reads", s["reads"], "unsigned char", [fields_index(fields, n) for n in s["reads"]]),
                                               ("Writes", s["writes"], "unsigned char", [fields_index(fields, n) for n in s["writes"]]),
                                               ("ObjReads", s["objectReads"], "unsigned short", s["objectReads"]),
@@ -2342,7 +2413,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
         ro, wo = ref("ObjReads", s["objectReads"]), ref("ObjWrites", s["objectWrites"])
         every = ref("AllOf", s["allOf"])
-        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s, %d },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every[0], every[1]))
+        by_id = ", %s, %d" % ref("IdReach", s["byId"]) if s.get("byId") else ""
+        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s, %d%s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every[0], every[1], by_id))
     L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
     first = 0
     for sub, spec in subsystems.items():
@@ -3218,6 +3290,14 @@ def handle_type(kind: str) -> str:
 def json_slot(s: dict, model: dict) -> dict:
     names = ["%s.%s" % (f["object"], f["name"]) for f in model["object_fields"]]
     out = {k: v for k, v in s.items() if k not in ("rawParams", "params")}
+    if "byId" in s:
+        groups: list[dict] = []
+        for b in s["byId"]:
+            if groups and groups[-1]["reach"] == b["reach"]:
+                groups[-1]["fields"].append(b["field"])
+            else:
+                groups.append({"fields": [b["field"]], "reach": b["reach"], "depth": b["depth"]})
+        out["byId"] = groups
     out["objectReads"] = [names[i] for i in s["objectReads"]]
     out["objectWrites"] = [names[i] for i in s["objectWrites"]]
     return out
@@ -3597,7 +3677,7 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        t.AddString((const char*)a[%d].v.p);" % index[o["text"]])
         L.append("        break;")
         L.append("    }")
-    L += ["    }", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
+    L += ["    }", "    ImportRng(t, c.id);", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
     return "\n".join(L)
 
 

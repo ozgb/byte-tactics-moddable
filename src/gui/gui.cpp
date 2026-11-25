@@ -9,6 +9,7 @@
 #include <iostream>
 #include <math.h>
 #include "../util/tdf.h"
+#include "../util/ftol.h"
 
 struct GafEntry;
 struct Gadget;
@@ -1518,7 +1519,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
             strcpy(buf, e->u.text);
         } else if (e->max != 0) {
 #ifdef __clang__
-            int num = (int)((double)e->knobPos * e->max / (e->width - e->knobSize));
+            int num = bx_ftol((double)e->knobPos * e->max / (e->width - e->knobSize));
 #else
             int num = (int)((float)e->knobPos * e->max / (e->width - e->knobSize));
 #endif
@@ -1600,7 +1601,7 @@ void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
                                 *(short*)(entry - 0x127) / rows;
                             int eax_val = *(short*)(me + 0x140) + esi_val;
 #ifdef __clang__
-                            int result = (int)((double)edx_val * eax_val /
+                            int result = bx_ftol((double)edx_val * eax_val /
                                 (*(short*)(me + 0x136) - 1));
 #else
                             int result = (int)((float)edx_val * eax_val /
@@ -1628,7 +1629,7 @@ void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
                                 short count = *(short*)(me + 0xbe);
 #ifdef __clang__
                                 double ratio = (double)scale * height;
-                                result = (int)(ratio / count);
+                                result = bx_ftol(ratio / count);
 #else
                                 float ratio = (float)scale * height;
                                 result = (int)(ratio / count);
@@ -1727,7 +1728,7 @@ void __stdcall SetListBoxScrollByName(Gui* param_1, char* param_2, int param_3) 
         float q = (float)e3->range * me->u.list.firstRow / me->u.list.maxFirstRow;
         if ((float)e3->knobPos != q)
 #endif
-            e3->knobPos = (short)q;
+            e3->knobPos = (short)bx_ftol(q);
     }
     param_1->changed = 1;
 }
@@ -2241,7 +2242,7 @@ void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
                 int step = numerator / denominator;
                 int last = e->u.list.rowCount;
 #ifdef __clang__
-                int rows = (int)((double)step / last * (me->height - 3));
+                int rows = bx_ftol((double)step / last * (me->height - 3));
 #else
                 int rows = (int)((float)step / last * (me->height - 3));
 #endif
@@ -2506,7 +2507,7 @@ void __stdcall DrawProgressBarGadget(Gui* obj, int index)
 
 #ifdef __clang__
     double scale = (double)entry->u.anim.value / entry->u.anim.total;
-    rect.right = (int)(scale * (entry->width - 4)) + rect.left;
+    rect.right = bx_ftol(scale * (entry->width - 4)) + rect.left;
 #else
     float scale = (float)entry->u.anim.value / entry->u.anim.total;
     rect.right = (int)(scale * (entry->width - 4)) + rect.left;
@@ -4911,7 +4912,7 @@ static inline void TickProgressBarGadget(Gui* menu, int i)
     Gadget* e = &entries[i];
     if (e->u.anim.active && e->u.anim.value < e->u.anim.max) {
         if ((int)GetTicks() > e->u.anim.next) {
-            e->u.anim.value += (int)e->u.anim.step;
+            e->u.anim.value += bx_ftol(e->u.anim.step);
             if (e->u.anim.value > e->u.anim.max) {
                 e->u.anim.value = e->u.anim.max;
                 e->u.anim.active = 0;

@@ -151,6 +151,12 @@ struct ReplayObjectField {
     unsigned short array;
 };
 
+struct ReplayIdReach {
+    unsigned short field;
+    const unsigned short* reach;
+    unsigned short reachCount;
+};
+
 struct ReplaySlotSets {
     const char* name;
     unsigned char subsystem;
@@ -164,6 +170,8 @@ struct ReplaySlotSets {
     unsigned objWriteCount;
     const unsigned short* allOf;
     unsigned allOfCount;
+    const ReplayIdReach* idReach;
+    unsigned idReachCount;
 };
 
 struct ReplaySubsystem {

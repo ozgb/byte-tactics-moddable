@@ -61,9 +61,9 @@ The queue is 131088 bytes. The pending events are the records numbered from `hea
 - at the end of each step, for what the later parts of the step recorded (network resource sharing, the blink of the player's display, the expiry of line-of-sight markers);
 - when a match is shut down, after every unit has been killed and before the units are freed, for what those kills recorded, which name units by index.
 
-There is no drain after the last step. Each drain sits before the first reader of what was recorded. Effects that draw from the view random stream draw at the drain, in record order, and that stream is not hashed.
+A frame has no drain of its own after its last step: the drain at the end of that step is the last one. Each drain sits before the first reader of what was recorded. Effects that draw from the view random stream draw at the drain, in record order, and that stream is not hashed.
 
-**Radar events.** The two radar kinds carry no values in the record. The logic writes a snapshot into a second block of the state block, the radar arena (2 MiB), and records the snapshot's byte offset. The arena is emptied by a drain that finds the queue empty. A full arena ends a test-mode run with a fatal error and, when playing, the snapshot and its event are dropped.
+**Radar events.** The two radar kinds carry no values in the record. The logic writes a snapshot into a second block of the state block, the radar arena (2 MiB), and records the snapshot's byte offset. Every drain empties the arena after it has handed over the last pending record, whether or not the queue held a radar event, and the start of a match (the match load) empties it too. So an offset is read only by the drain that hands over its event, and a snapshot never lives past the next drain: a snapshot recorded in a step is gone by the end of that step, and one recorded outside a step by the first drain of the next frame. A full arena ends a test-mode run with a fatal error and, when playing, the snapshot and its event are dropped.
 
 ## The kinds
 

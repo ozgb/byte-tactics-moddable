@@ -8,13 +8,14 @@
 #include "../util/vec3.h"
 #include "../../interfaces/ref.h"
 #include "../util/engine_services.h"
+#include "../util/ftol.h"
 
 static inline int Vec3Length(const Vec3* v)
 {
     double fx = v->x;
     double fy = v->y;
     double fz = v->z;
-    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+    return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
 }
 
 static inline void Vec3Scale(Vec3* v, int s)
@@ -128,8 +129,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 
 #include "../../link/globals.h"
 
-void __stdcall DeleteOrder(Unit* owner, Order* node);
-
 extern int __cdecl _strcmpi(const char*, const char*);
 
 
@@ -189,7 +188,7 @@ static inline void ClampToZero(int& value)
 
 static inline void AddFixed(int& v, float f)
 {
-    v += (int)((double)f * 65536.0);
+    v += bx_ftol((double)f * 65536.0);
 }
 
 static inline Vec3 Offset(short angle, int distance)
@@ -258,13 +257,13 @@ void UnitMotion::SteerGroundUnit(Unit* unit)
 
     Vec3* ppos = &unit->pos;
     Vec3 d = PosMinus(p[1], *ppos);
-    int gap1 = (int)_hypot(d.x, d.z);
+    int gap1 = bx_ftol(_hypot(d.x, d.z));
 
     int dz;
     if (gap1 > 0x500000) {
         int dx = p[1].x - p[0].x;
         dz = p[1].z - p[0].z;
-        int len = (int)_hypot(dx, dz);
+        int len = bx_ftol(_hypot(dx, dz));
         if (len >= 0x10000) {
             int ndx = (int)(((__int64)dx << 16) / len);
             int ndz = (int)(((__int64)dz << 16) / len);
@@ -377,10 +376,10 @@ void UnitMotion::SteerAircraft(Unit* unit) {
     float dist = (float)_hypot(velocity.x, velocity.z) * eps;
     float maxd = (float)((UnitDefMoveView*)unit->def.get())->brakerate * eps;
     if (dist > maxd) {
-        int f = (int)((double)maxd / dist * 65536.0);
+        int f = bx_ftol((double)maxd / dist * 65536.0);
         MulFixed(velocity.x, f);
         MulFixed(velocity.z, f);
-        int g = (int)(((double)dist - maxd) * 65536.0);
+        int g = bx_ftol(((double)dist - maxd) * 65536.0);
         velocity += Offset(unit->angles.heading, g);
     }
 
@@ -448,7 +447,7 @@ void UnitMotion::SteerAircraft(Unit* unit) {
 #endif
 
 #ifdef __clang__
-    velocity.x += (int)(vxs * 65536.0);
+    velocity.x += bx_ftol(vxs * 65536.0);
 #else
     AddFixed(velocity.x, vx);
 #endif

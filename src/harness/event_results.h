@@ -1,7 +1,7 @@
 #ifndef HARNESS_EVENT_RESULTS_H
 #define HARNESS_EVENT_RESULTS_H
 
-enum { EVENT_RESULT_BYTES = 80, EVENT_RESULT_REFS = 4 };
+enum { EVENT_RESULT_BYTES = 112, EVENT_RESULT_REFS = 4 };
 
 struct EventResult {
     unsigned int size;

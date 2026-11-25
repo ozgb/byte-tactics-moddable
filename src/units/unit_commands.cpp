@@ -31,6 +31,7 @@ struct UnitDefMaxHealthView {
 #include "../orders/mission_type.h"
 
 #include "unit_commands.h"
+#include "../util/ftol.h"
 
 union MissionSlot {
     MissionType type;
@@ -79,9 +80,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
         case 'M':
         case 'm': {
             sscanf(buf + 1, " %f %f", &L.f1, &L.f2);
-            L.pos.x = (int)(L.f1 * 65536.0);
+            L.pos.x = bx_ftol(L.f1 * 65536.0);
             L.pos.y = 0;
-            L.pos.z = (int)(L.f2 * 65536.0);
+            L.pos.z = bx_ftol(L.f2 * 65536.0);
             out.m.type = MissionType(g_seams.orders->GetOrderType(2, unit, 0, (Vec3*)&L.pos));
             OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.m.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
             processed = 1;
@@ -90,9 +91,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
         case 'U':
         case 'u': {
             sscanf(buf + 1, " %f %f", &L.f1, &L.f2);
-            L.pos.x = (int)(L.f1 * 65536.0);
+            L.pos.x = bx_ftol(L.f1 * 65536.0);
             L.pos.y = 0;
-            L.pos.z = (int)(65536.0 * L.f2);
+            L.pos.z = bx_ftol(65536.0 * L.f2);
             out.u.type = MissionType(g_seams.orders->GetOrderType(5, unit, 0, (Vec3*)&L.pos));
             OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.u.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
             processed = 1;
@@ -113,11 +114,11 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
         case 'p': {
             M2.pf = 0.0f;
             sscanf(buf + 1, " %f %f %f", &L.f1, &L.f2, &M2.pf);
-            L.pos.x = (int)(L.f1 * 65536.0);
+            L.pos.x = bx_ftol(L.f1 * 65536.0);
             L.pos.y = 0;
-            L.pos.z = (int)(L.f2 * 65536.0);
+            L.pos.z = bx_ftol(L.f2 * 65536.0);
             out.p.type = MissionType(g_seams.orders->GetOrderType(9, unit, 0, (Vec3*)&L.pos));
-            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.p.type.index, 1, 0, (Vec3*)&L.pos, (int)(M2.pf * 30.0f), 0);
+            OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.p.type.index, 1, 0, (Vec3*)&L.pos, bx_ftol(M2.pf * 30.0f), 0);
             processed = 1;
             selected = 1;
             break;
@@ -125,9 +126,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
         case 'A':
         case 'a': {
             if (sscanf(buf + 1, " %f %f", &L.f1, &L.f2) == 2) {
-                L.pos.x = (int)(L.f1 * 65536.0);
+                L.pos.x = bx_ftol(L.f1 * 65536.0);
                 L.pos.y = 0;
-                L.pos.z = (int)(L.f2 * 65536.0);
+                L.pos.z = bx_ftol(L.f2 * 65536.0);
                 out.a.type = MissionType(g_seams.orders->GetOrderType(3, unit, 0, (Vec3*)&L.pos));
                 OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, out.a.type.index, 1, 0, (Vec3*)&L.pos, 0, 0);
                 selected = 1;
@@ -150,9 +151,9 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
                 OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("BUILDWEAPON"), 1, 0, (Vec3*)nullptr, 0, L.n);
             } else {
                 sscanf(buf + 1, " %[a-zA-Z0-9_.] %d %f %f", buf, &L.n, &L.f1, &L.f2);
-                L.pos.x = (int)(L.f1 * 65536.0);
+                L.pos.x = bx_ftol(L.f1 * 65536.0);
                 L.pos.y = 0;
-                L.pos.z = (int)(65536.0 * L.f2);
+                L.pos.z = bx_ftol(65536.0 * L.f2);
                 unsigned short id = g_seams.units->FindUnitTypeId(buf);
                 if (id != 0) {
                     if (unit->motion != 0)
@@ -179,7 +180,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, const Ref<Unit>* units,
                 M2.wf = 0.0f;
                 L.move = 0;
                 sscanf(buf + 1, " %f %d", &M2.wf, &L.move);
-                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAIT"), 1, 0, (Vec3*)nullptr, (int)(M2.wf * 30.0f), L.move);
+                OrdersPublishAdd(SCHED_UNITS, ORDERS_ADD, unit, g_seams.orders->MissionTypeFromName("WAIT"), 1, 0, (Vec3*)nullptr, bx_ftol(M2.wf * 30.0f), L.move);
                 processed = 1;
             }
             break;

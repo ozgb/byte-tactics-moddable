@@ -61,6 +61,7 @@ extern void __cdecl operator delete(void*);
 #include "../graphics/object_pool.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/mission.h"
+#include "../util/ftol.h"
 
 // FUNCTION: 0x42e310
 void LoadWeaponTypes()
@@ -101,31 +102,31 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     parser->GetFieldString(w->description, "name", 0x40, g_emptyText);
 
     w->speed =
-        (int)(parser->GetFieldDouble("weaponvelocity", 0.0) * 2184.5333333333333);
+        bx_ftol(parser->GetFieldDouble("weaponvelocity", 0.0) * 2184.5333333333333);
     w->startSpeed =
-        (int)(parser->GetFieldDouble("startvelocity", 0.0) * 2184.5333333333333);
+        bx_ftol(parser->GetFieldDouble("startvelocity", 0.0) * 2184.5333333333333);
     w->acceleration =
-        (int)(parser->GetFieldDouble("weaponacceleration", 0.0) *
+        bx_ftol(parser->GetFieldDouble("weaponacceleration", 0.0) *
               72.81777777777778);
     w->range = parser->GetFieldInt("range", 0x7fff);
     w->coverage = parser->GetFieldInt("coverage", 0);
-    w->reloadTime = (unsigned short)(parser->GetFieldDouble("reloadtime", 0.0) * 30.0);
+    w->reloadTime = (unsigned short)bx_ftol(parser->GetFieldDouble("reloadtime", 0.0) * 30.0);
     w->energyPerShot = (float)parser->GetFieldDouble("energypershot", 0.0);
     w->metalPerShot = (float)parser->GetFieldDouble("metalpershot", 0.0);
     w->areaOfEffect = (unsigned short)parser->GetFieldInt("areaofeffect", 0);
     w->edgeDamage = (float)parser->GetFieldDouble("edgeeffectiveness", 0.0);
-    w->lifetime = (unsigned short)(parser->GetFieldDouble("weapontimer", 0.0) * 30.0);
+    w->lifetime = (unsigned short)bx_ftol(parser->GetFieldDouble("weapontimer", 0.0) * 30.0);
     w->flags.b.noAutoRange = parser->GetFieldInt("noautorange", 0);
     w->turnRate =
-        (unsigned short)(parser->GetFieldDouble("turnrate", 0.0) * 0.03333333333333333);
+        (unsigned short)bx_ftol(parser->GetFieldDouble("turnrate", 0.0) * 0.03333333333333333);
     w->burst = (unsigned short)parser->GetFieldInt("burst", 0);
-    w->burstRate = (unsigned short)(parser->GetFieldDouble("burstrate", 0.0) * 30.0);
+    w->burstRate = (unsigned short)bx_ftol(parser->GetFieldDouble("burstrate", 0.0) * 30.0);
     w->spread = (unsigned short)parser->GetFieldInt("sprayangle", 0);
-    w->duration = (unsigned short)(parser->GetFieldDouble("duration", 0.0) * 30.0);
-    w->lifeRand = (unsigned short)(parser->GetFieldDouble("randomdecay", 0.0) * 30.0);
-    w->smokeRate = (unsigned short)(parser->GetFieldDouble("smokedelay", 0.0) * 30.0);
-    w->flightTime = (unsigned short)(parser->GetFieldDouble("flighttime", 0.0) * 30.0);
-    w->holdTime = (unsigned short)(parser->GetFieldDouble("holdtime", 0.0) * 30.0);
+    w->duration = (unsigned short)bx_ftol(parser->GetFieldDouble("duration", 0.0) * 30.0);
+    w->lifeRand = (unsigned short)bx_ftol(parser->GetFieldDouble("randomdecay", 0.0) * 30.0);
+    w->smokeRate = (unsigned short)bx_ftol(parser->GetFieldDouble("smokedelay", 0.0) * 30.0);
+    w->flightTime = (unsigned short)bx_ftol(parser->GetFieldDouble("flighttime", 0.0) * 30.0);
+    w->holdTime = (unsigned short)bx_ftol(parser->GetFieldDouble("holdtime", 0.0) * 30.0);
     w->pitch =
         parser->GetFieldDouble("minbarrelangle", -11.25) * (PI / 180);
     w->fireStarter = (unsigned char)parser->GetFieldInt("firestarter", 0);
@@ -168,7 +169,7 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     w->tolerance = (unsigned short)parser->GetFieldInt("tolerance", 0);
     w->pitchTolerance = (unsigned short)parser->GetFieldInt("pitchtolerance", 0);
     w->shakeMagnitude = parser->GetFieldInt("shakemagnitude", 0);
-    w->shakeDuration = (int)(parser->GetFieldDouble("shakeduration", 0.0) * 30.0);
+    w->shakeDuration = bx_ftol(parser->GetFieldDouble("shakeduration", 0.0) * 30.0);
 
     char model[0x100];
     if (parser->GetFieldString(model, "model", 0x100, g_emptyText) != 0) {

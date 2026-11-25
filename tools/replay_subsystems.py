@@ -13,6 +13,12 @@ LIST = ROOT / "tests" / "replay_subsystems.json"
 RECORDINGS = ROOT / "tests" / "replay"
 
 
+def injects(entry):
+    """The injected changes of an entry: its `inject`, one object or a list of them."""
+    inject = entry["inject"]
+    return inject if isinstance(inject, list) else [inject]
+
+
 def load(path=LIST):
     return json.loads(Path(path).read_text())
 
@@ -30,7 +36,7 @@ def check(entries, recordings=RECORDINGS):
             continue
         if not list(directory.glob("*.txt")):
             errors.append(f"tests/replay/{name}/ holds no recordings")
-        wanted = [entry["inject"]["recording"]] + ([entry["self_test"]] if "self_test" in entry else [])
+        wanted = [inject["recording"] for inject in injects(entry)] + ([entry["self_test"]] if "self_test" in entry else [])
         for recording in wanted:
             if not (directory / recording).is_file():
                 errors.append(f"tests/replay/{name}/{recording} does not exist")
@@ -46,7 +52,7 @@ def log_name(name, entry, kind):
 def rows(entries, kind):
     out = []
     for name, entry in entries.items():
-        inject = entry["inject"]
+        inject = injects(entry)[0]
         wasm = entry.get("wasm")
         log = log_name(name, entry, kind)
         if kind == "native":
@@ -54,7 +60,8 @@ def rows(entries, kind):
         elif kind == "self" and "self_test" in entry:
             out.append([log, name, entry["self_test"]])
         elif kind == "inject":
-            out.append([log, name, str(inject["expect"]), inject["field"], inject["recording"]])
+            for i, each in enumerate(injects(entry)):
+                out.append([log if i == 0 else f"{log}_{i + 1}", name, str(each["expect"]), each["field"], each["recording"]])
         elif kind == "wasm" and wasm:
             out.append([log, name, wasm["module"]])
         elif kind == "wasm-self" and wasm and "self_test" in entry:

@@ -26,7 +26,7 @@ The subsystems and the issue each maps to:
 | [weapons](#weapons) | 118 | #15 |
 | [targeting](#targeting) | 15 | #16 |
 | [los_radar](#los_radar) | 113 | #17 |
-| [orders](#orders) | 246 | #18 |
+| [orders](#orders) | 251 | #18 |
 | [units](#the-remaining-subsystems) | 151 | none yet |
 | [players](#the-remaining-subsystems) | 150 | none yet |
 | [map](#the-remaining-subsystems) | 82 | none yet |
@@ -34,11 +34,11 @@ The subsystems and the issue each maps to:
 | [scripts](#the-remaining-subsystems) | 93 | none yet |
 | [movement](#the-remaining-subsystems) | 173 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
-| [game](#the-remaining-subsystems) | 394 | none yet |
-| [harness](#the-remaining-subsystems) | 855 | none yet |
+| [game](#the-remaining-subsystems) | 392 | none yet |
+| [harness](#the-remaining-subsystems) | 850 | none yet |
 | [presentation](#the-remaining-subsystems) | 1430 | none yet |
 | [platform](#the-remaining-subsystems) | 827 | none yet |
-| [seams](#the-remaining-subsystems) | 225 | none yet |
+| [seams](#the-remaining-subsystems) | 227 | none yet |
 | [files](#the-remaining-subsystems) | 169 | none yet |
 
 The eleven subsystems without a module issue are described briefly [below](#the-remaining-subsystems). #10 (per-module replay tests) uses all of them.
@@ -105,7 +105,7 @@ Coverage: 0.0% of functions (0 of 16), 0.0% of lines, 0.0% of branches; 16 live 
 
 Issue #11. 52 functions. Economy is on interface 5.0 behind the scheduler (#937, #1009): the per-unit resource accounts are private to the module, in a region the engine allocates at the size `RegionSize` asks for and hands to `Init`, and every write another subsystem makes to economy's state is an event (an `EconomyEventHeader` and its kind's payload) that the scheduler (`src/game/scheduler.cpp`) applies through `Apply`. Economy reaches the rest of the game through a world view (`src/seams/economy_world.cpp`) and hands its effects (cloak, extractor speed, sharing) back through `Emit`. The module holds the income step `EconomyUpdatePlayer`, metal extraction, resource sharing and the share console commands (`src/game/economy*.cpp`, `share_commands.cpp`).
 
-Coverage: 94.4% of functions (51 of 54), 91.4% of lines, 73.9% of branches; 3 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
+Coverage: 94.4% of functions (51 of 54), 91.5% of lines, 73.9% of branches; 3 live functions no scenario enters, and 3 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (3 of 54 after `conditions-dark-side` and `conditions-shore-to-shore` (#420) and `save-midgame` (#422), and `load-midgame` (#442), and the six `console-` scenarios (#445), and `share-metal`, `share-energy` and `share-all` (#953); 51 are entered, 94.4%), by reason:
 
@@ -486,11 +486,11 @@ Coverage: 91.8% of functions (89 of 97), 88.0% of lines, 74.5% of branches; 8 li
 
 ## orders
 
-Issue #18. 246 functions. The order state machines, VTOL orders and order lists (`src/orders/*.cpp`). The unit motion (`UnitMotion`) and the goal objects are movement's since #993: orders makes, steers and frees them through `g_seams.movement`.
+Issue #18. 251 functions. The order state machines, VTOL orders and order lists (`src/orders/*.cpp`). The unit motion (`UnitMotion`) and the goal objects are movement's since #993: orders makes, steers and frees them through `g_seams.movement`.
 
-Coverage: 94.8% of functions (235 of 248), 85.3% of lines, 65.3% of branches; 13 live functions no scenario enters, and 17 more are dead (data/coverage.csv).
+Coverage: 94.8% of functions (239 of 252), 85.5% of lines, 65.5% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
 
-**Live functions no scenario enters** (13 of 248 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 235 are entered, 94.8%), by reason:
+**Live functions no scenario enters** (13 of 252 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 239 are entered, 94.8%), by reason:
 
 - Save and load only (1): `OrderKindFromSavedIndex`. `save-midgame` enters the save side of `Order`, and `load-midgame` (#442) enters `LowerBoundOrderTypes`, `OrderTypeNameLess`, `OrderKindFromName`, `ResolveUnitTypeKey`, the load constructor of `Order` and `Order::ReattachFxToUnit`. The move targets' save and load are movement's since #993 (see movement).
 - Info panel, cursor, build menu and shutdown only (2): `ClearOrderTypeTable` and `OrdersClearOrderTypeTable`, the seam's slot that calls it.
@@ -500,13 +500,12 @@ Coverage: 94.8% of functions (235 of 248), 85.3% of lines, 65.3% of branches; 13
 
 **Entry points.** Phase roots: none. The scheduler's units phase (`SchedUnitsPhase`, game) calls `OrdersRunOrders` and `OrdersRunSecondaryOrders` between `UpdateUnitBody` and `UpdateMotion`.
 
-23 functions are called from other subsystems. The most called, with their callers:
+20 functions are called from other subsystems. The most called, with their callers:
 
 - `OrdersGetOrderType` (3 from ai, 1 from game)
 - `CopyDwordIfNonNull` (3 from platform)
 - `OrdersMissionTypeFromName` (1 from game, 1 from presentation, 1 from units)
-- `DeleteOrder` (1 from presentation)
-- By calling subsystem (functions called): presentation 11, game 6, units 4, harness 3, ai 1, platform 1, seams 1
+- By calling subsystem (functions called): presentation 8, game 6, units 4, harness 3, ai 1, platform 1, seams 1
 
 **Imports.** 123 functions of 13 subsystems, by target, each with the number of functions it calls there:
 
@@ -530,7 +529,7 @@ Coverage: 94.8% of functions (235 of 248), 85.3% of lines, 65.3% of branches; 13
 
 **Draft interface.**
 
-- Exports: 23 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation)).
+- Exports: 20 functions (`RunOrders`, `RunSecondaryOrders`, `AddOrder`, `DeleteOrders`, `GetOrderType`, `IssueAttackOrder`, `OrderType::GetTableEntry` (presentation)).
 - Needs from seams: 123 functions in movement, seams, game, platform, units, files, network, los_radar, map, scripts, features, economy, weapons.
 - Owns: 38 named sim items that only this subsystem writes, for example `Order::state`, `Order::pos`, `Order::next`, `Order::attached`, `Order::unit`.
 - Shares: 6 named sim items that other subsystems also write, for example `Order::flags`, `Unit::pos`, `Unit::flags`, `Unit::health`, `Unit::buildLeft`.
@@ -546,9 +545,9 @@ Coverage: 94.8% of functions (235 of 248), 85.3% of lines, 65.3% of branches; 13
 
 Each has no module issue yet. Entry points and couplings come from the same tool (`uv run tools/coupling.py --summary NAME`); the numbers count functions.
 
-**units** (151 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (1). It is called most by game (25 distinct functions) and seams (9). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.6% of functions (106 of 121), 86.1% of lines, 71.1% of branches; 15 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 15 is under **units, functions no scenario enters** below.
+**units** (151 functions). Phase root `UpdateAllUnits`; the scheduler's unit loop calls `UpdateUnitWeapons` (weapons), `RunScripts` (scripts), `RunOrders` (orders) and `UpdateMotion` (movement) between units' steps. 52 functions are called from outside; the busiest are `FindUnitTypeId` (18) and `CreateUnit` (1). It is called most by game (25 distinct functions) and seams (9). It imports 140 functions, mostly platform (47), presentation (7), seams (7) and files (16). It holds the unit table and lifecycle code (`CreateUnit`, `Unit::SetStateBits`); the COB scripts and piece queries are scripts' since #993, and it reaches them through `g_seams.scripts` and scripts' START event. It applies most of orders' writes, as units' events (#986). Coverage: 87.7% of functions (107 of 122), 86.2% of lines, 71.2% of branches; 15 live functions no scenario enters, and 28 more are dead (data/coverage.csv). The list of those 15 is under **units, functions no scenario enters** below.
 
-**units, functions no scenario enters** (15 of 121 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 106 are entered, 87.6%), by reason:
+**units, functions no scenario enters** (15 of 122 after `combat-deaths`, `meteors-earthquake` and `meteors-hailstorm` (#419) and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 107 are entered, 87.7%), by reason:
 
 - Network only (4): `WriteUnitState`, `ReceiveUnitStates`, `ReadUnitState` and `CreateUnitFromPacket`.
 - No caller in the game (1): `PathOrderAttach::~PathOrderAttach`. It is the virtual destructor of the unit reference that an order and a move target embed: they are freed by their own `Destroy`, which unlinks the reference through units' `UnitRefUnlink`, and since #993 the unlink is `UnitRef::Unlink`'s own body rather than an inline call of the destructor.
@@ -557,14 +556,14 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Entered by the console: `KillAllUnits`, `KillUnitsOfType` and `ReloadUnitType`, by `console-units` (#445). `Selectable` is entered too since the coverage of #652, by a path not yet traced.
 - Unit info dialog only (2): `MakePropList` and its static `spd`.
 
-**players** (150 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 29 functions are called from outside, mostly by game (21) and presentation (1); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 61 functions: platform 12, network 5, seams 8, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 66.5% of functions (105 of 158), 68.4% of lines, 61.7% of branches; 53 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 53 follows this paragraph.
+**players** (150 functions). Phase root `UpdatePlayers`, which calls into economy (`UpdatePlayerEconomy`), ai (`UpdatePlayerAI`, squads), pathfinding (`RunSearches`) and los_radar (its LOS calls) in turn. 29 functions are called from outside, mostly by game (21) and presentation (1); the busiest are `SetupPlayerSlot` (3) and `ResetPlayerSlots` (3); its writes come in as events (`docs/players-interface.md`). It imports 61 functions: platform 12, network 5, seams 8, files 10, presentation 0. It holds the per-player state and victory conditions. Coverage: 68.8% of functions (110 of 160), 71.3% of lines, 65.6% of branches; 50 live functions no scenario enters, and 10 more are dead (data/coverage.csv). The list of those 50 follows this paragraph.
 
-**players, functions no scenario enters** (53 of 158 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 105 are entered, 66.5%), by reason:
+**players, functions no scenario enters** (50 of 160 after `conditions-dark-side` and `conditions-shore-to-shore` (#420), `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), the six `console-` scenarios (#445), and the ten `mission-` scenarios of #764; 110 are entered, 68.8%), by reason:
 
 - Mission maps only (3): `DefeatAnyUnitPassesZ::DefeatAnyUnitPassesZ`, `DefeatAnyUnitPassesZ::IsSatisfied` and `DefeatAnyUnitPassesZ::VisitUnit`. `RegisterConditions` creates the condition classes from mission condition keys in the map file (`CommanderKilled`, `KillEnemyCommander`, `AllUnitsKilledOfType` and so on), in every game type, and `CheckVictory` and `CheckDefeat` read the lists only for game type 1. Three skirmish maps carry a condition key, all in `totala2.hpi`: Dark Side and Lava Alley carry `KillEnemyCommander`, and Shore to Shore carries `CommanderKilled`. The `conditions-dark-side` and `conditions-shore-to-shore` scenarios run them. The other keys appear on mission maps only, which have only `Easy`, `Medium` and `Hard` schemas and so load under game type 1 only (under game type 2, `Mission::SelectSchema` wants a `Network N` schema). The ten `mission-` scenarios of #764 and `mission-defeat`, `mission-victory` and `mission-radius` (#444) play missions of `tactics1.hpi`, `tactics2.hpi`, `tactics4.hpi`, `tactics5.hpi` and `tactics7.hpi` and enter every condition class but `DefeatAnyUnitPassesZ`: `mission-kill-of-type` the victory conditions `KillAllOfType` and `KillUnitType`, `mission-kill-mobile` `KillAllMobileUnits`, `mission-build-unit` `BuildUnitType`, `mission-capture` `CaptureUnitType`, `mission-passes-x` and `mission-passes-z` `UnitTypePassesX` and `UnitTypePassesZ`, `mission-timer` `VictoryTimerRunsOut`, and the defeat conditions `mission-defeat-all-units` `AllUnitsKilled`, `mission-defeat-of-type` `AllUnitsKilledOfType` and `mission-defeat-passes-x` `AnyUnitPassesX`. `AnyUnitPassesZ` is set by one mission, `CC19` (The Vebreen Fleet, `totala4.hpi`), and no scenario can load it: `RegisterDataArchives` adds at most ten `*.HPI` archives, so with the install's thirteen, `tactics1.hpi` to `tactics8.hpi`, `totala1.hpi` and `totala2.hpi` are added and `totala3.hpi`, `totala4.hpi` and `worlds.hpi` never are, and the campaign maps of `totala4.hpi` are not found. `SetStartingStorageBonus` and its static `AtLeast200` are entered from `InitPlayerResources` under game type 1 (the other call site is in `UpdatePlayers` under `commanderDeath == 2`, which the harness cannot set). Their `VisitUnit` slots are reached from their own `OnUnitDied` or `IsSatisfied`.
 - Save and load only (36): `DefeatAllUnitsKilled::LoadState`, `DefeatAllUnitsKilled::SaveState`, `DefeatAllUnitsKilledOfType::LoadState`, `DefeatAllUnitsKilledOfType::SaveState`, `DefeatAnyUnitPassesX::LoadState`, `DefeatAnyUnitPassesX::SaveState`, `DefeatAnyUnitPassesZ::LoadState`, `DefeatAnyUnitPassesZ::SaveState`, `DefeatCommanderKilled::LoadState`, `DefeatCommanderKilled::SaveState`, `DefeatDeathTimerRunsOut::LoadState`, `DefeatDeathTimerRunsOut::SaveState`, `DefeatUnitTypeKilled::LoadState`, `DefeatUnitTypeKilled::SaveState`, `VictoryBuildUnitType::LoadState`, `VictoryBuildUnitType::SaveState`, `VictoryCaptureUnitType::LoadState`, `VictoryCaptureUnitType::SaveState`, `VictoryDestroyAllUnits::LoadState`, `VictoryDestroyAllUnits::SaveState`, `VictoryKillAllMobileUnits::LoadState`, `VictoryKillAllMobileUnits::SaveState`, `VictoryKillAllOfType::LoadState`, `VictoryKillAllOfType::SaveState`, `VictoryKillEnemyCommander::LoadState`, `VictoryKillEnemyCommander::SaveState`, `VictoryKillUnitType::LoadState`, `VictoryKillUnitType::SaveState`, `VictoryMoveUnitToRadius::LoadState`, `VictoryMoveUnitToRadius::SaveState`, `VictoryTimerRunsOut::LoadState`, `VictoryTimerRunsOut::SaveState`, `VictoryUnitTypePassesX::LoadState`, `VictoryUnitTypePassesX::SaveState`, `VictoryUnitTypePassesZ::LoadState`, `VictoryUnitTypePassesZ::SaveState`. `save-midgame` (#422) enters `MissionConditions::SaveConditions` and `SavePlayers`, but the save side of a condition runs only for a condition the map has, and The Pass has none, so the `SaveState` slots and their `LoadState` slots stay listed. `load-midgame` (#442) enters `LoadPlayerControllers`, `LoadPlayers` and `MissionConditions::LoadConditions`.
-- Network only (6): `CountActiveAIPlayers`, `FillScoreTables` and `IsReporterDllLoaded` (the score tables of the online score reporter of the lobby and of `UnitSync`, and the AI count it reads), `PlayerRecordAt` (a static of `DrawSyncStatus`, the load-progress strip drawn only for game type 3 while waiting for other machines), and `RecordWatchModeNotice` and `RecordWatchPrompt` (the watch-mode notice and prompt of a defeated player).
-- Menu or dialog click only (1): `SaveNumSkirmishPlayers` (called from the skirmish menu, which test mode skips).
+- Network only (3): `CountActiveAIPlayers` (the AI count of the online score reporter), and `RecordWatchModeNotice` and `RecordWatchPrompt` (the watch-mode notice and prompt of a defeated player).
+- Needs a case no scenario sets up yet (1): `DeactivateConditionsNative` (the native `DeactivateConditions` slot). Its only caller deactivates the conditions when a mission map places no mission units, and every mission scenario places some.
 - Shutdown only (2): `FreePlayers` and `PlayersShutdown` (both called from `ShutdownIngameSystems`, which no scenario runs).
 - Test only (3): `PlayersWriteState`, `WriteCondition` and `HarnessConditionClass`. The seam's `WriteState` and its helpers write players' report (record 46, `playersState`), which the harness dumps but does not hash, and only at the tick `-testdump` names; the coverage run does not pass it.
 - Network game only (2): `??$PlayersFillHeader@UPlayersSendUnit@@UUnit@@@@YGXPAUPlayersSendUnit@@HPAUUnit@@@Z` and `??$PlayersPublishSendUnit@UUnit@@@@YGXPAUUnit@@H@Z`. `GiveUnitToPlayer` publishes SEND_UNIT (whose header `PlayersFillHeader` fills) only when the unit goes to a remote human (player type 3).
@@ -620,13 +619,13 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (394 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 249 functions are called from outside, by platform (85 distinct functions) and presentation (35); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 627 functions, the most of any subsystem, 218 of them from presentation, then platform 105, network 30, files 23 and units 25.
+**game** (392 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 249 functions are called from outside, by platform (85 distinct functions) and presentation (36); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 627 functions, the most of any subsystem, 218 of them from presentation, then platform 105, network 30, files 23 and units 25.
 
-**game, functions no scenario enters** (87 of 403 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 316 are entered, 78.4%), by reason:
+**game, functions no scenario enters** (91 of 407 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 316 are entered, 77.6%), by reason:
 
-- Network only (6): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes), `ScheduleUnitsDeliver` (units' inbox, delivered by `ReceiveUnitStates` after each unit's `UpdateMotion`). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
+- Network only (9): `PreBattleFrame`, `RecordMessage`, `UpdateBattleRoom`, `MovementPublishSetSpeed` (movement's SET_SPEED, which `ReadUnitState` publishes from a unit state packet), `WeaponsPublishRemoteDamage` (the remote damage packet's event, which `HandleNetPackets` publishes), `ScheduleUnitsDeliver` (units' inbox, delivered by `ReceiveUnitStates` after each unit's `UpdateMotion`), `FillScoreTables` and `IsReporterDllLoaded` (the score tables of the online score reporter of the lobby and of `UnitSync`), `PlayerRecordAt` (a static of `DrawSyncStatus`, the load-progress strip drawn only for game type 3 while waiting for other machines). Needs other machines or a network session; test mode runs every player on one machine. Covered by the replay recordings, #10 and #389.
 - Needs a case no scenario sets up yet (2): `RecordFocusCommander` (the camera move after a commander is created for a player who starts without one) and `RecordTeleportParticles` (the sparks of a teleport order).
-- Menu or front end only (4): `Force640x480Surfaces`, `ReturnToMainMenuFrame`, `SaveAllMissionsSetting`, `SetGameMode`. The lobby, menus and dialogs, which test mode skips. Covered by #398's UI log.
+- Menu or front end only (5): `Force640x480Surfaces`, `ReturnToMainMenuFrame`, `SaveAllMissionsSetting`, `SetGameMode`, `SaveNumSkirmishPlayers` (called from the skirmish menu). The lobby, menus and dialogs, which test mode skips. Covered by #398's UI log.
 - Save and load only (8): `DeleteHapiBank`, `ListSavedGames`, `LoadGameScreenHandler`, `SaveGameScreenHandler`, `SavedGameSelectHandler`, `ShowLoadGameScreen`, `ShowSaveGameScreen`, `ShowSavedGameInfo`. Test mode saves (the `save` key, `save-midgame`) and loads that save (the `load` key, `load-midgame`, #442), which enters `FreeSummaryBank`, `LoadSavedGameState`, `OpenHapiBank` and `OpenSummaryBank`. The screens and handlers of the save and load menus are never entered.
 - Console command, game logic only (2): `CmdInclude` (it reads `debugdat\include.txt`) and `CmdPrintWeights` (it writes the file its second argument names). The `console` key leaves both out (#445): a scenario reads no file beyond the game data and writes none. The other 29 functions of this group, `ExecuteCommandLine` and `DefaultCommandHandler` among them, are entered by the six `console-` scenarios (#445).
 - Console command, display, sound, debugger or host only (32): `CmdAntiAlias`, `CmdBigBrother`, `CmdCDPlay`, `CmdCDStop`, `CmdClock`, `CmdContour`, `CmdDebugBreak`, `CmdDither`, `CmdFShadow`, `CmdFilm`, `CmdFilmSpeed`, `CmdGamma`, `CmdLight`, `CmdLogo`, `CmdMakePoster`, `CmdMemDump`, `CmdMusicMode`, `CmdNetStats`, `CmdNoShake`, `CmdProfile`, `CmdRCache`, `CmdSave`, `CmdScreenChat`, `CmdScrollSpeed`, `CmdSelBoxes`, `CmdSenderror`, `CmdShading`, `CmdShadow`, `CmdSing`, `CmdSound3D`, `CmdSwitchAlt`, `CmdTShadow`. Commands that only change presentation or the host (display and sound settings, the camera, the debugger, files, network statistics). Typed console input; the `console` key (#445) leaves them out, except `CmdNow`, the cheat code `Now Film Chris Include Reload Assert` that enables the debug commands, which every console scenario types. Covered by #398.
@@ -653,19 +652,19 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Developer tool only (2): `HAPI_CreateFile`, `RenameFile`. The GUI layout editor.
 - Game data only (8): `FreeArchiveRecord`, `HAPI_LoadOpenFile`, `HAPI_LoadOpenFile`, `HAPI_TellFile`, `RemoveFile`, `RemoveFile`, `WriteBufferToFile`, `WriteBufferToFile`. Entered only with files the stock install lacks (OVR banks, `download` TDFs, briefings) or with a cache missing (palette and shade tables written on first run). `AccountBank::GetIntegerItem`, `AccountBank::LoadAccount`, `HapiBank::GetIntegerItem`, the other copy of `HAPI_TellFile` and `SquashUnpackedSize` are entered by the load of `load-midgame` (#442).
 
-**state, functions no scenario enters** (67 of 553 after the scenarios of `reference/scenarios/`; 486 are entered, 87.9%), by reason:
+**state, functions no scenario enters** (67 of 558 after the scenarios of `reference/scenarios/`; 491 are entered, 88.0%), by reason:
 
 - Shutdown only (3): `BlockVector::~BlockVector`, `BlockVector::~BlockVector` and `BlockVector::~BlockVector`. They are the destructors of the damage table, LOS table and order table arrays, which are freed from `FreeWeaponTypes` and `FreeLosTables`, and no scenario runs the shutdown because test mode ends with `host_exit(0)` right after the last tick.
 - Template instances no entered function uses (63): `??8@YG_NABU?$Ref@D@@PAD@Z`, `??8@YG_NABU?$Ref@G@@PAG@Z`, `??8@YG_NABU?$Ref@UFrameRing@@@@PAUFrameRing@@@Z`, `??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z`, `??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@D@@PAD@Z`, `??9@YG_NABU?$Ref@UHotRadarSlot@@@@PAUHotRadarSlot@@@Z`, `??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z`, `??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z`, `BlockVector::Capacity`, `BlockVector::Capacity`, `BlockVector::Clear`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::operator?4`, `BlockVector::operator?4`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `Ref::Ref`, `Ref::Ref`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?D`. These are the `Ref` accessors and comparisons of `interfaces/ref.h` and the `BlockVector` members of `src/state/block_vector.h`, one instance for each type and member. No function a scenario enters calls them.
 - Error paths only (1): `RefOutsideBlock`. The fatal error of a `Ref` whose pointer lies outside the state block, which a passing run never reaches.
 
-**harness** (855 functions). The test harness of #3 (`src/harness`). No phase root. 49 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 84 functions (game 27, platform 29).
+**harness** (850 functions). The test harness of #3 (`src/harness`). No phase root. 50 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 84 functions (game 27, platform 29).
 
-**presentation** (1430 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 353 functions: platform 159, network 54, files 32, game 35, map 4. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
+**presentation** (1430 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 351 functions: platform 159, network 54, files 32, game 36, map 4. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
 **platform** (827 functions). Devices, files, memory, the TDF and `HapiBank` readers, the console and the C library, and the timers (`GetTicks`, `GetMilliseconds`), window and environment code of `src/graphics/display.cpp` (set by `override`). No phase root. 311 functions are called from outside, by presentation (159 distinct functions), game (105), network (52) and units (47); the busiest are `GameFreeThunk` (162), `operator new` (119), `operator delete` (80), then `Translate` (77) and `GameAllocIgnoreTag` (77). It imports 181 functions: game 85, presentation 46.
 
-**seams** (225 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 190 functions are called from outside. It imports 146 functions.
+**seams** (227 functions). No phase root. The native side of the seam function tables of #8 (`src/seams`). 190 functions are called from outside. It imports 147 functions.
 
 **files** (169 functions). No phase root. The archive and bank readers (`src/files`: `HapiBank`, HPI and SQSH archives). 78 functions are called from outside.
 
@@ -766,27 +765,27 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | subsystem | entered of live functions | functions | lines | branches | never entered | dead |
 |---|---|---|---|---|---|---|
 | **wind_meteors** | 0 of 16 | 0.0% | 0.0% | 0.0% | 16 | 0 |
-| **economy** | 51 of 54 | 94.4% | 91.4% | 73.9% | 3 | 3 |
+| **economy** | 51 of 54 | 94.4% | 91.5% | 73.9% | 3 | 3 |
 | **features** | 54 of 55 | 98.2% | 87.4% | 73.8% | 1 | 4 |
 | **ai** | 87 of 109 | 79.8% | 75.6% | 72.9% | 22 | 31 |
 | **pathfinding** | 69 of 78 | 88.5% | 82.3% | 69.4% | 9 | 10 |
 | **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
 | **targeting** | 21 of 21 | 100.0% | 96.2% | 79.1% | 0 | 1 |
 | **los_radar** | 89 of 97 | 91.8% | 88.0% | 74.5% | 8 | 22 |
-| **orders** | 235 of 248 | 94.8% | 85.3% | 65.3% | 13 | 17 |
-| **units** | 106 of 121 | 87.6% | 86.1% | 71.1% | 15 | 28 |
-| **players** | 105 of 158 | 66.5% | 68.4% | 61.7% | 53 | 10 |
+| **orders** | 239 of 252 | 94.8% | 85.5% | 65.5% | 13 | 18 |
+| **units** | 107 of 122 | 87.7% | 86.2% | 71.2% | 15 | 28 |
+| **players** | 110 of 160 | 68.8% | 71.3% | 65.6% | 50 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |
 | **mission** | 28 of 47 | 59.6% | 74.9% | 62.7% | 19 | 1 |
 | **scripts** | 65 of 87 | 74.7% | 86.5% | 78.2% | 22 | 6 |
 | **movement** | 118 of 177 | 66.7% | 69.4% | 62.2% | 59 | 8 |
 | files | 112 of 142 | 78.9% | 79.6% | 65.1% | 30 | 35 |
-| game | 316 of 403 | 78.4% | 62.6% | 42.2% | 87 | 23 |
+| game | 316 of 407 | 77.6% | 61.6% | 41.4% | 91 | 23 |
 | network | 53 of 297 | 17.8% | 11.0% | 4.1% | 244 | 74 |
 | platform | 405 of 753 | 53.8% | 41.3% | 28.2% | 348 | 86 |
-| presentation | 568 of 1153 | 49.3% | 36.3% | 29.6% | 585 | 295 |
-| seams | 216 of 239 | 90.4% | 92.9% | 58.9% | 23 | 0 |
-| state | 486 of 553 | 87.9% | 70.3% | 49.2% | 67 | 59 |
+| presentation | 568 of 1153 | 49.3% | 36.2% | 29.4% | 585 | 295 |
+| seams | 212 of 234 | 90.6% | 93.1% | 59.2% | 22 | 0 |
+| state | 491 of 558 | 88.0% | 70.4% | 49.1% | 67 | 59 |
 
 Functions are assigned to a subsystem by `data/subsystems.csv` first, then by the names of special members (`X::X`, `X::~X`, `X::operator<code>`). A function still without a row is `state` when its file is under `interfaces/` or `src/state/`, else it gets the subsystem that the rules of `tools/coupling.py` give its name and file. Functions in `src/harness/`, `build/` and `toolchain/` are left out.
 

@@ -1848,6 +1848,12 @@ void After_weapons_Apply()
     CompareResult(g_result_weapons_Apply);
 }
 
+void Run_weapons_UpdateProjectiles()
+{
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateProjectiles();
+}
+
 void Run_weapons_UpdateExplosions()
 {
     SetClosing(nullptr);
@@ -3058,6 +3064,10 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateProjectiles") == 0) {
+        Run_weapons_UpdateProjectiles();
         return true;
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateExplosions") == 0) {

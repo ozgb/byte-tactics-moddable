@@ -15,6 +15,7 @@
 #include "../../interfaces/economy.h"
 #include "../../interfaces/rand_stream.h"
 #include "../util/tdf.h"
+#include "../util/ftol.h"
 
 struct Player;
 struct Unit;
@@ -797,8 +798,8 @@ void InitPlayerResources()
             case 1: {
                 MissionParams mission;
                 g_seams.mission->GetMissionParams(&mission);
-                SetStartingStorageBonus(player, (int)mission.startMetal[i],
-                             (int)mission.startEnergy[i]);
+                SetStartingStorageBonus(player, bx_ftol(mission.startMetal[i]),
+                             bx_ftol(mission.startEnergy[i]));
                 player->energy = mission.startEnergy[i];
                 player->metal = mission.startMetal[i];
                 break;

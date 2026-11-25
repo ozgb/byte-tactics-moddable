@@ -2957,10 +2957,10 @@ class CStrings(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
 
-    def test_the_real_schema_has_it_only_for_the_mission_names_and_the_order_table(self):
+    def test_the_real_schema_has_it_only_for_the_mission_names_the_order_table_and_damage_tables(self):
         real = json.loads(rs.JSON_OUT.read_text())["annotations"]["objects"]
         users = {k for k, v in real.items() if any(f["kind"] == "cstring" for f in v["fields"])}
-        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo", "OrderEntry"})
+        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo", "OrderEntry", "DamageTableEntry"})
 
     def test_a_walk_never_follows_a_string(self):
         for kind in ("cstring", "cstringref", "cstrings"):
@@ -3241,7 +3241,7 @@ class EventForms(unittest.TestCase):
         body = hooks[hooks.index("RecWeaponsApply"):]
         body = body[:body.index("\n}\n")]
         unrecorded = rs.load_annotations()["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
-        self.assertEqual(set(unrecorded), {"WEAPONS_DETONATE", "WEAPONS_EXPLODE_PIECE", "WEAPONS_AREA_DAMAGE", "WEAPONS_SPAWN", "WEAPONS_REMOVE_PROJECTILES"})
+        self.assertEqual(set(unrecorded), {"WEAPONS_EXPLODE_PIECE"})
         guard = body.index("if (a0 != nullptr && a1 >= sizeof(*a0) && (")
         self.assertLess(guard, body.index("ReplayRoots roots;"))
         for name in unrecorded:
@@ -3325,6 +3325,85 @@ class Committed(unittest.TestCase):
         exports = [m for m in manifest["modules"] if m["name"] == "wind_meteors"][0]["exports"]
         _, _, model = rs.generate(rs.read_rows())
         self.assertEqual(sorted(exports), sorted(model["subsystems"]["wind_meteors"]["slots"]))
+
+
+class EventWeapons(unittest.TestCase):
+    """The payload members of an event that hold the number of a weapon (`weapons`)."""
+
+    def event(self, ann):
+        return ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]
+
+    def test_a_listed_member_leads_to_the_weapon(self):
+        files, errors, _ = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual([e for e in errors if "`weapons`" in e], [])
+        schema = files[rs.SCHEMA_H]
+        self.assertIn("ROK_WEAPONSSPAWN, RK_I32, ROK_WEAPONDEF,", schema)
+        self.assertIn("ROK_WEAPONSAREADAMAGE, RK_I32, ROK_WEAPONDEF,", schema)
+
+    def test_a_member_that_is_no_int_is_an_error(self):
+        ann = annotations()
+        self.event(ann)["weapons"] = ["WeaponsSpawn.announce", "WeaponsSpawn.weapon", "WeaponsSpawn.weapon"]
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertFalse(any("names WeaponsSpawn.announce" in e for e in errors), errors)
+        self.assertTrue(any("names WeaponsSpawn.weapon twice" in e for e in errors), errors)
+        self.event(ann)["weapons"] = ["WeaponsSpawn.pos", "WeaponsSpawn.nothing"]
+        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        self.assertTrue(any("names WeaponsSpawn.pos, which is no int member" in e for e in errors), errors)
+        self.assertTrue(any("names WeaponsSpawn.nothing, which is no int member" in e for e in errors), errors)
+
+
+class UnitsById(unittest.TestCase):
+    """A slot's own reach for the units it reaches by their id (`by_id`)."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def by_id(self, ann):
+        return ann["subsystems"]["weapons"]["slots"]["UpdateProjectiles"]["by_id"]
+
+    def test_the_slot_names_its_reach_and_the_field_keeps_its_own(self):
+        files, errors, model = self.generated()
+        self.assertEqual([e for e in errors if "by_id" in e], [])
+        slot = model["subsystems"]["weapons"]["slots"]["UpdateProjectiles"]
+        self.assertEqual([b["field"] for b in slot["byId"]], ["Cell.occupant", "Cell.occupant2"])
+        self.assertNotIn("Unit.aimCob", slot["byId"][0]["reach"])
+        self.assertEqual([b["fields"] for b in rs.json_slot(slot, model)["byId"]], [["Cell.occupant", "Cell.occupant2"]])
+        schema = files[rs.SCHEMA_H]
+        self.assertIn("static const ReplayIdReach kReplayWeaponsUpdateProjectilesIdReach[] = {", schema)
+        self.assertIn("kReplayWeaponsUpdateProjectilesIdReach, 2 },", schema)
+        self.assertNotIn("kReplayWeaponsUpdateExplosionsIdReach", schema)
+
+    def test_a_field_that_is_no_unit_id_is_an_error(self):
+        ann = annotations()
+        self.by_id(ann)[0]["fields"] = ["Cell.feature"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("the `by_id` field Cell.feature is no unitid field" in e for e in errors), errors)
+
+    def test_a_field_named_twice_is_an_error(self):
+        ann = annotations()
+        self.by_id(ann).append(dict(self.by_id(ann)[0], fields=["Cell.occupant"]))
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("the `by_id` field Cell.occupant is listed twice" in e for e in errors), errors)
+
+    def test_an_entry_needs_its_fields_and_no_other_keys(self):
+        ann = annotations()
+        self.by_id(ann)[0].pop("fields")
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("a `by_id` entry needs its `fields`" in e for e in errors), errors)
+        ann = annotations()
+        self.by_id(ann)[0]["limit"] = 3
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("a `by_id` entry has the unknown keys limit" in e for e in errors), errors)
+
+    def test_the_reach_is_checked_as_a_fields_is(self):
+        ann = annotations()
+        self.by_id(ann)[0]["depth"] = 1
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("by_id Cell.occupant" in e and "its depth says 1" in e for e in errors), errors)
+        ann = annotations()
+        self.by_id(ann)[0]["reach"] = ["Unit.nothing"]
+        _, errors, _ = self.generated(ann)
+        self.assertTrue(any("the reach names the unknown field Unit.nothing" in e for e in errors), errors)
 
 
 class LinkSources(unittest.TestCase):

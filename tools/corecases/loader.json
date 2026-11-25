@@ -893,5 +893,356 @@
     "8208"
    ]
   ]
+ },
+ {
+  "name": "pair_manifest_layout",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_layout.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_manifest_module_entry",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_module_entry.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_manifest_window",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_window.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_manifest_window_reaches",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_window_reaches.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_manifest_overlap",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_overlap.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_layout_module_entry",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_layout_module_entry.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_layout_window",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_layout_window.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_layout_window_reaches",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_layout_window_reaches.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_layout_overlap",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_layout_overlap.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_module_entry_window",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_module_entry_window.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_module_entry_window_reaches",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_module_entry_window_reaches.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_module_entry_overlap",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_module_entry_overlap.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_window_window_reaches",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_window_window_reaches.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_window_overlap",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_window_overlap.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_window_reaches_overlap",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_window_reaches_overlap.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_layout_manifest_entry",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_layout_manifest_entry.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_manifest_entry_module_entry",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_manifest_entry_module_entry.json"
+   ]
+  ]
+ },
+ {
+  "name": "pair_module_entry_manifest_entry",
+  "calls": [
+   [
+    "manifest",
+    "loader/pair_module_entry_manifest_entry.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_data_base_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/data_base_negative.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_data_base_fraction",
+  "calls": [
+   [
+    "manifest",
+    "loader/data_base_fraction.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_no_exports",
+  "calls": [
+   [
+    "manifest",
+    "loader/no_exports.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "add",
+    "1",
+    "2"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_no_data",
+  "calls": [
+   [
+    "manifest",
+    "loader/no_data.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "add",
+    "1",
+    "2"
+   ]
+  ]
+ },
+ {
+  "name": "load_major_newer",
+  "calls": [
+   [
+    "manifest",
+    "loader/major_newer.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "call_missing_export",
+  "calls": [
+   [
+    "manifest",
+    "loader/base.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "absent"
+   ]
+  ]
+ },
+ {
+  "name": "trap_start",
+  "calls": [
+   [
+    "manifest",
+    "loader/base.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/start_trap.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "trap_float_overflow",
+  "calls": [
+   [
+    "manifest",
+    "loader/traps_float.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/traps_float.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "trap_big"
+   ]
+  ]
+ },
+ {
+  "name": "trap_float_nan",
+  "calls": [
+   [
+    "manifest",
+    "loader/traps_float.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/traps_float.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "trap_nan"
+   ]
+  ]
+ },
+ {
+  "name": "trap_float_unsigned_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/traps_float.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/traps_float.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "trap_neg",
+    "-1"
+   ]
+  ]
  }
 ]

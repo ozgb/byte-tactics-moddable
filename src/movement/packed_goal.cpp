@@ -3,6 +3,7 @@
 #include "../../interfaces/ref.h"
 #include "../util/vec3.h"
 #include "../util/engine_services.h"
+#include "../util/ftol.h"
 
 struct Unit;
 class HapiBank;
@@ -76,7 +77,7 @@ void PackedGoal::TickTowardGoal()
     Vec3 old = pos;
     ((OrderFx*)target)->FillWorldPos(&pos);
     vel = pos - old;
-    int dist = (int)_hypot(owner->pos.x - pos.x, owner->pos.z - pos.z);
+    int dist = bx_ftol(_hypot(owner->pos.x - pos.x, owner->pos.z - pos.z));
     if (dist > 0xa00000) {
         if (((UnitDefSeaFlags*)owner->def.get())->seaUnit)
             pos.y = (g_game->seaLevel + owner->def->altitude) << 16;

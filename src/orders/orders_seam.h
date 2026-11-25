@@ -4,6 +4,7 @@
 class HapiBank;
 class MissionType;
 struct OrdersEventHeader;
+struct OrdersGroupCommand;
 struct StateWriter;
 struct Unit;
 struct Vec3;
@@ -19,5 +20,6 @@ void __stdcall OrdersClearOrderTypeTable(void);
 void __stdcall OrdersLoadOrders(Unit* unit, HapiBank* file, int count);
 int __stdcall OrdersSaveOrders(Unit* unit, HapiBank* file);
 void __stdcall OrdersWriteState(const StateWriter* writer);
+int __stdcall OrdersExpandGroupCommand(const OrdersGroupCommand* command, unsigned int size);
 
 #endif

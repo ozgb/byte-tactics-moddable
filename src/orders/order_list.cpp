@@ -71,8 +71,6 @@ static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 
 #include "../../link/globals.h"
 
-void __stdcall DeleteOrder(Unit* owner, Order* node);
-
 extern int __cdecl _strcmpi(const char*, const char*);
 
 

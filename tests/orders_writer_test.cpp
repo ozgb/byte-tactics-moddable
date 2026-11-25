@@ -27,6 +27,7 @@
 #pragma pack(pop)
 #include "../src/game/scheduler.h"
 #include "../src/game/weapons_events.h"
+#include "../src/game/orders_events.h"
 #include "../src/orders/order_list.h"
 #include "../src/orders/orders_seam.h"
 #include "../src/seams/orders_world.h"
@@ -87,7 +88,6 @@ int __stdcall RandomInt(int n)
 }
 
 void __stdcall RecordSimEvent(SimEventKind, unsigned int, const unsigned int*, unsigned int) {}
-void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int) {}
 
 MissionType::MissionType(const char* name)
 {
@@ -121,9 +121,16 @@ static bool IsHandled(SchedHandler handler)
     return handler == OrdersOnWeaponsParalyze;
 }
 
+enum { kGroupUnits = 3, kMaxCommands = 8 };
+
+static OrdersAdd s_commands[kMaxCommands];
+static int s_commandCount;
+
 void __stdcall SchedPublish(int outbox, const void* data, unsigned int size)
 {
     int kind = *(const int*)data;
+    if (outbox == SCHED_ORDERS && kind == ORDERS_COMMAND && size == sizeof(OrdersAdd) && s_commandCount < kMaxCommands)
+        memcpy(&s_commands[s_commandCount++], data, sizeof(OrdersAdd));
     int count = 0;
     const SchedRoute* routes = SchedRoutes(&count);
     for (int i = 0; i < count; i++)
@@ -327,6 +334,102 @@ static void CheckStateRecords()
     Check(s_lineCount == 0, "a unit without orders has no record");
 }
 
+static int __stdcall RawExpandGroupCommand(const OrdersGroupCommand* c, unsigned int size)
+{
+    if (size < sizeof(OrdersGroupCommand))
+        return 0;
+    Ref<Unit> first;
+    first.offset = c->h.unit;
+    Vec3 pos;
+    pos.x = c->pos[0];
+    pos.y = c->pos[1];
+    pos.z = c->pos[2];
+    int published = 0;
+    for (int i = 0; i < ORDERS_GROUP_UNITS; i++) {
+        if (!((c->units[i >> 5] >> (i & 31)) & 1))
+            continue;
+        OrdersPublishAdd(SCHED_ORDERS, ORDERS_COMMAND, first.get() + i, c->type, c->queue, (Unit*)nullptr, &pos, c->params[0], c->params[1]);
+        published++;
+    }
+    return published;
+}
+
+static int s_lastOutcome;
+
+void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int outcome)
+{
+    s_lastOutcome = outcome;
+}
+
+static void Expand(OrdersSeam* seam, const OrdersGroupCommand* command)
+{
+    g_seams.orders = seam;
+    s_commandCount = 0;
+    OrdersOnGroupCommand(command, sizeof(*command));
+}
+
+static void CheckGroupCommand()
+{
+    static OrderTableEntry entries[2];
+    static char none[] = "aaa_none";
+    static char spread[] = "spread";
+    memset(entries, 0, sizeof entries);
+    entries[0].name = none;
+    entries[1].name = spread;
+    entries[1].flags = 2;
+    RegisterOrderTypes(entries, 2);
+    int type = MissionType("spread").index;
+
+    Unit* group = (Unit*)SimAlloc((kGroupUnits + 1) * sizeof(Unit));
+    memset((void*)group, 0, (kGroupUnits + 1) * sizeof(Unit));
+    UnitDef* def = (UnitDef*)SimAlloc(sizeof(UnitDef));
+    memset((void*)def, 0, sizeof(UnitDef));
+    Ref<Unit> savedEnd = g_game->unitsEnd;
+    g_game->unitsEnd = &group[kGroupUnits];
+    for (int i = 0; i <= kGroupUnits; i++) {
+        group[i].def = def;
+        group[i].pos.x = (100 + 10 * i) << 16;
+        group[i].pos.z = 200 << 16;
+    }
+
+    OrdersGroupCommand command;
+    memset(&command, 0, sizeof command);
+    command.h.kind = ORDERS_GROUP_COMMAND;
+    command.h.unit = Ref<Unit>(&group[0]).offset;
+    command.type = type;
+    command.hasPos = 1;
+    command.pos[0] = 500 << 16;
+    command.pos[1] = 7 << 16;
+    command.pos[2] = 600 << 16;
+    command.units[0] = 1u | 4u;
+
+    static OrdersSeam defaultSeam, rawSeam;
+    memset(&defaultSeam, 0, sizeof defaultSeam);
+    defaultSeam.ExpandGroupCommand = OrdersExpandGroupCommand;
+    rawSeam = defaultSeam;
+    rawSeam.ExpandGroupCommand = RawExpandGroupCommand;
+
+    Expand(&defaultSeam, &command);
+    Check(s_commandCount == 2 && s_lastOutcome == 2, "the default expansion orders the two units of the command");
+    Check(s_commandCount == 2 && s_commands[0].h.unit == command.h.unit && s_commands[1].h.unit == Ref<Unit>(&group[2]).offset, "the default orders the units in the order of the unit array");
+    Check(s_commandCount == 2 && s_commands[0].pos[0] == (490 << 16) && s_commands[1].pos[0] == (510 << 16), "the default spreads the position by each unit's distance from the group's centre");
+    Check(s_commandCount == 2 && s_commands[0].pos[2] == (600 << 16) && s_commands[0].pos[1] == (7 << 16), "the default keeps the height and the centre's z");
+    Check(s_commandCount == 2 && s_commands[0].type == type && s_commands[0].hasPos == 1, "the default gives each unit the command's order type and a position");
+    OrdersAdd spreadFirst = s_commands[0];
+
+    Expand(&rawSeam, &command);
+    Check(s_commandCount == 2 && s_lastOutcome == 2, "the replaced expansion orders the same two units");
+    Check(s_commandCount == 2 && s_commands[0].pos[0] == (500 << 16) && s_commands[1].pos[0] == (500 << 16), "the replaced expansion gives every unit the raw position");
+    Check(s_commandCount == 2 && memcmp(&s_commands[0], &spreadFirst, sizeof spreadFirst) != 0, "replacing the expansion changes the orders");
+
+    command.target = Ref<Unit>(&group[2]).offset;
+    g_missionOrderTableVec[type].flags = 2 | 0x200;
+    Expand(&defaultSeam, &command);
+    Check(s_commandCount == 1 && s_commands[0].h.unit == command.h.unit && s_commands[0].pos[0] == (500 << 16), "a target the order takes is left out of the group and of the centre");
+
+    g_game->unitsEnd = savedEnd;
+}
+
 int main()
 {
     Setup();
@@ -344,6 +447,7 @@ int main()
     Play(&tampered, true);
 
     CheckStateRecords();
+    CheckGroupCommand();
     int sum = 0;
     for (int t = 0; t < kTicks; t++)
         sum += Ticks(t);

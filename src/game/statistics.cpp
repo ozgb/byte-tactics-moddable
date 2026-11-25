@@ -8,6 +8,7 @@
 
 #include "statistics.h"
 #include "../../link/globals.h"
+#include "../util/ftol.h"
 extern char g_userNameSetting[];
 extern DpspGuid g_dpspGuidIpx;
 extern DpspGuid g_dpspGuidSerial;
@@ -82,8 +83,8 @@ int FillScoreTables()
                 allies[n] = 0;
             MissionParams mission;
             g_seams.mission->GetMissionParams(&mission);
-            int score = (int)((unsigned int)g_game->ticks / 60 * mission.timeMul);
-            score += (int)(p->kills * mission.killMul);
+            int score = bx_ftol((unsigned int)g_game->ticks / 60 * mission.timeMul);
+            score += bx_ftol(p->kills * mission.killMul);
             g_onlineReportScoreBoards[i]->score = score;
             g_onlineReportScoreBoards[i]->count = 9;
             OnlineReportScore* s;
@@ -95,16 +96,16 @@ int FillScoreTables()
             s->value = p->losses;
             s = g_onlineReportScoreBoards[i]->scores[2];
             s->name = g_scoreNames[2];
-            s->value = (int)p->totalEnergyProduced;
+            s->value = bx_ftol(p->totalEnergyProduced);
             s = g_onlineReportScoreBoards[i]->scores[3];
             s->name = g_scoreNames[3];
-            s->value = (int)p->totalMetalProduced;
+            s->value = bx_ftol(p->totalMetalProduced);
             s = g_onlineReportScoreBoards[i]->scores[4];
             s->name = g_scoreNames[4];
-            s->value = (int)p->energyWasted;
+            s->value = bx_ftol(p->energyWasted);
             s = g_onlineReportScoreBoards[i]->scores[5];
             s->name = g_scoreNames[5];
-            s->value = (int)p->metalWasted;
+            s->value = bx_ftol(p->metalWasted);
             s = g_onlineReportScoreBoards[i]->scores[6];
             s->name = g_scoreNames[6];
             s->value = p->commanderKills;

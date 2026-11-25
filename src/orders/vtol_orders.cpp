@@ -25,6 +25,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 #endif
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 static inline Vec3 PosMinus(const Vec3& a, const Vec3& b)
 {
@@ -697,7 +698,7 @@ int __stdcall VtolRepairUnitOrder(Unit* unit, Order* order, int flags)
         RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIRS_UNSUCCESSFUL);
         return 8;
     }
-    if (order->range && (int)_hypot(unit->xWhole - order->x, unit->zWhole - order->z) >= order->range)
+    if (order->range && bx_ftol(_hypot(unit->xWhole - order->x, unit->zWhole - order->z)) >= order->range)
         return 5;
     if (order->target->mode != 1) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIRS_UNSUCCESSFUL);
@@ -862,7 +863,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
     }
     short& ox = order->x;
     short& oz = order->z;
-    if (order->range && (int)_hypot(unit->xWhole - ox, unit->zWhole - oz) >= order->range)
+    if (order->range && bx_ftol(_hypot(unit->xWhole - ox, unit->zWhole - oz)) >= order->range)
         return 5;
     int range = ((WeaponDef*)unit->weapons[0].weapon)->range;
     unsigned int state = 0;
@@ -877,7 +878,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
-        int dist = (int)_hypot(order->target->pos.x - unit->pos.x, order->target->pos.z - unit->pos.z);
+        int dist = bx_ftol(_hypot(order->target->pos.x - unit->pos.x, order->target->pos.z - unit->pos.z));
         int angle = GetHeadingBetween(&unit->pos, &order->target->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = Sum(unit->pos, off);
@@ -1371,7 +1372,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
     }
     if (target)
         order->pos = target->pos;
-    if (order->range && (int)_hypot(unit->xWhole - order->start.x, unit->zWhole - order->start.y) >= order->range)
+    if (order->range && bx_ftol(_hypot(unit->xWhole - order->start.x, unit->zWhole - order->start.y)) >= order->range)
         return 5;
     unsigned int state = 0;
     state = order->state;
@@ -1390,7 +1391,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         Vec3* up;
         op = &order->pos;
         up = &unit->pos;
-        if ((int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z) < 0x1e00000) {
+        if (bx_ftol(_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z)) < 0x1e00000) {
             int angle = GetHeadingBetween(up, op);
             Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x8c00000));
             AttachMove(order, dest, 0x3c0);
@@ -1404,7 +1405,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         Vec3* up2;
         op2 = &order->pos;
         up2 = &unit->pos;
-        int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
+        int dist = bx_ftol(_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z));
         int angle = GetHeadingBetween(up2, op2);
         int radius = dist / 2;
         Vec3 dest = AddVec3(unit->pos, Offset(RandomInt(0x4000) + angle - 0x2000, radius));
@@ -1425,7 +1426,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         if (!rate)
             break;
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
-        int time = (int)(x * unit->motion->field_22) + 1;
+        int time = bx_ftol(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
         unsigned int obj;
         if (order->target)
@@ -1519,7 +1520,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         order->SetDeadlineTicks(0x1e);
         order->state = 2;
     }
-    if (order->range && (int)_hypot(unit->xWhole - order->x, unit->zWhole - order->z) >= order->range)
+    if (order->range && bx_ftol(_hypot(unit->xWhole - order->x, unit->zWhole - order->z)) >= order->range)
         return 5;
     unsigned int state = 0;
     state = order->state;
@@ -1533,7 +1534,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         WeaponsPublishRelease(SCHED_ORDERS, (Unit*)unit, 3);
-        int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
+        int dist = bx_ftol(_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z));
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = AddVec3(unit->pos, off);
@@ -1729,7 +1730,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
     case 2:
         if (flags & 0x40)
             return 8;
-        order->time = (int)(30.0f - (f->metal + f->energy) * -0.5f);
+        order->time = bx_ftol(30.0f - (f->metal + f->energy) * -0.5f);
         RecordUnitSpeech(unit, 11, SIM_SPEECH_KIND_TEXT);
         return 1;
     case 3:
@@ -1973,7 +1974,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx(obj);
         return 2;
     }
-    if (order->range && (int)_hypot(unit->xWhole - order->x, unit->zWhole - order->z) >= order->range)
+    if (order->range && bx_ftol(_hypot(unit->xWhole - order->x, unit->zWhole - order->z)) >= order->range)
         return 5;
     switch (order->state) {
     case 0:
@@ -2007,7 +2008,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             else
                 order->ticks += 0x2d;
             Fixed d;
-            d.value = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
+            d.value = bx_ftol(_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z));
             if (d.whole > 0xa0) {
                 Vec3 p = order->target->pos;
                 p.x += ((UnitMotion*)order->target->motion)->velocity.x * 45;

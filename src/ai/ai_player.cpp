@@ -165,7 +165,7 @@ struct MovableVec3 {
         double fx = x;
         double fy = y;
         double fz = z;
-        return (int)sqrt(fx * fx + fy * fy + fz * fz);
+        return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     }
     void Scale(int s)
     {
@@ -1380,7 +1380,7 @@ void __stdcall ScaleUnitWeights(int player, unsigned int* mask, float scale, int
         if (mask[i >> 5] & (1 << (i & 0x1f))) {
             int off = i * 4;
             if (*(int*)(off + (int)p->vec_bd.Begin()) == 0) {
-                p->vec_ad[i].value = (unsigned char)__min(__max((int)(p->vec_ad[i].value * scale), 0), 100);
+                p->vec_ad[i].value = (unsigned char)__min(__max(bx_ftol(p->vec_ad[i].value * scale), 0), 100);
                 if (lock)
                     *(int*)(off + (int)p->vec_bd.Begin()) = 1;
             }

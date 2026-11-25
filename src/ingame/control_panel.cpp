@@ -1009,7 +1009,7 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
     float energyCharge = type->energyCost * step;
     float metalCharge = type->metalCost * step;
 #endif
-    int hp = (int)(prev * type->maxHealth) - (int)(next * type->maxHealth);
+    int hp = bx_ftol(prev * type->maxHealth) - bx_ftol(next * type->maxHealth);
     if (amount < 0.0f) {
         float refund = -metalCharge;
         EconPublish(SCHED_UNITS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);

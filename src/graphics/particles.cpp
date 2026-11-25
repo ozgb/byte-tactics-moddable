@@ -56,7 +56,7 @@ struct TeleportEndpoint {
         float fx = x;
         float fy = y;
         float fz = z;
-        return (int)sqrt(fx * fx + fy * fy + fz * fz);
+        return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     }
     TeleportEndpoint& operator+=(const TeleportEndpoint& o)
     {
@@ -1642,7 +1642,7 @@ static inline int LengthFloat(const Vec3& v)
     float fx = v.x;
     float fy = v.y;
     float fz = v.z;
-    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+    return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
 }
 
 // FUNCTION: 0x473d50

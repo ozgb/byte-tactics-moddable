@@ -42985,6 +42985,13 @@ address,function,file,kind,target
 ,ArgOutBytes,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgOutBytes,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ArgOutBytes,src/harness/replay.cpp,function,
+,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayAddObjectName
+,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayText::Add
+,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayText::AddChar
+,ArgOutUnitBuffer,src/harness/replay.cpp,call,Table
+,ArgOutUnitBuffer,src/harness/replay.cpp,call,get
+,ArgOutUnitBuffer,src/harness/replay.cpp,deref_read,*Ref<Unit>
+,ArgOutUnitBuffer,src/harness/replay.cpp,function,
 ,ArgPending,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgPending,src/harness/replay.cpp,function,
 ,ArgRegionOffset,src/harness/replay.cpp,call,ArgValue
@@ -49026,7 +49033,10 @@ address,function,file,kind,target
 ,ImportResultObjectReach,src/harness/replay.cpp,call,Table
 ,ImportResultObjectReach,src/harness/replay.cpp,call,__builtin_va_end
 ,ImportResultObjectReach,src/harness/replay.cpp,call,__builtin_va_start
+,ImportResultObjectReach,src/harness/replay.cpp,call,strchr
 ,ImportResultObjectReach,src/harness/replay.cpp,deref_read,*ReplayObjectField
+,ImportResultObjectReach,src/harness/replay.cpp,deref_read,*char
+,ImportResultObjectReach,src/harness/replay.cpp,field_read,ReplayObjectField::kind
 ,ImportResultObjectReach,src/harness/replay.cpp,function,
 ,ImportResultObjectReach,src/harness/replay.cpp,global_read,s_field
 ,ImportResultPending,src/harness/replay.cpp,call,ReplayText::Add
@@ -55620,6 +55630,11 @@ address,function,file,kind,target
 ,RecLosRadarApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const LosRadarEventHeader *, unsigned int) __attribute__((stdcall)) [LosRadarSeam::Apply]"
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,FinishImport
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ImportValue
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarClampWorldPosToTerrain,src/harness/replay_hooks.inc,field_read,LosRadarSeam::ClampWorldPosToTerrain
@@ -55695,6 +55710,7 @@ address,function,file,kind,target
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,indirect_call,indirect via Cell *(*const)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetOriginCellAtPosition]
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgOutUnitBuffer
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,FinishImport
@@ -55712,6 +55728,7 @@ address,function,file,kind,target
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int, Ref<Unit> *, int) __attribute__((stdcall)) [LosRadarSeam::GetSeenUnitsInRadius]"
+,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,ArgOutUnitBuffer
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,FinishImport
@@ -58904,6 +58921,7 @@ address,function,file,kind,target
 ,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryBuildUnitType_UnitScanVisitor
 ,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor
 ,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllOfType_UnitScanVisitor
+,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor
 ,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor
 ,ReplayExtraVtables,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor
 ,ReplayFail,src/harness/replay_text.cpp,call,strncpy
@@ -59553,6 +59571,7 @@ address,function,file,kind,target
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryKillAllOfType
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryKillEnemyCommander
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryKillUnitType
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryMoveUnitToRadius
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryTimerRunsOut
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryUnitTypePassesX
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_vtsym_VictoryUnitTypePassesZ
@@ -61053,6 +61072,14 @@ address,function,file,kind,target
 ,SetValue,src/gui/dialogs.cpp,function,
 ,SetWholePart,src/map/terrain.cpp,deref_write,*short
 ,SetWholePart,src/map/terrain.cpp,function,
+,SetsOfKind,src/harness/replay.cpp,deref_read,*ReplaySlotSets
+,SetsOfKind,src/harness/replay.cpp,field_read,ReplayKindSets::kind
+,SetsOfKind,src/harness/replay.cpp,field_read,ReplayKindSets::sets
+,SetsOfKind,src/harness/replay.cpp,field_read,ReplayKindSets::slot
+,SetsOfKind,src/harness/replay.cpp,function,
+,SetsOfKind,src/harness/replay.cpp,global_read,kReplayKindSetCount@src/harness/replay_schema.h
+,SetsOfKind,src/harness/replay.cpp,global_read,kReplayKindSets@src/harness/replay_schema.h
+,SetsOfKind,src/harness/replay.cpp,global_read,kReplaySlots@src/harness/replay_schema.h
 ,SettingGetBlob,src/host/settings_io.h,call,host_setting_get
 ,SettingGetBlob,src/host/settings_io.h,function,
 ,SettingGetInt,src/host/settings_io.h,call,host_setting_get
@@ -61363,6 +61390,7 @@ address,function,file,kind,target
 ,SlotEnter,src/harness/replay.cpp,call,ReplayText::AddInt
 ,SlotEnter,src/harness/replay.cpp,call,ReplayText::Clear
 ,SlotEnter,src/harness/replay.cpp,call,ReplayText::Data
+,SlotEnter,src/harness/replay.cpp,call,SetsOfKind
 ,SlotEnter,src/harness/replay.cpp,call,host_thread_id
 ,SlotEnter,src/harness/replay.cpp,call,operator=
 ,SlotEnter,src/harness/replay.cpp,deref_read,*Recording
@@ -61380,11 +61408,11 @@ address,function,file,kind,target
 ,SlotEnter,src/harness/replay.cpp,global_maybe_written,s_snapshots
 ,SlotEnter,src/harness/replay.cpp,global_maybe_written,s_tail
 ,SlotEnter,src/harness/replay.cpp,global_read,g_game
-,SlotEnter,src/harness/replay.cpp,global_read,kReplaySlots@src/harness/replay_schema.h
 ,SlotEnter,src/harness/replay.cpp,global_read,s_field
 ,SlotEnter,src/harness/replay.cpp,global_read,s_rec
 ,SlotEnter,src/harness/replay.cpp,global_read,s_recording
 ,SlotEnter,src/harness/replay.cpp,global_read,s_tick
+,SlotEnter,src/harness/replay.cpp,global_write,s_kind
 ,SlotEnter,src/harness/replay.cpp,global_write,s_recording
 ,SlotEnter,src/harness/replay.cpp,global_write,s_roots
 ,SlotEnter,src/harness/replay.cpp,global_write,s_slot
@@ -61398,6 +61426,7 @@ address,function,file,kind,target
 ,SlotLeave,src/harness/replay.cpp,call,ReplayText::AddChar
 ,SlotLeave,src/harness/replay.cpp,call,ReplayText::AddInt
 ,SlotLeave,src/harness/replay.cpp,call,ReplayText::AddText
+,SlotLeave,src/harness/replay.cpp,call,SetsOfKind
 ,SlotLeave,src/harness/replay.cpp,deref_read,*Recording
 ,SlotLeave,src/harness/replay.cpp,field_maybe_written,Recording::out
 ,SlotLeave,src/harness/replay.cpp,field_read,Recording::out
@@ -61405,8 +61434,8 @@ address,function,file,kind,target
 ,SlotLeave,src/harness/replay.cpp,field_read,ReplaySlotSets::writeCount
 ,SlotLeave,src/harness/replay.cpp,field_read,ReplaySlotSets::writes
 ,SlotLeave,src/harness/replay.cpp,function,
-,SlotLeave,src/harness/replay.cpp,global_read,kReplaySlots@src/harness/replay_schema.h
 ,SlotLeave,src/harness/replay.cpp,global_read,s_call
+,SlotLeave,src/harness/replay.cpp,global_read,s_kind
 ,SlotLeave,src/harness/replay.cpp,global_read,s_rec
 ,SlotLeave,src/harness/replay.cpp,global_read,s_recording
 ,SlotLeave,src/harness/replay.cpp,global_read,s_slot

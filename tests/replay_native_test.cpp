@@ -851,6 +851,8 @@ bool ApplyReachField(void* object, unsigned kind, const char* suffix)
 {
     const char* value = OutValue(suffix);
     const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
+    if (object != nullptr && value != nullptr && f != nullptr && f->kind == RK_BLOB)
+        return ReplayApplyBlob(*f, object, suffix, value, g_known, true, g_objects, AllocObject);
     return object == nullptr || value == nullptr || f == nullptr || ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
 }
 
@@ -1252,6 +1254,28 @@ void CompareObjectResult(unsigned kind, const void* object)
         recorded = "no such line";
     if (strcmp(recorded, value.Data()) != 0)
         Diff("result", recorded, value.Data());
+    value.Free();
+}
+
+void CompareUnitBuffer(const char* name, const Ref<Unit>* units, int count, int capacity)
+{
+    if (count > capacity)
+        count = capacity;
+    ReplayText value;
+    value.AddChar('[');
+    for (int i = 0; i < count; i++) {
+        if (i != 0)
+            value.AddChar(',');
+        ReplayAddObjectName(value, g_objects, ROK_UNIT, units[i].get(), false);
+    }
+    value.AddChar(']');
+    HashText(value.Data());
+    CoreClosing(name, value.Data());
+    const char* recorded = OutLine(name);
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
     value.Free();
 }
 
@@ -2472,6 +2496,21 @@ const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
     return nullptr;
 }
 
+const ReplaySlotSets* SetsOfKind(const ReplaySlotSets* sets)
+{
+    unsigned slot = (unsigned)(sets - kReplaySlots);
+    for (unsigned i = 0; i < kReplayKindSetCount; i++) {
+        if (kReplayKindSets[i].slot != slot)
+            continue;
+        for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+            int kind;
+            if (sscanf(g_lines[k], "  a event.kind %d", &kind) == 1 && kind == kReplayKindSets[i].kind)
+                return kReplayKindSets[i].sets;
+        }
+    }
+    return sets;
+}
+
 void SplitLines()
 {
     g_lineCount = 0;
@@ -2901,6 +2940,7 @@ void ReplayCall(const char* file, Outcome& out)
     const ReplaySlotSets* sets = FindSlot(g_subsystem, slotText);
     if (sets == nullptr)
         Fatal(file, g_callIndex, "unknown slot", slotText);
+    sets = SetsOfKind(sets);
     g_coreWrites.Clear();
     g_coreClosings.Clear();
     g_diffs = 0;
@@ -3935,6 +3975,24 @@ void EnemyListSelfTest()
     Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 301, 0, wide, 5);
     printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
+
+    printf("a recorded slot whose count is above its capacity\n");
+    ResetBlock();
+    LoadCall(call);
+    BeginImport();
+    memset(narrow, 0, sizeof narrow);
+    Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, narrow, 2);
+    LoadCall("  a capacity 2\n  o out [Unit#3,Unit#9]\n  o result 3\n");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 3, 2);
+    Check(g_diffs == 0, "the buffer holds the first capacity units of a larger count, as the line has them");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 1, 2);
+    Check(g_diffs == 1, "a count below the units of the line is a difference");
+    LoadCall("  a capacity 2\n  o out [Unit#3,Unit#9,Unit#5]\n  o result 3\n");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 3, 2);
+    Check(g_diffs == 1, "a line with more units than the capacity is a difference");
 }
 
 void ShapeSelfTest()

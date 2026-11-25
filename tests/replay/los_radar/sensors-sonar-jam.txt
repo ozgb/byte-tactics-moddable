@@ -75960,6 +75960,14 @@ call 0 Apply
   o snapshot#1 x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   o snapshot#1 x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   o snapshot#2 x:01000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000
+call 0 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 0 RefreshUnitIndex
   r Unit#2500.buildLeft f32:0x00000000
   r Player#0.allied x:0100000000000000000000
@@ -81030,6 +81038,14 @@ call 0 UpdateSensorRadarAndCloak
   o ids x:0100
   w Unit#1.flags 0x90e00321
 call 0 RecordRadarMapped
+call 0 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 0 RefreshUnitIndex
   a player 1
 call 0 UpdateUnitLineOfSight
@@ -81941,6 +81957,22 @@ call 2 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 3 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
+call 3 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 3 RefreshUnitIndex
   a player 0
 call 3 UpdateUnitLineOfSight
@@ -82396,6 +82428,14 @@ call 11 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 12 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (41943040,65536,19660800)
+  a radius 150
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 12 RefreshUnitIndex
   a player 0
 call 12 UpdateUnitLineOfSight
@@ -82866,6 +82906,14 @@ call 21 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 22 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (41943040,65536,19660800)
+  a radius 150
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 22 RefreshUnitIndex
   a player 0
 call 22 UpdateUnitLineOfSight
@@ -83101,6 +83149,14 @@ call 26 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 27 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 27 RefreshUnitIndex
   a player 0
 call 27 UpdateUnitLineOfSight
@@ -83110,6 +83166,14 @@ call 27 RecordRadarUnits
   i services.SimCaptureAlloc 56 = snapshot#1
   i services.RecordSimEvent 34 0 [0] 1
   o snapshot#1 x:01000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000
+call 27 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 27 RefreshUnitIndex
   a player 1
 call 27 UpdateUnitLineOfSight
@@ -83541,6 +83605,14 @@ call 35 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 36 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out [Unit#252]
+  o result 1
 call 36 RefreshUnitIndex
   a player 0
 call 36 UpdateUnitLineOfSight
@@ -84387,6 +84459,14 @@ call 53 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 54 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 54 RefreshUnitIndex
   a player 0
 call 54 UpdateUnitLineOfSight
@@ -84434,6 +84514,14 @@ call 54 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 55 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out [Unit#252]
+  o result 1
 call 55 RefreshUnitIndex
   a player 0
 call 55 UpdateUnitLineOfSight
@@ -84444,6 +84532,14 @@ call 55 RecordRadarUnits
   i services.SimCaptureAlloc 104 = snapshot#1
   i services.RecordSimEvent 34 0 [0] 1
   o snapshot#1 x:02000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000fc00fc00800200002c01000001020000000000008a020000000000000000000000000000000000000000000000000000
+call 55 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 55 RefreshUnitIndex
   a player 1
 call 55 UpdateUnitLineOfSight
@@ -85201,6 +85297,14 @@ call 70 GetMapCell
 call 71 SoundHeardMask
   a at (37582133,1293843,15407943)
   o result 3
+call 71 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (41943040,65536,19660800)
+  a radius 150
+  a flags 0
+  a capacity 64
+  o out [Unit#1]
+  o result 1
 call 71 GetMapCellAtPosition
   a pos (38209192,1176296,16004986)
   o result Cell#3396
@@ -85830,6 +85934,14 @@ call 83 RecordRadarUnits
   i services.SimCaptureAlloc 104 = snapshot#1
   i services.RecordSimEvent 34 0 [0] 1
   o snapshot#1 x:02000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000fc00fc00800200002c01000001030000000000008a020000000000000000000000000000000000000000000000000000
+call 83 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 83 RefreshUnitIndex
   a player 1
 call 83 UpdateUnitLineOfSight
@@ -86060,6 +86172,14 @@ call 87 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 88 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out [Unit#252]
+  o result 1
 call 88 RefreshUnitIndex
   a player 0
 call 88 UpdateUnitLineOfSight
@@ -86982,6 +87102,14 @@ call 105 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 106 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (41943040,65536,19660800)
+  a radius 150
+  a flags 0
+  a capacity 64
+  o out [Unit#1]
+  o result 1
 call 106 RefreshUnitIndex
   a player 0
 call 106 UpdateUnitLineOfSight
@@ -87222,6 +87350,14 @@ call 110 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 111 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 111 RefreshUnitIndex
   a player 0
 call 111 UpdateUnitLineOfSight
@@ -87232,6 +87368,14 @@ call 111 RecordRadarUnits
   i services.SimCaptureAlloc 104 = snapshot#1
   i services.RecordSimEvent 34 0 [0] 1
   o snapshot#1 x:02000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000fc00fc00800200002c01000001030000000000008a020000000000000000000000000000000000000000000000000000
+call 111 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 111 RefreshUnitIndex
   a player 1
 call 111 UpdateUnitLineOfSight
@@ -88586,6 +88730,14 @@ call 138 RecordRadarUnits
   i services.SimCaptureAlloc 104 = snapshot#1
   i services.RecordSimEvent 34 0 [0] 1
   o snapshot#1 x:02000000000000000100010030020000f0000000000290019001000000000000000000000000000000000000000000000000000000000000fc00fc00800200002c01000001030000000000008a020000000000000000000000000000000000000000000000000000
+call 138 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 200
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 138 RefreshUnitIndex
   a player 1
 call 138 UpdateUnitLineOfSight
@@ -89019,6 +89171,14 @@ call 146 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 147 GetVisibleEnemiesInRadius
+  a player 0
+  a pos (36700160,65536,15728640)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out [Unit#252]
+  o result 1
 call 147 GetMapCellAtPosition
   a pos (38836251,1058749,16602029)
   o result Cell#3397
@@ -89074,6 +89234,14 @@ call 147 GetMapCell
   a x 19
   a y 2
   o result Cell#467
+call 148 GetVisibleEnemiesInRadius
+  a player 1
+  a pos (221249536,65536,92274688)
+  a radius 290
+  a flags 0
+  a capacity 64
+  o out []
+  o result 0
 call 148 GetMapCellAtPosition
   a pos (39463310,941202,17199072)
   o result Cell#3621

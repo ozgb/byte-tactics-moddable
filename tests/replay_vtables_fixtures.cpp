@@ -15,6 +15,7 @@ extern void (* const g_vtsym_VictoryBuildUnitType[])() __asm__("??_7VictoryBuild
 extern void (* const g_vtsym_VictoryCaptureUnitType[])() __asm__("??_7VictoryCaptureUnitType@@6B@");
 extern void (* const g_vtsym_VictoryKillAllOfType[])() __asm__("??_7VictoryKillAllOfType@@6BMissionCondition@@@");
 extern void (* const g_vtsym_VictoryKillUnitType[])() __asm__("??_7VictoryKillUnitType@@6B@");
+extern void (* const g_vtsym_VictoryMoveUnitToRadius[])() __asm__("??_7VictoryMoveUnitToRadius@@6BMissionCondition@@@");
 extern void (* const g_vtsym_VictoryUnitTypePassesX[])() __asm__("??_7VictoryUnitTypePassesX@@6BMissionCondition@@@");
 extern void (* const g_vtsym_VictoryUnitTypePassesZ[])() __asm__("??_7VictoryUnitTypePassesZ@@6BMissionCondition@@@");
 extern void (* const g_vtsym_VictoryTimerRunsOut[])() __asm__("??_7VictoryTimerRunsOut@@6B@");
@@ -43,6 +44,7 @@ extern void (* const g_vtsym_FixtureTwin[])() __asm__("??_7FixtureTwin@@6BFixtur
 extern void (* const g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor[])() __asm__("??_7VictoryKillAllMobileUnits@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_VictoryBuildUnitType_UnitScanVisitor[])() __asm__("??_7VictoryBuildUnitType@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_VictoryKillAllOfType_UnitScanVisitor[])() __asm__("??_7VictoryKillAllOfType@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor[])() __asm__("??_7VictoryMoveUnitToRadius@@6BRadiusUnitVisitor@@@");
 extern void (* const g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor[])() __asm__("??_7VictoryUnitTypePassesX@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor[])() __asm__("??_7VictoryUnitTypePassesZ@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor[])() __asm__("??_7DefeatAllUnitsKilled@@6BUnitScanVisitor@@@");
@@ -78,6 +80,8 @@ const void* ReplayVtable(unsigned kind)
         return g_vtsym_VictoryKillAllOfType;
     case ROK_VICTORYKILLUNITTYPE:
         return g_vtsym_VictoryKillUnitType;
+    case ROK_VICTORYMOVEUNITTORADIUS:
+        return g_vtsym_VictoryMoveUnitToRadius;
     case ROK_VICTORYUNITTYPEPASSESX:
         return g_vtsym_VictoryUnitTypePassesX;
     case ROK_VICTORYUNITTYPEPASSESZ:
@@ -160,6 +164,8 @@ const char* ReplayVtableName(unsigned kind)
         return "g_vtsym_VictoryKillAllOfType";
     case ROK_VICTORYKILLUNITTYPE:
         return "g_vtsym_VictoryKillUnitType";
+    case ROK_VICTORYMOVEUNITTORADIUS:
+        return "g_vtsym_VictoryMoveUnitToRadius";
     case ROK_VICTORYUNITTYPEPASSESX:
         return "g_vtsym_VictoryUnitTypePassesX";
     case ROK_VICTORYUNITTYPEPASSESZ:
@@ -229,6 +235,10 @@ unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out)
     case ROK_VICTORYKILLALLOFTYPE:
         out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryKillAllOfType*>(0x1000)) - (const char*)0x1000);
         out[0].vtable = g_vtsec_VictoryKillAllOfType_UnitScanVisitor;
+        return 1;
+    case ROK_VICTORYMOVEUNITTORADIUS:
+        out[0].offset = (unsigned)((const char*)static_cast<RadiusUnitVisitor*>(reinterpret_cast<VictoryMoveUnitToRadius*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor;
         return 1;
     case ROK_VICTORYUNITTYPEPASSESX:
         out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryUnitTypePassesX*>(0x1000)) - (const char*)0x1000);

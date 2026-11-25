@@ -1735,6 +1735,14 @@ static const TraceField kEventMapSetSeaLevel[] = {
     { "level", offsetof(MapSetSeaLevel, level), 4, TF_SCALAR, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(MapSetEdge) == 16, "MapSetEdge");
+static const TraceField kEventMapSetEdge[] = {
+    { "kind", offsetof(MapSetEdge, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(MapSetEdge, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "x", offsetof(MapSetEdge, x), 4, TF_SCALAR, TT_NONE, 0 },
+    { "z", offsetof(MapSetEdge, z), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(MapCellsChanged) == 32, "MapCellsChanged");
 static const TraceField kEventMapEffectCellsChanged[] = {
     { "kind", offsetof(MapCellsChanged, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1755,9 +1763,10 @@ static const TraceEventKind kMapKinds[] = {
     { 168, "MAP_PASS_MAPS", sizeof(MapPassMaps), kEventMapPassMaps, 5 },
     { 169, "MAP_LOAD_PATH_LOCK_STAMP", sizeof(MapPathLockStamp), kEventMapLoadPathLockStamp, 4 },
     { 170, "MAP_SET_SEA_LEVEL", sizeof(MapSetSeaLevel), kEventMapSetSeaLevel, 4 },
+    { 171, "MAP_SET_EDGE", sizeof(MapSetEdge), kEventMapSetEdge, 5 },
     { 176, "MAP_EFFECT_CELLS_CHANGED", sizeof(MapCellsChanged), kEventMapEffectCellsChanged, 6 },
 };
-static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 11 };
+static const TraceEventModule kMapEvents = { "map", 40, kMapKinds, 12 };
 
 static_assert(sizeof(PlayersGiveUnit) == 48, "PlayersGiveUnit");
 static const TraceField kEventPlayersGiveUnit[] = {

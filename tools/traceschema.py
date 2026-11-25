@@ -1023,7 +1023,7 @@ EVENT_MODULES = [
                 {"MAP_ADD_UNIT": None, "MAP_REMOVE_UNIT": None, "MAP_CLEAR_UNIT": None, "MAP_RECLAIM_FOOTPRINT": None,
                  "MAP_SET_YARD": "MapSetYard", "MAP_BUCKET_UNLINK": None, "MAP_BUCKET_PREPEND": None,
                  "MAP_PASS_MAPS": "MapPassMaps", "MAP_LOAD_PATH_LOCK_STAMP": "MapPathLockStamp",
-                 "MAP_SET_SEA_LEVEL": "MapSetSeaLevel",
+                 "MAP_SET_SEA_LEVEL": "MapSetSeaLevel", "MAP_SET_EDGE": "MapSetEdge",
                  "MAP_EFFECT_CELLS_CHANGED": "MapCellsChanged"}, size_header="map_event_size.h"),
     EventModule("playersEvents", 41, "Players", "players.h", "PlayersEventHeader",
                 ["PlayersEventKind", "PlayersEffectKind"],

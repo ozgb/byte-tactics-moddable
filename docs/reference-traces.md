@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v34`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 91 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 92 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
   for each scenario.

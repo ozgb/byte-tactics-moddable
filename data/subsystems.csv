@@ -4051,6 +4051,7 @@ MapInsertResult::MapInsertResult,src/debug/free_block_map.h,platform,folder:src/
 MapOnFeaturesPassMaps,src/seams/map_world.cpp,seams,folder:src/seams/,
 MapPoint,src/map/terrain.cpp,map,file:src/map/terrain,
 MapPublishCellsChanged,src/game/map_events.h,map,name:Cell,
+MapPublishSetEdge,src/game/map_events.h,game,default:src/game/,
 MapPublishSetSeaLevel,src/game/map_events.h,game,default:src/game/,game
 MapRange,src/ai/ai_player.cpp,ai,file:src/ai/,
 MapSlot,src/harness/harness.cpp,harness,folder:src/harness/,

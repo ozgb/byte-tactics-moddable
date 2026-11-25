@@ -588,6 +588,7 @@ recorded call as `r` lines. `replayschema.py --check` fails for a name that is n
 two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
 a member that is a unit ref already.
+
 `"weapons"` lists the payload members (`Struct.member`) that hold the number of a weapon, an `int`:
 `["WeaponsAreaDamage.weapon", "WeaponsSpawn.weapon"]`. The line keeps the number (`a event.weapon 225`), and the recorder makes
 `weapondef#225` a root of the call, so the slot's reads of that weapon are recorded as `r` lines, as a weapon argument's are (a

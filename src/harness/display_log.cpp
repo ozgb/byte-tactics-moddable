@@ -1091,10 +1091,17 @@ static int CompareFrom(int ia, int ib, int depth)
     return lx < ly ? -1 : (lx > ly ? 1 : 0);
 }
 
-static int ByteAt(int item, int depth)
+static unsigned WordAt(int item, int depth)
 {
     const Item* it = &s_items[item];
-    return depth < it->end - it->start ? (unsigned char)s_text[it->start + depth] : -1;
+    const unsigned char* p = (const unsigned char*)s_text + it->start + depth;
+    int n = it->end - it->start - depth;
+    if (n >= 4)
+        return (unsigned)p[0] << 24 | (unsigned)p[1] << 16 | (unsigned)p[2] << 8 | (unsigned)p[3];
+    unsigned w = 0;
+    for (int i = 0; i < 4; i++)
+        w = w << 8 | (i < n ? (unsigned)p[i] : 0u);
+    return w;
 }
 
 static void SortLines(int* a, int n, int depth)
@@ -1112,15 +1119,15 @@ static void SortLines(int* a, int n, int depth)
             }
             return;
         }
-        int b0 = ByteAt(a[0], depth);
-        int b1 = ByteAt(a[n / 2], depth);
-        int b2 = ByteAt(a[n - 1], depth);
-        int pivot = b0 < b1 ? (b1 < b2 ? b1 : (b0 < b2 ? b2 : b0)) : (b0 < b2 ? b0 : (b1 < b2 ? b2 : b1));
+        unsigned b0 = WordAt(a[0], depth);
+        unsigned b1 = WordAt(a[n / 2], depth);
+        unsigned b2 = WordAt(a[n - 1], depth);
+        unsigned pivot = b0 < b1 ? (b1 < b2 ? b1 : (b0 < b2 ? b2 : b0)) : (b0 < b2 ? b0 : (b1 < b2 ? b2 : b1));
         int lt = 0;
         int i = 0;
         int gt = n;
         while (i < gt) {
-            int c = ByteAt(a[i], depth);
+            unsigned c = WordAt(a[i], depth);
             if (c < pivot) {
                 int t = a[lt];
                 a[lt] = a[i];
@@ -1138,11 +1145,11 @@ static void SortLines(int* a, int n, int depth)
         }
         SortLines(a, lt, depth);
         SortLines(a + gt, n - gt, depth);
-        if (pivot < 0)
-            return;
         a += lt;
         n = gt - lt;
-        depth++;
+        if (n > 0 && s_items[a[0]].end - s_items[a[0]].start <= depth + 4)
+            return;
+        depth += 4;
     }
 }
 

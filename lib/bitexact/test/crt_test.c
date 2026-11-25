@@ -3,6 +3,10 @@
 #include <string.h>
 
 #include "../bitexact.h"
+#include "../bx_game.h"
+#include "../bx_libcmt.h"
+#include "../bx_stl.h"
+#include "kit.h"
 #include "vectors.h"
 
 #ifdef BX_REPLAY
@@ -62,6 +66,10 @@ static unsigned int seed_at(int i)
     return rnd32();
 }
 
+static int kit_draws[10000];
+static int kit_next[4];
+static int kit_edge;
+
 static void test_rand(void)
 {
     int i, j;
@@ -76,8 +84,16 @@ static void test_rand(void)
             int got = bx_rand(&s);
             if (want != got) {
                 fail(&st_rand, "seed 0x%lx draw %lu want %lu", seed, j, want);
+                kit_dropped("rand");
                 break;
             }
+            kit_draws[j] = want;
+        }
+        if (j == 10000) {
+            kit_begin("rand", i < 8);
+            kit_u32(seed);
+            kit_bytes(kit_draws, sizeof(kit_draws));
+            kit_end();
         }
     }
 }
@@ -86,9 +102,11 @@ static int same_state(const bx_rand_state *s)
 {
     bx_rand_state t = *s;
     int k;
-    for (k = 0; k < 4; k++)
-        if (ORACLE_INT(rand()) != bx_rand(&t))
+    for (k = 0; k < 4; k++) {
+        kit_next[k] = ORACLE_INT(rand());
+        if (kit_next[k] != bx_rand(&t))
             return 0;
+    }
     return 1;
 }
 
@@ -102,9 +120,22 @@ static int check_shuffle(int n, unsigned int seed, int *a, int *b)
     bx_srand(&s, seed);
     ORACLE_BYTES(orig_random_shuffle_int(a, a + n), a, n * sizeof(int));
     bx_random_shuffle_int(&s, b, b + n);
-    if (n > 0 && memcmp(a, b, n * sizeof(int)) != 0)
+    if (n > 0 && memcmp(a, b, n * sizeof(int)) != 0) {
+        kit_dropped("shuffle");
         return 0;
-    return same_state(&s);
+    }
+    if (!same_state(&s)) {
+        kit_dropped("shuffle");
+        return 0;
+    }
+    kit_begin("shuffle", kit_edge);
+    kit_u32(seed);
+    kit_i32(n);
+    kit_u32((bx_u32)(n * sizeof(int)));
+    kit_bytes(a, n * sizeof(int));
+    kit_bytes(kit_next, sizeof(kit_next));
+    kit_end();
+    return 1;
 }
 
 static void test_shuffle(void)
@@ -117,6 +148,7 @@ static void test_shuffle(void)
         for (i = 0; i < 100; i++) {
             unsigned int seed = seed_at(i);
             st_shuffle.cases++;
+            kit_edge = i < 8;
             if (!check_shuffle(n, seed, a, b))
                 fail(&st_shuffle, "size %lu seed 0x%lx (%lu)", n, seed, 0);
         }
@@ -124,6 +156,7 @@ static void test_shuffle(void)
         for (i = 0; i < 20; i++) {
             unsigned int seed = seed_at(i);
             st_shuffle.cases++;
+            kit_edge = i < 2 && big[n] >= 32767 && big[n] <= 32769;
             if (!check_shuffle(big[n], seed, a, b))
                 fail(&st_shuffle, "size %lu seed 0x%lx (%lu)", big[n], seed, 0);
         }
@@ -163,8 +196,17 @@ static void test_load(void)
             bx_init_explosions_rand(&s);
             bx_random_shuffle_int(&s, b, b + n);
             st_load.cases++;
-            if (memcmp(a, b, sizeof(a)) != 0 || !same_state(&s))
+            if (memcmp(a, b, sizeof(a)) != 0 || !same_state(&s)) {
                 fail(&st_load, "seed 0x%lx n %lu (%lu)", seed, n, 0);
+                kit_dropped("load_sequence");
+            } else {
+                kit_begin("load_sequence", i < 8);
+                kit_u32(seed);
+                kit_i32(n);
+                kit_bytes(a, sizeof(a));
+                kit_bytes(kit_next, sizeof(kit_next));
+                kit_end();
+            }
         }
     }
 }
@@ -245,10 +287,15 @@ int main(int argc, char **argv)
     int i, bad = 0;
     if (argc > 1 && !vec_open(argv[1]))
         return 2;
+    kit_open(argc > 2 ? argv[2] : NULL);
+    kit_layout("rand", "in seed u32\nout draws bytes40000\n");
+    kit_layout("shuffle", "in seed u32\nin size i32\nout order str\nout next bytes16\n");
+    kit_layout("load_sequence", "in seed u32\nin size i32\nout order bytes40\nout next bytes16\n");
     test_rand();
     test_shuffle();
     test_load();
     test_qsort();
+    bad |= kit_close();
     if (argc > 1)
         bad |= vec_close();
     printf("info: InitExplosions draws %lu times\n", (unsigned long)bx_init_explosions_draws());

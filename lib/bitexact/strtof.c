@@ -1,4 +1,4 @@
-#include "bitexact.h"
+#include "bx_libcmt.h"
 #include "bx_tables.h"
 
 typedef struct {

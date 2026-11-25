@@ -1,0 +1,1092 @@
+{
+  "entries": {
+    "acos": {
+      "dropped": 7,
+      "edge": 5,
+      "edge_total": 5,
+      "file": "acos.bin",
+      "inputs": [
+        [
+          "x",
+          "f64"
+        ]
+      ],
+      "outputs": [
+        [
+          "angle",
+          "f64"
+        ]
+      ],
+      "random": 5000,
+      "random_total": 499988
+    },
+    "angle_of_vector": {
+      "dropped": 0,
+      "edge": 16129,
+      "edge_total": 16129,
+      "file": "angle_of_vector.bin",
+      "inputs": [
+        [
+          "x",
+          "i32"
+        ],
+        [
+          "z",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "angle",
+          "i32"
+        ]
+      ],
+      "random": 6666,
+      "random_total": 3361201
+    },
+    "apply_rotation": {
+      "dropped": 0,
+      "edge": 0,
+      "edge_total": 0,
+      "file": "apply_rotation.bin",
+      "inputs": [
+        [
+          "m0",
+          "i32"
+        ],
+        [
+          "m1",
+          "i32"
+        ],
+        [
+          "m2",
+          "i32"
+        ],
+        [
+          "m3",
+          "i32"
+        ],
+        [
+          "m4",
+          "i32"
+        ],
+        [
+          "m5",
+          "i32"
+        ],
+        [
+          "m6",
+          "i32"
+        ],
+        [
+          "m7",
+          "i32"
+        ],
+        [
+          "m8",
+          "i32"
+        ],
+        [
+          "x",
+          "i32"
+        ],
+        [
+          "y",
+          "i32"
+        ],
+        [
+          "z",
+          "i32"
+        ],
+        [
+          "aliased",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "rx",
+          "i32"
+        ],
+        [
+          "ry",
+          "i32"
+        ],
+        [
+          "rz",
+          "i32"
+        ]
+      ],
+      "random": 1250,
+      "random_total": 1250000
+    },
+    "atoi": {
+      "dropped": 0,
+      "edge": 2460,
+      "edge_total": 2460,
+      "file": "atoi.bin",
+      "inputs": [
+        [
+          "s",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 4243,
+      "random_total": 6000
+    },
+    "compare_bytes": {
+      "dropped": 0,
+      "edge": 256,
+      "edge_total": 256,
+      "file": "compare_bytes.bin",
+      "inputs": [
+        [
+          "a",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "strcmpi",
+          "bytes256"
+        ],
+        [
+          "strnicmp1",
+          "bytes256"
+        ],
+        [
+          "strnicmp2",
+          "bytes256"
+        ],
+        [
+          "strncmp1",
+          "bytes256"
+        ],
+        [
+          "strncmp2",
+          "bytes256"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "cosine": {
+      "dropped": 0,
+      "edge": 65536,
+      "edge_total": 65536,
+      "file": "cosine.bin",
+      "inputs": [
+        [
+          "angle",
+          "u32"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "double_text": {
+      "dropped": 0,
+      "edge": 131,
+      "edge_total": 131,
+      "file": "double_text.bin",
+      "inputs": [
+        [
+          "text",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "f64"
+        ]
+      ],
+      "random": 3072,
+      "random_total": 1100000
+    },
+    "float_text": {
+      "dropped": 0,
+      "edge": 0,
+      "edge_total": 0,
+      "file": "float_text.bin",
+      "inputs": [
+        [
+          "text",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "fbits",
+          "u32"
+        ]
+      ],
+      "random": 3742,
+      "random_total": 2000000
+    },
+    "ftol": {
+      "dropped": 0,
+      "edge": 134,
+      "edge_total": 134,
+      "file": "ftol.bin",
+      "inputs": [
+        [
+          "d",
+          "f64"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 6666,
+      "random_total": 8000
+    },
+    "hypot": {
+      "dropped": 0,
+      "edge": 0,
+      "edge_total": 0,
+      "file": "hypot.bin",
+      "inputs": [
+        [
+          "x",
+          "f64"
+        ],
+        [
+          "y",
+          "f64"
+        ]
+      ],
+      "outputs": [
+        [
+          "length",
+          "f64"
+        ]
+      ],
+      "random": 3333,
+      "random_total": 2000000
+    },
+    "isalnum": {
+      "dropped": 127,
+      "edge": 257,
+      "edge_total": 257,
+      "file": "isalnum.bin",
+      "inputs": [
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "isdigit": {
+      "dropped": 127,
+      "edge": 257,
+      "edge_total": 257,
+      "file": "isdigit.bin",
+      "inputs": [
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "isspace": {
+      "dropped": 127,
+      "edge": 257,
+      "edge_total": 257,
+      "file": "isspace.bin",
+      "inputs": [
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "itoa": {
+      "dropped": 0,
+      "edge": 755,
+      "edge_total": 755,
+      "file": "itoa.bin",
+      "inputs": [
+        [
+          "value",
+          "i32"
+        ],
+        [
+          "radix",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "s",
+          "str"
+        ]
+      ],
+      "random": 4621,
+      "random_total": 8000
+    },
+    "load_sequence": {
+      "dropped": 0,
+      "edge": 64,
+      "edge_total": 64,
+      "file": "load_sequence.bin",
+      "inputs": [
+        [
+          "seed",
+          "u32"
+        ],
+        [
+          "size",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "order",
+          "bytes40"
+        ],
+        [
+          "next",
+          "bytes16"
+        ]
+      ],
+      "random": 1250,
+      "random_total": 2336
+    },
+    "memmove": {
+      "dropped": 0,
+      "edge": 1818,
+      "edge_total": 1818,
+      "file": "memmove.bin",
+      "inputs": [
+        [
+          "dst",
+          "i32"
+        ],
+        [
+          "src",
+          "i32"
+        ],
+        [
+          "n",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "ret",
+          "i32"
+        ],
+        [
+          "buf",
+          "bytes64"
+        ]
+      ],
+      "random": 1000,
+      "random_total": 12000
+    },
+    "mul_div": {
+      "dropped": 0,
+      "edge": 294,
+      "edge_total": 294,
+      "file": "mul_div.bin",
+      "inputs": [
+        [
+          "a",
+          "i32"
+        ],
+        [
+          "b",
+          "i32"
+        ],
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "i32"
+        ]
+      ],
+      "random": 5000,
+      "random_total": 2476073
+    },
+    "mul_hi": {
+      "dropped": 0,
+      "edge": 16129,
+      "edge_total": 16129,
+      "file": "mul_hi.bin",
+      "inputs": [
+        [
+          "a",
+          "i32"
+        ],
+        [
+          "b",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "high",
+          "i32"
+        ]
+      ],
+      "random": 6666,
+      "random_total": 1000000
+    },
+    "rand": {
+      "dropped": 0,
+      "edge": 8,
+      "edge_total": 8,
+      "file": "rand.bin",
+      "inputs": [
+        [
+          "seed",
+          "u32"
+        ]
+      ],
+      "outputs": [
+        [
+          "draws",
+          "bytes40000"
+        ]
+      ],
+      "random": 1,
+      "random_total": 1492
+    },
+    "rotate_point": {
+      "dropped": 0,
+      "edge": 1152,
+      "edge_total": 1152,
+      "file": "rotate_point.bin",
+      "inputs": [
+        [
+          "angle",
+          "u32"
+        ],
+        [
+          "x",
+          "i32"
+        ],
+        [
+          "z",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "rx",
+          "i32"
+        ],
+        [
+          "rz",
+          "i32"
+        ]
+      ],
+      "random": 4000,
+      "random_total": 12533184
+    },
+    "rotation_matrix": {
+      "dropped": 0,
+      "edge": 1536,
+      "edge_total": 1536,
+      "file": "rotation_matrix.bin",
+      "inputs": [
+        [
+          "angle_a",
+          "u32"
+        ],
+        [
+          "angle_b",
+          "u32"
+        ],
+        [
+          "angle_c",
+          "u32"
+        ]
+      ],
+      "outputs": [
+        [
+          "m0",
+          "i32"
+        ],
+        [
+          "m1",
+          "i32"
+        ],
+        [
+          "m2",
+          "i32"
+        ],
+        [
+          "m3",
+          "i32"
+        ],
+        [
+          "m4",
+          "i32"
+        ],
+        [
+          "m5",
+          "i32"
+        ],
+        [
+          "m6",
+          "i32"
+        ],
+        [
+          "m7",
+          "i32"
+        ],
+        [
+          "m8",
+          "i32"
+        ]
+      ],
+      "random": 1666,
+      "random_total": 13581376
+    },
+    "scaled_cosine": {
+      "dropped": 0,
+      "edge": 1016,
+      "edge_total": 1016,
+      "file": "scaled_cosine.bin",
+      "inputs": [
+        [
+          "angle",
+          "u32"
+        ],
+        [
+          "scale",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "i32"
+        ]
+      ],
+      "random": 6666,
+      "random_total": 9846344
+    },
+    "scaled_sine": {
+      "dropped": 0,
+      "edge": 1016,
+      "edge_total": 1016,
+      "file": "scaled_sine.bin",
+      "inputs": [
+        [
+          "angle",
+          "u32"
+        ],
+        [
+          "scale",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "i32"
+        ]
+      ],
+      "random": 6666,
+      "random_total": 9846344
+    },
+    "shuffle": {
+      "dropped": 0,
+      "edge": 526,
+      "edge_total": 526,
+      "file": "shuffle.bin",
+      "inputs": [
+        [
+          "seed",
+          "u32"
+        ],
+        [
+          "size",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "order",
+          "str"
+        ],
+        [
+          "next",
+          "bytes16"
+        ]
+      ],
+      "random": 25,
+      "random_total": 6094
+    },
+    "sine": {
+      "dropped": 0,
+      "edge": 65536,
+      "edge_total": 65536,
+      "file": "sine.bin",
+      "inputs": [
+        [
+          "angle",
+          "u32"
+        ]
+      ],
+      "outputs": [
+        [
+          "value",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "sprintf": {
+      "dropped": 0,
+      "edge": 5682,
+      "edge_total": 5682,
+      "file": "sprintf.bin",
+      "inputs": [
+        [
+          "fmt",
+          "str"
+        ],
+        [
+          "kinds",
+          "str"
+        ],
+        [
+          "args",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "s",
+          "str"
+        ],
+        [
+          "ret",
+          "i32"
+        ]
+      ],
+      "random": 1018,
+      "random_total": 7220
+    },
+    "sqrt": {
+      "dropped": 0,
+      "edge": 0,
+      "edge_total": 0,
+      "file": "sqrt.bin",
+      "inputs": [
+        [
+          "x",
+          "f64"
+        ]
+      ],
+      "outputs": [
+        [
+          "root",
+          "f64"
+        ]
+      ],
+      "random": 5000,
+      "random_total": 2000000
+    },
+    "sqrt_float": {
+      "dropped": 0,
+      "edge": 0,
+      "edge_total": 0,
+      "file": "sqrt_float.bin",
+      "inputs": [
+        [
+          "fbits",
+          "u32"
+        ]
+      ],
+      "outputs": [
+        [
+          "rbits",
+          "u32"
+        ]
+      ],
+      "random": 10000,
+      "random_total": 2000000
+    },
+    "sscanf": {
+      "dropped": 0,
+      "edge": 549,
+      "edge_total": 549,
+      "file": "sscanf.bin",
+      "inputs": [
+        [
+          "fmt",
+          "str"
+        ],
+        [
+          "text",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "ret",
+          "i32"
+        ],
+        [
+          "ints",
+          "bytes16"
+        ],
+        [
+          "s",
+          "bytes64"
+        ]
+      ],
+      "random": 745,
+      "random_total": 5400
+    },
+    "strchr": {
+      "dropped": 0,
+      "edge": 1452,
+      "edge_total": 1452,
+      "file": "strchr.bin",
+      "inputs": [
+        [
+          "hay",
+          "str"
+        ],
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "off",
+          "i32"
+        ]
+      ],
+      "random": 4455,
+      "random_total": 10000
+    },
+    "strcmpi": {
+      "dropped": 0,
+      "edge": 3136,
+      "edge_total": 3136,
+      "file": "strcmpi.bin",
+      "inputs": [
+        [
+          "a",
+          "str"
+        ],
+        [
+          "b",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 3317,
+      "random_total": 20000
+    },
+    "strcspn": {
+      "dropped": 0,
+      "edge": 4840,
+      "edge_total": 4840,
+      "file": "strcspn.bin",
+      "inputs": [
+        [
+          "hay",
+          "str"
+        ],
+        [
+          "set",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "n",
+          "i32"
+        ]
+      ],
+      "random": 4036,
+      "random_total": 10000
+    },
+    "strlwr": {
+      "dropped": 0,
+      "edge": 259,
+      "edge_total": 259,
+      "file": "strlwr.bin",
+      "inputs": [
+        [
+          "s",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "s",
+          "str"
+        ]
+      ],
+      "random": 2808,
+      "random_total": 6000
+    },
+    "strncmp": {
+      "dropped": 0,
+      "edge": 16981,
+      "edge_total": 16981,
+      "file": "strncmp.bin",
+      "inputs": [
+        [
+          "a",
+          "str"
+        ],
+        [
+          "b",
+          "str"
+        ],
+        [
+          "n",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 2845,
+      "random_total": 20000
+    },
+    "strncpy": {
+      "dropped": 0,
+      "edge": 525,
+      "edge_total": 525,
+      "file": "strncpy.bin",
+      "inputs": [
+        [
+          "src",
+          "str"
+        ],
+        [
+          "n",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "dst",
+          "bytes24"
+        ]
+      ],
+      "random": 1909,
+      "random_total": 4000
+    },
+    "strnicmp": {
+      "dropped": 0,
+      "edge": 16981,
+      "edge_total": 16981,
+      "file": "strnicmp.bin",
+      "inputs": [
+        [
+          "a",
+          "str"
+        ],
+        [
+          "b",
+          "str"
+        ],
+        [
+          "n",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 2845,
+      "random_total": 20000
+    },
+    "strrchr": {
+      "dropped": 0,
+      "edge": 1452,
+      "edge_total": 1452,
+      "file": "strrchr.bin",
+      "inputs": [
+        [
+          "hay",
+          "str"
+        ],
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "off",
+          "i32"
+        ]
+      ],
+      "random": 4455,
+      "random_total": 10000
+    },
+    "strstr": {
+      "dropped": 0,
+      "edge": 4840,
+      "edge_total": 4840,
+      "file": "strstr.bin",
+      "inputs": [
+        [
+          "hay",
+          "str"
+        ],
+        [
+          "needle",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "off",
+          "i32"
+        ]
+      ],
+      "random": 4036,
+      "random_total": 10000
+    },
+    "strtok": {
+      "dropped": 0,
+      "edge": 540,
+      "edge_total": 540,
+      "file": "strtok.bin",
+      "inputs": [
+        [
+          "s",
+          "str"
+        ],
+        [
+          "delims",
+          "str"
+        ],
+        [
+          "delims2",
+          "str"
+        ]
+      ],
+      "outputs": [
+        [
+          "count",
+          "i32"
+        ],
+        [
+          "toks",
+          "bytes192"
+        ],
+        [
+          "buf",
+          "bytes48"
+        ]
+      ],
+      "random": 286,
+      "random_total": 6000
+    },
+    "tolower": {
+      "dropped": 0,
+      "edge": 384,
+      "edge_total": 384,
+      "file": "tolower.bin",
+      "inputs": [
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
+    "toupper": {
+      "dropped": 0,
+      "edge": 384,
+      "edge_total": 384,
+      "file": "toupper.bin",
+      "inputs": [
+        [
+          "c",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "v",
+          "i32"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    }
+  },
+  "format": 1,
+  "omitted": {
+    "qsort": "game logic has no qsort call, and the order in which equal elements end is left open"
+  }
+}

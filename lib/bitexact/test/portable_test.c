@@ -2,6 +2,9 @@
 #include <string.h>
 
 #include "../bitexact.h"
+#include "../bx_game.h"
+#include "../bx_libcmt.h"
+#include "../bx_stl.h"
 
 int bx_sscanf(const char *buf, const char *fmt, ...);
 

@@ -5,6 +5,10 @@
 #include <string.h>
 
 #include "../bitexact.h"
+#include "../bx_game.h"
+#include "../bx_libcmt.h"
+#include "../bx_stl.h"
+#include "kit.h"
 #include "vectors.h"
 
 #ifdef BX_REPLAY
@@ -165,15 +169,24 @@ static void test_sqrt(math_stat_t *sd, math_stat_t *sf, math_stat_t *sc)
     int i;
     for (i = 0; i < MATH_CASES; i++) {
         double x = (i & 3) == 0 ? random_int_double() : random_positive();
-        double want, got;
+        double want, got, x87_want;
         float f;
         if (x < 0)
             x = -x;
         want = ORACLE_DOUBLE(x87_sqrt(x));
+        x87_want = want;
         got = bx_sqrt(x);
         record_u(sd, bits_of(want) == bits_of(got), "x %.17g want %.17g got %.17g", x, want, got);
         want = ORACLE_DOUBLE(sqrt(x));
         record_u(sc, bits_of(want) == bits_of(got), "x %.17g want %.17g got %.17g", x, want, got);
+        if (bits_of(want) != bits_of(got) || bits_of(x87_want) != bits_of(got)) {
+            kit_dropped("sqrt");
+        } else {
+            kit_begin("sqrt", 0);
+            kit_f64(x);
+            kit_f64(want);
+            kit_end();
+        }
         if ((i & 3) == 1)
             f = (float)random_int_double();
         else
@@ -185,6 +198,14 @@ static void test_sqrt(math_stat_t *sd, math_stat_t *sf, math_stat_t *sc)
             float gotf = (float)bx_sqrt((double)f);
             record_u(sf, bits_of_float(wantf) == bits_of_float(gotf), "f %.9g want %.9g got %.9g", (double)f,
                      (double)wantf, (double)gotf);
+            if (bits_of_float(wantf) != bits_of_float(gotf)) {
+                kit_dropped("sqrt_float");
+            } else {
+                kit_begin("sqrt_float", 0);
+                kit_u32(bits_of_float(f));
+                kit_u32(bits_of_float(wantf));
+                kit_end();
+            }
         }
     }
 }
@@ -268,6 +289,15 @@ static void test_hypot(math_stat_t *simple, math_stat_t *extended, math_stat_t *
         record_b(extended, bits_of(want) == bits_of(got), "x %.17g y %.17g want %.17g got %.17g", x, y, want, got);
         got = bx_hypot(x, y);
         record_b(port, bits_of(want) == bits_of(got), "x %.17g y %.17g want %.17g got %.17g", x, y, want, got);
+        if (bits_of(want) != bits_of(got)) {
+            kit_dropped("hypot");
+        } else {
+            kit_begin("hypot", 0);
+            kit_f64(x);
+            kit_f64(y);
+            kit_f64(want);
+            kit_end();
+        }
         record_b(&port_class[i % 6], bits_of(want) == bits_of(got), "x %.17g y %.17g want %.17g got %.17g", x, y,
                  want, got);
     }
@@ -335,6 +365,14 @@ static void test_acos(math_stat_t *s, math_stat_t *port, math_stat_t *by_class)
         record_u(s, bits_of(want) == bits_of(got), "x %.17g want %.17g got %.17g", x, want, got);
         got = bx_acos(x);
         record_u(port, bits_of(want) == bits_of(got), "x %.17g want %.17g got %.17g", x, want, got);
+        if (bits_of(want) != bits_of(got)) {
+            kit_dropped("acos");
+        } else {
+            kit_begin("acos", i < 5);
+            kit_f64(x);
+            kit_f64(want);
+            kit_end();
+        }
         if (bits_of(want) != bits_of(got) && port->mismatches > ACOS_ALLOWED)
             printf("  acos over the limit: x 0x%08x%08x want 0x%08x%08x got 0x%08x%08x\n", (bx_u32)(bits_of(x) >> 32),
                    (bx_u32)bits_of(x), (bx_u32)(bits_of(want) >> 32), (bx_u32)bits_of(want),
@@ -504,10 +542,22 @@ static void show_text(const char *text, char *out)
     out[p] = 0;
 }
 
+static int kit_atof_edge = -1;
+
 static void check_atof(math_stat_t *s, const char *text, double want)
 {
     double got = bx_atof_msvc5(text);
     s->cases++;
+    if (kit_atof_edge >= 0) {
+        if (bits_of(want) != bits_of(got)) {
+            kit_dropped("double_text");
+        } else {
+            kit_begin("double_text", kit_atof_edge);
+            kit_str(text);
+            kit_f64(want);
+            kit_end();
+        }
+    }
     if (bits_of(want) != bits_of(got)) {
         s->mismatches++;
         if (s->mismatches <= 3) {
@@ -527,12 +577,15 @@ static void test_atof_msvc5(math_stat_t *s, math_stat_t *tdf, const char *tdf_pa
     FILE *f = tdf_path ? fopen(tdf_path, "r") : 0;
     unsigned long count = 0, recorded, k;
 
+    kit_atof_edge = 1;
     for (i = 0; i < (int)(sizeof(atof_fixed) / sizeof(atof_fixed[0])); i++)
         check_atof(s, atof_fixed[i], ORACLE_DOUBLE(atof(atof_fixed[i])));
+    kit_atof_edge = 0;
     for (i = 0; i < ATOF_RANDOM_CASES; i++) {
         make_atof_text(i, text);
         check_atof(s, text, ORACLE_DOUBLE(atof(text)));
     }
+    kit_atof_edge = -1;
     if (f) {
         while (fgets(text, sizeof(text), f))
             count++;
@@ -646,6 +699,14 @@ static void test_strtof(math_stat_t *s)
         wb = bits_of_float(want);
         gb = bits_of_float(got);
         s->cases++;
+        if (wb != gb) {
+            kit_dropped("float_text");
+        } else {
+            kit_begin("float_text", 0);
+            kit_str(text);
+            kit_u32(wb);
+            kit_end();
+        }
         if (wb != gb) {
             s->mismatches++;
             if (s->mismatches == 1)
@@ -872,6 +933,12 @@ ac = {"simple acos vs acos"}, acp = {"bx_acos vs acos"},
                        af1 = {"bx_atof_msvc5 vs atof"}, af2 = {"bx_atof_msvc5 vs atof, TDF strings"};
     int bad = 0, i;
 
+    kit_layout("sqrt", "in x f64\nout root f64\n");
+    kit_layout("sqrt_float", "in fbits u32\nout rbits u32\n");
+    kit_layout("hypot", "in x f64\nin y f64\nout length f64\n");
+    kit_layout("acos", "in x f64\nout angle f64\n");
+    kit_layout("float_text", "in text str\nout fbits u32\n");
+    kit_layout("double_text", "in text str\nout value f64\n");
     test_sqrt(&sd, &sf, &sc);
     test_hypot(&hy, &hx, hc, &hp, hpc);
     test_acos(&ac, &acp, acc);

@@ -1,4 +1,6 @@
 #include "bitexact.h"
+#include "bx_game.h"
+#include "bx_libcmt.h"
 
 #define CASE_COUNT 18
 

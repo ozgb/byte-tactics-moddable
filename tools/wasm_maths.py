@@ -47,7 +47,7 @@ LIB = ROOT / "lib/bitexact"
 GUARD = "WASM_MATHS_UNDER_WASMTIME"
 WASMTIME = "50.0.1"
 CLANG = "22.1.8"
-LIB_SOURCES = [LIB / "trig.c", LIB / "math.c", LIB / "strtof.c"]
+LIB_SOURCES = [LIB / name for name in ("fixed_trig.c", "ext.c", "dd.c", "sqrt.c", "hypot.c", "acos.c", "strtof.c")]
 WASM_FLAGS = ["--target=wasm32", "-O2", "-nostdlib", "-ffp-contract=off", "-mno-nontrapping-fptoint", "-fwrapv", "-fno-strict-aliasing", "-w",
               f"-I{LIB}"]
 

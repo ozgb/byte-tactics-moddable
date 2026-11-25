@@ -80,19 +80,6 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
-{
-    ReplayText t;
-    StartImport(t, "features.GetFootprintCentre");
-    Space(t);
-    t.Add("?");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
-    const char* r = Enter(t);
-    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
-    (void)r;
-}
-
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
 {
     ReplayText t;
@@ -105,6 +92,17 @@ Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
     Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
     ApplyReach(o, ROK_CELL, ".metal");
     return o;
+}
+
+unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.SoundHeardMask");
+    Space(t);
+    t.Add("at=");
+    AddVec3(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
 }
 
 Cell* __stdcall Imp_los_radar_GetMapCellAtPosition(Vec3* a0)
@@ -128,17 +126,6 @@ int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
     t.Add("?");
     const char* r = Enter(t);
     return ParseResult<int>(r);
-}
-
-unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
-{
-    ReplayText t;
-    StartImport(t, "los_radar.SoundHeardMask");
-    Space(t);
-    t.Add("at=");
-    AddVec3(t, a0);
-    const char* r = Enter(t);
-    return ParseResult<unsigned int>(r);
 }
 
 int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
@@ -176,6 +163,52 @@ int __stdcall Imp_map_GetGroundHeight(Vec3* a0)
     AddVec3Xz(t, a0);
     const char* r = Enter(t);
     return ParseResult<int>(r);
+}
+
+int __stdcall Imp_mission_GetGameType()
+{
+    ReplayText t;
+    StartImport(t, "mission.GetGameType");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_network_SendFeatureBurning(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureBurning");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureHit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendFeatureKilled(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureKilled");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
 }
 
 void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
@@ -262,6 +295,36 @@ void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2
     (void)r;
 }
 
+void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.CellsChanged");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+unsigned int __stdcall Imp_scripts_ObjectStateSize(Object3do* a0)
+{
+    ReplayText t;
+    StartImport(t, "scripts.ObjectStateSize");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, false);
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
 void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
 {
     ReplayText t;
@@ -336,23 +399,16 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
-void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
-    StartImport(t, "pathfinding.CellsChanged");
+    StartImport(t, "features.GetFootprintCentre");
     Space(t);
-    ReplayValue(t, a0);
+    t.Add("?");
     Space(t);
-    ReplayValue(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    Space(t);
-    ReplayValue(t, a4);
-    Space(t);
-    ReplayValue(t, a5);
+    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
     const char* r = Enter(t);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
     (void)r;
 }
 
@@ -365,6 +421,31 @@ WindMeteorsSeam g_native_wind_meteors = {
     LoadMeteorDefaults,
     SaveMeteors,
     LoadMeteors,
+};
+
+FeaturesSeam g_native_features = {
+    UpdateFeaturesSlot,
+    LoadFeatureFileList,
+    FreeFeatureFileList,
+    NopAfterFeatureEnum,
+    ResolveFeatureLinks,
+    InitFeatureAnimPool,
+    FreeFeaturePool,
+    PlaceMissionFeatures,
+    StampFeatureMetal,
+    GetCellFeature,
+    FindOrLoadFeatureType,
+    GetFootprintCentreSlot,
+    SaveFeatures,
+    LoadFeatures,
+    ApplyEvent,
+    PlaceEvent,
+    FeatureTypeCount,
+    AnimateFeatureType,
+    ScanFeatureCell,
+    FirstFeatureSpot,
+    UpdateFeatureSpot,
+    FindFeatureAtPos,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -486,6 +567,150 @@ void Run_wind_meteors_LoadMeteors()
     HapiBank* p0 = (HapiBank*)ArgHandle("bank");
     SetClosing(nullptr);
     g_seams.wind_meteors->LoadMeteors(p0);
+}
+
+unsigned short g_result_features_GetCellFeature;
+
+void Run_features_GetCellFeature()
+{
+    Cell* p0 = (Cell*)ArgObject("cell", ROK_CELL);
+    SetClosing("result");
+    g_result_features_GetCellFeature = g_seams.features->GetCellFeature(p0);
+}
+
+void After_features_GetCellFeature()
+{
+    CompareResult(g_result_features_GetCellFeature);
+}
+
+Vec3 g_out_features_GetFootprintCentre_2;
+
+void Run_features_GetFootprintCentre()
+{
+    Point16 p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("cell", ROK_POINT16, &p0);
+    Feature* p1 = (Feature*)ArgObject("def", ROK_FEATURE);
+    memset(&g_out_features_GetFootprintCentre_2, 0, sizeof g_out_features_GetFootprintCentre_2);
+    SetClosing("result");
+    g_seams.features->GetFootprintCentre(&p0, p1, &g_out_features_GetFootprintCentre_2);
+}
+
+void After_features_GetFootprintCentre()
+{
+    CompareValueResult(ROK_VEC3, &g_out_features_GetFootprintCentre_2);
+}
+
+int g_result_features_Apply;
+
+void Run_features_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_FEATURES, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_features_Apply = g_seams.features->Apply((FeaturesEventHeader*)p0, p1);
+}
+
+void After_features_Apply()
+{
+    CompareResult(g_result_features_Apply);
+}
+
+int g_result_features_Place;
+
+void Run_features_Place()
+{
+    FeaturesPlace p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("place", ROK_FEATURESPLACE, &p0);
+    SetClosing("result");
+    g_result_features_Place = g_seams.features->Place(&p0);
+}
+
+void After_features_Place()
+{
+    CompareResult(g_result_features_Place);
+}
+
+int g_result_features_FeatureTypeCount;
+
+void Run_features_FeatureTypeCount()
+{
+    SetClosing("result");
+    g_result_features_FeatureTypeCount = g_seams.features->FeatureTypeCount();
+}
+
+void After_features_FeatureTypeCount()
+{
+    CompareResult(g_result_features_FeatureTypeCount);
+}
+
+void Run_features_AnimateFeatureType()
+{
+    int p0 = ArgScalar<int>("type");
+    SetClosing(nullptr);
+    g_seams.features->AnimateFeatureType(p0);
+}
+
+void Run_features_ScanFeatureCell()
+{
+    SetClosing(nullptr);
+    g_seams.features->ScanFeatureCell();
+}
+
+int g_result_features_FirstFeatureSpot;
+
+void Run_features_FirstFeatureSpot()
+{
+    SetClosing("result");
+    g_result_features_FirstFeatureSpot = g_seams.features->FirstFeatureSpot();
+}
+
+void After_features_FirstFeatureSpot()
+{
+    CompareResult(g_result_features_FirstFeatureSpot);
+}
+
+int g_result_features_UpdateFeatureSpot;
+
+void Run_features_UpdateFeatureSpot()
+{
+    int p0 = ArgScalar<int>("spot");
+    SetClosing("result");
+    g_result_features_UpdateFeatureSpot = g_seams.features->UpdateFeatureSpot(p0);
+}
+
+void After_features_UpdateFeatureSpot()
+{
+    CompareResult(g_result_features_UpdateFeatureSpot);
+}
+
+Point16 g_out_features_FindFeatureAtPos_1;
+bool g_out_features_FindFeatureAtPos_1_null;
+Point16 g_out_features_FindFeatureAtPos_2;
+bool g_out_features_FindFeatureAtPos_2_null;
+unsigned short g_result_features_FindFeatureAtPos;
+
+void Run_features_FindFeatureAtPos()
+{
+    Vec3 p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("pos", ROK_VEC3, &p0);
+    memset(&g_out_features_FindFeatureAtPos_1, 0, sizeof g_out_features_FindFeatureAtPos_1);
+    g_out_features_FindFeatureAtPos_1_null = ParseNullOut("cell");
+    memset(&g_out_features_FindFeatureAtPos_2, 0, sizeof g_out_features_FindFeatureAtPos_2);
+    g_out_features_FindFeatureAtPos_2_null = ParseNullOut("size");
+    SetClosing("cell.", "size.", "result");
+    g_result_features_FindFeatureAtPos = g_seams.features->FindFeatureAtPos(&p0, g_out_features_FindFeatureAtPos_1_null ? nullptr : &g_out_features_FindFeatureAtPos_1, g_out_features_FindFeatureAtPos_2_null ? nullptr : &g_out_features_FindFeatureAtPos_2);
+}
+
+void After_features_FindFeatureAtPos()
+{
+    if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_1_null) CompareStruct("cell", ROK_POINT16, &g_out_features_FindFeatureAtPos_1);
+    if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_2_null) CompareStruct("size", ROK_POINT16, &g_out_features_FindFeatureAtPos_2);
+    CompareResult(g_result_features_FindFeatureAtPos);
 }
 
 int g_result_weapons_Apply;
@@ -907,6 +1132,46 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_LoadMeteors();
         return true;
     }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetCellFeature") == 0) {
+        Run_features_GetCellFeature();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetFootprintCentre") == 0) {
+        Run_features_GetFootprintCentre();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_features_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Place") == 0) {
+        Run_features_Place();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FeatureTypeCount") == 0) {
+        Run_features_FeatureTypeCount();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "AnimateFeatureType") == 0) {
+        Run_features_AnimateFeatureType();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "ScanFeatureCell") == 0) {
+        Run_features_ScanFeatureCell();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FirstFeatureSpot") == 0) {
+        Run_features_FirstFeatureSpot();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "UpdateFeatureSpot") == 0) {
+        Run_features_UpdateFeatureSpot();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FindFeatureAtPos") == 0) {
+        Run_features_FindFeatureAtPos();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
         return true;
@@ -1010,6 +1275,22 @@ void RunAfter(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0)
         After_wind_meteors_LoadMeteorDefaults();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetCellFeature") == 0)
+        After_features_GetCellFeature();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetFootprintCentre") == 0)
+        After_features_GetFootprintCentre();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Apply") == 0)
+        After_features_Apply();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Place") == 0)
+        After_features_Place();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FeatureTypeCount") == 0)
+        After_features_FeatureTypeCount();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FirstFeatureSpot") == 0)
+        After_features_FirstFeatureSpot();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "UpdateFeatureSpot") == 0)
+        After_features_UpdateFeatureSpot();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FindFeatureAtPos") == 0)
+        After_features_FindFeatureAtPos();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
@@ -1058,16 +1339,18 @@ void RunAfter(const char* subsystem, const char* slot)
 
 WeaponsSeam g_import_weapons;
 FilesSeam g_import_files;
-FeaturesSeam g_import_features;
 LosRadarSeam g_import_los_radar;
 MapSeam g_import_map;
+MissionSeam g_import_mission;
 NetworkSeam g_import_network;
-ScriptsSeam g_import_scripts;
 PathfindingSeam g_import_pathfinding;
+ScriptsSeam g_import_scripts;
+FeaturesSeam g_import_features;
 
 void BindSeams()
 {
     g_seams.wind_meteors = &g_native_wind_meteors;
+    g_seams.features = &g_native_features;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.map = &g_native_map;
@@ -1075,35 +1358,46 @@ void BindSeams()
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
-    g_seams.features = &g_import_features;
-    g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+    g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
-    g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+    g_seams.mission = &g_import_mission;
+    g_import_mission.GetGameType = Imp_mission_GetGameType;
     g_seams.network = &g_import_network;
+    g_import_network.SendFeatureBurning = Imp_network_SendFeatureBurning;
+    g_import_network.SendFeatureHit = Imp_network_SendFeatureHit;
+    g_import_network.SendFeatureKilled = Imp_network_SendFeatureKilled;
     g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
     g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
     g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
+    g_seams.pathfinding = &g_import_pathfinding;
+    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     g_seams.scripts = &g_import_scripts;
+    g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
     g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
     g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
     g_import_scripts.QueryScript = Imp_scripts_QueryScript;
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
-    g_seams.pathfinding = &g_import_pathfinding;
-    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
     }
+    if (strcmp(g_subsystem, "features") == 0) {
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+    }
     if (strcmp(g_subsystem, "weapons") == 0) {
+        g_seams.features = &g_import_features;
+        g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;

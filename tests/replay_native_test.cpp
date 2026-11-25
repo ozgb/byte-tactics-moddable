@@ -15,6 +15,7 @@
 #include "../src/game/game_state.h"
 #include "../src/map/meteors.h"
 #include "../src/map/feature_spot.h"
+#include "../src/map/features.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
 #include "../src/map/terrain.h"
@@ -101,6 +102,10 @@ void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int)
 {
 }
 
+void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader*, unsigned int, int)
+{
+}
+
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int)
 {
 }
@@ -159,6 +164,7 @@ short __cdecl AngleOfVector(int x, int z)
 #pragma comment(linker, "/alternatename:?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21@Z=?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2H@Z")
 #pragma comment(linker, "/alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z")
 #pragma comment(linker, "/alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z")
+#pragma comment(linker, "/alternatename:?InitGafSequence@@YGXPAUHandle@@PAUAnimSrc@@H@Z=?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z")
 #pragma comment(linker, "/alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z")
 #pragma comment(linker, "/alternatename:?SolveLaunchAngle@@YGFHHHHH@Z=?SolveLaunchAngle@@YGFHHHHM@Z")
 #pragma comment(linker, "/alternatename:?SubtractVec3@@YGXPAUVec3@@0PAH11@Z=?SubtractVec3@@YGXPAH0000@Z")
@@ -867,6 +873,12 @@ void* ParseStructOpt(const char* name, unsigned kind, void* storage)
         return nullptr;
     ParseStruct(name, kind, storage);
     return storage;
+}
+
+bool ParseNullOut(const char* name)
+{
+    const char* value = ArgLine(name);
+    return value != nullptr && strcmp(value, "null") == 0;
 }
 
 struct StructsHolder {
@@ -1604,6 +1616,16 @@ int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
     return first != nullptr ? first->amount : -1;
 }
 
+int __stdcall Native_fixture_Locate(FixtureAmount* first, FixtureAmount* second)
+{
+    if (first == nullptr)
+        return 0;
+    first->amount = 4;
+    if (second != nullptr)
+        second->amount = 9;
+    return 1;
+}
+
 int __stdcall Native_fixture_Strike(WeaponDef* weapon)
 {
     if (weapon == nullptr)
@@ -1657,6 +1679,17 @@ int __stdcall CanPlaceUnitFootprintSlot(UnitDef* unit, unsigned short otherTypeI
 int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);
+}
+
+void __stdcall GetFootprintCentreSlot(const Point16* cell, Feature* def, Vec3* out)
+{
+    Point16 at = *cell;
+    *out = GetFootprintCentre(&at, def);
+}
+
+void __stdcall UpdateFeaturesSlot(void)
+{
+    abort();
 }
 
 void __cdecl UpdateWindSlot(RandStream stream)
@@ -3312,6 +3345,24 @@ void ShapeSelfTest()
     Check(g_outCount == 1, "an o line named by the closing list is the call's, not the import's");
     SetClosing(nullptr);
 
+    printf("a nullable out value\n");
+    LoadCall("  i fixture.Locate = 1\n  o first (4)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount found = { 0 };
+    FixtureAmount foundSize = { 0 };
+    int located = Imp_fixture_Locate(&found, &foundSize);
+    Check(g_diffs == 0 && located == 1 && found.amount == 4 && foundSize.amount == 9, "the stub writes each o line back and the line holds no value going in");
+    LoadCall("  i fixture.Locate = 1\n  o first (4)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount partial = { 0 };
+    Imp_fixture_Locate(&partial, nullptr);
+    Check(g_diffs == 0 && partial.amount == 4, "a null pointer is skipped");
+    LoadCall("  i fixture.Locate = 0\n");
+    BeginImport();
+    FixtureAmount alone = { 7 };
+    Imp_fixture_Locate(&alone, nullptr);
+    Check(g_diffs == 0 && alone.amount == 7, "and a pointer with no o line is left alone");
+
     printf("in/out of the slot under replay\n");
     LoadCall("  a p2 (5)\n  o p2 (8)\n");
     FixtureAmount storage = { 0 };
@@ -3434,6 +3485,29 @@ void InOutRunnerSelfTest()
     After_fixture_Measure();
     printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
+
+    printf("a nullable out value of the slot under replay\n");
+    LoadCall("  a second null\n  o first.amount 4\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "a null out pointer is passed as null, and has no o line");
+    LoadCall("  o first.amount 4\n  o second.amount 9\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "and a pointer that is not null is compared with its o lines");
+    LoadCall("  a first null\n  a second null\n  o result 0\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "a call whose result leaves the out values alone records none");
+    LoadCall("  o first.amount 5\n  o second.amount 9\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    printf("an out struct that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "first.amount") == 0, "a replayed value that differs is reported at its field");
 }
 
 void WeaponArgumentSelfTest()

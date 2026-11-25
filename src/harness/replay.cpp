@@ -305,6 +305,15 @@ void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, 
     ReplayAddStruct(t, tag, name, kind, p, Table());
 }
 
+void ArgNullOut(ReplayText& t, const char* name, const void* p)
+{
+    if (p != nullptr)
+        return;
+    t.Add("  a ");
+    t.Add(name);
+    t.Add(" null\n");
+}
+
 void ArgEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size)
 {
     ReplayAddEvent(t, name, table, p, size, Table());

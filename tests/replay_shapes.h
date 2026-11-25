@@ -107,6 +107,16 @@ int __stdcall Imp_fixture_Notify(FixtureNotify* a0, Callback* a1, int a2)
     return ParseResult<int>(r);
 }
 
+int __stdcall Imp_fixture_Locate(FixtureAmount* a0, FixtureAmount* a1)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Locate");
+    const char* r = Enter(t);
+    ApplyInOut(a0, "first", ROK_FIXTUREAMOUNT);
+    ApplyInOut(a1, "second", ROK_FIXTUREAMOUNT);
+    return ParseResult<int>(r);
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -191,4 +201,27 @@ void Run_fixture_Notify()
 void After_fixture_Notify()
 {
     CompareResult(g_result_fixture_Notify);
+}
+
+FixtureAmount g_out_fixture_Locate_0;
+bool g_out_fixture_Locate_0_null;
+FixtureAmount g_out_fixture_Locate_1;
+bool g_out_fixture_Locate_1_null;
+int g_result_fixture_Locate;
+
+void Run_fixture_Locate()
+{
+    memset(&g_out_fixture_Locate_0, 0, sizeof g_out_fixture_Locate_0);
+    g_out_fixture_Locate_0_null = ParseNullOut("first");
+    memset(&g_out_fixture_Locate_1, 0, sizeof g_out_fixture_Locate_1);
+    g_out_fixture_Locate_1_null = ParseNullOut("second");
+    SetClosing("first.", "second.", "result");
+    g_result_fixture_Locate = Native_fixture_Locate(g_out_fixture_Locate_0_null ? nullptr : &g_out_fixture_Locate_0, g_out_fixture_Locate_1_null ? nullptr : &g_out_fixture_Locate_1);
+}
+
+void After_fixture_Locate()
+{
+    if (g_result_fixture_Locate != 0 && !g_out_fixture_Locate_0_null) CompareStruct("first", ROK_FIXTUREAMOUNT, &g_out_fixture_Locate_0);
+    if (g_result_fixture_Locate != 0 && !g_out_fixture_Locate_1_null) CompareStruct("second", ROK_FIXTUREAMOUNT, &g_out_fixture_Locate_1);
+    CompareResult(g_result_fixture_Locate);
 }

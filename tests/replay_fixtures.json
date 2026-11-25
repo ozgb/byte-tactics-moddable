@@ -1087,6 +1087,38 @@
    "result": {
     "mode": "scalar"
    }
+  },
+  "Locate": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "FixtureAmount*",
+     "name": "first"
+    },
+    {
+     "type": "FixtureAmount*",
+     "name": "second"
+    }
+   ],
+   "args": {
+    "first": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "out",
+     "nullable": true,
+     "when": "result != 0"
+    },
+    "second": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "out",
+     "nullable": true,
+     "when": "result != 0"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
   }
  },
  "inside": {

@@ -127,7 +127,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -395,7 +395,7 @@ class TargetingForms(unittest.TestCase):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = "result == 0"
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("`when` is only `result != 0`" in e for e in errors), errors)
+        self.assertTrue(any("`when` is only `result != N`" in e for e in errors), errors)
 
     def test_an_import_may_print_only_the_axes_it_reads(self):
         files, _, _ = self.generated()
@@ -906,11 +906,11 @@ class StructForms(unittest.TestCase):
         files, _, _ = self.generated(self.targeting())
         self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])
 
-    def test_only_a_struct_in_can_be_nullable(self):
+    def test_an_out_vec3_cannot_be_nullable(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["nullable"] = True
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        self.assertTrue(any("an out Vec3, which is `vec3` data and cannot be nullable" in e for e in errors), errors)
 
     def test_an_array_of_structs_is_a_pointer_and_a_count(self):
         files, errors, _ = self.generated(self.targeting(mode="structs", count="weapon"))
@@ -1856,11 +1856,11 @@ class FeatureKinds(unittest.TestCase):
     def test_the_rows_that_need_a_rule_have_one(self):
         ann = annotations()
         have = {(r["kind"], r["target"]) for r in ann["rules"]}
-        for want in (("field_escape", "Feature::name"), ("field_escape", "FeatureName::name"), ("field_escape", "Game::anim"), ("field_escape", "Game::featureCount"),
-                     ("field_escape", "Spot::frame"), ("deref_read", "*int"), ("deref_write", "*unsigned short")):
+        for want in (("field_escape", "Game::pool"), ("deref_read", "*int"), ("deref_write", "*int"), ("field_read", "Pool::entries"), ("field_read", "Game::cells")):
             self.assertIn(want, have)
-        _, _, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual(model["subsystems"]["features"]["pending"]["ruleless"], 0)
+        _, errors, model = rs.generate(rs.read_rows(), ann)
+        self.assertEqual([e for e in errors if e.startswith("features")], [])
+        self.assertNotIn("pending", model["subsystems"]["features"])
 
 
 class AllOfKinds(unittest.TestCase):
@@ -2120,6 +2120,32 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn("AddInOut(t, ROK_FIXTUREAMOUNT, a0);", stub)
         self.assertIn('ApplyInOut(a0, "count", ROK_FIXTUREAMOUNT);', stub)
 
+    def test_a_nullable_out_struct_writes_null_going_in_and_its_fields_only_when_it_is_set_and_the_condition_holds(self):
+        s, _ = self.slot([("FixtureAmount*", "cell")], {"cell": self.OUTOPT}, "unsigned short", {"mode": "scalar"})
+        a = s["args"][0]
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgNullOut(s_call, "cell", a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), [])
+        self.assertEqual(rs.arg_out(a, 0, "o", {}), ['if (result != 65535 && a0 != nullptr) ArgStruct(s_tail, "o", "cell", ROK_FIXTUREAMOUNT, a0);'])
+        wrapper = "\n".join(rs.wrapper("features", {}, "Find", s, {}, True))
+        self.assertIn('if (result != 65535) ImportOutInOut(line, "cell", ROK_FIXTUREAMOUNT, a0);', wrapper)
+        stub = "\n".join(rs.import_stub("features", "Find", s))
+        self.assertNotIn("AddInOut", stub)
+        self.assertIn('ApplyInOut(a0, "cell", ROK_FIXTUREAMOUNT);', stub)
+
+    def test_the_replayer_passes_a_nullable_out_struct_as_null_when_the_recording_says_so_and_compares_it_when_set(self):
+        s, _ = self.slot([("FixtureAmount*", "cell")], {"cell": self.OUTOPT}, "unsigned short", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("features", "Find", s))
+        self.assertIn('g_out_features_Find_0_null = ParseNullOut("cell");', runner)
+        self.assertIn("g_seams.features->Find(g_out_features_Find_0_null ? nullptr : &g_out_features_Find_0)", runner)
+        self.assertIn('if (g_result_features_Find != 65535 && !g_out_features_Find_0_null) CompareStruct("cell", ROK_FIXTUREAMOUNT, &g_out_features_Find_0);', runner)
+
+    def test_a_condition_is_result_not_equal_to_a_number(self):
+        for when, ok in (("result != 0", True), ("result != 65535", True), ("result != x", False)):
+            ann = annotations()
+            ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = when
+            errors = rs.generate(rs.read_rows(), ann)[1]
+            self.assertEqual(not any("`when` is only" in e for e in errors), ok, (when, errors))
+
     def test_the_replayer_passes_an_in_out_value_by_address_or_null_and_compares_it_after(self):
         s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT}, "int", {"mode": "scalar"})
         runner = "\n".join(rs.runner("units", "Query", s))
@@ -2128,11 +2154,12 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn('CompareInOut("count", ROK_FIXTUREAMOUNT, g_inout_units_Query_0_null ? nullptr : &g_inout_units_Query_0);', runner)
         self.assertIn("g_seams.units->Query(p0)", runner)
 
-    def test_an_in_out_value_can_be_nullable_and_an_out_value_cannot(self):
+    OUTOPT = {"mode": "struct", "kind": "FixtureAmount", "dir": "out", "nullable": True, "when": "result != 65535"}
+
+    def test_an_in_out_value_and_an_out_struct_can_be_nullable(self):
         self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": self.INOUT}), [])
         self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, nullable=False)}), [])
-        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="out")})
-        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.OUTOPT)}, "int", {"mode": "scalar"}), [])
         errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="both")})
         self.assertTrue(any("has the direction both" in e for e in errors), errors)
 

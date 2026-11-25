@@ -44,5 +44,13 @@
       "expect": 295,
       "field": "Unit#2.weapon0ReloadTimer"
     }
+  },
+  "features": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_FEATURE_HP_BONUS=20000",
+      "recording": "commander-death.txt",
+      "expect": 404,
+      "field": "import 1 los_radar.GetMapCell"
+    }
   }
 }

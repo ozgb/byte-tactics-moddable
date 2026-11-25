@@ -40,7 +40,8 @@
    },
    "gravity": "i32",
    "localPlayer": "u8",
-   "projectileCount": "i32"
+   "projectileCount": "i32",
+   "scanIndex": "i32"
   },
   "sim_fields": {
    "g_meteorNextStrikeTime": [
@@ -137,7 +138,10 @@
    "ReachUnitVec3": "a view of Unit.pos, which the Unit::pos rule records, and the stack copies made from it",
    "UnitDamagePacket": "the damage packet DamageUnit builds on its stack and applies at once",
    "UnitDamagePacketOut": "the damage packet DamageUnit builds on its stack",
-   "WeaponSlotInitState": "the loop counter and the largest reload time of InitUnitWeaponSlots, on its stack"
+   "WeaponSlotInitState": "the loop counter and the largest reload time of InitUnitWeaponSlots, on its stack",
+   "Coord": "a union on the stack of SpreadFire and the smoke functions, the position of a puff of smoke or of a fire's spread, not kept",
+   "Rot16": "the rotation PlaceEvent builds on its stack, copied into Spot.rot",
+   "AnimPair": "the pair of animation tables KillFeature copies from the feature's definition, on its stack"
   },
   "includes": [
    "../game/los_helpers.h",
@@ -1122,7 +1126,8 @@
       "aliases": [
        "PlayerInfo::shareMetal",
        "PlayerInfo::shareEnergy",
-       "PlayerInfo::shareMapping"
+       "PlayerInfo::shareMapping",
+       "PlayerInfo::flags_97"
       ]
      }
     ]
@@ -1210,7 +1215,13 @@
      },
      {
       "name": "flags",
-      "kind": "u8"
+      "kind": "u8",
+      "aliases": [
+       "Cell::flag0",
+       "Cell::bits1",
+       "Cell::owner",
+       "Cell::bit7"
+      ]
      },
      {
       "name": "occupant",
@@ -1241,6 +1252,10 @@
        "UnitMotion.pathLockStamp"
       ],
       "depth": 2
+     },
+     {
+      "name": "spot",
+      "kind": "u16"
      }
     ],
     "delta": true
@@ -2199,7 +2214,8 @@
        "Feature::bits12"
       ]
      }
-    ]
+    ],
+    "delta": true
    },
    "Spot": {
     "type": "Spot",
@@ -2255,7 +2271,8 @@
       "kind": "ref",
       "target": "ModelState",
       "aliases": [
-       "FeatureSpot::state"
+       "FeatureSpot::state",
+       "Ref<SpotState>::offset"
       ],
       "when": {
        "via": "feature",
@@ -2416,7 +2433,8 @@
        "FeatureSpot::spotFlags"
       ]
      }
-    ]
+    ],
+    "delta": true
    },
    "Pool": {
     "type": "Pool",
@@ -2492,6 +2510,25 @@
       "name": "fire",
       "kind": "code",
       "table": "weaponFire"
+     }
+    ]
+   },
+   "WeaponHit": {
+    "type": "WeaponDef",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "weapons",
+     "count": 256
+    },
+    "fields": [
+     {
+      "name": "damage",
+      "kind": "u16"
+     },
+     {
+      "name": "fireStarter",
+      "kind": "u8"
      }
     ]
    }
@@ -2713,56 +2750,6 @@
     "note": "the low flag byte of the weapon in a slot"
    },
    {
-    "kind": "field_escape",
-    "target": "Feature::name",
-    "rule": "fields",
-    "reads": [
-     "Feature.name"
-    ],
-    "note": "the name is compared and copied through its address"
-   },
-   {
-    "kind": "field_escape",
-    "target": "FeatureName::name",
-    "rule": "fields",
-    "note": "a local copy of the saved name table, not state"
-   },
-   {
-    "kind": "field_escape",
-    "target": "TntFeatureName::name",
-    "rule": "fields",
-    "note": "the feature name table of the map file the loader passes in, not state"
-   },
-   {
-    "kind": "field_escape",
-    "target": "Game::anim",
-    "rule": "fields",
-    "reads": [
-     "Pool.entries",
-     "Pool.featureUnit",
-     "Pool.usedHead",
-     "Pool.restHead",
-     "Pool.freeHead"
-    ],
-    "writes": [
-     "Pool.entries",
-     "Pool.featureUnit",
-     "Pool.usedHead",
-     "Pool.restHead",
-     "Pool.freeHead"
-    ],
-    "note": "FeatureAnimPool is the feature pool seen 16 bytes earlier: anim, featureUnit, activeHead, idleHead and freeHead are the five words of Pool"
-   },
-   {
-    "kind": "field_escape",
-    "target": "Game::featureCount",
-    "rule": "fields",
-    "functions": [
-     "ResolveFeatureLinks"
-    ],
-    "note": "count points at Game.featureCount, a block field the slot's reads name"
-   },
-   {
     "kind": "deref_read",
     "target": "*int",
     "rule": "fields",
@@ -2771,45 +2758,6 @@
     ],
     "reads": [],
     "note": "the position is the x and z of the event, recorded as pos.x and pos.z"
-   },
-   {
-    "kind": "deref_read",
-    "target": "*int",
-    "rule": "fields",
-    "functions": [
-     "ResolveFeatureLinks"
-    ],
-    "note": "*count reads Game.featureCount, a block field the slot's reads name"
-   },
-   {
-    "kind": "deref_read",
-    "target": "*char",
-    "rule": "fields",
-    "functions": [
-     "PlaceMissionFeatures"
-    ],
-    "note": "the first byte of a mission feature's name, which points into the mission's record"
-   },
-   {
-    "kind": "field_escape",
-    "target": "Spot::frame",
-    "rule": "fields",
-    "writes": [
-     "Handle.index"
-    ],
-    "note": "frame is the low byte of the index of the spot's animation cursor, stored as a short through its address"
-   },
-   {
-    "kind": "deref_write",
-    "target": "*unsigned short",
-    "rule": "fields",
-    "functions": [
-     "LoadFeatures"
-    ],
-    "writes": [
-     "Handle.index"
-    ],
-    "note": "the same short store into the frame of a spot"
    },
    {
     "kind": "field_read",
@@ -3625,6 +3573,125 @@
      "Unit.weapon2Flags"
     ],
     "note": "a slot's flag bits are set through a view of its flags word"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Game::pool",
+    "rule": "fields",
+    "reads": [
+     "Pool.entries",
+     "Pool.usedHead",
+     "Pool.restHead",
+     "Pool.freeHead"
+    ],
+    "writes": [
+     "Pool.usedHead",
+     "Pool.restHead",
+     "Pool.freeHead"
+    ],
+    "note": "the pool's heads are read and written through its address"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "MoveFeatureSpot"
+    ],
+    "reads": [
+     "Pool.usedHead",
+     "Pool.restHead",
+     "Pool.freeHead"
+    ],
+    "note": "the head the caller names is one of the pool's three heads"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "MoveFeatureSpot"
+    ],
+    "writes": [
+     "Pool.usedHead",
+     "Pool.restHead",
+     "Pool.freeHead"
+    ],
+    "note": "the head the caller names is one of the pool's three heads"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::features",
+    "rule": "all-of",
+    "object": "Feature",
+    "functions": [
+     "AnimateFeatureType",
+     "BurnOut",
+     "DamageFeature",
+     "FindFeatureAtPos",
+     "GetFeature",
+     "KillFeature",
+     "PlaceFeature",
+     "RemoveFeature",
+     "ReplaceFeatureWithDead",
+     "ScanFeatureCell",
+     "SpreadFire",
+     "StartFeatureBurning",
+     "UpdateFeatureSpot"
+    ],
+    "note": "the feature table: every feature type is a root of the call, as a spot and a cell name one by number"
+   },
+   {
+    "kind": "field_read",
+    "target": "Pool::entries",
+    "rule": "all-of",
+    "object": "Spot",
+    "functions": [
+     "AllocFeatureSpot",
+     "KillFeature",
+     "MoveFeatureSpot",
+     "PlaceFeature",
+     "StartFeatureBurning",
+     "UpdateFeatureSpot",
+     "DamageFeature",
+     "RemoveFeature",
+     "ReplaceFeatureWithDead"
+    ],
+    "note": "the spot pool: every spot is a root of the call, as a cell and the lists name one by index"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::cells",
+    "rule": "all-of",
+    "object": "Cell",
+    "functions": [
+     "CellAt",
+     "PlaceFeature",
+     "RemoveFeature",
+     "ScanFeatureCell"
+    ],
+    "note": "the cell table: every cell is a root of the call, as a feature's cell is picked by index"
+   },
+   {
+    "kind": "field_read",
+    "target": "Pool::usedHead",
+    "rule": "all-of",
+    "object": "Pool",
+    "functions": [
+     "FirstFeatureSpot",
+     "MoveFeatureSpot"
+    ],
+    "note": "the pool of spots: its heads are the root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "WeaponDef::damage",
+    "rule": "all-of",
+    "object": "WeaponHit",
+    "functions": [
+     "DamageFeature"
+    ],
+    "note": "the weapon of a DAMAGE event is named by its number: every weapon is a root of the call, and the table of views over the weapon array records what a feature takes from it"
    }
   ],
   "subsystems": {
@@ -4008,10 +4075,18 @@
     }
    },
    "features": {
-    "status": "pending",
+    "status": "complete",
     "imports": [
+     "los_radar.GetMapCell",
      "los_radar.SoundHeardMask",
-     "pathfinding.CellsChanged"
+     "map.GetCellMeanHeight",
+     "map.GetGroundHeight",
+     "mission.GetGameType",
+     "network.SendFeatureBurning",
+     "network.SendFeatureHit",
+     "network.SendFeatureKilled",
+     "pathfinding.CellsChanged",
+     "scripts.ObjectStateSize"
     ],
     "slots": {
      "GetFootprintCentre": {
@@ -4026,9 +4101,187 @@
         "kind": "Vec3",
         "dir": "out"
        }
-      }
+      },
+      "native": "GetFootprintCentreSlot"
+     },
+     "InitFeatureAnimPool": {
+      "record": false,
+      "reason": "load class"
+     },
+     "Apply": {
+      "functions": [
+       "ApplyEvent",
+       "CellAt",
+       "DamageFeature",
+       "FeatureVec3",
+       "PlaceEvent",
+       "RemoveFeature",
+       "KillFeature",
+       "StartFeatureBurning",
+       "PlaceFeature",
+       "GetFeature",
+       "ClearCell",
+       "FreeState",
+       "MoveFeatureSpot",
+       "RefreshPassMaps",
+       "AllocFeatureSpot",
+       "ReplaceFeatureWithDead",
+       "GetFootprintCentre",
+       "PublishEffect"
+      ],
+      "args": {
+       "event": {
+        "mode": "event",
+        "events": "features",
+        "size": "size",
+        "unrecorded": {
+         "FEATURES_RECLAIM": "#897"
+        }
+       }
+      },
+      "native": "ApplyEvent"
+     },
+     "Place": {
+      "functions": [
+       "PlaceEvent",
+       "CellAt",
+       "FeatureVec3",
+       "PlaceFeature",
+       "AllocFeatureSpot",
+       "GetFootprintCentre",
+       "PublishEffect",
+       "RefreshPassMaps",
+       "RemoveFeature",
+       "MoveFeatureSpot",
+       "ClearCell",
+       "FreeState"
+      ],
+      "args": {
+       "place": {
+        "mode": "struct",
+        "kind": "FeaturesPlace",
+        "dir": "in"
+       }
+      },
+      "native": "PlaceEvent"
+     },
+     "FindFeatureAtPos": {
+      "args": {
+       "pos": {
+        "mode": "struct",
+        "kind": "Vec3",
+        "dir": "in"
+       },
+       "cell": {
+        "mode": "struct",
+        "kind": "Point16",
+        "dir": "out",
+        "nullable": true,
+        "when": "result != 65535"
+       },
+       "size": {
+        "mode": "struct",
+        "kind": "Point16",
+        "dir": "out",
+        "nullable": true,
+        "when": "result != 65535"
+       }
+      },
+      "reads": [
+       "Game.width",
+       "Game.height"
+      ]
+     },
+     "LoadFeatureFileList": {
+      "record": false,
+      "reason": "load class"
+     },
+     "FreeFeatureFileList": {
+      "record": false,
+      "reason": "load class"
+     },
+     "NopAfterFeatureEnum": {
+      "record": false,
+      "reason": "load class"
+     },
+     "ResolveFeatureLinks": {
+      "record": false,
+      "reason": "load class"
+     },
+     "FreeFeaturePool": {
+      "record": false,
+      "reason": "load class"
+     },
+     "PlaceMissionFeatures": {
+      "record": false,
+      "reason": "load class"
+     },
+     "StampFeatureMetal": {
+      "record": false,
+      "reason": "load class"
+     },
+     "FindOrLoadFeatureType": {
+      "record": false,
+      "reason": "load class"
+     },
+     "LoadFeatures": {
+      "record": false,
+      "reason": "load class"
+     },
+     "SaveFeatures": {
+      "record": false,
+      "reason": "a query of a saved game, outside the tick"
+     },
+     "GetCellFeature": {
+      "reads": [
+       "Game.width",
+       "Game.height"
+      ]
+     },
+     "UpdateFeatureSpot": {
+      "functions": [
+       "UpdateFeatureSpot",
+       "BurnOut",
+       "FeatureVec3",
+       "MoveFeatureSpot",
+       "ReplaceFeatureWithDead",
+       "SmokeAt",
+       "SpreadFire",
+       "Vec3NonZero",
+       "PlaceFeature",
+       "RemoveFeature",
+       "FootprintCentreSmoke",
+       "Rand",
+       "GetFootprintCentre",
+       "PublishEffect",
+       "StartFeatureBurning",
+       "AllocFeatureSpot",
+       "RefreshPassMaps",
+       "ClearCell",
+       "FreeState"
+      ]
+     },
+     "ScanFeatureCell": {
+      "functions": [
+       "ScanFeatureCell",
+       "PlaceFeature",
+       "AllocFeatureSpot",
+       "GetFootprintCentre",
+       "PublishEffect",
+       "RefreshPassMaps",
+       "RemoveFeature",
+       "MoveFeatureSpot",
+       "ClearCell",
+       "FreeState"
+      ]
+     },
+     "UpdateFeatures": {
+      "record": false,
+      "reason": "the phase driver: the scheduler calls the slots below, each recorded on its own",
+      "native": "UpdateFeaturesSlot"
      }
-    }
+    },
+    "issue": 1045
    },
    "ai": {
     "status": "pending",
@@ -4644,7 +4897,8 @@
   },
   "game_aliases": {
    "netGameFlags": "flags_2a44",
-   "matchFlags": "uiOptionFlags"
+   "matchFlags": "uiOptionFlags",
+   "uiOptionFlags_37f2f_1": "uiOptionFlags"
   },
   "services": [
    {
@@ -6056,6 +6310,10 @@
    "Player Info": {
     "kind": "PlayerInfo",
     "size": 185
+   },
+   "Object State": {
+    "kind": "ModelState",
+    "size": 88
    }
   }
  },
@@ -6091,6 +6349,7 @@
   {"name": "Game.gravity", "base": "game", "size": 4, "kind": "i32"},
   {"name": "Game.localPlayer", "base": "game", "size": 1, "kind": "u8"},
   {"name": "Game.projectileCount", "base": "game", "size": 4, "kind": "i32"},
+  {"name": "Game.scanIndex", "base": "game", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorNextStrikeTime", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorWeaponName", "base": "sim", "size": 32, "kind": "string"},
   {"name": "SimGlobals.g_meteorSpawnMagnitude", "base": "sim", "size": 4, "kind": "i32"},
@@ -6116,10 +6375,10 @@
   {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": {"base": "game", "member": "defs", "ref": true, "count": "unitDefCount", "alloc": 1024}, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags"}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "ref", "target": "UnitTypeSet"}, {"name": "weaponCategories0", "kind": "ref", "member": "weaponCategories[0]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories1", "kind": "ref", "member": "weaponCategories[1]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories2", "kind": "ref", "member": "weaponCategories[2]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "footprintx", "kind": "i16"}, {"name": "footprintz", "kind": "i16"}, {"name": "yardmap", "kind": "array", "elem": "u8", "ref": true, "length": "footprintx*footprintz", "array": 3}, {"name": "draft", "kind": "u8"}, {"name": "maxslope", "kind": "u8"}, {"name": "maxwaterslope", "kind": "u8"}, {"name": "maxwaterdepth", "kind": "i16"}, {"name": "minwaterdepth", "kind": "i16"}, {"name": "mobile", "kind": "u8"}, {"name": "damagemodifier", "kind": "i32"}, {"name": "maxHealth", "kind": "u32"}, {"name": "modelMaxYHigh", "kind": "i16"}, {"name": "weapons0", "kind": "weapon", "member": "weapons[0]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons1", "kind": "weapon", "member": "weapons[1]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons2", "kind": "weapon", "member": "weapons[2]", "aliases": ["UnitDef::weapons"]}]},
   {"name": "weapondef", "type": "WeaponDef", "scope": "index", "table": null, "inside": null, "fields": [{"name": "flags", "kind": "flags", "member": "flags.value", "aliases": ["WeaponDefTargetView::field_111", "<anon>::ballistic", "<anon>::burnBlow", "<anon>::commandFire", "<anon>::interceptor", "<anon>::lineOfSight", "<anon>::noAutoRange", "<anon>::selfProp", "<anon>::startSmoke", "<anon>::stockpile", "<anon>::targetable", "<anon>::toAirWeapon", "<anon>::turret", "<anon>::vLaunch", "<anon>::waterWeapon"]}, {"name": "speed", "kind": "i32", "aliases": ["WeaponDefTargetView::radius"]}, {"name": "acceleration", "kind": "i32"}, {"name": "accuracy", "kind": "i16"}, {"name": "burst", "kind": "u16"}, {"name": "coverage", "kind": "i32"}, {"name": "energyPerShot", "kind": "f32"}, {"name": "metalPerShot", "kind": "f32"}, {"name": "pitch", "kind": "f32", "aliases": ["WeaponDef::field_c8"]}, {"name": "index", "kind": "u8"}, {"name": "lifetime", "kind": "u16"}, {"name": "pitchTolerance", "kind": "u16"}, {"name": "range", "kind": "i32"}, {"name": "reloadTime", "kind": "u16"}, {"name": "sound", "kind": "u16"}, {"name": "startSpeed", "kind": "i32"}, {"name": "tolerance", "kind": "u16"}]},
   {"name": "MeteorShowerParams", "type": "MeteorShowerParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "weapon", "kind": "string", "size": 32}, {"name": "radius", "kind": "i32"}, {"name": "density", "kind": "f32"}, {"name": "duration", "kind": "f32"}, {"name": "interval", "kind": "f32"}]},
-  {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping"]}]},
+  {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping", "PlayerInfo::flags_97"]}]},
   {"name": "SpatialBucket", "type": "SpatialBucket", "scope": "state", "table": {"base": "game", "member": "cells_1429f", "ref": true, "count": "width_142a3*height_142a7"}, "inside": null, "delta": true, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}]},
   {"name": "OverflowBucket", "type": "SpatialBucket", "scope": "state", "table": null, "inside": null, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}]},
-  {"name": "Cell", "type": "Cell", "scope": "state", "table": {"base": "game", "member": "cells", "ref": true, "count": "width*height"}, "inside": null, "delta": true, "fields": [{"name": "metal", "kind": "u8"}, {"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "offsetY", "kind": "u8"}, {"name": "offsetX", "kind": "u8"}, {"name": "flags", "kind": "u8"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}]},
+  {"name": "Cell", "type": "Cell", "scope": "state", "table": {"base": "game", "member": "cells", "ref": true, "count": "width*height"}, "inside": null, "delta": true, "fields": [{"name": "metal", "kind": "u8"}, {"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "offsetY", "kind": "u8"}, {"name": "offsetX", "kind": "u8"}, {"name": "flags", "kind": "u8", "aliases": ["Cell::flag0", "Cell::bits1", "Cell::owner", "Cell::bit7"]}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "spot", "kind": "u16"}]},
   {"name": "CobScript", "type": "CobScript", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "UnitMotion", "type": "UnitMotion", "scope": "state", "table": null, "inside": null, "fields": [{"name": "velocityX", "kind": "i32", "member": "velocity.x"}, {"name": "velocityY", "kind": "i32", "member": "velocity.y"}, {"name": "velocityZ", "kind": "i32", "member": "velocity.z"}, {"name": "pathLockStamp", "kind": "i32", "aliases": ["MotionTickView::lastTick"]}, {"name": "speed", "kind": "i32", "aliases": ["DroppedMotionIdView::id", "MotionRangeView::range"]}]},
   {"name": "Vec3", "type": "Vec3", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i32"}, {"name": "y", "kind": "i32"}, {"name": "z", "kind": "i32"}]},
@@ -6145,13 +6404,14 @@
   {"name": "GafFrame", "type": "GafFrame", "scope": "state", "table": null, "inside": null, "fields": [{"name": "width", "kind": "u16"}, {"name": "height", "kind": "u16"}, {"name": "xOffset", "kind": "i16"}, {"name": "yOffset", "kind": "i16"}, {"name": "transparency", "kind": "u8"}]},
   {"name": "Object3do", "type": "Object3do", "scope": "state", "table": null, "inside": null, "fields": [{"name": "vertexCount", "kind": "i32"}, {"name": "box_x", "kind": "i32"}, {"name": "box_y", "kind": "i32"}, {"name": "box_z", "kind": "i32"}]},
   {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex"]}]},
-  {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 309, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12"]}]},
-  {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 324, "condMask": 1, "condField": 309, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
+  {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "delta": true, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12"]}]},
+  {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "delta": true, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state", "Ref<SpotState>::offset"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
   {"name": "Pool", "type": "Pool", "scope": "state", "table": {"base": "game", "member": "pool", "count": 1}, "inside": null, "fields": [{"name": "entries", "kind": "ref", "target": "Spot"}, {"name": "featureUnit", "kind": "ref", "target": "alloc"}, {"name": "usedHead", "kind": "i32"}, {"name": "restHead", "kind": "i32"}, {"name": "freeHead", "kind": "i32"}]},
   {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "Mission", "type": "Mission", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "WeaponAimCobCb", "type": "WeaponAimCobCb", "scope": "state", "table": null, "inside": [{"kind": "Unit", "member": "weapons[].aimCob"}], "vptr": "g_weaponAimCobVtable", "vptr_unset": "a unit's aim callbacks hold 0 until weapons' INIT_SLOTS event stores the global", "fields": [{"name": "nAimCobDone", "kind": "i32"}]},
   {"name": "WeaponFire", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "fire", "kind": "code", "table": "weaponFire", "codeTable": 1}]},
+  {"name": "WeaponHit", "type": "WeaponDef", "scope": "state", "table": {"base": "game", "member": "weapons", "count": 256}, "inside": null, "fields": [{"name": "damage", "kind": "u16"}, {"name": "fireStarter", "kind": "u8"}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
   {"name": "WindMeteorsLimits", "type": "WindMeteorsLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "min", "kind": "i32"}, {"name": "max", "kind": "i32"}]},
@@ -6258,7 +6518,16 @@
   {"name": "ScriptsEventHeader", "type": "ScriptsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}, {"name": "unit", "kind": "ref", "target": "Unit"}]},
   {"name": "ScriptsStart", "type": "ScriptsStart", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "form", "kind": "i32"}, {"name": "index", "kind": "i32"}, {"name": "name", "kind": "string", "size": 32}, {"name": "callback", "kind": "u32"}, {"name": "update", "kind": "i32"}, {"name": "count", "kind": "i32"}, {"name": "args0", "kind": "i32", "member": "args[0]"}, {"name": "args1", "kind": "i32", "member": "args[1]"}, {"name": "args2", "kind": "i32", "member": "args[2]"}, {"name": "args3", "kind": "i32", "member": "args[3]"}]},
   {"name": "ScriptsDetachPiece", "type": "ScriptsDetachPiece", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "piece", "kind": "i32"}, {"name": "pose", "kind": "i32"}]},
-  {"name": "ScriptsState", "type": "ScriptsState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "state", "kind": "u32"}, {"name": "feature", "kind": "i32"}]}
+  {"name": "ScriptsState", "type": "ScriptsState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit", "member": "h.unit"}, {"name": "state", "kind": "u32"}, {"name": "feature", "kind": "i32"}]},
+  {"name": "FeaturesEventHeader", "type": "FeaturesEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
+  {"name": "FeaturesPlace", "type": "FeaturesPlace", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "x", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "feature", "kind": "i32"}, {"name": "flags", "kind": "i32"}, {"name": "owner", "kind": "i32"}, {"name": "pos0", "kind": "i32", "member": "pos[0]"}, {"name": "pos1", "kind": "i32", "member": "pos[1]"}, {"name": "pos2", "kind": "i32", "member": "pos[2]"}, {"name": "rot0", "kind": "i32", "member": "rot[0]"}, {"name": "rot1", "kind": "i32", "member": "rot[1]"}, {"name": "rot2", "kind": "i32", "member": "rot[2]"}]},
+  {"name": "FeaturesRemove", "type": "FeaturesRemove", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "x", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "force", "kind": "i32"}]},
+  {"name": "FeaturesDamage", "type": "FeaturesDamage", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "x", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "weapon", "kind": "i32"}]},
+  {"name": "FeaturesReclaim", "type": "FeaturesReclaim", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "unit", "kind": "ref", "target": "Unit"}, {"name": "pos0", "kind": "i32", "member": "pos[0]"}, {"name": "pos1", "kind": "i32", "member": "pos[1]"}, {"name": "pos2", "kind": "i32", "member": "pos[2]"}]},
+  {"name": "FeaturesFreeState", "type": "FeaturesFreeState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "state", "kind": "u32"}]},
+  {"name": "FeaturesInitState", "type": "FeaturesInitState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "state", "kind": "u32"}, {"name": "feature", "kind": "i32"}]},
+  {"name": "FeaturesPassMaps", "type": "FeaturesPassMaps", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "x", "kind": "i32"}, {"name": "z", "kind": "i32"}, {"name": "width", "kind": "i32"}, {"name": "height", "kind": "i32"}]},
+  {"name": "FeaturesAreaDamage", "type": "FeaturesAreaDamage", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "i32"}, {"name": "pos0", "kind": "i32", "member": "pos[0]"}, {"name": "pos1", "kind": "i32", "member": "pos[1]"}, {"name": "pos2", "kind": "i32", "member": "pos[2]"}]}
  ],
  "subsystems": {
   "wind_meteors": {
@@ -6292,30 +6561,18 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 0], "status": "pending", "imports": ["los_radar.SoundHeardMask", "pathfinding.CellsChanged"], "pending": {"untracked": 3, "ruleless": 0, "unresolvedSlots": ["Apply", "Place"], "unannotatedArgs": ["InitFeatureAnimPool(info)", "Apply(event)", "Place(place)", "FindFeatureAtPos(pos)", "FindFeatureAtPos(cell)", "FindFeatureAtPos(size)"]}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "mission.GetGameType", "network.SendFeatureBurning", "network.SendFeatureHit", "network.SendFeatureKilled", "pathfinding.CellsChanged", "scripts.ObjectStateSize"], "issue": 1045, "unrecorded": {"UpdateFeatures": {"reason": "the phase driver: the scheduler calls the slots below, each recorded on its own", "native": "UpdateFeaturesSlot"}, "LoadFeatureFileList": {"reason": "load class", "native": "LoadFeatureFileList"}, "FreeFeatureFileList": {"reason": "load class", "native": "FreeFeatureFileList"}, "NopAfterFeatureEnum": {"reason": "load class", "native": "NopAfterFeatureEnum"}, "ResolveFeatureLinks": {"reason": "load class", "native": "ResolveFeatureLinks"}, "InitFeatureAnimPool": {"reason": "load class", "native": "InitFeatureAnimPool"}, "FreeFeaturePool": {"reason": "load class", "native": "FreeFeaturePool"}, "PlaceMissionFeatures": {"reason": "load class", "native": "PlaceMissionFeatures"}, "StampFeatureMetal": {"reason": "load class", "native": "StampFeatureMetal"}, "FindOrLoadFeatureType": {"reason": "load class", "native": "FindOrLoadFeatureType"}, "SaveFeatures": {"reason": "a query of a saved game, outside the tick", "native": "SaveFeatures"}, "LoadFeatures": {"reason": "load class", "native": "LoadFeatures"}}},
    "slots": {
-    "UpdateFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateFeatures"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateFeatures"},
-    "LoadFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadFeatureFileList"},
-    "FreeFeatureFileList": {"conv": "__stdcall", "ret": "void", "functions": ["FreeFeatureFileList"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeFeatureFileList"},
-    "NopAfterFeatureEnum": {"conv": "__stdcall", "ret": "void", "functions": ["NopAfterFeatureEnum"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "NopAfterFeatureEnum"},
-    "ResolveFeatureLinks": {"conv": "__stdcall", "ret": "void", "functions": ["ResolveFeatureLinks"], "reads": [], "writes": [], "objectReads": ["Feature.name"], "objectWrites": ["Feature.dead", "Feature.burnt", "Feature.reclamate"], "allOf": [], "args": [], "result": null, "native": "ResolveFeatureLinks"},
-    "InitFeatureAnimPool": {"conv": "__stdcall", "ret": "void", "functions": ["InitFeatureAnimPool"], "reads": [], "writes": [], "objectReads": ["Pool.entries", "Pool.featureUnit", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "objectWrites": ["Pool.entries", "Pool.featureUnit", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "allOf": [], "args": [{"name": "info", "type": "TntInfo*", "line": "info", "mode": "pending"}], "result": null, "native": "InitFeatureAnimPool"},
-    "FreeFeaturePool": {"conv": "__stdcall", "ret": "void", "functions": ["FreeFeaturePool"], "reads": ["Game.featureCount"], "writes": ["Game.featureCount"], "objectReads": ["Feature.object", "Feature.anims", "Feature.flags16", "Spot.prev", "Spot.feature", "Pool.entries", "Pool.featureUnit", "Pool.usedHead", "Pool.restHead"], "objectWrites": ["Feature.object", "Feature.anims", "Pool.entries", "Pool.featureUnit"], "allOf": [], "args": [], "result": null, "native": "FreeFeaturePool"},
-    "PlaceMissionFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["PlaceMissionFeatures"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Feature.flags16"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "PlaceMissionFeatures"},
-    "StampFeatureMetal": {"conv": "__stdcall", "ret": "void", "functions": ["StampFeatureMetal"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.feature", "Feature.footprint", "Feature.metal", "Feature.flags16"], "objectWrites": ["Cell.metal"], "allOf": [], "args": [], "result": null, "native": "StampFeatureMetal"},
-    "GetCellFeature": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["GetCellFeature"], "reads": ["Game.width"], "writes": [], "objectReads": ["Cell.feature", "Cell.offsetY", "Cell.offsetX"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Cell*", "line": "cell", "mode": "object", "kind": "Cell"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "GetCellFeature"},
-    "FindOrLoadFeatureType": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["FindOrLoadFeatureType"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "FindOrLoadFeatureType"},
-    "GetFootprintCentre": {"conv": "__stdcall", "ret": "void", "functions": ["GetFootprintCentre"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Feature.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Point16*", "line": "cell", "mode": "struct", "kind": "Point16", "dir": "in"}, {"name": "def", "type": "Feature*", "line": "def", "mode": "object", "kind": "Feature"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "value", "kind": "Vec3", "dir": "out"}], "result": null, "native": "GetFootprintCentre"},
-    "SaveFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["SaveFeatures"], "reads": ["Game.width", "Game.height", "Game.featureCount"], "writes": [], "objectReads": ["Cell.feature", "Cell.flags", "Handle.index", "Handle.src", "Feature.name", "Feature.seqburn", "Feature.seqburnshad", "Feature.seqdie", "Feature.seqdieshad", "Feature.seqreclamate", "Feature.seqreclamateshad", "Feature.flags16", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.rot", "Spot.damage", "Spot.timer"], "objectWrites": [], "allOf": [], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveFeatures"},
-    "LoadFeatures": {"conv": "__stdcall", "ret": "void", "functions": ["LoadFeatures"], "reads": ["Game.featureCount"], "writes": [], "objectReads": ["Feature.name"], "objectWrites": ["Handle.index", "Spot.damage", "Spot.timer"], "allOf": [], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadFeatures"},
-    "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "FeaturesEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
-    "Place": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "place", "type": "FeaturesPlace*", "line": "place", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "Place"},
+    "GetCellFeature": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["GetCellFeature"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.feature", "Cell.offsetY", "Cell.offsetX"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Cell*", "line": "cell", "mode": "object", "kind": "Cell"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "GetCellFeature"},
+    "GetFootprintCentre": {"conv": "__stdcall", "ret": "void", "functions": ["GetFootprintCentre"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Feature.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Point16*", "line": "cell", "mode": "struct", "kind": "Point16", "dir": "in"}, {"name": "def", "type": "Feature*", "line": "def", "mode": "object", "kind": "Feature"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "value", "kind": "Vec3", "dir": "out"}], "result": null, "native": "GetFootprintCentreSlot"},
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyEvent", "CellAt", "DamageFeature", "FeatureVec3", "PlaceEvent", "RemoveFeature", "KillFeature", "StartFeatureBurning", "PlaceFeature", "GetFeature", "ClearCell", "FreeState", "MoveFeatureSpot", "RefreshPassMaps", "AllocFeatureSpot", "ReplaceFeatureWithDead", "GetFootprintCentre", "PublishEffect"], "reads": ["Game.width", "Game.height", "Game.uiOptionFlags", "Game.featureCount", "Game.playerIndex", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.info", "Unit.cell", "Unit.footprint", "PlayerInfo.flags_97_wide", "Cell.height", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Feature.footprint", "Feature.object", "Feature.seqburn", "Feature.seqburnshad", "Feature.seqdie", "Feature.seqdieshad", "Feature.seqreclamate", "Feature.seqreclamateshad", "Feature.burnTime", "Feature.damage", "Feature.dead", "Feature.reclamate", "Feature.flags16", "Spot.prev", "Spot.next", "Spot.anim", "Spot.shadow", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.rot", "Spot.damage", "Spot.cell", "Spot.flags", "Pool.entries", "Pool.usedHead", "Pool.restHead", "Pool.freeHead", "WeaponHit.damage", "WeaponHit.fireStarter"], "objectWrites": ["Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Spot.prev", "Spot.next", "Spot.anim", "Spot.shadow", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.rot", "Spot.damage", "Spot.cell", "Spot.feature", "Spot.timer", "Spot.flags", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "allOf": ["Cell", "Feature", "Spot", "Pool", "WeaponHit"], "args": [{"name": "event", "type": "FeaturesEventHeader*", "line": "event", "mode": "event", "events": "features", "size": "size", "unrecorded": {"FEATURES_RECLAIM": "#897"}, "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyEvent"},
+    "Place": {"conv": "__stdcall", "ret": "int", "functions": ["PlaceEvent", "CellAt", "FeatureVec3", "PlaceFeature", "AllocFeatureSpot", "GetFootprintCentre", "PublishEffect", "RefreshPassMaps", "RemoveFeature", "MoveFeatureSpot", "ClearCell", "FreeState"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Feature.footprint", "Feature.object", "Feature.flags16", "Spot.prev", "Spot.next", "Spot.state", "Spot.rot", "Pool.entries", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "objectWrites": ["Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Spot.prev", "Spot.next", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.rot", "Spot.damage", "Spot.cell", "Spot.feature", "Spot.flags", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "allOf": ["Cell", "Feature", "Spot", "Pool"], "args": [{"name": "place", "type": "FeaturesPlace*", "line": "place", "mode": "struct", "kind": "FeaturesPlace", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "PlaceEvent"},
     "FeatureTypeCount": {"conv": "__stdcall", "ret": "int", "functions": ["FeatureTypeCount"], "reads": ["Game.featureCount"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "FeatureTypeCount"},
-    "AnimateFeatureType": {"conv": "__stdcall", "ret": "void", "functions": ["AnimateFeatureType"], "reads": [], "writes": [], "objectReads": ["Feature.anim", "Feature.shadowAnim", "Feature.flags16"], "objectWrites": ["Feature.anim", "Feature.shadowAnim"], "allOf": [], "args": [{"name": "type", "type": "int", "line": "type", "mode": "scalar"}], "result": null, "native": "AnimateFeatureType"},
-    "ScanFeatureCell": {"conv": "__stdcall", "ret": "void", "functions": ["ScanFeatureCell"], "reads": ["Game.width", "Game.height", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Cell.unit", "Cell.feature", "Cell.flags", "Feature.seedChance", "Feature.seedSpread"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "ScanFeatureCell"},
-    "FirstFeatureSpot": {"conv": "__stdcall", "ret": "int", "functions": ["FirstFeatureSpot"], "reads": [], "writes": [], "objectReads": ["Pool.usedHead"], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "FirstFeatureSpot"},
-    "UpdateFeatureSpot": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateFeatureSpot"], "reads": ["Game.ticks", "Game.seaLevel", "Game.gravity"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Handle.src", "Feature.flags16", "Spot.prev", "Spot.anim", "Spot.shadow", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.cell", "Spot.feature", "Spot.timer", "Spot.flags", "Pool.entries", "Pool.restHead"], "objectWrites": ["Spot.anim", "Spot.shadow", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.cell", "Spot.timer", "Pool.restHead"], "allOf": [], "args": [{"name": "spot", "type": "int", "line": "spot", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdateFeatureSpot"},
-    "FindFeatureAtPos": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["FindFeatureAtPos"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Feature.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}, {"name": "cell", "type": "Point16*", "line": "cell", "mode": "pending"}, {"name": "size", "type": "Point16*", "line": "size", "mode": "pending"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "FindFeatureAtPos"}
+    "AnimateFeatureType": {"conv": "__stdcall", "ret": "void", "functions": ["AnimateFeatureType"], "reads": [], "writes": [], "objectReads": ["Feature.anim", "Feature.shadowAnim", "Feature.flags16"], "objectWrites": ["Feature.anim", "Feature.shadowAnim"], "allOf": ["Feature"], "args": [{"name": "type", "type": "int", "line": "type", "mode": "scalar"}], "result": null, "native": "AnimateFeatureType"},
+    "ScanFeatureCell": {"conv": "__stdcall", "ret": "void", "functions": ["ScanFeatureCell", "PlaceFeature", "AllocFeatureSpot", "GetFootprintCentre", "PublishEffect", "RefreshPassMaps", "RemoveFeature", "MoveFeatureSpot", "ClearCell", "FreeState"], "reads": ["Game.width", "Game.height", "Game.scanIndex", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.scanIndex", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.unit", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Feature.footprint", "Feature.object", "Feature.seedChance", "Feature.seedSpread", "Feature.flags16", "Spot.prev", "Spot.next", "Spot.state", "Spot.rot", "Pool.entries", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "objectWrites": ["Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Spot.prev", "Spot.next", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.rot", "Spot.damage", "Spot.cell", "Spot.feature", "Spot.flags", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "allOf": ["Cell", "Feature", "Spot", "Pool"], "args": [], "result": null, "native": "ScanFeatureCell"},
+    "FirstFeatureSpot": {"conv": "__stdcall", "ret": "int", "functions": ["FirstFeatureSpot"], "reads": [], "writes": [], "objectReads": ["Pool.usedHead"], "objectWrites": [], "allOf": ["Pool"], "args": [], "result": {"type": "int", "mode": "scalar"}, "native": "FirstFeatureSpot"},
+    "UpdateFeatureSpot": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateFeatureSpot", "BurnOut", "FeatureVec3", "MoveFeatureSpot", "ReplaceFeatureWithDead", "SmokeAt", "SpreadFire", "Vec3NonZero", "PlaceFeature", "RemoveFeature", "FootprintCentreSmoke", "Rand", "GetFootprintCentre", "PublishEffect", "StartFeatureBurning", "AllocFeatureSpot", "RefreshPassMaps", "ClearCell", "FreeState"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.windX", "Game.windZ", "Game.seaLevel", "Game.gravity", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.height", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "GafFrame.width", "GafFrame.height", "GafFrame.xOffset", "GafFrame.yOffset", "Handle.src", "Feature.footprint", "Feature.object", "Feature.seqburn", "Feature.seqburnshad", "Feature.burnweapon", "Feature.burnTime", "Feature.dead", "Feature.burnt", "Feature.reclamate", "Feature.spreadChance", "Feature.flags16", "Spot.prev", "Spot.next", "Spot.anim", "Spot.shadow", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.rot", "Spot.cell", "Spot.feature", "Spot.timer", "Spot.flags", "Pool.entries", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "objectWrites": ["Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.spot", "Spot.prev", "Spot.next", "Spot.anim", "Spot.shadow", "Spot.state", "Spot.posX", "Spot.posY", "Spot.posZ", "Spot.velX", "Spot.velY", "Spot.velZ", "Spot.rot", "Spot.damage", "Spot.cell", "Spot.feature", "Spot.timer", "Spot.flags", "Pool.usedHead", "Pool.restHead", "Pool.freeHead"], "allOf": ["Cell", "Feature", "Spot", "Pool"], "args": [{"name": "spot", "type": "int", "line": "spot", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdateFeatureSpot"},
+    "FindFeatureAtPos": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["FindFeatureAtPos"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Feature.footprint"], "objectWrites": [], "allOf": ["Feature"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}, {"name": "cell", "type": "Point16*", "line": "cell", "mode": "struct", "kind": "Point16", "dir": "out", "nullable": true, "when": "result != 65535"}, {"name": "size", "type": "Point16*", "line": "size", "mode": "struct", "kind": "Point16", "dir": "out", "nullable": true, "when": "result != 65535"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "FindFeatureAtPos"}
    }
   },
   "ai": {
@@ -6376,7 +6633,7 @@
    }
   },
   "los_radar": {
-   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [5, 0], "status": "pending", "imports": [], "unrecorded": {"GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}}, "pending": {"untracked": 35, "ruleless": 22, "unresolvedSlots": ["InitRadar", "FreeRadar", "RegionSize", "Init", "Shutdown", "SightCache", "WriteState"], "unannotatedArgs": ["GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "ClampWorldPosToTerrain(out)", "IsPointVisible(pos)", "RegionSize(map)", "Init(map)", "Init(region)", "Shutdown result", "SightCache(out)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [5, 0], "status": "pending", "imports": [], "unrecorded": {"GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}}, "pending": {"untracked": 34, "ruleless": 22, "unresolvedSlots": ["InitRadar", "FreeRadar", "RegionSize", "Init", "Shutdown", "SightCache", "WriteState"], "unannotatedArgs": ["GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "ClampWorldPosToTerrain(out)", "IsPointVisible(pos)", "RegionSize(map)", "Init(map)", "Init(region)", "Shutdown result", "SightCache(out)", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateUnitLineOfSight", "RemoveUnitLineOfSight", "RevealNewUnit", "AddEyeball", "UpdateCellHeightRange", "RecalculateLineOfSight", "CmdShareMapping", "CmdShareRadar"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.flags_2a44", "Game.seaLevel", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.exploredSize", "Player.explored", "Unit.def", "Unit.player", "Unit.cell", "Unit.footprint", "Unit.unitDefIndex", "UnitDef.range", "UnitDef.modelMaxYHigh", "PlayerInfo.flags_97_wide", "Cell.height", "FrameTable.count", "GafFrame.xOffset", "GafFrame.yOffset"], "objectWrites": ["PlayerInfo.flags_97_wide", "Cell.high", "Cell.low"], "allOf": ["Player"], "args": [{"name": "event", "type": "LosRadarEventHeader*", "line": "event", "mode": "event", "events": "los_radar", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "GetMapCell": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCell"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell", "reach": ["metal"]}, "native": "GetMapCell"},
@@ -6387,7 +6644,7 @@
     "SoundHeardMask": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["SoundHeardMask"], "reads": ["Game.visibilityMask", "Game.mapFlags"], "writes": [], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "at", "type": "Vec3*", "line": "at", "mode": "vec3", "label": "at"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "SoundHeardMask"},
     "UpdateUnitLineOfSight": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitLineOfSight"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.def", "Unit.player", "UnitDef.range", "UnitDef.modelMaxYHigh"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitLineOfSight"},
     "RecordRadarUnits": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarUnits"], "reads": ["Game.uiOptionFlags", "Game.projectileCount"], "writes": [], "objectReads": ["Player.info", "Unit.unitDefIndex", "Projectile.owner"], "objectWrites": [], "allOf": ["Projectile"], "args": [], "result": null, "native": "RecordRadarUnits"},
-    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak"], "reads": ["Game.ticks", "Game.mapFlags", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ"], "objectWrites": ["Unit.flags"], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
+    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak"], "reads": ["Game.ticks", "Game.mapFlags", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "PlayerInfo.flags_97_wide"], "objectWrites": ["Unit.flags"], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
     "RecordRadarMapped": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarMapped"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.explored"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RecordRadarMapped"},
     "ExpireEyeballs": {"conv": "__stdcall", "ret": "void", "functions": ["ExpireEyeballs"], "reads": ["Game.ticks"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "ExpireEyeballs"},
     "LoadTntMap": {"conv": "__stdcall", "ret": "void", "functions": ["LoadTntMap"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadTntMap"},
@@ -6576,7 +6833,7 @@
    }
   },
   "mission": {
-   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [2, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot"}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}, "GetMissionParams": {"reason": "#660 part 3", "native": "GetMissionParamsSlot"}, "CountMissionUnits": {"reason": "#660 part 3", "native": "CountMissionUnitsSlot"}, "GetMissionUnit": {"reason": "#660 part 3", "native": "GetMissionUnitSlot"}, "SetMissionUnitPosition": {"reason": "#660 part 3", "native": "SetMissionUnitPositionSlot"}, "CountMissionFeatures": {"reason": "#660 part 3", "native": "CountMissionFeaturesSlot"}, "GetMissionFeature": {"reason": "#660 part 3", "native": "GetMissionFeatureSlot"}, "GetMemory": {"reason": "#660 part 3", "native": "GetMemorySlot"}, "GetNumPlayers": {"reason": "#660 part 3", "native": "GetNumPlayersSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
+   "header": {"interface": "interfaces/mission.h", "struct": "MissionSeam", "version": [2, 0], "status": "pending", "imports": [], "unrecorded": {"GetGameType": {"reason": "#660 part 3", "native": "GetGameTypeSlot", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "GetNameSlot": {"reason": "#660 part 3", "native": "GetNameSlotSlot"}, "SetMissionType": {"reason": "#660 part 3", "native": "SetMissionType"}, "FreeOtaEnumCacheAndMission": {"reason": "#660 part 3", "native": "FreeOtaEnumCacheAndMission"}, "AdvanceMission": {"reason": "#660 part 3", "native": "AdvanceMissionSlot"}, "GetCampaignName": {"reason": "#660 part 3", "native": "GetCampaignNameSlot"}, "GetMissionIndex": {"reason": "#660 part 3", "native": "GetMissionIndexSlot"}, "GetMissionName": {"reason": "#660 part 3", "native": "GetMissionNameSlot"}, "GetStartPosition": {"reason": "#660 part 3", "native": "GetStartPositionSlot"}, "LoadCampaign": {"reason": "#660 part 3", "native": "LoadCampaignSlot"}, "LoadMissionByName": {"reason": "#660 part 3", "native": "LoadMissionByNameSlot"}, "MissionExists": {"reason": "#660 part 3", "native": "MissionExistsSlot"}, "RefreshMapList": {"reason": "#660 part 3", "native": "RefreshMapListSlot"}, "SelectMission": {"reason": "#660 part 3", "native": "SelectMissionSlot"}, "ComputeMapChecksum": {"reason": "#660 part 3", "native": "ComputeMapChecksumSlot"}, "GetTerrainLength": {"reason": "#660 part 3", "native": "GetTerrainLengthSlot"}, "CountMissions": {"reason": "#660 part 3", "native": "CountMissionsSlot"}, "GetCampaignMissionName": {"reason": "#660 part 3", "native": "GetCampaignMissionNameSlot"}, "CountStartPositions": {"reason": "#660 part 3", "native": "CountStartPositionsSlot"}, "GetBriefing": {"reason": "#660 part 3", "native": "GetBriefingSlot"}, "GetDescription": {"reason": "#660 part 3", "native": "GetDescriptionSlot"}, "GetPlanet": {"reason": "#660 part 3", "native": "GetPlanetSlot"}, "GetTerrainSizeTier": {"reason": "#660 part 3", "native": "GetTerrainSizeTierSlot"}, "GetTranslatedName": {"reason": "#660 part 3", "native": "GetTranslatedNameSlot"}, "HasMissionName": {"reason": "#660 part 3", "native": "HasMissionNameSlot"}, "SelectSchema": {"reason": "#660 part 3", "native": "SelectSchemaSlot"}, "GetMissionParams": {"reason": "#660 part 3", "native": "GetMissionParamsSlot"}, "CountMissionUnits": {"reason": "#660 part 3", "native": "CountMissionUnitsSlot"}, "GetMissionUnit": {"reason": "#660 part 3", "native": "GetMissionUnitSlot"}, "SetMissionUnitPosition": {"reason": "#660 part 3", "native": "SetMissionUnitPositionSlot"}, "CountMissionFeatures": {"reason": "#660 part 3", "native": "CountMissionFeaturesSlot"}, "GetMissionFeature": {"reason": "#660 part 3", "native": "GetMissionFeatureSlot"}, "GetMemory": {"reason": "#660 part 3", "native": "GetMemorySlot"}, "GetNumPlayers": {"reason": "#660 part 3", "native": "GetNumPlayersSlot"}}, "pending": {"untracked": 0, "ruleless": 0, "unresolvedSlots": [], "unannotatedArgs": []}},
    "slots": {
 
    }

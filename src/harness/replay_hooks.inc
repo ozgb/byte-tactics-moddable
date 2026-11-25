@@ -281,7 +281,7 @@ double __stdcall RecEconomyGetEnergyUse(EconType a0)
     double result = s_inner_economy->GetEnergyUse(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -319,7 +319,7 @@ unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
     unsigned short result = s_inner_features->GetCellFeature(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -345,7 +345,7 @@ void __stdcall RecFeaturesGetFootprintCentre(const Point16* a0, Feature* a1, Vec
     s_inner_features->GetFootprintCentre(a0, a1, a2);
     if (scope.Import()) {
         ImportResultValue(line, ROK_VEC3, a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
@@ -464,7 +464,7 @@ unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Poin
         ImportResult(line, result);
         if (result != 65535) ImportOutInOut(line, "cell", ROK_POINT16, a1);
         if (result != 65535) ImportOutInOut(line, "size", ROK_POINT16, a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         if (result != 65535 && a1 != nullptr) ArgStruct(s_tail, "o", "cell", ROK_POINT16, a1);
@@ -706,7 +706,7 @@ void __stdcall RecPathfindingSubmit(const PathRequest* a0)
     }
     s_inner_pathfinding->Submit(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -726,7 +726,7 @@ void __stdcall RecPathfindingCancel(PathHandle a0)
     }
     s_inner_pathfinding->Cancel(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -756,7 +756,7 @@ void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3, unsign
     }
     s_inner_pathfinding->CellsChanged(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -857,7 +857,7 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
     WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
     if (scope.Import()) {
         ImportResultWeapon(line, result, 1, "flags");
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgWeaponResult(s_tail, result, 1, "flags");
@@ -883,7 +883,7 @@ int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
     int result = s_inner_weapons->GetWeaponRange(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -912,7 +912,7 @@ int __stdcall RecWeaponsWeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a2)
     int result = s_inner_weapons->WeaponCanReachUnit(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -938,7 +938,7 @@ Projectile* __stdcall RecWeaponsFindTargetableProjectile(Unit* a0, unsigned int 
     Projectile* result = s_inner_weapons->FindTargetableProjectile(a0, a1);
     if (scope.Import()) {
         ImportResultObject(line, ROK_PROJECTILE, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_PROJECTILE, result, "o");
@@ -968,7 +968,7 @@ int __stdcall RecWeaponsWeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
     int result = s_inner_weapons->WeaponCanReachPos(a0, a1, a2, a3);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1073,7 +1073,7 @@ unsigned char __stdcall RecTargetingChooseWeapon(Unit* a0)
     unsigned char result = s_inner_targeting->ChooseWeapon(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1130,7 +1130,7 @@ Cell* __stdcall RecLosRadarGetMapCell(int a0, int a1)
     Cell* result = s_inner_los_radar->GetMapCell(a0, a1);
     if (scope.Import()) {
         ImportResultObjectReach(line, ROK_CELL, result, 1, "metal");
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_CELL, result, "o");
@@ -1153,7 +1153,7 @@ Cell* __stdcall RecLosRadarGetMapCellAtPosition(Vec3* a0)
     Cell* result = s_inner_los_radar->GetMapCellAtPosition(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_CELL, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_CELL, result, "o");
@@ -1176,7 +1176,7 @@ Cell* __stdcall RecLosRadarGetOriginCellAtPosition(Vec3* a0)
     Cell* result = s_inner_los_radar->GetOriginCellAtPosition(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_CELL, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_CELL, result, "o");
@@ -1230,7 +1230,7 @@ unsigned int __stdcall RecLosRadarSoundHeardMask(const Vec3* a0)
     unsigned int result = s_inner_los_radar->SoundHeardMask(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1329,7 +1329,7 @@ int __stdcall RecLosRadarIsPointVisible(Player* a0, Vec3* a1)
     int result = s_inner_los_radar->IsPointVisible(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1495,7 +1495,7 @@ int __stdcall RecOrdersGetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* 
     int result = s_inner_orders->GetOrderType(a0, a1, a2, a3);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1561,7 +1561,7 @@ unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
     unsigned short result = s_inner_units->FindUnitTypeId(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1590,7 +1590,7 @@ int __stdcall RecUnitsAddRepairProgress(Unit* a0, Unit* a1, float a2)
     int result = s_inner_units->AddRepairProgress(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1617,7 +1617,7 @@ int __stdcall RecUnitsCanLoad(Unit* a0, Unit* a1)
     int result = s_inner_units->CanLoad(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1644,7 +1644,7 @@ int __stdcall RecUnitsCanReclaim(Unit* a0, Unit* a1)
     int result = s_inner_units->CanReclaim(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1671,7 +1671,7 @@ int __stdcall RecUnitsCanRepair(Unit* a0, Unit* a1)
     int result = s_inner_units->CanRepair(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1863,7 +1863,7 @@ int __stdcall RecMapGetCellMeanHeight(Vec3* a0)
     int result = s_inner_map->GetCellMeanHeight(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1939,7 +1939,7 @@ void __stdcall RecMapSnapWorldPosToFootprint(UnitDef* a0, Vec3* a1)
     s_inner_map->SnapWorldPosToFootprint(a0, a1);
     if (scope.Import()) {
         ImportOutInOut(line, "pos", ROK_VEC3, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgInOutExit(s_tail, "pos", ROK_VEC3, a1);
@@ -1964,7 +1964,7 @@ int __stdcall RecMapCanPlaceFootprintAt(Unit* a0, Vec3* a1)
     int result = s_inner_map->CanPlaceFootprintAt(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -1990,7 +1990,7 @@ int __stdcall RecMapIsPadSlotFree(Unit* a0, int a1)
     int result = s_inner_map->IsPadSlotFree(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2013,7 +2013,7 @@ int __stdcall RecMapGetGroundHeight(Vec3* a0)
     int result = s_inner_map->GetGroundHeight(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2121,7 +2121,7 @@ int __stdcall RecScriptsQueryScript(CobScript* a0, const char* a1, int* a2, int*
         ImportOutInOutScalar(line, "arg1", a3);
         ImportOutInOutScalar(line, "arg2", a4);
         ImportOutInOutScalar(line, "arg3", a5);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgInOutScalarExit(s_tail, "arg0", a2);
@@ -2151,7 +2151,7 @@ int __stdcall RecScriptsFindScript(CobScript* a0, const char* a1)
     int result = s_inner_scripts->FindScript(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2177,7 +2177,7 @@ void __stdcall RecScriptsGetPieceOffset(Unit* a0, int a1, Vec3* a2)
     s_inner_scripts->GetPieceOffset(a0, a1, a2);
     if (scope.Import()) {
         ImportResultValue(line, ROK_VEC3, a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
@@ -2202,7 +2202,7 @@ void __stdcall RecScriptsGetPiecePosition(Unit* a0, int a1, Vec3* a2)
     s_inner_scripts->GetPiecePosition(a0, a1, a2);
     if (scope.Import()) {
         ImportResultValue(line, ROK_VEC3, a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
@@ -2227,7 +2227,7 @@ void __stdcall RecScriptsGetPieceAngles(Unit* a0, int a1, Angles16* a2)
     s_inner_scripts->GetPieceAngles(a0, a1, a2);
     if (scope.Import()) {
         ImportResultValue(line, ROK_ANGLES16, a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_ANGLES16, a2);
@@ -2251,7 +2251,7 @@ void __stdcall RecScriptsGetNanoPiecePosition(Unit* a0, Vec3* a1)
     }
     s_inner_scripts->GetNanoPiecePosition(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -2275,7 +2275,7 @@ void __stdcall RecScriptsGetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2
     s_inner_scripts->GetAimFromPosition(a0, a1, a2);
     if (scope.Import()) {
         ImportOutVec3(line, "out", a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -2297,7 +2297,7 @@ void __stdcall RecScriptsGetSweetSpot(Unit* a0, Vec3* a1)
     s_inner_scripts->GetSweetSpot(a0, a1);
     if (scope.Import()) {
         ImportOutVec3(line, "out", a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -2372,7 +2372,7 @@ unsigned int __stdcall RecScriptsObjectStateSize(Object3do* a0)
     unsigned int result = s_inner_scripts->ObjectStateSize(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2570,7 +2570,7 @@ unsigned int __stdcall RecMovementNewPathOrderAt(unsigned int a0, const Vec3* a1
     unsigned int result = s_inner_movement->NewPathOrderAt(a0, a1);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2598,7 +2598,7 @@ unsigned int __stdcall RecMovementNewPathOrderToUnit(unsigned int a0, Unit* a1)
     unsigned int result = s_inner_movement->NewPathOrderToUnit(a0, a1);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2628,7 +2628,7 @@ unsigned int __stdcall RecMovementNewPathOrderToUnitAt(unsigned int a0, Unit* a1
     unsigned int result = s_inner_movement->NewPathOrderToUnitAt(a0, a1, a2);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2658,7 +2658,7 @@ unsigned int __stdcall RecMovementNewPathOrderToUnitAtAngle(unsigned int a0, Uni
     unsigned int result = s_inner_movement->NewPathOrderToUnitAtAngle(a0, a1, a2);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2687,7 +2687,7 @@ unsigned int __stdcall RecMovementNewAirManeuverOrder(unsigned int a0, const Vec
     unsigned int result = s_inner_movement->NewAirManeuverOrder(a0, a1, a2);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2718,7 +2718,7 @@ unsigned int __stdcall RecMovementNewApproachRadius(unsigned int a0, int a1, int
     unsigned int result = s_inner_movement->NewApproachRadius(a0, a1, a2, a3);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2751,7 +2751,7 @@ unsigned int __stdcall RecMovementNewRingApproach(unsigned int a0, int a1, int a
     unsigned int result = s_inner_movement->NewRingApproach(a0, a1, a2, a3, a4);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2780,7 +2780,7 @@ unsigned int __stdcall RecMovementNewPointMarker(unsigned int a0, const Point16*
     unsigned int result = s_inner_movement->NewPointMarker(a0, a1, a2);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2805,7 +2805,7 @@ int __stdcall RecMovementTargetType(unsigned int a0)
     int result = s_inner_movement->TargetType(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2829,7 +2829,7 @@ unsigned int __stdcall RecMovementUnitTarget(Unit* a0)
     unsigned int result = s_inner_movement->UnitTarget(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -2851,7 +2851,7 @@ int __stdcall RecMissionGetGameType()
     int result = s_inner_mission->GetGameType();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -2874,7 +2874,7 @@ const char* __stdcall RecMissionGetNameSlot(int a0)
     const char* result = s_inner_mission->GetNameSlot(a0);
     if (scope.Import()) {
         ImportResult(line, (const char*)result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", (const char*)result, "o");
@@ -2962,7 +2962,7 @@ void __stdcall RecMissionGetMissionParams(MissionParams* a0)
     s_inner_mission->GetMissionParams(a0);
     if (scope.Import()) {
         ImportResultValue(line, ROK_MISSIONPARAMS, a0);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_MISSIONPARAMS, a0);
@@ -3656,7 +3656,7 @@ int __stdcall RecFilesBankOpenAccount(HapiBank* a0, const char* a1)
     int result = s_inner_files->BankOpenAccount(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -3683,7 +3683,7 @@ int __stdcall RecFilesBankSetInteger(HapiBank* a0, const char* a1, int a2)
     int result = s_inner_files->BankSetInteger(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -3742,7 +3742,7 @@ int __stdcall RecFilesBankGetInteger(HapiBank* a0, const char* a1, int a2)
     int result = s_inner_files->BankGetInteger(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -3898,7 +3898,7 @@ void __stdcall RecNetworkBroadcastPlayerInfo()
     }
     s_inner_network->BroadcastPlayerInfo();
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -3972,7 +3972,7 @@ void __stdcall RecNetworkSendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsi
     }
     s_inner_network->SendUnitDamage(a0, a1, a2, a3, a4);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4047,7 +4047,7 @@ void __stdcall RecNetworkSendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, 
     }
     s_inner_network->SendWeaponFire(a0, a1, a2, a3, a4);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4071,7 +4071,7 @@ void __stdcall RecNetworkSendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
     }
     s_inner_network->SendWeaponFireAt(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4095,7 +4095,7 @@ void __stdcall RecNetworkSendProjectileDetonated(Unit* a0, Projectile* a1)
     }
     s_inner_network->SendProjectileDetonated(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4120,7 +4120,7 @@ void __stdcall RecNetworkSendFeatureHit(WeaponDef* a0, int a1, int a2)
     }
     s_inner_network->SendFeatureHit(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4142,7 +4142,7 @@ void __stdcall RecNetworkSendFeatureKilled(int a0, int a1)
     }
     s_inner_network->SendFeatureKilled(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4164,7 +4164,7 @@ void __stdcall RecNetworkSendFeatureBurning(int a0, int a1)
     }
     s_inner_network->SendFeatureBurning(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4189,7 +4189,7 @@ void __stdcall RecNetworkSendFeatureReclaimed(Unit* a0, int a1, int a2)
     }
     s_inner_network->SendFeatureReclaimed(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4223,7 +4223,7 @@ int __stdcall RecNetworkSendScriptCall(Unit* a0, short a1, char a2, int a3, int 
     int result = s_inner_network->SendScriptCall(a0, a1, a2, a3, a4, a5, a6);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4259,7 +4259,7 @@ int __stdcall RecNetworkSendScriptCallByName(Unit* a0, const char* a1, char a2, 
     int result = s_inner_network->SendScriptCallByName(a0, a1, a2, a3, a4, a5, a6);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4285,7 +4285,7 @@ void __stdcall RecNetworkSendShareMetal(unsigned char a0, unsigned char a1, floa
     }
     s_inner_network->SendShareMetal(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4309,7 +4309,7 @@ void __stdcall RecNetworkSendShareEnergy(unsigned char a0, unsigned char a1, flo
     }
     s_inner_network->SendShareEnergy(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4331,7 +4331,7 @@ void __stdcall RecNetworkSendShareMapInfo(unsigned char a0, unsigned char a1)
     }
     s_inner_network->SendShareMapInfo(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4352,7 +4352,7 @@ void __stdcall RecNetworkBroadcastPlayerEconomy(Player* a0)
     }
     s_inner_network->BroadcastPlayerEconomy(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4393,7 +4393,7 @@ int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a
     int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
         ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 41, 7);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4421,7 +4421,7 @@ int __stdcall RecLosRadarGetSeenUnitsInRadius(int a0, const Vec3* a1, int a2, Re
     int result = s_inner_los_radar->GetSeenUnitsInRadius(a0, a1, a2, a3, a4);
     if (scope.Import()) {
         ImportOutUnitBuffer(line, "los_radar.GetSeenUnitsInRadius", "out", a3, result, a4, kReplayReachFields + 0, 1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4446,7 +4446,7 @@ Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
     Unit* result = s_inner_units->LoadUnit(a0, a1);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
@@ -4479,7 +4479,7 @@ Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, const Ve
     Unit* result = s_inner_units->CreateUnit(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
@@ -4508,7 +4508,7 @@ int __stdcall RecUnitsAddBuildProgress(Unit* a0, Unit* a1, float a2)
     int result = s_inner_units->AddBuildProgress(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4531,7 +4531,7 @@ void __stdcall RecUnitsUnitRefUnlink(UnitRef* a0)
     }
     s_inner_units->UnitRefUnlink(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4560,7 +4560,7 @@ int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<U
     int result = s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3, a4);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4589,7 +4589,7 @@ void __stdcall RecUnitsUnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
     }
     s_inner_units->UnitRefInit(a0, a1, a2);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4613,7 +4613,7 @@ void __stdcall RecUnitsUnitRefSetUnit(UnitRef* a0, Unit* a1)
     }
     s_inner_units->UnitRefSetUnit(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4635,7 +4635,7 @@ Unit* __stdcall RecUnitsUnitRefGet(UnitRef* a0)
     Unit* result = s_inner_units->UnitRefGet(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
@@ -4661,7 +4661,7 @@ void __stdcall RecUnitsUnitRefSetValue(UnitRef* a0, OrderBase* a1)
     }
     s_inner_units->UnitRefSetValue(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4679,7 +4679,7 @@ void __stdcall RecPlayersLoadDefaultAIScript()
     }
     s_inner_players->LoadDefaultAIScript();
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4708,7 +4708,7 @@ int __stdcall RecMapUnitsInRange(const Vec3* a0, int a1, int a2, unsigned short*
     if (scope.Import()) {
         ImportResult(line, result);
         ImportOutBytes(line, "ids", a3, (int)result * 2, (a4 * 2));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgOutBytes(s_tail, "ids", a3, (int)result * 2, (a4 * 2));
@@ -4739,7 +4739,7 @@ unsigned int __stdcall RecMovementLoadTarget(int a0, unsigned int a1, HapiBank* 
     unsigned int result = s_inner_movement->LoadTarget(a0, a1, a2, a3);
     if (scope.Import()) {
         ImportResultObject(line, ROK_ORDERFX, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_ORDERFX, ReplayRefPtr(result), "o");
@@ -4770,7 +4770,7 @@ void __stdcall RecMovementSaveTarget(unsigned int a0, unsigned int a1, HapiBank*
     }
     s_inner_movement->SaveTarget(a0, a1, a2, a3);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -4789,7 +4789,7 @@ unsigned int __stdcall RecEconworldTick()
     unsigned int result = s_inner_econworld->Tick();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4810,7 +4810,7 @@ int __stdcall RecEconworldDifficulty()
     int result = s_inner_econworld->Difficulty();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4831,7 +4831,7 @@ int __stdcall RecEconworldSharingEnabled()
     int result = s_inner_econworld->SharingEnabled();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4852,7 +4852,7 @@ float __stdcall RecEconworldWind()
     float result = s_inner_econworld->Wind();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4873,7 +4873,7 @@ float __stdcall RecEconworldTide()
     float result = s_inner_econworld->Tide();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4896,7 +4896,7 @@ void __stdcall RecEconworldPlayerInfo(int a0, EconPlayerInfo* a1)
     s_inner_econworld->PlayerInfo(a0, a1);
     if (scope.Import()) {
         ImportResultValue(line, ROK_ECONPLAYERINFO, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_ECONPLAYERINFO, a1);
@@ -4920,7 +4920,7 @@ int __stdcall RecEconworldAllied(int a0, int a1)
     int result = s_inner_econworld->Allied(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -4943,7 +4943,7 @@ EconUnit __stdcall RecEconworldFirstUnit(int a0)
     EconUnit result = s_inner_econworld->FirstUnit(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
@@ -4967,7 +4967,7 @@ EconUnit __stdcall RecEconworldLastUnit(int a0)
     EconUnit result = s_inner_econworld->LastUnit(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
@@ -4992,7 +4992,7 @@ EconUnit __stdcall RecEconworldNextUnit(EconUnit a0)
     EconUnit result = s_inner_econworld->NextUnit(a0);
     if (scope.Import()) {
         ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
@@ -5017,7 +5017,7 @@ int __stdcall RecEconworldUnitSlot(EconUnit a0)
     int result = s_inner_econworld->UnitSlot(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5042,7 +5042,7 @@ int __stdcall RecEconworldUnitInfo(EconUnit a0, EconUnitInfo* a1)
     if (scope.Import()) {
         ImportResult(line, result);
         ImportOutInOut(line, "uinfo", ROK_ECONUNITINFO, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5065,7 +5065,7 @@ void __stdcall RecEconworldTypeInfo(EconType a0, EconTypeInfo* a1)
     s_inner_econworld->TypeInfo(a0, a1);
     if (scope.Import()) {
         ImportResultValue(line, ROK_ECONTYPEINFO, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_ECONTYPEINFO, a1);
@@ -5089,7 +5089,7 @@ int __stdcall RecEconworldCellMetal(int a0, int a1)
     int result = s_inner_econworld->CellMetal(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5112,7 +5112,7 @@ void __stdcall RecEconworldEmit(const EconomyEventHeader* a0, unsigned int a1)
     }
     s_inner_econworld->Emit(a0, a1);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -5131,7 +5131,7 @@ unsigned int __stdcall RecPathworldTick()
     unsigned int result = s_inner_pathworld->Tick();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5152,7 +5152,7 @@ unsigned int __stdcall RecPathworldSearchStepLimit()
     unsigned int result = s_inner_pathworld->SearchStepLimit();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5173,7 +5173,7 @@ int __stdcall RecPathworldPlayerCount()
     int result = s_inner_pathworld->PlayerCount();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5196,7 +5196,7 @@ int __stdcall RecPathworldIsPlaying(int a0)
     int result = s_inner_pathworld->IsPlaying(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5217,7 +5217,7 @@ int __stdcall RecPathworldUnitsPerPlayer()
     int result = s_inner_pathworld->UnitsPerPlayer();
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5240,7 +5240,7 @@ PathUnit __stdcall RecPathworldFirstUnit(int a0)
     PathUnit result = s_inner_pathworld->FirstUnit(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5263,7 +5263,7 @@ PathUnit __stdcall RecPathworldLastUnit(int a0)
     PathUnit result = s_inner_pathworld->LastUnit(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5286,7 +5286,7 @@ PathUnit __stdcall RecPathworldNextUnit(PathUnit a0)
     PathUnit result = s_inner_pathworld->NextUnit(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5310,7 +5310,7 @@ int __stdcall RecPathworldUnitState(PathUnit a0, PathUnitState* a1)
     if (scope.Import()) {
         ImportResult(line, result);
         if (result != 0) ImportOutInOut(line, "out", ROK_PATHUNITSTATE, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         if (result != 0) ArgStruct(s_tail, "o", "out", ROK_PATHUNITSTATE, a1);
@@ -5334,7 +5334,7 @@ PathClass __stdcall RecPathworldMoveClass(int a0)
     PathClass result = s_inner_pathworld->MoveClass(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5361,7 +5361,7 @@ int __stdcall RecPathworldInBounds(PathClass a0, int a1, int a2)
     int result = s_inner_pathworld->InBounds(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5388,7 +5388,7 @@ int __stdcall RecPathworldPass(PathClass a0, int a1, int a2)
     int result = s_inner_pathworld->Pass(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5410,7 +5410,7 @@ void __stdcall RecPathworldSeenSize(int* a0, int* a1)
     if (scope.Import()) {
         ImportOutScalar(line, "width", a0);
         ImportOutScalar(line, "height", a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -5435,7 +5435,7 @@ int __stdcall RecPathworldSeen(int a0, int a1, int a2)
     int result = s_inner_pathworld->Seen(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5466,7 +5466,7 @@ int __stdcall RecPathworldLineOfSight(PathClass a0, int a1, int a2, int a3, int 
     int result = s_inner_pathworld->LineOfSight(a0, a1, a2, a3, a4);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5493,7 +5493,7 @@ int __stdcall RecPathworldTerrainPass(PathClass a0, int a1, int a2)
     int result = s_inner_pathworld->TerrainPass(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -5515,7 +5515,7 @@ void __stdcall RecPathworldBeginSearch(PathUnit a0)
     }
     s_inner_pathworld->BeginSearch(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -5535,7 +5535,7 @@ void __stdcall RecPathworldEndSearch(PathUnit a0)
     }
     s_inner_pathworld->EndSearch(a0);
     if (scope.Import()) {
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }

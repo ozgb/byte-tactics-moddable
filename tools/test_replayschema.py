@@ -2640,7 +2640,17 @@ class ElementForms(unittest.TestCase):
         for kind, value in (("FixtureCb", ""), ("FixtureCb", True), ("FixtureCell", "a reason")):
             ann = annotations()
             ann["objects"][kind]["vptr_unset"] = value
-            self.has(ann, "%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % kind)
+            self.has(ann, "%s: `vptr_unset` is the reason a kind with a vptr, or an embedded kind with a vtable, may hold 0 in it" % kind)
+
+    def test_import_objects_is_a_reason_and_reaches_the_subsystem_row(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0 \},')
+        for value in ("", True):
+            ann = annotations()
+            ann["subsystems"]["weapons"]["import_objects"] = value
+            self.has(ann, "weapons: import_objects needs a reason")
 
     def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
         files, errors, _ = self.generated()

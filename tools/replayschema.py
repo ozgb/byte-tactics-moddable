@@ -1974,6 +1974,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             subsystems[sub]["world"] = True
         if spec.get("issue"):
             subsystems[sub]["issue"] = spec["issue"]
+        if "import_objects" in spec:
+            if not isinstance(spec["import_objects"], str) or not spec["import_objects"]:
+                errors.append("%s: import_objects needs a reason" % sub)
+            subsystems[sub]["importObjects"] = spec["import_objects"]
         if unrecorded:
             subsystems[sub]["unrecorded"] = unrecorded
         left = {k: v for k, v in done.items() if v}
@@ -2435,7 +2439,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     first = 0
     for sub, spec in subsystems.items():
         n = len(spec["slots"])
-        L.append('    { "%s", %d, %d, %d, %d, %d, %s },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT"))
+        L.append('    { "%s", %d, %d, %d, %d, %d, %s, %d },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT", int("importObjects" in spec)))
         first += n
     L += ["};", "static const unsigned kReplaySubsystemCount = SUB_COUNT;", "", "#endif", ""]
     return "\n".join(L)
@@ -2705,7 +2709,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_named_out(a):
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
-        L.append("        FinishImport(line);")
+        L.append("        FinishImport(line, roots);")
         L.append("    }")
     if nest:
         L.append("    if (scope.Nested()) {")
@@ -3085,7 +3089,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         elif m == "callback":
             L.append("    Space(t);\n    AddObject(t, OBJ_CALLBACK + RCB_%s, %s);" % (upper(a["callback"]), v))
         elif m == "object":
-            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), "ReplayRefPtr(%s)" % v if a.get("ref") else v))
+            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, true);" % (upper(a["kind"]), "ReplayRefPtr(%s)" % v if a.get("ref") else v))
         elif m == "bytes-in":
             L.append("    Space(t);\n    AddBytes(t, %s, %s);" % (v, length_parts(a, i)[1]))
         elif is_value_out(a):
@@ -3708,7 +3712,7 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        t.AddString((const char*)a[%d].v.p);" % index[o["text"]])
         L.append("        break;")
         L.append("    }")
-    L += ["    }", "    ImportRng(t, c.id);", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
+    L += ["    }", "    ImportRng(t, c.id);", "    t.AddChar('\\n');", "    ImportServiceObjects(t, c);", "    ReplayCalls() = 1;", "}", ""]
     return "\n".join(L)
 
 

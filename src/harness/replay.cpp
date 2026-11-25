@@ -230,6 +230,66 @@ void CaptureObjectSet(const ReplaySlotSets& sets, bool entry)
         ReplayCaptureObjects(s_call, r.known, r.table, s_reach, sets.objWrites, sets.objWriteCount, 'w');
 }
 
+enum { MAX_FREED = 16 };
+
+const void* s_freed[MAX_FREED];
+unsigned s_freedCount;
+
+bool Freed(const void* p)
+{
+    for (unsigned i = 0; i < s_freedCount; i++) {
+        if (s_freed[i] == p)
+            return true;
+    }
+    return false;
+}
+
+void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
+{
+    for (unsigned i = 0; i < from.count; i++) {
+        if (!Freed(from.object[i]))
+            to.Add(from.kind[i], from.object[i]);
+    }
+}
+
+void ImportObjects(ReplayText& t, const ReplayRoots* extra)
+{
+    static unsigned short s_changed[kReplayObjectFieldCount];
+    static ReplayReach s_importReach;
+    if (!s_recording || !kReplaySubsystems[s_sub].importObjects)
+        return;
+    Recording& r = *s_rec[s_sub];
+    const ReplaySlotSets& sets = kReplaySlots[s_slot];
+    unsigned n = 0;
+    for (unsigned i = 0; i < sets.objReadCount; i++) {
+        bool written = false;
+        for (unsigned j = 0; j < sets.objWriteCount && !written; j++)
+            written = sets.objWrites[j] == sets.objReads[i];
+        if (!written)
+            s_changed[n++] = sets.objReads[i];
+    }
+    if (n == 0)
+        return;
+    ReplayRoots roots;
+    AddLiveRoots(roots, s_roots);
+    if (extra != nullptr)
+        AddLiveRoots(roots, *extra);
+    ReplayWalk(s_importReach, r.table, true, sets, roots.kind, roots.object, roots.count);
+    ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_changed, n, 'o');
+}
+
+void ImportServiceObjects(ReplayText& t, const ReplayImport& c)
+{
+    if (c.id != RI_SIM_FREE) {
+        ImportObjects(t, nullptr);
+        return;
+    }
+    if (s_freedCount < MAX_FREED)
+        s_freed[s_freedCount++] = c.args[0].v.p;
+    else
+        ReplayFail("more than 16 allocations are freed in one recorded call");
+}
+
 void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
 {
     Recording& r = *s_rec[sub];
@@ -245,6 +305,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     s_call.Clear();
     s_tail.Clear();
     s_roots = roots;
+    s_freedCount = 0;
     if (s_tick >= 0) {
         s_field.Clear();
         s_field.AddInt(s_tick);
@@ -746,22 +807,26 @@ void ImportBytes(ReplayText& t, const void* p, int length)
 
 void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
 {
+    if (count > length)
+        count = length;
     if (count <= 0 || p == nullptr)
         return;
     t.Add("\n  o ");
     t.Add(name);
     t.AddChar(' ');
-    ReplayBytes(t, p, count < length ? count : length);
+    ReplayBytes(t, p, count);
 }
 
 void ArgOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
 {
+    if (count > length)
+        count = length;
     if (count <= 0 || p == nullptr)
         return;
     t.Add("  o ");
     t.Add(name);
     t.AddChar(' ');
-    ReplayBytes(t, p, count < length ? count : length);
+    ReplayBytes(t, p, count);
     t.AddChar('\n');
 }
 
@@ -892,11 +957,12 @@ void FinishNested(ReplayText& line)
     line.Free();
 }
 
-void FinishImport(ReplayText& line)
+void FinishImport(ReplayText& line, const ReplayRoots& roots)
 {
     s_call.AddText(line);
     s_call.AddChar('\n');
     line.Free();
+    ImportObjects(s_call, &roots);
 }
 
 #include "replay_hooks.inc"

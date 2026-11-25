@@ -1096,6 +1096,28 @@ handler. The imports made inside an import are not recorded, so the recorder wri
 `RandomInt` and `GameRand` have no such line: the replayer advances the word as the game does. Besides weapons' recordings,
 players' `console-units` and `mission-capture` have one such line each.
 
+### An object field that an import changes
+
+An import can change a field of an object that the slot reads but does not write: movement's `SchedPublish` of a TURN or a MOVE runs units' handler on a synchronous
+route, which sets the unit's heading and position before the import returns, and units' `UnitRefInit` and `UnitRefUnlink` link and unlink the reference that a `PathOrder`
+embeds (`PathOrder.ref`, `PathOrderAttach.owner`). After each import of a subsystem that asks for it (below), the recorder walks the slot's roots, the live objects of the call and, for an import of a seam, the
+objects the import's arguments name, and writes an `o` line for each field of the slot's read set and not of its write set whose value differs from what the recording
+last gave:
+
+```
+  i services.SchedPublish 14 12
+  o Unit#251.heading 8310
+  i units.UnitRefInit PathOrderAttach#1 Unit#2 null
+  o PathOrderAttach#1.owner Unit#2
+  o PathOrderAttach#1.next PathOrder#1.ref
+  o PathOrderAttach#1.value null
+```
+
+The replayer's answer to the import stores the value in the field before the module goes on, as for the fields of a service (`A service that leaves a block field behind`).
+A field of the write set never has the line, so a field the slot computes is compared by its `w` line and never set from the recording. An object the import frees
+(`services.SimFree`) is not walked. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement has it); `replayschema.py --check` fails for one with no reason. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
+form on a fixture (`an object field that an import changes`).
+
 ## The schema and its annotations
 
 `data/replay_schema.json` has the `annotations` (written by hand, kept as written by the tool) and the generated
@@ -1533,9 +1555,9 @@ own `pool`, which the module grows), and a write to a `Game` field through a poi
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
-The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte, and a region at its recorded offset (see A module's region and world view, "A region that holds block offsets"). It runs the forms of out buffers too (`a byte buffer a slot fills`, `a scratch buffer`, `a scalar the import writes`).
+The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte, and a region at its recorded offset (see A module's region and world view, "A region that holds block offsets"). It runs the forms of out buffers too (`a byte buffer a slot fills`, `a scratch buffer`, `a scalar the import writes`). A result larger than its buffer is as long as the buffer, and a call with no bytes has no `o` line whatever its result. It replays an event that holds the offset of a polymorphic object (`a event.target ApproachRadius#1`, resolved to an object of that kind with its vtable, and `null`), and a region placed where it would clash, where it is not 8-byte aligned, and where it would leave a free remainder under the smallest chunk, each reported as such.
 
-The recordings of pathfinding, which the modern build runs as native code in every mode (it has no WASM module yet), hold five windows of 600 KB to 2 MB, each with the region form's `RegionSize` and `Init` first (the region at its recorded offset, `a region 4341424`, of 959,664 bytes). Every tick's `Step` is mostly imports, a walk of the unit slots through `pathworld.NextUnit` (about 2,700 lines), so a window is a few ticks: `orders-move-attack` (ticks 179 to 195: `Submit` once, `Cancel` once, `Step` 17, `Poll` 19, `CellsChanged` once; the search of tick 181 is a STARTED event of 24 bytes and a FINISHED one of 28, both found directly, with 101 `pathworld.Pass` imports, `UnitState`, `SeenSize`, `BeginSearch` and `EndSearch`), `skirmish2` (ticks 1169 to 1172: `Cancel` 2, `CellsChanged` 15 at tick 1170, `Submit` once, `Step` 4, `Poll` 6, the events of tick 1171), `orders-tier2-core` (ticks 1029 to 1031: `Cancel` 2, `Submit` once, the events of tick 1030, 299 `pathworld.Pass`), `orders-air` (ticks 3599 to 3601: `Cancel` and `Submit` once, the events of tick 3600) and `orders-factory` (ticks 17 to 20: `Cancel` once and `CellsChanged` 15 at tick 19, each with the cause 2 and its movement class bits). A unit's `PathUnit`, a movement class and a requester's `PathHandle` are numbers in the recording (`i pathworld.UnitState 3316696 = 1`, `a requester 5406984`), and `o out (0,(32,13),63113,780,2,2)` is the `PathUnitState` the stub writes. The event payload of `Poll` is `o out x:...` as long as the result (`x:0200000090983200...` for a FINISHED), and its `points` are a scratch buffer. The injected change is the default step budget of a search, 0x500 in place of 0x535 (the step-budget injection of the test build, which the game takes when the match sets no limit): `Step` adds a smaller share to the budget kept in the region, and the divergence is reported at call 1 of `skirmish2`, at `region`, byte 72:
+The recordings of pathfinding, which the modern build runs as native code in every mode (it has no WASM module yet), hold five windows of 600 KB to 2 MB, each with the region form's `RegionSize` and `Init` first (the region at its recorded offset, `a region 4341424`, of 959,664 bytes). Every tick's `Step` is mostly imports, a walk of the unit slots through `pathworld.NextUnit` (about 2,700 lines), so a window is a few ticks: `orders-move-attack` (ticks 179 to 195: `Submit` once, `Cancel` once, `Step` 17, `Poll` 19, `CellsChanged` once; the search of tick 181 is a STARTED event of 24 bytes and a FINISHED one of 28, both found directly, with 101 `pathworld.Pass` imports, `UnitState`, `SeenSize`, `BeginSearch` and `EndSearch`), `skirmish2` (ticks 1169 to 1172: `Cancel` 2, `CellsChanged` 15 at tick 1170, `Submit` once, `Step` 4, `Poll` 6, the events of tick 1171), `orders-tier2-core` (ticks 1029 to 1031: `Cancel` 2, `Submit` once, the events of tick 1030, 299 `pathworld.Pass`), `orders-air` (ticks 3599 to 3601: `Cancel` and `Submit` once, the events of tick 3600) and `orders-factory` (ticks 17 to 20: `Cancel` once and `CellsChanged` 15 at tick 19, each with the cause 2 and its movement class bits). A unit's `PathUnit`, a movement class and a requester's `PathHandle` are numbers in the recording (`i pathworld.UnitState 3316696 = 1`, `a requester 5406984`), and `o out (0,(32,13),63113,780,2,2)` is the `PathUnitState` the stub writes. The event payload of `Poll` is `o out x:...` as long as the result (`x:0200000090983200...` for a FINISHED), and its `points` are a scratch buffer. The injected change is the default step budget of a search, 0x500 in place of 0x535 (the step-budget injection of the test build, which the game takes when the match sets no limit): `Init` writes the budget into the region (its `stepsPerTick`), so the divergence is reported at call 1 of `skirmish2`, its `Init`, at `region`, byte 72:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 1 region tests/replay/pathfinding/skirmish2.txt
@@ -1683,6 +1705,12 @@ The recordings of ai 6.0, which the modern build runs as native code in every mo
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 76 SquadManager#1.countdown tests/replay/ai/skirmish2.txt
+```
+
+The recordings of movement 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), are windows of a few ticks to a hundred, each of 10 to 80 KB: `orders-guard-attacked` (ticks 8 to 30: `UpdateMotion` 130, `Apply` 6, `UnitTarget` 3, `NewApproachRadius` 2), `orders-air-fights` (ticks 8 to 40: `UpdateMotion` 221, `Apply` 9, `UnitTarget` 4, `NewPathOrderAt` and `NewPointMarker`), `orders-air-repair` (ticks 668 to 760: `UpdateMotion` 279, `Apply` 27, `NewPathOrderToUnitAtAngle` 6, with 182 `scripts.GetPiecePosition` and the links and unlinks of the reference a `PathOrder` embeds), `orders-air` (ticks 4090 to 4102: `UpdateMotion` 78, `NewPathOrderAt` and `NewPathOrderToUnit`, with `scripts.GetPieceAngles`), `units-transport` (ticks 4408 to 4416: `UpdateMotion` 27 and a `NewPointMarker`) and `orders-build-patrol` (ticks 148 to 162: `UpdateMotion` 30, `NewApproachRadius` and `NewRingApproach`, with `pathfinding.Submit` and `Cancel`). The new orders are the object result form (`o result ApproachRadius#1`), a target in an event is its offset (`a event.target ApproachRadius#1`), and most imports are the `services.SchedPublish` of an effect, after which the fields that units' handlers change are `o` lines (`An object field that an import changes`). `replay_inject_test.exe` is also built with the speed-divisor injection of 0x6c0000 (the 0x640000 that divides the speed range of a unit in `UpdateVelocityFromHeading`), and the divergence is reported at call 1 of `orders-build-patrol` and at `UnitMotion#2.velocityX` (recorded -50187, replayed -46469):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 1 UnitMotion#2.velocityX tests/replay/movement/orders-build-patrol.txt
 ```
 
 ### Against the WASM module

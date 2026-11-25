@@ -39,11 +39,15 @@ call 8 UpdateMotion
   r Player#0.type 1
   r UnitMotion#1.obj AiSearchGoal#1
   r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
   r UnitMotion#1.speed 0
   r UnitMotion#1.flags 1
   r UnitMotion#1.turn 0
   r UnitMotion#1.lastMoveTick 0
   r UnitMotion#1.p2X 0
+  r UnitMotion#1.p2Y 0
+  r UnitMotion#1.p2Z 0
   r AiSearchGoal#1.target null
   r AiSearchGoal#1.owner Unit#1
   r AiSearchGoal#1.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -86,11 +90,15 @@ call 8 UpdateMotion
   r Player#1.type 1
   r UnitMotion#2.obj AiSearchGoal#2
   r UnitMotion#2.velocityX 0
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ 0
   r UnitMotion#2.speed 0
   r UnitMotion#2.flags 1
   r UnitMotion#2.turn 0
   r UnitMotion#2.lastMoveTick 0
   r UnitMotion#2.p2X 0
+  r UnitMotion#2.p2Y 0
+  r UnitMotion#2.p2Z 0
   r AiSearchGoal#2.target null
   r AiSearchGoal#2.owner Unit#251
   r AiSearchGoal#2.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -112,26 +120,43 @@ call 10 Apply
   r Unit#2.heading -32768
   r Unit#2.list null
   r Unit#2.def UnitDef#51
+  r Unit#2.player Player#0
   r Unit#2.motion null
   r Unit#2.posX 39321600
+  r Unit#2.posY 65536
   r Unit#2.posZ 19660800
   r UnitDef#51.flags1 0x00818889
   r UnitDef#51.altitude 110
   r UnitDef#51.bankscale 65536
   r UnitDef#51.pitchscale 0
   r UnitDef#51.turnrate 512
+  r UnitDef#51.movementclass null
   a event.kind 320
   a event.unit Unit#2
   a size 8
   i services.SimAlloc 47 = alloc#1
   i services.SimAlloc 40 = alloc#2
   w Unit#2.motion UnitMotion#3
+  w UnitMotion#3.obj LiteGoal#1
+  w UnitMotion#3.movementClass null
   w UnitMotion#3.velocityX 0
+  w UnitMotion#3.velocityY 0
+  w UnitMotion#3.velocityZ 0
   w UnitMotion#3.speed 0
   w UnitMotion#3.flags 1
   w UnitMotion#3.turn 0
   w UnitMotion#3.p2X 0
+  w UnitMotion#3.p2Y 0
+  w UnitMotion#3.p2Z 0
   w LiteGoal#1.target null
+  w LiteGoal#1.owner Unit#2
+  w LiteGoal#1.posX 39321600
+  w LiteGoal#1.posY 65536
+  w LiteGoal#1.posZ 19660800
+  w LiteGoal#1.velX 0
+  w LiteGoal#1.velY 0
+  w LiteGoal#1.velZ 0
+  w LiteGoal#1.heading -32768
   w LiteGoal#1.netDirtyFlags 1
   o result 1
 call 10 Apply
@@ -141,8 +166,10 @@ call 10 Apply
   r Unit#3.heading -32768
   r Unit#3.list null
   r Unit#3.def UnitDef#51
+  r Unit#3.player Player#0
   r Unit#3.motion null
   r Unit#3.posX 41943040
+  r Unit#3.posY 65536
   r Unit#3.posZ 19660800
   a event.kind 320
   a event.unit Unit#3
@@ -150,12 +177,26 @@ call 10 Apply
   i services.SimAlloc 47 = alloc#3
   i services.SimAlloc 40 = alloc#4
   w Unit#3.motion UnitMotion#4
+  w UnitMotion#4.obj LiteGoal#2
+  w UnitMotion#4.movementClass null
   w UnitMotion#4.velocityX 0
+  w UnitMotion#4.velocityY 0
+  w UnitMotion#4.velocityZ 0
   w UnitMotion#4.speed 0
   w UnitMotion#4.flags 1
   w UnitMotion#4.turn 0
   w UnitMotion#4.p2X 0
+  w UnitMotion#4.p2Y 0
+  w UnitMotion#4.p2Z 0
   w LiteGoal#2.target null
+  w LiteGoal#2.owner Unit#3
+  w LiteGoal#2.posX 41943040
+  w LiteGoal#2.posY 65536
+  w LiteGoal#2.posZ 19660800
+  w LiteGoal#2.velX 0
+  w LiteGoal#2.velY 0
+  w LiteGoal#2.velZ 0
+  w LiteGoal#2.heading -32768
   w LiteGoal#2.netDirtyFlags 1
   o result 1
 call 10 Apply
@@ -165,26 +206,43 @@ call 10 Apply
   r Unit#4.heading -32768
   r Unit#4.list null
   r Unit#4.def UnitDef#123
+  r Unit#4.player Player#0
   r Unit#4.motion null
   r Unit#4.posX 39321600
+  r Unit#4.posY 65536
   r Unit#4.posZ 22282240
   r UnitDef#123.flags1 0x00818881
   r UnitDef#123.altitude 200
   r UnitDef#123.bankscale 65536
   r UnitDef#123.pitchscale 0
   r UnitDef#123.turnrate 356
+  r UnitDef#123.movementclass null
   a event.kind 320
   a event.unit Unit#4
   a size 8
   i services.SimAlloc 47 = alloc#5
   i services.SimAlloc 40 = alloc#6
   w Unit#4.motion UnitMotion#5
+  w UnitMotion#5.obj LiteGoal#3
+  w UnitMotion#5.movementClass null
   w UnitMotion#5.velocityX 0
+  w UnitMotion#5.velocityY 0
+  w UnitMotion#5.velocityZ 0
   w UnitMotion#5.speed 0
   w UnitMotion#5.flags 1
   w UnitMotion#5.turn 0
   w UnitMotion#5.p2X 0
+  w UnitMotion#5.p2Y 0
+  w UnitMotion#5.p2Z 0
   w LiteGoal#3.target null
+  w LiteGoal#3.owner Unit#4
+  w LiteGoal#3.posX 39321600
+  w LiteGoal#3.posY 65536
+  w LiteGoal#3.posZ 22282240
+  w LiteGoal#3.velX 0
+  w LiteGoal#3.velY 0
+  w LiteGoal#3.velZ 0
+  w LiteGoal#3.heading -32768
   w LiteGoal#3.netDirtyFlags 1
   o result 1
 call 10 Apply
@@ -194,26 +252,43 @@ call 10 Apply
   r Unit#5.heading -32768
   r Unit#5.list null
   r Unit#5.def UnitDef#29
+  r Unit#5.player Player#0
   r Unit#5.motion null
   r Unit#5.posX 41943040
+  r Unit#5.posY 65536
   r Unit#5.posZ 22282240
   r UnitDef#29.flags1 0x008088c9
   r UnitDef#29.altitude 70
   r UnitDef#29.bankscale 98304
   r UnitDef#29.pitchscale 0
   r UnitDef#29.turnrate 90
+  r UnitDef#29.movementclass null
   a event.kind 320
   a event.unit Unit#5
   a size 8
   i services.SimAlloc 47 = alloc#7
   i services.SimAlloc 40 = alloc#8
   w Unit#5.motion UnitMotion#6
+  w UnitMotion#6.obj LiteGoal#4
+  w UnitMotion#6.movementClass null
   w UnitMotion#6.velocityX 0
+  w UnitMotion#6.velocityY 0
+  w UnitMotion#6.velocityZ 0
   w UnitMotion#6.speed 0
   w UnitMotion#6.flags 1
   w UnitMotion#6.turn 0
   w UnitMotion#6.p2X 0
+  w UnitMotion#6.p2Y 0
+  w UnitMotion#6.p2Z 0
   w LiteGoal#4.target null
+  w LiteGoal#4.owner Unit#5
+  w LiteGoal#4.posX 41943040
+  w LiteGoal#4.posY 65536
+  w LiteGoal#4.posZ 22282240
+  w LiteGoal#4.velX 0
+  w LiteGoal#4.velY 0
+  w LiteGoal#4.velZ 0
+  w LiteGoal#4.heading -32768
   w LiteGoal#4.netDirtyFlags 1
   o result 1
 call 10 Apply
@@ -223,26 +298,36 @@ call 10 Apply
   r Unit#252.heading -32768
   r Unit#252.list null
   r Unit#252.def UnitDef#144
+  r Unit#252.player Player#1
   r Unit#252.motion null
   r Unit#252.posX 50462720
+  r Unit#252.posY 65536
   r Unit#252.posZ 22282240
   r UnitDef#144.flags1 0x00918089
   r UnitDef#144.altitude 0
   r UnitDef#144.bankscale 65536
   r UnitDef#144.pitchscale 0
   r UnitDef#144.turnrate 1100
+  r UnitDef#144.movementclass MovementClass#5
   a event.kind 320
   a event.unit Unit#252
   a size 8
   i services.SimAlloc 47 = alloc#9
   i services.SimAlloc 101 = alloc#10
   w Unit#252.motion UnitMotion#7
+  w UnitMotion#7.obj AiSearchGoal#3
+  w UnitMotion#7.movementClass MovementClass#5
   w UnitMotion#7.velocityX 0
+  w UnitMotion#7.velocityY 0
+  w UnitMotion#7.velocityZ 0
   w UnitMotion#7.speed 0
   w UnitMotion#7.flags 1
   w UnitMotion#7.turn 0
   w UnitMotion#7.p2X 0
+  w UnitMotion#7.p2Y 0
+  w UnitMotion#7.p2Z 0
   w AiSearchGoal#3.target null
+  w AiSearchGoal#3.owner Unit#252
   w AiSearchGoal#3.count 0
   w AiSearchGoal#3.repathClaimTick 0
   w AiSearchGoal#3.flags 8
@@ -258,8 +343,6 @@ call 10 UpdateMotion
   r Unit#2.list Order#3
   r Unit#2.flags 0x90240021
   r Unit#2.carrier null
-  r Unit#2.player Player#0
-  r Unit#2.posY 65536
   r SpatialBucket#60.bytes x:010100000000
   r Order#3.flags_42 147456
   r Order#3.unit Unit#2
@@ -269,12 +352,7 @@ call 10 UpdateMotion
   r UnitDef#51.acceleration 22937
   r UnitDef#51.moverate1 524288
   r UnitDef#51.moverate2 1310720
-  r UnitMotion#3.obj LiteGoal#1
   r UnitMotion#3.lastMoveTick 0
-  r LiteGoal#1.owner Unit#2
-  r LiteGoal#1.posX 39321600
-  r LiteGoal#1.velX 0
-  r LiteGoal#1.heading -32768
   a unit Unit#2
   i services.SchedPublish 14 8
 call 10 UpdateMotion
@@ -285,17 +363,10 @@ call 10 UpdateMotion
   r Unit#3.list Order#4
   r Unit#3.flags 0x90240021
   r Unit#3.carrier null
-  r Unit#3.player Player#0
-  r Unit#3.posY 65536
   r SpatialBucket#61.bytes x:012a00000000
   r Order#4.flags_42 147456
   r Order#4.unit Unit#3
-  r UnitMotion#4.obj LiteGoal#2
   r UnitMotion#4.lastMoveTick 0
-  r LiteGoal#2.owner Unit#3
-  r LiteGoal#2.posX 41943040
-  r LiteGoal#2.velX 0
-  r LiteGoal#2.heading -32768
   a unit Unit#3
   i services.SchedPublish 14 8
 call 10 UpdateMotion
@@ -306,8 +377,6 @@ call 10 UpdateMotion
   r Unit#4.list Order#5
   r Unit#4.flags 0x90040021
   r Unit#4.carrier null
-  r Unit#4.player Player#0
-  r Unit#4.posY 65536
   r Order#5.flags_42 147456
   r Order#5.unit Unit#4
   r UnitDef#123.draft 0
@@ -316,12 +385,7 @@ call 10 UpdateMotion
   r UnitDef#123.acceleration 5242
   r UnitDef#123.moverate1 1179648
   r UnitDef#123.moverate2 1179648
-  r UnitMotion#5.obj LiteGoal#3
   r UnitMotion#5.lastMoveTick 0
-  r LiteGoal#3.owner Unit#4
-  r LiteGoal#3.posX 39321600
-  r LiteGoal#3.velX 0
-  r LiteGoal#3.heading -32768
   a unit Unit#4
   i services.SchedPublish 14 8
 call 10 UpdateMotion
@@ -332,8 +396,6 @@ call 10 UpdateMotion
   r Unit#5.list Order#6
   r Unit#5.flags 0x10e40021
   r Unit#5.carrier null
-  r Unit#5.player Player#0
-  r Unit#5.posY 65536
   r Order#6.flags_42 147456
   r Order#6.unit Unit#5
   r UnitDef#29.draft 0
@@ -342,12 +404,7 @@ call 10 UpdateMotion
   r UnitDef#29.acceleration 3932
   r UnitDef#29.moverate1 904396
   r UnitDef#29.moverate2 904396
-  r UnitMotion#6.obj LiteGoal#4
   r UnitMotion#6.lastMoveTick 0
-  r LiteGoal#4.owner Unit#5
-  r LiteGoal#4.posX 41943040
-  r LiteGoal#4.velX 0
-  r LiteGoal#4.heading -32768
   a unit Unit#5
   i services.SchedPublish 14 8
 call 10 UpdateMotion
@@ -361,8 +418,6 @@ call 10 UpdateMotion
   r Unit#252.list Order#7
   r Unit#252.flags 0x90240221
   r Unit#252.carrier null
-  r Unit#252.player Player#1
-  r Unit#252.posY 65536
   r SpatialBucket#62.bytes x:01e700000000
   r Order#7.flags_42 147456
   r Order#7.unit Unit#252
@@ -372,9 +427,7 @@ call 10 UpdateMotion
   r UnitDef#144.acceleration 5999
   r UnitDef#144.moverate1 225442
   r UnitDef#144.moverate2 225442
-  r UnitMotion#7.obj AiSearchGoal#3
   r UnitMotion#7.lastMoveTick 0
-  r AiSearchGoal#3.owner Unit#252
   r AiSearchGoal#3.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#252
   i services.SchedPublish 14 8
@@ -598,6 +651,8 @@ call 20 NewPointMarker
 call 20 Apply
   r Unit#1.list Order#8
   r Order#8.flags_42 1062153
+  r UnitDef#34.movementclass MovementClass#2
+  r UnitMotion#1.movementClass MovementClass#2
   a event.kind 326
   a event.unit Unit#1
   a event.target PointMarker#1
@@ -612,12 +667,17 @@ call 20 UpdateMotion
   r AiSearchGoal#1.points x:3002f000b0029001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -1044
+  o Unit#1.flags 0x90c10021
   i services.SchedPublish 14 20
+  o Unit#1.posX 36701124
+  o Unit#1.posZ 15718857
   i services.SchedPublish 14 12
   i services.SchedPublish 14 12
   i services.SchedPublish 14 12
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 964
+  w UnitMotion#1.velocityZ -9783
   w UnitMotion#1.speed 9830
   w UnitMotion#1.turn -1044
   w UnitMotion#1.lastMoveTick 20
@@ -640,15 +700,17 @@ call 20 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 21 UpdateMotion
-  r Unit#1.heading -1044
   r Unit#1.flags 0x90c00025
-  r Unit#1.posX 36701124
-  r Unit#1.posZ 15718857
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -2088
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36705197
+  o Unit#1.posZ 15699624
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 4073
+  w UnitMotion#1.velocityZ -19233
   w UnitMotion#1.speed 19660
   w UnitMotion#1.lastMoveTick 21
 call 21 UpdateMotion
@@ -670,14 +732,17 @@ call 21 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 22 UpdateMotion
-  r Unit#1.heading -2088
-  r Unit#1.posX 36705197
-  r Unit#1.posZ 15699624
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -3132
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36714103
+  o Unit#1.posZ 15671513
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 8906
+  w UnitMotion#1.velocityZ -28111
   w UnitMotion#1.speed 29490
   w UnitMotion#1.lastMoveTick 22
 call 22 UpdateMotion
@@ -699,14 +764,17 @@ call 22 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 23 UpdateMotion
-  r Unit#1.heading -3132
-  r Unit#1.posX 36714103
-  r Unit#1.posZ 15671513
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -4176
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36729597
+  o Unit#1.posZ 15635375
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 15494
+  w UnitMotion#1.velocityZ -36138
   w UnitMotion#1.speed 39320
   w UnitMotion#1.lastMoveTick 23
 call 23 UpdateMotion
@@ -728,14 +796,17 @@ call 23 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 24 UpdateMotion
-  r Unit#1.heading -4176
-  r Unit#1.posX 36729597
-  r Unit#1.posZ 15635375
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -5220
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36753296
+  o Unit#1.posZ 15592315
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 23699
+  w UnitMotion#1.velocityZ -43060
   w UnitMotion#1.speed 49150
   w UnitMotion#1.lastMoveTick 24
 call 24 UpdateMotion
@@ -757,14 +828,17 @@ call 24 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 25 UpdateMotion
-  r Unit#1.heading -5220
-  r Unit#1.posX 36753296
-  r Unit#1.posZ 15592315
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -6264
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36786659
+  o Unit#1.posZ 15543681
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 33363
+  w UnitMotion#1.velocityZ -48634
   w UnitMotion#1.speed 58980
   w UnitMotion#1.lastMoveTick 25
 call 25 UpdateMotion
@@ -786,14 +860,17 @@ call 25 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 26 UpdateMotion
-  r Unit#1.heading -6264
-  r Unit#1.posX 36786659
-  r Unit#1.posZ 15543681
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -7308
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36830959
+  o Unit#1.posZ 15491032
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 44300
+  w UnitMotion#1.velocityZ -52649
   w UnitMotion#1.speed 68810
   w UnitMotion#1.lastMoveTick 26
 call 26 UpdateMotion
@@ -815,14 +892,17 @@ call 26 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 27 UpdateMotion
-  r Unit#1.heading -7308
-  r Unit#1.posX 36830959
-  r Unit#1.posZ 15491032
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -8352
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36887242
+  o Unit#1.posZ 15436113
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 56283
+  w UnitMotion#1.velocityZ -54919
   w UnitMotion#1.speed 78640
   w UnitMotion#1.lastMoveTick 27
 call 27 UpdateMotion
@@ -844,14 +924,17 @@ call 27 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 28 UpdateMotion
-  r Unit#1.heading -8352
-  r Unit#1.posX 36887242
-  r Unit#1.posZ 15436113
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -9396
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 36949239
+  o Unit#1.posZ 15387729
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 61997
+  w UnitMotion#1.velocityZ -48384
   w UnitMotion#1.speed 78643
   w UnitMotion#1.lastMoveTick 28
 call 28 UpdateMotion
@@ -873,14 +956,17 @@ call 28 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 29 UpdateMotion
-  r Unit#1.heading -9396
-  r Unit#1.posX 36949239
-  r Unit#1.posZ 15387729
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -10440
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 37015680
+  o Unit#1.posZ 15345652
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 66441
+  w UnitMotion#1.velocityZ -42077
   w UnitMotion#1.lastMoveTick 29
 call 29 UpdateMotion
   a unit Unit#2
@@ -904,14 +990,17 @@ call 30 UnitTarget
   a unit Unit#5
   o result null
 call 30 UpdateMotion
-  r Unit#1.heading -10440
-  r Unit#1.posX 37015680
-  r Unit#1.posZ 15345652
+  r Unit#1.flags 0x90c00025
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -11484
+  o Unit#1.flags 0x90c10025
   i services.SchedPublish 14 20
+  o Unit#1.posX 37085923
+  o Unit#1.posZ 15310295
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 70243
+  w UnitMotion#1.velocityZ -35357
   w UnitMotion#1.lastMoveTick 30
 call 30 UpdateMotion
   a unit Unit#2
@@ -941,6 +1030,9 @@ call 30 NewPathOrderAt
   a pos (41943040,65536,22282240)
   i services.SimAlloc 54 = alloc#12
   i units.UnitRefInit PathOrderAttach#1 null null
+  o PathOrderAttach#1.owner null
+  o PathOrderAttach#1.next null
+  o PathOrderAttach#1.value null
   w PathOrder#1.source Order#9
   w PathOrder#1.approachRadius 0
   w PathOrder#1.altitude 0
@@ -954,6 +1046,7 @@ call 30 NewPathOrderAt
   w PathOrder#1.posZ 22282240
   o result PathOrder#1
 call 30 Apply
+  r PathOrder#1.ref.owner null
   a event.kind 329
   a event.unit Unit#5
   a event.target PathOrder#1
@@ -975,11 +1068,15 @@ call 30 Apply
 call 30 UpdateMotion
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -90
+  o Unit#5.flags 0x10e50021
   i services.SchedPublish 14 16
   i services.ScheduleMapCanPlaceUnitFootprint UnitDef#29 5 (39,20) 2 = 1
   o SimGlobals.g_lastPlaceMetalSum 75
   i services.SchedPublish 14 8
   i services.SchedPublish 14 32
+  o Unit#5.flags 0x10e50022
+  o Unit#5.posY 131072
   i services.SchedPublish 14 8
   i services.SchedPublish 14 12
   i services.SchedPublish 14 8
@@ -987,9 +1084,13 @@ call 30 UpdateMotion
   i services.SchedPublish 14 12
   i services.SchedPublish 14 12
   i services.SchedPublish 14 8
+  w UnitMotion#6.velocityY 65536
   w UnitMotion#6.speed 65536
   w UnitMotion#6.turn -90
   w UnitMotion#6.lastMoveTick 30
+  w UnitMotion#6.p2Y 65536
+  w LiteGoal#4.posY 2359296
+  w LiteGoal#4.velY 2293760
 call 30 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -997,15 +1098,17 @@ call 30 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 31 UpdateMotion
-  r Unit#1.heading -11484
   r Unit#1.flags 0x90c00125
-  r Unit#1.posX 37085923
-  r Unit#1.posZ 15310295
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -12528
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37159296
+  o Unit#1.posZ 15281994
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 73373
+  w UnitMotion#1.velocityZ -28301
   w UnitMotion#1.lastMoveTick 31
 call 31 UpdateMotion
   r Unit#2.flags 0x90240121
@@ -1020,15 +1123,18 @@ call 31 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 31 UpdateMotion
-  r Unit#5.heading -90
   r Unit#5.flags 0x10e40126
-  r Unit#5.posY 131072
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -180
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 196608
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 31
+  w UnitMotion#6.p2Y 62259
+  w LiteGoal#4.velY 0
 call 31 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1037,20 +1143,24 @@ call 31 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 32 UpdateMotion
-  r Unit#1.heading -12528
-  r Unit#1.posX 37159296
-  r Unit#1.posZ 15281994
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -13572
+  o Unit#1.flags 0x90c10125
   i services.ScheduleMapCanPlaceUnitFootprint UnitDef#34 1 (35,14) 1 = 1
   o SimGlobals.g_lastPlaceMetalSum 75
   i services.SchedPublish 14 8
   i services.SchedPublish 14 32
+  o Unit#1.cell (35,14)
+  o Unit#1.posX 37235088
+  o Unit#1.posZ 15261018
   i services.SchedPublish 14 8
   i services.SchedPublish 14 12
   i services.SchedPublish 14 8
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 75792
+  w UnitMotion#1.velocityZ -20976
   w UnitMotion#1.lastMoveTick 32
 call 32 UpdateMotion
   a unit Unit#2
@@ -1062,14 +1172,17 @@ call 32 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 32 UpdateMotion
-  r Unit#5.heading -180
-  r Unit#5.posY 196608
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -270
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 262144
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 32
+  w UnitMotion#6.p2Y 59145
 call 32 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1077,15 +1190,17 @@ call 32 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 33 UpdateMotion
-  r Unit#1.cell (35,14)
-  r Unit#1.heading -13572
-  r Unit#1.posX 37235088
-  r Unit#1.posZ 15261018
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -14616
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37312569
+  o Unit#1.posZ 15247568
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 77481
+  w UnitMotion#1.velocityZ -13450
   w UnitMotion#1.lastMoveTick 33
 call 33 UpdateMotion
   a unit Unit#2
@@ -1097,14 +1212,17 @@ call 33 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 33 UpdateMotion
-  r Unit#5.heading -270
-  r Unit#5.posY 262144
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -360
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 327680
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 33
+  w UnitMotion#6.p2Y 56187
 call 33 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1112,14 +1230,17 @@ call 33 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 34 UpdateMotion
-  r Unit#1.heading -14616
-  r Unit#1.posX 37312569
-  r Unit#1.posZ 15247568
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -15660
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37391068
+  o Unit#1.posZ 15242749
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 78499
+  w UnitMotion#1.velocityZ -4819
   w UnitMotion#1.lastMoveTick 34
 call 34 UpdateMotion
   a unit Unit#2
@@ -1131,14 +1252,17 @@ call 34 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 34 UpdateMotion
-  r Unit#5.heading -360
-  r Unit#5.posY 327680
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -450
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 393216
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 34
+  w UnitMotion#6.p2Y 53377
 call 34 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1146,14 +1270,17 @@ call 34 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 35 UpdateMotion
-  r Unit#1.heading -15660
-  r Unit#1.posX 37391068
-  r Unit#1.posZ 15242749
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -16704
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37469653
+  o Unit#1.posZ 15245648
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 78585
+  w UnitMotion#1.velocityZ 2899
   w UnitMotion#1.lastMoveTick 35
 call 35 UpdateMotion
   a unit Unit#2
@@ -1165,14 +1292,17 @@ call 35 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 35 UpdateMotion
-  r Unit#5.heading -450
-  r Unit#5.posY 393216
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -540
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 458752
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 35
+  w UnitMotion#6.p2Y 50707
 call 35 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1180,14 +1310,17 @@ call 35 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 36 UpdateMotion
-  r Unit#1.heading -16704
-  r Unit#1.posX 37469653
-  r Unit#1.posZ 15245648
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -17748
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37547576
+  o Unit#1.posZ 15256227
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 77923
+  w UnitMotion#1.velocityZ 10579
   w UnitMotion#1.lastMoveTick 36
 call 36 UpdateMotion
   a unit Unit#2
@@ -1199,14 +1332,17 @@ call 36 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 36 UpdateMotion
-  r Unit#5.heading -540
-  r Unit#5.posY 458752
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -630
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 524288
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 36
+  w UnitMotion#6.p2Y 48171
 call 36 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1214,14 +1350,17 @@ call 36 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 37 UpdateMotion
-  r Unit#1.heading -17748
-  r Unit#1.posX 37547576
-  r Unit#1.posZ 15256227
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -18792
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37624088
+  o Unit#1.posZ 15274400
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 76512
+  w UnitMotion#1.velocityZ 18173
   w UnitMotion#1.lastMoveTick 37
 call 37 UpdateMotion
   a unit Unit#2
@@ -1233,14 +1372,17 @@ call 37 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 37 UpdateMotion
-  r Unit#5.heading -630
-  r Unit#5.posY 524288
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -720
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 589824
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 37
+  w UnitMotion#6.p2Y 45762
 call 37 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1248,14 +1390,17 @@ call 37 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 38 UpdateMotion
-  r Unit#1.heading -18792
-  r Unit#1.posX 37624088
-  r Unit#1.posZ 15274400
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -19836
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37698449
+  o Unit#1.posZ 15299984
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 74361
+  w UnitMotion#1.velocityZ 25584
   w UnitMotion#1.lastMoveTick 38
 call 38 UpdateMotion
   a unit Unit#2
@@ -1267,14 +1412,17 @@ call 38 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 38 UpdateMotion
-  r Unit#5.heading -720
-  r Unit#5.posY 589824
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -810
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 655360
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 38
+  w UnitMotion#6.p2Y 43473
 call 38 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1282,14 +1430,17 @@ call 38 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 39 UpdateMotion
-  r Unit#1.heading -19836
-  r Unit#1.posX 37698449
-  r Unit#1.posZ 15299984
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -20880
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37769950
+  o Unit#1.posZ 15332730
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 71501
+  w UnitMotion#1.velocityZ 32746
   w UnitMotion#1.lastMoveTick 39
 call 39 UpdateMotion
   a unit Unit#2
@@ -1301,14 +1452,17 @@ call 39 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 39 UpdateMotion
-  r Unit#5.heading -810
-  r Unit#5.posY 655360
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -900
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 720896
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 39
+  w UnitMotion#6.p2Y 41299
 call 39 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1316,14 +1470,17 @@ call 39 UpdateMotion
   a unit Unit#252
   i services.SchedPublish 14 8
 call 40 UpdateMotion
-  r Unit#1.heading -20880
-  r Unit#1.posX 37769950
-  r Unit#1.posZ 15332730
+  r Unit#1.flags 0x90c00125
   a unit Unit#1
   i services.SchedPublish 14 12
+  o Unit#1.heading -21924
+  o Unit#1.flags 0x90c10125
   i services.SchedPublish 14 20
+  o Unit#1.posX 37837409
+  o Unit#1.posZ 15373165
   i services.SchedPublish 14 8
   w UnitMotion#1.velocityX 67459
+  w UnitMotion#1.velocityZ 40435
   w UnitMotion#1.lastMoveTick 40
 call 40 UpdateMotion
   a unit Unit#2
@@ -1335,14 +1492,17 @@ call 40 UpdateMotion
   a unit Unit#4
   i services.SchedPublish 14 8
 call 40 UpdateMotion
-  r Unit#5.heading -900
-  r Unit#5.posY 720896
+  r Unit#5.flags 0x10e40126
   a unit Unit#5
   i services.SchedPublish 14 12
+  o Unit#5.heading -990
+  o Unit#5.flags 0x10e50126
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
+  o Unit#5.posY 786432
   i services.SchedPublish 14 8
   w UnitMotion#6.lastMoveTick 40
+  w UnitMotion#6.p2Y 39233
 call 40 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8

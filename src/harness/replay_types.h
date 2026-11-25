@@ -104,7 +104,7 @@ struct ReplayEventKind {
 };
 
 struct ReplayEventTable {
-    unsigned char header;
+    unsigned short header;
     unsigned first;
     unsigned count;
 };
@@ -182,6 +182,7 @@ struct ReplaySubsystem {
     unsigned firstSlot;
     unsigned slotCount;
     unsigned events;
+    unsigned char importObjects;
 };
 
 #endif

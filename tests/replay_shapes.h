@@ -87,7 +87,7 @@ int __stdcall Imp_fixture_Strike(WeaponDef* a0)
     ReplayText t;
     StartImport(t, "fixture.Strike");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -97,7 +97,7 @@ int __stdcall Imp_fixture_Notify(FixtureNotify* a0, Callback* a1, int a2)
     ReplayText t;
     StartImport(t, "fixture.Notify");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FIXTURENOTIFY, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTURENOTIFY, a0, true);
     Space(t);
     AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a1);
     Space(t);
@@ -175,7 +175,7 @@ int __stdcall Imp_fixture_HandGoal(unsigned int a0)
     ReplayText t;
     StartImport(t, "fixture.HandGoal");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }

@@ -573,5 +573,6 @@ void ReplayImportEnd(ReplayImport& c)
     }
     ImportRng(t, c.id);
     t.AddChar('\n');
+    ImportServiceObjects(t, c);
     ReplayCalls() = 1;
 }

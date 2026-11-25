@@ -19,7 +19,7 @@ int __stdcall Imp_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3
     ReplayText t;
     StartImport(t, "weapons.WeaponCanReachPos");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     AddStructIn(t, ROK_VEC3, a1);
     Space(t);
@@ -35,7 +35,7 @@ Projectile* __stdcall Imp_weapons_FindTargetableProjectile(Unit* a0, unsigned in
     ReplayText t;
     StartImport(t, "weapons.FindTargetableProjectile");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -48,7 +48,7 @@ int __stdcall Imp_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
     ReplayText t;
     StartImport(t, "weapons.GetWeaponRange");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -60,9 +60,9 @@ int __stdcall Imp_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a
     ReplayText t;
     StartImport(t, "weapons.WeaponCanReachUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
     ReplayValue(t, a2);
     const char* r = Enter(t);
@@ -197,7 +197,7 @@ EconUnit __stdcall Imp_econworld_NextUnit(EconUnit a0)
     ReplayText t;
     StartImport(t, "econworld.NextUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
@@ -207,7 +207,7 @@ int __stdcall Imp_econworld_UnitSlot(EconUnit a0)
     ReplayText t;
     StartImport(t, "econworld.UnitSlot");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -217,7 +217,7 @@ int __stdcall Imp_econworld_UnitInfo(EconUnit a0, EconUnitInfo* a1)
     ReplayText t;
     StartImport(t, "econworld.UnitInfo");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     ApplyInOut(a1, "uinfo", ROK_ECONUNITINFO);
     return ParseResult<int>(r);
@@ -287,7 +287,7 @@ void __stdcall Imp_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
     ReplayText t;
     StartImport(t, "network.SendFeatureHit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, true);
     Space(t);
     ReplayValue(t, a1);
     Space(t);
@@ -313,7 +313,7 @@ void __stdcall Imp_network_SendFeatureReclaimed(Unit* a0, int a1, int a2)
     ReplayText t;
     StartImport(t, "network.SendFeatureReclaimed");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     Space(t);
@@ -327,9 +327,9 @@ void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
     ReplayText t;
     StartImport(t, "network.SendProjectileDetonated");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -339,7 +339,7 @@ int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2
     ReplayText t;
     StartImport(t, "network.SendScriptCallByName");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     t.AddString((const char*)a1);
     Space(t);
@@ -361,9 +361,9 @@ void __stdcall Imp_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, un
     ReplayText t;
     StartImport(t, "network.SendUnitDamage");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
     ReplayValue(t, a2);
     Space(t);
@@ -379,11 +379,11 @@ void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2
     ReplayText t;
     StartImport(t, "network.SendWeaponFire");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     t.Add("?");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, true);
     Space(t);
     t.Add("?");
     Space(t);
@@ -419,7 +419,7 @@ void __stdcall Imp_network_BroadcastPlayerEconomy(Player* a0)
     ReplayText t;
     StartImport(t, "network.BroadcastPlayerEconomy");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -496,7 +496,7 @@ int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
     ReplayText t;
     StartImport(t, "los_radar.IsPointVisible");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, true);
     Space(t);
     t.Add("pos=");
     AddVec3(t, a1);
@@ -636,7 +636,7 @@ void __stdcall Imp_pathfinding_Cancel(PathHandle a0)
     ReplayText t;
     StartImport(t, "pathfinding.Cancel");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PATHGOAL, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_PATHGOAL, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -646,7 +646,7 @@ unsigned int __stdcall Imp_scripts_ObjectStateSize(Object3do* a0)
     ReplayText t;
     StartImport(t, "scripts.ObjectStateSize");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, true);
     const char* r = Enter(t);
     return ParseResult<unsigned int>(r);
 }
@@ -656,7 +656,7 @@ void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char 
     ReplayText t;
     StartImport(t, "scripts.GetAimFromPosition");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a2);
     const char* r = Enter(t);
@@ -669,7 +669,7 @@ void __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1, Vec3* a2)
     ReplayText t;
     StartImport(t, "scripts.GetPieceOffset");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -682,7 +682,7 @@ void __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1, Vec3* a2)
     ReplayText t;
     StartImport(t, "scripts.GetPiecePosition");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -695,7 +695,7 @@ int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, in
     ReplayText t;
     StartImport(t, "scripts.QueryScript");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, true);
     Space(t);
     t.AddString((const char*)a1);
     Space(t);
@@ -719,7 +719,7 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     ReplayText t;
     StartImport(t, "scripts.GetSweetSpot");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     const char* r = Enter(t);
     ApplyVec3(a1, "out");
     (void)r;
@@ -730,7 +730,7 @@ void __stdcall Imp_scripts_GetPieceAngles(Unit* a0, int a1, Angles16* a2)
     ReplayText t;
     StartImport(t, "scripts.GetPieceAngles");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -745,9 +745,9 @@ int __stdcall Imp_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3
     Space(t);
     ReplayValue(t, a0);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, true);
     Space(t);
     AddStructIn(t, ROK_VEC3, a3);
     const char* r = Enter(t);
@@ -976,7 +976,7 @@ void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, V
     Space(t);
     AddStructIn(t, ROK_POINT16, a0);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, true);
     const char* r = Enter(t);
     *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
     (void)r;
@@ -1043,7 +1043,7 @@ void __stdcall Imp_units_UnitRefUnlink(UnitRef* a0)
     ReplayText t;
     StartImport(t, "units.UnitRefUnlink");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -1053,9 +1053,9 @@ void __stdcall Imp_units_UnitRefSetUnit(UnitRef* a0, Unit* a1)
     ReplayText t;
     StartImport(t, "units.UnitRefSetUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -1065,11 +1065,11 @@ void __stdcall Imp_units_UnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
     ReplayText t;
     StartImport(t, "units.UnitRefInit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDER, a2, false);
+    ReplayAddObjectName(t, g_objects, ROK_ORDER, a2, true);
     const char* r = Enter(t);
     (void)r;
 }

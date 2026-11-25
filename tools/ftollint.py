@@ -11,7 +11,9 @@ when a scenario drives it out of range; this lint sees all of them. It disassemb
 each instruction's function from the linker map (as tools/x87lint.py does) and fails on a `fist`, `fistp`,
 `fisttp` or a truncating or rounding SSE conversion to an integer in a game-logic function: one whose
 `// FUNCTION:` address is in data/game_logic.csv or is a `game` row of data/crt_calls.csv, or whose own name is
-there. LIBCMT and lib/bitexact objects are left out. The limit: an instruction is put in the public symbol that
+there. Constructors, destructors and operators are named as the markers name them (`Class::Class`,
+`Class::~Class`, `Class::operator==`, `operatornew`), a scalar or vector deleting destructor as its destructor.
+LIBCMT and lib/bitexact objects are left out. The limit: an instruction is put in the public symbol that
 precedes it, so a static function with no map entry counts as part of the function before it, and a game function
 inlined into a presentation function is not checked. Exits 1 on a failure.
 """
@@ -33,6 +35,29 @@ GAME_LOGIC = ROOT / "data" / "game_logic.csv"
 CRT_CALLS = ROOT / "data" / "crt_calls.csv"
 CONVERSION = re.compile(r"^(fistp?|fisttp)[slq]*$|^v?cvtt?(s[sd]2si|p[sd]2dq|p[sd]2pi)[lq]?$")
 EXCLUDED_OBJECTS = ("LIBCMT:", "bitexact:")
+SPECIAL = re.compile(r"^\?\?(_[GE]|[0-9A-Z])((?:[A-Za-z_]\w*@)*)@")
+OPERATORS = {"2": "new", "3": "delete", "4": "=", "8": "==", "9": "!=", "A": "[]", "D": "*", "G": "-", "H": "+",
+             "K": "/", "M": "<", "N": "<=", "O": ">", "P": ">=", "R": "()"}
+
+
+def plain_name(decorated: str, plain: str) -> str:
+    """The marker's name of a mapped function: `plain` (blockpointers.demangle) except for the constructors,
+    destructors and operators, which it leaves decorated."""
+    m = SPECIAL.match(decorated)
+    if not m:
+        return plain
+    code, scopes = m.group(1), [s for s in m.group(2).split("@") if s]
+    owner = "::".join(reversed(scopes))
+    if code == "0" and scopes:
+        return "%s::%s" % (owner, scopes[0])
+    if code in ("1", "_G", "_E") and scopes:
+        return "%s::~%s" % (owner, scopes[0])
+    if code not in OPERATORS:
+        return plain
+    op = OPERATORS[code]
+    if owner:
+        return "%s::operator%s" % (owner, op)
+    return "operator" + op
 
 
 def game_addresses(game_logic: Path, crt_calls: Path) -> tuple[set[int], set[str]]:
@@ -68,7 +93,7 @@ def lint(disasm: str, map_text: str, game: set[str]) -> tuple[list[str], list[st
         f = code.at(int(m.group(1), 16))
         if f is None or f.obj.startswith(EXCLUDED_OBJECTS):
             continue
-        key = (f.plain, f.obj, m.group(2))
+        key = (plain_name(f.name, f.plain), f.obj, m.group(2))
         counts[key] = counts.get(key, 0) + 1
     for (name, obj, mnemonic), n in sorted(counts.items()):
         if name in game:

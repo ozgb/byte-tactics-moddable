@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "../../../interfaces/host.h"
 
@@ -136,10 +138,10 @@ extern "C" void HOST_CALL host_dir_close(void* dir)
 
 extern "C" int HOST_CALL host_dir_create(const char* path)
 {
+    struct _stat st;
     if (_mkdir(path) == 0)
         return 0;
-    DWORD attrib = GetFileAttributesA(path);
-    return attrib != 0xffffffff && (attrib & FILE_ATTRIBUTE_DIRECTORY) ? 0 : -1;
+    return _stat(path, &st) == 0 && (st.st_mode & _S_IFDIR) != 0 ? 0 : -1;
 }
 
 extern "C" unsigned int HOST_CALL host_file_exe_path(char* buf, unsigned int size)

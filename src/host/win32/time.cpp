@@ -17,7 +17,7 @@ extern "C" unsigned long long HOST_CALL host_time_counter(void)
 
 extern "C" unsigned int HOST_CALL host_wall_seconds(void)
 {
-    return (unsigned int)time(NULL);
+    return (unsigned int)time(nullptr);
 }
 
 // FUNCTION: 0x4b6b50

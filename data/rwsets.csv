@@ -6861,10 +6861,9 @@ address,function,file,kind,target
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,EmitWhiteSmoke
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,PointInRect
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,RotateByAngles
+0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,get
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,operator PieceRec *
-0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,operator Player *
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,operator Vec3 *
-0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,call,operator->
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,deref_maybe_written,*Vec3
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,field_maybe_written,Game::viewport
 0x421550,DrawExplodedPiece,src/weapons/explosions.cpp,field_read,ExplodedPiece::b0

@@ -192,7 +192,7 @@ def run_clang(kit: Path | None = None) -> int:
         if kit is None:
             code = run(exe, vec, *(tdf_args() if exe.name == "bitexact_test.exe" else [])) or code
         else:
-            code = run(exe, vec, *([NO_TDF] if exe.name == "bitexact_test.exe" else []), kit) or code
+            code = run(exe, vec, *((tdf_args() or [NO_TDF]) if exe.name == "bitexact_test.exe" else []), kit) or code
     return code
 
 

@@ -9,6 +9,7 @@
 #include "../bx_libcmt.h"
 #include "../bx_stl.h"
 #include "../bx_tables.h"
+#include "kit.h"
 #include "vectors.h"
 
 #define INT_MIN_ (-2147483647 - 1)
@@ -125,6 +126,22 @@ static int edges[] = {0, 1, -1, INT_MAX_, INT_MIN_, 0x10000, -0x10000, 1000000, 
 static unsigned short angle_specials[] = {0, 1, 0x2aab, 0x3fff, 0x4000, 0x8000, 0xc000, 0xffff};
 #define N_ANGLE_SPECIALS ((int)(sizeof(angle_specials) / sizeof(angle_specials[0])))
 
+static int kit_edge;
+
+static int special_angle(unsigned int a)
+{
+    int i;
+    for (i = 0; i < N_ANGLE_SPECIALS; i++)
+        if (angle_specials[i] == a)
+            return 1;
+    return 0;
+}
+
+static int extreme_special(int index)
+{
+    return index < 3 || index >= n_specials - 4;
+}
+
 static void add_special(int v)
 {
     specials[n_specials++] = v;
@@ -155,15 +172,46 @@ static void test_angles(void)
         int want = ORACLE_INT(FixedSine((unsigned short)a));
         int got = bx_FixedSine((bx_u16)a);
         st_sine.cases++;
-        if (want != got)
+        if (want != got) {
             mismatch(&st_sine, "angle 0x%04x want %d got %d", a, want, got);
+            kit_dropped("sine");
+        } else {
+            kit_begin("sine", 1);
+            kit_u32(a);
+            kit_i32(want);
+            kit_end();
+        }
         want = ORACLE_INT(orig_cos((unsigned short)a));
         got = bx_fixed_cos((bx_u16)a);
         st_cos.cases++;
-        if (want != got)
+        if (want != got) {
             mismatch(&st_cos, "angle 0x%04x want %d got %d", a, want, got);
+            kit_dropped("cosine");
+        } else {
+            kit_begin("cosine", 1);
+            kit_u32(a);
+            kit_i32(want);
+            kit_end();
+        }
     }
 }
+
+#ifdef BX_KIT
+static void kit_mul_hi(int edge, int a, int b, int want, int got)
+{
+    if (want != got) {
+        kit_dropped("mul_hi");
+        return;
+    }
+    kit_begin("mul_hi", edge);
+    kit_i32(a);
+    kit_i32(b);
+    kit_i32(want);
+    kit_end();
+}
+#else
+#define kit_mul_hi(edge, a, b, want, got) ((void)0)
+#endif
 
 static void test_mul_hi(void)
 {
@@ -173,6 +221,7 @@ static void test_mul_hi(void)
             int want = ORACLE_INT(orig_mul_hi(specials[i], specials[j]));
             int got = bx_mul_hi32(specials[i], specials[j]);
             st_mulhi.cases++;
+            kit_mul_hi(1, specials[i], specials[j], want, got);
             if (want != got)
                 mismatch(&st_mulhi, "a %d b %d want %d got %d", specials[i], specials[j], want, got);
         }
@@ -182,6 +231,7 @@ static void test_mul_hi(void)
         int want = ORACLE_INT(orig_mul_hi(a, b));
         int got = bx_mul_hi32(a, b);
         st_mulhi.cases++;
+        kit_mul_hi(0, a, b, want, got);
         if (want != got)
             mismatch(&st_mulhi, "a %d b %d want %d got %d", a, b, want, got);
     }
@@ -192,11 +242,29 @@ static void one_scaled(unsigned int a, int scale)
     int want = ORACLE_INT(orig_sin_scaled((short)a, scale));
     int got = bx_ScaledSin((bx_i16)a, scale);
     st_sin_scaled.cases++;
+    if (want != got) {
+        kit_dropped("scaled_sine");
+    } else {
+        kit_begin("scaled_sine", kit_edge);
+        kit_u32(a & 0xffff);
+        kit_i32(scale);
+        kit_i32(want);
+        kit_end();
+    }
     if (want != got)
         mismatch(&st_sin_scaled, "angle 0x%04x scale %d want %d got %d", a & 0xffff, scale, want, got);
     want = ORACLE_INT(orig_cos_scaled((short)a, scale));
     got = bx_ScaledCos((bx_i16)a, scale);
     st_cos_scaled.cases++;
+    if (want != got) {
+        kit_dropped("scaled_cosine");
+    } else {
+        kit_begin("scaled_cosine", kit_edge);
+        kit_u32(a & 0xffff);
+        kit_i32(scale);
+        kit_i32(want);
+        kit_end();
+    }
     if (want != got)
         mismatch(&st_cos_scaled, "angle 0x%04x scale %d want %d got %d", a & 0xffff, scale, want, got);
 }
@@ -206,8 +274,10 @@ static void test_scaled(void)
     unsigned int a;
     int i;
     for (a = 0; a < 0x10000; a++) {
+        kit_edge = special_angle(a);
         for (i = 0; i < n_specials; i++)
             one_scaled(a, specials[i]);
+        kit_edge = 0;
         for (i = 0; i < 8; i++)
             one_scaled(a, rnd_wide());
     }
@@ -220,6 +290,15 @@ static void one_atan(int x, int z)
     int want = ORACLE_INT(orig_atan(x, z));
     int got = bx_AngleOfVector(x, z);
     st_atan.cases++;
+    if (want != got) {
+        kit_dropped("angle_of_vector");
+    } else {
+        kit_begin("angle_of_vector", kit_edge);
+        kit_i32(x);
+        kit_i32(z);
+        kit_i32(want);
+        kit_end();
+    }
     if (want != got)
         mismatch(&st_atan, "x %d z %d want %d got %d", x, z, want, got);
 }
@@ -227,9 +306,11 @@ static void one_atan(int x, int z)
 static void test_atan(void)
 {
     int i, j;
+    kit_edge = 1;
     for (i = 0; i < n_specials; i++)
         for (j = 0; j < n_specials; j++)
             one_atan(specials[i], specials[j]);
+    kit_edge = 0;
     for (i = -300; i <= 300; i++)
         for (j = -300; j <= 300; j++)
             one_atan(i, j);
@@ -303,6 +384,17 @@ static void one_rotate(unsigned int a, int x, int z)
     ORACLE_WORDS(orig_rotate((short)a, w), w, 2);
     bx_RotatePoint2D((bx_i16)a, g);
     st_rotate.cases++;
+    if (w[0] != g[0] || w[1] != g[1]) {
+        kit_dropped("rotate_point");
+    } else {
+        kit_begin("rotate_point", kit_edge);
+        kit_u32(a & 0xffff);
+        kit_i32(x);
+        kit_i32(z);
+        kit_i32(w[0]);
+        kit_i32(w[1]);
+        kit_end();
+    }
     if (w[0] != g[0] || w[1] != g[1])
         mismatch(&st_rotate, "angle 0x%04x xz (%d, %d) want (%d, %d) got (%d, %d)", a & 0xffff, x, z, w[0], w[1], g[0], g[1]);
 }
@@ -312,9 +404,11 @@ static void test_rotate(void)
     unsigned int a;
     int i, j;
     for (a = 0; a < 0x10000; a++) {
+        kit_edge = special_angle(a);
         for (i = 0; i < N_EDGES; i++)
             for (j = 0; j < N_EDGES; j++)
                 one_rotate(a, edges[i], edges[j]);
+        kit_edge = 0;
         for (i = 0; i < 16; i++)
             one_rotate(a, rnd_wide(), rnd_wide());
     }
@@ -346,8 +440,16 @@ static void one_build(unsigned short a0, unsigned short a1, unsigned short a2)
     for (i = 0; i < 9; i++)
         if (m[i] != g_rotationMatrix[i]) {
             mismatch(&st_build, "angles (0x%04x, 0x%04x, 0x%04x) entry %d want %d got %d", a0, a1, a2, i, g_rotationMatrix[i], m[i]);
+            kit_dropped("rotation_matrix");
             return;
         }
+    kit_begin("rotation_matrix", kit_edge);
+    kit_u32(a0);
+    kit_u32(a1);
+    kit_u32(a2);
+    for (i = 0; i < 9; i++)
+        kit_i32(g_rotationMatrix[i]);
+    kit_end();
 }
 
 static void test_build(void)
@@ -362,11 +464,35 @@ static void test_build(void)
                     v[axis] = (unsigned short)a;
                     v[(axis + 1) % 3] = angle_specials[i];
                     v[(axis + 2) % 3] = angle_specials[j];
+                    kit_edge = special_angle(a);
                     one_build(v[0], v[1], v[2]);
                 }
+    kit_edge = 0;
     for (i = 0; i < RANDOM_CASES; i++)
         one_build((unsigned short)rnd32(), (unsigned short)rnd32(), (unsigned short)rnd32());
 }
+
+#ifdef BX_KIT
+static void kit_apply(const int *m, const int *in, int aliased, const int *want, const int *got)
+{
+    int k;
+    if (memcmp(want, got, 3 * sizeof(int)) != 0) {
+        kit_dropped("apply_rotation");
+        return;
+    }
+    kit_begin("apply_rotation", 0);
+    for (k = 0; k < 9; k++)
+        kit_i32(m[k]);
+    for (k = 0; k < 3; k++)
+        kit_i32(in[k]);
+    kit_i32(aliased);
+    for (k = 0; k < 3; k++)
+        kit_i32(want[k]);
+    kit_end();
+}
+#else
+#define kit_apply(m, in, aliased, want, got) ((void)0)
+#endif
 
 static void test_apply(void)
 {
@@ -382,6 +508,7 @@ static void test_apply(void)
         ORACLE_WORDS(orig_apply(in, want), want, 3);
         bx_apply_rotation_matrix(m, in, got);
         st_apply.cases++;
+        kit_apply(m, in, 0, want, got);
         if (memcmp(want, got, sizeof(want)))
             mismatch(&st_apply, "in (%d, %d, %d) want (%d, %d, %d) got (%d, %d, %d)", in[0], in[1], in[2], want[0], want[1], want[2], got[0], got[1], got[2]);
         if (i % 4 == 0) {
@@ -391,6 +518,7 @@ static void test_apply(void)
             ORACLE_WORDS(orig_apply(w2, w2), w2, 3);
             bx_apply_rotation_matrix(m, g2, g2);
             st_apply.cases++;
+            kit_apply(m, in, 1, w2, g2);
             if (memcmp(w2, g2, sizeof(w2)))
                 mismatch(&st_apply, "in place (%d, %d, %d) want (%d, %d, %d) got (%d, %d, %d)", in[0], in[1], in[2], w2[0], w2[1], w2[2], g2[0], g2[1], g2[2]);
         }
@@ -411,6 +539,16 @@ static void one_div3(int a, int b, int c)
     want = ORACLE_INT(orig_div3(a, b, c));
     got = bx_MulDivTrunc(a, b, c);
     st_div3.cases++;
+    if (want != got) {
+        kit_dropped("mul_div");
+    } else {
+        kit_begin("mul_div", kit_edge);
+        kit_i32(a);
+        kit_i32(b);
+        kit_i32(c);
+        kit_i32(want);
+        kit_end();
+    }
     if (want != got)
         mismatch(&st_div3, "a %d b %d c %d want %d got %d", a, b, c, want, got);
 }
@@ -420,8 +558,11 @@ static void test_div3(void)
     int i, j, k;
     for (i = 0; i < n_specials; i++)
         for (j = 0; j < n_specials; j++)
-            for (k = 0; k < n_specials; k++)
+            for (k = 0; k < n_specials; k++) {
+                kit_edge = extreme_special(i) && extreme_special(j) && extreme_special(k);
                 one_div3(specials[i], specials[j], specials[k]);
+            }
+    kit_edge = 0;
     for (i = 0; i < RANDOM_CASES; i++) {
         int a = (i & 1) ? rnd_full() : rnd_wide();
         int b = (i & 2) ? rnd_full() : rnd_wide();
@@ -462,6 +603,21 @@ int main(int argc, char **argv)
 
     if (argc > 1 && !vec_open(argv[1]))
         return 2;
+    kit_open(argc > 3 ? argv[3] : NULL);
+    kit_layout("sine", "in angle u32\nout value i32\n");
+    kit_layout("cosine", "in angle u32\nout value i32\n");
+    kit_layout("mul_hi", "in a i32\nin b i32\nout high i32\n");
+    kit_layout("scaled_sine", "in angle u32\nin scale i32\nout value i32\n");
+    kit_layout("scaled_cosine", "in angle u32\nin scale i32\nout value i32\n");
+    kit_layout("angle_of_vector", "in x i32\nin z i32\nout angle i32\n");
+    kit_layout("rotate_point", "in angle u32\nin x i32\nin z i32\nout rx i32\nout rz i32\n");
+    kit_layout("rotation_matrix",
+               "in angle_a u32\nin angle_b u32\nin angle_c u32\nout m0 i32\nout m1 i32\nout m2 i32\nout m3 i32\nout m4 i32\n"
+               "out m5 i32\nout m6 i32\nout m7 i32\nout m8 i32\n");
+    kit_layout("apply_rotation",
+               "in m0 i32\nin m1 i32\nin m2 i32\nin m3 i32\nin m4 i32\nin m5 i32\nin m6 i32\nin m7 i32\nin m8 i32\n"
+               "in x i32\nin y i32\nin z i32\nin aliased i32\nout rx i32\nout ry i32\nout rz i32\n");
+    kit_layout("mul_div", "in a i32\nin b i32\nin c i32\nout value i32\n");
 #ifndef BX_REPLAY
     orig_cos = (fn_angle)entry(0x20, prologue);
     orig_mul_hi = (fn_mul_hi)entry(0x40, prologue);
@@ -493,6 +649,7 @@ int main(int argc, char **argv)
             bad = 1;
     }
     bad |= run_math_tests(argc > 2 ? argv[2] : 0);
+    kit_close();
     if (argc > 1)
         bad |= vec_close();
     printf("info: the table's 80-bit fsincos values are exact roundings; this CPU's fsincos differs from them in %lu of %lu values"

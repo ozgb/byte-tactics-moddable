@@ -11,6 +11,7 @@ typedef struct {
     char name[32];
     FILE *file[2];
     int laid_out;
+    long dropped;
 } kit_entry;
 
 static char kit_dir[512];
@@ -133,6 +134,13 @@ void kit_str(const char *s)
     kit_bytes(s, n);
 }
 
+void kit_dropped(const char *entry)
+{
+    kit_entry *e;
+    if (kit_active && (e = kit_find(entry)) != NULL)
+        e->dropped++;
+}
+
 void kit_end(void)
 {
     kit_out = NULL;
@@ -140,11 +148,22 @@ void kit_end(void)
 
 void kit_close(void)
 {
+    char path[640];
     int i, k;
-    for (i = 0; i < kit_count; i++)
+    for (i = 0; i < kit_count; i++) {
         for (k = 0; k < 2; k++)
             if (kit_entries[i].file[k] != NULL)
                 fclose(kit_entries[i].file[k]);
+        if (kit_entries[i].dropped > 0) {
+            FILE *f;
+            kit_path(path, sizeof(path), kit_entries[i].name, ".dropped.txt");
+            f = fopen(path, "wb");
+            if (f != NULL) {
+                fprintf(f, "%ld\n", kit_entries[i].dropped);
+                fclose(f);
+            }
+        }
+    }
     kit_count = 0;
     kit_active = 0;
     kit_out = NULL;

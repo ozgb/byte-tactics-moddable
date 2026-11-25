@@ -707,6 +707,27 @@ void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, i
     ReplayBytes(t, p, count < length ? count : length);
 }
 
+void ArgOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
+{
+    if (count <= 0 || p == nullptr)
+        return;
+    t.Add("  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayBytes(t, p, count < length ? count : length);
+    t.AddChar('\n');
+}
+
+template <class T> void ImportOutScalar(ReplayText& t, const char* name, const T* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayValue(t, *p);
+}
+
 void ImportOutVec3(ReplayText& t, const char* name, const Vec3* v)
 {
     t.Add("\n  o ");

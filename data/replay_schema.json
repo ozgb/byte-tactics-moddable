@@ -209,6 +209,10 @@
    "<anon>::lo": "a stack struct of ComputeReclaimDamagePulse",
    "<anon>::words": "a union on the stack of IsUnitVisibleToPlayer",
    "GafFrame::pixelsOrLayers": "read only when mapFlags bit 2 is 0, which no recorded scenario reaches",
+   "Game::pathfinder": "set by Init and Shutdown to the region, whose block offset the Init line records",
+   "g_dirDeltaX": "a constant table of the eight grid directions",
+   "g_dirDeltaZ": "a constant table of the eight grid directions",
+   "g_turnCosts": "a constant table of the cost of a turn",
    "g_orderFxVtable": "the vtable of a kind, stored by its constructor and never written as a line",
    "g_approachRadiusVtable": "the vtable of a kind, stored by its constructor and never written as a line",
    "g_ringApproachVtable": "the vtable of a kind, stored by its constructor and never written as a line",
@@ -254,13 +258,35 @@
    "RadarProjectileCapture": "a projectile of the capture buffer, recorded as its snapshot",
    "RadarMappedCapture": "the mapped capture buffer, recorded as its snapshot",
    "RadarWeaponCapture": "a weapon of the capture buffer, recorded as its snapshot",
+   "HeapEntry": "the module's region, recorded as the byte array `region`",
+   "Layout": "the module's region, recorded as the byte array `region`",
+   "Node": "the module's region, recorded as the byte array `region`",
+   "NodeData": "the module's region, recorded as the byte array `region`",
+   "OpenHeap": "the module's region, recorded as the byte array `region`",
+   "PathCell": "the module's region, recorded as the byte array `region`",
+   "PathEventData": "the module's region, recorded as the byte array `region`",
+   "PathEventRecord": "the module's region, recorded as the byte array `region`",
+   "PathExtra": "the module's region, recorded as the byte array `region`",
+   "Pathfinder": "the module's region, recorded as the byte array `region`",
+   "PathGrid": "the module's region, recorded as the byte array `region`",
+   "PathPending": "the module's region, recorded as the byte array `region`",
+   "RegionLayout": "the module's region, recorded as the byte array `region`",
+   "TurnCostPair": "the module's region, recorded as the byte array `region`",
+   "Ref<Node>": "a reference to a member of the module's region, held in the region and recorded as its bytes",
+   "Ref<PathCell>": "a reference to a member of the module's region, held in the region and recorded as its bytes",
+   "Ref<Ref<Node>>": "a reference to a member of the module's region, held in the region and recorded as its bytes",
+   "Ref<unsigned int>": "a reference to a member of the module's region, held in the region and recorded as its bytes",
+   "PathPoint": "a point of a goal area, on a stack",
+   "PathfindingEventHeader": "the event payload Poll builds on its stack and copies to the caller's buffer",
+   "PathfindingStarted": "the event payload Poll builds on its stack and copies to the caller's buffer",
+   "PathfindingProgress": "the event payload Poll builds on its stack and copies to the caller's buffer",
+   "PathfindingFinished": "the event payload Poll builds on its stack and copies to the caller's buffer",
    "AirManeuverOrderRecord": "the record a target is read from in a saved game, a stack copy of a bank",
    "PathOrderRecord": "the record a target is read from in a saved game, a stack copy of a bank",
    "PointMarkerRecord": "the record a target is read from in a saved game, a stack copy of a bank",
    "RingApproachRecord": "the record a target is read from in a saved game, a stack copy of a bank",
    "Ref<AiSearchGoal>": "the handle of a goal, built from its pointer to name the goal to pathfinding",
    "PathGoalArea": "the goal area of a request, filled on a stack and copied into the request",
-   "PathPoint": "a point of a goal area, on a stack",
    "MovementSavedState": "the state a LOAD event carries, recorded as the lines of its payload"
   },
   "includes": [
@@ -6054,6 +6080,128 @@
      }
     ]
    },
+   "PathMapInfo": {
+    "type": "PathMapInfo",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "width",
+      "kind": "i32"
+     },
+     {
+      "name": "height",
+      "kind": "i32"
+     },
+     {
+      "name": "unitSlots",
+      "kind": "i32"
+     },
+     {
+      "name": "moveClassCount",
+      "kind": "i32"
+     }
+    ]
+   },
+   "PathUnitState": {
+    "type": "PathUnitState",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "player",
+      "kind": "i32"
+     },
+     {
+      "name": "cell",
+      "kind": "point16"
+     },
+     {
+      "name": "heading",
+      "kind": "u16"
+     },
+     {
+      "name": "moveClass",
+      "kind": "u32"
+     },
+     {
+      "name": "footprintX",
+      "kind": "i32"
+     },
+     {
+      "name": "footprintY",
+      "kind": "i32"
+     }
+    ]
+   },
+   "PathRequest": {
+    "type": "PathRequest",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "unit",
+      "kind": "u32"
+     },
+     {
+      "name": "notBefore",
+      "kind": "u32"
+     },
+     {
+      "name": "goalKind",
+      "kind": "i32",
+      "member": "goal.kind"
+     },
+     {
+      "name": "goalCentre",
+      "kind": "point16",
+      "member": "goal.centre"
+     },
+     {
+      "name": "goalRadius0",
+      "kind": "i32",
+      "member": "goal.radius[0]"
+     },
+     {
+      "name": "goalRadius1",
+      "kind": "i32",
+      "member": "goal.radius[1]"
+     },
+     {
+      "name": "goalLeft",
+      "kind": "i32",
+      "member": "goal.left"
+     },
+     {
+      "name": "goalRight",
+      "kind": "i32",
+      "member": "goal.right"
+     },
+     {
+      "name": "goalTop",
+      "kind": "i32",
+      "member": "goal.top"
+     },
+     {
+      "name": "goalBottom",
+      "kind": "i32",
+      "member": "goal.bottom"
+     },
+     {
+      "name": "requester",
+      "kind": "u32"
+     },
+     {
+      "name": "target",
+      "kind": "u32"
+     },
+     {
+      "name": "useStart",
+      "kind": "i32"
+     },
+     {
+      "name": "start",
+      "kind": "point16"
+     }
+    ]
+   },
    "PointMarker": {
     "type": "PointMarker",
     "scope": "state",
@@ -6400,7 +6548,7 @@
      }
     ]
    },
-   "PathRequest": {
+   "PathRequestRefs": {
     "type": "PathRequest",
     "scope": "value",
     "fields": [
@@ -10058,6 +10206,144 @@
     "note": "a component of a position or velocity of an explosion or an exploded piece"
    },
    {
+    "kind": "deref_read",
+    "target": "*char",
+    "rule": "fields",
+    "functions": [
+     "CopyOneByte"
+    ],
+    "note": "a byte of the module's region, recorded as the byte array `region`",
+    "reads": []
+   },
+   {
+    "kind": "deref_read",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "CopyDwordPair",
+     "Pathfinder::FindPending",
+     "Pathfinder::FindPendingOfUnit",
+     "Pathfinder::Submit",
+     "UnlinkRequester",
+     "UnlinkUnit"
+    ],
+    "note": "a word of the module's region, recorded as the byte array `region`",
+    "reads": []
+   },
+   {
+    "kind": "deref_read",
+    "target": "*unsigned int",
+    "rule": "fields",
+    "functions": [
+     "PathGrid::ClearBlock",
+     "PathGrid::ClearLast",
+     "PathGrid::Set",
+     "Pathfinder::ExpandNeighbour",
+     "Pathfinder::Pathfinder",
+     "Pathfinder::RunSearches",
+     "Pathfinder::StartSearch",
+     "Pathfinder::Visit"
+    ],
+    "note": "a word of the module's region, recorded as the byte array `region`",
+    "reads": []
+   },
+   {
+    "kind": "deref_write",
+    "target": "*char",
+    "rule": "fields",
+    "functions": [
+     "CopyOneByte"
+    ],
+    "note": "a byte of the module's region, recorded as the byte array `region`",
+    "writes": []
+   },
+   {
+    "kind": "deref_write",
+    "target": "*int",
+    "rule": "fields",
+    "functions": [
+     "CopyDwordPair",
+     "Pathfinder::Pathfinder",
+     "Pathfinder::Submit",
+     "UnlinkRequester",
+     "UnlinkUnit"
+    ],
+    "note": "a word of the module's region, recorded as the byte array `region`",
+    "writes": []
+   },
+   {
+    "kind": "deref_write",
+    "target": "*unsigned int",
+    "rule": "fields",
+    "functions": [
+     "PathGrid::ClearBlock",
+     "PathGrid::ClearLast",
+     "PathGrid::Set",
+     "Pathfinder::ExpandNeighbour",
+     "Pathfinder::Pathfinder",
+     "Pathfinder::RunSearches",
+     "Pathfinder::StartSearch",
+     "Pathfinder::Visit"
+    ],
+    "note": "a word of the module's region, recorded as the byte array `region`",
+    "writes": []
+   },
+   {
+    "kind": "field_escape",
+    "target": "Node::data",
+    "rule": "fields",
+    "functions": [
+     "Pathfinder::ExpandNeighbour"
+    ],
+    "note": "a member of the module's region, reached through its address and recorded as the byte array `region`",
+    "reads": [],
+    "writes": []
+   },
+   {
+    "kind": "field_escape",
+    "target": "PathEventRecord::event",
+    "rule": "fields",
+    "functions": [
+     "Pathfinder::AddEvent"
+    ],
+    "note": "a member of the module's region, reached through its address and recorded as the byte array `region`",
+    "reads": [],
+    "writes": []
+   },
+   {
+    "kind": "field_escape",
+    "target": "PathPending::nextRequester",
+    "rule": "fields",
+    "functions": [
+     "UnlinkRequester"
+    ],
+    "note": "a member of the module's region, reached through its address and recorded as the byte array `region`",
+    "reads": [],
+    "writes": []
+   },
+   {
+    "kind": "field_escape",
+    "target": "PathPending::nextUnit",
+    "rule": "fields",
+    "functions": [
+     "UnlinkUnit"
+    ],
+    "note": "a member of the module's region, reached through its address and recorded as the byte array `region`",
+    "reads": [],
+    "writes": []
+   },
+   {
+    "kind": "field_escape",
+    "target": "Pathfinder::cursor",
+    "rule": "fields",
+    "functions": [
+     "Pathfinder::RunSearches"
+    ],
+    "note": "a member of the module's region, reached through its address and recorded as the byte array `region`",
+    "reads": [],
+    "writes": []
+   },
+   {
     "kind": "field_escape",
     "target": "Unit::cell",
     "rule": "fields",
@@ -11167,18 +11453,771 @@
     ]
    },
    "pathfinding": {
-    "status": "pending",
+    "status": "complete",
     "slots": {
-     "CellsChanged": {},
+     "CellsChanged": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingCellsChanged"
+     },
      "SetSearchScale": {
       "record": false,
-      "reason": "optional, null for an implementation without it; called by a console command"
+      "reason": "optional, null for an implementation without it; called by a console command",
+      "native": "PathfindingSetBaseScale"
      },
      "DebugCell": {
       "record": false,
-      "reason": "optional, null for an implementation without it; called by the debug overlay"
+      "reason": "optional, null for an implementation without it; called by the debug overlay",
+      "native": "PathfindingDebugCell"
+     },
+     "WriteState": {
+      "record": false,
+      "reason": "a dump query, called from the harness only",
+      "native": "PathfindingWriteState"
+     },
+     "Submit": {
+      "args": {
+       "request": {
+        "mode": "struct",
+        "kind": "PathRequest",
+        "dir": "in",
+        "import": {
+         "mode": "value",
+         "kind": "PathRequestRefs",
+         "byPointer": true
+        }
+       }
+      },
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingSubmit"
+     },
+     "RegionSize": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingRegionSize"
+     },
+     "Init": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingInit"
+     },
+     "Shutdown": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingShutdown"
+     },
+     "Cancel": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingCancel",
+      "args": {
+       "requester": {
+        "mode": "scalar",
+        "import": {
+         "mode": "object",
+         "kind": "PathGoal",
+         "poly": "PathGoal",
+         "ref": true
+        }
+       }
+      }
+     },
+     "Step": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingStep"
+     },
+     "Poll": {
+      "functions": [
+       "CopyDwordPair",
+       "CopyOneByte",
+       "AdjustHeap",
+       "PushHeapSiftUp",
+       "Pathfinder::GetCellState",
+       "Pathfinder::InitCostTables",
+       "Pathfinder::MarkGoalCell",
+       "Pathfinder::ClearDirtyCells",
+       "DirectionFromStep",
+       "Pathfinder::Estimate",
+       "Pathfinder::ExpandNeighbour",
+       "Pathfinder::ExpandBestNode",
+       "Pathfinder::TracePath",
+       "Pathfinder::ProbeStraightPath",
+       "Pathfinder::StartSearch",
+       "Pathfinder::ReleaseHeldPathLock",
+       "Pathfinder::AbortIfGoalMatch",
+       "Pathfinder::Pathfinder",
+       "Pathfinder::RunSearches",
+       "Pathfinder::RemoveNode",
+       "OpenHeap::SiftUp",
+       "OpenHeap::SiftDown",
+       "Pathfinder::GrowNodes",
+       "Pathfinder::FreeNode",
+       "FixMul",
+       "GetPathfinder",
+       "LayoutFor",
+       "NodeData::NodeData",
+       "NodeIsLive",
+       "OpenHeap::Clear",
+       "OpenHeap::Free",
+       "OpenHeap::Pop",
+       "OpenHeap::Remove",
+       "OpenHeap::SiftDownInline",
+       "OpenHeap::Size",
+       "OpenHeap::Update",
+       "OwnNodeIndex",
+       "PathEventPayload",
+       "PathGrid::At",
+       "PathGrid::ClearBlock",
+       "PathGrid::ClearLast",
+       "PathGrid::InBounds",
+       "PathGrid::Index",
+       "PathGrid::Set",
+       "Pathfinder::AddEvent",
+       "Pathfinder::Cancel",
+       "Pathfinder::Cost",
+       "Pathfinder::CostFix",
+       "Pathfinder::Dir",
+       "Pathfinder::Entry",
+       "Pathfinder::EstimateCost",
+       "Pathfinder::Extra",
+       "Pathfinder::FindPending",
+       "Pathfinder::FindPendingOfUnit",
+       "Pathfinder::Finish",
+       "Pathfinder::MarkGoal",
+       "Pathfinder::OnLine",
+       "Pathfinder::Passable",
+       "Pathfinder::Poll",
+       "Pathfinder::Push",
+       "Pathfinder::Release",
+       "Pathfinder::RemovePending",
+       "Pathfinder::RequesterBucket",
+       "Pathfinder::ResetTable",
+       "Pathfinder::Steps",
+       "Pathfinder::Submit",
+       "Pathfinder::UnitBucket",
+       "Pathfinder::Visit",
+       "PathfindingCancel",
+       "PathfindingCellsChanged",
+       "PathfindingInit",
+       "PathfindingPoll",
+       "PathfindingRegionSize",
+       "PathfindingSetBaseScale",
+       "PathfindingShutdown",
+       "PathfindingStep",
+       "PathfindingSubmit",
+       "StepsFor",
+       "UnlinkRequester",
+       "UnlinkUnit",
+       "operator<"
+      ],
+      "native": "PathfindingPoll",
+      "args": {
+       "out": {
+        "mode": "bytes-out",
+        "length": "size"
+       },
+       "points": {
+        "mode": "scratch",
+        "capacity": "capacity"
+       }
+      }
      }
-    }
+    },
+    "imports": [
+     "pathworld.Tick",
+     "pathworld.SearchStepLimit",
+     "pathworld.PlayerCount",
+     "pathworld.IsPlaying",
+     "pathworld.UnitsPerPlayer",
+     "pathworld.FirstUnit",
+     "pathworld.LastUnit",
+     "pathworld.NextUnit",
+     "pathworld.UnitState",
+     "pathworld.MoveClass",
+     "pathworld.InBounds",
+     "pathworld.Pass",
+     "pathworld.SeenSize",
+     "pathworld.Seen",
+     "pathworld.LineOfSight",
+     "pathworld.TerrainPass",
+     "pathworld.BeginSearch",
+     "pathworld.EndSearch"
+    ],
+    "region": {
+     "size": "RegionSize",
+     "init": "Init",
+     "shutdown": "Shutdown"
+    },
+    "issue": 1080
    },
    "los_radar": {
     "status": "complete",
@@ -13868,6 +14907,101 @@
       }
      }
     }
+   },
+   "pathworld": {
+    "status": "complete",
+    "slots": {
+     "Tick": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "SearchStepLimit": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "PlayerCount": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "IsPlaying": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "UnitsPerPlayer": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "FirstUnit": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "LastUnit": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "NextUnit": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "UnitState": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding",
+      "args": {
+       "out": {
+        "mode": "struct",
+        "kind": "PathUnitState",
+        "dir": "out",
+        "when": "result != 0"
+       }
+      }
+     },
+     "MoveClass": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "InBounds": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "Pass": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "SeenSize": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding",
+      "args": {
+       "width": {
+        "mode": "scalar",
+        "dir": "out"
+       },
+       "height": {
+        "mode": "scalar",
+        "dir": "out"
+       }
+      }
+     },
+     "Seen": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "LineOfSight": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "TerrainPass": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "BeginSearch": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     },
+     "EndSearch": {
+      "record": false,
+      "reason": "a world view slot: an import of pathfinding"
+     }
+    }
    }
   },
   "game_aliases": {
@@ -15513,6 +16647,9 @@
   {"name": "LosUnitIndex", "type": "LosUnitIndex", "scope": "state", "table": null, "inside": null, "fields": [{"name": "players", "kind": "embeds", "count": 10, "target": "LosUnitIndexEntry", "elems": 5}]},
   {"name": "LosUnitIndexEntry", "type": "LosUnitIndexEntry", "scope": "state", "table": null, "inside": [{"kind": "LosUnitIndex", "member": "players[]"}], "fields": [{"name": "live", "kind": "i32"}, {"name": "lastTick", "kind": "u32"}, {"name": "hasSpecial", "kind": "i32"}, {"name": "visible", "kind": "vector", "elem": {"mode": "object", "kind": "Unit"}, "vector": 15, "target": "Unit"}, {"name": "known", "kind": "vector", "elem": {"mode": "object", "kind": "Unit"}, "vector": 16, "target": "Unit"}]},
   {"name": "SideDef", "type": "SideDef", "scope": "state", "table": {"base": "game", "member": "sideDefs", "count": 5}, "inside": null, "fields": [{"name": "commander", "kind": "string", "size": 32, "aliases": ["PlayerName::commander"]}]},
+  {"name": "PathMapInfo", "type": "PathMapInfo", "scope": "value", "table": null, "inside": null, "fields": [{"name": "width", "kind": "i32"}, {"name": "height", "kind": "i32"}, {"name": "unitSlots", "kind": "i32"}, {"name": "moveClassCount", "kind": "i32"}]},
+  {"name": "PathUnitState", "type": "PathUnitState", "scope": "value", "table": null, "inside": null, "fields": [{"name": "player", "kind": "i32"}, {"name": "cell", "kind": "point16"}, {"name": "heading", "kind": "u16"}, {"name": "moveClass", "kind": "u32"}, {"name": "footprintX", "kind": "i32"}, {"name": "footprintY", "kind": "i32"}]},
+  {"name": "PathRequest", "type": "PathRequest", "scope": "value", "table": null, "inside": null, "fields": [{"name": "unit", "kind": "u32"}, {"name": "notBefore", "kind": "u32"}, {"name": "goalKind", "kind": "i32", "member": "goal.kind"}, {"name": "goalCentre", "kind": "point16", "member": "goal.centre"}, {"name": "goalRadius0", "kind": "i32", "member": "goal.radius[0]"}, {"name": "goalRadius1", "kind": "i32", "member": "goal.radius[1]"}, {"name": "goalLeft", "kind": "i32", "member": "goal.left"}, {"name": "goalRight", "kind": "i32", "member": "goal.right"}, {"name": "goalTop", "kind": "i32", "member": "goal.top"}, {"name": "goalBottom", "kind": "i32", "member": "goal.bottom"}, {"name": "requester", "kind": "u32"}, {"name": "target", "kind": "u32"}, {"name": "useStart", "kind": "i32"}, {"name": "start", "kind": "point16"}]},
   {"name": "PointMarker", "type": "PointMarker", "scope": "state", "table": null, "inside": null, "vtable": "g_pointMarkerVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order", "aliases": ["OrderFx::source"]}, {"name": "x1", "kind": "i32"}, {"name": "x2", "kind": "i32"}, {"name": "y1", "kind": "i32"}, {"name": "y2", "kind": "i32"}]},
   {"name": "AirManeuverOrder", "type": "AirManeuverOrder", "scope": "state", "table": null, "inside": null, "vtable": "g_airManeuverOrderVtable", "fields": [{"name": "source", "kind": "ref", "target": "Order", "aliases": ["OrderFx::source"]}, {"name": "flags", "kind": "u16", "aliases": ["AirManeuverOrder::headingSet"]}, {"name": "targetX", "kind": "i32", "member": "target.x", "aliases": ["AirManeuverOrder::target"]}, {"name": "targetY", "kind": "i32", "member": "target.y"}, {"name": "targetZ", "kind": "i32", "member": "target.z"}, {"name": "otherX", "kind": "i32", "member": "other.x", "aliases": ["AirManeuverOrder::other"]}, {"name": "otherY", "kind": "i32", "member": "other.y"}, {"name": "otherZ", "kind": "i32", "member": "other.z"}, {"name": "saveOnly22", "kind": "i16"}, {"name": "heading", "kind": "u16"}, {"name": "value_26", "kind": "u16"}, {"name": "self", "kind": "ref", "target": "Unit"}]},
   {"name": "PathGoal", "type": "PathGoal", "scope": "state", "table": null, "inside": null, "kinds": ["AiSearchGoal", "PatrolGoal", "LiteGoal", "PackedPosGoal"], "fields": []},
@@ -15520,7 +16657,7 @@
   {"name": "PatrolGoal", "type": "PatrolGoal", "scope": "state", "table": null, "inside": null, "vtable_symbol": "??_7PatrolGoal@@6B@", "vtable": "g_vtsym_PatrolGoal", "fields": [{"name": "target", "kind": "ref", "target": "OrderFx", "poly": "OrderFx", "aliases": ["PathGoal::target"]}, {"name": "owner", "kind": "ref", "target": "Unit", "aliases": ["PathGoal::owner"]}, {"name": "points", "kind": "bytes", "size": 12}, {"name": "count", "kind": "i32", "aliases": ["PatrolGoal::count"]}]},
   {"name": "PackedPosGoal", "type": "PackedPosGoal", "scope": "state", "table": null, "inside": null, "vtable_symbol": "??_7PackedPosGoal@@6B@", "vtable": "g_vtsym_PackedPosGoal", "fields": [{"name": "target", "kind": "ref", "target": "OrderFx", "poly": "OrderFx", "aliases": ["PathGoal::target"]}, {"name": "owner", "kind": "ref", "target": "Unit", "aliases": ["PathGoal::owner"]}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["PackedGoal::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y"}, {"name": "posZ", "kind": "i32", "member": "pos.z"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["PackedGoal::vel"]}, {"name": "velY", "kind": "i32", "member": "vel.y"}, {"name": "velZ", "kind": "i32", "member": "vel.z"}, {"name": "heading", "kind": "i16", "aliases": ["PackedGoal::heading"]}]},
   {"name": "LiteGoal", "type": "LiteGoal", "scope": "state", "table": null, "inside": null, "vtable_symbol": "??_7LiteGoal@@6B@", "vtable": "g_vtsym_LiteGoal", "fields": [{"name": "target", "kind": "ref", "target": "OrderFx", "poly": "OrderFx", "aliases": ["PathGoal::target"]}, {"name": "owner", "kind": "ref", "target": "Unit", "aliases": ["PathGoal::owner"]}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["PackedGoal::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y"}, {"name": "posZ", "kind": "i32", "member": "pos.z"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["PackedGoal::vel"]}, {"name": "velY", "kind": "i32", "member": "vel.y"}, {"name": "velZ", "kind": "i32", "member": "vel.z"}, {"name": "heading", "kind": "i16", "aliases": ["PackedGoal::heading"]}, {"name": "netDirtyFlags", "kind": "u8", "aliases": ["LiteGoal::dirty", "LiteGoal::mode", "LiteGoal::state"]}]},
-  {"name": "PathRequest", "type": "PathRequest", "scope": "value", "table": null, "inside": null, "fields": [{"name": "unit", "kind": "ref", "target": "Unit"}, {"name": "notBefore", "kind": "u32"}, {"name": "goalKind", "kind": "i32", "member": "goal.kind"}, {"name": "goalCentre", "kind": "point16", "member": "goal.centre"}, {"name": "goalRadius0", "kind": "i32", "member": "goal.radius[0]"}, {"name": "goalRadius1", "kind": "i32", "member": "goal.radius[1]"}, {"name": "goalLeft", "kind": "i32", "member": "goal.left"}, {"name": "goalRight", "kind": "i32", "member": "goal.right"}, {"name": "goalTop", "kind": "i32", "member": "goal.top"}, {"name": "goalBottom", "kind": "i32", "member": "goal.bottom"}, {"name": "requester", "kind": "ref", "target": "PathGoal", "poly": "PathGoal"}, {"name": "target", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "useStart", "kind": "i32"}, {"name": "start", "kind": "point16"}]},
+  {"name": "PathRequestRefs", "type": "PathRequest", "scope": "value", "table": null, "inside": null, "fields": [{"name": "unit", "kind": "ref", "target": "Unit"}, {"name": "notBefore", "kind": "u32"}, {"name": "goalKind", "kind": "i32", "member": "goal.kind"}, {"name": "goalCentre", "kind": "point16", "member": "goal.centre"}, {"name": "goalRadius0", "kind": "i32", "member": "goal.radius[0]"}, {"name": "goalRadius1", "kind": "i32", "member": "goal.radius[1]"}, {"name": "goalLeft", "kind": "i32", "member": "goal.left"}, {"name": "goalRight", "kind": "i32", "member": "goal.right"}, {"name": "goalTop", "kind": "i32", "member": "goal.top"}, {"name": "goalBottom", "kind": "i32", "member": "goal.bottom"}, {"name": "requester", "kind": "ref", "target": "PathGoal", "poly": "PathGoal"}, {"name": "target", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "useStart", "kind": "i32"}, {"name": "start", "kind": "point16"}]},
   {"name": "PlainOrderFx", "type": "OrderFx", "scope": "state", "table": null, "inside": null, "vtable": "g_orderFxVtable", "vtable_declared": true, "fields": [{"name": "source", "kind": "ref", "target": "Order", "aliases": ["OrderFx::source"]}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
@@ -15737,17 +16874,16 @@
    }
   },
   "pathfinding": {
-   "header": {"interface": "interfaces/pathfinding.h", "struct": "PathfindingSeam", "version": [4, 0], "status": "pending", "imports": [], "unrecorded": {"SetSearchScale": {"reason": "optional, null for an implementation without it; called by a console command", "native": "SetSearchScale"}, "DebugCell": {"reason": "optional, null for an implementation without it; called by the debug overlay", "native": "DebugCell"}}, "pending": {"untracked": 0, "ruleless": 2, "unresolvedSlots": ["RegionSize", "Init", "Shutdown", "CellsChanged", "Step", "WriteState"], "unannotatedArgs": ["RegionSize(map)", "Init(map)", "Init(region)", "Shutdown result", "Submit(request)", "Cancel(requester)", "Poll(out)", "Poll(points)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/pathfinding.h", "struct": "PathfindingSeam", "version": [4, 0], "status": "complete", "imports": ["pathworld.Tick", "pathworld.SearchStepLimit", "pathworld.PlayerCount", "pathworld.IsPlaying", "pathworld.UnitsPerPlayer", "pathworld.FirstUnit", "pathworld.LastUnit", "pathworld.NextUnit", "pathworld.UnitState", "pathworld.MoveClass", "pathworld.InBounds", "pathworld.Pass", "pathworld.SeenSize", "pathworld.Seen", "pathworld.LineOfSight", "pathworld.TerrainPass", "pathworld.BeginSearch", "pathworld.EndSearch"], "region": {"size": "RegionSize", "init": "Init", "shutdown": "Shutdown"}, "issue": 1080, "unrecorded": {"WriteState": {"reason": "a dump query, called from the harness only", "native": "PathfindingWriteState"}, "SetSearchScale": {"reason": "optional, null for an implementation without it; called by a console command", "native": "PathfindingSetBaseScale"}, "DebugCell": {"reason": "optional, null for an implementation without it; called by the debug overlay", "native": "PathfindingDebugCell"}}},
    "slots": {
-    "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "PathMapInfo*", "line": "map", "mode": "pending"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "RegionSize"},
-    "Init": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "PathMapInfo*", "line": "map", "mode": "pending"}, {"name": "region", "type": "void*", "line": "region", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "Init"},
-    "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "pending"}, "native": "Shutdown"},
-    "Submit": {"conv": "__stdcall", "ret": "void", "functions": ["Pathfinder::Submit"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "request", "type": "PathRequest*", "line": "request", "mode": "pending"}], "result": null, "native": "Submit"},
-    "Cancel": {"conv": "__stdcall", "ret": "void", "functions": ["Pathfinder::Cancel"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "requester", "type": "PathHandle", "line": "requester", "mode": "pending"}], "result": null, "native": "Cancel"},
-    "CellsChanged": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "left", "type": "int", "line": "left", "mode": "scalar"}, {"name": "top", "type": "int", "line": "top", "mode": "scalar"}, {"name": "right", "type": "int", "line": "right", "mode": "scalar"}, {"name": "bottom", "type": "int", "line": "bottom", "mode": "scalar"}, {"name": "classes", "type": "unsigned int", "line": "classes", "mode": "scalar"}, {"name": "cause", "type": "int", "line": "cause", "mode": "scalar"}], "result": null, "native": "CellsChanged"},
-    "Step": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "Step"},
-    "Poll": {"conv": "__stdcall", "ret": "int", "functions": ["Pathfinder::Poll"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "out", "type": "PathfindingEventHeader*", "line": "out", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}, {"name": "points", "type": "PathPoint*", "line": "points", "mode": "pending"}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Poll"},
-    "WriteState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "writer", "type": "StateWriter*", "line": "writer", "mode": "pending"}], "result": null, "native": "WriteState"}
+    "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "PathMapInfo*", "line": "map", "mode": "value", "kind": "PathMapInfo", "byPointer": true}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "PathfindingRegionSize"},
+    "Init": {"conv": "__stdcall", "ret": "void", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "PathMapInfo*", "line": "map", "mode": "value", "kind": "PathMapInfo", "byPointer": true}, {"name": "region", "type": "void*", "line": "region", "mode": "region"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "PathfindingInit"},
+    "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "region"}, "native": "PathfindingShutdown"},
+    "Submit": {"conv": "__stdcall", "ret": "void", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "request", "type": "PathRequest*", "line": "request", "mode": "struct", "kind": "PathRequest", "dir": "in", "import": {"mode": "value", "kind": "PathRequestRefs", "byPointer": true}}], "result": null, "native": "PathfindingSubmit"},
+    "Cancel": {"conv": "__stdcall", "ret": "void", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "requester", "type": "PathHandle", "line": "requester", "mode": "scalar", "import": {"mode": "object", "kind": "PathGoal", "poly": "PathGoal", "ref": true}}], "result": null, "native": "PathfindingCancel"},
+    "CellsChanged": {"conv": "__stdcall", "ret": "void", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "left", "type": "int", "line": "left", "mode": "scalar"}, {"name": "top", "type": "int", "line": "top", "mode": "scalar"}, {"name": "right", "type": "int", "line": "right", "mode": "scalar"}, {"name": "bottom", "type": "int", "line": "bottom", "mode": "scalar"}, {"name": "classes", "type": "unsigned int", "line": "classes", "mode": "scalar"}, {"name": "cause", "type": "int", "line": "cause", "mode": "scalar"}], "result": null, "native": "PathfindingCellsChanged"},
+    "Step": {"conv": "__stdcall", "ret": "void", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "PathfindingStep"},
+    "Poll": {"conv": "__stdcall", "ret": "int", "functions": ["CopyDwordPair", "CopyOneByte", "AdjustHeap", "PushHeapSiftUp", "Pathfinder::GetCellState", "Pathfinder::InitCostTables", "Pathfinder::MarkGoalCell", "Pathfinder::ClearDirtyCells", "DirectionFromStep", "Pathfinder::Estimate", "Pathfinder::ExpandNeighbour", "Pathfinder::ExpandBestNode", "Pathfinder::TracePath", "Pathfinder::ProbeStraightPath", "Pathfinder::StartSearch", "Pathfinder::ReleaseHeldPathLock", "Pathfinder::AbortIfGoalMatch", "Pathfinder::Pathfinder", "Pathfinder::RunSearches", "Pathfinder::RemoveNode", "OpenHeap::SiftUp", "OpenHeap::SiftDown", "Pathfinder::GrowNodes", "Pathfinder::FreeNode", "FixMul", "GetPathfinder", "LayoutFor", "NodeData::NodeData", "NodeIsLive", "OpenHeap::Clear", "OpenHeap::Free", "OpenHeap::Pop", "OpenHeap::Remove", "OpenHeap::SiftDownInline", "OpenHeap::Size", "OpenHeap::Update", "OwnNodeIndex", "PathEventPayload", "PathGrid::At", "PathGrid::ClearBlock", "PathGrid::ClearLast", "PathGrid::InBounds", "PathGrid::Index", "PathGrid::Set", "Pathfinder::AddEvent", "Pathfinder::Cancel", "Pathfinder::Cost", "Pathfinder::CostFix", "Pathfinder::Dir", "Pathfinder::Entry", "Pathfinder::EstimateCost", "Pathfinder::Extra", "Pathfinder::FindPending", "Pathfinder::FindPendingOfUnit", "Pathfinder::Finish", "Pathfinder::MarkGoal", "Pathfinder::OnLine", "Pathfinder::Passable", "Pathfinder::Poll", "Pathfinder::Push", "Pathfinder::Release", "Pathfinder::RemovePending", "Pathfinder::RequesterBucket", "Pathfinder::ResetTable", "Pathfinder::Steps", "Pathfinder::Submit", "Pathfinder::UnitBucket", "Pathfinder::Visit", "PathfindingCancel", "PathfindingCellsChanged", "PathfindingInit", "PathfindingPoll", "PathfindingRegionSize", "PathfindingSetBaseScale", "PathfindingShutdown", "PathfindingStep", "PathfindingSubmit", "StepsFor", "UnlinkRequester", "UnlinkUnit", "operator<"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Unit.cell", "Unit.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "out", "type": "PathfindingEventHeader*", "line": "out", "mode": "bytes-out", "length": "size", "lengthIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}, {"name": "points", "type": "PathPoint*", "line": "points", "mode": "scratch", "capacity": "capacity"}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "PathfindingPoll"}
    }
   },
   "weapons": {
@@ -16010,6 +17146,12 @@
   },
   "econworld": {
    "header": {"interface": "interfaces/economy.h", "struct": "EconomyWorldView", "version": [5, 0], "status": "complete", "imports": [], "world": true, "unrecorded": {"Tick": {"reason": "a world view slot: an import of economy", "native": "Tick", "conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "unsigned int", "mode": "scalar"}}, "Difficulty": {"reason": "a world view slot: an import of economy", "native": "Difficulty", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "SharingEnabled": {"reason": "a world view slot: an import of economy", "native": "SharingEnabled", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "Wind": {"reason": "a world view slot: an import of economy", "native": "Wind", "conv": "__stdcall", "ret": "float", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "float", "mode": "scalar"}}, "Tide": {"reason": "a world view slot: an import of economy", "native": "Tide", "conv": "__stdcall", "ret": "float", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "float", "mode": "scalar"}}, "PlayerInfo": {"reason": "a world view slot: an import of economy", "native": "PlayerInfo", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "out", "type": "EconPlayerInfo*", "line": "out", "mode": "value", "kind": "EconPlayerInfo", "dir": "out"}], "result": null}, "Allied": {"reason": "a world view slot: an import of economy", "native": "Allied", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "from", "type": "int", "line": "from", "mode": "scalar"}, {"name": "to", "type": "int", "line": "to", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "FirstUnit": {"reason": "a world view slot: an import of economy", "native": "FirstUnit", "conv": "__stdcall", "ret": "EconUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "EconUnit", "mode": "object", "kind": "Unit", "ref": true}}, "LastUnit": {"reason": "a world view slot: an import of economy", "native": "LastUnit", "conv": "__stdcall", "ret": "EconUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "EconUnit", "mode": "object", "kind": "Unit", "ref": true}}, "NextUnit": {"reason": "a world view slot: an import of economy", "native": "NextUnit", "conv": "__stdcall", "ret": "EconUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "EconUnit", "line": "unit", "mode": "object", "kind": "Unit", "ref": true}], "result": {"type": "EconUnit", "mode": "object", "kind": "Unit", "ref": true}}, "UnitSlot": {"reason": "a world view slot: an import of economy", "native": "UnitSlot", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "EconUnit", "line": "unit", "mode": "object", "kind": "Unit", "ref": true}], "result": {"type": "int", "mode": "scalar"}}, "UnitInfo": {"reason": "a world view slot: an import of economy", "native": "UnitInfo", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "EconUnit", "line": "unit", "mode": "object", "kind": "Unit", "ref": true}, {"name": "out", "type": "EconUnitInfo*", "line": "uinfo", "mode": "value", "kind": "EconUnitInfo", "dir": "out", "named": true}], "result": {"type": "int", "mode": "scalar"}}, "TypeInfo": {"reason": "a world view slot: an import of economy", "native": "TypeInfo", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "type", "type": "EconType", "line": "type", "mode": "scalar"}, {"name": "out", "type": "EconTypeInfo*", "line": "out", "mode": "value", "kind": "EconTypeInfo", "dir": "out"}], "result": null}, "CellMetal": {"reason": "a world view slot: an import of economy", "native": "CellMetal", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "Emit": {"reason": "a world view slot: an import of economy", "native": "Emit", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "effect", "type": "EconomyEventHeader*", "line": "effect", "mode": "effect", "events": "economy", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null}}},
+   "slots": {
+
+   }
+  },
+  "pathworld": {
+   "header": {"interface": "interfaces/pathfinding.h", "struct": "PathWorldView", "version": [4, 0], "status": "complete", "imports": [], "world": true, "unrecorded": {"Tick": {"reason": "a world view slot: an import of pathfinding", "native": "Tick", "conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "unsigned int", "mode": "scalar"}}, "SearchStepLimit": {"reason": "a world view slot: an import of pathfinding", "native": "SearchStepLimit", "conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "unsigned int", "mode": "scalar"}}, "PlayerCount": {"reason": "a world view slot: an import of pathfinding", "native": "PlayerCount", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "IsPlaying": {"reason": "a world view slot: an import of pathfinding", "native": "IsPlaying", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "UnitsPerPlayer": {"reason": "a world view slot: an import of pathfinding", "native": "UnitsPerPlayer", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "int", "mode": "scalar"}}, "FirstUnit": {"reason": "a world view slot: an import of pathfinding", "native": "FirstUnit", "conv": "__stdcall", "ret": "PathUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "PathUnit", "mode": "scalar"}}, "LastUnit": {"reason": "a world view slot: an import of pathfinding", "native": "LastUnit", "conv": "__stdcall", "ret": "PathUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "PathUnit", "mode": "scalar"}}, "NextUnit": {"reason": "a world view slot: an import of pathfinding", "native": "NextUnit", "conv": "__stdcall", "ret": "PathUnit", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "PathUnit", "line": "unit", "mode": "scalar"}], "result": {"type": "PathUnit", "mode": "scalar"}}, "UnitState": {"reason": "a world view slot: an import of pathfinding", "native": "UnitState", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "PathUnit", "line": "unit", "mode": "scalar"}, {"name": "out", "type": "PathUnitState*", "line": "out", "mode": "struct", "kind": "PathUnitState", "dir": "out", "when": "result != 0"}], "result": {"type": "int", "mode": "scalar"}}, "MoveClass": {"reason": "a world view slot: an import of pathfinding", "native": "MoveClass", "conv": "__stdcall", "ret": "PathClass", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "index", "type": "int", "line": "index", "mode": "scalar"}], "result": {"type": "PathClass", "mode": "scalar"}}, "InBounds": {"reason": "a world view slot: an import of pathfinding", "native": "InBounds", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "PathClass", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "Pass": {"reason": "a world view slot: an import of pathfinding", "native": "Pass", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "PathClass", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "SeenSize": {"reason": "a world view slot: an import of pathfinding", "native": "SeenSize", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "width", "type": "int*", "line": "width", "mode": "scalar", "dir": "out"}, {"name": "height", "type": "int*", "line": "height", "mode": "scalar", "dir": "out"}], "result": null}, "Seen": {"reason": "a world view slot: an import of pathfinding", "native": "Seen", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "LineOfSight": {"reason": "a world view slot: an import of pathfinding", "native": "LineOfSight", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "PathClass", "line": "moveClass", "mode": "scalar"}, {"name": "x0", "type": "int", "line": "x0", "mode": "scalar"}, {"name": "y0", "type": "int", "line": "y0", "mode": "scalar"}, {"name": "x1", "type": "int", "line": "x1", "mode": "scalar"}, {"name": "y1", "type": "int", "line": "y1", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "TerrainPass": {"reason": "a world view slot: an import of pathfinding", "native": "TerrainPass", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "moveClass", "type": "PathClass", "line": "moveClass", "mode": "scalar"}, {"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "BeginSearch": {"reason": "a world view slot: an import of pathfinding", "native": "BeginSearch", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "PathUnit", "line": "unit", "mode": "scalar"}], "result": null}, "EndSearch": {"reason": "a world view slot: an import of pathfinding", "native": "EndSearch", "conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "PathUnit", "line": "unit", "mode": "scalar"}], "result": null}}},
    "slots": {
 
    }

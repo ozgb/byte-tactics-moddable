@@ -36,6 +36,7 @@
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
 #include "../src/game/economy.h"
+#include "../src/ai/pathfinder.h"
 #include "../src/game/players.h"
 #include "../src/game/players_events.h"
 #include "../src/ai/ai_player.h"
@@ -147,6 +148,9 @@ Game* g_game;
 SimGlobals* g_simGlobals;
 char g_extTdf[4];
 Seams g_seams;
+const TurnCostTable g_turnCosts = { { 0, 40, 60, 80, 100, 80, 60, 40 } };
+signed char g_dirDeltaX[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+signed char g_dirDeltaZ[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
 
 SimGlobals& SimCreate()
 {
@@ -1152,6 +1156,41 @@ bool InnerOfParentheses(const char* text, char* inner, unsigned size)
     return true;
 }
 
+template <class T> void ApplyOutScalar(T* dst, const char* name)
+{
+    const char* value = OutExact(name);
+    if (value != nullptr && dst != nullptr)
+        ParseScalar(value, *dst);
+}
+
+void CompareBytes(const char* name, const unsigned char* bytes, int count, int length)
+{
+    if (count > length)
+        count = length;
+    const char* recorded = OutLine(name);
+    if (count <= 0) {
+        if (recorded != nullptr)
+            Diff(name, recorded, "no line");
+        return;
+    }
+    ReplayText value;
+    ReplayBytes(value, bytes, count);
+    HashText(value.Data());
+    CoreClosing(name, value.Data());
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff(name, recorded, value.Data());
+    value.Free();
+}
+
+struct ScratchHolder {
+    void* data;
+    ScratchHolder() : data(nullptr) {}
+    ~ScratchHolder() { free(data); }
+    void Reserve(size_t bytes) { data = calloc(bytes > 0 ? bytes : 1, 1); }
+};
+
 template <class T> void ApplyInOutScalar(T* dst, const char* name)
 {
     const char* value = OutExact(name);
@@ -1885,6 +1924,22 @@ int __stdcall Native_fixture_Measure(int* p2, short* p3, unsigned char* p4)
     if (p4 != nullptr)
         *p4 = (unsigned char)(*p4 + 1);
     return 1;
+}
+
+int __stdcall Native_fixture_Drain(void* out, unsigned int size)
+{
+    unsigned char* bytes = (unsigned char*)out;
+    unsigned int n = size < 3 ? size : 3;
+    for (unsigned int k = 0; k < n; k++)
+        bytes[k] = (unsigned char)(0x10 + k);
+    return (int)n;
+}
+
+int __stdcall Native_fixture_Gather(int* points, int capacity)
+{
+    for (int k = 0; k < capacity; k++)
+        points[k] = 100 + k;
+    return capacity;
 }
 
 int __stdcall GetWeaponRangeSlot(Unit* unit, unsigned int weapon)
@@ -7189,6 +7244,57 @@ void GameWriteSelfTest()
     delete table;
 }
 
+void OutFormsSelfTest()
+{
+    printf("a byte buffer a slot fills\n");
+    ResetBlock();
+    LoadCall("  a size 8\n  o out x:101112\n  o result 3\n");
+    BeginCompare();
+    Run_fixture_Drain();
+    After_fixture_Drain();
+    Check(g_diffs == 0, "a slot's out bytes replay equal, as long as the result");
+    LoadCall("  a size 2\n  o out x:1011\n  o result 2\n");
+    BeginCompare();
+    Run_fixture_Drain();
+    After_fixture_Drain();
+    Check(g_diffs == 0, "and a smaller buffer is as long as its size");
+    LoadCall("  a size 8\n  o out x:101113\n  o result 3\n");
+    BeginCompare();
+    Run_fixture_Drain();
+    After_fixture_Drain();
+    printf("bytes that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "out") == 0, "a byte that differs is reported at the argument");
+    LoadCall("  a size 8\n  o result 3\n");
+    BeginCompare();
+    Run_fixture_Drain();
+    After_fixture_Drain();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "out") == 0, "a missing o line is a difference");
+    LoadCall("  a size 0\n  o result 0\n");
+    BeginCompare();
+    Run_fixture_Drain();
+    After_fixture_Drain();
+    Check(g_diffs == 0, "a call with no bytes has no o line");
+
+    printf("a scratch buffer\n");
+    LoadCall("  a capacity 64\n  o result 64\n");
+    BeginCompare();
+    Run_fixture_Gather();
+    After_fixture_Gather();
+    Check(g_diffs == 0, "a scratch buffer of the capacity is passed, and what the call writes to it is not compared");
+
+    printf("a scalar the import writes\n");
+    LoadCall("  i fixture.Dims\n  o width 12\n  o height -7\n");
+    BeginImport();
+    int width = 99;
+    int height = 99;
+    Imp_fixture_Dims(&width, &height);
+    Check(g_diffs == 0 && width == 12 && height == -7, "the stub writes each o line through its pointer");
+    LoadCall("  i fixture.Dims\n  o width 12\n");
+    BeginImport();
+    Imp_fixture_Dims(&width, nullptr);
+    Check(g_diffs == 0 && width == 12, "and a null pointer takes none");
+}
+
 void RegionSelfTest()
 {
     printf("a module's region\n");
@@ -7265,6 +7371,7 @@ int SelfTest(const char* file)
     ShapeSelfTest();
     EnemyListSelfTest();
     InOutRunnerSelfTest();
+    OutFormsSelfTest();
     WeaponArgumentSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();

@@ -125,7 +125,8 @@ pair. The reading is an object:
 | `pairs` | `[first word, second word]` for each pair: the second word is an offset, which the game turns into an address but never reads through |
 | `code` | the code length's words from the code offset |
 
-The game doesn't read the code length; the reading uses it to bound the code.
+The game doesn't read the code length; the reading uses it to bound the code. Every count is signed: a negative one
+gives an empty list (and a negative static count is reported as it is).
 
 **GAF.** The file starts with three words: a version, the entry count and a zero, then an offset for each entry. The
 entry count is read as its low 16 bits, as a signed number: a count word of 0x00020001 holds one entry, and one of
@@ -133,7 +134,7 @@ entry count is read as its low 16 bits, as a signed number: a count word of 0x00
 a 32-byte name (offset 8, NUL-terminated), and then, at offset 40, two words for each frame: the frame's offset and
 its duration. A frame is 24 bytes: width and height (16 bits, unsigned), x and y (16 bits, signed), the transparent
 index, `compressed`, the subframe count and `blend` (a byte each), a word the game doesn't read, the offset of the
-frame's data and a word it doesn't read. The reading is the list of entries, each `{"name", "loop", "frames"}`, and
+frame's data and a word it doesn't read. The frame and subframe counts are unsigned. The reading is the list of entries, each `{"name", "loop", "frames"}`, and
 a frame is:
 
 | Field | Value |
@@ -143,21 +144,26 @@ a frame is:
 | `frames` | when the subframe count is not 0: the subframes, each a frame without `duration`; the data is a word for each, the subframe's offset |
 | `pixels` | otherwise: the rows, top first, each a list of `width` palette indices, `null` for a pixel the row leaves transparent |
 
-A frame whose `compressed` is 0 holds `width` × `height` bytes, row by row, and every byte is a pixel (the transparent
+A frame is compressed when `compressed` is not 0 (any value, not only 1); a frame with subframes is read the same
+whatever its flag. A frame whose `compressed` is 0 holds `width` × `height` bytes, row by row, and every byte is a pixel (the transparent
 index is a pixel value like any other here; drawing is what skips it). A compressed frame holds, for each row, a
 16-bit byte count and then that many bytes of commands, each a byte `b`: when bit 0 is set, `b >> 1` pixels are
 transparent; when bit 1 is set, the next byte is repeated `(b >> 2) + 1` times; otherwise the next `(b >> 2) + 1`
-bytes are copied. A row's pixels start transparent, and it decodes until it has `width` pixels: a run that goes
-past the end of the row is cut there, and a row whose byte count is 0 stays transparent. The byte count is used only
-to find the next row.
+bytes are copied. A copied or repeated byte is a pixel even when it equals the transparent index. A row's pixels start
+transparent, and it decodes until it has `width` pixels: a run that goes past the end of the row is cut there (the
+rest of a cut literal is not read), and a row whose byte count is 0 stays transparent. The byte count is used only to
+find the next row: bytes after the command that fills the row are skipped, and a row whose commands give fewer than
+`width` pixels goes on reading commands from the bytes that follow it in the file (the next row's byte count first)
+until it has them.
 
 **3DO.** A piece is thirteen words: a version, the vertex count, the primitive count, the selection primitive (-1 for
-none), the offset from its parent (x, y, z), the offset of its name (0 for none), a word the game doesn't read, the
-offsets of its vertices and of its primitives, and the offsets of its next sibling and its first child (0 for none).
+none), the offset from its parent (x, y, z), the offset of its name (0 for none), a word the game makes an address when it is not 0 but doesn't
+read through, the offsets of its vertices and of its primitives, and the offsets of its next sibling and its first child (0 for none).
 The first piece is at offset 0. A vertex is three words (x, y, z), and a primitive is eight words: its colour, its
-vertex count, a word the game doesn't read, the offset of its vertex indices (16 bits each, unsigned), the offset of
+vertex count, a word the game makes an address when it is not 0 but doesn't read through, the offset of its vertex
+indices (16 bits each, unsigned), the offset of
 its texture name (0 for none) and three words the game doesn't read. The reading is the list of the first piece and
-its siblings, in order, each:
+its siblings, in order, each (a negative vertex or primitive count gives an empty list):
 
 | Field | Value |
 | --- | --- |
@@ -182,15 +188,18 @@ are not called: in each the game reads outside the file's data, which gives no v
 | --- | --- |
 | `scripts\trunc.cob` | its tables are past the end, and the game reads and rewrites them there |
 | `scripts\over.cob` | a script count of 100000: the game reads and rewrites the name table past the end |
-| `anims\trunc.gaf` | the entries are past the end, and the game reads them there |
+| `anims\trunc.gaf` | the file ends inside the first entry's name: that entry's frame table and the other two entries are past the end, and the game reads them there |
 | `anims\over.gaf` | a frame count of 30000: the game reads frame offsets past the end |
 | `objects3d\trunc.3do` | the vertices, primitives and children are past the end |
 | `objects3d\over.3do` | a primitive count of 100000: the game reads and sorts primitives past the end |
 
-Nor are these called: a compressed GAF row whose commands give fewer than `width` pixels (the game goes on reading
-the next row's bytes), a GAF subframe with subframes of its own (the game doesn't make their offsets addresses), a 3DO
+Nor are these called: a short compressed row (above) that reads past the end of the file, a GAF subframe with subframes of its own (the game doesn't make their offsets addresses), a 3DO
 primitive with no vertices when the sort reaches it (the game divides by zero), a selection primitive past the
-primitive count, and an index past a piece's vertices.
+primitive count, and an index past a piece's vertices. The game makes each offset an address in place, by adding the
+address of the file's data to the word, so a word it reaches twice is rewritten twice and no longer an offset. So
+these are not called either: a COB table or pair table that overlaps another, a GAF frame that two entries or two
+frames name, a 3DO piece that two pieces name as sibling or child, and a 3DO piece or primitive whose address-made
+word (word 8 of a piece, word 2 of a primitive) is also a word the game rewrites through another offset.
 
 ## The groups
 
@@ -202,9 +211,9 @@ primitive count, and an index past a piece's vertices.
 | `reading` | `read`, `seek`, `tell`, `length`, `readat` and `load` on a loose file and on each way an archive stores a file, across block boundaries and at the end |
 | `malformed` | the archives that are refused, those read anyway, and broken chunks |
 | `formats` | the TDF reading of TDF and FBI files, a missing and an empty one, and a TDF file that can't be parsed |
-| `cob` | the COB reading of a script with several scripts, pieces and a pair, of one with none, and of a missing and an empty file |
-| `gaf` | the GAF reading of compressed and raw frames (a skipped, an empty, a literal and a cut row), subframes, an empty entry, a count word with high bits, and a missing and an empty file |
-| `3do` | the 3DO reading of a nested tree with siblings, a piece without a name, primitives with and without a texture, the reordering with and without a selection primitive, and a missing and an empty file |
+| `cob` | the COB reading of a script with several scripts, pieces and a pair, of one with none, of one with negative counts, and of a missing and an empty file |
+| `gaf` | the GAF reading of compressed and raw frames (skipped, empty, literal, cut repeat and cut literal rows in the middle and at the end, a row with bytes after it fills, a short row that reads on, pixels equal to the transparent index, a `compressed` of 2), subframes under a compressed parent, an empty entry, count words with high bits and with the sign bit, and a missing and an empty file |
+| `3do` | the 3DO reading of a nested tree with siblings, a piece without a name, primitives with and without a texture, the reordering with and without a selection primitive, a selection on a piece with no primitives, negative counts, and a missing and an empty file |
 
 A vector of `reference/files/<group>.json` is `{"name", "fixture", "calls", "results"}`: the calls, each a list of
 strings, and the `[call, value]` the in-repo engine wrote for each.

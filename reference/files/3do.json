@@ -6,16 +6,18 @@
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["3do", [{"name": "base", "offset": [0, 0, 0], "vertices": [[0, 0, 0], [10, -1, 0], [0, 0, 10], [5, 4, 5], [1, -3, 1], [2, 8, 2]], "selection": 0, "primitives": [{"colour": 4, "vertices": [1, 4, 0, 2], "texture": null}, {"colour": 3, "vertices": [0, 2], "texture": null}, {"colour": 1, "vertices": [0, 1, 2], "texture": "skin"}, {"colour": 2, "vertices": [3, 4, 5], "texture": "skin"}, {"colour": 5, "vertices": [5, 3], "texture": "glow"}], "children": [{"name": "turret", "offset": [0, 196608, 0], "vertices": [[0, 0, 0], [1, 1, 1], [-1, 2, -1]], "selection": -1, "primitives": [{"colour": 6, "vertices": [0, 1, 2], "texture": "armtex"}, {"colour": 7, "vertices": [2, 1, 0], "texture": null}], "children": [{"name": "barrel", "offset": [0, 0, 131072], "vertices": [[0, 0, 4]], "selection": -1, "primitives": [], "children": []}]}, {"name": null, "offset": [-65536, 0, 0], "vertices": [], "selection": -1, "primitives": [], "children": []}]}, {"name": "debris", "offset": [7, 8, 9], "vertices": [[1, 2, 3]], "selection": -1, "primitives": [{"colour": 8, "vertices": [0], "texture": null}], "children": []}]]
+   ["3do", [{"name": "base", "offset": [0, 0, 0], "vertices": [[0, 0, 0], [10, -1, 0], [0, 0, 10], [5, 4, 5], [1, -3, 1], [2, 8, 2]], "selection": 0, "primitives": [{"colour": 4, "vertices": [1, 4, 0, 2], "texture": null}, {"colour": 3, "vertices": [0, 2], "texture": null}, {"colour": 1, "vertices": [0, 1, 2], "texture": "skin"}, {"colour": 2, "vertices": [3, 4, 5], "texture": "skin"}, {"colour": 5, "vertices": [5, 3], "texture": "glow"}], "children": [{"name": "turret", "offset": [0, 196608, 0], "vertices": [[0, 0, 0], [1, 1, 1], [-1, 2, -1]], "selection": -1, "primitives": [{"colour": 6, "vertices": [0, 1, 2], "texture": "armtex"}, {"colour": 7, "vertices": [2, 1, 0], "texture": null}], "children": [{"name": "barrel", "offset": [0, 0, 131072], "vertices": [[0, 0, 4]], "selection": 2, "primitives": [], "children": []}]}, {"name": null, "offset": [-65536, 0, 0], "vertices": [], "selection": -1, "primitives": [], "children": []}]}, {"name": "debris", "offset": [7, 8, 9], "vertices": [[1, 2, 3]], "selection": -1, "primitives": [{"colour": 8, "vertices": [0], "texture": null}], "children": []}]]
   ]},
  {"name": "flat", "fixture": "base",
   "calls": [
    ["mount"],
-   ["3do", "objects3d\\flat.3do"]
+   ["3do", "objects3d\\flat.3do"],
+   ["3do", "objects3d\\negative.3do"]
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["3do", [{"name": "flat", "offset": [0, 0, 0], "vertices": [[0, 5, 0], [0, 2, 0], [0, 1, 0]], "selection": -1, "primitives": [{"colour": 1, "vertices": [0], "texture": null}, {"colour": 3, "vertices": [2], "texture": null}, {"colour": 2, "vertices": [1], "texture": null}], "children": []}]]
+   ["3do", [{"name": "flat", "offset": [0, 0, 0], "vertices": [[0, 5, 0], [0, 2, 0], [0, 1, 0]], "selection": -1, "primitives": [{"colour": 1, "vertices": [0], "texture": null}, {"colour": 3, "vertices": [2], "texture": null}, {"colour": 2, "vertices": [1], "texture": null}], "children": []}]],
+   ["3do", [{"name": "negative", "offset": [1, 2, 3], "vertices": [], "selection": 1, "primitives": [], "children": []}]]
   ]},
  {"name": "missing", "fixture": "base",
   "calls": [

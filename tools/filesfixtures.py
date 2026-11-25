@@ -456,6 +456,7 @@ def model(pieces: list[Piece]) -> bytes:
 ARMFIX_COB = cob([("Create", 0), ("Activate", 4), ("Deactivate", 7)], ["base", "turret", "barrel"], 5,
                  [(9, "pair")], [0x10021001, 0, 1, -65536, 0x10011000, 2, 0x7FFFFFFF, 0x10064000, -1, 3, 0x10012000])
 NONE_COB = cob([], [], 0, [], [])
+NEGATIVE_COB = struct.pack("<6i", 4, -1, -1, -3, -2, -1) + NONE_COB[24:]
 
 GAF_IDLE = Frame(6, 4, 3, 2, 9, compressed=1, rows=[
     [None, None, 5, 5, 5, 7],
@@ -464,14 +465,23 @@ GAF_IDLE = Frame(6, 4, 3, 2, 9, compressed=1, rows=[
     bytes([1 << 1 | 1, (8 - 1) << 2 | 2, 0x22]),
 ])
 GAF_RAW = Frame(4, 3, -1, -2, 0, rows=[[0, 1, 2, 3], [9, 9, 0, 0], [255, 128, 7, 0]])
-GAF_LAYERED = Frame(5, 5, 2, 2, 0, subframes=[
+GAF_CUTS = Frame(4, 5, 0, 0, 7, compressed=2, rows=[
+    bytes([1 << 1 | 1, (5 - 1) << 2 | 2, 7]),
+    bytes([(6 - 1) << 2, 21, 7, 33, 44, 55, 66]),
+    bytes([(4 - 1) << 2 | 2, 5, 0, 0]),
+    bytes([(2 - 1) << 2, 9, 8]),
+    [10, 11, 12, 13],
+])
+GAF_LAYERED = Frame(5, 5, 2, 2, 0, compressed=1, subframes=[
     Frame(2, 2, 1, 1, 3, rows=[[3, 4], [4, 3]]),
     Frame(3, 2, 0, 0, 0, compressed=1, blend=1, rows=[[None, 8, None], [6, 6, None]]),
 ])
 FIXTURE_GAF = gaf([("Idle", 1, [(GAF_IDLE, 2), (GAF_RAW, 0x00010004)]),
                    ("Empty", 0, []),
-                   ("Layered", 0, [(GAF_LAYERED, 1)])])
+                   ("Layered", 0, [(GAF_LAYERED, 1)]),
+                   ("Cuts", 1, [(GAF_CUTS, 3)])])
 COUNT_GAF = gaf([("Only", 0, [(Frame(1, 1, 0, 0, 0, rows=[[42]]), 1)])], count=0x00020001)
+NEGATIVE_GAF = gaf([], count=0x0000FFFF)
 
 FIXTURE_3DO = model([
     Piece("base", (0, 0, 0),
@@ -482,11 +492,13 @@ FIXTURE_3DO = model([
           children=[
               Piece("turret", (0, 3 * 65536, 0), [(0, 0, 0), (1, 1, 1), (-1, 2, -1)],
                     [(6, [0, 1, 2], "armtex"), (7, [2, 1, 0], None)],
-                    children=[Piece("barrel", (0, 0, 2 * 65536), [(0, 0, 4)], [])]),
+                    children=[Piece("barrel", (0, 0, 2 * 65536), [(0, 0, 4)], [], selection=2)]),
               Piece(None, (-65536, 0, 0), [], []),
           ]),
     Piece("debris", (7, 8, 9), [(1, 2, 3)], [(8, [0], None)]),
 ])
+NEGATIVE_3DO = model([Piece("negative", (1, 2, 3), [], [], selection=1)])
+NEGATIVE_3DO = NEGATIVE_3DO[:4] + struct.pack("<ii", -1, -2) + NEGATIVE_3DO[12:]
 FLAT_3DO = model([Piece("flat", (0, 0, 0), [(0, 5, 0), (0, 2, 0), (0, 1, 0)],
                         [(1, [0], None), (2, [1], None), (3, [2], None)])])
 
@@ -508,6 +520,9 @@ def base() -> dict[str, bytes]:
         "scripts/none.cob": NONE_COB,
         "anims/fixture.gaf": FIXTURE_GAF,
         "anims/count.gaf": COUNT_GAF,
+        "anims/negative.gaf": NEGATIVE_GAF,
+        "scripts/negative.cob": NEGATIVE_COB,
+        "objects3d/negative.3do": NEGATIVE_3DO,
         "objects3d/fixture.3do": FIXTURE_3DO,
         "objects3d/flat.3do": FLAT_3DO,
     }

@@ -15,8 +15,12 @@
     "size": 89
    },
    "anims/fixture.gaf": {
-    "sha256": "5f7a08e2d634be260d8f593553552aea14b0c42c147672c8ee6cacca091f97f5",
-    "size": 346
+    "sha256": "b4d665b10da0e73b088ef5cad83495406ffbabb97ade1e0b568c6c326c4a8cf9",
+    "size": 454
+   },
+   "anims/negative.gaf": {
+    "sha256": "0d057bf248d11c57db8030d2b93e08f3da6c831d94e1408f209e65559092975a",
+    "size": 12
    },
    "b.ccx": {
     "sha256": "c304af600ff40b2fd58a44a33b9f4caff4ac76ff9741d146293146ff6467662b",
@@ -47,12 +51,16 @@
     "size": 280
    },
    "objects3d/fixture.3do": {
-    "sha256": "38a8dd3a65b12bcb50c176acdb84b5bb6d5d05b860ec81c3564ced5d22071144",
+    "sha256": "883981467e00652b6172cb8eb6af24f25250d5a61fc38f83ed1c9964764f7148",
     "size": 738
    },
    "objects3d/flat.3do": {
     "sha256": "e349dada2a5d1d399cdb7fadf9c6257293eb876ef84ddabd8c3967209436d2b7",
     "size": 195
+   },
+   "objects3d/negative.3do": {
+    "sha256": "6b2ceb22bc8ab28360e27c89e45a3ed60e27a2970753eee082e8c576218a0df5",
+    "size": 61
    },
    "readme.txt": {
     "sha256": "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4",
@@ -69,6 +77,10 @@
    "scripts/armfix.cob": {
     "sha256": "be2d6065e2329aa6a53f9225dfdceb4a89afc4dbeb226902230fc85a121a0a6e",
     "size": 183
+   },
+   "scripts/negative.cob": {
+    "sha256": "4d17d9df7849f1e4858f63bc50f650f4bedbb01339301abc38a444a42c490ee3",
+    "size": 44
    },
    "scripts/none.cob": {
     "sha256": "120fea7ea6edd948ed0e6ee7e2c9f52bfce06c54d40d5f4433a2f7a80c3410de",
@@ -159,11 +171,11 @@
   },
   "malformed": {
    "anims/over.gaf": {
-    "sha256": "cd3c6d40523f1cf7c94e3ef18c1002ae3e64e0175381ad9c753ff974523d208d",
-    "size": 346
+    "sha256": "12c24d8a1e53dd834c6da9631f274d8a940ee5ffc93fa05c79530ca9f4d694f8",
+    "size": 454
    },
    "anims/trunc.gaf": {
-    "sha256": "d08eecc6a09707323a52144f2aa2d065e040ad5fd75be6ef87d6b6608af96f67",
+    "sha256": "7ed9e18dc24ac3603eb27f14aa710a741f215c5456dc9d24917909561b20a0ea",
     "size": 40
    },
    "badmagic.hpi": {
@@ -191,7 +203,7 @@
     "size": 80
    },
    "objects3d/over.3do": {
-    "sha256": "20a7cb618e4c0614ef2c4e71a66797347bb982dbe4c11bee867ed4d26aa627c7",
+    "sha256": "0755376870c8a34f6160f82d1b103785dd9ffc192c56b2ffe436d94a99d1ec10",
     "size": 738
    },
    "objects3d/trunc.3do": {

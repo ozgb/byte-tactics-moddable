@@ -6,16 +6,18 @@
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["gaf", [{"name": "Idle", "loop": 1, "frames": [{"width": 6, "height": 4, "x": 3, "y": 2, "transparent": 9, "compressed": 1, "blend": 0, "duration": 2, "pixels": [[null, null, 5, 5, 5, 7], [null, null, null, null, null, null], [11, 23, 3, 47, 5, 60], [null, 34, 34, 34, 34, 34]]}, {"width": 4, "height": 3, "x": -1, "y": -2, "transparent": 0, "compressed": 0, "blend": 0, "duration": 4, "pixels": [[0, 1, 2, 3], [9, 9, 0, 0], [255, 128, 7, 0]]}]}, {"name": "Empty", "loop": 0, "frames": []}, {"name": "Layered", "loop": 0, "frames": [{"width": 5, "height": 5, "x": 2, "y": 2, "transparent": 0, "compressed": 0, "blend": 0, "duration": 1, "frames": [{"width": 2, "height": 2, "x": 1, "y": 1, "transparent": 3, "compressed": 0, "blend": 0, "pixels": [[3, 4], [4, 3]]}, {"width": 3, "height": 2, "x": 0, "y": 0, "transparent": 0, "compressed": 1, "blend": 1, "pixels": [[null, 8, null], [6, 6, null]]}]}]}]]
+   ["gaf", [{"name": "Idle", "loop": 1, "frames": [{"width": 6, "height": 4, "x": 3, "y": 2, "transparent": 9, "compressed": 1, "blend": 0, "duration": 2, "pixels": [[null, null, 5, 5, 5, 7], [null, null, null, null, null, null], [11, 23, 3, 47, 5, 60], [null, 34, 34, 34, 34, 34]]}, {"width": 4, "height": 3, "x": -1, "y": -2, "transparent": 0, "compressed": 0, "blend": 0, "duration": 4, "pixels": [[0, 1, 2, 3], [9, 9, 0, 0], [255, 128, 7, 0]]}]}, {"name": "Empty", "loop": 0, "frames": []}, {"name": "Layered", "loop": 0, "frames": [{"width": 5, "height": 5, "x": 2, "y": 2, "transparent": 0, "compressed": 1, "blend": 0, "duration": 1, "frames": [{"width": 2, "height": 2, "x": 1, "y": 1, "transparent": 3, "compressed": 0, "blend": 0, "pixels": [[3, 4], [4, 3]]}, {"width": 3, "height": 2, "x": 0, "y": 0, "transparent": 0, "compressed": 1, "blend": 1, "pixels": [[null, 8, null], [6, 6, null]]}]}]}, {"name": "Cuts", "loop": 1, "frames": [{"width": 4, "height": 5, "x": 0, "y": 0, "transparent": 7, "compressed": 2, "blend": 0, "duration": 3, "pixels": [[null, 7, 7, 7], [21, 7, 33, 44], [5, 5, 5, 5], [9, 8, null, null], [10, 11, 12, 13]]}]}]]
   ]},
  {"name": "count", "fixture": "base",
   "calls": [
    ["mount"],
-   ["gaf", "anims\\count.gaf"]
+   ["gaf", "anims\\count.gaf"],
+   ["gaf", "anims\\negative.gaf"]
   ],
   "results": [
    ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
-   ["gaf", [{"name": "Only", "loop": 0, "frames": [{"width": 1, "height": 1, "x": 0, "y": 0, "transparent": 0, "compressed": 0, "blend": 0, "duration": 1, "pixels": [[42]]}]}]]
+   ["gaf", [{"name": "Only", "loop": 0, "frames": [{"width": 1, "height": 1, "x": 0, "y": 0, "transparent": 0, "compressed": 0, "blend": 0, "duration": 1, "pixels": [[42]]}]}]],
+   ["gaf", []]
   ]},
  {"name": "missing", "fixture": "base",
   "calls": [

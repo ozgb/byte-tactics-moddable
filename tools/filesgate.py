@@ -170,17 +170,17 @@ CASES: dict[str, list[tuple[str, str, list[list[str]]]]] = {
     ],
     "cob": [
         ("scripts", "base", M + [["cob", r"scripts\armfix.cob"], ["cob", r"SCRIPTS\ARMFIX.COB"]]),
-        ("none", "base", M + [["cob", r"scripts\none.cob"]]),
+        ("none", "base", M + [["cob", r"scripts\none.cob"], ["cob", r"scripts\negative.cob"]]),
         ("missing", "base", M + [["cob", r"scripts\nothing.cob"], ["cob", r"data\empty.bin"]]),
     ],
     "gaf": [
         ("anims", "base", M + [["gaf", r"anims\fixture.gaf"]]),
-        ("count", "base", M + [["gaf", r"anims\count.gaf"]]),
+        ("count", "base", M + [["gaf", r"anims\count.gaf"], ["gaf", r"anims\negative.gaf"]]),
         ("missing", "base", M + [["gaf", r"anims\nothing.gaf"], ["gaf", r"data\empty.bin"]]),
     ],
     "3do": [
         ("model", "base", M + [["3do", r"objects3d\fixture.3do"]]),
-        ("flat", "base", M + [["3do", r"objects3d\flat.3do"]]),
+        ("flat", "base", M + [["3do", r"objects3d\flat.3do"], ["3do", r"objects3d\negative.3do"]]),
         ("missing", "base", M + [["3do", r"objects3d\nothing.3do"], ["3do", r"data\empty.bin"]]),
     ],
 }

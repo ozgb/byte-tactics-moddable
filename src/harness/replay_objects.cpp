@@ -535,8 +535,16 @@ void EmitArray(ReplayText& out, ReplayKnown& known, const char* key, const char*
             ArrayLine(out, tag, key, head);
             out.AddChar('\n');
         }
+        bool sparse = strcmp(key, "region") == 0;
         for (unsigned start = 0; start < count; start += perLine) {
             unsigned n = count - start < perLine ? count - start : perLine;
+            if (sparse && strspn(hex + start * elem * 2, "0") >= n * elem * 2) {
+                if (start == 0) {
+                    ArrayLine(out, tag, key, head);
+                    out.AddChar('\n');
+                }
+                continue;
+            }
             ArrayLine(out, tag, key, start == 0 ? head : "");
             if (start == 0)
                 out.AddChar(' ');

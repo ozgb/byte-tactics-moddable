@@ -80,8 +80,10 @@ STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
 FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
-           "bool", "float", "double", "Point16", "Vec3", "RandStream"}
-VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16"}
+           "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType"}
+VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16", "EconMapInfo", "PlayersMapInfo", "LosRadarMapInfo", "PathMapInfo", "EconomySpend"}
+ELABORATED = {"EconomySpend"}
+WORLD_VIEWS = {"econworld": ("EconomyWorldView", "economy")}
 BARE_POINTER = re.compile(r"^\*(float|double|short|int|long|unsigned short|unsigned int|unsigned char|char)$")
 SLOT = re.compile(r"([\w:<>\*\s&,]+?)\s*\(\s*(__\w+)\s*\*\s*(\w+)\s*\)\s*\(([^;]*?)\)\s*;")
 TYPE_WORDS = {"unsigned", "char", "short", "int", "long", "float", "double", "bool"}
@@ -120,7 +122,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts", "economy", "players")
 
 
 def event_table(subsystem: str) -> dict:
@@ -177,6 +179,11 @@ def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | 
             if where != field["name"]:
                 field["member"] = where
             fields.append(field)
+    if not path:
+        seen = [f["name"] for f in fields]
+        for f in fields:
+            if seen.count(f["name"]) > 1 and "." in f.get("member", ""):
+                f["name"] = f["member"]
     return fields
 
 
@@ -240,6 +247,11 @@ def seam_members() -> list[tuple[str, str]]:
     return [(m.group(2), m.group(1)) for m in re.finditer(r"(\w+Seam)\* (\w+);", body)]
 
 
+def world_members() -> list[tuple[str, str]]:
+    """(name, struct name) of every world view a subsystem is given at Init: not a member of `Seams`, and never recorded itself."""
+    return [(name, struct) for name, (struct, _) in WORLD_VIEWS.items()]
+
+
 def normalise(ctype: str) -> str:
     t = re.sub(r"\bconst\b", "", ctype)
     t = re.sub(r"\s*\*\s*", "*", t)
@@ -267,11 +279,12 @@ def split_params(text: str) -> list[str]:
 
 def parse_interface(subsystem: str, struct: str) -> dict:
     """The version and slots of interfaces/<subsystem>.h."""
-    path = INTERFACES / (subsystem + ".h")
+    header = WORLD_VIEWS[subsystem][1] if subsystem in WORLD_VIEWS else subsystem
+    path = INTERFACES / (header + ".h")
     text = path.read_text()
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
     text = re.sub(r"//[^\n]*", "", text)
-    prefix = subsystem.upper()
+    prefix = header.upper()
     major = int(re.search(r"#define %s_VERSION_MAJOR (\d+)" % prefix, text).group(1))
     minor = int(re.search(r"#define %s_VERSION_MINOR (\d+)" % prefix, text).group(1))
     body = re.search(r"struct %s \{(.*?)\n\};" % struct, text, re.S).group(1)
@@ -1114,7 +1127,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "region", "world", "effect", "pending"}
 STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 
@@ -1145,7 +1158,7 @@ def length_parts(a: dict, i: int) -> tuple[list[str], str]:
     last = len(steps) - 1
     lines.append("int len%d = l%d_%d != nullptr ? (int)l%d_%d->%s : 0;" % (i, i, last, i, last, steps[-1]))
     return lines, "len%d" % i if scale == 1 else "(len%d * %d)" % (i, scale)
-RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "pending"}
+RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "region", "pending"}
 
 
 CAST_MODES = {"object", "struct", "structs", "vec3"}
@@ -1164,7 +1177,12 @@ def is_value_ptr(a: dict) -> bool:
 
 def is_value_out(a: dict) -> bool:
     """A pointer to a value kind that the slot fills (`{"mode": "value", "dir": "out"}`): recorded as the `result` of the call, the line a by-value result writes (`= (x,y,z)` in an import, `o result (x,y,z)` in a slot). A slot has one, and no other result."""
-    return a["mode"] == "value" and a.get("dir") == "out"
+    return a["mode"] == "value" and a.get("dir") == "out" and not a.get("named")
+
+
+def is_named_out(a: dict) -> bool:
+    """A pointer to a value kind that an import fills and that is not its result (`{"mode": "value", "dir": "out", "named": true}`): the `o <line> (tuple)` line the in/out form writes after the import line."""
+    return a["mode"] == "value" and a.get("dir") == "out" and bool(a.get("named"))
 
 
 def pointee(a: dict) -> str:
@@ -1291,6 +1309,15 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
             if table is not None:
                 errors += check_event_extras(where, label, a, table, kinds)
+        elif a["mode"] == "effect":
+            table = ann.get("events", {}).get(a.get("events"))
+            size = a.get("size")
+            if table is None:
+                errors.append("%s: %s needs `events` that names a table of EVENTS" % (where, label))
+            elif arg_type(a) != table["header"] + "*":
+                errors.append("%s: %s is %s, and the effects of %s start with %s*" % (where, label, arg_type(a), a["events"], table["header"]))
+            if size not in names or size == a["name"] or args[names.index(size)]["type"] not in INTEGER_ARGS:
+                errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
         elif a["mode"] == "vector":
             check_vector_arg(where, a, label, kinds, errors)
         elif a["mode"] == "units-buffer":
@@ -1320,7 +1347,7 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
                 errors.append("%s: %s is a value with the direction %s, and only inout and out are allowed on a value" % (where, label, a["dir"]))
             if a.get("byPointer") and "dir" in a:
                 errors.append("%s: %s is a value by a const pointer, which takes no direction" % (where, label))
-            if a.get("dir") == "out" and result is not None:
+            if a.get("dir") == "out" and result is not None and not a.get("named"):
                 errors.append("%s: %s is a value out, which is the result of the slot, and the slot has a result" % (where, label))
             value_kind(a, label, bool(a.get("byPointer")) or a.get("dir") == "out")
         elif a["mode"] == "callback":
@@ -1455,6 +1482,32 @@ def unaccounted_indirect(target: str, sub: str, spec: dict, ann: dict, closure: 
     return "an indirect call"
 
 
+def check_region(sub: str, region: dict, names: list[str], iface: dict) -> list[str]:
+    """Errors for a subsystem's `region` annotation: `size`, `init` and `shutdown` name its slots, `world` a world view that Init takes."""
+    errors = []
+    if set(region) - {"size", "init", "shutdown", "world"} or not {"size", "init", "shutdown"} <= set(region):
+        return ["%s: `region` has the keys size, init and shutdown, and optionally world" % sub]
+    for key in ("size", "init", "shutdown"):
+        if region[key] not in names:
+            errors.append("%s: the region's %s is %s, which is no slot of interfaces/%s.h" % (sub, key, region[key], sub))
+    if "world" in region and region["world"] not in WORLD_VIEWS:
+        errors.append("%s: the region's world %s is no world view of WORLD_VIEWS" % (sub, region["world"]))
+    return errors
+
+
+def region_arg_notes(region: dict, s: dict, ann: dict) -> dict:
+    """The argument notes the `region` annotation implies: the `void*` of Init is the region, the world view pointer is the world."""
+    notes = {}
+    if s["name"] == region["init"]:
+        for p in s["params"]:
+            ctype = normalise(p["type"])
+            if ctype == "void*":
+                notes[p["name"]] = {"mode": "region"}
+            elif region.get("world") in WORLD_VIEWS and ctype == WORLD_VIEWS[region["world"]][0] + "*":
+                notes[p["name"]] = {"mode": "world", "seam": region["world"]}
+    return notes
+
+
 def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]]) -> dict:
     """The generated model: fields, objects, subsystems, and the errors."""
     game, sim = block_tables(ann)
@@ -1558,7 +1611,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
     kind_types = {spec["type"] for spec in ann["objects"].values()}
     exempt_types = ann.get("exempt_types", {})
-    seam_types = {struct for _, struct in seam_members()} | {"Seams"}
+    seam_types = {struct for _, struct in seam_members() + world_members()} | {"Seams"}
     errors += ["exempt_types: %s needs a reason" % t for t, why in exempt_types.items() if not why]
 
     def rule_for(kind: str, target: str, function: str) -> int | None:
@@ -1568,7 +1621,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         return found[0] if found else None
     subsystems = {}
     slot_list = []
-    members = seam_members()
+    members = seam_members() + world_members()
     unknown = sorted(set(ann["subsystems"]) - {m[0] for m in members})
     errors += ["annotations name the unknown subsystem %s" % s for s in unknown]
     imported_any = {imp for spec in ann["subsystems"].values() for imp in spec.get("imports", [])}
@@ -1581,6 +1634,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
         complete = spec["status"] == "complete"
         notes = spec.get("slots", {})
         names = [s["name"] for s in iface["slots"]]
+        region = spec.get("region")
+        if region is not None:
+            region_errors = check_region(sub, region, names, iface)
+            errors += region_errors
+            if any("size, init and shutdown" in e for e in region_errors):
+                region = None
         errors += ["%s: annotated slot %s is not in interfaces/%s.h" % (sub, n, sub) for n in notes if n not in names]
         slots = {}
         pending = {"untracked": set(), "rules": set(), "functions": [], "args": [], "types": set(), "indirect": set()}
@@ -1699,13 +1758,18 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 reads.update(RNG_FIELDS)
                 writes.update(RNG_FIELDS)
             order = list(field_index)
-            args = [classify_arg(p, note.get("args", {}).get(p["name"]), ann) for p in s["params"]]
+            region_notes = region_arg_notes(region, s, ann) if region is not None else {}
+            args = [classify_arg(p, region_notes.get(p["name"], note.get("args", {}).get(p["name"])), ann) for p in s["params"]]
+            if region is not None and not skipped and s["name"] != region["size"]:
+                reads.add("region") if s["name"] != region["init"] else None
+                if s["name"] != region["shutdown"]:
+                    writes.add("region")
             for a in args:
                 if a.get("when") and (a["mode"] != "struct" or a.get("dir") != "out" or a["when"] != "result != 0" or s["ret"] == "void"):
                     errors.append("%s.%s(%s): `when` is only `result != 0`, on an out struct of a slot that returns a value" % (sub, s["name"], a["name"]))
                 if a["mode"] == "units" or (a["mode"] == "units-buffer" and "playsAs" not in note):
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
-            result = classify_result(s["ret"], note.get("result"), ann)
+            result = classify_result(s["ret"], {"mode": "region"} if region is not None and s["name"] == region["shutdown"] else note.get("result"), ann)
             errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
             for a in args:
                 if a["mode"] == "pending":
@@ -1736,6 +1800,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             "interface": "interfaces/%s.h" % sub, "struct": struct, "version": iface["version"], "status": spec["status"],
             "imports": spec.get("imports", []), "slots": slots,
         }
+        if region is not None:
+            subsystems[sub]["region"] = region
+        if sub in {w[0] for w in world_members()}:
+            subsystems[sub]["world"] = True
         if spec.get("issue"):
             subsystems[sub]["issue"] = spec["issue"]
         if unrecorded:
@@ -1841,6 +1909,8 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
         fields.append({"name": "SimGlobals." + name, "base": "sim", "offset": name, "size": size, "kind": kind})
     for i, name in enumerate(RNG_FIELDS):
         fields.append({"name": name, "base": "rng", "offset": i, "size": 4, "kind": "u32"})
+    arrays.append({"elem": 1, "ref": True, "raw": False, "strings": 0, "length": parse_length("size", "region", errors), "owner": "ReplayRegionView", "member": "data"})
+    fields.append({"name": "region", "base": "region", "offset": 4, "size": 4, "kind": "array", "array": len(arrays)})
     return fields
 
 
@@ -1913,7 +1983,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     L += ["    ROK_%s," % upper(o["name"]) for o in objects]
     L += ["    ROK_COUNT", "};", "", "static const ReplayField kReplayFields[] = {"]
     for f in fields:
-        base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG"}[f["base"]]
+        base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG", "region": "RB_REGION"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
         extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] == "ref" else ""
         if f["kind"] == "vector":
@@ -2209,6 +2279,10 @@ def render_hooks(ann: dict, model: dict) -> str:
     for sub, spec in subsystems.items():
         L.append("const %s* s_inner_%s;" % (spec["struct"], sub))
         L.append("%s s_rec_%s;" % (spec["struct"], sub))
+    L += ["bool s_hooked[SUB_COUNT];", ""]
+    for sub, spec in subsystems.items():
+        if spec.get("world"):
+            L.append("const %s* WrapWorld_%s(const %s* inner);" % (spec["struct"], sub, spec["struct"]))
     L.append("")
     for sub, slot, s in slot_table(subsystems):
         L += wrapper(sub, subsystems[sub], slot, s, objects, sub + "." + slot in imported, slot in subsystems[sub].get("unrecorded", {}),
@@ -2234,22 +2308,50 @@ def render_hooks(ann: dict, model: dict) -> str:
     L.append("void HookSeams(const bool* on)")
     L.append("{")
     L.append("    bool any = false;")
-    L.append("    for (unsigned i = 0; i < SUB_COUNT; i++)")
+    L.append("    for (unsigned i = 0; i < SUB_COUNT; i++) {")
     L.append("        any = any || on[i];")
+    L.append("        s_hooked[i] = on[i];")
+    L.append("    }")
     for sub, spec in subsystems.items():
+        if spec.get("world"):
+            continue
         L.append("    s_inner_%s = g_seams.%s;" % (sub, sub))
         L.append("    s_rec_%s = *s_inner_%s;" % (sub, sub))
     for sub, slot, s in slot_table(subsystems):
         spec = subsystems[sub]
+        if spec.get("world"):
+            continue
         unrecorded = slot in spec.get("unrecorded", {})
         owners = ([] if unrecorded else ["on[SUB_%s]" % upper(sub)]) + ["on[SUB_%s]" % upper(o) for o in imported.get(sub + "." + slot, [])]
         if not unrecorded and nestable(slot, s):
             owners.append("any")
         L.append("    if (%s)" % " || ".join(owners))
         L.append("        s_rec_%s.%s = Rec%s%s;" % (sub, slot, camel(sub), slot))
-    for sub in subsystems:
-        L.append("    g_seams.%s = &s_rec_%s;" % (sub, sub))
+    for sub, spec in subsystems.items():
+        if not spec.get("world"):
+            L.append("    g_seams.%s = &s_rec_%s;" % (sub, sub))
     L += ["}", ""]
+    for sub, spec in subsystems.items():
+        if not spec.get("world"):
+            continue
+        L.append("const %s* WrapWorld_%s(const %s* inner)" % (spec["struct"], sub, spec["struct"]))
+        L.append("{")
+        owners = sorted({o for slot in spec.get("unrecorded", {}) for o in imported.get(sub + "." + slot, [])})
+        L.append("    if (inner == nullptr || !(%s))" % " || ".join("s_hooked[SUB_%s]" % upper(o) for o in owners))
+        L.append("        return inner;")
+        L.append("    s_inner_%s = inner;" % sub)
+        L.append("    s_rec_%s = *inner;" % sub)
+        for slot in imported_unrecorded(spec):
+            L.append("    s_rec_%s.%s = Rec%s%s;" % (sub, slot, camel(sub), slot))
+        L.append("    return &s_rec_%s;" % sub)
+        L += ["}", ""]
+    always = [(sub, spec["region"]) for sub, spec in subsystems.items() if spec.get("region")]
+    L.append("bool RecordsAlways(unsigned slot)")
+    L.append("{")
+    for sub, region in always:
+        L.append("    if (slot == RSL_%s_%s || slot == RSL_%s_%s)" % (upper(sub), upper(region["size"]), upper(sub), upper(region["init"])))
+        L.append("        return true;")
+    L += ["    return false;", "}", ""]
     return "\n".join(L)
 
 
@@ -2308,7 +2410,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     L.append("    ReplayRoots roots;")
     for i, a in enumerate(s["args"]):
         if a["mode"] == "object":
-            L.append("    roots.Add(ROK_%s, a%d);" % (upper(a["kind"]), i))
+            L.append("    roots.Add(ROK_%s, %s);" % (upper(a["kind"]), ("ReplayRefPtr(a%d)" if a.get("ref") else "a%d") % i))
         elif a["mode"] == "weapon":
             L.append("    roots.Add(ROK_WEAPONDEF, a%d);" % i)
         elif a["mode"] == "struct" and a.get("dir") != "out":
@@ -2316,6 +2418,11 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         elif a["mode"] == "event":
             L.append("    EventRoots(roots, RET_%s, a%d, a%d);" % (upper(a["events"]), i, a["sizeIndex"]))
     L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
+    for i, a in enumerate(s["args"]):
+        if a["mode"] == "region":
+            L.append("    RegionBind(SUB_%s, a%d, a%d);" % (upper(sub), i, i + 1))
+        elif a["mode"] == "world":
+            L.append("    a%d = WrapWorld_%s(a%d);" % (i, a["seam"], i))
     callback_args = [i for i, a in enumerate(s["args"]) if a["mode"] == "callback"]
     held_args = [] if is_import else callback_args
     for i in held_args:
@@ -2384,6 +2491,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
             elif is_scalar_inout(a):
                 L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
+            elif is_named_out(a):
+                L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
         L.append("        FinishImport(line);")
         L.append("    }")
     if nest:
@@ -2399,7 +2508,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
-    if res is not None and res["mode"] in ("scalar", "object", "value"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -2443,6 +2552,8 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportHandle(line, %s, %s);" % (handle_id(a["kind"]), var)]
     elif mode == "object":
+        if a.get("ref"):
+            var = "ReplayRefPtr(%s)" % var
         if phase == "a":
             return ['ArgObject(s_call, "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
         if phase == "i":
@@ -2471,6 +2582,13 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportInOutScalar(line, %s);" % var]
         return ['ArgInOutScalarExit(s_tail, "%s", %s);' % (line, var)]
+    elif mode in ("region", "world"):
+        return []
+    elif mode == "effect":
+        if phase == "i":
+            return ["ImportEffect(line, RET_%s, %s, a%d);" % (upper(a["events"]), var, a["sizeIndex"])]
+    elif mode == "value" and is_named_out(a):
+        return []
     elif mode == "value" and is_value_out(a):
         if phase == "o":
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, %s);' % (upper(a["kind"]), var)]
@@ -2531,9 +2649,11 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         if mode == "scalar":
             return ['ArgValue(s_tail, "result", result, "o");']
         if mode == "object":
-            return ['ArgObject(s_tail, "result", ROK_%s, result, "o");' % upper(res["kind"])]
+            return ['ArgObject(s_tail, "result", ROK_%s, %s, "o");' % (upper(res["kind"]), "ReplayRefPtr(result)" if res.get("ref") else "result")]
         if mode == "value":
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
+        if mode == "region":
+            return ["ArgRegionResult(s_tail, result);"]
         return []
     lines = []
     if mode == "scalar":
@@ -2544,7 +2664,7 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         reach = ", ".join('"%s"' % f for f in res["reach"])
         lines.append("ImportResultObjectReach(line, ROK_%s, result, %d, %s);" % (upper(res["kind"]), len(res["reach"]), reach))
     elif mode == "object":
-        lines.append("ImportResultObject(line, ROK_%s, result);" % upper(res["kind"]))
+        lines.append("ImportResultObject(line, ROK_%s, %s);" % (upper(res["kind"]), "ReplayRefPtr(result)" if res.get("ref") else "result"))
     elif mode == "value":
         lines.append("ImportResultValue(line, ROK_%s, &result);" % upper(res["kind"]))
     elif mode == "weapon":
@@ -2558,7 +2678,7 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
 def render_slots(ann: dict, model: dict) -> str:
     subsystems = model["subsystems"]
     L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers", ""]
-    ready = {sub: spec for sub, spec in subsystems.items() if spec["status"] == "complete"}
+    ready = {sub: spec for sub, spec in subsystems.items() if spec["status"] == "complete" and not spec.get("world")}
     imports = {}
     for sub, spec in ready.items():
         for imp in spec["imports"]:
@@ -2575,6 +2695,8 @@ def render_slots(ann: dict, model: dict) -> str:
             if s.get("playsAs") in slots:
                 replays.setdefault(seam, []).append(slot)
                 L += list_stub(seam, slot, s)
+    for seam in imports:
+        L.append("%s g_import_%s;" % (subsystems[seam]["struct"], seam))
     for sub, spec in ready.items():
         L.append("%s g_native_%s = {" % (spec["struct"], sub))
         for slot in (x["name"] for x in parse_interface(sub, spec["struct"])["slots"]):
@@ -2598,18 +2720,17 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
-    for seam in imports:
-        L.append("%s g_import_%s;" % (subsystems[seam]["struct"], seam))
     L += ["", "void BindSeams()", "{"]
     for sub in ready:
         L.append("    g_seams.%s = &g_native_%s;" % (sub, sub))
     for seam, slots in imports.items():
         if seam not in ready:
-            L.append("    g_seams.%s = &g_import_%s;" % (seam, seam))
+            if not subsystems[seam].get("world"):
+                L.append("    g_seams.%s = &g_import_%s;" % (seam, seam))
             for slot in slots + replays.get(seam, []):
                 L.append("    g_import_%s.%s = Imp_%s_%s;" % (seam, slot, seam, slot))
     for sub, spec in ready.items():
@@ -2710,6 +2831,10 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             pass
         elif m == "units" or m == "vector":
             pass
+        elif m == "effect":
+            L.append("    Space(t);\n    ReplayAddEffect(t, RET_%s, %s, a%d, g_objects);" % (upper(a["events"]), v, names.index(a["size"])))
+        elif is_named_out(a):
+            pass
         elif m == "struct" and a.get("dir") == "inout":
             L.append("    Space(t);\n    AddInOut(t, ROK_%s, %s);" % (upper(a["kind"]), v))
         elif is_scalar_inout(a):
@@ -2719,7 +2844,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         elif m == "callback":
             L.append("    Space(t);\n    AddObject(t, OBJ_CALLBACK + RCB_%s, %s);" % (upper(a["callback"]), v))
         elif m == "object":
-            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), v))
+            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), "ReplayRefPtr(%s)" % v if a.get("ref") else v))
         elif m == "bytes-in":
             L.append("    Space(t);\n    AddBytes(t, %s, %s);" % (v, length_parts(a, i)[1]))
         elif is_value_out(a):
@@ -2737,6 +2862,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
         elif (a["mode"] == "vec3" and a.get("dir") == "out") or is_vec3_out(a):
             L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
+        elif is_named_out(a):
+            L.append('    ApplyInOut(%s, "%s", ROK_%s);' % (arg_var(a, i), a["line"], upper(a["kind"])))
         elif is_value_out(a):
             L.append("    *%s = ParseValueText<%s>(ROK_%s, r);" % (arg_var(a, i), pointee(a), upper(a["kind"])))
         elif a["mode"] == "units":
@@ -2754,6 +2881,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         L.append("    return ParseResult<%s>(r);" % s["ret"])
     elif res["mode"] == "value":
         L.append("    return ParseValueText<%s>(ROK_%s, r);" % (s["ret"], upper(res["kind"])))
+    elif res["mode"] == "object" and res.get("ref"):
+        L.append("    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));")
     elif res["mode"] == "object":
         L.append("    %s o = (%s)ReplayResolveObject(r, nullptr, g_objects, AllocObject);" % (s["ret"], s["ret"]))
         for f in res.get("reach", []):
@@ -2797,6 +2926,9 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             call.append("%s_text" % v)
         elif m == "handle":
             L.append("    %s* %s = (%s*)ArgHandle(\"%s\");" % (handle_type(a["kind"]), v, handle_type(a["kind"]), line))
+            call.append(v)
+        elif m == "object" and a.get("ref"):
+            L.append("    %s %s = ReplayRefOffset(ArgObject(\"%s\", ROK_%s));" % (t, v, line, upper(a["kind"])))
             call.append(v)
         elif m == "object":
             L.append("    %s* %s = (%s*)ArgObject(\"%s\", ROK_%s);" % (arg_type(a)[:-1], v, arg_type(a)[:-1], line, upper(a["kind"])))
@@ -2853,7 +2985,10 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             after.append('    CompareValueResult(ROK_%s, &%s);' % (upper(a["kind"]), g))
             call.append("&" + g)
         elif is_value_ptr(a):
-            L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (pointee(a), v, pointee(a), line, upper(a["kind"]), v))
+            if pointee(a) in ELABORATED:
+                L.append("    struct %s %s;\n    memset(&%s, 0, sizeof %s);\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (pointee(a), v, v, v, line, upper(a["kind"]), v))
+            else:
+                L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (pointee(a), v, pointee(a), line, upper(a["kind"]), v))
             call.append("&" + v)
         elif m == "value":
             L.append("    %s %s = %s();\n    ParseValueArg(\"%s\", ROK_%s, &%s);" % (t, v, t, line, upper(a["kind"]), v))
@@ -2867,11 +3002,19 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         elif m == "callback":
             L.append('    %s %s = (%s)ArgCallback("%s", RCB_%s);' % (t, v, t, line, upper(a["callback"])))
             call.append(v)
+        elif m == "region":
+            size_line = s["args"][i + 1]["line"]
+            L.append('    void* %s = AllocRegion(ArgScalar<unsigned>("%s"));' % (v, size_line))
+            L.append('    RegionBind(%s, ArgScalar<unsigned>("%s"));' % (v, size_line))
+            call.append(v)
+        elif m == "world":
+            L.append("    %s %s = &g_import_%s;" % (t, v, a["seam"]))
+            call.append(v)
         else:
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object", "value"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
@@ -2882,11 +3025,13 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         head.append("%s %s;" % (s["ret"], g))
         L.append("    %s = %s;" % (g, expr))
         if res["mode"] == "object":
-            after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), g))
+            after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), "ReplayRefPtr(%s)" % g if res.get("ref") else g))
         elif res["mode"] == "scalar":
             after.append("    CompareResult(%s);" % g)
         elif res["mode"] == "value":
             after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
+        elif res["mode"] == "region":
+            after.append("    CompareRegionResult(%s);" % g)
     L += ["}", ""]
     out = head + [""] if head else []
     out += L

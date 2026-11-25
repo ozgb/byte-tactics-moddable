@@ -80,6 +80,251 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
+unsigned int __stdcall Imp_econworld_Tick()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Tick");
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
+int __stdcall Imp_econworld_Difficulty()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Difficulty");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_econworld_SharingEnabled()
+{
+    ReplayText t;
+    StartImport(t, "econworld.SharingEnabled");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+float __stdcall Imp_econworld_Wind()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Wind");
+    const char* r = Enter(t);
+    return ParseResult<float>(r);
+}
+
+float __stdcall Imp_econworld_Tide()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Tide");
+    const char* r = Enter(t);
+    return ParseResult<float>(r);
+}
+
+void __stdcall Imp_econworld_PlayerInfo(int a0, EconPlayerInfo* a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.PlayerInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    *a1 = ParseValueText<EconPlayerInfo>(ROK_ECONPLAYERINFO, r);
+    (void)r;
+}
+
+int __stdcall Imp_econworld_Allied(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.Allied");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+EconUnit __stdcall Imp_econworld_FirstUnit(int a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.FirstUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
+EconUnit __stdcall Imp_econworld_LastUnit(int a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.LastUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
+EconUnit __stdcall Imp_econworld_NextUnit(EconUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.NextUnit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
+int __stdcall Imp_econworld_UnitSlot(EconUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.UnitSlot");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_econworld_UnitInfo(EconUnit a0, EconUnitInfo* a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.UnitInfo");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    const char* r = Enter(t);
+    ApplyInOut(a1, "uinfo", ROK_ECONUNITINFO);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_econworld_TypeInfo(EconType a0, EconTypeInfo* a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.TypeInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    *a1 = ParseValueText<EconTypeInfo>(ROK_ECONTYPEINFO, r);
+    (void)r;
+}
+
+int __stdcall Imp_econworld_CellMetal(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.CellMetal");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_econworld_Emit(const EconomyEventHeader* a0, unsigned int a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.Emit");
+    Space(t);
+    ReplayAddEffect(t, RET_ECONOMY, a0, a1, g_objects);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareMapInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendProjectileDetonated");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, false);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
+{
+    ReplayText t;
+    StartImport(t, "network.SendScriptCallByName");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    t.AddString((const char*)a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    Space(t);
+    ReplayValue(t, a6);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
+{
+    ReplayText t;
+    StartImport(t, "network.SendUnitDamage");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, Vec3* a3, Vec3* a4)
+{
+    ReplayText t;
+    StartImport(t, "network.SendWeaponFire");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    t.Add("?");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendWeaponFireAt");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    t.Add("?");
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
@@ -178,90 +423,6 @@ int __stdcall Imp_map_GetGroundHeight(Vec3* a0)
     return ParseResult<int>(r);
 }
 
-void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
-{
-    ReplayText t;
-    StartImport(t, "network.SendProjectileDetonated");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, false);
-    const char* r = Enter(t);
-    (void)r;
-}
-
-int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2, int a3, int a4, int a5, int a6)
-{
-    ReplayText t;
-    StartImport(t, "network.SendScriptCallByName");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    t.AddString((const char*)a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    Space(t);
-    ReplayValue(t, a4);
-    Space(t);
-    ReplayValue(t, a5);
-    Space(t);
-    ReplayValue(t, a6);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
-void __stdcall Imp_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, unsigned short a4)
-{
-    ReplayText t;
-    StartImport(t, "network.SendUnitDamage");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    Space(t);
-    ReplayValue(t, a4);
-    const char* r = Enter(t);
-    (void)r;
-}
-
-void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2, Vec3* a3, Vec3* a4)
-{
-    ReplayText t;
-    StartImport(t, "network.SendWeaponFire");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
-    Space(t);
-    t.Add("?");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
-    Space(t);
-    t.Add("?");
-    Space(t);
-    t.Add("?");
-    const char* r = Enter(t);
-    (void)r;
-}
-
-void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2)
-{
-    ReplayText t;
-    StartImport(t, "network.SendWeaponFireAt");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    t.Add("?");
-    Space(t);
-    t.Add("?");
-    const char* r = Enter(t);
-    (void)r;
-}
-
 void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
 {
     ReplayText t;
@@ -356,6 +517,15 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsi
     (void)r;
 }
 
+WeaponsSeam g_import_weapons;
+FilesSeam g_import_files;
+EconomyWorldView g_import_econworld;
+NetworkSeam g_import_network;
+FeaturesSeam g_import_features;
+LosRadarSeam g_import_los_radar;
+MapSeam g_import_map;
+ScriptsSeam g_import_scripts;
+PathfindingSeam g_import_pathfinding;
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWindSlot,
     UpdateMeteors,
@@ -365,6 +535,21 @@ WindMeteorsSeam g_native_wind_meteors = {
     LoadMeteorDefaults,
     SaveMeteors,
     LoadMeteors,
+};
+
+EconomySeam g_native_economy = {
+    EconomyRegionSize,
+    EconomyInit,
+    EconomyShutdown,
+    EconomyApply,
+    EconomySpend,
+    EconomyUpdatePlayer,
+    EconomyUpdateMetalExtraction,
+    EconomyUpdateResourceSharing,
+    EconomyRequestGranted,
+    EconomyGetEnergyUse,
+    EconomyUnitAccount,
+    EconomyWriteState,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -486,6 +671,144 @@ void Run_wind_meteors_LoadMeteors()
     HapiBank* p0 = (HapiBank*)ArgHandle("bank");
     SetClosing(nullptr);
     g_seams.wind_meteors->LoadMeteors(p0);
+}
+
+unsigned int g_result_economy_RegionSize;
+
+void Run_economy_RegionSize()
+{
+    EconMapInfo p0 = EconMapInfo();
+    ParseValueArg("map", ROK_ECONMAPINFO, &p0);
+    SetClosing("result");
+    g_result_economy_RegionSize = g_seams.economy->RegionSize(&p0);
+}
+
+void After_economy_RegionSize()
+{
+    CompareResult(g_result_economy_RegionSize);
+}
+
+void Run_economy_Init()
+{
+    EconMapInfo p0 = EconMapInfo();
+    ParseValueArg("map", ROK_ECONMAPINFO, &p0);
+    EconomyWorldView* p1 = &g_import_econworld;
+    void* p2 = AllocRegion(ArgScalar<unsigned>("size"));
+    RegionBind(p2, ArgScalar<unsigned>("size"));
+    unsigned int p3 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.economy->Init(&p0, p1, p2, p3);
+}
+
+void* g_result_economy_Shutdown;
+
+void Run_economy_Shutdown()
+{
+    SetClosing("result");
+    g_result_economy_Shutdown = g_seams.economy->Shutdown();
+}
+
+void After_economy_Shutdown()
+{
+    CompareRegionResult(g_result_economy_Shutdown);
+}
+
+int g_result_economy_Apply;
+
+void Run_economy_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_ECONOMY, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_economy_Apply = g_seams.economy->Apply((EconomyEventHeader*)p0, p1);
+}
+
+void After_economy_Apply()
+{
+    CompareResult(g_result_economy_Apply);
+}
+
+int g_result_economy_Spend;
+
+void Run_economy_Spend()
+{
+    struct EconomySpend p0;
+    memset(&p0, 0, sizeof p0);
+    ParseValueArg("spend", ROK_ECONOMYSPEND, &p0);
+    SetClosing("result");
+    g_result_economy_Spend = g_seams.economy->Spend(&p0);
+}
+
+void After_economy_Spend()
+{
+    CompareResult(g_result_economy_Spend);
+}
+
+void Run_economy_UpdatePlayerEconomy()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.economy->UpdatePlayerEconomy(p0);
+}
+
+void Run_economy_UpdateMetalExtraction()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    SetClosing(nullptr);
+    g_seams.economy->UpdateMetalExtraction(p0);
+}
+
+void Run_economy_UpdateResourceSharing()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.economy->UpdateResourceSharing(p0);
+}
+
+int g_result_economy_RequestGranted;
+
+void Run_economy_RequestGranted()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    unsigned int p1 = ArgScalar<unsigned int>("resources");
+    SetClosing("result");
+    g_result_economy_RequestGranted = g_seams.economy->RequestGranted(p0, p1);
+}
+
+void After_economy_RequestGranted()
+{
+    CompareResult(g_result_economy_RequestGranted);
+}
+
+double g_result_economy_GetEnergyUse;
+
+void Run_economy_GetEnergyUse()
+{
+    EconType p0 = ArgScalar<EconType>("type");
+    SetClosing("result");
+    g_result_economy_GetEnergyUse = g_seams.economy->GetEnergyUse(p0);
+}
+
+void After_economy_GetEnergyUse()
+{
+    CompareResult(g_result_economy_GetEnergyUse);
+}
+
+EconAccount g_out_economy_UnitAccount_1;
+
+void Run_economy_UnitAccount()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    memset(&g_out_economy_UnitAccount_1, 0, sizeof g_out_economy_UnitAccount_1);
+    SetClosing("out.");
+    g_seams.economy->UnitAccount(p0, &g_out_economy_UnitAccount_1);
+}
+
+void After_economy_UnitAccount()
+{
+    CompareStruct("out", ROK_ECONACCOUNT, &g_out_economy_UnitAccount_1);
 }
 
 int g_result_weapons_Apply;
@@ -907,6 +1230,50 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_LoadMeteors();
         return true;
     }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_economy_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Init") == 0) {
+        Run_economy_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_economy_Shutdown();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_economy_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Spend") == 0) {
+        Run_economy_Spend();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdatePlayerEconomy") == 0) {
+        Run_economy_UpdatePlayerEconomy();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateMetalExtraction") == 0) {
+        Run_economy_UpdateMetalExtraction();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateResourceSharing") == 0) {
+        Run_economy_UpdateResourceSharing();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestGranted") == 0) {
+        Run_economy_RequestGranted();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0) {
+        Run_economy_GetEnergyUse();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UnitAccount") == 0) {
+        Run_economy_UnitAccount();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
         return true;
@@ -1010,6 +1377,20 @@ void RunAfter(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0)
         After_wind_meteors_LoadMeteorDefaults();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_economy_RegionSize();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_economy_Shutdown();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Apply") == 0)
+        After_economy_Apply();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Spend") == 0)
+        After_economy_Spend();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestGranted") == 0)
+        After_economy_RequestGranted();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0)
+        After_economy_GetEnergyUse();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UnitAccount") == 0)
+        After_economy_UnitAccount();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
@@ -1056,18 +1437,11 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_PassMapInBounds();
 }
 
-WeaponsSeam g_import_weapons;
-FilesSeam g_import_files;
-FeaturesSeam g_import_features;
-LosRadarSeam g_import_los_radar;
-MapSeam g_import_map;
-NetworkSeam g_import_network;
-ScriptsSeam g_import_scripts;
-PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
 {
     g_seams.wind_meteors = &g_native_wind_meteors;
+    g_seams.economy = &g_native_economy;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.map = &g_native_map;
@@ -1075,6 +1449,28 @@ void BindSeams()
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
+    g_import_econworld.Tick = Imp_econworld_Tick;
+    g_import_econworld.Difficulty = Imp_econworld_Difficulty;
+    g_import_econworld.SharingEnabled = Imp_econworld_SharingEnabled;
+    g_import_econworld.Wind = Imp_econworld_Wind;
+    g_import_econworld.Tide = Imp_econworld_Tide;
+    g_import_econworld.PlayerInfo = Imp_econworld_PlayerInfo;
+    g_import_econworld.Allied = Imp_econworld_Allied;
+    g_import_econworld.FirstUnit = Imp_econworld_FirstUnit;
+    g_import_econworld.LastUnit = Imp_econworld_LastUnit;
+    g_import_econworld.NextUnit = Imp_econworld_NextUnit;
+    g_import_econworld.UnitSlot = Imp_econworld_UnitSlot;
+    g_import_econworld.UnitInfo = Imp_econworld_UnitInfo;
+    g_import_econworld.TypeInfo = Imp_econworld_TypeInfo;
+    g_import_econworld.CellMetal = Imp_econworld_CellMetal;
+    g_import_econworld.Emit = Imp_econworld_Emit;
+    g_seams.network = &g_import_network;
+    g_import_network.SendShareMapInfo = Imp_network_SendShareMapInfo;
+    g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
+    g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
+    g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
+    g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
+    g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
     g_seams.features = &g_import_features;
     g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
     g_seams.los_radar = &g_import_los_radar;
@@ -1083,12 +1479,6 @@ void BindSeams()
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
-    g_seams.network = &g_import_network;
-    g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
-    g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
-    g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
-    g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
-    g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
     g_seams.scripts = &g_import_scripts;
     g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
     g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;

@@ -73,7 +73,7 @@ enum SchedModule {
 void __stdcall SchedPublish(int outbox, const void* event, unsigned int size);
 void __stdcall EmitFrom(int outbox, const void* effect, unsigned int size);
 struct EconomySpend;
-int __stdcall ScheduleEconomySpend(const EconomySpend* spend);
+int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend);
 int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources);
 void __stdcall ScheduleMetalExtraction(unsigned int unit);
 void __stdcall ScheduleUnitsDeliver();

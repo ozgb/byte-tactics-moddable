@@ -116,8 +116,35 @@ unsigned RandomSeed()
 
 #pragma pop_macro("g_randomSeed")
 
+struct RegionState {
+    void* ptr;
+    unsigned size;
+};
+
+RegionState s_regions[SUB_COUNT];
+ReplayRegionView s_regionView;
+
+void RegionBind(unsigned sub, void* ptr, unsigned size)
+{
+    s_regions[sub].ptr = ptr;
+    s_regions[sub].size = size;
+    SimBlockTrack(&s_regions[sub].ptr);
+}
+
+const unsigned char* RegionViewOf()
+{
+    const RegionState& r = s_regions[s_sub];
+    s_regionView.size = r.size;
+    s_regionView.data = r.ptr == nullptr ? 0u : (unsigned)((const unsigned char*)r.ptr - (const unsigned char*)SimBlockBase());
+    return (const unsigned char*)&s_regionView;
+}
+
+bool RecordsAlways(unsigned slot);
+
 const unsigned char* BlockBase(const ReplayField& f)
 {
+    if (f.base == RB_REGION)
+        return RegionViewOf();
     if (f.base == RB_GAME)
         return (const unsigned char*)g_game;
     return f.base == RB_SIM ? (const unsigned char*)g_simGlobals : nullptr;
@@ -168,7 +195,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     s_slot = slot;
     s_sub = sub;
     s_tick = g_game == nullptr ? -1 : g_game->ticks;
-    s_recording = !r.windowed || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
+    s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
     ReplayHandles().Reset();
@@ -514,6 +541,17 @@ void ImportInOut(ReplayText& t, unsigned kind, const void* p)
     ReplayAddInOut(t, kind, p, Table());
 }
 
+void ImportEffect(ReplayText& t, unsigned table, const void* p, unsigned size)
+{
+    t.AddChar(' ');
+    ReplayAddEffect(t, table, p, size, Table());
+}
+
+void ArgRegionResult(ReplayText& t, const void* result)
+{
+    t.Add(result != nullptr && result == s_regions[s_sub].ptr ? "  o result region\n" : "  o result null\n");
+}
+
 void ImportOutInOut(ReplayText& t, const char* name, unsigned kind, const void* p)
 {
     if (p == nullptr)
@@ -816,7 +854,7 @@ int ReplayConfigure(const char* value, char* error, int size)
     unsigned sub = 0;
     while (sub < kReplaySubsystemCount && strcmp(kReplaySubsystems[sub].name, subsystem) != 0)
         sub++;
-    if (sub == kReplaySubsystemCount) {
+    if (sub == kReplaySubsystemCount || kReplaySubsystems[sub].slotCount == 0) {
         _snprintf(error, size, ": %s is not a simulation subsystem", subsystem);
         return 0;
     }

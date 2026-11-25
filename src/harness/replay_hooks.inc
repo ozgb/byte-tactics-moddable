@@ -36,6 +36,11 @@ const FilesSeam* s_inner_files;
 FilesSeam s_rec_files;
 const NetworkSeam* s_inner_network;
 NetworkSeam s_rec_network;
+const EconomyWorldView* s_inner_econworld;
+EconomyWorldView s_rec_econworld;
+bool s_hooked[SUB_COUNT];
+
+const EconomyWorldView* WrapWorld_econworld(const EconomyWorldView* inner);
 
 void __cdecl RecWindMeteorsUpdateWind(RandStream a0)
 {
@@ -137,7 +142,7 @@ unsigned int __stdcall RecEconomyRegionSize(const EconMapInfo* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_REGIONSIZE, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
+        ArgValueStruct(s_call, "a", "map", ROK_ECONMAPINFO, a0);
     }
     unsigned int result = s_inner_economy->RegionSize(a0);
     if (scope.Open()) {
@@ -150,10 +155,10 @@ void __stdcall RecEconomyInit(const EconMapInfo* a0, const EconomyWorldView* a1,
 {
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_INIT, SUB_ECONOMY, roots);
+    a1 = WrapWorld_econworld(a1);
+    RegionBind(SUB_ECONOMY, a2, a3);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
-        ArgPending(s_call, "world");
-        ArgPending(s_call, "region");
+        ArgValueStruct(s_call, "a", "map", ROK_ECONMAPINFO, a0);
         ArgValue(s_call, "size", a3);
     }
     s_inner_economy->Init(a0, a1, a2, a3);
@@ -169,6 +174,7 @@ void* __stdcall RecEconomyShutdown()
     }
     void* result = s_inner_economy->Shutdown();
     if (scope.Open()) {
+        ArgRegionResult(s_tail, result);
     }
     return result;
 }
@@ -176,9 +182,10 @@ void* __stdcall RecEconomyShutdown()
 int __stdcall RecEconomyApply(const EconomyEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
+    EventRoots(roots, RET_ECONOMY, a0, a1);
     SlotScope scope(RSL_ECONOMY_APPLY, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "event");
+        ArgEvent(s_call, "event", RET_ECONOMY, a0, a1);
         ArgValue(s_call, "size", a1);
     }
     int result = s_inner_economy->Apply(a0, a1);
@@ -193,7 +200,7 @@ int __stdcall RecEconomySpend(const EconomySpend* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_SPEND, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "spend");
+        ArgValueStruct(s_call, "a", "spend", ROK_ECONOMYSPEND, a0);
     }
     int result = s_inner_economy->Spend(a0);
     if (scope.Open()) {
@@ -217,9 +224,10 @@ void __stdcall RecEconomyUpdatePlayerEconomy(int a0)
 void __stdcall RecEconomyUpdateMetalExtraction(EconUnit a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
     SlotScope scope(RSL_ECONOMY_UPDATEMETALEXTRACTION, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "unit");
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
     }
     s_inner_economy->UpdateMetalExtraction(a0);
     if (scope.Open()) {
@@ -241,9 +249,10 @@ void __stdcall RecEconomyUpdateResourceSharing(int a0)
 int __stdcall RecEconomyRequestGranted(EconUnit a0, unsigned int a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
     SlotScope scope(RSL_ECONOMY_REQUESTGRANTED, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "unit");
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
         ArgValue(s_call, "resources", a1);
     }
     int result = s_inner_economy->RequestGranted(a0, a1);
@@ -258,7 +267,7 @@ double __stdcall RecEconomyGetEnergyUse(EconType a0)
     ReplayRoots roots;
     SlotScope scope(RSL_ECONOMY_GETENERGYUSE, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "type");
+        ArgValue(s_call, "type", a0);
     }
     double result = s_inner_economy->GetEnergyUse(a0);
     if (scope.Open()) {
@@ -270,25 +279,14 @@ double __stdcall RecEconomyGetEnergyUse(EconType a0)
 void __stdcall RecEconomyUnitAccount(EconUnit a0, EconAccount* a1)
 {
     ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
     SlotScope scope(RSL_ECONOMY_UNITACCOUNT, SUB_ECONOMY, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "unit");
-        ArgPending(s_call, "out");
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
     }
     s_inner_economy->UnitAccount(a0, a1);
     if (scope.Open()) {
-    }
-}
-
-void __stdcall RecEconomyWriteState(const StateWriter* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_ECONOMY_WRITESTATE, SUB_ECONOMY, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "writer");
-    }
-    s_inner_economy->WriteState(a0);
-    if (scope.Open()) {
+        ArgStruct(s_tail, "o", "out", ROK_ECONACCOUNT, a1);
     }
 }
 
@@ -1476,7 +1474,7 @@ unsigned int __stdcall RecLosRadarRegionSize(const LosRadarMapInfo* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_REGIONSIZE, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
+        ArgValueStruct(s_call, "a", "map", ROK_LOSRADARMAPINFO, a0);
     }
     unsigned int result = s_inner_los_radar->RegionSize(a0);
     if (scope.Open()) {
@@ -1490,7 +1488,7 @@ void __stdcall RecLosRadarInit(const LosRadarMapInfo* a0, void* a1, unsigned int
     ReplayRoots roots;
     SlotScope scope(RSL_LOS_RADAR_INIT, SUB_LOS_RADAR, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
+        ArgValueStruct(s_call, "a", "map", ROK_LOSRADARMAPINFO, a0);
         ArgPending(s_call, "region");
         ArgValue(s_call, "size", a2);
     }
@@ -2580,7 +2578,7 @@ unsigned int __stdcall RecPlayersRegionSize(const PlayersMapInfo* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_REGIONSIZE, SUB_PLAYERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "info");
+        ArgValueStruct(s_call, "a", "info", ROK_PLAYERSMAPINFO, a0);
     }
     unsigned int result = s_inner_players->RegionSize(a0);
     if (scope.Open()) {
@@ -2594,7 +2592,7 @@ void __stdcall RecPlayersInit(const PlayersMapInfo* a0, void* a1, unsigned int a
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_INIT, SUB_PLAYERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "info");
+        ArgValueStruct(s_call, "a", "info", ROK_PLAYERSMAPINFO, a0);
         ArgPending(s_call, "region");
         ArgValue(s_call, "size", a2);
     }
@@ -4756,7 +4754,16 @@ void __stdcall RecNetworkSendShareMapInfo(unsigned char a0, unsigned char a1)
         ArgValue(s_call, "from", a0);
         ArgValue(s_call, "to", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendShareMapInfo");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
     s_inner_network->SendShareMapInfo(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4809,6 +4816,345 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
     return result;
 }
 
+unsigned int __stdcall RecEconworldTick()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_TICK, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Tick");
+    }
+    unsigned int result = s_inner_econworld->Tick();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecEconworldDifficulty()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_DIFFICULTY, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Difficulty");
+    }
+    int result = s_inner_econworld->Difficulty();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecEconworldSharingEnabled()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_SHARINGENABLED, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.SharingEnabled");
+    }
+    int result = s_inner_econworld->SharingEnabled();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+float __stdcall RecEconworldWind()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_WIND, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Wind");
+    }
+    float result = s_inner_econworld->Wind();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+float __stdcall RecEconworldTide()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_TIDE, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Tide");
+    }
+    float result = s_inner_econworld->Tide();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecEconworldPlayerInfo(int a0, EconPlayerInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_PLAYERINFO, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.PlayerInfo");
+        ImportValue(line, a0);
+    }
+    s_inner_econworld->PlayerInfo(a0, a1);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_ECONPLAYERINFO, a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_ECONPLAYERINFO, a1);
+    }
+}
+
+int __stdcall RecEconworldAllied(int a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_ALLIED, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "from", a0);
+        ArgValue(s_call, "to", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Allied");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
+    int result = s_inner_econworld->Allied(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+EconUnit __stdcall RecEconworldFirstUnit(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_FIRSTUNIT, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.FirstUnit");
+        ImportValue(line, a0);
+    }
+    EconUnit result = s_inner_econworld->FirstUnit(a0);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+    }
+    return result;
+}
+
+EconUnit __stdcall RecEconworldLastUnit(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_LASTUNIT, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.LastUnit");
+        ImportValue(line, a0);
+    }
+    EconUnit result = s_inner_econworld->LastUnit(a0);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+    }
+    return result;
+}
+
+EconUnit __stdcall RecEconworldNextUnit(EconUnit a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
+    SlotScope scope(RSL_ECONWORLD_NEXTUNIT, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.NextUnit");
+        ImportObject(line, ROK_UNIT, ReplayRefPtr(a0));
+    }
+    EconUnit result = s_inner_econworld->NextUnit(a0);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_UNIT, ReplayRefPtr(result));
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+    }
+    return result;
+}
+
+int __stdcall RecEconworldUnitSlot(EconUnit a0)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
+    SlotScope scope(RSL_ECONWORLD_UNITSLOT, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.UnitSlot");
+        ImportObject(line, ROK_UNIT, ReplayRefPtr(a0));
+    }
+    int result = s_inner_econworld->UnitSlot(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecEconworldUnitInfo(EconUnit a0, EconUnitInfo* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, ReplayRefPtr(a0));
+    SlotScope scope(RSL_ECONWORLD_UNITINFO, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgObject(s_call, "unit", ROK_UNIT, ReplayRefPtr(a0));
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.UnitInfo");
+        ImportObject(line, ROK_UNIT, ReplayRefPtr(a0));
+    }
+    int result = s_inner_econworld->UnitInfo(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ImportOutInOut(line, "uinfo", ROK_ECONUNITINFO, a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecEconworldTypeInfo(EconType a0, EconTypeInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_TYPEINFO, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "type", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.TypeInfo");
+        ImportValue(line, a0);
+    }
+    s_inner_econworld->TypeInfo(a0, a1);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_ECONTYPEINFO, a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_ECONTYPEINFO, a1);
+    }
+}
+
+int __stdcall RecEconworldCellMetal(int a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_CELLMETAL, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "x", a0);
+        ArgValue(s_call, "y", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.CellMetal");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
+    int result = s_inner_econworld->CellMetal(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecEconworldEmit(const EconomyEventHeader* a0, unsigned int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ECONWORLD_EMIT, SUB_ECONWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "size", a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i econworld.Emit");
+        ImportEffect(line, RET_ECONOMY, a0, a1);
+        ImportValue(line, a1);
+    }
+    s_inner_econworld->Emit(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -4820,6 +5166,40 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_FILES_BANKSETINTEGER)
             return true;
         if (slot == RSL_FILES_BANKGETINTEGER)
+            return true;
+        return false;
+    case SUB_ECONOMY:
+        if (slot == RSL_ECONWORLD_TICK)
+            return true;
+        if (slot == RSL_ECONWORLD_DIFFICULTY)
+            return true;
+        if (slot == RSL_ECONWORLD_SHARINGENABLED)
+            return true;
+        if (slot == RSL_ECONWORLD_WIND)
+            return true;
+        if (slot == RSL_ECONWORLD_TIDE)
+            return true;
+        if (slot == RSL_ECONWORLD_PLAYERINFO)
+            return true;
+        if (slot == RSL_ECONWORLD_ALLIED)
+            return true;
+        if (slot == RSL_ECONWORLD_FIRSTUNIT)
+            return true;
+        if (slot == RSL_ECONWORLD_LASTUNIT)
+            return true;
+        if (slot == RSL_ECONWORLD_NEXTUNIT)
+            return true;
+        if (slot == RSL_ECONWORLD_UNITSLOT)
+            return true;
+        if (slot == RSL_ECONWORLD_UNITINFO)
+            return true;
+        if (slot == RSL_ECONWORLD_TYPEINFO)
+            return true;
+        if (slot == RSL_ECONWORLD_CELLMETAL)
+            return true;
+        if (slot == RSL_ECONWORLD_EMIT)
+            return true;
+        if (slot == RSL_NETWORK_SENDSHAREMAPINFO)
             return true;
         return false;
     case SUB_FEATURES:
@@ -4897,8 +5277,10 @@ bool IsNestedSlot(unsigned slot)
 void HookSeams(const bool* on)
 {
     bool any = false;
-    for (unsigned i = 0; i < SUB_COUNT; i++)
+    for (unsigned i = 0; i < SUB_COUNT; i++) {
         any = any || on[i];
+        s_hooked[i] = on[i];
+    }
     s_inner_wind_meteors = g_seams.wind_meteors;
     s_rec_wind_meteors = *s_inner_wind_meteors;
     s_inner_economy = g_seams.economy;
@@ -4971,8 +5353,6 @@ void HookSeams(const bool* on)
         s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
     if (on[SUB_ECONOMY])
         s_rec_economy.UnitAccount = RecEconomyUnitAccount;
-    if (on[SUB_ECONOMY])
-        s_rec_economy.WriteState = RecEconomyWriteState;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
     if (on[SUB_FEATURES])
@@ -5575,7 +5955,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendShareMetal = RecNetworkSendShareMetal;
     if (on[SUB_NETWORK])
         s_rec_network.SendShareEnergy = RecNetworkSendShareEnergy;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_ECONOMY])
         s_rec_network.SendShareMapInfo = RecNetworkSendShareMapInfo;
     if (on[SUB_NETWORK])
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
@@ -5600,4 +5980,35 @@ void HookSeams(const bool* on)
     g_seams.mission = &s_rec_mission;
     g_seams.files = &s_rec_files;
     g_seams.network = &s_rec_network;
+}
+
+const EconomyWorldView* WrapWorld_econworld(const EconomyWorldView* inner)
+{
+    if (inner == nullptr || !(s_hooked[SUB_ECONOMY]))
+        return inner;
+    s_inner_econworld = inner;
+    s_rec_econworld = *inner;
+    s_rec_econworld.Tick = RecEconworldTick;
+    s_rec_econworld.Difficulty = RecEconworldDifficulty;
+    s_rec_econworld.SharingEnabled = RecEconworldSharingEnabled;
+    s_rec_econworld.Wind = RecEconworldWind;
+    s_rec_econworld.Tide = RecEconworldTide;
+    s_rec_econworld.PlayerInfo = RecEconworldPlayerInfo;
+    s_rec_econworld.Allied = RecEconworldAllied;
+    s_rec_econworld.FirstUnit = RecEconworldFirstUnit;
+    s_rec_econworld.LastUnit = RecEconworldLastUnit;
+    s_rec_econworld.NextUnit = RecEconworldNextUnit;
+    s_rec_econworld.UnitSlot = RecEconworldUnitSlot;
+    s_rec_econworld.UnitInfo = RecEconworldUnitInfo;
+    s_rec_econworld.TypeInfo = RecEconworldTypeInfo;
+    s_rec_econworld.CellMetal = RecEconworldCellMetal;
+    s_rec_econworld.Emit = RecEconworldEmit;
+    return &s_rec_econworld;
+}
+
+bool RecordsAlways(unsigned slot)
+{
+    if (slot == RSL_ECONOMY_REGIONSIZE || slot == RSL_ECONOMY_INIT)
+        return true;
+    return false;
 }

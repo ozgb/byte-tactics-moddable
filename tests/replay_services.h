@@ -426,7 +426,7 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     (void)r;
 }
 
-int __stdcall ScheduleEconomySpend(const EconomySpend* spend)
+int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend)
 {
     ReplayText t;
     StartImport(t, RI_SCHEDULE_ECONOMY_SPEND);

@@ -515,6 +515,16 @@ def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
 
 
 VTABLE_NAME = re.compile(r"^[A-Za-z_]\w*$")
+VTABLE_SYMBOL = re.compile(r"^\?\?_7[A-Za-z_][\w@]*@@6B@$")
+
+
+def has_vtable(spec: dict) -> bool:
+    return "vtable" in spec or "vtable_symbol" in spec
+
+
+def vtable_name(spec: dict) -> str:
+    """The global the generated code compares a vptr with: the annotation's own, or one that an asm label binds to the compiler's symbol."""
+    return spec["vtable"] if "vtable" in spec else "g_vtsym_" + spec["type"]
 
 
 def check_polymorphic(ann: dict) -> list[str]:
@@ -527,7 +537,7 @@ def check_polymorphic(ann: dict) -> list[str]:
         if "kinds" not in spec:
             continue
         where = "%s (base)" % base
-        if spec["scope"] != "state" or spec.get("table") or spec.get("inside") or spec.get("vtable"):
+        if spec["scope"] != "state" or spec.get("table") or spec.get("inside") or has_vtable(spec):
             errors.append("%s: a base kind is a state kind with no table, inside or vtable of its own" % where)
         if spec["fields"]:
             errors.append("%s: a base kind has no fields, its kinds have them" % where)
@@ -537,7 +547,7 @@ def check_polymorphic(ann: dict) -> list[str]:
             concrete = kinds.get(name)
             if concrete is None:
                 errors.append("%s: the kind %s is not an object of the schema" % (where, name))
-            elif "vtable" not in concrete:
+            elif not has_vtable(concrete):
                 errors.append("%s: the kind %s has no vtable" % (where, name))
             elif name in owner:
                 errors.append("%s: the kind %s is also a kind of %s" % (where, name, owner[name]))
@@ -545,14 +555,21 @@ def check_polymorphic(ann: dict) -> list[str]:
                 owner[name] = base
     seen: dict[str, str] = {}
     for name, spec in kinds.items():
-        if "vtable" not in spec:
+        if not has_vtable(spec):
             continue
-        if not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"]):
+        if "vtable" in spec and "vtable_symbol" in spec:
+            errors.append("%s: has a `vtable` and a `vtable_symbol`, one of them" % name)
+        elif "vtable_symbol" in spec:
+            if not isinstance(spec["vtable_symbol"], str) or not VTABLE_SYMBOL.match(spec["vtable_symbol"]):
+                errors.append("%s: `vtable_symbol` is the mangled name of the class's vtable, `??_7<Class>@@6B@`" % name)
+            elif spec["vtable_symbol"] != "??_7%s@@6B@" % spec["type"]:
+                errors.append("%s: `vtable_symbol` %s is not the vtable of the type %s" % (name, spec["vtable_symbol"], spec["type"]))
+        elif not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"]):
             errors.append("%s: the vtable is the name of a global" % name)
-        elif spec["vtable"] in seen:
-            errors.append("%s: the vtable %s is also the vtable of %s" % (name, spec["vtable"], seen[spec["vtable"]]))
+        if vtable_name(spec) in seen:
+            errors.append("%s: the vtable %s is also the vtable of %s" % (name, vtable_name(spec), seen[vtable_name(spec)]))
         else:
-            seen[spec["vtable"]] = name
+            seen[vtable_name(spec)] = name
         if spec["scope"] != "state" or spec.get("table"):
             errors.append("%s: a kind with a vtable is a state kind with no table" % name)
         if name not in owner and not spec.get("inside"):
@@ -690,7 +707,7 @@ def check_blobs(ann: dict) -> list[str]:
             if spec["scope"] != "state":
                 errors.append("%s: only the fields of a state kind are blobs" % where)
             target = kinds.get(f.get("target"))
-            if target is not None and (target["scope"] != "state" or target.get("table") or target.get("inside") or target.get("kinds") or target.get("vtable")):
+            if target is not None and (target["scope"] != "state" or target.get("table") or target.get("inside") or target.get("kinds") or has_vtable(target)):
                 errors.append("%s: the target %s of a blob has a table, sites or kinds, and is named by them, not at first sight" % (where, f["target"]))
             if f.get("callback") is not None:
                 errors.append("%s: a blob is not a callback" % where)
@@ -757,7 +774,7 @@ def check_inside(ann: dict) -> tuple[dict, list[str]]:
 def check_vptr(ann: dict) -> list[str]:
     """Errors for `vptr`: the global that holds the vtable of a kind whose first word the code sets by hand."""
     errors = []
-    taken = {spec["vtable"]: name for name, spec in ann["objects"].items() if isinstance(spec.get("vtable"), str)}
+    taken = {vtable_name(spec): name for name, spec in ann["objects"].items() if has_vtable(spec)}
     for name, spec in ann["objects"].items():
         if "vptr_unset" in spec and ("vptr" not in spec or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
             errors.append("%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % name)
@@ -769,7 +786,7 @@ def check_vptr(ann: dict) -> list[str]:
             errors.append("%s: the vptr %s is also the vtable of %s" % (name, spec["vptr"], taken[spec["vptr"]]))
         else:
             taken[spec["vptr"]] = name
-        if spec["scope"] != "state" or spec.get("table") or spec.get("kinds") or "vtable" in spec:
+        if spec["scope"] != "state" or spec.get("table") or spec.get("kinds") or has_vtable(spec):
             errors.append("%s: a kind with a vptr is a state kind with no table, kinds or vtable" % name)
     return errors
 
@@ -785,7 +802,7 @@ def check_delta(ann: dict) -> list[str]:
             errors.append("%s: `delta` is true, or absent" % where)
         if not is_global_table(spec):
             errors.append("%s: only a kind with a table of Game or SimGlobals can be a delta" % where)
-        if spec["scope"] != "state" or spec.get("inside") or spec.get("kinds") or spec.get("vtable"):
+        if spec["scope"] != "state" or spec.get("inside") or spec.get("kinds") or has_vtable(spec):
             errors.append("%s: a delta kind is a state kind with no sites, kinds or vtable" % where)
     return errors
 
@@ -1469,7 +1486,7 @@ def unaccounted_indirect(target: str, sub: str, spec: dict, ann: dict, closure: 
         cls, method = virtual.groups()
         kinds = ann["objects"]
         base = next((s for s in kinds.values() if s["type"] == cls and "kinds" in s), None)
-        concrete = [kinds[k]["type"] for k in base["kinds"]] if base else [s["type"] for s in kinds.values() if s["type"] == cls and "vtable" in s]
+        concrete = [kinds[k]["type"] for k in base["kinds"]] if base else [s["type"] for s in kinds.values() if s["type"] == cls and has_vtable(s)]
         if not concrete:
             return "a vtable dispatch on %s, which is no kind with `poly`" % cls
         defined = [t + "::" + method for t in concrete if t + "::" + method in by_function]
@@ -1526,9 +1543,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vptr", "vptr_unset", "kinds", "delta"):
+        for key in ("vtable", "vtable_symbol", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
+        if spec.get("vtable_symbol"):
+            entry["vtable"] = vtable_name(spec)
         objects.append(entry)
         if is_global_table(spec):
             if spec["scope"] != "state":
@@ -3539,7 +3558,7 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
         L = [GENERATED, '#include "replay_schema_fixtures.h"', '#include "../src/harness/replay_objects.h"', ""]
     else:
         L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
-    L += ["extern void (* const %s[])();" % (o.get("vtable") or o["vptr"]) for o in kinds]
+    L += ["extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "") for o in kinds]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
         L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
         for o in kinds:

@@ -10,6 +10,8 @@ extern void (* const g_fixtureTimerVtable[])();
 extern void (* const g_fixtureAssaultVtable[])();
 extern void (* const g_fixtureCbVtable[])();
 extern void (* const g_fixtureAttachVtable[])();
+extern void (* const g_vtsym_FixtureGoalA[])() __asm__("??_7FixtureGoalA@@6B@");
+extern void (* const g_vtsym_FixtureGoalB[])() __asm__("??_7FixtureGoalB@@6B@");
 
 const void* ReplayVtable(unsigned kind)
 {
@@ -30,6 +32,10 @@ const void* ReplayVtable(unsigned kind)
         return g_fixtureCbVtable;
     case ROK_FIXTUREATTACH:
         return g_fixtureAttachVtable;
+    case ROK_FIXTUREGOALA:
+        return g_vtsym_FixtureGoalA;
+    case ROK_FIXTUREGOALB:
+        return g_vtsym_FixtureGoalB;
     default:
         return nullptr;
     }
@@ -54,6 +60,10 @@ const char* ReplayVtableName(unsigned kind)
         return "g_fixtureCbVtable";
     case ROK_FIXTUREATTACH:
         return "g_fixtureAttachVtable";
+    case ROK_FIXTUREGOALA:
+        return "g_vtsym_FixtureGoalA";
+    case ROK_FIXTUREGOALB:
+        return "g_vtsym_FixtureGoalB";
     default:
         return "";
     }

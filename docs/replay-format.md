@@ -574,6 +574,7 @@ the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is
 |---|---|---|
 | `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
 | `vtable` | a concrete kind | the global table of 12 functions the vptr points at; the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
+| `vtable_symbol` | a concrete kind | instead of `vtable`, for a class whose vtable the compiler emits and no source global names: the mangled symbol `??_7<Type>@@6B@` (the tool refuses any other) |
 | `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
 
 The numbering is per concrete kind, in order of first appearance, as for any state kind. An example of the lines a call holds:
@@ -620,6 +621,17 @@ of the same C type, `WeaponFire`, is a state kind with a `table` over the array 
 the handler of `weapondef#17`. The table is recorded whole at the first call that reads it (256 lines) and by changes after that. A function that is in none of the entries is an error that names the table (the recorder
 writes `orderNotify[?]`), and an index past the table is refused by the replayer. One order function is not an entry, because
 no header declares it with the type its definition has.
+
+### A class with a compiler-emitted vtable
+
+A class with real virtual methods that the code constructs itself (`AiSearchGoal`, `UnitScript`) has a vtable that the compiler emits, and no
+global of the sources holds it. Its kind names the symbol: `"vtable_symbol": "??_7AiSearchGoal@@6B@"`, instead of `vtable`. The generated
+`replay_vtables.cpp` declares a global for the kind, `extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");`, so it is the
+class's own vtable, in the game and in the replayer's link. The symbol is the vtable of the kind's `type`, which the tool checks. Everything else is
+as for a `vtable`: the kind belongs to a base with `kinds` and a `poly` ref, the recorder writes the concrete kind its vptr names, and the replayer
+allocates the object and stores the class's vtable, so a virtual call on a rebuilt object runs the class's own method. The fields are the
+members the schema lists; a base class's members (the goal's `target` and `owner`) are listed on each concrete kind. The kit's copy of the schema
+leaves `vtable_symbol` out, as it does `vtable`. The native self-test builds `FixtureGoalA` and `FixtureGoalB` objects, records them and calls a method of a rebuilt one.
 
 ## Callbacks
 

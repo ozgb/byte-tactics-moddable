@@ -896,6 +896,61 @@
      "kind": "u32"
     }
    ]
+  },
+  "FixtureGoalBase": {
+   "type": "FixtureGoalBase",
+   "scope": "state",
+   "kinds": [
+    "FixtureGoalA",
+    "FixtureGoalB"
+   ],
+   "fields": []
+  },
+  "FixtureGoalA": {
+   "type": "FixtureGoalA",
+   "scope": "state",
+   "vtable_symbol": "??_7FixtureGoalA@@6B@",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "heading",
+     "kind": "i16"
+    }
+   ]
+  },
+  "FixtureGoalB": {
+   "type": "FixtureGoalB",
+   "scope": "state",
+   "vtable_symbol": "??_7FixtureGoalB@@6B@",
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
+    },
+    {
+     "name": "count",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureGoalHolder": {
+   "type": "FixtureGoalHolder",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
+     "kind": "i32"
+    },
+    {
+     "name": "goal",
+     "kind": "ref",
+     "target": "FixtureGoalBase",
+     "poly": "FixtureGoalBase"
+    }
+   ]
   }
  },
  "fixtures": {

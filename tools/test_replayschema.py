@@ -164,7 +164,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -200,7 +200,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("FindWeaponByName", weapons["slots"])
         kept = weapons["unrecorded"]["FindWeaponByName"]
@@ -423,7 +423,7 @@ class TargetingForms(unittest.TestCase):
         files, errors, _ = self.generated()
         self.assertEqual(errors, [])
         shapes = files[rs.SHAPES_SLOTS]
-        self.assertIn("ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), false);", shapes)
+        self.assertIn("ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), true);", shapes)
         self.assertIn('ArgScalar<unsigned int>("goal")', shapes)
         hooks = files[rs.FIXTURE_HOOKS_INC]
         body = hooks[hooks.index("RecFixtureHandGoal"):]
@@ -612,7 +612,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="WeaponCanReachUnit"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -1019,7 +1019,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('0, 0, 0, 3, 0, 0 },'), base)
+        self.assertTrue(base.endswith('0, 0, 0, 6, 0, 0 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ", text)
         self.assertIn("ROK_PLAINTIMER, ROK_ASSAULTTIMER, ", text)
         self.assertIn("ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB, ROK_FIXTURETWIN };", text)
@@ -1228,7 +1228,7 @@ class Callbacks(unittest.TestCase):
         self.assertIn("ImportCallback(line, cb2, RCB_CALLBACK, a2);", body)
         self.assertLess(body.index("s_inner_scripts->StartScriptWithArgsByIndex"), body.index("cb2.Stop();"))
         self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
-        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
+        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line, roots);"))
 
     def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
         files, _, _ = self.generated(self.with_import())
@@ -1630,15 +1630,15 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
     def nested_generated(self):
-        """The generator's output with a command slot CmdPlan added to the movement seam, as the Cmd slots were before #964 took them out of the interfaces."""
+        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces."""
         ann = annotations()
-        ann["subsystems"]["movement"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
+        ann["subsystems"]["orders"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
         with tempfile.TemporaryDirectory() as d:
             for h in rs.INTERFACES.glob("*.h"):
                 (Path(d) / h.name).write_text(h.read_text())
-            ai = Path(d) / "movement.h"
+            ai = Path(d) / "orders.h"
             text = ai.read_text()
-            start = text.index("struct MovementSeam {")
+            start = text.index("struct OrdersSeam {")
             end = text.index("\n};", start)
             ai.write_text(text[:end] + "\n    void (__stdcall* CmdPlan)(CommandArgs* args);" + text[end:])
             with mock.patch.object(rs, "INTERFACES", Path(d)):
@@ -1647,24 +1647,24 @@ class ReentrantServices(unittest.TestCase):
     def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
         files, errors, model = self.nested_generated()
         self.assertEqual(errors, [])
-        slots = model["subsystems"]["movement"]["slots"]
+        slots = model["subsystems"]["orders"]["slots"]
         self.assertTrue(rs.nestable("CmdPlan", slots["CmdPlan"]))
         self.assertFalse(rs.nestable("UpdateWind", model["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]))
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecMovementCmdPlan("):]
+        body = hooks[hooks.index("RecOrdersCmdPlan("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('line.Add("\\n    c movement.CmdPlan");', body)
+        self.assertIn('line.Add("\\n    c orders.CmdPlan");', body)
         self.assertIn("ImportArgv(line, a0);", body)
         self.assertIn("FinishNested(line);", body)
-        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_MOVEMENT_CMDPLAN:", hooks)
-        self.assertIn("if (on[SUB_MOVEMENT] || any)\n        s_rec_movement.CmdPlan = RecMovementCmdPlan;", hooks)
+        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_ORDERS_CMDPLAN:", hooks)
+        self.assertIn("if (on[SUB_ORDERS] || any)\n        s_rec_orders.CmdPlan = RecOrdersCmdPlan;", hooks)
 
     def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
         _, _, model = self.nested_generated()
-        player = "\n".join(rs.nested_player({"movement": {"slots": {"CmdPlan": model["subsystems"]["movement"]["slots"]["CmdPlan"]}}}))
+        player = "\n".join(rs.nested_player({"orders": {"slots": {"CmdPlan": model["subsystems"]["orders"]["slots"]["CmdPlan"]}}}))
         self.assertIn("void PlayNestedCalls(const char* import)", player)
-        self.assertIn('if (CallbackIs(name, "movement.CmdPlan")) {', player)
-        self.assertIn("g_seams.movement->CmdPlan(&p0.args);", player)
+        self.assertIn('if (CallbackIs(name, "orders.CmdPlan")) {', player)
+        self.assertIn("g_seams.orders->CmdPlan(&p0.args);", player)
 
     def test_a_length_for_the_text_names_an_int_argument(self):
         ann = annotations()
@@ -1842,7 +1842,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_LOSUNITINDEXENTRY, ROK_LOSUNITINDEX, offsetof(LosUnitIndex, players[0]), "players[]", sizeof(((LosUnitIndex*)nullptr)->players[0]), 10, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 20;", text)
+        self.assertIn("kReplayInsideSiteCount = 21;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()

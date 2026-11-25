@@ -347,6 +347,8 @@ void DisplayLogFill(Surface* dst, Rect* rect, int colour)
 
 void DisplayLogOutline(Surface* dst, const int* rect, int colour, int lit)
 {
+    if (rect == nullptr)
+        return;
     DlSurface d;
     Surfaceof(dst, &d);
     Rect r;
@@ -479,7 +481,8 @@ void DisplayLogText(Surface* dst, const unsigned char* text, int x, int y, int w
     PutInt(display->keyColor);
     PutXY(x, y);
     DlPutRaw(" ");
-    DlPutName((const char*)text, (int)strlen((const char*)text));
+    if (text != nullptr)
+        DlPutName((const char*)text, (int)strlen((const char*)text));
     DlEnd();
 }
 

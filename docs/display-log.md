@@ -70,7 +70,9 @@ The cursor line closes the frame. It names the picture the display shows as the 
 cursor and the position of the mouse when the frame ends, which is where the picture's
 origin is put (the picture's own offset is applied as for a `sprite`). The mouse starts in
 the middle of the screen, at 320 240, and moves with the scenario's input and where the game
-puts it (a scroll by the mouse puts it back where it started). The frame dump leaves the
+puts it (a scroll by the mouse puts it back where it started). In a test-mode run the mouse
+is the harness's in every scenario, with input lines or without: the host's pointer and the
+host's own mouse and key events never reach the game. The frame dump leaves the
 cursor out; its picture is a decision of the presentation (the order the cursor would give),
 so it is judged here. The game steps an animated cursor by the wall clock, not by ticks or frames, so
 the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. When the display

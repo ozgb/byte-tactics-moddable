@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons and economy have recordings so far; pathfinding, los_radar and players have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy and players have recordings so far; pathfinding and los_radar have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -574,7 +574,8 @@ the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is
 |---|---|---|
 | `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
 | `vtable` | a concrete kind | the global table of 12 functions the vptr points at; the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
-| `vtable_symbol` | a concrete kind | instead of `vtable`, for a class whose vtable the compiler emits and no source global names: the mangled symbol `??_7<Type>@@6B@` (the tool refuses any other) |
+| `vtable_symbol` | a concrete kind | instead of `vtable`, for a class whose vtable the compiler emits and no source global names: the mangled symbol `??_7<Type>@@6B@`, or `??_7<Type>@@6B<Base>@@@` for a class with several bases, where `<Base>` is the first (the tool refuses any other) |
+| `vtable_secondary` | a concrete kind with a `vtable_symbol` | the other bases of the class that hold a vtable of their own, by name: `["UnitScanVisitor"]` (see below) |
 | `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
 
 The numbering is per concrete kind, in order of first appearance, as for any state kind. An example of the lines a call holds:
@@ -632,6 +633,13 @@ as for a `vtable`: the kind belongs to a base with `kinds` and a `poly` ref, the
 allocates the object and stores the class's vtable, so a virtual call on a rebuilt object runs the class's own method. The fields are the
 members the schema lists; a base class's members (the goal's `target` and `owner`) are listed on each concrete kind. The kit's copy of the schema
 leaves `vtable_symbol` out, as it does `vtable`. The native self-test builds `FixtureGoalA` and `FixtureGoalB` objects, records them and calls a method of a rebuilt one.
+
+A class with several bases keeps one vtable pointer for each base that has virtual methods: the victory conditions of players derive from `MissionCondition` and, to be scanned over the units, from `UnitScanVisitor`
+(`class DefeatAllUnitsKilled : public MissionCondition, public UnitScanVisitor`). The compiler emits `??_7DefeatAllUnitsKilled@@6BMissionCondition@@@` for the first and
+`??_7DefeatAllUnitsKilled@@6BUnitScanVisitor@@@` for the second, so the kind's `vtable_symbol` is the first and `"vtable_secondary": ["UnitScanVisitor"]` lists the others. The recorder still
+tells the kind by the first vptr. The replayer stores the class's vtable at the start of the object and, for each base of the list, the vtable of that base at the offset of its subobject
+(`static_cast<UnitScanVisitor*>` of the class, computed by `ReplayExtraVtables` of the generated `replay_vtables.cpp`), so the module's call of `visitor->VisitUnit` on the subobject reaches the class's own method.
+The tool checks that the base is a polymorphic base of the type. The kit's copy of the schema leaves `vtable_secondary` out. The native self-test builds a `FixtureTwin`, which derives from `FixtureGoalBase` and `FixtureScanBase`, and calls a method through its second base.
 
 ## Callbacks
 
@@ -1256,6 +1264,16 @@ economy:
 - `Apply` of LOAD: only a loaded game publishes it (`load-midgame` is not recorded).
 - `GetEnergyUse` is recorded at tick 0 only (`console-iwin`, the whole run, 100 ticks): the unit type loader calls it, and a window cannot start before tick 1.
 
+players:
+
+- The respawn of the commander (`UpdatePlayerBody` when `Game.commanderDeath` is 2): no scenario sets that option. Its imports (`units.CreateUnit`, `units.FindUnitTypeId`, `features.FindFeatureAtPos`, `map.GetCellMeanHeight`, `mission.GetMissionParams`) and the services it calls are annotated for the call, and unproven by a recording.
+- `UpdatePlayersFinish` and `UpdatePlayerTail` of a network game reach `network.BroadcastPlayerInfo` and `network.SendShare*` only with a remote partner: `allied-victory` and `share-all` have one, and the committed windows hold `BroadcastPlayerEconomy` (tick 330) and the shares (tick 900); `BroadcastPlayerInfo` is called only by the watch-mode path of `UpdatePlayerBody`, which no scenario takes (`Game.mapFlags` bit 1 with a watching host).
+- `VictoryMoveUnitToRadius` is no kind: it scans through `map.UnitsInRange`, whose buffer of unit ids has no form yet, and the recorder stops with `an MissionCondition has a vtable that is none of its kinds` on a scenario that creates one (`mission-radius` and `mission-defeat-passes-x`, whose missions have a radius condition).
+- The victory and defeat conditions of the scenarios `mission-kill-mobile`, `mission-build-unit`, `mission-passes-x`, `mission-passes-z`, `mission-timer`, `mission-victory`, `mission-defeat-of-type`, `mission-defeat` and `commander-death` are kinds of the schema, and each scenario records and replays equal over a window of its checks, but no committed recording holds them: each file costs about 0.75 MB for the units of the players' ranges, which every window walks. `VictoryKillAllOfType`, `DefeatAllUnitsKilled` and `DefeatAllUnitsKilledOfType` are the three classes with a second base that the committed recordings scan with.
+- `SaveConditions`, `LoadConditions`, `RegisterConditions`, `FreeConditions`, `DeleteConditions`, `NewConditions`, `LoadPlayers`, `SavePlayers`, `LoadPlayerControllers`, `InitPlayers`, `FreePlayers`, `SetupPlayerSlot`, `RebuildAIFeatureCells`, `LoadDefaultAIScript` and `InitPlayerResources` are not recorded (`load class`): the match is set up and torn down, saved and loaded with them, and the traces of every scenario already cover that.
+- `UpdateBlink` is not recorded: only the in-game dialogs call it, and it steps the blink of the player markers, which the display reads.
+- `UpdatePlayers` and `UpdatePlayersOnStream` are not recorded: they are the scheduler's phase driver, which calls `UpdatePlayerHead`, `UpdatePlayerBody`, `UpdatePlayerTail` and `UpdatePlayersFinish` through the seam table (each recorded on its own) and the other subsystems' slots.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1296,6 +1314,24 @@ The recordings of economy: `console-economy` (ticks 30 to 200: `Apply` of RESET,
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 2 region tests/replay/economy/duel-shore-to-shore.txt
+```
+
+The recordings of players, every one with `RegionSize` and `Init` first and then the windowed calls (`UpdatePlayerHead` runs for each of the ten slots at each tick, `UpdatePlayerBody` for each player each 30 ticks, with the region restored as `r region` runs before it, and `UpdatePlayersFinish` at each tick):
+
+| Recording | Window | Calls | Reaches |
+|---|---|---|---|
+| `skirmish2` | 29 to 32 | Head 40, Body 8, Finish 4, Tail 2 | a skirmish (game type 2): the first period of each player's `UpdatePlayerBody` at tick 30, `CheckVictory` and `CheckDefeat` of the skirmish |
+| `console-units` | 145 to 175 | Head 310, Body 62, Finish 31, `Apply` 9 (KILL_UNITS 3, UNIT_DIED 5, UNIT_CREATED 1), `DeactivateConditions` 2 | `+kill 1` and `+kill`: `KillPlayerUnits` and its `SchedPublish` of the kill effects, the conditions told of the deaths |
+| `mission-capture` | 495 to 502 | Head 80, Body 16, Finish 8, `Apply` 3 (GIVE_UNIT, UNIT_CREATED, UNIT_DIED) | a capture (game type 1): `GiveUnitToPlayer`, `VictoryCaptureUnitType::OnUnitCaptured`, `DefeatAllUnitsKilledOfType::OnUnitDied` with `units.FindUnitTypeId` and the scan of the units |
+| `mission-kill-of-type` | 180 to 190 | Head 110, Body 22, Finish 11, `Apply` 55 (UNIT_DIED) | `VictoryKillAllOfType` and `VictoryKillUnitType` counting the deaths, `units.FindUnitTypeId` 2 |
+| `mission-defeat-all-units` | 335 to 362 | Head 260, Body 52, Finish 26, Tail 2 | the end of a lost mission: `DefeatAllUnitsKilled::IsSatisfied` scans the units, the countdown ends at tick 360 and sets `Game.endGameFlags` |
+| `allied-victory` | 329 to 362 | Head 340, Body 136, Finish 34, Tail 6 | game type 3: `CheckAlliedVictory`, `network.BroadcastPlayerEconomy` at tick 330 and the end of a won game at tick 360 (`Game.endGameVictory`) |
+| `share-all` | 898 to 903 | Head 60, Body 12, Finish 6, Tail 2, `Apply` 2 (TRANSFER) | `TransferMetal` and `TransferEnergy` with `services.ScheduleEconomySpend` and `network.SendShareMetal` and `SendShareEnergy` |
+
+The injected change of players is the period of a player's `UpdatePlayerBody`, 30 ticks (`0x1e`) in the game and `0x1f` in `replay_inject_test.exe`: the divergence is reported at call 16 of `skirmish2`, at `region` (`byte 4 of 84: recorded 3c, replayed 3d`, the first body of a player at tick 30):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 16 region tests/replay/players/skirmish2.txt
 ```
 
 `replay_inject_test.exe` is built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the

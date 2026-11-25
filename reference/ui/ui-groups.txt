@@ -36,6 +36,7 @@ bt-ui 1
 63 select 2,3
 70 input mouse move 480 360
 71 input mouse right down 480 360
+71 command order mode 1 kind - units 2,3 target - pos 656 1 360 param 0 amount 0 remove 0
 71 order Move_Ground unit 2 target - pos 636 1 350 type - param 0 amount 0 remove 0
 71 order Move_Ground unit 3 target - pos 676 1 370 type - param 0 amount 0 remove 0
 72 input mouse right up 480 360
@@ -48,6 +49,7 @@ bt-ui 1
 83 select 4
 90 input mouse move 440 380
 91 input mouse right down 440 380
+91 command order mode 1 kind - units 4 target - pos 616 1 380 param 0 amount 0 remove 0
 91 order Move_Ground unit 4 target - pos 616 1 380 type - param 0 amount 0 remove 0
 92 input mouse right up 440 380
 163 view 4

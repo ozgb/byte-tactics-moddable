@@ -13,10 +13,12 @@ bt-ui 1
 30 input key down 16
 31 input mouse move 464 300
 32 input mouse left down 464 300
+32 command build type ARMSOLAR units 1 pos 648 1 296 remove 1
 32 order MobileBuild unit 1 target - pos 648 1 296 type ARMSOLAR param - amount 0 remove 1
 33 input mouse left up 464 300
 34 input mouse move 400 340
 35 input mouse left down 400 340
+35 command build type ARMSOLAR units 1 pos 584 1 344 remove 1
 35 order MobileBuild unit 1 target - pos 584 1 344 type ARMSOLAR param - amount 0 remove 1
 36 input mouse left up 400 340
 37 input key up 16
@@ -25,6 +27,7 @@ bt-ui 1
 52 input mouse left up 96 187
 60 input mouse move 464 380
 61 input mouse left down 464 380
+61 command build type ARMWIN units 1 pos 640 1 384 remove 0
 61 order MobileBuild unit 1 target - pos 640 1 384 type ARMWIN param - amount 0 remove 0
 62 input mouse left up 464 380
 139 view 3

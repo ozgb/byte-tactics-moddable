@@ -1,0 +1,86 @@
+function,address,file,item,callers,note
+DrawFrame,0x4b7f90,src/graphics/gaf.cpp,sprite,BlitFeatureGaf;BlitGafFrameAtOffset;BuildTedRadarFrame;CaptureBackgroundAndDrawCursor;DrawBattleFrame;DrawButton;DrawExplosions;DrawFlags;DrawFogOfWar;DrawGadgetGlyph;DrawGafBar;DrawHotspot;DrawLightBars;DrawListboxFrame;DrawLoadingBar;DrawOptionsScrollBar;DrawProjectiles;DrawRadarUnits;DrawSliderBar;DrawSoftwareCursor;DrawStatusPanel;DrawTextClipped;DrawUnitInfoPanel;LoadingScreenFrame;OpenEndMissionScreen;RedrawMouseCursor;ResizeRadarPicture;ScaledPosOffset;ShowSoftwareCursor;UpdatePlanet;UpdateSolarSystem;WriteScreenshot,"a layered frame draws each layer through DrawFrame or DrawFrameBlended, recorded once as the whole picture"
+DrawFrameOpaque,0x4b8150,src/graphics/gaf.cpp,sprite_opaque,DrawMapTiles,
+DrawFrameBlended,0x4b8500,src/graphics/gaf.cpp,sprite_blend,DrawFlags;DrawProjectiles;DrawWeaponCoverage,
+DrawFrameGray,0x4b86e0,src/graphics/gaf.cpp,sprite_gray,DrawFogOfWar,
+EraseFrameDithered,0x4b88d0,src/graphics/gaf.cpp,sprite_erase,DrawFogOfWar,extra field is the parity
+DrawFrameShadow,0x4b8ec0,src/graphics/gaf.cpp,sprite_shadow,DrawExplosions,
+DrawLens,0x4b9360,src/graphics/gaf.cpp,lens,DrawProjectiles,"the lens frame is a displacement map; DrawLens copies and draws through CopySurfaceRect and DrawFrame, not recorded"
+DrawFrameLit,0x4b8310,src/graphics/gaf.cpp,sprite_lit,DrawButton;DrawGadgetGlyph;DrawTextClipped,extra field is the light table row
+ClearFrame,0x4b8e50,src/graphics/gaf.cpp,clear,WriteScreenshot,recorded on a frame target
+DrawFrameQuad,0x4c7580,src/graphics/surface.cpp,quad,BlitSideLogoToRect;DrawExplodedPieceFaces;DrawHotspot;DrawListBox;DrawOptionsScrollBar;DrawProjectedFaces;DrawScorePanel;ResizeRadarPicture,
+DrawSurface,0x4c6b70,src/graphics/surface.cpp,blit,BlitLayers;DrawBitmapBackground;DrawEndGameFrame;DrawListboxFrame;DrawRadar;DrawRadarUnits;DrawUnitInfoImage;HandleOptionsPanelClick;HideSoftwareCursor;LoadingScreenFrame;OpenEndMultiScreen;OpenOptionsPanel;RenderLayer;RunEndGameState;ShowSoftwareCursor,copy when the source is a sub-surface of its target
+CopySurfaceRect,0x4c6d20,src/graphics/surface.cpp,copy,DrawListBox;DrawTextInput,
+FillSurface,0x4c6890,src/graphics/surface.cpp,clear,BlankScreen;ClearScreenWithHudPalette;DrawLightBars;HandleMainMenuClick;LoadPictureCached;OpenEndMissionScreen;OpenMainMenu;PlayMovie;ResizeRadarPicture,
+DrawLine,0x4be950,src/graphics/draw.cpp,line,AiSearchGoal::DrawOnSurface;DrawBattleFrame;DrawBevelBorder;DrawBevelBorderDarkFirst;DrawBuildFootprint;DrawButton;DrawClosedPolygon;DrawLabel;DrawLineGadget;DrawListBox;DrawMapDebugOverlay;DrawOrderRangeRing;DrawProjectiles;DrawRaisedBox;DrawRangeCircle;DrawRotatedQuadOutline;DrawSunkenBox;DrawTextInput;DrawTriangleContours;DrawWorldDeltaLine;DrawWorldSegmentLine;RedrawGadgetRect,
+DrawPixel,0x4bee60,src/graphics/draw.cpp,pixel,BuildRadarPicture;DrawRadarUnits,
+FadeRectangle,0x4bf4d0,src/graphics/draw.cpp,fade,DrawButton;DrawGadgetGlyph;DrawLabel;DrawListBox;DrawScorePanel;DrawSliderBar;DrawUnitBuilderProbe;DrawUnitStateProbe;LoadGuiLayer;RedrawGadgetRect;RunEndGameState;StepScreenFade,a null rectangle is the whole display
+FillRectangle,0x4bf6f0,src/graphics/draw.cpp,fill,DrawColorGrid;DrawFogOfWar;DrawHitPointBar;DrawHotspot;DrawLabel;DrawListboxFrame;DrawLoadingBar;DrawMapDebugOverlay;DrawPanelBar;DrawPercentBar;DrawProbeProbabilityBar;DrawProfileBarLine;DrawProgressBar;DrawProgressBarGadget;DrawRaisedBox;DrawResourcePanel;DrawSunkenBox;DrawSyncStatus;DrawTextInput;FillBevelBox;FillBevelBoxDarkFirst;UpdatePlanet;UpdateSolarSystem,
+DrawLitRectangle,0x4bf7b0,src/graphics/draw.cpp,outline_lit,DrawGadgetSelectionBox,
+DrawRectangle,0x4bf8c0,src/graphics/draw.cpp,outline,DrawBattleFrame;DrawColorCellOutline;DrawMapTileSelectionOutline;DrawPercentBar;DrawProbeProbabilityBar;DrawProfileBarLine;DrawRadar;DrawUnitBuilderProbe;DrawUnitStateProbe,
+GrayRectangle,0x4bfe10,src/graphics/draw.cpp,gray,DrawButton;DrawFogOfWar;DrawLabel;DrawSliderBar;RedrawGadgetRect,
+DitherRectangle,0x4bff20,src/graphics/draw.cpp,dither,DrawFogOfWar,
+DrawCircle,0x4c0070,src/graphics/draw.cpp,circle,DrawRadarUnits,
+DrawDashedCircle,0x4c01a0,src/graphics/draw.cpp,circle_dashed,DrawRadarUnits,
+FillPolygon,0x4c0310,src/graphics/draw.cpp,polygon,DrawExplodedPieceFaces;DrawMapDebugOverlay;DrawProjectedFaces,
+DrawString,0x4c14f0,src/graphics/font.cpp,text,DrawBattleFrame;DrawBlinkWords;DrawKillCount;DrawLabel;DrawMapDebugOverlay;DrawNetworkStats;DrawProfileBarLine;DrawRangeCircle;DrawResourcePanel;DrawSliderBar;DrawTextClipped;DrawUnitBuilderProbe;DrawUnitInfoPanel;DrawUnitStateProbe;UpdateSolarSystem,recorded after the string is cut to its width; DrawOutlinedString is five of these
+DrawMapTiles,0x483fa0,src/map/line_of_sight.cpp,terrain,DrawBattleFrame,tiles drawn through DrawFrameOpaque and DrawTile are not recorded
+DrawObjectState,0x458810,src/units/unit_motion.cpp,model,-,called by DrawUnit (src/graphics) from DrawBattleFrame and BlitFeatureGaf; one cargo item per carried unit follows; the cached picture is not recorded
+DrawModel3doProjected,0x46bae0,src/ingame/info_panel.cpp,projectile,DrawProjectiles,"the projected faces are DrawFrameQuad and FillPolygon calls, not recorded"
+DrawDebrisProjected,-,src/ingame/info_panel.cpp,shard,DrawExplosions,"the faces are DrawFrameQuad and FillPolygon calls, not recorded"
+DrawExplodedPiece,0x421550,src/weapons/explosions.cpp,debris,DrawExplodedPieces;DrawExplosions,recorded only when DrawExplodedPieceFaces would draw; the smoke and thrust emission is not a draw
+DrawExplodedPieceFaces,0x4211d0,src/weapons/explosions.cpp,internal,DrawExplodedPiece,called by DrawExplodedPiece; its quads and polygons are not recorded
+DrawFrameDepth,0x4b90a0,src/graphics/gaf.cpp,internal,-,called by DrawObjectPicture to compose a cargo unit into the cached picture
+DrawFrameScaled,0x4b9a50,src/graphics/gaf.cpp,none: no callers,-,
+DrawFrameScaledBlended,0x4b9740,src/graphics/gaf.cpp,none: no callers,-,
+GrabBackground,0x4b94c0,src/graphics/gaf.cpp,none: no callers,-,
+HalveFrame,0x4587b0,src/graphics/model_render.cpp,none: no callers,-,makes a picture
+CutOutFrame,0x4b9d70,src/graphics/gaf.cpp,none: makes a picture,CMemoryCache::BuildShadow,builds the unit shadow picture
+DownsampleFrame,0x4b95a0,src/graphics/gaf.cpp,none: makes a picture,BuildRadarPicture,builds the minimap picture
+ZeroFramePixels,0x4b96a0,src/graphics/gaf.cpp,internal,-,edits a picture in place
+TintFrameBelow,0x4b96e0,src/graphics/gaf.cpp,internal,-,edits a picture in place
+CutFrameBelow,0x4ba1b0,src/graphics/gaf.cpp,internal,-,edits a picture in place
+MakeSilhouette,0x45a470,src/graphics/model_render.cpp,none: makes a picture,-,part of the model picture cache
+SurfaceFromFrame,0x4b8a80,src/graphics/gaf.cpp,none: adapter,BuildTedRadarFrame;ResizeRadarPicture;WriteScreenshot,wraps a frame as a surface
+FrameFromSurface,0x4b8ae0,src/graphics/gaf.cpp,none: adapter,BuildRadarPicture;LoadUnitPortrait;OpenOptionsPanel;ShowSavedGameInfo;WriteScreenshot,wraps a surface as a frame
+AllocFrame,0x4b8da0,src/graphics/gaf.cpp,none: makes pictures,BuildExplosionFrame;BuildTedRadarFrame;LoadRadarPic;ResizeRadarPicture;WriteScreenshot,registers the picture by its name
+AllocDepthFrame,0x4b8e00,src/graphics/gaf.cpp,none: makes pictures,-,registers the picture by its name
+BuildLensFrame,0x4b91b0,src/graphics/gaf.cpp,none: makes pictures,InitExplosions,
+LoadGaf,0x4b8c60,src/graphics/gaf.cpp,none: makes pictures,LoadAnimGaf;LoadFeatureType;LoadGafFile;LoadGafIntoSlot;LoadLogos;LoadScreenGaf;LoadTextureGafs;RenderLayer,names every frame of every entry
+DrawSurfaceKeyed,0x4c6c50,src/graphics/surface.cpp,none: no callers,-,
+CopySurfaceRectKeyed,0x4c6dc0,src/graphics/surface.cpp,none: no callers,-,
+DrawTile,0x4c6e70,src/graphics/surface.cpp,internal,DrawMapTiles,called by DrawMapTiles
+DrawCursor,0x4c67c0,src/graphics/surface.cpp,none: present step,-,suppressed with FlipScreen; the cursor is the closing line of the frame
+FlipScreen,0x4c63a0,src/graphics/surface.cpp,none: present step,BlankScreen;BlitOptionsPanel;ClearScreenWithHudPalette;ConnectToGame;DrawBattleFrame;DrawEndGameFrame;DrawLightBars;HandleMainMenuClick;HandleOptionsPanelClick;LoadPictureCached;LoadingScreenFrame;OpenEndMissionScreen;OpenEndMultiScreen;OpenMainMenu;PlayMovie;PresentFrontendFrame;RunEndGameState;RunWhileScreenNamed,ends the frame
+DrawQuadRow,0x4c7310,src/graphics/surface.cpp,internal,-,called by DrawFrameQuad
+DrawTexturedPolygon,0x4c8760,src/graphics/surface.cpp,internal,-,called by DrawFrameQuad
+DrawLitTexturedPolygon,0x4c8bb0,src/graphics/surface.cpp,internal,-,called by DrawFrameQuad
+AllocSurface,0x4c69f0,src/graphics/surface.cpp,none: makes pictures,BuildRadarPicture;CreateOffscreenSurface;Force640x480Surfaces;InitGame;InitMouse;InitRadar;LoadingScreenFrame;OpenOptionsPanel;RenderLayer;RunEndGameState,registers the surface by its name
+FreeSurface,0x4c6ac0,src/graphics/surface.cpp,none: makes pictures,BuildRadarPicture;DrawBitmapBackground;FreePictureCache;FreeRadar;HandleEndMissionClick;HandleInGameOptionsClick;HandleOptionsPanelClick;HandleRestrictionsClick;HandleUnitInfoDialogEvent;LoadPictureCached;OpenEndMultiScreen;RenderLayer;ShowSavedGameInfo;ShutdownMouse,unregisters the surface
+DrawLitLine,0x4bec70,src/graphics/draw.cpp,internal,-,called by DrawLitRectangle
+DrawBlendedLine,0x4bed70,src/graphics/draw.cpp,none: no callers,-,
+ReadPixel,0x4befe0,src/graphics/draw.cpp,none: no callers,-,
+DrawPolyline,0x4bf060,src/graphics/draw.cpp,none: no callers,-,
+DrawPolylines,0x4bf260,src/graphics/draw.cpp,none: no callers,-,
+XorRectangle,0x4bfd60,src/graphics/draw.cpp,none: no callers,-,
+DrawPolygon,0x4c07b0,src/graphics/draw.cpp,none: no callers,-,
+DrawPolygonEdges,0x4c0820,src/graphics/draw.cpp,internal,-,called by DrawPieceEdges
+FillFlatPolygon,0x4c1000,src/graphics/draw.cpp,internal,-,called by DrawPolygon and DrawPieceEdges
+FillShadedPolygon,0x4c0c70,src/graphics/draw.cpp,internal,-,called by the lit model pieces
+ScanFillPolygon,0x4c0330,src/graphics/draw.cpp,internal,-,called by FillPolygon
+ClipRectangle,0x4bf620,src/graphics/draw.cpp,internal,-,called by the rectangle primitives
+ClipLine,0x4bea20,src/graphics/draw.cpp,internal,-,called by the line primitives
+DrawStringCentered,0x4c1760,src/graphics/font.cpp,none: no callers,-,
+DrawOutlinedString,0x4c1830,src/graphics/font.cpp,none: five DrawString items,RunEndGameState,left unhooked so that each of its five DrawString calls is an item
+UpdateRadarMapped,0x466c20,src/ingame/radar.cpp,none: direct pixel writes,DrainSimEvents,"writes the RADAR MAPPED surface without a primitive; DrawRadar then blits it, so the blit is an item but the writes are not"
+BuildTedRadarFrame,-,src/ingame/radar_picture.cpp,none: makes pictures,LoadTntMap,"the map embedded minimap: raw map data drawn into TED GENERATED PIC with DrawFrame (an item with a ? picture), then used as the radar picture"
+BuildRadarPicture,0x466780,src/ingame/radar_picture.cpp,none: makes pictures,InitRadar,DrawPixel calls onto the RADAR PIC TEMP surface are items; DownsampleFrame into the RADAR PIC surface is not
+SmackToBuffer,-,-,none: movie frames,-,the movie decoder writes video straight into the screen surface during a movie; not in this tree
+DrawFrameRate,0x4b6570,src/graphics/display.cpp,none: debug text,-,"FRATE text through host_frame_text on the host back buffer, only when not windowed"
+WriteScreenshot,0x495a30,src/ingame/keys.cpp,none: screenshot,CmdMakePoster,"draws into an AllocFrame ScreenShot frame; its items name that frame as the target, and the file is written with host_file_write"
+OpenOptionsPanel,0x460160,src/frontend/options.cpp,none: direct pixel writes,HandleInGameOptionsClick;HandleSelectProviderClick;HandleSingleMenuClick;RunFrontendStateMachine,memcpy of the options layer surface into the FLIPSURFACE pixels
+BuildExplosionFrame,0x420d20,src/weapons/explosions.cpp,none: makes pictures,BuildCalcedExplosion;MakeExplosion,writes the pixels of an ExplosionFrame picture
+BuildFogTiles,0x4843c0,src/map/line_of_sight.cpp,none: makes pictures,DrawFogOfWar,builds the fog tile pictures
+RecalculateLineOfSight,0x4816a0,src/map/line_of_sight.cpp,none: not a draw,ApplyLosRadarEvent;WriteScreenshot,"the line-of-sight loops in line_of_sight.cpp read the LOS GAF frame pixels into the visibility mask, which is game state, not a target"
+HideSoftwareCursor,0x4c2470,src/gui/mouse.cpp,none: cursor,BeginMouseScroll;CloseTopScreen;DrawBattleFrame;DrawBitmapBackground;LoadGuiLayer;MenuFrame;OpenMainMenu;OpenNewGameMenu;PresentFrontendFrame;RunEndGameState;RunFrontendStateMachine;SetUpSkirmish;ToggleTabMenu,"draws on the cursor save-under surfaces, and the cursor is the closing line of the frame"
+ShowSoftwareCursor,0x4c2870,src/gui/mouse.cpp,none: cursor,CloseTopScreen;DrawBattleFrame;DrawBitmapBackground;DrawEndGameFrame;EndMouseScroll;InitFrame;LoadGuiLayer;LoadingScreenFrame;MenuFrame;OpenEndMultiScreen;OpenMainMenu;OpenNewGameMenu;PresentFrontendFrame;RunEndGameState;RunFrontendStateMachine;RunWhileScreenNamed;ToggleTabMenu;UpdateMouseScroll,the cursor is the closing line of the frame; with the cursor thread on it draws nothing

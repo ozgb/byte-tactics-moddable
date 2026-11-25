@@ -31,6 +31,10 @@ void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit);
 void __stdcall HarnessUiGroup(const char* what, int group);
 void __stdcall HarnessUiCommand(const OrdersGroupCommand* command);
 struct tagPALETTEENTRY;
+struct DlPicture;
 void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const tagPALETTEENTRY* entries);
+
+const char* HarnessMapName();
+void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY);
 
 #endif

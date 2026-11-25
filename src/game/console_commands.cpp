@@ -13,6 +13,7 @@
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 struct GafFrame;
 struct Script;
@@ -375,7 +376,7 @@ void __stdcall CmdSearch(CommandArgs* args)
         SimSetSearchSteps((unsigned int)args->GetIntArg(1, 0));
     }
     if (args->count == 3 && g_seams.pathfinding->SetSearchScale != nullptr) {
-        g_seams.pathfinding->SetSearchScale((int)(atof(args->GetArg(2, g_emptyText)) * 65536.0));
+        g_seams.pathfinding->SetSearchScale(bx_ftol(atof(args->GetArg(2, g_emptyText)) * 65536.0));
     }
 }
 
@@ -549,8 +550,8 @@ void __stdcall CmdMapping(int unused)
 // FUNCTION: 0x416db0
 void __stdcall CmdContour(CommandArgs* args)
 {
-    g_contourSpacing = (int)(args->GetFloatArg(1, 0.0f) * 256.0f);
-    g_contourOffset = (int)(args->GetFloatArg(2, 0.75f) * 256.0f);
+    g_contourSpacing = bx_ftol(args->GetFloatArg(1, 0.0f) * 256.0f);
+    g_contourOffset = bx_ftol(args->GetFloatArg(2, 0.75f) * 256.0f);
 }
 
 // FUNCTION: 0x416e00

@@ -281,6 +281,7 @@ unsigned char Unit::ChooseWeapon()
 #include "../ingame/game_dialogs.h"
 #include "../util/math.h"
 #include "../../interfaces/host.h"
+#include "../util/ftol.h"
 
 static void PublishCleared(Unit* unit, int weapon)
 {
@@ -448,7 +449,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
-        int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
+        int dist = bx_ftol(sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z));
         int scale = (int)(((__int64)dist << 16) / ((WeaponDefTargetView*)e->weapon.get())->radius);
         scale = (int)((scale * (__int64)TARGET_BODY_SCALE) >> 16);
         __int64 s = scale;

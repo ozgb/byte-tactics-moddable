@@ -412,6 +412,7 @@ static inline unsigned int ReplaceFlagField(unsigned int flags, unsigned int val
 #include "../../interfaces/seams.h"
 
 #include <conio.h>
+#include "../util/ftol.h"
 
 // FUNCTION: 0x42bf40
 void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
@@ -513,7 +514,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             value = parser.current->GetFieldInt("stealth", 0);
             unitdef->flags1 = SetFlagField(unitdef->flags1, value, 8, 1);
             unitdef->cloakcost = (float)parser.current->GetFieldInt("cloakcost", 0);
-            unitdef->cloakcostmoving = (float)parser.current->GetFieldInt("cloakcostmoving", (int)unitdef->cloakcost);
+            unitdef->cloakcostmoving = (float)parser.current->GetFieldInt("cloakcostmoving", bx_ftol(unitdef->cloakcost));
             unitdef->mincloakdistance =
                 (short)parser.current->GetFieldInt("mincloakdistance", 0);
             unitdef->buildangle =

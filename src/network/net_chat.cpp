@@ -19,6 +19,7 @@
 
 #include "../../link/globals.h"
 #include "net_chat.h"
+#include "../util/ftol.h"
 
 void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../gui/dialogs.h"
@@ -191,13 +192,13 @@ void __stdcall DrawMessages(void* surf)
             int height = 138;
             int id = (*(ChatHudEntry (*)[30])&g_game->entries)[i].unit_46;
             if (id != 10) {
-                t = (int)(GetFontHeight() * 0.8);
+                t = bx_ftol(GetFontHeight() * 0.8);
                 Rect r;
                 r.top = y;
                 r.left = 138;
                 r.right = t + 138;
                 r.bottom = y + t;
-                height = (int)(138.0 - t * -1.5);
+                height = bx_ftol(138.0 - t * -1.5);
                 BlitSideLogoToRect(surf, &g_game->players_1b63[id], &r, 0);
             }
             DrawTextClipped(surf, (char *)&(*(ChatHudEntry (*)[30])&g_game->entries)[i], height, y, -1, 0);

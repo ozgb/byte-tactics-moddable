@@ -102,6 +102,7 @@ int __cdecl AngleOfVector(int x, int z);
 Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn* spawn);
 
 #include "../../link/globals.h"
+#include "../util/ftol.h"
 
 // FUNCTION: 0x48a7f0
 void __stdcall SnapUnitToGround(Unit* unit)
@@ -332,7 +333,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
     if (u->unitDefIndex == 0)
         return;
     stream->WriteBits(u->health, 0x10);
-    stream->WriteBits((u->buildLeft != 0.0f) ? 1 - (int)(u->buildLeft * -254.0f) : 0, 8);
+    stream->WriteBits((u->buildLeft != 0.0f) ? 1 - bx_ftol(u->buildLeft * -254.0f) : 0, 8);
     stream->WriteBits(u->activateFlags, 8);
     stream->WriteBits(u->flags & 3, 2);
     if (u->carrier) {

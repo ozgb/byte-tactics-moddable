@@ -45,7 +45,7 @@ add_custom_command(
   DEPENDS "${CMAKE_SOURCE_DIR}/tools/bitexact_tables.py"
   VERBATIM)
 add_library(bitexact STATIC
-  "${BITEXACT_DIR}/sqrt.c" "${BITEXACT_DIR}/ext.c" "${BITEXACT_DIR}/dd.c" "${BITEXACT_DIR}/rand.c"
+  "${BITEXACT_DIR}/sqrt.c" "${BITEXACT_DIR}/ftol.c" "${BITEXACT_DIR}/ext.c" "${BITEXACT_DIR}/dd.c" "${BITEXACT_DIR}/rand.c"
   "${BITEXACT_DIR}/hypot.c" "${BITEXACT_DIR}/acos.c" "${BITEXACT_DIR}/strtof.c" "${BITEXACT_DIR}/qsort.c" "${BITEXACT_DIR}/shuffle.c"
   "${BITEXACT_DIR}/fixed_trig.c" "${BITEXACT_DIR}/explosions.c"
   "${BITEXACT_TABLES}")
@@ -422,8 +422,8 @@ target_compile_options(ref_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/ref_test.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/ref_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
-          $<TARGET_OBJECTS:ref_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-  DEPENDS ref_test_objects $<TARGET_OBJECTS:ref_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          $<TARGET_OBJECTS:ref_test_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS ref_test_objects bitexact $<TARGET_OBJECTS:ref_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(ref_test DEPENDS "${CMAKE_BINARY_DIR}/ref_test.exe")
 
@@ -446,8 +446,8 @@ target_compile_options(economy_writer_test_objects PRIVATE ${GAME_COMPILE_OPTION
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/economy_writer_test.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/economy_writer_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
-          $<TARGET_OBJECTS:economy_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-  DEPENDS economy_writer_test_objects $<TARGET_OBJECTS:economy_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          $<TARGET_OBJECTS:economy_writer_test_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS economy_writer_test_objects bitexact $<TARGET_OBJECTS:economy_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(economy_writer_test DEPENDS "${CMAKE_BINARY_DIR}/economy_writer_test.exe")
 add_library(features_writer_test_objects OBJECT src/map/features.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/features_writer_test.cpp)
@@ -457,8 +457,8 @@ target_compile_options(features_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIO
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/features_writer_test.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/features_writer_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
-          $<TARGET_OBJECTS:features_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-  DEPENDS features_writer_test_objects $<TARGET_OBJECTS:features_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          $<TARGET_OBJECTS:features_writer_test_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS features_writer_test_objects bitexact $<TARGET_OBJECTS:features_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(features_writer_test DEPENDS "${CMAKE_BINARY_DIR}/features_writer_test.exe")
 add_library(targeting_writer_test_objects OBJECT src/units/unit_targets.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/targeting_writer_test.cpp)
@@ -468,8 +468,8 @@ target_compile_options(targeting_writer_test_objects PRIVATE ${GAME_COMPILE_OPTI
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/targeting_writer_test.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/targeting_writer_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
-          $<TARGET_OBJECTS:targeting_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-  DEPENDS targeting_writer_test_objects $<TARGET_OBJECTS:targeting_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          $<TARGET_OBJECTS:targeting_writer_test_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS targeting_writer_test_objects bitexact $<TARGET_OBJECTS:targeting_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(targeting_writer_test DEPENDS "${CMAKE_BINARY_DIR}/targeting_writer_test.exe")
 add_library(los_radar_writer_test_objects OBJECT src/map/line_of_sight.cpp src/map/line_of_sight_index.cpp src/game/players.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/los_radar_writer_test.cpp)
@@ -479,8 +479,8 @@ target_compile_options(los_radar_writer_test_objects PRIVATE ${GAME_COMPILE_OPTI
 add_custom_command(
   OUTPUT "${CMAKE_BINARY_DIR}/los_radar_writer_test.exe"
   COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/los_radar_writer_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
-          $<TARGET_OBJECTS:los_radar_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
-  DEPENDS los_radar_writer_test_objects $<TARGET_OBJECTS:los_radar_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          $<TARGET_OBJECTS:los_radar_writer_test_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS los_radar_writer_test_objects bitexact $<TARGET_OBJECTS:los_radar_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(los_radar_writer_test DEPENDS "${CMAKE_BINARY_DIR}/los_radar_writer_test.exe")
 add_library(map_writer_test_objects OBJECT src/map/terrain.cpp src/map/pass_map.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/map_writer_test.cpp)

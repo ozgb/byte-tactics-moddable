@@ -12,6 +12,7 @@
 #include "../debug/debug_lib.h"
 
 #include "../../link/globals.h"
+#include "../util/ftol.h"
 
 // GLOBAL: 0x511de8
 struct Game;
@@ -572,7 +573,7 @@ int CMemoryCache::ShadeByIntensity(GafFrame* image, ModelState* model)
     else
         palette2 = (b & 0xf) + 0xa0;
 
-    int alpha = (int)(owner->buildLeft * 255.0f);
+    int alpha = bx_ftol(owner->buildLeft * 255.0f);
     if (alpha > 0xeb) {
         RecolorByShade(image, Scale(alpha - 0xeb, 255, 20), -2, -2, palette1);
     } else if (alpha > 200) {
@@ -1113,7 +1114,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, ModelState* list,
                             float light = accum[*idx][0] * g_lightX + accum[*idx][1] * g_lightY;
                             light += accum[*idx][2] * g_lightZ;
 #endif
-                            poly[j].shade = 0x1f & ((int)(DAT_004fd4cc * light));
+                            poly[j].shade = 0x1f & (bx_ftol(DAT_004fd4cc * light));
                         } else {
                             poly[j].shade = 0xf;
                         }

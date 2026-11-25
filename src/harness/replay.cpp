@@ -544,6 +544,14 @@ void ImportValueStruct(ReplayText& t, unsigned kind, const void* p)
     ReplayAddValue(t, kind, p, Table());
 }
 
+void ImportStructIn(ReplayText& t, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        t.Add(" null");
+    else
+        ImportValueStruct(t, kind, p);
+}
+
 void ImportInOut(ReplayText& t, unsigned kind, const void* p)
 {
     t.AddChar(' ');

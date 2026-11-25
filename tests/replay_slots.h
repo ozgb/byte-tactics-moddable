@@ -14,6 +14,35 @@ WeaponDef* __stdcall Imp_weapons_FindWeaponByName(const char* a0)
     return w;
 }
 
+int __stdcall Imp_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
+{
+    ReplayText t;
+    StartImport(t, "weapons.WeaponCanReachPos");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a1);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+Projectile* __stdcall Imp_weapons_FindTargetableProjectile(Unit* a0, unsigned int a1)
+{
+    ReplayText t;
+    StartImport(t, "weapons.FindTargetableProjectile");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    Projectile* o = (Projectile*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
 int __stdcall Imp_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
 {
     ReplayText t;
@@ -434,15 +463,22 @@ unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
     return ParseResult<unsigned int>(r);
 }
 
-Cell* __stdcall Imp_los_radar_GetMapCellAtPosition(Vec3* a0)
+int __stdcall Imp_los_radar_GetSeenUnitsInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
 {
     ReplayText t;
-    StartImport(t, "los_radar.GetMapCellAtPosition");
+    StartImport(t, "los_radar.GetSeenUnitsInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    AddValueStruct(t, ROK_VEC3, a1);
+    Space(t);
+    ReplayValue(t, a2);
     Space(t);
     t.Add("?");
+    Space(t);
+    ReplayValue(t, a4);
     const char* r = Enter(t);
-    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
-    return o;
+    return ParseResult<int>(r);
 }
 
 int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
@@ -455,6 +491,17 @@ int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
     t.Add("?");
     const char* r = Enter(t);
     return ParseResult<int>(r);
+}
+
+Cell* __stdcall Imp_los_radar_GetMapCellAtPosition(Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetMapCellAtPosition");
+    Space(t);
+    t.Add("?");
+    const char* r = Enter(t);
+    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
 }
 
 int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
@@ -478,7 +525,7 @@ int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
     ReplayText t;
     StartImport(t, "map.GetCellMeanHeight");
     Space(t);
-    t.Add("?");
+    AddStructIn(t, ROK_VEC3, a0);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -500,6 +547,17 @@ int __stdcall Imp_mission_GetGameType()
     StartImport(t, "mission.GetGameType");
     const char* r = Enter(t);
     return ParseResult<int>(r);
+}
+
+const char* __stdcall Imp_mission_GetNameSlot(int a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetNameSlot");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    (void)r;
+    return (const char*)0;
 }
 
 void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
@@ -615,12 +673,46 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
+int __stdcall Imp_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
+{
+    ReplayText t;
+    StartImport(t, "orders.GetOrderType");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a3);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_players_LoadDefaultAIScript()
+{
+    ReplayText t;
+    StartImport(t, "players.LoadDefaultAIScript");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+double __stdcall Imp_economy_GetEnergyUse(EconType a0)
+{
+    ReplayText t;
+    StartImport(t, "economy.GetEnergyUse");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<double>(r);
+}
+
 void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
     StartImport(t, "features.GetFootprintCentre");
     Space(t);
-    t.Add("?");
+    AddStructIn(t, ROK_POINT16, a0);
     Space(t);
     ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
     const char* r = Enter(t);
@@ -633,7 +725,7 @@ unsigned short __stdcall Imp_features_FindFeatureAtPos(Vec3* a0, Point16* a1, Po
     ReplayText t;
     StartImport(t, "features.FindFeatureAtPos");
     Space(t);
-    t.Add("?");
+    AddStructIn(t, ROK_VEC3, a0);
     const char* r = Enter(t);
     ApplyInOut(a1, "cell", ROK_POINT16);
     ApplyInOut(a2, "size", ROK_POINT16);
@@ -680,6 +772,9 @@ MapSeam g_import_map;
 MissionSeam g_import_mission;
 PathfindingSeam g_import_pathfinding;
 ScriptsSeam g_import_scripts;
+OrdersSeam g_import_orders;
+PlayersSeam g_import_players;
+EconomySeam g_import_economy;
 FeaturesSeam g_import_features;
 UnitsSeam g_import_units;
 WindMeteorsSeam g_native_wind_meteors = {
@@ -731,6 +826,24 @@ FeaturesSeam g_native_features = {
     FirstFeatureSpot,
     UpdateFeatureSpot,
     FindFeatureAtPos,
+};
+
+AiSeam g_native_ai = {
+    AiApply,
+    DumpPlayerAI,
+    ResetAIPlayers,
+    CreatePlayerAI,
+    DestroyPlayerAI,
+    UpdatePlayerAI,
+    RebuildFeatureCells,
+    ParseDownloadableAiWeightScripts,
+    ReparseAiWeightScriptsIfLimitNotSticky,
+    CreateSquads,
+    FreeSquads,
+    UpdateSquadsSlot,
+    CreateSquadManagerSlot,
+    FreeSquadManagerSlot,
+    WriteAiStateSlot,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -1249,6 +1362,114 @@ void After_features_FindFeatureAtPos()
     if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_1_null) CompareStruct("cell", ROK_POINT16, &g_out_features_FindFeatureAtPos_1);
     if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_2_null) CompareStruct("size", ROK_POINT16, &g_out_features_FindFeatureAtPos_2);
     CompareResult(g_result_features_FindFeatureAtPos);
+}
+
+int g_result_ai_Apply;
+
+void Run_ai_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_AI, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_ai_Apply = g_seams.ai->Apply((AiEventHeader*)p0, p1);
+}
+
+void After_ai_Apply()
+{
+    CompareResult(g_result_ai_Apply);
+}
+
+void Run_ai_DumpPlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    TdfFile* p1 = (TdfFile*)ArgHandle("file");
+    SetClosing(nullptr);
+    g_seams.ai->DumpPlayerAI(p0, p1);
+}
+
+void Run_ai_ResetAIPlayers()
+{
+    SetClosing(nullptr);
+    g_seams.ai->ResetAIPlayers();
+}
+
+void Run_ai_CreatePlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->CreatePlayerAI(p0);
+}
+
+void Run_ai_DestroyPlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->DestroyPlayerAI(p0);
+}
+
+void Run_ai_UpdatePlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->UpdatePlayerAI(p0);
+}
+
+void Run_ai_RebuildFeatureCells()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->RebuildFeatureCells(p0);
+}
+
+void Run_ai_ParseDownloadableAiWeightScripts()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->ParseDownloadableAiWeightScripts(p0);
+}
+
+void Run_ai_ReparseAiWeightScriptsIfLimitNotSticky()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->ReparseAiWeightScriptsIfLimitNotSticky(p0);
+}
+
+void Run_ai_CreateSquads()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->CreateSquads(p0);
+}
+
+void Run_ai_FreeSquads()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->FreeSquads(p0);
+}
+
+void Run_ai_UpdateSquads()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->UpdateSquads(p0);
+}
+
+void Run_ai_CreateSquadManager()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->CreateSquadManager(p0);
+}
+
+void Run_ai_FreeSquadManager()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->FreeSquadManager(p0);
 }
 
 int g_result_weapons_Apply;
@@ -2156,6 +2377,62 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_features_FindFeatureAtPos();
         return true;
     }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_ai_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "DumpPlayerAI") == 0) {
+        Run_ai_DumpPlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ResetAIPlayers") == 0) {
+        Run_ai_ResetAIPlayers();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreatePlayerAI") == 0) {
+        Run_ai_CreatePlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "DestroyPlayerAI") == 0) {
+        Run_ai_DestroyPlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "UpdatePlayerAI") == 0) {
+        Run_ai_UpdatePlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "RebuildFeatureCells") == 0) {
+        Run_ai_RebuildFeatureCells();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ParseDownloadableAiWeightScripts") == 0) {
+        Run_ai_ParseDownloadableAiWeightScripts();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ReparseAiWeightScriptsIfLimitNotSticky") == 0) {
+        Run_ai_ReparseAiWeightScriptsIfLimitNotSticky();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquads") == 0) {
+        Run_ai_CreateSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "FreeSquads") == 0) {
+        Run_ai_FreeSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "UpdateSquads") == 0) {
+        Run_ai_UpdateSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquadManager") == 0) {
+        Run_ai_CreateSquadManager();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "FreeSquadManager") == 0) {
+        Run_ai_FreeSquadManager();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
         return true;
@@ -2409,6 +2686,8 @@ void RunAfter(const char* subsystem, const char* slot)
         After_features_UpdateFeatureSpot();
     if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FindFeatureAtPos") == 0)
         After_features_FindFeatureAtPos();
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "Apply") == 0)
+        After_ai_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0)
@@ -2511,6 +2790,7 @@ void BindSeams()
     g_seams.wind_meteors = &g_native_wind_meteors;
     g_seams.economy = &g_native_economy;
     g_seams.features = &g_native_features;
+    g_seams.ai = &g_native_ai;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
     g_seams.units = &g_native_units;
@@ -2553,8 +2833,9 @@ void BindSeams()
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
     g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
-    g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+    g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
     g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+    g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
     g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
@@ -2565,9 +2846,13 @@ void BindSeams()
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
     g_import_scripts.QueryScript = Imp_scripts_QueryScript;
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+    g_seams.orders = &g_import_orders;
+    g_import_orders.GetOrderType = Imp_orders_GetOrderType;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
     }
@@ -2577,7 +2862,24 @@ void BindSeams()
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
         g_seams.mission = &g_import_mission;
         g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+    }
+    if (strcmp(g_subsystem, "ai") == 0) {
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.weapons = &g_import_weapons;
+        g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
+        g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
+        g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+        g_seams.players = &g_import_players;
+        g_import_players.LoadDefaultAIScript = Imp_players_LoadDefaultAIScript;
+        g_seams.economy = &g_import_economy;
+        g_import_economy.GetEnergyUse = Imp_economy_GetEnergyUse;
     }
     if (strcmp(g_subsystem, "weapons") == 0) {
         g_seams.features = &g_import_features;
@@ -2590,6 +2892,8 @@ void BindSeams()
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
         g_seams.map = &g_import_map;
@@ -2602,11 +2906,13 @@ void BindSeams()
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
         g_seams.mission = &g_import_mission;
         g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     }
     if (strcmp(g_subsystem, "players") == 0) {
         g_seams.mission = &g_import_mission;
         g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
         g_seams.units = &g_import_units;
         g_import_units.FindUnitTypeId = Imp_units_FindUnitTypeId;

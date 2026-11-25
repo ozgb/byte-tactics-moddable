@@ -409,22 +409,6 @@ void ReplayImportEnd(ReplayImport& c)
         ImportResultObject(t, ROK_UNIT, (c.result.kind == 1 ? c.result.v.p : nullptr));
         break;
     }
-    case RI_SCHEDULE_MAP_CAN_BUILD_AT:
-    {
-        AddSpace(t);
-        t.AddInt(a[2].v.i);
-        AddResult(t, c.result);
-        break;
-    }
-    case RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT:
-    {
-        AddSpace(t);
-        t.AddInt(a[1].v.i);
-        AddSpace(t);
-        t.AddInt(a[3].v.i);
-        AddResult(t, c.result);
-        break;
-    }
     case RI_SCHEDULE_MAP_PICK_RECLAIMABLE:
     {
         AddSpace(t);
@@ -554,6 +538,26 @@ void ReplayImportEnd(ReplayImport& c)
         AddSpace(t);
         t.AddInt(a[1].v.i);
         AddResult(t, c.result);
+        break;
+    }
+    case RI_SCHEDULE_MAP_CAN_BUILD_AT:
+    {
+        AddSpace(t);
+        t.AddInt(a[2].v.i);
+        AddResult(t, c.result);
+        t.Add("\n  o SimGlobals.g_lastPlaceMetalSum ");
+        t.AddInt(g_lastPlaceMetalSum);
+        break;
+    }
+    case RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT:
+    {
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddSpace(t);
+        t.AddInt(a[3].v.i);
+        AddResult(t, c.result);
+        t.Add("\n  o SimGlobals.g_lastPlaceMetalSum ");
+        t.AddInt(g_lastPlaceMetalSum);
         break;
     }
     }

@@ -84,5 +84,13 @@
       "expect": 25,
       "field": "Unit#1.healthPercent"
     }
+  },
+  "ai": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_SQUAD_PERIOD=45",
+      "recording": "skirmish2.txt",
+      "expect": 76,
+      "field": "SquadManager#1.countdown"
+    }
   }
 }

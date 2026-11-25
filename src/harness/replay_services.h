@@ -46,8 +46,6 @@ enum ReplayImportId {
     RI_SCHEDULE_TARGETING_TARGET_POS,
     RI_SCHEDULE_TARGETING_FIND,
     RI_SCHEDULE_TARGETING_FIRE_AT_WILL,
-    RI_SCHEDULE_MAP_CAN_BUILD_AT,
-    RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT,
     RI_SCHEDULE_MAP_PICK_RECLAIMABLE,
     RI_SIM_CAPTURE_ALLOC,
     RI_FIND_SLOT_BY_DPID,
@@ -64,6 +62,8 @@ enum ReplayImportId {
     RI_GET_OBJECT_HEIGHT,
     RI_EXECUTE_COMMAND_TEXT,
     RI_SCHEDULE_ECONOMY_REQUEST_GRANTED,
+    RI_SCHEDULE_MAP_CAN_BUILD_AT,
+    RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT,
     RI_COUNT
 };
 
@@ -111,8 +111,6 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.ScheduleTargetingTargetPos",
     "services.ScheduleTargetingFind",
     "services.ScheduleTargetingFireAtWill",
-    "services.ScheduleMapCanBuildAt",
-    "services.ScheduleMapCanPlaceUnitFootprint",
     "services.ScheduleMapPickReclaimable",
     "services.SimCaptureAlloc",
     "services.FindSlotByDpid",
@@ -129,6 +127,8 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.GetObjectHeight",
     "services.ExecuteCommandText",
     "services.ScheduleEconomyRequestGranted",
+    "services.ScheduleMapCanBuildAt",
+    "services.ScheduleMapCanPlaceUnitFootprint",
 };
 
 #endif

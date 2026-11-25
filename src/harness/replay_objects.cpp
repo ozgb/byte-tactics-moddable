@@ -1578,8 +1578,11 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
         unsigned count = pass == 0 ? sets.readCount : sets.writeCount;
         for (unsigned i = 0; i < count; i++) {
             const ReplayField& f = kReplayFields[set[i]];
-            if (f.kind == RK_REF && f.base == RB_GAME)
-                Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)((const unsigned char*)g_game + f.offset)), nullptr, 0);
+            if (f.kind == RK_REF && (f.base == RB_GAME || f.base == RB_SIM)) {
+                const unsigned char* base = f.base == RB_GAME ? (const unsigned char*)g_game : (const unsigned char*)g_simGlobals;
+                if (base != nullptr)
+                    Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)(base + f.offset)), nullptr, 0);
+            }
             if (f.kind == RK_VECTOR && f.base != RB_RNG && kReplayVectors[f.array - 1].mode == RV_OBJECT) {
                 const unsigned char* root = f.base == RB_GAME ? (const unsigned char*)g_game : (const unsigned char*)g_simGlobals;
                 VectorView view = root == nullptr ? VectorView() : ViewOf(ReplayFieldView(f), root);

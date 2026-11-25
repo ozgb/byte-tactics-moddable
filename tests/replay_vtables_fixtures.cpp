@@ -5,6 +5,7 @@
 extern void (* const g_approachRadiusVtable[])();
 extern void (* const g_ringApproachVtable[])();
 extern void (* const g_pathOrderVtable[])();
+extern void (* const g_orderVtable[])() __asm__("??_7Order@@6B@");
 extern void (* const g_weaponAimCobVtable[])();
 extern void (* const g_vtsym_VictoryKillEnemyCommander[])() __asm__("??_7VictoryKillEnemyCommander@@6B@");
 extern void (* const g_vtsym_VictoryDestroyAllUnits[])() __asm__("??_7VictoryDestroyAllUnits@@6B@");
@@ -23,6 +24,14 @@ extern void (* const g_vtsym_DefeatUnitTypeKilled[])() __asm__("??_7DefeatUnitTy
 extern void (* const g_vtsym_DefeatDeathTimerRunsOut[])() __asm__("??_7DefeatDeathTimerRunsOut@@6B@");
 extern void (* const g_vtsym_DefeatAnyUnitPassesX[])() __asm__("??_7DefeatAnyUnitPassesX@@6BMissionCondition@@@");
 extern void (* const g_vtsym_DefeatAnyUnitPassesZ[])() __asm__("??_7DefeatAnyUnitPassesZ@@6BMissionCondition@@@");
+extern void (* const g_assaultTimerVtable[])() __asm__("??_7AssaultTimer@@6B@");
+extern void (* const g_escortTimerVtable[])() __asm__("??_7EscortTimer@@6B@");
+extern void (* const g_squadScoutTimerVtable[])() __asm__("??_7SquadScoutTimer@@6B@");
+extern void (* const g_scoutTimerVtable[])() __asm__("??_7ScoutTimer@@6B@");
+extern void (* const g_buildTimerVtable[])() __asm__("??_7BuildTimer@@6B@");
+extern void (* const g_spatialTimerVtable[])() __asm__("??_7SpatialTimer@@6B@");
+extern void (* const g_plainTimerVtable[])() __asm__("??_7SquadTimer@@6B@");
+extern void (* const g_pathOrderAttachVtable[])() __asm__("??_7PathOrderAttach@@6B@");
 extern void (* const g_fixtureTimerVtable[])();
 extern void (* const g_fixtureAssaultVtable[])();
 extern void (* const g_fixtureCbVtable[])();
@@ -50,6 +59,8 @@ const void* ReplayVtable(unsigned kind)
         return g_ringApproachVtable;
     case ROK_PATHORDER:
         return g_pathOrderVtable;
+    case ROK_ORDER:
+        return g_orderVtable;
     case ROK_WEAPONAIMCOBCB:
         return g_weaponAimCobVtable;
     case ROK_VICTORYKILLENEMYCOMMANDER:
@@ -86,6 +97,22 @@ const void* ReplayVtable(unsigned kind)
         return g_vtsym_DefeatAnyUnitPassesX;
     case ROK_DEFEATANYUNITPASSESZ:
         return g_vtsym_DefeatAnyUnitPassesZ;
+    case ROK_ASSAULTTIMER:
+        return g_assaultTimerVtable;
+    case ROK_ESCORTTIMER:
+        return g_escortTimerVtable;
+    case ROK_SQUADSCOUTTIMER:
+        return g_squadScoutTimerVtable;
+    case ROK_SCOUTTIMER:
+        return g_scoutTimerVtable;
+    case ROK_BUILDTIMER:
+        return g_buildTimerVtable;
+    case ROK_SPATIALTIMER:
+        return g_spatialTimerVtable;
+    case ROK_PLAINTIMER:
+        return g_plainTimerVtable;
+    case ROK_PATHORDERATTACH:
+        return g_pathOrderAttachVtable;
     case ROK_FIXTURETIMER:
         return g_fixtureTimerVtable;
     case ROK_FIXTUREASSAULT:
@@ -114,6 +141,8 @@ const char* ReplayVtableName(unsigned kind)
         return "g_ringApproachVtable";
     case ROK_PATHORDER:
         return "g_pathOrderVtable";
+    case ROK_ORDER:
+        return "g_orderVtable";
     case ROK_WEAPONAIMCOBCB:
         return "g_weaponAimCobVtable";
     case ROK_VICTORYKILLENEMYCOMMANDER:
@@ -150,6 +179,22 @@ const char* ReplayVtableName(unsigned kind)
         return "g_vtsym_DefeatAnyUnitPassesX";
     case ROK_DEFEATANYUNITPASSESZ:
         return "g_vtsym_DefeatAnyUnitPassesZ";
+    case ROK_ASSAULTTIMER:
+        return "g_assaultTimerVtable";
+    case ROK_ESCORTTIMER:
+        return "g_escortTimerVtable";
+    case ROK_SQUADSCOUTTIMER:
+        return "g_squadScoutTimerVtable";
+    case ROK_SCOUTTIMER:
+        return "g_scoutTimerVtable";
+    case ROK_BUILDTIMER:
+        return "g_buildTimerVtable";
+    case ROK_SPATIALTIMER:
+        return "g_spatialTimerVtable";
+    case ROK_PLAINTIMER:
+        return "g_plainTimerVtable";
+    case ROK_PATHORDERATTACH:
+        return "g_pathOrderAttachVtable";
     case ROK_FIXTURETIMER:
         return "g_fixtureTimerVtable";
     case ROK_FIXTUREASSAULT:

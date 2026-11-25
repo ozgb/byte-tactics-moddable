@@ -1120,12 +1120,16 @@ void SquadManager::TickTimers()
     }
 }
 
+#ifndef BT_REPLAY_INJECT_SQUAD_PERIOD
+#define BT_REPLAY_INJECT_SQUAD_PERIOD 30
+#endif
+
 // FUNCTION: 0x408c40
 void SquadManager::TickIfActive()
 {
     if (player->active != 0 && player->type == 2) {
         if (--countdown <= 0) {
-            countdown = 30;
+            countdown = BT_REPLAY_INJECT_SQUAD_PERIOD;
             AssignSquads();
         }
         for (int i = 0; i < 10; i++) {

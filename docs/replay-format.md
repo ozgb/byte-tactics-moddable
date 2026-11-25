@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy and players have recordings so far; pathfinding and los_radar have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units and ai have recordings so far; pathfinding and los_radar have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -494,7 +494,7 @@ a value kind (`scope: value`, no row of the field sets matches its fields):
 
 | Form | Annotation | Lines |
 |---|---|---|
-| nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL |
+| nullable struct in | `{"mode": "struct", "kind": "Vec3", "dir": "in", "nullable": true}` | `a pos null` for a null pointer, else the lines of the fields; the replayer passes NULL; in an import line the value as `(x,y,z)` or `null` |
 | array of structs in | `{"mode": "structs", "kind": "Point16", "count": "count"}` | `a points[0].x 1`, `a points[0].y 2`, `a points[1].x 3`, and so on for each of `count` elements (`count` names another integer argument); `a points null` and `a points []` for a null pointer and an empty array |
 | struct by value | `{"mode": "value", "kind": "Angles16"}`, for an argument or `result` | `a kind (5)`, `o result (-3,40000,7)`, and in an import line ` (5)` and ` = (-3,40000,7)`: the values of its fields in order, in parentheses, written as the field's kind writes them |
 | nullable in/out struct | `{"mode": "struct", "kind": "MissionType", "dir": "inout", "nullable": true}` | the value going in as `(5)`, or `null` for a null pointer, in an import line (` (5)`) and in the `a` lines of a slot (`a count (5)`); the value coming out as `o count (9)`, written only when the pointer is not null. The replayer passes the value by address (or NULL), and the stub of an import writes the `o` line back through the pointer |
@@ -581,7 +581,7 @@ the base lists: `ApproachRadius#1`, never `OrderFx#1`, and no vptr or address is
 |---|---|---|
 | `kinds` | a base kind | the concrete kinds the base may be; the base has no fields of its own, its kinds list theirs (the base part included, `source`) |
 | `vtable` | a concrete kind | the global table of 12 functions the vptr points at; the tool declares it in the schema and `static_assert`s that the type is polymorphic and derives from the base |
-| `vtable_symbol` | a concrete kind | instead of `vtable`, for a class whose vtable the compiler emits and no source global names: the mangled symbol `??_7<Type>@@6B@`, or `??_7<Type>@@6B<Base>@@@` for a class with several bases, where `<Base>` is the first (the tool refuses any other) |
+| `vtable_symbol` | a concrete kind | for a class whose vtable the compiler emits and no source global names: the mangled symbol `??_7<Type>@@6B@`, or `??_7<Type>@@6B<Base>@@@` for a class with several bases, where `<Base>` is the first (the tool refuses any other) |
 | `vtable_secondary` | a concrete kind with a `vtable_symbol` | the other bases of the class that hold a vtable of their own, by name: `["UnitScanVisitor"]` (see below) |
 | `poly` | a `ref` field, an object argument or result | names the base the pointer is typed as; it has to be the `target` or `kind`. A pointer to a base without `poly` is an error |
 
@@ -599,8 +599,8 @@ The fields of the object are those of its concrete kind. The replayer allocates 
 own vtable for that kind as the vptr (the vtable global of the replayer's link, which holds the module sources), so a vtable is
 never replayed as bytes; a `ref` accepts any kind of the base it is typed as. A vptr that matches none of the listed kinds is
 an error: the recorder writes `OrderFx#?`, and the run ends with `cannot write a replay file: an OrderFx has a vtable that is none of
-its kinds` (naming the symbol when the vptr is the vtable of another kind of the schema). Only a vtable that is
-a global of the sources can be a kind's vtable. A vtable the compiler emits from a class has no name to compare with.
+its kinds` (naming the symbol when the vptr is the vtable of another kind of the schema). A vtable the compiler emits, which no
+global of the sources names, is a kind's `vtable_symbol` (see A class with a compiler-emitted vtable).
 
 ### Code pointers
 
@@ -624,21 +624,22 @@ the replayer, linking its own functions, stores its own address for the index. `
 table, for the subsystem that owns it. The copy of the schema in the oracle kit names each entry by what it stands for, not by its
 function: an `orderNotify` entry by the name of its order type in the order type table (the names `orders.MissionTypeFromName` takes;
 two names joined by `/` when one function serves both, and `Ready` for the first, which has no name), and a `weaponFire` entry by the
-bit of `WeaponDef.flags` that selects it (`turret`, else `vLaunch`, else `lineOfSight` or `selfProp`, else `dropped`). A kind of the `index` scope cannot hold a code field (`WeaponDef.fire` is set when the weapon types load, to one of four functions): a second kind
+bit of `WeaponDef.flags` that selects it (`turret`, else `vLaunch`, else `lineOfSight` or `selfProp`, else `dropped`). A kind of the `index` scope cannot hold a code field (a value kind can: an element of the order table, `OrderEntry.notify`; `WeaponDef.fire` is set when the weapon types load, to one of four functions): a second kind
 of the same C type, `WeaponFire`, is a state kind with a `table` over the array (`{"base": "game", "member": "weapons", "count": 256}`, no `ref`) and `fire` as its only field, and a rule with `"rule": "all-of"` on `WeaponDef::fire` makes every weapon a root of the call, so `WeaponFire#17.fire` is
 the handler of `weapondef#17`. The table is recorded whole at the first call that reads it (256 lines) and by changes after that. A function that is in none of the entries is an error that names the table (the recorder
-writes `orderNotify[?]`), and an index past the table is refused by the replayer. One order function is not an entry, because
-no header declares it with the type its definition has.
+writes `orderNotify[?]`), and an index past the table is refused by the replayer. `GroundPickupOrder` is an entry through the declaration of `unit_orders.h` that has the type its definition has (an `unsigned char` flags).
 
 ### A class with a compiler-emitted vtable
 
 A class with real virtual methods that the code constructs itself (`AiSearchGoal`, `UnitScript`) has a vtable that the compiler emits, and no
-global of the sources holds it. Its kind names the symbol: `"vtable_symbol": "??_7AiSearchGoal@@6B@"`, instead of `vtable`. The generated
+global of the sources holds it. Its kind names the symbol: `"vtable_symbol": "??_7AiSearchGoal@@6B@"`. The generated
 `replay_vtables.cpp` declares a global for the kind, `extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");`, so it is the
-class's own vtable, in the game and in the replayer's link. The symbol is the vtable of the kind's `type`, which the tool checks. Everything else is
-as for a `vtable`: the kind belongs to a base with `kinds` and a `poly` ref, the recorder writes the concrete kind its vptr names, and the replayer
+class's own vtable, in the game and in the replayer's link. A kind may name that global itself with a `vtable` beside the symbol
+(`"vtable": "g_assaultTimerVtable", "vtable_symbol": "??_7AssaultTimer@@6B@"` declares `g_assaultTimerVtable`), and the tool refuses a global that two kinds name. The symbol is the vtable of the kind's `type`, which the tool checks. Everything else is
+as for a `vtable`: the kind belongs to a base with `kinds` and a `poly` ref (or is the only kind of its class, with no base and no site: `Order`), the recorder writes the concrete kind its vptr names, and the replayer
 allocates the object and stores the class's vtable, so a virtual call on a rebuilt object runs the class's own method. The fields are the
-members the schema lists; a base class's members (the goal's `target` and `owner`) are listed on each concrete kind. The kit's copy of the schema
+members the schema lists; a base class's members (the goal's `target` and `owner`) are listed on each concrete kind. A class whose base is also made on its own gets a kind for the base part
+(`PlainTimer`, type `SquadTimer`, listed among the kinds of the base kind `SquadTimer`). The kit's copy of the schema
 leaves `vtable_symbol` out, as it does `vtable`. The native self-test builds `FixtureGoalA` and `FixtureGoalB` objects, records them and calls a method of a rebuilt one.
 
 A class with several bases keeps one vtable pointer for each base that has virtual methods: the victory conditions of players derive from `MissionCondition` and, to be scanned over the units, from `UnitScanVisitor`
@@ -937,9 +938,25 @@ set the walk reaches the object, so its fields in the object sets are recorded, 
   r Game.slowest null
 ```
 
-The target is a state kind with no `table`, `inside`, `kinds` or `vtable`, because only such a kind is named by first sight, and
+The target is a state kind with no `table` behind a ref, `inside`, `kinds` or `vtable`, because only such a kind is named by first sight, and
 `replayschema.py --check` fails otherwise. A pointer to a separate object of a table kind (an overflow bucket that is not in its table) is
 `Kind#?` and cannot be rebuilt, so it needs a kind of its own.
+
+The target may instead be a kind of a table of `Game` or `SimGlobals` (`"unitsEnd": {"kind": "ref", "target": "Unit"}`): the field is then written as the element,
+`Game.unitsEnd Unit#2500`, as `Player.unitsEnd` is, and the replayer stores the address of that element of the table. A rule that makes the table kind all-of for the
+rows that read the field (`field_read Game::unitsEnd`) makes the walk reach every unit up to it.
+
+### An array of refs in the sim globals
+
+A `SimGlobals` member that is an array of `Ref`s to separate objects (`g_playerAI[10]`, one `PlayerAI` a player) is `{"kind": "refs", "count": 10, "target": "PlayerAI"}`
+in `sim_fields`. The generator makes it one block field of kind `ref` an element, named `SimGlobals.g_playerAI[3]`, and a slot that reads or writes the array has them all in its sets.
+Each is written and restored as a `ref` of `Game` is, `r SimGlobals.g_playerAI[0] PlayerAI#1` or `null`, and the walk follows the object it names. The target is a state kind with no table, sites or kinds.
+
+### A service that leaves a block field behind
+
+An entry of `services` may list `outs` of the form `{"label": "SimGlobals.g_lastPlaceMetalSum", "sim": "g_lastPlaceMetalSum"}`: the recorder writes `o SimGlobals.g_lastPlaceMetalSum 2007`
+after the import line, and the replayer's answer stores the value in the global before it returns. `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint` have it, since the map module
+leaves the metal under the footprint in that global and ai reads it right after the call.
 
 ## The schema and its annotations
 
@@ -1303,7 +1320,7 @@ units:
 
 units is complete with part of its seam recorded: the slots below are `record: false` with the reason in the schema, and each has what it needs written here.
 
-- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds `ApplyUnitDeath`, `InitUnitScript`, `ClearUnitRefs` and `FinishConstruction`, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement, and `PathOrderAttach` has no vtable global to name).
+- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds `ApplyUnitDeath`, `InitUnitScript`, `ClearUnitRefs` and `FinishConstruction`, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement).
 - `UnitRefUnlink`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefGet` and `UnitRefSetValue`: the reference is an embedded `PathOrderAttach` of an order, a kind that orders annotates.
 - `UpdateUnitTail`: `AlignUnitToGround` reads the unit's 3D model through `Game.types` (`ModelGroundView`, `CornerHeightSample`), which has no form.
 - `CreateFactoryIndex`, `FreeFactoryIndex`, `RefreshFactoryIndex` and `GetFactoriesInRadius`: the factory index is `s_index` in `src/units/factory_index.cpp`, a static outside the block (only the pointer is tracked by `SimBlockTrack`), so no field names it.
@@ -1313,6 +1330,14 @@ units is complete with part of its seam recorded: the slots below are `record: f
 - `UpdateUnitBody`'s water damage (`mission.waterDoesDamage` with a damage and a unit at or under the sea level that does not float) and its selection reset (`selected` with `selectable` cleared): no recorded window has a mission that sets water damage, and a unit is selected only by the interface.
 - `UpdateUnitHead`'s wind generator branch (`windgenerator` above 0 with the wind on): the recorded windows have no wind generator.
 - `FindUnitType` with a name that is no type (it returns null): every recorded name is a type.
+
+ai:
+
+- `DumpPlayerAI`: its only caller is the console command `PrintWeights`, which writes a file, and no scenario runs it.
+- `DestroyPlayerAI`, `FreeSquads` and `FreeSquadManager`: the players are torn down after the last tick of a match, and the recorder has closed its file by then.
+- `Apply` of REACT_TO_ATTACK: no recorded window has a unit of a computer player under attack (the AI of `skirmish2` and `console-sight` does not meet an enemy within the windows).
+- The imports `weapons.WeaponCanReachPos`, `weapons.FindTargetableProjectile` and `los_radar.GetSeenUnitsInRadius`, and `los_radar.IsPointVisible`, which the retargeting and the scouting call when an enemy is near: no recorded call reaches them.
+- The `ScoutTimer` and `SquadScoutTimer` branches that need an enemy in sight, and the orders an assault timer gives (`orders.GetOrderType` is called once in `console-sight` and once in `skirmish2`).
 
 ## Replaying
 
@@ -1477,6 +1502,12 @@ wine build/modern/replay_inject_test.exe --expect 25 Unit#1.healthPercent tests/
 ```
 
 `services.ScheduleEconomyRequestGranted` names its unit as `Unit#N`, not as its block offset, which differs between the recording and the replay: the argument is `{"mode": "object", "kind": "Unit", "ref": true}`, as a unit of the world view is.
+
+The recordings of ai 6.0, which the modern build runs as native code in every mode: `console-sight` (the whole run, 200 ticks: `CreateSquads`, `CreateSquadManager` and `CreatePlayerAI` of both players at tick 0, `ParseDownloadableAiWeightScripts` and `ReparseAiWeightScriptsIfLimitNotSticky` with the console commands they run, `RebuildFeatureCells`, `ResetAIPlayers` (the console `reloadaiprofiles`), `Apply` of SET_SQUAD, PLAN, WEIGHT and LIMIT, and 402 calls each of `UpdatePlayerAI` and `UpdateSquads`, two players over 201 ticks) and `skirmish2`, ticks 250 to 700 only (the timers of a four-player skirmish: the build timer places factories with `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint`, and the scout, squad scout, spatial and assault timers fire, 902 calls each of both slots over 451 ticks). Each file starts with a first record of every unit (`UpdatePlayerAI` reaches the whole pool) and every unit type, about 1.4 MB, and a call after that holds only what changed. The injected change is `BT_REPLAY_INJECT_SQUAD_PERIOD=45`, the 30 ticks that `SquadManager::TickIfActive` waits before it assigns squads again; it is reported at call 76 of `skirmish2` and at `SquadManager#1.countdown`:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 76 SquadManager#1.countdown tests/replay/ai/skirmish2.txt
+```
 
 ### Against the WASM module
 

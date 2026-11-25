@@ -122,7 +122,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts", "economy", "players", "features")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "ai", "movement", "units", "scripts", "economy", "players", "features")
 
 
 def event_table(subsystem: str) -> dict:
@@ -563,14 +563,12 @@ def check_polymorphic(ann: dict) -> list[str]:
     for name, spec in kinds.items():
         if not has_vtable(spec):
             continue
-        if "vtable" in spec and "vtable_symbol" in spec:
-            errors.append("%s: has a `vtable` and a `vtable_symbol`, one of them" % name)
-        elif "vtable_symbol" in spec:
+        if "vtable_symbol" in spec:
             if not isinstance(spec["vtable_symbol"], str) or not VTABLE_SYMBOL.match(spec["vtable_symbol"]):
                 errors.append("%s: `vtable_symbol` is the mangled name of the class's vtable, `??_7<Class>@@6B@`" % name)
             elif not spec["vtable_symbol"].startswith("??_7%s@@6B" % spec["type"]):
                 errors.append("%s: `vtable_symbol` %s is not the vtable of the type %s" % (name, spec["vtable_symbol"], spec["type"]))
-        elif not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"]):
+        if "vtable" in spec and (not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"])):
             errors.append("%s: the vtable is the name of a global" % name)
         secondary = spec.get("vtable_secondary")
         if secondary is not None and ("vtable_symbol" not in spec or not isinstance(secondary, list) or not secondary
@@ -582,7 +580,7 @@ def check_polymorphic(ann: dict) -> list[str]:
             seen[vtable_name(spec)] = name
         if spec["scope"] != "state" or spec.get("table"):
             errors.append("%s: a kind with a vtable is a state kind with no table" % name)
-        if name not in owner and not spec.get("inside"):
+        if name not in owner and not spec.get("inside") and "vtable_symbol" not in spec:
             errors.append("%s: has a vtable and is a kind of no base, and is embedded nowhere" % name)
     for name, spec in kinds.items():
         for f in spec["fields"]:
@@ -600,8 +598,8 @@ def check_polymorphic(ann: dict) -> list[str]:
             if f["kind"] == "code":
                 if f.get("table") not in tables:
                     errors.append("%s: a code field names a table of `code_tables`" % where)
-                if spec["scope"] != "state":
-                    errors.append("%s: only the fields of a state kind are code pointers" % where)
+                if spec["scope"] not in ("state", "value"):
+                    errors.append("%s: only the fields of a state or value kind are code pointers" % where)
     return errors
 
 
@@ -936,6 +934,8 @@ def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> 
         return "Game." + aliases[target]
     if target in sim:
         return "SimGlobals." + target
+    if "@" in target and target.split("@")[0] in sim:
+        return "SimGlobals." + target.split("@")[0]
     return None
 
 
@@ -1671,6 +1671,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     unknown = sorted(set(ann["subsystems"]) - {m[0] for m in members})
     errors += ["annotations name the unknown subsystem %s" % s for s in unknown]
     imported_any = {imp for spec in ann["subsystems"].values() for imp in spec.get("imports", [])}
+    imported_complete = {imp for spec in ann["subsystems"].values() if spec.get("status") == "complete" for imp in spec.get("imports", [])}
     for sub, struct in members:
         spec = ann["subsystems"].get(sub)
         if spec is None:
@@ -1732,10 +1733,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         if name in fixture_only:
                             pass
                         elif name is not None:
+                            spread = [n for n in field_index if n == name or n.startswith(name + "[")]
                             if "r" in BLOCK_KINDS[kind]:
-                                reads.add(name)
+                                reads.update(spread)
                             if "w" in BLOCK_KINDS[kind]:
-                                writes.add(name)
+                                writes.update(spread)
                         elif target in ann["exempt"] or target in table_targets:
                             pass
                         elif target.startswith("Game::") or target.startswith("g_"):
@@ -1817,10 +1819,11 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], {"mode": "region"} if region is not None and s["name"] == region["shutdown"] else note.get("result"), ann)
             errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
+            needed = not skipped or "%s.%s" % (sub, s["name"]) in imported_complete
             for a in args:
-                if a["mode"] == "pending":
+                if a["mode"] == "pending" and needed:
                     pending["args"].append("%s(%s)" % (s["name"], a["name"]))
-            if result is not None and result["mode"] == "pending":
+            if result is not None and result["mode"] == "pending" and needed:
                 pending["args"].append("%s result" % s["name"])
             for into in (obj_reads, obj_writes):
                 into.update(blobs[i] for i in list(into) if i in blobs)
@@ -1895,8 +1898,8 @@ def check_game_ref(name: str, spec: dict, leaf: dict | None, kinds: dict, errors
     found = kinds.get(target)
     if found is None or found["scope"] != "state":
         errors.append("%s: the target %s is no state kind of the schema" % (where, target))
-    elif found.get("table") or found.get("inside") or found.get("kinds"):
-        errors.append("%s: the target %s has a table, sites or kinds, and is named by them, not at first sight" % (where, target))
+    elif (found.get("table") and not is_global_table(found)) or found.get("inside") or found.get("kinds"):
+        errors.append("%s: the target %s has a table behind a ref, sites or kinds, and is named by them, not at first sight" % (where, target))
     if leaf is None or leaf["size"] != 4:
         raise Error("Game has no field %s of 4 bytes for a ref" % name)
     return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": "ref", "target": target}
@@ -1944,6 +1947,17 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
     for name, spec in sim.items():
         if isinstance(spec, dict) and spec.get("kind") == "vector":
             fields.append(block_vector(name, spec, "SimGlobals", vectors if vectors is not None else [], ann, errors))
+            continue
+        if isinstance(spec, dict) and spec.get("kind") == "refs":
+            where = "SimGlobals.%s" % name
+            found = (kinds or {}).get(spec.get("target"))
+            if set(spec) - {"kind", "count", "target"} or not isinstance(spec.get("count"), int) or spec["count"] < 1:
+                errors.append("%s: a ref array of the block is {\"kind\": \"refs\", \"count\": N, \"target\": KIND}" % where)
+            elif found is None or found["scope"] != "state" or found.get("table") or found.get("inside") or found.get("kinds"):
+                errors.append("%s: the target %s is no state kind with no table, sites or kinds, which is named at first sight" % (where, spec.get("target")))
+            else:
+                for i in range(spec["count"]):
+                    fields.append({"name": "%s[%d]" % (where, i), "base": "sim", "offset": "%s[%d]" % (name, i), "size": 4, "kind": "ref", "target": spec["target"]})
             continue
         if isinstance(spec, dict):
             array = check_array("SimGlobals.%s" % name, spec, "SimGlobals", errors)
@@ -2617,6 +2631,8 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgInOutExit(s_tail, "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
         if a.get("dir", "in") == "in" and phase == "a":
             return ['ArgStruct(s_call, "a", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
+        if a.get("dir", "in") == "in" and phase == "i":
+            return ["ImportStructIn(line, ROK_%s, %s);" % (upper(a["kind"]), var)]
         if is_struct_out_opt(a):
             if phase == "a":
                 return ['ArgNullOut(s_call, "%s", %s);' % (line, var)]
@@ -2898,6 +2914,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             pass
         elif m == "struct" and a.get("dir") == "inout":
             L.append("    Space(t);\n    AddInOut(t, ROK_%s, %s);" % (upper(a["kind"]), v))
+        elif m == "struct" and a.get("dir", "in") == "in":
+            L.append("    Space(t);\n    AddStructIn(t, ROK_%s, %s);" % (upper(a["kind"]), v))
         elif is_scalar_inout(a):
             L.append("    Space(t);\n    AddInOutScalar(t, %s);" % v)
         elif m == "vec3":
@@ -3476,6 +3494,9 @@ def render_service_end(services: list[dict]) -> str:
                 L.append('            t.Add("%s ");' % o["label"])
                 L.append("            AddHandle(t, %s, self->%s);" % (handle_id(o["handle"]), o["member"]))
                 L.append("        }")
+            elif "sim" in o:
+                L.append('        t.Add("\\n  o %s ");' % o["label"])
+                L.append("        t.AddInt(%s);" % o["sim"])
             elif "int" in o:
                 L.append('        t.Add("\\n  o %s ");' % o["label"])
                 L.append("        t.AddInt(*(const int*)a[%d].v.p);" % index[o["int"]])
@@ -3510,6 +3531,9 @@ def service_result_lines(s: dict, ctx: str) -> list[str]:
                     L.append("if (%sText != nullptr)\n    %s = ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
                 else:
                     L.append("%s = %sText == nullptr ? nullptr : ParseRecord(%sText);" % (o["member"], o["member"], o["member"]))
+            elif "sim" in o:
+                L.append('const char* %sText = OutValue("%s");' % (o["sim"], o["label"]))
+                L.append("if (%sText != nullptr)\n    %s = atoi(%sText);" % (o["sim"], o["sim"], o["sim"]))
             elif "int" in o:
                 L.append('const char* %sText = OutValue("%s");' % (o["int"], o["label"]))
                 L.append("if (%sText != nullptr && %s != nullptr)\n    *%s = atoi(%sText);" % (o["int"], o["int"], o["int"], o["int"]))

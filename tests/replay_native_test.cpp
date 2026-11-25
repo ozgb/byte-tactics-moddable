@@ -38,6 +38,9 @@
 #include "../src/game/economy.h"
 #include "../src/game/players.h"
 #include "../src/game/players_events.h"
+#include "../src/ai/ai_player.h"
+#include "../src/units/squads.h"
+#include "../src/orders/orders_seam.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -113,6 +116,10 @@ void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader*, unsigned int, in
 {
 }
 
+void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int)
+{
+}
+
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int)
 {
 }
@@ -174,6 +181,11 @@ short __cdecl AngleOfVector(int x, int z)
 #pragma comment(linker, "/alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z")
 #pragma comment(linker, "/alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z")
 #pragma comment(linker, "/alternatename:?InitGafSequence@@YGXPAUHandle@@PAUAnimSrc@@H@Z=?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z")
+#pragma comment(linker, "/alternatename:?FindNearestEnemyUnit@SquadManager@@QAEPAUUnit@@UVec3@@@Z=?FindNearestEnemyUnit@SquadManager@@QAEPAUUnit@@HHH@Z")
+#pragma comment(linker, "/alternatename:?IsCountBelowAiLimit@@YGHHGH@Z=?IsCountBelowAiLimit@@YGHEGH@Z")
+#pragma comment(linker, "/alternatename:?ScaleUnitWeights@@YGXHPAVUnitTypeSet@@MH@Z=?ScaleUnitWeights@@YGXHPAIMH@Z")
+#pragma comment(linker, "/alternatename:?SetUnitLimits@@YGXHPAVUnitTypeSet@@HH@Z=?SetUnitLimits@@YGXHPAIHH@Z")
+#pragma comment(linker, "/alternatename:?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@PAUVec3@@HH@Z=?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@HHH@Z")
 #pragma comment(linker, "/alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z")
 #pragma comment(linker, "/alternatename:?FindUnitType@@YGPAVUnitDef@@PBD@Z=?FindUnitType@@YGPAUUnitDefNameKeyView@@PBD@Z")
 #pragma comment(linker, "/alternatename:?SolveLaunchAngle@@YGFHHHHH@Z=?SolveLaunchAngle@@YGFHHHHM@Z")
@@ -528,6 +540,8 @@ const ReplayField* FindBlockField(const char* name)
     const char* open = strchr(name, '[');
     if (open == nullptr)
         return FindField(name);
+    if (const ReplayField* whole = FindField(name))
+        return whole;
     char base[96];
     size_t length = (size_t)(open - name);
     if (length >= sizeof base)
@@ -701,6 +715,11 @@ template <> float ParseResult<float>(const char* text)
     float f;
     memcpy(&f, &bits, 4);
     return f;
+}
+
+template <> double ParseResult<double>(const char* text)
+{
+    return ParseF64(text);
 }
 
 void AddBytes(ReplayText& t, const void* p, int length)
@@ -951,6 +970,14 @@ void ParseValueArg(const char* name, unsigned kind, void* object)
 void AddValueStruct(ReplayText& t, unsigned kind, const void* object)
 {
     ReplayAddValue(t, kind, object, g_objects);
+}
+
+void AddStructIn(ReplayText& t, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        t.Add("null");
+    else
+        AddValueStruct(t, kind, p);
 }
 
 template <class T> T ParseValueText(unsigned kind, const char* text)
@@ -1956,6 +1983,34 @@ void __stdcall WriteStateSlot(const StateWriter* writer)
     MapWriteState(writer);
 }
 
+void __stdcall UpdateSquadsSlot(int player)
+{
+    SquadManager* manager = g_game->players[player].ai.get();
+    if (manager == nullptr)
+        return;
+    manager->TickIfActive();
+}
+
+void __stdcall CreateSquadManagerSlot(Player* player)
+{
+    player->ai = new (SimAlloc(64)) SquadManager(player);
+}
+
+void __stdcall FreeSquadManagerSlot(Player* player)
+{
+    SquadManager* manager = player->ai.get();
+    if (manager == nullptr)
+        return;
+    manager->DeleteTimers();
+    delete manager;
+    player->ai = nullptr;
+}
+
+void __stdcall WriteAiStateSlot(const StateWriter* writer)
+{
+    AiWriteState(writer);
+}
+
 WeaponDef* __stdcall FindWeaponByNameSlot(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
@@ -2436,7 +2491,7 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
 void CompareObjects(const ReplaySlotSets* sets)
 {
     g_blobSeen.clear();
-    ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
+    ReplayWalk(g_reach, g_objects, true, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
     for (unsigned at = 0; at < g_reach.count; at++) {

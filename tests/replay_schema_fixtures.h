@@ -5477,9 +5477,9 @@ static const unsigned char kReplayUnitsUpdateUnitBodyReads[] = { 0, 17 };
 static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 22, 88, 89, 91, 92, 93, 94, 95, 96, 97, 98, 102, 136, 137, 138, 139, 148 };
 static const unsigned short kReplayUnitsUpdateUnitBodyObjWrites[] = { 88, 89, 92, 93, 94 };
 static const unsigned short kReplayPlayersApplyAllOf[] = { ROK_PLAYER, ROK_SIDEDEF };
-static const unsigned char kReplayPlayersApplyReads[] = { 36, 92 };
+static const unsigned char kReplayPlayersApplyReads[] = { 34, 35, 36, 92 };
 static const unsigned char kReplayPlayersApplyWrites[] = { 34, 35, 92 };
-static const unsigned short kReplayPlayersApplyObjReads[] = { 0, 2, 3, 20, 22, 23, 33, 34, 42, 43, 46, 88, 89, 91, 96, 97, 98, 99, 100, 144, 203, 539, 540, 541, 542, 544, 545, 546, 547, 548, 549, 550, 551, 552, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 594, 595, 596, 597, 598, 599, 782 };
+static const unsigned short kReplayPlayersApplyObjReads[] = { 0, 2, 3, 20, 22, 23, 33, 34, 42, 43, 46, 88, 89, 91, 96, 97, 98, 99, 100, 144, 201, 203, 539, 540, 541, 542, 544, 545, 546, 547, 548, 549, 550, 551, 552, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 594, 595, 596, 597, 598, 599, 782 };
 static const unsigned short kReplayPlayersApplyObjWrites[] = { 22, 201, 544, 545, 546, 547, 548, 549, 550, 551, 552, 555, 556, 558, 559, 561, 562, 563, 564, 566, 567, 568, 571, 572, 575, 576, 578, 579, 580, 581, 582, 583, 585, 586, 587, 588, 590, 591, 592, 594, 595, 597, 598 };
 static const unsigned char kReplayPlayersDeactivateConditionsReads[] = { 92 };
 static const unsigned char kReplayPlayersDeactivateConditionsWrites[] = { 92 };
@@ -5679,7 +5679,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "CanRepair", SUB_UNITS, kReplayUnitsCanRepairReads, 1, nullptr, 0, kReplayUnitsCanRepairObjReads, 9, nullptr, 0, nullptr, 0 },
     { "UpdateUnitHead", SUB_UNITS, kReplayUnitsUpdateUnitHeadReads, 4, kReplayUnitsUpdateUnitHeadWrites, 1, kReplayUnitsUpdateUnitHeadObjReads, 2, nullptr, 0, nullptr, 0 },
     { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 18, kReplayUnitsUpdateUnitBodyObjWrites, 5, nullptr, 0 },
-    { "Apply", SUB_PLAYERS, kReplayPlayersApplyReads, 2, kReplayPlayersApplyWrites, 3, kReplayPlayersApplyObjReads, 79, kReplayPlayersApplyObjWrites, 43, kReplayPlayersApplyAllOf, 2 },
+    { "Apply", SUB_PLAYERS, kReplayPlayersApplyReads, 4, kReplayPlayersApplyWrites, 3, kReplayPlayersApplyObjReads, 80, kReplayPlayersApplyObjWrites, 43, kReplayPlayersApplyAllOf, 2 },
     { "DeactivateConditions", SUB_PLAYERS, kReplayPlayersDeactivateConditionsReads, 1, kReplayPlayersDeactivateConditionsWrites, 1, nullptr, 0, kReplayPlayersDeactivateConditionsObjWrites, 1, nullptr, 0 },
     { "UpdatePlayerHead", SUB_PLAYERS, kReplayPlayersUpdatePlayerHeadReads, 1, kReplayPlayersUpdatePlayerHeadWrites, 1, kReplayPlayersUpdatePlayerHeadObjReads, 3, nullptr, 0, kReplayPlayersUpdatePlayerHeadAllOf, 1 },
     { "UpdatePlayerBody", SUB_PLAYERS, kReplayPlayersUpdatePlayerBodyReads, 16, kReplayPlayersUpdatePlayerBodyWrites, 7, kReplayPlayersUpdatePlayerBodyObjReads, 86, kReplayPlayersUpdatePlayerBodyObjWrites, 46, kReplayPlayersUpdatePlayerBodyAllOf, 2 },

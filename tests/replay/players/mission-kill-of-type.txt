@@ -8,6 +8,8 @@ call 0 Init
   a size 84
   w region [84] 0:ffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 call 180 Apply
+  r Game.endGameFlags 0
+  r Game.endGameVictory 0
   r Game.list_391ed MissionConditions#1
   r region 4:b4 8:b4
   r Unit#321.cell (52,50)
@@ -2902,6 +2904,7 @@ call 180 Apply
   r Unit#250.player Player#0
   r Unit#250.playerIndex 0
   r Unit#250.motion null
+  r PlayerInfo#1.kind 1
   r PlayerInfo#1.side 0
   r Unit#251.cell (41,144)
   r Unit#251.footprint (2,2)
@@ -5642,6 +5645,7 @@ call 180 Apply
   r Unit#500.player Player#1
   r Unit#500.playerIndex 1
   r Unit#500.motion null
+  r PlayerInfo#2.kind 2
   r PlayerInfo#2.side 1
   r Unit#501.cell (0,0)
   r Unit#501.footprint (0,0)
@@ -8393,6 +8397,7 @@ call 180 Apply
   r Unit#750.player Player#2
   r Unit#750.playerIndex 10
   r Unit#750.motion null
+  r PlayerInfo#3.kind 0
   r PlayerInfo#3.side 0
   r Unit#751.cell (0,0)
   r Unit#751.footprint (0,0)
@@ -11144,6 +11149,7 @@ call 180 Apply
   r Unit#1000.player Player#3
   r Unit#1000.playerIndex 10
   r Unit#1000.motion null
+  r PlayerInfo#4.kind 0
   r PlayerInfo#4.side 0
   r Unit#1001.cell (0,0)
   r Unit#1001.footprint (0,0)
@@ -13895,6 +13901,7 @@ call 180 Apply
   r Unit#1250.player Player#4
   r Unit#1250.playerIndex 10
   r Unit#1250.motion null
+  r PlayerInfo#5.kind 0
   r PlayerInfo#5.side 0
   r Unit#1251.cell (0,0)
   r Unit#1251.footprint (0,0)
@@ -16646,6 +16653,7 @@ call 180 Apply
   r Unit#1500.player Player#5
   r Unit#1500.playerIndex 10
   r Unit#1500.motion null
+  r PlayerInfo#6.kind 0
   r PlayerInfo#6.side 0
   r Unit#1501.cell (0,0)
   r Unit#1501.footprint (0,0)
@@ -19397,6 +19405,7 @@ call 180 Apply
   r Unit#1750.player Player#6
   r Unit#1750.playerIndex 10
   r Unit#1750.motion null
+  r PlayerInfo#7.kind 0
   r PlayerInfo#7.side 0
   r Unit#1751.cell (0,0)
   r Unit#1751.footprint (0,0)
@@ -22148,6 +22157,7 @@ call 180 Apply
   r Unit#2000.player Player#7
   r Unit#2000.playerIndex 10
   r Unit#2000.motion null
+  r PlayerInfo#8.kind 0
   r PlayerInfo#8.side 0
   r Unit#2001.cell (0,0)
   r Unit#2001.footprint (0,0)
@@ -24899,6 +24909,7 @@ call 180 Apply
   r Unit#2250.player Player#8
   r Unit#2250.playerIndex 10
   r Unit#2250.motion null
+  r PlayerInfo#9.kind 0
   r PlayerInfo#9.side 0
   r Unit#2251.cell (0,0)
   r Unit#2251.footprint (0,0)
@@ -27650,6 +27661,7 @@ call 180 Apply
   r Unit#2500.player Player#9
   r Unit#2500.playerIndex 10
   r Unit#2500.motion null
+  r PlayerInfo#10.kind 0
   r PlayerInfo#10.side 0
   r UnitDef#60.unitname "ARMPEEP"
   r UnitDef#30.unitname "ARMFAST"
@@ -27694,18 +27706,6 @@ call 180 Apply
   a event.kind 195
   a event.unit Unit#321
   a size 8
-  w Game.endGameFlags 0
-  w Game.endGameVictory 0
-  w PlayerInfo#1.kind 1
-  w PlayerInfo#2.kind 2
-  w PlayerInfo#3.kind 0
-  w PlayerInfo#4.kind 0
-  w PlayerInfo#5.kind 0
-  w PlayerInfo#6.kind 0
-  w PlayerInfo#7.kind 0
-  w PlayerInfo#8.kind 0
-  w PlayerInfo#9.kind 0
-  w PlayerInfo#10.kind 0
   o result 1
 call 180 Apply
   r Unit#322.flags 0x90244001

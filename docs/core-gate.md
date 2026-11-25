@@ -400,6 +400,31 @@ x86_64 Linux executable or the sandbox could not start, and then `message` says 
 Exit status: 0 when every judged group is equal, 1 when one differs or failed, 2 when the core was refused or the gate
 could not run (the vectors can't be read, or neither `--sandbox` nor `--trusted` was given).
 
+## The freeze
+
+The human froze the core's five headers at their `interfaces-v35` majors until a clean-room core passes this gate
+(#1042, 2026-11-25): `services.h` 4, `rand_stream.h` 1, `state_writer.h` 1, `sim_events.h` 1 and `files.h` 3. Minors
+(additions) still land. What the headers mean is frozen too (how `Emit` picks an outbox, sim event order, the order of
+random draws, what `WriteState` hashes), and that shows in the stored vectors, so they are frozen as well.
+
+`data/frozen_interfaces.csv` holds one row per frozen header (`header,major,decision`), and CI enforces it:
+
+- `tools/abidiff.py` fails a header whose major is not its row's, even when the bump would otherwise pass.
+- `tools/coregate.py --check-frozen` fails a pull request that changes or removes a vector of
+  `reference/core/<group>.json` (by name) or a file under `reference/core/<group>/`, compared with the merge base with
+  `origin/moddable`. Added vectors, files and groups pass.
+
+A sanctioned change edits the CSV in the same pull request, and the maintainer checks the citation in review:
+
+- **A major bump** moves the header's row to the new major and sets `decision` to the human's decision (an issue or
+  comment link).
+- **A re-record** adds or edits the row `reference/core/<group>.json` (`major` empty) with a decision. A change to what
+  the group judges needs the human; a re-record that only changes a vector's inputs may cite the maintainer when the
+  pull request shows the judged value is unchanged. Only a row the pull request adds or edits lets the group change, so
+  a row left from an earlier one unfreezes nothing.
+
+Lifting the freeze removes the header rows.
+
 ## Known limits
 
 - **The order of the tick** (`docs/schedule.md`) is judged by no group: it needs the modules to run. The scenario mode

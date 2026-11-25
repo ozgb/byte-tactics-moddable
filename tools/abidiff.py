@@ -63,10 +63,17 @@ directory is needed.
 
 The baseline headers are read with `git show REF:interfaces/F.h` into a temporary directory. REF is
 the newest `interfaces-v*` tag; until one exists, the merge base of HEAD and origin/moddable.
+
+A header with a row in data/frozen_interfaces.csv (#1089) must also have the row's major, whatever the baseline: one
+line each, `ok (frozen at major N by <decision>)` or `FAIL (frozen at major N by <decision>, ...)`, even when the bump
+would otherwise pass. A sanctioned bump moves the row's major and cites the human's decision in the same pull request.
+Rows for reference/core/ are tools/coregate.py's (`--check-frozen`).
 """
 
 import argparse
 import atexit
+import csv
+import io
 import functools
 import json
 import os
@@ -82,6 +89,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MSVC_INCLUDE = ROOT / "toolchain" / "msvc5-sp3" / "INCLUDE"
 BASE_BRANCH = "origin/moddable"
 MODULES_JSON = ROOT / "wasm" / "modules.json"
+FROZEN = ROOT / "data" / "frozen_interfaces.csv"
 CLANG = ["clang-cl", "--target=i686-pc-windows-msvc", "/nologo", "-TP", "-fms-compatibility",
          "-fms-extensions", "-fms-compatibility-version=11.00", "-fsyntax-only",
          "-Xclang", "-fdump-record-layouts-complete", "-Xclang", "-ast-dump=json"]
@@ -578,6 +586,30 @@ def diff_dirs(old_dir: Path, new_dir: Path, tagged: bool, manifest: dict | None 
             return list(pool.map(one, names))
 
 
+def frozen_rows(text: str) -> dict[str, dict]:
+    """The rows of data/frozen_interfaces.csv, keyed by header path."""
+    return {row["header"]: row for row in csv.DictReader(io.StringIO(text))}
+
+
+def check_frozen(rows: dict[str, dict], root: Path) -> list[Result]:
+    """One verdict for each frozen interface header under root: its major must be the row's."""
+    out = []
+    for path, row in sorted(rows.items()):
+        if not path.startswith("interfaces/"):
+            continue
+        frozen = "frozen at major %s by %s" % (row["major"], row["decision"])
+        name = "%s (frozen)" % Path(path).stem
+        header = root / path
+        found = MAJOR.search(header.read_text()) if header.exists() else None
+        if found is None:
+            out.append(Result(name, False, "FAIL (%s, %s)" % (frozen, "header removed" if not header.exists() else "no major")))
+        elif found.group(2) != row["major"]:
+            out.append(Result(name, False, "FAIL (%s, header is at major %s)" % (frozen, found.group(2))))
+        else:
+            out.append(Result(name, True, "ok (%s)" % frozen))
+    return out
+
+
 def git(*args: str) -> str:
     run = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
     if run.returncode != 0:
@@ -629,6 +661,7 @@ def main() -> None:
         extract_baseline(ref, Path(tmp))
         results = diff_dirs(Path(tmp), ROOT / "interfaces", tagged, manifest)
     results += imports_results(ROOT / "interfaces", manifest)
+    results += check_frozen(frozen_rows(FROZEN.read_text()) if FROZEN.exists() else {}, ROOT)
     print("baseline: %s (%s)" % (ref, "interfaces-v* tag exists" if tagged else "before interfaces-v1"))
     for result in results:
         print("%s: %s" % (result.name, result.summary))

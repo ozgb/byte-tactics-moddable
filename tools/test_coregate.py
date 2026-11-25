@@ -314,5 +314,50 @@ class Engine(unittest.TestCase):
                 self.assertEqual(result["vectors"]["runtime/" + other]["status"], "equal")
 
 
+def group_file(*vectors: tuple[str, list]) -> bytes:
+    return coregate.dump({"format": 1, "group": "commands", "vectors": [
+        {"name": n, "calls": [["c"]], "results": r} for n, r in vectors]}).encode()
+
+
+class Frozen(unittest.TestCase):
+    path = "reference/core/commands.json"
+    base = {path: group_file(("a", ["1"]), ("b", ["2"])), "reference/core/commands/a.txt": b"x"}
+
+    def failures(self, head: dict, unfrozen: set = frozenset()) -> list[str]:
+        return coregate.frozen_failures(self.base, {**self.base, **head}, unfrozen)
+
+    def test_a_changed_vector_fails(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]), ("b", ["3"]))}),
+                         ["reference/core/commands.json: vector b changed"])
+
+    def test_a_removed_vector_or_group_fails(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]))}),
+                         ["reference/core/commands.json: vector b removed"])
+        self.assertEqual(len(self.failures({self.path: None})), 2)
+
+    def test_an_added_vector_passes(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]), ("b", ["2"]), ("c", ["4"]))}), [])
+
+    def test_a_changed_input_file_fails(self):
+        self.assertEqual(self.failures({"reference/core/commands/a.txt": b"y"}),
+                         ["reference/core/commands/a.txt: changed"])
+        self.assertEqual(self.failures({"reference/core/commands/a.txt": None}),
+                         ["reference/core/commands/a.txt: removed"])
+
+    def test_a_group_with_a_new_row_may_change(self):
+        head = {self.path: group_file(("a", ["9"])), "reference/core/commands/a.txt": b"y"}
+        self.assertEqual(self.failures(head, {"commands"}), [])
+        self.assertEqual(len(self.failures(head, {"hash"})), 3)
+
+    def test_only_an_added_or_edited_row_unfreezes(self):
+        row = {self.path: {"header": self.path, "major": "", "decision": "#1"}}
+        edited = {self.path: {"header": self.path, "major": "", "decision": "#2"}}
+        empty = {self.path: {"header": self.path, "major": "", "decision": ""}}
+        self.assertEqual(coregate.unfrozen_groups({}, row), {"commands"})
+        self.assertEqual(coregate.unfrozen_groups(row, edited), {"commands"})
+        self.assertEqual(coregate.unfrozen_groups(row, row), set())
+        self.assertEqual(coregate.unfrozen_groups({}, empty), set())
+
+
 if __name__ == "__main__":
     unittest.main()

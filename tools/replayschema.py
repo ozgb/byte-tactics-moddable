@@ -122,7 +122,7 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     return merged
 
 
-EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts", "economy", "players")
+EVENT_SUBSYSTEMS = ("wind_meteors", "targeting", "los_radar", "map", "weapons", "orders", "movement", "units", "scripts", "economy", "players", "features")
 
 
 def event_table(subsystem: str) -> dict:
@@ -410,6 +410,11 @@ def check_vector(where: str, spec: dict, owner: str, ann: dict, errors: list[str
 def is_based(spec: dict) -> bool:
     """A table whose elements are behind a ref field of another kind, `{"base": {"object": K, "field": F}, "count": N}`."""
     return isinstance(spec.get("table"), dict) and isinstance(spec["table"].get("base"), dict)
+
+
+def is_owner_table(spec: dict) -> bool:
+    """A kind whose elements an array behind a ref field of another kind holds (`Mission.rules`): an all-of rule over it makes every element of every owner a root."""
+    return isinstance(spec.get("table", {}).get("base"), dict)
 
 
 def is_global_table(spec: dict) -> bool:
@@ -1191,7 +1196,22 @@ SCALAR_INOUT = {"int*", "unsigned int*", "short*", "unsigned short*", "unsigned 
 
 def is_vec3_out(a: dict) -> bool:
     """A `Vec3` struct the slot fills (dir out): as an import argument it is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds."""
-    return a["mode"] == "struct" and a.get("dir") == "out" and a.get("kind") == "Vec3"
+    return a["mode"] == "struct" and a.get("dir") == "out" and a.get("kind") == "Vec3" and not a.get("nullable")
+
+
+def is_struct_out_opt(a: dict) -> bool:
+    """A struct the slot fills through a pointer that may be null (dir out, `nullable`): the caller passes a null pointer to leave it out. A slot writes `a name null` for a null pointer; the `o` lines follow only for a pointer that is not null, and only when `when` holds."""
+    return a["mode"] == "struct" and a.get("dir") == "out" and bool(a.get("nullable"))
+
+
+def is_struct_out_import(a: dict) -> bool:
+    """A struct other than Vec3 the slot fills (dir out): as an import argument it is the `o <name> (fields)` line of an in/out value, written only for a pointer that is not null and when `when` holds, and its stub writes it back."""
+    return a["mode"] == "struct" and a.get("dir") == "out" and a.get("kind") != "Vec3"
+
+
+def when_guard(a: dict, var: str = "result") -> str:
+    """The C++ condition of an out struct's `when`, with the result as `var`."""
+    return "%s != %s" % (var, a["when"].rpartition("!=")[2].strip())
 
 
 def is_value_ptr(a: dict) -> bool:
@@ -1320,8 +1340,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             value_kind(a, label, True)
             if a.get("dir", "in") not in ("in", "out", "inout"):
                 errors.append("%s: %s has the direction %s, and a struct is in, out or inout" % (where, label, a["dir"]))
-            elif a.get("nullable") and a.get("dir", "in") == "out":
-                errors.append("%s: %s is an out struct, and only a struct in or inout can be nullable" % (where, label))
+            elif a.get("nullable") and a.get("dir", "in") == "out" and a.get("kind") == "Vec3":
+                errors.append("%s: %s is an out Vec3, which is `vec3` data and cannot be nullable" % (where, label))
         elif a["mode"] == "event":
             table = ann.get("events", {}).get(a.get("events"))
             size = a.get("size")
@@ -1768,7 +1788,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                     else:
                                         into.add(object_index[(k, fname)])
                         if rule["rule"] == "all-of":
-                            if not is_global_table(ann["objects"].get(rule["object"], {})):
+                            if not (is_global_table(ann["objects"].get(rule["object"], {})) or is_owner_table(ann["objects"].get(rule["object"], {}))):
                                 message = "the all-of rule names %s, which is no table kind of the schema" % rule["object"]
                                 if message not in errors:
                                     errors.append(message)
@@ -1791,8 +1811,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 if s["name"] != region["shutdown"]:
                     writes.add("region")
             for a in args:
-                if a.get("when") and (a["mode"] != "struct" or a.get("dir") != "out" or a["when"] != "result != 0" or s["ret"] == "void"):
-                    errors.append("%s.%s(%s): `when` is only `result != 0`, on an out struct of a slot that returns a value" % (sub, s["name"], a["name"]))
+                if a.get("when") and (a["mode"] != "struct" or a.get("dir") != "out" or not re.fullmatch(r"result != \d+", a["when"]) or s["ret"] == "void"):
+                    errors.append("%s.%s(%s): `when` is only `result != N` (N a number), on an out struct of a slot that returns a value" % (sub, s["name"], a["name"]))
                 if a["mode"] == "units" or (a["mode"] == "units-buffer" and "playsAs" not in note):
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], {"mode": "region"} if region is not None and s["name"] == region["shutdown"] else note.get("result"), ann)
@@ -2508,7 +2528,9 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             elif a["mode"] == "vec3" and a.get("dir") == "out":
                 L.append('        ImportOutVec3(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_vec3_out(a):
-                L.append('        %sImportOutVec3(line, "%s", %s);' % ("if (result != 0) " if a.get("when") else "", a["line"], arg_var(a, i)))
+                L.append('        %sImportOutVec3(line, "%s", %s);' % ("if (%s) " % when_guard(a) if a.get("when") else "", a["line"], arg_var(a, i)))
+            elif is_struct_out_import(a):
+                L.append('        %sImportOutInOut(line, "%s", ROK_%s, %s);' % ("if (%s) " % when_guard(a) if a.get("when") else "", a["line"], upper(a["kind"]), arg_var(a, i)))
             elif a["mode"] == "units":
                 L.append('        ImportOutUnits(line, "%s", a%d, kReplayReachFields + %d, %d);' % (a["line"], i, a["reachFirst"], a["reachCount"]))
             elif a["mode"] == "units-buffer" and own is not None:
@@ -2536,7 +2558,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
-    if res is not None and res["mode"] in ("scalar", "object", "value", "region"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -2595,8 +2617,14 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgInOutExit(s_tail, "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
         if a.get("dir", "in") == "in" and phase == "a":
             return ['ArgStruct(s_call, "a", "%s", ROK_%s, %s);' % (line, upper(a["kind"]), var)]
-        if a.get("dir") == "out" and phase == "o":
-            guard = "if (result != 0) " if a.get("when") else ""
+        if is_struct_out_opt(a):
+            if phase == "a":
+                return ['ArgNullOut(s_call, "%s", %s);' % (line, var)]
+            if phase == "o":
+                conds = ([when_guard(a)] if a.get("when") else []) + ["%s != nullptr" % var]
+                return ['if (%s) ArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (" && ".join(conds), line, upper(a["kind"]), var)]
+        elif a.get("dir") == "out" and phase == "o":
+            guard = "if (%s) " % when_guard(a) if a.get("when") else ""
             return ['%sArgStruct(s_tail, "o", "%s", ROK_%s, %s);' % (guard, line, upper(a["kind"]), var)]
     elif mode == "event":
         if phase == "a":
@@ -2682,6 +2710,11 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
         if mode == "region":
             return ["ArgRegionResult(s_tail, result);"]
+        if mode == "text":
+            return ['ArgValue(s_tail, "result", (const char*)result, "o");']
+        if mode == "weapon":
+            reach = "".join(', "%s"' % f for f in res.get("reach", []))
+            return ["ArgWeaponResult(s_tail, result, %d%s);" % (len(res.get("reach", [])), reach)]
         return []
     lines = []
     if mode == "scalar":
@@ -2748,7 +2781,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2855,7 +2888,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
         elif m == "vec3" and a.get("dir") == "out":
             pass
-        elif is_vec3_out(a):
+        elif is_vec3_out(a) or is_struct_out_import(a):
             pass
         elif m == "units" or m == "vector":
             pass
@@ -2890,7 +2923,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append('    ApplyBytes(a%d, %s, "%s");' % (i, length_parts(a, i)[1], a["line"]))
         elif (a["mode"] == "vec3" and a.get("dir") == "out") or is_vec3_out(a):
             L.append('    ApplyVec3(%s, "%s");' % (arg_var(a, i), a["line"]))
-        elif is_named_out(a):
+        elif is_named_out(a) or is_struct_out_import(a):
             L.append('    ApplyInOut(%s, "%s", ROK_%s);' % (arg_var(a, i), a["line"], upper(a["kind"])))
         elif is_value_out(a):
             L.append("    *%s = ParseValueText<%s>(ROK_%s, r);" % (arg_var(a, i), pointee(a), upper(a["kind"])))
@@ -2980,12 +3013,21 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
                 L.append("    %s %s;\n    memset(&%s, 0, sizeof %s);" % (ctype, v, v, v))
                 L.append('    ParseStruct("%s", ROK_%s, &%s);' % (line, upper(a["kind"]), v))
                 call.append("&" + v)
+            elif is_struct_out_opt(a):
+                g = "g_out_%s_%s_%d" % (sub, slot, i)
+                head += ["%s %s;" % (ctype, g), "bool %s_null;" % g]
+                L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
+                L.append('    %s_null = ParseNullOut("%s");' % (g, line))
+                closing.append(line + ".")
+                conds = ([when_guard(a, "g_result_%s_%s" % (sub, slot))] if a.get("when") else []) + ["!%s_null" % g]
+                after.append('    if (%s) CompareStruct("%s", ROK_%s, &%s);' % (" && ".join(conds), line, upper(a["kind"]), g))
+                call.append("%s_null ? nullptr : &%s" % (g, g))
             else:
                 g = "g_out_%s_%s_%d" % (sub, slot, i)
                 head.append("%s %s;" % (ctype, g))
                 L.append("    memset(&%s, 0, sizeof %s);" % (g, g))
                 closing.append(line + ".")
-                guard = "if (%s != 0) " % ("g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
+                guard = "if (%s) " % when_guard(a, "g_result_%s_%s" % (sub, slot)) if a.get("when") else ""
                 after.append('    %sCompareStruct("%s", ROK_%s, &%s);' % (guard, line, upper(a["kind"]), g))
                 call.append("&" + g)
         elif m == "event":
@@ -3042,7 +3084,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object", "value", "region"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
@@ -3056,6 +3098,10 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), "ReplayRefPtr(%s)" % g if res.get("ref") else g))
         elif res["mode"] == "scalar":
             after.append("    CompareResult(%s);" % g)
+        elif res["mode"] == "text":
+            after.append("    CompareResult((const char*)%s);" % g)
+        elif res["mode"] == "weapon":
+            after.append("    CompareWeaponResult(%s);" % g)
         elif res["mode"] == "value":
             after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
         elif res["mode"] == "region":
@@ -3741,7 +3787,7 @@ RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "s
 
 def runnable(s: dict) -> bool:
     """The replayer's runner can pass every argument of the slot and compare its result."""
-    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value"))
+    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon"))
 
 
 def native_name(slot: str) -> str:

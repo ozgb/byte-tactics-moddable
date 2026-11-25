@@ -332,6 +332,15 @@ void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, 
     ReplayAddStruct(t, tag, name, kind, p, Table());
 }
 
+void ArgNullOut(ReplayText& t, const char* name, const void* p)
+{
+    if (p != nullptr)
+        return;
+    t.Add("  a ");
+    t.Add(name);
+    t.Add(" null\n");
+}
+
 void ArgEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size)
 {
     ReplayAddEvent(t, name, table, p, size, Table());
@@ -607,6 +616,32 @@ void ImportResultObject(ReplayText& t, unsigned kind, const void* p)
 {
     t.Add(" = ");
     ReplayAddObjectName(t, Table(), kind, p, true);
+}
+
+void ArgWeaponResult(ReplayText& t, const void* p, unsigned count, ...)
+{
+    t.Add("  o result ");
+    ReplayAddWeapon(t, p);
+    t.AddChar('\n');
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(ROK_WEAPONDEF, name);
+        if (f == nullptr)
+            continue;
+        t.Add("  o ");
+        ReplayAddWeapon(t, p);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
+        t.AddChar('\n');
+    }
+    va_end(names);
 }
 
 void ImportResultWeapon(ReplayText& t, const void* p, unsigned count, ...)

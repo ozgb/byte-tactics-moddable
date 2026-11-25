@@ -290,106 +290,6 @@ void __stdcall RecEconomyUnitAccount(EconUnit a0, EconAccount* a1)
     }
 }
 
-void __stdcall RecFeaturesUpdateFeatures()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_UPDATEFEATURES, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->UpdateFeatures();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesLoadFeatureFileList()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_LOADFEATUREFILELIST, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->LoadFeatureFileList();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesFreeFeatureFileList()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_FREEFEATUREFILELIST, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->FreeFeatureFileList();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesNopAfterFeatureEnum()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_NOPAFTERFEATUREENUM, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->NopAfterFeatureEnum();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesResolveFeatureLinks()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_RESOLVEFEATURELINKS, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->ResolveFeatureLinks();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesInitFeatureAnimPool(TntInfo* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_INITFEATUREANIMPOOL, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "info");
-    }
-    s_inner_features->InitFeatureAnimPool(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesFreeFeaturePool()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_FREEFEATUREPOOL, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->FreeFeaturePool();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesPlaceMissionFeatures()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_PLACEMISSIONFEATURES, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->PlaceMissionFeatures();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesStampFeatureMetal()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_STAMPFEATUREMETAL, SUB_FEATURES, roots);
-    if (scope.Open()) {
-    }
-    s_inner_features->StampFeatureMetal();
-    if (scope.Open()) {
-    }
-}
-
 unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
 {
     ReplayRoots roots;
@@ -399,20 +299,6 @@ unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
         ArgObject(s_call, "cell", ROK_CELL, a0);
     }
     unsigned short result = s_inner_features->GetCellFeature(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-unsigned short __stdcall RecFeaturesFindOrLoadFeatureType(const char* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_FINDORLOADFEATURETYPE, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "name", (const char*)a0);
-    }
-    unsigned short result = s_inner_features->FindOrLoadFeatureType(a0);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -443,36 +329,15 @@ void __stdcall RecFeaturesGetFootprintCentre(const Point16* a0, Feature* a1, Vec
     }
 }
 
-void __stdcall RecFeaturesSaveFeatures(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_SAVEFEATURES, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_features->SaveFeatures(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecFeaturesLoadFeatures(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_FEATURES_LOADFEATURES, SUB_FEATURES, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_features->LoadFeatures(a0);
-    if (scope.Open()) {
-    }
-}
-
 int __stdcall RecFeaturesApply(const FeaturesEventHeader* a0, unsigned int a1)
 {
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == FEATURES_RECLAIM))
+        return s_inner_features->Apply(a0, a1);
     ReplayRoots roots;
+    EventRoots(roots, RET_FEATURES, a0, a1);
     SlotScope scope(RSL_FEATURES_APPLY, SUB_FEATURES, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "event");
+        ArgEvent(s_call, "event", RET_FEATURES, a0, a1);
         ArgValue(s_call, "size", a1);
     }
     int result = s_inner_features->Apply(a0, a1);
@@ -487,7 +352,7 @@ int __stdcall RecFeaturesPlace(const FeaturesPlace* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_PLACE, SUB_FEATURES, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "place");
+        ArgStruct(s_call, "a", "place", ROK_FEATURESPLACE, a0);
     }
     int result = s_inner_features->Place(a0);
     if (scope.Open()) {
@@ -564,23 +429,24 @@ unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Poin
     ReplayRoots roots;
     SlotScope scope(RSL_FEATURES_FINDFEATUREATPOS, SUB_FEATURES, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "pos");
-        ArgPending(s_call, "cell");
-        ArgPending(s_call, "size");
+        ArgStruct(s_call, "a", "pos", ROK_VEC3, a0);
+        ArgNullOut(s_call, "cell", a1);
+        ArgNullOut(s_call, "size", a2);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i features.FindFeatureAtPos");
-        ImportPending(line);
-        ImportPending(line);
-        ImportPending(line);
     }
     unsigned short result = s_inner_features->FindFeatureAtPos(a0, a1, a2);
     if (scope.Import()) {
         ImportResult(line, result);
+        if (result != 65535) ImportOutInOut(line, "cell", ROK_POINT16, a1);
+        if (result != 65535) ImportOutInOut(line, "size", ROK_POINT16, a2);
         FinishImport(line);
     }
     if (scope.Open()) {
+        if (result != 65535 && a1 != nullptr) ArgStruct(s_tail, "o", "cell", ROK_POINT16, a1);
+        if (result != 65535 && a2 != nullptr) ArgStruct(s_tail, "o", "size", ROK_POINT16, a2);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -936,6 +802,29 @@ void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
     s_inner_weapons->UpdateUnitWeapons(a0);
     if (scope.Open()) {
     }
+}
+
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "name", (const char*)a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.FindWeaponByName");
+        ImportValue(line, (const char*)a0);
+    }
+    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
+    if (scope.Import()) {
+        ImportResultWeapon(line, result, 1, "flags");
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgWeaponResult(s_tail, result, 1, "flags");
+    }
+    return result;
 }
 
 int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
@@ -2909,7 +2798,16 @@ unsigned int __stdcall RecScriptsObjectStateSize(Object3do* a0)
     if (scope.Open()) {
         ArgObject(s_call, "model", ROK_OBJECT3DO, a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i scripts.ObjectStateSize");
+        ImportObject(line, ROK_OBJECT3DO, a0);
+    }
     unsigned int result = s_inner_scripts->ObjectStateSize(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -3346,6 +3244,184 @@ void __stdcall RecMovementWriteState(const StateWriter* a0)
     s_inner_movement->WriteState(a0);
     if (scope.Open()) {
     }
+}
+
+int __stdcall RecMissionGetGameType()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETGAMETYPE, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetGameType");
+    }
+    int result = s_inner_mission->GetGameType();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+const char* __stdcall RecMissionGetNameSlot(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETNAMESLOT, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    const char* result = s_inner_mission->GetNameSlot(a0);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", (const char*)result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionIndex()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONINDEX, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->GetMissionIndex();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+const char* __stdcall RecMissionGetMissionName()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONNAME, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    const char* result = s_inner_mission->GetMissionName();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", (const char*)result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetStartPosition(Vec3* a0, int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETSTARTPOSITION, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "id", a1);
+    }
+    int result = s_inner_mission->GetStartPosition(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_VEC3, a0);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionCountStartPositions()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTSTARTPOSITIONS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountStartPositions();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionHasMissionName()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_HASMISSIONNAME, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->HasMissionName();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecMissionGetMissionParams(MissionParams* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONPARAMS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetMissionParams");
+    }
+    s_inner_mission->GetMissionParams(a0);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_MISSIONPARAMS, a0);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONPARAMS, a0);
+    }
+}
+
+int __stdcall RecMissionCountMissionUnits()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTMISSIONUNITS, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountMissionUnits();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionUnit(int a0, MissionUnitInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONUNIT, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    int result = s_inner_mission->GetMissionUnit(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_MISSIONUNITINFO, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionCountMissionFeatures()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_COUNTMISSIONFEATURES, SUB_MISSION, roots);
+    if (scope.Open()) {
+    }
+    int result = s_inner_mission->CountMissionFeatures();
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecMissionGetMissionFeature(int a0, MissionFeatureInfo* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONFEATURE, SUB_MISSION, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    int result = s_inner_mission->GetMissionFeature(a0, a1);
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_MISSIONFEATUREINFO, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
 }
 
 FileHandle* __stdcall RecFilesOpenRead(const char* a0)
@@ -4434,7 +4510,17 @@ void __stdcall RecNetworkSendFeatureHit(WeaponDef* a0, int a1, int a2)
         ArgValue(s_call, "x", a1);
         ArgValue(s_call, "z", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendFeatureHit");
+        ImportObject(line, ROK_WEAPONDEF, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
     s_inner_network->SendFeatureHit(a0, a1, a2);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4447,7 +4533,16 @@ void __stdcall RecNetworkSendFeatureKilled(int a0, int a1)
         ArgValue(s_call, "x", a0);
         ArgValue(s_call, "z", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendFeatureKilled");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
     s_inner_network->SendFeatureKilled(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4460,7 +4555,16 @@ void __stdcall RecNetworkSendFeatureBurning(int a0, int a1)
         ArgValue(s_call, "x", a0);
         ArgValue(s_call, "z", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendFeatureBurning");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
     s_inner_network->SendFeatureBurning(a0, a1);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4638,68 +4742,6 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
     s_inner_network->SendUnitStates(a0);
     if (scope.Open()) {
-    }
-}
-
-WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);
-    if (scope.Open()) {
-        ArgValue(s_call, "name", (const char*)a0);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i weapons.FindWeaponByName");
-        ImportValue(line, (const char*)a0);
-    }
-    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
-    if (scope.Import()) {
-        ImportResultWeapon(line, result, 1, "flags");
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-    return result;
-}
-
-int __stdcall RecMissionGetGameType()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MISSION_GETGAMETYPE, SUB_MISSION, roots, false);
-    if (scope.Open()) {
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i mission.GetGameType");
-    }
-    int result = s_inner_mission->GetGameType();
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecMissionGetMissionParams(MissionParams* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_MISSION_GETMISSIONPARAMS, SUB_MISSION, roots, false);
-    if (scope.Open()) {
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i mission.GetMissionParams");
-    }
-    s_inner_mission->GetMissionParams(a0);
-    if (scope.Import()) {
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-        ArgStruct(s_tail, "o", "out", ROK_MISSIONPARAMS, a0);
     }
 }
 
@@ -5090,9 +5132,25 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         return false;
     case SUB_FEATURES:
+        if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
+        if (slot == RSL_MAP_GETCELLMEANHEIGHT)
+            return true;
+        if (slot == RSL_MAP_GETGROUNDHEIGHT)
+            return true;
+        if (slot == RSL_MISSION_GETGAMETYPE)
+            return true;
+        if (slot == RSL_NETWORK_SENDFEATUREBURNING)
+            return true;
+        if (slot == RSL_NETWORK_SENDFEATUREHIT)
+            return true;
+        if (slot == RSL_NETWORK_SENDFEATUREKILLED)
+            return true;
         if (slot == RSL_PATHFINDING_CELLSCHANGED)
+            return true;
+        if (slot == RSL_SCRIPTS_OBJECTSTATESIZE)
             return true;
         return false;
     case SUB_WEAPONS:
@@ -5263,33 +5321,9 @@ void HookSeams(const bool* on)
     if (on[SUB_ECONOMY])
         s_rec_economy.UnitAccount = RecEconomyUnitAccount;
     if (on[SUB_FEATURES])
-        s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
-    if (on[SUB_FEATURES])
-        s_rec_features.LoadFeatureFileList = RecFeaturesLoadFeatureFileList;
-    if (on[SUB_FEATURES])
-        s_rec_features.FreeFeatureFileList = RecFeaturesFreeFeatureFileList;
-    if (on[SUB_FEATURES])
-        s_rec_features.NopAfterFeatureEnum = RecFeaturesNopAfterFeatureEnum;
-    if (on[SUB_FEATURES])
-        s_rec_features.ResolveFeatureLinks = RecFeaturesResolveFeatureLinks;
-    if (on[SUB_FEATURES])
-        s_rec_features.InitFeatureAnimPool = RecFeaturesInitFeatureAnimPool;
-    if (on[SUB_FEATURES])
-        s_rec_features.FreeFeaturePool = RecFeaturesFreeFeaturePool;
-    if (on[SUB_FEATURES])
-        s_rec_features.PlaceMissionFeatures = RecFeaturesPlaceMissionFeatures;
-    if (on[SUB_FEATURES])
-        s_rec_features.StampFeatureMetal = RecFeaturesStampFeatureMetal;
-    if (on[SUB_FEATURES])
         s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
-    if (on[SUB_FEATURES])
-        s_rec_features.FindOrLoadFeatureType = RecFeaturesFindOrLoadFeatureType;
     if (on[SUB_FEATURES] || on[SUB_WEAPONS])
         s_rec_features.GetFootprintCentre = RecFeaturesGetFootprintCentre;
-    if (on[SUB_FEATURES])
-        s_rec_features.SaveFeatures = RecFeaturesSaveFeatures;
-    if (on[SUB_FEATURES])
-        s_rec_features.LoadFeatures = RecFeaturesLoadFeatures;
     if (on[SUB_FEATURES])
         s_rec_features.Apply = RecFeaturesApply;
     if (on[SUB_FEATURES])
@@ -5358,6 +5392,8 @@ void HookSeams(const bool* on)
         s_rec_weapons.Apply = RecWeaponsApply;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
+    if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
+        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
@@ -5382,7 +5418,7 @@ void HookSeams(const bool* on)
         s_rec_targeting.SavedTargetPair = RecTargetingSavedTargetPair;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.Apply = RecLosRadarApply;
-    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_MAP])
+    if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_WEAPONS] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
     if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
@@ -5564,7 +5600,7 @@ void HookSeams(const bool* on)
         s_rec_players.Shutdown = RecPlayersShutdown;
     if (on[SUB_MAP])
         s_rec_map.Apply = RecMapApply;
-    if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_PLAYERS])
+    if (on[SUB_MAP] || on[SUB_FEATURES] || on[SUB_WEAPONS] || on[SUB_PLAYERS])
         s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
         s_rec_map.CanBuildAt = RecMapCanBuildAt;
@@ -5578,7 +5614,7 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
-    if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_TARGETING])
+    if (on[SUB_MAP] || on[SUB_FEATURES] || on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_map.GetGroundHeight = RecMapGetGroundHeight;
     if (on[SUB_MAP])
         s_rec_map.PassMapGet = RecMapPassMapGet;
@@ -5612,7 +5648,7 @@ void HookSeams(const bool* on)
         s_rec_scripts.FreeObjectState = RecScriptsFreeObjectState;
     if (on[SUB_SCRIPTS])
         s_rec_scripts.UpdateObjectState = RecScriptsUpdateObjectState;
-    if (on[SUB_SCRIPTS])
+    if (on[SUB_SCRIPTS] || on[SUB_FEATURES])
         s_rec_scripts.ObjectStateSize = RecScriptsObjectStateSize;
     if (on[SUB_SCRIPTS])
         s_rec_scripts.NewUnitScript = RecScriptsNewUnitScript;
@@ -5672,6 +5708,30 @@ void HookSeams(const bool* on)
         s_rec_movement.UnitTarget = RecMovementUnitTarget;
     if (on[SUB_MOVEMENT])
         s_rec_movement.WriteState = RecMovementWriteState;
+    if (on[SUB_MISSION] || on[SUB_FEATURES] || on[SUB_PLAYERS])
+        s_rec_mission.GetGameType = RecMissionGetGameType;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetNameSlot = RecMissionGetNameSlot;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionIndex = RecMissionGetMissionIndex;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionName = RecMissionGetMissionName;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetStartPosition = RecMissionGetStartPosition;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountStartPositions = RecMissionCountStartPositions;
+    if (on[SUB_MISSION])
+        s_rec_mission.HasMissionName = RecMissionHasMissionName;
+    if (on[SUB_MISSION] || on[SUB_PLAYERS])
+        s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountMissionUnits = RecMissionCountMissionUnits;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionUnit = RecMissionGetMissionUnit;
+    if (on[SUB_MISSION])
+        s_rec_mission.CountMissionFeatures = RecMissionCountMissionFeatures;
+    if (on[SUB_MISSION])
+        s_rec_mission.GetMissionFeature = RecMissionGetMissionFeature;
     if (on[SUB_FILES])
         s_rec_files.OpenRead = RecFilesOpenRead;
     if (on[SUB_FILES])
@@ -5810,11 +5870,11 @@ void HookSeams(const bool* on)
         s_rec_network.SendWeaponFireAt = RecNetworkSendWeaponFireAt;
     if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendProjectileDetonated = RecNetworkSendProjectileDetonated;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_FEATURES])
         s_rec_network.SendFeatureHit = RecNetworkSendFeatureHit;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_FEATURES])
         s_rec_network.SendFeatureKilled = RecNetworkSendFeatureKilled;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_FEATURES])
         s_rec_network.SendFeatureBurning = RecNetworkSendFeatureBurning;
     if (on[SUB_NETWORK])
         s_rec_network.SendFeatureReclaimed = RecNetworkSendFeatureReclaimed;
@@ -5832,12 +5892,6 @@ void HookSeams(const bool* on)
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
-    if (on[SUB_WIND_METEORS])
-        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
-    if (on[SUB_PLAYERS])
-        s_rec_mission.GetGameType = RecMissionGetGameType;
-    if (on[SUB_PLAYERS])
-        s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

@@ -1599,6 +1599,23 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
             ExpandDeltaTable(reach, table, assign, kind, fields, fieldCount, deferred);
             continue;
         }
+        if (kReplayObjectKinds[kind].table == RT_ORDER) {
+            const ReplayObjectKind& k = kReplayObjectKinds[kind];
+            for (unsigned i = 0; i < k.insideCount; i++) {
+                const ReplayInsideSite& site = kReplayInsideSites[k.insideFirst + i];
+                if (!site.ref)
+                    continue;
+                unsigned owners = ContainerCount(table, site.container);
+                for (unsigned o = 0; o < owners; o++) {
+                    const unsigned char* owner = (const unsigned char*)table.Pointer(site.container, o + 1);
+                    unsigned char* first = owner == nullptr ? nullptr : BlockAt(*(const unsigned*)(owner + site.offset));
+                    unsigned room = owner == nullptr ? 0 : SiteRoom(site, owner);
+                    for (unsigned e = 0; first != nullptr && e < room; e++)
+                        Visit(reach, table, assign, (unsigned char)kind, first + e * site.stride, nullptr, 0);
+                }
+            }
+            continue;
+        }
         unsigned char* base;
         unsigned count;
         unsigned stride;

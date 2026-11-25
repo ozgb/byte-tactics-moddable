@@ -127,7 +127,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::mapWidth"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -191,7 +191,7 @@ class Unrecorded(unittest.TestCase):
 
     def imported(self):
         ann = annotations()
-        self.assertFalse(ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"]["record"])
+        ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"].update({"record": False, "reason": "#711"})
         return ann
 
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
@@ -395,7 +395,7 @@ class TargetingForms(unittest.TestCase):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = "result == 0"
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("`when` is only `result != 0`" in e for e in errors), errors)
+        self.assertTrue(any("`when` is only `result != N`" in e for e in errors), errors)
 
     def test_an_import_may_print_only_the_axes_it_reads(self):
         files, _, _ = self.generated()
@@ -906,11 +906,11 @@ class StructForms(unittest.TestCase):
         files, _, _ = self.generated(self.targeting())
         self.assertIn("g_seams.targeting->GetWeaponTargetPos(p0, &p1, p2)", files[rs.SLOTS_H])
 
-    def test_only_a_struct_in_can_be_nullable(self):
+    def test_an_out_vec3_cannot_be_nullable(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["nullable"] = True
         _, errors, _ = self.generated(ann)
-        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        self.assertTrue(any("an out Vec3, which is `vec3` data and cannot be nullable" in e for e in errors), errors)
 
     def test_an_array_of_structs_is_a_pointer_and_a_count(self):
         files, errors, _ = self.generated(self.targeting(mode="structs", count="weapon"))
@@ -1797,7 +1797,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 12;", text)
+        self.assertIn("kReplayInsideSiteCount = 15;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1892,11 +1892,11 @@ class FeatureKinds(unittest.TestCase):
     def test_the_rows_that_need_a_rule_have_one(self):
         ann = annotations()
         have = {(r["kind"], r["target"]) for r in ann["rules"]}
-        for want in (("field_escape", "Feature::name"), ("field_escape", "FeatureName::name"), ("field_escape", "Game::anim"), ("field_escape", "Game::featureCount"),
-                     ("field_escape", "Spot::frame"), ("deref_read", "*int"), ("deref_write", "*unsigned short")):
+        for want in (("field_escape", "Game::pool"), ("deref_read", "*int"), ("deref_write", "*int"), ("field_read", "Pool::entries"), ("field_read", "Game::cells")):
             self.assertIn(want, have)
-        _, _, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual(model["subsystems"]["features"]["pending"]["ruleless"], 0)
+        _, errors, model = rs.generate(rs.read_rows(), ann)
+        self.assertEqual([e for e in errors if e.startswith("features")], [])
+        self.assertNotIn("pending", model["subsystems"]["features"])
 
 
 class AllOfKinds(unittest.TestCase):
@@ -2156,6 +2156,55 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn("AddInOut(t, ROK_FIXTUREAMOUNT, a0);", stub)
         self.assertIn('ApplyInOut(a0, "count", ROK_FIXTUREAMOUNT);', stub)
 
+    def test_a_nullable_out_struct_writes_null_going_in_and_its_fields_only_when_it_is_set_and_the_condition_holds(self):
+        s, _ = self.slot([("FixtureAmount*", "cell")], {"cell": self.OUTOPT}, "unsigned short", {"mode": "scalar"})
+        a = s["args"][0]
+        self.assertEqual(rs.arg_out(a, 0, "a", {}), ['ArgNullOut(s_call, "cell", a0);'])
+        self.assertEqual(rs.arg_out(a, 0, "i", {}), [])
+        self.assertEqual(rs.arg_out(a, 0, "o", {}), ['if (result != 65535 && a0 != nullptr) ArgStruct(s_tail, "o", "cell", ROK_FIXTUREAMOUNT, a0);'])
+        wrapper = "\n".join(rs.wrapper("features", {}, "Find", s, {}, True))
+        self.assertIn('if (result != 65535) ImportOutInOut(line, "cell", ROK_FIXTUREAMOUNT, a0);', wrapper)
+        stub = "\n".join(rs.import_stub("features", "Find", s))
+        self.assertNotIn("AddInOut", stub)
+        self.assertIn('ApplyInOut(a0, "cell", ROK_FIXTUREAMOUNT);', stub)
+
+    def test_the_replayer_passes_a_nullable_out_struct_as_null_when_the_recording_says_so_and_compares_it_when_set(self):
+        s, _ = self.slot([("FixtureAmount*", "cell")], {"cell": self.OUTOPT}, "unsigned short", {"mode": "scalar"})
+        runner = "\n".join(rs.runner("features", "Find", s))
+        self.assertIn('g_out_features_Find_0_null = ParseNullOut("cell");', runner)
+        self.assertIn("g_seams.features->Find(g_out_features_Find_0_null ? nullptr : &g_out_features_Find_0)", runner)
+        self.assertIn('if (g_result_features_Find != 65535 && !g_out_features_Find_0_null) CompareStruct("cell", ROK_FIXTUREAMOUNT, &g_out_features_Find_0);', runner)
+
+    def test_a_text_result_is_recorded_as_the_text_and_compared_as_the_text(self):
+        s, _ = self.slot([], {}, "const char*", {"mode": "text"})
+        self.assertEqual(rs.result_out(s["result"], {}, "o"), ['ArgValue(s_tail, "result", (const char*)result, "o");'])
+        runner = "\n".join(rs.runner("units", "Label", s))
+        self.assertIn("CompareResult((const char*)g_result_units_Label);", runner)
+
+    def test_a_weapon_result_is_recorded_by_its_name_and_its_reach_and_compared_by_its_name(self):
+        s, _ = self.slot([], {}, "WeaponDef*", {"mode": "weapon", "reach": ["flags"]})
+        self.assertEqual(rs.result_out(s["result"], {}, "o"), ['ArgWeaponResult(s_tail, result, 1, "flags");'])
+        runner = "\n".join(rs.runner("units", "Pick", s))
+        self.assertIn("CompareWeaponResult(g_result_units_Pick);", runner)
+
+    def test_an_all_of_rule_may_name_a_table_behind_a_ref_field_and_not_a_kind_with_no_table(self):
+        _, errors, model = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual([e for e in errors if "all-of" in e], [])
+        self.assertEqual(model["subsystems"]["mission"]["slots"]["CountStartPositions"]["allOf"], ["Mission", "MissionRule"])
+        ann = annotations()
+        for rule in ann["rules"]:
+            if rule["target"] == "Mission::missionIndex":
+                rule["object"] = "MissionType"
+        errors = rs.generate(rs.read_rows(), ann)[1]
+        self.assertTrue(any("the all-of rule names MissionType, which is no table kind of the schema" in e for e in errors), errors)
+
+    def test_a_condition_is_result_not_equal_to_a_number(self):
+        for when, ok in (("result != 0", True), ("result != 65535", True), ("result != x", False)):
+            ann = annotations()
+            ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = when
+            errors = rs.generate(rs.read_rows(), ann)[1]
+            self.assertEqual(not any("`when` is only" in e for e in errors), ok, (when, errors))
+
     def test_the_replayer_passes_an_in_out_value_by_address_or_null_and_compares_it_after(self):
         s, _ = self.slot([("FixtureAmount*", "count")], {"count": self.INOUT}, "int", {"mode": "scalar"})
         runner = "\n".join(rs.runner("units", "Query", s))
@@ -2164,11 +2213,12 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn('CompareInOut("count", ROK_FIXTUREAMOUNT, g_inout_units_Query_0_null ? nullptr : &g_inout_units_Query_0);', runner)
         self.assertIn("g_seams.units->Query(p0)", runner)
 
-    def test_an_in_out_value_can_be_nullable_and_an_out_value_cannot(self):
+    OUTOPT = {"mode": "struct", "kind": "FixtureAmount", "dir": "out", "nullable": True, "when": "result != 65535"}
+
+    def test_an_in_out_value_and_an_out_struct_can_be_nullable(self):
         self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": self.INOUT}), [])
         self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, nullable=False)}), [])
-        errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="out")})
-        self.assertTrue(any("only a struct in or inout can be nullable" in e for e in errors), errors)
+        self.assertEqual(self.errors([("FixtureAmount*", "count")], {"count": dict(self.OUTOPT)}, "int", {"mode": "scalar"}), [])
         errors = self.errors([("FixtureAmount*", "count")], {"count": dict(self.INOUT, dir="both")})
         self.assertTrue(any("has the direction both" in e for e in errors), errors)
 
@@ -2405,7 +2455,7 @@ class ElementForms(unittest.TestCase):
             ann["objects"]["FixtureGroup"]["table"] = table
             self.has(ann, message)
 
-    def test_a_table_behind_a_ref_field_is_no_delta_all_of_or_inside_kind(self):
+    def test_a_table_behind_a_ref_field_is_no_delta_or_inside_kind_and_may_be_all_of(self):
         ann = annotations()
         ann["objects"]["FixtureGroup"]["delta"] = True
         self.has(ann, "FixtureGroup delta: only a kind with a table of Game or SimGlobals can be a delta")
@@ -2415,7 +2465,7 @@ class ElementForms(unittest.TestCase):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
         errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)[1]
-        self.assertTrue(any("the all-of rule names FixtureGroup, which is no table kind of the schema" in e for e in errors), errors)
+        self.assertFalse(any("which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
         files, _, _ = self.generated()
@@ -2775,10 +2825,10 @@ class CStrings(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
 
-    def test_the_real_schema_has_none_of_it(self):
-        files, _, _ = rs.generate(rs.read_rows())
-        self.assertNotIn("CSTRING", files[rs.SCHEMA_H].replace("#include", ""))
-        self.assertEqual(files[rs.JSON_OUT].count("cstring"), 0)
+    def test_the_real_schema_has_it_only_for_the_names_of_the_mission(self):
+        real = json.loads(rs.JSON_OUT.read_text())["annotations"]["objects"]
+        users = {k for k, v in real.items() if any(f["kind"] == "cstring" for f in v["fields"])}
+        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo"})
 
     def test_a_walk_never_follows_a_string(self):
         for kind in ("cstring", "cstringref", "cstrings"):

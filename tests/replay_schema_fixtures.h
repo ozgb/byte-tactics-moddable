@@ -381,6 +381,10 @@ enum ReplayObjectKindId {
     ROK_FIXTURELOSLINE,
     ROK_FIXTURELOSSTEP,
     ROK_FIXTUREORDERENTRY,
+    ROK_FIXTUREGOALBASE,
+    ROK_FIXTUREGOALA,
+    ROK_FIXTUREGOALB,
+    ROK_FIXTUREGOALHOLDER,
     ROK_COUNT
 };
 
@@ -1163,10 +1167,14 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FixtureLosLine", sizeof(LosLine), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureLosStep", sizeof(LosStep), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FixtureOrderEntry", sizeof(OrderTableEntry), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FixtureGoalBase", sizeof(FixtureGoalBase), RS_STATE, RT_ORDER, 0, 0, 5, 2, 0, 0 },
+    { "FixtureGoalA", sizeof(FixtureGoalA), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FixtureGoalB", sizeof(FixtureGoalB), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FixtureGoalHolder", sizeof(FixtureGoalHolder), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 207;
+static const unsigned kReplayObjectKindCount = 211;
 
-static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };
+static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB };
 
 enum ReplayCallbackId {
     RCB_UNITSCANVISITOR,
@@ -2264,9 +2272,15 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "name", offsetof(OrderTableEntry, name), sizeof(((OrderTableEntry*)nullptr)->name), ROK_FIXTUREORDERENTRY, RK_CSTRING, 0, 0, 0, {}, 0, 0 },
     { "drawMask", offsetof(OrderTableEntry, drawMask), sizeof(((OrderTableEntry*)nullptr)->drawMask), ROK_FIXTUREORDERENTRY, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(OrderTableEntry, flags), sizeof(((OrderTableEntry*)nullptr)->flags), ROK_FIXTUREORDERENTRY, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "ticks", offsetof(FixtureGoalA, ticks), sizeof(((FixtureGoalA*)nullptr)->ticks), ROK_FIXTUREGOALA, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "heading", offsetof(FixtureGoalA, heading), sizeof(((FixtureGoalA*)nullptr)->heading), ROK_FIXTUREGOALA, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "ticks", offsetof(FixtureGoalB, ticks), sizeof(((FixtureGoalB*)nullptr)->ticks), ROK_FIXTUREGOALB, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "count", offsetof(FixtureGoalB, count), sizeof(((FixtureGoalB*)nullptr)->count), ROK_FIXTUREGOALB, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "id", offsetof(FixtureGoalHolder, id), sizeof(((FixtureGoalHolder*)nullptr)->id), ROK_FIXTUREGOALHOLDER, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goal", offsetof(FixtureGoalHolder, goal), sizeof(((FixtureGoalHolder*)nullptr)->goal), ROK_FIXTUREGOALHOLDER, RK_REF, ROK_FIXTUREGOALBASE, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1071;
-static const unsigned kReplayWalkableFieldCount = 197;
+static const unsigned kReplayObjectFieldCount = 1077;
+static const unsigned kReplayWalkableFieldCount = 198;
 
 static const unsigned short kReplayReachFields[] = { 46, 51, 168, 169, 170, 38, 37, 0, 24, 51, 171, 34, 983, 38, 36, 39, 46, 52, 54, 109 };
 
@@ -3347,6 +3361,12 @@ static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->value)) && __is
 static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->name)) && __is_same(__remove_cv(__remove_pointer(decltype(((OrderTableEntry*)nullptr)->name))), char), "OrderTableEntry::name is a char pointer");
 static_assert(sizeof(((OrderTableEntry*)nullptr)->drawMask) == 4, "OrderTableEntry::drawMask has the size the schema says");
 static_assert(sizeof(((OrderTableEntry*)nullptr)->flags) == 4, "OrderTableEntry::flags has the size the schema says");
+static_assert(sizeof(((FixtureGoalA*)nullptr)->ticks) == 2, "FixtureGoalA::ticks has the size the schema says");
+static_assert(sizeof(((FixtureGoalA*)nullptr)->heading) == 2, "FixtureGoalA::heading has the size the schema says");
+static_assert(sizeof(((FixtureGoalB*)nullptr)->ticks) == 2, "FixtureGoalB::ticks has the size the schema says");
+static_assert(sizeof(((FixtureGoalB*)nullptr)->count) == 4, "FixtureGoalB::count has the size the schema says");
+static_assert(sizeof(((FixtureGoalHolder*)nullptr)->id) == 4, "FixtureGoalHolder::id has the size the schema says");
+static_assert(sizeof(((FixtureGoalHolder*)nullptr)->goal) == 4, "FixtureGoalHolder::goal has the size the schema says");
 static_assert(__is_base_of(OrderFx, ApproachRadius), "ApproachRadius is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, RingApproach), "RingApproach is a kind of OrderFx");
 static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");
@@ -3360,6 +3380,10 @@ static_assert(__is_polymorphic(FixtureTimer), "FixtureTimer has a vtable");
 static_assert(__is_polymorphic(FixtureAssault), "FixtureAssault has a vtable");
 static_assert(!__is_polymorphic(FixtureCb) && sizeof(FixtureCb) >= sizeof(void*), "FixtureCb has a vptr that the code sets by hand");
 static_assert(__is_polymorphic(FixtureAttach), "FixtureAttach has a vtable");
+static_assert(__is_base_of(FixtureGoalBase, FixtureGoalA), "FixtureGoalA is a kind of FixtureGoalBase");
+static_assert(__is_base_of(FixtureGoalBase, FixtureGoalB), "FixtureGoalB is a kind of FixtureGoalBase");
+static_assert(__is_polymorphic(FixtureGoalA), "FixtureGoalA has a vtable");
+static_assert(__is_polymorphic(FixtureGoalB), "FixtureGoalB has a vtable");
 
 enum ReplaySubsystemId {
     SUB_WIND_METEORS,

@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 8`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 9`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 8
+bt-trace 9
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -90,8 +90,9 @@ the hash `0x0123456789abcdef` is written `0123456789abcdef`.
 | `wind` | After the wind is updated. |
 | `meteors` | After the meteors are updated. |
 | `world` | Immediately after `meteors`; the hash state is reset for it. |
+| `tick` | At the end of the tick, after every step that follows the last phase (`docs/schedule.md`, "After the phases"), and before the tick's save and round trip. The last tick of a run writes it too, before the run exits. |
 
-A test-mode tick therefore has 8 rows. The rows are flushed at the end of each tick.
+A test-mode tick therefore has 9 rows. The rows are flushed at the end of each tick.
 
 ## 3. The hash
 
@@ -99,7 +100,7 @@ The hash is a 64-bit FNV-1a variant, over a stream of bytes the walk produces (s
 state is one 64-bit value `h`, mod 2^64.
 
 - Offset basis: `h = 0xcbf29ce484222325`. It is set at the start of every row, and again before
-  the `world` row. (The two halves are 0xcbf29ce4 high and 0x84222325 low.)
+  the `world` row and the `tick` row. (The two halves are 0xcbf29ce4 high and 0x84222325 low.)
 - Prime: `P = 0x100000001b3`.
 - To hash a run of `n` bytes `b[0..n)`:
   - while at least 8 bytes remain: `h = (h xor w) * P`, where `w` is the next 8 bytes read as a
@@ -302,6 +303,25 @@ section 9 meteors          (7.7)
 **The world row** starts again from the offset basis and hashes sections 10 to 14, 18 to 23, 24, 25 and 27 in order,
 then sections 29 to 31 when the tick is 1. It has no tick or random preamble. Sections 15, 26 and 28 are not in
 the row since format 6, and sections 24 and 25 hold other content (sections 8.13 and 8.14).
+
+**The `tick` row** (format 9) is the state at the end of the tick, the whole of what the other rows judge, read once
+everything in the tick has run. It is one hash from the offset basis: exactly what a phase row hashes, then, with no
+reset, exactly what the world row hashes.
+
+```
+h = offset basis
+H32(game tick)
+H32(random state 1)
+H32(random state 2)
+sections 1, 2, 6, 7, 8, 9                       (as in a phase row)
+sections 10 to 14, 18 to 25, 27                 (as in the world row)
+sections 29 to 31                               (tick 1 only)
+```
+
+Its hash is not the world row's hash continued, nor a hash of the other rows: the world part is hashed on the state
+at the end of the tick, which the steps after the last phase may have changed (an eyeball that expires clears
+visibility, a resource share moves metal or energy between players). An engine that reaches the same end-of-tick
+state by another order of work inside the tick has the same `tick` row and may have other phase rows.
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
@@ -1886,7 +1906,7 @@ and a pointer is `null` or `heap`; a field with no name is `+0x<offset>`.
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
-rows in file order (`net` if present, the seven phases, then `world`). Build a byte string from them:
+rows in file order (`net` if present, the seven phases, then `world` and `tick`). Build a byte string from them:
 for each row, the 8 bytes of the 64-bit row hash, **little-endian** (the least significant byte
 first; note this is the reverse of the order of the digits in the file). The digest is the standard
 64-bit FNV-1a over that byte string, one byte at a time:
@@ -1895,22 +1915,26 @@ first; note this is the reverse of the order of the digits in the file). The dig
 h = 0xcbf29ce484222325
 for each byte x:  h = (h xor x) * 0x100000001b3   (mod 2^64)
 ```
-It is written as 16 lowercase hex digits. A test-mode tick has 8 rows, so the string is 64 bytes.
+It is written as 16 lowercase hex digits. A test-mode tick has 9 rows, so the string is 72 bytes.
+
+The **state** of a tick is its `tick` row (section 6), as the trace writes it: 16 lowercase hex digits. The
+digest judges every row, so it enforces the order of the phases inside the tick; the state judges only the end
+of the tick. `tools/reference.py --check` compares the digests, and `--check --end-of-tick` the states.
 
 The digest file is:
 
 ```
-bt-digest 8
-trace_format bt-trace 8
+bt-digest 9
+trace_format bt-trace 9
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
 crt_seed <n>
 view_seed <n>
 fpu_control_word 0x<hex>
-<tick> <digest>
+<tick> <digest> <state>
 ```
-with one `<tick> <digest>` line per tick, in tick order. The `quirks` line of a trace is not copied.
+with one `<tick> <digest> <state>` line per tick, in tick order. The `quirks` line of a trace is not copied.
 
 ## 10. dump.txt
 
@@ -1947,6 +1971,11 @@ are the world row's. The
 `world` row is a trace row only after `meteors`, and its lines in the `meteors` block are its hash
 input. The world lines in the other phases' blocks are the world tables at that phase; they have no
 row of their own.
+
+**The `tick` block** (format 9) comes last, after the `meteors` block and its section 35 lines. It has the same
+parts in the same order as a phase block (the phase-row lines, the world lines, then the lines that are not hash
+input, without section 35), read at the end of the tick. Its phase-row lines and world lines, in order and with
+no reset between them, are the hash input of the `tick` row.
 
 **What has no line.** Section numbers, the index words (`H32(i)`), presence bytes, `END` and the
 `H8(which + 1)` and `H8(0)` markers of the order chains are hashed but not dumped. They follow from
@@ -2029,7 +2058,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 8.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 9.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
@@ -2068,6 +2097,11 @@ hashed again, section 21 hashes no goal, section 22 hashes only a path target's 
 grew, and four records are new: 52 `ordersState`, 53 `movementState`, 54 `unitsState` and 55 `scriptsState` (sections 8.31 and 8.36 to 8.39),
 with the prefixes `weaponsState.`, `ordersState.`, `movementState.`, `unitsState.` and `scriptsState.`. A reader of format 7 must
 read the new rows, and a reader of the dump must skip the four new prefixes. The digests of the stored scenarios change, and so does the tag.
+
+Format 9 added the `tick` row (section 6), the ninth row of a test-mode tick, after `world`: the state at the end of the tick, read
+after every step that follows the last phase (#1037). A dump has a `tick` block after the `meteors` block (section 10), and a digest
+file line is `<tick> <digest> <state>` (section 9), the digest folding nine rows. No other row changes, but every digest does, and so
+does the tag.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

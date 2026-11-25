@@ -3,10 +3,12 @@
     uv run tools/test_tracerehash.py
 """
 
+import json
 import lzma
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import tracerehash as tr
 
@@ -566,6 +568,85 @@ class SharedStateTest(unittest.TestCase):
         for v in (1, 2, 3):
             want.h32(v)
         self.assertEqual(w.hash.h, want.h)
+
+
+class TickRowTest(unittest.TestCase):
+    PHASE = [("gameTick", "0x00000001"), ("rng.parkMiller", "0x00000002"), ("rng.crtHoldrand", "0x00000003"),
+             ("meteors.x", "0x00000004")]
+
+    @staticmethod
+    def block(world):
+        return TickRowTest.PHASE + [("game.x", world)]
+
+    def rows(self, blocks):
+        def meteors(self):
+            self.hash.h32(int(self.take("meteors.x"), 16))
+
+        def game(self):
+            self.hash.h32(int(self.take("game.x"), 16))
+
+        quiet = {name: lambda self: None for name in (
+            "units", "projectiles", "players", "features", "wind", "cells", "visibility", "explored", "spatial",
+            "pathfinder", "move_classes", "orders", "motions", "order_effects", "scripts", "los_radar_index",
+            "factory_index", "unit_resources")}
+        with mock.patch.multiple(tr.Walker, meteors=meteors, game=game, **quiet):
+            return tr.rehash(tr.Schema({"targets": [], "tables": {}}), blocks)
+
+    def test_the_tick_row_is_one_hash_over_the_phase_part_and_the_world_part(self):
+        meteors = self.block("0x00000005")
+        got = {phase: value for _, phase, value in self.rows({(2, "meteors"): meteors, (2, "tick"): meteors})}
+        one = tr.Hasher()
+        for v in (1, 2, 3, 4, 5):
+            one.h32(v)
+        world = tr.Hasher()
+        world.h32(5)
+        self.assertEqual(got["tick"], one.h)
+        self.assertEqual(got["world"], world.h)
+        self.assertNotEqual(got["tick"], got["world"])
+
+    def test_a_changed_world_value_changes_only_the_tick_row(self):
+        meteors = self.block("0x00000005")
+        a = self.rows({(2, "meteors"): meteors, (2, "tick"): meteors})
+        b = self.rows({(2, "meteors"): meteors, (2, "tick"): self.block("0x00000006")})
+        self.assertEqual(a[:2], b[:2])
+        self.assertEqual([r[1] for r in b], ["meteors", "world", "tick"])
+        self.assertNotEqual(a[2], b[2])
+
+
+class TailWriteTest(unittest.TestCase):
+    """A write in the tail of the step (after `meteors`) is seen by the `tick` row of its own tick and by no other row."""
+
+    FIXTURE = Path(__file__).resolve().parent / "testdata/tracerehash/orders-build-patrol-24"
+
+    @classmethod
+    def setUpClass(cls):
+        schema_path = Path(__file__).resolve().parent.parent / "data/trace_schema.json"
+        cls.schema = tr.Schema(json.loads(schema_path.read_text()))
+        cls.blocks = tr.parse_dump(tr.read_text(f"{cls.FIXTURE}.dump.txt.xz"), cls.schema.data["trace_format"])
+        cls.trace = tr.parse_trace_rows(tr.read_text(f"{cls.FIXTURE}.trace.txt"))
+
+    def rows_with_tick_block(self, change):
+        blocks = dict(self.blocks)
+        blocks[(24, "tick")] = [change(path, value) for path, value in self.blocks[(24, "tick")]]
+        return {phase: f"{value:016x}" for _, phase, value in tr.rehash(self.schema, blocks)}
+
+    def assert_only_the_tick_row_changes(self, got):
+        for phase in ("units", "meteors", "world"):
+            self.assertEqual(got[phase], self.trace[(24, phase)])
+        self.assertNotEqual(got["tick"], self.trace[(24, "tick")])
+
+    def test_the_unchanged_dump_gives_the_stored_tick_row(self):
+        self.assertEqual(self.rows_with_tick_block(lambda path, value: (path, value))["tick"], self.trace[(24, "tick")])
+
+    def test_an_expired_eyeball_changes_the_tick_row(self):
+        cleared = next(path for path, value in self.blocks[(24, "tick")]
+                       if path.startswith("visibility[") and value.startswith("hex:") and value.strip("hex:0"))
+        got = self.rows_with_tick_block(lambda path, value: (path, "hex:" + "00" * ((len(value) - 4) // 2)) if path == cleared else (path, value))
+        self.assert_only_the_tick_row_changes(got)
+
+    def test_a_shared_resource_changes_the_tick_row(self):
+        got = self.rows_with_tick_block(lambda path, value: (path, "0x00000000") if path == "players[0].metal" else (path, value))
+        self.assert_only_the_tick_row_changes(got)
 
 
 class ReadTextTest(unittest.TestCase):

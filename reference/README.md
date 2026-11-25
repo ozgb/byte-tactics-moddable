@@ -109,7 +109,7 @@ with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
 ## Event logs
 
-`--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records; format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`).
+`--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records, and after the last run of each tick a `<tick> tick <count> <ordered> <set>` line that leaves the phase out and keeps the order only for the kinds whose order counts (`bt-event-digest 2`); format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`). With `--end-of-tick` the digests are compared on their `tick` lines alone, and the record named is the first one that differs under the same rule (`tools/tracediff.py --events --end-of-tick`).
 
 ## Traces
 
@@ -166,7 +166,7 @@ The phase function is the one `RunGameSteps` calls just before the phase's hash
 `UpdateAllUnits`, `projectiles` `UpdateProjectiles`, `explosions`
 `UpdateExplosions`, `players` `UpdatePlayers`, `features` `UpdateFeatures`,
 `wind` `UpdateWind` and `meteors` `UpdateMeteors`. The `world` row follows `UpdateMeteors`
-and has no function of its own.
+and has no function of its own, and nor has the `tick` row, at the end of the step.
 
 Traces with different scenario or seeds are refused (exit 2).
 Exit status is 0 for identical traces, 1 for a divergence and 2 for an error.
@@ -254,8 +254,9 @@ seeds) and runs deterministically: two runs give identical traces.
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase
 hashes: the digest of a tick is computed from the tick's rows as
 [docs/trace-format.md](../docs/trace-format.md), "The per-tick digest", says. In
-test mode there are 8 rows per tick (the 7 phases `units` to `meteors`, since `net`
-does not run, then `world`).
+test mode there are 9 rows per tick (the 7 phases `units` to `meteors`, since `net`
+does not run, then `world` and `tick`). Each line also carries the tick's `tick` row,
+the end-of-tick state, which `tools/reference.py --check --end-of-tick` compares alone.
 
 `tools/tracedigest.py trace.txt` converts a `trace.txt` to this form.
 
@@ -299,7 +300,7 @@ A second `--check` with the same cache key waits for the first on a key lock (`b
 rather than playing the same exe twice. `--no-lock` takes no slot and no key lock, for a run that is not a gate.
 A passing `--check` is cached: its output, date and commit go to `~/.cache/bt-gate/<key>.txt` (shared by every worktree on the machine),
 where the key is a SHA-256 of the exe, `wasmtime_host.dll`, the `.wasm` modules and `modules.json` beside it, `reference/scenarios`, `traces`,
-`sounds`, `ui`, `frames` and `saves`, `tools/playtest/`, `tools/reference.py`, `playtest.py`, `tracediff.py`, `tracedigest.py`, `savefile.py` and `blockpointers.py` with every `tools/` module they import (found from the source), `data/block_pointers.csv`, the `TotalA.map` beside the exe (or its absence), and the options that change what is played
+`sounds`, `ui`, `frames` and `saves`, `tools/playtest/`, `tools/reference.py`, `playtest.py`, `tracediff.py`, `tracedigest.py`, `savefile.py` and `blockpointers.py` with every `tools/` module they import (found from the source), `data/block_pointers.csv`, `docs/sim-events.md` (the order classes the event digest reads), the `TotalA.map` beside the exe (or its absence), and the options that change what is played
 (tier, mode, `--steps-per-frame`, `--quirks`, `--roundtrip`, `--poison`); the `commit.txt` beside the exe is not part of it. A failing run writes nothing.
 The key is looked up before the key lock and again after it, so a run that waited behind a gate of the same inputs reports that gate's pass. On a hit
 `--check` prints `cached pass from <date> at <commit>` and the stored lines and exits 0; this counts as a gate run, and the pull request body says "cached".

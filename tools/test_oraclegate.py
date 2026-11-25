@@ -47,10 +47,11 @@ WINE_LOG = (
 class Suite(unittest.TestCase):
     def test_the_first_divergence_has_the_modules_side_only(self):
         suite = oraclegate.parse_suite(REPORT, 1, ["allied-victory", "console-features", "console-sight"])
-        self.assertEqual(suite["allied-victory"], {"status": "equal"})
+        self.assertEqual(suite["allied-victory"], {"status": "equal", "digest": {"status": "equal"}})
         self.assertEqual(suite["console-features"], {"status": "differs", "tick": 70, "phase": "meteors",
-                                                     "field": "SimGlobals.g_meteorScheduleGap", "value": "0x3c"})
-        self.assertEqual(suite["console-sight"], {"status": "not_judged"})
+                                                     "field": "SimGlobals.g_meteorScheduleGap", "value": "0x3c",
+                                                     "digest": {"status": "not_judged"}})
+        self.assertEqual(suite["console-sight"], {"status": "not_judged", "digest": {"status": "not_judged"}})
 
     def test_no_reference_value_reaches_the_result(self):
         suite = oraclegate.parse_suite(REPORT, 1, ["allied-victory", "console-features"])
@@ -68,7 +69,7 @@ class Suite(unittest.TestCase):
     def test_a_scenario_that_failed_to_run(self):
         report = "scenarios failed to run:\nconsole-features: failed to run, playtest.py ended with:\n    the game exited with code 2\n"
         suite = oraclegate.parse_suite(report, 1, ["console-features"])
-        self.assertEqual(suite["console-features"], {"status": "failed"})
+        self.assertEqual(suite["console-features"], {"status": "failed", "digest": {"status": "not_judged"}})
         self.assertEqual(oraclegate.verdict_of(suite, {}), "failed")
 
     def test_other_checks_failing_is_not_equal(self):
@@ -99,6 +100,70 @@ class Suite(unittest.TestCase):
         field = "  first differing field: bad name here: a=1 b=2"
         suite = oraclegate.parse_suite("DIFF a (1 ticks, 0:01) tick 3: x\ntracediff for a: a = r\n" + field + "\n", 1, ["a"])
         self.assertIsNone(suite["a"]["field"])
+
+
+END_OF_TICK_REPORT = f"""ok   a (900 ticks, 1:02)
+ok   b (300 ticks, 0:40, 12 sound lines) [digest differs from tick 41]
+DIFF c (300 ticks, 0:40) tick 70: stored {REFERENCE_HASH}, got badc0de [kept: build/scratch/x] [digest differs from tick 70]
+3 of 3 scenarios equal, total 0:30
+2 of 3 scenarios equal on every row
+
+tracediff for c: a = the reference at 0123abc, b = build/oracle/runtime/TotalA.exe
+first divergence: tick 70, phase tick
+  first differing field: Players[0].metal: a={REFERENCE_VALUE} b=0x3c
+"""
+
+
+class DigestVerdict(unittest.TestCase):
+    def module(self, tmp):
+        module = Path(tmp) / "m.wasm"
+        module.write_bytes(b"\0asm\1\0\0\0")
+        return module
+
+    def test_the_suffix_gives_each_scenarios_digest_verdict(self):
+        suite = oraclegate.parse_suite(END_OF_TICK_REPORT, 1, ["a", "b", "c", "d"])
+        self.assertEqual(suite["a"], {"status": "equal", "digest": {"status": "equal"}})
+        self.assertEqual(suite["b"], {"status": "equal", "digest": {"status": "differs", "tick": 41}})
+        self.assertEqual(suite["c"]["status"], "differs")
+        self.assertEqual((suite["c"]["tick"], suite["c"]["phase"], suite["c"]["value"]), (70, "tick", "0x3c"))
+        self.assertEqual(suite["c"]["digest"], {"status": "differs", "tick": 70})
+        self.assertEqual(suite["d"], {"status": "not_judged", "digest": {"status": "not_judged"}})
+
+    def test_a_failed_scenario_has_no_digest_verdict(self):
+        suite = oraclegate.parse_suite("a: failed to run, playtest.py ended with:\n", 1, ["a"])
+        self.assertEqual(suite["a"]["digest"], {"status": "not_judged"})
+
+    def test_the_result_has_format_2_and_the_top_level_digest(self):
+        self.assertEqual(oraclegate.FORMAT, 2)
+        suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01) [digest differs from tick 4]\nok   b (10 ticks, 0:01)\n", 0, ["a", "b"])
+        with tempfile.TemporaryDirectory() as tmp:
+            result = oraclegate.build_result("wind_meteors", self.module(tmp), False, {}, suite, {"wind_meteors/x": {"status": "equal"}}, None, 1)
+        self.assertEqual(result["format"], 2)
+        self.assertEqual(result["verdict"], "equal")
+        self.assertEqual(result["digest"], "differs")
+        self.assertEqual(result["scenarios"]["a"]["digest"], {"status": "differs", "tick": 4})
+        self.assertEqual(result["scenarios"]["b"]["digest"], {"status": "equal"})
+
+    def test_the_top_level_digest_is_equal_or_not_judged(self):
+        equal = oraclegate.parse_suite("ok   a (10 ticks, 0:01)\nok   b (10 ticks, 0:01)\n", 0, ["a", "b"])
+        self.assertEqual(oraclegate.digest_of(equal), "equal")
+        self.assertEqual(oraclegate.digest_of(oraclegate.parse_suite("", 1, ["a"])), "not_judged")
+        self.assertEqual(oraclegate.digest_of({}), "not_judged")
+
+    def test_the_verdict_stays_the_state_verdict(self):
+        suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01) [digest differs from tick 4]\n", 0, ["a"])
+        self.assertEqual(oraclegate.verdict_of(suite, {}), "equal")
+
+    def test_a_refused_module_has_no_digest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = oraclegate.build_result("wind_meteors", self.module(tmp), False, {}, None, None, "bad", 1)
+        self.assertNotIn("digest", result)
+
+    def test_no_reference_value_reaches_the_digest_fields(self):
+        suite = oraclegate.parse_suite(END_OF_TICK_REPORT, 1, ["a", "b", "c"])
+        text = json.dumps(suite)
+        for secret in (REFERENCE_VALUE, REFERENCE_HASH, "0123abc"):
+            self.assertNotIn(secret, text)
 
 
 class Recordings(unittest.TestCase):

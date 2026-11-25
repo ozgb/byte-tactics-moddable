@@ -1774,6 +1774,7 @@ static void RoundTripBlock()
 }
 
 static void VisitSharePackets();
+static void WriteTickRow();
 
 void HarnessAfterStep()
 {
@@ -1781,8 +1782,10 @@ void HarnessAfterStep()
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
 #endif
-    if (HarnessTestMode() && s_trace != nullptr)
+    if (HarnessTestMode() && s_trace != nullptr) {
         VisitSharePackets();
+        WriteTickRow();
+    }
     if (HarnessTestMode()) {
         for (int i = 0; i < s_roundTripCount; i++) {
             if ((unsigned)g_game->ticks == s_roundTrips[i])
@@ -4404,6 +4407,34 @@ void HarnessPhase(int phase)
         if (s_dumpNow)
             fflush(s_dump);
     }
+}
+
+static void WriteTickRow()
+{
+    unsigned tick = GameU32(GAME_TICK);
+    unsigned holdrand = GameHoldrand(RAND_STREAM_MAIN);
+    unsigned parkMiller = g_randomSeed;
+
+    s_traceTick = tick;
+    s_tracePhase = "tick";
+    s_dumpNow = s_dumpEnabled && tick == s_dumpTick;
+    s_hash = kHashOffset;
+
+    VisitU32("gameTick", tick);
+    VisitU32("rng.parkMiller", parkMiller);
+    VisitU32("rng.crtHoldrand", holdrand);
+    VisitUnits();
+    VisitProjectiles();
+    VisitPlayers();
+    VisitFeatures();
+    VisitWind();
+    VisitMeteors();
+    VisitWorld();
+
+    fprintf(s_trace, "%u tick %08x%08x\n", tick, (unsigned)(s_hash >> 32), (unsigned)s_hash);
+    fflush(s_trace);
+    if (s_dumpNow)
+        fflush(s_dump);
 }
 
 static void OpenTrace(unsigned controlWord)

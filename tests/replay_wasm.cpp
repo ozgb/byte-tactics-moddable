@@ -16,10 +16,11 @@ struct Glue {
     void(__stdcall* useSeam)();
     int(__stdcall* fuelClose)(unsigned* used);
     int(__stdcall* fatalPending)();
+    int(__stdcall* outOfFuel)(unsigned* budget);
 };
 
 const Glue kGlue[] = {
-    { "wind_meteors", WindMeteorsInstall, WindMeteorsBind, WindMeteorsUseSeam, WindMeteorsFuelClose, WindMeteorsFatalPending },
+    { "wind_meteors", WindMeteorsInstall, WindMeteorsBind, WindMeteorsUseSeam, WindMeteorsFuelClose, WindMeteorsFatalPending, WindMeteorsOutOfFuel },
 };
 
 ModuleMemory s_memory;
@@ -28,6 +29,24 @@ char s_wasmPath[320];
 char s_directory[320];
 wl_loader* s_loader;
 int s_active;
+void (*s_trapHook)(const char* errorClass);
+
+const char* TrapClass(const char* text, bool outOfFuel)
+{
+    if (outOfFuel || strstr(text, "ran out of fuel") != nullptr)
+        return "out_of_fuel";
+    if (strstr(text, "unreachable") != nullptr)
+        return "unreachable";
+    if (strstr(text, "out of bounds memory") != nullptr)
+        return "memory_access";
+    if (strstr(text, "divide by zero") != nullptr || strstr(text, "integer overflow") != nullptr)
+        return "divide";
+    if (strstr(text, "indirect call") != nullptr || strstr(text, "uninitialized element") != nullptr)
+        return "table";
+    if (strstr(text, "stack") != nullptr)
+        return "stack";
+    return "trap";
+}
 
 void Stop(const char* what)
 {
@@ -41,6 +60,10 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
     (void)user;
     if (s_glue != nullptr && s_glue->fatalPending())
         return;
+    if (s_trapHook != nullptr) {
+        unsigned budget;
+        s_trapHook(TrapClass(message, s_glue != nullptr && s_glue->outOfFuel(&budget) != 0));
+    }
     sprintf(text, "%s trapped: %s", module, message);
     Stop(text);
 }
@@ -86,6 +109,8 @@ const ModuleMemory* __stdcall ModulesMemory()
 
 void __stdcall ModulesFatal(const char* text)
 {
+    if (s_trapHook != nullptr)
+        s_trapHook(TrapClass(text, false));
     printf("FAIL: %s: %s\n", s_wasmPath, text);
     exit(2);
 }
@@ -95,7 +120,12 @@ extern "C" void HOST_CALL host_log(const char* text)
     fputs(text, stdout);
 }
 
-void ReplayWasmSelect(const char* wasmPath)
+void ReplayWasmSetTrapHook(void (*hook)(const char* errorClass))
+{
+    s_trapHook = hook;
+}
+
+void ReplayWasmSelect(const char* wasmPath, const char* subsystem)
 {
     if (strlen(wasmPath) >= sizeof s_wasmPath)
         Stop("the module path is too long");
@@ -109,7 +139,7 @@ void ReplayWasmSelect(const char* wasmPath)
     s_glue = nullptr;
     for (const Glue& glue : kGlue) {
         size_t n = strlen(glue.subsystem);
-        if (strncmp(stem, glue.subsystem, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
+        if (subsystem != nullptr ? strcmp(subsystem, glue.subsystem) == 0 : strncmp(stem, glue.subsystem, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
             s_glue = &glue;
     }
     if (s_glue == nullptr)

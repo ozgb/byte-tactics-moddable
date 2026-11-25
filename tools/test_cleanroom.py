@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "cleanroom"))
 
 import broker as bk
 import canary as cn
+import coresandbox as cs
 import launch as ln
 import manifest as mf
 import proxy as px
@@ -932,6 +933,7 @@ class RealGateTests(unittest.TestCase):
     def test_launch_forwards_game_dir_to_the_broker(self):
         self.assertEqual(ln.broker_argv("/s", "/g")[-2:], ["--game-dir", "/g"])
         self.assertNotIn("--game-dir", ln.broker_argv("/s"))
+        self.assertEqual(ln.broker_argv("/s", None, "/i")[-2:], ["--core-image", "/i"])
 
     def test_missing_result_is_an_error_without_the_logs(self):
         self.request("r2", "silent")
@@ -962,6 +964,255 @@ class RealGateTests(unittest.TestCase):
         self.assertIn("error", bk.filter_result(d / "list.json", "i", 0))
         self.assertIn("error", bk.filter_result(d / "none.json", "i", 0))
         self.assertEqual(bk.filter_result(target, "i", 0)["id"], "i")
+
+
+ELF_HEADER = b"\x7fELF" + bytes([2, 1, 1, 0]) + bytes(8) + (2).to_bytes(2, "little") + (62).to_bytes(2, "little") + bytes(40)
+
+
+def elf(kind=2, machine=62, cls=2, data=1):
+    head = bytearray(ELF_HEADER)
+    head[4], head[5] = cls, data
+    head[16:18] = kind.to_bytes(2, "little")
+    head[18:20] = machine.to_bytes(2, "little")
+    return bytes(head)
+
+
+class CoreRequestTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.session = bk.prepare(Path(self.tmp.name) / "s")
+
+    def request(self, name, core=ELF_HEADER, wasm=b"\0asm\1\0\0\0", subsystem=None):
+        d = self.session / "outbox" / name
+        d.mkdir()
+        if core is not None:
+            (d / "core").write_bytes(core)
+        if wasm is not None:
+            (d / "module.wasm").write_bytes(wasm)
+        if subsystem:
+            (d / "subsystem").write_text(subsystem + "\n")
+        (d / "ready").write_text("")
+
+    def answer(self, name, core_gate=None):
+        bk.process_mailbox(self.session, bk.stub_gate, core_gate)
+        return json.loads((self.session / "inbox" / f"{name}.json").read_text())
+
+    def test_good_request_reaches_the_core_gate(self):
+        seen = []
+
+        def core_gate(core, wasm, request_id):
+            seen.append((core, wasm, request_id))
+            return {"gate": "coregate", "id": request_id, "verdict": "equal"}
+
+        self.request("c1")
+        self.assertEqual(self.answer("c1", core_gate)["verdict"], "equal")
+        self.assertEqual(seen, [(ELF_HEADER, b"\0asm\1\0\0\0", "c1")])
+
+    def test_unconfigured_core_gate_is_an_error(self):
+        self.request("c2")
+        self.assertIn("not configured", self.answer("c2")["error"])
+
+    def test_bad_requests_get_an_error_and_never_reach_the_gate(self):
+        def core_gate(*args):
+            self.fail("the core gate ran")
+
+        self.request("nomodule", wasm=None)
+        self.request("badelf", core=b"MZ\0\0")
+        self.request("badwasm", wasm=b"nope")
+        self.request("both", subsystem="parser")
+        self.request("link")
+        core = self.session / "outbox" / "link" / "core"
+        core.unlink()
+        core.symlink_to("/bin/sh")
+        for name in ("nomodule", "badelf", "badwasm", "both", "link"):
+            self.assertIn("error", self.answer(name, core_gate), name)
+
+    def test_too_large_core_is_refused(self):
+        self.request("big")
+        with mock.patch.object(bk, "MAX_CORE", 10):
+            self.assertIn("too large", self.answer("big")["error"])
+
+    def test_module_request_still_works(self):
+        d = self.session / "outbox" / "m1"
+        d.mkdir()
+        (d / "module.wasm").write_bytes(b"\0asm\1\0\0\0")
+        (d / "subsystem").write_text("parser\n")
+        (d / "ready").write_text("")
+        self.assertEqual(self.answer("m1")["subsystem"], "parser")
+
+
+class CoreGateTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.session = bk.prepare(Path(self.tmp.name) / "s")
+        self.script = Path(self.tmp.name) / "fake_core_gate.py"
+        self.script.write_text(
+            "import json, sys\nfrom pathlib import Path\n"
+            "out = Path(sys.argv[sys.argv.index('--out') + 1])\n"
+            "Path(out.parent / 'argv.json').write_text(json.dumps(sys.argv))\n"
+            "(out / 'logs').mkdir()\n(out / 'logs' / 'a.txt').write_text('SECRET-LOG')\n"
+            "(out / 'result.json').write_text(json.dumps({'verdict': 'differs', 'gate': 'forged', 'id': 'forged'}))\n"
+            "print('STDOUT-ONLY')\n"
+        )
+
+    def test_only_result_json_crosses_as_coregate(self):
+        d = self.session / "outbox" / "c1"
+        d.mkdir()
+        (d / "core").write_bytes(ELF_HEADER)
+        (d / "module.wasm").write_bytes(b"\0asm\1\0\0\0")
+        (d / "ready").write_text("")
+        gate = bk.make_core_gate(self.session, "/img.smolmachine", [sys.executable, str(self.script)])
+        self.assertEqual(bk.process_mailbox(self.session, None, gate), ["c1"])
+        self.assertEqual(sorted(p.name for p in (self.session / "inbox").iterdir()), ["c1.json"])
+        text = (self.session / "inbox" / "c1.json").read_text()
+        result = json.loads(text)
+        self.assertEqual((result["verdict"], result["gate"], result["id"]), ("differs", "coregate", "c1"))
+        for secret in ("SECRET-LOG", "STDOUT-ONLY"):
+            self.assertNotIn(secret, text)
+        work = self.session / "gate" / "c1"
+        argv = json.loads((work / "argv.json").read_text())
+        self.assertEqual(argv[1:], [str(work / "core"), "--module", str(work / "module.wasm"), "--sandbox", "/img.smolmachine", "--out", str(work / "out")])
+        self.assertEqual((work / "core").read_bytes(), ELF_HEADER)
+
+    def test_missing_result_and_timeout_are_errors(self):
+        silent = Path(self.tmp.name) / "silent.py"
+        silent.write_text("import sys\nsys.exit(3)\n")
+        gate = bk.make_core_gate(self.session, "/i", [sys.executable, str(silent)])
+        result = gate(ELF_HEADER, b"\0asm", "s1")
+        self.assertEqual(result["gate"], "coregate")
+        self.assertIn("no usable result", result["error"])
+        sleeper = Path(self.tmp.name) / "sleep.py"
+        sleeper.write_text("import time\ntime.sleep(30)\n")
+        gate = bk.make_core_gate(self.session, "/i", [sys.executable, str(sleeper)], timeout=1)
+        self.assertIn("timed out", gate(ELF_HEADER, b"\0asm", "s2")["error"])
+
+    def test_core_image_option_is_parsed(self):
+        with mock.patch.object(bk, "one_pass", return_value=[]) as one_pass:
+            with contextlib.redirect_stdout(io.StringIO()):
+                bk.main(["once", "--session", str(self.session), "--no-push", "--core-image", "/i.smolmachine"])
+                bk.main(["once", "--session", str(self.session), "--no-push"])
+        self.assertIsNotNone(one_pass.call_args_list[0].args[3])
+        self.assertIsNone(one_pass.call_args_list[1].args[3])
+
+
+class FakeSmolvm:
+    """A runner that records the smolvm argv it is given and answers machine ls from `network`."""
+
+    def __init__(self, network=False, create_code=0):
+        self.calls = []
+        self.network = network
+        self.create_code = create_code
+
+    def __call__(self, argv, **kw):
+        self.calls.append(list(argv))
+        verbs = argv[1:3]
+        out = ""
+        if verbs == ["machine", "ls"]:
+            name = next(c[c.index("--name") + 1] for c in self.calls if c[1:3] == ["machine", "create"])
+            out = json.dumps([{"name": name, "network": self.network}])
+        code = self.create_code if verbs == ["machine", "create"] else 0
+        return subprocess.CompletedProcess(argv, code, out, "")
+
+    def verbs(self):
+        return [" ".join(c[1:3]) for c in self.calls]
+
+
+class CoreSandboxTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = Path(self.tmp.name).resolve()
+        self.share = self.dir / "share"
+        self.share.mkdir()
+        self.image = self.dir / "img.smolmachine"
+        self.image.write_text("x")
+
+    def test_argv_has_one_mount_and_no_network(self):
+        fake = FakeSmolvm()
+        with cs.Sandbox(self.image, self.share, Path("/s/smolvm"), fake) as box:
+            self.assertEqual(box.prefix()[:3], ["/s/smolvm", "machine", "exec"])
+            self.assertEqual(box.prefix()[3:5], ["--name", box.name])
+            self.assertEqual(box.prefix()[-1], "--")
+            self.assertEqual(fake.verbs(), ["machine create", "machine update", "machine ls", "machine start"])
+        create = fake.calls[0]
+        mounts = [create[i + 1] for i, a in enumerate(create) if a == "-v"]
+        self.assertEqual(mounts, [f"{self.share}:{self.share}"])
+        for flag in cs.NET_FLAGS + cs.GRANT_FLAGS:
+            self.assertNotIn(flag, create)
+        self.assertEqual(create[create.index("--from") + 1], str(self.image))
+        self.assertIn("--no-net", fake.calls[1])
+        self.assertEqual(fake.verbs()[-2:], ["machine stop", "machine delete"])
+        self.assertIn("--force", fake.calls[-1])
+
+    def test_machine_is_deleted_when_the_body_raises(self):
+        fake = FakeSmolvm()
+        with self.assertRaises(RuntimeError):
+            with cs.Sandbox(self.image, self.share, runner=fake):
+                raise RuntimeError("boom")
+        self.assertEqual(fake.verbs()[-1], "machine delete")
+
+    def test_remaining_network_is_refused_and_cleaned_up(self):
+        fake = FakeSmolvm(network=True)
+        with self.assertRaises(cs.SandboxRefused):
+            with cs.Sandbox(self.image, self.share, runner=fake):
+                self.fail("entered")
+        self.assertNotIn("machine start", fake.verbs())
+        self.assertEqual(fake.verbs()[-1], "machine delete")
+
+    def test_failed_create_is_refused(self):
+        fake = FakeSmolvm(create_code=1)
+        with self.assertRaises(cs.SandboxRefused):
+            cs.Sandbox(self.image, self.share, runner=fake).__enter__()
+
+    def test_shares_that_are_or_hold_the_repository_are_refused(self):
+        repo = ln.REPO
+        for bad in (repo, repo / "tools", repo.parent, Path.home(), Path.home() / ".ssh", self.dir / "missing"):
+            fake = FakeSmolvm()
+            with self.assertRaises(cs.SandboxRefused, msg=str(bad)):
+                cs.Sandbox(self.image, bad, runner=fake).__enter__()
+            self.assertEqual(fake.calls, [], str(bad))
+
+    def test_share_under_build_scratch_of_the_repository_passes(self):
+        scratch = ln.REPO / "build" / "scratch" / "test-coresandbox"
+        scratch.mkdir(parents=True, exist_ok=True)
+        self.addCleanup(shutil.rmtree, scratch, True)
+        with cs.Sandbox(self.image, scratch, runner=FakeSmolvm()):
+            pass
+
+    def test_a_missing_image_is_refused(self):
+        with self.assertRaises(cs.SandboxRefused):
+            cs.Sandbox(self.dir / "none", self.share, runner=FakeSmolvm()).__enter__()
+
+    def test_check_argv_refuses_other_mounts_and_network_flags(self):
+        good = cs.create_argv("n", "/i", "/s")
+        cs.check_argv(good, "/s")
+        for extra in (["--net"], ["--allow-host", "x"], ["-v", "/etc:/etc"], ["--mount-socket", "/a:/b"], ["--ssh-agent"]):
+            with self.assertRaises(cs.SandboxRefused, msg=str(extra)):
+                cs.check_argv(good + extra, "/s")
+        with self.assertRaises(cs.SandboxRefused):
+            cs.check_argv(good[:-2], "/s")
+
+
+class CoreExecutableTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def check(self, data):
+        path = Path(self.tmp.name) / "f"
+        path.write_bytes(data)
+        return cs.is_core_executable(path)
+
+    def test_x86_64_elf_executables_pass(self):
+        self.assertIsNone(self.check(elf(kind=2)))
+        self.assertIsNone(self.check(elf(kind=3)))
+
+    def test_everything_else_gives_a_reason(self):
+        for data in (elf(machine=183), elf(cls=1), elf(data=2), elf(kind=1), elf(kind=4), b"\x7fELF", b"MZ" + bytes(40), b""):
+            self.assertIsInstance(self.check(data), str, data[:24])
+        self.assertIsInstance(cs.is_core_executable(Path(self.tmp.name) / "missing"), str)
 
 
 class BranchRuleTests(unittest.TestCase):

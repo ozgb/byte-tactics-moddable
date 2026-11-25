@@ -1,6 +1,6 @@
 """Host-side broker for a clean-room session: git sync and the gate mailbox.
 
-    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--game-dir DIR]
+    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--game-dir DIR] [--core-image FILE]
     uv run tools/cleanroom/broker.py once --session DIR
 
 The session directory holds `outbox/` (the agent writes, the broker reads), `inbox/` (only the
@@ -21,6 +21,12 @@ descriptor and checks the opened descriptors, so a swap for a symlink after the 
 redirect a read. It checks the id, the subsystem name, the size and the wasm magic, runs the gate,
 and runs `tools/oraclegate.py` on a copy of the module in `SESSION/gate/ID/`, on the host. Only that run's `result.json`
 crosses, as `inbox/ID.json` by rename; its `logs/` and `runtime/` stay in `SESSION/gate/`.
+
+Core requests: `outbox/ID/core` (an executable of at most 256 MiB with the ELF magic), `outbox/ID/module.wasm` (its
+wind_meteors module) and `outbox/ID/ready` make a core request, opened and checked the same way; a request with both
+`core` and `subsystem` is refused. The broker runs `tools/coregate.py CORE --module MODULE --sandbox IMAGE --out DIR` in
+`SESSION/gate/ID/` on the host (the core only ever runs inside a microVM that script starts) and lets only
+`out/result.json` cross, with `"gate": "coregate"`. Without `--core-image` a core request is answered with an error.
 
 Push: after each sync the broker pushes every `refs/heads/impl/<name>` of the bare repository whose commit changed to
 `--btm-remote` and opens a pull request into `main` of `--btm-repo` for each new branch. It reads the token from
@@ -55,6 +61,8 @@ from pathlib import Path
 REPO_NAME = "btm.git"
 WASM_MAGIC = b"\0asm"
 MAX_WASM = 64 * 1024 * 1024
+MAX_CORE = 256 * 1024 * 1024
+ELF_MAGIC = b"\x7fELF"
 MAX_BUNDLE = 1024 * 1024 * 1024
 BUNDLE_NAME = "btm.bundle"
 STATE_NAME = "bundle.state"
@@ -67,6 +75,8 @@ WASM_DIRS = (ROOT / "build" / "modern", ROOT / "build" / "wasm-modules")
 MANIFEST_NAME = "manifest.txt"
 NULL_SHA = "0" * 40
 ORACLEGATE = ROOT / "tools" / "oraclegate.py"
+COREGATE = ROOT / "tools" / "coregate.py"
+CORE_NOT_CONFIGURED = "the core gate is not configured: the broker has no --core-image"
 ASKPASS = Path(__file__).resolve().parent / "askpass.sh"
 GATE_TIMEOUT = 4 * 3600
 MAX_RESULT = 1024 * 1024
@@ -414,13 +424,21 @@ def push_branches(session, token_file, remote, repo=DEFAULT_REPO, api_base=DEFAU
         state_file.write_text(json.dumps(state, sort_keys=True) + "\n")
 
 
+def open_optional(name, dir_fd):
+    """Open a regular file as open_regular does, or return None when it does not exist."""
+    try:
+        return open_regular(name, dir_fd)
+    except FileNotFoundError:
+        return None
+
+
 def read_request(outbox_fd, name):
-    """Return (wasm bytes, subsystem) for a ready request directory, None if not ready; raise ValueError."""
+    """Return ("module", wasm, subsystem) or ("core", core, wasm) for a ready request directory, None if not ready; raise ValueError."""
     try:
         dir_fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=outbox_fd)
     except OSError:
         return None
-    wasm_fd = sub_fd = None
+    opened = {}
     try:
         try:
             os.close(open_regular("ready", dir_fd)[0])
@@ -429,25 +447,43 @@ def read_request(outbox_fd, name):
         if not ID_RE.match(name):
             raise ValueError("bad id")
         try:
-            wasm_fd, size = open_regular("module.wasm", dir_fd)
-            sub_fd, _ = open_regular("subsystem", dir_fd)
-        except (FileNotFoundError, ValueError) as err:
+            for file in ("core", "subsystem", "module.wasm"):
+                found = open_optional(file, dir_fd)
+                if found:
+                    opened[file] = found
+        except ValueError as err:
             raise ValueError(f"missing or not a regular file: {err}") from err
-        if size > MAX_WASM:
+        if "core" in opened and "subsystem" in opened:
+            raise ValueError("a request has either core or subsystem, not both")
+        kind = "core" if "core" in opened else "module"
+        if kind == "module" and "subsystem" not in opened:
+            raise ValueError("missing or not a regular file: subsystem")
+        if "module.wasm" not in opened:
+            raise ValueError("missing or not a regular file: module.wasm")
+        if opened["module.wasm"][1] > MAX_WASM:
             raise ValueError("module too large")
-        taken, wasm_fd = wasm_fd, None
-        wasm = read_limited(taken, MAX_WASM)
-        taken, sub_fd = sub_fd, None
-        subsystem = read_limited(taken, 4096).decode(errors="replace").strip()
+        if kind == "core" and opened["core"][1] > MAX_CORE:
+            raise ValueError("core too large")
+        taken = {}
+        for file in list(opened):
+            fd, _ = opened.pop(file)
+            limit = {"core": MAX_CORE, "module.wasm": MAX_WASM}.get(file, 4096)
+            taken[file] = read_limited(fd, limit)
     finally:
-        for fd in (wasm_fd, sub_fd, dir_fd):
-            if fd is not None:
-                os.close(fd)
-    if not SUBSYSTEM_RE.match(subsystem):
-        raise ValueError("bad subsystem name")
+        for fd, _ in opened.values():
+            os.close(fd)
+        os.close(dir_fd)
+    wasm = taken["module.wasm"]
     if not wasm.startswith(WASM_MAGIC):
         raise ValueError("not a wasm module")
-    return wasm, subsystem
+    if kind == "core":
+        if not taken["core"].startswith(ELF_MAGIC):
+            raise ValueError("not an ELF executable")
+        return "core", taken["core"], wasm
+    subsystem = taken["subsystem"].decode(errors="replace").strip()
+    if not SUBSYSTEM_RE.match(subsystem):
+        raise ValueError("bad subsystem name")
+    return "module", wasm, subsystem
 
 
 def stub_gate(wasm, subsystem, request_id):
@@ -493,7 +529,39 @@ def make_gate(session, command=None, timeout=GATE_TIMEOUT, game_dir=None):
     return gate
 
 
-def filter_result(path, request_id, code):
+def make_core_gate(session, image, command=None, timeout=GATE_TIMEOUT):
+    """Return a gate that runs coregate on a core and its module and lets only its result.json cross.
+
+    `command` is the argv prefix of the judge (default: this interpreter and tools/coregate.py). It runs as
+    `command CORE --module MODULE --sandbox IMAGE --out DIR` in SESSION/gate/ID/ on the host.
+    """
+    prefix = list(command) if command else [sys.executable, str(COREGATE)]
+
+    def gate(core, wasm, request_id):
+        work = Path(session) / "gate" / request_id
+        shutil.rmtree(work, ignore_errors=True)
+        work.mkdir(parents=True)
+        core_path = work / "core"
+        core_path.write_bytes(core)
+        core_path.chmod(0o755)
+        module = work / "module.wasm"
+        module.write_bytes(wasm)
+        out = work / "out"
+        out.mkdir()
+        try:
+            run = subprocess.run(
+                [*prefix, str(core_path), "--module", str(module), "--sandbox", str(image), "--out", str(out)],
+                cwd=work, capture_output=True, text=True, timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return {"gate": "coregate", "id": request_id, "error": f"the gate timed out after {timeout}s"}
+        (work / "gate.log").write_text(run.stdout + run.stderr)
+        return filter_result(out / "result.json", request_id, run.returncode, "coregate")
+
+    return gate
+
+
+def filter_result(path, request_id, code, gate="oraclegate"):
     """Return the parsed result.json at path (and nothing else of the gate's output), or an error result."""
     try:
         info = os.lstat(path)
@@ -503,8 +571,8 @@ def filter_result(path, request_id, code):
         if not isinstance(result, dict):
             raise ValueError("not an object")
     except (OSError, ValueError) as err:
-        return {"gate": "oraclegate", "id": request_id, "error": f"the gate wrote no usable result (exit {code}): {err}"}
-    return {**result, "gate": "oraclegate", "id": request_id}
+        return {"gate": gate, "id": request_id, "error": f"the gate wrote no usable result (exit {code}): {err}"}
+    return {**result, "gate": gate, "id": request_id}
 
 
 def write_result(inbox, request_id, result):
@@ -518,7 +586,7 @@ def write_push_refusals(inbox, refused):
     write_result(inbox, "push", {"refused": [refused[ref] for ref in sorted(refused)]})
 
 
-def process_mailbox(session, gate=None):
+def process_mailbox(session, gate=None, core_gate=None):
     """Answer every ready request that has no result yet; return the ids answered."""
     session = Path(session)
     answered = []
@@ -532,15 +600,22 @@ def process_mailbox(session, gate=None):
                 request = read_request(outbox_fd, request_id)
                 if request is None:
                     continue
-                wasm, subsystem = request
-                result = gate(wasm, subsystem, request_id)
+                kind, first, second = request
+                if kind == "core":
+                    result = core_gate(first, second, request_id) if core_gate else {
+                        "gate": "coregate", "id": request_id, "error": CORE_NOT_CONFIGURED,
+                    }
+                    detail = "core"
+                else:
+                    result = gate(first, second, request_id)
+                    detail = f"subsystem {second}"
             except (ValueError, OSError) as err:
                 result = {"gate": "oraclegate", "id": request_id, "error": str(err)}
                 log(session, f"gate request {request_id!r} refused: {err}")
                 if not ID_RE.match(request_id):
                     continue
             else:
-                log(session, f"gate request {request_id} subsystem {subsystem} answered")
+                log(session, f"gate request {request_id} {detail} answered")
             write_result(session / "inbox", request_id, result)
             answered.append(request_id)
     finally:
@@ -548,23 +623,23 @@ def process_mailbox(session, gate=None):
     return answered
 
 
-def one_pass(session, push=None, gate=None):
+def one_pass(session, push=None, gate=None, core_gate=None):
     """Sync the bundle, push when `push` (a dict of push_branches options) is given, answer the mailbox."""
     sync_refs(session)
     if push:
         push_branches(session, **push)
-    return process_mailbox(session, gate)
+    return process_mailbox(session, gate, core_gate)
 
 
-def serve(session, interval, push=None, gate=None):
+def serve(session, interval, push=None, gate=None, core_gate=None):
     stop = []
     signal.signal(signal.SIGTERM, lambda *_: stop.append(1))
     signal.signal(signal.SIGINT, lambda *_: stop.append(1))
     log(session, "broker started")
     while not stop:
-        one_pass(session, push, gate)
+        one_pass(session, push, gate, core_gate)
         time.sleep(interval)
-    one_pass(session, push, gate)
+    one_pass(session, push, gate, core_gate)
     log(session, "broker stopped")
     return 0
 
@@ -581,16 +656,18 @@ def main(argv=None):
     ap.add_argument("--no-push", action="store_true", help="do not push branches or open pull requests")
     ap.add_argument("--gate-timeout", type=int, default=GATE_TIMEOUT)
     ap.add_argument("--game-dir", default=None, help="game directory for the real gate (default: oraclegate looks in Steam/GOG places)")
+    ap.add_argument("--core-image", default=None, help="clean-room .smolmachine the core gate runs cores in (default: core requests are refused)")
     args = ap.parse_args(argv)
     prepare(args.session)
     push = None if args.no_push else {
         "token_file": args.btm_token_file, "remote": args.btm_remote, "repo": args.btm_repo, "api_base": args.api_base,
     }
     gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
+    core_gate = make_core_gate(args.session, args.core_image, timeout=args.gate_timeout) if args.core_image else None
     if args.cmd == "once":
-        print(json.dumps(one_pass(args.session, push, gate)))
+        print(json.dumps(one_pass(args.session, push, gate, core_gate)))
         return 0
-    return serve(args.session, args.interval, push, gate)
+    return serve(args.session, args.interval, push, gate, core_gate)
 
 
 if __name__ == "__main__":

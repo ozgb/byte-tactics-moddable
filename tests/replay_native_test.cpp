@@ -225,6 +225,45 @@ void Fatal(const char* file, int call, const char* what, const char* text)
 }
 
 ReplayKnown g_known;
+bool g_core;
+bool g_coreFault;
+bool g_coreDropped;
+ReplayText g_coreWrites;
+ReplayText g_coreClosings;
+
+void CoreJson(ReplayText& list, const char* kind, const char* name, const char* value)
+{
+    if (list.Size() != 0)
+        list.AddChar(',');
+    list.AddChar('"');
+    ReplayText line;
+    line.Add(kind);
+    line.AddChar(' ');
+    line.Add(name);
+    line.AddChar(' ');
+    line.Add(value);
+    for (const unsigned char* p = (const unsigned char*)line.Data(); *p != 0; p++) {
+        if (*p == '"' || *p == '\\') {
+            list.AddChar('\\');
+            list.AddChar((char)*p);
+        } else if (*p < 0x20 || *p >= 0x7f) {
+            char escape[8];
+            sprintf(escape, "\\u%04x", *p);
+            list.Add(escape);
+        } else {
+            list.AddChar((char)*p);
+        }
+    }
+    list.AddChar('"');
+    line.Free();
+}
+
+void CoreClosing(const char* name, const char* value)
+{
+    if (g_core)
+        CoreJson(g_coreClosings, "o", name, value);
+}
+
 ReplayObjectTable g_objects;
 ReplayReach g_reach;
 
@@ -918,6 +957,7 @@ void CompareValueResult(unsigned kind, const void* object)
     ReplayText value;
     AddValueStruct(value, kind, object);
     HashText(value.Data());
+    CoreClosing("result", value.Data());
     const char* recorded = OutLine("result");
     if (recorded == nullptr)
         recorded = "no such line";
@@ -937,6 +977,7 @@ void CompareStruct(const char* name, unsigned kind, const void* object)
         sprintf(key, "%s.%s", name, f.name);
         ReplayFormatObjectField(f, object, g_objects, false, value);
         HashText(value.Data());
+        CoreClosing(key, value.Data());
         const char* recorded = OutLine(key);
         if (recorded == nullptr)
             recorded = "no such line";
@@ -966,6 +1007,7 @@ void CompareInOut(const char* name, unsigned kind, const void* object)
     ReplayText value;
     ReplayAddValue(value, kind, object, g_objects);
     HashText(value.Data());
+    CoreClosing(name, value.Data());
     if (recorded == nullptr)
         recorded = "no such line";
     if (strcmp(recorded, value.Data()) != 0)
@@ -1012,6 +1054,7 @@ template <class T> void CompareInOutScalar(const char* name, const T* object)
     ReplayText value;
     ReplayAddInOutScalar(value, object);
     HashText(value.Data());
+    CoreClosing(name, value.Data());
     if (recorded == nullptr)
         recorded = "no such line";
     if (strcmp(recorded, value.Data()) != 0)
@@ -1024,6 +1067,7 @@ void CompareObjectResult(unsigned kind, const void* object)
     ReplayText value;
     ReplayAddObjectName(value, g_objects, kind, object, false);
     HashText(value.Data());
+    CoreClosing("result", value.Data());
     const char* recorded = OutLine("result");
     if (recorded == nullptr)
         recorded = "no such line";
@@ -1037,6 +1081,7 @@ template <class T> void CompareResult(T result)
     ReplayText value;
     ReplayValue(value, result);
     HashText(value.Data());
+    CoreClosing("result", value.Data());
     const char* recorded = OutLine("result");
     if (recorded == nullptr)
         recorded = "no such line";
@@ -1892,6 +1937,7 @@ struct Outcome {
     int call;
     char key[96];
     ReplayText log;
+    ReplayText core;
 };
 
 struct LineKey {
@@ -2062,8 +2108,35 @@ void CompareObjects(const ReplaySlotSets* sets)
     value.Free();
 }
 
+void CoreWrites(const char* file, const ReplaySlotSets* sets)
+{
+    if (sets->objWriteCount != 0)
+        Fatal(file, g_callIndex, "core mode cannot write object fields", sets->name);
+    ReplayText value;
+    for (unsigned i = 0; i < sets->writeCount; i++) {
+        const ReplayField& f = kReplayFields[sets->writes[i]];
+        if (f.kind == RK_VECTOR)
+            Fatal(file, g_callIndex, "core mode cannot write vector fields", f.name);
+        FormatField(f, value);
+        const char* known = g_known.Get(f.name);
+        if (known != nullptr && strcmp(known, value.Data()) == 0)
+            continue;
+        g_known.Set(f.name, value.Data());
+        if (g_coreFault && g_callIndex >= 1 && !g_coreDropped) {
+            g_coreDropped = true;
+            continue;
+        }
+        CoreJson(g_coreWrites, "w", f.name, value.Data());
+    }
+    value.Free();
+}
+
 void CompareWrites(const char* file, const ReplaySlotSets* sets)
 {
+    if (g_core) {
+        CoreWrites(file, sets);
+        return;
+    }
     ReplayText value;
     for (int k = g_callFirst + 1; k < g_callEnd; k++) {
         const char* line = g_lines[k];
@@ -2204,6 +2277,8 @@ void ReplayCall(const char* file, Outcome& out)
     const ReplaySlotSets* sets = FindSlot(g_subsystem, slotText);
     if (sets == nullptr)
         Fatal(file, g_callIndex, "unknown slot", slotText);
+    g_coreWrites.Clear();
+    g_coreClosings.Clear();
     g_diffs = 0;
     g_firstKey[0] = '\0';
     g_detail.Clear();
@@ -2282,6 +2357,16 @@ void ReplayCall(const char* file, Outcome& out)
     }
     out.imports += g_importIndex;
     out.calls++;
+    if (g_core) {
+        if (g_callIndex != 0)
+            out.core.AddChar(',');
+        out.core.AddChar('[');
+        out.core.AddText(g_coreWrites);
+        if (g_coreWrites.Size() != 0 && g_coreClosings.Size() != 0)
+            out.core.AddChar(',');
+        out.core.AddText(g_coreClosings);
+        out.core.AddChar(']');
+    }
 }
 
 enum Mutation { MUT_NONE, MUT_ARGUMENT, MUT_EXTRA, MUT_MISSING };
@@ -2385,9 +2470,11 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     out.call = -1;
     out.key[0] = '\0';
     out.log.Clear();
+    out.core.Clear();
+    g_coreDropped = false;
     int at = 2;
     g_callIndex = 0;
-    while (at < g_lineCount && !out.diverged) {
+    while (at < g_lineCount && (g_core || !out.diverged)) {
         if (g_lines[at][0] == '\0') {
             at++;
             continue;
@@ -6343,6 +6430,57 @@ int SelfTest(const char* file)
     return 0;
 }
 
+FILE* g_coreOut;
+
+void CoreError(const char* errorClass)
+{
+    fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"]}\n", errorClass);
+    fclose(g_coreOut);
+    exit(0);
+}
+
+int CoreHost(const char* callsPath, const char* outPath)
+{
+    FILE* calls = fopen(callsPath, "rb");
+    if (calls == nullptr) {
+        printf("FAIL: cannot read %s\n", callsPath);
+        return 2;
+    }
+    g_coreOut = fopen(outPath, "wb");
+    if (g_coreOut == nullptr) {
+        printf("FAIL: cannot write %s\n", outPath);
+        return 2;
+    }
+    const char* fault = getenv("BT_CORE_FAULT");
+    g_core = true;
+    g_coreFault = fault != nullptr && strcmp(fault, "host_write") == 0;
+    ReplayWasmSetTrapHook(CoreError);
+    char line[1024];
+    while (fgets(line, sizeof line, calls) != nullptr) {
+        size_t length = strlen(line);
+        while (length > 0 && (line[length - 1] == '\n' || line[length - 1] == '\r'))
+            line[--length] = '\0';
+        if (length == 0)
+            continue;
+        char* recording = strchr(line, '\t');
+        char* module = recording == nullptr ? nullptr : strchr(recording + 1, '\t');
+        if (strncmp(line, "replay\t", 7) != 0 || module == nullptr) {
+            printf("FAIL: not a replay call: %s\n", line);
+            return 2;
+        }
+        *module++ = '\0';
+        recording++;
+        ReplayWasmSelect(module, "wind_meteors");
+        Outcome out;
+        ReplayFile(recording, out);
+        fprintf(g_coreOut, "replay\t[%s]\n", out.core.Data());
+        fflush(g_coreOut);
+    }
+    fclose(g_coreOut);
+    fclose(calls);
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -6350,6 +6488,13 @@ int main(int argc, char** argv)
     int expectCall = -1;
     const char* expectField = nullptr;
     int arg = 1;
+    if (arg + 3 < argc && strcmp(argv[arg], "--core") == 0) {
+        if (strcmp(argv[arg + 1], "host") != 0) {
+            printf("FAIL: no core group %s\n", argv[arg + 1]);
+            return 2;
+        }
+        return CoreHost(argv[arg + 2], argv[arg + 3]);
+    }
     if (arg + 1 < argc && strcmp(argv[arg], "--wasm") == 0) {
         ReplayWasmSelect(argv[arg + 1]);
         printf("replaying against the WASM module %s\n", argv[arg + 1]);
@@ -6363,7 +6508,7 @@ int main(int argc, char** argv)
         expectField = argv[arg + 2];
         arg += 3;
     } else if (arg >= argc) {
-        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test [RECORDING] | --expect CALL FIELD RECORDING...] RECORDING...\n");
+        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test [RECORDING] | --expect CALL FIELD RECORDING...] RECORDING...\n       replay_native_test --core host CALLS OUT\n");
         return 2;
     }
     for (; arg < argc; arg++)

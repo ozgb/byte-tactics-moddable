@@ -634,8 +634,8 @@ For example, the lines `a event.kind 66`, `a event.weapon "Meteor"`, `a event.ra
 `interval` at 48, 52 bytes in all, in hex
 `42000000` `4d6574656f72` followed by 26 `00` bytes, `2c010000` `00000040` `0000a040` `00007042`.
 
-`"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
-`WEAPONS_EXPLODE_PIECE` and scripts' `Apply` `SCRIPTS_FREE_STATE` and `SCRIPTS_INIT_STATE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
+`"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: scripts' `Apply` leaves
+`SCRIPTS_FREE_STATE` and `SCRIPTS_INIT_STATE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
@@ -1060,6 +1060,21 @@ lines of no call named is not listed. A holder holds one file in a recording: a 
 The recorder keeps, for every file a loader of the schema read while any recording is configured, its address, size, name and bytes, and a later load at the same address
 replaces the earlier entry. The loaders hand the file to the recorder between reading it and relocating it, and do nothing else when no recording is configured. A line
 that names a pointer is mapped when it is written: the file whose bytes hold the pointer, the holder whose pointer is the start of the file, and the offset.
+
+### Faces a later load step bound
+
+A model is more than its file once the game has run `BindModelTextures` on it: that step reads the GAF files, which a recording does not carry, and sets the `flags` and the animation sequence (`tex.src`) of the faces that have a texture. The simulation reads both (`BreakPieceIntoDebris` takes the team colour texture of a face that has one, `GetGafFrame`). A `model` load line is therefore followed, after its `x` lines, by one line for each face whose bind bits are set:
+
+```
+load model UnitDef#12 "objects3d\\armcom.3do" [9120]
+  x 0:...
+  bind 908 0x19001e FrameTable#12
+  bind 972 0x350006 null
+```
+
+`bind <offset> <flags> <src>`: the face is named by its byte offset from the start of the file (as `UnitDef#12+offset` names a node), `flags` is its whole flags word in hex, and `src` is the animation sequence, `FrameTable#N` named as the services name it (so that `i services.GetGafFrame FrameTable#12 0` resolves to the same object), or `null` when the face has none (a face whose flags bit 1 is clear). The recorder takes the lines from the live model the first time a line names it. A face with none of the bits 0 to 2 of its flags set has no line.
+
+The replayer runs the loaders as before, clears bits 0 to 2 of the flags of every face, then sets the flags of each listed face and its `tex.src` to the object the name gives, made empty as for a `ptr` that no line named. A `bind` line that names no face, or an object it cannot make, stops the replay. The self-test builds a model with three faces, binds two, and checks the lines, the replayed flags, and that the named object is the one later lines resolve to.
 
 ### A pointer to load-time data
 
@@ -1520,7 +1535,7 @@ weapons:
 - `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
 - The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
 - `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
-- `Apply` of EXPLODE_PIECE: the slot leaves it `unrecorded`, so the exploded pieces of `combat-deaths` reach the recording only through what they change. It allocates the piece in the debris chunk cache, a block of chunks in the block that the schema has no form for, and reads the model of the unit (#1081). DETONATE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES are recorded: the detonation and the area damage reach the cells around a shot as roots and their units by id (A unit reached by its id, per slot).
+- `Apply` of EXPLODE_PIECE is recorded, but not the debris cache behind it (`g_debrisMemCache`, the 100,000-byte arena of chunks that `StartExplodePiece` allocates the exploded blocks from). It is allocator bookkeeping that no trace hashes (`data/trace_coverage.csv`), so it is an `exempt` target and `DebrisCache` and its chunk header are `exempt_types`; the replayer builds a fresh cache (`InitSimCache(100000)`) and the debris pieces (the slots, faces and vertices that `InitExplosions` sets up) before the first call. The allocation therefore replays as the recording shows it, the slot taken and the block named `ExplodedPiece#N`, as long as the cache does not wrap: when the arena is full the allocator frees the oldest blocks and clears their `g_explodedPieces` slots, which the replayer's cache, holding none of the blocks that were there before the window, cannot do. A window must not cover a wrap (about 500 pieces, none in a committed recording). The vertices and faces of a debris piece (`DebrisPiece.verts`, `faces`, `GafRef::pic`) are written for drawing only and are exempt. DETONATE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES are recorded: the detonation and the area damage reach the cells around a shot as roots and their units by id (A unit reached by its id, per slot).
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 
 economy:
@@ -1584,7 +1599,7 @@ scripts:
 - `Apply` of FREE_STATE and INIT_STATE: unrecorded (`unrecorded` of the slot). They free and build the model state of a feature spot from `Feature.object`, the model of a feature type, which no holder of the load kinds names, so the pointer could not be written. DETACH_PIECE: nothing publishes it (`WeaponsPublishDetachPiece` has no caller), so no scenario reaches it.
 - `CreateObjectState` is a recorded slot that no committed recording calls: it builds the model state of a unit type that has no script, and every unit type that the scenarios checked (`orders-factory`, `orders-air`, `mission-victory`, `console-units`) create has one.
 - A script that sets a unit value and reads it back in the same call (the factory's `SetUnitValue 18` and `GetUnitValue 18`, the yard): `SchedPublish` runs the handler of the event before it returns, and the handler writes `Unit.cobStateFlags`, which the script then reads, so the replay would take the other branch. No form records a block field that a handler of an import wrote, so no recorded window holds such a call: the recordings avoid the tick at which `orders-factory` finishes a unit (793). An import line that names a block field its handler wrote is the form that would record it.
-- The paths of a script that no recorded window reaches: `EmitSfx` (smoke and thrust, with the `los_radar.IsUnitVisibleToPlayer` import), `AttachUnit` and `DropUnit` of a transport, `GetUnitValue` of the angle and distance cases and of the ground height (`map.GetGroundHeight`), `ExplodePiece` (weapons' EXPLODE_PIECE, left out there), and a start with a callback by its index.
+- The paths of a script that no recorded window reaches: `EmitSfx` (smoke and thrust, with the `los_radar.IsUnitVisibleToPlayer` import), `AttachUnit` and `DropUnit` of a transport, `GetUnitValue` of the angle and distance cases and of the ground height (`map.GetGroundHeight`), `ExplodePiece` (weapons' EXPLODE_PIECE, which no scripts window reaches), and a start with a callback by its index.
 
 ## Replaying
 
@@ -1730,7 +1745,7 @@ wine build/modern/replay_inject_test.exe --expect 393 Unit#2.weapon0ReloadTimer 
 wine build/modern/replay_inject_test.exe --expect 8 Projectile#0.spawnTick tests/replay/weapons/console-features.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold every slot of weapons, and the `Apply` of every kind but EXPLODE_PIECE, which it leaves unrecorded ("Event arguments", "Not recorded"): the damage, claims, releases, slot set-ups, aim answers, detonations, area damage, spawns and removals that reach weapons as events. `UpdateProjectiles` and the detonation and area damage reach every cell of the map (`all-of` over `Game.cells`, a table recorded as changed elements), so each file starts with a first record of every cell, written as runs: 102,400 cells in about 86 KB for `mission-timer`, and 262,144 cells in about 1 MB of the 2 MB of `long-greenhaven-8p`. The nine files are about 10 MB, and none is over 2.3 MB. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold every slot of weapons, and the `Apply` of every kind ("Not recorded" says what of EXPLODE_PIECE is left out): the damage, claims, releases, slot set-ups, aim answers, detonations, area damage, spawns and removals that reach weapons as events. `UpdateProjectiles` and the detonation and area damage reach every cell of the map (`all-of` over `Game.cells`, a table recorded as changed elements), so each file starts with a first record of every cell, written as runs: 102,400 cells in about 86 KB for `mission-timer`, and 262,144 cells in about 1 MB of the 2 MB of `long-greenhaven-8p`. The nine files are about 10 MB, and none is over 2.3 MB. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
 
 - `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 33 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
 - `console-ilose`, the whole run of 100 ticks (1,930 calls; `Apply`: 1 DAMAGE, 9 RELEASE, 2 INIT_SLOTS, 1 DETONATE and 1 REMOVE_PROJECTILES): the load-time `FindWeaponByName` (1,790 calls: the first call names every weapon of the array, `r WeaponName#N.name "..."`, and each returns its weapon, `o result weapondef#N` with `o weapondef#N.flags`, or null), a few `UpdateUnitWeapons` and `GetWeaponRange`.

@@ -16724,6 +16724,7 @@ call 70 UpdateUnitWeapons
 call 70 UpdateProjectiles
 call 70 UpdateExplosions
 call 70 Apply
+  r rng.main 0x4ff5d899
   r weapondef#225.flags 0x00000020
   r weapondef#225.index 225
   r weapondef#225.reloadTime 0
@@ -16739,6 +16740,32 @@ call 70 Apply
   r weapondef#225.explosionSeq FrameTable#7
   r weapondef#225.splash FrameTable#8
   r weapondef#225.table null
+  r Player#0.info PlayerInfo#1
+  r Player#1.info PlayerInfo#2
+  r Player#2.info PlayerInfo#3
+  r Player#3.info PlayerInfo#4
+  r Player#4.info PlayerInfo#5
+  r Player#5.info PlayerInfo#6
+  r Player#6.info PlayerInfo#7
+  r Player#7.info PlayerInfo#8
+  r Player#8.info PlayerInfo#9
+  r Player#9.info PlayerInfo#10
+  r GafSources#0.ptr FrameTable#6
+  r GafSources#1.ptr FrameTable#9
+  r GafSources#2.ptr FrameTable#10
+  r GafSources#3.ptr FrameTable#11
+  r GafSources#4.ptr FrameTable#7
+  r GafSources#5.ptr FrameTable#12
+  r PlayerInfo#1.color 0
+  r PlayerInfo#2.color 1
+  r PlayerInfo#3.color 2
+  r PlayerInfo#4.color 3
+  r PlayerInfo#5.color 4
+  r PlayerInfo#6.color 5
+  r PlayerInfo#7.color 6
+  r PlayerInfo#8.color 7
+  r PlayerInfo#9.color 8
+  r PlayerInfo#10.color 9
   a event.kind 266
   a event.unit null
   a event.weapon 225
@@ -16768,7 +16795,6 @@ call 70 Apply
   w Projectile#0.nextSmokeTick 70
   o result 1
 call 71 UpdateUnitWeapons
-  r rng.main 0x4ff5d899
   r weapondef#225.speed 655360
   r weapondef#225.acceleration 0
   r weapondef#225.accuracy 0
@@ -17212,6 +17238,7 @@ call 85 UpdateProjectiles
   w Projectile#0.anglesPitch 7680
 call 85 UpdateExplosions
 call 85 Apply
+  r rng.main 0x056653db
   a event.kind 266
   a event.unit null
   a event.weapon 225
@@ -17241,7 +17268,6 @@ call 85 Apply
   w Projectile#1.nextSmokeTick 85
   o result 1
 call 86 UpdateUnitWeapons
-  r rng.main 0x056653db
   a unit Unit#1
   i services.ScheduleTargetingTargetPos Unit#1 0 = 0
   o x 0

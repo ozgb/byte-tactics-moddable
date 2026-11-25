@@ -679,7 +679,6 @@ game,harness,shared_write,ScriptsEventHeader::kind,1
 game,harness,shared_write,Vec3::x,3
 game,harness,shared_write,Vec3::y,1
 game,harness,shared_write,Vec3::z,3
-game,harness,shared_write,WeaponsEventHeader::kind,1
 game,los_radar,indirect,ExpireEyeballs,1
 game,los_radar,indirect,FreeMapResources,1
 game,los_radar,indirect,GetMapCellAtPosition,1
@@ -4558,6 +4557,8 @@ presentation,harness,shared_write,Game::endGameVictory,2
 presentation,harness,shared_write,Game::numPlayers,2
 presentation,harness,shared_write,Game::uiOptionFlags,1
 presentation,harness,shared_write,MissionType::index,1
+presentation,harness,shared_write,Object3do::child,1
+presentation,harness,shared_write,Object3do::sibling,1
 presentation,harness,shared_write,OrdersEventHeader::kind,1
 presentation,harness,shared_write,OrdersEventHeader::unit,1
 presentation,harness,shared_write,Player::allied,1

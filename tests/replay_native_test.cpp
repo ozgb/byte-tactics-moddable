@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <math.h>
 #include <vector>
 #include <algorithm>
 
@@ -40,6 +41,10 @@
 #include "../src/weapons/weapons_apply.h"
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
+#include "../src/weapons/explosion_types.h"
+#include "../src/graphics/piece_frame.h"
+#include "../src/graphics/memory_cache.h"
+#include "../link/globals.h"
 #include "../src/game/economy.h"
 #include "../src/game/players.h"
 #include "../src/game/players_events.h"
@@ -185,6 +190,8 @@ short __cdecl AngleOfVector(int x, int z)
 
 #pragma comment(linker, "/alternatename:?AngleOfVector@@YAHHH@Z=?AngleOfVector@@YAFHH@Z")
 #pragma comment(linker, "/alternatename:?AddExplosionEffect@@YGXPAUVec3@@PAXHH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z")
+#pragma comment(linker, "/alternatename:?AddExplosionEffect@@YGXPAX0HH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z")
+#pragma comment(linker, "/alternatename:?GetGafFrame@@YGPAXPAUGafSequence@@H@Z=?GetGafFrame@@YGPAUGafFrame@@PAUFrameTable@@H@Z")
 #pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAF2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
 #pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAG2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
 #pragma comment(linker, "/alternatename:?FindTargetableProjectile@@YGPAHPAUUnit@@E@Z=?FindTargetableProjectile@@YGPAUProjectile@@PAUInterceptorUnitView@@H@Z")
@@ -2609,6 +2616,29 @@ void BindLoadFiles()
     g_import_files.LengthByName = LoadFileLength;
 }
 
+void ClearFaceBits(PieceFrame* face, unsigned, void*)
+{
+    *(unsigned*)&face->flags &= ~7u;
+}
+
+void BindModelFaces(const char* file, void* base, unsigned size, const std::vector<ReplayLoadBind>& binds)
+{
+    ReplayEachFace(base, size, ClearFaceBits, nullptr);
+    for (size_t i = 0; i < binds.size(); i++) {
+        PieceFrame* face = ReplayFaceAt(base, size, binds[i].offset);
+        if (face == nullptr)
+            Fatal(file, 0, "a bind line names no face of its model", "bind");
+        *(unsigned*)&face->flags = binds[i].flags;
+        if (strcmp(binds[i].src, "null") != 0) {
+            unsigned kind = 0;
+            void* target = ReplayResolveObject(binds[i].src, &kind, g_objects, AllocObject);
+            if (target == nullptr)
+                Fatal(file, 0, "a bind line names an object it cannot make", binds[i].src);
+            face->color = (unsigned short*)target;
+        }
+    }
+}
+
 void LoadInputs(const char* file, int end)
 {
     BindLoadFiles();
@@ -2647,12 +2677,25 @@ void LoadInputs(const char* file, int end)
             for (unsigned long i = 0; i < n; i++)
                 f->bytes[first + i] = (unsigned char)ParseHexByte(colon + 1 + i * 2);
         }
+        std::vector<ReplayLoadBind> binds;
+        for (; at < end && strncmp(g_lines[at], "  bind ", 7) == 0; at++) {
+            ReplayLoadBind b;
+            char flagsText[24];
+            char src[40];
+            if (sscanf(g_lines[at], "  bind %u %23s %39s", &b.offset, flagsText, src) != 3)
+                Fatal(file, 0, "a bind line is `  bind <offset> <flags> <FrameTable#N|null>`", g_lines[at]);
+            b.flags = (unsigned)strtoul(flagsText, nullptr, 0);
+            strcpy(b.src, src);
+            binds.push_back(b);
+        }
         g_loadFiles.push_back(f);
         g_loading = true;
         void* base = LoadByKind(load, f->name);
         g_loading = false;
         if (base == nullptr)
             Fatal(file, 0, "the loader refused the file of a load line", line);
+        if (load == RL_MODEL)
+            BindModelFaces(file, base, size, binds);
         ReplayLoadAdopt(load, (unsigned)kind, index, base, size);
     }
 }
@@ -3279,6 +3322,25 @@ bool Mutate(int mutation)
     return false;
 }
 
+void InitDebrisForReplay()
+{
+    for (int i = 0; i < 300; ++i) {
+        g_game->slots[i].state = -1;
+        g_game->slots[i].vertexCount = 8;
+        g_game->slots[i].faceCount = 6;
+        g_game->slots[i].firstFace = -1;
+        g_game->slots[i].verts = g_game->vertices_1e88f[i];
+        g_game->slots[i].faces = (*(Face (*)[300][6])&g_game->frames)[i];
+        for (int j = 0; j < 6; ++j) {
+            (*(Face (*)[300][6])&g_game->frames)[i][j].flags.raw |= 1;
+            (*(Face (*)[300][6])&g_game->frames)[i][j].color = 200;
+            (*(Face (*)[300][6])&g_game->frames)[i][j].nverts = 4;
+            (*(Face (*)[300][6])&g_game->frames)[i][j].vindex = g_faceVertexIndices[j];
+        }
+    }
+    g_debrisMemCache.InitSimCache(100000);
+}
+
 void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
 {
     if (!LoadFile(file)) {
@@ -3323,6 +3385,8 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
         at++;
     g_callIndex = 0;
     LoadInputs(file, at);
+    if (strcmp(g_subsystem, "weapons") == 0)
+        InitDebrisForReplay();
     while (at < g_lineCount && (g_core || !out.diverged)) {
         if (g_lines[at][0] == '\0') {
             at++;
@@ -7852,6 +7916,69 @@ void LoadInputsSelfTest()
     delete table;
 }
 
+void LoadBindSelfTest()
+{
+    printf("load binds\n");
+    ResetBlock();
+    ReplayClearFailure();
+    BindLoadFiles();
+    unsigned char file[256];
+    memset(file, 0, sizeof file);
+    Object3do* root = (Object3do*)file;
+    root->firstFace = -1;
+    root->faceCount = 3;
+    root->vertices = (Vec3*)208;
+    root->faces = (PieceFrame*)64;
+    for (int i = 0; i < 3; i++) {
+        PieceFrame* face = (PieceFrame*)(file + 64 + 32 * i);
+        face->count = 1;
+        face->indices = (unsigned short*)224;
+    }
+    AddLoadFile("objects3d\\bind.3do", file, sizeof file);
+    ReplayLoadHook() = NoteLoadHook;
+    Object3do* model = (Object3do*)Load3do((char*)"objects3d\\bind.3do");
+    MirrorObject(model);
+    ReplayLoadHook() = nullptr;
+    Check(model != nullptr && model->faceCount == 3, "the model loads");
+    unsigned short sequence[8] = { 4, 0, 0, 0, 0, 0, 0, 0 };
+    *(unsigned*)&model->faces[1].flags = 0x1e;
+    model->faces[1].color = sequence;
+    *(unsigned*)&model->faces[2].flags = 0x1;
+    UnitDef* defs = (UnitDef*)Fresh(2 * (unsigned)sizeof(UnitDef));
+    g_game->defs = defs;
+    g_game->unitDefCount = 2;
+    void** types = (void**)Fresh(2 * (unsigned)sizeof(void*));
+    g_game->types = (Object3do**)types;
+    types[1] = model;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayText name;
+    ReplayAddLoadName(name, *table, RL_MODEL, model);
+    ReplayText lines;
+    ReplayAddLoadLines(*table, lines);
+    printf("%s", lines.Data());
+    Check(strstr(lines.Data(), "  bind 96 0x1e FrameTable#1\n  bind 128 0x1 null\n") != nullptr && strstr(lines.Data(), "  bind 64 ") == nullptr, "a face a bind set is a bind line with its offset, its flags and the object its sequence is; an unbound face has none");
+    name.Free();
+    lines.Free();
+    delete table;
+
+    ResetBlock();
+    BindLoadFiles();
+    AddLoadFile("objects3d\\bind.3do", file, sizeof file);
+    Object3do* again = (Object3do*)Load3do((char*)"objects3d\\bind.3do");
+    MirrorObject(again);
+    *(unsigned*)&again->faces[0].flags = 0x7;
+    std::vector<ReplayLoadBind> binds;
+    ReplayLoadBind one = { 96, 0x1e, "FrameTable#1" };
+    ReplayLoadBind two = { 128, 0x1, "null" };
+    binds.push_back(one);
+    binds.push_back(two);
+    BindModelFaces("bind", again, sizeof file, binds);
+    void* made = g_objects.Pointer(ROK_FRAMETABLE, 1);
+    Check((*(unsigned*)&again->faces[0].flags & 7) == 0 && *(unsigned*)&again->faces[1].flags == 0x1e && *(unsigned*)&again->faces[2].flags == 0x1, "the replayer clears the bits of every face and sets those of the lines");
+    Check(made != nullptr && (void*)again->faces[1].color == made && again->faces[2].color == nullptr, "and names the object of a sequence as the services' answers do, FrameTable#1, so a later line resolves to it");
+    Check(ReplayFaceAt(again, sizeof file, 77) == nullptr && ReplayFaceAt(again, sizeof file, 96) == again->faces + 1, "a face is found by its offset in the file");
+}
+
 void LoadFormSelfTest()
 {
     printf("load forms\n");
@@ -8051,6 +8178,7 @@ int SelfTest(const char* file)
     BlobSelfTest();
     SharedBlobSelfTest();
     LoadInputsSelfTest();
+    LoadBindSelfTest();
     LoadFormSelfTest();
     EmptyTargetSelfTest();
     RebindSelfTest();
@@ -8193,6 +8321,42 @@ extern "C" void __cdecl bx_RotatePoint2D(short angle, int* xz);
 void __cdecl RotatePoint2D(short angle, int* xy)
 {
     bx_RotatePoint2D(angle, xy);
+}
+
+Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to)
+{
+    Vec3f r;
+    r.x = to.x - from.x;
+    r.y = to.y - from.y;
+    r.z = to.z - from.z;
+    return r;
+}
+
+Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b)
+{
+    double yz = (double)a.y * b.z;
+    double zy = (double)a.z * b.y;
+    double zx = (double)a.z * b.x;
+    double xz = (double)a.x * b.z;
+    double xy = (double)a.x * b.y;
+    double yx = (double)a.y * b.x;
+    Vec3f r;
+    r.z = (float)(xy - yx);
+    r.x = (float)(yz - zy);
+    r.y = (float)(zx - xz);
+    return r;
+}
+
+Vec3f __stdcall NormalizeVector(Vec3f v)
+{
+    double sx = (double)v.x * v.x;
+    double sy = (double)v.y * v.y;
+    double sz = (double)v.z * v.z;
+    double len = sqrt(sx + sy + sz);
+    v.x /= len;
+    v.y /= len;
+    v.z /= len;
+    return v;
 }
 
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles)

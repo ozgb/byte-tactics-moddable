@@ -784,8 +784,6 @@ void __stdcall RecPathfindingWriteState(const StateWriter* a0)
 
 int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == WEAPONS_EXPLODE_PIECE))
-        return s_inner_weapons->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_WEAPONS, a0, a1);
     SlotScope scope(RSL_WEAPONS_APPLY, SUB_WEAPONS, roots);

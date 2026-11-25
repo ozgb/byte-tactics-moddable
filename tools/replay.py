@@ -160,7 +160,7 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
             inside = True
         elif not inside and line.startswith("load "):
             loading = True
-        elif not inside and loading and line.startswith("  x "):
+        elif not inside and loading and (line.startswith("  x ") or line.startswith("  bind ")):
             pass
         elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "raciow" and line[3] == " "):
             problems.append(f"line {n} is neither a call nor a line of one: {line!r}")

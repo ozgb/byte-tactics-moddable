@@ -3357,16 +3357,16 @@ class EventForms(unittest.TestCase):
     def test_a_kind_left_unrecorded_is_passed_through_before_any_line(self):
         files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWeaponsApply"):]
+        body = hooks[hooks.index("RecScriptsApply"):]
         body = body[:body.index("\n}\n")]
-        unrecorded = rs.load_annotations()["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
-        self.assertEqual(set(unrecorded), {"WEAPONS_EXPLODE_PIECE"})
+        unrecorded = rs.load_annotations()["subsystems"]["scripts"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
+        self.assertEqual(set(unrecorded), {"SCRIPTS_FREE_STATE", "SCRIPTS_INIT_STATE"})
         guard = body.index("if (a0 != nullptr && a1 >= sizeof(*a0) && (")
         self.assertLess(guard, body.index("ReplayRoots roots;"))
         for name in unrecorded:
             self.assertIn("a0->kind == %s" % name, body[guard:body.index("ReplayRoots roots;")])
-        self.assertIn("return s_inner_weapons->Apply(a0, a1);", body)
-        self.assertIn('ArgEvent(s_call, "event", RET_WEAPONS, a0, a1);', body)
+        self.assertIn("return s_inner_scripts->Apply(a0, a1);", body)
+        self.assertIn('ArgEvent(s_call, "event", RET_SCRIPTS, a0, a1);', body)
 
     def test_refs_name_a_member_of_one_struct(self):
         structs = rs.interface_structs("weapons")

@@ -17,6 +17,8 @@
 #include "replay_text.h"
 #include "replay_types.h"
 #include "replay_objects.h"
+#include "../graphics/object3do.h"
+#include "../graphics/piece_frame.h"
 
 void* __cdecl operator new(unsigned int size);
 
@@ -3259,6 +3261,83 @@ bool LoadSame(const ReplayLoadUse& use, const LoadEntry& e)
 
 }
 
+
+namespace {
+
+bool InImage(const void* p, unsigned base, unsigned size, unsigned bytes)
+{
+    unsigned at = (unsigned)(size_t)p;
+    return at >= base && at - base <= size && size - (at - base) >= bytes;
+}
+
+void WalkFaces(unsigned base, unsigned size, const Object3do* node, unsigned depth, void (*visit)(PieceFrame*, unsigned, void*), void* context)
+{
+    for (; node != nullptr && depth < 64; node = node->sibling) {
+        if (!InImage(node, base, size, sizeof(Object3do)))
+            return;
+        if (node->faceCount > 0 && InImage(node->faces, base, size, (unsigned)node->faceCount * sizeof(PieceFrame))) {
+            for (int i = 0; i < node->faceCount; i++)
+                visit(node->faces + i, (unsigned)(size_t)(node->faces + i) - base, context);
+        }
+        if (node->child != nullptr)
+            WalkFaces(base, size, node->child, depth + 1, visit, context);
+    }
+}
+
+struct FaceFind {
+    unsigned offset;
+    PieceFrame* face;
+};
+
+void FindFace(PieceFrame* face, unsigned offset, void* context)
+{
+    FaceFind* f = (FaceFind*)context;
+    if (offset == f->offset)
+        f->face = face;
+}
+
+struct BindCapture {
+    ReplayObjectTable* table;
+    ReplayLoadUse* use;
+    const void* base;
+    unsigned size;
+};
+
+void CaptureFace(PieceFrame* face, unsigned offset, void* context)
+{
+    BindCapture* c = (BindCapture*)context;
+    unsigned flags = *(unsigned*)&face->flags;
+    if ((flags & 7) == 0)
+        return;
+    ReplayLoadBind bind;
+    bind.offset = offset;
+    bind.flags = flags;
+    const void* src = face->color;
+    if ((flags & 2) != 0 && src != nullptr && !InImage(src, (unsigned)(size_t)c->base, c->size, 1)) {
+        ReplayText name;
+        ReplayAddObjectName(name, *c->table, ROK_FRAMETABLE, src, true);
+        _snprintf(bind.src, sizeof bind.src, "%s", name.Data());
+        bind.src[sizeof bind.src - 1] = '\0';
+    } else {
+        strcpy(bind.src, "null");
+    }
+    c->use->binds.push_back(bind);
+}
+
+}
+
+void ReplayEachFace(const void* base, unsigned size, void (*visit)(PieceFrame*, unsigned, void*), void* context)
+{
+    WalkFaces((unsigned)(size_t)base, size, (const Object3do*)base, 0, visit, context);
+}
+
+PieceFrame* ReplayFaceAt(const void* base, unsigned size, unsigned offset)
+{
+    FaceFind f = { offset, nullptr };
+    ReplayEachFace(base, size, FindFace, &f);
+    return f.face;
+}
+
 void ReplayLoadsReset()
 {
     for (size_t i = 0; i < LoadEntries().size(); i++)
@@ -3335,6 +3414,10 @@ bool ReplayAddLoadName(ReplayText& t, ReplayObjectTable& table, unsigned load, c
             use->name[sizeof use->name - 1] = '\0';
             use->bytes = e->bytes;
             uses.push_back(use);
+            if (strcmp(kReplayLoads[load].name, "model") == 0) {
+                BindCapture capture = { &table, use, (const void*)(size_t)e->base, e->size };
+                ReplayEachFace(capture.base, e->size, CaptureFace, &capture);
+            }
         } else if (!LoadSame(*use, *e)) {
             LoadFail("the same holder has two different files in the %s load of %s", kReplayLoads[load].name, e->name);
         }
@@ -3407,6 +3490,17 @@ void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out)
             out.AddUnsigned((unsigned)at);
             out.AddChar(':');
             AddHex(out, p, (unsigned)run);
+            out.AddChar('\n');
+        }
+        for (size_t b = 0; b < use.binds.size(); b++) {
+            out.Add("  bind ");
+            out.AddUnsigned(use.binds[b].offset);
+            out.Add(" 0x");
+            char hex[16];
+            _snprintf(hex, sizeof hex, "%x", use.binds[b].flags);
+            out.Add(hex);
+            out.AddChar(' ');
+            out.Add(use.binds[b].src);
             out.AddChar('\n');
         }
     }

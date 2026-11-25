@@ -1,0 +1,455 @@
+# The commands of a tick as events
+
+A scenario scripts three kinds of line that the game would otherwise get from a person: `spawn`, `order` and `console`
+(`docs/scenario-format.md`, section 4). This page says what each of them is, as events of the interfaces: which
+events a line publishes, in which order, with which payload, from which state, and what it does when the line names
+nothing that exists. A core that publishes the same events in the same order at the same point of the tick plays the
+scenarios that the page lists as judged (section 7) to the stored traces, without anything else of the line's
+meaning. The events themselves, and what each kind does when a module consumes it, are in the interface headers; this page
+never repeats that.
+
+## 1. The rule of delivery
+
+- A command is delivered when no tick is running: before the first phase of the tick it precedes, in the step the
+  scenario format calls the start of the tick. The tick a line names is that tick.
+- The commands of one tick are delivered in the order of `docs/scenario-format.md`, section 4: the `spawn` lines, then
+  the `order` lines, then the `console` lines, each group in file order. (`input` lines come after the console lines,
+  are not commands of this page, and no scenario of section 7 has one.)
+- Every command publishes its events to the engine's outbox. An event published while no tick is running reaches
+  the module that handles its kind at once: the module consumes it in its `Apply`, in the order of publication, before
+  the next event of the command is published. An event that a handler publishes while it consumes one is delivered at
+  once too, before the handler returns.
+- The inboxes are empty again before the tick starts: nothing a command published waits for a phase.
+- A command reads the state as it is when it is delivered, after every earlier command of the tick took effect. A
+  guard that the page states ("a player that exists", "the cell has a feature") is evaluated at that moment, so a
+  `console` line that follows another of the same tick sees its effects.
+- A guard that fails publishes nothing, unless the page says otherwise. A guard that an event's `Apply` has (a
+  player above 9, an amount of 0) is not checked by the command: the event is published, counted in the log (section
+  2), and refused by its module with outcome 0.
+
+## 2. The command log
+
+A test-mode run writes `commands.txt` beside `trace.txt`. It is a diagnostic and an input a core can be played from,
+not a verdict, and no stored copy of it exists. Its first line is
+
+    bt-commands 1
+
+and every later line is one scripted `spawn`, `order` or `console` line, in the order the lines were delivered:
+
+    <tick> <key> <line> <count>[ <KIND> <hex>]...
+
+- `tick` is the tick the command precedes (the line's tick).
+- `key` is `spawn`, `order` or `console`.
+- `line` is the line number of the scenario file.
+- `count` is the number of events the command published to the engine's outbox. Only outermost publications count:
+  an event that a handler publishes while another event is being delivered is not counted and not listed.
+- After `count`, one ` <KIND> <hex>` pair for each counted event, in publication order: `KIND` is the enum name of
+  the event's kind in its interface header (`PLAYERS_TRANSFER`), and `hex` is the event's payload bytes, all of them
+  from its `kind` field on, in lowercase hexadecimal with no separators, each integer in the machine's little-endian
+  byte order.
+- `input` lines get no line. A command that publishes nothing is a line with `count` 0 and no pairs.
+
+## 3. Reading a console line
+
+The text after the tick and the `+` of a `console` line (at most 79 characters) is the command line.
+
+- **Words.** The line is split at blanks (space, tab and the other white space characters) into words. A `#` ends the
+  word it is in and the line: nothing after it is read. At most 20 words are kept. The first word is the command.
+- **Numbers.** `argument n` is word n (the command is word 0). A number argument is the decimal integer the C library
+  reads at the start of the word: leading white space, an optional sign, digits, and the first other character ends
+  it; a word with no digits at its start is 0. An argument the line does not have is its default, which each command
+  states (0 when it states none). The count of words is the number of words of the line, the command included.
+- **Which command.** The command's first word is compared with the names of the table in section 4, in any case. A
+  command that is not enabled does nothing (the line is then given to the unit-name handler, which is enabled only
+  with the cheat code, and which finds no unit type of that name). A harness refuses, with status 2, a line whose first
+  word is neither a command of the table nor the name of a unit type (`docs/scenario-format.md`, section 4.3).
+- **Enabled.** Each command of the table has a class: `always`, `skirmish` or `cheat`. A line is run with the classes
+  `always`, plus `skirmish` when the match is a skirmish (game type 2; the other game types of the scenarios do not
+  allow it), or with all three classes when bit 0x2 of `uiOptionFlags` is set when the line is delivered. The unit
+  names of section 4.2 are in the class `cheat`.
+- **The cheat code.** The command `now` sets bit 0x2 of `uiOptionFlags` when its line has exactly six words and they
+  are `now Film Chris Include Reload Assert` (the five after the command are compared exactly, in that case), and clears
+  that bit otherwise. The bit is not part of the hashed word (the trace keeps bits 3 and 7 to 10 of `uiOptionFlags`).
+  A scenario types the code in its first `console` line, and the classes are read again at each line.
+- **The cursor.** Before each console line the cursor is at the world position 640 260: the position is 640 and
+  260 world units, the height is the ground height there (the map's `GetGroundHeight`) but not less than the sea
+  level, and the cell it points at is the cell of 16 by 16 world units that holds it, cell (40, 16). The cell's feature
+  is what `GetCellFeature` answers for that cell: the feature type of the feature on it, following a cell of a larger
+  feature's footprint back to the feature's own cell, and 0xffff when the cell has none. The cursor is a
+  fixed input of a command, not state: a command that moves it (`move`) changes nothing a later line sees.
+- **The local player.** `localPlayer` is the slot whose view the game shows (the scenario's `local_player`), and
+  `playerIndex` is the slot the interface shows resources and conditions of; they are equal until `control` or `view`
+  changes them. A command that says "the local player" or "the viewing player" reads that field when delivered.
+- **A player that exists.** A player argument is cut to a byte (its value modulo 256) first. The player exists when it is
+  below 10, its record is active, its type is 1, 2 or 3, and its index is not 10. A command that tests it and fails
+  does nothing, unless it says otherwise.
+
+## 4. The console commands
+
+### 4.1 The table
+
+The groups: `events` commands published events before this change; `converted` commands wrote simulation state
+directly and now publish events; `direct` commands still write state directly and are not events (a scenario that uses
+one is not judged); `presentation` commands touch nothing the simulation or the trace reads, and a core ignores them.
+The class is the one of section 3. Command words are compared in any case.
+
+| Command | Group | Class | Events |
+| --- | --- | --- | --- |
+| `give` | events | always | PLAYERS_TRANSFER |
+| `meteor` | events | skirmish | WIND_METEORS_ENABLE, WIND_METEORS_DISABLE, WIND_METEORS_START |
+| `assign` | events | cheat | ORDERS_COMMAND |
+| `atm` | converted | skirmish | PLAYERS_SET_STORE |
+| `nometal` | converted | always | PLAYERS_SET_STORE |
+| `noenergy` | converted | always | PLAYERS_SET_STORE |
+| `sealevel` | converted | cheat | MAP_SET_SEA_LEVEL |
+| `edge` | direct | cheat | none |
+| `iwin` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
+| `ilose` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
+| `ai` | converted | cheat | PLAYERS_SET_TYPE |
+| `kill` | converted | cheat | UNITS_KILL_ALL or PLAYERS_KILL_UNITS, then PLAYERS_DEACTIVATE_CONDITIONS |
+| `reload` | converted | cheat | UNITS_RELOAD_TYPE |
+| `reloadaiprofiles` | direct | cheat | none |
+| `burnall` | converted | cheat | FEATURES_REMOVE_ALL |
+| `burnone` | converted | cheat | FEATURES_REMOVE |
+| `feature` | converted | cheat | FEATURES_PLACE |
+| `selectable` | converted | always | UNITS_SET_FLAGS |
+| `armflea`, `armpw`, `corak` | converted | cheat | UNITS_CREATE |
+| `control` | direct | cheat | none |
+| `view` | direct | skirmish | none |
+| `doubleshot` | direct | skirmish | none |
+| `halfshot` | direct | skirmish | none |
+| `radar` | direct | skirmish | none |
+| `shootall` | direct | always | none |
+| `treedeath` | direct | cheat | none |
+| `los` | direct | skirmish | LOS_RADAR_RECALCULATE |
+| `lostype` | direct | always | LOS_RADAR_RECALCULATE |
+| `mapping` | direct | skirmish | LOS_RADAR_RECALCULATE |
+| `nowisee` | direct | skirmish | LOS_RADAR_RECALCULATE |
+| `search` | direct | cheat | none |
+| `sharemetal` | direct | always | none |
+| `shareenergy` | direct | always | none |
+| `shareall` | direct | always | LOS_RADAR_SHARE_MAPPING, LOS_RADAR_SHARE_RADAR |
+| `setsharemetal` | direct | always | none |
+| `setshareenergy` | direct | always | none |
+| `now` | presentation | always | none |
+| `iface` | presentation | always | none |
+| `move` | presentation | cheat | none |
+| `drop` | presentation | always | none |
+| `assert` | presentation | cheat | none |
+| `dprint` | presentation | cheat | none |
+| `mem` | presentation | cheat | none |
+| `zbuffer` | presentation | cheat | none |
+
+The row of the unit names lists the names the scenarios type: a scenario that types another unit type name needs a
+new name in that row. `meteor`, `atm`, `view`, `doubleshot`, `halfshot`, `radar`, `los`, `mapping` and `nowisee` are
+in the class `skirmish`: a scenario of another game type runs them only after the cheat code.
+
+### 4.2 Commands that publish events
+
+Each command below says its guards and then its events, in publication order. "The cell" is the cursor's cell
+(40, 16) and "the cursor's feature" is the answer of section 3. Amounts are floats.
+
+- **`give <player> <amount> metal` and `give <player> <amount> energy`.** Let `to` be argument 1 (default 0, cut to a
+  byte). Nothing when `to` is not a player that exists. Word 3 is compared in any case: `metal` publishes PLAYERS_TRANSFER
+  with `from` the local player, `to`, `resource` 1, `amount` argument 2 (default 0) as a float, `announce` 1; `energy` does
+  the same with `resource` 0; any other word 3 publishes nothing. An amount of 0 is still published (and refused with
+  outcome 0).
+- **`meteor [n]`.** One word: WIND_METEORS_START. More than one word: WIND_METEORS_ENABLE when argument 1 is not 0, else
+  WIND_METEORS_DISABLE. The events are the header alone.
+- **`assign <order type name> [a] [b]`.** The local player's selected units (the units whose selected bit 0x10 of
+  `flags` is set, in the order of the unit array) get ORDERS_COMMAND as section 6.2 says it is given for an order with no
+  mode and no position: `type` is what `MissionTypeFromName` answers for word 1 (nothing at all when it answers 0),
+  `params[0]` is argument 1 read as a number (0 for a name), `params[1]` is argument 2, `queue` is bit 2 of the key flags
+  of the interface's last mouse event (0 when the run has no `input` line). No unit is selected in a scenario of
+  section 7, so no event is published.
+- **`atm`.** Arguments are ignored. Two events: PLAYERS_SET_STORE with `player` the viewing player (`playerIndex`),
+  `resource` 0, `add` 1, `amount` 1000; then the same with `resource` 1.
+- **`nometal [player [amount]]`, `noenergy [player [amount]]`.** `player` is the local player when the line has one
+  word, else argument 1 cut to a byte. Nothing unless it is a player that exists. PLAYERS_SET_STORE with `player`,
+  `resource` 1 (`nometal`) or 0 (`noenergy`), `add` 0, `amount` argument 2 (default 0) as a float.
+- **`sealevel [n]`.** MAP_SET_SEA_LEVEL with `level` argument 1 (default 0), always.
+- **`iwin`.** `s` is the side of the local player (0 Arm, 1 Core). PLAYERS_KILL_UNITS with `player` 0 when `s` is 1, else
+  1; then PLAYERS_END_GAME with `victory` 1.
+- **`ilose`.** PLAYERS_KILL_UNITS with `player` the side of the local player (0 or 1, used as a slot number); then
+  PLAYERS_END_GAME with `victory` 0.
+- **`ai [player]`.** `player` is argument 1 (default the local player), cut to a byte. Nothing unless it is a player that
+  exists. PLAYERS_SET_TYPE with `player` and `type` 2 when the player's type is 1, else 1.
+- **`kill [player]`.** With one word, UNITS_KILL_ALL; otherwise PLAYERS_KILL_UNITS with `player` argument 1 cut to a
+  byte. Then, always, PLAYERS_DEACTIVATE_CONDITIONS.
+- **`reload <unit type>`.** Nothing with one word. The unit type is looked up by name in any case (no wildcard); nothing
+  when there is none. UNITS_RELOAD_TYPE with `type` its number.
+- **`burnall`.** FEATURES_REMOVE_ALL, always.
+- **`burnone`.** Nothing unless the cursor's feature is below 0xfffb (there is a feature). FEATURES_REMOVE with `x` 40,
+  `z` 16, `force` 1.
+- **`feature <name>`.** The name is looked up in any case among the feature types the match has already loaded (a type
+  that no loaded map or unit refers to is not found, and none is loaded); nothing when there is none (an absent word 1
+  is the empty name). FEATURES_PLACE with `x` 40, `z` 16, `feature` its number, `flags` 0, `owner` 10, and `pos` and
+  `rot` 0. The feature module decides what happens on a cell that is occupied.
+- **`selectable`.** For each record of the unit array from the second (index 1) to the last in use, in array order,
+  whose `flags` has the alive bit 0x10000000: UNITS_SET_FLAGS with that unit, `clear` 0, `set` 0x20.
+- **A unit type name typed alone.** The word is matched, in any case, against every unit type of the match, in type
+  number order (a scenario names exactly one; the matching also takes `*` and `?`, which the scenario format does not
+  allow). For each match: UNITS_CREATE with `player` argument 1 (default 0), `type` the type's number, and `pos` the
+  cursor position moved by the map's `SnapWorldPosToFootprint` for that type. (For a second match the position is moved
+  first by the previous unit's width; no scenario has one.) The units module makes the unit finished (outcome 1) or not
+  (outcome 0: the type is 0 or not usable in this match, the player holds as many of it as the type allows, or the
+  player has no free unit slot). The page does not define a player that does not exist: no scenario names one.
+
+### 4.3 Commands that are not events
+
+These are written by the game directly or through a module's own function, not by an event. The core's verdict
+(section 7) does not include a scenario that uses one. Each does exactly this:
+
+- **`control <player>`.** When argument 1 (cut to a byte) is a player that exists: `localPlayer` and `playerIndex` become
+  it.
+- **`view <player>`.** The same test; only `playerIndex` becomes it.
+- **`doubleshot`, `halfshot`, `radar`, `shootall`, `treedeath`.** Each flips one bit of `uiOptionFlags` (0x80, 0x100,
+  0x200, 0x400 and 0x8). The word mixes bits the simulation reads with bits the view reads; the trace keeps these five.
+- **`los`, `lostype`, `mapping`, `nowisee`.** They change `mapFlags`: `los` flips bit 1, `lostype` bit 2, `mapping` bit 0,
+  and `nowisee` clears bits 0 and 1. Then LOS_RADAR_RECALCULATE with `reset` 0 for `los` and `lostype` and 1 for `mapping` and
+  `nowisee`.
+- **`edge [w [h]]`.** Always: the playable width of the map becomes the map's width in cells times 16 minus argument 1
+  (default 32), and the playable height the map's height in cells times 16 minus argument 2 (default 128). (With no
+  argument it is what the match started with.) It is not an event because the map module's state for the replay format
+  does not hold these fields yet.
+- **`reloadaiprofiles`.** The AI players are reset and their profiles loaded again, which runs the AI script's own
+  console lines (`plan`, `weight`, `limit` and the others the script holds), each publishing its AI event as section 4.2
+  would. It is not an event because an event whose handling runs console lines would put the console inside the
+  simulation; where the loading of AI profiles belongs is a decision this page does not make.
+- **`search [steps [scale]]`.** When argument 1 is not 0, the search steps per tick of the block header (the scenario
+  key `search_steps`) become it, as an unsigned number. When the line has exactly three words and the pathfinding module
+  has the optional slot `SetSearchScale`, it is called with argument 2 read as a decimal number (the C `atof`), times
+  65536, cut to an integer.
+- **`sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy`.** They act only when bit 0 of
+  `netGameFlags` is set, which no test-mode run does, so in every scenario they do nothing. When it is set:
+  `sharemetal` and `shareenergy` flip the local player's metal or energy sharing switch, add a line to the message log
+  and send the player's info to the other machines; `shareall` does both and then publishes LOS_RADAR_SHARE_MAPPING and
+  LOS_RADAR_SHARE_RADAR for the local player; `setsharemetal n` and `setshareenergy n` set the local player's metal or
+  energy share level to the smaller of argument 1 and the player's storage capacity of that resource, and add a line to
+  the message log.
+
+### 4.4 Commands that touch only the presentation
+
+- **`now`.** Sets or clears bit 0x2 of `uiOptionFlags` as section 3 says. It decides which later lines run; it changes
+  nothing else, and the bit is not hashed.
+- **`iface <n>`.** The interface type, 0 for left-click orders and 1 for right-click orders.
+- **`move <dx> <dz>`.** Moves the cursor by dx and dz cells (16 world units each), for that line only; the next
+  console line puts the cursor back.
+- **`drop <n>`.** Sets bit 0x1 of `uiOptionFlags` to whether argument 1 is 0 (network timeouts); not hashed.
+- **`assert`, `dprint`, `mem`, `zbuffer`.** Nothing.
+
+## 5. `spawn`
+
+`spawn <tick> <slot> <unit type> <x> <z>` publishes one event, UNITS_CREATE, with `player` the slot, `type` the unit type's
+number, and `pos` as below. The unit type name is compared in any case. A line is refused with status 2 when the game has
+no unit type of that name, or when `x` is not below the map's playable width or `z` not below its playable height (both in
+world units, as `edge` last set them).
+
+The position: `pos[0]` is `x` times 65536 and `pos[2]` is `z` times 65536. The height is the map's `GetGroundHeight` at that
+position (-1 off the map), raised to the sea level when it is below it; `pos[1]` is that height times 65536. Then the
+map's `SnapWorldPosToFootprint` for the unit type moves the position (it changes nothing for a mobile unit type; for
+another it puts the footprint on the cell grid and sets the height). The event carries the moved position.
+
+## 6. `order`
+
+### 6.1 The table
+
+The kinds of the `order` line, with a `+` before the kind meaning the shift key (a queued order). The mode is the
+first argument of the orders query `GetOrderType`, which says what order type a unit gets against a target for that
+mode; `-` means the kind does not use a mode. "Target" says whether a unit target of the line (`<slot>:<type>:<n>`) is
+given to the order.
+
+| Order | Mode | Target | Events |
+| --- | --- | --- | --- |
+| `move` | 2 | yes | ORDERS_COMMAND |
+| `attack` | 3 | yes | ORDERS_COMMAND |
+| `dgun` | 4 | yes | ORDERS_COMMAND |
+| `unload` | 5 | no | ORDERS_COMMAND |
+| `load` | 6 | yes | ORDERS_COMMAND |
+| `guard` | 7 | yes | ORDERS_COMMAND |
+| `repair` | 8 | yes | ORDERS_COMMAND |
+| `patrol` | 9 | yes | ORDERS_COMMAND |
+| `teleport` | 11 | yes | ORDERS_COMMAND |
+| `reclaim` | 12 | yes | ORDERS_COMMAND |
+| `capture` | 13 | yes | ORDERS_COMMAND |
+| `build` | 14 | no | ORDERS_COMMAND |
+| `stop` | - | no | ORDERS_COMMAND |
+| `cloak` | - | no | ORDERS_COMMAND |
+| `activate` | - | no | ORDERS_COMMAND |
+| `deactivate` | - | no | ORDERS_COMMAND |
+| `movestate` | - | no | ORDERS_COMMAND |
+| `firestate` | - | no | ORDERS_COMMAND |
+| `selfdestruct` | - | no | ORDERS_CANCEL, or ORDERS_COMMAND |
+| `qbuild` | - | no | ORDERS_QUEUE_BUILD |
+
+### 6.2 The units and the events
+
+**The units that are ordered.** The selector `<slot>:<type>:<n>` names the n-th live unit of that unit type owned by
+the slot, in the order of the unit array (a unit is live when its unit type number is not 0); `<slot>:all` names every live
+unit of the slot. The line is refused with status 2 when it names no unit (fewer than n live units of the type, or none),
+when a unit type name is unknown, when a unit target selector names no live unit, or when the position (given, or taken
+from the target unit) has `x` not below the playable width or `z` not below the playable height. The slot is the local
+player and the viewing player while the order is given. The units that get an event are the named units (the selection),
+and each event goes in the order of the unit array.
+
+**The position.** `x z` of the line, or for a unit target the target's position in whole world units (its 16.16
+coordinate shifted right by 16, arithmetically). `pos[0]` is x times 65536, `pos[2]` is z times 65536, and `pos[1]` is the
+ground height there raised to the sea level, times 65536, as in section 5 (no footprint snapping). A line whose kind has no
+position and no target (`stop`, `cloak`, `activate`, `deactivate`, `movestate`, `firestate`, `selfdestruct`, `qbuild`)
+has no position: `hasPos` 0 and `pos` 0.
+
+**The kinds with a mode** (`move`, `attack`, `dgun`, `unload`, `load`, `guard`, `repair`, `patrol`, `teleport`,
+`reclaim`, `capture`). Let the *target* be the line's unit target when the mode takes one (every mode but 5, 10 and
+14) and the line has one, else none. The target is not ordered itself: it is left out of the selection. Let `n` be
+the number of selected units but the target. Nothing is published when `n` is 0. Else, for each such unit `u` in
+array order:
+
+1. `type` is `GetOrderType(mode, u, target, position)`. Nothing for `u` when it is 0.
+2. Nothing for `u` when `type` is the order type "Standing_FireOrder" and the unit type of `u` lacks the data flag
+   `firestandorders` (bit 1 of `flags2` of the unit type), or when it is "Standing_MoveOrder" and the unit type lacks
+   `mobilestandorders` (bit 0 of `flags2`). (Only `movestate` and `firestate` reach this.)
+3. The position is the one above, with the formation spread when the order type's table flags have bit 2 (the order
+   types "Move_Ground", "Patrol", "RepairPatrol", "VTOL_Move", "VTOL_Patrol" and "VTOL_RepairPatrol") and the line has a
+   position:
+   - `cx` is the sum over the `n` units of their x in whole world units (the 16.16 `pos.x` shifted right by 16
+     arithmetically and cut to a signed 16-bit integer), divided by `n`, truncating toward 0; `cz` likewise with z.
+     The centre is `cx * 65536`, `cz * 65536`.
+   - With `dx = u.x - centre.x` and `dz = u.z - centre.z` (32-bit integers, 16.16, wrapping), and `s = (dx*dx >> 32) +
+     (dz*dz >> 32)` (each square in 64 bits, shifted arithmetically, then cut to 32 bits), when `s <= n * 3000` the
+     event's position is `pos[0] + dx`, `pos[1]`, `pos[2] + dz` (32-bit, wrapping); otherwise it is the position unmoved.
+4. ORDERS_COMMAND with `unit` the unit, `type`, `queue` 1 when the line has a `+` and else 0, `target` the target unit (0
+   for none), `hasPos` 1 and `pos` as step 3 (every kind with a mode has a position), `params` 0 and 0.
+
+The target of a mode that does not take one (5, 14) is never an event target; an `unload` whose line names a unit
+uses only its position.
+
+**The kinds with no mode.** The units are the selection, `n` is their number, and for each in array order one
+ORDERS_COMMAND with `unit`, `queue` as above, `target` 0, `hasPos` 0 and `pos` 0, and
+- `stop`: `type` is `MissionTypeFromName("STOP")`, `params` 0 and 0.
+- `cloak on`: "CLOAK_ON"; `cloak off`: "CLOAK_OFF"; `activate`: "ACTIVATE"; `deactivate`: "DEACTIVATE"; `params` 0 and 0.
+- `movestate n`: "STANDING_MOVEORDER", `params[0]` n (0, 1 or 2), `params[1]` 0; skipped for a unit as step 2 says.
+- `firestate n`: "STANDING_FIREORDER", the same, with step 2's test.
+
+**`selfdestruct`** toggles. In the order of the unit array, for each selected unit that already has an order of the type
+`MissionTypeFromName("SELFDESTRUCT")` in its order list: ORDERS_CANCEL with `unit` and `order` that type. When no selected
+unit had one, nothing was cancelled, and each selected unit gets an ORDERS_COMMAND of that type as the kinds with no mode
+do, `params` 0 and 0 (and `queue` from the `+`).
+
+**`qbuild <unit type> [n]`.** For each selected unit in array order, ORDERS_QUEUE_BUILD with `unit`, `count` n (default 1,
+1 to 99) and `name` the unit type as written in the line (at most 31 characters, zero-terminated). The name must be a unit type
+of the game, except that `MAKENUKE` and `MAKEANTI`, in exactly that case, are passed as they are. A `+` changes nothing.
+
+**`build <unit type> x z`.** The unit type must exist (else status 2). Let `fx` and `fz` be its `footprintx` and `footprintz`, and the
+cursor's world position `X Z` the line's `x z` times 65536. The site's cell is `cx = (X - (fx << 19) + 0x80000) >> 20` and `cz =
+(Z - (fz << 19) + 0x80000) >> 20` (arithmetic shifts, cut to signed 16 bits). The site is refused with status 2 when
+the map's `CanBuildAt` for that unit type, that cell, type 0 and the ordering player answers 0 (the site is off the map,
+blocked, too steep, not visible or not explored to that player, and the other rules of that slot). Else the site's
+position is `pos[0] = (fx + cx*2) << 19`, `pos[2] = (fz + cz*2) << 19` and `pos[1]` the height that `CanBuildAt` left in its
+placement record (the lowest ground height under the cells of the footprint that the yard map marks as ground level, or the
+sea level minus the unit type's `draft` when it has none) times 65536. For each selected unit in array order whose unit type has bit 0x40 of
+`flags1` (builder): ORDERS_COMMAND with `unit`, `type` `MissionTypeFromName("MOBILEBUILD")` when bit 0x800 of its unit
+type's `flags1` is clear, else `MissionTypeFromName("VTOL_MOBILEBUILD")`, `queue` 0 (the `+` changes nothing for `build`),
+`target` 0, `hasPos` 1, `pos` the site, `params[0]` the unit type's number and `params[1]` 0. A selected unit that is not a
+builder gets nothing.
+
+## 7. The scenarios of the core's verdict
+
+A core is judged on the scenarios marked `judged`: it turns each one's lines into events by this page, and its traces must
+equal the stored ones. A scenario is `left out` when it needs something the core does not have: the presentation (its
+`input` lines), saving and loading (not in the core spec), or a console command of section 4.3, which is not an event.
+`tools/commands.py --check` keeps this table equal to the one of `reference/README.md` and refuses a judged scenario with
+one of those, and a scenario that uses a console command or an order kind that this page does not list.
+
+| Scenario | Verdict | Reason |
+| --- | --- | --- |
+| ai-antinuke-intercept | judged | - |
+| allied-victory | judged | - |
+| combat-deaths | judged | - |
+| commander-death | judged | - |
+| conditions-dark-side | judged | - |
+| conditions-shore-to-shore | judged | - |
+| console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-features | left out | console commands that are not events: `treedeath` |
+| console-ilose | judged | - |
+| console-iwin | judged | - |
+| console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
+| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search`, `edge` |
+| duel-coast-to-coast | judged | - |
+| duel-great-divide | judged | - |
+| duel-pass-dark | judged | - |
+| duel-shore-to-shore | judged | - |
+| edges-economy-targeting | judged | - |
+| edges-targeting-lead | left out | console commands that are not events: `shootall` |
+| eight-full-moon | judged | - |
+| eight-greenhaven | judged | - |
+| eight-pincushion-teams | judged | - |
+| hailstorm-los-off | judged | - |
+| load-midgame | left out | saves or loads a game: save and load are not in the core spec |
+| load-targets | left out | saves or loads a game: save and load are not in the core spec |
+| long-great-divide-2p | judged | - |
+| long-greenhaven-8p | judged | - |
+| los-off-mapped-ai | judged | - |
+| meteors-earthquake | judged | - |
+| meteors-hailstorm | judged | - |
+| mission-build-unit | judged | - |
+| mission-capture | judged | - |
+| mission-defeat | judged | - |
+| mission-defeat-all-units | judged | - |
+| mission-defeat-of-type | judged | - |
+| mission-defeat-passes-x | judged | - |
+| mission-kill-mobile | judged | - |
+| mission-kill-of-type | judged | - |
+| mission-passes-x | judged | - |
+| mission-passes-z | judged | - |
+| mission-radius | judged | - |
+| mission-timer | judged | - |
+| mission-victory | judged | - |
+| orders-air | judged | - |
+| orders-air-fights | judged | - |
+| orders-air-repair | judged | - |
+| orders-attack-nomove | judged | - |
+| orders-attack-nomove-range | judged | - |
+| orders-build-patrol | judged | - |
+| orders-factory | judged | - |
+| orders-guard-attacked | judged | - |
+| orders-guard-reclaim | judged | - |
+| orders-immediate | judged | - |
+| orders-move-attack | judged | - |
+| orders-tier2-core | judged | - |
+| orders-tier2-spider | judged | - |
+| orders-tier2-vader | judged | - |
+| orders-weapon-build | judged | - |
+| quad-fox-holes | judged | - |
+| quad-king-of-the-hill | judged | - |
+| quad-lava-highground | judged | - |
+| quad-two-continents | judged | - |
+| save-midgame | left out | saves or loads a game: save and load are not in the core spec |
+| save-targets | left out | saves or loads a game: save and load are not in the core spec |
+| sensors-floating-teeth | judged | - |
+| sensors-floating-teeth-los-off | judged | - |
+| sensors-los-off | judged | - |
+| sensors-sonar-jam | judged | - |
+| share-all | judged | - |
+| share-energy | judged | - |
+| share-metal | judged | - |
+| six-hundred-isles | judged | - |
+| six-painted-desert | judged | - |
+| six-yerrot-mountains | judged | - |
+| skirmish2 | judged | - |
+| skirmish4 | judged | - |
+| skirmish4-long | judged | - |
+| ten-lava-run | judged | - |
+| ten-ring-atoll | judged | - |
+| trio-anteer-strait | judged | - |
+| trio-dark-side | judged | - |
+| trio-etorrep-glacier | judged | - |
+| ui-build-menu | left out | has `input` lines: it needs the presentation |
+| ui-build-place | left out | has `input` lines: it needs the presentation |
+| ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-drag-select | left out | has `input` lines: it needs the presentation |
+| ui-groups | left out | has `input` lines: it needs the presentation |
+| ui-keys | left out | has `input` lines: it needs the presentation |
+| ui-left-click-orders | left out | has `input` lines: it needs the presentation |
+| ui-right-click | left out | has `input` lines: it needs the presentation |
+| units-transport | judged | - |
+| units-transport-ship | judged | - |

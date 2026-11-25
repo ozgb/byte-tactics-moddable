@@ -42993,11 +42993,9 @@ address,function,file,kind,target
 ,ArgOutBytes,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ArgOutBytes,src/harness/replay.cpp,function,
 ,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayAddObjectName
-,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayFail
 ,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgOutUnitBuffer,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ArgOutUnitBuffer,src/harness/replay.cpp,call,Table
-,ArgOutUnitBuffer,src/harness/replay.cpp,call,_snprintf
 ,ArgOutUnitBuffer,src/harness/replay.cpp,call,get
 ,ArgOutUnitBuffer,src/harness/replay.cpp,deref_read,*Ref<Unit>
 ,ArgOutUnitBuffer,src/harness/replay.cpp,function,

@@ -3292,6 +3292,7 @@ class EventForms(unittest.TestCase):
         for kind_writes, want in (({"PLAYERS_NOTHING": ["Player.metal"]}, "which is no kind of the events of players"),
                                   ({"PLAYERS_SET_STORE": []}, "no list of object fields"),
                                   ({"PLAYERS_SET_STORE": ["Player.nothing"]}, "which is no object field"),
+                                  ({"PLAYERS_SET_STORE": ["GafFrame.width"]}, "which is not among the slot's reads"),
                                   (["PLAYERS_SET_STORE"], "maps the name of a kind")):
             ann = annotations()
             ann["subsystems"]["players"]["slots"]["Apply"]["args"]["event"]["kindWrites"] = kind_writes

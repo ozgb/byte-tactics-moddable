@@ -833,17 +833,12 @@ void ImportOutUnitBuffer(ReplayText& t, const char* slot, const char* name, cons
 
 void ArgOutUnitBuffer(ReplayText& t, const char* slot, const char* name, const Ref<Unit>* units, int result, int capacity)
 {
-    if (result > capacity) {
-        char message[200];
-        _snprintf(message, sizeof message, "%s returned %d units for a buffer of %d: a recording would lose units", slot, result, capacity);
-        message[sizeof message - 1] = '\0';
-        ReplayFail(message);
-        return;
-    }
+    (void)slot;
+    int held = result < capacity ? result : capacity;
     t.Add("  o ");
     t.Add(name);
     t.Add(" [");
-    for (int i = 0; i < result; i++) {
+    for (int i = 0; i < held; i++) {
         if (i != 0)
             t.AddChar(',');
         ReplayAddObjectName(t, Table(), ROK_UNIT, units[i].get(), true);

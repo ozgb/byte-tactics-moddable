@@ -3975,6 +3975,24 @@ void EnemyListSelfTest()
     Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 301, 0, wide, 5);
     printf("a repeat with another radius: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 1 los_radar.GetVisibleEnemiesInRadius") == 0, "a repeat with other arguments is reported as an extra import");
+
+    printf("a recorded slot whose count is above its capacity\n");
+    ResetBlock();
+    LoadCall(call);
+    BeginImport();
+    memset(narrow, 0, sizeof narrow);
+    Imp_los_radar_GetVisibleEnemiesInRadius(1, &pos, 300, 0, narrow, 2);
+    LoadCall("  a capacity 2\n  o out [Unit#3,Unit#9]\n  o result 3\n");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 3, 2);
+    Check(g_diffs == 0, "the buffer holds the first capacity units of a larger count, as the line has them");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 1, 2);
+    Check(g_diffs == 1, "a count below the units of the line is a difference");
+    LoadCall("  a capacity 2\n  o out [Unit#3,Unit#9,Unit#5]\n  o result 3\n");
+    BeginCompare();
+    CompareUnitBuffer("out", narrow, 3, 2);
+    Check(g_diffs == 1, "a line with more units than the capacity is a difference");
 }
 
 void ShapeSelfTest()

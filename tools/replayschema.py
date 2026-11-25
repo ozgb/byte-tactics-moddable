@@ -1950,6 +1950,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         k, _, fname = name.partition(".")
                         if (k, fname) not in object_index:
                             errors.append("%s.%s(%s): %s writes %s, which is no object field" % (sub, s["name"], a["name"], kname, name))
+                        elif object_index[(k, fname)] not in obj_reads:
+                            errors.append("%s.%s(%s): %s writes %s, which is not among the slot's reads, so no call records its value before" % (sub, s["name"], a["name"], kname, name))
                         else:
                             extra.add(object_index[(k, fname)])
                     if kname in names_of:

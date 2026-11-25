@@ -436,6 +436,7 @@ one of those, and a scenario that uses a console command or an order kind that t
 | orders-guard-reclaim | judged | - |
 | orders-immediate | judged | - |
 | orders-move-attack | judged | - |
+| orders-reclaim-feature | judged | - |
 | orders-tier2-core | judged | - |
 | orders-tier2-spider | judged | - |
 | orders-tier2-vader | judged | - |

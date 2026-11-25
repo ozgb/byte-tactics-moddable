@@ -220,6 +220,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | orders-build-patrol | The Pass | 2 | 600 | Human Arm commander builds a solar collector, then patrols (`build`, `patrol`) |
 | orders-guard-reclaim | The Pass | 2 | 600 | Human Arm commander builds a solar collector, guards it, then reclaims it (`build`, `guard`, `reclaim`) |
 | orders-move-attack | The Pass | 2 | 600 | Human Arm commander moves, attacks the Core commander, then the whole slot moves (`move`, `attack`, `<slot>:all`) |
+| orders-reclaim-feature | The Pass | 2 | 300 | Human Arm commander reclaims a tree the console places (`feature`, `reclaim` at a position), so features' `ReclaimFeature` answers a RECLAIM event at tick 245 |
 | quad-fox-holes | Fox Holes | 4 | 7200 | Four players on Fox Holes, alternating sides, four minutes |
 | quad-king-of-the-hill | King of the Hill | 4 | 9000 | Four players on King of the Hill in two allied teams of two, five minutes |
 | quad-lava-highground | Lava Highground | 4 | 5400 | Four Arm players on Lava Highground, random start positions, three minutes |
@@ -309,6 +310,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | orders-guard-reclaim | judged | - |
 | orders-immediate | judged | - |
 | orders-move-attack | judged | - |
+| orders-reclaim-feature | judged | - |
 | orders-tier2-core | judged | - |
 | orders-tier2-spider | judged | - |
 | orders-tier2-vader | judged | - |

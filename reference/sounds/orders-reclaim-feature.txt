@@ -1,0 +1,7 @@
+bt-sound 1
+0 stop_all - - - - -
+103 play_file reclaim1.WAV -585 - - -
+133 play_file reclaim1.WAV -585 - - -
+163 play_file reclaim1.WAV -585 - - -
+193 play_file reclaim1.WAV -585 - - -
+223 play_file reclaim1.WAV -585 - - -

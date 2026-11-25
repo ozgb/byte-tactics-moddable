@@ -971,6 +971,17 @@ A `SimGlobals` member that is an array of `Ref`s to separate objects (`g_playerA
 in `sim_fields`. The generator makes it one block field of kind `ref` an element, named `SimGlobals.g_playerAI[3]`, and a slot that reads or writes the array has them all in its sets.
 Each is written and restored as a `ref` of `Game` is, `r SimGlobals.g_playerAI[0] PlayerAI#1` or `null`, and the walk follows the object it names. The target is a state kind with no table, sites or kinds.
 
+A single `Ref` member is `{"kind": "ref", "target": KIND}`, one block field named after the member. los_radar's unit index is one: `SimGlobals.g_losUnitIndex` holds a `LosUnitIndex`,
+whose `players` are 10 embedded `LosUnitIndexEntry`s (`embeds`), named by their site. `CreateUnitIndex` allocates the index and stores the ref, so its `w` line names the object
+at first sight, and the replayer names the module's block the same way when it compares the line; `RefreshUnitIndex` writes the lists:
+
+```
+  i services.SimAlloc 440 = alloc#1
+  w SimGlobals.g_losUnitIndex LosUnitIndex#1
+  w LosUnitIndex#1.players[0].live 1
+  w LosUnitIndex#1.players[1].visible [2/2] Unit#1,Unit#2
+```
+
 ### A service that leaves a block field behind
 
 An entry of `services` may list `outs` of the form `{"label": "SimGlobals.g_lastPlaceMetalSum", "sim": "g_lastPlaceMetalSum"}`: the recorder writes `o SimGlobals.g_lastPlaceMetalSum 2007`
@@ -1365,9 +1376,8 @@ los_radar:
 - `Apply` of SHARE_MAP (`ShareMapInfo`), CELL_HEIGHTS and SIGHT_LOAD: no recorded scenario publishes them (the first comes from `UpdateResourceSharing` of a network game and the third from a loaded game, which the run-from-tick-0 recordings do not include).
 - The sight circle drawn from a frame of the `vismask` table, `GafFrame::pixelsOrLayers` (`mapFlags` bit 2 clear, `+lostype` off): `console-sight` reaches it and is not recorded, because the pixels of a GAF frame are loaded engine memory that the replayer would have to rebuild as a blob. The recorded scenarios all draw sight from the height-line tables (`Game.grid1`, `SimGlobals.g_losTables`).
 - `GetVisibleEnemiesInRadius` as a slot: its out buffer of units has no form in a slot (`units-buffer` is the form of an import), so the slot is `record: false` and targeting's recordings replay it as an import line.
-- The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers, and `HasReadyUnitInRange` needs a cloaking unit; the last two run when a match is unloaded.
+- The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers; `UpdateSensorRadarAndCloak` calls `HasReadyUnitInRange` for each unit that can cloak, so both recordings replay it as part of that slot (it reads the `visible` lists of the index and decides `Unit.flags` bit 0x1000 and `Unit.workTime`); the last two run when a match is unloaded.
 - `GetSeenUnitsInRadius`, `LoadMappingData`, `SaveMappingData`, `InitRadar`, `FreeRadar`, `LoadTntMap`, `FreeMapResources`: load class, or called by `ai` only.
-- The unit index (`LosUnitIndex`, `s_index` in `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window cannot restore it: los_radar is recorded as whole runs from tick 0, and the index is checked through the results of `HasReadyUnitInRange` and of targeting's `GetVisibleEnemiesInRadius` imports.
 
 ## Replaying
 

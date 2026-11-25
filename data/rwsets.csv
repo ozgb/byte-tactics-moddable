@@ -45153,13 +45153,14 @@ address,function,file,kind,target
 ,EnsureTable,src/harness/replay_objects.cpp,global_read,g_game
 ,EnsureTable,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,EnsureTable,src/harness/replay_objects.cpp,global_read,kReplayTables@src/harness/replay_schema.h
-,EnsureUnitIndex,src/map/line_of_sight_index.cpp,call,SimBlockTrack
+,EnsureUnitIndex,src/map/line_of_sight_index.cpp,call,operator LosUnitIndex *
+,EnsureUnitIndex,src/map/line_of_sight_index.cpp,call,operator bool
 ,EnsureUnitIndex,src/map/line_of_sight_index.cpp,call,operator new
+,EnsureUnitIndex,src/map/line_of_sight_index.cpp,call,operator=
 ,EnsureUnitIndex,src/map/line_of_sight_index.cpp,function,
-,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_escape,s_index@src/map/line_of_sight_index.cpp
+,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_read,kSim
-,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
-,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_write,s_index@src/map/line_of_sight_index.cpp
+,EnsureUnitIndex,src/map/line_of_sight_index.cpp,global_write,g_losUnitIndex
 ,EnterHarnessTestMode,src/util/test_mode.cpp,function,
 ,EnterHarnessTestMode,src/util/test_mode.cpp,global_write,s_testMode@src/util/test_mode.cpp
 ,EnterLoadingFrontend,src/harness/harness.cpp,field_write,Game::frontendNextSubState
@@ -45181,9 +45182,10 @@ address,function,file,kind,target
 ,EntriesLowerBound,src/util/tdf.cpp,call,end
 ,EntriesLowerBound,src/util/tdf.cpp,field_read,StringRef::ptr
 ,EntriesLowerBound,src/util/tdf.cpp,function,
+,EntryOf,src/map/line_of_sight_index.cpp,call,operator->
 ,EntryOf,src/map/line_of_sight_index.cpp,field_escape,LosUnitIndex::players
 ,EntryOf,src/map/line_of_sight_index.cpp,function,
-,EntryOf,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
+,EntryOf,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,EventLogDropped,src/ingame/sim_event_drain.cpp,call,EventLogPut
 ,EventLogDropped,src/ingame/sim_event_drain.cpp,call,sprintf
 ,EventLogDropped,src/ingame/sim_event_drain.cpp,field_read,Game::ticks
@@ -46305,12 +46307,14 @@ address,function,file,kind,target
 ,FreeTeam,src/network/net_game.cpp,function,
 ,FreeTeam,src/network/net_game.cpp,global_read,g_game
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,call,ReleaseUnits
+,FreeUnitIndex,src/map/line_of_sight_index.cpp,call,operator bool
+,FreeUnitIndex,src/map/line_of_sight_index.cpp,call,operator->
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,field_read,LosUnitIndex::players
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,field_read,LosUnitIndexEntry::known
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,field_read,LosUnitIndexEntry::visible
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,field_write,LosUnitIndexEntry::live
 ,FreeUnitIndex,src/map/line_of_sight_index.cpp,function,
-,FreeUnitIndex,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
+,FreeUnitIndex,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,FreeUnitPictureCache,src/graphics/model_render.cpp,call,UnitTable::Destroy
 ,FreeUnitPictureCache,src/graphics/model_render.cpp,call,operator delete
 ,FreeUnitPictureCache,src/graphics/model_render.cpp,deref_write,*UnitTable
@@ -50689,9 +50693,11 @@ address,function,file,kind,target
 ,LosTable::SetNumLines,src/map/los_lines.h,call,BlockVector::Resize
 ,LosTable::SetNumLines,src/map/los_lines.h,call,LosLine::~LosLine
 ,LosTable::SetNumLines,src/map/los_lines.h,function,
+,LosUnitIndexOf,src/map/line_of_sight_index.cpp,call,operator bool
+,LosUnitIndexOf,src/map/line_of_sight_index.cpp,call,operator->
 ,LosUnitIndexOf,src/map/line_of_sight_index.cpp,field_escape,LosUnitIndex::players
 ,LosUnitIndexOf,src/map/line_of_sight_index.cpp,function,
-,LosUnitIndexOf,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
+,LosUnitIndexOf,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,LosUnitOfHandle,src/map/line_of_sight.cpp,call,get
 ,LosUnitOfHandle,src/map/line_of_sight.cpp,field_write,Ref<Unit>::offset
 ,LosUnitOfHandle,src/map/line_of_sight.cpp,function,
@@ -57530,6 +57536,8 @@ address,function,file,kind,target
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,Unit::Ready
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,get
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,operator Unit *
+,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,operator bool
+,RefreshUnitIndex,src/map/line_of_sight_index.cpp,call,operator->
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,field_escape,Game::players
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,field_maybe_written,LosUnitIndexEntry::known
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,field_maybe_written,LosUnitIndexEntry::visible
@@ -57550,7 +57558,7 @@ address,function,file,kind,target
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,field_write,LosUnitIndexEntry::lastTick
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,function,
 ,RefreshUnitIndex,src/map/line_of_sight_index.cpp,global_read,g_game
-,RefreshUnitIndex,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
+,RefreshUnitIndex,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,RegionBind,src/harness/replay.cpp,call,SimBlockTrack
 ,RegionBind,src/harness/replay.cpp,field_maybe_written,RegionState::ptr
 ,RegionBind,src/harness/replay.cpp,field_write,RegionState::ptr
@@ -64460,6 +64468,8 @@ address,function,file,kind,target
 ,WriteGoal,src/movement/movement_apply.cpp,global_read,kPatrolGoal@src/movement/movement_apply.cpp
 ,WriteGoal,src/movement/movement_apply.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,call,WriteUnits
+,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,call,operator bool
+,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,call,operator->
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,call,sprintf
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,field_read,LosUnitIndex::players
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,field_read,LosUnitIndexEntry::hasSpecial
@@ -64469,7 +64479,7 @@ address,function,file,kind,target
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,field_read,StateWriter::Begin
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,field_read,StateWriter::Int
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,function,
-,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,global_read,s_index@src/map/line_of_sight_index.cpp
+,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,global_read,g_losUnitIndex
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,WriteLosUnitIndex,src/map/line_of_sight_index.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
 ,WriteNodes,src/ai/pathfind.cpp,call,NodeIsLive

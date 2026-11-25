@@ -3420,6 +3420,22 @@ class CompilerVtablesAndRefArrays(unittest.TestCase):
         ann["sim_fields"]["g_playerAI"]["target"] = "Player"
         self.has(ann, "SimGlobals.g_playerAI: the target Player is no state kind")
 
+    def test_a_ref_of_the_sim_globals_is_one_field(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        fields = [f for f in model["fields"] if f["name"].startswith("SimGlobals.g_losUnitIndex")]
+        self.assertEqual([(f["name"], f["kind"], f["target"], f["size"]) for f in fields], [("SimGlobals.g_losUnitIndex", "ref", "LosUnitIndex", 4)])
+        self.assertIn('{ "SimGlobals.g_losUnitIndex", offsetof(SimGlobals, g_losUnitIndex), 4, RB_SIM, RK_REF, 0, ROK_LOSUNITINDEX },', files[rs.SCHEMA_H])
+        self.assertIn("SimGlobals.g_losUnitIndex", model["subsystems"]["los_radar"]["slots"]["RefreshUnitIndex"]["reads"])
+
+    def test_a_ref_of_the_sim_globals_has_only_a_target(self):
+        ann = annotations()
+        ann["sim_fields"]["g_losUnitIndex"]["count"] = 1
+        self.has(ann, "SimGlobals.g_losUnitIndex: a ref of the block is")
+        ann = annotations()
+        ann["sim_fields"]["g_losUnitIndex"]["target"] = "Player"
+        self.has(ann, "SimGlobals.g_losUnitIndex: the target Player is no state kind")
+
 
 if __name__ == "__main__":
     unittest.main()

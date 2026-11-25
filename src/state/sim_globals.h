@@ -19,6 +19,7 @@
 #include "../util/vec3.h"
 
 struct ExplodedPiece;
+struct LosUnitIndex;
 struct PlayerAI;
 struct WeaponDef;
 
@@ -63,6 +64,7 @@ struct SimGlobals {
     unsigned char pad_be2c[4];
     unsigned int g_randomSeed;
     unsigned char pad_be3c[4];
+    Ref<LosUnitIndex> g_losUnitIndex;
     PassMapTable g_passMaps;
     Quirks g_quirks;
 };
@@ -155,6 +157,7 @@ static_assert(sizeof(((SimGlobals*)0)->g_losTables) == 16, "g_losTables size");
 #define pad_be2c (Sim().pad_be2c)
 #define g_randomSeed (Sim().g_randomSeed)
 #define pad_be3c (Sim().pad_be3c)
+#define g_losUnitIndex (Sim().g_losUnitIndex)
 #define g_passMaps (Sim().g_passMaps)
 #define g_quirks (Sim().g_quirks)
 typedef unsigned char SimType_g_meteorWeaponNameTail[28];

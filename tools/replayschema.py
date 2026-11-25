@@ -1953,13 +1953,18 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
         if isinstance(spec, dict) and spec.get("kind") == "vector":
             fields.append(block_vector(name, spec, "SimGlobals", vectors if vectors is not None else [], ann, errors))
             continue
-        if isinstance(spec, dict) and spec.get("kind") == "refs":
+        if isinstance(spec, dict) and spec.get("kind") in ("ref", "refs"):
             where = "SimGlobals.%s" % name
             found = (kinds or {}).get(spec.get("target"))
-            if set(spec) - {"kind", "count", "target"} or not isinstance(spec.get("count"), int) or spec["count"] < 1:
+            single = spec["kind"] == "ref"
+            if single and set(spec) - {"kind", "target"}:
+                errors.append("%s: a ref of the block is {\"kind\": \"ref\", \"target\": KIND}" % where)
+            elif not single and (set(spec) - {"kind", "count", "target"} or not isinstance(spec.get("count"), int) or spec["count"] < 1):
                 errors.append("%s: a ref array of the block is {\"kind\": \"refs\", \"count\": N, \"target\": KIND}" % where)
             elif found is None or found["scope"] != "state" or found.get("table") or found.get("inside") or found.get("kinds"):
                 errors.append("%s: the target %s is no state kind with no table, sites or kinds, which is named at first sight" % (where, spec.get("target")))
+            elif single:
+                fields.append({"name": where, "base": "sim", "offset": name, "size": 4, "kind": "ref", "target": spec["target"]})
             else:
                 for i in range(spec["count"]):
                     fields.append({"name": "%s[%d]" % (where, i), "base": "sim", "offset": "%s[%d]" % (name, i), "size": 4, "kind": "ref", "target": spec["target"]})

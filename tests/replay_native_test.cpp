@@ -508,14 +508,14 @@ unsigned char* BlockBase(const ReplayField& f)
     return f.base == RB_GAME ? (unsigned char*)g_game : (unsigned char*)g_simGlobals;
 }
 
-void FormatField(const ReplayField& f, ReplayText& out)
+void FormatField(const ReplayField& f, ReplayText& out, bool assign = false)
 {
     out.Clear();
     if (f.base == RB_RNG) {
         out.AddHex32(f.offset == 2 ? *SeedWord() : *SimRandStream((int)f.offset));
         return;
     }
-    ReplayFormatObjectField(ReplayFieldView(f), BlockBase(f), g_objects, false, out);
+    ReplayFormatObjectField(ReplayFieldView(f), BlockBase(f), g_objects, assign, out);
 }
 
 bool RestoreField(const ReplayField& f, const char* value)
@@ -2590,7 +2590,7 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             CompareBlockVector(f);
             continue;
         }
-        FormatField(f, value);
+        FormatField(f, value, true);
         HashText(value.Data());
         const char* known = g_known.Get(f.name);
         if (known == nullptr)

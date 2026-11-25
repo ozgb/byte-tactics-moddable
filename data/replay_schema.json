@@ -177,6 +177,10 @@
      "mode": "value",
      "kind": "LosTable"
     }
+   },
+   "g_losUnitIndex": {
+    "kind": "ref",
+    "target": "LosUnitIndex"
    }
   },
   "exempt": {
@@ -246,8 +250,6 @@
    "Ref<OrderFx>": "the offset of a Ref that the field holding it records whole",
    "Ref<OrderBase>": "the offset of a Ref that the field holding it records whole",
    "SightQuery": "a sight query on the stack, or an eyeball read as one",
-   "LosUnitIndex": "the unit index, module state outside the block that CreateUnitIndex builds at match load and RefreshUnitIndex rebuilds",
-   "LosUnitIndexEntry": "an entry of the unit index, module state outside the block",
    "DetectionVisitor": "the visitor of UpdateSensorRadarAndCloak, on its stack",
    "RadarDrawCapture": "the capture buffer of the radar, recorded as its snapshot",
    "RadarUnitCapture": "a unit of the capture buffer, recorded as its snapshot",
@@ -305,7 +307,8 @@
    "pack1:../ai/squad_timer.h",
    "../units/squad.h",
    "../weapons/debris.h",
-   "../weapons/explosion_types.h"
+   "../weapons/explosion_types.h",
+   "../map/line_of_sight_index.h"
   ],
   "objects": {
    "Player": {
@@ -5763,6 +5766,58 @@
       "target": "FrameTable"
      }
     ]
+   },
+   "LosUnitIndex": {
+    "type": "LosUnitIndex",
+    "scope": "state",
+    "fields": [
+     {
+      "name": "players",
+      "kind": "embeds",
+      "count": 10,
+      "target": "LosUnitIndexEntry"
+     }
+    ]
+   },
+   "LosUnitIndexEntry": {
+    "type": "LosUnitIndexEntry",
+    "scope": "state",
+    "inside": [
+     {
+      "kind": "LosUnitIndex",
+      "member": "players[]"
+     }
+    ],
+    "fields": [
+     {
+      "name": "live",
+      "kind": "i32"
+     },
+     {
+      "name": "lastTick",
+      "kind": "u32"
+     },
+     {
+      "name": "hasSpecial",
+      "kind": "i32"
+     },
+     {
+      "name": "visible",
+      "kind": "vector",
+      "elem": {
+       "mode": "object",
+       "kind": "Unit"
+      }
+     },
+     {
+      "name": "known",
+      "kind": "vector",
+      "elem": {
+       "mode": "object",
+       "kind": "Unit"
+      }
+     }
+    ]
    }
   },
   "rules": [
@@ -8832,8 +8887,10 @@
     "kind": "field_escape",
     "target": "LosUnitIndex::players",
     "rule": "fields",
-    "reads": [],
-    "note": "the unit index is module state outside the block, rebuilt from the start of a run"
+    "reads": [
+     "LosUnitIndex.players"
+    ],
+    "note": "EntryOf and LosUnitIndexOf hand out an entry of the index"
    },
    {
     "kind": "field_read",
@@ -13881,6 +13938,7 @@
   {"name": "SimGlobals.g_playerAI[9]", "base": "sim", "size": 4, "kind": "ref", "target": "PlayerAI"},
   {"name": "SimGlobals.g_missionOrderTableVec", "base": "sim", "size": 16, "kind": "vector", "vector": 1},
   {"name": "SimGlobals.g_losTables", "base": "sim", "size": 16, "kind": "vector", "vector": 2},
+  {"name": "SimGlobals.g_losUnitIndex", "base": "sim", "size": 4, "kind": "ref", "target": "LosUnitIndex"},
   {"name": "rng.main", "base": "rng", "size": 4, "kind": "u32"},
   {"name": "rng.load", "base": "rng", "size": 4, "kind": "u32"},
   {"name": "rng.seed", "base": "rng", "size": 4, "kind": "u32"},
@@ -13991,6 +14049,8 @@
   {"name": "GafSrc2", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "src2", "count": 1}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
   {"name": "GafSrc3", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "src3", "count": 1}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
   {"name": "GafLists", "type": "StringRef", "scope": "state", "table": {"base": "game", "member": "lists", "count": 3}, "inside": null, "fields": [{"name": "ptr", "kind": "ptr", "target": "FrameTable"}]},
+  {"name": "LosUnitIndex", "type": "LosUnitIndex", "scope": "state", "table": null, "inside": null, "fields": [{"name": "players", "kind": "embeds", "count": 10, "target": "LosUnitIndexEntry", "elems": 5}]},
+  {"name": "LosUnitIndexEntry", "type": "LosUnitIndexEntry", "scope": "state", "table": null, "inside": [{"kind": "LosUnitIndex", "member": "players[]"}], "fields": [{"name": "live", "kind": "i32"}, {"name": "lastTick", "kind": "u32"}, {"name": "hasSpecial", "kind": "i32"}, {"name": "visible", "kind": "vector", "elem": {"mode": "object", "kind": "Unit"}, "vector": 15, "target": "Unit"}, {"name": "known", "kind": "vector", "elem": {"mode": "object", "kind": "Unit"}, "vector": 16, "target": "Unit"}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
   {"name": "WindMeteorsLimits", "type": "WindMeteorsLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "min", "kind": "i32"}, {"name": "max", "kind": "i32"}]},
@@ -14249,14 +14309,14 @@
     "SoundHeardMask": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["SoundHeardMask", "GetMapCell"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.mapFlags", "region"], "writes": ["region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Cell.metal", "Cell.height", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Player", "Cell"], "args": [{"name": "at", "type": "Vec3*", "line": "at", "mode": "vec3", "label": "at"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "SoundHeardMask"},
     "UpdateUnitLineOfSight": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitLineOfSight", "SightCellOf", "SightFrameOf", "UpdateLineOfSight", "SightOf", "AddLineOfSight", "RemoveLineOfSight", "RevealAroundUnit", "ExploredCell", "LosLine::GetLosLineStep", "LosLine::GetLosLineStepCount", "LosTable::GetLosLine", "LosTable::GetLosLineCount", "LosTables::GetLosTable", "LosTables::GetLosTableCount", "LodRaw"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.flags_142f1", "Game.losTable", "Game.grid1.width", "Game.grid1.height", "Game.grid1.count", "Game.grid1.cells", "SimGlobals.g_losTables", "region"], "writes": ["Game.visibilityMask", "Game.mapFlags", "Game.flags_142f1", "SimGlobals.g_losTables", "region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.def", "Unit.player", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.modelMaxYHigh", "UnitDef.range", "FrameTable.count", "GafFrame.width", "GafFrame.height", "GafFrame.xOffset", "GafFrame.yOffset", "GafFrame.transparency", "Eye.player", "Eye.x", "Eye.flagA", "Eye.flagB", "Eye.posX", "Eye.posY", "Eye.posZ", "Eye.screenPos"], "objectWrites": ["Player.explored", "Eye.screenPos"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitLineOfSight"},
     "RecordRadarUnits": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarUnits", "CaptureUnit", "Player_Get", "RadarProjectileShown", "RadarUnitShown", "IsOnRadar", "ExploredOnRadar", "VisibleOnRadar"], "reads": ["Game.width", "Game.height", "Game.uiOptionFlags", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.projectileCount", "Game.unitsEnd", "region"], "writes": ["region"], "objectReads": ["Player.info", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.activateFlags", "Unit.id", "Unit.unitDefIndex", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Stockpile", "Unit.weapon1Stockpile", "Unit.weapon2Stockpile", "Unit.flags", "Unit.recentlyDamagedTimer", "Unit.def", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "UnitDef.flags1", "UnitDef.flags2", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "weapondef.flags", "weapondef.coverage", "PlayerInfo.color", "Projectile.attacker", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": ["Player", "Unit", "Projectile"], "args": [], "result": null, "native": "RecordRadarUnits"},
-    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak", "Game::Current", "IsExplored", "IsSeen", "InsideExplored", "DetectionVisitor::MarkUnitsInRadarOrSonarRadius", "RadarJamVisitor::ApplyRadarJamFlag", "SonarJamVisitor::ApplySonarJamFlag", "HasReadyUnitInRange", "EntryOf"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.unitsEnd", "Game.numPlayers", "region"], "writes": ["region"], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.allied", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.activateFlags", "Unit.workTime", "Unit.unitDefIndex", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.flags1", "UnitDef.flags2", "UnitDef.modelMaxY", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.mincloakdistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "PlayerInfo.flags_97_wide", "PlayerInfo.flags"], "objectWrites": ["Unit.flags"], "allOf": ["Player", "Unit"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
+    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak", "Game::Current", "IsExplored", "IsSeen", "InsideExplored", "DetectionVisitor::MarkUnitsInRadarOrSonarRadius", "RadarJamVisitor::ApplyRadarJamFlag", "SonarJamVisitor::ApplySonarJamFlag", "HasReadyUnitInRange", "EntryOf"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.unitsEnd", "Game.numPlayers", "SimGlobals.g_losUnitIndex", "region"], "writes": ["region"], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.allied", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.activateFlags", "Unit.workTime", "Unit.unitDefIndex", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.flags1", "UnitDef.flags2", "UnitDef.modelMaxY", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.mincloakdistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "PlayerInfo.flags_97_wide", "PlayerInfo.flags", "LosUnitIndex.players", "LosUnitIndexEntry.visible"], "objectWrites": ["Unit.flags"], "allOf": ["Player", "Unit"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
     "RecordRadarMapped": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarMapped"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex", "Game.flags_142f1", "region"], "writes": ["Game.flags_142f1", "region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": ["Player"], "args": [], "result": null, "native": "RecordRadarMapped"},
     "ExpireEyeballs": {"conv": "__stdcall", "ret": "void", "functions": ["ExpireEyeballs", "RemoveLineOfSight", "ExploredCell", "LosLine::GetLosLineStep", "LosLine::GetLosLineStepCount", "LosTable::GetLosLine", "LosTable::GetLosLineCount", "LosTables::GetLosTable", "LosTables::GetLosTableCount"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.mapFlags", "Game.playerIndex", "Game.count_14277", "Game.flags_142f1", "Game.losTable", "Game.grid1.width", "Game.grid1.height", "Game.grid1.count", "Game.grid1.cells", "SimGlobals.g_losTables", "region"], "writes": ["Game.mapFlags", "Game.count_14277", "Game.flags_142f1", "SimGlobals.g_losTables", "region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.posY", "GafFrame.width", "GafFrame.height", "GafFrame.transparency", "Eye.player", "Eye.x", "Eye.flagB", "Eye.posY", "Eye.expires", "Eye.screenPos"], "objectWrites": ["Player.explored"], "allOf": ["Eye"], "args": [], "result": null, "native": "ExpireEyeballs"},
-    "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "int", "functions": ["HasReadyUnitInRange", "EntryOf"], "reads": ["region"], "writes": ["region"], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
+    "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "int", "functions": ["HasReadyUnitInRange", "EntryOf"], "reads": ["SimGlobals.g_losUnitIndex", "region"], "writes": ["region"], "objectReads": ["Unit.flags", "LosUnitIndex.players", "LosUnitIndexEntry.visible"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
     "IsPointVisible": {"conv": "__stdcall", "ret": "int", "functions": ["IsPointVisible"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex", "region"], "writes": ["region"], "objectReads": ["Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPointVisible"},
-    "CreateUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["CreateUnitIndex", "EnsureUnitIndex"], "reads": ["region"], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "CreateUnitIndex"},
-    "FreeUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitIndex", "ReleaseUnits"], "reads": ["region"], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "FreeUnitIndex"},
-    "RefreshUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshUnitIndex", "IsUnitVisibleToPlayer", "Unit::PlayerIndex", "Unit::Ready", "IsVisible", "IsVisibleByMask", "IsExplored", "IsPointVisible", "IsSeen", "InsideExplored"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.unitsEnd", "region"], "writes": ["region"], "objectReads": ["Player.allied", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.activateFlags", "Unit.flags", "Unit.buildLeft", "Unit.def", "Unit.player", "UnitDef.flags1", "UnitDef.modelMaxY", "UnitDef.modelMinX", "UnitDef.modelMinZ", "UnitDef.modelSizeZ", "UnitDef.modelSizeX", "UnitDef.modelSizeY"], "objectWrites": [], "allOf": ["Player", "Unit"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "RefreshUnitIndex"},
+    "CreateUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["CreateUnitIndex", "EnsureUnitIndex"], "reads": ["SimGlobals.g_losUnitIndex", "region"], "writes": ["SimGlobals.g_losUnitIndex", "region"], "objectReads": ["LosUnitIndex.players", "LosUnitIndexEntry.visible", "LosUnitIndexEntry.known"], "objectWrites": ["LosUnitIndexEntry.live", "LosUnitIndexEntry.lastTick", "LosUnitIndexEntry.hasSpecial", "LosUnitIndexEntry.visible", "LosUnitIndexEntry.known"], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "CreateUnitIndex"},
+    "FreeUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitIndex", "ReleaseUnits"], "reads": ["SimGlobals.g_losUnitIndex", "region"], "writes": ["region"], "objectReads": ["LosUnitIndex.players", "LosUnitIndexEntry.visible", "LosUnitIndexEntry.known"], "objectWrites": ["LosUnitIndexEntry.live"], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "FreeUnitIndex"},
+    "RefreshUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshUnitIndex", "IsUnitVisibleToPlayer", "Unit::PlayerIndex", "Unit::Ready", "IsVisible", "IsVisibleByMask", "IsExplored", "IsPointVisible", "IsSeen", "InsideExplored"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.unitsEnd", "SimGlobals.g_losUnitIndex", "region"], "writes": ["region"], "objectReads": ["Player.allied", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Player.index", "Unit.activateFlags", "Unit.flags", "Unit.buildLeft", "Unit.def", "Unit.player", "UnitDef.flags1", "UnitDef.modelMaxY", "UnitDef.modelMinX", "UnitDef.modelMinZ", "UnitDef.modelSizeZ", "UnitDef.modelSizeX", "UnitDef.modelSizeY", "LosUnitIndex.players", "LosUnitIndexEntry.live", "LosUnitIndexEntry.lastTick", "LosUnitIndexEntry.visible", "LosUnitIndexEntry.known"], "objectWrites": ["LosUnitIndexEntry.lastTick", "LosUnitIndexEntry.hasSpecial", "LosUnitIndexEntry.visible", "LosUnitIndexEntry.known"], "allOf": ["Player", "Unit"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "RefreshUnitIndex"},
     "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["LosRadarRegionSize"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "LosRadarRegionSize"},
     "Init": {"conv": "__stdcall", "ret": "void", "functions": ["LosRadarInit"], "reads": [], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}, {"name": "region", "type": "void*", "line": "region", "mode": "region"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "LosRadarInit"},
     "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": ["LosRadarShutdown"], "reads": ["region"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "region"}, "native": "LosRadarShutdown"}

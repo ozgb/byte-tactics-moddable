@@ -5378,7 +5378,7 @@ static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 42, 
 static const unsigned short kReplayFeaturesApplyAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL, ROK_WEAPONHIT };
 static const unsigned char kReplayFeaturesApplyReads[] = { 1, 2, 18, 19, 22, 89, 90, 91 };
 static const unsigned char kReplayFeaturesApplyWrites[] = { 89, 90, 91 };
-static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 42, 43, 197, 224, 236, 239, 240, 241, 242, 245, 401, 402, 407, 408, 409, 410, 411, 412, 416, 417, 420, 422, 427, 428, 429, 430, 431, 432, 433, 434, 435, 439, 440, 441, 444, 445, 447, 448, 449, 640, 641 };
+static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 42, 43, 99, 197, 224, 236, 239, 240, 241, 242, 245, 401, 402, 407, 408, 409, 410, 411, 412, 416, 417, 418, 419, 420, 422, 427, 428, 429, 430, 431, 432, 433, 434, 435, 439, 440, 441, 444, 445, 447, 448, 449, 640, 641 };
 static const unsigned short kReplayFeaturesApplyObjWrites[] = { 239, 240, 241, 242, 245, 428, 429, 430, 431, 432, 433, 434, 435, 439, 440, 441, 442, 443, 444, 447, 448, 449 };
 static const unsigned short kReplayFeaturesPlaceAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
 static const unsigned char kReplayFeaturesPlaceReads[] = { 1, 2 };
@@ -5400,7 +5400,7 @@ static const unsigned char kReplayFeaturesUpdateFeatureSpotReads[] = { 0, 1, 2, 
 static const unsigned char kReplayFeaturesUpdateFeatureSpotWrites[] = { 89, 90, 91 };
 static const unsigned short kReplayFeaturesUpdateFeatureSpotObjReads[] = { 42, 43, 236, 239, 240, 241, 242, 245, 386, 387, 388, 389, 398, 401, 402, 407, 408, 415, 416, 420, 421, 422, 424, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 441, 442, 443, 444, 445, 447, 448, 449 };
 static const unsigned short kReplayFeaturesUpdateFeatureSpotObjWrites[] = { 239, 240, 241, 242, 245, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 447, 448, 449 };
-static const unsigned short kReplayFeaturesFindFeatureAtPosAllOf[] = { ROK_FEATURE };
+static const unsigned short kReplayFeaturesFindFeatureAtPosAllOf[] = { ROK_CELL, ROK_FEATURE };
 static const unsigned char kReplayFeaturesFindFeatureAtPosReads[] = { 1, 2 };
 static const unsigned short kReplayFeaturesFindFeatureAtPosObjReads[] = { 42, 43, 239, 240, 241, 401 };
 static const unsigned char kReplayAiApplyReads[] = { 0, 15, 39, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 89, 90, 91 };
@@ -5731,14 +5731,14 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UnitAccount", SUB_ECONOMY, kReplayEconomyUnitAccountReads, 1, kReplayEconomyUnitAccountWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 2, nullptr, 0, kReplayFeaturesGetCellFeatureObjReads, 3, nullptr, 0, nullptr, 0 },
     { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 42, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
+    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 45, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
     { "Place", SUB_FEATURES, kReplayFeaturesPlaceReads, 2, nullptr, 0, kReplayFeaturesPlaceObjReads, 18, kReplayFeaturesPlaceObjWrites, 19, kReplayFeaturesPlaceAllOf, 4 },
     { "FeatureTypeCount", SUB_FEATURES, kReplayFeaturesFeatureTypeCountReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AnimateFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesAnimateFeatureTypeObjReads, 3, kReplayFeaturesAnimateFeatureTypeObjWrites, 2, kReplayFeaturesAnimateFeatureTypeAllOf, 1 },
     { "ScanFeatureCell", SUB_FEATURES, kReplayFeaturesScanFeatureCellReads, 6, kReplayFeaturesScanFeatureCellWrites, 4, kReplayFeaturesScanFeatureCellObjReads, 21, kReplayFeaturesScanFeatureCellObjWrites, 19, kReplayFeaturesScanFeatureCellAllOf, 4 },
     { "FirstFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesFirstFeatureSpotObjReads, 1, nullptr, 0, kReplayFeaturesFirstFeatureSpotAllOf, 1 },
     { "UpdateFeatureSpot", SUB_FEATURES, kReplayFeaturesUpdateFeatureSpotReads, 10, kReplayFeaturesUpdateFeatureSpotWrites, 3, kReplayFeaturesUpdateFeatureSpotObjReads, 44, kReplayFeaturesUpdateFeatureSpotObjWrites, 25, kReplayFeaturesUpdateFeatureSpotAllOf, 4 },
-    { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 1 },
+    { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 2 },
     { "Apply", SUB_AI, kReplayAiApplyReads, 17, kReplayAiApplyWrites, 4, kReplayAiApplyObjReads, 13, kReplayAiApplyObjWrites, 4, nullptr, 0 },
     { "DumpPlayerAI", SUB_AI, kReplayAiDumpPlayerAIReads, 13, nullptr, 0, kReplayAiDumpPlayerAIObjReads, 7, kReplayAiDumpPlayerAIObjWrites, 3, kReplayAiDumpPlayerAIAllOf, 1 },
     { "ResetAIPlayers", SUB_AI, kReplayAiResetAIPlayersReads, 11, nullptr, 0, kReplayAiResetAIPlayersObjReads, 10, nullptr, 0, kReplayAiResetAIPlayersAllOf, 1 },

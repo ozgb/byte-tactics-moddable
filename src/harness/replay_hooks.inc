@@ -350,8 +350,6 @@ void __stdcall RecFeaturesGetFootprintCentre(const Point16* a0, Feature* a1, Vec
 
 int __stdcall RecFeaturesApply(const FeaturesEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == FEATURES_RECLAIM))
-        return s_inner_features->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_FEATURES, a0, a1);
     SlotScope scope(RSL_FEATURES_APPLY, SUB_FEATURES, roots);
@@ -5178,6 +5176,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDFEATUREKILLED)
             return true;
+        if (slot == RSL_NETWORK_SENDFEATURERECLAIMED)
+            return true;
         if (slot == RSL_PATHFINDING_CELLSCHANGED)
             return true;
         if (slot == RSL_SCRIPTS_OBJECTSTATESIZE)
@@ -5954,7 +5954,7 @@ void HookSeams(const bool* on)
         s_rec_network.SendFeatureKilled = RecNetworkSendFeatureKilled;
     if (on[SUB_NETWORK] || on[SUB_FEATURES])
         s_rec_network.SendFeatureBurning = RecNetworkSendFeatureBurning;
-    if (on[SUB_NETWORK] || on[SUB_ORDERS])
+    if (on[SUB_NETWORK] || on[SUB_FEATURES] || on[SUB_ORDERS])
         s_rec_network.SendFeatureReclaimed = RecNetworkSendFeatureReclaimed;
     if (on[SUB_NETWORK] || on[SUB_ORDERS])
         s_rec_network.SendScriptCall = RecNetworkSendScriptCall;

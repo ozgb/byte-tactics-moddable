@@ -13085,6 +13085,8 @@ call 182 Apply
   r Feature#0.seqreclamateshad null
   r Feature#0.burnTime 0
   r Feature#0.damage 32009
+  r Feature#0.energy f32:0x00000000
+  r Feature#0.metal f32:0x435f0000
   r Feature#0.dead 65535
   r Feature#0.reclamate 65535
   r Feature#1.seqburn FrameTable#1
@@ -13095,6 +13097,8 @@ call 182 Apply
   r Feature#1.seqreclamateshad null
   r Feature#1.burnTime 150
   r Feature#1.damage 0
+  r Feature#1.energy f32:0x437a0000
+  r Feature#1.metal f32:0x00000000
   r Feature#1.dead 231
   r Feature#1.reclamate 231
   r Feature#2.seqburn FrameTable#4
@@ -13105,6 +13109,8 @@ call 182 Apply
   r Feature#2.seqreclamateshad null
   r Feature#2.burnTime 150
   r Feature#2.damage 0
+  r Feature#2.energy f32:0x437a0000
+  r Feature#2.metal f32:0x00000000
   r Feature#2.dead 233
   r Feature#2.reclamate 231
   r Feature#3.seqburn FrameTable#6
@@ -13115,6 +13121,8 @@ call 182 Apply
   r Feature#3.seqreclamateshad null
   r Feature#3.burnTime 150
   r Feature#3.damage 0
+  r Feature#3.energy f32:0x437a0000
+  r Feature#3.metal f32:0x00000000
   r Feature#3.dead 235
   r Feature#3.reclamate 231
   r Feature#4.seqburn FrameTable#8
@@ -13125,6 +13133,8 @@ call 182 Apply
   r Feature#4.seqreclamateshad null
   r Feature#4.burnTime 150
   r Feature#4.damage 0
+  r Feature#4.energy f32:0x437a0000
+  r Feature#4.metal f32:0x00000000
   r Feature#4.dead 233
   r Feature#4.reclamate 233
   r Feature#5.seqburn FrameTable#11
@@ -13135,6 +13145,8 @@ call 182 Apply
   r Feature#5.seqreclamateshad null
   r Feature#5.burnTime 150
   r Feature#5.damage 0
+  r Feature#5.energy f32:0x437a0000
+  r Feature#5.metal f32:0x00000000
   r Feature#5.dead 238
   r Feature#5.reclamate 238
   r Feature#6.seqburn FrameTable#13
@@ -13145,6 +13157,8 @@ call 182 Apply
   r Feature#6.seqreclamateshad null
   r Feature#6.burnTime 150
   r Feature#6.damage 0
+  r Feature#6.energy f32:0x437a0000
+  r Feature#6.metal f32:0x00000000
   r Feature#6.dead 235
   r Feature#6.reclamate 235
   r Feature#7.seqburn null
@@ -13155,6 +13169,8 @@ call 182 Apply
   r Feature#7.seqreclamateshad null
   r Feature#7.burnTime 0
   r Feature#7.damage 1680
+  r Feature#7.energy f32:0x00000000
+  r Feature#7.metal f32:0x44dd0000
   r Feature#7.dead 241
   r Feature#7.reclamate 231
   r Feature#8.seqburn null
@@ -13165,6 +13181,8 @@ call 182 Apply
   r Feature#8.seqreclamateshad null
   r Feature#8.burnTime 0
   r Feature#8.damage 1888
+  r Feature#8.energy f32:0x00000000
+  r Feature#8.metal f32:0x4487c000
   r Feature#8.dead 65535
   r Feature#8.reclamate 231
   r Feature#9.seqburn null
@@ -13175,6 +13193,8 @@ call 182 Apply
   r Feature#9.seqreclamateshad null
   r Feature#9.burnTime 0
   r Feature#9.damage 832
+  r Feature#9.energy f32:0x00000000
+  r Feature#9.metal f32:0x43700000
   r Feature#9.dead 242
   r Feature#9.reclamate 231
   r Feature#10.seqburn null
@@ -13185,6 +13205,8 @@ call 182 Apply
   r Feature#10.seqreclamateshad null
   r Feature#10.burnTime 0
   r Feature#10.damage 288
+  r Feature#10.energy f32:0x00000000
+  r Feature#10.metal f32:0x440b0000
   r Feature#10.dead 65535
   r Feature#10.reclamate 231
   r Feature#11.seqburn null
@@ -13195,6 +13217,8 @@ call 182 Apply
   r Feature#11.seqreclamateshad null
   r Feature#11.burnTime 0
   r Feature#11.damage 964
+  r Feature#11.energy f32:0x00000000
+  r Feature#11.metal f32:0x43c08000
   r Feature#11.dead 243
   r Feature#11.reclamate 231
   r Feature#12.seqburn null
@@ -13205,6 +13229,8 @@ call 182 Apply
   r Feature#12.seqreclamateshad null
   r Feature#12.burnTime 0
   r Feature#12.damage 300
+  r Feature#12.energy f32:0x00000000
+  r Feature#12.metal f32:0x42c00000
   r Feature#12.dead 65535
   r Feature#12.reclamate 231
   r Feature#13.seqburn null
@@ -13215,6 +13241,8 @@ call 182 Apply
   r Feature#13.seqreclamateshad null
   r Feature#13.burnTime 0
   r Feature#13.damage 2404
+  r Feature#13.energy f32:0x00000000
+  r Feature#13.metal f32:0x44c8c000
   r Feature#13.dead 244
   r Feature#13.reclamate 231
   r Feature#14.seqburn null
@@ -13225,6 +13253,8 @@ call 182 Apply
   r Feature#14.seqreclamateshad null
   r Feature#14.burnTime 0
   r Feature#14.damage 1326
+  r Feature#14.energy f32:0x00000000
+  r Feature#14.metal f32:0x44c84000
   r Feature#14.dead 245
   r Feature#14.reclamate 231
   r Feature#15.seqburn null
@@ -13235,6 +13265,8 @@ call 182 Apply
   r Feature#15.seqreclamateshad null
   r Feature#15.burnTime 0
   r Feature#15.damage 624
+  r Feature#15.energy f32:0x00000000
+  r Feature#15.metal f32:0x4477c000
   r Feature#15.dead 246
   r Feature#15.reclamate 231
   r Feature#16.seqburn null
@@ -13245,6 +13277,8 @@ call 182 Apply
   r Feature#16.seqreclamateshad null
   r Feature#16.burnTime 0
   r Feature#16.damage 640
+  r Feature#16.energy f32:0x00000000
+  r Feature#16.metal f32:0x434c0000
   r Feature#16.dead 247
   r Feature#16.reclamate 231
   r Feature#17.seqburn null
@@ -13255,6 +13289,8 @@ call 182 Apply
   r Feature#17.seqreclamateshad null
   r Feature#17.burnTime 0
   r Feature#17.damage 464
+  r Feature#17.energy f32:0x00000000
+  r Feature#17.metal f32:0x42d20000
   r Feature#17.dead 65535
   r Feature#17.reclamate 231
   r Feature#18.seqburn null
@@ -13265,6 +13301,8 @@ call 182 Apply
   r Feature#18.seqreclamateshad null
   r Feature#18.burnTime 0
   r Feature#18.damage 1128
+  r Feature#18.energy f32:0x00000000
+  r Feature#18.metal f32:0x45474000
   r Feature#18.dead 248
   r Feature#18.reclamate 231
   r Feature#19.seqburn null
@@ -13275,6 +13313,8 @@ call 182 Apply
   r Feature#19.seqreclamateshad null
   r Feature#19.burnTime 0
   r Feature#19.damage 1480
+  r Feature#19.energy f32:0x00000000
+  r Feature#19.metal f32:0x442a0000
   r Feature#19.dead 249
   r Feature#19.reclamate 231
   r Feature#20.seqburn null
@@ -13285,6 +13325,8 @@ call 182 Apply
   r Feature#20.seqreclamateshad null
   r Feature#20.burnTime 0
   r Feature#20.damage 44
+  r Feature#20.energy f32:0x00000000
+  r Feature#20.metal f32:0x42100000
   r Feature#20.dead 250
   r Feature#20.reclamate 231
   r Feature#21.seqburn null
@@ -13295,6 +13337,8 @@ call 182 Apply
   r Feature#21.seqreclamateshad null
   r Feature#21.burnTime 0
   r Feature#21.damage 144
+  r Feature#21.energy f32:0x00000000
+  r Feature#21.metal f32:0x42400000
   r Feature#21.dead 251
   r Feature#21.reclamate 231
   r Feature#22.seqburn null
@@ -13305,6 +13349,8 @@ call 182 Apply
   r Feature#22.seqreclamateshad null
   r Feature#22.burnTime 0
   r Feature#22.damage 256
+  r Feature#22.energy f32:0x00000000
+  r Feature#22.metal f32:0x43020000
   r Feature#22.dead 65535
   r Feature#22.reclamate 231
   r Feature#23.seqburn null
@@ -13315,6 +13361,8 @@ call 182 Apply
   r Feature#23.seqreclamateshad null
   r Feature#23.burnTime 0
   r Feature#23.damage 544
+  r Feature#23.energy f32:0x00000000
+  r Feature#23.metal f32:0x43aa0000
   r Feature#23.dead 252
   r Feature#23.reclamate 231
   r Feature#24.seqburn null
@@ -13325,6 +13373,8 @@ call 182 Apply
   r Feature#24.seqreclamateshad null
   r Feature#24.burnTime 0
   r Feature#24.damage 24000
+  r Feature#24.energy f32:0x00000000
+  r Feature#24.metal f32:0x44fc6000
   r Feature#24.dead 65535
   r Feature#24.reclamate 231
   r Feature#25.seqburn null
@@ -13335,6 +13385,8 @@ call 182 Apply
   r Feature#25.seqreclamateshad null
   r Feature#25.burnTime 0
   r Feature#25.damage 1160
+  r Feature#25.energy f32:0x00000000
+  r Feature#25.metal f32:0x4420c000
   r Feature#25.dead 65535
   r Feature#25.reclamate 231
   r Feature#26.seqburn null
@@ -13345,6 +13397,8 @@ call 182 Apply
   r Feature#26.seqreclamateshad null
   r Feature#26.burnTime 0
   r Feature#26.damage 1948
+  r Feature#26.energy f32:0x00000000
+  r Feature#26.metal f32:0x44c66000
   r Feature#26.dead 253
   r Feature#26.reclamate 231
   r Feature#27.seqburn null
@@ -13355,6 +13409,8 @@ call 182 Apply
   r Feature#27.seqreclamateshad null
   r Feature#27.burnTime 0
   r Feature#27.damage 24000
+  r Feature#27.energy f32:0x00000000
+  r Feature#27.metal f32:0x455c3000
   r Feature#27.dead 65535
   r Feature#27.reclamate 231
   r Feature#28.seqburn null
@@ -13365,6 +13421,8 @@ call 182 Apply
   r Feature#28.seqreclamateshad null
   r Feature#28.burnTime 0
   r Feature#28.damage 8800
+  r Feature#28.energy f32:0x00000000
+  r Feature#28.metal f32:0x45825800
   r Feature#28.dead 254
   r Feature#28.reclamate 231
   r Feature#29.seqburn null
@@ -13375,6 +13433,8 @@ call 182 Apply
   r Feature#29.seqreclamateshad null
   r Feature#29.burnTime 0
   r Feature#29.damage 1440
+  r Feature#29.energy f32:0x00000000
+  r Feature#29.metal f32:0x45819800
   r Feature#29.dead 255
   r Feature#29.reclamate 231
   r Feature#30.seqburn null
@@ -13385,6 +13445,8 @@ call 182 Apply
   r Feature#30.seqreclamateshad null
   r Feature#30.burnTime 0
   r Feature#30.damage 1682
+  r Feature#30.energy f32:0x00000000
+  r Feature#30.metal f32:0x43bb0000
   r Feature#30.dead 256
   r Feature#30.reclamate 231
   r Feature#31.seqburn null
@@ -13395,6 +13457,8 @@ call 182 Apply
   r Feature#31.seqreclamateshad null
   r Feature#31.burnTime 0
   r Feature#31.damage 24000
+  r Feature#31.energy f32:0x00000000
+  r Feature#31.metal f32:0x44894000
   r Feature#31.dead 65535
   r Feature#31.reclamate 231
   r Feature#32.seqburn null
@@ -13405,6 +13469,8 @@ call 182 Apply
   r Feature#32.seqreclamateshad null
   r Feature#32.burnTime 0
   r Feature#32.damage 578
+  r Feature#32.energy f32:0x00000000
+  r Feature#32.metal f32:0x439e8000
   r Feature#32.dead 65535
   r Feature#32.reclamate 231
   r Feature#33.seqburn null
@@ -13415,6 +13481,8 @@ call 182 Apply
   r Feature#33.seqreclamateshad null
   r Feature#33.burnTime 0
   r Feature#33.damage 560
+  r Feature#33.energy f32:0x00000000
+  r Feature#33.metal f32:0x42c00000
   r Feature#33.dead 257
   r Feature#33.reclamate 231
   r Feature#34.seqburn null
@@ -13425,6 +13493,8 @@ call 182 Apply
   r Feature#34.seqreclamateshad null
   r Feature#34.burnTime 0
   r Feature#34.damage 1760
+  r Feature#34.energy f32:0x00000000
+  r Feature#34.metal f32:0x45878000
   r Feature#34.dead 258
   r Feature#34.reclamate 231
   r Feature#35.seqburn null
@@ -13435,6 +13505,8 @@ call 182 Apply
   r Feature#35.seqreclamateshad null
   r Feature#35.burnTime 0
   r Feature#35.damage 984
+  r Feature#35.energy f32:0x00000000
+  r Feature#35.metal f32:0x436e0000
   r Feature#35.dead 259
   r Feature#35.reclamate 231
   r Feature#36.seqburn null
@@ -13445,6 +13517,8 @@ call 182 Apply
   r Feature#36.seqreclamateshad null
   r Feature#36.burnTime 0
   r Feature#36.damage 24000
+  r Feature#36.energy f32:0x00000000
+  r Feature#36.metal f32:0x44abe000
   r Feature#36.dead 65535
   r Feature#36.reclamate 231
   r Feature#37.seqburn null
@@ -13455,6 +13529,8 @@ call 182 Apply
   r Feature#37.seqreclamateshad null
   r Feature#37.burnTime 0
   r Feature#37.damage 24000
+  r Feature#37.energy f32:0x00000000
+  r Feature#37.metal f32:0x434c0000
   r Feature#37.dead 65535
   r Feature#37.reclamate 231
   r Feature#38.seqburn null
@@ -13465,6 +13541,8 @@ call 182 Apply
   r Feature#38.seqreclamateshad null
   r Feature#38.burnTime 0
   r Feature#38.damage 696
+  r Feature#38.energy f32:0x00000000
+  r Feature#38.metal f32:0x43140000
   r Feature#38.dead 260
   r Feature#38.reclamate 231
   r Feature#39.seqburn null
@@ -13475,6 +13553,8 @@ call 182 Apply
   r Feature#39.seqreclamateshad null
   r Feature#39.burnTime 0
   r Feature#39.damage 3288
+  r Feature#39.energy f32:0x00000000
+  r Feature#39.metal f32:0x45d5a000
   r Feature#39.dead 261
   r Feature#39.reclamate 231
   r Feature#40.seqburn null
@@ -13485,6 +13565,8 @@ call 182 Apply
   r Feature#40.seqreclamateshad null
   r Feature#40.burnTime 0
   r Feature#40.damage 4000
+  r Feature#40.energy f32:0x00000000
+  r Feature#40.metal f32:0x41000000
   r Feature#40.dead 262
   r Feature#40.reclamate 231
   r Feature#41.seqburn null
@@ -13495,6 +13577,8 @@ call 182 Apply
   r Feature#41.seqreclamateshad null
   r Feature#41.burnTime 0
   r Feature#41.damage 2048
+  r Feature#41.energy f32:0x00000000
+  r Feature#41.metal f32:0x44b42000
   r Feature#41.dead 263
   r Feature#41.reclamate 231
   r Feature#42.seqburn null
@@ -13505,6 +13589,8 @@ call 182 Apply
   r Feature#42.seqreclamateshad null
   r Feature#42.burnTime 0
   r Feature#42.damage 800
+  r Feature#42.energy f32:0x00000000
+  r Feature#42.metal f32:0x43400000
   r Feature#42.dead 264
   r Feature#42.reclamate 231
   r Feature#43.seqburn null
@@ -13515,6 +13601,8 @@ call 182 Apply
   r Feature#43.seqreclamateshad null
   r Feature#43.burnTime 0
   r Feature#43.damage 664
+  r Feature#43.energy f32:0x00000000
+  r Feature#43.metal f32:0x43c00000
   r Feature#43.dead 265
   r Feature#43.reclamate 231
   r Feature#44.seqburn null
@@ -13525,6 +13613,8 @@ call 182 Apply
   r Feature#44.seqreclamateshad null
   r Feature#44.burnTime 0
   r Feature#44.damage 440
+  r Feature#44.energy f32:0x00000000
+  r Feature#44.metal f32:0x42f20000
   r Feature#44.dead 266
   r Feature#44.reclamate 231
   r Feature#45.seqburn null
@@ -13535,6 +13625,8 @@ call 182 Apply
   r Feature#45.seqreclamateshad null
   r Feature#45.burnTime 0
   r Feature#45.damage 63
+  r Feature#45.energy f32:0x00000000
+  r Feature#45.metal f32:0x41f00000
   r Feature#45.dead 267
   r Feature#45.reclamate 231
   r Feature#46.seqburn null
@@ -13545,6 +13637,8 @@ call 182 Apply
   r Feature#46.seqreclamateshad null
   r Feature#46.burnTime 0
   r Feature#46.damage 3800
+  r Feature#46.energy f32:0x00000000
+  r Feature#46.metal f32:0x41800000
   r Feature#46.dead 65535
   r Feature#46.reclamate 65535
   r Feature#47.seqburn null
@@ -13555,6 +13649,8 @@ call 182 Apply
   r Feature#47.seqreclamateshad null
   r Feature#47.burnTime 0
   r Feature#47.damage 1108
+  r Feature#47.energy f32:0x00000000
+  r Feature#47.metal f32:0x43df0000
   r Feature#47.dead 65535
   r Feature#47.reclamate 231
   r Feature#48.seqburn null
@@ -13565,6 +13661,8 @@ call 182 Apply
   r Feature#48.seqreclamateshad null
   r Feature#48.burnTime 0
   r Feature#48.damage 800
+  r Feature#48.energy f32:0x00000000
+  r Feature#48.metal f32:0x439f0000
   r Feature#48.dead 268
   r Feature#48.reclamate 231
   r Feature#49.seqburn null
@@ -13575,6 +13673,8 @@ call 182 Apply
   r Feature#49.seqreclamateshad null
   r Feature#49.burnTime 0
   r Feature#49.damage 1219
+  r Feature#49.energy f32:0x00000000
+  r Feature#49.metal f32:0x4455c000
   r Feature#49.dead 269
   r Feature#49.reclamate 231
   r Feature#50.seqburn null
@@ -13585,6 +13685,8 @@ call 182 Apply
   r Feature#50.seqreclamateshad null
   r Feature#50.burnTime 0
   r Feature#50.damage 500
+  r Feature#50.energy f32:0x00000000
+  r Feature#50.metal f32:0x42aa0000
   r Feature#50.dead 270
   r Feature#50.reclamate 231
   r Feature#51.seqburn null
@@ -13595,6 +13697,8 @@ call 182 Apply
   r Feature#51.seqreclamateshad null
   r Feature#51.burnTime 0
   r Feature#51.damage 53
+  r Feature#51.energy f32:0x00000000
+  r Feature#51.metal f32:0x420c0000
   r Feature#51.dead 271
   r Feature#51.reclamate 231
   r Feature#52.seqburn null
@@ -13605,6 +13709,8 @@ call 182 Apply
   r Feature#52.seqreclamateshad null
   r Feature#52.burnTime 0
   r Feature#52.damage 1600
+  r Feature#52.energy f32:0x00000000
+  r Feature#52.metal f32:0x41b80000
   r Feature#52.dead 262
   r Feature#52.reclamate 231
   r Feature#53.seqburn null
@@ -13615,6 +13721,8 @@ call 182 Apply
   r Feature#53.seqreclamateshad null
   r Feature#53.burnTime 0
   r Feature#53.damage 202
+  r Feature#53.energy f32:0x00000000
+  r Feature#53.metal f32:0x42600000
   r Feature#53.dead 65535
   r Feature#53.reclamate 231
   r Feature#54.seqburn null
@@ -13625,6 +13733,8 @@ call 182 Apply
   r Feature#54.seqreclamateshad null
   r Feature#54.burnTime 0
   r Feature#54.damage 2480
+  r Feature#54.energy f32:0x00000000
+  r Feature#54.metal f32:0x45804000
   r Feature#54.dead 272
   r Feature#54.reclamate 231
   r Feature#55.seqburn null
@@ -13635,6 +13745,8 @@ call 182 Apply
   r Feature#55.seqreclamateshad null
   r Feature#55.burnTime 0
   r Feature#55.damage 2301
+  r Feature#55.energy f32:0x00000000
+  r Feature#55.metal f32:0x471ca400
   r Feature#55.dead 273
   r Feature#55.reclamate 231
   r Feature#56.seqburn null
@@ -13645,6 +13757,8 @@ call 182 Apply
   r Feature#56.seqreclamateshad null
   r Feature#56.burnTime 0
   r Feature#56.damage 704
+  r Feature#56.energy f32:0x00000000
+  r Feature#56.metal f32:0x43d00000
   r Feature#56.dead 274
   r Feature#56.reclamate 231
   r Feature#57.seqburn null
@@ -13655,6 +13769,8 @@ call 182 Apply
   r Feature#57.seqreclamateshad null
   r Feature#57.burnTime 0
   r Feature#57.damage 2302
+  r Feature#57.energy f32:0x00000000
+  r Feature#57.metal f32:0x44c2a000
   r Feature#57.dead 275
   r Feature#57.reclamate 231
   r Feature#58.seqburn null
@@ -13665,6 +13781,8 @@ call 182 Apply
   r Feature#58.seqreclamateshad null
   r Feature#58.burnTime 0
   r Feature#58.damage 640
+  r Feature#58.energy f32:0x00000000
+  r Feature#58.metal f32:0x42f20000
   r Feature#58.dead 276
   r Feature#58.reclamate 231
   r Feature#59.seqburn null
@@ -13675,6 +13793,8 @@ call 182 Apply
   r Feature#59.seqreclamateshad null
   r Feature#59.burnTime 0
   r Feature#59.damage 984
+  r Feature#59.energy f32:0x00000000
+  r Feature#59.metal f32:0x43e98000
   r Feature#59.dead 277
   r Feature#59.reclamate 231
   r Feature#60.seqburn null
@@ -13685,6 +13805,8 @@ call 182 Apply
   r Feature#60.seqreclamateshad null
   r Feature#60.burnTime 0
   r Feature#60.damage 2404
+  r Feature#60.energy f32:0x00000000
+  r Feature#60.metal f32:0x44c8a000
   r Feature#60.dead 278
   r Feature#60.reclamate 231
   r Feature#61.seqburn null
@@ -13695,6 +13817,8 @@ call 182 Apply
   r Feature#61.seqreclamateshad null
   r Feature#61.burnTime 0
   r Feature#61.damage 368
+  r Feature#61.energy f32:0x00000000
+  r Feature#61.metal f32:0x429c0000
   r Feature#61.dead 279
   r Feature#61.reclamate 231
   r Feature#62.seqburn null
@@ -13705,6 +13829,8 @@ call 182 Apply
   r Feature#62.seqreclamateshad null
   r Feature#62.burnTime 0
   r Feature#62.damage 484
+  r Feature#62.energy f32:0x00000000
+  r Feature#62.metal f32:0x42de0000
   r Feature#62.dead 280
   r Feature#62.reclamate 231
   r Feature#63.seqburn null
@@ -13715,6 +13841,8 @@ call 182 Apply
   r Feature#63.seqreclamateshad null
   r Feature#63.burnTime 0
   r Feature#63.damage 2152
+  r Feature#63.energy f32:0x00000000
+  r Feature#63.metal f32:0x440d0000
   r Feature#63.dead 281
   r Feature#63.reclamate 231
   r Feature#64.seqburn null
@@ -13725,6 +13853,8 @@ call 182 Apply
   r Feature#64.seqreclamateshad null
   r Feature#64.burnTime 0
   r Feature#64.damage 794
+  r Feature#64.energy f32:0x00000000
+  r Feature#64.metal f32:0x43830000
   r Feature#64.dead 282
   r Feature#64.reclamate 231
   r Feature#65.seqburn null
@@ -13735,6 +13865,8 @@ call 182 Apply
   r Feature#65.seqreclamateshad null
   r Feature#65.burnTime 0
   r Feature#65.damage 600
+  r Feature#65.energy f32:0x00000000
+  r Feature#65.metal f32:0x43520000
   r Feature#65.dead 283
   r Feature#65.reclamate 231
   r Feature#66.seqburn null
@@ -13745,6 +13877,8 @@ call 182 Apply
   r Feature#66.seqreclamateshad null
   r Feature#66.burnTime 0
   r Feature#66.damage 115
+  r Feature#66.energy f32:0x00000000
+  r Feature#66.metal f32:0x00000000
   r Feature#66.dead 284
   r Feature#66.reclamate 231
   r Feature#67.seqburn null
@@ -13755,6 +13889,8 @@ call 182 Apply
   r Feature#67.seqreclamateshad null
   r Feature#67.burnTime 0
   r Feature#67.damage 520
+  r Feature#67.energy f32:0x00000000
+  r Feature#67.metal f32:0x45023000
   r Feature#67.dead 285
   r Feature#67.reclamate 231
   r Feature#68.seqburn null
@@ -13765,6 +13901,8 @@ call 182 Apply
   r Feature#68.seqreclamateshad null
   r Feature#68.burnTime 0
   r Feature#68.damage 256
+  r Feature#68.energy f32:0x00000000
+  r Feature#68.metal f32:0x42980000
   r Feature#68.dead 286
   r Feature#68.reclamate 231
   r Feature#69.seqburn null
@@ -13775,6 +13913,8 @@ call 182 Apply
   r Feature#69.seqreclamateshad null
   r Feature#69.burnTime 0
   r Feature#69.damage 420
+  r Feature#69.energy f32:0x00000000
+  r Feature#69.metal f32:0x43530000
   r Feature#69.dead 287
   r Feature#69.reclamate 231
   r Feature#70.seqburn null
@@ -13785,6 +13925,8 @@ call 182 Apply
   r Feature#70.seqreclamateshad null
   r Feature#70.burnTime 0
   r Feature#70.damage 376
+  r Feature#70.energy f32:0x00000000
+  r Feature#70.metal f32:0x439b0000
   r Feature#70.dead 288
   r Feature#70.reclamate 231
   r Feature#71.seqburn null
@@ -13795,6 +13937,8 @@ call 182 Apply
   r Feature#71.seqreclamateshad null
   r Feature#71.burnTime 0
   r Feature#71.damage 432
+  r Feature#71.energy f32:0x00000000
+  r Feature#71.metal f32:0x43b90000
   r Feature#71.dead 289
   r Feature#71.reclamate 231
   r Feature#72.seqburn null
@@ -13805,6 +13949,8 @@ call 182 Apply
   r Feature#72.seqreclamateshad null
   r Feature#72.burnTime 0
   r Feature#72.damage 1700
+  r Feature#72.energy f32:0x00000000
+  r Feature#72.metal f32:0x42200000
   r Feature#72.dead 290
   r Feature#72.reclamate 231
   r Feature#73.seqburn null
@@ -13815,6 +13961,8 @@ call 182 Apply
   r Feature#73.seqreclamateshad null
   r Feature#73.burnTime 0
   r Feature#73.damage 360
+  r Feature#73.energy f32:0x00000000
+  r Feature#73.metal f32:0x43820000
   r Feature#73.dead 65535
   r Feature#73.reclamate 231
   r Feature#74.seqburn null
@@ -13825,6 +13973,8 @@ call 182 Apply
   r Feature#74.seqreclamateshad null
   r Feature#74.burnTime 0
   r Feature#74.damage 960
+  r Feature#74.energy f32:0x00000000
+  r Feature#74.metal f32:0x430a0000
   r Feature#74.dead 291
   r Feature#74.reclamate 231
   r Feature#75.seqburn null
@@ -13835,6 +13985,8 @@ call 182 Apply
   r Feature#75.seqreclamateshad null
   r Feature#75.burnTime 0
   r Feature#75.damage 320
+  r Feature#75.energy f32:0x00000000
+  r Feature#75.metal f32:0x42380000
   r Feature#75.dead 292
   r Feature#75.reclamate 231
   r Feature#76.seqburn null
@@ -13845,6 +13997,8 @@ call 182 Apply
   r Feature#76.seqreclamateshad null
   r Feature#76.burnTime 0
   r Feature#76.damage 1258
+  r Feature#76.energy f32:0x00000000
+  r Feature#76.metal f32:0x4496c000
   r Feature#76.dead 293
   r Feature#76.reclamate 231
   r Feature#77.seqburn null
@@ -13855,6 +14009,8 @@ call 182 Apply
   r Feature#77.seqreclamateshad null
   r Feature#77.burnTime 0
   r Feature#77.damage 24000
+  r Feature#77.energy f32:0x00000000
+  r Feature#77.metal f32:0x44eac000
   r Feature#77.dead 65535
   r Feature#77.reclamate 231
   r Feature#78.seqburn null
@@ -13865,6 +14021,8 @@ call 182 Apply
   r Feature#78.seqreclamateshad null
   r Feature#78.burnTime 0
   r Feature#78.damage 1063
+  r Feature#78.energy f32:0x00000000
+  r Feature#78.metal f32:0x43740000
   r Feature#78.dead 294
   r Feature#78.reclamate 231
   r Feature#79.seqburn null
@@ -13875,6 +14033,8 @@ call 182 Apply
   r Feature#79.seqreclamateshad null
   r Feature#79.burnTime 0
   r Feature#79.damage 1456
+  r Feature#79.energy f32:0x00000000
+  r Feature#79.metal f32:0x44de4000
   r Feature#79.dead 65535
   r Feature#79.reclamate 231
   r Feature#80.seqburn null
@@ -13885,6 +14045,8 @@ call 182 Apply
   r Feature#80.seqreclamateshad null
   r Feature#80.burnTime 0
   r Feature#80.damage 24000
+  r Feature#80.energy f32:0x00000000
+  r Feature#80.metal f32:0x42a00000
   r Feature#80.dead 65535
   r Feature#80.reclamate 231
   r Feature#81.seqburn null
@@ -13895,6 +14057,8 @@ call 182 Apply
   r Feature#81.seqreclamateshad null
   r Feature#81.burnTime 0
   r Feature#81.damage 200
+  r Feature#81.energy f32:0x00000000
+  r Feature#81.metal f32:0x42280000
   r Feature#81.dead 295
   r Feature#81.reclamate 231
   r Feature#82.seqburn null
@@ -13905,6 +14069,8 @@ call 182 Apply
   r Feature#82.seqreclamateshad null
   r Feature#82.burnTime 0
   r Feature#82.damage 41
+  r Feature#82.energy f32:0x00000000
+  r Feature#82.metal f32:0x41700000
   r Feature#82.dead 296
   r Feature#82.reclamate 231
   r Feature#83.seqburn null
@@ -13915,6 +14081,8 @@ call 182 Apply
   r Feature#83.seqreclamateshad null
   r Feature#83.burnTime 0
   r Feature#83.damage 236
+  r Feature#83.energy f32:0x00000000
+  r Feature#83.metal f32:0x427c0000
   r Feature#83.dead 297
   r Feature#83.reclamate 231
   r Feature#84.seqburn null
@@ -13925,6 +14093,8 @@ call 182 Apply
   r Feature#84.seqreclamateshad null
   r Feature#84.burnTime 0
   r Feature#84.damage 576
+  r Feature#84.energy f32:0x00000000
+  r Feature#84.metal f32:0x42ce0000
   r Feature#84.dead 298
   r Feature#84.reclamate 231
   r Feature#85.seqburn null
@@ -13935,6 +14105,8 @@ call 182 Apply
   r Feature#85.seqreclamateshad null
   r Feature#85.burnTime 0
   r Feature#85.damage 24000
+  r Feature#85.energy f32:0x00000000
+  r Feature#85.metal f32:0x44338000
   r Feature#85.dead 65535
   r Feature#85.reclamate 231
   r Feature#86.seqburn null
@@ -13945,6 +14117,8 @@ call 182 Apply
   r Feature#86.seqreclamateshad null
   r Feature#86.burnTime 0
   r Feature#86.damage 739
+  r Feature#86.energy f32:0x00000000
+  r Feature#86.metal f32:0x42e40000
   r Feature#86.dead 299
   r Feature#86.reclamate 231
   r Feature#87.seqburn null
@@ -13955,6 +14129,8 @@ call 182 Apply
   r Feature#87.seqreclamateshad null
   r Feature#87.burnTime 0
   r Feature#87.damage 624
+  r Feature#87.energy f32:0x00000000
+  r Feature#87.metal f32:0x448fc000
   r Feature#87.dead 300
   r Feature#87.reclamate 231
   r Feature#88.seqburn null
@@ -13965,6 +14141,8 @@ call 182 Apply
   r Feature#88.seqreclamateshad null
   r Feature#88.burnTime 0
   r Feature#88.damage 800
+  r Feature#88.energy f32:0x4592d000
+  r Feature#88.metal f32:0x00000000
   r Feature#88.dead 65535
   r Feature#88.reclamate 231
   r Feature#89.seqburn null
@@ -13975,6 +14153,8 @@ call 182 Apply
   r Feature#89.seqreclamateshad null
   r Feature#89.burnTime 0
   r Feature#89.damage 256
+  r Feature#89.energy f32:0x00000000
+  r Feature#89.metal f32:0x43a30000
   r Feature#89.dead 65535
   r Feature#89.reclamate 231
   r Feature#90.seqburn null
@@ -13985,6 +14165,8 @@ call 182 Apply
   r Feature#90.seqreclamateshad null
   r Feature#90.burnTime 0
   r Feature#90.damage 160
+  r Feature#90.energy f32:0x00000000
+  r Feature#90.metal f32:0x42740000
   r Feature#90.dead 65535
   r Feature#90.reclamate 231
   r Feature#91.seqburn null
@@ -13995,6 +14177,8 @@ call 182 Apply
   r Feature#91.seqreclamateshad null
   r Feature#91.burnTime 0
   r Feature#91.damage 1840
+  r Feature#91.energy f32:0x00000000
+  r Feature#91.metal f32:0x452ae000
   r Feature#91.dead 301
   r Feature#91.reclamate 231
   r Feature#92.seqburn null
@@ -14005,6 +14189,8 @@ call 182 Apply
   r Feature#92.seqreclamateshad null
   r Feature#92.burnTime 0
   r Feature#92.damage 408
+  r Feature#92.energy f32:0x00000000
+  r Feature#92.metal f32:0x42d00000
   r Feature#92.dead 65535
   r Feature#92.reclamate 231
   r Feature#93.seqburn null
@@ -14015,6 +14201,8 @@ call 182 Apply
   r Feature#93.seqreclamateshad null
   r Feature#93.burnTime 0
   r Feature#93.damage 400
+  r Feature#93.energy f32:0x00000000
+  r Feature#93.metal f32:0x443b0000
   r Feature#93.dead 302
   r Feature#93.reclamate 231
   r Feature#94.seqburn null
@@ -14025,6 +14213,8 @@ call 182 Apply
   r Feature#94.seqreclamateshad null
   r Feature#94.burnTime 0
   r Feature#94.damage 261
+  r Feature#94.energy f32:0x00000000
+  r Feature#94.metal f32:0x42e80000
   r Feature#94.dead 303
   r Feature#94.reclamate 231
   r Feature#95.seqburn null
@@ -14035,6 +14225,8 @@ call 182 Apply
   r Feature#95.seqreclamateshad null
   r Feature#95.burnTime 0
   r Feature#95.damage 24000
+  r Feature#95.energy f32:0x00000000
+  r Feature#95.metal f32:0x41800000
   r Feature#95.dead 65535
   r Feature#95.reclamate 231
   r Feature#96.seqburn null
@@ -14045,6 +14237,8 @@ call 182 Apply
   r Feature#96.seqreclamateshad null
   r Feature#96.burnTime 0
   r Feature#96.damage 360
+  r Feature#96.energy f32:0x00000000
+  r Feature#96.metal f32:0x43380000
   r Feature#96.dead 304
   r Feature#96.reclamate 231
   r Feature#97.seqburn null
@@ -14055,6 +14249,8 @@ call 182 Apply
   r Feature#97.seqreclamateshad null
   r Feature#97.burnTime 0
   r Feature#97.damage 794
+  r Feature#97.energy f32:0x00000000
+  r Feature#97.metal f32:0x42cc0000
   r Feature#97.dead 305
   r Feature#97.reclamate 231
   r Feature#98.seqburn null
@@ -14065,6 +14261,8 @@ call 182 Apply
   r Feature#98.seqreclamateshad null
   r Feature#98.burnTime 0
   r Feature#98.damage 342
+  r Feature#98.energy f32:0x44a48000
+  r Feature#98.metal f32:0x00000000
   r Feature#98.dead 65535
   r Feature#98.reclamate 231
   r Feature#99.seqburn null
@@ -14075,6 +14273,8 @@ call 182 Apply
   r Feature#99.seqreclamateshad null
   r Feature#99.burnTime 0
   r Feature#99.damage 794
+  r Feature#99.energy f32:0x00000000
+  r Feature#99.metal f32:0x43040000
   r Feature#99.dead 306
   r Feature#99.reclamate 231
   r Feature#100.seqburn null
@@ -14085,6 +14285,8 @@ call 182 Apply
   r Feature#100.seqreclamateshad null
   r Feature#100.burnTime 0
   r Feature#100.damage 24000
+  r Feature#100.energy f32:0x00000000
+  r Feature#100.metal f32:0x44664000
   r Feature#100.dead 65535
   r Feature#100.reclamate 231
   r Feature#101.seqburn null
@@ -14095,6 +14297,8 @@ call 182 Apply
   r Feature#101.seqreclamateshad null
   r Feature#101.burnTime 0
   r Feature#101.damage 24000
+  r Feature#101.energy f32:0x00000000
+  r Feature#101.metal f32:0x4490c000
   r Feature#101.dead 65535
   r Feature#101.reclamate 231
   r Feature#102.seqburn null
@@ -14105,6 +14309,8 @@ call 182 Apply
   r Feature#102.seqreclamateshad null
   r Feature#102.burnTime 0
   r Feature#102.damage 24000
+  r Feature#102.energy f32:0x00000000
+  r Feature#102.metal f32:0x43f60000
   r Feature#102.dead 65535
   r Feature#102.reclamate 231
   r Feature#103.seqburn null
@@ -14115,6 +14321,8 @@ call 182 Apply
   r Feature#103.seqreclamateshad null
   r Feature#103.burnTime 0
   r Feature#103.damage 1160
+  r Feature#103.energy f32:0x00000000
+  r Feature#103.metal f32:0x463d2000
   r Feature#103.dead 307
   r Feature#103.reclamate 231
   r Feature#104.seqburn null
@@ -14125,6 +14333,8 @@ call 182 Apply
   r Feature#104.seqreclamateshad null
   r Feature#104.burnTime 0
   r Feature#104.damage 920
+  r Feature#104.energy f32:0x00000000
+  r Feature#104.metal f32:0x44050000
   r Feature#104.dead 65535
   r Feature#104.reclamate 231
   r Feature#105.seqburn null
@@ -14135,6 +14345,8 @@ call 182 Apply
   r Feature#105.seqreclamateshad null
   r Feature#105.burnTime 0
   r Feature#105.damage 24000
+  r Feature#105.energy f32:0x00000000
+  r Feature#105.metal f32:0x42840000
   r Feature#105.dead 65535
   r Feature#105.reclamate 231
   r Feature#106.seqburn null
@@ -14145,6 +14357,8 @@ call 182 Apply
   r Feature#106.seqreclamateshad null
   r Feature#106.burnTime 0
   r Feature#106.damage 24000
+  r Feature#106.energy f32:0x00000000
+  r Feature#106.metal f32:0x4434c000
   r Feature#106.dead 65535
   r Feature#106.reclamate 231
   r Feature#107.seqburn null
@@ -14155,6 +14369,8 @@ call 182 Apply
   r Feature#107.seqreclamateshad null
   r Feature#107.burnTime 0
   r Feature#107.damage 24000
+  r Feature#107.energy f32:0x00000000
+  r Feature#107.metal f32:0x4437c000
   r Feature#107.dead 65535
   r Feature#107.reclamate 231
   r Feature#108.seqburn null
@@ -14165,6 +14381,8 @@ call 182 Apply
   r Feature#108.seqreclamateshad null
   r Feature#108.burnTime 0
   r Feature#108.damage 1158
+  r Feature#108.energy f32:0x00000000
+  r Feature#108.metal f32:0x43630000
   r Feature#108.dead 308
   r Feature#108.reclamate 231
   r Feature#109.seqburn null
@@ -14175,6 +14393,8 @@ call 182 Apply
   r Feature#109.seqreclamateshad null
   r Feature#109.burnTime 0
   r Feature#109.damage 985
+  r Feature#109.energy f32:0x00000000
+  r Feature#109.metal f32:0x45b12000
   r Feature#109.dead 309
   r Feature#109.reclamate 231
   r Feature#110.seqburn null
@@ -14185,6 +14405,8 @@ call 182 Apply
   r Feature#110.seqreclamateshad null
   r Feature#110.burnTime 0
   r Feature#110.damage 264
+  r Feature#110.energy f32:0x00000000
+  r Feature#110.metal f32:0x42d00000
   r Feature#110.dead 310
   r Feature#110.reclamate 231
   r Feature#111.seqburn null
@@ -14195,6 +14417,8 @@ call 182 Apply
   r Feature#111.seqreclamateshad null
   r Feature#111.burnTime 0
   r Feature#111.damage 1300
+  r Feature#111.energy f32:0x00000000
+  r Feature#111.metal f32:0x43900000
   r Feature#111.dead 311
   r Feature#111.reclamate 231
   r Feature#112.seqburn null
@@ -14205,6 +14429,8 @@ call 182 Apply
   r Feature#112.seqreclamateshad null
   r Feature#112.burnTime 0
   r Feature#112.damage 2064
+  r Feature#112.energy f32:0x00000000
+  r Feature#112.metal f32:0x43f80000
   r Feature#112.dead 312
   r Feature#112.reclamate 231
   r Feature#113.seqburn null
@@ -14215,6 +14441,8 @@ call 182 Apply
   r Feature#113.seqreclamateshad null
   r Feature#113.burnTime 0
   r Feature#113.damage 1120
+  r Feature#113.energy f32:0x00000000
+  r Feature#113.metal f32:0x470d3e00
   r Feature#113.dead 313
   r Feature#113.reclamate 231
   r Feature#114.seqburn null
@@ -14225,6 +14453,8 @@ call 182 Apply
   r Feature#114.seqreclamateshad null
   r Feature#114.burnTime 0
   r Feature#114.damage 680
+  r Feature#114.energy f32:0x00000000
+  r Feature#114.metal f32:0x431d0000
   r Feature#114.dead 314
   r Feature#114.reclamate 231
   r Feature#115.seqburn null
@@ -14235,6 +14465,8 @@ call 182 Apply
   r Feature#115.seqreclamateshad null
   r Feature#115.burnTime 0
   r Feature#115.damage 141
+  r Feature#115.energy f32:0x00000000
+  r Feature#115.metal f32:0x42280000
   r Feature#115.dead 315
   r Feature#115.reclamate 231
   r Feature#116.seqburn null
@@ -14245,6 +14477,8 @@ call 182 Apply
   r Feature#116.seqreclamateshad null
   r Feature#116.burnTime 0
   r Feature#116.damage 256
+  r Feature#116.energy f32:0x00000000
+  r Feature#116.metal f32:0x44260000
   r Feature#116.dead 316
   r Feature#116.reclamate 231
   r Feature#117.seqburn null
@@ -14255,6 +14489,8 @@ call 182 Apply
   r Feature#117.seqreclamateshad null
   r Feature#117.burnTime 0
   r Feature#117.damage 700
+  r Feature#117.energy f32:0x00000000
+  r Feature#117.metal f32:0x43560000
   r Feature#117.dead 317
   r Feature#117.reclamate 231
   r Feature#118.seqburn null
@@ -14265,6 +14501,8 @@ call 182 Apply
   r Feature#118.seqreclamateshad null
   r Feature#118.burnTime 0
   r Feature#118.damage 1760
+  r Feature#118.energy f32:0x00000000
+  r Feature#118.metal f32:0x44db2000
   r Feature#118.dead 318
   r Feature#118.reclamate 231
   r Feature#119.seqburn null
@@ -14275,6 +14513,8 @@ call 182 Apply
   r Feature#119.seqreclamateshad null
   r Feature#119.burnTime 0
   r Feature#119.damage 856
+  r Feature#119.energy f32:0x00000000
+  r Feature#119.metal f32:0x43820000
   r Feature#119.dead 319
   r Feature#119.reclamate 231
   r Feature#120.seqburn null
@@ -14285,6 +14525,8 @@ call 182 Apply
   r Feature#120.seqreclamateshad null
   r Feature#120.burnTime 0
   r Feature#120.damage 296
+  r Feature#120.energy f32:0x00000000
+  r Feature#120.metal f32:0x440a0000
   r Feature#120.dead 65535
   r Feature#120.reclamate 231
   r Feature#121.seqburn null
@@ -14295,6 +14537,8 @@ call 182 Apply
   r Feature#121.seqreclamateshad null
   r Feature#121.burnTime 0
   r Feature#121.damage 976
+  r Feature#121.energy f32:0x00000000
+  r Feature#121.metal f32:0x43b60000
   r Feature#121.dead 320
   r Feature#121.reclamate 231
   r Feature#122.seqburn null
@@ -14305,6 +14549,8 @@ call 182 Apply
   r Feature#122.seqreclamateshad null
   r Feature#122.burnTime 0
   r Feature#122.damage 316
+  r Feature#122.energy f32:0x00000000
+  r Feature#122.metal f32:0x42b80000
   r Feature#122.dead 65535
   r Feature#122.reclamate 231
   r Feature#123.seqburn null
@@ -14315,6 +14561,8 @@ call 182 Apply
   r Feature#123.seqreclamateshad null
   r Feature#123.burnTime 0
   r Feature#123.damage 212
+  r Feature#123.energy f32:0x00000000
+  r Feature#123.metal f32:0x42340000
   r Feature#123.dead 321
   r Feature#123.reclamate 231
   r Feature#124.seqburn null
@@ -14325,6 +14573,8 @@ call 182 Apply
   r Feature#124.seqreclamateshad null
   r Feature#124.burnTime 0
   r Feature#124.damage 2536
+  r Feature#124.energy f32:0x00000000
+  r Feature#124.metal f32:0x44c54000
   r Feature#124.dead 322
   r Feature#124.reclamate 231
   r Feature#125.seqburn null
@@ -14335,6 +14585,8 @@ call 182 Apply
   r Feature#125.seqreclamateshad null
   r Feature#125.burnTime 0
   r Feature#125.damage 656
+  r Feature#125.energy f32:0x00000000
+  r Feature#125.metal f32:0x43630000
   r Feature#125.dead 323
   r Feature#125.reclamate 231
   r Feature#126.seqburn null
@@ -14345,6 +14597,8 @@ call 182 Apply
   r Feature#126.seqreclamateshad null
   r Feature#126.burnTime 0
   r Feature#126.damage 1540
+  r Feature#126.energy f32:0x00000000
+  r Feature#126.metal f32:0x44260000
   r Feature#126.dead 324
   r Feature#126.reclamate 231
   r Feature#127.seqburn null
@@ -14355,6 +14609,8 @@ call 182 Apply
   r Feature#127.seqreclamateshad null
   r Feature#127.burnTime 0
   r Feature#127.damage 40
+  r Feature#127.energy f32:0x00000000
+  r Feature#127.metal f32:0x42080000
   r Feature#127.dead 325
   r Feature#127.reclamate 231
   r Feature#128.seqburn null
@@ -14365,6 +14621,8 @@ call 182 Apply
   r Feature#128.seqreclamateshad null
   r Feature#128.burnTime 0
   r Feature#128.damage 1960
+  r Feature#128.energy f32:0x00000000
+  r Feature#128.metal f32:0x44836000
   r Feature#128.dead 65535
   r Feature#128.reclamate 231
   r Feature#129.seqburn null
@@ -14375,6 +14633,8 @@ call 182 Apply
   r Feature#129.seqreclamateshad null
   r Feature#129.burnTime 0
   r Feature#129.damage 192
+  r Feature#129.energy f32:0x00000000
+  r Feature#129.metal f32:0x42f40000
   r Feature#129.dead 65535
   r Feature#129.reclamate 231
   r Feature#130.seqburn null
@@ -14385,6 +14645,8 @@ call 182 Apply
   r Feature#130.seqreclamateshad null
   r Feature#130.burnTime 0
   r Feature#130.damage 552
+  r Feature#130.energy f32:0x00000000
+  r Feature#130.metal f32:0x43ac0000
   r Feature#130.dead 326
   r Feature#130.reclamate 231
   r Feature#131.seqburn null
@@ -14395,6 +14657,8 @@ call 182 Apply
   r Feature#131.seqreclamateshad null
   r Feature#131.burnTime 0
   r Feature#131.damage 24000
+  r Feature#131.energy f32:0x00000000
+  r Feature#131.metal f32:0x44f60000
   r Feature#131.dead 65535
   r Feature#131.reclamate 231
   r Feature#132.seqburn null
@@ -14405,6 +14669,8 @@ call 182 Apply
   r Feature#132.seqreclamateshad null
   r Feature#132.burnTime 0
   r Feature#132.damage 450
+  r Feature#132.energy f32:0x00000000
+  r Feature#132.metal f32:0x447b8000
   r Feature#132.dead 65535
   r Feature#132.reclamate 231
   r Feature#133.seqburn null
@@ -14415,6 +14681,8 @@ call 182 Apply
   r Feature#133.seqreclamateshad null
   r Feature#133.burnTime 0
   r Feature#133.damage 2060
+  r Feature#133.energy f32:0x00000000
+  r Feature#133.metal f32:0x44c2c000
   r Feature#133.dead 327
   r Feature#133.reclamate 231
   r Feature#134.seqburn null
@@ -14425,6 +14693,8 @@ call 182 Apply
   r Feature#134.seqreclamateshad null
   r Feature#134.burnTime 0
   r Feature#134.damage 24000
+  r Feature#134.energy f32:0x00000000
+  r Feature#134.metal f32:0x45511000
   r Feature#134.dead 65535
   r Feature#134.reclamate 231
   r Feature#135.seqburn null
@@ -14435,6 +14705,8 @@ call 182 Apply
   r Feature#135.seqreclamateshad null
   r Feature#135.burnTime 0
   r Feature#135.damage 8800
+  r Feature#135.energy f32:0x00000000
+  r Feature#135.metal f32:0x45825800
   r Feature#135.dead 328
   r Feature#135.reclamate 231
   r Feature#136.seqburn null
@@ -14445,6 +14717,8 @@ call 182 Apply
   r Feature#136.seqreclamateshad null
   r Feature#136.burnTime 0
   r Feature#136.damage 24000
+  r Feature#136.energy f32:0x00000000
+  r Feature#136.metal f32:0x45511000
   r Feature#136.dead 329
   r Feature#136.reclamate 231
   r Feature#137.seqburn null
@@ -14455,6 +14729,8 @@ call 182 Apply
   r Feature#137.seqreclamateshad null
   r Feature#137.burnTime 0
   r Feature#137.damage 1360
+  r Feature#137.energy f32:0x00000000
+  r Feature#137.metal f32:0x46b05200
   r Feature#137.dead 330
   r Feature#137.reclamate 231
   r Feature#138.seqburn null
@@ -14465,6 +14741,8 @@ call 182 Apply
   r Feature#138.seqreclamateshad null
   r Feature#138.burnTime 0
   r Feature#138.damage 2240
+  r Feature#138.energy f32:0x00000000
+  r Feature#138.metal f32:0x43a80000
   r Feature#138.dead 331
   r Feature#138.reclamate 231
   r Feature#139.seqburn null
@@ -14475,6 +14753,8 @@ call 182 Apply
   r Feature#139.seqreclamateshad null
   r Feature#139.burnTime 0
   r Feature#139.damage 24000
+  r Feature#139.energy f32:0x00000000
+  r Feature#139.metal f32:0x4489e000
   r Feature#139.dead 65535
   r Feature#139.reclamate 231
   r Feature#140.seqburn null
@@ -14485,6 +14765,8 @@ call 182 Apply
   r Feature#140.seqreclamateshad null
   r Feature#140.burnTime 0
   r Feature#140.damage 592
+  r Feature#140.energy f32:0x00000000
+  r Feature#140.metal f32:0x439c0000
   r Feature#140.dead 65535
   r Feature#140.reclamate 231
   r Feature#141.seqburn null
@@ -14495,6 +14777,8 @@ call 182 Apply
   r Feature#141.seqreclamateshad null
   r Feature#141.burnTime 0
   r Feature#141.damage 568
+  r Feature#141.energy f32:0x00000000
+  r Feature#141.metal f32:0x42d00000
   r Feature#141.dead 332
   r Feature#141.reclamate 231
   r Feature#142.seqburn null
@@ -14505,6 +14789,8 @@ call 182 Apply
   r Feature#142.seqreclamateshad null
   r Feature#142.burnTime 0
   r Feature#142.damage 1960
+  r Feature#142.energy f32:0x00000000
+  r Feature#142.metal f32:0x45850800
   r Feature#142.dead 333
   r Feature#142.reclamate 231
   r Feature#143.seqburn null
@@ -14515,6 +14801,8 @@ call 182 Apply
   r Feature#143.seqreclamateshad null
   r Feature#143.burnTime 0
   r Feature#143.damage 496
+  r Feature#143.energy f32:0x00000000
+  r Feature#143.metal f32:0x42e20000
   r Feature#143.dead 334
   r Feature#143.reclamate 231
   r Feature#144.seqburn null
@@ -14525,6 +14813,8 @@ call 182 Apply
   r Feature#144.seqreclamateshad null
   r Feature#144.burnTime 0
   r Feature#144.damage 24000
+  r Feature#144.energy f32:0x00000000
+  r Feature#144.metal f32:0x44ac6000
   r Feature#144.dead 65535
   r Feature#144.reclamate 231
   r Feature#145.seqburn null
@@ -14535,6 +14825,8 @@ call 182 Apply
   r Feature#145.seqreclamateshad null
   r Feature#145.burnTime 0
   r Feature#145.damage 24000
+  r Feature#145.energy f32:0x00000000
+  r Feature#145.metal f32:0x43500000
   r Feature#145.dead 65535
   r Feature#145.reclamate 231
   r Feature#146.seqburn null
@@ -14545,6 +14837,8 @@ call 182 Apply
   r Feature#146.seqreclamateshad null
   r Feature#146.burnTime 0
   r Feature#146.damage 660
+  r Feature#146.energy f32:0x00000000
+  r Feature#146.metal f32:0x430c0000
   r Feature#146.dead 335
   r Feature#146.reclamate 231
   r Feature#147.seqburn null
@@ -14555,6 +14849,8 @@ call 182 Apply
   r Feature#147.seqreclamateshad null
   r Feature#147.burnTime 0
   r Feature#147.damage 3288
+  r Feature#147.energy f32:0x00000000
+  r Feature#147.metal f32:0x45d5a000
   r Feature#147.dead 336
   r Feature#147.reclamate 231
   r Feature#148.seqburn null
@@ -14565,6 +14861,8 @@ call 182 Apply
   r Feature#148.seqreclamateshad null
   r Feature#148.burnTime 0
   r Feature#148.damage 2512
+  r Feature#148.energy f32:0x00000000
+  r Feature#148.metal f32:0x44d60000
   r Feature#148.dead 337
   r Feature#148.reclamate 231
   r Feature#149.seqburn null
@@ -14575,6 +14873,8 @@ call 182 Apply
   r Feature#149.seqreclamateshad null
   r Feature#149.burnTime 0
   r Feature#149.damage 4000
+  r Feature#149.energy f32:0x00000000
+  r Feature#149.metal f32:0x41000000
   r Feature#149.dead 262
   r Feature#149.reclamate 231
   r Feature#150.seqburn null
@@ -14585,6 +14885,8 @@ call 182 Apply
   r Feature#150.seqreclamateshad null
   r Feature#150.burnTime 0
   r Feature#150.damage 856
+  r Feature#150.energy f32:0x00000000
+  r Feature#150.metal f32:0x43480000
   r Feature#150.dead 338
   r Feature#150.reclamate 231
   r Feature#151.seqburn null
@@ -14595,6 +14897,8 @@ call 182 Apply
   r Feature#151.seqreclamateshad null
   r Feature#151.burnTime 0
   r Feature#151.damage 416
+  r Feature#151.energy f32:0x00000000
+  r Feature#151.metal f32:0x42a00000
   r Feature#151.dead 339
   r Feature#151.reclamate 231
   r Feature#152.seqburn null
@@ -14605,6 +14909,8 @@ call 182 Apply
   r Feature#152.seqreclamateshad null
   r Feature#152.burnTime 0
   r Feature#152.damage 504
+  r Feature#152.energy f32:0x00000000
+  r Feature#152.metal f32:0x430c0000
   r Feature#152.dead 340
   r Feature#152.reclamate 231
   r Feature#153.seqburn null
@@ -14615,6 +14921,8 @@ call 182 Apply
   r Feature#153.seqreclamateshad null
   r Feature#153.burnTime 0
   r Feature#153.damage 67
+  r Feature#153.energy f32:0x00000000
+  r Feature#153.metal f32:0x41f00000
   r Feature#153.dead 341
   r Feature#153.reclamate 231
   r Feature#154.seqburn null
@@ -14625,6 +14933,8 @@ call 182 Apply
   r Feature#154.seqreclamateshad null
   r Feature#154.burnTime 0
   r Feature#154.damage 3500
+  r Feature#154.energy f32:0x00000000
+  r Feature#154.metal f32:0x41600000
   r Feature#154.dead 65535
   r Feature#154.reclamate 65535
   r Feature#155.seqburn null
@@ -14635,6 +14945,8 @@ call 182 Apply
   r Feature#155.seqreclamateshad null
   r Feature#155.burnTime 0
   r Feature#155.damage 1108
+  r Feature#155.energy f32:0x00000000
+  r Feature#155.metal f32:0x43df0000
   r Feature#155.dead 65535
   r Feature#155.reclamate 231
   r Feature#156.seqburn null
@@ -14645,6 +14957,8 @@ call 182 Apply
   r Feature#156.seqreclamateshad null
   r Feature#156.burnTime 0
   r Feature#156.damage 1219
+  r Feature#156.energy f32:0x00000000
+  r Feature#156.metal f32:0x4455c000
   r Feature#156.dead 342
   r Feature#156.reclamate 231
   r Feature#157.seqburn null
@@ -14655,6 +14969,8 @@ call 182 Apply
   r Feature#157.seqreclamateshad null
   r Feature#157.burnTime 0
   r Feature#157.damage 1500
+  r Feature#157.energy f32:0x00000000
+  r Feature#157.metal f32:0x41a80000
   r Feature#157.dead 262
   r Feature#157.reclamate 231
   r Feature#158.seqburn null
@@ -14665,6 +14981,8 @@ call 182 Apply
   r Feature#158.seqreclamateshad null
   r Feature#158.burnTime 0
   r Feature#158.damage 232
+  r Feature#158.energy f32:0x00000000
+  r Feature#158.metal f32:0x42640000
   r Feature#158.dead 65535
   r Feature#158.reclamate 231
   r Feature#159.seqburn null
@@ -14675,6 +14993,8 @@ call 182 Apply
   r Feature#159.seqreclamateshad null
   r Feature#159.burnTime 0
   r Feature#159.damage 2400
+  r Feature#159.energy f32:0x00000000
+  r Feature#159.metal f32:0x457a3000
   r Feature#159.dead 343
   r Feature#159.reclamate 231
   r Feature#160.seqburn null
@@ -14685,6 +15005,8 @@ call 182 Apply
   r Feature#160.seqreclamateshad null
   r Feature#160.burnTime 0
   r Feature#160.damage 2440
+  r Feature#160.energy f32:0x00000000
+  r Feature#160.metal f32:0x45a4b000
   r Feature#160.dead 344
   r Feature#160.reclamate 231
   r Feature#161.seqburn null
@@ -14695,6 +15017,8 @@ call 182 Apply
   r Feature#161.seqreclamateshad null
   r Feature#161.burnTime 0
   r Feature#161.damage 1975
+  r Feature#161.energy f32:0x00000000
+  r Feature#161.metal f32:0x46d24800
   r Feature#161.dead 345
   r Feature#161.reclamate 231
   r Feature#162.seqburn null
@@ -14705,6 +15029,8 @@ call 182 Apply
   r Feature#162.seqreclamateshad null
   r Feature#162.burnTime 0
   r Feature#162.damage 522
+  r Feature#162.energy f32:0x00000000
+  r Feature#162.metal f32:0x42b00000
   r Feature#162.dead 346
   r Feature#162.reclamate 231
   r Feature#163.seqburn null
@@ -14715,6 +15041,8 @@ call 182 Apply
   r Feature#163.seqreclamateshad null
   r Feature#163.burnTime 0
   r Feature#163.damage 744
+  r Feature#163.energy f32:0x00000000
+  r Feature#163.metal f32:0x43ca0000
   r Feature#163.dead 347
   r Feature#163.reclamate 231
   r Feature#164.seqburn null
@@ -14725,6 +15053,8 @@ call 182 Apply
   r Feature#164.seqreclamateshad null
   r Feature#164.burnTime 0
   r Feature#164.damage 482
+  r Feature#164.energy f32:0x00000000
+  r Feature#164.metal f32:0x43ab0000
   r Feature#164.dead 348
   r Feature#164.reclamate 231
   r Feature#165.seqburn null
@@ -14735,6 +15065,8 @@ call 182 Apply
   r Feature#165.seqreclamateshad null
   r Feature#165.burnTime 0
   r Feature#165.damage 950
+  r Feature#165.energy f32:0x00000000
+  r Feature#165.metal f32:0x43eb8000
   r Feature#165.dead 349
   r Feature#165.reclamate 231
   r Feature#166.seqburn null
@@ -14745,6 +15077,8 @@ call 182 Apply
   r Feature#166.seqreclamateshad null
   r Feature#166.burnTime 0
   r Feature#166.damage 2685
+  r Feature#166.energy f32:0x00000000
+  r Feature#166.metal f32:0x44b34000
   r Feature#166.dead 350
   r Feature#166.reclamate 231
   r Feature#167.seqburn null
@@ -14755,6 +15089,8 @@ call 182 Apply
   r Feature#167.seqreclamateshad null
   r Feature#167.burnTime 0
   r Feature#167.damage 950
+  r Feature#167.energy f32:0x00000000
+  r Feature#167.metal f32:0x43968000
   r Feature#167.dead 351
   r Feature#167.reclamate 231
   r Feature#168.seqburn null
@@ -14765,6 +15101,8 @@ call 182 Apply
   r Feature#168.seqreclamateshad null
   r Feature#168.burnTime 0
   r Feature#168.damage 1520
+  r Feature#168.energy f32:0x00000000
+  r Feature#168.metal f32:0x45855800
   r Feature#168.dead 352
   r Feature#168.reclamate 231
   r Feature#169.seqburn null
@@ -14775,6 +15113,8 @@ call 182 Apply
   r Feature#169.seqreclamateshad null
   r Feature#169.burnTime 0
   r Feature#169.damage 23934
+  r Feature#169.energy f32:0x00000000
+  r Feature#169.metal f32:0x46b84e00
   r Feature#169.dead 353
   r Feature#169.reclamate 231
   r Feature#170.seqburn null
@@ -14785,6 +15125,8 @@ call 182 Apply
   r Feature#170.seqreclamateshad null
   r Feature#170.burnTime 0
   r Feature#170.damage 2080
+  r Feature#170.energy f32:0x00000000
+  r Feature#170.metal f32:0x44080000
   r Feature#170.dead 354
   r Feature#170.reclamate 231
   r Feature#171.seqburn null
@@ -14795,6 +15137,8 @@ call 182 Apply
   r Feature#171.seqreclamateshad null
   r Feature#171.burnTime 0
   r Feature#171.damage 300
+  r Feature#171.energy f32:0x00000000
+  r Feature#171.metal f32:0x43690000
   r Feature#171.dead 355
   r Feature#171.reclamate 231
   r Feature#172.seqburn null
@@ -14805,6 +15149,8 @@ call 182 Apply
   r Feature#172.seqreclamateshad null
   r Feature#172.burnTime 0
   r Feature#172.damage 568
+  r Feature#172.energy f32:0x00000000
+  r Feature#172.metal f32:0x43560000
   r Feature#172.dead 356
   r Feature#172.reclamate 231
   r Feature#173.seqburn null
@@ -14815,6 +15161,8 @@ call 182 Apply
   r Feature#173.seqreclamateshad null
   r Feature#173.burnTime 0
   r Feature#173.damage 624
+  r Feature#173.energy f32:0x00000000
+  r Feature#173.metal f32:0x4477c000
   r Feature#173.dead 357
   r Feature#173.reclamate 231
   r Feature#174.seqburn null
@@ -14825,6 +15173,8 @@ call 182 Apply
   r Feature#174.seqreclamateshad null
   r Feature#174.burnTime 0
   r Feature#174.damage 120
+  r Feature#174.energy f32:0x00000000
+  r Feature#174.metal f32:0x00000000
   r Feature#174.dead 358
   r Feature#174.reclamate 231
   r Feature#175.seqburn null
@@ -14835,6 +15185,8 @@ call 182 Apply
   r Feature#175.seqreclamateshad null
   r Feature#175.burnTime 0
   r Feature#175.damage 480
+  r Feature#175.energy f32:0x00000000
+  r Feature#175.metal f32:0x43490000
   r Feature#175.dead 359
   r Feature#175.reclamate 231
   r Feature#176.seqburn null
@@ -14845,6 +15197,8 @@ call 182 Apply
   r Feature#176.seqreclamateshad null
   r Feature#176.burnTime 0
   r Feature#176.damage 140
+  r Feature#176.energy f32:0x00000000
+  r Feature#176.metal f32:0x42240000
   r Feature#176.dead 360
   r Feature#176.reclamate 231
   r Feature#177.seqburn null
@@ -14855,6 +15209,8 @@ call 182 Apply
   r Feature#177.seqreclamateshad null
   r Feature#177.burnTime 0
   r Feature#177.damage 368
+  r Feature#177.energy f32:0x00000000
+  r Feature#177.metal f32:0x437e0000
   r Feature#177.dead 65535
   r Feature#177.reclamate 231
   r Feature#178.seqburn null
@@ -14865,6 +15221,8 @@ call 182 Apply
   r Feature#178.seqreclamateshad null
   r Feature#178.burnTime 0
   r Feature#178.damage 794
+  r Feature#178.energy f32:0x00000000
+  r Feature#178.metal f32:0x42e40000
   r Feature#178.dead 361
   r Feature#178.reclamate 231
   r Feature#179.seqburn null
@@ -14875,6 +15233,8 @@ call 182 Apply
   r Feature#179.seqreclamateshad null
   r Feature#179.burnTime 0
   r Feature#179.damage 1120
+  r Feature#179.energy f32:0x00000000
+  r Feature#179.metal f32:0x43160000
   r Feature#179.dead 362
   r Feature#179.reclamate 231
   r Feature#180.seqburn null
@@ -14885,6 +15245,8 @@ call 182 Apply
   r Feature#180.seqreclamateshad null
   r Feature#180.burnTime 0
   r Feature#180.damage 400
+  r Feature#180.energy f32:0x00000000
+  r Feature#180.metal f32:0x42240000
   r Feature#180.dead 363
   r Feature#180.reclamate 231
   r Feature#181.seqburn null
@@ -14895,6 +15257,8 @@ call 182 Apply
   r Feature#181.seqreclamateshad null
   r Feature#181.burnTime 0
   r Feature#181.damage 1172
+  r Feature#181.energy f32:0x00000000
+  r Feature#181.metal f32:0x44910000
   r Feature#181.dead 364
   r Feature#181.reclamate 231
   r Feature#182.seqburn null
@@ -14905,6 +15269,8 @@ call 182 Apply
   r Feature#182.seqreclamateshad null
   r Feature#182.burnTime 0
   r Feature#182.damage 736
+  r Feature#182.energy f32:0x00000000
+  r Feature#182.metal f32:0x43808000
   r Feature#182.dead 365
   r Feature#182.reclamate 231
   r Feature#183.seqburn null
@@ -14915,6 +15281,8 @@ call 182 Apply
   r Feature#183.seqreclamateshad null
   r Feature#183.burnTime 0
   r Feature#183.damage 24000
+  r Feature#183.energy f32:0x00000000
+  r Feature#183.metal f32:0x44e44000
   r Feature#183.dead 65535
   r Feature#183.reclamate 231
   r Feature#184.seqburn null
@@ -14925,6 +15293,8 @@ call 182 Apply
   r Feature#184.seqreclamateshad null
   r Feature#184.burnTime 0
   r Feature#184.damage 1045
+  r Feature#184.energy f32:0x00000000
+  r Feature#184.metal f32:0x43800000
   r Feature#184.dead 366
   r Feature#184.reclamate 231
   r Feature#185.seqburn null
@@ -14935,6 +15305,8 @@ call 182 Apply
   r Feature#185.seqreclamateshad null
   r Feature#185.burnTime 0
   r Feature#185.damage 794
+  r Feature#185.energy f32:0x00000000
+  r Feature#185.metal f32:0x43040000
   r Feature#185.dead 367
   r Feature#185.reclamate 231
   r Feature#186.seqburn null
@@ -14945,6 +15317,8 @@ call 182 Apply
   r Feature#186.seqreclamateshad null
   r Feature#186.burnTime 0
   r Feature#186.damage 794
+  r Feature#186.energy f32:0x00000000
+  r Feature#186.metal f32:0x43040000
   r Feature#186.dead 368
   r Feature#186.reclamate 231
   r Feature#187.seqburn null
@@ -14955,6 +15329,8 @@ call 182 Apply
   r Feature#187.seqreclamateshad null
   r Feature#187.burnTime 0
   r Feature#187.damage 1600
+  r Feature#187.energy f32:0x00000000
+  r Feature#187.metal f32:0x44e68000
   r Feature#187.dead 65535
   r Feature#187.reclamate 231
   r Feature#188.seqburn null
@@ -14965,6 +15341,8 @@ call 182 Apply
   r Feature#188.seqreclamateshad null
   r Feature#188.burnTime 0
   r Feature#188.damage 24000
+  r Feature#188.energy f32:0x00000000
+  r Feature#188.metal f32:0x42980000
   r Feature#188.dead 65535
   r Feature#188.reclamate 231
   r Feature#189.seqburn null
@@ -14975,6 +15353,8 @@ call 182 Apply
   r Feature#189.seqreclamateshad null
   r Feature#189.burnTime 0
   r Feature#189.damage 2352
+  r Feature#189.energy f32:0x00000000
+  r Feature#189.metal f32:0x44bcc000
   r Feature#189.dead 369
   r Feature#189.reclamate 231
   r Feature#190.seqburn null
@@ -14985,6 +15365,8 @@ call 182 Apply
   r Feature#190.seqreclamateshad null
   r Feature#190.burnTime 0
   r Feature#190.damage 560
+  r Feature#190.energy f32:0x00000000
+  r Feature#190.metal f32:0x43500000
   r Feature#190.dead 370
   r Feature#190.reclamate 231
   r Feature#191.seqburn null
@@ -14995,6 +15377,8 @@ call 182 Apply
   r Feature#191.seqreclamateshad null
   r Feature#191.burnTime 0
   r Feature#191.damage 41
+  r Feature#191.energy f32:0x00000000
+  r Feature#191.metal f32:0x41700000
   r Feature#191.dead 371
   r Feature#191.reclamate 231
   r Feature#192.seqburn null
@@ -15005,6 +15389,8 @@ call 182 Apply
   r Feature#192.seqreclamateshad null
   r Feature#192.burnTime 0
   r Feature#192.damage 846
+  r Feature#192.energy f32:0x00000000
+  r Feature#192.metal f32:0x43070000
   r Feature#192.dead 372
   r Feature#192.reclamate 231
   r Feature#193.seqburn null
@@ -15015,6 +15401,8 @@ call 182 Apply
   r Feature#193.seqreclamateshad null
   r Feature#193.burnTime 0
   r Feature#193.damage 1611
+  r Feature#193.energy f32:0x00000000
+  r Feature#193.metal f32:0x43bd0000
   r Feature#193.dead 373
   r Feature#193.reclamate 231
   r Feature#194.seqburn null
@@ -15025,6 +15413,8 @@ call 182 Apply
   r Feature#194.seqreclamateshad null
   r Feature#194.burnTime 0
   r Feature#194.damage 240
+  r Feature#194.energy f32:0x00000000
+  r Feature#194.metal f32:0x42780000
   r Feature#194.dead 374
   r Feature#194.reclamate 231
   r Feature#195.seqburn null
@@ -15035,6 +15425,8 @@ call 182 Apply
   r Feature#195.seqreclamateshad null
   r Feature#195.burnTime 0
   r Feature#195.damage 24000
+  r Feature#195.energy f32:0x00000000
+  r Feature#195.metal f32:0x44318000
   r Feature#195.dead 65535
   r Feature#195.reclamate 231
   r Feature#196.seqburn null
@@ -15045,6 +15437,8 @@ call 182 Apply
   r Feature#196.seqreclamateshad null
   r Feature#196.burnTime 0
   r Feature#196.damage 800
+  r Feature#196.energy f32:0x4592d000
+  r Feature#196.metal f32:0x00000000
   r Feature#196.dead 65535
   r Feature#196.reclamate 231
   r Feature#197.seqburn null
@@ -15055,6 +15449,8 @@ call 182 Apply
   r Feature#197.seqreclamateshad null
   r Feature#197.burnTime 0
   r Feature#197.damage 915
+  r Feature#197.energy f32:0x00000000
+  r Feature#197.metal f32:0x436c0000
   r Feature#197.dead 375
   r Feature#197.reclamate 231
   r Feature#198.seqburn null
@@ -15065,6 +15461,8 @@ call 182 Apply
   r Feature#198.seqreclamateshad null
   r Feature#198.burnTime 0
   r Feature#198.damage 2280
+  r Feature#198.energy f32:0x00000000
+  r Feature#198.metal f32:0x44314000
   r Feature#198.dead 376
   r Feature#198.reclamate 231
   r Feature#199.seqburn null
@@ -15075,6 +15473,8 @@ call 182 Apply
   r Feature#199.seqreclamateshad null
   r Feature#199.burnTime 0
   r Feature#199.damage 160
+  r Feature#199.energy f32:0x00000000
+  r Feature#199.metal f32:0x42680000
   r Feature#199.dead 65535
   r Feature#199.reclamate 231
   r Feature#200.seqburn null
@@ -15085,6 +15485,8 @@ call 182 Apply
   r Feature#200.seqreclamateshad null
   r Feature#200.burnTime 0
   r Feature#200.damage 221
+  r Feature#200.energy f32:0x00000000
+  r Feature#200.metal f32:0x4487a000
   r Feature#200.dead 65535
   r Feature#200.reclamate 231
   r Feature#201.seqburn null
@@ -15095,6 +15497,8 @@ call 182 Apply
   r Feature#201.seqreclamateshad null
   r Feature#201.burnTime 0
   r Feature#201.damage 2048
+  r Feature#201.energy f32:0x00000000
+  r Feature#201.metal f32:0x44430000
   r Feature#201.dead 377
   r Feature#201.reclamate 231
   r Feature#202.seqburn null
@@ -15105,6 +15509,8 @@ call 182 Apply
   r Feature#202.seqreclamateshad null
   r Feature#202.burnTime 0
   r Feature#202.damage 456
+  r Feature#202.energy f32:0x00000000
+  r Feature#202.metal f32:0x42d80000
   r Feature#202.dead 65535
   r Feature#202.reclamate 231
   r Feature#203.seqburn null
@@ -15115,6 +15521,8 @@ call 182 Apply
   r Feature#203.seqreclamateshad null
   r Feature#203.burnTime 0
   r Feature#203.damage 480
+  r Feature#203.energy f32:0x00000000
+  r Feature#203.metal f32:0x43600000
   r Feature#203.dead 65535
   r Feature#203.reclamate 231
   r Feature#204.seqburn null
@@ -15125,6 +15533,8 @@ call 182 Apply
   r Feature#204.seqreclamateshad null
   r Feature#204.burnTime 0
   r Feature#204.damage 261
+  r Feature#204.energy f32:0x00000000
+  r Feature#204.metal f32:0x42e80000
   r Feature#204.dead 378
   r Feature#204.reclamate 231
   r Feature#205.seqburn null
@@ -15135,6 +15545,8 @@ call 182 Apply
   r Feature#205.seqreclamateshad null
   r Feature#205.burnTime 0
   r Feature#205.damage 24000
+  r Feature#205.energy f32:0x00000000
+  r Feature#205.metal f32:0x41800000
   r Feature#205.dead 65535
   r Feature#205.reclamate 231
   r Feature#206.seqburn null
@@ -15145,6 +15557,8 @@ call 182 Apply
   r Feature#206.seqreclamateshad null
   r Feature#206.burnTime 0
   r Feature#206.damage 144
+  r Feature#206.energy f32:0x00000000
+  r Feature#206.metal f32:0x42400000
   r Feature#206.dead 379
   r Feature#206.reclamate 231
   r Feature#207.seqburn null
@@ -15155,6 +15569,8 @@ call 182 Apply
   r Feature#207.seqreclamateshad null
   r Feature#207.burnTime 0
   r Feature#207.damage 272
+  r Feature#207.energy f32:0x00000000
+  r Feature#207.metal f32:0x42fa0000
   r Feature#207.dead 380
   r Feature#207.reclamate 231
   r Feature#208.seqburn null
@@ -15165,6 +15581,8 @@ call 182 Apply
   r Feature#208.seqreclamateshad null
   r Feature#208.burnTime 0
   r Feature#208.damage 342
+  r Feature#208.energy f32:0x44a48000
+  r Feature#208.metal f32:0x00000000
   r Feature#208.dead 65535
   r Feature#208.reclamate 231
   r Feature#209.seqburn null
@@ -15175,6 +15593,8 @@ call 182 Apply
   r Feature#209.seqreclamateshad null
   r Feature#209.burnTime 0
   r Feature#209.damage 794
+  r Feature#209.energy f32:0x00000000
+  r Feature#209.metal f32:0x44ce8000
   r Feature#209.dead 65535
   r Feature#209.reclamate 231
   r Feature#210.seqburn null
@@ -15185,6 +15605,8 @@ call 182 Apply
   r Feature#210.seqreclamateshad null
   r Feature#210.burnTime 0
   r Feature#210.damage 592
+  r Feature#210.energy f32:0x00000000
+  r Feature#210.metal f32:0x42ce0000
   r Feature#210.dead 381
   r Feature#210.reclamate 231
   r Feature#211.seqburn null
@@ -15195,6 +15617,8 @@ call 182 Apply
   r Feature#211.seqreclamateshad null
   r Feature#211.burnTime 0
   r Feature#211.damage 24000
+  r Feature#211.energy f32:0x00000000
+  r Feature#211.metal f32:0x4461c000
   r Feature#211.dead 65535
   r Feature#211.reclamate 231
   r Feature#212.seqburn null
@@ -15205,6 +15629,8 @@ call 182 Apply
   r Feature#212.seqreclamateshad null
   r Feature#212.burnTime 0
   r Feature#212.damage 3280
+  r Feature#212.energy f32:0x00000000
+  r Feature#212.metal f32:0x44288000
   r Feature#212.dead 382
   r Feature#212.reclamate 231
   r Feature#213.seqburn null
@@ -15215,6 +15641,8 @@ call 182 Apply
   r Feature#213.seqreclamateshad null
   r Feature#213.burnTime 0
   r Feature#213.damage 24000
+  r Feature#213.energy f32:0x00000000
+  r Feature#213.metal f32:0x43f00000
   r Feature#213.dead 65535
   r Feature#213.reclamate 231
   r Feature#214.seqburn null
@@ -15225,6 +15653,8 @@ call 182 Apply
   r Feature#214.seqreclamateshad null
   r Feature#214.burnTime 0
   r Feature#214.damage 2240
+  r Feature#214.energy f32:0x00000000
+  r Feature#214.metal f32:0x463b4800
   r Feature#214.dead 383
   r Feature#214.reclamate 231
   r Feature#215.seqburn null
@@ -15235,6 +15665,8 @@ call 182 Apply
   r Feature#215.seqreclamateshad null
   r Feature#215.burnTime 0
   r Feature#215.damage 864
+  r Feature#215.energy f32:0x00000000
+  r Feature#215.metal f32:0x44020000
   r Feature#215.dead 65535
   r Feature#215.reclamate 231
   r Feature#216.seqburn null
@@ -15245,6 +15677,8 @@ call 182 Apply
   r Feature#216.seqreclamateshad null
   r Feature#216.burnTime 0
   r Feature#216.damage 640
+  r Feature#216.energy f32:0x00000000
+  r Feature#216.metal f32:0x42ec0000
   r Feature#216.dead 384
   r Feature#216.reclamate 231
   r Feature#217.seqburn null
@@ -15255,6 +15689,8 @@ call 182 Apply
   r Feature#217.seqreclamateshad null
   r Feature#217.burnTime 0
   r Feature#217.damage 24000
+  r Feature#217.energy f32:0x00000000
+  r Feature#217.metal f32:0x42820000
   r Feature#217.dead 65535
   r Feature#217.reclamate 231
   r Feature#218.seqburn null
@@ -15265,6 +15701,8 @@ call 182 Apply
   r Feature#218.seqreclamateshad null
   r Feature#218.burnTime 0
   r Feature#218.damage 24000
+  r Feature#218.energy f32:0x00000000
+  r Feature#218.metal f32:0x443a4000
   r Feature#218.dead 65535
   r Feature#218.reclamate 231
   r Feature#219.seqburn null
@@ -15275,6 +15713,8 @@ call 182 Apply
   r Feature#219.seqreclamateshad null
   r Feature#219.burnTime 0
   r Feature#219.damage 1172
+  r Feature#219.energy f32:0x00000000
+  r Feature#219.metal f32:0x44910000
   r Feature#219.dead 385
   r Feature#219.reclamate 231
   r Feature#220.seqburn null
@@ -15285,6 +15725,8 @@ call 182 Apply
   r Feature#220.seqreclamateshad null
   r Feature#220.burnTime 0
   r Feature#220.damage 2048
+  r Feature#220.energy f32:0x00000000
+  r Feature#220.metal f32:0x44aac000
   r Feature#220.dead 386
   r Feature#220.reclamate 231
   r Feature#221.seqburn null
@@ -15295,6 +15737,8 @@ call 182 Apply
   r Feature#221.seqreclamateshad null
   r Feature#221.burnTime 0
   r Feature#221.damage 24000
+  r Feature#221.energy f32:0x00000000
+  r Feature#221.metal f32:0x44318000
   r Feature#221.dead 387
   r Feature#221.reclamate 231
   r Feature#222.seqburn null
@@ -15305,6 +15749,8 @@ call 182 Apply
   r Feature#222.seqreclamateshad null
   r Feature#222.burnTime 0
   r Feature#222.damage 24000
+  r Feature#222.energy f32:0x00000000
+  r Feature#222.metal f32:0x44318000
   r Feature#222.dead 65535
   r Feature#222.reclamate 231
   r Feature#223.seqburn null
@@ -15315,6 +15761,8 @@ call 182 Apply
   r Feature#223.seqreclamateshad null
   r Feature#223.burnTime 0
   r Feature#223.damage 1217
+  r Feature#223.energy f32:0x00000000
+  r Feature#223.metal f32:0x43600000
   r Feature#223.dead 388
   r Feature#223.reclamate 231
   r Feature#224.seqburn null
@@ -15325,6 +15773,8 @@ call 182 Apply
   r Feature#224.seqreclamateshad null
   r Feature#224.burnTime 0
   r Feature#224.damage 1140
+  r Feature#224.energy f32:0x00000000
+  r Feature#224.metal f32:0x45b44000
   r Feature#224.dead 389
   r Feature#224.reclamate 231
   r Feature#225.seqburn null
@@ -15335,6 +15785,8 @@ call 182 Apply
   r Feature#225.seqreclamateshad null
   r Feature#225.burnTime 0
   r Feature#225.damage 284
+  r Feature#225.energy f32:0x00000000
+  r Feature#225.metal f32:0x42c80000
   r Feature#225.dead 390
   r Feature#225.reclamate 231
   r Feature#226.seqburn null
@@ -15345,6 +15797,8 @@ call 182 Apply
   r Feature#226.seqreclamateshad null
   r Feature#226.burnTime 0
   r Feature#226.damage 1400
+  r Feature#226.energy f32:0x00000000
+  r Feature#226.metal f32:0x438c0000
   r Feature#226.dead 391
   r Feature#226.reclamate 231
   r Feature#227.seqburn null
@@ -15355,6 +15809,8 @@ call 182 Apply
   r Feature#227.seqreclamateshad null
   r Feature#227.burnTime 0
   r Feature#227.damage 1502
+  r Feature#227.energy f32:0x00000000
+  r Feature#227.metal f32:0x44d6a000
   r Feature#227.dead 65535
   r Feature#227.reclamate 231
   r Feature#228.seqburn null
@@ -15365,6 +15821,8 @@ call 182 Apply
   r Feature#228.seqreclamateshad null
   r Feature#228.burnTime 0
   r Feature#228.damage 280
+  r Feature#228.energy f32:0x00000000
+  r Feature#228.metal f32:0x42940000
   r Feature#228.dead 392
   r Feature#228.reclamate 231
   r Feature#229.seqburn null
@@ -15375,6 +15833,8 @@ call 182 Apply
   r Feature#229.seqreclamateshad null
   r Feature#229.burnTime 0
   r Feature#229.damage 2040
+  r Feature#229.energy f32:0x00000000
+  r Feature#229.metal f32:0x43f00000
   r Feature#229.dead 393
   r Feature#229.reclamate 231
   r Feature#230.seqburn null
@@ -15385,6 +15845,8 @@ call 182 Apply
   r Feature#230.seqreclamateshad null
   r Feature#230.burnTime 0
   r Feature#230.damage 1430
+  r Feature#230.energy f32:0x00000000
+  r Feature#230.metal f32:0x42300000
   r Feature#230.dead 394
   r Feature#230.reclamate 231
   r Feature#231.seqburn null
@@ -15395,6 +15857,8 @@ call 182 Apply
   r Feature#231.seqreclamateshad null
   r Feature#231.burnTime 0
   r Feature#231.damage 0
+  r Feature#231.energy f32:0x00000000
+  r Feature#231.metal f32:0x00000000
   r Feature#231.dead 231
   r Feature#231.reclamate 65535
   r Feature#232.seqburn null
@@ -15405,6 +15869,8 @@ call 182 Apply
   r Feature#232.seqreclamateshad null
   r Feature#232.burnTime 0
   r Feature#232.damage 0
+  r Feature#232.energy f32:0x42480000
+  r Feature#232.metal f32:0x00000000
   r Feature#232.dead 235
   r Feature#232.reclamate 231
   r Feature#233.seqburn null
@@ -15415,6 +15881,8 @@ call 182 Apply
   r Feature#233.seqreclamateshad null
   r Feature#233.burnTime 0
   r Feature#233.damage 0
+  r Feature#233.energy f32:0x00000000
+  r Feature#233.metal f32:0x00000000
   r Feature#233.dead 233
   r Feature#233.reclamate 65535
   r Feature#234.seqburn null
@@ -15425,6 +15893,8 @@ call 182 Apply
   r Feature#234.seqreclamateshad null
   r Feature#234.burnTime 0
   r Feature#234.damage 0
+  r Feature#234.energy f32:0x42480000
+  r Feature#234.metal f32:0x00000000
   r Feature#234.dead 231
   r Feature#234.reclamate 231
   r Feature#235.seqburn null
@@ -15435,6 +15905,8 @@ call 182 Apply
   r Feature#235.seqreclamateshad null
   r Feature#235.burnTime 0
   r Feature#235.damage 0
+  r Feature#235.energy f32:0x00000000
+  r Feature#235.metal f32:0x00000000
   r Feature#235.dead 235
   r Feature#235.reclamate 65535
   r Feature#236.seqburn null
@@ -15445,6 +15917,8 @@ call 182 Apply
   r Feature#236.seqreclamateshad null
   r Feature#236.burnTime 0
   r Feature#236.damage 0
+  r Feature#236.energy f32:0x42480000
+  r Feature#236.metal f32:0x00000000
   r Feature#236.dead 238
   r Feature#236.reclamate 238
   r Feature#237.seqburn null
@@ -15455,6 +15929,8 @@ call 182 Apply
   r Feature#237.seqreclamateshad null
   r Feature#237.burnTime 0
   r Feature#237.damage 0
+  r Feature#237.energy f32:0x42480000
+  r Feature#237.metal f32:0x00000000
   r Feature#237.dead 235
   r Feature#237.reclamate 235
   r Feature#238.seqburn null
@@ -15465,6 +15941,8 @@ call 182 Apply
   r Feature#238.seqreclamateshad null
   r Feature#238.burnTime 0
   r Feature#238.damage 0
+  r Feature#238.energy f32:0x00000000
+  r Feature#238.metal f32:0x00000000
   r Feature#238.dead 238
   r Feature#238.reclamate 65535
   r Feature#239.seqburn null
@@ -15475,6 +15953,8 @@ call 182 Apply
   r Feature#239.seqreclamateshad null
   r Feature#239.burnTime 0
   r Feature#239.damage 0
+  r Feature#239.energy f32:0x42480000
+  r Feature#239.metal f32:0x00000000
   r Feature#239.dead 238
   r Feature#239.reclamate 238
   r Feature#240.seqburn null
@@ -15485,6 +15965,8 @@ call 182 Apply
   r Feature#240.seqreclamateshad null
   r Feature#240.burnTime 0
   r Feature#240.damage 0
+  r Feature#240.energy f32:0x42480000
+  r Feature#240.metal f32:0x00000000
   r Feature#240.dead 231
   r Feature#240.reclamate 231
   r Feature#241.seqburn null
@@ -15495,6 +15977,8 @@ call 182 Apply
   r Feature#241.seqreclamateshad null
   r Feature#241.burnTime 0
   r Feature#241.damage 1680
+  r Feature#241.energy f32:0x00000000
+  r Feature#241.metal f32:0x445d0000
   r Feature#241.dead 65535
   r Feature#241.reclamate 231
   r Feature#242.seqburn null
@@ -15505,6 +15989,8 @@ call 182 Apply
   r Feature#242.seqreclamateshad null
   r Feature#242.burnTime 0
   r Feature#242.damage 832
+  r Feature#242.energy f32:0x00000000
+  r Feature#242.metal f32:0x42f00000
   r Feature#242.dead 65535
   r Feature#242.reclamate 231
   r Feature#243.seqburn null
@@ -15515,6 +16001,8 @@ call 182 Apply
   r Feature#243.seqreclamateshad null
   r Feature#243.burnTime 0
   r Feature#243.damage 964
+  r Feature#243.energy f32:0x00000000
+  r Feature#243.metal f32:0x43400000
   r Feature#243.dead 65535
   r Feature#243.reclamate 231
   r Feature#244.seqburn null
@@ -15525,6 +16013,8 @@ call 182 Apply
   r Feature#244.seqreclamateshad null
   r Feature#244.burnTime 0
   r Feature#244.damage 2404
+  r Feature#244.energy f32:0x00000000
+  r Feature#244.metal f32:0x4448c000
   r Feature#244.dead 65535
   r Feature#244.reclamate 231
   r Feature#245.seqburn null
@@ -15535,6 +16025,8 @@ call 182 Apply
   r Feature#245.seqreclamateshad null
   r Feature#245.burnTime 0
   r Feature#245.damage 663
+  r Feature#245.energy f32:0x00000000
+  r Feature#245.metal f32:0x44484000
   r Feature#245.dead 395
   r Feature#245.reclamate 231
   r Feature#246.seqburn null
@@ -15545,6 +16037,8 @@ call 182 Apply
   r Feature#246.seqreclamateshad null
   r Feature#246.burnTime 0
   r Feature#246.damage 624
+  r Feature#246.energy f32:0x00000000
+  r Feature#246.metal f32:0x43f80000
   r Feature#246.dead 65535
   r Feature#246.reclamate 231
   r Feature#247.seqburn null
@@ -15555,6 +16049,8 @@ call 182 Apply
   r Feature#247.seqreclamateshad null
   r Feature#247.burnTime 0
   r Feature#247.damage 320
+  r Feature#247.energy f32:0x00000000
+  r Feature#247.metal f32:0x42cc0000
   r Feature#247.dead 65535
   r Feature#247.reclamate 231
   r Feature#248.seqburn null
@@ -15565,6 +16061,8 @@ call 182 Apply
   r Feature#248.seqreclamateshad null
   r Feature#248.burnTime 0
   r Feature#248.damage 1128
+  r Feature#248.energy f32:0x00000000
+  r Feature#248.metal f32:0x44c74000
   r Feature#248.dead 65535
   r Feature#248.reclamate 231
   r Feature#249.seqburn null
@@ -15575,6 +16073,8 @@ call 182 Apply
   r Feature#249.seqreclamateshad null
   r Feature#249.burnTime 0
   r Feature#249.damage 1480
+  r Feature#249.energy f32:0x00000000
+  r Feature#249.metal f32:0x43aa0000
   r Feature#249.dead 65535
   r Feature#249.reclamate 231
   r Feature#250.seqburn null
@@ -15585,6 +16085,8 @@ call 182 Apply
   r Feature#250.seqreclamateshad null
   r Feature#250.burnTime 0
   r Feature#250.damage 44
+  r Feature#250.energy f32:0x00000000
+  r Feature#250.metal f32:0x41900000
   r Feature#250.dead 65535
   r Feature#250.reclamate 231
   r Feature#251.seqburn null
@@ -15595,6 +16097,8 @@ call 182 Apply
   r Feature#251.seqreclamateshad null
   r Feature#251.burnTime 0
   r Feature#251.damage 144
+  r Feature#251.energy f32:0x00000000
+  r Feature#251.metal f32:0x41c00000
   r Feature#251.dead 65535
   r Feature#251.reclamate 231
   r Feature#252.seqburn null
@@ -15605,6 +16109,8 @@ call 182 Apply
   r Feature#252.seqreclamateshad null
   r Feature#252.burnTime 0
   r Feature#252.damage 544
+  r Feature#252.energy f32:0x00000000
+  r Feature#252.metal f32:0x432a0000
   r Feature#252.dead 65535
   r Feature#252.reclamate 231
   r Feature#253.seqburn null
@@ -15615,6 +16121,8 @@ call 182 Apply
   r Feature#253.seqreclamateshad null
   r Feature#253.burnTime 0
   r Feature#253.damage 1948
+  r Feature#253.energy f32:0x00000000
+  r Feature#253.metal f32:0x44468000
   r Feature#253.dead 65535
   r Feature#253.reclamate 231
   r Feature#254.seqburn null
@@ -15625,6 +16133,8 @@ call 182 Apply
   r Feature#254.seqreclamateshad null
   r Feature#254.burnTime 0
   r Feature#254.damage 4400
+  r Feature#254.energy f32:0x00000000
+  r Feature#254.metal f32:0x45025000
   r Feature#254.dead 65535
   r Feature#254.reclamate 231
   r Feature#255.seqburn null
@@ -15635,6 +16145,8 @@ call 182 Apply
   r Feature#255.seqreclamateshad null
   r Feature#255.burnTime 0
   r Feature#255.damage 1440
+  r Feature#255.energy f32:0x00000000
+  r Feature#255.metal f32:0x4501a000
   r Feature#255.dead 65535
   r Feature#255.reclamate 231
   r Feature#256.seqburn null
@@ -15645,6 +16157,8 @@ call 182 Apply
   r Feature#256.seqreclamateshad null
   r Feature#256.burnTime 0
   r Feature#256.damage 1682
+  r Feature#256.energy f32:0x00000000
+  r Feature#256.metal f32:0x433b0000
   r Feature#256.dead 65535
   r Feature#256.reclamate 231
   r Feature#257.seqburn null
@@ -15655,6 +16169,8 @@ call 182 Apply
   r Feature#257.seqreclamateshad null
   r Feature#257.burnTime 0
   r Feature#257.damage 560
+  r Feature#257.energy f32:0x00000000
+  r Feature#257.metal f32:0x42400000
   r Feature#257.dead 65535
   r Feature#257.reclamate 231
   r Feature#258.seqburn null
@@ -15665,6 +16181,8 @@ call 182 Apply
   r Feature#258.seqreclamateshad null
   r Feature#258.burnTime 0
   r Feature#258.damage 880
+  r Feature#258.energy f32:0x00000000
+  r Feature#258.metal f32:0x45078000
   r Feature#258.dead 65535
   r Feature#258.reclamate 231
   r Feature#259.seqburn null
@@ -15675,6 +16193,8 @@ call 182 Apply
   r Feature#259.seqreclamateshad null
   r Feature#259.burnTime 0
   r Feature#259.damage 984
+  r Feature#259.energy f32:0x00000000
+  r Feature#259.metal f32:0x42ee0000
   r Feature#259.dead 65535
   r Feature#259.reclamate 231
   r Feature#260.seqburn null
@@ -15685,6 +16205,8 @@ call 182 Apply
   r Feature#260.seqreclamateshad null
   r Feature#260.burnTime 0
   r Feature#260.damage 696
+  r Feature#260.energy f32:0x00000000
+  r Feature#260.metal f32:0x42940000
   r Feature#260.dead 65535
   r Feature#260.reclamate 231
   r Feature#261.seqburn null
@@ -15695,6 +16217,8 @@ call 182 Apply
   r Feature#261.seqreclamateshad null
   r Feature#261.burnTime 0
   r Feature#261.damage 1644
+  r Feature#261.energy f32:0x00000000
+  r Feature#261.metal f32:0x4555a000
   r Feature#261.dead 65535
   r Feature#261.reclamate 231
   r Feature#262.seqburn null
@@ -15705,6 +16229,8 @@ call 182 Apply
   r Feature#262.seqreclamateshad null
   r Feature#262.burnTime 0
   r Feature#262.damage 2000
+  r Feature#262.energy f32:0x00000000
+  r Feature#262.metal f32:0x40c00000
   r Feature#262.dead 396
   r Feature#262.reclamate 397
   r Feature#263.seqburn null
@@ -15715,6 +16241,8 @@ call 182 Apply
   r Feature#263.seqreclamateshad null
   r Feature#263.burnTime 0
   r Feature#263.damage 2048
+  r Feature#263.energy f32:0x00000000
+  r Feature#263.metal f32:0x44344000
   r Feature#263.dead 65535
   r Feature#263.reclamate 231
   r Feature#264.seqburn null
@@ -15725,6 +16253,8 @@ call 182 Apply
   r Feature#264.seqreclamateshad null
   r Feature#264.burnTime 0
   r Feature#264.damage 800
+  r Feature#264.energy f32:0x00000000
+  r Feature#264.metal f32:0x42c00000
   r Feature#264.dead 65535
   r Feature#264.reclamate 231
   r Feature#265.seqburn null
@@ -15735,6 +16265,8 @@ call 182 Apply
   r Feature#265.seqreclamateshad null
   r Feature#265.burnTime 0
   r Feature#265.damage 332
+  r Feature#265.energy f32:0x00000000
+  r Feature#265.metal f32:0x43400000
   r Feature#265.dead 65535
   r Feature#265.reclamate 231
   r Feature#266.seqburn null
@@ -15745,6 +16277,8 @@ call 182 Apply
   r Feature#266.seqreclamateshad null
   r Feature#266.burnTime 0
   r Feature#266.damage 440
+  r Feature#266.energy f32:0x00000000
+  r Feature#266.metal f32:0x42740000
   r Feature#266.dead 65535
   r Feature#266.reclamate 231
   r Feature#267.seqburn null
@@ -15755,6 +16289,8 @@ call 182 Apply
   r Feature#267.seqreclamateshad null
   r Feature#267.burnTime 0
   r Feature#267.damage 63
+  r Feature#267.energy f32:0x00000000
+  r Feature#267.metal f32:0x41700000
   r Feature#267.dead 65535
   r Feature#267.reclamate 231
   r Feature#268.seqburn null
@@ -15765,6 +16301,8 @@ call 182 Apply
   r Feature#268.seqreclamateshad null
   r Feature#268.burnTime 0
   r Feature#268.damage 800
+  r Feature#268.energy f32:0x00000000
+  r Feature#268.metal f32:0x431f0000
   r Feature#268.dead 65535
   r Feature#268.reclamate 231
   r Feature#269.seqburn null
@@ -15775,6 +16313,8 @@ call 182 Apply
   r Feature#269.seqreclamateshad null
   r Feature#269.burnTime 0
   r Feature#269.damage 609
+  r Feature#269.energy f32:0x00000000
+  r Feature#269.metal f32:0x43d60000
   r Feature#269.dead 65535
   r Feature#269.reclamate 231
   r Feature#270.seqburn null
@@ -15785,6 +16325,8 @@ call 182 Apply
   r Feature#270.seqreclamateshad null
   r Feature#270.burnTime 0
   r Feature#270.damage 500
+  r Feature#270.energy f32:0x00000000
+  r Feature#270.metal f32:0x422c0000
   r Feature#270.dead 65535
   r Feature#270.reclamate 231
   r Feature#271.seqburn null
@@ -15795,6 +16337,8 @@ call 182 Apply
   r Feature#271.seqreclamateshad null
   r Feature#271.burnTime 0
   r Feature#271.damage 26
+  r Feature#271.energy f32:0x00000000
+  r Feature#271.metal f32:0x41900000
   r Feature#271.dead 65535
   r Feature#271.reclamate 231
   r Feature#272.seqburn null
@@ -15805,6 +16349,8 @@ call 182 Apply
   r Feature#272.seqreclamateshad null
   r Feature#272.burnTime 0
   r Feature#272.damage 2480
+  r Feature#272.energy f32:0x00000000
+  r Feature#272.metal f32:0x45004000
   r Feature#272.dead 65535
   r Feature#272.reclamate 231
   r Feature#273.seqburn null
@@ -15815,6 +16361,8 @@ call 182 Apply
   r Feature#273.seqreclamateshad null
   r Feature#273.burnTime 0
   r Feature#273.damage 2301
+  r Feature#273.energy f32:0x00000000
+  r Feature#273.metal f32:0x469ca400
   r Feature#273.dead 65535
   r Feature#273.reclamate 231
   r Feature#274.seqburn null
@@ -15825,6 +16373,8 @@ call 182 Apply
   r Feature#274.seqreclamateshad null
   r Feature#274.burnTime 0
   r Feature#274.damage 704
+  r Feature#274.energy f32:0x00000000
+  r Feature#274.metal f32:0x43500000
   r Feature#274.dead 65535
   r Feature#274.reclamate 231
   r Feature#275.seqburn null
@@ -15835,6 +16385,8 @@ call 182 Apply
   r Feature#275.seqreclamateshad null
   r Feature#275.burnTime 0
   r Feature#275.damage 2302
+  r Feature#275.energy f32:0x00000000
+  r Feature#275.metal f32:0x44428000
   r Feature#275.dead 65535
   r Feature#275.reclamate 231
   r Feature#276.seqburn null
@@ -15845,6 +16397,8 @@ call 182 Apply
   r Feature#276.seqreclamateshad null
   r Feature#276.burnTime 0
   r Feature#276.damage 640
+  r Feature#276.energy f32:0x00000000
+  r Feature#276.metal f32:0x42700000
   r Feature#276.dead 65535
   r Feature#276.reclamate 231
   r Feature#277.seqburn null
@@ -15855,6 +16409,8 @@ call 182 Apply
   r Feature#277.seqreclamateshad null
   r Feature#277.burnTime 0
   r Feature#277.damage 984
+  r Feature#277.energy f32:0x00000000
+  r Feature#277.metal f32:0x436a0000
   r Feature#277.dead 65535
   r Feature#277.reclamate 231
   r Feature#278.seqburn null
@@ -15865,6 +16421,8 @@ call 182 Apply
   r Feature#278.seqreclamateshad null
   r Feature#278.burnTime 0
   r Feature#278.damage 1202
+  r Feature#278.energy f32:0x00000000
+  r Feature#278.metal f32:0x44488000
   r Feature#278.dead 65535
   r Feature#278.reclamate 231
   r Feature#279.seqburn null
@@ -15875,6 +16433,8 @@ call 182 Apply
   r Feature#279.seqreclamateshad null
   r Feature#279.burnTime 0
   r Feature#279.damage 368
+  r Feature#279.energy f32:0x00000000
+  r Feature#279.metal f32:0x421c0000
   r Feature#279.dead 65535
   r Feature#279.reclamate 231
   r Feature#280.seqburn null
@@ -15885,6 +16445,8 @@ call 182 Apply
   r Feature#280.seqreclamateshad null
   r Feature#280.burnTime 0
   r Feature#280.damage 484
+  r Feature#280.energy f32:0x00000000
+  r Feature#280.metal f32:0x42600000
   r Feature#280.dead 65535
   r Feature#280.reclamate 231
   r Feature#281.seqburn null
@@ -15895,6 +16457,8 @@ call 182 Apply
   r Feature#281.seqreclamateshad null
   r Feature#281.burnTime 0
   r Feature#281.damage 2152
+  r Feature#281.energy f32:0x00000000
+  r Feature#281.metal f32:0x438d0000
   r Feature#281.dead 65535
   r Feature#281.reclamate 231
   r Feature#282.seqburn null
@@ -15905,6 +16469,8 @@ call 182 Apply
   r Feature#282.seqreclamateshad null
   r Feature#282.burnTime 0
   r Feature#282.damage 794
+  r Feature#282.energy f32:0x00000000
+  r Feature#282.metal f32:0x42840000
   r Feature#282.dead 65535
   r Feature#282.reclamate 231
   r Feature#283.seqburn null
@@ -15915,6 +16481,8 @@ call 182 Apply
   r Feature#283.seqreclamateshad null
   r Feature#283.burnTime 0
   r Feature#283.damage 600
+  r Feature#283.energy f32:0x00000000
+  r Feature#283.metal f32:0x42d20000
   r Feature#283.dead 65535
   r Feature#283.reclamate 231
   r Feature#284.seqburn null
@@ -15925,6 +16493,8 @@ call 182 Apply
   r Feature#284.seqreclamateshad null
   r Feature#284.burnTime 0
   r Feature#284.damage 115
+  r Feature#284.energy f32:0x00000000
+  r Feature#284.metal f32:0x00000000
   r Feature#284.dead 65535
   r Feature#284.reclamate 231
   r Feature#285.seqburn null
@@ -15935,6 +16505,8 @@ call 182 Apply
   r Feature#285.seqreclamateshad null
   r Feature#285.burnTime 0
   r Feature#285.damage 260
+  r Feature#285.energy f32:0x00000000
+  r Feature#285.metal f32:0x44822000
   r Feature#285.dead 65535
   r Feature#285.reclamate 231
   r Feature#286.seqburn null
@@ -15945,6 +16517,8 @@ call 182 Apply
   r Feature#286.seqreclamateshad null
   r Feature#286.burnTime 0
   r Feature#286.damage 128
+  r Feature#286.energy f32:0x00000000
+  r Feature#286.metal f32:0x42180000
   r Feature#286.dead 65535
   r Feature#286.reclamate 231
   r Feature#287.seqburn null
@@ -15955,6 +16529,8 @@ call 182 Apply
   r Feature#287.seqreclamateshad null
   r Feature#287.burnTime 0
   r Feature#287.damage 420
+  r Feature#287.energy f32:0x00000000
+  r Feature#287.metal f32:0x42d40000
   r Feature#287.dead 65535
   r Feature#287.reclamate 231
   r Feature#288.seqburn null
@@ -15965,6 +16541,8 @@ call 182 Apply
   r Feature#288.seqreclamateshad null
   r Feature#288.burnTime 0
   r Feature#288.damage 188
+  r Feature#288.energy f32:0x00000000
+  r Feature#288.metal f32:0x431b0000
   r Feature#288.dead 65535
   r Feature#288.reclamate 231
   r Feature#289.seqburn null
@@ -15975,6 +16553,8 @@ call 182 Apply
   r Feature#289.seqreclamateshad null
   r Feature#289.burnTime 0
   r Feature#289.damage 432
+  r Feature#289.energy f32:0x00000000
+  r Feature#289.metal f32:0x43390000
   r Feature#289.dead 65535
   r Feature#289.reclamate 231
   r Feature#290.seqburn null
@@ -15985,6 +16565,8 @@ call 182 Apply
   r Feature#290.seqreclamateshad null
   r Feature#290.burnTime 0
   r Feature#290.damage 1700
+  r Feature#290.energy f32:0x00000000
+  r Feature#290.metal f32:0x41a00000
   r Feature#290.dead 65535
   r Feature#290.reclamate 231
   r Feature#291.seqburn null
@@ -15995,6 +16577,8 @@ call 182 Apply
   r Feature#291.seqreclamateshad null
   r Feature#291.burnTime 0
   r Feature#291.damage 480
+  r Feature#291.energy f32:0x00000000
+  r Feature#291.metal f32:0x428a0000
   r Feature#291.dead 65535
   r Feature#291.reclamate 231
   r Feature#292.seqburn null
@@ -16005,6 +16589,8 @@ call 182 Apply
   r Feature#292.seqreclamateshad null
   r Feature#292.burnTime 0
   r Feature#292.damage 160
+  r Feature#292.energy f32:0x00000000
+  r Feature#292.metal f32:0x41b80000
   r Feature#292.dead 65535
   r Feature#292.reclamate 231
   r Feature#293.seqburn null
@@ -16015,6 +16601,8 @@ call 182 Apply
   r Feature#293.seqreclamateshad null
   r Feature#293.burnTime 0
   r Feature#293.damage 1258
+  r Feature#293.energy f32:0x00000000
+  r Feature#293.metal f32:0x4416c000
   r Feature#293.dead 65535
   r Feature#293.reclamate 231
   r Feature#294.seqburn null
@@ -16025,6 +16613,8 @@ call 182 Apply
   r Feature#294.seqreclamateshad null
   r Feature#294.burnTime 0
   r Feature#294.damage 1063
+  r Feature#294.energy f32:0x00000000
+  r Feature#294.metal f32:0x42f40000
   r Feature#294.dead 65535
   r Feature#294.reclamate 231
   r Feature#295.seqburn null
@@ -16035,6 +16625,8 @@ call 182 Apply
   r Feature#295.seqreclamateshad null
   r Feature#295.burnTime 0
   r Feature#295.damage 200
+  r Feature#295.energy f32:0x00000000
+  r Feature#295.metal f32:0x41a80000
   r Feature#295.dead 65535
   r Feature#295.reclamate 231
   r Feature#296.seqburn null
@@ -16045,6 +16637,8 @@ call 182 Apply
   r Feature#296.seqreclamateshad null
   r Feature#296.burnTime 0
   r Feature#296.damage 41
+  r Feature#296.energy f32:0x00000000
+  r Feature#296.metal f32:0x40e00000
   r Feature#296.dead 65535
   r Feature#296.reclamate 231
   r Feature#297.seqburn null
@@ -16055,6 +16649,8 @@ call 182 Apply
   r Feature#297.seqreclamateshad null
   r Feature#297.burnTime 0
   r Feature#297.damage 236
+  r Feature#297.energy f32:0x00000000
+  r Feature#297.metal f32:0x42000000
   r Feature#297.dead 65535
   r Feature#297.reclamate 231
   r Feature#298.seqburn null
@@ -16065,6 +16661,8 @@ call 182 Apply
   r Feature#298.seqreclamateshad null
   r Feature#298.burnTime 0
   r Feature#298.damage 576
+  r Feature#298.energy f32:0x00000000
+  r Feature#298.metal f32:0x42500000
   r Feature#298.dead 65535
   r Feature#298.reclamate 231
   r Feature#299.seqburn null
@@ -16075,6 +16673,8 @@ call 182 Apply
   r Feature#299.seqreclamateshad null
   r Feature#299.burnTime 0
   r Feature#299.damage 739
+  r Feature#299.energy f32:0x00000000
+  r Feature#299.metal f32:0x42640000
   r Feature#299.dead 65535
   r Feature#299.reclamate 231
   r Feature#300.seqburn null
@@ -16085,6 +16685,8 @@ call 182 Apply
   r Feature#300.seqreclamateshad null
   r Feature#300.burnTime 0
   r Feature#300.damage 312
+  r Feature#300.energy f32:0x00000000
+  r Feature#300.metal f32:0x440fc000
   r Feature#300.dead 65535
   r Feature#300.reclamate 231
   r Feature#301.seqburn null
@@ -16095,6 +16697,8 @@ call 182 Apply
   r Feature#301.seqreclamateshad null
   r Feature#301.burnTime 0
   r Feature#301.damage 1840
+  r Feature#301.energy f32:0x00000000
+  r Feature#301.metal f32:0x44aae000
   r Feature#301.dead 65535
   r Feature#301.reclamate 231
   r Feature#302.seqburn null
@@ -16105,6 +16709,8 @@ call 182 Apply
   r Feature#302.seqreclamateshad null
   r Feature#302.burnTime 0
   r Feature#302.damage 200
+  r Feature#302.energy f32:0x00000000
+  r Feature#302.metal f32:0x43bb0000
   r Feature#302.dead 65535
   r Feature#302.reclamate 231
   r Feature#303.seqburn null
@@ -16115,6 +16721,8 @@ call 182 Apply
   r Feature#303.seqreclamateshad null
   r Feature#303.burnTime 0
   r Feature#303.damage 261
+  r Feature#303.energy f32:0x00000000
+  r Feature#303.metal f32:0x42680000
   r Feature#303.dead 65535
   r Feature#303.reclamate 231
   r Feature#304.seqburn null
@@ -16125,6 +16733,8 @@ call 182 Apply
   r Feature#304.seqreclamateshad null
   r Feature#304.burnTime 0
   r Feature#304.damage 360
+  r Feature#304.energy f32:0x00000000
+  r Feature#304.metal f32:0x42b80000
   r Feature#304.dead 65535
   r Feature#304.reclamate 231
   r Feature#305.seqburn null
@@ -16135,6 +16745,8 @@ call 182 Apply
   r Feature#305.seqreclamateshad null
   r Feature#305.burnTime 0
   r Feature#305.damage 794
+  r Feature#305.energy f32:0x00000000
+  r Feature#305.metal f32:0x424c0000
   r Feature#305.dead 65535
   r Feature#305.reclamate 231
   r Feature#306.seqburn null
@@ -16145,6 +16757,8 @@ call 182 Apply
   r Feature#306.seqreclamateshad null
   r Feature#306.burnTime 0
   r Feature#306.damage 794
+  r Feature#306.energy f32:0x00000000
+  r Feature#306.metal f32:0x42840000
   r Feature#306.dead 65535
   r Feature#306.reclamate 231
   r Feature#307.seqburn null
@@ -16155,6 +16769,8 @@ call 182 Apply
   r Feature#307.seqreclamateshad null
   r Feature#307.burnTime 0
   r Feature#307.damage 580
+  r Feature#307.energy f32:0x00000000
+  r Feature#307.metal f32:0x45bd2000
   r Feature#307.dead 65535
   r Feature#307.reclamate 231
   r Feature#308.seqburn null
@@ -16165,6 +16781,8 @@ call 182 Apply
   r Feature#308.seqreclamateshad null
   r Feature#308.burnTime 0
   r Feature#308.damage 579
+  r Feature#308.energy f32:0x00000000
+  r Feature#308.metal f32:0x42e20000
   r Feature#308.dead 65535
   r Feature#308.reclamate 231
   r Feature#309.seqburn null
@@ -16175,6 +16793,8 @@ call 182 Apply
   r Feature#309.seqreclamateshad null
   r Feature#309.burnTime 0
   r Feature#309.damage 492
+  r Feature#309.energy f32:0x00000000
+  r Feature#309.metal f32:0x45312000
   r Feature#309.dead 65535
   r Feature#309.reclamate 231
   r Feature#310.seqburn null
@@ -16185,6 +16805,8 @@ call 182 Apply
   r Feature#310.seqreclamateshad null
   r Feature#310.burnTime 0
   r Feature#310.damage 132
+  r Feature#310.energy f32:0x00000000
+  r Feature#310.metal f32:0x42500000
   r Feature#310.dead 65535
   r Feature#310.reclamate 231
   r Feature#311.seqburn null
@@ -16195,6 +16817,8 @@ call 182 Apply
   r Feature#311.seqreclamateshad null
   r Feature#311.burnTime 0
   r Feature#311.damage 650
+  r Feature#311.energy f32:0x00000000
+  r Feature#311.metal f32:0x43100000
   r Feature#311.dead 65535
   r Feature#311.reclamate 231
   r Feature#312.seqburn null
@@ -16205,6 +16829,8 @@ call 182 Apply
   r Feature#312.seqreclamateshad null
   r Feature#312.burnTime 0
   r Feature#312.damage 2064
+  r Feature#312.energy f32:0x00000000
+  r Feature#312.metal f32:0x43780000
   r Feature#312.dead 65535
   r Feature#312.reclamate 231
   r Feature#313.seqburn null
@@ -16215,6 +16841,8 @@ call 182 Apply
   r Feature#313.seqreclamateshad null
   r Feature#313.burnTime 0
   r Feature#313.damage 560
+  r Feature#313.energy f32:0x00000000
+  r Feature#313.metal f32:0x468d3e00
   r Feature#313.dead 65535
   r Feature#313.reclamate 231
   r Feature#314.seqburn null
@@ -16225,6 +16853,8 @@ call 182 Apply
   r Feature#314.seqreclamateshad null
   r Feature#314.burnTime 0
   r Feature#314.damage 340
+  r Feature#314.energy f32:0x00000000
+  r Feature#314.metal f32:0x429e0000
   r Feature#314.dead 65535
   r Feature#314.reclamate 231
   r Feature#315.seqburn null
@@ -16235,6 +16865,8 @@ call 182 Apply
   r Feature#315.seqreclamateshad null
   r Feature#315.burnTime 0
   r Feature#315.damage 141
+  r Feature#315.energy f32:0x00000000
+  r Feature#315.metal f32:0x41a80000
   r Feature#315.dead 65535
   r Feature#315.reclamate 231
   r Feature#316.seqburn null
@@ -16245,6 +16877,8 @@ call 182 Apply
   r Feature#316.seqreclamateshad null
   r Feature#316.burnTime 0
   r Feature#316.damage 128
+  r Feature#316.energy f32:0x00000000
+  r Feature#316.metal f32:0x43a60000
   r Feature#316.dead 65535
   r Feature#316.reclamate 231
   r Feature#317.seqburn null
@@ -16255,6 +16889,8 @@ call 182 Apply
   r Feature#317.seqreclamateshad null
   r Feature#317.burnTime 0
   r Feature#317.damage 700
+  r Feature#317.energy f32:0x00000000
+  r Feature#317.metal f32:0x42d60000
   r Feature#317.dead 65535
   r Feature#317.reclamate 231
   r Feature#318.seqburn null
@@ -16265,6 +16901,8 @@ call 182 Apply
   r Feature#318.seqreclamateshad null
   r Feature#318.burnTime 0
   r Feature#318.damage 1760
+  r Feature#318.energy f32:0x00000000
+  r Feature#318.metal f32:0x445b0000
   r Feature#318.dead 65535
   r Feature#318.reclamate 231
   r Feature#319.seqburn null
@@ -16275,6 +16913,8 @@ call 182 Apply
   r Feature#319.seqreclamateshad null
   r Feature#319.burnTime 0
   r Feature#319.damage 856
+  r Feature#319.energy f32:0x00000000
+  r Feature#319.metal f32:0x43020000
   r Feature#319.dead 65535
   r Feature#319.reclamate 231
   r Feature#320.seqburn null
@@ -16285,6 +16925,8 @@ call 182 Apply
   r Feature#320.seqreclamateshad null
   r Feature#320.burnTime 0
   r Feature#320.damage 976
+  r Feature#320.energy f32:0x00000000
+  r Feature#320.metal f32:0x43360000
   r Feature#320.dead 65535
   r Feature#320.reclamate 231
   r Feature#321.seqburn null
@@ -16295,6 +16937,8 @@ call 182 Apply
   r Feature#321.seqreclamateshad null
   r Feature#321.burnTime 0
   r Feature#321.damage 212
+  r Feature#321.energy f32:0x00000000
+  r Feature#321.metal f32:0x41b00000
   r Feature#321.dead 65535
   r Feature#321.reclamate 231
   r Feature#322.seqburn null
@@ -16305,6 +16949,8 @@ call 182 Apply
   r Feature#322.seqreclamateshad null
   r Feature#322.burnTime 0
   r Feature#322.damage 2536
+  r Feature#322.energy f32:0x00000000
+  r Feature#322.metal f32:0x44454000
   r Feature#322.dead 65535
   r Feature#322.reclamate 231
   r Feature#323.seqburn null
@@ -16315,6 +16961,8 @@ call 182 Apply
   r Feature#323.seqreclamateshad null
   r Feature#323.burnTime 0
   r Feature#323.damage 328
+  r Feature#323.energy f32:0x00000000
+  r Feature#323.metal f32:0x42e40000
   r Feature#323.dead 65535
   r Feature#323.reclamate 231
   r Feature#324.seqburn null
@@ -16325,6 +16973,8 @@ call 182 Apply
   r Feature#324.seqreclamateshad null
   r Feature#324.burnTime 0
   r Feature#324.damage 1540
+  r Feature#324.energy f32:0x00000000
+  r Feature#324.metal f32:0x43a60000
   r Feature#324.dead 65535
   r Feature#324.reclamate 231
   r Feature#325.seqburn null
@@ -16335,6 +16985,8 @@ call 182 Apply
   r Feature#325.seqreclamateshad null
   r Feature#325.burnTime 0
   r Feature#325.damage 40
+  r Feature#325.energy f32:0x00000000
+  r Feature#325.metal f32:0x41880000
   r Feature#325.dead 65535
   r Feature#325.reclamate 231
   r Feature#326.seqburn null
@@ -16345,6 +16997,8 @@ call 182 Apply
   r Feature#326.seqreclamateshad null
   r Feature#326.burnTime 0
   r Feature#326.damage 552
+  r Feature#326.energy f32:0x00000000
+  r Feature#326.metal f32:0x432c0000
   r Feature#326.dead 65535
   r Feature#326.reclamate 231
   r Feature#327.seqburn null
@@ -16355,6 +17009,8 @@ call 182 Apply
   r Feature#327.seqreclamateshad null
   r Feature#327.burnTime 0
   r Feature#327.damage 2060
+  r Feature#327.energy f32:0x00000000
+  r Feature#327.metal f32:0x4442c000
   r Feature#327.dead 65535
   r Feature#327.reclamate 231
   r Feature#328.seqburn null
@@ -16365,6 +17021,8 @@ call 182 Apply
   r Feature#328.seqreclamateshad null
   r Feature#328.burnTime 0
   r Feature#328.damage 4400
+  r Feature#328.energy f32:0x00000000
+  r Feature#328.metal f32:0x45025000
   r Feature#328.dead 65535
   r Feature#328.reclamate 231
   r Feature#329.seqburn null
@@ -16375,6 +17033,8 @@ call 182 Apply
   r Feature#329.seqreclamateshad null
   r Feature#329.burnTime 0
   r Feature#329.damage 24000
+  r Feature#329.energy f32:0x00000000
+  r Feature#329.metal f32:0x44d10000
   r Feature#329.dead 65535
   r Feature#329.reclamate 231
   r Feature#330.seqburn null
@@ -16385,6 +17045,8 @@ call 182 Apply
   r Feature#330.seqreclamateshad null
   r Feature#330.burnTime 0
   r Feature#330.damage 680
+  r Feature#330.energy f32:0x00000000
+  r Feature#330.metal f32:0x46305400
   r Feature#330.dead 65535
   r Feature#330.reclamate 231
   r Feature#331.seqburn null
@@ -16395,6 +17057,8 @@ call 182 Apply
   r Feature#331.seqreclamateshad null
   r Feature#331.burnTime 0
   r Feature#331.damage 2240
+  r Feature#331.energy f32:0x00000000
+  r Feature#331.metal f32:0x43280000
   r Feature#331.dead 65535
   r Feature#331.reclamate 231
   r Feature#332.seqburn null
@@ -16405,6 +17069,8 @@ call 182 Apply
   r Feature#332.seqreclamateshad null
   r Feature#332.burnTime 0
   r Feature#332.damage 568
+  r Feature#332.energy f32:0x00000000
+  r Feature#332.metal f32:0x42500000
   r Feature#332.dead 65535
   r Feature#332.reclamate 231
   r Feature#333.seqburn null
@@ -16415,6 +17081,8 @@ call 182 Apply
   r Feature#333.seqreclamateshad null
   r Feature#333.burnTime 0
   r Feature#333.damage 980
+  r Feature#333.energy f32:0x00000000
+  r Feature#333.metal f32:0x45051000
   r Feature#333.dead 65535
   r Feature#333.reclamate 231
   r Feature#334.seqburn null
@@ -16425,6 +17093,8 @@ call 182 Apply
   r Feature#334.seqreclamateshad null
   r Feature#334.burnTime 0
   r Feature#334.damage 496
+  r Feature#334.energy f32:0x00000000
+  r Feature#334.metal f32:0x42600000
   r Feature#334.dead 65535
   r Feature#334.reclamate 231
   r Feature#335.seqburn null
@@ -16435,6 +17105,8 @@ call 182 Apply
   r Feature#335.seqreclamateshad null
   r Feature#335.burnTime 0
   r Feature#335.damage 660
+  r Feature#335.energy f32:0x00000000
+  r Feature#335.metal f32:0x428c0000
   r Feature#335.dead 65535
   r Feature#335.reclamate 231
   r Feature#336.seqburn null
@@ -16445,6 +17117,8 @@ call 182 Apply
   r Feature#336.seqreclamateshad null
   r Feature#336.burnTime 0
   r Feature#336.damage 1644
+  r Feature#336.energy f32:0x00000000
+  r Feature#336.metal f32:0x4555a000
   r Feature#336.dead 65535
   r Feature#336.reclamate 231
   r Feature#337.seqburn null
@@ -16455,6 +17129,8 @@ call 182 Apply
   r Feature#337.seqreclamateshad null
   r Feature#337.burnTime 0
   r Feature#337.damage 2512
+  r Feature#337.energy f32:0x00000000
+  r Feature#337.metal f32:0x44560000
   r Feature#337.dead 65535
   r Feature#337.reclamate 231
   r Feature#338.seqburn null
@@ -16465,6 +17141,8 @@ call 182 Apply
   r Feature#338.seqreclamateshad null
   r Feature#338.burnTime 0
   r Feature#338.damage 856
+  r Feature#338.energy f32:0x00000000
+  r Feature#338.metal f32:0x42c80000
   r Feature#338.dead 65535
   r Feature#338.reclamate 231
   r Feature#339.seqburn null
@@ -16475,6 +17153,8 @@ call 182 Apply
   r Feature#339.seqreclamateshad null
   r Feature#339.burnTime 0
   r Feature#339.damage 416
+  r Feature#339.energy f32:0x00000000
+  r Feature#339.metal f32:0x42200000
   r Feature#339.dead 65535
   r Feature#339.reclamate 231
   r Feature#340.seqburn null
@@ -16485,6 +17165,8 @@ call 182 Apply
   r Feature#340.seqreclamateshad null
   r Feature#340.burnTime 0
   r Feature#340.damage 252
+  r Feature#340.energy f32:0x00000000
+  r Feature#340.metal f32:0x428c0000
   r Feature#340.dead 65535
   r Feature#340.reclamate 231
   r Feature#341.seqburn null
@@ -16495,6 +17177,8 @@ call 182 Apply
   r Feature#341.seqreclamateshad null
   r Feature#341.burnTime 0
   r Feature#341.damage 67
+  r Feature#341.energy f32:0x00000000
+  r Feature#341.metal f32:0x41700000
   r Feature#341.dead 65535
   r Feature#341.reclamate 231
   r Feature#342.seqburn null
@@ -16505,6 +17189,8 @@ call 182 Apply
   r Feature#342.seqreclamateshad null
   r Feature#342.burnTime 0
   r Feature#342.damage 610
+  r Feature#342.energy f32:0x00000000
+  r Feature#342.metal f32:0x43d60000
   r Feature#342.dead 65535
   r Feature#342.reclamate 231
   r Feature#343.seqburn null
@@ -16515,6 +17201,8 @@ call 182 Apply
   r Feature#343.seqreclamateshad null
   r Feature#343.burnTime 0
   r Feature#343.damage 2400
+  r Feature#343.energy f32:0x00000000
+  r Feature#343.metal f32:0x44fa4000
   r Feature#343.dead 65535
   r Feature#343.reclamate 231
   r Feature#344.seqburn null
@@ -16525,6 +17213,8 @@ call 182 Apply
   r Feature#344.seqreclamateshad null
   r Feature#344.burnTime 0
   r Feature#344.damage 1220
+  r Feature#344.energy f32:0x00000000
+  r Feature#344.metal f32:0x4524b000
   r Feature#344.dead 65535
   r Feature#344.reclamate 231
   r Feature#345.seqburn null
@@ -16535,6 +17225,8 @@ call 182 Apply
   r Feature#345.seqreclamateshad null
   r Feature#345.burnTime 0
   r Feature#345.damage 1975
+  r Feature#345.energy f32:0x00000000
+  r Feature#345.metal f32:0x46524800
   r Feature#345.dead 65535
   r Feature#345.reclamate 231
   r Feature#346.seqburn null
@@ -16545,6 +17237,8 @@ call 182 Apply
   r Feature#346.seqreclamateshad null
   r Feature#346.burnTime 0
   r Feature#346.damage 522
+  r Feature#346.energy f32:0x00000000
+  r Feature#346.metal f32:0x42300000
   r Feature#346.dead 65535
   r Feature#346.reclamate 231
   r Feature#347.seqburn null
@@ -16555,6 +17249,8 @@ call 182 Apply
   r Feature#347.seqreclamateshad null
   r Feature#347.burnTime 0
   r Feature#347.damage 744
+  r Feature#347.energy f32:0x00000000
+  r Feature#347.metal f32:0x434a0000
   r Feature#347.dead 65535
   r Feature#347.reclamate 231
   r Feature#348.seqburn null
@@ -16565,6 +17261,8 @@ call 182 Apply
   r Feature#348.seqreclamateshad null
   r Feature#348.burnTime 0
   r Feature#348.damage 482
+  r Feature#348.energy f32:0x00000000
+  r Feature#348.metal f32:0x432b0000
   r Feature#348.dead 65535
   r Feature#348.reclamate 231
   r Feature#349.seqburn null
@@ -16575,6 +17273,8 @@ call 182 Apply
   r Feature#349.seqreclamateshad null
   r Feature#349.burnTime 0
   r Feature#349.damage 950
+  r Feature#349.energy f32:0x00000000
+  r Feature#349.metal f32:0x436c0000
   r Feature#349.dead 65535
   r Feature#349.reclamate 231
   r Feature#350.seqburn null
@@ -16585,6 +17285,8 @@ call 182 Apply
   r Feature#350.seqreclamateshad null
   r Feature#350.burnTime 0
   r Feature#350.damage 1343
+  r Feature#350.energy f32:0x00000000
+  r Feature#350.metal f32:0x44334000
   r Feature#350.dead 65535
   r Feature#350.reclamate 231
   r Feature#351.seqburn null
@@ -16595,6 +17297,8 @@ call 182 Apply
   r Feature#351.seqreclamateshad null
   r Feature#351.burnTime 0
   r Feature#351.damage 240
+  r Feature#351.energy f32:0x00000000
+  r Feature#351.metal f32:0x42f40000
   r Feature#351.dead 65535
   r Feature#351.reclamate 231
   r Feature#352.seqburn null
@@ -16605,6 +17309,8 @@ call 182 Apply
   r Feature#352.seqreclamateshad null
   r Feature#352.burnTime 0
   r Feature#352.damage 1520
+  r Feature#352.energy f32:0x00000000
+  r Feature#352.metal f32:0x45055000
   r Feature#352.dead 65535
   r Feature#352.reclamate 231
   r Feature#353.seqburn null
@@ -16615,6 +17321,8 @@ call 182 Apply
   r Feature#353.seqreclamateshad null
   r Feature#353.burnTime 0
   r Feature#353.damage 11967
+  r Feature#353.energy f32:0x00000000
+  r Feature#353.metal f32:0x46384c00
   r Feature#353.dead 65535
   r Feature#353.reclamate 231
   r Feature#354.seqburn null
@@ -16625,6 +17333,8 @@ call 182 Apply
   r Feature#354.seqreclamateshad null
   r Feature#354.burnTime 0
   r Feature#354.damage 2080
+  r Feature#354.energy f32:0x00000000
+  r Feature#354.metal f32:0x43880000
   r Feature#354.dead 65535
   r Feature#354.reclamate 231
   r Feature#355.seqburn null
@@ -16635,6 +17345,8 @@ call 182 Apply
   r Feature#355.seqreclamateshad null
   r Feature#355.burnTime 0
   r Feature#355.damage 150
+  r Feature#355.energy f32:0x00000000
+  r Feature#355.metal f32:0x42e80000
   r Feature#355.dead 65535
   r Feature#355.reclamate 231
   r Feature#356.seqburn null
@@ -16645,6 +17357,8 @@ call 182 Apply
   r Feature#356.seqreclamateshad null
   r Feature#356.burnTime 0
   r Feature#356.damage 568
+  r Feature#356.energy f32:0x00000000
+  r Feature#356.metal f32:0x42d60000
   r Feature#356.dead 65535
   r Feature#356.reclamate 231
   r Feature#357.seqburn null
@@ -16655,6 +17369,8 @@ call 182 Apply
   r Feature#357.seqreclamateshad null
   r Feature#357.burnTime 0
   r Feature#357.damage 794
+  r Feature#357.energy f32:0x00000000
+  r Feature#357.metal f32:0x440fc000
   r Feature#357.dead 65535
   r Feature#357.reclamate 231
   r Feature#358.seqburn null
@@ -16665,6 +17381,8 @@ call 182 Apply
   r Feature#358.seqreclamateshad null
   r Feature#358.burnTime 0
   r Feature#358.damage 120
+  r Feature#358.energy f32:0x00000000
+  r Feature#358.metal f32:0x00000000
   r Feature#358.dead 65535
   r Feature#358.reclamate 231
   r Feature#359.seqburn null
@@ -16675,6 +17393,8 @@ call 182 Apply
   r Feature#359.seqreclamateshad null
   r Feature#359.burnTime 0
   r Feature#359.damage 480
+  r Feature#359.energy f32:0x00000000
+  r Feature#359.metal f32:0x42c80000
   r Feature#359.dead 65535
   r Feature#359.reclamate 231
   r Feature#360.seqburn null
@@ -16685,6 +17405,8 @@ call 182 Apply
   r Feature#360.seqreclamateshad null
   r Feature#360.burnTime 0
   r Feature#360.damage 140
+  r Feature#360.energy f32:0x00000000
+  r Feature#360.metal f32:0x41a00000
   r Feature#360.dead 65535
   r Feature#360.reclamate 231
   r Feature#361.seqburn null
@@ -16695,6 +17417,8 @@ call 182 Apply
   r Feature#361.seqreclamateshad null
   r Feature#361.burnTime 0
   r Feature#361.damage 794
+  r Feature#361.energy f32:0x00000000
+  r Feature#361.metal f32:0x42640000
   r Feature#361.dead 65535
   r Feature#361.reclamate 231
   r Feature#362.seqburn null
@@ -16705,6 +17429,8 @@ call 182 Apply
   r Feature#362.seqreclamateshad null
   r Feature#362.burnTime 0
   r Feature#362.damage 560
+  r Feature#362.energy f32:0x00000000
+  r Feature#362.metal f32:0x42960000
   r Feature#362.dead 65535
   r Feature#362.reclamate 231
   r Feature#363.seqburn null
@@ -16715,6 +17441,8 @@ call 182 Apply
   r Feature#363.seqreclamateshad null
   r Feature#363.burnTime 0
   r Feature#363.damage 200
+  r Feature#363.energy f32:0x00000000
+  r Feature#363.metal f32:0x41a80000
   r Feature#363.dead 65535
   r Feature#363.reclamate 231
   r Feature#364.seqburn null
@@ -16725,6 +17453,8 @@ call 182 Apply
   r Feature#364.seqreclamateshad null
   r Feature#364.burnTime 0
   r Feature#364.damage 1172
+  r Feature#364.energy f32:0x00000000
+  r Feature#364.metal f32:0x44110000
   r Feature#364.dead 65535
   r Feature#364.reclamate 231
   r Feature#365.seqburn null
@@ -16735,6 +17465,8 @@ call 182 Apply
   r Feature#365.seqreclamateshad null
   r Feature#365.burnTime 0
   r Feature#365.damage 368
+  r Feature#365.energy f32:0x00000000
+  r Feature#365.metal f32:0x43010000
   r Feature#365.dead 65535
   r Feature#365.reclamate 65535
   r Feature#366.seqburn null
@@ -16745,6 +17477,8 @@ call 182 Apply
   r Feature#366.seqreclamateshad null
   r Feature#366.burnTime 0
   r Feature#366.damage 1045
+  r Feature#366.energy f32:0x00000000
+  r Feature#366.metal f32:0x43000000
   r Feature#366.dead 65535
   r Feature#366.reclamate 231
   r Feature#367.seqburn null
@@ -16755,6 +17489,8 @@ call 182 Apply
   r Feature#367.seqreclamateshad null
   r Feature#367.burnTime 0
   r Feature#367.damage 794
+  r Feature#367.energy f32:0x00000000
+  r Feature#367.metal f32:0x42840000
   r Feature#367.dead 65535
   r Feature#367.reclamate 231
   r Feature#368.seqburn null
@@ -16765,6 +17501,8 @@ call 182 Apply
   r Feature#368.seqreclamateshad null
   r Feature#368.burnTime 0
   r Feature#368.damage 794
+  r Feature#368.energy f32:0x00000000
+  r Feature#368.metal f32:0x42840000
   r Feature#368.dead 65535
   r Feature#368.reclamate 231
   r Feature#369.seqburn null
@@ -16775,6 +17513,8 @@ call 182 Apply
   r Feature#369.seqreclamateshad null
   r Feature#369.burnTime 0
   r Feature#369.damage 2352
+  r Feature#369.energy f32:0x00000000
+  r Feature#369.metal f32:0x443cc000
   r Feature#369.dead 65535
   r Feature#369.reclamate 231
   r Feature#370.seqburn null
@@ -16785,6 +17525,8 @@ call 182 Apply
   r Feature#370.seqreclamateshad null
   r Feature#370.burnTime 0
   r Feature#370.damage 560
+  r Feature#370.energy f32:0x00000000
+  r Feature#370.metal f32:0x42d00000
   r Feature#370.dead 65535
   r Feature#370.reclamate 231
   r Feature#371.seqburn null
@@ -16795,6 +17537,8 @@ call 182 Apply
   r Feature#371.seqreclamateshad null
   r Feature#371.burnTime 0
   r Feature#371.damage 41
+  r Feature#371.energy f32:0x00000000
+  r Feature#371.metal f32:0x41000000
   r Feature#371.dead 65535
   r Feature#371.reclamate 231
   r Feature#372.seqburn null
@@ -16805,6 +17549,8 @@ call 182 Apply
   r Feature#372.seqreclamateshad null
   r Feature#372.burnTime 0
   r Feature#372.damage 846
+  r Feature#372.energy f32:0x00000000
+  r Feature#372.metal f32:0x42880000
   r Feature#372.dead 65535
   r Feature#372.reclamate 231
   r Feature#373.seqburn null
@@ -16815,6 +17561,8 @@ call 182 Apply
   r Feature#373.seqreclamateshad null
   r Feature#373.burnTime 0
   r Feature#373.damage 1611
+  r Feature#373.energy f32:0x00000000
+  r Feature#373.metal f32:0x433d0000
   r Feature#373.dead 65535
   r Feature#373.reclamate 231
   r Feature#374.seqburn null
@@ -16825,6 +17573,8 @@ call 182 Apply
   r Feature#374.seqreclamateshad null
   r Feature#374.burnTime 0
   r Feature#374.damage 240
+  r Feature#374.energy f32:0x00000000
+  r Feature#374.metal f32:0x41f80000
   r Feature#374.dead 65535
   r Feature#374.reclamate 231
   r Feature#375.seqburn null
@@ -16835,6 +17585,8 @@ call 182 Apply
   r Feature#375.seqreclamateshad null
   r Feature#375.burnTime 0
   r Feature#375.damage 915
+  r Feature#375.energy f32:0x00000000
+  r Feature#375.metal f32:0x42ec0000
   r Feature#375.dead 65535
   r Feature#375.reclamate 231
   r Feature#376.seqburn null
@@ -16845,6 +17597,8 @@ call 182 Apply
   r Feature#376.seqreclamateshad null
   r Feature#376.burnTime 0
   r Feature#376.damage 1240
+  r Feature#376.energy f32:0x00000000
+  r Feature#376.metal f32:0x43b10000
   r Feature#376.dead 65535
   r Feature#376.reclamate 231
   r Feature#377.seqburn null
@@ -16855,6 +17609,8 @@ call 182 Apply
   r Feature#377.seqreclamateshad null
   r Feature#377.burnTime 0
   r Feature#377.damage 2048
+  r Feature#377.energy f32:0x00000000
+  r Feature#377.metal f32:0x43c30000
   r Feature#377.dead 65535
   r Feature#377.reclamate 231
   r Feature#378.seqburn null
@@ -16865,6 +17621,8 @@ call 182 Apply
   r Feature#378.seqreclamateshad null
   r Feature#378.burnTime 0
   r Feature#378.damage 261
+  r Feature#378.energy f32:0x00000000
+  r Feature#378.metal f32:0x42680000
   r Feature#378.dead 65535
   r Feature#378.reclamate 231
   r Feature#379.seqburn null
@@ -16875,6 +17633,8 @@ call 182 Apply
   r Feature#379.seqreclamateshad null
   r Feature#379.burnTime 0
   r Feature#379.damage 144
+  r Feature#379.energy f32:0x00000000
+  r Feature#379.metal f32:0x41c00000
   r Feature#379.dead 65535
   r Feature#379.reclamate 231
   r Feature#380.seqburn null
@@ -16885,6 +17645,8 @@ call 182 Apply
   r Feature#380.seqreclamateshad null
   r Feature#380.burnTime 0
   r Feature#380.damage 136
+  r Feature#380.energy f32:0x00000000
+  r Feature#380.metal f32:0x427c0000
   r Feature#380.dead 65535
   r Feature#380.reclamate 231
   r Feature#381.seqburn null
@@ -16895,6 +17657,8 @@ call 182 Apply
   r Feature#381.seqreclamateshad null
   r Feature#381.burnTime 0
   r Feature#381.damage 592
+  r Feature#381.energy f32:0x00000000
+  r Feature#381.metal f32:0x42500000
   r Feature#381.dead 65535
   r Feature#381.reclamate 231
   r Feature#382.seqburn null
@@ -16905,6 +17669,8 @@ call 182 Apply
   r Feature#382.seqreclamateshad null
   r Feature#382.burnTime 0
   r Feature#382.damage 2140
+  r Feature#382.energy f32:0x00000000
+  r Feature#382.metal f32:0x43d08000
   r Feature#382.dead 65535
   r Feature#382.reclamate 231
   r Feature#383.seqburn null
@@ -16915,6 +17681,8 @@ call 182 Apply
   r Feature#383.seqreclamateshad null
   r Feature#383.burnTime 0
   r Feature#383.damage 1120
+  r Feature#383.energy f32:0x00000000
+  r Feature#383.metal f32:0x45bb4800
   r Feature#383.dead 65535
   r Feature#383.reclamate 231
   r Feature#384.seqburn null
@@ -16925,6 +17693,8 @@ call 182 Apply
   r Feature#384.seqreclamateshad null
   r Feature#384.burnTime 0
   r Feature#384.damage 640
+  r Feature#384.energy f32:0x00000000
+  r Feature#384.metal f32:0x426c0000
   r Feature#384.dead 65535
   r Feature#384.reclamate 231
   r Feature#385.seqburn null
@@ -16935,6 +17705,8 @@ call 182 Apply
   r Feature#385.seqreclamateshad null
   r Feature#385.burnTime 0
   r Feature#385.damage 1172
+  r Feature#385.energy f32:0x00000000
+  r Feature#385.metal f32:0x44910000
   r Feature#385.dead 398
   r Feature#385.reclamate 231
   r Feature#386.seqburn null
@@ -16945,6 +17717,8 @@ call 182 Apply
   r Feature#386.seqreclamateshad null
   r Feature#386.burnTime 0
   r Feature#386.damage 2048
+  r Feature#386.energy f32:0x00000000
+  r Feature#386.metal f32:0x442ac000
   r Feature#386.dead 65535
   r Feature#386.reclamate 231
   r Feature#387.seqburn null
@@ -16955,6 +17729,8 @@ call 182 Apply
   r Feature#387.seqreclamateshad null
   r Feature#387.burnTime 0
   r Feature#387.damage 24000
+  r Feature#387.energy f32:0x00000000
+  r Feature#387.metal f32:0x42da0000
   r Feature#387.dead 65535
   r Feature#387.reclamate 231
   r Feature#388.seqburn null
@@ -16965,6 +17741,8 @@ call 182 Apply
   r Feature#388.seqreclamateshad null
   r Feature#388.burnTime 0
   r Feature#388.damage 609
+  r Feature#388.energy f32:0x00000000
+  r Feature#388.metal f32:0x42e00000
   r Feature#388.dead 65535
   r Feature#388.reclamate 231
   r Feature#389.seqburn null
@@ -16975,6 +17753,8 @@ call 182 Apply
   r Feature#389.seqreclamateshad null
   r Feature#389.burnTime 0
   r Feature#389.damage 570
+  r Feature#389.energy f32:0x00000000
+  r Feature#389.metal f32:0x45344000
   r Feature#389.dead 65535
   r Feature#389.reclamate 231
   r Feature#390.seqburn null
@@ -16985,6 +17765,8 @@ call 182 Apply
   r Feature#390.seqreclamateshad null
   r Feature#390.burnTime 0
   r Feature#390.damage 142
+  r Feature#390.energy f32:0x00000000
+  r Feature#390.metal f32:0x42480000
   r Feature#390.dead 65535
   r Feature#390.reclamate 231
   r Feature#391.seqburn null
@@ -16995,6 +17777,8 @@ call 182 Apply
   r Feature#391.seqreclamateshad null
   r Feature#391.burnTime 0
   r Feature#391.damage 700
+  r Feature#391.energy f32:0x00000000
+  r Feature#391.metal f32:0x430c0000
   r Feature#391.dead 65535
   r Feature#391.reclamate 231
   r Feature#392.seqburn null
@@ -17005,6 +17789,8 @@ call 182 Apply
   r Feature#392.seqreclamateshad null
   r Feature#392.burnTime 0
   r Feature#392.damage 140
+  r Feature#392.energy f32:0x00000000
+  r Feature#392.metal f32:0x42140000
   r Feature#392.dead 65535
   r Feature#392.reclamate 231
   r Feature#393.seqburn null
@@ -17015,6 +17801,8 @@ call 182 Apply
   r Feature#393.seqreclamateshad null
   r Feature#393.burnTime 0
   r Feature#393.damage 2040
+  r Feature#393.energy f32:0x00000000
+  r Feature#393.metal f32:0x43700000
   r Feature#393.dead 65535
   r Feature#393.reclamate 231
   r Feature#394.seqburn null
@@ -17025,6 +17813,8 @@ call 182 Apply
   r Feature#394.seqreclamateshad null
   r Feature#394.burnTime 0
   r Feature#394.damage 1430
+  r Feature#394.energy f32:0x00000000
+  r Feature#394.metal f32:0x41b00000
   r Feature#394.dead 65535
   r Feature#394.reclamate 231
   r Feature#395.seqburn null
@@ -17035,6 +17825,8 @@ call 182 Apply
   r Feature#395.seqreclamateshad null
   r Feature#395.burnTime 0
   r Feature#395.damage 624
+  r Feature#395.energy f32:0x00000000
+  r Feature#395.metal f32:0x43f80000
   r Feature#395.dead 65535
   r Feature#395.reclamate 231
   r Feature#396.seqburn null
@@ -17045,6 +17837,8 @@ call 182 Apply
   r Feature#396.seqreclamateshad null
   r Feature#396.burnTime 0
   r Feature#396.damage 0
+  r Feature#396.energy f32:0x00000000
+  r Feature#396.metal f32:0x00000000
   r Feature#396.dead 396
   r Feature#396.reclamate 231
   r Feature#397.seqburn null
@@ -17055,6 +17849,8 @@ call 182 Apply
   r Feature#397.seqreclamateshad null
   r Feature#397.burnTime 0
   r Feature#397.damage 20000
+  r Feature#397.energy f32:0x00000000
+  r Feature#397.metal f32:0x00000000
   r Feature#397.dead 397
   r Feature#397.reclamate 65535
   r Feature#398.seqburn null
@@ -17065,6 +17861,8 @@ call 182 Apply
   r Feature#398.seqreclamateshad null
   r Feature#398.burnTime 0
   r Feature#398.damage 1172
+  r Feature#398.energy f32:0x00000000
+  r Feature#398.metal f32:0x44110000
   r Feature#398.dead 65535
   r Feature#398.reclamate 65535
   r WeaponHit#0.damage 0

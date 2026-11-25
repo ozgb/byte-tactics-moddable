@@ -4873,6 +4873,16 @@ const char* HarnessMapName()
     return s_map;
 }
 
+void HarnessCursorPosition(int* x, int* y)
+{
+    POINT pt;
+    pt.x = 0;
+    pt.y = 0;
+    HarnessGetCursorPos(&pt);
+    *x = pt.x;
+    *y = pt.y;
+}
+
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
     if (!s_testMode || DlIsOn() == 0)

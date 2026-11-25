@@ -15,6 +15,7 @@ int __stdcall RectInsideRect(Rect* a, Rect* b);
 int __stdcall PointInRect(void* region, int x, int y);
 const char* HarnessMapName();
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY);
+void HarnessCursorPosition(int* x, int* y);
 
 extern char* g_game;
 extern float g_lightX;
@@ -57,8 +58,6 @@ enum {
     DISP_WIDTH = 212,
     DISP_HEIGHT = 216,
     DISP_USE_OVERRIDE = 220,
-    DISP_MOUSE_X = 406,
-    DISP_MOUSE_Y = 410,
     DISP_CURSOR_HIDE = 430,
     DISP_CURSOR_SPRITE = 434,
     DISP_CURSOR_THREAD = 462,
@@ -937,6 +936,8 @@ static void DisplayLogFrameEnd(void* displayArg)
     unsigned char palette[256 * 4];
     DlPicture cursor;
     const GafFrame* sprite;
+    int mouseX;
+    int mouseY;
     int i;
     if (DlIsOn() == 0)
         return;
@@ -952,7 +953,8 @@ static void DisplayLogFrameEnd(void* displayArg)
         return;
     }
     PictureOf(sprite, &cursor);
-    HarnessDisplayFrame(palette, &cursor, RdI(display, DISP_MOUSE_X), RdI(display, DISP_MOUSE_Y));
+    HarnessCursorPosition(&mouseX, &mouseY);
+    HarnessDisplayFrame(palette, &cursor, mouseX, mouseY);
 }
 
 static void LogDebris(void* surface, const char* inner, const char* obj, const short* angles)

@@ -50,6 +50,10 @@ PY_SUFFIXES = {".py"}
 
 PUBLISHED_INTERFACES = {
     "lib/bitexact/bitexact.h",
+    "lib/bitexact/bx_game.h",
+    "lib/bitexact/bx_libcmt.h",
+    "lib/bitexact/bx_stl.h",
+    "lib/bitexact/internal.h",
     "src/state/block.h",
     "src/state/game_rand.h",
 }

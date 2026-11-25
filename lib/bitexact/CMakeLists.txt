@@ -18,13 +18,16 @@ else()
 endif()
 
 add_library(bitexact_portable STATIC
-  trig.c math.c strtof.c rand.c qsort.c
+  sqrt.c ext.c dd.c rand.c hypot.c acos.c strtof.c qsort.c shuffle.c fixed_trig.c explosions.c
   "${BITEXACT_ROOT}/cmake/bitexact/sscanf.c"
   "${BX_TABLES_SOURCE}")
 target_include_directories(bitexact_portable PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(bitexact_portable_test test/portable_test.c)
 target_link_libraries(bitexact_portable_test PRIVATE bitexact_portable)
+
+add_executable(bitexact_portable_vectors test/vectors_test.c)
+target_link_libraries(bitexact_portable_vectors PRIVATE bitexact_portable)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles("
@@ -53,12 +56,14 @@ else()
 endif()
 target_compile_options(bitexact_portable PRIVATE ${BX_FLAGS})
 target_compile_options(bitexact_portable_test PRIVATE ${BX_FLAGS})
+target_compile_options(bitexact_portable_vectors PRIVATE ${BX_FLAGS})
 if(NOT MSVC)
   target_compile_options(bitexact_portable PRIVATE -Wno-comment)
 endif()
 if(MSVC)
   target_compile_definitions(bitexact_portable PRIVATE _CRT_SECURE_NO_WARNINGS)
   target_compile_definitions(bitexact_portable_test PRIVATE _CRT_SECURE_NO_WARNINGS)
+  target_compile_definitions(bitexact_portable_vectors PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
 enable_testing()
@@ -67,3 +72,6 @@ add_test(NAME bitexact_portable_hashes
     "-DEXE=$<TARGET_FILE:bitexact_portable_test>"
     "-DEXPECTED=${CMAKE_CURRENT_SOURCE_DIR}/test/portable_hashes.txt"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/test/compare_hashes.cmake")
+
+add_test(NAME bitexact_portable_vectors
+  COMMAND bitexact_portable_vectors "${BITEXACT_ROOT}/tests/runtime/vectors")

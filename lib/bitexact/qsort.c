@@ -1,4 +1,4 @@
-#include "bitexact.h"
+#include "bx_libcmt.h"
 
 #define CUTOFF 8
 #define STKSIZ 30

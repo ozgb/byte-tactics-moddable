@@ -25,7 +25,7 @@ source file; a file with no simulation function is not checked:
   service       declared at depth 0 in interfaces/services.h or src/util/engine_services.h, or a member of a class
                 one of them defines
   host          declared in interfaces/host.h
-  bitexact      a bx_ name, or declared in lib/bitexact/bitexact.h
+  bitexact      a bx_ name, or declared in a lib/bitexact header
   library       a symbol no object of the build defines (the CRT, the MSVC 5 libraries, the imports), or
                 one src/util/operator_new.cpp defines (operator new and delete), or throw info (_TI,
                 _CTA, _CT) or a symbol whose own scope is std (a member or static of a std template)
@@ -196,7 +196,7 @@ STATE_HEADERS = ("interfaces/ref.h",)
 SEAMS_HEADER = "interfaces/seams.h"
 SERVICES_HEADERS = ("interfaces/services.h", "src/util/engine_services.h")
 HOST_HEADER = "interfaces/host.h"
-BITEXACT_HEADER = "lib/bitexact/bitexact.h"
+BITEXACT_HEADERS = "lib/bitexact/*.h"
 SEAM_TABLE = "g_seams"
 REASON = re.compile(r"TODO\(#[0-9]+\): \S")
 VIRTUAL_PREFIX = "virtual "
@@ -591,6 +591,13 @@ def header_names(root: Path, relative: str) -> set:
     return declared(path.read_text(encoding="latin-1")) if path.exists() else set()
 
 
+def bitexact_header_names(root: Path) -> set:
+    names = set()
+    for path in sorted(root.glob(BITEXACT_HEADERS)):
+        names |= declared(path.read_text(encoding="latin-1"))
+    return names
+
+
 @dataclass
 class Rules:
     """What the build allows a subsystem, gathered from the tree and the units."""
@@ -678,7 +685,7 @@ def build_rules(root: Path, units: list) -> Rules:
     for header in STATE_HEADERS:
         state |= header_names(root, header)
     return Rules(by_function, by_file, services, header_names(root, HOST_HEADER), header_names(root, SEAMS_HEADER) | {SEAM_TABLE}, state,
-                 header_names(root, BITEXACT_HEADER), const_names(root), code_defs, data_defs, phase_functions(root))
+                 bitexact_header_names(root), const_names(root), code_defs, data_defs, phase_functions(root))
 
 
 def classify(rules: Rules, subsystem: str, symbol: str, caller: tuple = None):

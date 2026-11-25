@@ -1,4 +1,4 @@
-#include "bitexact.h"
+#include "bx_game.h"
 
 extern bx_i32 g_rotationMatrix[9];
 

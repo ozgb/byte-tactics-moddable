@@ -1,30 +1,27 @@
-"""Generate the bit-exact library's tables as C source, without orig/TotalA.exe.
+"""Generate the bit-exact library's tables as C source, from exact integer arithmetic alone.
 
     uv run tools/bitexact_tables.py [output.c]
 
-The default output is build/bitexact/bx_tables.c. The tables are computed:
-the sine table the hand-written trig in src/util/fixed_trig.cpp reads
-(0x509f00, 640 entries, the cosine a quarter turn on) is
-round(sin(i * 2 * pi / 512) * 0x2000), and the doubles at 0x509ef0 and
-0x509ef8 are the decimal constants 10430.37835047 and 9.587379924285e-05
-(not 0x8000 / pi and pi / 0x8000, which differ in the low bits). tools/bitexact.py checks them
-against the exe's bytes.
+The default output is build/bitexact/bx_tables.c. The tables are:
 
-The exe's x87 code takes sin and cos from fsincos, whose 64-bit results the
-port cannot compute with C doubles. Only 65536 angles reach it, so their
-results are tabulated here: the correctly rounded 64-bit mantissa of sin and
-cos of the double angle * g_angle16ToRad, computed in exact integer
-arithmetic (tools/bitexact.py checks the table against the CPU's fsincos).
-The same arithmetic gives atan(k/16) and pi as double-double constants for
-the port's atan2.
-
-The CRT's text to float conversion (LIBCMT's strgtold12 and ld12mul, in
-lib/bitexact/strtof.c) multiplies by powers of ten from two tables of 29
-entries each, 10^(+-n) for n = 1..7, 8..56 in steps of 8 and so on by
-powers of 8 up to 10^(+-4096), as 12-byte extended values: an 80-bit mantissa
-rounded to nearest and an exponent word. An entry whose low 16 bits are 0x8000 or more is stored one
-unit of the 64-bit mantissa too high, because the multiplier subtracts that unit
-again; tools/bitexact.py checks the tables against the exe.
+- The sine table: 640 signed 16-bit entries, entry i being
+  round(sin(i * 2 * pi / 512) * 0x2000); the cosine is the same table read a
+  quarter turn (128 entries) on.
+- Two doubles, the decimal constants 10430.37835047 and 9.587379924285e-05
+  (the conversion factors between a 16-bit angle, 0x10000 being a full turn,
+  and radians; not 0x8000 / pi and pi / 0x8000, which differ in the low bits).
+- The sine and cosine of every 16-bit angle (65536 entries, the angle taken
+  as signed): the correctly rounded 64-bit mantissa of sin and cos of
+  angle * 9.587379924285e-05, as an 80-bit extended value (mantissa high word,
+  mantissa low word) and a sign/exponent word, computed in exact integer
+  arithmetic. The same arithmetic gives atan(k / 16) for k = 0..16 as a
+  double-double (a pair of doubles), the 12 coefficients (-1)^m / (2m + 1) of
+  the arctangent series as double-doubles, and pi and pi / 2 as double-doubles.
+- The powers of ten 10^n and 10^-n, for n = 1..7, 8..56 in steps of 8 and so
+  on by powers of 8 up to 4096: two tables of 29 entries each, every entry
+  12 bytes, an 80-bit mantissa rounded to nearest and an exponent word. An
+  entry whose low 16 bits are 0x8000 or more is stored one unit of the 64-bit
+  mantissa too high.
 """
 
 import math
@@ -33,15 +30,10 @@ import sys
 from fractions import Fraction
 from pathlib import Path
 
-from sources import ROOT
+ROOT = Path(__file__).resolve().parent.parent
 
 OUT = ROOT / "build/bitexact/bx_tables.c"
-SIN_TABLE = 0x509F00
 SIN_TABLE_LEN = 640
-RAD_TO_ANGLE16 = 0x509EF0
-ANGLE16_TO_RAD = 0x509EF8
-POW10_POS = 0x5116F0
-POW10_NEG = 0x511850
 POW10_ENTRIES = 29
 ATAN_SERIES_TERMS = 12
 
